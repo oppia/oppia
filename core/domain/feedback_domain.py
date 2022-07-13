@@ -188,7 +188,7 @@ class FeedbackMessage:
         full_message_id: str. The ID of the feedback message.
         thread_id: str. The ID of the feedback thread containing this
             message.
-        message_id: str. The ID of the feedback thread message.
+        message_id: int. The ID of the feedback thread message.
         author_id: str. The ID of the message's author.
         updated_status: str. The new status of the feedback thread.
         updated_subject: str. The new feedback thread subject.
@@ -379,7 +379,7 @@ class FeedbackThreadSummary:
             read by the user,
         author_last_message: str. The name of the author of the last message.
         author_second_last_message: str. The name of the author of the second
-            last message.
+            last message and None if no second-to-last message exists.
         exploration_title: str. The title of the exploration to which
             exploration belongs.
         exploration_id: str. The id of the exploration associated to the thread.

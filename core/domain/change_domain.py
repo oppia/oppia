@@ -28,8 +28,8 @@ from typing import Any, Dict, List, Mapping, Union, cast
 
 # Union type defined from allowed types that a Dict can contain for its values.
 AcceptableChangeDictTypes = Union[
-    int,
     str,
+    int,
     None,
     List[str],
     List[Dict[str, Any]],

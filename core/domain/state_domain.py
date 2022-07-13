@@ -34,7 +34,7 @@ from core.domain import param_domain
 from core.domain import translation_domain
 from extensions.objects.models import objects
 
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Mapping, Optional, Sequence, Union
 from typing_extensions import TypedDict
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
@@ -2358,7 +2358,7 @@ class RuleSpecDict(TypedDict):
     """Dictionary representing the RuleSpec object."""
 
     rule_type: str
-    inputs: Dict[str, Any]
+    inputs: Dict[str, Union[str, int, List[str], List[List[str]], Dict[str, Sequence[str]]]]
 
 
 class RuleSpec(translation_domain.BaseTranslatableObject):
@@ -2367,7 +2367,7 @@ class RuleSpec(translation_domain.BaseTranslatableObject):
     def __init__(
         self,
         rule_type: str,
-        inputs: Dict[str, Any]
+        inputs: Mapping[str, Union[str, int, List[str], List[List[str]], Dict[str, Sequence[str]]]]
     ) -> None:
         """Initializes a RuleSpec domain object.
 

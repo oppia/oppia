@@ -56,13 +56,9 @@ class DraftUpgradeUnitTests(test_utils.GenericTestBase):
         self.save_new_valid_exploration(self.EXP_ID, self.USER_ID)
 
     def test_try_upgrade_with_no_version_difference(self) -> None:
-        self.assertEqual(
-            len(
-                draft_upgrade_services.try_upgrading_draft_to_exp_version(
-                    self.DRAFT_CHANGELIST, 1, 1, self.EXP_ID
-                )
-            ), 0
-        )
+        self.assertIsNone(
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                self.DRAFT_CHANGELIST, 1, 1, self.EXP_ID))
 
     def test_try_upgrade_raises_exception_if_versions_are_invalid(self) -> None:
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
@@ -76,13 +72,9 @@ class DraftUpgradeUnitTests(test_utils.GenericTestBase):
             'Changed exploration title.')
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(exploration.version, 2)
-        self.assertEqual(
-            len(
-                draft_upgrade_services.try_upgrading_draft_to_exp_version(
-                    self.DRAFT_CHANGELIST, 1, exploration.version, self.EXP_ID
-                )
-            ), 0
-        )
+        self.assertIsNone(
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                self.DRAFT_CHANGELIST, 1, exploration.version, self.EXP_ID))
 
     def test_try_upgrade_failure_due_to_unsupported_commit_type(self) -> None:
         exp_services.update_exploration(  # type: ignore[no-untyped-call]
@@ -90,13 +82,9 @@ class DraftUpgradeUnitTests(test_utils.GenericTestBase):
             'Changed exploration title.')
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(exploration.version, 2)
-        self.assertEqual(
-            len(
-                draft_upgrade_services.try_upgrading_draft_to_exp_version(
-                    self.DRAFT_CHANGELIST, 1, exploration.version, self.EXP_ID
-                )
-            ), 0
-        )
+        self.assertIsNone(
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                self.DRAFT_CHANGELIST, 1, exploration.version, self.EXP_ID))
 
     def test_try_upgrade_failure_due_to_unimplemented_upgrade_methods(
         self
@@ -106,14 +94,9 @@ class DraftUpgradeUnitTests(test_utils.GenericTestBase):
             'Ran Exploration Migration job.')
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(exploration.version, 2)
-        self.assertEqual(
-            len(
-                draft_upgrade_services.try_upgrading_draft_to_exp_version(
-                    self.DRAFT_CHANGELIST, 1, exploration.version, self.EXP_ID
-                )
-            ), 0
-        )
-
+        self.assertIsNone(
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                self.DRAFT_CHANGELIST, 1, exploration.version, self.EXP_ID))
 
 class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
     """Test the DraftUpgradeUtil module."""
@@ -198,6 +181,8 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
                 draft_change_list_v49, 1, 2, self.EXP_ID)
         )
+        # Ruling out the possibility of None for mypy type checking.
+        assert migrated_draft_change_list_v50 is not None
         # Change draft change lists into a list of dicts so that it is
         # easy to compare the whole draft change list.
         draft_change_list_v49_dict_list = [
@@ -225,6 +210,8 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
                 draft_change_list_v48, 1, 2, self.EXP_ID)
         )
+        # Ruling out the possibility of None for mypy type checking.
+        assert migrated_draft_change_list_v49 is not None
         # Change draft change lists into a list of dicts so that it is
         # easy to compare the whole draft change list.
         draft_change_list_v48_dict_list = [
@@ -278,6 +265,8 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
                 draft_change_list_v47, 1, 2, self.EXP_ID)
         )
+        # Ruling out the possibility of None for mypy type checking.
+        assert migrated_draft_change_list_v48 is not None
         # Change draft change lists into a list of dicts so that it is
         # easy to compare the whole draft change list.
         draft_change_list_v47_dict_list = [
@@ -338,6 +327,8 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
                 draft_change_list_v46, 1, 2, self.EXP_ID)
         )
+        # Ruling out the possibility of None for mypy type checking.
+        assert migrated_draft_change_list_v47 is not None
         # Change draft change lists into a list of dicts so that it is
         # easy to compare the whole draft change list.
         draft_change_list_v46_dict_list = [
@@ -365,6 +356,8 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
                 draft_change_list_v45, 1, 2, self.EXP_ID)
         )
+        # Ruling out the possibility of None for mypy type checking.
+        assert migrated_draft_change_list_v46 is not None
         # Change draft change lists into a list of dicts so that it is
         # easy to compare the whole draft change list.
         draft_change_list_v45_dict_list = [
@@ -392,6 +385,8 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
                 draft_change_list_v44, 1, 2, self.EXP_ID)
         )
+        # Ruling out the possibility of None for mypy type checking.
+        assert migrated_draft_change_list_v45 is not None
         # Change draft change lists into a list of dicts so that it is
         # easy to compare the whole draft change list.
         draft_change_list_v44_dict_list = [
@@ -424,6 +419,8 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
                 draft_change_list_v43, 1, 2, self.EXP_ID)
         )
+        # Ruling out the possibility of None for mypy type checking.
+        assert migrated_draft_change_list_v44 is not None
         # Change draft change lists into a list of dicts so that it is
         # easy to compare the whole draft change list.
         draft_change_list_v43_dict_list = [
@@ -478,11 +475,13 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 draft_change_list_1_v42, 1, 2, self.EXP_ID))
         # Verify that changes which include answer groups are
         # not upgraded to v42.
-        self.assertEqual(len(migrated_draft_change_list_1_v43), 0)
+        self.assertIsNone(migrated_draft_change_list_1_v43)
 
         migrated_draft_change_list_2_v43 = (
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
                 draft_change_list_2_v42, 1, 2, self.EXP_ID))
+        # Ruling out the possibility of None for mypy type checking.
+        assert migrated_draft_change_list_2_v43 is not None
         # Change draft change lists into a list of dicts so that it is
         # easy to compare the whole draft change list.
         draft_change_list_2_v42_dict_list = [
@@ -539,11 +538,13 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 draft_change_list_1_v41, 1, 2, self.EXP_ID))
         # Verify that changes which include answer groups are
         # not upgraded to v41.
-        self.assertEqual(len(migrated_draft_change_list_1_v42), 0)
+        self.assertIsNone(migrated_draft_change_list_1_v42)
 
         migrated_draft_change_list_2_v42 = (
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
                 draft_change_list_2_v41, 1, 2, self.EXP_ID))
+        # Ruling out the possibility of None for mypy type checking.
+        assert migrated_draft_change_list_2_v42 is not None
         # Change draft change lists into a list of dicts so that it is
         # easy to compare the whole draft change list.
         draft_change_list_2_v41_dict_list = [
@@ -600,11 +601,13 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 draft_change_list_1_v40, 1, 2, self.EXP_ID))
         # Verify that changes which include answer groups are
         # not upgraded to v41.
-        self.assertEqual(len(migrated_draft_change_list_1_v41), 0)
+        self.assertIsNone(migrated_draft_change_list_1_v41)
 
         migrated_draft_change_list_2_v41 = (
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
                 draft_change_list_2_v40, 1, 2, self.EXP_ID))
+        # Ruling out the possibility of None for mypy type checking.
+        assert migrated_draft_change_list_2_v41 is not None
         # Change draft change lists into a list of dicts so that it is
         # easy to compare the whole draft change list.
         draft_change_list_2_v40_dict_list = [
@@ -661,11 +664,13 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 draft_change_list_1_v39, 1, 2, self.EXP_ID))
         # Verify that changes which include customization arguments are
         # not upgraded to v40.
-        self.assertEqual(len(migrated_draft_change_list_1_v40), 0)
+        self.assertIsNone(migrated_draft_change_list_1_v40)
 
         migrated_draft_change_list_2_v40 = (
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
                 draft_change_list_2_v39, 1, 2, self.EXP_ID))
+        # Ruling out the possibility of None for mypy type checking.
+        assert migrated_draft_change_list_2_v40 is not None
         # Change draft change lists into a list of dicts so that it is
         # easy to compare the whole draft change list.
         draft_change_list_2_v39_dict_list = [
@@ -700,6 +705,8 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
                 draft_change_list_v38, 1, 2, self.EXP_ID)
         )
+        # Ruling out the possibility of None for mypy type checking.
+        assert migrated_draft_change_list_v39 is not None
         # Change draft change lists into a list of dicts so that it is
         # easy to compare the whole draft change list.
         draft_change_list_v38_dict_list = [
@@ -732,6 +739,8 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
                 draft_change_list_v37, 1, 2, self.EXP_ID)
         )
+        # Ruling out the possibility of None for mypy type checking.
+        assert migrated_draft_change_list_v38 is not None
         # Change draft change lists into a list of dicts so that it is
         # easy to compare the whole draft change list.
         draft_change_list_v37_dict_list = [
@@ -820,6 +829,8 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
                 draft_change_list_v36, 1, 2, self.EXP_ID))
 
+        # Ruling out the possibility of None for mypy type checking.
+        assert migrated_draft_change_list_v37 is not None
         # Change draft change lists into a list of dicts so that it is
         # easy to compare the whole draft change list.
         draft_change_list_v37_dict_list = [
@@ -872,11 +883,13 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
         migrated_draft_change_list_1_v36 = (
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
                 draft_change_list_1_v35, 1, 2, self.EXP_ID))
-        self.assertEqual(len(migrated_draft_change_list_1_v36), 0)
+        self.assertIsNone(migrated_draft_change_list_1_v36)
 
         migrated_draft_change_list_2_v36 = (
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
                 draft_change_list_2_v35, 1, 2, self.EXP_ID))
+        # Ruling out the possibility of None for mypy type checking.
+        assert migrated_draft_change_list_2_v36 is not None
         # Change draft change lists into a list of dicts so that it is
         # easy to compare the whole draft change list.
         draft_change_list_2_v35_dict_list = [
@@ -943,11 +956,13 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
         migrated_draft_change_list_1_v35 = (
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
                 draft_change_list_1_v34, 1, 2, self.EXP_ID))
-        self.assertEqual(len(migrated_draft_change_list_1_v35), 0)
+        self.assertIsNone(migrated_draft_change_list_1_v35)
 
         migrated_draft_change_list_2_v35 = (
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
                 draft_change_list_2_v34, 1, 2, self.EXP_ID))
+        # Ruling out the possibility of None for mypy type checking.
+        assert migrated_draft_change_list_2_v35 is not None
         # Change draft change lists into a list of dicts so that it is
         # easy to compare the whole draft change list.
         draft_change_list_2_v34_dict_list = [
@@ -1161,6 +1176,8 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
         migrated_draft_change_list = (
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
                 draft_change_list, 1, 2, self.EXP_ID))
+        # Ruling out the possibility of None for mypy type checking.
+        assert migrated_draft_change_list is not None
         self.assertEqual(
             migrated_draft_change_list[0].to_dict(),
             exp_domain.ExplorationChange({
@@ -1458,6 +1475,8 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
                 draft_change_list_v32, 1, 2, self.EXP_ID)
         )
+        # Ruling out the possibility of None for mypy type checking.
+        assert migrated_draft_change_list_v33 is not None
         # Change draft change lists into a list of dicts so that it is
         # easy to compare the whole draft change list.
         expected_draft_change_list_v33_dict_list = [
@@ -1490,6 +1509,8 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
                 draft_change_list_v31, 1, 2, self.EXP_ID)
         )
+        # Ruling out the possibility of None for mypy type checking.
+        assert migrated_draft_change_list_v32 is not None
         # Change draft change lists into a list of dicts so that it is
         # easy to compare the whole draft change list.
         draft_change_list_v31_dict_list = [
@@ -1550,6 +1571,8 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
                 draft_change_list_v30, 1, 2, self.EXP_ID)
         )
+        # Ruling out the possibility of None for mypy type checking.
+        assert migrated_draft_change_list_v31 is not None
         # Change draft change lists into a list of dicts so that it is
         # easy to compare the whole draft change list.
         expected_draft_change_list_v31_dict_list = [
@@ -1639,6 +1662,8 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
                 draft_change_list_v29, 1, 2, self.EXP_ID)
         )
+        # Ruling out the possibility of None for mypy type checking.
+        assert migrated_draft_change_list_v30 is not None
         # Change draft change lists into a list of dicts so that it is
         # easy to compare the whole draft change list.
         expected_draft_change_list_v30_dict_list = [
@@ -1671,6 +1696,8 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
                 draft_change_list_v28, 1, 2, self.EXP_ID)
         )
+        # Ruling out the possibility of None for mypy type checking.
+        assert migrated_draft_change_list_v29 is not None
         # Change draft change lists into a list of dicts so that it is
         # easy to compare the whole draft change list.
         draft_change_list_v28_dict_list = [
@@ -1728,6 +1755,8 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
                 draft_change_list_v27, 1, 2, self.EXP_ID)
         )
+        # Ruling out the possibility of None for mypy type checking.
+        assert migrated_draft_change_list_v28 is not None
         # Change draft change lists into a list of dicts so that it is
         # easy to compare the whole draft change list.
         expected_draft_change_list_v28_dict_list = [

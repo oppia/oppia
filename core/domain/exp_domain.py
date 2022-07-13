@@ -2774,7 +2774,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         exp_dict = self.to_dict()
         # The dictionary returned by `to_dict()` method is ExplorationDict
         # and ExplorationDict does not contain `schema_version` key, but here
-        # we are accessing a `schema_version` key which causes MyPy to throw
+        # we are defining a `schema_version` key which causes MyPy to throw
         # error TypedDict has no key 'schema_version'. Thus to silent the error,
         # we used ignore here.
         exp_dict['schema_version'] = self.CURRENT_EXP_SCHEMA_VERSION  # type: ignore[misc]
@@ -3273,7 +3273,7 @@ class ExplorationChangeMergeVerifier:
     # new property is added or deleted which affects or is affected
     # by interaction id and whose changes directly conflicts with
     # interaction id changes.
-    PROPERTIES_CONFLICTING_INTERACTION_ID_CHANGES = [
+    PROPERTIES_CONFLICTING_INTERACTION_ID_CHANGES: List[str] = [
         STATE_PROPERTY_INTERACTION_CUST_ARGS,
         STATE_PROPERTY_INTERACTION_SOLUTION,
         STATE_PROPERTY_INTERACTION_ANSWER_GROUPS
@@ -3285,7 +3285,7 @@ class ExplorationChangeMergeVerifier:
     # new property is added or deleted which affects or is affected
     # by customization args and whose changes directly conflicts with
     # cust args changes.
-    PROPERTIES_CONFLICTING_CUST_ARGS_CHANGES = [
+    PROPERTIES_CONFLICTING_CUST_ARGS_CHANGES: List[str] = [
         STATE_PROPERTY_INTERACTION_SOLUTION,
         STATE_PROPERTY_RECORDED_VOICEOVERS,
         STATE_PROPERTY_INTERACTION_ANSWER_GROUPS
@@ -3297,7 +3297,7 @@ class ExplorationChangeMergeVerifier:
     # new property is added or deleted which affects or is affected
     # by answer groups and whose changes directly conflicts with
     # answer groups changes.
-    PROPERTIES_CONFLICTING_ANSWER_GROUPS_CHANGES = [
+    PROPERTIES_CONFLICTING_ANSWER_GROUPS_CHANGES: List[str] = [
         STATE_PROPERTY_INTERACTION_SOLUTION,
         STATE_PROPERTY_RECORDED_VOICEOVERS,
         STATE_PROPERTY_INTERACTION_CUST_ARGS
@@ -3309,7 +3309,7 @@ class ExplorationChangeMergeVerifier:
     # new property is added or deleted which affects or is affected
     # by solution and whose changes directly conflicts with
     # solution changes.
-    PROPERTIES_CONFLICTING_SOLUTION_CHANGES = [
+    PROPERTIES_CONFLICTING_SOLUTION_CHANGES: List[str] = [
         STATE_PROPERTY_INTERACTION_ANSWER_GROUPS,
         STATE_PROPERTY_RECORDED_VOICEOVERS,
         STATE_PROPERTY_INTERACTION_CUST_ARGS
@@ -3321,7 +3321,7 @@ class ExplorationChangeMergeVerifier:
     # new property is added or deleted which affects or is affected
     # by voiceovers and whose changes directly conflicts with
     # voiceovers changes.
-    PROPERTIES_CONFLICTING_VOICEOVERS_CHANGES = [
+    PROPERTIES_CONFLICTING_VOICEOVERS_CHANGES: List[str] = [
         STATE_PROPERTY_CONTENT,
         STATE_PROPERTY_INTERACTION_SOLUTION,
         STATE_PROPERTY_INTERACTION_HINTS,
@@ -3333,7 +3333,7 @@ class ExplorationChangeMergeVerifier:
 
     # NON_CONFLICTING_PROPERTIES: List of the properties
     # in which if there are any changes then they are always mergeable.
-    NON_CONFLICTING_PROPERTIES = [
+    NON_CONFLICTING_PROPERTIES: List[str] = [
         STATE_PROPERTY_UNCLASSIFIED_ANSWERS,
         STATE_PROPERTY_NEXT_CONTENT_ID_INDEX,
         STATE_PROPERTY_LINKED_SKILL_ID,
@@ -3344,7 +3344,9 @@ class ExplorationChangeMergeVerifier:
 
         self.added_state_names: List[str] = []
         self.deleted_state_names: List[str] = []
-        self.new_to_old_state_names: Dict[str, str] = {}
+        self.new_to_old_state_names: Dict[str, str] = (
+            collections.defaultdict(str)
+        )
         self.changed_properties: Dict[str, Set[str]] = (
             collections.defaultdict(set)
         )

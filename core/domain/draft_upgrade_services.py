@@ -27,7 +27,7 @@ from core.domain import rules_registry
 from core.domain import state_domain
 from core.platform import models
 
-from typing import Callable, Dict, List
+from typing import Callable, Dict, List, Optional
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -50,7 +50,7 @@ def try_upgrading_draft_to_exp_version(
     current_draft_version: int,
     to_exp_version: int,
     exp_id: str
-) -> List[exp_domain.ExplorationChange]:
+) -> Optional[List[exp_domain.ExplorationChange]]:
     """Try upgrading a list of ExplorationChange domain objects to match the
     latest exploration version.
 
@@ -76,7 +76,7 @@ def try_upgrading_draft_to_exp_version(
         raise utils.InvalidInputException(
             'Current draft version is greater than the exploration version.')
     if current_draft_version == to_exp_version:
-        return []
+        return None
 
     exp_versions = list(range(current_draft_version + 1, to_exp_version + 1))
     commits_list = (
@@ -91,18 +91,18 @@ def try_upgrading_draft_to_exp_version(
                 len(commit.commit_cmds) != 1 or
                 commit.commit_cmds[0]['cmd'] !=
                 exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION):
-            return []
+            return None
         conversion_fn_name = '_convert_states_v%s_dict_to_v%s_dict' % (
             commit.commit_cmds[0]['from_version'],
             commit.commit_cmds[0]['to_version'])
         if not hasattr(DraftUpgradeUtil, conversion_fn_name):
             logging.warning('%s is not implemented' % conversion_fn_name)
-            return []
+            return None
         conversion_fn = getattr(DraftUpgradeUtil, conversion_fn_name)
         try:
             draft_change_list = conversion_fn(draft_change_list)
         except InvalidDraftConversionException:
-            return []
+            return None
         upgrade_times += 1
     return draft_change_list
 

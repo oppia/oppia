@@ -1128,7 +1128,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
     # TODO(#13059): After we fully type the codebase we plan to get
     # rid of the tests that intentionally test wrong inputs that we
     # can normally catch by typing. In this test, only some cases should be
-    # removed, preferably all the type ignore should be removed.
+    # removed, preferably those cases that include type ignores with either
+    # arg-type or assignment.
     def test_validation(self) -> None:
         """Test validation of explorations."""
         exploration = exp_domain.Exploration.create_default_exploration('eid')
@@ -1610,6 +1611,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(  # type: ignore[no-untyped-call]
             exploration, 'Expected \'tags\' to be a list')
 
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
         exploration.tags = [123]  # type: ignore[list-item]
         self._assert_validation_error(exploration, 'to be a string')  # type: ignore[no-untyped-call]
         exploration.tags = ['abc', 123]  # type: ignore[list-item]

@@ -355,12 +355,13 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
             feedback_models.GeneralFeedbackThreadUserModel.get(
                 user_id, thread_id))
 
-        message_ids = (
+        # TODO(#15621): The explicit declaration of type for ndb properties
+        # should be removed. Currently, these ndb properties are annotated with
+        # Any return type. Once we have proper return type we can remove this.
+        message_ids: List[int] = (
             feedback_thread_user_model.message_ids_read_by_user if
             feedback_thread_user_model else []
         )
-        # Ruling out the possibility of any other type for mypy type checking.
-        assert isinstance(message_ids, list)
         return message_ids
 
     def test_get_threads_single_exploration(self) -> None:
