@@ -234,12 +234,6 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
         """
         return cls.query(cls.topic_id == topic_id).fetch()
 
-    @classmethod
-    def delete_all(cls) -> None:
-        """Deletes all entities of this class."""
-        keys = cls.query().fetch(keys_only=True)
-        datastore_services.delete_multi(keys)
-
 
 class SkillOpportunityModel(base_models.BaseModel):
     """Model for opportunities to add questions to skills.
@@ -325,9 +319,3 @@ class SkillOpportunityModel(base_models.BaseModel):
             (cursor.urlsafe().decode('utf-8') if cursor else None),
             more_results
         )
-
-    @classmethod
-    def delete_all(cls) -> None:
-        """Deletes all entities of this class."""
-        keys = cls.query().fetch(keys_only=True)
-        datastore_services.delete_multi(keys)

@@ -164,10 +164,6 @@ describe('Home tab Component', () => {
       .toEqual('I18N_LEARNER_DASHBOARD_MORNING_GREETING');
   });
 
-  it('should get RTL language status correctly', () => {
-    expect(component.isLanguageRTL()).toBeTrue();
-  });
-
   it('should get time of day as afternoon', () => {
     var baseTime = new Date();
     baseTime.setHours(15);

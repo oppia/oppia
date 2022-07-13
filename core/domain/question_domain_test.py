@@ -344,6 +344,11 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         state.interaction.default_outcome.dest = 'abc'
         self._assert_validation_error(
             'Expected all answer groups to have destination as None.')
+        state.interaction.default_outcome.dest = None
+        state.interaction.default_outcome.dest_if_really_stuck = 'pqr'
+        self._assert_validation_error(
+            'Expected all answer groups to have destination for the '
+            'stuck learner as None.')
         state.interaction.default_outcome.labelled_as_correct = False
         self._assert_validation_error(
             'Expected at least one answer group to have a correct answer')
@@ -384,6 +389,38 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
         self._assert_validation_error(
             'Expected all answer groups to have destination as None.')
+
+        state.interaction.answer_groups = [
+            state_domain.AnswerGroup.from_dict({
+                'outcome': {
+                    'dest': None,
+                    'dest_if_really_stuck': 'pqr',
+                    'feedback': {
+                        'content_id': 'feedback_1',
+                        'html': '<p>Feedback</p>'
+                    },
+                    'labelled_as_correct': True,
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None
+                },
+                'rule_specs': [{
+                    'inputs': {
+                        'x': {
+                            'contentId': 'rule_input_4',
+                            'normalizedStrSet': ['Test']
+                        }
+                    },
+                    'rule_type': 'Contains'
+                }],
+                'training_data': [],
+                'tagged_skill_misconception_id': None
+            })
+        ]
+
+        self._assert_validation_error(
+            'Expected all answer groups to have destination for the '
+            'stuck learner as None.')
 
     def test_validate_invalid_list_of_inapplicable_skill_misconception_ids(
             self):

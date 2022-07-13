@@ -209,11 +209,11 @@ class DraftUpgradeUtil:
 
     @classmethod
     def _convert_states_v50_dict_to_v51_dict(cls, draft_change_list):
-        """Converts draft change list from state version 49 to 50. Version 50
-        adds a new dest_if_really_stuck field to the Outcome class to redirect
-        the learners to a state for strengthening concepts. As this is a new
-        property and therefore doesn't affect anypre-existing drafts,
-        there should be no changes to drafts.
+        """Converts from version 50 to 51. Version 51 adds a new
+        dest_if_really_stuck field to Outcome class to redirect learners
+        to a state for strengthening concepts when they get really stuck. As
+        this is a new property and therefore doesn't affect any pre-existing
+        drafts, there should be no changes to drafts.
 
         Args:
             draft_change_list: list(ExplorationChange). The list of

@@ -1034,6 +1034,15 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     raise utils.ValidationError(
                         'Expected outcome dest to be a string, received %s'
                         % answer_group.outcome.dest)
+
+                outcome = answer_group.outcome
+                if outcome.dest_if_really_stuck is not None:
+                    if not isinstance(outcome.dest_if_really_stuck, str):
+                        raise utils.ValidationError(
+                            'Expected dest_if_really_stuck to be a '
+                            'string, received %s' %
+                            outcome.dest_if_really_stuck)
+
             if state.interaction.default_outcome is not None:
                 if not state.interaction.default_outcome.dest:
                     raise utils.ValidationError(
@@ -1042,6 +1051,16 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     raise utils.ValidationError(
                         'Expected outcome dest to be a string, received %s'
                         % state.interaction.default_outcome.dest)
+
+                default_outcome = state.interaction.default_outcome
+                if default_outcome.dest_if_really_stuck is not None:
+                    if not isinstance(
+                        default_outcome.dest_if_really_stuck, str
+                    ):
+                        raise utils.ValidationError(
+                            'Expected dest_if_really_stuck to be a '
+                            'string, received %s'
+                            % default_outcome.dest_if_really_stuck)
 
         if self.states_schema_version is None:
             raise utils.ValidationError(
@@ -1138,10 +1157,27 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         'The destination %s is not a valid state.'
                         % default_outcome.dest)
 
+                # Check default if-stuck destinations.
+                if (
+                    default_outcome.dest_if_really_stuck is not None and
+                    default_outcome.dest_if_really_stuck not in all_state_names
+                ):
+                    raise utils.ValidationError(
+                        'The destination for the stuck learner %s '
+                        'is not a valid state.'
+                        % default_outcome.dest_if_really_stuck)
+
+                if default_outcome.dest_if_really_stuck == state_name:
+                    raise utils.ValidationError(
+                        'The destination for a stuck learner cannot be the '
+                        'same state.')
+
                 # Check that, if the outcome is a non-self-loop, then the
                 # refresher_exploration_id is None.
-                if (default_outcome.refresher_exploration_id is not None and
-                        default_outcome.dest != state_name):
+                if (
+                    default_outcome.refresher_exploration_id is not None and
+                    default_outcome.dest != state_name
+                ):
                     raise utils.ValidationError(
                         'The default outcome for state %s has a refresher '
                         'exploration ID, but is not a self-loop.' % state_name)
@@ -1153,10 +1189,30 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         'The destination %s is not a valid state.'
                         % group.outcome.dest)
 
+                # Check group if-stuck destinations.
+                if (
+                    group.outcome.dest_if_really_stuck is not None and
+                    group.outcome.dest_if_really_stuck not in all_state_names
+                ):
+                    raise utils.ValidationError(
+                        'The destination for the stuck learner %s '
+                        'is not a valid state.'
+                        % group.outcome.dest_if_really_stuck)
+
+                if (
+                    group.outcome.dest_if_really_stuck is not None and
+                    group.outcome.dest_if_really_stuck == state_name
+                ):
+                    raise utils.ValidationError(
+                        'The destination for a stuck learner cannot be the '
+                        'same state.')
+
                 # Check that, if the outcome is a non-self-loop, then the
                 # refresher_exploration_id is None.
-                if (group.outcome.refresher_exploration_id is not None and
-                        group.outcome.dest != state_name):
+                if (
+                    group.outcome.refresher_exploration_id is not None and
+                    group.outcome.dest != state_name
+                ):
                     raise utils.ValidationError(
                         'The outcome for an answer group in state %s has a '
                         'refresher exploration ID, but is not a self-loop.'
@@ -1285,8 +1341,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 if default_outcome is not None:
                     # Check that, if the outcome is a self-loop, then the
                     # outcome is not labelled as correct.
-                    if (default_outcome.dest == state_name and
-                            default_outcome.labelled_as_correct):
+                    if (
+                        default_outcome.dest == state_name and
+                        default_outcome.labelled_as_correct
+                    ):
                         raise utils.ValidationError(
                             'The default outcome for state %s is labelled '
                             'correct but is a self-loop.' % state_name)
@@ -1294,11 +1352,22 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 for group in interaction.answer_groups:
                     # Check that, if the outcome is a self-loop, then the
                     # outcome is not labelled as correct.
-                    if (group.outcome.dest == state_name and
-                            group.outcome.labelled_as_correct):
+                    if (
+                        group.outcome.dest == state_name and
+                        group.outcome.labelled_as_correct
+                    ):
                         raise utils.ValidationError(
                             'The outcome for an answer group in state %s is '
                             'labelled correct but is a self-loop.' % state_name)
+
+                    if (
+                        group.outcome.labelled_as_correct and
+                        group.outcome.dest_if_really_stuck is not None
+                    ):
+                        raise utils.ValidationError(
+                            'The outcome for the state is labelled '
+                            'correct but a destination for the stuck learner '
+                            'is specified.')
 
             if len(warnings_list) > 0:
                 warning_str = ''
@@ -2206,9 +2275,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
     @classmethod
     def _convert_states_v50_dict_to_v51_dict(cls, states_dict):
-        """Converts from version 50 to 51. Version 51 adds
-        a new dest_if_really_stuck field to the Outcome class to redirect
-        the learners to a state for strengthening concepts.
+        """Converts from version 50 to 51. Version 51 adds a new
+        dest_if_really_stuck field to Outcome class to redirect learners
+        to a state for strengthening concepts when they get really stuck.
 
         Args:
             states_dict: dict. A dict where each key-value pair represents,
@@ -2224,7 +2293,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 answer_group['outcome']['dest_if_really_stuck'] = None
 
             if state_dict['interaction']['default_outcome'] is not None:
-                state_dict['interaction']['default_outcome']['dest_if_really_stuck'] = None # pylint: disable=line-too-long
+                state_dict['interaction'][
+                    'default_outcome']['dest_if_really_stuck'] = None
 
         return states_dict
 
@@ -2475,15 +2545,16 @@ class Exploration(translation_domain.BaseTranslatableObject):
     def _convert_v55_dict_to_v56_dict(cls, exploration_dict):
         """Converts a v55 exploration dict into a v56 exploration dict.
         Version 56 adds a new dest_if_really_stuck field to the Outcome class
-        to redirect the learners to a state for strengthening concepts.
+        to redirect the learners to a state for strengthening concepts when
+        they get really stuck.
 
         Args:
             exploration_dict: dict. The dict representation of an exploration
-                with schema version v54.
+                with schema version v55.
 
         Returns:
             dict. The dict representation of the Exploration domain object,
-            following schema version v55.
+            following schema version v56.
         """
         exploration_dict['schema_version'] = 56
 

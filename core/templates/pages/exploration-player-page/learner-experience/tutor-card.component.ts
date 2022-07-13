@@ -55,6 +55,9 @@ const REDUCED_MOTION_ANIMATION_DURATION_IN_MSECS = 2000;
 const CONFETTI_ANIMATION_DELAY_IN_MSECS = 2000;
 const STANDARD_ANIMATION_DURATION_IN_MSECS = 4000;
 
+import './tutor-card.component.css';
+
+
 @Component({
   selector: 'oppia-tutor-card',
   templateUrl: './tutor-card.component.html',
