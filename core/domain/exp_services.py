@@ -1610,7 +1610,8 @@ def regenerate_exploration_and_contributors_summaries(exploration_id):
 
 
 def compute_summary_of_exploration(
-    exploration, exp_rights, exp_summary_model):
+    exploration, exp_rights, exp_summary_model,
+    update_exploration_model_last_updated=True):
     """Create an ExplorationSummary domain object for a given Exploration
     domain object and return it.
 
@@ -1621,6 +1622,8 @@ def compute_summary_of_exploration(
             to compute summary.
         exp_summary_model: ExplorationSummaryModel. The exploration summary
             model, whose summary is computed.
+        update_exploration_model_last_updated: bool. This flag is used to
+            update exploration_model_last_updated, only when required.
 
     Returns:
         ExplorationSummary. The resulting exploration summary domain object.
@@ -1634,12 +1637,15 @@ def compute_summary_of_exploration(
         ratings = feconf.get_empty_ratings()
         scaled_average_rating = feconf.EMPTY_SCALED_AVERAGE_RATING
 
+    if update_exploration_model_last_updated:
+        exploration_model_last_updated = datetime.datetime.fromtimestamp(
+            get_last_updated_by_human_ms(exploration.id) / 1000.0)
+    else:
+        exploration_model_last_updated = exploration.last_updated
+
     contributors_summary = (
         exp_summary_model.contributors_summary if exp_summary_model else {})
     contributor_ids = list(contributors_summary.keys())
-
-    exploration_model_last_updated = datetime.datetime.fromtimestamp(
-        get_last_updated_by_human_ms(exploration.id) / 1000.0)
     exploration_model_created_on = exploration.created_on
     first_published_msec = exp_rights.first_published_msec
     exp_summary = exp_domain.ExplorationSummary(
