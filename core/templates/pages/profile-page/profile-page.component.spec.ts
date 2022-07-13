@@ -575,8 +575,4 @@ describe('Profile page', () => {
     expect(loggerService.error).toHaveBeenCalledWith(
       'Error: cannot decrement page');
   }));
-
-  it('should get RTL language status correctly', () => {
-    expect(componentInstance.isLanguageRTL()).toEqual(true);
-  });
 });
