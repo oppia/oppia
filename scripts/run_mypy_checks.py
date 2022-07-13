@@ -113,8 +113,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/jobs/batch_jobs/blog_validation_jobs_test.py',
     'core/jobs/batch_jobs/exp_search_indexing_jobs.py',
     'core/jobs/batch_jobs/exp_search_indexing_jobs_test.py',
-    'core/jobs/batch_jobs/math_interactions_audit_jobs.py',
-    'core/jobs/batch_jobs/math_interactions_audit_jobs_test.py',
     'core/jobs/batch_jobs/model_validation_jobs.py',
     'core/jobs/batch_jobs/model_validation_jobs_test.py',
     'core/jobs/batch_jobs/opportunity_management_jobs.py',

@@ -24,6 +24,9 @@ from core.jobs.batch_jobs import math_interactions_audit_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
 
+from typing import Type
+from typing_extensions import Final
+
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import datastore_services
@@ -36,10 +39,12 @@ datastore_services = models.Registry.import_datastore_services()
 
 class FindMathExplorationsWithRulesJobTests(job_test_utils.JobTestBase):
 
-    JOB_CLASS = math_interactions_audit_jobs.FindMathExplorationsWithRulesJob
+    JOB_CLASS: Type[
+        math_interactions_audit_jobs.FindMathExplorationsWithRulesJob
+    ] = math_interactions_audit_jobs.FindMathExplorationsWithRulesJob
 
-    EXP_1_ID = 'exp_1_id'
-    EXP_2_ID = 'exp_2_id'
+    EXP_1_ID: Final = 'exp_1_id'
+    EXP_2_ID: Final = 'exp_2_id'
 
     def test_empty_storage(self) -> None:
         self.assert_job_output_is_empty()
