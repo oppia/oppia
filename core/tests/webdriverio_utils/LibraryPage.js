@@ -20,17 +20,17 @@
 var action = require('./action.js');
 var waitFor = require('./waitFor.js');
 
-var LibraryPage = function() {
+var LibraryPage = async function() {
   var LIBRARY_URL_SUFFIX = '/community-library';
 
-  var addToPlayLaterListButton = $('.e2e-test-add-to-playlist-btn');
-  var allCollectionSummaryTile = $('.e2e-test- collection-summary-tile');
-  var allCollectionSummaryTile = $('.e2e-test-collection-summary-tile');
-  var allExplorationSummaryTile = $('.e2e-test-exp-summary-tile');
-  var allExplorationSummaryTile = $('.e2e-test-exp-summary-tile');
-  var expHoverElement = $('.e2e-test-exploration-dashboard-card');
-  var mainHeader = $('.e2e-test-library-main-header');
-  var searchButton = $('.e2e-test-search-button');
+  var addToPlayLaterListButton = await $('.e2e-test-add-to-playlist-btn');
+  var allCollectionSummaryTile = await $('.e2e-test- collection-summary-tile');
+  var allCollectionSummaryTile = await $('.e2e-test-collection-summary-tile');
+  var allExplorationSummaryTile = await $('.e2e-test-exp-summary-tile');
+  var allExplorationSummaryTile = await $('.e2e-test-exp-summary-tile');
+  var expHoverElement = await $('.e2e-test-exploration-dashboard-card');
+  var mainHeader = await $('.e2e-test-library-main-header');
+  var searchButton = await $('.e2e-test-search-button');
   var allExplorationsTitled = function(explorationName) {
     return $$(
       `.e2e-test-exp-summary-tile-title=${explorationName}`);

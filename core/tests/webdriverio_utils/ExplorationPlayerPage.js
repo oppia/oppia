@@ -22,17 +22,19 @@ var waitFor = require('./waitFor.js');
 var action = require('./action.js');
 var interactions = require('../../../extensions/interactions/webdriverio.js');
 
-var ExplorationPlayerPage = function() {
-  var conversationInput = $('.e2e-test-conversation-input');
+var ExplorationPlayerPage = async function() {
+  var conversationInput = await $('.e2e-test-conversation-input');
   var conversationContentSelector = function() {
     return $$('.e2e-test-conversation-content');
   };
-  var explorationHeader = $('.e2e-test-exploration-header');
-  var feedbackCloseButton = $('.e2e-test-exploration-feedback-close-button');
-  var feedbackPopupLink = $('.e2e-test-exploration-feedback-popup-link');
-  var feedbackSubmitButton = $('.e2e-test-exploration-feedback-submit-btn');
-  var feedbackTextArea = $('.e2e-test-exploration-feedback-textarea');
-  var waitingForResponseElem = $('.e2e-test-input-response-loading-dots');
+  var explorationHeader = await $('.e2e-test-exploration-header');
+  var feedbackCloseButton = await $(
+    '.e2e-test-exploration-feedback-close-button');
+  var feedbackPopupLink = await $('.e2e-test-exploration-feedback-popup-link');
+  var feedbackSubmitButton = await $(
+    '.e2e-test-exploration-feedback-submit-btn');
+  var feedbackTextArea = await $('.e2e-test-exploration-feedback-textarea');
+  var waitingForResponseElem = await $('.e2e-test-input-response-loading-dots');
 
   // This verifies the question just asked, including formatting and
   // rich-text components. To do so the richTextInstructions function will be

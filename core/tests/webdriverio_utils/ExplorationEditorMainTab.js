@@ -28,33 +28,34 @@ var action = require('./action.js');
 var _NEW_STATE_OPTION = 'A New Card Called...';
 var _CURRENT_STATE_OPTION = '(try again)';
 
-var ExplorationEditorMainTab = function() {
+var ExplorationEditorMainTab = async function() {
   /*
    * Interactive elements
    */
-  var addOrUpdateSolutionModal = $('.e2e-test-add-or-update-solution-modal');
-  var addResponseDetails = $('.e2e-test-add-response-details');
-  var addResponseHeader = $('.e2e-test-add-response-modal-header');
-  var answerDescription = $('.e2e-test-answer-description');
-  var answerTab = $('.e2e-test-answer-tab');
-  var ckEditorElement = $('.e2e-test-ck-editor');
-  var defaultResponseTab = $('.e2e-test-default-response-tab');
+  var addOrUpdateSolutionModal = await $(
+    '.e2e-test-add-or-update-solution-modal');
+  var addResponseDetails = await $('.e2e-test-add-response-details');
+  var addResponseHeader = await $('.e2e-test-add-response-modal-header');
+  var answerDescription = await $('.e2e-test-answer-description');
+  var answerTab = await $('.e2e-test-answer-tab');
+  var ckEditorElement = await $('.e2e-test-ck-editor');
+  var defaultResponseTab = await $('.e2e-test-default-response-tab');
   var deleteNodeLocator = '.e2e-test-delete-node';
-  var editOutcomeDestAddExplorationId = $(
+  var editOutcomeDestAddExplorationId = await $(
     '.e2e-test-add-refresher-exploration-id');
-  var editOutcomeDestBubble = $('.e2e-test-dest-bubble');
-  var editOutcomeDestDropdownOptions = $(
+  var editOutcomeDestBubble = await $('.e2e-test-dest-bubble');
+  var editOutcomeDestDropdownOptions = await $(
     '.e2e-test-destination-selector-dropdown');
-  var editorWelcomeModal = $('.e2e-test-welcome-modal');
-  var explanationTextAreaElement = $('.e2e-test-explanation-textarea');
-  var explorationGraph = $('.e2e-test-exploration-graph');
-  var fadeIn = $('.e2e-test-editor-cards-container');
-  var feedbackBubble = $('.e2e-test-feedback-bubble');
-  var feedbackEditor = $('.e2e-test-open-feedback-editor');
-  var hintTextElement = $('.e2e-test-hint-text');
-  var interaction = $('.e2e-test-interaction');
-  var interactionEditor = $('.e2e-test-interaction-editor');
-  var interactionHtmlElement = $('.e2e-test-interaction-html');
+  var editorWelcomeModal = await $('.e2e-test-welcome-modal');
+  var explanationTextAreaElement = await $('.e2e-test-explanation-textarea');
+  var explorationGraph = await $('.e2e-test-exploration-graph');
+  var fadeIn = await $('.e2e-test-editor-cards-container');
+  var feedbackBubble = await $('.e2e-test-feedback-bubble');
+  var feedbackEditor = await $('.e2e-test-open-feedback-editor');
+  var hintTextElement = await $('.e2e-test-hint-text');
+  var interaction = await $('.e2e-test-interaction');
+  var interactionEditor = await $('.e2e-test-interaction-editor');
+  var interactionHtmlElement = await $('.e2e-test-interaction-html');
   var interactionTab = function(tabId) {
     return $('.e2e-test-interaction-tab-' + tabId);
   };
@@ -71,57 +72,59 @@ var ExplorationEditorMainTab = function() {
       `.e2e-test-html-multiple-select-option=${optionNum}`);
   };
   var nodeLabelLocator = '.e2e-test-node-label';
-  var openOutcomeDestEditor = $('.e2e-test-open-outcome-dest-editor');
-  var openOutcomeFeedBackEditor = $('.e2e-test-open-outcome-feedback-editor');
-  var postTutorialPopover = $('.ng-joyride .popover-content');
+  var openOutcomeDestEditor = await $('.e2e-test-open-outcome-dest-editor');
+  var openOutcomeFeedBackEditor = await $(
+    '.e2e-test-open-outcome-feedback-editor');
+  var postTutorialPopover = await $('.ng-joyride .popover-content');
   var responseBody = function(responseNum) {
     return $(`.e2e-test-response-body-${responseNum}`);
   };
-  var ruleDetails = $('.e2e-test-rule-details');
-  var stateContentDisplay = $('.e2e-test-state-content-display');
+  var ruleDetails = await $('.e2e-test-rule-details');
+  var stateContentDisplay = await $('.e2e-test-state-content-display');
   var stateContentEditorLocator = '.e2e-test-state-content-editor';
-  var stateEditButton = $('.e2e-test-edit-content-pencil-button');
-  var stateEditorTag = $('.e2e-test-state-content-editor');
-  var stateNameContainer = $('.e2e-test-state-name-container');
-  var stateNameInput = $('.e2e-test-state-name-input');
+  var stateEditButton = await $('.e2e-test-edit-content-pencil-button');
+  var stateEditorTag = await $('.e2e-test-state-content-editor');
+  var stateNameContainer = await $('.e2e-test-state-name-container');
+  var stateNameInput = await $('.e2e-test-state-name-input');
   var stateNodeLabel = function(nodeElement) {
     return nodeElement.$(nodeLabelLocator);
   };
-  var titleElement = $('.ng-joyride-title');
+  var titleElement = await $('.ng-joyride-title');
 
   /*
    * Buttons
    */
-  var addAnswerButton = $('.e2e-test-add-answer');
-  var addHintButton = $('.e2e-test-oppia-add-hint-button');
-  var addInteractionButton = $('.e2e-test-open-add-interaction-modal');
-  var addNewResponseButton = $('.e2e-test-add-new-response');
-  var addResponseButton = $('.e2e-test-open-add-response-modal');
-  var addSolutionButton = $('.e2e-test-oppia-add-solution-button');
-  var answerCorrectnessToggle = $('.e2e-test-editor-correctness-toggle');
-  var cancelOutcomeDestButton = $('.e2e-test-cancel-outcome-dest');
-  var closeAddResponseButton = $('.e2e-test-close-add-response-modal');
-  var confirmDeleteInteractionButton = $(
+  var addAnswerButton = await $('.e2e-test-add-answer');
+  var addHintButton = await $('.e2e-test-oppia-add-hint-button');
+  var addInteractionButton = await $('.e2e-test-open-add-interaction-modal');
+  var addNewResponseButton = await $('.e2e-test-add-new-response');
+  var addResponseButton = await $('.e2e-test-open-add-response-modal');
+  var addSolutionButton = await $('.e2e-test-oppia-add-solution-button');
+  var answerCorrectnessToggle = await $('.e2e-test-editor-correctness-toggle');
+  var cancelOutcomeDestButton = await $('.e2e-test-cancel-outcome-dest');
+  var closeAddResponseButton = await $('.e2e-test-close-add-response-modal');
+  var confirmDeleteInteractionButton = await $(
     '.e2e-test-confirm-delete-interaction');
-  var confirmDeleteResponseButton = $('.e2e-test-confirm-delete-response');
-  var confirmDeleteStateButton = $('.e2e-test-confirm-delete-state');
-  var deleteAnswerButton = $('.e2e-test-delete-answer');
-  var deleteInteractionButton = $('.e2e-test-delete-interaction');
-  var deleteResponseButton = $('.e2e-test-delete-response');
-  var dismissWelcomeModalButton = $('.e2e-test-dismiss-welcome-modal');
-  var saveAnswerButton = $('.e2e-test-save-answer');
-  var saveHintButton = $('.e2e-test-save-hint');
-  var saveInteractionButton = $('.e2e-test-save-interaction');
-  var saveOutcomeDestButton = $('.e2e-test-save-outcome-dest');
-  var saveOutcomeFeedbackButton = $('.e2e-test-save-outcome-feedback');
-  var saveStateContentButton = $('.e2e-test-save-state-content');
-  var startTutorialButton = $('.e2e-test-start-tutorial');
-  var submitSolutionButton = $('.e2e-test-submit-solution-button');
+  var confirmDeleteResponseButton = await $(
+    '.e2e-test-confirm-delete-response');
+  var confirmDeleteStateButton = await $('.e2e-test-confirm-delete-state');
+  var deleteAnswerButton = await $('.e2e-test-delete-answer');
+  var deleteInteractionButton = await $('.e2e-test-delete-interaction');
+  var deleteResponseButton = await $('.e2e-test-delete-response');
+  var dismissWelcomeModalButton = await $('.e2e-test-dismiss-welcome-modal');
+  var saveAnswerButton = await $('.e2e-test-save-answer');
+  var saveHintButton = await $('.e2e-test-save-hint');
+  var saveInteractionButton = await $('.e2e-test-save-interaction');
+  var saveOutcomeDestButton = await $('.e2e-test-save-outcome-dest');
+  var saveOutcomeFeedbackButton = await $('.e2e-test-save-outcome-feedback');
+  var saveStateContentButton = await $('.e2e-test-save-state-content');
+  var startTutorialButton = await $('.e2e-test-start-tutorial');
+  var submitSolutionButton = await $('.e2e-test-submit-solution-button');
 
   /*
    * Symbols
    */
-  var correctAnswerTickMark = $('.e2e-test-correct-tick-mark');
+  var correctAnswerTickMark = await $('.e2e-test-correct-tick-mark');
 
 
   /*
@@ -172,7 +175,7 @@ var ExplorationEditorMainTab = function() {
     ];
     for (const HEADING of tutorialTabHeadings) {
     // Use: await tutorialTabHeadings.forEach(async function(heading) {
-      var tutorialTabHeadingElement = $(`.popover-title=${HEADING}`);
+      var tutorialTabHeadingElement = await $(`.popover-title=${HEADING}`);
       await waitFor.visibilityOf(
         tutorialTabHeadingElement, 'Tutorial: ' + HEADING + 'is not visible');
       // Progress to the next instruction in the tutorial.
@@ -499,7 +502,7 @@ var ExplorationEditorMainTab = function() {
   this.addHint = async function(hint) {
     await action.waitForAutosave();
     await action.click('Add Hint', addHintButton);
-    var addHintModal = $('.e2e-test-hint-modal=Add Hint');
+    var addHintModal = await $('.e2e-test-hint-modal=Add Hint');
     await waitFor.visibilityOf(
       addHintModal, 'Add hint modal takes too long to appear');
     var hintTextButton = await hintTextElement.$$('<p>');

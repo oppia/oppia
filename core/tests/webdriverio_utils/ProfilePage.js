@@ -19,19 +19,20 @@
 
 var waitFor = require('./waitFor.js');
 
-var ProfilePage = function() {
-  var allExplorationCardElement = $('.e2e-test-exploration-dashboard-card');
+var ProfilePage = async function() {
+  var allExplorationCardElement = await $(
+    '.e2e-test-exploration-dashboard-card');
   var allExplorationCardSelector = function() {
     return $$('.e2e-test-exploration-dashboard-card');
   };
-  var bio = $('.e2e-test-profile-bio');
-  var createdExplorationStat = $('.e2e-test-profile-created-stat');
-  var currUserProfilePhoto = $('.e2e-test-profile-current-user-photo');
-  var interestPlaceholder = $('.e2e-test-profile-no-interest');
+  var bio = await $('.e2e-test-profile-bio');
+  var createdExplorationStat = await $('.e2e-test-profile-created-stat');
+  var currUserProfilePhoto = await $('.e2e-test-profile-current-user-photo');
+  var interestPlaceholder = await $('.e2e-test-profile-no-interest');
   var interestsSelector = function() {
     return $$('.e2e-test-profile-interest');
   };
-  var otherUserProfilePhoto = $('.e2e-test-profile-other-user-photo');
+  var otherUserProfilePhoto = await $('.e2e-test-profile-other-user-photo');
 
   this.get = async function(userName) {
     await browser.url('/profile/' + userName);

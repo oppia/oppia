@@ -19,13 +19,13 @@
 var action = require('./action.js');
 var waitFor = require('./waitFor.js');
 
-var SubscriptionDashboardPage = function() {
-  var subscriptionButton = $('.e2e-test-subscription-button');
-  var subscribeLabel = $('.e2e-test-subscribe-label');
+var SubscriptionDashboardPage = async function() {
+  var subscriptionButton = await $('.e2e-test-subscription-button');
+  var subscribeLabel = await $('.e2e-test-subscribe-label');
   var subscriptionNameSelector = function() {
     return $$('.e2e-test-subscription-name');
   };
-  var unsubscribeLabel = $('.e2e-test-unsubscribe-label');
+  var unsubscribeLabel = await $('.e2e-test-unsubscribe-label');
 
   this.navigateToUserSubscriptionPage = async function(userName) {
     await browser.url('/profile/' + userName);

@@ -21,29 +21,30 @@ var action = require('../webdriverio_utils/action.js');
 var waitFor = require('./waitFor.js');
 var workflow = require('../webdriverio_utils/workflow.js');
 
-var PreferencesPage = function() {
+var PreferencesPage = async function() {
   var USER_PREFERENCES_URL = '/preferences';
-  var audioLanguageSelector = $('.e2e-test-audio-language-selector');
-  var createrDashboardRadio = $('.e2e-test-creator-dashboard-radio');
-  var customProfilePhoto = $('.e2e-test-custom-photo');
-  var deleteAccountButton = $('.e2e-test-delete-account-button');
-  var editorRoleEmailsCheckbox = $('.e2e-test-editor-role-email-checkbox');
-  var emailUpdatesCheckbox = $('.e2e-test-email-updates-checkbox');
-  var exportAccountButton = $('.e2e-test-export-account-button');
-  var feedbackMessageEmailsCheckbox = $(
+  var audioLanguageSelector = await $('.e2e-test-audio-language-selector');
+  var createrDashboardRadio = await $('.e2e-test-creator-dashboard-radio');
+  var customProfilePhoto = await $('.e2e-test-custom-photo');
+  var deleteAccountButton = await $('.e2e-test-delete-account-button');
+  var editorRoleEmailsCheckbox = await $(
+    '.e2e-test-editor-role-email-checkbox');
+  var emailUpdatesCheckbox = await $('.e2e-test-email-updates-checkbox');
+  var exportAccountButton = await $('.e2e-test-export-account-button');
+  var feedbackMessageEmailsCheckbox = await $(
     '.e2e-test-feedback-message-email-checkbox');
-  var languageSelector = $('.e2e-test-site-language-selector');
-  var learnerDashboardRadio = $('.e2e-test-learner-dashboard-radio');
-  var navBar = $('.e2e-test-navbar-dropdown-toggle');
-  var pageHeader = $('.e2e-test-preferences-title');
-  var profilePhotoClickable = $('.e2e-test-photo-clickable');
-  var profilePhotoCropper = $('.e2e-test-photo-crop .cropper-container');
-  var profilePhotoUploadError = $('.e2e-test-upload-error');
+  var languageSelector = await $('.e2e-test-site-language-selector');
+  var learnerDashboardRadio = await $('.e2e-test-learner-dashboard-radio');
+  var navBar = await $('.e2e-test-navbar-dropdown-toggle');
+  var pageHeader = await $('.e2e-test-preferences-title');
+  var profilePhotoClickable = await $('.e2e-test-photo-clickable');
+  var profilePhotoCropper = await $('.e2e-test-photo-crop .cropper-container');
+  var profilePhotoUploadError = await $('.e2e-test-upload-error');
   var subscriptionsSelector = function() {
     return $$('.e2e-test-subscription-name');
   };
-  var userBioElement = $('.e2e-test-user-bio');
-  var userInterestsInput = $('.e2e-test-subject-interests-input');
+  var userBioElement = await $('.e2e-test-user-bio');
+  var userInterestsInput = await $('.e2e-test-subject-interests-input');
 
   var saveNewChanges = async function(fieldName) {
     await action.click('Navbar Button', navBar);
@@ -99,14 +100,14 @@ var PreferencesPage = function() {
 
   this.selectSystemLanguage = async function(language) {
     await action.click('system language selector', languageSelector);
-    var dropdownOption = $(`.mat-option-text=${language}`);
+    var dropdownOption = await $(`.mat-option-text=${language}`);
     await action.click('clickable', dropdownOption);
     await saveNewChanges('System Language');
   };
 
   this.selectPreferredAudioLanguage = async function(language) {
     await action.click('clickable', audioLanguageSelector);
-    var dropdownOption = $(`.mat-option-text=${language}`);
+    var dropdownOption = await $(`.mat-option-text=${language}`);
     await action.click('clickable', dropdownOption);
     await saveNewChanges('Preferred Audio Language');
   };

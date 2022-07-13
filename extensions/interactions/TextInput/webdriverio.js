@@ -34,7 +34,7 @@ var customizeInteraction = async function(elem, placeholderText, heightOfBox) {
 
 var expectInteractionDetailsToMatch = async function(
     elem, placeholderText, heightOfBox) {
-  const textInputInteraction = $('<oppia-interactive-text-input>');
+  const textInputInteraction = await $('<oppia-interactive-text-input>');
   // We use presenceOf here instead of visibilityOf because the container
   // has a height and width of 0.
   await waitFor.presenceOf(
@@ -65,7 +65,7 @@ var submitAnswer = async function(elem, answer) {
   var inputElem = textInputElem.$('<input>');
   if (await textAreaElem.isExisting()) {
     await action.setValue('Text Area Input', textAreaElem, answer);
-    var submitAnswerBtn = $('.e2e-test-submit-answer-button');
+    var submitAnswerBtn = await $('.e2e-test-submit-answer-button');
     await action.click('Submit Answer Button', submitAnswerBtn);
   } else {
     // This must be chained in here due to the textInputElem possibly being
@@ -75,7 +75,7 @@ var submitAnswer = async function(elem, answer) {
     if (await inputElem.isExisting()) {
       await action.clear('Text Input Element', inputElem);
       await action.setValue('Text Input Element', inputElem, answer);
-      var submitAnswerBtn = $('.e2e-test-submit-answer-button');
+      var submitAnswerBtn = await $('.e2e-test-submit-answer-button');
       await action.click('Submit Answer Button', submitAnswerBtn);
     }
   }

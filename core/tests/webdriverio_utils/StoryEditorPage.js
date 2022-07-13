@@ -23,23 +23,27 @@ var general = require('./general.js');
 var waitFor = require('./waitFor.js');
 var workflow = require('../webdriverio_utils/workflow.js');
 
-var StoryEditorPage = function() {
+var StoryEditorPage = async function() {
   var EDITOR_URL_PREFIX = '/story_editor/';
-  var thumbnailContainer = $('.e2e-test-thumbnail-container');
-  var returnToTopicButton = $('.e2e-test-return-to-topic-button');
-  var saveStoryButton = $('.e2e-test-save-story-button');
-  var commitMessageField = $('.e2e-test-commit-message-input');
-  var closeSaveModalButton = $('.e2e-test-close-save-modal-button');
-  var createChapterButton = $('.e2e-test-add-chapter-button');
-  var newChapterTitleField = $('.e2e-test-new-chapter-title-field');
-  var newChapterExplorationField = $('.e2e-test-chapter-exploration-input');
-  var confirmChapterCreationButton = $(
+  var thumbnailContainer = await $('.e2e-test-thumbnail-container');
+  var returnToTopicButton = await $('.e2e-test-return-to-topic-button');
+  var saveStoryButton = await $('.e2e-test-save-story-button');
+  var commitMessageField = await $('.e2e-test-commit-message-input');
+  var closeSaveModalButton = await $('.e2e-test-close-save-modal-button');
+  var createChapterButton = await $('.e2e-test-add-chapter-button');
+  var newChapterTitleField = await $('.e2e-test-new-chapter-title-field');
+  var newChapterExplorationField = await $(
+    '.e2e-test-chapter-exploration-input');
+  var confirmChapterCreationButton = await $(
     '.e2e-test-confirm-chapter-creation-button');
-  var publishStoryButton = $('.e2e-test-publish-story-button');
-  var unpublishStoryButton = $('.e2e-test-unpublish-story-button');
-  var backToStoryEditorButton = $('.e2e-test-back-to-story-editor-button');
-  var storyMetaTagContentField = $('.e2e-test-story-meta-tag-content-field');
-  var storyMetaTagContentLabel = $('.e2e-test-story-meta-tag-content-label');
+  var publishStoryButton = await $('.e2e-test-publish-story-button');
+  var unpublishStoryButton = await $('.e2e-test-unpublish-story-button');
+  var backToStoryEditorButton = await $(
+    '.e2e-test-back-to-story-editor-button');
+  var storyMetaTagContentField = await $(
+    '.e2e-test-story-meta-tag-content-field');
+  var storyMetaTagContentLabel = await $(
+    '.e2e-test-story-meta-tag-content-label');
 
   /*
    * CHAPTER
@@ -47,11 +51,11 @@ var StoryEditorPage = function() {
   var chapterTitlesSelector = function() {
     return $$('.e2e-test-chapter-title');
   };
-  var nodeDescriptionInputField = $('.e2e-test-add-chapter-description');
-  var nodeOutlineEditor = $('.e2e-test-add-chapter-outline');
-  var nodeOutlineFinalizeCheckbox = $('.e2e-test-finalize-outline');
-  var nodeOutlineSaveButton = $('.e2e-test-node-outline-save-button');
-  var createChapterThumbnailButton = $(
+  var nodeDescriptionInputField = await $('.e2e-test-add-chapter-description');
+  var nodeOutlineEditor = await $('.e2e-test-add-chapter-outline');
+  var nodeOutlineFinalizeCheckbox = await $('.e2e-test-finalize-outline');
+  var nodeOutlineSaveButton = await $('.e2e-test-node-outline-save-button');
+  var createChapterThumbnailButton = await $(
     '.e2e-test-chapter-input-thumbnail .e2e-test-photo-button');
 
   this.get = async function(storyId) {
@@ -118,7 +122,7 @@ var StoryEditorPage = function() {
   };
 
   this.navigateToChapterWithName = async function(chapterName) {
-    var chapterNameSelector = $(`span=${chapterName}`);
+    var chapterNameSelector = await $(`span=${chapterName}`);
     await waitFor.visibilityOf(
       chapterNameSelector, 'Chapter name is taking too long to appear');
     var chapterTitles = await chapterTitlesSelector();

@@ -83,7 +83,7 @@ var submitAnswer = async function(elem, answer) {
     await action.click('Selection Input Item', selectionInputItem);
   }
 
-  var submitAnswerButton = $(
+  var submitAnswerButton = await $(
     '.e2e-test-submit-answer-button');
   await waitFor.elementToBeClickable(
     submitAnswerButton, 'Submit Answer button is not clickable');

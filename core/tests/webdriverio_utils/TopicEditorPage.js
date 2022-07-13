@@ -24,49 +24,55 @@ var waitFor = require('./waitFor.js');
 var workflow = require('../webdriverio_utils/workflow.js');
 var forms = require('../webdriverio_utils/forms.js');
 
-var TopicEditorPage = function() {
+var TopicEditorPage = async function() {
   var EDITOR_URL_PREFIX = '/topic_editor/';
-  var addSubtopicButton = $('.e2e-test-add-subtopic-button');
-  var closeSaveModalButton = $('.e2e-test-close-save-modal-button');
-  var commitMessageField = $('.e2e-test-commit-message-input');
-  var confirmStoryCreationButton = $('.e2e-test-confirm-story-creation-button');
-  var confirmSubtopicCreationButton = $(
+  var addSubtopicButton = await $('.e2e-test-add-subtopic-button');
+  var closeSaveModalButton = await $('.e2e-test-close-save-modal-button');
+  var commitMessageField = await $('.e2e-test-commit-message-input');
+  var confirmStoryCreationButton = await $(
+    '.e2e-test-confirm-story-creation-button');
+  var confirmSubtopicCreationButton = await $(
     '.e2e-test-confirm-subtopic-creation-button');
-  var createStoryButton = $('.e2e-test-create-story-button');
-  var newStoryDescriptionField = $('.e2e-test-new-story-description-field');
-  var newStoryTitleField = $('.e2e-test-new-story-title-field');
-  var newStoryUrlFragmentField = $('.e2e-test-new-story-url-fragment-field');
-  var newSubtopicEditorElement = $('.e2e-test-new-subtopic-editor');
-  var newSubtopicTitlefield = $('.e2e-test-new-subtopic-title-field');
-  var newSubtopicUrlFragmentField = $(
+  var createStoryButton = await $('.e2e-test-create-story-button');
+  var newStoryDescriptionField = await $(
+    '.e2e-test-new-story-description-field');
+  var newStoryTitleField = await $('.e2e-test-new-story-title-field');
+  var newStoryUrlFragmentField = await $(
+    '.e2e-test-new-story-url-fragment-field');
+  var newSubtopicEditorElement = await $('.e2e-test-new-subtopic-editor');
+  var newSubtopicTitlefield = await $('.e2e-test-new-subtopic-title-field');
+  var newSubtopicUrlFragmentField = await $(
     '.e2e-test-new-subtopic-url-fragment-field');
-  var practiceTabCheckbox = $('.e2e-test-toggle-practice-tab');
-  var publishTopicButton = $('.e2e-test-publish-topic-button');
-  var reassignSkillButton = $('.e2e-test-reassign-skill-button');
-  var saveRearrangedSkillsButton = $('.e2e-test-save-rearrange-skills');
-  var saveTopicButton = $('.e2e-test-save-topic-button');
-  var showSchemaEditorElement = $('.e2e-test-show-schema-editor');
+  var practiceTabCheckbox = await $('.e2e-test-toggle-practice-tab');
+  var publishTopicButton = await $('.e2e-test-publish-topic-button');
+  var reassignSkillButton = await $('.e2e-test-reassign-skill-button');
+  var saveRearrangedSkillsButton = await $('.e2e-test-save-rearrange-skills');
+  var saveTopicButton = await $('.e2e-test-save-topic-button');
+  var showSchemaEditorElement = await $('.e2e-test-show-schema-editor');
   var storyListItemsSelector = function() {
     return $$('.e2e-test-story-list-item');
   };
-  var storyListTable = $('.e2e-test-story-list-table');
-  var storyThumbnailButton = $(
+  var storyListTable = await $('.e2e-test-story-list-table');
+  var storyThumbnailButton = await $(
     '.e2e-test-thumbnail-editor .e2e-test-photo-button');
   var subtopicColumnsSelector = function() {
     return $$('.e2e-test-subtopic-column');
   };
-  var subtopicDescriptionEditor = $('.e2e-test-subtopic-description-editor');
+  var subtopicDescriptionEditor = await $(
+    '.e2e-test-subtopic-description-editor');
   var subtopicSkillDescriptionLocator = '.e2e-test-subtopic-skill-description';
-  var subtopicThumbnailButton = $(
+  var subtopicThumbnailButton = await $(
     '.e2e-test-subtopic-thumbnail .e2e-test-photo-button');
-  var thumbnailContainer = $('.e2e-test-thumbnail-container');
-  var thumbnailContainer = $('.e2e-test-thumbnail-container');
-  var topicEditorTab = $('.e2e-test-edit-topic-tab');
-  var topicMetaTagContentField = $('.e2e-test-topic-meta-tag-content-field');
-  var topicMetaTagContentLabel = $('.e2e-test-topic-meta-tag-content-label');
-  var topicPageTitleFragmentField = $(
+  var thumbnailContainer = await $('.e2e-test-thumbnail-container');
+  var thumbnailContainer = await $('.e2e-test-thumbnail-container');
+  var topicEditorTab = await $('.e2e-test-edit-topic-tab');
+  var topicMetaTagContentField = await $(
+    '.e2e-test-topic-meta-tag-content-field');
+  var topicMetaTagContentLabel = await $(
+    '.e2e-test-topic-meta-tag-content-label');
+  var topicPageTitleFragmentField = await $(
     '.e2e-test-topic-page-title-fragment-field');
-  var topicPageTitleFragmentLabel = $(
+  var topicPageTitleFragmentLabel = await $(
     '.e2e-test-topic-page-title-fragment-label');
   var uncategorizedSkillsSelector = function() {
     return $$('.e2e-test-uncategorized-skill-card');

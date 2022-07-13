@@ -22,19 +22,19 @@ var forms = require('./forms.js');
 var general = require('./general.js');
 var waitFor = require('./waitFor.js');
 
-var AdminPage = function() {
+var AdminPage = async function() {
   var ADMIN_URL_SUFFIX = '/admin';
-  var addNewRoleButton = $('.e2e-test-add-new-role-button');
-  var adminRolesTab = $('.e2e-test-admin-roles-tab');
-  var adminRolesTabContainer = $('.e2e-test-roles-tab-container');
-  var configTab = $('.e2e-test-admin-config-tab');
-  var editUserRoleButton = $('.e2e-test-role-edit-button');
-  var progressSpinner = $('.e2e-test-progress-spinner');
-  var roleEditorContainer = $('.e2e-test-roles-editor-card-container');
-  var roleSelector = $('.e2e-test-new-role-selector');
-  var saveAllConfigs = $('.e2e-test-save-all-configs');
-  var statusMessage = $('.e2e-test-status-message');
-  var usernameInputFieldForRolesEditing = $(
+  var addNewRoleButton = await $('.e2e-test-add-new-role-button');
+  var adminRolesTab = await $('.e2e-test-admin-roles-tab');
+  var adminRolesTabContainer = await $('.e2e-test-roles-tab-container');
+  var configTab = await $('.e2e-test-admin-config-tab');
+  var editUserRoleButton = await $('.e2e-test-role-edit-button');
+  var progressSpinner = await $('.e2e-test-progress-spinner');
+  var roleEditorContainer = await $('.e2e-test-roles-editor-card-container');
+  var roleSelector = await $('.e2e-test-new-role-selector');
+  var saveAllConfigs = await $('.e2e-test-save-all-configs');
+  var statusMessage = await $('.e2e-test-status-message');
+  var usernameInputFieldForRolesEditing = await $(
     '.e2e-test-username-for-role-editor');
 
   var _switchToRolesTab = async function() {
@@ -87,7 +87,7 @@ var AdminPage = function() {
 
     await waitFor.invisibilityOf(
       progressSpinner, 'Progress spinner is taking too long to disappear.');
-    var removeButtonElement = $(
+    var removeButtonElement = await $(
       '.e2e-test-' + newRole.split(' ').join('-') +
       '-remove-button-container');
     await waitFor.visibilityOf(

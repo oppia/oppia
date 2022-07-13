@@ -42,16 +42,16 @@ var checkForAddTitleWarning = async function() {
 
 // Trigger onblur event for title.
 var triggerTitleOnBlurEvent = async function() {
-  var explorationTitleInput = $('.e2e-test-exploration-title-input');
+  var explorationTitleInput = await $('.e2e-test-exploration-title-input');
   await action.click('Exploration Title Input', explorationTitleInput);
-  var explorationObjectiveInput = $(
+  var explorationObjectiveInput = await $(
     '.e2e-test-exploration-objective-input');
   await action.click('Exploration Objective Input', explorationObjectiveInput);
 };
 
 // Open edit roles.
 var openEditRolesForm = async function() {
-  var testEditRoles = $('.e2e-test-edit-roles');
+  var testEditRoles = await $('.e2e-test-edit-roles');
   await action.click('Test edit roles', testEditRoles);
   await action.setValue('Test Role Username', $(
     '.e2e-test-role-username'), 'Chuck Norris');
@@ -74,17 +74,17 @@ var createExplorationAndStartTutorial = async function(isCollectionEditor) {
 
   await creatorDashboardPage.clickCreateActivityButton();
   if (isCollectionEditor) {
-    var activityCreationModal = $('.e2e-test-creation-modal');
+    var activityCreationModal = await $('.e2e-test-creation-modal');
     await waitFor.visibilityOf(
       activityCreationModal,
       'ActivityCreationModal takes too long to be visible.');
-    var createExplorationButton = $(
+    var createExplorationButton = await $(
       '.e2e-test-create-exploration');
     await action.click('Create Exploration Button', createExplorationButton);
   }
 
   await waitFor.pageToFullyLoad();
-  var stateNameText = $('.e2e-test-state-name-text');
+  var stateNameText = await $('.e2e-test-state-name-text');
   await waitFor.visibilityOf(
     stateNameText, 'State name text takes too long to appear.');
 };
@@ -96,7 +96,7 @@ var createCollectionAsAdmin = async function() {
   var creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage;
   await creatorDashboardPage.get();
   await creatorDashboardPage.clickCreateActivityButton();
-  var activityCreationModal = $('.e2e-test-creation-modal');
+  var activityCreationModal = await $('.e2e-test-creation-modal');
   await waitFor.visibilityOf(
     activityCreationModal, 'Activity Creation modal takes too long to appear');
   await creatorDashboardPage.clickCreateCollectionButton();
@@ -109,7 +109,7 @@ var createExplorationAsAdmin = async function() {
   var creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage;
   await creatorDashboardPage.get();
   await creatorDashboardPage.clickCreateActivityButton();
-  var activityCreationModal = $('.e2e-test-creation-modal');
+  var activityCreationModal = await $('.e2e-test-creation-modal');
   await waitFor.visibilityOf(
     activityCreationModal, 'Activity Creation modal takes too long to appear');
   await creatorDashboardPage.clickCreateExplorationButton();
@@ -121,22 +121,22 @@ var publishExploration = async function() {
   await waitFor.elementToBeClickable(
     $('.e2e-test-publish-exploration'));
   await $('.e2e-test-publish-exploration').isDisplayed();
-  var testPublishExploration = $('.e2e-test-publish-exploration');
+  var testPublishExploration = await $('.e2e-test-publish-exploration');
   await action.click('Test Publish Exploration', testPublishExploration);
-  var prePublicationButtonElem = $('.e2e-test-confirm-pre-publication');
+  var prePublicationButtonElem = await $('.e2e-test-confirm-pre-publication');
   await action.click(
     'Pre Publication Button Element', prePublicationButtonElem);
 
   await waitFor.invisibilityOf(
     prePublicationButtonElem,
     'prePublicationButtonElem taking too long to disappear while publishing');
-  var testConfirmPublish = $('.e2e-test-confirm-publish');
+  var testConfirmPublish = await $('.e2e-test-confirm-publish');
   await action.click('Test Confirm Publish', testConfirmPublish);
 
-  var sharePublishModal = $('.e2e-test-share-publish-modal');
+  var sharePublishModal = await $('.e2e-test-share-publish-modal');
   await waitFor.visibilityOf(
     sharePublishModal, 'Share Publish Modal takes too long to appear');
-  var closePublishModalButton = $('.e2e-test-share-publish-close');
+  var closePublishModalButton = await $('.e2e-test-share-publish-close');
   await action.click('Close Publish Modal Button', closePublishModalButton);
 };
 
@@ -272,7 +272,7 @@ var getImageSource = async function(customImageElement) {
 var uploadImage = async function(
     imageClickableElement, imgPath, resetExistingImage) {
   await action.click('Image clickable element', imageClickableElement);
-  var thumbnailResetButton = $(
+  var thumbnailResetButton = await $(
     '.e2e-test-thumbnail-reset-button');
   if (resetExistingImage) {
     expect(await thumbnailResetButton.isExisting()).toBe(true);
@@ -282,7 +282,7 @@ var uploadImage = async function(
   }
 
   absPath = path.resolve(__dirname, imgPath);
-  var imageUploadInput = $('.e2e-test-photo-upload-input');
+  var imageUploadInput = await $('.e2e-test-photo-upload-input');
   return await action.setValue(
     'Image Upload Input', imageUploadInput, absPath, clickInputElement = false);
 };
@@ -295,9 +295,9 @@ var submitImage = async function(
   await uploadImage(imageClickableElement, imgPath, resetExistingImage);
   await waitFor.visibilityOf(
     imageContainer, 'Image container is taking too long to appear');
-  var imageSubmitButton = $('.e2e-test-photo-upload-submit');
+  var imageSubmitButton = await $('.e2e-test-photo-upload-submit');
   await action.click('Image submit button', imageSubmitButton);
-  var imageUploadInput = $('.e2e-test-photo-upload-input');
+  var imageUploadInput = await $('.e2e-test-photo-upload-input');
   await waitFor.invisibilityOf(
     imageUploadInput,
     'Image uploader is taking too long to disappear');

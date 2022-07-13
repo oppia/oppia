@@ -34,10 +34,10 @@ var expectInteractionDetailsToMatch = async function(elem) {
 };
 
 var submitAnswer = async function(elem, answer) {
-  var numericInput = elem.$('<oppia-interactive-numeric-input>')
+  var numericInput = await elem.$('<oppia-interactive-numeric-input>')
     .$('<input>');
   await action.setValue('Numeric Input Element', numericInput, answer);
-  var submitAnswerBtn = $('.e2e-test-submit-answer-button');
+  var submitAnswerBtn = await $('.e2e-test-submit-answer-button');
   await action.click('Submit Answer Button', submitAnswerBtn);
 };
 

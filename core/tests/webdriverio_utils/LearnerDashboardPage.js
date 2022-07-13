@@ -20,26 +20,27 @@
 var waitFor = require('./waitFor.js');
 var action = require('./action.js');
 
-var LearnerDashboardPage = function() {
+var LearnerDashboardPage = async function() {
   var LEARNER_DASHBOARD_URL = '/learner-dashboard';
-  var addToLearnerGoalsButton = $(
+  var addToLearnerGoalsButton = await $(
     '.e2e-test-add-topic-to-current-goals-button');
-  var communityLessonsSection = $('.e2e-test-community-lessons-section');
-  var completeCommunityLessonsSection = $(
+  var communityLessonsSection = await $('.e2e-test-community-lessons-section');
+  var completeCommunityLessonsSection = await $(
     '.e2e-test-completed-community-lessons-section');
-  var completedGoalsTopicName = $('.e2e-test-completed-goals-topic-name');
-  var currentGoalsTopicName = $('.e2e-test-topic-name-in-current-goals');
-  var editGoalsTopicName = $('.e2e-test-topic-name-in-edit-goals');
-  var feedbackMessage = $('.e2e-test-feedback-message');
-  var feedbackSection = $('.e2e-test-feedback-section');
-  var feedbackThread = $('.e2e-test-feedback-thread');
-  var goalsSection = $('.e2e-test-goals-section');
-  var homeSection = $('.e2e-test-home-section');
-  var incompleteCommunityLessonsSection = $(
+  var completedGoalsTopicName = await $('.e2e-test-completed-goals-topic-name');
+  var currentGoalsTopicName = await $('.e2e-test-topic-name-in-current-goals');
+  var editGoalsTopicName = await $('.e2e-test-topic-name-in-edit-goals');
+  var feedbackMessage = await $('.e2e-test-feedback-message');
+  var feedbackSection = await $('.e2e-test-feedback-section');
+  var feedbackThread = await $('.e2e-test-feedback-thread');
+  var goalsSection = await $('.e2e-test-goals-section');
+  var homeSection = await $('.e2e-test-home-section');
+  var incompleteCommunityLessonsSection = await $(
     '.e2e-test-incomplete-community-lessons-section');
-  var progressSection = $('.e2e-test-progress-section');
-  var subscriptionSection = $('.e2e-test-subscriptions-section');
-  var skillProficiencyTopicTitle = $('.e2e-test-skill-proficiency-topic-title');
+  var progressSection = await $('.e2e-test-progress-section');
+  var subscriptionSection = await $('.e2e-test-subscriptions-section');
+  var skillProficiencyTopicTitle = await $(
+    '.e2e-test-skill-proficiency-topic-title');
   var stopicNamesInLearnerTopicSummaryTilesSelector = function() {
     return $$('.e2e-test-learner-topic-summary-tile-title');
   };
@@ -86,7 +87,7 @@ var LearnerDashboardPage = function() {
   };
 
   this.expectTitleOfCollectionSummaryTileToMatch = async function(title) {
-    var collectionTitle = $(
+    var collectionTitle = await $(
       `.e2e-test-collection-summary-tile-title=${title}`);
     await waitFor.visibilityOf(
       collectionTitle, 'Unable to find collection ' + title);
@@ -102,7 +103,7 @@ var LearnerDashboardPage = function() {
   this.expectTitleOfExplorationSummaryTileToMatch = async function(title) {
     // This explorationTitleArray is an Array but it will have only one element
     // that is the exploration with the title passed as a parameter.
-    var explorationTitle = $(
+    var explorationTitle = await $(
       `.e2e-test-exp-summary-tile-title=${title}`);
     var titleOfExplorationSummary = await action.getText(
       'Exploration title', explorationTitle);
@@ -116,7 +117,7 @@ var LearnerDashboardPage = function() {
     await waitFor.textToBePresentInElement(
       editGoalsTopicName, name,
       `Text "${name}" taking too long to be present in editGoalsTopic`);
-    var topicName = $(
+    var topicName = await $(
       `.e2e-test-topic-name-in-edit-goals=${name}`);
     expect(await action.getText('Topic Name', topicName)).toMatch(name);
   };
@@ -128,7 +129,7 @@ var LearnerDashboardPage = function() {
     await waitFor.textToBePresentInElement(
       currentGoalsTopicName, name,
       `Text "${name}" taking too long to be present in currentGoalsTopic`);
-    var topicName = $(
+    var topicName = await $(
       `.e2e-test-topic-name-in-current-goals=${name}`);
     expect(await action.getText('Topic Name', topicName)).toMatch(name);
   };
@@ -141,7 +142,7 @@ var LearnerDashboardPage = function() {
     await waitFor.textToBePresentInElement(
       skillProficiencyTopicTitle, name,
       `Text "${name}" taking too long to be present in skillProficiencyTopic`);
-    var topicName = $(
+    var topicName = await $(
       `.e2e-test-skill-proficiency-topic-title=${name}`);
     expect(await action.getText('Topic Name', topicName)).toMatch(name);
   };
@@ -154,7 +155,7 @@ var LearnerDashboardPage = function() {
     await waitFor.textToBePresentInElement(
       completedGoalsTopicName, name,
       `Text "${name}" taking too long to be present in completedGoalsTopic`);
-    var topicName = $(
+    var topicName = await $(
       `.e2e-test-completed-goals-topic-name*=${name}`);
     expect(await action.getText('Topic Name', topicName)).toMatch(name);
   };

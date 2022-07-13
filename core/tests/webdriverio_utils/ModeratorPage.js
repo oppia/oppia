@@ -20,8 +20,8 @@
 var general = require('./general.js');
 var waitFor = require('./waitFor.js');
 
-var ModeratorPage = function() {
-  var moderatorPage = $('.e2e-test-moderator-page');
+var ModeratorPage = async function() {
+  var moderatorPage = await $('.e2e-test-moderator-page');
 
   this.get = async function() {
     await browser.url(general.MODERATOR_URL_SUFFIX);

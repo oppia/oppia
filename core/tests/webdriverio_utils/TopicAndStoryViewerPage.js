@@ -20,9 +20,10 @@
 var action = require('../webdriverio_utils/action.js');
 var waitFor = require('./waitFor.js');
 
-var TopicAndStoryViewerPage = function() {
-  var lessonTrack = $('.e2e-test-lesson-track');
-  var practiceSessionContainer = $('.e2e-test-practice-session-container');
+var TopicAndStoryViewerPage = async function() {
+  var lessonTrack = await $('.e2e-test-lesson-track');
+  var practiceSessionContainer = await $(
+    '.e2e-test-practice-session-container');
   var chapterTitleListSelector = function() {
     return $$('.e2e-test-chapter-title');
   };

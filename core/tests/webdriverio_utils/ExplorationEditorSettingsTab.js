@@ -22,23 +22,26 @@ var general = require('./general.js');
 var waitFor = require('./waitFor.js');
 var action = require('./action.js');
 
-var ExplorationEditorSettingsTab = function() {
+var ExplorationEditorSettingsTab = async function() {
   /*
    * Interactive elements
    */
-  var explorationCategoryInput = $('.e2e-test-exploration-category-input');
-  var explorationLanguageInput = $('.e2e-test-exploration-language-select');
-  var explorationObjectiveInput = $('.e2e-test-exploration-objective-input');
-  var explorationTitleInput = $('.e2e-test-exploration-title-input');
-  var neutralElement = $('.e2e-test-settings-container');
+  var explorationCategoryInput = await $(
+    '.e2e-test-exploration-category-input');
+  var explorationLanguageInput = await $(
+    '.e2e-test-exploration-language-select');
+  var explorationObjectiveInput = await $(
+    '.e2e-test-exploration-objective-input');
+  var explorationTitleInput = await $('.e2e-test-exploration-title-input');
+  var neutralElement = await $('.e2e-test-settings-container');
 
   /*
    * Buttons
    */
-  var confirmDeleteExplorationButton = $(
+  var confirmDeleteExplorationButton = await $(
     '.e2e-test-really-delete-exploration-button');
-  var deleteExplorationButton = $('.e2e-test-delete-exploration-button');
-  var disableCorrectnessFeedbackButton = $(
+  var deleteExplorationButton = await $('.e2e-test-delete-exploration-button');
+  var disableCorrectnessFeedbackButton = await $(
     '.e2e-test-enable-mark-correctness-feedback');
 
   /*

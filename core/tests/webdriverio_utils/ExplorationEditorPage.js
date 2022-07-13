@@ -26,32 +26,35 @@ var ExplorationEditorMainTab = require(
 var ExplorationEditorSettingsTab = require(
   '../webdriverio_utils/ExplorationEditorSettingsTab.js');
 
-var ExplorationEditorPage = function() {
+var ExplorationEditorPage = async function() {
   /*
   * Interactive elements
   */
-  var commitMessageInput = $('.e2e-test-commit-message-input');
-  var confirmPublish = $('.e2e-test-confirm-publish');
-  var expCategoryDropdownElement = $('.e2e-test-exploration-category-dropdown');
-  var expLanguageSelectorElement = $('.e2e-test-exploration-language-select');
-  var expObjective = $('.e2e-test-exploration-objective-input');
-  var expTags = $('.e2e-test-tags');
-  var expTitle = $('.e2e-test-exploration-title-input');
-  var explorationMetadataModalHeaderElement = $(
+  var commitMessageInput = await $('.e2e-test-commit-message-input');
+  var confirmPublish = await $('.e2e-test-confirm-publish');
+  var expCategoryDropdownElement = await $(
+    '.e2e-test-exploration-category-dropdown');
+  var expLanguageSelectorElement = await $(
+    '.e2e-test-exploration-language-select');
+  var expObjective = await $('.e2e-test-exploration-objective-input');
+  var expTags = await $('.e2e-test-tags');
+  var expTitle = await $('.e2e-test-exploration-title-input');
+  var explorationMetadataModalHeaderElement = await $(
     '.e2e-test-metadata-modal-header');
-  var modalContentElement = $('.modal-content');
-  var sharePublishModalElement = $('.e2e-test-share-publish-modal');
+  var modalContentElement = await $('.modal-content');
+  var sharePublishModalElement = await $('.e2e-test-share-publish-modal');
 
   /*
    * Buttons
    */
-  var closeButton = $('.e2e-test-share-publish-close');
-  var commitChangesButton = $('.e2e-test-save-draft-button');
-  var navigateToSettingsTabButton = $('.e2e-test-settings-tab');
-  var prePublicationConfirmButton = $('.e2e-test-confirm-pre-publication');
-  var publishExplorationButton = $('.e2e-test-publish-exploration');
-  var saveChangesButton = $('.e2e-test-save-changes');
-  var saveDraftButtonTextContainer = $('.e2e-test-save-draft-message');
+  var closeButton = await $('.e2e-test-share-publish-close');
+  var commitChangesButton = await $('.e2e-test-save-draft-button');
+  var navigateToSettingsTabButton = await $('.e2e-test-settings-tab');
+  var prePublicationConfirmButton = await $(
+    '.e2e-test-confirm-pre-publication');
+  var publishExplorationButton = await $('.e2e-test-publish-exploration');
+  var saveChangesButton = await $('.e2e-test-save-changes');
+  var saveDraftButtonTextContainer = await $('.e2e-test-save-draft-message');
 
   /*
    * Components

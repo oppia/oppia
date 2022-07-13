@@ -20,21 +20,21 @@
 var waitFor = require('./waitFor.js');
 var action = require('./action.js');
 
-var CollectionEditorPage = function() {
-  var addExplorationButton = $('.e2e-test-add-exploration-button');
-  var addExplorationInput = $('.e2e-test-add-exploration-input');
-  var categoryFilterDropdown = $(
+var CollectionEditorPage = async function() {
+  var addExplorationButton = await $('.e2e-test-add-exploration-button');
+  var addExplorationInput = await $('.e2e-test-add-exploration-input');
+  var categoryFilterDropdown = await $(
     '.e2e-test-collection-editor-category-dropdown');
-  var closeSaveModalButton = $('.e2e-test-close-save-modal-button');
-  var collectionEditorObjectiveInput = $(
+  var closeSaveModalButton = await $('.e2e-test-close-save-modal-button');
+  var collectionEditorObjectiveInput = await $(
     '.e2e-test-collection-editor-objective-input');
-  var commitMessageInput = $('.e2e-test-commit-message-input');
-  var editorPublishButton = $('.e2e-test-editor-publish-button');
-  var editorTitleInput = $('.e2e-test-collection-editor-title-input');
-  var saveChangesButton = $('.e2e-test-collection-save-changes-button');
-  var saveDraftButton = $('.e2e-test-save-draft-button');
-  var saveInProgressLabel = $('.e2e-test-save-in-progress-label');
-  var saveModal = $('.e2e-test-save-modal');
+  var commitMessageInput = await $('.e2e-test-commit-message-input');
+  var editorPublishButton = await $('.e2e-test-editor-publish-button');
+  var editorTitleInput = await $('.e2e-test-collection-editor-title-input');
+  var saveChangesButton = await $('.e2e-test-collection-save-changes-button');
+  var saveDraftButton = await $('.e2e-test-save-draft-button');
+  var saveInProgressLabel = await $('.e2e-test-save-in-progress-label');
+  var saveModal = await $('.e2e-test-save-modal');
 
   this.addExistingExploration = async function(explorationId) {
     await waitFor.visibilityOf(

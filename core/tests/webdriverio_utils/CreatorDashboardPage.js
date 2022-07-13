@@ -20,23 +20,26 @@
 var waitFor = require('./waitFor.js');
 var action = require('./action.js');
 
-var CreatorDashboardPage = function() {
+var CreatorDashboardPage = async function() {
   var CREATOR_DASHBOARD_URL = '/creator-dashboard';
 
   var allExplorationCardsSelector = function() {
     return $$('.e2e-test-exploration-dashboard-card');
   };
-  var activityCreationModal = $('.e2e-test-creation-modal');
-  var averageRating = $('.e2e-test-oppia-average-rating');
-  var collectionCard = $('.e2e-test-collection-card');
-  var collectionEditorContainer = $(
+  var activityCreationModal = await $('.e2e-test-creation-modal');
+  var averageRating = await $('.e2e-test-oppia-average-rating');
+  var collectionCard = await $('.e2e-test-collection-card');
+  var collectionEditorContainer = await $(
     '.e2e-test-collection-editor-cards-container');
-  var createActivityButton = $('.e2e-test-create-activity');
-  var createCollectionButton = $('.e2e-test-create-collection');
-  var createExplorationButton = $('.e2e-test-create-exploration');
-  var createNewExplorationButton = $('.e2e-test-create-new-exploration-button');
-  var explorationDashboardCard = $('.e2e-test-exploration-dashboard-card');
-  var explorationFeedbackCount = $('.e2e-test-exp-summary-tile-open-feedback');
+  var createActivityButton = await $('.e2e-test-create-activity');
+  var createCollectionButton = await $('.e2e-test-create-collection');
+  var createExplorationButton = await $('.e2e-test-create-exploration');
+  var createNewExplorationButton = await $(
+    '.e2e-test-create-new-exploration-button');
+  var explorationDashboardCard = await $(
+    '.e2e-test-exploration-dashboard-card');
+  var explorationFeedbackCount = await $(
+    '.e2e-test-exp-summary-tile-open-feedback');
   var expSummaryRowFeedbackElementsSelector = function() {
     return $$('.e2e-test-exp-summary-row-open-feedback');
   };
@@ -61,12 +64,12 @@ var CreatorDashboardPage = function() {
   var expSummaryTileViewsElementsSelector = function() {
     return $$('.e2e-test-exp-summary-tile-num-views');
   };
-  var listViewButton = $('.e2e-test-oppia-list-view-btn');
+  var listViewButton = await $('.e2e-test-oppia-list-view-btn');
   // Dashboard stat elements.
-  var openFeedbacks = $('.e2e-test-oppia-open-feedback');
-  var subscriptionTab = $('.e2e-test-subscription-tab');
-  var subscribers = $('.e2e-test-oppia-total-subscribers');
-  var totalPlays = $('.e2e-test-oppia-total-plays');
+  var openFeedbacks = await $('.e2e-test-oppia-open-feedback');
+  var subscriptionTab = await $('.e2e-test-subscription-tab');
+  var subscribers = await $('.e2e-test-oppia-total-subscribers');
+  var totalPlays = await $('.e2e-test-oppia-total-plays');
 
   // Returns all exploration card elements with the given name.
   var _getExplorationElements = async function(explorationTitle) {

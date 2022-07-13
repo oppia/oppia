@@ -51,7 +51,7 @@ var expectInteractionDetailsToMatch = async function(elem) {
 var submitAnswer = async function(elem, answer) {
   await objects.MathEditor(elem.$(
     '<oppia-interactive-math-equation-input>')).setValue(answer);
-  var submitAnswerBtn = $('.e2e-test-submit-answer-button');
+  var submitAnswerBtn = await $('.e2e-test-submit-answer-button');
   await action.click('Submit Answer Button', submitAnswerBtn);
 };
 
