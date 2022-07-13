@@ -148,11 +148,13 @@ def get_multi_user_ids_from_usernames(
         for username in usernames
     ]
 
-    found_models = user_models.UserSettingsModel.query(
-        user_models.UserSettingsModel.normalized_username.IN(
-            normalized_usernames
-        )
-    ).fetch()
+    found_models: Sequence[user_models.UserSettingsModel] = (
+        user_models.UserSettingsModel.query(
+            user_models.UserSettingsModel.normalized_username.IN(
+                normalized_usernames
+            )
+        ).fetch()
+    )
 
     username_to_user_id_map = {
         model.normalized_username: model.id for model in found_models
@@ -1138,7 +1140,7 @@ def get_multiple_user_auth_details(
     Args:
         user_ids: list(str). The list of user_ids for which we need to fetch
             the user auth details.
-List[Optional
+
     Returns:
         list(UserAuthDetails). The UserAuthDetails domain objects
         corresponding to the given user ids.
