@@ -250,7 +250,7 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
                 model_pair[0]
             )
             return exploration
-        except:
+        except Exception:
             return None
 
     def convert_into_model_pair(
