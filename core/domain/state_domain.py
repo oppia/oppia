@@ -45,6 +45,14 @@ from core.domain import translatable_object_registry  # pylint: disable=invalid-
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
 
+AllowedRuleSpecInputs = Union[
+    str,
+    int,
+    List[str],
+    List[List[str]],
+    Dict[str, Sequence[str]]
+]
+
 
 class AnswerGroupDict(TypedDict):
     """Dictionary representing the AnswerGroup object."""
@@ -2358,7 +2366,7 @@ class RuleSpecDict(TypedDict):
     """Dictionary representing the RuleSpec object."""
 
     rule_type: str
-    inputs: Dict[str, Union[str, int, List[str], List[List[str]], Dict[str, Sequence[str]]]]
+    inputs: Dict[str, AllowedRuleSpecInputs]
 
 
 class RuleSpec(translation_domain.BaseTranslatableObject):
@@ -2367,7 +2375,7 @@ class RuleSpec(translation_domain.BaseTranslatableObject):
     def __init__(
         self,
         rule_type: str,
-        inputs: Mapping[str, Union[str, int, List[str], List[List[str]], Dict[str, Sequence[str]]]]
+        inputs: Mapping[str, AllowedRuleSpecInputs]
     ) -> None:
         """Initializes a RuleSpec domain object.
 
