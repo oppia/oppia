@@ -86,10 +86,10 @@ class MigrateExplorationJobTests(
 
         swap_states_schema_48 = self.swap(
             feconf, 'CURRENT_STATE_SCHEMA_VERSION', 48)
-        swap_exp_schema_53 = self.swap(
-            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 53)
+        swap_exp_schema_55 = self.swap(
+            exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 55)
 
-        with swap_states_schema_48, swap_exp_schema_53:
+        with swap_states_schema_48, swap_exp_schema_55:
             exploration = exp_domain.Exploration.create_default_exploration(
                 self.NEW_EXP_ID, title=self.EXP_TITLE, category='Algorithms')
             exp_services.save_new_exploration(
@@ -108,8 +108,7 @@ class MigrateExplorationJobTests(
             ])
 
         migrated_exp_model = exp_models.ExplorationModel.get(self.NEW_EXP_ID)
-        self.assertEqual(
-            migrated_exp_model.states_schema_version, 48)
+        self.assertEqual(migrated_exp_model.states_schema_version, 50)
 
     def test_broken_exp_is_not_migrated(self) -> None:
         exploration_rights = rights_domain.ActivityRights(
