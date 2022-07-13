@@ -78,6 +78,12 @@
   width: 70%;
 }
 
+.syllabus-item-image {
+  height: 78px;
+  object-fit: fill;
+  width: 100px
+}
+
 .added-syllabus-container {
   background: rgba(39, 99, 92, 0.05);
   display: flex;
@@ -108,29 +114,29 @@
 }
 
 .remove-syllabus {
+  align-items: center;
+  background: white;
+  border-radius: 15px;
+  cursor: pointer;
+  display: grid;
+  height: 15px;
+  justify-items: center;
   position: absolute;
   right: 5px;
   top: 5px;
-  background: white;
-  cursor: pointer;
   width: 15px;
-  height: 15px;
-  border-radius: 15px;
-  display: grid;
-  align-items: center;
-  justify-items: center;
 }
 
 .remove-syllabus::after {
-  margin-top: -5px;
   content: "\00d7";
+  margin-top: -5px;
 }
 
 .syllabus-item-title-container {
   align-items: center;
   display: grid;
-  justify-content: right;
   grid-gap: 5px;
+  justify-content: right;
 }
 
 .syllabus-item-title-info {
@@ -142,7 +148,7 @@
 .syllabus-item-title-info .syllabus-item-type-pill {
   background: #eaf0ef;
   border-radius: 10px;
-  color: #27635C;
+  color: #27635c;
   font-size: 12px;
   padding: 4px 8px;
   text-transform: none;
@@ -198,12 +204,6 @@
   color: #fff;
   font-weight: 700;
   min-width: 130px;
-}
-
-.syllabus-item-image {
-  height: 78px;
-  object-fit: fill;
-  width: 100px
 }
 
 .no-syllabus-items-text {

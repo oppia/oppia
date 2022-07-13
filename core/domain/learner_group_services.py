@@ -29,7 +29,7 @@ from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.platform import models
 
-from typing import List, Optional, Union
+from typing import List, Optional, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -581,7 +581,7 @@ def get_learner_group_from_model(
 
 def can_user_be_invited(
     user_id: str, username: str, group_id: str
-) -> Union[bool, str]:
+) -> Tuple[bool, str]:
     """Checks if the user can be invited to the learner group.
 
     Args:
@@ -599,13 +599,11 @@ def can_user_be_invited(
     # Case of inviting to new learner group.
     if not learner_group:
         return (True, '')
-
-    if user_id in learner_group.student_user_ids:
+    elif user_id in learner_group.student_user_ids:
         return (
             False, ('User with username %s is already a student.' % username)
         )
-
-    if user_id in learner_group.invited_student_user_ids:
+    elif user_id in learner_group.invited_student_user_ids:
         return (
             False,
             (
@@ -613,8 +611,7 @@ def can_user_be_invited(
                 'learner group' % username
             )
         )
-
-    if user_id in learner_group.facilitator_user_ids:
+    elif user_id in learner_group.facilitator_user_ids:
         return (
             False,
             (

@@ -186,7 +186,6 @@ export class CreateLearnerGroupPageComponent implements OnInit, OnDestroy {
          this.windowRef.nativeWindow.location.host +
           '/learner-group/' + this.learnerGroup.id
       );
-      console.log('Learner group created: ', this.learnerGroup);
       this.loaderService.hideLoadingScreen();
     });
   }

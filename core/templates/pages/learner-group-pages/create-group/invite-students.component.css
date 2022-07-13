@@ -23,8 +23,8 @@
   border-radius: 4px;
   display: flex;
   flex-wrap: wrap;
-  height: 180px;
   gap: 20px;
+  height: 180px;
   overflow: auto;
   padding: 20px;
 }

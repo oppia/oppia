@@ -48,7 +48,7 @@ export class LearnerGroupSyllabusBackendApiService {
       syllabusFilter: LearnerGroupSyllabusFilter
   ): Promise<LearnerGroupSyllabus> {
     return new Promise((resolve, reject) => {
-      const learnerGroupUrl = '/learner_group_search_syllabus_handler'
+      const learnerGroupUrl = '/learner_group_search_syllabus_handler';
 
       const filterData = {
         search_keyword: syllabusFilter.keyword,

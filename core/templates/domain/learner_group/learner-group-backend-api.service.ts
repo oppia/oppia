@@ -147,7 +147,7 @@ export class LearnerGroupBackendApiService {
       username: string
   ): Promise<LearnerGroupInvitedUserInfo> {
     return new Promise((resolve, reject) => {
-      const learnerGroupUrl = '/learner_group_search_student_handler'
+      const learnerGroupUrl = '/learner_group_search_student_handler';
       const filterData = {
         username: username,
         learner_group_id: learnerGroupId

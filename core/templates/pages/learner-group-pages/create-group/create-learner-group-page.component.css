@@ -23,6 +23,19 @@
   padding-top: 60px;
 }
 
+.oppia-learner-group-pages-breadcrumb li {
+  display: flex;
+}
+
+.oppia-navbar-breadcrumb.oppia-learner-group-pages-breadcrumb a {
+  color: #fff;
+  padding-top: 0;
+}
+
+.oppia-navbar-breadcrumb.oppia-learner-group-pages-breadcrumb a:hover {
+  text-decoration: underline;
+}
+
 .oppia-learner-groups-section {
   background-color: #fff;
   border-radius: 4px;
@@ -92,11 +105,11 @@
   content: "";
   height: 16px;
   margin-top: -2px;
+  -ms-transform: rotate(45deg);
+  -o-transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
   transform: rotate(45deg);
   width: 8px;
-  -o-transform: rotate(45deg);
-  -ms-transform: rotate(45deg);
-  -webkit-transform: rotate(45deg);
 }
 
 .oppia-learner-group-progressbar li .indicator {
@@ -156,9 +169,9 @@
 
 .oppia-prev-section-button {
   background: #fff;
-  border: solid 1px #27635C;
+  border: solid 1px #27635c;
   border-radius: 4px;
-  color: #27635C;
+  color: #27635c;
   cursor: pointer;
   margin-left: auto;
   padding: 6px 24px;
@@ -228,6 +241,6 @@
   top: -140px;
 }
 
-.oppia-group-link .fa-copy{
+.oppia-group-link .fa-copy {
   cursor: pointer;
 }

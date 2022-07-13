@@ -3945,22 +3945,6 @@ div.oppia-issues-learner-action {
   height: auto;
 }
 
-/*
- Styling for breadcrumbs on learner group page mainpage
-*/
-.oppia-learner-group-pages-breadcrumb li {
-  display: flex;
-}
-
-.oppia-navbar-breadcrumb.oppia-learner-group-pages-breadcrumb a {
-  color: #fff;
-  padding-top: 0;
-}
-
-.oppia-navbar-breadcrumb.oppia-learner-group-pages-breadcrumb a:hover {
-  text-decoration: underline;
-}
-
 @media (max-width: 610px) {
   .oppia-profile-picture-container {
     float: left;

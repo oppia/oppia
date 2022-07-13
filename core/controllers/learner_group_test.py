@@ -20,7 +20,8 @@ import json
 
 from core import feconf
 from core.constants import constants
-from core.domain import config_domain, learner_group_fetchers
+from core.domain import config_domain
+from core.domain import learner_group_fetchers
 from core.domain import learner_group_services
 from core.domain import skill_services
 from core.domain import story_domain

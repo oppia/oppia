@@ -74,7 +74,7 @@ describe('Learner Group Syllabus Backend API Service', () => {
   };
 
   const SEARCH_NEW_SYLLABUS_URL = (
-    '/learner_group_search_syllabus_handler/groupId'
+    '/learner_group_search_syllabus_handler'
   );
 
   beforeEach(() => {
@@ -101,16 +101,17 @@ describe('Learner Group Syllabus Backend API Service', () => {
         keyword: 'Place',
         type: 'All',
         category: 'All',
-        languageCode: 'en'
+        languageCode: 'en',
+        learnerGroupId: 'groupId'
       };
 
       learnerGroupSyllabusBackendApiService
         .searchNewSyllabusItemsAsync(
-          'groupId', syllabusFilter).then(successHandler, failHandler);
+          syllabusFilter).then(successHandler, failHandler);
 
       var req = httpTestingController.expectOne(
         SEARCH_NEW_SYLLABUS_URL + '?search_keyword=Place&search_type=All' +
-        '&search_category=All&search_language_code=en'
+        '&search_category=All&search_language_code=en&learner_group_id=groupId'
       );
       expect(req.request.method).toEqual('GET');
       req.flush(sampleLearnerGroupSyllabusDict);
