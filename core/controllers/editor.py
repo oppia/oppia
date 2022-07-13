@@ -154,7 +154,9 @@ class ExplorationHandler(EditorHandler):
         version = self.normalized_request.get('v')
         apply_draft = self.normalized_request.get('apply_draft')
 
-        user_settings = user_services.get_user_settings(self.user_id)
+        user_settings = user_services.get_user_settings(
+            self.user_id, strict=False
+        )
         has_seen_editor_tutorial = False
         has_seen_translation_tutorial = False
         if user_settings is not None:

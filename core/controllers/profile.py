@@ -327,6 +327,8 @@ class SignupPage(base.BaseHandler):
         """Handles GET requests."""
         return_url = self.normalized_request.get(
             'return_url', self.request.uri)
+        # Ruling out the possibility of None for mypy type checking.
+        assert self.user_id is not None
         # Validating return_url for no external redirections.
         if re.match('^/[^//]', return_url) is None:
             return_url = '/'
@@ -419,7 +421,8 @@ class SignupHandler(base.BaseHandler):
                         bulk_email_signup_message_should_be_shown)
                 })
                 return
-
+        # Ruling out the possibility of None for mypy type checking.
+        assert self.user_id is not None
         has_ever_registered = user_services.has_ever_registered(self.user_id)
         has_fully_registered_account = (
             user_services.has_fully_registered_account(self.user_id))

@@ -26,6 +26,8 @@ from __future__ import annotations
 from core.platform.app_identity import (
     gae_app_identity_services as app_identity_services)
 from core.platform.auth import firebase_auth_services as platform_auth_services
+from core.platform.bulk_email import (
+    dev_mode_bulk_email_services as bulk_email_services)
 from core.platform.cache import redis_cache_services as memory_cache_services
 from core.platform.datastore import (
     cloud_datastore_services as datastore_services)
@@ -76,6 +78,7 @@ __all__ = [
     'base_models',
     'beam_job_models',
     'blog_models',
+    'bulk_email_services',
     'classifier_models',
     'collection_models',
     'config_models',

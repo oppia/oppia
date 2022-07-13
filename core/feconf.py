@@ -25,7 +25,7 @@ import os
 
 from core.constants import constants
 
-from typing import Dict, List, Union
+from typing import Callable, Dict, List, Union
 from typing_extensions import TypedDict
 
 CommandType = (
@@ -682,13 +682,16 @@ MESSAGE_TYPE_FEEDBACK = 'feedback'
 MESSAGE_TYPE_SUGGESTION = 'suggestion'
 
 MODERATOR_ACTION_UNPUBLISH_EXPLORATION = 'unpublish_exploration'
-DEFAULT_SALUTATION_HTML_FN = (
+DEFAULT_SALUTATION_HTML_FN: Callable[[str], str] = (
     lambda recipient_username: 'Hi %s,' % recipient_username)
-DEFAULT_SIGNOFF_HTML_FN = (
+DEFAULT_SIGNOFF_HTML_FN: Callable[[str], str] = (
     lambda sender_username: (
         'Thanks!<br>%s (Oppia moderator)' % sender_username))
 
-VALID_MODERATOR_ACTIONS = {
+VALID_MODERATOR_ACTIONS: Dict[
+    str,
+    Dict[str, Union[str, Callable[[str], str]]]
+] = {
     MODERATOR_ACTION_UNPUBLISH_EXPLORATION: {
         'email_config': 'unpublish_exploration_email_html_body',
         'email_subject_fn': (

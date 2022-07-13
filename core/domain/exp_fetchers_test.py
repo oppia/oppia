@@ -292,7 +292,7 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
     ) -> None:
         auth_id = 'test_id'
         user_email = 'test@email.com'
-        user_id = user_services.create_new_user(auth_id, user_email).user_id  # type: ignore[no-untyped-call]
+        user_id = user_services.create_new_user(auth_id, user_email).user_id
         self.assertIsNone(exp_fetchers.get_exploration_user_data(
             user_id, self.EXP_1_ID))
 
@@ -300,10 +300,10 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
         auth_id = 'test_id'
         username = 'testname'
         user_email = 'test@email.com'
-        user_id = user_services.create_new_user(auth_id, user_email).user_id  # type: ignore[no-untyped-call]
-        user_services.set_username(user_id, username)  # type: ignore[no-untyped-call]
+        user_id = user_services.create_new_user(auth_id, user_email).user_id
+        user_services.set_username(user_id, username)
 
-        user_services.update_learner_checkpoint_progress(  # type: ignore[no-untyped-call]
+        user_services.update_learner_checkpoint_progress(
             user_id, self.EXP_1_ID, 'Introduction', 1)
         expected_user_data_dict = {
             'rating': None,

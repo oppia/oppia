@@ -1463,7 +1463,7 @@ class DeleteAuthAssociationsTests(FirebaseAuthServicesTestBase):
     def setUp(self) -> None:
         super(DeleteAuthAssociationsTests, self).setUp()
         self.firebase_sdk_stub.create_user(self.AUTH_ID)
-        user_settings = user_services.create_new_user(self.AUTH_ID, self.EMAIL) # type: ignore[no-untyped-call]
+        user_settings = user_services.create_new_user(self.AUTH_ID, self.EMAIL)
         self.user_id = user_settings.user_id
         firebase_auth_services.mark_user_for_deletion(self.user_id)
 

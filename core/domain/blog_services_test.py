@@ -365,8 +365,8 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
     def test_check_can_edit_blog_post(self) -> None:
         blog_post_rights = (
             blog_services.get_blog_post_rights(self.blog_post_a_id))
-        user_info_a = user_services.get_user_actions_info(self.user_id_a)  # type: ignore[no-untyped-call]
-        user_info_b = user_services.get_user_actions_info(self.user_id_b)  # type: ignore[no-untyped-call]
+        user_info_a = user_services.get_user_actions_info(self.user_id_a)
+        user_info_b = user_services.get_user_actions_info(self.user_id_b)
 
         self.assertFalse(blog_services.check_can_edit_blog_post(
             user_info_b, blog_post_rights))

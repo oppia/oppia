@@ -69,7 +69,7 @@ class PlatformFeaturesEvaluationHandlerTest(test_utils.GenericTestBase):
                         {
                             'type': 'server_mode',
                             'conditions': [
-                                ['=', param_domain.ServerModes.DEV.value]
+                                ['=', param_domain.ServerMode.DEV.value]
                             ]
                         }
                     ],
@@ -228,7 +228,7 @@ class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
 
         with dev_mode_ctx, dummy_feature_dev_stage_context:
             self._set_dummy_feature_status_for_mode(
-                True, param_domain.ServerModes.DEV
+                True, param_domain.ServerMode.DEV
             )
 
             result = self.get_json(
@@ -243,7 +243,7 @@ class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
 
         with dev_mode_ctx, dummy_feature_dev_stage_context:
             self._set_dummy_feature_status_for_mode(
-                False, param_domain.ServerModes.DEV
+                False, param_domain.ServerMode.DEV
             )
             self.get_json(
                 '/platform_feature_dummy_handler',
@@ -257,7 +257,7 @@ class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
 
         with dev_mode_ctx, dummy_feature_prod_stage_context:
             self._set_dummy_feature_status_for_mode(
-                True, param_domain.ServerModes.PROD
+                True, param_domain.ServerMode.PROD
             )
 
             result = self.get_json(
@@ -272,7 +272,7 @@ class PlatformFeatureDummyHandlerTest(test_utils.GenericTestBase):
 
         with dev_mode_ctx, dummy_feature_prod_stage_context:
             self._set_dummy_feature_status_for_mode(
-                False, param_domain.ServerModes.PROD
+                False, param_domain.ServerMode.PROD
             )
             self.get_json(
                 '/platform_feature_dummy_handler',

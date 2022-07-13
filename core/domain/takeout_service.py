@@ -75,7 +75,7 @@ def export_data_for_user(user_id: str) -> takeout_domain.TakeoutData:
     Raises:
         NotImplementedError. Takeout for profile users is not implemented.
     """
-    user_settings = user_services.get_user_settings(user_id)  # type: ignore[no-untyped-call]
+    user_settings = user_services.get_user_settings(user_id, strict=False)
     if user_settings is not None and (
             feconf.ROLE_ID_MOBILE_LEARNER in user_settings.roles):
         raise NotImplementedError(
