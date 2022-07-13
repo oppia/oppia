@@ -29,10 +29,14 @@ from core.jobs.batch_jobs import story_migration_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
 
+from typing import Type
+from typing_extensions import Final
+
 MYPY = False
 if MYPY:
     from mypy_imports import datastore_services
     from mypy_imports import story_models
+    from mypy_imports import topic_models
 
 (story_models, topic_models) = models.Registry.import_models([
     models.NAMES.story, models.NAMES.topic
@@ -42,12 +46,14 @@ datastore_services = models.Registry.import_datastore_services()
 
 class MigrateStoryJobTests(job_test_utils.JobTestBase):
 
-    JOB_CLASS = story_migration_jobs.MigrateStoryJob
+    JOB_CLASS: Type[
+        story_migration_jobs.MigrateStoryJob
+    ] = story_migration_jobs.MigrateStoryJob
 
-    STORY_1_ID = 'story_1_id'
-    TOPIC_1_ID = 'topic_1_id'
+    STORY_1_ID: Final = 'story_1_id'
+    TOPIC_1_ID: Final = 'topic_1_id'
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         story_summary_model = self.create_model(
             story_models.StorySummaryModel,
@@ -80,7 +86,7 @@ class MigrateStoryJobTests(job_test_utils.JobTestBase):
         datastore_services.update_timestamps_multi([
             topic_model, story_summary_model])
         datastore_services.put_multi([topic_model, story_summary_model])
-        self.latest_contents = {
+        self.latest_contents: story_domain.StoryContentsDict = {
             'nodes': [{
                 'id': 'node_1111',
                 'title': 'title',
@@ -99,7 +105,10 @@ class MigrateStoryJobTests(job_test_utils.JobTestBase):
             'next_node_id': 'node_2222'
         }
         self.broken_contents = copy.deepcopy(self.latest_contents)
-        self.broken_contents['nodes'][0]['description'] = 123
+        # The expected type of `description` key is string but here for testing
+        # purposes we are providing a integer value, which causes MyPy to throw
+        # an error. Thus to silent the error, we used ignore here.
+        self.broken_contents['nodes'][0]['description'] = 123  # type: ignore[arg-type]
 
         self.unmigrated_contents = copy.deepcopy(self.latest_contents)
         self.unmigrated_contents['nodes'][0]['thumbnail_size_in_bytes'] = 123
