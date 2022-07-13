@@ -23,6 +23,7 @@ from core.constants import constants
 from core.domain import caching_services
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import opportunity_services
 from core.domain import rights_domain
 from core.domain import story_domain
 from core.domain import story_services
@@ -208,19 +209,21 @@ class MigrateExplorationJobTests(
                 feconf.SYSTEM_COMMITTER_ID)
             exp_services.publish_exploration_and_update_user_profiles(
                 owner_action, self.NEW_EXP_ID)
-            opportunity_models.ExplorationOpportunitySummaryModel(
-                id=self.NEW_EXP_ID,
-                topic_id='topic_id1',
-                topic_name='a_topic name',
-                story_id='story_id_1',
-                story_title='A story title',
-                chapter_title='A chapter title',
-                content_count=20,
-                incomplete_translation_language_codes=['hi', 'ar'],
-                translation_counts={},
-                language_codes_needing_voice_artists=['en'],
-                language_codes_with_assigned_voice_artists=[]
-            ).put()
+            opportunity_model = (
+                opportunity_models.ExplorationOpportunitySummaryModel(
+                    id=self.NEW_EXP_ID,
+                    topic_id='topic_id1',
+                    topic_name='topic',
+                    story_id='story_id_1',
+                    story_title='A story title',
+                    chapter_title='Title 1',
+                    content_count=20,
+                    incomplete_translation_language_codes=['hi', 'ar'],
+                    translation_counts={'hi': 1, 'ar': 2},
+                    language_codes_needing_voice_artists=['en'],
+                    language_codes_with_assigned_voice_artists=[]))
+            opportunity_model.put()
+
             self.create_story_linked_to_exploration()
 
             self.assertEqual(exploration.states_schema_version, 48)
@@ -232,3 +235,23 @@ class MigrateExplorationJobTests(
             job_run_result.JobRunResult(
                 stdout='EXP MIGRATED SUCCESS: 1', stderr='')
         ])
+
+        updated_opp_model = (
+            opportunity_models.ExplorationOpportunitySummaryModel.get(
+                self.NEW_EXP_ID, strict=False))
+        updated_opp_summary = (
+              opportunity_services
+                  .get_exploration_opportunity_summary_from_model(
+                      updated_opp_model))
+
+        expected_opp_summary_dict = {
+            'id': 'exp_1',
+            'topic_name': 'topic',
+            'chapter_title': 'Title 1',
+            'story_title': 'A story title',
+            'content_count': 1,
+            'translation_counts': {},
+            'translation_in_review_counts': {}}
+
+        self.assertEqual(
+            updated_opp_summary.to_dict(), expected_opp_summary_dict)

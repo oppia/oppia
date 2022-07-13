@@ -78,6 +78,13 @@ class MigrateExplorationJob(base_jobs.JobBase):
         try:
             exploration = exp_fetchers.get_exploration_from_model(exp_model)
             exploration.validate()
+
+            with datastore_services.get_ndb_context():
+                if exp_services.get_story_id_linked_to_exploration(
+                        exp_id) is not None:
+                    exp_services.validate_exploration_for_story(
+                        exploration, True)
+
         except Exception as e:
             logging.exception(e)
             return result.Err((exp_id, e))
@@ -197,10 +204,6 @@ class MigrateExplorationJob(base_jobs.JobBase):
         )
         change_dicts = [change.to_dict() for change in exp_changes]
         with datastore_services.get_ndb_context():
-            if exp_services.get_story_id_linked_to_exploration(
-                migrated_exp.id) is not None:
-                exp_services.validate_exploration_for_story(migrated_exp, True)
-
             models_to_put = updated_exp_model.compute_models_to_commit(
                 feconf.MIGRATION_BOT_USERNAME,
                 feconf.COMMIT_TYPE_EDIT,
@@ -223,10 +226,10 @@ class MigrateExplorationJob(base_jobs.JobBase):
     def _update_exploration_opportunity_summary_models(
         exp_id: str,
         migrated_exp: exp_domain.Exploration,
-        exp_id_to_exp_opp_summary_model: (
-            Optional[Dict[
-                str,
-                opportunity_models.ExplorationOpportunitySummaryModel]]) = None
+        exp_id_to_exp_opp_summary_model: Optional[Dict[
+            str,
+            opportunity_models.ExplorationOpportunitySummaryModel
+        ]] = None
     ):
         """Generates newly updated exploration opportunity summary models.
 
@@ -255,7 +258,6 @@ class MigrateExplorationJob(base_jobs.JobBase):
                 opportunity_services
                     .get_exploration_opportunity_summary_from_model(
                         exp_opp_summary_model))
-
             exp_opp_summary.content_count = content_count
             exp_opp_summary.translation_counts = translation_counts
             exp_opp_summary.incomplete_translation_language_codes = (

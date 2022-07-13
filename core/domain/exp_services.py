@@ -1610,7 +1610,7 @@ def regenerate_exploration_and_contributors_summaries(exploration_id):
 
 
 def compute_summary_of_exploration(
-        exploration, exp_rights, exp_summary_model):
+    exploration, exp_rights, exp_summary_model):
     """Create an ExplorationSummary domain object for a given Exploration
     domain object and return it.
 
