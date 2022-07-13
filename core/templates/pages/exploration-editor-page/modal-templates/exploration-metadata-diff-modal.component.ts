@@ -1,4 +1,4 @@
-// Copyright 2021 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,17 +13,18 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for state diff modal.
+ * @fileoverview Component for showing metadata diff between different
+ * exploration versions.
  */
 
 import { Input, OnInit } from '@angular/core';
 import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { State } from 'domain/state/StateObjectFactory';
+import { ExplorationMetadata } from 'domain/exploration/ExplorationMetadataObjectFactory';
 import { HistoryTabYamlConversionService } from '../services/history-tab-yaml-conversion.service';
 
-export interface headersAndYamlStrs {
+interface headersAndYamlStrs {
   leftPane: string;
   rightPane: string;
 }
@@ -36,10 +37,10 @@ interface mergeviewOptions {
 }
 
 @Component({
-  selector: 'oppia-state-diff',
-  templateUrl: './state-diff-modal.component.html',
+  selector: 'oppia-exploration-metadata-diff',
+  templateUrl: './exploration-metadata-diff-modal.component.html',
 })
-export class StateDiffModalComponent
+export class ExplorationMetadataDiffModalComponent
   extends ConfirmOrCancelModal implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
@@ -47,14 +48,12 @@ export class StateDiffModalComponent
 
   // The following properties will be null when there is no change introduced
   // in either of the state. It remains same as original State.
-  @Input() newState!: State | null;
-  @Input() oldState!: State | null;
-  @Input() newStateName!: string;
-  @Input() oldStateName!: string;
+  @Input() oldMetadata!: ExplorationMetadata | null;
+  @Input() newMetadata!: ExplorationMetadata | null;
   @Input() headers!: headersAndYamlStrs;
   yamlStrs: headersAndYamlStrs = {
     leftPane: '',
-    rightPane: '',
+    rightPane: ''
   };
 
   CODEMIRROR_MERGEVIEW_OPTIONS: mergeviewOptions = {
@@ -65,21 +64,21 @@ export class StateDiffModalComponent
   };
 
   constructor(
-      private ngbActiveModal: NgbActiveModal,
-      private historyTabYamlConversionService: HistoryTabYamlConversionService
+    private ngbActiveModal: NgbActiveModal,
+    private historyTabYamlConversionService: HistoryTabYamlConversionService
   ) {
     super(ngbActiveModal);
   }
 
   ngOnInit(): void {
     this.historyTabYamlConversionService
-      .getYamlStringFromStateOrMetadata(this.oldState)
+      .getYamlStringFromStateOrMetadata(this.oldMetadata)
       .then((result) => {
         this.yamlStrs.leftPane = result;
       });
 
     this.historyTabYamlConversionService
-      .getYamlStringFromStateOrMetadata(this.newState)
+      .getYamlStringFromStateOrMetadata(this.newMetadata)
       .then((result) => {
         this.yamlStrs.rightPane = result;
       });
