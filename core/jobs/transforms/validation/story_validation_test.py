@@ -236,7 +236,7 @@ class ValidateStorySnapshotMetadataModelTests(job_test_utils.PipelinedTestBase):
             ])
 
     def test_story_change_object_with_invalid_story_contents_property(
-            self
+        self
     ) -> None:
         commit_dict = {
             'cmd': 'update_story_contents_property',

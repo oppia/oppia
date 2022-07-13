@@ -75,6 +75,9 @@ import { EditableExplorationBackendApiService } from 'domain/exploration/editabl
 import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
 
+import './conversation-skin.component.css';
+
+
 // Note: This file should be assumed to be in an IIFE, and the constants below
 // should only be used within this file.
 const TIME_FADEOUT_MSEC = 100;
@@ -135,7 +138,6 @@ export class ConversationSkinComponent {
   isAnimatingToOneCard: boolean;
   isRefresherExploration: boolean;
   parentExplorationIds: string[];
-  storyViewerUrl: string;
   conceptCard: ConceptCard;
   questionSessionCompleted: boolean;
   moveToExploration: boolean;
@@ -533,10 +535,6 @@ export class ConversationSkinComponent {
     }, 100);
   }
 
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
-  }
-
   getExplorationLink(): string {
     if (this.recommendedExplorationSummaries &&
         this.recommendedExplorationSummaries[0]) {
@@ -868,12 +866,6 @@ export class ConversationSkinComponent {
           this.urlService.getUrlParams().story_url_fragment);
         let nodeId = this.urlService.getUrlParams().node_id;
         this.inStoryMode = true;
-        this.storyViewerUrl = this.urlInterpolationService.interpolateUrl(
-          TopicViewerDomainConstants.STORY_VIEWER_URL_TEMPLATE, {
-            topic_url_fragment: topicUrlFragment,
-            classroom_url_fragment: classroomUrlFragment,
-            story_url_fragment: storyUrlFragment
-          });
         this.storyViewerBackendApiService.fetchStoryDataAsync(
           topicUrlFragment, classroomUrlFragment,
           storyUrlFragment).then(

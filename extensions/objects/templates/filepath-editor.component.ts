@@ -16,7 +16,7 @@
  * @fileoverview Component for filepath editor.
  */
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
 @Component({
@@ -42,7 +42,9 @@ export class FilepathEditorComponent implements OnInit {
     }
     if (this.value.endsWith('.svg')) {
       this.svgEditorIsShown = true;
+      this.imageEditorIsShown = false;
     } else {
+      this.svgEditorIsShown = false;
       this.imageEditorIsShown = true;
     }
   }
@@ -71,6 +73,15 @@ export class FilepathEditorComponent implements OnInit {
   onClickUploadImage(): void {
     this.imageEditorIsShown = true;
     this.svgEditorIsShown = false;
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (
+      changes.value &&
+      changes.value.currentValue !== changes.value.previousValue
+    ) {
+      this.ngOnInit();
+    }
   }
 }
 
