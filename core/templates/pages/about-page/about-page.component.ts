@@ -27,6 +27,9 @@ import { WindowRef } from
   'services/contextual/window-ref.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
+import './about-page.component.css';
+
+
 @Component({
   selector: 'about-page',
   templateUrl: './about-page.component.html'
@@ -58,10 +61,6 @@ export class AboutPageComponent {
 
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
-  }
-
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   onClickVisitClassroomButton(): void {

@@ -128,10 +128,19 @@
           Changes from version <[$ctrl.compareVersionMetadata.earlierVersion.versionNumber]>
           to version <[$ctrl.compareVersionMetadata.laterVersion.versionNumber]>
         </h3>
-        <version-diff-visualization diff-data="$ctrl.diffData"
-                                    earlier-version-header="$ctrl.earlierVersionHeader"
-                                    later-version-header="$ctrl.laterVersionHeader">
-        </version-diff-visualization>
+        <div class="exploration-metadata-changes-container">
+          Changes in exploration metadata (title, category etc.):
+          <a class="text-primary view-metadata-changes-button e2e-test-view-metadata-history" ng-click="$ctrl.showExplorationMetadataDiffModal()">
+            View metadata changes
+          </a>
+        </div>
+        <div class="state-changes-container">
+          <div>Changes in exploration states:</div>
+          <version-diff-visualization diff-data="$ctrl.diffData"
+                                      earlier-version-header="$ctrl.earlierVersionHeader"
+                                      later-version-header="$ctrl.laterVersionHeader">
+          </version-diff-visualization>
+        </div>
       </div>
     </div>
   </md-card>
@@ -279,6 +288,12 @@
   }
   history-tab .oppia-reset-button {
     height: 35px;
+  }
+  history-tab .exploration-metadata-changes-container {
+    margin-bottom: 30px;
+  }
+  history-tab .view-metadata-changes-button {
+    white-space: nowrap;
   }
   @media screen and (max-width: 768px) {
     history-tab .revision-container .revision-select-container {
