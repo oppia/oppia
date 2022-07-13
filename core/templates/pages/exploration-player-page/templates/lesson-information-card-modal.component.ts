@@ -16,6 +16,7 @@
  * @fileoverview Component for lesson information card modal.
  */
 
+import { Clipboard } from '@angular/cdk/clipboard';
 import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
@@ -27,10 +28,15 @@ import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-b
 import { LearnerExplorationSummaryBackendDict } from
   'domain/summary/learner-exploration-summary.model';
 import { UrlService } from 'services/contextual/url.service';
+import { UserService } from 'services/user.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { LocalStorageService } from 'services/local-storage.service';
 import { I18nLanguageCodeService, TranslationKeyType } from
   'services/i18n-language-code.service';
 import { ExplorationPlayerStateService } from '../services/exploration-player-state.service';
+
+import './lesson-information-card-modal.component.css';
+
 
  @Component({
    selector: 'oppia-lesson-information-card-modal',
@@ -64,14 +70,20 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
   separatorArray: number[] = [];
   userIsLoggedIn: boolean = false;
   lessonAuthorsSubmenuIsShown: boolean = false;
+  loggedOutProgressUniqueUrlId: string;
+  loggedOutProgressUniqueUrl: string;
+  saveProgressMenuIsShown: boolean = false;
 
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
+    private clipboard: Clipboard,
     private urlService: UrlService,
+    private userService: UserService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private storyViewerBackendApiService: StoryViewerBackendApiService,
     private windowRef: WindowRef,
+    private localStorageService: LocalStorageService,
     private editableExplorationBackendApiService:
       EditableExplorationBackendApiService,
     private explorationPlayerStateService: ExplorationPlayerStateService
@@ -119,7 +131,13 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
                 this.storyId, TranslationKeyType.TITLE));
         });
     }
-
+    this.loggedOutProgressUniqueUrlId = (
+      this.explorationPlayerStateService.getUniqueProgressUrlId());
+    if (this.loggedOutProgressUniqueUrlId) {
+      this.loggedOutProgressUniqueUrl = (
+        this.urlService.getOrigin() +
+        '/progress/' + this.loggedOutProgressUniqueUrlId);
+    }
     // Rendering the separators in the progress bar requires
     // the number of separators.The purpose of separatorArray
     // is to provide the number of checkpoints in the template file.
@@ -165,5 +183,37 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
 
   isLanguageRTL(): boolean {
     return this.i18nLanguageCodeService.isCurrentLanguageRTL();
+  }
+
+  async saveLoggedOutProgress(): Promise<void> {
+    if (!this.loggedOutProgressUniqueUrlId) {
+      this.explorationPlayerStateService
+        .setUniqueProgressUrlId()
+        .then(() => {
+          this.loggedOutProgressUniqueUrlId = (
+            this.explorationPlayerStateService.getUniqueProgressUrlId());
+          this.loggedOutProgressUniqueUrl = (
+            this.urlService.getOrigin() +
+            '/progress/' + this.loggedOutProgressUniqueUrlId);
+        });
+    }
+    this.saveProgressMenuIsShown = true;
+  }
+
+  copyProgressUrl(): void {
+    this.clipboard.copy(this.loggedOutProgressUniqueUrl);
+  }
+
+  onLoginButtonClicked(): void {
+    this.userService.getLoginUrlAsync().then(
+      (loginUrl) => {
+        this.localStorageService.updateUniqueProgressIdOfLoggedOutLearner(
+          this.loggedOutProgressUniqueUrlId);
+        this.windowRef.nativeWindow.location.href = loginUrl;
+      });
+  }
+
+  closeSaveProgressMenu(): void {
+    this.saveProgressMenuIsShown = false;
   }
 }

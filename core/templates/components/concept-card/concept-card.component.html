@@ -1,7 +1,7 @@
 <div class="oppia-concept-card-viewer" *ngIf="!loadingMessage">
   <div class="concept-card-explanation">
     <div class="oppia-concept-card-explanation-container">
-      <angular-html-bind-wrapper classStr="protractor-test-concept-card-explanation"
+      <angular-html-bind-wrapper classStr="e2e-test-concept-card-explanation"
                                  [htmlData]="currentConceptCard.getExplanation().html">
       </angular-html-bind-wrapper>
       <div *ngIf="skillDeletedMessage">

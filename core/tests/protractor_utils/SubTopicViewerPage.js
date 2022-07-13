@@ -21,16 +21,16 @@ var waitFor = require('./waitFor.js');
 var action = require('./action.js');
 
 var SubTopicViewerPage = function() {
-  var subTopicTileList = element.all(by.css('.protractor-test-subtopic-tile'));
+  var subTopicTileList = element.all(by.css('.e2e-test-subtopic-tile'));
   var conceptCardList = element.all(
-    by.css('.protractor-test-concept-card-link'));
+    by.css('.e2e-test-concept-card-link'));
   var conceptCardExplanation = element(
-    by.css('.protractor-test-concept-card-explanation'));
+    by.css('.e2e-test-concept-card-explanation'));
 
   this.get = async function(subTopicName) {
     await waitFor.pageToFullyLoad();
     var subTopicTile = element(by.cssContainingText(
-      '.protractor-test-subtopic-tile', subTopicName));
+      '.e2e-test-subtopic-tile', subTopicName));
     await waitFor.presenceOf(
       subTopicTile, 'Sub topic ' + subTopicName + ' card is not present,');
     await action.click(subTopicName, subTopicTile);
