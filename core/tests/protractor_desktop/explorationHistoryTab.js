@@ -416,7 +416,7 @@ describe('Exploration history', function() {
       },
       45: {
         text: '    default_outcome: {}',
-        highlighted: true
+        highlighted: false
       },
       46: {
         text: '    feedback_1: {}',
