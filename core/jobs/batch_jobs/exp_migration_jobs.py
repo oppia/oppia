@@ -281,23 +281,26 @@ class MigrateExplorationJob(base_jobs.JobBase):
 
             exp_opp_summary.validate()
 
-            exp_opp_summary_model = (
-                opportunity_models.ExplorationOpportunitySummaryModel(
-                    id=exp_opp_summary.id,
-                    topic_id=exp_opp_summary.topic_id,
-                    topic_name=exp_opp_summary.topic_name,
-                    story_id=exp_opp_summary.story_id,
-                    story_title=exp_opp_summary.story_title,
-                    chapter_title=exp_opp_summary.chapter_title,
-                    content_count=exp_opp_summary.content_count,
-                    incomplete_translation_language_codes=(
-                        exp_opp_summary.incomplete_translation_language_codes),
-                    translation_counts=exp_opp_summary.translation_counts,
-                    language_codes_needing_voice_artists=(
-                        exp_opp_summary.language_codes_needing_voice_artists),
-                    language_codes_with_assigned_voice_artists=(
-                        exp_opp_summary
-                            .language_codes_with_assigned_voice_artists)))
+            with datastore_services.get_ndb_context():
+                exp_opp_summary_model = (
+                    opportunity_models.ExplorationOpportunitySummaryModel(
+                        id=exp_opp_summary.id,
+                        topic_id=exp_opp_summary.topic_id,
+                        topic_name=exp_opp_summary.topic_name,
+                        story_id=exp_opp_summary.story_id,
+                        story_title=exp_opp_summary.story_title,
+                        chapter_title=exp_opp_summary.chapter_title,
+                        content_count=exp_opp_summary.content_count,
+                        incomplete_translation_language_codes=(
+                            exp_opp_summary
+                                .incomplete_translation_language_codes),
+                        translation_counts=exp_opp_summary.translation_counts,
+                        language_codes_needing_voice_artists=(
+                            exp_opp_summary
+                                .language_codes_needing_voice_artists),
+                        language_codes_with_assigned_voice_artists=(
+                            exp_opp_summary
+                                .language_codes_with_assigned_voice_artists)))
 
             datastore_services.update_timestamps_multi([exp_opp_summary_model])
 
