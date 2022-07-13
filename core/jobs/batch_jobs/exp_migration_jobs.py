@@ -161,7 +161,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
         """
         exp_summary = exp_services.compute_summary_of_exploration(
             migrated_exp, exp_rights_model, exp_summary_model,
-            update_exploration_model_last_updated=False)
+            skip_exploration_model_last_updated=True)
         exp_summary.version += 1
         updated_exp_summary_model = (
             exp_services.populate_exp_summary_model_fields(

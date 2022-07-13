@@ -1611,7 +1611,7 @@ def regenerate_exploration_and_contributors_summaries(exploration_id):
 
 def compute_summary_of_exploration(
     exploration, exp_rights, exp_summary_model,
-    update_exploration_model_last_updated=True):
+    skip_exploration_model_last_updated=False):
     """Create an ExplorationSummary domain object for a given Exploration
     domain object and return it.
 
@@ -1622,26 +1622,36 @@ def compute_summary_of_exploration(
             to compute summary.
         exp_summary_model: ExplorationSummaryModel. The exploration summary
             model, whose summary is computed.
-        update_exploration_model_last_updated: bool. This flag is used to
+        skip_exploration_model_last_updated: bool. This flag is used to
             update exploration_model_last_updated, only when required.
 
     Returns:
         ExplorationSummary. The resulting exploration summary domain object.
+
+    Raises:
+        Exception. ExplorationSummaryModel cannot be None and
+            skip_exploration_model_last_updated cannot be set to True
+            at the same time.
     """
     if exp_summary_model:
         old_exp_summary = exp_fetchers.get_exploration_summary_from_model(
             exp_summary_model)
         ratings = old_exp_summary.ratings or feconf.get_empty_ratings()
         scaled_average_rating = get_scaled_average_rating(ratings)
+        exploration_model_last_updated = (
+            old_exp_summary.exploration_model_last_updated)
     else:
+        if skip_exploration_model_last_updated:
+            raise Exception(
+                'ExplorationSummaryModel cannot be None, when '
+                'skip_exploration_model_last_updated is set to True'
+                'for exploration ID %s' % exploration.id)
         ratings = feconf.get_empty_ratings()
         scaled_average_rating = feconf.EMPTY_SCALED_AVERAGE_RATING
 
-    if update_exploration_model_last_updated:
+    if not skip_exploration_model_last_updated:
         exploration_model_last_updated = datetime.datetime.fromtimestamp(
             get_last_updated_by_human_ms(exploration.id) / 1000.0)
-    else:
-        exploration_model_last_updated = exploration.last_updated
 
     contributors_summary = (
         exp_summary_model.contributors_summary if exp_summary_model else {})
