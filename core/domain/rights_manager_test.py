@@ -69,7 +69,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
         self.user_moderator = user_services.get_user_actions_info(
             self.user_id_moderator)
-        self.system_user = user_services.get_system_user()  # type: ignore[no-untyped-call]
+        self.system_user = user_services.get_system_user()
         self.login(self.MODERATOR_EMAIL)
 
         self.user_voiceover_admin = user_services.get_user_actions_info(
@@ -834,7 +834,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
         self.user_e = user_services.get_user_actions_info(self.user_id_e)
         self.user_moderator = user_services.get_user_actions_info(
             self.user_id_moderator)
-        self.system_user = user_services.get_system_user()  # type: ignore[no-untyped-call]
+        self.system_user = user_services.get_system_user()
         self.login(self.MODERATOR_EMAIL)
 
     def test_get_collection_rights_for_nonexistent_collection(self) -> None:

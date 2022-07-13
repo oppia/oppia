@@ -1072,7 +1072,7 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
     def test_email_is_not_sent_recipient_has_muted_emails_globally(
         self
     ) -> None:
-        user_services.update_email_preferences(  # type: ignore[no-untyped-call]
+        user_services.update_email_preferences(
             self.editor_id, True, False, False, False)
 
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
@@ -1087,7 +1087,7 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
     def test_email_is_not_sent_recipient_has_muted_this_exploration(
         self
     ) -> None:
-        user_services.set_email_preferences_for_exploration(  # type: ignore[no-untyped-call]
+        user_services.set_email_preferences_for_exploration(
             self.editor_id, self.exploration.id,
             mute_feedback_notifications=True)
 

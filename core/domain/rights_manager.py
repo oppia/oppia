@@ -1097,7 +1097,7 @@ def _deassign_role(
             'This user does not have any role in %s with ID %s'
             % (activity_type, activity_id))
 
-    assignee_username = user_services.get_usernames([removed_user_id])[0]  # type: ignore[no-untyped-call]
+    assignee_username = user_services.get_usernames([removed_user_id])[0]
     if assignee_username is None:
         assignee_username = 'ANONYMOUS'
     commit_message = 'Remove %s from role %s for %s' % (

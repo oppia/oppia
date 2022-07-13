@@ -2528,7 +2528,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
             self.admin_id).first_contribution_msec)
 
         # Test editor of published exploration has updated contribution time.
-        rights_manager.release_ownership_of_exploration(  # type: ignore[no-untyped-call]
+        rights_manager.release_ownership_of_exploration(
             self.admin, self.EXP_ID)
 
         exp_services.update_exploration(  # type: ignore[no-untyped-call]
@@ -2594,7 +2594,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
 
         # Test that another user who commits to unpublished exploration does not
         # have updated first contribution time.
-        rights_manager.assign_role_for_exploration(  # type: ignore[no-untyped-call]
+        rights_manager.assign_role_for_exploration(
             self.admin, self.EXP_ID, self.editor_id, 'editor')
         exp_services.update_exploration(  # type: ignore[no-untyped-call]
             self.editor_id, self.EXP_ID, [exp_domain.ExplorationChange({
@@ -2619,7 +2619,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
     ) -> None:
         self.save_new_valid_exploration(
             self.EXP_ID, self.admin_id, end_state_name='End')
-        rights_manager.assign_role_for_exploration(  # type: ignore[no-untyped-call]
+        rights_manager.assign_role_for_exploration(
             self.admin, self.EXP_ID, self.editor_id, 'editor')
         exp_services.publish_exploration_and_update_user_profiles(  # type: ignore[no-untyped-call]
             self.admin, self.EXP_ID)
@@ -2637,7 +2637,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
 
         exp_services.publish_exploration_and_update_user_profiles(  # type: ignore[no-untyped-call]
             self.owner, self.EXP_ID)
-        rights_manager.unpublish_exploration(self.owner, self.EXP_ID)  # type: ignore[no-untyped-call]
+        rights_manager.unpublish_exploration(self.owner, self.EXP_ID)
 
         # Test that contribution time is not eliminated if exploration is
         # unpublished.
@@ -2663,7 +2663,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
 
         # Test editor of published collection has updated
         # first contribution time.
-        rights_manager.release_ownership_of_collection(  # type: ignore[no-untyped-call]
+        rights_manager.release_ownership_of_collection(
             self.admin, self.COL_ID)
 
         collection_services.update_collection(  # type: ignore[no-untyped-call]
@@ -2703,7 +2703,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
 
         # Test that another user who commits to unpublished collection does not
         # have updated first contribution time.
-        rights_manager.assign_role_for_collection(  # type: ignore[no-untyped-call]
+        rights_manager.assign_role_for_collection(
             self.admin, self.COL_ID, self.editor_id, 'editor')
         collection_services.update_collection(  # type: ignore[no-untyped-call]
             self.editor_id, self.COL_ID, [{
@@ -2731,7 +2731,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
             category=self.COLLECTION_CATEGORY,
             objective=self.COLLECTION_OBJECTIVE,
             exploration_id=self.EXP_ID)
-        rights_manager.assign_role_for_collection(  # type: ignore[no-untyped-call]
+        rights_manager.assign_role_for_collection(
             self.admin, self.COL_ID, self.editor_id, 'editor')
         collection_services.publish_collection_and_update_user_profiles(  # type: ignore[no-untyped-call]
             self.admin, self.COL_ID)
@@ -2753,7 +2753,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
             exploration_id=self.EXP_ID)
         collection_services.publish_collection_and_update_user_profiles(  # type: ignore[no-untyped-call]
             self.owner, self.COL_ID)
-        rights_manager.unpublish_collection(self.owner, self.COL_ID)  # type: ignore[no-untyped-call]
+        rights_manager.unpublish_collection(self.owner, self.COL_ID)
 
         # Test that first contribution msec is not eliminated if collection is
         # unpublished.
@@ -2848,7 +2848,7 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
         self.assertEqual(
             user_services.get_last_week_dashboard_stats(self.owner_id), None)
 
-        self.process_and_flush_pending_tasks()  # type: ignore[no-untyped-call]
+        self.process_and_flush_pending_tasks()
 
         self.assertEqual(
             user_services.get_weekly_dashboard_stats(self.owner_id), [])
@@ -3545,7 +3545,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
 
         user_services.remove_translation_review_rights_in_language(
             self.reviewer_1_id, 'hi')
-        self.process_and_flush_pending_tasks()  # type: ignore[no-untyped-call]
+        self.process_and_flush_pending_tasks()
 
         stats = suggestion_services.get_community_contribution_stats()  # type: ignore[no-untyped-call]
         self.assertEqual(stats.question_reviewer_count, 1)

@@ -382,7 +382,7 @@ def create_messages(
 
     if (feconf.CAN_SEND_EMAILS and (
             feconf.CAN_SEND_FEEDBACK_MESSAGE_EMAILS and
-            user_services.is_user_registered(author_id)) and  # type: ignore[no-untyped-call]
+            user_services.is_user_registered(author_id)) and
             # TODO(#12079): Figure out a better way to avoid sending feedback
             # thread emails for contributor dashboard suggestions.
             (len(text) > 0 or old_statuses[index] != new_statuses[index]) and
@@ -1176,7 +1176,7 @@ def _get_all_recipient_ids(
     owner_ids = set(exploration_rights.owner_ids)
     participant_ids = {
         message.author_id for message in get_messages(thread_id)
-        if user_services.is_user_registered(message.author_id)  # type: ignore[no-untyped-call]
+        if user_services.is_user_registered(message.author_id)
     }
 
     batch_recipient_ids = owner_ids - {author_id}
@@ -1204,7 +1204,7 @@ def _send_batch_emails(
         has_suggestion: bool. Whether this thread has a related learner
             suggestion.
     """
-    can_recipients_receive_email = email_manager.can_users_receive_thread_email(  # type: ignore[no-untyped-call]
+    can_recipients_receive_email = email_manager.can_users_receive_thread_email(
         recipient_list, exploration_id, has_suggestion)
     for recipient_id, can_receive_email in zip(
             recipient_list, can_recipients_receive_email):
@@ -1231,7 +1231,7 @@ def _send_instant_emails(
         has_suggestion: bool. Whether this thread has a related learner
             suggestion.
     """
-    can_recipients_receive_email = email_manager.can_users_receive_thread_email(  # type: ignore[no-untyped-call]
+    can_recipients_receive_email = email_manager.can_users_receive_thread_email(
         recipient_list, exploration_id, has_suggestion)
     for recipient_id, can_receive_email in zip(
             recipient_list, can_recipients_receive_email):
@@ -1261,7 +1261,7 @@ def _send_feedback_thread_status_change_emails(
         has_suggestion: bool. Whether this thread has a related learner
             suggestion.
     """
-    can_recipients_receive_email = email_manager.can_users_receive_thread_email(  # type: ignore[no-untyped-call]
+    can_recipients_receive_email = email_manager.can_users_receive_thread_email(
         recipient_list, exploration_id, has_suggestion)
     for recipient_id, can_receive_email in zip(
             recipient_list, can_recipients_receive_email):
