@@ -132,10 +132,6 @@ var suites = {
       'protractor_desktop/skillEditor.js'
     ],
 
-    topicAndStoryViewer: [
-      'protractor_desktop/topicAndStoryViewer.js'
-    ],
-
     wipeout: [
       'protractor_desktop/wipeout.js',
     ]
