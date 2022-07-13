@@ -23,16 +23,161 @@ var action = require('./action.js');
 var interactions = require('../../../extensions/interactions/webdriverio.js');
 
 var ExplorationPlayerPage = function() {
+  var audioBarExpandButton = $('.e2e-test-audio-bar');
+  var cancelRedirectionButton = $('.e2e-test-cancel-redirection-button');
+  var correctFeedbackElement = $('.e2e-test-correct-feedback');
+  var confirmRedirectionButton = $(
+    '.e2e-test-confirm-redirection-button');
+  var continueToSolutionButton = $('.e2e-test-continue-to-solution-btn');
+  var conversationFeedback = $('.e2e-test-conversation-feedback-latest');
+  var conversationSkinCardsContainer = $(
+    '.e2e-test-conversation-skin-cards-container');
   var conversationInput = $('.e2e-test-conversation-input');
   var conversationContentSelector = function() {
     return $$('.e2e-test-conversation-content');
   };
   var explorationHeader = $('.e2e-test-exploration-header');
+  var explorationInfoIcon = $('.e2e-test-exploration-info-icon');
   var feedbackCloseButton = $('.e2e-test-exploration-feedback-close-button');
   var feedbackPopupLink = $('.e2e-test-exploration-feedback-popup-link');
   var feedbackSubmitButton = $('.e2e-test-exploration-feedback-submit-btn');
   var feedbackTextArea = $('.e2e-test-exploration-feedback-textarea');
+  var flaggedSuccessElement = $(
+    '.e2e-test-exploration-flagged-success-message');
+  var gotItButton = $('.e2e-test-learner-got-it-button');
+  var infoCardRating = $('.e2e-test-info-card-rating');
+  var nextCardButton = $('.e2e-test-continue-to-next-card-button');
+  var pauseButton = $('.e2e-test-pause-circle');
+  var playButton = $('.e2e-test-play-circle');
+  var reportExplorationButton = $('.e2e-test-report-exploration-button');
+  var returnToParentButton = $('.e2e-test-return-to-parent-button');
+  let submitButton = $('.e2e-test-submit-report-button');
+  var suggestionPopupLink = $('.e2e-test-exploration-suggestion-popup-link');
+  var viewHintButton = $('.e2e-test-view-hint');
+  var viewSolutionButton = $('.e2e-test-view-solution');
+  var voiceoverLanguageSelector = $('.e2e-test-audio-lang-select');
   var waitingForResponseElem = $('.e2e-test-input-response-loading-dots');
+
+  this.expandAudioBar = async function() {
+    await action.click('Audio Bar Expand Button', audioBarExpandButton);
+  };
+
+  this.pressPlayButton = async function() {
+    await action.click('Play Button', playButton);
+  };
+
+  this.expectAudioToBePlaying = async function() {
+    await waitFor.visibilityOf(
+      pauseButton, 'Pause button taking too long to show up.');
+  };
+
+  this.pressPauseButton = async function() {
+    await action.click('Pause Button', pauseButton);
+  };
+
+  this.expectAudioToBePaused = async function() {
+    await waitFor.visibilityOf(
+      playButton, 'Play button taking too long to show up.');
+  };
+
+  this.changeVoiceoverLanguage = async function(language) {
+    await waitFor.visibilityOf(
+      voiceoverLanguageSelector, 'Language selector takes too long to appear.');
+    await voiceoverLanguageSelector.selectByVisibleText(language);
+  };
+
+  this.clickThroughToNextCard = async function() {
+    await waitFor.elementToBeClickable(nextCardButton);
+    await action.click('Next Card button', nextCardButton);
+  };
+
+  this.clickSuggestChangesButton = async function() {
+    await action.click('Suggestion Popup link', suggestionPopupLink);
+  };
+
+  this.expectNextCardButtonTextToBe = async function(text) {
+    await waitFor.visibilityOf(
+      nextCardButton, 'Next Card Button not showing up.');
+    var buttonText = await nextCardButton.getText();
+    expect(buttonText).toMatch(text);
+  };
+
+  this.reportExploration = async function() {
+    await action.click('Report Exploration Button', reportExplorationButton);
+    let radioButton = await $$('<input>')[0];
+    await waitFor.visibilityOf(
+      radioButton, 'Radio Buttons takes too long to appear');
+    await action.click('Radio Button', radioButton);
+    // eslint-disable-next-line oppia/e2e-practices
+    let textArea = $('<textarea>');
+    await action.sendKeys('Text Area', textArea, 'Reporting this exploration');
+    await action.click('Submit Button', submitButton);
+    let afterSubmitText = await flaggedSuccessElement.getText();
+    expect(afterSubmitText).toMatch(
+      'Your report has been forwarded to the moderators for review.');
+  };
+
+  this.viewHint = async function() {
+    // We need to wait some time for the solution to activate.
+    var until = require('wdio-wait-for');
+    const WAIT_FOR_FIRST_HINT_MSEC = 60000;
+    await browser.waitUntil(
+      until.elementToBeClickable(viewHintButton),
+      {
+        timeout: WAIT_FOR_FIRST_HINT_MSEC,
+        timeoutMsg: '"View Hint" button takes too long to be clickable'
+      });
+    await action.click('View Hint Button', viewHintButton);
+    await clickGotItButton();
+  };
+
+  this.viewSolution = async function() {
+    var until = require('wdio-wait-for');
+    const WAIT_FOR_SUBSEQUENT_HINTS = 30000;
+    // We need to wait some time for the solution to activate.
+    await browser.waitUntil(
+      until.elementToBeClickable(viewSolutionButton),
+      {
+        timeout: WAIT_FOR_SUBSEQUENT_HINTS,
+        timeoutMsg: '"View Solution" button takes too long to be clickable'
+      });
+    await action.click('View Solution Button', viewSolutionButton);
+    await action.click(
+      'Continue To Solution Button', continueToSolutionButton);
+    await clickGotItButton();
+  };
+
+  var clickGotItButton = async function() {
+    await waitFor.elementToBeClickable(gotItButton);
+    await action.click('Got It Button', gotItButton);
+  };
+
+  this.clickConfirmRedirectionButton = async function() {
+    await waitFor.elementToBeClickable(confirmRedirectionButton);
+    await action.click('Confirm Redirection Button', confirmRedirectionButton);
+    await waitFor.pageToFullyLoad();
+  };
+
+  this.clickCancelRedirectionButton = async function() {
+    await waitFor.elementToBeClickable(cancelRedirectionButton);
+    await action.click('Cancel Redirection Button', cancelRedirectionButton);
+  };
+
+  this.clickOnReturnToParentButton = async function() {
+    await waitFor.elementToBeClickable(returnToParentButton);
+    await action.click('Return To Parent Button', returnToParentButton);
+    await waitFor.pageToFullyLoad();
+  };
+
+  this.clickCloseLessonInfoTooltip = async function(
+      closeLessonInfoTooltipElement
+  ) {
+    await waitFor.elementToBeClickable(
+      closeLessonInfoTooltipElement,
+      'Lesson Info Tooltip takes too long to appear');
+    await action.click(
+      'Close Lesson Info Tooltip', closeLessonInfoTooltipElement);
+  };
 
   // This verifies the question just asked, including formatting and
   // rich-text components. To do so the richTextInstructions function will be
@@ -51,6 +196,82 @@ var ExplorationPlayerPage = function() {
     ).toMatch(richTextInstructions);
   };
 
+  this.expectExplorationToBeOver = async function() {
+    var conversationContent = await conversationContentSelector();
+    var lastElement = conversationContent.length - 1;
+    await waitFor.visibilityOf(
+      conversationContent[lastElement], 'Ending message not visible');
+    await waitFor.textToBePresentInElement(
+      conversationContent[lastElement], 'Congratulations, you have finished!',
+      'Ending Message Not Visible');
+    expect(
+      await (conversationContent[lastElement].getText())
+    ).toEqual('Congratulations, you have finished!');
+  };
+
+  this.expectExplorationToNotBeOver = async function() {
+    var conversationContent = await conversationContentSelector();
+    var lastElement = conversationContent.length - 1;
+    await waitFor.visibilityOf(
+      conversationContent[lastElement], 'Ending message not visible');
+    expect(
+      await conversationContent[lastElement].getText()
+    ).not.toEqual('Congratulations, you have finished!');
+  };
+
+  // Additional arguments may be sent to this function, and they will be
+  // passed on to the relevant interaction's detail checker.
+  this.expectInteractionToMatch = async function(interactionId) {
+    await waitFor.visibilityOf(
+      conversationSkinCardsContainer,
+      'Conversation skill cards take too long to appear.');
+    // Convert additional arguments to an array to send on.
+    var args = [conversationInput];
+    for (var i = 1; i < arguments.length; i++) {
+      args.push(arguments[i]);
+    }
+    var interaction = await interactions.getInteraction(interactionId);
+    await interaction.expectInteractionDetailsToMatch.apply(null, args);
+  };
+
+  // Note that the 'latest' feedback may be on either the current or a
+  // previous card.
+  this.expectLatestFeedbackToMatch = async function(richTextInstructions) {
+    await waitFor.visibilityOf(conversationFeedback);
+    await forms.expectRichText(
+      conversationFeedback
+    ).toMatch(richTextInstructions);
+  };
+
+  this.expectExplorationNameToBe = async function(name) {
+    await waitFor.visibilityOf(
+      explorationHeader, 'Exploration Header taking too long to appear.');
+    await waitFor.textToBePresentInElement(
+      explorationHeader, name, 'No Header Text');
+    expect(
+      await explorationHeader.getText()
+    ).toBe(name);
+  };
+
+  this.expectExplorationRatingOnInformationCardToEqual = async function(
+      ratingValue) {
+    await waitFor.elementToBeClickable(explorationInfoIcon);
+    await action.click('Exploration Info Icon', explorationInfoIcon);
+    var value = await infoCardRating.getText();
+    expect(value).toBe(ratingValue);
+  };
+
+  this.rateExploration = async function(ratingValue) {
+    var ratingStars = await $$('.e2e-test-rating-star');
+    await action.click('Submit Button', ratingStars[ratingValue - 1]);
+    await waitFor.visibilityOfSuccessToast(
+      'Success toast for rating takes too long to appear.');
+    await waitFor.elementToBeClickable(feedbackCloseButton);
+    await action.click('Feedback Close Button', feedbackCloseButton);
+    await waitFor.invisibilityOf(
+      feedbackCloseButton, 'Close Feedback button does not disappear');
+  };
+
   // `answerData` is a variable that is passed to the
   // corresponding interaction's protractor utilities.
   // Its definition and type are interaction-specific.
@@ -66,37 +287,6 @@ var ExplorationPlayerPage = function() {
       waitingForResponseElem, 'Response takes too long to appear');
   };
 
-  this.expectExplorationNameToBe = async function(name) {
-    await waitFor.visibilityOf(
-      explorationHeader, 'Exploration Header taking too long to appear.');
-    await waitFor.textToBePresentInElement(
-      explorationHeader, name, 'No Header Text');
-    expect(
-      await explorationHeader.getText()
-    ).toBe(name);
-  };
-
-  this.rateExploration = async function(ratingValue) {
-    var ratingStars = await $$('.e2e-test-rating-star');
-    await action.click('Submit Button', ratingStars[ratingValue - 1]);
-    await waitFor.visibilityOfSuccessToast(
-      'Success toast for rating takes too long to appear.');
-    await waitFor.elementToBeClickable(feedbackCloseButton);
-    await action.click('Feedback Close Button', feedbackCloseButton);
-    await waitFor.invisibilityOf(
-      feedbackCloseButton, 'Close Feedback button does not disappear');
-  };
-
-  this.expectExplorationToNotBeOver = async function() {
-    var conversationContent = await conversationContentSelector();
-    var lastElement = conversationContent.length - 1;
-    await waitFor.visibilityOf(
-      conversationContent[lastElement], 'Ending message not visible');
-    expect(
-      await conversationContent[lastElement].getText()
-    ).not.toEqual('Congratulations, you have finished!');
-  };
-
   this.submitFeedback = async function(feedback) {
     await waitFor.elementToBeClickable(feedbackPopupLink);
     await action.click('Feedback Popup Link', feedbackPopupLink);
@@ -105,6 +295,12 @@ var ExplorationPlayerPage = function() {
     await action.click('Feedback Submit Button', feedbackSubmitButton);
     await waitFor.invisibilityOf(
       feedbackSubmitButton, 'Feedback popup takes too long to disappear');
+  };
+
+  this.expectCorrectFeedback = async function() {
+    await waitFor.visibilityOf(
+      correctFeedbackElement,
+      'Correct feedback footer takes too long to appear');
   };
 };
 

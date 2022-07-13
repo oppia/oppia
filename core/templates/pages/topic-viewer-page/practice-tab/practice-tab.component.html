@@ -19,7 +19,7 @@
                         class="practice-tab-mat-checkbox e2e-test-skill-checkbox"
                         [(ngModel)]="selectedSubtopicIndices[i]"
                         (change)="checkIfQuestionsExist(selectedSubtopicIndices)">
-            <span [ngClass]="{'subtopic-title': displayArea === 'progressTab'}">
+            <span [ngClass]="{'subtopic-title': displayArea === 'progressTab'}" class="e2e-test-skill-checkbox-title">
               {{ subtopic.getTitle() }}
             </span>
           </mat-checkbox>

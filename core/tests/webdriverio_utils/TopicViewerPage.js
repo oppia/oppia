@@ -30,7 +30,7 @@ var TopicViewerPage = function() {
   this.get = async function(classroomUrlFragment, topicName) {
     await browser.url(`/learn/${classroomUrlFragment}`);
     await waitFor.pageToFullyLoad();
-    var topicLink = $(`.e2e-test-topic-link=${topicName}`);
+    var topicLink = $(`.e2e-test-topic-name=${topicName}`);
     await waitFor.presenceOf(
       topicLink, 'Topic ' +
       topicName + ' card is not present on /' + classroomUrlFragment);
@@ -66,7 +66,7 @@ var TopicViewerPage = function() {
   };
 
   this.selectSkillForPractice = async function(subtopicTitle) {
-    var skillCheckbox = $(`.e2e-test-skill-checkbox=${subtopicTitle}`);
+    var skillCheckbox = $(`.e2e-test-skill-checkbox-title=${subtopicTitle}`);
     await action.click('Select skill to practice', skillCheckbox);
   };
 

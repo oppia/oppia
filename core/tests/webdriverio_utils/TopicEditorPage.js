@@ -27,7 +27,6 @@ var forms = require('../webdriverio_utils/forms.js');
 var TopicEditorPage = function() {
   var EDITOR_URL_PREFIX = '/topic_editor/';
   var addSubtopicButton = $('.e2e-test-add-subtopic-button');
-  var cKEditorElement = $('.e2e-test-ck-editor');
   var closeSaveModalButton = $('.e2e-test-close-save-modal-button');
   var closeRTEButton = $('.e2e-test-close-rich-text-component-editor');
   var commitMessageField = $('.e2e-test-commit-message-input');
@@ -102,7 +101,6 @@ var TopicEditorPage = function() {
     '.e2e-test-subtopic-thumbnail .e2e-test-photo-button');
   var thumbnailContainer = $('.e2e-test-thumbnail-container');
   var thumbnailContainer = $('.e2e-test-thumbnail-container');
-  var topicEditorTab = $('.e2e-test-edit-topic-tab');
   var topicMetaTagContentField = $('.e2e-test-topic-meta-tag-content-field');
   var topicMetaTagContentLabel = $('.e2e-test-topic-meta-tag-content-label');
   var topicPageTitleFragmentField = $(
@@ -254,11 +252,12 @@ var TopicEditorPage = function() {
 
   this.addConceptCardToSubtopicExplanation = async function(skillName) {
     await action.click('RTE input', subtopicPageContentButton);
-    var conceptCardButton = cKEditorElement.$(
-      '.cke_button_label=Insert Concept Card Link');
+    // Chaining selectors is selecting the non-interceptable element.
+    // eslint-disable-next-line oppia/e2e-practices
+    var conceptCardButton = $('#cke_124');
     await action.click('Concept card button', conceptCardButton);
     var skillForConceptCard = $(
-      '.e2e-test-rte-skill-selector-item=', skillName);
+      `.e2e-test-rte-skill-selector-item=${skillName}`);
     await action.click('Skill for concept card', skillForConceptCard);
     await action.click('Close RTE button', closeRTEButton);
   };
