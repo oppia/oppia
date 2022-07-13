@@ -169,7 +169,6 @@ class LearnerGroupHandler(base.BaseHandler):
         is_valid_request = learner_group_services.is_user_facilitator(
             self.user_id, learner_group_id
         )
-
         if not is_valid_request:
             raise self.UnauthorizedUserException(
                 'You are not a facilitator of this learner group.')
@@ -207,7 +206,6 @@ class LearnerGroupHandler(base.BaseHandler):
         is_valid_request = learner_group_services.is_user_facilitator(
             self.user_id, learner_group_id
         )
-
         if not is_valid_request:
             raise self.UnauthorizedUserException(
                 'You do not have the rights to delete this learner group '
