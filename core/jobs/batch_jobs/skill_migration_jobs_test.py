@@ -28,6 +28,9 @@ from core.jobs.batch_jobs import skill_migration_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
 
+from typing import Type
+from typing_extensions import Final
+
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import skill_models
@@ -37,11 +40,13 @@ if MYPY: # pragma: no cover
 
 class MigrateSkillJobTests(job_test_utils.JobTestBase):
 
-    JOB_CLASS = skill_migration_jobs.MigrateSkillJob
+    JOB_CLASS: Type[
+        skill_migration_jobs.MigrateSkillJob
+    ] = skill_migration_jobs.MigrateSkillJob
 
-    SKILL_1_ID = 'skill_1'
+    SKILL_1_ID: Final = 'skill_1'
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         skill_summary_model = self.create_model(
             skill_models.SkillSummaryModel,

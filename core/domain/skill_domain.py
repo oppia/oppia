@@ -720,7 +720,7 @@ class Skill:
                 'Skill description should be less than %d chars, received %s'
                 % (description_length_limit, description))
 
-    def validate(self):
+    def validate(self) -> None:
         """Validates various properties of the Skill object.
 
         Raises:

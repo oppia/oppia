@@ -37,6 +37,10 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import skill_models
+
 (skill_models, user_models, question_models, topic_models) = (
     models.Registry.import_models([
         models.NAMES.skill, models.NAMES.user, models.NAMES.question,
@@ -733,7 +737,9 @@ def apply_change_list(skill_id, change_list, committer_id):
         raise e
 
 
-def populate_skill_model_fields(skill_model, skill):
+def populate_skill_model_fields(
+    skill_model: skill_models.SkillModel, skill: skill_domain.Skill
+) -> skill_models.SkillModel:
     """Populate skill model with the data from skill object.
 
     Args:
@@ -895,7 +901,9 @@ def delete_skill_summary(skill_id):
         skill_summary_model.delete()
 
 
-def compute_summary_of_skill(skill):
+def compute_summary_of_skill(
+    skill: skill_domain.Skill
+) -> skill_domain.SkillSummary:
     """Create a SkillSummary domain object for a given Skill domain
     object and return it.
 
@@ -930,7 +938,10 @@ def create_skill_summary(skill_id):
     save_skill_summary(skill_summary)
 
 
-def populate_skill_summary_model_fields(skill_summary_model, skill_summary):
+def populate_skill_summary_model_fields(
+    skill_summary_model: skill_models.SkillSummaryModel,
+    skill_summary: skill_domain.SkillSummary
+) -> skill_models.SkillSummaryModel:
     """Populate skill summary model with the data from skill summary object.
 
     Args:

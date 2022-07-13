@@ -181,9 +181,14 @@ class MigrateSkillJob(base_jobs.JobBase):
                 commit_message,
                 change_dicts,
                 additional_models={}
-            ).values()
-        datastore_services.update_timestamps_multi(list(models_to_put))
-        return models_to_put
+            )
+        models_to_put_values = []
+        for _, value in models_to_put.items():
+            # Here, we are narrowing down the type from object to BaseModel.
+            assert isinstance(value, base_models.BaseModel)
+            models_to_put_values.append(value)
+        datastore_services.update_timestamps_multi(models_to_put_values)
+        return models_to_put_values
 
     @staticmethod
     def _update_skill_summary(
