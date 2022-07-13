@@ -407,17 +407,13 @@ def get_multi_users_progress_in_stories(
 
     # All poosible combinations of user_id and story_id for which progress
     # models are returned.
-    all_posssible_combinations = list(
-        itertools.product(user_ids, valid_story_ids)
-    )
+    all_posssible_combinations = itertools.product(user_ids, valid_story_ids)
     progress_models = user_models.StoryProgressModel.get_multi(
         user_ids, valid_story_ids
     )
-
     all_users_stories_progress: Dict[
         str, List[story_domain.LearnerGroupSyllabusStorySummaryDict]
     ] = {user_id: [] for user_id in user_ids}
-
     for i, (user_id, story_id) in enumerate(all_posssible_combinations):
         progress_model = progress_models[i]
         completed_node_ids = []

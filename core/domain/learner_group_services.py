@@ -271,7 +271,6 @@ def get_matching_learner_group_syllabus_to_add(
         if language_code and language_code != topic.language_code:
             continue
 
-        # If the keyword matches a topic name.
         if keyword in topic.canonical_name:
             # If search type is set to default or search type is set to
             # 'Story', add all story ids of this topic to the filtered
@@ -302,8 +301,6 @@ def get_matching_learner_group_syllabus_to_add(
                         topic, group_subtopic_page_ids
                     )
                 )
-
-        # If the keyword does not matches a topic name.
         else:
             # If search type is set to default or search type is set to
             # 'Skill', add the subtopics which have the keyword in their

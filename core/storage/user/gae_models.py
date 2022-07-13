@@ -2068,9 +2068,7 @@ class StoryProgressModel(base_models.BaseModel):
             list(StoryProgressModel|None). The list of StoryProgressModel
             instances which matches the given user_ids and story_ids.
         """
-        all_posssible_combinations = list(
-            itertools.product(user_ids, story_ids)
-        )
+        all_posssible_combinations = itertools.product(user_ids, story_ids)
         instance_ids = [
             cls._generate_id(user_id, story_id)
             for (user_id, story_id) in all_posssible_combinations

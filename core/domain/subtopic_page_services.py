@@ -337,14 +337,10 @@ def get_topic_ids_from_subtopic_page_ids(
     Returns:
         list(str). The topic ids corresponding to the given subtopic page ids.
     """
-    topic_ids: List[str] = []
-
-    for subtopic_page_id in subtopic_page_ids:
-        topic_id = subtopic_page_id.split(':')[0]
-        if topic_id not in topic_ids:
-            topic_ids.append(topic_id)
-
-    return topic_ids
+    return list({
+        subtopic_page_id.split(':')[0] for subtopic_page_id in
+        subtopic_page_ids
+    })
 
 
 def get_multi_users_subtopic_pages_progress(
@@ -376,8 +372,6 @@ def get_multi_users_subtopic_pages_progress(
         }
     )
 
-    # Fetch the progress of the all students in all the subtopics assigned
-    # in the group syllabus.
     all_users_skill_mastery_dicts = (
         skill_services.get_multi_users_skills_mastery(
             user_ids, all_skill_ids
@@ -387,13 +381,14 @@ def get_multi_users_subtopic_pages_progress(
     all_users_subtopic_prog_summaries: Dict[
         str, List[subtopic_page_domain.SubtopicPageSummaryDict]
     ] = {user_id: [] for user_id in user_ids}
-
     for topic in topics:
         for subtopic in topic.subtopics:
             subtopic_page_id = '{}:{}'.format(topic.id, subtopic.id)
             if subtopic_page_id not in subtopic_page_ids:
                 continue
-            for user_id, skills_mastery_dict in all_users_skill_mastery_dicts.items(): # pylint: disable=line-too-long
+            for user_id, skills_mastery_dict in (
+                all_users_skill_mastery_dicts.items()
+            ):
                 skill_mastery_dict = {
                     skill_id: mastery
                     for skill_id, mastery in skills_mastery_dict.items()

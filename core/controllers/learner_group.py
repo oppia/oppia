@@ -109,7 +109,6 @@ class CreateLearnerGroupHandler(base.BaseHandler):
         invited_student_ids = user_services.get_multi_user_ids_from_usernames(
             invited_student_usernames)
 
-        # Create a new learner group ID.
         new_learner_grp_id = learner_group_fetchers.get_new_learner_group_id()
 
         learner_group = learner_group_services.create_learner_group(
