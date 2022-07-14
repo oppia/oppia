@@ -39,8 +39,13 @@ export class LearnerGroupDetailsComponent {
     return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
-  updateLearnerGroupDetails(): void {
+  updateGroupTitle(title: string): void {
+    this.learnerGroupTitle = title;
     this.updateLearnerGroupTitle.emit(this.learnerGroupTitle);
+  }
+
+  updateGroupDescription(description: string): void {
+    this.learnerGroupDescription = description;
     this.updateLearnerGroupDesc.emit(this.learnerGroupDescription);
   }
 }

@@ -30,7 +30,7 @@
            *ngIf="shortLearnerGroupSummaries.length > 0">
         <div class="oppia-learner-group-summary-card"
              *ngFor="let learnerGroupSummary of shortLearnerGroupSummaries">
-          <a [href]="learnerGroupPageUrl(learnerGroupSummary.id)" class="oppia-learner-group-summary-card-info">
+          <a [href]="getLearnerGroupPageUrl(learnerGroupSummary.id)" class="oppia-learner-group-summary-card-info">
             <div class="oppia-learner-group-summary-card-title">
               {{learnerGroupSummary.title}}
             </div>

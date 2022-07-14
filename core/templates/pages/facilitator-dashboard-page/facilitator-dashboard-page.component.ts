@@ -22,15 +22,17 @@ import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 
 import { ContextService } from 'services/context.service';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { LoaderService } from 'services/loader.service';
 import { PageTitleService } from 'services/page-title.service';
 import { LearnerGroupPagesConstants } from
   'pages/learner-group-pages/learner-group-pages.constants';
-import { ShortLearnerGroupSummary } from 'domain/learner_group/short-learner-group-summary.model';
-import { FacilitatorDashboardBackendApiService } from 'domain/learner_group/facilitator-dashboard-backend-api.service';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { ShortLearnerGroupSummary } from
+  'domain/learner_group/short-learner-group-summary.model';
+import { FacilitatorDashboardBackendApiService } from
+  'domain/learner_group/facilitator-dashboard-backend-api.service';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
 
 @Component({
   selector: 'oppia-facilitator-dashboard-page',
@@ -45,17 +47,12 @@ export class FacilitatorDashboardPageComponent implements OnInit, OnDestroy {
     private contextService: ContextService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private pageTitleService: PageTitleService,
-    private windowDimensionsService: WindowDimensionsService,
     private translateService: TranslateService,
     private facilitatorDashboardBackendApiService:
       FacilitatorDashboardBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
     private loaderService: LoaderService
   ) {}
-
-  checkMobileView(): boolean {
-    return (this.windowDimensionsService.getWidth() < 500);
-  }
 
   isLanguageRTL(): boolean {
     return this.i18nLanguageCodeService.isCurrentLanguageRTL();
@@ -71,14 +68,14 @@ export class FacilitatorDashboardPageComponent implements OnInit, OnDestroy {
 
   setPageTitle(): void {
     let translatedTitle = this.translateService.instant(
-      'I18N_TOPNAV_FACILITATOR_DASHBOARD');
+      'I18N_FACILITATOR_DASHBOARD_PAGE_TITLE');
     this.pageTitleService.setDocumentTitle(translatedTitle);
   }
 
-  learnerGroupPageUrl(learnerGroupId: string): string {
+  getLearnerGroupPageUrl(learnerGroupId: string): string {
     return (
       this.urlInterpolationService.interpolateUrl(
-        '/create/learner-groups/<groupId>', {
+        '/create-learner-group/<groupId>', {
           groupId: learnerGroupId
         }
       )
@@ -97,6 +94,7 @@ export class FacilitatorDashboardPageComponent implements OnInit, OnDestroy {
           this.loaderService.hideLoadingScreen();
         }
       );
+    this.subscribeToOnLangChange();
   }
 
   ngOnDestroy(): void {

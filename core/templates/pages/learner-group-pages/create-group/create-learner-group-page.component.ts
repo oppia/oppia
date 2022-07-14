@@ -23,17 +23,20 @@ import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 
 import { ContextService } from 'services/context.service';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { LoaderService } from 'services/loader.service';
 import { PageTitleService } from 'services/page-title.service';
 import { LearnerGroupPagesConstants } from '../learner-group-pages.constants';
 import { LearnerGroupData } from 'domain/learner_group/learner-group.model';
-import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-group-backend-api.service';
-import { LearnerGroupSubtopicSummary } from 'domain/learner_group/learner-group-subtopic-summary.model';
+import { LearnerGroupBackendApiService } from
+  'domain/learner_group/learner-group-backend-api.service';
+import { LearnerGroupSubtopicSummary } from
+  'domain/learner_group/learner-group-subtopic-summary.model';
 import { StorySummary } from 'domain/story/story-summary.model';
-import { LearnerGroupInvitedUserInfo } from 'domain/learner_group/learner-group-user-progress.model';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { LearnerGroupInvitedUserInfo } from
+  'domain/learner_group/learner-group-user-progress.model';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
 @Component({
@@ -63,7 +66,6 @@ export class CreateLearnerGroupPageComponent implements OnInit, OnDestroy {
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private loaderService: LoaderService,
     private pageTitleService: PageTitleService,
-    private windowDimensionsService: WindowDimensionsService,
     private translateService: TranslateService,
     private learnerGroupBackendApiService: LearnerGroupBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
@@ -75,10 +77,7 @@ export class CreateLearnerGroupPageComponent implements OnInit, OnDestroy {
     this.activeSection = (
       this.LEARNER_GROUP_CREATION_SECTION_I18N_IDS.GROUP_DETAILS
     );
-  }
-
-  checkMobileView(): boolean {
-    return (this.windowDimensionsService.getWidth() < 500);
+    this.subscribeToOnLangChange();
   }
 
   isLanguageRTL(): boolean {
@@ -95,7 +94,7 @@ export class CreateLearnerGroupPageComponent implements OnInit, OnDestroy {
 
   setPageTitle(): void {
     let translatedTitle = this.translateService.instant(
-      'I18N_TOPNAV_FACILITATOR_DASHBOARD');
+      'I18N_CREATE_LEARNER_GROUP_PAGE_TITLE');
     this.pageTitleService.setDocumentTitle(translatedTitle);
   }
 
@@ -163,6 +162,7 @@ export class CreateLearnerGroupPageComponent implements OnInit, OnDestroy {
     if (sectionNumber === this.furthestReachedSectionNumber) {
       return 'active';
     }
+    return 'incomplete';
   }
 
   getOppiaLargeAvatarUrl(): string {

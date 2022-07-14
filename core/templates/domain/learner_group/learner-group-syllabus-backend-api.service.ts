@@ -26,6 +26,24 @@ import { UrlInterpolationService }
 import { LearnerGroupSyllabus, LearnerGroupSyllabusBackendDict }
   from './learner-group-syllabus.model';
 
+interface SyllabusFilterDetails {
+  description: string;
+  itemsName: string;
+  masterList: {
+    id: string;
+    text: string;
+  }[];
+  selection: string;
+  defaultValue: string;
+  summary: string;
+}
+
+export interface SyllabusSelectionDetails {
+  [key: string]: SyllabusFilterDetails,
+  types: SyllabusFilterDetails,
+  categories: SyllabusFilterDetails,
+  languageCodes: SyllabusFilterDetails
+}
 
 export interface LearnerGroupSyllabusFilter {
   keyword: string;

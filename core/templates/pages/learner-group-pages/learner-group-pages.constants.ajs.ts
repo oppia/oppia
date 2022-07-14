@@ -23,3 +23,7 @@ import { LearnerGroupPagesConstants } from './learner-group-pages.constants';
 angular.module('oppia').constant(
   'LEARNER_GROUP_CREATION_SECTION_I18N_IDS',
   LearnerGroupPagesConstants.LEARNER_GROUP_CREATION_SECTION_I18N_IDS);
+
+angular.module('oppia').constant(
+  'CREATE_LEARNER_GROUP_PAGE_URL',
+  LearnerGroupPagesConstants.CREATE_LEARNER_GROUP_PAGE_URL);

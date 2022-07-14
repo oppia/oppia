@@ -22,7 +22,6 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { TranslateService } from '@ngx-translate/core';
 import { Subject, Subscription } from 'rxjs';
 
-import { ContextService } from 'services/context.service';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
@@ -33,8 +32,11 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import constants from 'assets/constants';
 import { ConstructTranslationIdsService } from
   'services/construct-translation-ids.service';
-import { LearnerGroupSyllabusFilter, LearnerGroupSyllabusBackendApiService }
-  from 'domain/learner_group/learner-group-syllabus-backend-api.service';
+import { 
+  LearnerGroupSyllabusFilter,
+  LearnerGroupSyllabusBackendApiService,
+  SyllabusSelectionDetails 
+} from 'domain/learner_group/learner-group-syllabus-backend-api.service';
 import { StorySummary } from 'domain/story/story-summary.model';
 import { LearnerGroupSubtopicSummary } from
   'domain/learner_group/learner-group-subtopic-summary.model';
@@ -78,12 +80,10 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
   ACTION_CLOSE!: string;
   SUPPORTED_CONTENT_LANGUAGES!: LanguageIdAndText[];
   SEARCH_DROPDOWN_TYPES!: SearchDropDownItems[];
-  selectionDetails;
+  selectionDetails: SyllabusSelectionDetails;
   SEARCH_DROPDOWN_CATEGORIES!: SearchDropDownItems[];
   KEYBOARD_EVENT_TO_KEY_CODES!: {};
   directiveSubscriptions: Subscription = new Subscription();
-  classroomPageIsActive: boolean = false;
-  searchButtonIsActive: boolean = false;
   searchQuery: string = '';
   searchQueryChanged: Subject<string> = new Subject<string>();
   translationData: Record<string, number> = {};
@@ -92,7 +92,6 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
   syllabusFilter: LearnerGroupSyllabusFilter;
 
   constructor(
-    private contextService: ContextService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private windowDimensionsService: WindowDimensionsService,
     private translateService: TranslateService,
@@ -103,10 +102,6 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
       LearnerGroupSyllabusBackendApiService,
     private assetsBackendApiService: AssetsBackendApiService
   ) {}
-
-  checkMobileView(): boolean {
-    return (this.windowDimensionsService.getWidth() < 500);
-  }
 
   isMobileViewActive(): boolean {
     return this.windowDimensionsService.getWidth() <= 766;
@@ -173,6 +168,10 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
         this.searchQuery = model;
         this.onSearchQueryChangeExec();
       });
+
+    this.directiveSubscriptions.add(
+      this.translateService.onLangChange
+        .subscribe(() => this.refreshSearchBarLabels()));
   }
 
   // Update the description field of the relevant entry of selectionDetails.
@@ -287,14 +286,12 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
   }
 
   searchToBeExec(e: {target: {value: string}}): void {
-    if (!this.searchButtonIsActive) {
-      this.searchQueryChanged.next(e.target.value);
-    }
+    this.searchQueryChanged.next(e.target.value);
   }
 
   isValidSearch(): boolean {
     return (
-      this.searchQuery.length > 0 ||
+      (this.searchQuery && this.searchQuery.length > 0) ||
       this.selectionDetails.types.selection.length > 0 ||
       this.selectionDetails.categories.selection.length > 0 ||
       this.selectionDetails.languageCodes.selection.length > 0
@@ -352,38 +349,32 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
     this.updateLearnerGroupSyllabus();
   }
 
-  removeStoryFromSyllabus(storySummary: StorySummary): void {
+  removeStoryFromSyllabus(storyId: string): void {
     this.syllabusStorySummaries = this.syllabusStorySummaries.filter(
-      (s) => s.getId() !== storySummary.getId());
+      (s) => s.getId() !== storyId);
     this.syllabusStoryIds = this.syllabusStoryIds.filter(
-      (id) => id !== storySummary.getId());
+      (id) => id !== storyId);
     this.updateLearnerGroupSyllabus();
   }
 
-  removeSubtopicFromSyllabus(
-      subtopicSummary: LearnerGroupSubtopicSummary
-  ): void {
+  removeSubtopicFromSyllabus(subtopicPageId: string): void {
     this.syllabusSubtopicSummaries = this.syllabusSubtopicSummaries.filter(
-      (s) => s.subtopicPageId !== subtopicSummary.subtopicPageId);
+      (s) => s.subtopicPageId !== subtopicPageId);
     this.syllabusSubtopicPageIds = this.syllabusSubtopicPageIds.filter(
-      (id) => id !== subtopicSummary.subtopicPageId);
+      (id) => id !== subtopicPageId);
     this.updateLearnerGroupSyllabus();
   }
 
-  isStoryPartOfSyllabus(storySummary: StorySummary): boolean {
-    return this.syllabusStoryIds.indexOf(storySummary.getId()) !== -1;
+  isStoryPartOfSyllabus(storyId: string): boolean {
+    return this.syllabusStoryIds.indexOf(storyId) !== -1;
   }
 
-  isSubtopicPartOfSyllabus(
-      subtopicSummary: LearnerGroupSubtopicSummary
-  ): boolean {
-    return this.syllabusSubtopicPageIds.indexOf(
-      subtopicSummary.subtopicPageId) !== -1;
+  isSubtopicPartOfSyllabus(subtopicPageId: string): boolean {
+    return this.syllabusSubtopicPageIds.indexOf(subtopicPageId) !== -1;
   }
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
-    this.contextService.removeCustomEntityContext();
   }
 }
 

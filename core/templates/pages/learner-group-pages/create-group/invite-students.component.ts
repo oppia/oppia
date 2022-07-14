@@ -19,8 +19,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AlertsService } from 'services/alerts.service';
-import { WindowDimensionsService } from
-  'services/contextual/window-dimensions.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { LearnerGroupBackendApiService } from
   'domain/learner_group/learner-group-backend-api.service';
@@ -50,13 +48,8 @@ export class InviteStudentsComponent implements OnInit {
   constructor(
     private alertsService: AlertsService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
-    private windowDimensionsService: WindowDimensionsService,
     private learnerGroupBackendApiService: LearnerGroupBackendApiService
   ) {}
-
-  checkMobileView(): boolean {
-    return (this.windowDimensionsService.getWidth() < 500);
-  }
 
   isLanguageRTL(): boolean {
     return this.i18nLanguageCodeService.isCurrentLanguageRTL();
@@ -78,15 +71,15 @@ export class InviteStudentsComponent implements OnInit {
   onSearchQueryChangeExec(username: string): void {
     if (username) {
       if (this.invitedUsernames.includes(username)) {
-        this.alertsService.addWarning(
+        this.alertsService.addInfoMessage(
           'User with username ' + username + ' has been already invited.'
         );
         return;
       }
       this.learnerGroupBackendApiService.searchNewStudentToAddAsync(
         this.learnerGroupID, username
-      ).then((userInfo) => {
-        if (!userInfo.error) {
+      ).then(userInfo => {
+        if (userInfo.error.length == 0) {
           this.invitedUsersInfo.push(userInfo);
           this.invitedUsernames.push(userInfo.username);
           this.updateInvitedStudents();

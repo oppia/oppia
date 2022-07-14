@@ -22,9 +22,6 @@ export const LearnerGroupPagesConstants = {
     ADD_SYLLABUS_ITEMS: 'I18N_LEARNER_GROUP_ADD_SYLLABUS_ITEMS_SECTION',
     INVITE_STUDENTS: 'I18N_LEARNER_GROUP_INVITE_STUDENTS_SECTION',
   },
-  // Prototype group ID is used as the default ID until the group is created and
-  // an actual group ID is generated.
-  PROTOTYPE_GROUP_ID: 'groupID',
 
   CREATE_LEARNER_GROUP_PAGE_URL: '/create-learner-group'
 } as const;
