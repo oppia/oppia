@@ -597,7 +597,7 @@ def _check_coverage(
         uncovered_lines = re.search(
             r'TOTAL\s+(\d+)\s+(?P<total>\d+)\s+(\d+)\s+(\d+)\s+(\d+)%\s+',
             process.stdout).group('total')
-        coverage = float(uncovered_lines / all_lines) * 100
+        coverage = float((all_lines - uncovered_lines) / all_lines) * 100
     else:
         coverage_result = re.search(
             r'TOTAL\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(?P<total>\d+)%\s+',
