@@ -101,7 +101,7 @@ describe('Translation opportunities component', () => {
         topic_name: 'topic_1',
         story_title: 'Story title 1',
         chapter_title: 'Chapter title 1',
-        content_count: 1,
+        content_count: 4,
         translation_counts: {
           en: 2
         },
@@ -171,6 +171,21 @@ describe('Translation opportunities component', () => {
         expect(opportunitiesDicts.length).toBe(2);
         expect(more).toBeFalse();
       });
+  });
+
+  it('should move opportunities with no translatable cards to the bottom ' +
+    'of opportunity list', () => {
+    spyOn(translationLanguageService, 'getActiveLanguageCode').and.returnValue(
+      'en');
+    const {opportunitiesDicts, } = (
+      component.getPresentableOpportunitiesData({
+        opportunities: opportunitiesArray,
+        more: false
+      }));
+    expect(
+      opportunitiesDicts[opportunitiesDicts.length - 1].translationsCount +
+      opportunitiesDicts[opportunitiesDicts.length - 1].inReviewCount ===
+      opportunitiesDicts[opportunitiesDicts.length - 1].totalCount).toBeTrue();
   });
 
   it('should open translation modal when clicking button', fakeAsync(() => {
