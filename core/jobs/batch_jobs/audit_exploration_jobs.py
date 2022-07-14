@@ -21,15 +21,16 @@ from __future__ import annotations
 import html
 import json
 
+from core.constants import constants
+from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import rte_component_registry
-from core.domain import state_domain, exp_domain
+from core.domain import state_domain
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
 from core.jobs.types import job_run_result
 from core.platform import models
-from core.constants import constants
 
 import apache_beam as beam
 import bs4
@@ -78,8 +79,10 @@ class ExpStateAuditChecksJob(base_jobs.JobBase):
         Optional[opportunity_models.ExplorationOpportunitySummaryModel]
     ]) -> bool:
         """Returns whether the exp model is curated or not.
+
         Args:
             model_pair: tuple. The pair of exp and opportunity models.
+
         Returns:
             bool. Returns whether the exp model is curated or not.
         """
@@ -91,8 +94,10 @@ class ExpStateAuditChecksJob(base_jobs.JobBase):
     ]) -> exp_domain.Exploration:
         """Returns the exploration domain object from the curated
         exploration model.
+
         Args:
             model_pair: tuple. The pair of exp and opportunity models.
+
         Returns:
             bool. Returns whether the exp model is curated or not.
         """
@@ -107,8 +112,10 @@ class ExpStateAuditChecksJob(base_jobs.JobBase):
         Optional[opportunity_models.ExplorationOpportunitySummaryModel]
     ]:
         """Returns the pair of exp and opportunity models.
+
         Args:
             models_list_pair: tuple. The pair of models list.
+
         Returns:
             tuple. The pair of exp and opportunity models.
         """
@@ -325,7 +332,7 @@ class ExpStateAuditChecksJob(base_jobs.JobBase):
                         if not multi_item_value:
                             if (
                                 rule_spec.rule_type == (
-                                    'IsEqualToOrderingWithOneItemAt'+
+                                    'IsEqualToOrderingWithOneItemAt' +
                                     'IncorrectPosition'
                                 )
                             ):
@@ -353,8 +360,10 @@ class ExpStateAuditChecksJob(base_jobs.JobBase):
     @staticmethod
     def _get_rte_components(html_string: str):
         """Extracts the RTE components from an HTML string.
+
         Args:
             html_string: str. An HTML string.
+
         Returns:
             list(dict). A list of dictionaries, each representing an
             RTE component.
@@ -520,9 +529,11 @@ class ExpStateAuditChecksJob(base_jobs.JobBase):
         errored_values: List[dict[str, list]]
     ) -> List[Dict[str, List[Dict[str, List[str]]]]]:
         """Remove the empty arrays
+
         Args:
             errored_values: list[dict]. The list of dictionaries
                 containing the errored values.
+
         Returns:
             errored_values: list[dict]. The list of dictionaries
             containing the errored values with removed empty.
@@ -600,7 +611,7 @@ class ExpStateAuditChecksJob(base_jobs.JobBase):
             all_explorations
             | 'Filter private exps' >> beam.Filter(
                 lambda exp, private_exp_list: exp.id in private_exp_list,
-                    private_exp_list = beam.pvalue.AsList(
+                    private_exp_list=beam.pvalue.AsList(
                         exp_private_summ_models)
             )
             | 'Map private exp id, states, created date' >> beam.Map(
@@ -613,7 +624,7 @@ class ExpStateAuditChecksJob(base_jobs.JobBase):
             all_explorations
             | 'Filter public exps' >> beam.Filter(
                 lambda exp, public_exp_list: exp.id in public_exp_list,
-                    public_exp_list = beam.pvalue.AsList(
+                    public_exp_list=beam.pvalue.AsList(
                         exp_public_summ_models)
             )
             | 'Map public exp id, states, created date' >> beam.Map(

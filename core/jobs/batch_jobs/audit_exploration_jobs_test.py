@@ -917,24 +917,24 @@ class ExpStateAuditChecksJobTests(job_test_utils.JobTestBase):
                 f'13 is greater than end value 11\']}}]'
             ),
             job_run_result.JobRunResult.as_stdout(
-                f'NUMBER OF CURATED EXPS WITH INVALID ITEM SELEC '
-                f'INTERAC SUCCESS: 1'
+                'NUMBER OF CURATED EXPS WITH INVALID ITEM SELEC ' +
+                'INTERAC SUCCESS: 1'
             ),
             job_run_result.JobRunResult.as_stdout(
-                f'NUMBER OF CURATED EXPS WITH INVALID CONT INTERAC SUCCESS: 1'
+                'NUMBER OF CURATED EXPS WITH INVALID CONT INTERAC SUCCESS: 1'
             ),
             job_run_result.JobRunResult.as_stdout(
-                f'NUMBER OF CURATED EXPS WITH INVALID REF EXP ID SUCCESS: 1'
+                'NUMBER OF CURATED EXPS WITH INVALID REF EXP ID SUCCESS: 1'
             ),
             job_run_result.JobRunResult.as_stdout(
-                f'NUMBER OF CURATED EXPS WITH INVALID RTE IMAGE SUCCESS: 1'
+                'NUMBER OF CURATED EXPS WITH INVALID RTE IMAGE SUCCESS: 1'
             ),
             job_run_result.JobRunResult.as_stdout(
-                f'NUMBER OF CURATED EXPS WITH INVALID DRAG DROP '
-                f'INTERAC SUCCESS: 1'
+                'NUMBER OF CURATED EXPS WITH INVALID DRAG DROP ' +
+                'INTERAC SUCCESS: 1'
             ),
             job_run_result.JobRunResult.as_stdout(
-                f'NUMBER OF CURATED EXPS WITH INVALID RTE VIDEO SUCCESS: 1'
+                'NUMBER OF CURATED EXPS WITH INVALID RTE VIDEO SUCCESS: 1'
             )
         ])
 
@@ -1004,24 +1004,24 @@ class ExpStateAuditChecksJobTests(job_test_utils.JobTestBase):
                 f'13 is greater than end value 11\']}}]'
             ),
             job_run_result.JobRunResult.as_stdout(
-                f'NUMBER OF PRIVATE EXPS WITH INVALID ITEM SELEC '
-                f'INTERAC SUCCESS: 1'
+                'NUMBER OF PRIVATE EXPS WITH INVALID ITEM SELEC ' +
+                'INTERAC SUCCESS: 1'
             ),
             job_run_result.JobRunResult.as_stdout(
-                f'NUMBER OF PRIVATE EXPS WITH INVALID CONT INTERAC SUCCESS: 1'
+                'NUMBER OF PRIVATE EXPS WITH INVALID CONT INTERAC SUCCESS: 1'
             ),
             job_run_result.JobRunResult.as_stdout(
-                f'NUMBER OF PRIVATE EXPS WITH INVALID REF EXP ID SUCCESS: 1'
+                'NUMBER OF PRIVATE EXPS WITH INVALID REF EXP ID SUCCESS: 1'
             ),
             job_run_result.JobRunResult.as_stdout(
-                f'NUMBER OF PRIVATE EXPS WITH INVALID RTE IMAGE SUCCESS: 1'
+                'NUMBER OF PRIVATE EXPS WITH INVALID RTE IMAGE SUCCESS: 1'
             ),
             job_run_result.JobRunResult.as_stdout(
-                f'NUMBER OF PRIVATE EXPS WITH INVALID DRAG DROP '
-                f'INTERAC SUCCESS: 1'
+                'NUMBER OF PRIVATE EXPS WITH INVALID DRAG DROP ' +
+                'INTERAC SUCCESS: 1'
             ),
             job_run_result.JobRunResult.as_stdout(
-                f'NUMBER OF PRIVATE EXPS WITH INVALID RTE VIDEO SUCCESS: 1'
+                'NUMBER OF PRIVATE EXPS WITH INVALID RTE VIDEO SUCCESS: 1'
             )
         ])
 
@@ -1091,23 +1091,23 @@ class ExpStateAuditChecksJobTests(job_test_utils.JobTestBase):
                 f'13 is greater than end value 11\']}}]'
             ),
             job_run_result.JobRunResult.as_stdout(
-                f'NUMBER OF PUBLIC EXPS WITH INVALID ITEM SELEC '
-                f'INTERAC SUCCESS: 1'
+                'NUMBER OF PUBLIC EXPS WITH INVALID ITEM SELEC ' +
+                'INTERAC SUCCESS: 1'
             ),
             job_run_result.JobRunResult.as_stdout(
-                f'NUMBER OF PUBLIC EXPS WITH INVALID CONT INTERAC SUCCESS: 1'
+                'NUMBER OF PUBLIC EXPS WITH INVALID CONT INTERAC SUCCESS: 1'
             ),
             job_run_result.JobRunResult.as_stdout(
-                f'NUMBER OF PUBLIC EXPS WITH INVALID REF EXP ID SUCCESS: 1'
+                'NUMBER OF PUBLIC EXPS WITH INVALID REF EXP ID SUCCESS: 1'
             ),
             job_run_result.JobRunResult.as_stdout(
-                f'NUMBER OF PUBLIC EXPS WITH INVALID RTE IMAGE SUCCESS: 1'
+                'NUMBER OF PUBLIC EXPS WITH INVALID RTE IMAGE SUCCESS: 1'
             ),
             job_run_result.JobRunResult.as_stdout(
-                f'NUMBER OF PUBLIC EXPS WITH INVALID DRAG DROP '
-                f'INTERAC SUCCESS: 1'
+                'NUMBER OF PUBLIC EXPS WITH INVALID DRAG DROP ' +
+                'INTERAC SUCCESS: 1'
             ),
             job_run_result.JobRunResult.as_stdout(
-                f'NUMBER OF PUBLIC EXPS WITH INVALID RTE VIDEO SUCCESS: 1'
+                'NUMBER OF PUBLIC EXPS WITH INVALID RTE VIDEO SUCCESS: 1'
             )
         ])
