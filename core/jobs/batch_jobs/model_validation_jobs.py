@@ -266,7 +266,7 @@ class GetExistingModelKeyCounts(beam.PTransform):  # type: ignore[misc]
 
 # TODO(#15613): Due to incomplete typing of apache_beam library and absences
 # of stubs in Typeshed, MyPy assuming PTransform class is of type Any. Thus
-# to avoid MyPy's error (Class cannot subclass 'PTransform' (has type 'Any')) ,
+# to avoid MyPy's error (Class cannot subclass 'PTransform' (has type 'Any')),
 # we added an ignore here.
 class GetMissingModelKeyErrors(beam.PTransform):  # type: ignore[misc]
     """Returns PCollection of (key, error) pairs for each referenced model."""
