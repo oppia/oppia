@@ -76,8 +76,9 @@ class CheckBackendAssociatedTestFileTests(test_utils.GenericTestBase):
 
     def test_checks_pass_when_a_backend_file_in_exclusion_list_lacks_associated_test_file(  # pylint: disable=line-too-long
         self) -> None:
-        (check_backend_associated_test_file.
-            FILES_WITHOUT_ASSOCIATED_TEST_FILES.append(self.backend_file))
+        (
+            check_backend_associated_test_file.
+                FILES_WITHOUT_ASSOCIATED_TEST_FILES.append(self.backend_file))
         with self.print_swap, self.swap_logging, self.swap_exit:
             check_backend_associated_test_file.main()
 
