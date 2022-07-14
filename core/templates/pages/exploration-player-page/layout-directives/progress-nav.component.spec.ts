@@ -190,10 +190,6 @@ describe('Progress nav component', () => {
       expect(browserCheckerService.isMobileDevice).toHaveBeenCalled();
     });
 
-  it('should get RTL language status correctly', () => {
-    expect(componentInstance.isLanguageRTL()).toEqual(true);
-  });
-
   it('should not resolve special case for interaction if in desktop mode',
     () => {
       spyOn(browserCheckerService, 'isMobileDevice').and.returnValue(false);

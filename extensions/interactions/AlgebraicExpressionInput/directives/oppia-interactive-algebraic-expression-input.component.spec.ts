@@ -24,6 +24,7 @@ import { CurrentInteractionService } from 'pages/exploration-player-page/service
 import { GuppyInitializationService, GuppyObject } from 'services/guppy-initialization.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { TranslateService } from '@ngx-translate/core';
+import { AlgebraicExpressionAnswer } from 'interactions/answer-defs';
 
 class MockTranslateService {
   instant(key: string): string {
@@ -63,8 +64,12 @@ describe('AlgebraicExpressionInputInteractive', () => {
   }
 
   let mockCurrentInteractionService = {
-    onSubmit: (answer, rulesService) => {},
-    registerCurrentInteraction: (submitAnswerFn, validateExpressionFn) => {
+    onSubmit: (
+        answer: AlgebraicExpressionAnswer,
+        rulesService: CurrentInteractionService
+    ) => {},
+    registerCurrentInteraction: (
+        submitAnswerFn: Function, validateExpressionFn: Function) => {
       submitAnswerFn();
       validateExpressionFn();
     }

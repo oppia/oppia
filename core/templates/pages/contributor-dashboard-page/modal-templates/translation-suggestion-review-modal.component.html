@@ -2,7 +2,7 @@
   <div class="row align-items-start">
     <h3 class="col-3">Review translation</h3>
     <span title="{{ subheading }}"
-          class="col-8 pt-1 mt-4 oppia-translation-modal-subheading protractor-translation-suggestion-review-subheading"
+          class="col-8 pt-1 mt-4 oppia-translation-modal-subheading e2e-translation-suggestion-review-subheading"
           aria-hidden="false"> {{ subheading }}
     </span>
     <button type="button"
@@ -109,7 +109,7 @@
   </section>
   <div [hidden]="!reviewable" class="oppia-suggestion-review-message">
     Review message (required if rejecting):
-    <textarea class="protractor-test-suggestion-review-message w-100"
+    <textarea class="e2e-test-suggestion-review-message w-100"
               rows="3"
               [(ngModel)]="reviewMessage"
               [maxlength]="MAX_REVIEW_MESSAGE_LENGTH">

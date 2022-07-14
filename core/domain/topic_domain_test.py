@@ -50,8 +50,8 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.user_id_a = self.get_user_id_from_email('a@example.com')  # type: ignore[no-untyped-call]
         self.user_id_b = self.get_user_id_from_email('b@example.com')  # type: ignore[no-untyped-call]
 
-        self.user_a = user_services.get_user_actions_info(self.user_id_a)  # type: ignore[no-untyped-call]
-        self.user_b = user_services.get_user_actions_info(self.user_id_b)  # type: ignore[no-untyped-call]
+        self.user_a = user_services.get_user_actions_info(self.user_id_a)
+        self.user_b = user_services.get_user_actions_info(self.user_id_b)
 
     def test_create_default_topic(self) -> None:
         """Tests the create_default_topic() function."""

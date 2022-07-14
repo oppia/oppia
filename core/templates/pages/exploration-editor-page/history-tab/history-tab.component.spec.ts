@@ -249,6 +249,49 @@ describe('History tab component', function() {
         ' This is the commit message 2');
   });
 
+  it('should show exploration metadata diff modal', function() {
+    spyOn(
+      historyTabBackendApiService, 'getData')
+      .and.returnValue($q.resolve({
+        snapshots: snapshots
+      }));
+
+    ctrl.refreshVersionHistory();
+    $scope.$apply();
+
+    ctrl.changeSelectedVersions({
+      committerId: 'committer_3',
+      createdOnMsecsStr: '11/21/2014',
+      commitMessage: 'This is the commit message',
+      versionNumber: 1
+    }, 1);
+
+    ctrl.changeSelectedVersions({
+      committerId: 'committer_3',
+      createdOnMsecsStr: '11/21/2014',
+      commitMessage: 'This is the commit message',
+      versionNumber: 2
+    }, 2);
+
+    spyOn(compareVersionsService, 'getDiffGraphData').and.returnValue(
+      $q.resolve({}));
+    ctrl.compareSelectedVersions();
+    ctrl.changeCompareVersion();
+    $scope.$apply();
+
+    const spyObj = spyOn(ngbModal, 'open').and.callFake(() => {
+      return {
+        componentInstance: {},
+        result: Promise.resolve()
+      } as NgbModalRef;
+    });
+
+    ctrl.showExplorationMetadataDiffModal();
+    $scope.$apply();
+
+    expect(spyObj).toHaveBeenCalled();
+  });
+
   it('should open a new tab for download exploration with version', () => {
     spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
       open: jasmine.createSpy('open', () => {})

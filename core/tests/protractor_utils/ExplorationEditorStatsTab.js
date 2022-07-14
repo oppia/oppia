@@ -21,10 +21,10 @@ var ExplorationEditorStatsTab = function() {
   /**
      * Interactive elements
      */
-  var numPassersby = element(by.css('.protractor-test-num-passersby'));
-  var issueElementStr = '.protractor-test-issue';
-  var issueTitle = element(by.css('.protractor-test-issue-title'));
-  var resolveBtn = element(by.css('.protractor-test-issue-resolve'));
+  var numPassersby = element(by.css('.e2e-test-num-passersby'));
+  var issueElementStr = '.e2e-test-issue';
+  var issueTitle = element(by.css('.e2e-test-issue-title'));
+  var resolveBtn = element(by.css('.e2e-test-issue-resolve'));
 
   /**
      * Workflows

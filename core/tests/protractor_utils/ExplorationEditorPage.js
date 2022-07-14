@@ -43,81 +43,81 @@ var ExplorationEditorPage = function() {
   * Interactive elements
   */
   var commitMessageInput = element(
-    by.css('.protractor-test-commit-message-input'));
-  var neutralElement = element.all(by.css('.protractor-test-neutral-element'))
+    by.css('.e2e-test-commit-message-input'));
+  var neutralElement = element.all(by.css('.e2e-test-neutral-element'))
     .first();
   var expTitle = element(by.css(
-    '.protractor-test-exploration-title-input'));
+    '.e2e-test-exploration-title-input'));
   var expObjective = element(by.css(
-    '.protractor-test-exploration-objective-input'));
-  var expTags = element(by.css('.protractor-test-tags'));
+    '.e2e-test-exploration-objective-input'));
+  var expTags = element(by.css('.e2e-test-tags'));
   var expInput = expTags.element(by.tagName('input'));
   var expCategoryDropdownElement = element(
-    by.css('.protractor-test-exploration-category-dropdown'));
+    by.css('.e2e-test-exploration-category-dropdown'));
   var expLanguageSelectorElement = element(
-    by.css('.protractor-test-exploration-language-select'));
+    by.css('.e2e-test-exploration-language-select'));
   var explorationMetadataModalHeaderElement = element(
-    by.css('.protractor-test-metadata-modal-header'));
-  var confirmPublish = element(by.css('.protractor-test-confirm-publish'));
+    by.css('.e2e-test-metadata-modal-header'));
+  var confirmPublish = element(by.css('.e2e-test-confirm-publish'));
   var expTagsSelectionChoiceElements = element.all(
     by.css('.select2-selection__choice'));
   var modalContentElement = element(by.css('.modal-content'));
   var sharePublishModalElement = element(
-    by.css('.protractor-test-share-publish-modal'));
+    by.css('.e2e-test-share-publish-modal'));
   var selectionRenderedElement = element(
     by.css('.select2-selection__rendered'));
   var promptModalElement = element(
-    by.css('.protractor-test-save-prompt-modal'));
+    by.css('.e2e-test-save-prompt-modal'));
   var explorationSaveModalElement = element(
-    by.css('.protractor-test-exploration-save-modal'));
-  var toastMessage = element(by.css('.protractor-test-toast-message'));
+    by.css('.e2e-test-exploration-save-modal'));
+  var toastMessage = element(by.css('.e2e-test-toast-message'));
 
   /*
    * Non-Interactive elements
    */
-  var loadingModal = element(by.css('.protractor-test-loading-modal'));
+  var loadingModal = element(by.css('.e2e-test-loading-modal'));
 
   /*
    * Buttons
    */
   var confirmDiscardChangesButton = element(
-    by.css('.protractor-test-confirm-discard-changes'));
+    by.css('.e2e-test-confirm-discard-changes'));
   var discardChangesButton = element(
-    by.css('.protractor-test-discard-changes'));
+    by.css('.e2e-test-discard-changes'));
   var discardLostChangesButton = element(
-    by.css('.protractor-test-discard-lost-changes-button'));
+    by.css('.e2e-test-discard-lost-changes-button'));
   var discardAndExportLostChangesButton = element(
-    by.css('.protractor-test-discard-and-export-lost-changes-button'));
+    by.css('.e2e-test-discard-and-export-lost-changes-button'));
   var navigateToImprovementsTabButton = element(
-    by.css('.protractor-test-improvements-tab'));
+    by.css('.e2e-test-improvements-tab'));
   var navigateToFeedbackTabButton = element(
-    by.css('.protractor-test-feedback-tab'));
+    by.css('.e2e-test-feedback-tab'));
   var navigateToHistoryTabButton = element(
-    by.css('.protractor-test-history-tab'));
-  var navigateToMainTabButton = element(by.css('.protractor-test-main-tab'));
+    by.css('.e2e-test-history-tab'));
+  var navigateToMainTabButton = element(by.css('.e2e-test-main-tab'));
   var navigateToPreviewTabButton = element(
-    by.css('.protractor-test-preview-tab'));
+    by.css('.e2e-test-preview-tab'));
   var navigateToSettingsTabButton = element(
-    by.css('.protractor-test-settings-tab'));
-  var navigateToStatsTabButton = element(by.css('.protractor-test-stats-tab'));
+    by.css('.e2e-test-settings-tab'));
+  var navigateToStatsTabButton = element(by.css('.e2e-test-stats-tab'));
   var navigateToTranslationTabButton = element(
-    by.css('.protractor-test-translation-tab'));
-  var saveChangesButton = element(by.css('.protractor-test-save-changes'));
+    by.css('.e2e-test-translation-tab'));
+  var saveChangesButton = element(by.css('.e2e-test-save-changes'));
   var saveDiscardToggleButton = element(
-    by.css('.protractor-test-save-discard-toggle'));
+    by.css('.e2e-test-save-discard-toggle'));
   var commitChangesButton = element(
-    by.css('.protractor-test-save-draft-button'));
+    by.css('.e2e-test-save-draft-button'));
   var saveDraftButtonTextContainer = element(
-    by.css('.protractor-test-save-draft-message'));
+    by.css('.e2e-test-save-draft-message'));
   var recommendationPromptSaveButton = element(
-    by.css('.protractor-test-recommendation-prompt-save-button'));
+    by.css('.e2e-test-recommendation-prompt-save-button'));
   var publishChangesButtonTextContainer = element(
-    by.css('.protractor-test-publish-changes-message'));
+    by.css('.e2e-test-publish-changes-message'));
   var publishExplorationButton = element(
-    by.css('.protractor-test-publish-exploration'));
+    by.css('.e2e-test-publish-exploration'));
   var prePublicationConfirmButton = element(by.css(
-    '.protractor-test-confirm-pre-publication'));
-  var closeButton = element(by.css('.protractor-test-share-publish-close'));
+    '.e2e-test-confirm-pre-publication'));
+  var closeButton = element(by.css('.e2e-test-share-publish-close'));
 
   /*
    * Components
@@ -250,7 +250,7 @@ var ExplorationEditorPage = function() {
     }
     await action.click('Save draft button', commitChangesButton);
     // TODO(#13096): Remove browser.sleep from e2e files.
-    /* eslint-disable-next-line oppia/protractor-practices */
+    /* eslint-disable-next-line oppia/e2e-practices */
     await browser.sleep(2500);
     await waitFor.textToBePresentInElement(
       saveDraftButtonTextContainer, 'Save Draft',
@@ -264,7 +264,7 @@ var ExplorationEditorPage = function() {
       'Commit message input', commitMessageInput, commitMessage);
     await action.click('Publish changes button', commitChangesButton);
     // TODO(#13096): Remove browser.sleep from e2e files.
-    /* eslint-disable-next-line oppia/protractor-practices */
+    /* eslint-disable-next-line oppia/e2e-practices */
     await browser.sleep(2500);
     await waitFor.textToBePresentInElement(
       publishChangesButtonTextContainer, 'Publish Changes',

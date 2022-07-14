@@ -65,9 +65,11 @@ var CONSOLE_ERRORS_TO_IGNORE = [
   // error was observed on other websites (e.g. https://edu.google.com/) that
   // use gtag and it does not affect the user experience in any way.
   // Considering these reasons, the error may be ignored.
-  _.escapeRegExp(
-    'https://www.googletagmanager.com/a.* Failed to load resource: ' +
-    'the server responded with a status of 405 ()')
+  new RegExp(
+    'https:\/\/www.googletagmanager.com\/a.* Failed to load resource: ' +
+    'the server responded with a status of 405 ()',
+    'g'
+  ),
 ];
 
 var checkForConsoleErrors = async function(
@@ -155,7 +157,7 @@ var moveToEditor = async function(welcomeModalIsShown) {
 
 var expectErrorPage = async function(errorNum) {
   var errorContainer = element(
-    by.css('.protractor-test-error-container'));
+    by.css('.e2e-test-error-container'));
   await waitFor.visibilityOf(
     errorContainer,
     'Protractor test error container taking too long to appear');
@@ -168,7 +170,7 @@ var ensurePageHasNoTranslationIds = async function() {
   // The use of the InnerHTML is hacky, but is faster than checking each
   // individual component that contains text.
   var oppiaBaseContainer = element(by.css(
-    '.protractor-test-base-container'));
+    '.e2e-test-base-container'));
   await waitFor.visibilityOf(
     oppiaBaseContainer,
     'Oppia base container taking too long to appear.');
@@ -244,14 +246,14 @@ var checkConsoleErrorsExist = async function(expectedErrors) {
 };
 
 var goToHomePage = async function() {
-  var oppiaMainLogo = element(by.css('.protractor-test-oppia-main-logo'));
+  var oppiaMainLogo = element(by.css('.e2e-test-oppia-main-logo'));
   await action.click('Oppia Main Logo', oppiaMainLogo);
   return await waitFor.pageToFullyLoad();
 };
 
 var openProfileDropdown = async function() {
   var profileDropdown = element(
-    by.css('.protractor-test-profile-dropdown'));
+    by.css('.e2e-test-profile-dropdown'));
   await action.click(
     'Profile dropdown taking too long to be clickable.',
     profileDropdown);
@@ -260,7 +262,7 @@ var openProfileDropdown = async function() {
 var navigateToTopicsAndSkillsDashboardPage = async function() {
   await openProfileDropdown();
   var topicsAndSkillsDashboardLink = element(by.css(
-    '.protractor-test-topics-and-skills-dashboard-link'));
+    '.e2e-test-topics-and-skills-dashboard-link'));
   await waitFor.clientSideRedirection(async() => {
     await action.click(
       'Topics and skills dashboard link from dropdown',

@@ -42,22 +42,25 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
   styleUrls: []
 })
 export class InteractiveItemSelectionInputComponent implements OnInit {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() choicesWithValue!: string;
+  @Input() maxAllowableSelectionCountWithValue!: string;
+  @Input() minAllowableSelectionCountWithValue!: string;
+  choices!: string[];
+  choicesValue!: SubtitledHtml[];
+  maxAllowableSelectionCount!: number;
+  minAllowableSelectionCount!: number;
+  selectionCount!: number;
+  userSelections!: Record<string, boolean>;
+  displayedCard!: StateCard;
+  recordedVoiceovers!: RecordedVoiceovers;
   COMPONENT_NAME_RULE_INPUT!: string;
-  @Input() choicesWithValue: string;
-  @Input() maxAllowableSelectionCountWithValue: string;
-  @Input() minAllowableSelectionCountWithValue: string;
-  choices: string[];
-  choicesValue: SubtitledHtml[];
-  displayCheckboxes: boolean;
-  maxAllowableSelectionCount: number;
-  minAllowableSelectionCount: number;
-  newQuestion: boolean;
-  notEnoughSelections: boolean;
-  preventAdditionalSelections: boolean;
-  selectionCount: number;
-  userSelections: {[key: string]: boolean};
-  displayedCard: StateCard;
-  recordedVoiceovers: RecordedVoiceovers;
+  displayCheckboxes: boolean = false;
+  newQuestion: boolean = false;
+  notEnoughSelections: boolean = false;
+  preventAdditionalSelections: boolean = false;
 
   constructor(
     private browserCheckerService: BrowserCheckerService,
@@ -113,10 +116,10 @@ export class InteractiveItemSelectionInputComponent implements OnInit {
         combinedChoiceLabels += this.audioTranslationManagerService
           .cleanUpHTMLforVoiceover(choiceLabel);
       }
+
       // Say the choices aloud if autoplay is enabled.
       this.audioTranslationManagerService.setSequentialAudioTranslations(
-        this.recordedVoiceovers.getBindableVoiceovers(
-          this.choicesValue[0]._contentId),
+        this.recordedVoiceovers.getBindableVoiceovers(this.getContentId()),
         combinedChoiceLabels, this.COMPONENT_NAME_RULE_INPUT
       );
     }
@@ -136,6 +139,15 @@ export class InteractiveItemSelectionInputComponent implements OnInit {
 
   isLanguageRTL(): boolean {
     return this.i18nLanguageCodeService.isCurrentLanguageRTL();
+  }
+
+  getContentId(): string {
+    let contentId = this.choicesValue[0]._contentId;
+    if (contentId === null) {
+      throw new Error('Content id is null');
+    } else {
+      return contentId;
+    }
   }
 
   onToggleCheckbox(): void {
