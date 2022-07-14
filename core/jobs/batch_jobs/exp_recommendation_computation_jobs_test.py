@@ -30,15 +30,15 @@ from core.platform import models
 from typing import Dict, List, Tuple, Type, Union
 from typing_extensions import Final
 
-
 MYPY = False
 if MYPY:
     from mypy_imports import exp_models
     from mypy_imports import recommendations_models
 
-(exp_models, recommendations_models) = models.Registry.import_models(
-    [models.NAMES.exploration, models.NAMES.recommendations]
-)
+(exp_models, recommendations_models) = models.Registry.import_models([
+    models.NAMES.exploration,
+    models.NAMES.recommendations
+])
 
 StatsType = List[Tuple[str, List[Dict[str, Union[bool, int, str]]]]]
 

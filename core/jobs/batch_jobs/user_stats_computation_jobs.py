@@ -28,6 +28,7 @@ from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
+
 from typing import Iterable
 
 MYPY = False

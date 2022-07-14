@@ -38,6 +38,7 @@ from core.platform import models
 import apache_beam as beam
 
 import result
+
 from typing import Dict, List
 
 MYPY = False
@@ -51,12 +52,21 @@ if MYPY: # pragma: no cover
     from mypy_imports import topic_models
 
 (
-    exp_models, opportunity_models, question_models,
-    skill_models, story_models, topic_models
+    exp_models,
+    opportunity_models,
+    question_models,
+    skill_models,
+    story_models,
+    topic_models
 ) = models.Registry.import_models([
-    models.NAMES.exploration, models.NAMES.opportunity, models.NAMES.question,
-    models.NAMES.skill, models.NAMES.story, models.NAMES.topic
+    models.NAMES.exploration,
+    models.NAMES.opportunity,
+    models.NAMES.question,
+    models.NAMES.skill,
+    models.NAMES.story,
+    models.NAMES.topic
 ])
+
 datastore_services = models.Registry.import_datastore_services()
 
 

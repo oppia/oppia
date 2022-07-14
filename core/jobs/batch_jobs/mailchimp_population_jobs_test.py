@@ -27,6 +27,7 @@ from core.jobs.types import job_run_result
 from core.platform import models
 
 from mailchimp3 import mailchimpclient
+
 from typing import Dict, List, Mapping, Type, Union
 from typing_extensions import Final, TypedDict
 

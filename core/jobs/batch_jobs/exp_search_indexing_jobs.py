@@ -27,7 +27,9 @@ from core.platform import models
 
 import apache_beam as beam
 import result
+
 from typing import Iterable, List, cast
+from typing_extensions import Final
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -44,7 +46,7 @@ platform_search_services = models.Registry.import_search_services()
 class IndexExplorationsInSearchJob(base_jobs.JobBase):
     """Job that indexes the explorations in Elastic Search."""
 
-    MAX_BATCH_SIZE = 1000
+    MAX_BATCH_SIZE: Final = 1000
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns a PCollection of 'SUCCESS' or 'FAILURE' results from
@@ -68,6 +70,10 @@ class IndexExplorationsInSearchJob(base_jobs.JobBase):
         )
 
 
+# TODO(#15613): Due to incomplete typing of apache_beam library and absences
+# of stubs in Typeshed, MyPy assuming DoFn class is of type Any. Thus to avoid
+# MyPy's error (Class cannot subclass 'DoFn' (has type 'Any')) , we added an
+# ignore here.
 class IndexExplorationSummaries(beam.DoFn): # type: ignore[misc]
     """DoFn to index exploration summaries."""
 

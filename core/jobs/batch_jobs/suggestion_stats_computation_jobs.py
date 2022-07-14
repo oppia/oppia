@@ -46,8 +46,9 @@ if MYPY: # pragma: no cover
     from mypy_imports import opportunity_models
     from mypy_imports import suggestion_models
 
-(opportunity_models, suggestion_models) = models.Registry.import_models(
-    [models.NAMES.opportunity, models.NAMES.suggestion])
+(opportunity_models, suggestion_models) = models.Registry.import_models([
+    models.NAMES.opportunity, models.NAMES.suggestion
+])
 
 datastore_services = models.Registry.import_datastore_services()
 

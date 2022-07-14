@@ -30,6 +30,7 @@ import apache_beam as beam
 import mailchimp3
 from mailchimp3 import mailchimpclient
 import result
+
 from typing import Iterable, List
 
 MYPY = False

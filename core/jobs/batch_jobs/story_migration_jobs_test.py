@@ -41,6 +41,7 @@ if MYPY:
 (story_models, topic_models) = models.Registry.import_models([
     models.NAMES.story, models.NAMES.topic
 ])
+
 datastore_services = models.Registry.import_datastore_services()
 
 
