@@ -34,6 +34,8 @@ import { PlayerTranscriptService } from 'pages/exploration-player-page/services/
 import { MultipleChoiceInputRulesService } from './multiple-choice-input-rules.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
+import '../static/multiple_choice_input.css';
+
 @Component({
   selector: 'oppia-interactive-multiple-choice-input',
   templateUrl: './multiple-choice-input-interaction.component.html'

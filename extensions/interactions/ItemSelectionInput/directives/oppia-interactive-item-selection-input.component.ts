@@ -36,6 +36,8 @@ import { StateCard } from 'domain/state_card/state-card.model';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
+import '../static/item_selection_input.css';
+
 @Component({
   selector: 'oppia-interactive-item-selection-input',
   templateUrl: './item-selection-input-interaction.component.html',

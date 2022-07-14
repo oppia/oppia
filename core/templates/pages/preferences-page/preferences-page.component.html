@@ -1,7 +1,3 @@
-<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
-<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/pages/preferences-page/preferences-page.component.css" as="style">
-<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/pages/preferences-page/preferences-page.component.rtl.css" as="style">
-
 <background-banner></background-banner>
 <div class="oppia-dashboard-container ng-scope">
   <h2 class="oppia-preferences-page-heading e2e-test-preferences-title">
@@ -359,7 +355,3 @@
 
   </mat-card>
 </div>
-
-<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
-<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/preferences-page/preferences-page.component.css">
-<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/preferences-page/preferences-page.component.rtl.css">

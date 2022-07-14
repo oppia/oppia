@@ -1,7 +1,3 @@
-<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
-<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/components/summary-tile/exploration-summary-tile.component.css" as="style">
-<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/components/summary-tile/exploration-summary-tile.component.rtl.css" as="style">
-
 <div *ngIf="!mobileCardToBeShown">
   <oppia-learner-dashboard-icons *ngIf="showLearnerDashboardIconsIfPossible && userIsLoggedIn"
                                 [activityType]="activityType"
@@ -129,7 +125,3 @@
     </i>
   </button>
 </div>
-
-<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
-<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/components/summary-tile/exploration-summary-tile.component.css">
-<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/components/summary-tile/exploration-summary-tile.component.rtl.css">
