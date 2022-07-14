@@ -380,7 +380,9 @@ def get_multi_topic_summaries(
     return topic_summaries
 
 
-def get_published_topic_summaries() -> List[topic_domain.TopicSummary]:
+def get_published_topic_summaries() -> List[
+    Optional[topic_domain.TopicSummary]
+]:
     """Returns the summaries of all published topics present in the datastore.
 
     Returns:
@@ -392,8 +394,7 @@ def get_published_topic_summaries() -> List[topic_domain.TopicSummary]:
         topic_id
         for topic_id, topic_rights in topic_id_to_topic_rights.items()
         if topic_rights.topic_is_published]
-    return [topic_summary for topic_summary in get_multi_topic_summaries(
-            published_topic_ids) if topic_summary is not None]
+    return get_multi_topic_summaries(published_topic_ids)
 
 
 def get_all_skill_ids_assigned_to_some_topic() -> Set[str]:

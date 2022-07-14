@@ -49,19 +49,17 @@ class MockTopicObject(topic_domain.Topic):
 class TopicFetchersUnitTests(test_utils.GenericTestBase):
     """Tests for topic fetchers."""
 
-    user_id = 'user_id'
-    story_id_1 = 'story_1'
-    story_id_2 = 'story_2'
-    story_id_3 = 'story_3'
-    subtopic_id = 1
-    skill_id_1 = 'skill_1'
-    skill_id_2 = 'skill_2'
+    user_id: str = 'user_id'
+    story_id_1: str = 'story_1'
+    story_id_2: str = 'story_2'
+    story_id_3: str = 'story_3'
+    subtopic_id: int = 1
+    skill_id_1: str = 'skill_1'
+    skill_id_2: str = 'skill_2'
 
     def setUp(self) -> None:
         super(TopicFetchersUnitTests, self).setUp()
         self.TOPIC_ID = topic_fetchers.get_new_topic_id()
-        # TODO(#13059): After updating the type of __init__ in the `BaseChange`
-        # class, we can remove this ignore.
         changelist = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_ADD_SUBTOPIC,
             'title': 'Title',
@@ -427,12 +425,9 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(topic_summaries), 0)
 
         # Publish the topic.
-
-        # TODO(#13059): After updating the type of __init__ in the `BaseChange`
-        # class, we can remove this ignore.
         changelist = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
-            'old_subtopic_id': None,   # type: ignore[dict-item]
+            'old_subtopic_id': None,
             'new_subtopic_id': self.subtopic_id,
             'skill_id': self.skill_id_1
         })]
@@ -444,6 +439,8 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         topic_summaries = topic_fetchers.get_published_topic_summaries()
 
         self.assertEqual(len(topic_summaries), 1)
+        # Ruling out the possibility of None for mypy type checking.
+        assert topic_summaries[0] is not None
         self.assertEqual(topic_summaries[0].name, 'Name')
         self.assertEqual(topic_summaries[0].canonical_story_count, 0)
         self.assertEqual(topic_summaries[0].additional_story_count, 0)
@@ -452,11 +449,9 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic_summaries[0].subtopic_count, 1)
 
     def test_get_all_skill_ids_assigned_to_some_topic(self) -> None:
-        # TODO(#13059): After updating the type of __init__ in the `BaseChange`
-        # class, we can remove this ignore.
         change_list = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
-            'old_subtopic_id': None,   # type: ignore[dict-item]
+            'old_subtopic_id': None,
             'new_subtopic_id': 1,
             'skill_id': self.skill_id_1
         })]
