@@ -103,7 +103,7 @@ export const AppConstants = {
     UNICODE_STRING: 'UnicodeString',
   },
 
-  DEST_IF_REALLY_STUCK_FEAT_ENABLED: true,
+  DEST_IF_REALLY_STUCK_FEAT_ENABLED: false,
 
   // The maximum number of nodes to show in a row of the state graph.
   MAX_NODES_PER_ROW: 4,
