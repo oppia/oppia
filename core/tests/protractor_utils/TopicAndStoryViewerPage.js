@@ -35,6 +35,8 @@ var TopicAndStoryViewerPage = function() {
     by.css('.e2e-test-conversation-skin-cards-container'));
   var dismissSignUpSectionButton = element(
     by.css('.e2e-test-dismiss-sign-up-section-button'));
+  var startPracticeButton = element(
+    by.css('.e2e-test-start-practice-from-recommendations-button'));
   var practicetabContainer = element(
     by.css('.e2e-test-practice-tab-container'));
   var practiceSessionContainer = element(
