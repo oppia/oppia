@@ -597,6 +597,7 @@ TS_STRICT_EXCLUDE_PATHS = [
     'extensions/interactions/GraphInput/directives/graph-viz.component.ts',
     'extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component.spec.ts',
     'extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component.ts',
+    'extensions/interactions/ItemSelectionInput/item-selection-input-interactions.module.ts',
     'extensions/interactions/MultipleChoiceInput/directives/oppia-interactive-multiple-choice-input.component.spec.ts',
     'extensions/interactions/MultipleChoiceInput/directives/oppia-interactive-multiple-choice-input.component.ts',
     'extensions/interactions/MultipleChoiceInput/multiple-choice-input-interactions.module.ts',
