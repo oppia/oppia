@@ -143,7 +143,7 @@ angular.module('oppia').directive('audioTranslationBar', [
         '$interval', '$q', '$scope', '$uibModal', '$window',
         'AlertsService', 'AssetsBackendApiService', 'AudioPlayerService',
         'ContextService', 'EditabilityService',
-        'ExplorationStatesService', 'ExternalSaveService',
+        'ExplorationStatesService', 'ExternalSaveService', 'GraphDataService',
         'IdGenerationService', 'SiteAnalyticsService',
         'StateEditorService', 'StateRecordedVoiceoversService',
         'TranslationLanguageService', 'TranslationStatusService',
@@ -153,7 +153,7 @@ angular.module('oppia').directive('audioTranslationBar', [
             $interval, $q, $scope, $uibModal, $window,
             AlertsService, AssetsBackendApiService, AudioPlayerService,
             ContextService, EditabilityService,
-            ExplorationStatesService, ExternalSaveService,
+            ExplorationStatesService, ExternalSaveService, GraphDataService,
             IdGenerationService, SiteAnalyticsService,
             StateEditorService, StateRecordedVoiceoversService,
             TranslationLanguageService, TranslationStatusService,
@@ -344,12 +344,16 @@ angular.module('oppia').directive('audioTranslationBar', [
                 'Succesfuly uploaded recorded audio.');
               $scope.audioIsCurrentlyBeingSaved = false;
               $scope.initAudioBar();
+              setTimeout(() => {
+                GraphDataService.recompute();
+              });
             }, function(errorResponse) {
               $scope.audioIsCurrentlyBeingSaved = false;
               AlertsService.addWarning(errorResponse.error);
               $scope.initAudioBar();
             });
           };
+
           var toggleStartAndStopRecording = function() {
             if (!$scope.voiceoverRecorder.status().isRecording &&
                 !$scope.audioBlob) {
