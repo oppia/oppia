@@ -40,6 +40,7 @@ if MYPY: # pragma: no cover
 (config_models, user_models) = models.Registry.import_models(
     [models.NAMES.config, models.NAMES.user])
 
+
 # TODO(#15613): Due to incomplete typing of apache_beam library and absences
 # of stubs in Typeshed, MyPy assuming CombineFn class is of type Any. Thus to
 # avoid MyPy's error (Class cannot subclass 'CombineFn' (has type 'Any')) , we

@@ -107,6 +107,7 @@ class CollectWeeklyDashboardStatsJob(base_jobs.JobBase):
             | 'Merge new and old results together' >> beam.Flatten()
         )
 
+
 # TODO(#15613): Due to incomplete typing of apache_beam library and absences
 # of stubs in Typeshed, MyPy assuming DoFn class is of type Any. Thus to avoid
 # MyPy's error (Class cannot subclass 'DoFn' (has type 'Any')) , we added an
@@ -131,6 +132,7 @@ class CreateUserStatsModel(beam.DoFn): # type: ignore[misc]
                 user_models.UserStatsModel(id=user_settings_model.id))
         user_stats_model.update_timestamps()
         yield user_stats_model
+
 
 # TODO(#15613): Due to incomplete typing of apache_beam library and absences
 # of stubs in Typeshed, MyPy assuming DoFn class is of type Any. Thus to avoid
