@@ -55,6 +55,8 @@ export class StateContentEditorComponent implements OnInit {
   isEditable: boolean;
   HTML_SCHEMA: HTMLSchema;
 
+  cardHeightLimitReached = false;
+
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
     private contextService: ContextService,
@@ -103,6 +105,14 @@ export class StateContentEditorComponent implements OnInit {
     );
     let height = shadowPreviewCard.height();
     return (height > 630);
+  }
+
+  ngAfterViewChecked(): void {
+    let cardHeightLimitReached = this.isCardHeightLimitReached();
+    if (cardHeightLimitReached !== this.cardHeightLimitReached) {
+      this.cardHeightLimitReached = cardHeightLimitReached;
+      this.changeDetectorRef.detectChanges();
+    }
   }
 
   hideCardHeightLimitWarning(): void {

@@ -36,10 +36,10 @@
             {{ item }}
           </li>
         </ul>
-        <angular-html-bind-wrapper *ngIf="!contentTypeIsSetOfStrings"
-                                    [htmlData]="displayExplorationContent()"
-                                    #contentPanel>
-        </angular-html-bind-wrapper>
+        <oppia-rte-output-display *ngIf="!contentTypeIsSetOfStrings"
+                                  [rteString]="displayExplorationContent()"
+                                  #contentPanel>
+        </oppia-rte-output-display>
       </div>
       <div class="oppia-collapse-content"
            *ngIf="isContentOverflowing"
@@ -61,10 +61,10 @@
            [ngClass]="isTranslationExpanded ? 'oppia-expanded' : 'oppia-contracted'"
            #translationContainer>
         <div>
-          <angular-html-bind-wrapper [htmlData]="translationHtml"
-                                     *ngIf="!startedEditing"
-                                     #translationPanel>
-          </angular-html-bind-wrapper>
+          <oppia-rte-output-display [rteString]="translationHtml"
+                                    *ngIf="!startedEditing"
+                                    #translationPanel>
+          </oppia-rte-output-display>
           <ul *ngIf="contentTypeIsSetOfStrings">
             <li *ngFor="let item of translationHtml; index as idx">
               {{ item }}
@@ -124,9 +124,9 @@
           {{ item }}
         </li>
       </ul>
-      <angular-html-bind-wrapper *ngIf="!contentTypeIsSetOfStrings"
-                                 [htmlData]="contentHtml">
-      </angular-html-bind-wrapper>
+      <oppia-rte-output-display *ngIf="!contentTypeIsSetOfStrings"
+                                [rteString]="contentHtml">
+      </oppia-rte-output-display>
     </div>
   </section>
   <div [hidden]="!reviewable"

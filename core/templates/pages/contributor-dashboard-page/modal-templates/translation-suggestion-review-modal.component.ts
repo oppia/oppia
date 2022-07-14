@@ -33,6 +33,7 @@ import { AppConstants } from 'app.constants';
 import constants from 'assets/constants';
 import { ListSchema, UnicodeSchema } from 'services/schema-default-value.service';
 import { UserContributionRightsDataBackendDict } from 'services/user-backend-api.service';
+import { RteOutputDisplayComponent } from 'rich_text_components/rte-output-display.component';
 
 interface HTMLSchema {
   'type': string;
@@ -130,10 +131,10 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   isTranslationExpanded: boolean = false;
   isTranslationOverflowing: boolean = false;
   @ViewChild('contentPanel')
-    contentPanel!: ElementRef;
+    contentPanel!: RteOutputDisplayComponent;
 
   @ViewChild('translationPanel')
-    translationPanel!: ElementRef;
+    translationPanel!: RteOutputDisplayComponent;
 
   @ViewChild('contentContainer')
     contentContainer!: ElementRef;
@@ -265,10 +266,10 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   calculatePanelHeight(): void {
     setTimeout(()=>{
       this.isContentOverflowing = (
-        this.contentPanel.nativeElement.offsetHeight >
+        this.contentPanel.elementRef.nativeElement.offsetHeight >
         this.contentContainer.nativeElement.offsetHeight);
       this.isTranslationOverflowing = (
-        this.translationPanel.nativeElement.offsetHeight >
+        this.translationPanel.elementRef.nativeElement.offsetHeight >
         this.translationContainer.nativeElement.offsetHeight);
     }, 0);
   }
