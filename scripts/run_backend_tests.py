@@ -506,8 +506,7 @@ def main(args=None):
             incomplete_coverage)
 
     if parsed_args.generate_coverage_report:
-        subprocess.check_call([
-            sys.executable, '-m', 'coverage', 'combine'])
+        subprocess.check_call([sys.executable, '-m', 'coverage', 'combine'])
         report_stdout, coverage = _check_coverage(True)
         print(report_stdout)
 

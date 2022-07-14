@@ -34,6 +34,12 @@ INSTALLATION_TOOL_VERSIONS = {
 REQUIREMENTS_DEV_FILE_PATH = 'requirements_dev.in'
 COMPILED_REQUIREMENTS_DEV_FILE_PATH = 'requirements_dev.txt'
 
+_PARSER = argparse.ArgumentParser(
+    'Install Python development dependencies')
+_PARSER.add_argument(
+    '--assert_compiled', action='store_true',
+    help='Assert that the dev requirements file is already compiled.')
+
 
 def assert_in_venv() -> None:
     """Raise an error if we are not in a virtual environment.
@@ -55,10 +61,7 @@ def install_installation_tools() -> None:
         # module is not supported:
         # https://pip.pypa.io/en/stable/user_guide/#using-pip-from-your-program.
         subprocess.run(
-            [
-                sys.executable, '-m', 'pip', 'install',
-                f'{package}=={version}'
-            ],
+            [sys.executable, '-m', 'pip', 'install', f'{package}=={version}'],
             check=True,
             encoding='utf-8',
         )
@@ -82,8 +85,8 @@ def compile_dev_dependencies() -> bool:
         bool. Whether the compiled dev requirements file was changed.
     """
     with open(
-            COMPILED_REQUIREMENTS_DEV_FILE_PATH, 'r',
-            encoding='utf-8') as f:
+        COMPILED_REQUIREMENTS_DEV_FILE_PATH, 'r', encoding='utf-8'
+    ) as f:
         old_compiled = f.read()
     subprocess.run(
         [
@@ -94,8 +97,8 @@ def compile_dev_dependencies() -> bool:
         encoding='utf-8',
     )
     with open(
-            COMPILED_REQUIREMENTS_DEV_FILE_PATH, 'r',
-            encoding='utf-8') as f:
+        COMPILED_REQUIREMENTS_DEV_FILE_PATH, 'r', encoding='utf-8'
+    ) as f:
         new_compiled = f.read()
 
     return old_compiled != new_compiled
@@ -103,13 +106,7 @@ def compile_dev_dependencies() -> bool:
 
 def main(cli_args: Optional[List[str]] = None) -> None:
     """Install all dev dependencies."""
-    parser = argparse.ArgumentParser(
-        'Install Python development dependencies')
-    parser.add_argument(
-        '--assert_compiled', action='store_true',
-        help='Assert that the dev requirements file is already compiled.')
-    args = parser.parse_args(cli_args)
-
+    args = _PARSER.parse_args(cli_args)
     assert_in_venv()
     install_installation_tools()
     not_compiled = compile_dev_dependencies()

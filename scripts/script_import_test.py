@@ -37,21 +37,18 @@ class InstallThirdPartyLibsImportTests(test_utils.GenericTestBase):
         commands = []
         def mock_run(cmd_tokens, *_args, **_kwargs):
             commands.append(cmd_tokens)
-        run_swap = self.swap(
-            subprocess, 'run', mock_run)
+        run_swap = self.swap(subprocess, 'run', mock_run)
 
         with run_swap:
             from scripts import install_third_party_libs  # isort:skip pylint: disable=unused-import,line-too-long
-        self.assertEqual(
-            commands, [
-                [sys.executable, '-m', 'pip', 'install', version_string]
-                for version_string in (
-                    'pip==22.1.1', 'pip-tools==6.6.2',
-                    'setuptools==58.5.3')
-            ] + [
-                [
-                    'pip-compile', 'requirements_dev.in',
-                    '--output-file', 'requirements_dev.txt'
-                ],
-                ['pip-sync', 'requirements_dev.txt'],
-            ])
+        expected_commands = [
+            [sys.executable, '-m', 'pip', 'install', version_string]
+            for version_string in (
+                'pip==22.1.1', 'pip-tools==6.6.2', 'setuptools==58.5.3')
+        ]
+        expected_commands += [
+            ['pip-compile', 'requirements_dev.in', '--output-file',
+             'requirements_dev.txt'],
+            ['pip-sync', 'requirements_dev.txt'],
+        ]
+        self.assertEqual(commands, expected_commands)

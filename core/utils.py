@@ -35,7 +35,6 @@ import urllib.parse
 import urllib.request
 import zlib
 
-
 from core import feconf
 from core.constants import constants
 
