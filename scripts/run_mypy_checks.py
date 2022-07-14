@@ -109,8 +109,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/tests/load_tests/feedback_thread_summaries_test.py',
     'core/tests/test_utils.py',
     'core/tests/test_utils_test.py',
-    'core/jobs/batch_jobs/exp_search_indexing_jobs.py',
-    'core/jobs/batch_jobs/exp_search_indexing_jobs_test.py',
     'extensions/',
     'scripts/check_if_pr_is_low_risk.py',
     'scripts/check_if_pr_is_low_risk_test.py',
