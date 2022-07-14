@@ -145,14 +145,15 @@ class ExplorationStatsFrontendDict(TypedDict):
     num_completions: int
     state_stats_mapping: Dict[str, Dict[str, int]]
 
-
+# In argument 'customization_args', we used Any type because it accepts the
+# values of customization args and that values can be of type str, int, Dict,
+# bool, List and other types too. So to make it generalize for every type of
+# values, we used Any here.
 class LearnerActionDict(TypedDict):
     """Dictionary representing the LearnerAction object."""
 
     action_type: str
-    action_customization_args: Dict[str, Union[str, int, Dict[
-        str, Union[str, int]
-    ]]]
+    action_customization_args: Dict[str, Dict[str, Union[str, int]]]
     schema_version: int
 
 
@@ -1076,13 +1077,13 @@ class Playthrough:
                     type(self.issue_customization_args)))
 
         try:
-            issue = playthrough_issue_registry.Registry.get_issue_by_type( # type: ignore[no-untyped-call]
+            issue = playthrough_issue_registry.Registry.get_issue_by_type(
                 self.issue_type)
         except KeyError as e:
             raise utils.ValidationError('Invalid issue type: %s' % (
                 self.issue_type)) from e
 
-        customization_args_util.validate_customization_args_and_values( # type: ignore[no-untyped-call]
+        customization_args_util.validate_customization_args_and_values(
             'issue', self.issue_type, self.issue_customization_args,
             issue.customization_arg_specs)
 
@@ -1232,13 +1233,13 @@ class ExplorationIssue:
                     type(self.schema_version)))
 
         try:
-            issue = playthrough_issue_registry.Registry.get_issue_by_type( # type: ignore[no-untyped-call]
+            issue = playthrough_issue_registry.Registry.get_issue_by_type(
                 self.issue_type)
         except KeyError as e:
             raise utils.ValidationError('Invalid issue type: %s' % (
                 self.issue_type)) from e
 
-        customization_args_util.validate_customization_args_and_values( # type: ignore[no-untyped-call]
+        customization_args_util.validate_customization_args_and_values(
             'issue', self.issue_type, self.issue_customization_args,
             issue.customization_arg_specs)
 
@@ -1254,15 +1255,17 @@ class ExplorationIssue:
                     '%s' % type(playthrough_id))
 
 
+# In argument 'customization_args', we used Any type because it accepts the
+# values of customization args and that values can be of type str, int, Dict,
+# bool, List and other types too. So to make it generalize for every type of
+# values, we used Any here.
 class LearnerAction:
     """Domain object representing a learner action."""
 
     def __init__(
         self,
         action_type: str,
-        action_customization_args: Dict[str, Union[str, int, Dict[
-        str, Union[str, int]
-    ]]],
+        action_customization_args: Dict[str, Dict[str, Union[str, int]]],
         schema_version: int
     ):
         """Constructs a LearnerAction domain object.
@@ -1355,7 +1358,7 @@ class LearnerAction:
         except KeyError as e:
             raise utils.ValidationError(
                 'Invalid action type: %s' % self.action_type) from e
-        customization_args_util.validate_customization_args_and_values( # type: ignore[no-untyped-call]
+        customization_args_util.validate_customization_args_and_values(
             'action', self.action_type, self.action_customization_args,
             action.customization_arg_specs)
 
@@ -1425,7 +1428,7 @@ class StateAnswers:
 
             # Verify interaction_id is valid.
             if (self.interaction_id not in
-                    interaction_registry.Registry.get_all_interaction_ids()): # type: ignore[no-untyped-call]
+                    interaction_registry.Registry.get_all_interaction_ids()):
                 raise utils.ValidationError(
                     'Unknown interaction_id: %s' % self.interaction_id)
 
@@ -1998,7 +2001,7 @@ class LearnerAnswerDetails:
                 % str(self.interaction_id))
 
         if (self.interaction_id not in
-                interaction_registry.Registry.get_all_interaction_ids()): # type: ignore[no-untyped-call]
+                interaction_registry.Registry.get_all_interaction_ids()):
             raise utils.ValidationError(
                 'Unknown interaction_id: %s' % self.interaction_id)
 
