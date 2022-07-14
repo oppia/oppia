@@ -45,8 +45,8 @@
           <em>Nothing</em>
         </span>
         <span *ngIf="outcome && outcome.hasNonemptyFeedback()" class="oppia-non-empty-feedback-text">
-          <angular-html-bind-wrapper classStr="oppia-rte-editor" [htmlData]="outcome.feedback.html">
-          </angular-html-bind-wrapper>
+          <oppia-rte-output-display class="oppia-rte-editor" [rteString]="outcome.feedback.html">
+          </oppia-rte-output-display>
         </span>
       </div>
     </div>

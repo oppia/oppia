@@ -19,6 +19,7 @@ subclasses for each type of suggestion.
 from __future__ import annotations
 
 import copy
+import datetime
 
 from core import feconf
 from core import utils
@@ -1496,8 +1497,12 @@ class ReviewableSuggestionEmailInfo:
     """
 
     def __init__(
-            self, suggestion_type, language_code, suggestion_content,
-            submission_datetime):
+        self,
+        suggestion_type: str,
+        language_code: str,
+        suggestion_content: str,
+        submission_datetime: datetime.datetime
+    ) -> None:
         self.suggestion_type = suggestion_type
         self.language_code = language_code
         self.suggestion_content = suggestion_content
