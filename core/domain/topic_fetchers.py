@@ -288,13 +288,19 @@ def get_all_topics() -> List[topic_domain.Topic]:
 
 @overload
 def get_topic_rights(
-    topic_id: str, strict: Literal[True]
+    topic_id: str
 ) -> topic_domain.TopicRights: ...
 
 
 @overload
 def get_topic_rights(
-    topic_id: str, strict: Literal[False]
+    topic_id: str, *, strict: Literal[True]
+) -> topic_domain.TopicRights: ...
+
+
+@overload
+def get_topic_rights(
+    topic_id: str, *, strict: Literal[False]
 ) -> Optional[topic_domain.TopicRights]: ...
 
 
