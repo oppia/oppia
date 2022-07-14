@@ -460,6 +460,13 @@ export class StateGraphVisualization
       this.graphDataService.updateGraphData.subscribe(value => {
         if (value !== null && value !== undefined && value) {
           this.graphData = value;
+
+          if (
+            this.versionGraphData !== null &&
+            this.versionGraphData !== undefined) {
+            this.graphData = this.versionGraphData;
+          }
+
           this.redrawGraph();
           this.centerGraph();
         }
@@ -468,20 +475,17 @@ export class StateGraphVisualization
 
     if (this.graphDataService.getGraphData() !== null) {
       this.graphData = this.graphDataService.getGraphData();
+
+      if (
+        this.versionGraphData !== null &&
+        this.versionGraphData !== undefined) {
+        this.graphData = this.versionGraphData;
+      }
+
       this.redrawGraph();
       this.centerGraph();
       this.switch = true;
       this.changeDetectorRef.detectChanges();
-    }
-
-    if (
-      this.versionGraphData &&
-      this.versionGraphData !== null &&
-      this.versionGraphData !== undefined) {
-      this.graphData = this.versionGraphData;
-      console.error('called');
-      this.directiveSubscriptions.unsubscribe();
-      console.error(this.graphData);
     }
   }
 

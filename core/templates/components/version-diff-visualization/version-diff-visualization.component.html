@@ -16,7 +16,7 @@
     </state-graph-visualization>
   </md-card>
 
-  <div>
+  <div class="version-diff-graph">
     <md-card class="legend-graph version-diff-graph" ng-show="$ctrl.diffGraphData">
       <h4 class="exploration-graph-legend-heading">Exploration Graph Legend</h4>
       <state-graph-visualization [version-graph-data]="$ctrl.legendGraph"
@@ -45,6 +45,7 @@
     pointer-events: none;
   }
   .legend-graph {
+    position: initial;
     margin-top: 30px;
     right: -100px;
     top: 10px;
