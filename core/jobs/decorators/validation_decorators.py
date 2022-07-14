@@ -32,7 +32,7 @@ import apache_beam as beam
 from apache_beam import typehints
 
 from typing import (
-    Callable, Dict, FrozenSet, Iterator, List, Set, Tuple, Type, cast)
+    Callable, Dict, FrozenSet, Iterator, Sequence, Set, Tuple, Type, cast)
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -62,7 +62,7 @@ ModelRelationshipsType = Callable[
     Iterator[
         Tuple[
             model_property.PropertyType,
-            List[Type[base_models.BaseModel]]
+            Sequence[Type[base_models.BaseModel]]
         ]
     ]
 ]
