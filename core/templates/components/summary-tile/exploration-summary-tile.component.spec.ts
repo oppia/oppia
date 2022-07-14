@@ -124,7 +124,7 @@ class MockUrlService {
   }
 }
 
-describe('Exploration Summary Tile Component', () => {
+fdescribe('Exploration Summary Tile Component', () => {
   let component: ExplorationSummaryTileComponent;
   let fixture: ComponentFixture<ExplorationSummaryTileComponent>;
   let dateTimeFormatService: DateTimeFormatService;
@@ -224,8 +224,6 @@ describe('Exploration Summary Tile Component', () => {
   });
 
   it('should get RTL language status correctly', () => {
-    spyOn(
-      i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(false);
     expect(component.isLanguageRTL()).toBeFalse();
     spyOn(
       i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(true);
