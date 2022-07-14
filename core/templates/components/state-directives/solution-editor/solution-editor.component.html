@@ -16,8 +16,8 @@
           {{stateSolutionService.savedMemento.answerIsExclusive ? 'The only' : 'One'}} solution is...
         </strong>
         <span>
-          <angular-html-bind-wrapper [htmlData]="getAnswerHtml()">
-          </angular-html-bind-wrapper>
+          <oppia-interaction-display [htmlData]="getAnswerHtml()">
+          </oppia-interaction-display>
         </span>
       </div>
     </div>

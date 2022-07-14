@@ -16,7 +16,6 @@
  * @fileoverview Unit tests for DisplayHintModalComponent.
  */
 
-import { Component, Directive } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
@@ -34,17 +33,7 @@ import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { WrittenTranslations } from 'domain/exploration/WrittenTranslationsObjectFactory';
 import { AudioTranslationLanguageService } from '../services/audio-translation-language.service';
-
-
-let MockAngularHtmlBindWrapperDirective = function(
-    options: Component): Directive {
-  const metadata: Directive = {
-    selector: options.selector,
-    inputs: options.inputs,
-    outputs: options.outputs
-  };
-  return Directive(metadata)(class _ { }) as Directive;
-};
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 describe('Display hint modal', () => {
   let fixture: ComponentFixture<DisplayHintModalComponent>;
@@ -62,9 +51,6 @@ describe('Display hint modal', () => {
       declarations: [
         DisplayHintModalComponent,
         MockTranslatePipe,
-        MockAngularHtmlBindWrapperDirective({
-          selector: 'angular-html-bind-wrapper',
-          inputs: ['htmlData'] })
       ],
       providers: [
         NgbActiveModal,
@@ -74,7 +60,8 @@ describe('Display hint modal', () => {
         HintsAndSolutionManagerService,
         PlayerPositionService,
         PlayerTranscriptService
-      ]
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   }));
 

@@ -1,10 +1,10 @@
 <div class="oppia-response-set-input">
-  <span *ngIf="answer.length === 0"
+  <span *ngIf="escapedAnswer.length === 0"
         [innerHTML]="'I18N_INTERACTIONS_SET_INPUT_NO_ANSWER' | translate">
   </span>
-  <span *ngIf="answer.length > 0">
+  <span *ngIf="escapedAnswer.length > 0">
     <ul class="oppia-item-list">
-      <li *ngFor="let item of answer">
+      <li *ngFor="let item of escapedAnswer">
         {{ item }}
       </li>
     </ul>

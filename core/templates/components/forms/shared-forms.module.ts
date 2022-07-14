@@ -22,7 +22,7 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgbTooltipModule, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
-import { DynamicContentModule } from 'components/angular-html-bind/dynamic-content.module';
+import { DynamicContentModule } from 'components/interaction-display/dynamic-content.module';
 import { MaterialModule } from 'modules/material.module';
 import { SharedPipesModule } from 'filters/shared-pipes.module';
 import { TranslateModule } from '@ngx-translate/core';

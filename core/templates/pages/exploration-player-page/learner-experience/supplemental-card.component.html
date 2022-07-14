@@ -15,11 +15,10 @@
       <i class="material-icons md-18">&#xE5CD;</i>
     </button>
     <div>
-      <angular-html-bind-wrapper classStr="oppia-rte-viewer conversation-skin-help-card-content e2e-test-conversation-feedback-latest"
-                                 [htmlData]="helpCardHtml"
-                                 [parentScope]="this"
-                                 [ngClass]="getFeedbackAudioHighlightClass()">
-      </angular-html-bind-wrapper>
+      <oppia-rte-output-display class="oppia-rte-viewer conversation-skin-help-card-content e2e-test-conversation-feedback-latest"
+                                [rteString]="helpCardHtml"
+                                [ngClass]="getFeedbackAudioHighlightClass()">
+      </oppia-rte-output-display>
     </div>
     <br>
     <oppia-continue-button *ngIf="helpCardHasContinueButton"
@@ -34,9 +33,9 @@
   correctly. More details about the class can be found in extensions/interactions/
   DragAndDropSortInput/directives/drag-and-drop-sort-input-interaction.component.html-->
   <div class="conversation-skin-interaction-container" #interactionContainer>
-    <angular-html-bind-wrapper classStr="e2e-test-conversation-input"
+    <oppia-interaction-display classStr="e2e-test-conversation-input"
                                [parentScope]="this"
                                [htmlData]="currentDisplayedCard.getInteractionHtml()">
-    </angular-html-bind-wrapper>
+    </oppia-interaction-display>
   </div>
 </div>

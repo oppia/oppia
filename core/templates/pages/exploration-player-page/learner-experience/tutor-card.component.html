@@ -89,9 +89,9 @@
           This can lead to two conflicting copies of the interaction for
           non-inline interactions. -->
         <div *ngIf="isInteractionInline() && displayedCard.getInteractionHtml() && !displayedCard.isCompleted() && !conceptCardIsBeingShown">
-          <angular-html-bind-wrapper classStr="e2e-test-conversation-input"
+          <oppia-interaction-display classStr="e2e-test-conversation-input"
                                      [htmlData]="displayedCard.getInteractionHtml()">
-          </angular-html-bind-wrapper>
+          </oppia-interaction-display>
         </div>
       </div>
     </div>

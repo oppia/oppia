@@ -24,7 +24,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { YouTubePlayerModule } from '@angular/youtube-player';
 import { NgbAccordionModule, NgbModalModule, NgbNavModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { NoninteractiveCollapsible } from './Collapsible/directives/oppia-noninteractive-collapsible.component';
-import { DynamicContentModule } from 'components/angular-html-bind/dynamic-content.module';
+import { DynamicContentModule } from 'components/interaction-display/dynamic-content.module';
 import { NoninteractiveImage } from './Image/directives/oppia-noninteractive-image.component';
 import { NoninteractiveLink } from './Link/directives/oppia-noninteractive-link.component';
 import { NoninteractiveMath } from './Math/directives/oppia-noninteractive-math.component';

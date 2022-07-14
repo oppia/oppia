@@ -175,4 +175,15 @@ describe('StateHintsEditorComponent', () => {
     expect(component.saveStateContent.emit)
       .toHaveBeenCalled();
   });
+
+  it('should update when card height limit is reached', () => {
+    component.cardHeightLimitReached = false;
+    spyOn(component, 'isCardHeightLimitReached').and.returnValue(
+      !component.cardHeightLimitReached);
+
+    component.ngAfterViewChecked();
+
+    expect(component.cardHeightLimitReached).toBeTrue();
+    expect(component.isCardHeightLimitReached).toHaveBeenCalled();
+  });
 });

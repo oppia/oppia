@@ -3,8 +3,8 @@
     <div class="content">
       <span class="content-title">{{ editableTitle }}</span>
       <div class="html-content">
-        <angular-html-bind-wrapper [htmlData]="pageContents?.getHtml()">
-        </angular-html-bind-wrapper>
+        <oppia-rte-output-display [rteString]="pageContents?.getHtml()">
+        </oppia-rte-output-display>
       </div>
     </div>
   </div>

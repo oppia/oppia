@@ -4,16 +4,16 @@ Selected Misconception: {{ selectedMisconception && selectedMisconception.getNam
   <div *ngFor="let misconception of member.value">
     <button class="btn btn-secondary misconception-button" (click)="selectMisconception(misconception, member.key)">
       <strong class="d-inline">{{ misconception.isMandatory() ? '' : ' (Optional) ' }}{{ misconception.getName() }}</strong>
-      <angular-html-bind-wrapper classStr="misconception-notes-container" [htmlData]="misconception.getNotes()">
-      </angular-html-bind-wrapper>
+      <oppia-rte-output-display class="misconception-notes-container" [rteString]="misconception.getNotes()">
+      </oppia-rte-output-display>
     </button>
     <div *ngIf="selectedMisconceptionSkillId === member.key && selectedMisconception.getId() === misconception.getId()">
       <label class="misconception-label"> Note to creators: </label>
-      <angular-html-bind-wrapper [htmlData]="misconception.getNotes()">
-      </angular-html-bind-wrapper>
+      <oppia-rte-output-display [rteString]="misconception.getNotes()">
+      </oppia-rte-output-display>
       <label class="misconception-label"> Misconception Feedback: </label>
-      <angular-html-bind-wrapper [htmlData]="misconception.getFeedback()">
-      </angular-html-bind-wrapper>
+      <oppia-rte-output-display [rteString]="misconception.getFeedback()">
+      </oppia-rte-output-display>
     </div>
   </div>
 </div>

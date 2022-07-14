@@ -9,9 +9,9 @@
       </div>
     </ng-template>
     <ng-template ngbPanelContent>
-      <div class="e2e-panel-body">
-        <angular-html-bind-wrapper classStr="e2e-test-collapsible-content" [htmlData]="content">
-        </angular-html-bind-wrapper>
+      <div class="protractor-panel-body">
+        <oppia-rte-output-display class="e2e-test-collapsible-content" [rteString]="content">
+        </oppia-rte-output-display>
       </div>
     </ng-template>
   </ngb-panel>

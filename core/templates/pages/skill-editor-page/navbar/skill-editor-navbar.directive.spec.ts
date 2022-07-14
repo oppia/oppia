@@ -124,6 +124,7 @@ describe('Skill Editor Navbar Directive', function() {
     ctrl.$onInit();
     mockEventEmitter.emit();
     mockPrerequisiteSkillChangeEventEmitter.emit();
+    undoRedoService._undoRedoChangeEventEmitter.emit();
 
     expect($scope.activeTab).toBe('Editor');
     expect($scope.$applyAsync).toHaveBeenCalled();

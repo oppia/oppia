@@ -24,7 +24,7 @@ import { NgModule } from '@angular/core';
 import { AngularFireModule } from '@angular/fire';
 import { AngularFireAuth, AngularFireAuthModule, USE_EMULATOR } from '@angular/fire/auth';
 import { CustomFormsComponentsModule } from './forms/custom-forms-directives/custom-form-components.module';
-import { DynamicContentModule } from './angular-html-bind/dynamic-content.module';
+import { DynamicContentModule } from './interaction-display/dynamic-content.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MaterialModule } from 'modules/material.module';
 import { ObjectComponentsModule } from 'objects/object-components.module';
@@ -165,6 +165,7 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     RichTextComponentsModule,
     ObjectComponentsModule,
     OppiaCkEditor4Module,
+    RichTextComponentsModule,
     SearchBarModule,
     SharedFormsModule,
     StringUtilityPipesModule,

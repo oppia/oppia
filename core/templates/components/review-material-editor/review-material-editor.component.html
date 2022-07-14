@@ -10,8 +10,8 @@
       <span class="oppia-placeholder" [hidden]="!(editableExplanation === '')">
           Give a review or explanation of the skill.
       </span>
-      <angular-html-bind-wrapper [htmlData]="editableExplanation">
-      </angular-html-bind-wrapper>
+      <oppia-rte-output-display [rteString]="editableExplanation">
+      </oppia-rte-output-display>
     </div>
     <!-- This is a dummy div created to mask the contents when the user hovers over the content. -->
     <div class="oppia-editable-section-mask">
