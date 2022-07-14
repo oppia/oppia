@@ -37,7 +37,6 @@ var ExplorationEditorTranslationTab = require(
   '../webdriverio_utils/ExplorationEditorTranslationTab.js');
 var ExplorationPlayerPage = require(
   '../webdriverio_utils/ExplorationPlayerPage.js');
-const { browser } = require('protractor');
 
 var ExplorationEditorPage = function() {
   /*
