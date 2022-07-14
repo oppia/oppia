@@ -74,7 +74,6 @@ import { QuestionPlayerEngineService } from '../services/question-player-engine.
 import { RefresherExplorationConfirmationModalService } from '../services/refresher-exploration-confirmation-modal.service';
 import { StatsReportingService } from '../services/stats-reporting.service';
 import { ConversationSkinComponent } from './conversation-skin.component';
-import { PlatformFeatureService } from 'services/platform-feature.service';
 import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
 
@@ -90,16 +89,6 @@ class MockWindowRef {
     },
     scrollTo: (x, y) => {}
   };
-}
-
-class MockPlatformFeatureService {
-  get status(): object {
-    return {
-      EndChapterCelebration: {
-        isEnabled: true
-      }
-    };
-  }
 }
 
 describe('Conversation skin component', () => {
@@ -153,7 +142,6 @@ describe('Conversation skin component', () => {
   let readOnlyExplorationBackendApiService:
     ReadOnlyExplorationBackendApiService;
   let stateObjectFactory: StateObjectFactory;
-  let platformFeatureService: PlatformFeatureService;
   let learnerDashboardBackendApiService: LearnerDashboardBackendApiService;
 
   let displayedCard = new StateCard(
@@ -490,10 +478,6 @@ describe('Conversation skin component', () => {
         {
           provide: WindowRef,
           useClass: MockWindowRef
-        },
-        {
-          provide: PlatformFeatureService,
-          useClass: MockPlatformFeatureService
         }
       ],
       schemas: [NO_ERRORS_SCHEMA]
@@ -559,7 +543,6 @@ describe('Conversation skin component', () => {
     readOnlyExplorationBackendApiService = TestBed.inject(
       ReadOnlyExplorationBackendApiService);
     stateObjectFactory = TestBed.inject(StateObjectFactory);
-    platformFeatureService = TestBed.inject(PlatformFeatureService);
     learnerDashboardBackendApiService = TestBed.inject(
       LearnerDashboardBackendApiService);
     spyOn(
@@ -1597,25 +1580,6 @@ describe('Conversation skin component', () => {
     tick(1000);
     expect(animateSpy).toHaveBeenCalled();
   }));
-
-  it('should determine if endChapterCelebrationFeature is enabled or not',
-    () => {
-      const featureSpy = (
-        spyOnProperty(platformFeatureService, 'status', 'get')
-          .and.callThrough());
-
-      expect(componentInstance.isEndChapterCelebrationFeatureEnabled())
-        .toBe(true);
-
-      featureSpy.and.returnValue({
-        EndChapterCelebration: {
-          isEnabled: false
-        }
-      });
-
-      expect(componentInstance.isEndChapterCelebrationFeatureEnabled())
-        .toBe(false);
-    });
 
   it('should show upcoming card', () => {
     spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(0);

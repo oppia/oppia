@@ -206,6 +206,61 @@ describe('Topic and Story viewer functionality', function() {
     await users.logout();
   });
 
+  it('should display milestone message and load the next chapter upon' +
+    'clicking the next chapter card on the last state.',
+  async function() {
+    await users.createAndLoginUser(
+      'newStoryViewer2@storyViewer.com', 'newStoryViewer2', false);
+    await topicAndStoryViewerPage.get(
+      'math', 'topic-tasv-one', 'storyplayertasvone');
+    await topicAndStoryViewerPage.expectCompletedLessonCountToBe(0);
+
+    await topicAndStoryViewerPage.goToChapterIndex(0);
+    await explorationPlayerPage.submitAnswer('Continue', null);
+    await topicAndStoryViewerPage.expectMilestoneMessageToBe(
+      'You just completed your 1st chapter!');
+
+    await waitFor.clientSideRedirection(async() => {
+      // Click the next chapter card to trigger redirection.
+      await topicAndStoryViewerPage.goToNextChapterFromRecommendations();
+    }, (url) => {
+      // Wait until the URL has changed to that of the next chapter.
+      return (/node_id=node_2/.test(url));
+    }, async() => {
+      // Wait until the conversation-skin of the next chapter is loaded.
+      await topicAndStoryViewerPage.waitForConversationSkinCardsContainer();
+    });
+    users.logout();
+  });
+
+  it('should dismiss sign-up section and load practice session page upon' +
+  'clicking the practice session card on the last state.', async function() {
+    await topicAndStoryViewerPage.get(
+      'math', 'topic-tasv-one', 'storyplayertasvone');
+    await topicAndStoryViewerPage.expectCompletedLessonCountToBe(0);
+
+    await topicAndStoryViewerPage.goToChapterIndex(0);
+    await explorationPlayerPage.submitAnswer('Continue', null);
+
+    var endChapterSignUpSection = element(
+      by.css('.e2e-test-end-chapter-sign-up-section'));
+    await topicAndStoryViewerPage.waitForSignUpSection();
+    await topicAndStoryViewerPage.dismissSignUpSection();
+    await waitFor.invisibilityOf(
+      endChapterSignUpSection, 'Sign up section takes too long to disappear');
+
+    await waitFor.clientSideRedirection(async() => {
+      // Click the practice session card to trigger redirection.
+      await topicAndStoryViewerPage.goToPracticeSessionFromRecommendations();
+    }, (url) => {
+      // Wait until the URL has changed to that of the practice tab.
+      return (/practice/.test(url));
+    }, async() => {
+      // Wait until the practice tab is loaded.
+      await topicAndStoryViewerPage.waitForPracticeTabContainer();
+    });
+  });
+
   it(
     'should check for topic description, stories and revision cards',
     async function() {

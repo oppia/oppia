@@ -157,7 +157,6 @@ describe('PlatformFeatureService', () => {
             timestamp: Date.now(),
             featureStatusSummary: {
               [FeatureNames.DummyFeature]: true,
-              [FeatureNames.EndChapterCelebration]: true
             }
           })
         });

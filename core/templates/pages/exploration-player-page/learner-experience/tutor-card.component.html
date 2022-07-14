@@ -115,13 +115,13 @@
         </div>
       </div>
     </div>
-    <div *ngIf="platformFeatureService.status.EndChapterCelebration.isEnabled && isOnTerminalCard() && milestoneMessageIsToBeDisplayed && generateMilestoneMessage()">
+    <div *ngIf="isOnTerminalCard() && milestoneMessageIsToBeDisplayed && generateMilestoneMessage()">
       <div class="conversation-skin-milestone-message">
         <div class="milestone-message-star-container">
           <img [src]="getStaticImageUrl('/general/milestone-message-star-icon.svg')" class="star-icon">
           <p class="completed-chapter-count">{{ completedChaptersCount }}</p>
         </div>
-        <span class="milestone-message-text">{{ generateMilestoneMessage() }}</span>
+        <span class="milestone-message-text e2e-test-milestone-message-text">{{ generateMilestoneMessage() }}</span>
       </div>
     </div>
 

@@ -27,6 +27,16 @@ var TopicAndStoryViewerPage = function() {
   var lessonUncompletedIcons = element.all(
     by.css('.e2e-test-lesson-icon-uncompleted'));
   var lessonTrack = element(by.css('.e2e-test-lesson-track'));
+  var milestoneMessage = element(by.css('.e2e-test-milestone-message-text'));
+  var nextChapterButton = element(by.css('.e2e-test-next-chapter-button'));
+  var endChapterSignUpSection = element(
+    by.css('.e2e-test-end-chapter-sign-up-section'));
+  var conversationSkinCardsContainer = element(
+    by.css('.e2e-test-conversation-skin-cards-container'));
+  var dismissSignUpSectionButton = element(
+    by.css('.e2e-test-dismiss-sign-up-section-button'));
+  var practicetabContainer = element(
+    by.css('.e2e-test-practice-tab-container'));
   var practiceSessionContainer = element(
     by.css('.e2e-test-practice-session-container'));
 
@@ -44,6 +54,21 @@ var TopicAndStoryViewerPage = function() {
     await waitFor.pageToFullyLoad();
   };
 
+  this.goToNextChapterFromRecommendations = async function() {
+    await action.click('Next chapter button', nextChapterButton);
+    await waitFor.pageToFullyLoad();
+  };
+
+  this.goToPracticeSessionFromRecommendations = async function() {
+    await action.click('Start practice button', startPracticeButton);
+    await waitFor.pageToFullyLoad();
+  };
+
+  this.dismissSignUpSection = async function() {
+    await action.click(
+      'Don\'ts show me again button', dismissSignUpSectionButton);
+  };
+
   this.expectCompletedLessonCountToBe = async function(count) {
     await waitFor.visibilityOf(
       lessonTrack, 'Lesson track takes too long to be visible.');
@@ -54,6 +79,29 @@ var TopicAndStoryViewerPage = function() {
     await waitFor.visibilityOf(
       lessonTrack, 'Lesson track takes too long to be visible.');
     expect(await lessonUncompletedIcons.count()).toEqual(count);
+  };
+
+  this.expectMilestoneMessageToBe = async function(message) {
+    await waitFor.visibilityOf(
+      milestoneMessage, 'Milestone message takes too long to be visible.');
+    expect(await milestoneMessage.getText()).toEqual(message);
+  };
+
+  this.waitForConversationSkinCardsContainer = async function() {
+    await waitFor.visibilityOf(
+      conversationSkinCardsContainer,
+      'Conversation skin cards container takes too long to be visible.');
+  };
+
+  this.waitForSignUpSection = async function() {
+    await waitFor.visibilityOf(
+      endChapterSignUpSection, 'Sign up section takes too long to be visible.');
+  };
+
+  this.waitForPracticeTabContainer = async function() {
+    await waitFor.visibilityOf(
+      practicetabContainer,
+      'Practice tab container takes too long to be visible.');
   };
 
   this.waitForPracticeSessionContainer = async function() {
