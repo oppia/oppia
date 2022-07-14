@@ -84,15 +84,15 @@ class MockNavigationService {
   ACTION_CLOSE: string = 'close';
 }
 
-fdescribe('AddSyllabusItemsComponent', () => {
+describe('AddSyllabusItemsComponent', () => {
   let component: AddSyllabusItemsComponent;
   let fixture: ComponentFixture<AddSyllabusItemsComponent>;
   let i18nLanguageCodeService: I18nLanguageCodeService;
-  let navigationService: NavigationService
+  let navigationService: NavigationService;
   let translateService: TranslateService;
   let windowDimensionsService: WindowDimensionsService;
-  let assetsBackendApiService: AssetsBackendApiService
-  let constructTranslationIdsService: ConstructTranslationIdsService
+  let assetsBackendApiService: AssetsBackendApiService;
+  let constructTranslationIdsService: ConstructTranslationIdsService;
   let learnerGroupSyllabusBackendApiService:
     LearnerGroupSyllabusBackendApiService;
   let languageUtilService: LanguageUtilService;
@@ -322,8 +322,8 @@ fdescribe('AddSyllabusItemsComponent', () => {
   it('should execute search when search query is changed',
     fakeAsync(() => {
       spyOn(
-        learnerGroupSyllabusBackendApiService, 'searchNewSyllabusItemsAsync')
-          .and.returnValue(Promise.resolve(mockSyllabusItems));
+        learnerGroupSyllabusBackendApiService, 'searchNewSyllabusItemsAsync'
+      ).and.returnValue(Promise.resolve(mockSyllabusItems));
       component.ngOnInit();
       component.selectionDetails = selectionDetailsStub;
       component.selectionDetails.languageCodes.selection = '';

@@ -39,10 +39,10 @@ interface SyllabusFilterDetails {
 }
 
 export interface SyllabusSelectionDetails {
-  [key: string]: SyllabusFilterDetails,
-  types: SyllabusFilterDetails,
-  categories: SyllabusFilterDetails,
-  languageCodes: SyllabusFilterDetails
+  [key: string]: SyllabusFilterDetails;
+  types: SyllabusFilterDetails;
+  categories: SyllabusFilterDetails;
+  languageCodes: SyllabusFilterDetails;
 }
 
 export interface LearnerGroupSyllabusFilter {

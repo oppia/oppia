@@ -79,7 +79,7 @@ export class InviteStudentsComponent implements OnInit {
       this.learnerGroupBackendApiService.searchNewStudentToAddAsync(
         this.learnerGroupID, username
       ).then(userInfo => {
-        if (userInfo.error.length == 0) {
+        if (!userInfo.error) {
           this.invitedUsersInfo.push(userInfo);
           this.invitedUsernames.push(userInfo.username);
           this.updateInvitedStudents();

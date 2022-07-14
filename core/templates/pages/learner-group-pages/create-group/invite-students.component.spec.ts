@@ -26,7 +26,7 @@ import { LearnerGroupBackendApiService } from
   'domain/learner_group/learner-group-backend-api.service';
 import { AlertsService } from 'services/alerts.service';
 
-fdescribe('InviteStudentsComponent', () => {
+describe('InviteStudentsComponent', () => {
   let component: InviteStudentsComponent;
   let fixture: ComponentFixture<InviteStudentsComponent>;
   let alertsService: AlertsService;
@@ -37,7 +37,7 @@ fdescribe('InviteStudentsComponent', () => {
     username: 'username1',
     user_profile_picture_url: 'profile_picture_url1',
     error: ''
-  }
+  };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -93,8 +93,8 @@ fdescribe('InviteStudentsComponent', () => {
       username: 'username2',
       user_profile_picture_url: '',
       error: 'You cannot invite yourself to the learner group.'
-    }
-    const alertServiceSpy = spyOn(alertsService, 'addInfoMessage')
+    };
+    const alertServiceSpy = spyOn(alertsService, 'addInfoMessage');
 
     spyOn(learnerGroupBackendApiService, 'searchNewStudentToAddAsync')
       .and.returnValue(Promise.resolve(userInfo2));
@@ -114,7 +114,7 @@ fdescribe('InviteStudentsComponent', () => {
 
   it('should show alert message when trying to add an already invited ' +
   'student to the learner group', fakeAsync(() => {
-    const alertServiceSpy = spyOn(alertsService, 'addInfoMessage')
+    const alertServiceSpy = spyOn(alertsService, 'addInfoMessage');
 
     component.invitedUsersInfo = [userInfo];
     component.invitedUsernames = ['username1'];

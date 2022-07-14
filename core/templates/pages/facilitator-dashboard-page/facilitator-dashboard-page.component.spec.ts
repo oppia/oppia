@@ -41,7 +41,7 @@ class MockTranslateService {
   }
 }
 
-fdescribe('FacilitatorDashboardPageComponent', () => {
+describe('FacilitatorDashboardPageComponent', () => {
   let component: FacilitatorDashboardPageComponent;
   let fixture: ComponentFixture<FacilitatorDashboardPageComponent>;
   let i18nLanguageCodeService: I18nLanguageCodeService;

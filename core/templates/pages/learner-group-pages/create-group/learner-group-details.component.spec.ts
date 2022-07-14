@@ -23,7 +23,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { LearnerGroupDetailsComponent } from './learner-group-details.component';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
-fdescribe('LearnerGroupDetailsComponent', () => {
+describe('LearnerGroupDetailsComponent', () => {
   let component: LearnerGroupDetailsComponent;
   let fixture: ComponentFixture<LearnerGroupDetailsComponent>;
   let i18nLanguageCodeService: I18nLanguageCodeService;

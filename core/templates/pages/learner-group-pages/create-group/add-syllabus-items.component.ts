@@ -32,10 +32,10 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import constants from 'assets/constants';
 import { ConstructTranslationIdsService } from
   'services/construct-translation-ids.service';
-import { 
+import {
   LearnerGroupSyllabusFilter,
   LearnerGroupSyllabusBackendApiService,
-  SyllabusSelectionDetails 
+  SyllabusSelectionDetails
 } from 'domain/learner_group/learner-group-syllabus-backend-api.service';
 import { StorySummary } from 'domain/story/story-summary.model';
 import { LearnerGroupSubtopicSummary } from

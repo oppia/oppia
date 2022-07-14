@@ -45,7 +45,7 @@ class MockTranslateService {
   }
 }
 
-fdescribe('CreateLearnerGroupPageComponent', () => {
+describe('CreateLearnerGroupPageComponent', () => {
   let component: CreateLearnerGroupPageComponent;
   let fixture: ComponentFixture<CreateLearnerGroupPageComponent>;
   let i18nLanguageCodeService: I18nLanguageCodeService;
@@ -59,7 +59,7 @@ fdescribe('CreateLearnerGroupPageComponent', () => {
     username: 'username1',
     user_profile_picture_url: 'profile_picture_url1',
     error: ''
-  }
+  };
 
   const sampleSubtopicSummaryDict = {
     subtopic_id: 1,
@@ -135,8 +135,7 @@ fdescribe('CreateLearnerGroupPageComponent', () => {
     expect(component.subscribeToOnLangChange).toHaveBeenCalled();
     expect(component.activeSection).toEqual(
       LearnerGroupPagesConstants.LEARNER_GROUP_CREATION_SECTION_I18N_IDS
-      .GROUP_DETAILS
-    );
+        .GROUP_DETAILS);
   }));
 
   it('should call set page title whenever the language is changed', () => {
@@ -170,12 +169,11 @@ fdescribe('CreateLearnerGroupPageComponent', () => {
   it('should set active section correctly', () => {
     component.setActiveSection(
       LearnerGroupPagesConstants.LEARNER_GROUP_CREATION_SECTION_I18N_IDS
-      .ADD_SYLLABUS_ITEMS, 2);
+        .ADD_SYLLABUS_ITEMS, 2);
 
     expect(component.activeSection).toEqual(
       LearnerGroupPagesConstants.LEARNER_GROUP_CREATION_SECTION_I18N_IDS
-      .ADD_SYLLABUS_ITEMS
-    );
+        .ADD_SYLLABUS_ITEMS);
     expect(component.furthestReachedSectionNumber).toEqual(2);
   });
 
@@ -234,9 +232,9 @@ fdescribe('CreateLearnerGroupPageComponent', () => {
 
   it('should get progress tab status class', () => {
     component.furthestReachedSectionNumber = 2;
-    expect(component.getProgressTabStatusClass(3)).toBe('incomplete')
-    expect(component.getProgressTabStatusClass(2)).toBe('active')
-    expect(component.getProgressTabStatusClass(1)).toBe('completed')
+    expect(component.getProgressTabStatusClass(3)).toBe('incomplete');
+    expect(component.getProgressTabStatusClass(2)).toBe('active');
+    expect(component.getProgressTabStatusClass(1)).toBe('completed');
   });
 
   it('should get oppia large avatar url', () => {
@@ -257,7 +255,7 @@ fdescribe('CreateLearnerGroupPageComponent', () => {
       invited_student_usernames: ['username1'],
       subtopic_page_ids: ['subtopic_page_id'],
       story_ids: []
-    }
+    };
     const learnerGroup = LearnerGroupData.createFromBackendDict(
       learnerGroupBackendDict);
 
