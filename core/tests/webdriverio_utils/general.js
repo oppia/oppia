@@ -69,11 +69,7 @@ var CONSOLE_ERRORS_TO_IGNORE = [
     'https:\/\/www.googletagmanager.com\/a.* Failed to load resource: ' +
     'the server responded with a status of 405 ()',
     'g'
-  ),
-  _.escapeRegExp(
-    'chrome-error://chromewebdata/ 0 Refused to display' +
-    '\'http://localhost:9001/\' in a frame because it set' +
-    '\'X-Frame-Options\' to \'deny\'.'),
+  )
 ];
 
 var checkForConsoleErrors = async function(
