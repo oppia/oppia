@@ -385,7 +385,6 @@ import { PageHeadService } from './page-head.service';
 import { CollectionPlayerBackendApiService } from 'pages/collection-player-page/services/collection-player-backend-api.service';
 import { CollectionEditorRoutingService } from 'pages/collection-editor-page/services/collection-editor-routing.service';
 import { EmailDashboardResultBackendApiService } from 'pages/email-dashboard-pages/email-dashboard-result-backend-api.service';
-import { StateDiffModalBackendApiService } from 'pages/exploration-editor-page/services/state-diff-modal-backend-api.service';
 import { I18nService } from 'i18n/i18n.service';
 import { QuestionPlayerStateService } from 'components/question-directives/question-player/services/question-player-state.service';
 import { SettingTabBackendApiService } from 'pages/exploration-editor-page/services/setting-tab-backend-api.service';
@@ -418,6 +417,9 @@ import { QuestionUndoRedoService } from 'domain/editor/undo_redo/question-undo-r
 import { QuestionUpdateService } from 'domain/question/question-update.service';
 import { ExplorationMetadataObjectFactory } from 'domain/exploration/ExplorationMetadataObjectFactory';
 import { VersionHistoryBackendApiService } from 'pages/exploration-editor-page/services/version-history-backend-api.service';
+import { YamlService } from './yaml.service';
+import { HistoryTabYamlConversionService } from 'pages/exploration-editor-page/services/history-tab-yaml-conversion.service';
+import { VersionedExplorationCachingService } from 'pages/exploration-editor-page/services/versioned-exploration-caching.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -598,6 +600,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['HintsAndSolutionManagerService', HintsAndSolutionManagerService],
   ['HintObjectFactory', HintObjectFactory],
   ['HistoryTabBackendApiService', HistoryTabBackendApiService],
+  ['HistoryTabYamlConversionService', HistoryTabYamlConversionService],
   ['HtmlEscaperService', HtmlEscaperService],
   ['I18nLanguageCodeService', I18nLanguageCodeService],
   ['I18nService', I18nService],
@@ -765,7 +768,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['StateContentService', StateContentService],
   ['StateLinkedSkillIdService', StateLinkedSkillIdService],
   ['StateCustomizationArgsService', StateCustomizationArgsService],
-  ['StateDiffModalBackendApiService', StateDiffModalBackendApiService],
   ['StateEditorRefreshService', StateEditorRefreshService],
   ['StateEditorService', StateEditorService],
   ['StateGraphLayoutService', StateGraphLayoutService],
@@ -852,6 +854,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['UserExplorationPermissionsService', UserExplorationPermissionsService],
   ['UtilsService', UtilsService],
   ['ValidatorsService', ValidatorsService],
+  ['VersionedExplorationCachingService', VersionedExplorationCachingService],
   ['VersionHistoryBackendApiService', VersionHistoryBackendApiService],
   ['VersionTreeService', VersionTreeService],
   ['WindowDimensionsService', WindowDimensionsService],
@@ -860,6 +863,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['WorkedExampleObjectFactory', WorkedExampleObjectFactory],
   ['WrittenTranslationObjectFactory', WrittenTranslationObjectFactory],
   ['WrittenTranslationsObjectFactory', WrittenTranslationsObjectFactory],
+  ['YamlService', YamlService],
   ['baseInteractionValidationService', baseInteractionValidationService],
   ['UndoRedoService', UndoRedoService],
   ['QuestionValidationService', QuestionValidationService],

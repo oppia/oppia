@@ -284,7 +284,9 @@ class ExplorationHandler(base.BaseHandler):
 
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id, strict=False)
-        user_settings = user_services.get_user_settings(self.user_id)
+        user_settings = user_services.get_user_settings(
+            self.user_id, strict=False
+        )
 
         preferred_audio_language_code = None
         preferred_language_codes = None
@@ -374,6 +376,7 @@ class ExplorationHandler(base.BaseHandler):
                 rights_manager.check_can_edit_activity(
                     self.user, exploration_rights)),
             'exploration': exploration.to_player_dict(),
+            'exploration_metadata': exploration.get_metadata().to_dict(),
             'exploration_id': exploration_id,
             'is_logged_in': bool(self.user_id),
             'session_id': utils.generate_new_session_id(),
