@@ -198,7 +198,7 @@ angular.module('oppia').component('contributionsAndReview', {
       };
 
       var _showQuestionSuggestionModal = function(
-          suggestion, 
+          suggestion,
           suggestionIdToContribution,
           reviewable,
           misconceptionsBySkill
@@ -303,7 +303,7 @@ angular.module('oppia').component('contributionsAndReview', {
           var skill = skillDict.skill;
           misconceptionsBySkill[skill.getId()] = skill.getMisconceptions();
           _showQuestionSuggestionModal(
-            suggestion, 
+            suggestion,
             suggestionIdToContribution,
             reviewable,
             misconceptionsBySkill
