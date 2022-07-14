@@ -131,8 +131,8 @@ class ExplorationStatsTests(test_utils.GenericTestBase):
         # Using ignore[arg-type] because assertDictEqual method
         # expects both arguments to be of type Dict[Any, Any]
         self.assertDictEqual(
-            expected_exploration_stats_dict, # type: ignore[arg-type]
-            observed_exploration_stats.to_dict()) # type: ignore[arg-type]
+            expected_exploration_stats_dict,
+            observed_exploration_stats.to_dict())
 
     def test_get_sum_of_first_hit_counts(self) -> None:
         """Test the get_sum_of_first_hit_counts method."""
@@ -1403,7 +1403,9 @@ class LearnerActionTests(test_utils.GenericTestBase):
         action_dict['schema_version'] = 2
         if action_dict['action_type'] == 'ExplorationStart':
             action_dict['action_type'] = 'ExplorationStart1'
-            action_dict['action_customization_args']['new_key'] = 5
+            action_dict['action_customization_args']['new_key'] = {
+                'value': 5
+            }
 
         return action_dict
 
@@ -1459,7 +1461,9 @@ class LearnerActionTests(test_utils.GenericTestBase):
         self.assertEqual(
             playthrough.actions[0].action_type, 'ExplorationStart1')
         self.assertEqual(
-            playthrough.actions[0].action_customization_args['new_key'], 5)
+            playthrough.actions[0].action_customization_args['new_key'],
+            {'value': 5}
+        )
 
         # For other action types, no changes happen during migration.
         learner_action1 = stats_domain.LearnerAction('ExplorationQuit', {}, 1)
