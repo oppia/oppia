@@ -225,6 +225,9 @@ describe('Exploration Summary Tile Component', () => {
 
   it('should get RTL language status correctly', () => {
     spyOn(
+      i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(false);
+    expect(component.isLanguageRTL()).toBeFalse();
+    spyOn(
       i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(true);
     expect(component.isLanguageRTL()).toBeTrue();
   });

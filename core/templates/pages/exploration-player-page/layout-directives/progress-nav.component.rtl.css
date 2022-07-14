@@ -72,3 +72,10 @@
 .progress-nav-bar .row-item-previous-card {
   text-align: right;
 }
+
+.material-icons {
+  -moz-transform: scaleX(-1);
+  -o-transform: scaleX(-1);
+  -webkit-transform: scaleX(-1);
+  transform: scaleX(-1);
+}
