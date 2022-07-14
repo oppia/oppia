@@ -459,14 +459,14 @@ export class StateGraphVisualization
     this.directiveSubscriptions.add(
       this.graphDataService.updateGraphData.subscribe(value => {
         if (value !== null && value !== undefined && value) {
-          this.graphData = value;
-
           if (
             this.versionGraphData !== null &&
+            this.versionGraphData &&
             this.versionGraphData !== undefined) {
-            this.graphData = this.versionGraphData;
+            return;
           }
 
+          this.graphData = value;
           this.redrawGraph();
           this.centerGraph();
         }
