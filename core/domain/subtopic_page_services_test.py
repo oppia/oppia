@@ -51,7 +51,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super(SubtopicPageServicesUnitTests, self).setUp()
-        self.TOPIC_ID = topic_fetchers.get_new_topic_id()  # type: ignore[no-untyped-call]
+        self.TOPIC_ID = topic_fetchers.get_new_topic_id()
         self.subtopic_page = (
             subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
                 self.subtopic_id, self.TOPIC_ID))
