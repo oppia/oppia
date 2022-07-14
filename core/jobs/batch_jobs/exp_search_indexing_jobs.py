@@ -18,8 +18,8 @@
 
 from __future__ import annotations
 
-from core.domain import exp_fetchers
 from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import search_services
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
@@ -86,7 +86,7 @@ class IndexExplorationSummaries(beam.DoFn): # type: ignore[misc]
 
         Args:
             exp_summary: list(ExplorationSummary). List of Exp Summary domain
-            objects to be indexed.
+                objects to be indexed.
 
         Yields:
             JobRunResult. List containing one element, which is either SUCCESS,
