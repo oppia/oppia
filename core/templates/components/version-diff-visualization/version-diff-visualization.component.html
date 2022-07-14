@@ -4,31 +4,43 @@
 </div>
 
 <div class="version-diff-container">
-  <div>
+  <md-card class="version-diff-graph">
     <state-graph-visualization class="e2e-test-history-graph diff-graph"
-                               [graph-data]="$ctrl.diffGraphData"
+                               [version-graph-data]="$ctrl.diffGraphData"
                                [node-colors]="$ctrl.diffGraphNodeColors"
                                [node-secondary-labels]="$ctrl.diffGraphSecondaryLabels"
                                [init-state-id2]="$ctrl.v1InitStateId"
+                               class="version-diff-container-graph"
                                [link-property-mapping]="$ctrl.DIFF_GRAPH_LINK_PROPERTY_MAPPING"
                                (on-click-function)="$ctrl.onClickStateInDiffGraph($event)">
     </state-graph-visualization>
-  </div>
+  </md-card>
 
   <div>
-    <div class="legend-graph" ng-show="$ctrl.diffGraphData">
+    <md-card class="legend-graph version-diff-graph" ng-show="$ctrl.diffGraphData">
       <h4 class="exploration-graph-legend-heading">Exploration Graph Legend</h4>
-      <state-graph-visualization [graph-data]="$ctrl.legendGraph"
+      <state-graph-visualization [version-graph-data]="$ctrl.legendGraph"
                                  [node-colors]="$ctrl.LEGEND_GRAPH_COLORS"
                                  [node-secondary-labels]="$ctrl.LEGEND_GRAPH_SECONDARY_LABELS"
                                  [link-property-mapping]="$ctrl.LEGEND_GRAPH_LINK_PROPERTY_MAPPING"
                                  id="legend-graph">
       </state-graph-visualization>
-    </div>
+    </md-card>
   </div>
 </div>
 
 <style>
+  .version-diff-graph {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  .version-diff-container-graph {
+    position: absolute;
+    top: 0;
+  }
+
   .legend-graph .node rect {
     pointer-events: none;
   }

@@ -59,6 +59,7 @@ export class StateGraphVisualization
     deleted: string;
   };
 
+  @Input() versionGraphData: any;
   @Input() maximize: boolean = false;
   // Object whose keys are node ids and whose values are node colors.
   @Input() nodeColors: object;
@@ -471,6 +472,16 @@ export class StateGraphVisualization
       this.centerGraph();
       this.switch = true;
       this.changeDetectorRef.detectChanges();
+    }
+
+    if (
+      this.versionGraphData &&
+      this.versionGraphData !== null &&
+      this.versionGraphData !== undefined) {
+      this.graphData = this.versionGraphData;
+      console.error('called');
+      this.directiveSubscriptions.unsubscribe();
+      console.error(this.graphData);
     }
   }
 
