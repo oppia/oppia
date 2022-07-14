@@ -70,7 +70,7 @@ class ExpStateAuditChecksJob(base_jobs.JobBase):
 
         - Image should have an SVG extension (RTE image)
 
-        - Start value is before end value (RTE video)        
+        - Start value is before end value (RTE video)
     """
 
     def filter_curated_explorations(self, model_pair: Tuple[
