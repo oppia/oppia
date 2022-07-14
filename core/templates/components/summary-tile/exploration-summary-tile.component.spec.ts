@@ -124,7 +124,7 @@ class MockUrlService {
   }
 }
 
-fdescribe('Exploration Summary Tile Component', () => {
+describe('Exploration Summary Tile Component', () => {
   let component: ExplorationSummaryTileComponent;
   let fixture: ComponentFixture<ExplorationSummaryTileComponent>;
   let dateTimeFormatService: DateTimeFormatService;
