@@ -949,3 +949,21 @@ class GetNumberOfInvalidExplorationsJobTests(job_test_utils.JobTestBase):
         self.assert_job_output_is([
             job_run_result.JobRunResult.as_stdout('EXPS SUCCESS: 2')
         ])
+
+    def test_run_for_invalid_curated_explorations(self) -> None:
+        self.put_multi([self.exp_3, self.opportunity_3])
+        swap_earlier_state_to_60 = (
+            self.swap(feconf, 'EARLIEST_SUPPORTED_STATE_SCHEMA_VERSION', 60)
+        )
+        swap_current_state_61 = self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 61)
+        with swap_earlier_state_to_60, swap_current_state_61:
+            self.assert_job_output_is([
+                job_run_result.JobRunResult.as_stdout('EXPS SUCCESS: 1'),
+                job_run_result.JobRunResult.as_stdout(
+                    'INVALID CURATED EXPS SUCCESS: 1'
+                ),
+                job_run_result.JobRunResult.as_stderr(
+                    'Exp with ID %s is invalid' % (self.EXPLORATION_ID_3)
+                )
+            ])

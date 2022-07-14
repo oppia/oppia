@@ -245,13 +245,14 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
         Returns:
             bool. Returns whether the exp model is curated or not.
         """
+        exp_id = model_pair[0].id
         try:
             exploration = exp_fetchers.get_exploration_from_model(
                 model_pair[0]
             )
-            return exploration
+            return (exp_id, exploration)
         except Exception:
-            return None
+            return (exp_id, None)
 
     def convert_into_model_pair(
       self, models_list_pair: Tuple[
@@ -313,10 +314,24 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
                 self.convert_into_model_pair)
             | 'Filter curated explorations' >> beam.Filter(
                 self.filter_curated_explorations)
-            | 'Get exploration from model' >> beam.Map(
+            | 'Get exploration from model with exp id' >> beam.Map(
                 self.get_exploration_from_models)
+        )
+
+        invalid_curated_exploration_ids = (
+            curated_explorations
+            | 'Filter explorations with None' >>
+                beam.Filter(lambda exploration: exploration[1] is None)
+            | 'Extract the exploration ids' >>
+                beam.Map(lambda exploration: exploration[0])
+        )
+
+        valid_curated_explorations = (
+            curated_explorations
             | 'Filter explorations without None' >>
-                beam.Filter(lambda exploration: exploration is not None)
+                beam.Filter(lambda exploration: exploration[1] is not None)
+            | 'Drop the exploration ids' >>
+                beam.Map(lambda exploration: exploration[1])
         )
 
         report_number_of_exps_queried = (
@@ -326,14 +341,32 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
         )
 
         report_number_of_curated_exps_queried = (
-            curated_explorations
+            valid_curated_explorations
             | 'Report count of curated exp models' >> (
                 job_result_transforms.CountObjectsToJobRunResult(
                     'CURATED EXPS'))
         )
 
+        report_number_of_invalid_curated_explorations = (
+            invalid_curated_exploration_ids
+            | 'Report count of invalid curated exp models' >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'INVALID CURATED EXPS'
+                )
+            )
+        )
+
+        report_details_of_invalid_curated_explorations = (
+            invalid_curated_exploration_ids
+            | 'Save info on invalid curated explorations' >> beam.Map(
+                lambda exp_id: job_run_result.JobRunResult.as_stderr(
+                    'Exp with ID %s is invalid' % (exp_id)
+                )
+            )
+        )
+
         curated_exps_having_invalid_state_classifier_id = (
-            curated_explorations
+            valid_curated_explorations
             | 'Filter curated exps having invalid state classifier model id' >>
                 beam.Filter(lambda exp: (
                     self.filter_exps_having_invalid_state_classifier_model_id(
@@ -365,7 +398,7 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
         )
 
         curated_exps_having_non_empty_param_changes = (
-            curated_explorations
+            valid_curated_explorations
             | 'Filter explorations having non-empty param changes' >>
                 beam.Filter(lambda exp: len(exp.param_changes) > 0)
         )
@@ -389,7 +422,7 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
         )
 
         curated_exps_having_non_empty_param_specs = (
-            curated_explorations
+            valid_curated_explorations
             | 'Filter explorations having non-empty param specs' >>
                 beam.Filter(lambda exp: len(exp.param_specs) > 0)
         )
@@ -413,7 +446,7 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
         )
 
         curated_exps_having_invalid_training_data = (
-            curated_explorations
+            valid_curated_explorations
             | 'Filter explorations having non-empty training data' >>
                 beam.Filter(lambda exp: (
                     len(self.get_states_having_invalid_training_data(exp)) > 0)
@@ -440,7 +473,7 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
         )
 
         curated_exps_having_invalid_cust_args = (
-            curated_explorations
+            valid_curated_explorations
             | 'Filter explorations having invalid cust args' >>
                 beam.Filter(lambda exp: (
                     len(self.get_states_having_invalid_cust_args(exp)) > 0)
@@ -467,7 +500,7 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
         )
 
         curated_exps_having_invalid_outcome_param_changes = (
-            curated_explorations
+            valid_curated_explorations
             | 'Filter explorations having invalid outcome param changes' >>
                 beam.Filter(lambda exp: (
                     len(self.get_states_having_invalid_outcome(exp)) > 0)
@@ -496,7 +529,7 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
         )
 
         curated_exp_having_videos_or_links = (
-            curated_explorations
+            valid_curated_explorations
             | 'Filter explorations having videos or links' >>
                 beam.Filter(lambda exp: (
                     len(self.get_details_of_video_or_link_tags(exp)) > 0))
@@ -526,6 +559,8 @@ class GetNumberOfInvalidExplorationsJob(base_jobs.JobBase):
             (
                 report_number_of_exps_queried,
                 report_number_of_curated_exps_queried,
+                report_number_of_invalid_curated_explorations,
+                report_details_of_invalid_curated_explorations,
                 report_number_of_exps_having_invalid_state_classifer_id,
                 report_details_of_exps_having_invalid_state_classifer_id,
                 report_number_of_exps_having_invalid_param_changes,
