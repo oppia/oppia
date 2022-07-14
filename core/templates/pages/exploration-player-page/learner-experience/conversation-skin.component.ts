@@ -917,15 +917,17 @@ export class ConversationSkinComponent {
                   });
             }
             this.learnerDashboardBackendApiService
-              .fetchLearnerCompletedChaptersCountDataAsync().then((data) => {
-                let newCompletedChaptersCount = data.completedChaptersCount;
-                if (
-                  newCompletedChaptersCount === this.completedChaptersCount + 1
-                ) {
-                  this.completedChaptersCount = newCompletedChaptersCount;
-                  this.chapterIsCompletedForTheFirstTime = true;
-                }
-              });
+              .fetchLearnerCompletedChaptersCountDataAsync().then(
+                (responseData) => {
+                  let newCompletedChaptersCount = (
+                    responseData.completedChaptersCount);
+                  if (
+                    newCompletedChaptersCount !== this.completedChaptersCount
+                  ) {
+                    this.completedChaptersCount = newCompletedChaptersCount;
+                    this.chapterIsCompletedForTheFirstTime = true;
+                  }
+                });
           });
         } else {
           let loginRedirectUrl = this.urlInterpolationService.interpolateUrl(

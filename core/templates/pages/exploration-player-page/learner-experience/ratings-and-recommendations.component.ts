@@ -68,10 +68,14 @@ export class RatingsAndRecommendationsComponent {
   @Input() isRefresherExploration: boolean;
   @Input() recommendedExplorationSummaries: LearnerExplorationSummary[];
   @Input() parentExplorationIds: string[];
+  // The below property will be undefined when the current chapter
+  // is the last chapter of a story.
   @Input() nextLessonLink: string | undefined;
   inStoryMode: boolean;
-  storyViewerUrl: string | undefined;
   nextStoryNode: ReadOnlyStoryNode | null = null;
+  // The below properties will be undefined if the exploration is not being
+  // played in story mode, i.e. inStoryMode is false.
+  storyViewerUrl: string | undefined;
   nextStoryNodeIconUrl: string | undefined;
   storyId: string | undefined;
   collectionId: string;
@@ -105,20 +109,19 @@ export class RatingsAndRecommendationsComponent {
       this.storyViewerBackendApiService.fetchStoryDataAsync(
         topicUrlFragment, classroomUrlFragment,
         storyUrlFragment
-      ).then(
-        (res) => {
-          this.storyId = res.id;
-          for (let i = 0; i < res.nodes.length; i++) {
-            if (
-              res.nodes[i].id === nodeId && (i + 1) < res.nodes.length
-            ) {
-              this.nextStoryNode = res.nodes[i + 1];
-              this.nextStoryNodeIconUrl = this.getIconUrl(
-                this.storyId, this.nextStoryNode.thumbnailFilename);
-              break;
-            }
+      ).then((storyData) => {
+        this.storyId = storyData.id;
+        for (let i = 0; i < storyData.nodes.length; i++) {
+          if (
+            storyData.nodes[i].id === nodeId && (i + 1) < storyData.nodes.length
+          ) {
+            this.nextStoryNode = storyData.nodes[i + 1];
+            this.nextStoryNodeIconUrl = this.getIconUrl(
+              this.storyId, this.nextStoryNode.thumbnailFilename);
+            break;
           }
-        });
+        }
+      });
       this.storyViewerUrl = this.urlInterpolationService.interpolateUrl(
         TopicViewerDomainConstants.STORY_VIEWER_URL_TEMPLATE, {
           topic_url_fragment: topicUrlFragment,
