@@ -47,7 +47,6 @@ with the same id on the page. -->
                       [attr.x]="node.x0" [attr.y]="node.y0 - 8"
                       [attr.transform]="getHighlightTransform(node.x0, node.y0)"
                       style=" fill: yellow; z-index: 10000;"
-                      (click)="shivam(node.label)"
                       [attr.aria-label]="getNodeErrorMessage(node.label)">
                 </rect>
                 <text fill="firebrick" text-anchor="middle" [attr.x]="node.x0 + 11"
