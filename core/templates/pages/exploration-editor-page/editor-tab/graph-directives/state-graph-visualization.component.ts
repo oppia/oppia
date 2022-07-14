@@ -16,7 +16,7 @@
  * @fileoverview Component for the state graph visualization.
  */
 
-import { ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild, ViewChildren } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { StateGraphLayoutService } from 'components/graph-services/graph-layout.service';
 import { StateCardIsCheckpointService } from 'components/state-editor/state-editor-properties-services/state-card-is-checkpoint.service';
@@ -144,39 +144,40 @@ export class StateGraphVisualization
   }
 
   makeGraphPannable(): void {
-    let dimensions = this.getElementDimensions();
-    d3.selectAll('#pannableRect')
-      .call(
-        d3.zoom().scaleExtent([1, 1]).on('zoom', () => {
-          console.error('called');
-          if (this.graphBounds.right + this.graphBounds.left < dimensions.w) {
-            (d3.event).transform.x = 0;
-          } else {
-            d3.event.transform.x = this.clamp(
-              d3.event.transform.x,
-              dimensions.w - this.graphBounds.right -
-              this.origTranslations[0],
-              -this.graphBounds.left - this.origTranslations[0]);
-          }
+    setTimeout(() => {
+      let dimensions = this.getElementDimensions();
+      d3.selectAll('#pannableRect')
+        .call(
+          d3.zoom().scaleExtent([1, 1]).on('zoom', () => {
+            if (this.graphBounds.right + this.graphBounds.left < dimensions.w) {
+              (d3.event).transform.x = 0;
+            } else {
+              d3.event.transform.x = this.clamp(
+                d3.event.transform.x,
+                dimensions.w - this.graphBounds.right -
+                this.origTranslations[0],
+                -this.graphBounds.left - this.origTranslations[0]);
+            }
 
-          if (this.graphBounds.bottom + this.graphBounds.top < dimensions.h) {
-            d3.event.transform.y = 0;
-          } else {
-            d3.event.transform.y = this.clamp(
-              d3.event.transform.y,
-              dimensions.h - this.graphBounds.bottom -
-              this.origTranslations[1],
-              -this.graphBounds.top - this.origTranslations[1]);
-          }
+            if (this.graphBounds.bottom + this.graphBounds.top < dimensions.h) {
+              d3.event.transform.y = 0;
+            } else {
+              d3.event.transform.y = this.clamp(
+                d3.event.transform.y,
+                dimensions.h - this.graphBounds.bottom -
+                this.origTranslations[1],
+                -this.graphBounds.top - this.origTranslations[1]);
+            }
 
-          // We need a separate layer here so that the translation
-          // does not influence the panning event receivers.
-          this.innerTransformStr = (
-            'translate(' + d3.event.transform.x +
-            ',' + d3.event.transform.y + ')'
-          );
-        })
-      );
+            // We need a separate layer here so that the translation
+            // does not influence the panning event receivers.
+            this.innerTransformStr = (
+              'translate(' + d3.event.transform.x +
+              ',' + d3.event.transform.y + ')'
+            );
+          })
+        );
+    });
   }
 
   // Returns the closest number to `value` in the range
