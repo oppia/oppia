@@ -144,7 +144,7 @@ import { QuestionPlayerComponent } from './question-directives/question-player/q
 import { QuestionsListComponent } from './question-directives/questions-list/questions-list.component';
 import { SkillMasteryModalComponent } from './question-directives/question-player/skill-mastery-modal.component';
 import { StateGraphVisualization } from 'pages/exploration-editor-page/editor-tab/graph-directives/state-graph-visualization.component';
-
+import { VersionDiffVisualizationComponent } from './version-diff-visualization/version-diff-visualization.component';
 
 // Pipes.
 import { StringUtilityPipesModule } from 'filters/string-utility-filters/string-utility-pipes.module';
@@ -305,7 +305,8 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     QuestionPlayerComponent,
     QuestionsListComponent,
     SkillMasteryModalComponent,
-    StateGraphVisualization
+    StateGraphVisualization,
+    VersionDiffVisualizationComponent
   ],
 
   entryComponents: [
@@ -416,7 +417,8 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     QuestionPlayerComponent,
     QuestionsListComponent,
     SkillMasteryModalComponent,
-    StateGraphVisualization
+    StateGraphVisualization,
+    VersionDiffVisualizationComponent
   ],
 
   exports: [
@@ -539,7 +541,8 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     QuestionPlayerComponent,
     QuestionsListComponent,
     SkillMasteryModalComponent,
-    StateGraphVisualization
+    StateGraphVisualization,
+    VersionDiffVisualizationComponent
   ],
 })
 

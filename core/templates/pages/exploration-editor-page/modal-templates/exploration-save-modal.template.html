@@ -15,10 +15,11 @@
       <span ng-if="!showDiff">Show Changes</span>
       <span ng-if="showDiff">Hide Changes</span>
     </button>
-    <version-diff-visualization ng-if="showDiff" diff-data="diffData"
-                                earlier-version-header="earlierVersionHeader"
-                                later-version-header="laterVersionHeader">
-    </version-diff-visualization>
+    <oppia-version-diff-visualization ng-if="showDiff"
+                                      [diff-data]="diffData"
+                                      [earlier-version-header]="earlierVersionHeader"
+                                      [later-version-header]="laterVersionHeader">
+    </oppia-version-diff-visualization>
   </div>
   <div class="modal-footer">
     <button class="btn btn-secondary" ng-click="cancel()">Cancel</button>

@@ -140,6 +140,8 @@ export class RouterService {
           '/gui/' + this.explorationInitStateNameService.savedMemento);
       }
     }
+
+    this.centerGraphEventEmitter.emit();
   }
 
   _doNavigationWithState(path: string, pathType: string): void {
