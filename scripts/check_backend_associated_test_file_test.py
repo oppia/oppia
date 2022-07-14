@@ -29,7 +29,7 @@ class CheckBackendAssociatedTestFileTests(test_utils.GenericTestBase):
     """Unit tests for scripts/check_backend_associated_test_file.py."""
 
     def setUp(self) -> None:
-        super(CheckBackendAssociatedTestFileTests, self).setUp()
+        super().setUp()
         self.print_arr: list[str] = []
         def mock_print(msg: str) -> None:
             self.print_arr.append(msg)

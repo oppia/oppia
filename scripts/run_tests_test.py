@@ -56,9 +56,11 @@ class RunTestsTests(test_utils.GenericTestBase):
         def mock_popen(cmd: str, shell: bool) -> None:
             if cmd == 'bash scripts/run_e2e_tests.sh' and shell:
                 scripts_called['run_e2e_tests'] = True
+        def mock_install_third_party_libs() -> None:
+            pass
 
         swap_install_third_party_libs = self.swap(
-            install_third_party_libs, 'main', lambda: None)
+            install_third_party_libs, 'main', mock_install_third_party_libs)
         # This is done because run_backend_tests scripts installs third party
         # libs whenever it is imported.
         with swap_install_third_party_libs:
