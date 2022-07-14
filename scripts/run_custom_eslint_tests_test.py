@@ -31,7 +31,7 @@ class RunCustomEslintTestsTests(test_utils.GenericTestBase):
     """Unit tests for scripts/run_custom_eslint_tests.py."""
 
     def setUp(self) -> None:
-        super(RunCustomEslintTestsTests, self).setUp()
+        super().setUp()
 
         self.print_arr: list[str] = []
         def mock_print(msg: str) -> None:
