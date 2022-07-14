@@ -119,8 +119,9 @@ var StoryEditorPage = function() {
   };
 
   this.navigateToChapterWithName = async function(chapterName) {
+    var chapterNameSelector = $(`span=${chapterName}`);
     await waitFor.visibilityOf(
-      chapterTitle, 'Chapter name is taking too long to appear');
+      chapterNameSelector, 'Chapter name is taking too long to appear');
     var chapterTitles = await chapterTitlesSelector();
     var chapterIndex = -1;
     var chapterText = '';
