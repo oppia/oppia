@@ -564,7 +564,7 @@ def get_canonical_story_dicts(
     canonical_story_ids: List[str] = topic.get_canonical_story_ids(
         include_only_published=True)
     canonical_story_summaries: List[Optional[story_domain.StorySummary]] = [
-        story_fetchers.get_story_summary_by_id(  # type: ignore[no-untyped-call]
+        story_fetchers.get_story_summary_by_id(
             canonical_story_id) for canonical_story_id
         in canonical_story_ids]
     canonical_story_dicts = []
@@ -573,14 +573,23 @@ def get_canonical_story_dicts(
         assert story_summary is not None
 
         pending_and_all_nodes_in_story = (
-            story_fetchers.get_pending_and_all_nodes_in_story(  # type: ignore[no-untyped-call]
+            story_fetchers.get_pending_and_all_nodes_in_story(
                 user_id, story_summary.id))
         all_nodes = pending_and_all_nodes_in_story['all_nodes']
         pending_nodes = pending_and_all_nodes_in_story['pending_nodes']
         pending_node_titles = [node.title for node in pending_nodes]
         completed_node_titles = utils.compute_list_difference(
             story_summary.node_titles, pending_node_titles)
-        story_summary_dict = story_summary.to_human_readable_dict()  # type: ignore[no-untyped-call]
+        # Here, the return type of 'to_human_readable_dict()' method is
+        # HumanReadableStorySummaryDict which does not have topic_url_fragment,
+        # story_is_published and other keys. To overcome this missing keys
+        # issues, we defined a CannonicalStoryDict and assigned it to the
+        # `story_summary_dict`. Due this a conflict in type assignment is
+        # raised which cause MyPy to throw `Incompatible types in assignment`
+        # error. Thus to avoid error, we used ignore here.
+        story_summary_dict: CannonicalStoryDict = (
+            story_summary.to_human_readable_dict()  # type: ignore[assignment]
+        )
         story_summary_dict['topic_url_fragment'] = topic.url_fragment
         story_summary_dict['classroom_url_fragment'] = (
             classroom_services.get_classroom_url_fragment_for_topic_id(
