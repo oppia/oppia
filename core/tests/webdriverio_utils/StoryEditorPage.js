@@ -28,7 +28,7 @@ var StoryEditorPage = function() {
   var thumbnailContainer = $('.e2e-test-thumbnail-container');
   var returnToTopicButton = $('.e2e-test-return-to-topic-button');
   var saveStoryButton = $('.e2e-test-save-story-button');
-  var chapterTile = $('.e2e-test-chapter-title');
+  var chapterTitle = $('.e2e-test-chapter-title');
   var commitMessageField = $('.e2e-test-commit-message-input');
   var closeSaveModalButton = $('.e2e-test-close-save-modal-button');
   var createChapterButton = $('.e2e-test-add-chapter-button');
@@ -120,7 +120,7 @@ var StoryEditorPage = function() {
 
   this.navigateToChapterWithName = async function(chapterName) {
     await waitFor.visibilityOf(
-      chapterTile, 'Chapter name is taking too long to appear');
+      chapterTitle, 'Chapter name is taking too long to appear');
     var chapterTitles = await chapterTitlesSelector();
     var chapterIndex = -1;
     var chapterText = '';
