@@ -89,8 +89,8 @@
   }
 }
 
-@media(max-width:1052px) {
+@media(max-width: 1052px) {
   .oppia-hide-nav-heading {
-    display: none ;
+    display: none;
   }
 }
