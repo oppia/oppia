@@ -71,8 +71,8 @@ md-checkbox.item-selection-input-checkbox .md-label {
 
 .multiple-choice-content-container {
   display: table-cell;
-  padding-right: 12px;
   padding-left: 12px;
+  padding-right: 12px;
   vertical-align: top;
 }
 
