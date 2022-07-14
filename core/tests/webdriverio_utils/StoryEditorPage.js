@@ -28,7 +28,6 @@ var StoryEditorPage = function() {
   var thumbnailContainer = $('.e2e-test-thumbnail-container');
   var returnToTopicButton = $('.e2e-test-return-to-topic-button');
   var saveStoryButton = $('.e2e-test-save-story-button');
-  var chapterTitle = $('.e2e-test-chapter-title');
   var commitMessageField = $('.e2e-test-commit-message-input');
   var closeSaveModalButton = $('.e2e-test-close-save-modal-button');
   var createChapterButton = $('.e2e-test-add-chapter-button');
