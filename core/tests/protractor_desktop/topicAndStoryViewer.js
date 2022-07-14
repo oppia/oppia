@@ -230,7 +230,7 @@ describe('Topic and Story viewer functionality', function() {
       // Wait until the conversation-skin of the next chapter is loaded.
       await topicAndStoryViewerPage.waitForConversationSkinCardsContainer();
     });
-    users.logout();
+    await users.logout();
   });
 
   it('should dismiss sign-up section and load practice session page upon' +
