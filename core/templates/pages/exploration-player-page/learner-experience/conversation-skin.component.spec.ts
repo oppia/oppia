@@ -1785,4 +1785,15 @@ describe('Conversation skin component', () => {
 
     expect(componentInstance.isProgressClearanceMessageShown()).toBeTrue();
   });
+
+  it('should update when submit button is enabled', () => {
+    componentInstance.submitButtonIsDisabled = false;
+    spyOn(componentInstance, 'isSubmitButtonDisabled').and.returnValue(
+      !componentInstance.submitButtonIsDisabled);
+
+    componentInstance.ngAfterViewChecked();
+
+    expect(componentInstance.submitButtonIsDisabled).toBeTrue();
+    expect(componentInstance.isSubmitButtonDisabled).toHaveBeenCalled();
+  });
 });
