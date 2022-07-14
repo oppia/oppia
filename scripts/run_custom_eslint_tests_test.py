@@ -109,6 +109,7 @@ class RunCustomEslintTestsTests(test_utils.GenericTestBase):
 
         self.assertIn(self.proc_args, self.cmd_token_list)
         self.assertIn('All tests passed', self.print_arr)
+        self.assertEqual(self.sys_exit_code, 0)
 
     def test_incomplete_eslint_coverage_raises_exception(self) -> None:
         class MockTask:

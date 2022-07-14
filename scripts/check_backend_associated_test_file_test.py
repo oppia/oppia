@@ -47,11 +47,9 @@ class CheckBackendAssociatedTestFileTests(test_utils.GenericTestBase):
         # Creating a backend file.
         with open(self.backend_file, 'w', encoding='utf8') as f:
             f.write('Example code')
-            f.close()
         # Creating a frontend file.
         with open(self.frontend_file, 'w', encoding='utf8') as f:
             f.write('Example code')
-            f.close()
 
     def tearDown(self) -> None:
         super(CheckBackendAssociatedTestFileTests, self).tearDown()
@@ -72,16 +70,37 @@ class CheckBackendAssociatedTestFileTests(test_utils.GenericTestBase):
         self.assertIn(
             '\033[1m{}\033[0m needs an associated backend test file.\n'
             .format(self.backend_file), self.error_arr)
+        self.assertNotIn(
+            '\033[1m{}\033[0m needs an associated backend test file.\n'
+            .format(self.frontend_file), self.error_arr)
+
+    def test_checks_pass_when_a_backend_file_in_exclusion_list_lacks_associated_test_file(  # pylint: disable=line-too-long
+        self) -> None:
+        (check_backend_associated_test_file.
+            FILES_WITHOUT_ASSOCIATED_TEST_FILES.append(self.backend_file))
+        with self.print_swap, self.swap_logging, self.swap_exit:
+            check_backend_associated_test_file.main()
+
+        self.assertIn(
+            'Backend associated test file checks passed.', self.print_arr)
+        self.assertNotIn(
+            '\033[1m{}\033[0m needs an associated backend test file.\n'
+            .format(self.backend_file), self.error_arr)
+        self.assertNotIn(
+            '\033[1m{}\033[0m needs an associated backend test file.\n'
+            .format(self.frontend_file), self.error_arr)
 
     def test_checks_pass_when_all_backend_files_have_an_associated_test_file(
         self) -> None:
         # Creating the associated test file of the backend file.
         with open(self.backend_test_file, 'w', encoding='utf8') as f:
             f.write('Example code')
-            f.close()
         with self.print_swap, self.swap_logging, self.swap_exit:
             check_backend_associated_test_file.main()
 
         self.assertIn(
             'Backend associated test file checks passed.', self.print_arr)
         self.assertEqual(len(self.error_arr), 0)
+        self.assertNotIn(
+            '\033[1m{}\033[0m needs an associated backend test file.\n'
+            .format(self.frontend_file), self.error_arr)
