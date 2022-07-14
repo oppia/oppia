@@ -72,7 +72,9 @@ describe('Topic editor functionality', function() {
       'Subtopic 1', 'subtopic-one', '../data/test2_svg.svg',
       'Subtopic content');
     await topicEditorPage.saveTopic('Added subtopic.');
+    await users.logout();
 
+    await users.login('creator@topicEditor.com');
     await topicEditorPage.get(topicId);
     await topicEditorPage.expectNumberOfSubtopicsToBe(1);
     await topicEditorPage.deleteSubtopicWithIndex(0);
@@ -331,7 +333,7 @@ describe('Chapter editor functionality', function() {
   it(
     'should check presence of skillreview RTE element in exploration ' +
     'linked to story', async function() {
-      await browser.get('/create/' + dummyExplorationIds[0]);
+      await browser.url('/create/' + dummyExplorationIds[0]);
       await waitFor.pageToFullyLoad();
       await explorationEditorMainTab.setContent(
         async function(richTextEditor) {

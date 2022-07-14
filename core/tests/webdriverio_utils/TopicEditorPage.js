@@ -109,6 +109,7 @@ var TopicEditorPage = function() {
     '.e2e-test-topic-page-title-fragment-label');
   var uncategorizedSkillsContainer = $(
     '.e2e-test-uncategorized-skills-container');
+  var uncategorizedSkillCard = $('.e2e-test-uncategorized-skill-card');
   var uncategorizedSkillsSelector = function() {
     return $$('.e2e-test-uncategorized-skill-card');
   };
@@ -271,10 +272,10 @@ var TopicEditorPage = function() {
   };
 
   this.dragSkillToSubtopic = async function(skillDescription, subtopicIndex) {
-    var uncategorizedSkills = await uncategorizedSkillsSelector();
     await waitFor.visibilityOf(
-      uncategorizedSkills[0],
+      uncategorizedSkillCard,
       'Uncategorized skills taking too long to appear.');
+    var uncategorizedSkills = await uncategorizedSkillsSelector();
     var subtopicColumns = await subtopicColumnsSelector();
     var target = subtopicColumns[subtopicIndex];
     var uncategorizedSkillIndex = -1;
