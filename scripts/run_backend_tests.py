@@ -590,6 +590,14 @@ def _check_coverage(
             'Failed to calculate coverage because subprocess failed. %s'
             % process
         )
+    elif data_file is None:
+        all_lines = re.search(
+            r'TOTAL\s+(?P<total>\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)%\s+',
+            process.stdout).group('total')
+        uncovered_lines = re.search(
+            r'TOTAL\s+(\d+)\s+(?P<total>\d+)\s+(\d+)\s+(\d+)\s+(\d+)%\s+',
+            process.stdout).group('total')
+        coverage = float(uncovered_lines / all_lines) * 100
     else:
         coverage_result = re.search(
             r'TOTAL\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(?P<total>\d+)%\s+',
