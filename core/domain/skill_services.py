@@ -38,11 +38,11 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 
+from typing import Dict, List, Optional
+
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import skill_models
-
-from typing import Dict, List, Optional
 
 (skill_models, user_models, question_models, topic_models) = (
     models.Registry.import_models([
