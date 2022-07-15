@@ -685,7 +685,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         init_state_answer_groups = [
             state_domain.AnswerGroup(
                 state_domain.Outcome(
-                    'Second', state_domain.SubtitledHtml(
+                    'Second', None, state_domain.SubtitledHtml(
                         'feedback_0', '<p>Feedback</p>'),
                     False, [], None, None),
                 [
@@ -703,7 +703,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
                 None
             ), state_domain.AnswerGroup(
                 state_domain.Outcome(
-                    'Third', state_domain.SubtitledHtml(
+                    'Third', None, state_domain.SubtitledHtml(
                         'feedback_1', '<p>Feedback</p>'),
                     False, [], None, None),
                 [
@@ -726,7 +726,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         third_state_answer_groups = [
             state_domain.AnswerGroup(
                 state_domain.Outcome(
-                    'End', state_domain.SubtitledHtml(
+                    'End', None, state_domain.SubtitledHtml(
                         'feedback_0', '<p>Feedback</p>'),
                     False, [], None, None),
                 [
@@ -778,7 +778,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         second_state_answer_groups = [
             state_domain.AnswerGroup(
                 state_domain.Outcome(
-                    'End', state_domain.SubtitledHtml(
+                    'End', None, state_domain.SubtitledHtml(
                         'feedback_0', '<p>Feedback</p>'),
                     False, [], None, None),
                 [
@@ -856,7 +856,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         init_state_answer_groups = [
             state_domain.AnswerGroup(
                 state_domain.Outcome(
-                    'A', state_domain.SubtitledHtml(
+                    'A', None, state_domain.SubtitledHtml(
                         'feedback_0', '<p>Feedback</p>'),
                     False, [], None, None),
                 [
@@ -874,7 +874,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
                 None
             ), state_domain.AnswerGroup(
                 state_domain.Outcome(
-                    'B', state_domain.SubtitledHtml(
+                    'B', None, state_domain.SubtitledHtml(
                         'feedback_1', '<p>Feedback</p>'),
                     False, [], None, None),
                 [
@@ -892,7 +892,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
                 None
             ), state_domain.AnswerGroup(
                 state_domain.Outcome(
-                    'C', state_domain.SubtitledHtml(
+                    'C', None, state_domain.SubtitledHtml(
                         'feedback_2', '<p>Feedback</p>'),
                     False, [], None, None),
                 [
@@ -915,7 +915,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         a_and_b_state_answer_groups = [
             state_domain.AnswerGroup(
                 state_domain.Outcome(
-                    'D', state_domain.SubtitledHtml(
+                    'D', None, state_domain.SubtitledHtml(
                         'feedback_0', '<p>Feedback</p>'),
                     False, [], None, None),
                 [
@@ -938,7 +938,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         c_and_d_state_answer_groups = [
             state_domain.AnswerGroup(
                 state_domain.Outcome(
-                    'End', state_domain.SubtitledHtml(
+                    'End', None, state_domain.SubtitledHtml(
                         'feedback_0', '<p>Feedback</p>'),
                     False, [], None, None),
                 [
@@ -1002,7 +1002,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         c_state_answer_groups = [
             state_domain.AnswerGroup(
                 state_domain.Outcome(
-                    'D', state_domain.SubtitledHtml(
+                    'D', None, state_domain.SubtitledHtml(
                         'feedback_0', '<p>Feedback</p>'),
                     False, [], None, None),
                 [
@@ -1064,7 +1064,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         c_state_answer_groups = [
             state_domain.AnswerGroup(
                 state_domain.Outcome(
-                    'D', state_domain.SubtitledHtml(
+                    'D', None, state_domain.SubtitledHtml(
                         'feedback_0', '<p>Feedback</p>'),
                     False, [], None, None),
                 [
@@ -1082,7 +1082,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
                 None
             ), state_domain.AnswerGroup(
                 state_domain.Outcome(
-                    'End 2', state_domain.SubtitledHtml(
+                    'End 2', None, state_domain.SubtitledHtml(
                         'feedback_1', '<p>Feedback</p>'),
                     False, [], None, None),
                 [
@@ -1151,7 +1151,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration, 'Invalid character / in a state name')
 
         new_state = state_domain.State.create_default_state('ABC')  # type: ignore[no-untyped-call]
+        second_state = state_domain.State.create_default_state('BCD')  # type: ignore[no-untyped-call]
         self.set_interaction_for_state(new_state, 'TextInput')  # type: ignore[no-untyped-call]
+        self.set_interaction_for_state(second_state, 'TextInput')  # type: ignore[no-untyped-call]
 
         # The 'states' property must be a non-empty dict of states.
         exploration.states = {}
@@ -1164,7 +1166,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(  # type: ignore[no-untyped-call]
             exploration, 'Invalid character _ in a state name')
 
-        exploration.states = {'ABC': new_state}
+        exploration.states = {
+            'ABC': new_state,
+            'BCD': second_state
+        }
 
         self._assert_validation_error(  # type: ignore[no-untyped-call]
             exploration, 'has no initial state name')
@@ -1173,11 +1178,14 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         self._assert_validation_error(  # type: ignore[no-untyped-call]
             exploration,
-            r'There is no state in \[\'ABC\'\] corresponding to '
+            r'There is no state in \[\'ABC\'\, \'BCD\'\] corresponding to '
             'the exploration\'s initial state name initname.')
 
         # Test whether a default outcome to a non-existing state is invalid.
-        exploration.states = {exploration.init_state_name: new_state}
+        exploration.states = {
+            exploration.init_state_name: new_state,
+            'BCD': second_state
+        }
         self._assert_validation_error(  # type: ignore[no-untyped-call]
             exploration, 'destination ABC is not a valid')
 
@@ -1201,6 +1209,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             {
                 'outcome': {
                     'dest': exploration.init_state_name,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'feedback_1',
                         'html': '<p>Feedback</p>'
@@ -1235,9 +1244,38 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         interaction = init_state.interaction
         answer_groups = interaction.answer_groups
         answer_group = answer_groups[0]
+
+        default_outcome.dest_if_really_stuck = 'ABD'
+        self._assert_validation_error(  # type: ignore[no-untyped-call]
+            exploration, 'The destination for the stuck learner '
+            'ABD is not a valid state')
+
+        default_outcome.dest_if_really_stuck = None
+
+        # Testing the default outcome does not direct stuck learner
+        # back to the same state.
+        default_outcome.dest_if_really_stuck = exploration.init_state_name
+        self._assert_validation_error(  # type: ignore[no-untyped-call]
+            exploration, 'The destination for a stuck learner '
+            'cannot be the same state.')
+
+        default_outcome.dest_if_really_stuck = None
+
         answer_group.outcome.dest = 'DEF'
         self._assert_validation_error(  # type: ignore[no-untyped-call]
             exploration, 'destination DEF is not a valid')
+        answer_group.outcome.dest = exploration.init_state_name
+
+        answer_group.outcome.dest_if_really_stuck = 'XYZ'
+        self._assert_validation_error(  # type: ignore[no-untyped-call]
+            exploration, 'The destination for the stuck learner '
+            'XYZ is not a valid state')
+
+        answer_group.outcome.dest_if_really_stuck = exploration.init_state_name
+        self._assert_validation_error(  # type: ignore[no-untyped-call]
+            exploration, 'The destination for a stuck learner '
+            'cannot be the same state.')
+        answer_group.outcome.dest_if_really_stuck = None
 
         # Restore a valid exploration.
         self.set_interaction_for_state(  # type: ignore[no-untyped-call]
@@ -1309,6 +1347,16 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(  # type: ignore[no-untyped-call]
             exploration, 'Every outcome should have a destination.')
 
+        outcome.dest = destination
+
+        default_outcome = init_state.interaction.default_outcome
+        default_outcome.dest_if_really_stuck = 20  # type: ignore[assignment]
+
+        self._assert_validation_error(  # type: ignore[no-untyped-call]
+            exploration, 'Expected dest_if_really_stuck to be a string')
+
+        default_outcome.dest_if_really_stuck = None
+
         # Try setting the outcome destination to something other than a string.
         outcome.dest = 15  # type: ignore[assignment]
         self._assert_validation_error(  # type: ignore[no-untyped-call]
@@ -1336,6 +1384,31 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         outcome.labelled_as_correct = False
         exploration.validate()
 
+        # Try setting the outcome destination if stuck to something other
+        # than a string.
+        outcome.dest_if_really_stuck = 30  # type: ignore[assignment]
+        self._assert_validation_error(  # type: ignore[no-untyped-call]
+            exploration, 'Expected dest_if_really_stuck to be a string')
+
+        outcome.dest_if_really_stuck = 'BCD'
+        outcome.dest = 'BCD'
+
+        # Test that no destination for the stuck learner is specified when
+        # the outcome is labelled correct.
+        outcome.labelled_as_correct = True
+
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            Exception, 'The outcome for the state is labelled '
+            'correct but a destination for the stuck learner '
+            'is specified.'
+        ):
+            exploration.validate(strict=True)
+        exploration.validate()
+
+        outcome.labelled_as_correct = False
+        exploration.validate()
+
+        outcome.dest = destination
         outcome.param_changes = 'Changes'  # type: ignore[assignment]
         self._assert_validation_error(  # type: ignore[no-untyped-call]
             exploration, 'Expected outcome param_changes to be a list')
@@ -1501,7 +1574,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         # Validate AnswerGroup.
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
-                exploration.init_state_name, state_domain.SubtitledHtml(
+                exploration.init_state_name, None, state_domain.SubtitledHtml(
                     'feedback_1', 'Feedback'),
                 False, [], None, None),
             [
@@ -1525,7 +1598,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'Expected tagged skill misconception id to be a str, received 1')
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
-                exploration.init_state_name, state_domain.SubtitledHtml(
+                exploration.init_state_name, None, state_domain.SubtitledHtml(
                     'feedback_1', 'Feedback'),
                 False, [], None, None),
             [
@@ -1835,7 +1908,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             }))
         init_state.update_interaction_id('TextInput')  # type: ignore[no-untyped-call]
         default_outcome = state_domain.Outcome(
-            'Introduction', state_domain.SubtitledHtml(
+            'Introduction', None, state_domain.SubtitledHtml(
                 'default_outcome', '<p>The default outcome.</p>'),
             False, [], None, None
         )
@@ -1871,7 +1944,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             }))
         new_state.update_interaction_id('TextInput')  # type: ignore[no-untyped-call]
         default_outcome = state_domain.Outcome(
-            'Introduction', state_domain.SubtitledHtml(
+            'Introduction', None, state_domain.SubtitledHtml(
                 'default_outcome', '<p>The default outcome.</p>'),
             False, [], None, None)
         new_state.update_interaction_default_outcome(default_outcome)  # type: ignore[no-untyped-call]
@@ -1912,7 +1985,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             }))
         init_state.update_interaction_id('TextInput')  # type: ignore[no-untyped-call]
         default_outcome = state_domain.Outcome(
-            'Introduction', state_domain.SubtitledHtml(
+            'Introduction', None, state_domain.SubtitledHtml(
                 'default_outcome', '<p>The default outcome.</p>'),
             False, [], None, None
         )
@@ -1955,7 +2028,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             }))
         init_state.update_interaction_id('TextInput')  # type: ignore[no-untyped-call]
         default_outcome = state_domain.Outcome(
-            'Introduction', state_domain.SubtitledHtml(
+            'Introduction', None, state_domain.SubtitledHtml(
                 'default_outcome', '<p>The default outcome.</p>'),
             False, [], None, None
         )
@@ -2007,7 +2080,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
-                exploration.init_state_name, state_domain.SubtitledHtml(
+                exploration.init_state_name, None, state_domain.SubtitledHtml(
                     'feedback_1', 'Feedback'),
                 False, [], None, None),
             [
@@ -2431,7 +2504,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.add_states(['DEF'])
 
         default_outcome = state_domain.Outcome(
-            'DEF', state_domain.SubtitledHtml(
+            'DEF', None, state_domain.SubtitledHtml(
                 'default_outcome', '<p>Default outcome for state1</p>'),
             False, [], 'refresher_exploration_id', None,
         )
@@ -2458,7 +2531,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         )]
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
-                exploration.init_state_name, state_domain.SubtitledHtml(
+                exploration.init_state_name, None, state_domain.SubtitledHtml(
                     'feedback_1', 'Feedback'),
                 False, param_changes, None, None),
             [
@@ -2574,7 +2647,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         }
         state_answer_group = [state_domain.AnswerGroup(
             state_domain.Outcome(
-                exploration.init_state_name, state_domain.SubtitledHtml(
+                exploration.init_state_name, None, state_domain.SubtitledHtml(
                     'feedback_1', '<p>state outcome html</p>'),
                 False, [], None, None),
             [
@@ -2589,7 +2662,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             None
         )]
         state_default_outcome = state_domain.Outcome(
-            'State1', state_domain.SubtitledHtml(
+            'State1', None, state_domain.SubtitledHtml(
                 'default_outcome', '<p>Default outcome for State1</p>'),
             False, [], None, None
         )
@@ -4735,11 +4808,156 @@ tags: []
 title: Title
 """)
 
-    _LATEST_YAML_CONTENT: Final = YAML_CONTENT_V55
+    YAML_CONTENT_V56: Final = (
+        """author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 56
+states:
+  (untitled state):
+    card_is_checkpoint: true
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          dest_if_really_stuck: null
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 6
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        requireNonnegativeInput:
+          value: False
+      default_outcome:
+        dest: (untitled state)
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: NumericInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 4
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        rule_input_3: {}
+  END:
+    card_is_checkpoint: false
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        content: {}
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_0
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        dest_if_really_stuck: null
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 1
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    written_translations:
+      translations_mapping:
+        ca_placeholder_0: {}
+        content: {}
+        default_outcome: {}
+states_schema_version: 51
+tags: []
+title: Title
+""")
+
+    _LATEST_YAML_CONTENT: Final = YAML_CONTENT_V56
 
     def test_load_from_v46_with_item_selection_input_interaction(self) -> None:
         """Tests the migration of ItemSelectionInput rule inputs."""
-        sample_yaml_content = (
+        sample_yaml_content: str = (
             """author_notes: ''
 auto_tts_enabled: false
 blurb: ''
@@ -4762,6 +4980,7 @@ states:
       answer_groups:
       - outcome:
           dest: END
+          dest_if_really_stuck: null
           feedback:
             content_id: feedback_1
             html: <p>Correct!</p>
@@ -4792,6 +5011,7 @@ states:
           value: 1
       default_outcome:
         dest: (untitled state)
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -4868,7 +5088,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 55
+schema_version: 56
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -4880,6 +5100,7 @@ states:
       answer_groups:
       - outcome:
           dest: END
+          dest_if_really_stuck: null
           feedback:
             content_id: feedback_1
             html: <p>Correct!</p>
@@ -4910,6 +5131,7 @@ states:
           value: 1
       default_outcome:
         dest: (untitled state)
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -4972,7 +5194,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 50
+states_schema_version: 51
 tags: []
 title: Title
 """)
@@ -5125,7 +5347,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 55
+schema_version: 56
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -5137,6 +5359,7 @@ states:
       answer_groups:
       - outcome:
           dest: END
+          dest_if_really_stuck: null
           feedback:
             content_id: feedback_1
             html: <p>Correct!</p>
@@ -5176,6 +5399,7 @@ states:
             html: <p>Choice 2</p>
       default_outcome:
         dest: (untitled state)
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -5239,7 +5463,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 50
+states_schema_version: 51
 tags: []
 title: Title
 """)
@@ -5354,7 +5578,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 55
+schema_version: 56
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -5372,6 +5596,7 @@ states:
             unicode_str: Continue
       default_outcome:
         dest: END
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -5430,7 +5655,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 50
+states_schema_version: 51
 tags: []
 title: Title
 """)
@@ -5484,6 +5709,7 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                     'customization_args': {},
                     'default_outcome': {
                         'dest': dest_name,
+                        'dest_if_really_stuck': None,
                         'feedback': {
                             'content_id': feconf.DEFAULT_OUTCOME_CONTENT_ID,
                             'html': ''
@@ -5640,7 +5866,7 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
         state4.update_interaction_customization_args(customization_args_dict4)  # type: ignore[no-untyped-call]
 
         default_outcome = state_domain.Outcome(
-            'state2', state_domain.SubtitledHtml(
+            'state2', None, state_domain.SubtitledHtml(
                 'default_outcome', '<p>Default outcome for state1</p>'),
             False, [], None, None
         )
@@ -5677,7 +5903,7 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
         state_answer_group_list2 = [
             state_domain.AnswerGroup(
                 state_domain.Outcome(
-                    'state1', state_domain.SubtitledHtml(
+                    'state1', None, state_domain.SubtitledHtml(
                         'feedback_1', '<p>Outcome2 for state2</p>'),
                     False, [], None, None),
                 [
@@ -5696,7 +5922,7 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
                 None),
             state_domain.AnswerGroup(
                 state_domain.Outcome(
-                    'state3', state_domain.SubtitledHtml(
+                    'state3', None, state_domain.SubtitledHtml(
                         'feedback_2', '<p>Outcome1 for state2</p>'),
                     False, [], None, None),
                 [
@@ -5711,7 +5937,7 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
             )]
         state_answer_group_list3 = [state_domain.AnswerGroup(
             state_domain.Outcome(
-                'state1', state_domain.SubtitledHtml(
+                'state1', None, state_domain.SubtitledHtml(
                     'feedback_1', '<p>Outcome for state3</p>'),
                 False, [], None, None),
             [
@@ -6124,6 +6350,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None,
                 'dest': 'End',
+                'dest_if_really_stuck': None,
                 'labelled_as_correct': False,
                 'param_changes': [],
                 'feedback': {
@@ -6147,6 +6374,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     'refresher_exploration_id': None,
                     'missing_prerequisite_skill_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'labelled_as_correct': False,
                     'param_changes': [],
                     'feedback': {
@@ -6513,6 +6741,7 @@ class ExplorationChangesMergeabilityUnitTests(
                         'param_changes': [],
                         'refresher_exploration_id': None,
                         'dest': 'End',
+                        'dest_if_really_stuck': None,
                         'missing_prerequisite_skill_id': None,
                         'labelled_as_correct': False
                     }
@@ -6605,6 +6834,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'new_value': {
                 'refresher_exploration_id': None,
                 'dest': 'End',
+                'dest_if_really_stuck': None,
                 'missing_prerequisite_skill_id': None,
                 'feedback': {
                     'html': '',
@@ -6633,6 +6863,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     {
                         'refresher_exploration_id': None,
                         'dest': 'End',
+                        'dest_if_really_stuck': None,
                         'missing_prerequisite_skill_id': None,
                         'feedback':
                         {
@@ -6805,6 +7036,7 @@ class ExplorationChangesMergeabilityUnitTests(
                         'param_changes': [],
                         'refresher_exploration_id': None,
                         'dest': 'End',
+                        'dest_if_really_stuck': None,
                         'missing_prerequisite_skill_id': None,
                         'labelled_as_correct': False
                     }
@@ -6895,6 +7127,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     },
                     'missing_prerequisite_skill_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'param_changes': [],
                     'refresher_exploration_id': None
                 },
@@ -7009,6 +7242,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'param_changes': [
 
                 ],
+                'dest_if_really_stuck': None,
                 'dest': 'End'
             },
             'state_name': 'Introduction',
@@ -7024,6 +7258,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'param_changes': [
 
                 ],
+                'dest_if_really_stuck': None,
                 'dest': 'End'
             }
         })]
@@ -7043,6 +7278,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     },
                     'missing_prerequisite_skill_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'param_changes': [],
                     'labelled_as_correct': False,
                     'refresher_exploration_id': None
@@ -7072,6 +7308,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     },
                     'missing_prerequisite_skill_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'param_changes': [],
                     'labelled_as_correct': False,
                     'refresher_exploration_id': None
@@ -7124,6 +7361,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     },
                     'missing_prerequisite_skill_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'param_changes': [],
                     'labelled_as_correct': False,
                     'refresher_exploration_id': None
@@ -7147,6 +7385,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     },
                     'missing_prerequisite_skill_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'param_changes': [],
                     'labelled_as_correct': False,
                     'refresher_exploration_id': None
@@ -7173,6 +7412,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     },
                     'missing_prerequisite_skill_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'param_changes': [],
                     'labelled_as_correct': False,
                     'refresher_exploration_id': None
@@ -7305,6 +7545,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'new_value': {
                 'refresher_exploration_id': None,
                 'dest': 'End',
+                'dest_if_really_stuck': None,
                 'missing_prerequisite_skill_id': None,
                 'feedback': {
                     'html': '',
@@ -7330,6 +7571,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'outcome': {
                     'refresher_exploration_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'missing_prerequisite_skill_id': None,
                     'feedback': {
                         'html': '<p>Good</p>',
@@ -7390,6 +7632,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     },
                     'missing_prerequisite_skill_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'param_changes': [],
                     'refresher_exploration_id': None
                 },
@@ -7443,6 +7686,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     },
                     'missing_prerequisite_skill_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'param_changes': [],
                     'labelled_as_correct': False,
                     'refresher_exploration_id': None
@@ -7472,6 +7716,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     },
                     'missing_prerequisite_skill_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'param_changes': [],
                     'labelled_as_correct': False,
                     'refresher_exploration_id': None
@@ -7524,6 +7769,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     },
                     'missing_prerequisite_skill_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'param_changes': [],
                     'labelled_as_correct': False,
                     'refresher_exploration_id': None
@@ -7547,6 +7793,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     },
                     'missing_prerequisite_skill_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'param_changes': [],
                     'labelled_as_correct': False,
                     'refresher_exploration_id': None
@@ -7573,6 +7820,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     },
                     'missing_prerequisite_skill_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'param_changes': [],
                     'labelled_as_correct': False,
                     'refresher_exploration_id': None
@@ -7626,6 +7874,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     },
                     'missing_prerequisite_skill_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'param_changes': [],
                     'labelled_as_correct': False,
                     'refresher_exploration_id': None
@@ -7655,6 +7904,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     },
                     'missing_prerequisite_skill_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'param_changes': [],
                     'labelled_as_correct': False,
                     'refresher_exploration_id': None
@@ -7718,6 +7968,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     },
                     'missing_prerequisite_skill_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'param_changes': [],
                     'refresher_exploration_id': None
                 },
@@ -7838,6 +8089,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     },
                     'missing_prerequisite_skill_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'param_changes': [],
                     'labelled_as_correct': False,
                     'refresher_exploration_id': None
@@ -7864,6 +8116,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     },
                     'missing_prerequisite_skill_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'param_changes': [],
                     'labelled_as_correct': False,
                     'refresher_exploration_id': None
@@ -7916,6 +8169,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     },
                     'missing_prerequisite_skill_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'param_changes': [],
                     'labelled_as_correct': False,
                     'refresher_exploration_id': None
@@ -7939,6 +8193,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     },
                     'missing_prerequisite_skill_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'param_changes': [],
                     'labelled_as_correct': False,
                     'refresher_exploration_id': None
@@ -7965,6 +8220,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     },
                     'missing_prerequisite_skill_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'param_changes': [],
                     'labelled_as_correct': False,
                     'refresher_exploration_id': None
@@ -8059,6 +8315,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'old_value': None,
             'new_value': {
                 'dest': 'End',
+                'dest_if_really_stuck': None,
                 'missing_prerequisite_skill_id': None,
                 'param_changes': [],
                 'labelled_as_correct': False,
@@ -8082,6 +8339,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'new_value': [{
                 'outcome': {
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'missing_prerequisite_skill_id': None,
                     'param_changes': [],
                     'labelled_as_correct': False,
@@ -8201,6 +8459,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     },
                     'missing_prerequisite_skill_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'param_changes': [],
                     'refresher_exploration_id': None
                 },
@@ -8254,6 +8513,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     },
                     'missing_prerequisite_skill_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'param_changes': [],
                     'labelled_as_correct': False,
                     'refresher_exploration_id': None
@@ -8280,6 +8540,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     },
                     'missing_prerequisite_skill_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'param_changes': [],
                     'labelled_as_correct': False,
                     'refresher_exploration_id': None
@@ -8332,6 +8593,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     },
                     'missing_prerequisite_skill_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'param_changes': [],
                     'labelled_as_correct': False,
                     'refresher_exploration_id': None
@@ -8355,6 +8617,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     },
                     'missing_prerequisite_skill_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'param_changes': [],
                     'labelled_as_correct': False,
                     'refresher_exploration_id': None
@@ -8381,6 +8644,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     },
                     'missing_prerequisite_skill_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'param_changes': [],
                     'labelled_as_correct': False,
                     'refresher_exploration_id': None
@@ -8611,6 +8875,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     'refresher_exploration_id': None,
                     'missing_prerequisite_skill_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'html': '',
                         'content_id': 'feedback_2'
@@ -9025,6 +9290,7 @@ class ExplorationChangesMergeabilityUnitTests(
                         'missing_prerequisite_skill_id': None,
                         'labelled_as_correct': False,
                         'dest': 'End',
+                        'dest_if_really_stuck': None,
                         'param_changes': []
                     },
                     'training_data': [],
@@ -9053,6 +9319,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'missing_prerequisite_skill_id': None,
                 'labelled_as_correct': False,
                 'dest': 'End',
+                'dest_if_really_stuck': None,
                 'param_changes': []
             },
             'cmd': 'edit_state_property',
@@ -9066,6 +9333,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'missing_prerequisite_skill_id': None,
                 'labelled_as_correct': False,
                 'dest': 'End',
+                'dest_if_really_stuck': None,
                 'param_changes': [
 
                 ]
@@ -9081,6 +9349,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'missing_prerequisite_skill_id': None,
                 'labelled_as_correct': False,
                 'dest': 'Introduction',
+                'dest_if_really_stuck': None,
                 'param_changes': [
 
                 ]
@@ -9096,6 +9365,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'missing_prerequisite_skill_id': None,
                 'labelled_as_correct': False,
                 'dest': 'End',
+                'dest_if_really_stuck': None,
                 'param_changes': [
 
                 ]
@@ -9414,6 +9684,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     'html': ''
                 },
                 'param_changes': [],
+                'dest_if_really_stuck': None,
                 'dest': 'End'
             },
             'state_name': 'Introduction',
@@ -9429,6 +9700,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'param_changes': [
 
                 ],
+                'dest_if_really_stuck': None,
                 'dest': 'End'
             }
         }), exp_domain.ExplorationChange({
@@ -9507,6 +9779,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     },
                     'missing_prerequisite_skill_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'param_changes': [],
                     'refresher_exploration_id': None
                 },
@@ -9661,6 +9934,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'param_changes': [
 
                 ],
+                'dest_if_really_stuck': None,
                 'dest': 'End'
             },
             'state_name': 'Introduction',
@@ -9676,6 +9950,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'param_changes': [
 
                 ],
+                'dest_if_really_stuck': None,
                 'dest': 'End'
             }
         })]
@@ -9724,6 +9999,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     },
                     'missing_prerequisite_skill_id': None,
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'param_changes': [],
                     'refresher_exploration_id': None
                 },
@@ -9780,6 +10056,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'param_changes': [
 
                 ],
+                'dest_if_really_stuck': None,
                 'dest': 'End'
             },
             'state_name': 'Introduction',
@@ -9795,6 +10072,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'param_changes': [
 
                 ],
+                'dest_if_really_stuck': None,
                 'dest': 'End'
             }
         }), exp_domain.ExplorationChange({
@@ -10051,6 +10329,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'param_changes': [
 
                 ],
+                'dest_if_really_stuck': None,
                 'dest': 'End'
             },
             'state_name': 'Introduction',
@@ -10066,6 +10345,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'param_changes': [
 
                 ],
+                'dest_if_really_stuck': None,
                 'dest': 'End'
             }
         }), exp_domain.ExplorationChange({
@@ -10392,6 +10672,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'param_changes': [
 
                 ],
+                'dest_if_really_stuck': None,
                 'dest': 'End'
             },
             'state_name': 'Introduction',
@@ -10407,6 +10688,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'param_changes': [
 
                 ],
+                'dest_if_really_stuck': None,
                 'dest': 'End'
             }
         }), exp_domain.ExplorationChange({
@@ -10656,6 +10938,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     'training_data': [],
                     'outcome': {
                         'param_changes': [],
+                        'dest_if_really_stuck': None,
                         'dest': 'End',
                         'missing_prerequisite_skill_id': None,
                         'feedback': {
@@ -10765,6 +11048,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'outcome': {
                     'param_changes': [],
                     'dest': 'Introduction',
+                    'dest_if_really_stuck': None,
                     'missing_prerequisite_skill_id': None,
                     'feedback': {
                         'content_id': 'feedback_1',
@@ -10788,6 +11072,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'outcome': {
                     'param_changes': [],
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'missing_prerequisite_skill_id': None,
                     'feedback': {
                         'content_id': 'feedback_1',
@@ -10802,6 +11087,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'old_value': {
                 'param_changes': [],
                 'dest': 'Introduction',
+                'dest_if_really_stuck': None,
                 'missing_prerequisite_skill_id': None,
                 'feedback': {
                     'content_id': 'default_outcome',
@@ -10815,6 +11101,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'new_value': {
                 'param_changes': [],
                 'dest': 'End',
+                'dest_if_really_stuck': None,
                 'missing_prerequisite_skill_id': None,
                 'feedback': {
                     'content_id': 'default_outcome',
@@ -10856,6 +11143,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'old_value': {
                 'param_changes': [],
                 'dest': 'End',
+                'dest_if_really_stuck': None,
                 'missing_prerequisite_skill_id': None,
                 'feedback': {
                     'content_id': 'default_outcome',
@@ -10944,6 +11232,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     'outcome': {
                         'param_changes': [],
                         'dest': 'End',
+                        'dest_if_really_stuck': None,
                         'missing_prerequisite_skill_id': None,
                         'feedback': {
                             'content_id': 'feedback_1',
@@ -11085,6 +11374,7 @@ class ExplorationChangesMergeabilityUnitTests(
                         'outcome': {
                             'param_changes': [],
                             'dest': 'End',
+                            'dest_if_really_stuck': None,
                             'missing_prerequisite_skill_id': None,
                             'feedback': {
                                 'content_id': 'feedback_1',
@@ -11170,6 +11460,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     'outcome': {
                         'param_changes': [],
                         'dest': 'Introduction',
+                        'dest_if_really_stuck': None,
                         'missing_prerequisite_skill_id': None,
                         'feedback': {
                             'content_id': 'feedback_1',
@@ -11193,6 +11484,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     'outcome': {
                         'param_changes': [],
                         'dest': 'End',
+                        'dest_if_really_stuck': None,
                         'missing_prerequisite_skill_id': None,
                         'feedback': {
                             'content_id': 'feedback_1',
@@ -11207,6 +11499,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'old_value': {
                     'param_changes': [],
                     'dest': 'Introduction',
+                    'dest_if_really_stuck': None,
                     'missing_prerequisite_skill_id': None,
                     'feedback': {
                         'content_id': 'default_outcome',
@@ -11220,6 +11513,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'new_value': {
                     'param_changes': [],
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'missing_prerequisite_skill_id': None,
                     'feedback': {
                         'content_id': 'default_outcome',
@@ -11261,6 +11555,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'old_value': {
                     'param_changes': [],
                     'dest': 'End',
+                    'dest_if_really_stuck': None,
                     'missing_prerequisite_skill_id': None,
                     'feedback': {
                         'content_id': 'default_outcome',
