@@ -32,6 +32,10 @@ var ExplorationPlayerPage = function() {
   var feedbackPopupLink = $('.e2e-test-exploration-feedback-popup-link');
   var feedbackSubmitButton = $('.e2e-test-exploration-feedback-submit-btn');
   var feedbackTextArea = $('.e2e-test-exploration-feedback-textarea');
+  var ratingStar = $('.e2e-test-rating-star');
+  var ratingStarsSelector = function() {
+    return $$('.e2e-test-rating-star');
+  };
   var waitingForResponseElem = $('.e2e-test-input-response-loading-dots');
 
   // This verifies the question just asked, including formatting and
@@ -77,7 +81,9 @@ var ExplorationPlayerPage = function() {
   };
 
   this.rateExploration = async function(ratingValue) {
-    var ratingStars = await $$('.e2e-test-rating-star');
+    await waitFor.visibilityOf(
+      ratingStar, 'Rating stars takes too long to appear');
+    var ratingStars = await ratingStarsSelector();
     await action.click('Submit Button', ratingStars[ratingValue - 1]);
     await waitFor.visibilityOfSuccessToast(
       'Success toast for rating takes too long to appear.');
