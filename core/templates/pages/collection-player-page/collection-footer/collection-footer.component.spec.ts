@@ -77,8 +77,4 @@ describe('Collection footer component', () => {
     expect(urlInterpolationService.getStaticImageUrl)
       .toHaveBeenCalledWith('/general/apple.svg');
   });
-
-  it('should get RTL language status correctly', () => {
-    expect(component.isLanguageRTL()).toBeTrue();
-  });
 });

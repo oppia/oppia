@@ -1,6 +1,3 @@
-<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/pages/topic-viewer-page/stories-list/topic-viewer-stories-list.component.css" as="style">
-<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/pages/topic-viewer-page/stories-list/topic-viewer-stories-list.component.rtl.css" as="style">
-
 <div class="stories-list">
   <div class="oppia-stories-list-container">
     <mat-card class="oppia-page-card oppia-long-text">
@@ -12,7 +9,7 @@
           {{ topicNameTranslationKey | translate }}
         </span>
       </h2>
-      <div class="topic-description protractor-test-topic-description">
+      <div class="topic-description e2e-test-topic-description">
         <span *ngIf="!isHackyTopicNameTranslationDisplayed()">
           {{ topicDescription }}
         </span>
@@ -31,6 +28,3 @@
     </mat-card>
   </div>
 </div>
-<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
-<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/topic-viewer-page/stories-list/topic-viewer-stories-list.component.css">
-<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/topic-viewer-page/stories-list/topic-viewer-stories-list.component.rtl.css">

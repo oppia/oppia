@@ -24,15 +24,26 @@ import operator
 
 from core import feconf
 from core.constants import constants
+from core.domain import exp_domain
 from core.domain import improvements_domain
 from core.platform import models
 
+from typing import Dict, Iterator, List, Optional, Sequence, Tuple
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import datastore_services
+    from mypy_imports import improvements_models
+
 (improvements_models,) = (
-    models.Registry.import_models([models.NAMES.improvements]))
+    models.Registry.import_models([models.NAMES.improvements])
+)
 datastore_services = models.Registry.import_datastore_services()
 
 
-def _yield_all_tasks_ordered_by_status(composite_entity_id):
+def _yield_all_tasks_ordered_by_status(
+    composite_entity_id: str
+) -> Iterator[improvements_domain.TaskEntry]:
     """Yields all of the tasks corresponding to the given entity in storage.
 
     Args:
@@ -44,18 +55,23 @@ def _yield_all_tasks_ordered_by_status(composite_entity_id):
         improvements_domain.TaskEntry. All of the tasks corresponding to the
         given composite_entity_id.
     """
+    results: Sequence[improvements_models.TaskEntryModel] = []
     query = improvements_models.TaskEntryModel.query(
         improvements_models.TaskEntryModel.composite_entity_id ==
         composite_entity_id).order(improvements_models.TaskEntryModel.status)
     cursor, more = (None, True)
     while more:
         results, cursor, more = query.fetch_page(
-            feconf.MAX_TASK_MODELS_PER_FETCH, start_cursor=cursor)
+                feconf.MAX_TASK_MODELS_PER_FETCH,
+                start_cursor=cursor
+        )
         for task_model in results:
             yield get_task_entry_from_model(task_model)
 
 
-def get_task_entry_from_model(task_entry_model):
+def get_task_entry_from_model(
+    task_entry_model: improvements_models.TaskEntryModel
+) -> improvements_domain.TaskEntry:
     """Returns a domain object corresponding to the given task entry model.
 
     Args:
@@ -73,7 +89,9 @@ def get_task_entry_from_model(task_entry_model):
         task_entry_model.resolver_id, task_entry_model.resolved_on)
 
 
-def fetch_exploration_tasks(exploration):
+def fetch_exploration_tasks(
+    exploration: exp_domain.Exploration
+) -> Tuple[List[improvements_domain.TaskEntry], Dict[str, List[str]]]:
     """Returns a tuple encoding the open and resolved tasks corresponding to the
     exploration.
 
@@ -97,7 +115,7 @@ def fetch_exploration_tasks(exploration):
         _yield_all_tasks_ordered_by_status(composite_entity_id),
         operator.attrgetter('status'))
 
-    open_tasks = []
+    open_tasks: List[improvements_domain.TaskEntry] = []
     resolved_task_types_by_state_name = collections.defaultdict(list)
     for status_group, tasks in tasks_grouped_by_status:
         if status_group == constants.TASK_STATUS_OPEN:
@@ -109,7 +127,10 @@ def fetch_exploration_tasks(exploration):
     return open_tasks, dict(resolved_task_types_by_state_name)
 
 
-def fetch_exploration_task_history_page(exploration, urlsafe_start_cursor=None):
+def fetch_exploration_task_history_page(
+    exploration: exp_domain.Exploration,
+    urlsafe_start_cursor: Optional[str] = None
+) -> Tuple[List[improvements_domain.TaskEntry], Optional[str], bool]:
     """Fetches a page from the given exploration's history of resolved tasks.
 
     Args:
@@ -129,28 +150,39 @@ def fetch_exploration_task_history_page(exploration, urlsafe_start_cursor=None):
                 this batch. If False, there are no more results; if True, there
                 are probably more results.
     """
+    results: Sequence[improvements_models.TaskEntryModel] = []
     start_cursor = (
-        urlsafe_start_cursor and
-        datastore_services.make_cursor(urlsafe_cursor=urlsafe_start_cursor))
+        datastore_services.make_cursor(urlsafe_cursor=urlsafe_start_cursor)
+        if urlsafe_start_cursor else None
+    )
     results, cursor, more = (
         improvements_models.TaskEntryModel.query(
             improvements_models.TaskEntryModel.entity_type == (
-                constants.TASK_ENTITY_TYPE_EXPLORATION),
+                constants.TASK_ENTITY_TYPE_EXPLORATION
+            ),
             improvements_models.TaskEntryModel.entity_id == exploration.id,
             improvements_models.TaskEntryModel.status == (
-                constants.TASK_STATUS_RESOLVED))
-        .order(-improvements_models.TaskEntryModel.resolved_on)
-        .fetch_page(
-            feconf.MAX_TASK_MODELS_PER_HISTORY_PAGE, start_cursor=start_cursor))
+                constants.TASK_STATUS_RESOLVED
+            )
+        ).order(
+            -improvements_models.TaskEntryModel.resolved_on
+        ).fetch_page(
+            feconf.MAX_TASK_MODELS_PER_HISTORY_PAGE,
+            start_cursor=start_cursor
+        )
+    )
     # The urlsafe returns bytes and we need to decode them to string.
     return (
         [get_task_entry_from_model(model) for model in results],
-        cursor and cursor.urlsafe().decode('utf-8'),
+        cursor.urlsafe().decode('utf-8') if cursor else None,
         more
     )
 
 
-def put_tasks(tasks, update_last_updated_time=True):
+def put_tasks(
+    tasks: List[improvements_domain.TaskEntry],
+    update_last_updated_time: bool = True
+) -> None:
     """Puts each of the given tasks into storage if necessary, conditionally
     updating their last updated time.
 
@@ -189,7 +221,10 @@ def put_tasks(tasks, update_last_updated_time=True):
     improvements_models.TaskEntryModel.put_multi(models_to_put)
 
 
-def apply_changes_to_model(task_entry, task_entry_model):
+def apply_changes_to_model(
+    task_entry: improvements_domain.TaskEntry,
+    task_entry_model: improvements_models.TaskEntryModel
+) -> bool:
     """Makes changes to the given model when differences are found.
 
     Args:

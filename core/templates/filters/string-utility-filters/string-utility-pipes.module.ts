@@ -33,6 +33,8 @@ import { TruncateAtFirstEllipsisPipe } from 'filters/string-utility-filters/trun
 import { TruncateAtFirstLinePipe } from 'filters/string-utility-filters/truncate-at-first-line.pipe';
 import { UnderscoresToCamelCasePipe } from 'filters/string-utility-filters/underscores-to-camel-case.pipe';
 import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
+import { TruncateInputBasedOnInteractionAnswerTypePipe } from 'filters/truncate-input-based-on-interaction-answer-type.pipe';
+import { ParameterizeRuleDescriptionPipe } from 'filters/parameterize-rule-description.pipe';
 
 @NgModule({
   declarations: [
@@ -50,7 +52,9 @@ import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-te
     TruncateAtFirstEllipsisPipe,
     TruncateAtFirstLinePipe,
     UnderscoresToCamelCasePipe,
-    WrapTextWithEllipsisPipe
+    WrapTextWithEllipsisPipe,
+    TruncateInputBasedOnInteractionAnswerTypePipe,
+    ParameterizeRuleDescriptionPipe
   ],
   exports: [
     CamelCaseToHyphensPipe,
@@ -67,7 +71,9 @@ import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-te
     TruncateAtFirstEllipsisPipe,
     TruncateAtFirstLinePipe,
     UnderscoresToCamelCasePipe,
-    WrapTextWithEllipsisPipe
+    WrapTextWithEllipsisPipe,
+    TruncateInputBasedOnInteractionAnswerTypePipe,
+    ParameterizeRuleDescriptionPipe
   ]
 })
 export class StringUtilityPipesModule {}

@@ -23,48 +23,48 @@ var action = require('./action.js');
 var CreatorDashboardPage = function() {
   var CREATOR_DASHBOARD_URL = '/creator-dashboard';
   var activityCreationModal = element(
-    by.css('.protractor-test-creation-modal'));
+    by.css('.e2e-test-creation-modal'));
   var allExplorationCards = element.all(
-    by.css('.protractor-test-exploration-dashboard-card'));
+    by.css('.e2e-test-exploration-dashboard-card'));
   var explorationFeedbackCount =
-    element(by.css('.protractor-test-exp-summary-tile-open-feedback'));
+    element(by.css('.e2e-test-exp-summary-tile-open-feedback'));
   var explorationDashboardCard =
-    element(by.css('.protractor-test-exploration-dashboard-card'));
-  var collectionCard = element(by.css('.protractor-test-collection-card'));
+    element(by.css('.e2e-test-exploration-dashboard-card'));
+  var collectionCard = element(by.css('.e2e-test-collection-card'));
   var collectionEditorContainer = element(
-    by.css('.protractor-test-collection-editor-cards-container'));
-  var subscriptionTab = element(by.css('.protractor-test-subscription-tab'));
+    by.css('.e2e-test-collection-editor-cards-container'));
+  var subscriptionTab = element(by.css('.e2e-test-subscription-tab'));
   var createActivityButton =
-    element(by.css('.protractor-test-create-activity'));
+    element(by.css('.e2e-test-create-activity'));
   var createCollectionButton =
-    element(by.css('.protractor-test-create-collection'));
+    element(by.css('.e2e-test-create-collection'));
   var createExplorationButton =
-    element(by.css('.protractor-test-create-exploration'));
+    element(by.css('.e2e-test-create-exploration'));
   var createNewExplorationButton =
-    element(by.css('.protractor-test-create-new-exploration-button'));
-  var listViewButton = element(by.css('.protractor-test-oppia-list-view-btn'));
-  var titleMaskLocator = by.css('.protractor-test-title-mask');
+    element(by.css('.e2e-test-create-new-exploration-button'));
+  var listViewButton = element(by.css('.e2e-test-oppia-list-view-btn'));
+  var titleMaskLocator = by.css('.e2e-test-title-mask');
   var expSummaryTileTitleElements = element.all(
-    by.css('.protractor-test-exp-summary-tile-title'));
+    by.css('.e2e-test-exp-summary-tile-title'));
   var expSummaryTileRatingElements = element.all(
-    by.css('.protractor-test-exp-summary-tile-rating'));
+    by.css('.e2e-test-exp-summary-tile-rating'));
   var expSummaryTileViewsElements = element.all(
-    by.css('.protractor-test-exp-summary-tile-num-views'));
+    by.css('.e2e-test-exp-summary-tile-num-views'));
   var expSummaryRowTitleElements = element.all(
-    by.css('.protractor-test-exp-summary-row-title'));
+    by.css('.e2e-test-exp-summary-row-title'));
   var expSummaryRowRatingElements = element.all(
-    by.css('.protractor-test-exp-summary-row-rating'));
+    by.css('.e2e-test-exp-summary-row-rating'));
   var expSummaryRowViewsElements = element.all(
-    by.css('.protractor-test-exp-summary-row-num-views'));
+    by.css('.e2e-test-exp-summary-row-num-views'));
   var expSummaryTileFeedbackElements = element.all(
-    by.css('.protractor-test-exp-summary-tile-open-feedback'));
+    by.css('.e2e-test-exp-summary-tile-open-feedback'));
   // Dashboard stat elements.
-  var averageRating = element(by.css('.protractor-test-oppia-average-rating'));
-  var totalPlays = element(by.css('.protractor-test-oppia-total-plays'));
-  var openFeedbacks = element(by.css('.protractor-test-oppia-open-feedback'));
-  var subscribers = element(by.css('.protractor-test-oppia-total-subscribers'));
+  var averageRating = element(by.css('.e2e-test-oppia-average-rating'));
+  var totalPlays = element(by.css('.e2e-test-oppia-total-plays'));
+  var openFeedbacks = element(by.css('.e2e-test-oppia-open-feedback'));
+  var subscribers = element(by.css('.e2e-test-oppia-total-subscribers'));
   var expSummaryRowFeedbackElements = element.all(
-    by.css('.protractor-test-exp-summary-row-open-feedback'));
+    by.css('.e2e-test-exp-summary-row-open-feedback'));
 
   // Returns all exploration card elements with the given name.
   var _getExplorationElements = async function(explorationTitle) {

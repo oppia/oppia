@@ -31,19 +31,41 @@ from core.platform import models
 import apache_beam as beam
 from apache_beam import typehints
 
+from typing import (
+    Callable, Dict, FrozenSet, Iterator, Sequence, Set, Tuple, Type, cast)
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import base_models
+
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
-datastore_services = models.Registry.import_datastore_services()
+_ALL_MODEL_TYPES: FrozenSet[Type[base_models.BaseModel]] = frozenset(
+    models.Registry.get_all_storage_model_classes())
 
-_ALL_MODEL_TYPES = frozenset(models.Registry.get_all_storage_model_classes())
-_ALL_BASE_MODEL_TYPES = frozenset(
+_ALL_BASE_MODEL_TYPES: FrozenSet[Type[base_models.BaseModel]] = frozenset(
     models.Registry.get_storage_model_classes([models.NAMES.base_model]))
 
-_MODEL_TYPES_BY_BASE_CLASS = {
+_MODEL_TYPES_BY_BASE_CLASS: Dict[
+    Type[base_models.BaseModel],
+    FrozenSet[Type[base_models.BaseModel]]
+] = {
     base_class: frozenset({base_class}).union(
         t for t in _ALL_MODEL_TYPES if issubclass(t, base_class))
     for base_class in _ALL_BASE_MODEL_TYPES
 }
+
+# This type is defined for the arguments which can accept functions
+# that yields the values of type Tuple(property, List[BaseModel]).
+ModelRelationshipsType = Callable[
+    ...,
+    Iterator[
+        Tuple[
+            model_property.PropertyType,
+            Sequence[Type[base_models.BaseModel]]
+        ]
+    ]
+]
 
 
 class AuditsExisting:
@@ -57,9 +79,11 @@ class AuditsExisting:
     and only if ValidateExplorationModelId inherits from ValidateModelId.
     """
 
-    _DO_FN_TYPES_BY_KIND = collections.defaultdict(set)
+    _DO_FN_TYPES_BY_KIND: Dict[
+        str, Set[Type[beam.DoFn]]
+    ] = collections.defaultdict(set)
 
-    def __init__(self, *model_types):
+    def __init__(self, *model_types: Type[base_models.BaseModel]) -> None:
         """Initializes the decorator to target the given types of models.
 
         Args:
@@ -73,7 +97,7 @@ class AuditsExisting:
         """
         if not model_types:
             raise ValueError('Must target at least one model')
-        self._targeted_model_types = set()
+        self._targeted_model_types: Set[Type[base_models.BaseModel]] = set()
         for t in model_types:
             if t in _MODEL_TYPES_BY_BASE_CLASS:
                 self._targeted_model_types.update(_MODEL_TYPES_BY_BASE_CLASS[t])
@@ -86,7 +110,7 @@ class AuditsExisting:
             job_utils.get_model_kind(t) for t in self._targeted_model_types
         }
 
-    def __call__(self, do_fn_type):
+    def __call__(self, do_fn_type: Type[beam.DoFn]) -> Type[beam.DoFn]:
         """Decorator which registers the given DoFn to the targeted models.
 
         This decorator also installs type constraints on the DoFn to guard it
@@ -124,10 +148,19 @@ class AuditsExisting:
             typehints.with_input_types(
                 typehints.Union[self._targeted_model_types]),
             typehints.with_output_types(base_validation_errors.BaseAuditError))
-        return with_input_types(with_output_types(do_fn_type))
+        # TODO(#15613): The return type of functions with_input_types and
+        # with_output_types is Any, because these functions are not type
+        # annotated yet in Apache_beam library. Thus to return the appropriate
+        # type from function instead of Any. We used cast here.
+        return cast(
+            Type[beam.DoFn],
+            with_input_types(with_output_types(do_fn_type))
+        )
 
     @classmethod
-    def get_audit_do_fn_types_by_kind(cls):
+    def get_audit_do_fn_types_by_kind(
+        cls
+    ) -> Dict[str, FrozenSet[Type[beam.DoFn]]]:
         """Returns the sets of audit DoFns targeting a kind of model.
 
         Returns:
@@ -162,9 +195,11 @@ class RelationshipsOf:
 
     # A dict(ModelProperty: set(str)). The keys are properties of a model whose
     # values refer to the IDs of their corresponding set of model kinds.
-    _ID_REFERENCING_PROPERTIES = collections.defaultdict(set)
+    _ID_REFERENCING_PROPERTIES: Dict[
+        model_property.ModelProperty, Set[str]
+    ] = collections.defaultdict(set)
 
-    def __init__(self, model_class):
+    def __init__(self, model_class: Type[base_models.BaseModel]) -> None:
         """Initializes a new RelationshipsOf decorator.
 
         Args:
@@ -173,7 +208,9 @@ class RelationshipsOf:
         self._model_kind = self._get_model_kind(model_class)
         self._model_class = model_class
 
-    def __call__(self, model_relationships):
+    def __call__(
+        self, model_relationships: ModelRelationshipsType
+    ) -> ModelRelationshipsType:
         """Registers the property relationships of self._model_kind yielded by
         the generator.
 
@@ -200,7 +237,11 @@ class RelationshipsOf:
         return model_relationships
 
     @classmethod
-    def get_id_referencing_properties_by_kind_of_possessor(cls):
+    def get_id_referencing_properties_by_kind_of_possessor(
+        cls
+    ) -> Dict[
+        str, Tuple[Tuple[model_property.ModelProperty, Tuple[str, ...]], ...]
+    ]:
         """Returns properties whose values refer to the IDs of the corresponding
         set of model kinds, grouped by the kind of model the properties belong
         to.
@@ -210,11 +251,15 @@ class RelationshipsOf:
             (ModelProperty, set(kind of models)), grouped by the kind of model
             the properties belong to.
         """
-        by_kind = lambda model_property: model_property.model_kind
+        by_kind: Callable[
+            [model_property.ModelProperty], str
+        ] = lambda model_property: model_property.model_kind
         id_referencing_properties_by_kind_of_possessor = itertools.groupby(
             sorted(cls._ID_REFERENCING_PROPERTIES.keys(), key=by_kind),
             key=by_kind)
-        references_of = lambda p: cls._ID_REFERENCING_PROPERTIES[p]
+        references_of: Callable[
+            [model_property.ModelProperty], Set[str]
+        ] = lambda p: cls._ID_REFERENCING_PROPERTIES[p]
         return {
             kind: tuple((p, tuple(references_of(p))) for p in properties)
             for kind, properties in (
@@ -222,7 +267,7 @@ class RelationshipsOf:
         }
 
     @classmethod
-    def get_all_model_kinds_referenced_by_properties(cls):
+    def get_all_model_kinds_referenced_by_properties(cls) -> Set[str]:
         """Returns all model kinds that are referenced by another's property.
 
         Returns:
@@ -233,7 +278,9 @@ class RelationshipsOf:
             cls._ID_REFERENCING_PROPERTIES.values()))
 
     @classmethod
-    def get_model_kind_references(cls, model_kind, property_name):
+    def get_model_kind_references(
+        cls, model_kind: str, property_name: str
+    ) -> Set[str]:
         """Returns the kinds of models referenced by the given property.
 
         Args:
@@ -241,14 +288,19 @@ class RelationshipsOf:
             property_name: str. The property's name.
 
         Returns:
-            list(str). The kinds of models referenced by the given property.
+            set(str). The kinds of models referenced by the given property.
         """
         model_cls = job_utils.get_model_class(model_kind)
+        # Here model_cls is of type Type[datastore_services.Model] but from the
+        # implementation of ModelProperty it is clear that it can only accept
+        # Type[base_models.BaseModel]. So to narrow down the type, we used
+        # assert statement here.
+        assert issubclass(model_cls, base_models.BaseModel)
         prop = model_property.ModelProperty(
             model_cls, getattr(model_cls, property_name))
         return cls._ID_REFERENCING_PROPERTIES.get(prop, set())
 
-    def _get_model_kind(self, model_class):
+    def _get_model_kind(self, model_class: Type[base_models.BaseModel]) -> str:
         """Returns the kind of the model class.
 
         Args:
@@ -267,7 +319,9 @@ class RelationshipsOf:
                 '%s is not a subclass of BaseModel' % model_class.__name__)
         return job_utils.get_model_kind(model_class)
 
-    def _validate_name_of_model_relationships(self, model_relationships):
+    def _validate_name_of_model_relationships(
+        self, model_relationships: ModelRelationshipsType
+    ) -> None:
         """Checks that the model_relationships function has the expected name.
 
         Args:

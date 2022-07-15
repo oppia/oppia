@@ -451,6 +451,100 @@ class ExpVersionReferenceTests(test_utils.GenericTestBase):
             exp_domain.ExpVersionReference(0, 1)
 
 
+class TransientCheckpointUrlTests(test_utils.GenericTestBase):
+    """Testing TransientCheckpointUrl domain object."""
+
+    def setUp(self) -> None:
+        super(TransientCheckpointUrlTests, self).setUp()
+        self.transient_checkpoint_url = exp_domain.TransientCheckpointUrl(
+            'exp_id', 'frcs_name', 1, 'mrrcs_name', 1)
+
+    def test_initialization(self) -> None:
+        """Testing init method."""
+
+        self.assertEqual(self.transient_checkpoint_url.exploration_id, 'exp_id')
+        self.assertEqual(
+            self.transient_checkpoint_url
+            .furthest_reached_checkpoint_state_name,
+            'frcs_name')
+        self.assertEqual(
+            self.transient_checkpoint_url.
+            furthest_reached_checkpoint_exp_version, 1)
+        self.assertEqual(
+            self.transient_checkpoint_url
+            .most_recently_reached_checkpoint_state_name, 'mrrcs_name')
+        self.assertEqual(
+            self.transient_checkpoint_url
+            .most_recently_reached_checkpoint_exp_version, 1)
+
+    def test_to_dict(self):
+        logged_out_learner_progress_dict = {
+            'exploration_id': 'exploration_id',
+            'furthest_reached_checkpoint_exp_version': 1,
+            'furthest_reached_checkpoint_state_name': (
+                'furthest_reached_checkpoint_state_name'),
+            'most_recently_reached_checkpoint_exp_version': 1,
+            'most_recently_reached_checkpoint_state_name': (
+                'most_recently_reached_checkpoint_state_name')
+        }
+        logged_out_learner_progress_object = exp_domain.TransientCheckpointUrl(
+            'exploration_id',
+            'furthest_reached_checkpoint_state_name', 1,
+            'most_recently_reached_checkpoint_state_name', 1
+        )
+        self.assertEqual(
+            logged_out_learner_progress_object.to_dict(),
+            logged_out_learner_progress_dict)
+
+    def test_exploration_id_incorrect_type(self) -> None:
+        self.transient_checkpoint_url.exploration_id = 5  # type: ignore[assignment]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            utils.ValidationError,
+            'Expected exploration_id to be a str'
+        ):
+            self.transient_checkpoint_url.validate()
+
+    def test_furthest_reached_checkpoint_state_name_incorrect_type(
+        self
+    ) -> None:
+        self.transient_checkpoint_url.furthest_reached_checkpoint_state_name = 5  # type: ignore[assignment]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            utils.ValidationError,
+            'Expected furthest_reached_checkpoint_state_name to be a str'
+        ):
+            self.transient_checkpoint_url.validate()
+
+    def test_furthest_reached_checkpoint_exp_version_incorrect_type(
+        self
+    ) -> None:
+        self.transient_checkpoint_url.furthest_reached_checkpoint_exp_version = 'invalid_version'  # type: ignore[assignment]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            utils.ValidationError,
+            'Expected furthest_reached_checkpoint_exp_version to be an int'
+        ):
+            self.transient_checkpoint_url.validate()
+
+    def test_most_recently_reached_checkpoint_state_name_incorrect_type(
+        self
+    ) -> None:
+        self.transient_checkpoint_url.most_recently_reached_checkpoint_state_name = 5  # type: ignore[assignment]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            utils.ValidationError,
+            'Expected most_recently_reached_checkpoint_state_name to be a str'
+        ):
+            self.transient_checkpoint_url.validate()
+
+    def test_most_recently_reached_checkpoint_exp_version_incorrect_type(
+        self
+    ) -> None:
+        self.transient_checkpoint_url.most_recently_reached_checkpoint_exp_version = 'invalid_version'  # type: ignore[assignment]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            utils.ValidationError,
+            'Expected most_recently_reached_checkpoint_exp_version to be an int'
+        ):
+            self.transient_checkpoint_url.validate()
+
+
 class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
     """Test checkpoints validations in an exploration. """
 
@@ -11217,3 +11311,31 @@ class ExplorationMetadataDomainUnitTests(test_utils.GenericTestBase):
         }
 
         self.assertEqual(actual_metadata_dict, expected_metadata_dict)
+
+
+class MetadataVersionHistoryDomainUnitTests(test_utils.GenericTestBase):
+
+    def test_metadata_version_history_gets_created(self):
+        expected_dict = {
+            'last_edited_version_number': 1,
+            'last_edited_committer_id': 'user_1'
+        }
+        actual_dict = exp_domain.MetadataVersionHistory(1, 'user_1').to_dict()
+
+        self.assertEqual(expected_dict, actual_dict)
+
+    def test_metadata_version_history_gets_created_from_dict(self):
+        metadata_version_history_dict = {
+            'last_edited_version_number': 1,
+            'last_edited_committer_id': 'user_1'
+        }
+        metadata_version_history = (
+            exp_domain.MetadataVersionHistory.from_dict(
+                metadata_version_history_dict))
+
+        self.assertEqual(
+            metadata_version_history.last_edited_version_number,
+            metadata_version_history_dict['last_edited_version_number'])
+        self.assertEqual(
+            metadata_version_history.last_edited_committer_id,
+            metadata_version_history_dict['last_edited_committer_id'])
