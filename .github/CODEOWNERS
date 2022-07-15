@@ -476,6 +476,7 @@
 /core/templates/pages/topics-and-skills-dashboard-page/ @oppia/lace-frontend-reviewers
 
 # Learner group project.
+/core/controllers/learner_group*.py @oppia/lace-backend-reviewers
 /core/domain/learner_group*.py @oppia/lace-backend-reviewers
 /core/templates/domain/learner_group/ @oppia/lace-frontend-reviewers
 
