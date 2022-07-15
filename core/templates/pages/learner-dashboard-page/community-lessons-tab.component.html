@@ -1,21 +1,18 @@
-<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/pages/learner-dashboard-page/community-lessons-tab.component.css" as="style">
-<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/pages/learner-dashboard-page/community-lessons-tab.component.rtl.css" as="style">
-
 <div class="community-lessons-section" [ngStyle]="!windowIsNarrow && {'margin-top': '64px'}">
   <p class="lessons-title" [ngClass]="{'oppia-force-right-align': isLanguageRTL()}" [innerHTML]="'I18N_LEARNER_DASHBOARD_COMMUNITY_LESSONS_SECTION' | translate">
   </p>
   <div class="dropdown" *ngIf="windowIsNarrow && (totalCompletedLessonsList.length !== 0 || totalIncompleteLessonsList.length !== 0)">
     <span class="view-text" [ngStyle]="displayInCommunityLessons.length !== 0 && {'right': '100px'}">
-      <span [innerHTML]="I18N_LEARNER_DASHBOARD_VIEW | translate"></span>
+      <span>{{ 'I18N_LEARNER_DASHBOARD_VIEW' | translate }}</span>
     </span>
     <button (click)="toggleDropdown()" class="dropbtn">
       {{selectedSection}}
       <i class="fa fa-caret-down dropdown-icon"></i>
     </button>
     <div class="dropdown-content" *ngIf="dropdownEnabled">
-      <p (click)="changeSection(all)"><span [innerHTML]="I18N_LEARNER_DASHBOARD_ALL | translate"></span></p>
-      <p (click)="changeSection(completed)"><span [innerHTML]="I18N_LEARNER_DASHBOARD_COMPLETED_SECTION | translate"></span></p>
-      <p (click)="changeSection(incomplete)"><span [innerHTML]="I18N_LEARNER_DASHBOARD_INCOMPLETE | translate"></span></p>
+      <p (click)="changeSection(all)"><span>{{ 'I18N_LEARNER_DASHBOARD_ALL' | translate }}</span></p>
+      <p (click)="changeSection(completed)"><span>{{ 'I18N_LEARNER_DASHBOARD_COMPLETED_SECTION' | translate }}</span></p>
+      <p (click)="changeSection(incomplete)"><span>{{ 'I18N_LEARNER_DASHBOARD_INCOMPLETE' | translate }}</span></p>
     </div>
     <div class="pagination" *ngIf="displayInCommunityLessons.length !== 0">
       <i class="fa fa-angle-left pagination-arrow" aria-label="Previous Page" (click)="changePageByOne(moveToPrevPage, 'communityLessons')"></i>
@@ -32,11 +29,11 @@
     <a class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-learner-dashboard-intro-button-link"
        [innerHTML]="'I18N_ACTION_BROWSE_LESSONS' | translate"
        href="/community-library"
-       [routerLink]="communityLibraryUrl"
+       [smartRouterLink]="communityLibraryUrl"
        [oppiaFocusOn]="'ourLessonsBtn'">
     </a>
   </div>
-  <div class="incomplete-section protractor-test-incomplete-community-lessons-section" *ngIf="!windowIsNarrow">
+  <div class="incomplete-section e2e-test-incomplete-community-lessons-section" *ngIf="!windowIsNarrow">
     <div *ngIf="totalIncompleteLessonsList.length !== 0">
       <p [ngClass]="{'oppia-force-right-align': isLanguageRTL()}" class="sub-section-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION' | translate">
       </p>
@@ -89,18 +86,18 @@
           <button class="btn oppia-toggle-btn"
                   (click)="handleShowMore('incomplete')"
                   *ngIf="!showMoreInSection['incomplete']">
-            <span [innerHTML]="I18N_SHOW_MORE | translate"></span>
+            <span>{{ 'I18N_SHOW_MORE' | translate }}</span>
           </button>
           <button class="btn oppia-toggle-btn"
                   (click)="handleShowMore('incomplete')"
                   *ngIf="showMoreInSection['incomplete']">
-            <span [innerHTML]="I18N_SHOW_LESS | translate"></span>
+            <span>{{ 'I18N_SHOW_LESS' | translate }}</span>
           </button>
         </div>
       </div>
     </div>
   </div>
-  <div class="completed-section protractor-test-completed-community-lessons-section" *ngIf="!windowIsNarrow">
+  <div class="completed-section e2e-test-completed-community-lessons-section" *ngIf="!windowIsNarrow">
     <div *ngIf="totalCompletedLessonsList.length !== 0">
       <p [ngClass]="{'oppia-force-right-align': isLanguageRTL()}" class="sub-section-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_COMPLETED_SECTION' | translate">
       </p>
@@ -159,12 +156,12 @@
           <button class="btn oppia-toggle-btn"
                   (click)="handleShowMore('completed')"
                   *ngIf="!showMoreInSection['completed']">
-            <span [innerHTML]="I18N_SHOW_MORE | translate"></span>
+            <span>{{ 'I18N_SHOW_MORE' | translate }}</span>
           </button>
           <button class="btn oppia-toggle-btn"
                   (click)="handleShowMore('completed')"
                   *ngIf="showMoreInSection['completed']">
-            <span [innerHTML]="I18N_SHOW_LESS | translate"></span>
+            <span>{{ 'I18N_SHOW_LESS' | translate }}</span>
           </button>
         </div>
       </div>
@@ -173,7 +170,8 @@
   <div class="community-lessons-mobile-view" *ngIf="windowIsNarrow">
     <span class="oppia-learner-dashboard-nonexistent-exploration"
           *ngIf="completedToIncompleteCollections.length !== 0">
-      <span [innerHTML]="'I18N_LEARNER_DASHBOARD_COMPLETED_TO_INCOMPLETE_COLLECTIONS' | translate: {numberMoved: completedToIncompleteCollections.length}">
+      <span>
+        {{ 'I18N_LEARNER_DASHBOARD_COMPLETED_TO_INCOMPLETE_COLLECTIONS' | translate: {numberMoved: completedToIncompleteCollections.length} }}
       </span>
       <span>
         <ul>
@@ -252,7 +250,7 @@
     </div>
   </div>
 </div>
-<div class="playlist-section protractor-test-play-later-section">
+<div class="playlist-section e2e-test-play-later-section">
   <p [ngClass]="{'oppia-force-right-align': isLanguageRTL()}" class="lessons-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION' | translate">
   </p>
   <div *ngIf="noPlaylistActivity">
@@ -260,7 +258,7 @@
     <a class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-learner-dashboard-nonexistent-exploration"
        [innerHTML]="'I18N_ACTION_BROWSE_LESSONS' | translate"
        href="/community-library"
-       [routerLink]="communityLibraryUrl">
+       [smartRouterLink]="communityLibraryUrl">
     </a>
   </div>
   <div *ngIf="windowIsNarrow && displayLessonsInPlaylist.length !== 0">
@@ -343,18 +341,18 @@
         <button class="btn oppia-toggle-btn"
                 (click)="handleShowMore('playlist')"
                 *ngIf="!showMoreInSection['playlist']">
-          <span [innerHTML]="I18N_SHOW_MORE | translate"></span>
+          <span>{{ 'I18N_SHOW_MORE' | translate }}</span>
         </button>
         <button class="btn oppia-toggle-btn"
                 (click)="handleShowMore('playlist')"
                 *ngIf="showMoreInSection['playlist']">
-          <span [innerHTML]="I18N_SHOW_LESS | translate"></span>
+          <span>{{ 'I18N_SHOW_LESS' | translate }}</span>
         </button>
       </div>
     </div>
   </div>
 </div>
-<div class="subscriptions-section protractor-test-subscriptions-section" *ngIf="subscriptionsList.length !== 0">
+<div class="subscriptions-section e2e-test-subscriptions-section" *ngIf="subscriptionsList.length !== 0">
   <p [ngClass]="{'oppia-force-right-align': isLanguageRTL()}" class="lessons-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_SUBSCRIPTIONS_SECTION' | translate"></p>
   <div *ngIf="subscriptionsList.length !== 0" class="oppia-subscriptions-container">
     <mat-card class="oppia-subscription-card oppia-subscription-container-list"
@@ -364,7 +362,7 @@
              class="oppia-subscription-card-profile-picture rounded-circle">
         <span class="oppia-subscription-card-summary text-dark">
           <div class="oppia-subscription-name">
-            <strong class="protractor-test-subscription-name"
+            <strong class="e2e-test-subscription-name"
                     container="body"
                     triggers="showUsernamePopover(subscription.username)" ngbPopover="subscription.username">
               {{ subscription.username| truncate:10 }}
@@ -381,16 +379,13 @@
       <button class="btn oppia-toggle-btn"
               (click)="handleShowMore('subscription')"
               *ngIf="!showMoreInSection['subscription'] && !windowIsNarrow">
-        <span [innerHTML]="I18N_SHOW_MORE | translate"></span>
+        <span>{{ 'I18N_SHOW_MORE' | translate }}</span>
       </button>
       <button class="btn oppia-toggle-btn"
               (click)="handleShowMore('subscription')"
               *ngIf="showMoreInSection['subscription'] && !windowIsNarrow">
-        <span [innerHTML]="I18N_SHOW_LESS | translate"></span>
+        <span>{{ 'I18N_SHOW_LESS' | translate }}</span>
       </button>
     </div>
   </div>
 </div>
-<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
-<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/learner-dashboard-page/community-lessons-tab.component.css">
-<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/learner-dashboard-page/community-lessons-tab.component.rtl.css">

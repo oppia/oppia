@@ -77,6 +77,22 @@ describe('Exploration Player State Service', () => {
       objective: '',
       correctness_feedback_enabled: false
     },
+    exploration_metadata: {
+      title: '',
+      category: '',
+      objective: '',
+      language_code: 'en',
+      tags: [],
+      blurb: '',
+      author_notes: '',
+      states_schema_version: 50,
+      init_state_name: 'state_name',
+      param_specs: {},
+      param_changes: [],
+      auto_tts_enabled: false,
+      correctness_feedback_enabled: false,
+      edits_allowed: true
+    },
     exploration_id: 'test_id',
     is_logged_in: true,
     session_id: 'test_session',
@@ -87,8 +103,8 @@ describe('Exploration Player State Service', () => {
     correctness_feedback_enabled: true,
     record_playthrough_probability: 1,
     has_viewed_lesson_info_modal_once: false,
-    furthest_completed_checkpoint_exp_version: 1,
-    furthest_completed_checkpoint_state_name: 'State B',
+    furthest_reached_checkpoint_exp_version: 1,
+    furthest_reached_checkpoint_state_name: 'State B',
     most_recently_reached_checkpoint_state_name: 'State A',
     most_recently_reached_checkpoint_exp_version: 1
   };
@@ -655,4 +671,27 @@ describe('Exploration Player State Service', () => {
     explorationPlayerStateService.init();
     expect(explorationPlayerStateService.version).toBe(1);
   });
+
+  it('should tell if logged out learner progress is tracked', () => {
+    expect(explorationPlayerStateService.isLoggedOutLearnerProgressTracked())
+      .toBeFalse();
+    explorationPlayerStateService.trackLoggedOutLearnerProgress();
+    expect(explorationPlayerStateService.isLoggedOutLearnerProgressTracked())
+      .toBeTrue();
+  });
+
+  it('should set unique progress URL id correctly', fakeAsync(() => {
+    spyOn(
+      editableExplorationBackendApiService,
+      'recordProgressAndFetchUniqueProgressIdOfLoggedOutLearner')
+      .and.returnValue(Promise.resolve({
+        unique_progress_url_id: '123456'
+      }));
+    expect(explorationPlayerStateService.getUniqueProgressUrlId()).toBeNull();
+    explorationPlayerStateService.setLastCompletedCheckpoint('abc');
+    explorationPlayerStateService.setUniqueProgressUrlId();
+    tick(100);
+    expect(explorationPlayerStateService.getUniqueProgressUrlId()).toEqual(
+      '123456');
+  }));
 });

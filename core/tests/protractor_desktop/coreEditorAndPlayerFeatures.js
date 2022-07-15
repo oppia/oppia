@@ -90,7 +90,7 @@ describe('Enable correctness feedback and set correctness', function() {
 
     await explorationEditorMainTab.setStateName('First');
     await explorationEditorMainTab.setContent(await forms.toRichText(
-      'Select the right option.'));
+      'Select the right option.'), true);
 
     // Create interaction first.
     await explorationEditorMainTab.setInteraction('MultipleChoiceInput', [
@@ -440,10 +440,10 @@ describe('Core exploration functionality', function() {
     // this interaction does not have any customization options. To dismiss
     // this modal, user clicks 'Okay' implying that he/she has got the message.
     await explorationEditorMainTab.setInteraction('NumberWithUnits');
-    var testInteractionButton = element(by.css('.protractor-test-interaction'));
+    var testInteractionButton = element(by.css('.e2e-test-interaction'));
     await action.click('Test Interaction Button', testInteractionButton);
     var okayBtn = element(
-      by.css('.protractor-test-close-no-customization-modal'));
+      by.css('.e2e-test-close-no-customization-modal'));
     await action.click('Close \'No customization modal\' button', okayBtn);
 
     // Continue input has customization options. Therefore, on re-clicking, a
@@ -454,7 +454,7 @@ describe('Core exploration functionality', function() {
     await explorationEditorMainTab.setInteraction('Continue');
     await action.click('Test interaction button', testInteractionButton);
     var saveInteractionBtn = element(
-      by.css('.protractor-test-save-interaction'));
+      by.css('.e2e-test-save-interaction'));
     await action.click('Save interaction button', saveInteractionBtn);
   });
 

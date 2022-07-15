@@ -1,44 +1,46 @@
-<style>
-  .test-interaction-modal .submit-answer-btn {
-    margin-bottom: 20px;
-    text-align: right;
-  }
-  .test-interaction-modal table {
-    margin-bottom: 0;
-  }
-</style>
-
 <div class="form-inline test-interaction-modal">
-  <div ng-if="interactionIsInline">
+  <div *ngIf="interactionIsInline">
     <div class="preview-conversation-skin-inline-interaction">
       <table class="preview-conversation-skin-card-row-container">
         <tr class="preview-conversation-skin-card-row">
           <td class="preview-conversation-skin-row-avatar" valign="top">
-            <img class="preview-conversation-skin-row-avatar-img rounded-circle" ng-src="<[userBlueImgUrl]>" >
+            <img class="preview-conversation-skin-row-avatar-img rounded-circle" [src]="userBlueImgUrl" >
           </td>
           <td class="preview-conversation-skin-learner-input">
-            <angular-html-bind html-data="$ctrl.getInputTemplate()"></angular-html-bind>
+            <oppia-interaction-display [htmlData]="inputTemplate"></oppia-interaction-display>
           </td>
         </tr>
       </table>
     </div>
   </div>
-  <div class="preview-conversation-skin-supplemental-interaction" ng-if="!interactionIsInline">
+  <div class="preview-conversation-skin-supplemental-interaction" *ngIf="!interactionIsInline">
     <div>
-      <md-card class="preview-conversation-skin-supplemental-card">
+      <mat-card class="preview-conversation-skin-supplemental-card">
         <div>
-          <angular-html-bind html-data="$ctrl.getInputTemplate()">
-          </angular-html-bind>
+          <oppia-interaction-display [htmlData]="inputTemplate">
+          </oppia-interaction-display>
         </div>
-      </md-card>
+      </mat-card>
     </div>
   </div>
   <br>
   <div class="submit-answer-btn">
-    <md-button class="oppia-learner-confirm-button protractor-test-submit-answer-button"
-               ng-disabled="isSubmitButtonDisabled()"
-               ng-click="onSubmitAnswerFromButton()"
-               translate="I18N_INTERACTIONS_SUBMIT">
-    </md-button>
+    <button mat-button
+            class="oppia-learner-confirm-button e2e-test-submit-answer-button"
+            [disabled]="isSubmitButtonDisabled()"
+            (click)="onSubmitAnswerFromButton()"
+            translate="I18N_INTERACTIONS_SUBMIT">
+    </button>
   </div>
 </div>
+
+<style>
+  .test-interaction-modal .submit-answer-btn {
+    margin-bottom: 20px;
+    text-align: right;
+  }
+
+  .test-interaction-modal table {
+    margin-bottom: 0;
+  }
+</style>

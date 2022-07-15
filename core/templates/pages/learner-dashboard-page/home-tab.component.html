@@ -1,6 +1,3 @@
-<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/pages/learner-dashboard-page/home-tab.component.css" as="style">
-<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/pages/learner-dashboard-page/home-tab.component.rtl.css" as="style">
-
 <div class="home-tab">
   <div class="greeting" [ngStyle]="!windowIsNarrow && {'margin-top': '64px'}">
     {{ getTimeOfDay() | translate }}, {{ username }}!
@@ -35,7 +32,7 @@
       </div>
     </div>
   </div>
-  <div class="suggested-for-you protractor-test-suggested-for-you" *ngIf="isNonemptyObject(untrackedTopics) && !isGoalLimitReached()">
+  <div class="suggested-for-you e2e-test-suggested-for-you" *ngIf="isNonemptyObject(untrackedTopics) && !isGoalLimitReached()">
     <p class="suggested-for-you-heading" [innerHTML]="'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate">
     </p>
     <div class="suggested-for-you-section">
@@ -70,7 +67,7 @@
     <a class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-learner-dashboard-intro-button-link"
        [innerHTML]="'I18N_ACTION_BROWSE_LESSONS' | translate"
        href="/community-library"
-       [routerLink]="communityLibraryUrl"
+       [smartRouterLink]="communityLibraryUrl"
        [oppiaFocusOn]="'ourLessonsBtn'">
     </a>
   </div>
@@ -84,6 +81,3 @@
     </div>
   </div>
 </div>
-<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
-<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/learner-dashboard-page/home-tab.component.css">
-<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/learner-dashboard-page/home-tab.component.rtl.css">

@@ -253,39 +253,6 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             self.assertEqual('Third party type defs', error_messages.name)
             self.assertTrue(error_messages.failed)
 
-    def test_check_valid_strict_checks(self):
-        strict_ts_config_path_swap = self.swap(
-            other_files_linter,
-            'STRICT_TS_CONFIG_FILEPATH',
-            os.path.join(LINTER_TESTS_DIR, 'valid_strict_ts_config.json'))
-        expected_error_messages = (
-            'SUCCESS  Sorted strict TS config check passed')
-        with strict_ts_config_path_swap, self.print_swap:
-            error_messages = other_files_linter.CustomLintChecksManager(
-                FILE_CACHE).check_filenames_in_tsconfig_strict_are_sorted()
-            self.assertEqual(
-                error_messages.get_report()[0], expected_error_messages)
-            self.assertEqual('Sorted strict TS config', error_messages.name)
-            self.assertFalse(error_messages.failed)
-
-    def test_check_invalid_strict_checks(self):
-        strict_ts_config_path_swap = self.swap(
-            other_files_linter,
-            'STRICT_TS_CONFIG_FILEPATH',
-            os.path.join(LINTER_TESTS_DIR, 'invalid_strict_ts_config.json'))
-        expected_error_messages = 'FAILED  Sorted strict TS config check failed'
-        with strict_ts_config_path_swap, self.print_swap:
-            error_messages = other_files_linter.CustomLintChecksManager(
-                FILE_CACHE).check_filenames_in_tsconfig_strict_are_sorted()
-            self.assertEqual(
-                error_messages.get_report()[1], expected_error_messages)
-            self.assert_same_list_elements(
-                ['Files in %s are not alphabetically sorted.' % (
-                    other_files_linter.STRICT_TS_CONFIG_FILE_NAME)],
-                error_messages.get_report())
-            self.assertEqual('Sorted strict TS config', error_messages.name)
-            self.assertTrue(error_messages.failed)
-
     def test_check_github_workflows_use_merge_action_checks(self):
         def mock_listdir(unused_path):
             return ['pass.yml', 'fail.yml', 'README']

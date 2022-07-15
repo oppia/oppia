@@ -1,7 +1,3 @@
-<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
-<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/splash-page/splash-page.component.css">
-<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/splash-page/splash-page.component.rtl.css">
-
 <div class="splash-page">
   <div class="oppia-splash-section-one" dir="auto">
     <div class="oppia-splash-section-one-left">
@@ -171,11 +167,9 @@
         <p class="testimonial-student-details" [innerHTML]="testimonials[displayedTestimonialId].studentDetails | translate"></p>
       </div>
       <div class="splash-arrows-container">
-        <span (click)="decrementDisplayedTestimonialId()" class="material-icons">
-          arrow_back_ios
+        <span (click)="decrementDisplayedTestimonialId()" class="fas fa-angle-left oppia-splash-testimonial-arrow">
         </span>
-        <span (click)="incrementDisplayedTestimonialId()" class="material-icons">
-          arrow_forward_ios
+        <span (click)="incrementDisplayedTestimonialId()" class="fas fa-angle-right oppia-splash-testimonial-arrow">
         </span>
       </div>
     </div>

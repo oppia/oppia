@@ -1,5 +1,5 @@
 <div role="form">
-  <div class="protractor-test-schema-based-dict-editor" *ngFor="let property of propertySchemas; let idx = index">
+  <div class="e2e-test-schema-based-dict-editor" *ngFor="let property of propertySchemas; let idx = index">
     <div class="form-group">
       <label for="{{ fieldIds[property.name] }}">{{ getHumanReadablePropertyDescription(property) }}</label>
       <div id="{{ fieldIds[property.name] }}" *ngIf="localValue">

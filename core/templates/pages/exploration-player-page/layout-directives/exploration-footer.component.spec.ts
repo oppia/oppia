@@ -36,6 +36,7 @@ import { LoggerService } from 'services/contextual/logger.service';
 import { FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { ExplorationEngineService } from '../services/exploration-engine.service';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
+import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
 import { PlayerPositionService } from '../services/player-position.service';
 import { PlayerTranscriptService } from '../services/player-transcript.service';
 import { StateCard } from 'domain/state_card/state-card.model';
@@ -61,6 +62,8 @@ describe('ExplorationFooterComponent', () => {
   let explorationSummaryBackendApiService: ExplorationSummaryBackendApiService;
   let stateObjectFactory: StateObjectFactory;
   let explorationEngineService: ExplorationEngineService;
+  let editableExplorationBackendApiService:
+    EditableExplorationBackendApiService;
   let playerPositionService: PlayerPositionService;
   let playerTranscriptService: PlayerTranscriptService;
   let writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory;
@@ -97,6 +100,8 @@ describe('ExplorationFooterComponent', () => {
       ReadOnlyExplorationBackendApiService);
     explorationSummaryBackendApiService = TestBed.inject(
       ExplorationSummaryBackendApiService);
+    editableExplorationBackendApiService = TestBed.inject(
+      EditableExplorationBackendApiService);
     questionPlayerStateService = TestBed.inject(
       QuestionPlayerStateService);
     explorationEngineService = TestBed.inject(ExplorationEngineService);
@@ -127,6 +132,10 @@ describe('ExplorationFooterComponent', () => {
     spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(false);
     spyOn(contextService, 'getQuestionPlayerIsManuallySet').and
       .returnValue(true);
+    spyOn(
+      readOnlyExplorationBackendApiService,
+      'fetchCheckpointsFeatureIsEnabledStatus'
+    ).and.returnValue(Promise.resolve(true));
     spyOn(
       explorationSummaryBackendApiService,
       'loadPublicAndPrivateExplorationSummariesAsync').and.resolveTo({
@@ -436,6 +445,22 @@ describe('ExplorationFooterComponent', () => {
           }
         }
       },
+      exploration_metadata: {
+        title: 'Exploration',
+        category: 'Algebra',
+        objective: 'To learn',
+        language_code: 'en',
+        tags: [],
+        blurb: '',
+        author_notes: '',
+        states_schema_version: 50,
+        init_state_name: 'Introduction',
+        param_specs: {},
+        param_changes: [],
+        auto_tts_enabled: false,
+        correctness_feedback_enabled: true,
+        edits_allowed: true
+      },
       version: 1,
       can_edit: true,
       preferred_audio_language_code: 'en',
@@ -444,8 +469,8 @@ describe('ExplorationFooterComponent', () => {
       correctness_feedback_enabled: true,
       record_playthrough_probability: 1,
       has_viewed_lesson_info_modal_once: false,
-      furthest_completed_checkpoint_exp_version: 1,
-      furthest_completed_checkpoint_state_name: 'Mid',
+      furthest_reached_checkpoint_exp_version: 1,
+      furthest_reached_checkpoint_state_name: 'Mid',
       most_recently_reached_checkpoint_state_name: 'Mid',
       most_recently_reached_checkpoint_exp_version: 1
     };
@@ -639,6 +664,22 @@ describe('ExplorationFooterComponent', () => {
           }
         }
       },
+      exploration_metadata: {
+        title: 'Exploration',
+        category: 'Algebra',
+        objective: 'To learn',
+        language_code: 'en',
+        tags: [],
+        blurb: '',
+        author_notes: '',
+        states_schema_version: 50,
+        init_state_name: 'Introduction',
+        param_specs: {},
+        param_changes: [],
+        auto_tts_enabled: false,
+        correctness_feedback_enabled: true,
+        edits_allowed: true
+      },
       version: 1,
       can_edit: true,
       preferred_audio_language_code: 'en',
@@ -648,8 +689,8 @@ describe('ExplorationFooterComponent', () => {
       record_playthrough_probability: 1,
       draft_change_list_id: 0,
       has_viewed_lesson_info_modal_once: false,
-      furthest_completed_checkpoint_exp_version: 1,
-      furthest_completed_checkpoint_state_name: 'State B',
+      furthest_reached_checkpoint_exp_version: 1,
+      furthest_reached_checkpoint_state_name: 'State B',
       most_recently_reached_checkpoint_state_name: 'State A',
       most_recently_reached_checkpoint_exp_version: 1
     };
@@ -716,6 +757,22 @@ describe('ExplorationFooterComponent', () => {
           }
         }
       },
+      exploration_metadata: {
+        title: 'Exploration',
+        category: 'Algebra',
+        objective: 'To learn',
+        language_code: 'en',
+        tags: [],
+        blurb: '',
+        author_notes: '',
+        states_schema_version: 50,
+        init_state_name: 'Introduction',
+        param_specs: {},
+        param_changes: [],
+        auto_tts_enabled: false,
+        correctness_feedback_enabled: true,
+        edits_allowed: true
+      },
       version: 1,
       can_edit: true,
       preferred_audio_language_code: 'en',
@@ -725,8 +782,8 @@ describe('ExplorationFooterComponent', () => {
       record_playthrough_probability: 1,
       draft_change_list_id: 0,
       has_viewed_lesson_info_modal_once: false,
-      furthest_completed_checkpoint_exp_version: 1,
-      furthest_completed_checkpoint_state_name: 'State B',
+      furthest_reached_checkpoint_exp_version: 1,
+      furthest_reached_checkpoint_state_name: 'State B',
       most_recently_reached_checkpoint_state_name: 'State A',
       most_recently_reached_checkpoint_exp_version: 1
     };
@@ -743,9 +800,17 @@ describe('ExplorationFooterComponent', () => {
   }));
 
   it('should correctly mark lesson info tooltip as viewed', () => {
+    spyOn(
+      editableExplorationBackendApiService,
+      'recordLearnerHasViewedLessonInfoModalOnce').and.returnValue(
+      Promise.resolve());
     expect(component.hasLearnerHasViewedLessonInfoTooltip()).toBeFalse();
+    component.userIsLoggedIn = true;
     component.learnerHasViewedLessonInfo();
     expect(component.hasLearnerHasViewedLessonInfoTooltip()).toBeTrue();
+    expect(
+      editableExplorationBackendApiService.
+        recordLearnerHasViewedLessonInfoModalOnce).toHaveBeenCalled();
   });
 
   it('should show hints when initialized in question player when user is' +
@@ -771,6 +836,10 @@ describe('ExplorationFooterComponent', () => {
     spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(false);
     spyOn(contextService, 'getQuestionPlayerIsManuallySet').and
       .returnValue(false);
+    spyOn(
+      readOnlyExplorationBackendApiService,
+      'fetchCheckpointsFeatureIsEnabledStatus'
+    ).and.returnValue(Promise.resolve(true));
     component.windowIsNarrow = true;
 
     component.ngOnInit();

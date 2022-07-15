@@ -1,6 +1,5 @@
 extensions.interactions.base_test
 core.controllers.domain_objects_validator_test
-core.controllers.tasks_test
 core.controllers.voice_artist_test
 core.domain.suggestion_registry_test
 core.controllers.feedback_test
@@ -18,6 +17,7 @@ core.domain.subtopic_page_domain_test
 core.storage.skill.gae_models_test
 core.storage.topic.gae_models_test
 core.domain.app_feedback_report_domain_test
+core.domain.change_domain_test
 core.domain.collection_services_test
 core.storage.collection.gae_models_test
 core.storage.email.gae_models_test
