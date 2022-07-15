@@ -65,7 +65,7 @@ export class OutcomeIfStuckDestinationEditorComponent implements OnInit {
   ) {}
 
   updateChanges($event: string): void {
-    if ($event !== '') {
+    if ($event.length > 0) {
       this.outcomeNewStateName = $event;
       this.getChanges.emit();
     }

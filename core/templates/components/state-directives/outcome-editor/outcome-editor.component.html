@@ -195,7 +195,7 @@
 
 <br *ngIf="displayFeedback">
 
-<div *ngIf="!destinationIfStuckEditorIsOpen && !isInQuestionMode() && destIfStuckFeatEnabled && outcome && !outcome.labelledAsCorrect"
+<div *ngIf="destIfStuckFeatEnabled && !destinationIfStuckEditorIsOpen && !isInQuestionMode() && outcome && !outcome.labelledAsCorrect"
      class="h-100"
      title="{{ isEditable ? 'Change the if stuck destination card' : '' }}">
   <div class="oppia-readonly-rule-tile protractor-test-edit-outcome-dest-if-stuck-button"
@@ -209,8 +209,7 @@
       </div>
 
       <div>
-        <strong *ngIf="displayFeedback">(Optional) Direct the stuck learner
-        to...</strong>
+        <strong *ngIf="displayFeedback">(Optional) Direct the stuck learner to...</strong>
         <strong *ngIf="!displayFeedback">(Optional) Oppia directs the stuck learner to...</strong>
         <span *ngIf="outcome" class="position-relative">
           {{ outcome.destIfReallyStuck }}
@@ -220,7 +219,7 @@
   </div>
 </div>
 
-<div *ngIf="isEditable && destinationIfStuckEditorIsOpen && !isInQuestionMode() && destIfStuckFeatEnabled && outcome && !outcome.labelledAsCorrect">
+<div *ngIf="destIfStuckFeatEnabled && isEditable && destinationIfStuckEditorIsOpen && !isInQuestionMode() && outcome && !outcome.labelledAsCorrect">
   <form role="form"
         class="form-inline protractor-test-edit-outcome-dest-if-stuck"
         name="editOutcomeForm.editDestIfStuckForm"
