@@ -29,7 +29,7 @@ var DEFAULT_WAIT_TIME_MSECS_FOR_NEW_TAB = 15000;
 
 var alertToBePresent = async() => {
   await browser.waitUntil(
-    until.alertIsPresent(),
+    await until.alertIsPresent(),
     {
       timeout: DEFAULT_WAIT_TIME_MSECS,
       timeoutMsg: 'Alert box took too long to appear.'
@@ -54,7 +54,7 @@ var urlToBe = async function(url) {
 var elementToBeClickable = async function(element, errorMessage) {
   await element;
   await browser.waitUntil(
-    until.elementToBeClickable(element),
+    await until.elementToBeClickable(element),
     {
       timeout: DEFAULT_WAIT_TIME_MSECS,
       timeoutMsg: errorMessage
@@ -67,7 +67,6 @@ var elementToBeClickable = async function(element, errorMessage) {
  * @param {string} errorMessage - Error message when element is still visible.
  */
 var invisibilityOf = async function(element, errorMessage) {
-  await element;
   await browser.waitUntil(
     await until.invisibilityOf(element),
     {
@@ -96,7 +95,6 @@ var pageToFullyLoad = async function() {
  *                                provided text.
  */
 var textToBePresentInElement = async function(element, text, errorMessage) {
-  await element;
   await browser.waitUntil(
     await until.textToBePresentInElement(element, text),
     {
@@ -111,7 +109,6 @@ var textToBePresentInElement = async function(element, text, errorMessage) {
  * @param {string} errorMessage - Error message when element is not present.
  */
 var presenceOf = async function(element, errorMessage) {
-  await element;
   await browser.waitUntil(
     await until.presenceOf(element),
     {
@@ -126,7 +123,6 @@ var presenceOf = async function(element, errorMessage) {
  * @param {string} errorMessage - Error message when element is invisible.
  */
 var visibilityOf = async function(element, errorMessage) {
-  await element;
   await browser.waitUntil(
     await until.visibilityOf(element),
     {
@@ -145,7 +141,6 @@ var visibilityOf = async function(element, errorMessage) {
 var elementAttributeToBe = async function(
     element, attribute, value, errorMessage
 ) {
-  await element;
   await browser.waitUntil(async function() {
     return await element.getAttribute(attribute) === value;
   },
