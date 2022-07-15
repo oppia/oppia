@@ -143,6 +143,9 @@ export class ListOfSetsOfTranslatableHtmlContentIdsEditorComponent {
   ngOnInit(): void {
     this.initValues = [];
     this.choices = this.initArgs.choices;
+    if (this.value === undefined) {
+      this.value = [];
+    }
 
     // Initialize the default values.
     if (this.value[0] === undefined || this.value[0].length === 0) {
