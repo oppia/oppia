@@ -314,7 +314,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
     EXPECTED_THREAD_DICT: ExpectedThreadDict = {
         'status': u'open',
         'summary': None,
-        'original_author_id': 'test_user',
+        'original_author_id': None,
         'subject': u'a subject'
     }
     EXPECTED_THREAD_DICT_VIEWER: ExpectedThreadViewerDict = {
@@ -368,7 +368,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         threads = feedback_services.get_threads('exploration', self.EXP_ID_1)
         self.assertEqual(len(threads), 0)
         feedback_services.create_thread(
-            'exploration', self.EXP_ID_1, 'test_user',
+            'exploration', self.EXP_ID_1, None,
             self.EXPECTED_THREAD_DICT['subject'], 'not used here')
         threads = feedback_services.get_threads('exploration', self.EXP_ID_1)
         self.assertEqual(1, len(threads))
@@ -378,7 +378,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
     def test_get_all_threads(self) -> None:
         # Create an anonymous feedback thread.
         feedback_services.create_thread(
-            'exploration', self.EXP_ID_1, 'test_user',
+            'exploration', self.EXP_ID_1, None,
             self.EXPECTED_THREAD_DICT['subject'], 'not used here')
 
         threads = feedback_services.get_all_threads(
@@ -582,10 +582,10 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
 
     def test_get_thread_summaries_returns_correct_message_count(self) -> None:
         thread_id_1 = feedback_services.create_thread(
-            'exploration', self.EXP_ID_1, self.user_id,
+            'exploration', self.EXP_ID_1, None,
             self.EXPECTED_THREAD_DICT['subject'], 'not used here')
         thread_id_2 = feedback_services.create_thread(
-            'exploration', self.EXP_ID_2, self.user_id,
+            'exploration', self.EXP_ID_2, None,
             self.EXPECTED_THREAD_DICT['subject'], 'not used here')
 
         thread_summaries, _ = feedback_services.get_exp_thread_summaries(
@@ -730,24 +730,16 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         self.assertEqual(thread.last_nonempty_message_author_id, self.user_id)
 
     def test_cache_update_after_create_thread_with_anon_text(self) -> None:
-        # Here, argument `original_author_id` of create_thread can only accept
-        # string values but for testing purposes here we are providing None,
-        # which causes MyPy to throw error. Thus to avoid the error, we used
-        # ignore statement here.
         thread_id = feedback_services.create_thread(
-            'exploration', self.EXP_ID_1, None, 'subject', 'initial text')  # type: ignore[arg-type]
+            'exploration', self.EXP_ID_1, None, 'subject', 'initial text')
 
         thread = feedback_models.GeneralFeedbackThreadModel.get(thread_id)
         self.assertEqual(thread.last_nonempty_message_text, 'initial text')
         self.assertIsNone(thread.last_nonempty_message_author_id)
 
     def test_cache_update_after_create_message_with_user_text(self) -> None:
-        # Here, argument `original_author_id` of create_thread can only accept
-        # string values but for testing purposes here we are providing None,
-        # which causes MyPy to throw error. Thus to avoid the error, we used
-        # ignore statement here.
         thread_id = feedback_services.create_thread(
-            'exploration', self.EXP_ID_1, None, 'subject', 'initial text')  # type: ignore[arg-type]
+            'exploration', self.EXP_ID_1, None, 'subject', 'initial text')
 
         thread = feedback_models.GeneralFeedbackThreadModel.get(thread_id)
         self.assertEqual(thread.last_nonempty_message_text, 'initial text')
@@ -770,12 +762,8 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         self.assertEqual(thread.last_nonempty_message_text, 'initial text')
         self.assertEqual(thread.last_nonempty_message_author_id, self.user_id)
 
-        # Here, argument `author_id` of create_message can only accept
-        # string values but for testing purposes here we are providing None,
-        # which causes MyPy to throw error. Thus to avoid the error, we used
-        # ignore statement here.
         feedback_services.create_message(
-            thread_id, None, feedback_models.STATUS_CHOICES_FIXED, None,  # type: ignore[arg-type]
+            thread_id, None, feedback_models.STATUS_CHOICES_FIXED, None,
             'anonymous text')
 
         thread = feedback_models.GeneralFeedbackThreadModel.get(thread_id)
@@ -796,7 +784,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         self
     ) -> None:
         thread_id = feedback_services.create_thread(
-            'exploration', self.EXP_ID_1, 'test_user', 'subject', '')
+            'exploration', self.EXP_ID_1, None, 'subject', '')
 
         thread = feedback_models.GeneralFeedbackThreadModel.get(thread_id)
         self.assertIsNone(thread.last_nonempty_message_text)
@@ -805,12 +793,8 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
     def test_no_cache_update_after_create_message_with_empty_user_text(
         self
     ) -> None:
-        # Here, argument `original_author_id` of create_thread can only accept
-        # string values but for testing purposes here we are providing None,
-        # which causes MyPy to throw error. Thus to avoid the error, we used
-        # ignore statement here.
         thread_id = feedback_services.create_thread(
-            'exploration', self.EXP_ID_1, None, 'subject', 'initial text')  # type: ignore[arg-type]
+            'exploration', self.EXP_ID_1, None, 'subject', 'initial text')
 
         thread = feedback_models.GeneralFeedbackThreadModel.get(thread_id)
         self.assertEqual(thread.last_nonempty_message_text, 'initial text')
@@ -836,7 +820,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         self.assertEqual(thread.last_nonempty_message_author_id, self.user_id)
 
         feedback_services.create_message(
-            thread_id, self.user_id, feedback_models.STATUS_CHOICES_FIXED,
+            thread_id, None, feedback_models.STATUS_CHOICES_FIXED,
             None, '')
 
         thread = feedback_models.GeneralFeedbackThreadModel.get(thread_id)

@@ -101,7 +101,7 @@ def get_exp_id_from_thread_id(thread_id: str) -> str:
 def _create_models_for_thread_and_first_message(
     entity_type: str,
     entity_id: str,
-    original_author_id: str,
+    original_author_id: Optional[str],
     subject: str,
     text: str,
     has_suggestion: bool
@@ -111,7 +111,8 @@ def _create_models_for_thread_and_first_message(
     Args:
         entity_type: str. The type of entity the feedback thread is linked to.
         entity_id: str. The id of the entity.
-        original_author_id: str. The author id who starts this thread.
+        original_author_id: str. The author id who starts this thread, or None
+            if the author is anonymous.
         subject: str. The subject of this thread.
         text: str. The text of the feedback message. This may be ''.
         has_suggestion: bool. Whether this thread has a related learner
@@ -145,7 +146,7 @@ def _create_models_for_thread_and_first_message(
 def create_thread(
     entity_type: str,
     entity_id: str,
-    original_author_id: str,
+    original_author_id: Optional[str],
     subject: str,
     text: str,
     has_suggestion: bool = False
@@ -155,7 +156,8 @@ def create_thread(
     Args:
         entity_type: str. The type of entity the feedback thread is linked to.
         entity_id: str. The id of the entity.
-        original_author_id: str. The author id who starts this thread.
+        original_author_id: str. The author id who starts this thread, or None
+            if the author is anonymous.
         subject: str. The subject of this thread.
         text: str. The text of the feedback message. This may be ''.
         has_suggestion: bool. Whether the thread has a suggestion attached to
@@ -171,7 +173,7 @@ def create_thread(
 
 def create_message(
     thread_id: str,
-    author_id: str,
+    author_id: Optional[str],
     updated_status: Optional[str],
     updated_subject: Optional[str],
     text: str,
@@ -183,7 +185,8 @@ def create_message(
 
     Args:
         thread_id: str. The thread id the message belongs to.
-        author_id: str. The author id who creates this message.
+        author_id: str. The author id who creates this message, or None
+            if the author is anonymous.
         updated_status: str|None. One of STATUS_CHOICES. New thread status.
             Must be supplied if this is the first message of a thread. For the
             rest of the thread, should exist only when the status changes.
@@ -211,7 +214,7 @@ def create_message(
 
 def create_messages(
     thread_ids: List[str],
-    author_id: str,
+    author_id: Optional[str],
     updated_status: Optional[str],
     updated_subject: Optional[str],
     text: str,
@@ -223,7 +226,8 @@ def create_messages(
 
     Args:
         thread_ids: list(str). The thread ids to append the messages to.
-        author_id: str. The id of the author who creates the messages.
+        author_id: str. The id of the author who creates the messages, or None
+            if the author is anonymous.
         updated_status: str|None. One of STATUS_CHOICES. Applied to each thread.
             Must be supplied if this is the first message of the threads.
             Otherwise, this property should only exist when the status
@@ -382,6 +386,7 @@ def create_messages(
 
     if (feconf.CAN_SEND_EMAILS and (
             feconf.CAN_SEND_FEEDBACK_MESSAGE_EMAILS and
+            author_id is not None and
             user_services.is_user_registered(author_id)) and
             # TODO(#12079): Figure out a better way to avoid sending feedback
             # thread emails for contributor dashboard suggestions.
