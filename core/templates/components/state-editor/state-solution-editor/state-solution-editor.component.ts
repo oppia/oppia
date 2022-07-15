@@ -155,7 +155,7 @@ export class StateSolutionEditorComponent implements OnInit {
   isCurrentInteractionLinear(): boolean {
     let savedMemento = this.stateInteractionIdService.savedMemento;
     return (savedMemento !== null && INTERACTION_SPECS[
-      savedMemento as InteractionSpecsKey].is_linear);
+      savedMemento as InteractionSpecsKey]?.is_linear);
   }
 
   onSaveSolution(value: Solution | null): void {

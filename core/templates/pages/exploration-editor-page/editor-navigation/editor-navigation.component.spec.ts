@@ -21,7 +21,7 @@ import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { of, Subscription } from 'rxjs';
 import { NgbModal, NgbModalRef, NgbModule } from '@ng-bootstrap/ng-bootstrap';
-
+import { RouterService } from '../services/router.service';
 import { UserService } from 'services/user.service';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
@@ -51,6 +51,7 @@ describe('Editor Navigation Component', function() {
   var stateTutorialFirstTimeService = null;
   var threadDataBackendApiService = null;
   var userService = null;
+  let routerService = null;
   var windowDimensionsService = null;
   var internetConnectivityService = null;
 
@@ -85,7 +86,8 @@ describe('Editor Navigation Component', function() {
         HelpModalComponent,
       ],
       providers: [
-        ChangeListService
+        ChangeListService,
+        RouterService
       ]
     });
   });
@@ -97,6 +99,7 @@ describe('Editor Navigation Component', function() {
     userService = TestBed.get(UserService);
     changeListService = TestBed.inject(ChangeListService);
     ngbModal = TestBed.inject(NgbModal);
+    routerService = TestBed.inject(RouterService);
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -330,38 +333,57 @@ describe('Editor Navigation Component', function() {
     });
 
     it('should navigate to main tab when clicking on tab', function() {
+      spyOn(routerService, 'getActiveTabName')
+        .and.returnValue('main');
+
       $scope.selectMainTab();
       $rootScope.$apply();
       expect($scope.getActiveTabName()).toBe('main');
     });
 
     it('should navigate to translation tab when clicking on tab', function() {
+      spyOn(routerService, 'getActiveTabName')
+        .and.returnValue('translation');
+
       $scope.selectTranslationTab();
       $rootScope.$apply();
       expect($scope.getActiveTabName()).toBe('translation');
     });
 
     it('should navigate to preview tab when clicking on tab', function() {
+      spyOn(routerService, 'getActiveTabName')
+        .and.returnValue('preview');
+
       $scope.selectPreviewTab();
       $rootScope.$apply();
       $flushPendingTasks();
       $verifyNoPendingTasks('timeout');
+
       expect($scope.getActiveTabName()).toBe('preview');
     });
 
     it('should navigate to settings tab when clicking on tab', function() {
+      spyOn(routerService, 'getActiveTabName')
+        .and.returnValue('settings');
+
       $scope.selectSettingsTab();
       $rootScope.$apply();
       expect($scope.getActiveTabName()).toBe('settings');
     });
 
     it('should navigate to stats tab when clicking on tab', function() {
+      spyOn(routerService, 'getActiveTabName')
+        .and.returnValue('stats');
+
       $scope.selectStatsTab();
       $rootScope.$apply();
       expect($scope.getActiveTabName()).toBe('stats');
     });
 
     it('should navigate to improvements tab when clicking on tab', function() {
+      spyOn(routerService, 'getActiveTabName')
+        .and.returnValue('improvements');
+
       spyOn(explorationFeaturesService, 'isInitialized').and.returnValue(true);
       isImprovementsTabEnabledAsyncSpy.and.returnValue(true);
       $scope.selectImprovementsTab();
@@ -370,12 +392,18 @@ describe('Editor Navigation Component', function() {
     });
 
     it('should navigate to history tab when clicking on tab', function() {
+      spyOn(routerService, 'getActiveTabName')
+        .and.returnValue('history');
+
       $scope.selectHistoryTab();
       $rootScope.$apply();
       expect($scope.getActiveTabName()).toBe('history');
     });
 
     it('should navigate to feedback tab when clicking on tab', function() {
+      spyOn(routerService, 'getActiveTabName')
+        .and.returnValue('feedback');
+
       $scope.selectFeedbackTab();
       $rootScope.$apply();
       expect($scope.getActiveTabName()).toBe('feedback');

@@ -260,7 +260,7 @@ describe('Full exploration editor', function() {
       // Create an exploration with multiple groups.
       await explorationEditorMainTab.setStateName('first card');
       await explorationEditorMainTab.setContent(await forms.toRichText(
-        'How are you feeling?'));
+        'How are you feeling?'), true);
       await explorationEditorMainTab.setInteraction('TextInput');
       await explorationEditorMainTab.addResponse(
         'TextInput', await forms.toRichText('You must be happy!'),

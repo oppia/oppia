@@ -1,22 +1,22 @@
 <div class="oppia-editor-cards-container" ng-if="$ctrl.stateEditorInitialized">
-  <state-editor on-save-state-content="$ctrl.saveStateContent"
-                on-save-interaction-customization-args="$ctrl.saveInteractionCustomizationArgs"
-                on-save-next-content-id-index="$ctrl.saveNextContentIdIndex"
-                on-save-interaction-id="$ctrl.saveInteractionId"
-                on-save-interaction-default-outcome="$ctrl.saveInteractionDefaultOutcome"
-                on-save-interaction-answer-groups="$ctrl.saveInteractionAnswerGroups"
-                on-save-solution="$ctrl.saveSolution"
-                on-save-hints="$ctrl.saveHints"
-                on-save-inapplicable-skill-misconception-ids="$ctrl.saveInapplicableSkillMisconceptionIds"
-                state-content-placeholder="$ctrl.getStateContentPlaceholder()"
-                state-content-save-button-placeholder="$ctrl.getStateContentSaveButtonPlaceholder()"
-                show-mark-all-audio-as-needing-update-modal-if-required="$ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired"
-                interaction-is-shown="$ctrl.interactionIsShown"
-                recompute-graph="$ctrl.recomputeGraph"
-                navigate-to-state="$ctrl.navigateToState"
-                add-state="$ctrl.addState"
-                refresh-warnings="$ctrl.refreshWarnings">
-  </state-editor>
+  <oppia-state-editor (on-save-state-content)="$ctrl.saveStateContent($event)"
+                      (on-save-interaction-customization-args)="$ctrl.saveInteractionCustomizationArgs($event)"
+                      (on-save-next-content-id-index)="$ctrl.saveNextContentIdIndex($event)"
+                      (on-save-interaction-id)="$ctrl.saveInteractionId($event)"
+                      (on-save-interaction-default-outcome)="$ctrl.saveInteractionDefaultOutcome($event)"
+                      (on-save-interaction-answer-groups)="$ctrl.saveInteractionAnswerGroups($event)"
+                      (on-save-solution)="$ctrl.saveSolution($event)"
+                      (on-save-hints)="$ctrl.saveHints($event)"
+                      (on-save-inapplicable-skill-misconception-ids)="$ctrl.saveInapplicableSkillMisconceptionIds($event)"
+                      [state-content-placeholder]="$ctrl.getStateContentPlaceholder()"
+                      [state-content-save-button-placeholder]="$ctrl.getStateContentSaveButtonPlaceholder()"
+                      (show-mark-all-audio-as-needing-update-modal-if-required)="$ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired($event)"
+                      [interaction-is-shown]="$ctrl.interactionIsShown"
+                      (recompute-graph)="$ctrl.recomputeGraph($event)"
+                      (navigate-to-state)="$ctrl.navigateToState($event)"
+                      [add-state]="$ctrl.addState"
+                      (refresh-warnings)="$ctrl.refreshWarnings($event)">
+  </oppia-state-editor>
 </div>
 
 <style>

@@ -13,384 +13,415 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the answer group editor.
+ * @fileoverview Component for the answer group editor.
  */
 
-require('components/state-directives/rule-editor/rule-editor.component.ts');
-require(
-  'components/question-directives/question-misconception-editor/' +
-  'question-misconception-editor.component.ts');
-require('directives/angular-html-bind.directive.ts');
-require('filters/parameterize-rule-description.filter.ts');
-
-require('domain/utilities/url-interpolation.service.ts');
-require('domain/exploration/RuleObjectFactory.ts');
-require(
-  'pages/exploration-editor-page/editor-tab/services/responses.service.ts');
-require(
-  'pages/exploration-editor-page/editor-tab/training-panel/' +
-  'training-data-editor-panel.service.ts');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-editor.service.ts');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-interaction-id.service');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-property.service.ts');
-require('services/alerts.service.ts');
-require('services/external-save.service.ts');
-
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { AnswerChoice, StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
+import { StateNextContentIdIndexService } from 'components/state-editor/state-editor-properties-services/state-next-content-id-index.service';
+import { Rule, RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import isEqual from 'lodash/isEqual';
-
+import { ResponsesService } from 'pages/exploration-editor-page/editor-tab/services/responses.service';
+import { TrainingDataEditorPanelService } from 'pages/exploration-editor-page/editor-tab/training-panel/training-data-editor-panel.service';
+import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { Subscription } from 'rxjs';
+import { AlertsService } from 'services/alerts.service';
+import cloneDeep from 'lodash/cloneDeep';
+import { AppConstants } from 'app.constants';
+import { ExternalSaveService } from 'services/external-save.service';
+import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
+import { BaseTranslatableObject } from 'interactions/rule-input-defs';
 
-angular.module('oppia').component('answerGroupEditor', {
-  bindings: {
-    addState: '=',
-    displayFeedback: '=',
-    getOnSaveAnswerGroupDestFn: '&onSaveAnswerGroupDest',
-    getOnSaveAnswerGroupRulesFn: '&onSaveAnswerGroupRules',
-    getOnSaveAnswerGroupCorrectnessLabelFn: (
-      '&onSaveAnswerGroupCorrectnessLabel'),
-    getOnSaveNextContentIdIndex: '&onSaveNextContentIdIndex',
-    taggedSkillMisconceptionId: '=',
-    isEditable: '=',
-    getOnSaveAnswerGroupFeedbackFn: '&onSaveAnswerGroupFeedback',
-    onSaveTaggedMisconception: '=',
-    outcome: '=',
-    rules: '=',
-    showMarkAllAudioAsNeedingUpdateModalIfRequired: '=',
-    suppressWarnings: '&'
-  },
-  template: require('./answer-group-editor.component.html'),
-  controller: [
-    'AlertsService', 'ExternalSaveService', 'ResponsesService',
-    'RuleObjectFactory', 'StateEditorService', 'StateInteractionIdService',
-    'StateNextContentIdIndexService',
-    'TrainingDataEditorPanelService', 'ENABLE_ML_CLASSIFIERS',
-    'INTERACTION_SPECS',
-    function(
-        AlertsService, ExternalSaveService, ResponsesService,
-        RuleObjectFactory, StateEditorService, StateInteractionIdService,
-        StateNextContentIdIndexService,
-        TrainingDataEditorPanelService, ENABLE_ML_CLASSIFIERS,
-        INTERACTION_SPECS) {
-      var ctrl = this;
-      ctrl.directiveSubscriptions = new Subscription();
+interface TaggedMisconception {
+  skillId: string;
+  misconceptionId: number;
+}
 
-      ctrl.isInQuestionMode = function() {
-        return StateEditorService.isInQuestionMode();
-      };
+@Component({
+  selector: 'oppia-answer-group-editor',
+  templateUrl: './answer-group-editor.component.html'
+})
+export class AnswerGroupEditor implements OnInit, OnDestroy {
+  @Input() displayFeedback: boolean;
+  @Input() taggedSkillMisconceptionId: string;
+  @Input() isEditable: boolean;
+  @Input() outcome: Outcome;
+  @Input() rules: Rule[];
+  @Input() suppressWarnings: boolean;
+  @Input() addState: (value: string) => void;
+  @Output() onSaveAnswerGroupRules = new EventEmitter<Rule[]>();
+  @Output() onSaveAnswerGroupCorrectnessLabel = new EventEmitter<Outcome>();
+  @Output() onSaveNextContentIdIndex = new EventEmitter();
+  @Output() onSaveAnswerGroupDest = new EventEmitter<Outcome>();
+  @Output() onSaveAnswerGroupFeedback = new EventEmitter<Outcome>();
+  @Output() onSaveTaggedMisconception = new EventEmitter<TaggedMisconception>();
+  @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired =
+    new EventEmitter<string[]>();
 
-      ctrl.getAnswerChoices = function() {
-        return ResponsesService.getAnswerChoices();
-      };
+  rulesMemento: Rule[];
+  directiveSubscriptions = new Subscription();
+  originalContentIdToContent: object;
+  activeRuleIndex: number;
+  answerChoices: AnswerChoice[];
+  editAnswerGroupForm: object;
 
-      ctrl.getCurrentInteractionId = function() {
-        return StateInteractionIdService.savedMemento;
-      };
+  constructor(
+    private stateEditorService: StateEditorService,
+    private responsesService: ResponsesService,
+    private stateInteractionIdService: StateInteractionIdService,
+    private ruleObjectFactory: RuleObjectFactory,
+    private alertsService: AlertsService,
+    private stateNextContentIdIndexService: StateNextContentIdIndexService,
+    private trainingDataEditorPanelService: TrainingDataEditorPanelService,
+    private externalSaveService: ExternalSaveService,
+  ) {}
 
-      ctrl.getDefaultInputValue = function(varType) {
-        // TODO(bhenning): Typed objects in the backend should be required
-        // to provide a default value specific for their type.
-        switch (varType) {
-          default:
-          case 'Null':
-            return null;
-          case 'Boolean':
-            return false;
-          case 'Real':
-          case 'Int':
-          case 'NonnegativeInt':
-            return 0;
-          case 'PositiveInt':
-            return 1;
-          case 'CodeString':
-          case 'UnicodeString':
-          case 'NormalizedString':
-          case 'MathExpressionContent':
-          case 'Html':
-          case 'SanitizedUrl':
-          case 'Filepath':
-            return '';
-          case 'CodeEvaluation':
-            return {
-              code: ctrl.getDefaultInputValue('UnicodeString'),
-              error: ctrl.getDefaultInputValue('UnicodeString'),
-              evaluation: ctrl.getDefaultInputValue('UnicodeString'),
-              output: ctrl.getDefaultInputValue('UnicodeString')
-            };
-          case 'CoordTwoDim':
-            return [
-              ctrl.getDefaultInputValue('Real'),
-              ctrl.getDefaultInputValue('Real')];
-          case 'ListOfUnicodeString':
-          case 'SetOfAlgebraicIdentifier':
-          case 'SetOfUnicodeString':
-          case 'SetOfNormalizedString':
-          case 'MusicPhrase':
-            return [];
-          case 'CheckedProof':
-            return {
-              assumptions_string: ctrl.getDefaultInputValue('UnicodeString'),
-              correct: ctrl.getDefaultInputValue('Boolean'),
-              proof_string: ctrl.getDefaultInputValue('UnicodeString'),
-              target_string: ctrl.getDefaultInputValue('UnicodeString')
-            };
-          case 'Graph':
-            return {
-              edges: [],
-              isDirected: ctrl.getDefaultInputValue('Boolean'),
-              isLabeled: ctrl.getDefaultInputValue('Boolean'),
-              isWeighted: ctrl.getDefaultInputValue('Boolean'),
-              vertices: []
-            };
-          case 'NormalizedRectangle2D':
-            return [
-              [
-                ctrl.getDefaultInputValue('Real'),
-                ctrl.getDefaultInputValue('Real')
-              ],
-              [
-                ctrl.getDefaultInputValue('Real'),
-                ctrl.getDefaultInputValue('Real')
-              ]];
-          case 'ImageRegion':
-            return {
-              area: ctrl.getDefaultInputValue('NormalizedRectangle2D'),
-              regionType: ctrl.getDefaultInputValue('UnicodeString')
-            };
-          case 'ImageWithRegions':
-            return {
-              imagePath: ctrl.getDefaultInputValue('Filepath'),
-              labeledRegions: []
-            };
-          case 'ClickOnImage':
-            return {
-              clickPosition: [
-                ctrl.getDefaultInputValue('Real'),
-                ctrl.getDefaultInputValue('Real')
-              ],
-              clickedRegions: []
-            };
-          case 'TranslatableSetOfNormalizedString':
-            return {
-              contentId: null,
-              normalizedStrSet:
-                ctrl.getDefaultInputValue('SetOfNormalizedString')
-            };
-          case 'TranslatableSetOfUnicodeString':
-            return {
-              contentId: null,
-              normalizedStrSet:
-                ctrl.getDefaultInputValue('SetOfUnicodeString')
-            };
-        }
-      };
+  sendOnSaveTaggedMisconception(event: TaggedMisconception): void {
+    this.onSaveTaggedMisconception.emit(event);
+  }
 
-      ctrl.addNewRule = function() {
-        // Build an initial blank set of inputs for the initial rule.
-        var interactionId = ctrl.getCurrentInteractionId();
-        var ruleDescriptions = (
-          INTERACTION_SPECS[interactionId].rule_descriptions);
-        var ruleTypes = Object.keys(ruleDescriptions);
-        if (ruleTypes.length === 0) {
-          // This should never happen. An interaction must have at least
-          // one rule, as verified in a backend test suite:
-          //   extensions.interactions.base_test.InteractionUnitTests.
-          return;
-        }
-        var ruleType = ruleTypes[0];
-        var description = ruleDescriptions[ruleType];
+  sendOnSaveAnswerGroupCorrectnessLabel(event: Outcome): void {
+    this.onSaveAnswerGroupCorrectnessLabel.emit(event);
+  }
 
-        var PATTERN = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
-        var inputs = {};
-        const inputTypes = {};
-        while (description.match(PATTERN)) {
-          var varName = description.match(PATTERN)[1];
-          var varType = description.match(PATTERN)[2];
-          if (varType) {
-            varType = varType.substring(1);
-          }
+  sendOnSaveAnswerGroupFeedback(event: Outcome): void {
+    this.onSaveAnswerGroupFeedback.emit(event);
+  }
 
-          inputTypes[varName] = varType;
-          inputs[varName] = ctrl.getDefaultInputValue(varType);
-          description = description.replace(PATTERN, ' ');
-        }
+  sendOnSaveAnswerGroupDest(event: Outcome): void {
+    this.onSaveAnswerGroupDest.emit(event);
+  }
 
-        // Save the state of the rules before adding a new one (in case the
-        // user cancels the addition).
-        ctrl.rulesMemento = angular.copy(ctrl.rules);
+  isInQuestionMode(): boolean {
+    return this.stateEditorService.isInQuestionMode();
+  }
 
-        // TODO(bhenning): Should use functionality in ruleEditor.js, but
-        // move it to ResponsesService in StateResponses.js to properly
-        // form a new rule.
-        const rule = RuleObjectFactory.createNew(
-          ruleType, inputs, inputTypes);
-        ctrl.rules.push(rule);
-        ctrl.changeActiveRuleIndex(ctrl.rules.length - 1);
-      };
+  getAnswerChoices(): AnswerChoice[] {
+    return this.responsesService.getAnswerChoices();
+  }
 
-      ctrl.deleteRule = function(index) {
-        ctrl.rules.splice(index, 1);
-        ctrl.saveRules();
+  getCurrentInteractionId(): string {
+    return this.stateInteractionIdService.savedMemento;
+  }
 
-        if (ctrl.rules.length === 0) {
-          AlertsService.addWarning(
-            'All answer groups must have at least one rule.');
-        }
-      };
-
-      ctrl.cancelActiveRuleEdit = function() {
-        ctrl.rules.splice(0, ctrl.rules.length);
-        for (var i = 0; i < ctrl.rulesMemento.length; i++) {
-          ctrl.rules.push(ctrl.rulesMemento[i]);
-        }
-        ctrl.saveRules();
-      };
-
-      ctrl.saveRules = function() {
-        if (ctrl.originalContentIdToContent !== undefined) {
-          const updatedContentIdToContent = (
-            getTranslatableRulesContentIdToContentMap()
-          );
-          const contentIdsWithModifiedContent = [];
-          Object.keys(
-            ctrl.originalContentIdToContent
-          ).forEach(contentId => {
-            if (
-              ctrl.originalContentIdToContent.hasOwnProperty(contentId) &&
-              updatedContentIdToContent.hasOwnProperty(contentId) &&
-              !isEqual(
-                ctrl.originalContentIdToContent[contentId],
-                updatedContentIdToContent[contentId]
-              )
-            ) {
-              contentIdsWithModifiedContent.push(contentId);
-            }
-          });
-          ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired(
-            contentIdsWithModifiedContent);
-        }
-
-        ctrl.changeActiveRuleIndex(-1);
-        ctrl.rulesMemento = null;
-        ctrl.getOnSaveAnswerGroupRulesFn()(ctrl.rules);
-        StateNextContentIdIndexService.saveDisplayedValue();
-        ctrl.getOnSaveNextContentIdIndex()(
-          StateNextContentIdIndexService.displayed);
-      };
-
-      ctrl.changeActiveRuleIndex = function(newIndex) {
-        ResponsesService.changeActiveRuleIndex(newIndex);
-        ctrl.activeRuleIndex = ResponsesService.getActiveRuleIndex();
-      };
-
-      ctrl.openRuleEditor = function(index) {
-        if (!ctrl.isEditable) {
-          // The rule editor may not be opened in a read-only editor view.
-          return;
-        }
-        ctrl.originalContentIdToContent = (
-          getTranslatableRulesContentIdToContentMap()
-        );
-        ctrl.rulesMemento = angular.copy(ctrl.rules);
-        ctrl.changeActiveRuleIndex(index);
-      };
-
-      ctrl.isRuleEditorOpen = function() {
-        return ctrl.activeRuleIndex !== -1;
-      };
-
-      ctrl.isCurrentInteractionTrainable = function() {
-        var interactionId = ctrl.getCurrentInteractionId();
-        if (!INTERACTION_SPECS.hasOwnProperty(interactionId)) {
-          throw new Error(
-            'Invalid interaction id - ' + interactionId +
-            '. Answer group rules: ' +
-            ctrl.rules.map(rule => rule.type).join(', '));
-        }
-        return INTERACTION_SPECS[interactionId].is_trainable;
-      };
-
-      ctrl.openTrainingDataEditor = function() {
-        TrainingDataEditorPanelService.openTrainingDataEditor();
-      };
-
-      ctrl.isMLEnabled = function() {
-        return ENABLE_ML_CLASSIFIERS;
-      };
-
-      /**
-      * Extracts a mapping of content ids of translatable rules to the html
-      * or unicode content found in the rule inputs.
-      * @returns {Object} A Mapping of content ids (string) to content
-      *   (string).
-      */
-      const getTranslatableRulesContentIdToContentMap = function() {
-        const contentIdToContentMap = {};
-        ctrl.rules.forEach(rule => {
-          Object.keys(rule.inputs).forEach(ruleName => {
-            const ruleInput = rule.inputs[ruleName];
-            // All rules input types which are translatable are subclasses of
-            // BaseTranslatableObject having dict structure with contentId
-            // as a key.
-            if (ruleInput && ruleInput.hasOwnProperty('contentId')) {
-              contentIdToContentMap[ruleInput.contentId] = ruleInput;
-            }
-          });
-        });
-        return contentIdToContentMap;
-      };
-
-      ctrl.$onInit = function() {
-        // Updates answer choices when the interaction requires it -- e.g.,
-        // the rules for multiple choice need to refer to the multiple
-        // choice interaction's customization arguments.
-        // TODO(sll): Remove the need for this watcher, or make it less
-        // ad hoc.
-        ctrl.directiveSubscriptions.add(
-          ExternalSaveService.onExternalSave.subscribe(() => {
-            if (ctrl.isRuleEditorOpen()) {
-              if (StateEditorService.checkCurrentRuleInputIsValid()) {
-                ctrl.saveRules();
-              } else {
-                var messageContent = (
-                  'There was an unsaved rule input which was invalid and ' +
-                  'has been discarded.');
-                if (!AlertsService.messages.some(messageObject => (
-                  messageObject.content === messageContent))) {
-                  AlertsService.addInfoMessage(messageContent);
-                }
-              }
-            }
-          })
-        );
-        ctrl.directiveSubscriptions.add(
-          StateEditorService.onUpdateAnswerChoices.subscribe(() => {
-            ctrl.answerChoices = ctrl.getAnswerChoices();
-          })
-        );
-        ctrl.directiveSubscriptions.add(
-          StateInteractionIdService.onInteractionIdChanged.subscribe(
-            () => {
-              if (ctrl.isRuleEditorOpen()) {
-                ctrl.saveRules();
-              }
-              ctrl.answerChoices = ctrl.getAnswerChoices();
-            }
-          )
-        );
-        ctrl.rulesMemento = null;
-        ctrl.activeRuleIndex = ResponsesService.getActiveRuleIndex();
-        ctrl.editAnswerGroupForm = {};
-        ctrl.answerChoices = ctrl.getAnswerChoices();
-      };
-      ctrl.$onDestroy = function() {
-        ctrl.directiveSubscriptions.unsubscribe();
-      };
+  getDefaultInputValue(
+      varType: string): null | boolean |
+      number | number[] | string | object | object[] {
+    // TODO(bhenning): Typed objects in the backend should be required
+    // to provide a default value specific for their type.
+    switch (varType) {
+      default:
+      case 'Null':
+        return null;
+      case 'Boolean':
+        return false;
+      case 'Real':
+      case 'Int':
+      case 'NonnegativeInt':
+        return 0;
+      case 'PositiveInt':
+        return 1;
+      case 'CodeString':
+      case 'UnicodeString':
+      case 'NormalizedString':
+      case 'MathExpressionContent':
+      case 'Html':
+      case 'SanitizedUrl':
+      case 'Filepath':
+        return '';
+      case 'CodeEvaluation':
+        return {
+          code: this.getDefaultInputValue('UnicodeString'),
+          error: this.getDefaultInputValue('UnicodeString'),
+          evaluation: this.getDefaultInputValue('UnicodeString'),
+          output: this.getDefaultInputValue('UnicodeString')
+        };
+      case 'CoordTwoDim':
+        return [
+          this.getDefaultInputValue('Real'),
+          this.getDefaultInputValue('Real')];
+      case 'ListOfUnicodeString':
+      case 'SetOfAlgebraicIdentifier':
+      case 'SetOfUnicodeString':
+      case 'SetOfNormalizedString':
+      case 'MusicPhrase':
+        return [];
+      case 'CheckedProof':
+        return {
+          assumptions_string: this.getDefaultInputValue('UnicodeString'),
+          correct: this.getDefaultInputValue('Boolean'),
+          proof_string: this.getDefaultInputValue('UnicodeString'),
+          target_string: this.getDefaultInputValue('UnicodeString')
+        };
+      case 'Graph':
+        return {
+          edges: [],
+          isDirected: this.getDefaultInputValue('Boolean'),
+          isLabeled: this.getDefaultInputValue('Boolean'),
+          isWeighted: this.getDefaultInputValue('Boolean'),
+          vertices: []
+        };
+      case 'NormalizedRectangle2D':
+        return [
+          [
+            this.getDefaultInputValue('Real'),
+            this.getDefaultInputValue('Real')
+          ],
+          [
+            this.getDefaultInputValue('Real'),
+            this.getDefaultInputValue('Real')
+          ]];
+      case 'ImageRegion':
+        return {
+          area: this.getDefaultInputValue('NormalizedRectangle2D'),
+          regionType: this.getDefaultInputValue('UnicodeString')
+        };
+      case 'ImageWithRegions':
+        return {
+          imagePath: this.getDefaultInputValue('Filepath'),
+          labeledRegions: []
+        };
+      case 'ClickOnImage':
+        return {
+          clickPosition: [
+            this.getDefaultInputValue('Real'),
+            this.getDefaultInputValue('Real')
+          ],
+          clickedRegions: []
+        };
+      case 'TranslatableSetOfNormalizedString':
+        return {
+          contentId: null,
+          normalizedStrSet:
+            this.getDefaultInputValue('SetOfNormalizedString')
+        };
+      case 'TranslatableSetOfUnicodeString':
+        return {
+          contentId: null,
+          normalizedStrSet:
+            this.getDefaultInputValue('SetOfUnicodeString')
+        };
     }
-  ]
-});
+  }
+
+  addNewRule(): void {
+    // Build an initial blank set of inputs for the initial rule.
+    let interactionId = this.getCurrentInteractionId();
+    let ruleDescriptions = (
+      INTERACTION_SPECS[interactionId].rule_descriptions);
+    let ruleTypes = Object.keys(ruleDescriptions);
+    if (ruleTypes.length === 0) {
+      // This should never happen. An interaction must have at least
+      // one rule, as verified in a backend test suite:
+      //   extensions.interactions.base_test.InteractionUnitTests.
+      return;
+    }
+    let ruleType = ruleTypes[0];
+    let description = ruleDescriptions[ruleType];
+
+    let PATTERN = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
+    let inputs = {};
+    const inputTypes = {};
+    while (description.match(PATTERN)) {
+      let varName = description.match(PATTERN)[1];
+      let varType = description.match(PATTERN)[2];
+      if (varType) {
+        varType = varType.substring(1);
+      }
+
+      inputTypes[varName] = varType;
+      inputs[varName] = this.getDefaultInputValue(varType);
+      description = description.replace(PATTERN, ' ');
+    }
+
+    // Save the state of the rules before adding a new one (in case the
+    // user cancels the addition).
+    this.rulesMemento = cloneDeep(this.rules);
+
+    // TODO(bhenning): Should use functionality in ruleEditor.js, but
+    // move it to ResponsesService in StateResponses.js to properly
+    // form a new rule.
+    const rule = this.ruleObjectFactory.createNew(
+      ruleType, inputs, inputTypes);
+    this.rules.push(rule);
+    this.changeActiveRuleIndex(this.rules.length - 1);
+  }
+
+  sendShowMarkAllAudioAsNeedingUpdateModalIfRequired(event: string[]): void {
+    this.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit(event);
+  }
+
+  deleteRule(index: number): void {
+    this.rules.splice(index, 1);
+    this.saveRules();
+
+    if (this.rules.length === 0) {
+      this.alertsService.addWarning(
+        'All answer groups must have at least one rule.');
+    }
+  }
+
+  cancelActiveRuleEdit(): void {
+    this.rules.splice(0, this.rules.length);
+    for (let i = 0; i < this.rulesMemento.length; i++) {
+      this.rules.push(this.rulesMemento[i]);
+    }
+    this.saveRules();
+  }
+
+  saveRules(): void {
+    if (this.originalContentIdToContent !== undefined) {
+      const updatedContentIdToContent = (
+        this.getTranslatableRulesContentIdToContentMap()
+      );
+
+      const contentIdsWithModifiedContent = [];
+      Object.keys(
+        this.originalContentIdToContent
+      ).forEach(contentId => {
+        if (
+          this.originalContentIdToContent.hasOwnProperty(contentId) &&
+          updatedContentIdToContent.hasOwnProperty(contentId) &&
+          !isEqual(
+            this.originalContentIdToContent[contentId],
+            updatedContentIdToContent[contentId]
+          )
+        ) {
+          contentIdsWithModifiedContent.push(contentId);
+        }
+      });
+
+      this.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit(
+        contentIdsWithModifiedContent);
+    }
+
+    this.changeActiveRuleIndex(-1);
+    this.rulesMemento = null;
+    this.onSaveAnswerGroupRules.emit(this.rules);
+    this.stateNextContentIdIndexService.saveDisplayedValue();
+    this.onSaveNextContentIdIndex.emit(
+      this.stateNextContentIdIndexService.displayed);
+  }
+
+  changeActiveRuleIndex(newIndex: number): void {
+    this.responsesService.changeActiveRuleIndex(newIndex);
+    this.activeRuleIndex = this.responsesService.getActiveRuleIndex();
+  }
+
+  openRuleEditor(index: number): void {
+    if (!this.isEditable) {
+      // The rule editor may not be opened in a read-only editor view.
+      return;
+    }
+
+    this.originalContentIdToContent = (
+      this.getTranslatableRulesContentIdToContentMap()
+    );
+    this.rulesMemento = cloneDeep(this.rules);
+    this.changeActiveRuleIndex(index);
+  }
+
+  isRuleEditorOpen(): boolean {
+    return this.activeRuleIndex !== -1;
+  }
+
+  isCurrentInteractionTrainable(): boolean {
+    let interactionId = this.getCurrentInteractionId();
+    if (!INTERACTION_SPECS.hasOwnProperty(interactionId)) {
+      throw new Error(
+        'Invalid interaction id - ' + interactionId +
+        '. Answer group rules: ' +
+        this.rules.map(rule => rule.type).join(', '));
+    }
+    return INTERACTION_SPECS[interactionId].is_trainable;
+  }
+
+  openTrainingDataEditor(): void {
+    this.trainingDataEditorPanelService.openTrainingDataEditor();
+  }
+
+  isMLEnabled(): boolean {
+    return AppConstants.ENABLE_ML_CLASSIFIERS;
+  }
+
+  /**
+   * Extracts a mapping of content ids of translatable rules to the html
+   * or unicode content found in the rule inputs.
+   * @returns {Object} A Mapping of content ids (string) to content
+   *   (string).
+   */
+  getTranslatableRulesContentIdToContentMap(): object {
+    const contentIdToContentMap = {};
+    this.rules.forEach(rule => {
+      Object.keys(rule.inputs).forEach(ruleName => {
+        const ruleInput = rule.inputs[ruleName];
+        // All rules input types which are translatable are subclasses of
+        // BaseTranslatableObject having dict structure with contentId
+        // as a key.
+        if (ruleInput && ruleInput.hasOwnProperty('contentId')) {
+          contentIdToContentMap[(
+            ruleInput as BaseTranslatableObject).contentId] = ruleInput;
+        }
+      });
+    });
+    return contentIdToContentMap;
+  }
+
+  ngOnInit(): void {
+    // Updates answer choices when the interaction requires it -- e.g.,
+    // the rules for multiple choice need to refer to the multiple
+    // choice interaction's customization arguments.
+    // TODO(sll): Remove the need for this watcher, or make it less
+    // ad hoc.
+    this.directiveSubscriptions.add(
+      this.externalSaveService.onExternalSave.subscribe(() => {
+        if (this.isRuleEditorOpen()) {
+          if (this.stateEditorService.checkCurrentRuleInputIsValid()) {
+            this.saveRules();
+          } else {
+            let messageContent = (
+              'There was an unsaved rule input which was invalid and ' +
+              'has been discarded.');
+            if (!this.alertsService.messages.some(messageObject => (
+              messageObject.content === messageContent))) {
+              this.alertsService.addInfoMessage(messageContent);
+            }
+          }
+        }
+      })
+    );
+
+    this.directiveSubscriptions.add(
+      this.stateEditorService.onUpdateAnswerChoices.subscribe(() => {
+        this.answerChoices = this.getAnswerChoices();
+      })
+    );
+
+    this.directiveSubscriptions.add(
+      this.stateInteractionIdService.onInteractionIdChanged.subscribe(
+        () => {
+          if (this.isRuleEditorOpen()) {
+            this.saveRules();
+          }
+          this.answerChoices = this.getAnswerChoices();
+        }
+      )
+    );
+
+    this.rulesMemento = null;
+    this.activeRuleIndex = this.responsesService.getActiveRuleIndex();
+    this.editAnswerGroupForm = {};
+    this.answerChoices = this.getAnswerChoices();
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
+  }
+}
+
+angular.module('oppia').directive('oppiaAnswerGroupEditor',
+  downgradeComponent({
+    component: AnswerGroupEditor
+  }) as angular.IDirectiveFactory);

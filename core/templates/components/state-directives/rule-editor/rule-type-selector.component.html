@@ -1,0 +1,16 @@
+<mat-form-field appearance="fill" class="rule-type-selector">
+  <mat-label>Rule:</mat-label>
+  <mat-select [(value)]="localValue" disableRipple>
+    <mat-option class="e2e-test-rule-type-selector"
+                *ngFor="let choice of choices; index as index"
+                value="{{choice.id}}"
+                (click)="selectedRule($event)">{{choice.text}}
+    </mat-option>
+  </mat-select>
+</mat-form-field>
+
+<style>
+  .rule-type-selector {
+    width: 100%;
+  }
+</style>

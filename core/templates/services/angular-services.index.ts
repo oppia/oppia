@@ -408,14 +408,17 @@ import { ExplorationImprovementsService } from './exploration-improvements.servi
 import { PlaythroughIssuesService } from './playthrough-issues.service';
 import { SkillEditorStalenessDetectionService } from 'pages/skill-editor-page/services/skill-editor-staleness-detection.service';
 import { StoryEditorStalenessDetectionService } from 'pages/story-editor-page/services/story-editor-staleness-detection.service';
+import { RouterService } from 'pages/exploration-editor-page/services/router.service';
 import { TrainingDataService } from 'pages/exploration-editor-page/editor-tab/training-panel/training-data.service';
 import { ParameterMetadataService } from 'pages/exploration-editor-page/services/parameter-metadata.service';
 import { ExplorationWarningsService } from 'pages/exploration-editor-page/services/exploration-warnings.service';
 import { TrainingModalService } from 'pages/exploration-editor-page/editor-tab/training-panel/training-modal.service';
 import { TrainingDataEditorPanelService } from 'pages/exploration-editor-page/editor-tab/training-panel/training-data-editor-panel.service';
-import { QuestionUndoRedoService } from 'domain/editor/undo_redo/question-undo-redo.service';
 import { QuestionUpdateService } from 'domain/question/question-update.service';
+import { SkillEditorRoutingService } from 'pages/skill-editor-page/services/skill-editor-routing.service';
+import { QuestionUndoRedoService } from 'domain/editor/undo_redo/question-undo-redo.service';
 import { ExplorationMetadataObjectFactory } from 'domain/exploration/ExplorationMetadataObjectFactory';
+import { TranslationStatusService } from 'pages/exploration-editor-page/translation-tab/services/translation-status.service';
 import { YamlService } from './yaml.service';
 import { HistoryTabYamlConversionService } from 'pages/exploration-editor-page/services/history-tab-yaml-conversion.service';
 import { VersionedExplorationCachingService } from 'pages/exploration-editor-page/services/versioned-exploration-caching.service';
@@ -612,6 +615,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['ImprovementsService', ImprovementsService],
   ['InteractionAttributesExtractorService',
     InteractionAttributesExtractorService],
+  ['RouterService', RouterService],
   ['InteractionDetailsCacheService', InteractionDetailsCacheService],
   ['InteractionObjectFactory', InteractionObjectFactory],
   ['InteractionRulesRegistryService', InteractionRulesRegistryService],
@@ -753,6 +757,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['SkillEditorStalenessDetectionService',
     SkillEditorStalenessDetectionService],
   ['SkillEditorStateService', SkillEditorStateService],
+  ['SkillEditorRoutingService', SkillEditorRoutingService],
   ['SkillMasteryBackendApiService', SkillMasteryBackendApiService],
   ['SkillObjectFactory', SkillObjectFactory],
   ['SkillRightsBackendApiService', SkillRightsBackendApiService],
@@ -835,6 +840,7 @@ export const angularServices: [string, Type<{}>][] = [
     TranslationTabActiveContentIdService],
   ['TranslationTabActiveModeService', TranslationTabActiveModeService],
   ['TranslationTopicService', TranslationTopicService],
+  ['TranslationStatusService', TranslationStatusService],
   ['TruncatePipe', TruncatePipe],
   ['TrainingDataService', TrainingDataService],
   ['TrainingModalService', TrainingModalService],
@@ -869,5 +875,5 @@ export const angularServices: [string, Type<{}>][] = [
   ['DeleteAccountBackendApiService', DeleteAccountBackendApiService],
   ['NumberConversionService', NumberConversionService],
   ['ParameterMetadataService', ParameterMetadataService],
-  ['ExplorationWarningsService', ExplorationWarningsService],
+  ['ExplorationWarningsService', ExplorationWarningsService]
 ];
