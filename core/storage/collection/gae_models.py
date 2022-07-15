@@ -281,14 +281,12 @@ class CollectionModel(base_models.VersionedModel):
             'rights_model': CollectionRightsModel.get_by_id(self.id)
         }
 
-    # TODO(#13523): Change 'commit_cmds' to domain object/TypedDict to
-    # remove Any from type-annotation below.
     def compute_models_to_commit(
         self,
         committer_id: str,
         commit_type: str,
         commit_message: str,
-        commit_cmds: List[Dict[str, Any]],
+        commit_cmds: base_models.BaseVersionedCommitCmdType,
         # We expect Mapping because we want to allow models that inherit
         # from BaseModel as the values, if we used Dict this wouldn't
         # be allowed.
@@ -635,14 +633,12 @@ class CollectionRightsModel(base_models.VersionedModel):
             **CollectionRightsModel.convert_to_valid_dict(snapshot_dict))
         return self
 
-    # TODO(#13523): Change 'commit_cmds' to domain object/TypedDict to
-    # remove Any from type-annotation below.
     def compute_models_to_commit(
         self,
         committer_id: str,
         commit_type: str,
         commit_message: str,
-        commit_cmds: List[Dict[str, Any]],
+        commit_cmds: base_models.BaseVersionedCommitCmdType,
         # We expect Mapping because we want to allow models that inherit
         # from BaseModel as the values, if we used Dict this wouldn't
         # be allowed.
@@ -694,7 +690,11 @@ class CollectionRightsModel(base_models.VersionedModel):
                 if cmd['name'] == commit_cmd['cmd']
             )
             for user_id_attribute_name in user_id_attribute_names:
-                commit_cmds_user_ids.add(commit_cmd[user_id_attribute_name])
+                user_id_name_value = commit_cmd[user_id_attribute_name]
+                # # Ruling out the possibility of any other type for mypy type
+                # checking.
+                assert isinstance(user_id_name_value, str)
+                commit_cmds_user_ids.add(user_id_name_value)
         snapshot_metadata_model.commit_cmds_user_ids = list(
             sorted(commit_cmds_user_ids))
 

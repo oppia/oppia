@@ -143,7 +143,7 @@ class ActivityServicesTests(test_utils.GenericTestBase):
                 self._create_collection_reference(self.COL_ID_2)])
 
         # Deleting a featured activity removes it from the featured list.
-        collection_services.delete_collection(self.owner_id, self.COL_ID_2) # type: ignore[no-untyped-call]
+        collection_services.delete_collection(self.owner_id, self.COL_ID_2)
         self._compare_lists(
             activity_services.get_featured_activity_references(), [
                 self._create_exploration_reference(self.EXP_ID_0)])

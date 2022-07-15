@@ -62,7 +62,7 @@ class CollectionModelUnitTest(test_utils.GenericTestBase):
         collection = collection_domain.Collection.create_default_collection(
             'id', title='A title',
             category='A Category', objective='An Objective')
-        collection_services.save_new_collection('id', collection) # type: ignore[no-untyped-call]
+        collection_services.save_new_collection('id', collection)
 
         num_collections = (
             collection_models.CollectionModel.get_collection_count())
@@ -72,7 +72,7 @@ class CollectionModelUnitTest(test_utils.GenericTestBase):
         collection = collection_domain.Collection.create_default_collection(
             'id', title='A title',
             category='A Category', objective='An Objective')
-        collection_services.save_new_collection('id', collection) # type: ignore[no-untyped-call]
+        collection_services.save_new_collection('id', collection)
         collection_model = collection_models.CollectionModel.get_by_id('id')
         snapshot_dict = collection_model.compute_snapshot()
         snapshot_dict['nodes'] = ['node0', 'node1']

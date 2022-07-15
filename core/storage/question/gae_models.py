@@ -180,14 +180,12 @@ class QuestionModel(base_models.VersionedModel):
             'The id generator for QuestionModel is producing too many '
             'collisions.')
 
-    # TODO(#13523): Change 'commit_cmds' to TypedDict/Domain Object
-    # to remove Any used below.
     def compute_models_to_commit(
         self,
         committer_id: str,
         commit_type: str,
         commit_message: str,
-        commit_cmds: List[Dict[str, Any]],
+        commit_cmds: base_models.BaseVersionedCommitCmdType,
         # We expect Mapping because we want to allow models that inherit
         # from BaseModel as the values, if we used Dict this wouldn't
         # be allowed.

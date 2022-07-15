@@ -21,7 +21,7 @@ from __future__ import annotations
 from core.constants import constants
 from core.platform import models
 
-from typing import Any, Dict, List, Mapping
+from typing import Dict, Mapping
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -123,14 +123,12 @@ class SubtopicPageModel(base_models.VersionedModel):
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
-    # TODO(#13523): Change 'commit_cmds' to TypedDict/Domain Object
-    # to remove Any used below.
     def compute_models_to_commit(
         self,
         committer_id: str,
         commit_type: str,
         commit_message: str,
-        commit_cmds: List[Dict[str, Any]],
+        commit_cmds: base_models.BaseVersionedCommitCmdType,
         # We expect Mapping because we want to allow models that inherit
         # from BaseModel as the values, if we used Dict this wouldn't
         # be allowed.
