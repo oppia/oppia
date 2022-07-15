@@ -51,8 +51,7 @@
         "core.controllers.voice_artist_test",
         "core.jobs.batch_jobs.skill_migration_jobs_test",
         "core.jobs.batch_jobs.story_migration_jobs_test",
-        "core.jobs.batch_jobs.email_deletion_jobs_test",
-        "scripts.install_python_dev_dependencies_test"
+        "core.jobs.batch_jobs.email_deletion_jobs_test"
     ],
     "2": [
         "core.domain.rights_manager_test",
@@ -104,6 +103,7 @@
         "scripts.linters.python_linter_test",
         "core.platform.auth.firebase_auth_services_test",
         "scripts.install_python_prod_dependencies_test",
+        "scripts.install_python_dev_dependencies_test",
         "scripts.common_test",
         "core.controllers.beam_jobs_test",
         "core.controllers.contributor_dashboard_admin_test",
