@@ -255,9 +255,7 @@ describe('Settings Tab Component', () => {
     });
 
     it('should initialize controller properties after its initialization',
-      fakeAsync(() => {
-        jasmine.createSpy('hasState').and.stub();
-
+      (done) => {
         expect(ctrl.isRolesFormOpen).toBe(false);
         expect(ctrl.canDelete).toBe(true);
         expect(ctrl.canModifyRoles).toBe(true);
@@ -267,18 +265,20 @@ describe('Settings Tab Component', () => {
         expect(ctrl.canManageVoiceArtist).toBe(true);
         expect(ctrl.loggedInUser).toBe('username1');
 
-        ctrl.refreshSettingsTab();
-        tick(501);
-        $scope.$apply();
+        setTimeout(()=>{
+          $scope.$apply();
 
-        expect(ctrl.CATEGORY_LIST_FOR_SELECT2[0]).toEqual({
-          id: 'Astrology',
-          text: 'Astrology'
-        });
+          expect(ctrl.CATEGORY_LIST_FOR_SELECT2[0]).toEqual({
+            id: 'Astrology',
+            text: 'Astrology'
+          });
 
-        expect(ctrl.stateNames).toEqual(['Introduction']);
-        expect(ctrl.hasPageLoaded).toBe(true);
-      }));
+          expect(ctrl.stateNames).toEqual(['Introduction']);
+          expect(ctrl.hasPageLoaded).toBe(true);
+
+          done();
+        }, 501);
+      });
 
     it('should refresh settings tab when refreshSettingsTab flag is ' +
         'broadcasted', fakeAsync(() => {

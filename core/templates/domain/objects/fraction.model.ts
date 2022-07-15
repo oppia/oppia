@@ -157,9 +157,9 @@ export class Fraction {
 
   static fromDict(fractionDict: FractionAnswer): Fraction {
     return new Fraction(
-      fractionDict?.isNegative,
-      fractionDict?.wholeNumber,
-      fractionDict?.numerator,
-      fractionDict?.denominator);
+      fractionDict.isNegative,
+      fractionDict.wholeNumber,
+      fractionDict.numerator,
+      fractionDict.denominator);
   }
 }

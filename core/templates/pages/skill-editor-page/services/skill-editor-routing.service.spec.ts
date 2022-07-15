@@ -16,68 +16,53 @@
  * @fileoverview Unit tests for SkillEditorRoutingService.
  */
 
-import { fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { SkillEditorRoutingService } from 'pages/skill-editor-page/services/skill-editor-routing.service';
+require('pages/skill-editor-page/services/skill-editor-routing.service');
 
-describe('Skill Editor Routing Service', () => {
-  let sers: SkillEditorRoutingService;
+describe('Skill Editor Routing Service', function() {
+  var sers = null;
+  var $rootScope = null;
+  var $location = null;
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.inject(function($injector) {
+    sers = $injector.get('SkillEditorRoutingService');
+    $rootScope = $injector.get('$rootScope');
+    $location = $injector.get('$location');
+  }));
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      providers: [
-        SkillEditorRoutingService
-      ]
-    });
-
-    sers = TestBed.inject(SkillEditorRoutingService);
-    sers.navigateToMainTab();
+  it('should handler calls with unexpect paths', function() {
+    expect(sers.getActiveTabName()).toBe('main');
+    expect(sers.getTabStatuses()).toBe('main');
+    $location.path();
+    $rootScope.$apply();
+    expect(sers.getActiveTabName()).toBe('main');
+    expect(sers.getTabStatuses()).toBe('main');
+    $location.path('');
+    $rootScope.$apply();
+    expect(sers.getActiveTabName()).toBe('main');
+    expect(sers.getTabStatuses()).toBe('main');
   });
 
-  it('should handler calls with unexpect paths', fakeAsync(() => {
+  it('should toggle between main tab, questions and preview tab', function() {
+    sers.navigateToQuestionsTab();
+    $rootScope.$apply();
+    expect(sers.getActiveTabName()).toBe('questions');
+    expect(sers.getTabStatuses()).toBe('questions');
+
+    sers.navigateToPreviewTab();
+    $rootScope.$apply();
+    expect(sers.getActiveTabName()).toBe('preview');
+    expect(sers.getTabStatuses()).toBe('preview');
+
+    sers.navigateToMainTab();
+    $rootScope.$apply();
     expect(sers.getActiveTabName()).toBe('main');
     expect(sers.getTabStatuses()).toBe('main');
+  });
 
-    sers._changeTab('');
-    tick();
-
-    expect(sers.getActiveTabName()).toBe('main');
-    expect(sers.getTabStatuses()).toBe('main');
-
-    sers._changeTab('');
-    tick();
-
-    expect(sers.getActiveTabName()).toBe('main');
-    expect(sers.getTabStatuses()).toBe('main');
-  }));
-
-  it('should toggle between main tab, questions and preview tab',
-    fakeAsync(() => {
-      sers.navigateToQuestionsTab();
-      tick();
-
-      expect(sers.getActiveTabName()).toBe('questions');
-      expect(sers.getTabStatuses()).toBe('questions');
-
-      sers.navigateToPreviewTab();
-      tick();
-
-      expect(sers.getActiveTabName()).toBe('preview');
-      expect(sers.getTabStatuses()).toBe('preview');
-
-      sers.navigateToMainTab();
-      tick();
-
-      expect(sers.getActiveTabName()).toBe('main');
-      expect(sers.getTabStatuses()).toBe('main');
-    }));
-
-  it('should open the question-editor directly', fakeAsync(() => {
+  it('should open the question-editor directly', function() {
     sers.creatingNewQuestion(true);
-    tick();
     expect(sers.navigateToQuestionEditor()).toBe(true);
-
     sers.creatingNewQuestion(false);
-    tick();
     expect(sers.navigateToQuestionEditor()).toBe(false);
-  }));
+  });
 });

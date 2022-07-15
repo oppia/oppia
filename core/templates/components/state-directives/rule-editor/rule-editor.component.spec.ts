@@ -16,164 +16,138 @@
  * @fileoverview Unit tests for rule editor.
  */
 
-import { ComponentFixture, fakeAsync, flush, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { RuleEditorComponent } from './rule-editor.component';
+import { TestBed } from '@angular/core/testing';
 import { ObjectFormValidityChangeEvent } from 'app-events/app-events';
 import { EventBusGroup, EventBusService } from 'app-events/event-bus.service';
-import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import { ResponsesService } from 'pages/exploration-editor-page/editor-tab/services/responses.service';
-import { PopulateRuleContentIdsService } from 'pages/exploration-editor-page/services/populate-rule-content-ids.service';
-import { ChangeDetectorRef, NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { Rule } from 'domain/exploration/RuleObjectFactory';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 
-@Pipe({ name: 'truncate' })
-class MockTruncatePipe {
-  transform(value: string, params: number): string {
-    return value;
-  }
-}
+describe('RuleEditorComponent', () => {
+  importAllAngularServices();
 
-@Pipe({ name: 'convertToPlainText' })
-class MockConvertToPlainTextPipe {
-  transform(value: string): string {
-    return value;
-  }
-}
+  let ctrl = null;
+  let $scope = null;
+  let $rootScope = null;
+  let $timeout = null;
 
-class MockChangeDetectorRef {
-  detectChanges() {}
-}
+  let StateInteractionIdService = null;
+  let ResponsesService = null;
+  let PopulateRuleContentIdsService = null;
 
-describe('Rule Editor Component', () => {
-  let fixture: ComponentFixture<RuleEditorComponent>;
-  let component: RuleEditorComponent;
-  let eventBusService: EventBusService;
-  let stateInteractionIdService: StateInteractionIdService;
-  let responsesService: ResponsesService;
-  let populateRuleContentIdsService: PopulateRuleContentIdsService;
+  beforeEach(angular.mock.module('oppia'));
 
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      declarations: [
-        RuleEditorComponent,
-        MockTruncatePipe,
-        MockConvertToPlainTextPipe,
-      ],
-      providers: [
-        EventBusService,
-        StateInteractionIdService,
-        ResponsesService,
-        {
-          provide: ChangeDetectorRef,
-          useClass: MockChangeDetectorRef
-        },
-        PopulateRuleContentIdsService,
-      ],
-      schemas: [NO_ERRORS_SCHEMA],
-    }).compileComponents();
+  const INTERACTION_SPECS = {
+    TextInput: {
+      rule_descriptions: {
+        StartsWith: 'starts with at least one of' +
+          ' {{x|TranslatableSetOfNormalizedString}}',
+        Contains: 'contains at least one of' +
+          ' {{x|TranslatableSetOfNormalizedString}}',
+        Equals: 'is equal to at least one of' +
+          ' {{x|TranslatableSetOfNormalizedString}},' +
+            ' without taking case into account',
+        FuzzyEquals: 'is equal to at least one of {{x|TranslatableSetOf' +
+          'NormalizedString}}, misspelled by at most one character'
+      }
+    },
+    AlgebraicExpressionInput: {
+      rule_descriptions: {
+        MatchesExactlyWith: 'matches exactly with {{x|AlgebraicExpression}}',
+        IsEquivalentTo: 'is equivalent to {{x|AlgebraicExpression}}'
+      }
+    },
+    DummyInteraction1: {
+      rule_descriptions: {
+        MatchesExactlyWith: 'matches exactly with' +
+          ' {{x|SetOfTranslatableHtmlContentIds}}'
+      }
+    },
+    DummyInteraction2: {
+      rule_descriptions: {
+        MatchesExactlyWith: 'matches exactly with' +
+          ' {{x|ListOfSetsOfTranslatableHtmlContentIds}}'
+      }
+    },
+    DummyInteraction3: {
+      rule_descriptions: {
+        MatchesExactlyWith: 'matches exactly with' +
+          ' {{x|TranslatableHtmlContentId}}'
+      }
+    },
+    DummyInteraction4: {
+      rule_descriptions: {
+        MatchesExactlyWith: 'matches exactly with {{x|DragAndDropPositiveInt}}'
+      }
+    }
+  };
+
+  beforeEach(angular.mock.inject(($injector, $componentController) => {
+    $rootScope = $injector.get('$rootScope');
+    $scope = $rootScope.$new();
+    $timeout = $injector.get('$timeout');
+
+    StateInteractionIdService = $injector
+      .get('StateInteractionIdService');
+    ResponsesService = $injector.get('ResponsesService');
+    PopulateRuleContentIdsService = $injector
+      .get('PopulateRuleContentIdsService');
+
+    ctrl = $componentController('ruleEditor', {
+      $scope: $scope,
+      INTERACTION_SPECS: INTERACTION_SPECS
+    }, {
+      isEditingRuleInline: () => {
+        return true;
+      },
+      onCancelRuleEdit: () => {},
+      onSaveRule: () => {}
+    });
   }));
 
-  beforeEach(() => {
-    fixture = TestBed.createComponent(
-      RuleEditorComponent);
-    component = fixture.componentInstance;
-    eventBusService = TestBed.inject(EventBusService);
-    stateInteractionIdService = TestBed.inject(StateInteractionIdService);
-    responsesService = TestBed.inject(ResponsesService);
-    populateRuleContentIdsService = TestBed.inject(
-      PopulateRuleContentIdsService);
-  });
-
   afterEach(() => {
-    component.ngOnDestroy();
+    ctrl.$onDestroy();
   });
-
-  it('should intitialize properties of ListOfSetsOfTranslatableHtmlContentIds',
-    fakeAsync(() => {
-      spyOn(component, 'computeRuleDescriptionFragments').and.stub();
-      component.rule = {
-        type: 'Equals',
-        inputs: {
-          x: [],
-        },
-        inputTypes: {
-          x: 'ListOfSetsOfTranslatableHtmlContentIds'
-        }
-      } as unknown as Rule;
-      component.ruleDescriptionChoices = [
-        {
-          id: '1',
-          val: 'data 1',
-        },
-        {
-          id: '2',
-          val: 'data 2',
-        },
-        {
-          id: '3',
-          val: 'data 3',
-        }
-      ];
-      stateInteractionIdService.savedMemento = 'DragAndDropSortInput';
-
-      tick();
-      component.ngOnInit();
-
-      expect(component.currentInteractionId).toBe('DragAndDropSortInput');
-      expect(component.editRuleForm).toEqual({});
-      expect(component.rule.inputs.x).toEqual(
-        [
-          ['data 1'],
-          ['data 2'],
-          ['data 3']
-        ]
-      );
-    }));
 
   it('should set component properties on initialization', () => {
-    component.rule = {
+    ctrl.rule = {
       type: null
-    } as unknown as Rule;
-    stateInteractionIdService.savedMemento = 'TextInput';
+    };
+    StateInteractionIdService.savedMemento = 'TextInput';
 
-    expect(component.currentInteractionId).toBe(undefined);
-    expect(component.editRuleForm).toEqual(undefined);
+    expect(ctrl.currentInteractionId).toBe(undefined);
+    expect(ctrl.editRuleForm).toEqual(undefined);
 
-    component.ngOnInit();
+    ctrl.$onInit();
+    $scope.$apply();
 
-    expect(component.currentInteractionId).toBe('TextInput');
-    expect(component.editRuleForm).toEqual({});
+    expect(ctrl.currentInteractionId).toBe('TextInput');
+    expect(ctrl.editRuleForm).toEqual({});
   });
 
   it('should set change validity on form valid' +
-    ' change event', fakeAsync(() => {
-    const eventBusGroup = new EventBusGroup(eventBusService);
-    component.rule = {
+    ' change event', () => {
+    const eventBusGroup = new EventBusGroup(
+      TestBed.inject(EventBusService));
+    ctrl.rule = {
       type: null
-    } as unknown as Rule;
+    };
 
-    expect(component.isInvalid).toBe(undefined);
+    expect(ctrl.isInvalid).toBe(undefined);
 
-    component.isEditingRuleInline = true;
-    component.ngOnInit();
+    ctrl.$onInit();
+    $scope.$apply();
 
-    expect(component.isInvalid).toBe(false);
+    expect(ctrl.isInvalid).toBe(false);
 
-    component.modalId = Symbol();
+    ctrl.modalId = Symbol();
     eventBusGroup.emit(new ObjectFormValidityChangeEvent({
-      value: true, modalId: component.modalId as unknown as symbol
-    }));
-    tick();
-    component.ngAfterViewChecked();
+      value: true, modalId: ctrl.modalId}));
 
-    expect(component.isInvalid).toBe(true);
-  }));
+    expect(ctrl.isInvalid).toBe(true);
+  });
 
   it('should change rule type when user selects' +
-    ' new rule type and answer choice is present', fakeAsync(() => {
-    spyOn(responsesService, 'getAnswerChoices').and.returnValue(
+    ' new rule type and answer choice is present', () => {
+    spyOn(ResponsesService, 'getAnswerChoices').and.returnValue(
       [
         {
           val: 'c',
@@ -189,127 +163,108 @@ describe('Rule Editor Component', () => {
         },
       ]
     );
-    component.rule = {
+    ctrl.rule = {
       type: 'Equals',
-      inputTypes: { x: 'TranslatableSetOfNormalizedString' },
-      inputs: {
-        x: {
-          contentId: null,
-          normalizedStrSet: []
-        }
-      }
-    } as unknown as Rule;
-    component.currentInteractionId = 'TextInput';
+      inputTypes: {x: 'TranslatableSetOfNormalizedString'},
+      inputs: {x: {
+        contentId: null,
+        normalizedStrSet: []
+      }}
+    };
+    ctrl.currentInteractionId = 'TextInput';
 
-    component.onSelectNewRuleType('StartsWith');
-    flush(10);
+    ctrl.onSelectNewRuleType('StartsWith');
+    $timeout.flush(10);
 
-    expect(component.rule).toEqual({
+    expect(ctrl.rule).toEqual({
       type: 'StartsWith',
       inputTypes: {
         x: 'TranslatableSetOfNormalizedString'
       },
       inputs: {
-        x: { contentId: null, normalizedStrSet: [] }
-      }
-    } as unknown as Rule);
-  }));
-
-  it('should change rule type when user selects' +
-    ' new rule type and answer choice is not present', fakeAsync(() => {
-    spyOn(responsesService, 'getAnswerChoices')
-      .and.returnValue(undefined);
-    component.rule = {
-      type: 'Equals',
-      inputTypes: { x: 'TranslatableSetOfNormalizedString' },
-      inputs: {
-        x: {
-          contentId: null,
-          normalizedStrSet: []
-        }
-      }
-    } as unknown as Rule;
-    component.currentInteractionId = 'TextInput';
-
-    component.onSelectNewRuleType('StartsWith');
-    flush(10);
-
-    expect(component.rule).toEqual({
-      type: 'StartsWith',
-      inputTypes: {
-        x: 'TranslatableSetOfNormalizedString'
-      },
-      inputs: {
-        x: { contentId: null, normalizedStrSet: [] }
+        x: {contentId: null, normalizedStrSet: []}
       }
     });
-  }));
+  });
 
   it('should change rule type when user selects' +
-    ' new rule type and answer choice is not present', fakeAsync(() => {
-    spyOn(responsesService, 'getAnswerChoices')
+    ' new rule type and answer choice is not present', () => {
+    spyOn(ResponsesService, 'getAnswerChoices')
       .and.returnValue(undefined);
-    component.rule = {
-      type: 'MatchesExactlyWith',
-      inputTypes: { x: 'AlgebraicExpression' },
+    ctrl.rule = {
+      type: 'Equals',
+      inputTypes: {x: 'TranslatableSetOfNormalizedString'},
+      inputs: {x: {
+        contentId: null,
+        normalizedStrSet: []
+      }}
+    };
+    ctrl.currentInteractionId = 'TextInput';
+
+    ctrl.onSelectNewRuleType('StartsWith');
+    $timeout.flush(10);
+
+    expect(ctrl.rule).toEqual({
+      type: 'StartsWith',
+      inputTypes: {
+        x: 'TranslatableSetOfNormalizedString'
+      },
       inputs: {
-        x: {
-          contentId: null,
-          normalizedStrSet: []
-        }
+        x: {contentId: null, normalizedStrSet: []}
       }
-    } as unknown as Rule;
-    component.currentInteractionId = 'AlgebraicExpressionInput';
+    });
+  });
 
-    component.onSelectNewRuleType('MatchesExactlyWith');
-    flush(10);
-
-    expect(component.rule).toEqual({
+  it('should change rule type when user selects' +
+    ' new rule type and answer choice is not present', () => {
+    spyOn(ResponsesService, 'getAnswerChoices')
+      .and.returnValue(undefined);
+    ctrl.rule = {
       type: 'MatchesExactlyWith',
+      inputTypes: {x: 'AlgebraicExpression'},
+      inputs: {x: {
+        contentId: null,
+        normalizedStrSet: []
+      }}
+    };
+    ctrl.currentInteractionId = 'AlgebraicExpressionInput';
+
+    ctrl.onSelectNewRuleType('IsEquivalentTo');
+    $timeout.flush(10);
+
+    expect(ctrl.rule).toEqual({
+      type: 'IsEquivalentTo',
       inputTypes: {
         x: 'AlgebraicExpression'
       },
       inputs: {
-        x: { contentId: null, normalizedStrSet: [] }
+        x: {contentId: null, normalizedStrSet: []}
       }
     });
-  }));
+  });
 
   it('should cancel edit when user clicks cancel button', () => {
-    const item = {
-      type: null,
-      varName: 'varName'
-    };
-    component.rule = {
-      inputs: {varName: 2}
-    } as unknown as Rule;
+    spyOn(ctrl, 'onCancelRuleEdit');
 
-    spyOn(component.onCancelRuleEdit, 'emit');
+    ctrl.cancelThisEdit();
 
-    component.cancelThisEdit();
-    component.onSelectionChangeHtmlSelect(1, item);
-
-    expect(component.onCancelRuleEdit.emit).toHaveBeenCalled();
+    expect(ctrl.onCancelRuleEdit).toHaveBeenCalled();
   });
 
   it('should save rule when user clicks save button', () => {
-    component.rule = {
-      type: null
-    } as unknown as Rule;
-    spyOn(component.onSaveRule, 'emit').and.stub();
-    spyOn(populateRuleContentIdsService, 'populateNullRuleContentIds')
-      .and.stub();
+    spyOn(ctrl, 'onSaveRule');
+    spyOn(PopulateRuleContentIdsService, 'populateNullRuleContentIds');
 
-    component.saveThisRule();
+    ctrl.saveThisRule();
 
-    expect(component.onSaveRule.emit).toHaveBeenCalled();
-    expect(populateRuleContentIdsService.populateNullRuleContentIds)
+    expect(ctrl.onSaveRule).toHaveBeenCalled();
+    expect(PopulateRuleContentIdsService.populateNullRuleContentIds)
       .toHaveBeenCalled();
   });
 
   it('should set ruleDescriptionFragments for' +
-    ' SetOfTranslatableHtmlContentIds', fakeAsync(() => {
-    spyOn(responsesService, 'getAnswerChoices').and.returnValue(
+    ' SetOfTranslatableHtmlContentIds', () => {
+    spyOn(ResponsesService, 'getAnswerChoices').and.returnValue(
       [
         {
           val: 'c',
@@ -317,15 +272,15 @@ describe('Rule Editor Component', () => {
         }
       ]
     );
-    component.rule = {
-      type: 'Equals'
-    } as unknown as Rule;
-    component.currentInteractionId = 'ItemSelectionInput';
+    ctrl.rule = {
+      type: 'MatchesExactlyWith'
+    };
+    ctrl.currentInteractionId = 'DummyInteraction1';
 
-    component.onSelectNewRuleType('Equals');
-    flush();
+    ctrl.onSelectNewRuleType('MatchesExactlyWith');
+    $timeout.flush();
 
-    expect(component.ruleDescriptionFragments).toEqual([{
+    expect(ctrl.ruleDescriptionFragments).toEqual([{
       text: '',
       type: 'noneditable'
     }, {
@@ -335,11 +290,11 @@ describe('Rule Editor Component', () => {
       text: '',
       type: 'noneditable'
     }]);
-  }));
+  });
 
   it('should set ruleDescriptionFragments for' +
-    ' ListOfSetsOfTranslatableHtmlContentIds', fakeAsync(() => {
-    spyOn(responsesService, 'getAnswerChoices').and.returnValue(
+    ' ListOfSetsOfTranslatableHtmlContentIds', () => {
+    spyOn(ResponsesService, 'getAnswerChoices').and.returnValue(
       [
         {
           val: 'c',
@@ -347,16 +302,15 @@ describe('Rule Editor Component', () => {
         }
       ]
     );
-    component.rule = {
-      type: 'IsEqualToOrderingWithOneItemAtIncorrectPosition'
-    } as unknown as Rule;
-    component.currentInteractionId = 'DragAndDropSortInput';
+    ctrl.rule = {
+      type: 'MatchesExactlyWith'
+    };
+    ctrl.currentInteractionId = 'DummyInteraction2';
 
-    component.onSelectNewRuleType(
-      'IsEqualToOrderingWithOneItemAtIncorrectPosition');
-    flush();
+    ctrl.onSelectNewRuleType('MatchesExactlyWith');
+    $timeout.flush();
 
-    expect(component.ruleDescriptionFragments).toEqual([{
+    expect(ctrl.ruleDescriptionFragments).toEqual([{
       text: '',
       type: 'noneditable'
     }, {
@@ -366,11 +320,11 @@ describe('Rule Editor Component', () => {
       text: '',
       type: 'noneditable'
     }]);
-  }));
+  });
 
   it('should set ruleDescriptionFragments for' +
-    ' TranslatableHtmlContentId', fakeAsync(() => {
-    spyOn(responsesService, 'getAnswerChoices').and.returnValue(
+    ' TranslatableHtmlContentId', () => {
+    spyOn(ResponsesService, 'getAnswerChoices').and.returnValue(
       [
         {
           val: 'c',
@@ -378,28 +332,29 @@ describe('Rule Editor Component', () => {
         }
       ]
     );
-    component.rule = {
-      type: 'IsEqualToOrdering'
-    } as unknown as Rule;
-    component.currentInteractionId = 'DragAndDropSortInput';
-    component.onSelectNewRuleType('IsEqualToOrdering');
-    flush();
+    ctrl.rule = {
+      type: 'MatchesExactlyWith'
+    };
+    ctrl.currentInteractionId = 'DummyInteraction3';
 
-    expect(component.ruleDescriptionFragments).toEqual([{
+    ctrl.onSelectNewRuleType('MatchesExactlyWith');
+    $timeout.flush();
+
+    expect(ctrl.ruleDescriptionFragments).toEqual([{
       text: '',
       type: 'noneditable'
     }, {
-      type: 'dropdown',
+      type: 'dragAndDropHtmlStringSelect',
       varName: 'x'
     }, {
       text: '',
       type: 'noneditable'
     }]);
-  }));
+  });
 
   it('should set ruleDescriptionFragments for' +
-    ' DragAndDropPositiveInt', fakeAsync(() => {
-    spyOn(responsesService, 'getAnswerChoices').and.returnValue(
+    ' DragAndDropPositiveInt', () => {
+    spyOn(ResponsesService, 'getAnswerChoices').and.returnValue(
       [
         {
           val: 'c',
@@ -407,29 +362,38 @@ describe('Rule Editor Component', () => {
         }
       ]
     );
-    component.rule = {
-      type: 'HasElementXAtPositionY'
-    } as unknown as Rule;
-    component.currentInteractionId = 'DragAndDropSortInput';
+    ctrl.rule = {
+      type: 'MatchesExactlyWith'
+    };
+    ctrl.currentInteractionId = 'DummyInteraction4';
 
-    component.onSelectNewRuleType('HasElementXAtPositionY');
-    flush();
+    ctrl.onSelectNewRuleType('MatchesExactlyWith');
+    $timeout.flush();
 
-    expect(component.ruleDescriptionFragments.length).toEqual(5);
-  }));
+    expect(ctrl.ruleDescriptionFragments).toEqual([{
+      text: '',
+      type: 'noneditable'
+    }, {
+      type: 'dragAndDropPositiveIntSelect',
+      varName: 'x'
+    }, {
+      text: '',
+      type: 'noneditable'
+    }]);
+  });
 
   it('should set ruleDescriptionFragments as noneditable when answer' +
-    ' choices are empty', fakeAsync(() => {
-    spyOn(responsesService, 'getAnswerChoices').and.returnValue([]);
-    component.rule = {
+    ' choices are empty', () => {
+    spyOn(ResponsesService, 'getAnswerChoices').and.returnValue([]);
+    ctrl.rule = {
       type: 'MatchesExactlyWith'
-    } as unknown as Rule;
-    component.currentInteractionId = 'AlgebraicExpressionInput';
+    };
+    ctrl.currentInteractionId = 'DummyInteraction4';
 
-    component.onSelectNewRuleType('MatchesExactlyWith');
-    flush();
+    ctrl.onSelectNewRuleType('MatchesExactlyWith');
+    $timeout.flush();
 
-    expect(component.ruleDescriptionFragments).toEqual([{
+    expect(ctrl.ruleDescriptionFragments).toEqual([{
       text: '',
       type: 'noneditable'
     }, {
@@ -439,5 +403,5 @@ describe('Rule Editor Component', () => {
       text: '',
       type: 'noneditable'
     }]);
-  }));
+  });
 });

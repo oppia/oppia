@@ -82,8 +82,7 @@ class MockWindowRef {
       pathname: '/path/name',
       reload: () => {}
     },
-    onresize: () => {
-    },
+    onresize: null,
     addEventListener(event: string, callback) {
       callback({returnValue: null});
     },
@@ -635,7 +634,6 @@ describe('Conversation skin component', () => {
     componentInstance.displayedCard = displayedCard;
 
     componentInstance.ngOnInit();
-    window.dispatchEvent(new Event('resize'));
 
     mockOnHintConsumed.emit();
     mockOnSolutionViewedEventEmitter.emit();

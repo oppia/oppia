@@ -90,7 +90,7 @@ describe('Enable correctness feedback and set correctness', function() {
 
     await explorationEditorMainTab.setStateName('First');
     await explorationEditorMainTab.setContent(await forms.toRichText(
-      'Select the right option.'), true);
+      'Select the right option.'));
 
     // Create interaction first.
     await explorationEditorMainTab.setInteraction('MultipleChoiceInput', [
