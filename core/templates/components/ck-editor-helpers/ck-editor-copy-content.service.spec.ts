@@ -27,7 +27,8 @@ import { LoggerService } from 'services/contextual/logger.service';
  */
 const generateContent = (html: string): HTMLElement => {
   const container = document.createElement('template');
-  container.innerHTML = `<angular-html-bind>${html.trim()}</angular-html-bind>`;
+  container.innerHTML = (
+    `<angular-html-bind>${html.trim()}</angular-html-bind>`);
   // Return element inside <angular-html-bind />
   if (container.content.firstChild === null ||
     container.content.firstChild.firstChild === null) {
