@@ -71,7 +71,8 @@ describe('Version history backend api service', () => {
       '1', 'Introduction', 2
     ).then(successHandler, failureHandler);
 
-    const req = http.expectOne('/version_history/state/1/Introduction/2');
+    const req = http.expectOne(
+      '/version_history_handler/state/1/Introduction/2');
     expect(req.request.method).toEqual('GET');
     req.flush(sampleStateVersionHistoryDict);
     flushMicrotasks();
@@ -87,7 +88,8 @@ describe('Version history backend api service', () => {
       '1', 'Introduction', 2
     ).then(successHandler, failureHandler);
 
-    const req = http.expectOne('/version_history/state/1/Introduction/2');
+    const req = http.expectOne(
+      '/version_history_handler/state/1/Introduction/2');
     expect(req.request.method).toEqual('GET');
     req.flush({
       error: 'could not find the version history data'
@@ -136,7 +138,7 @@ describe('Version history backend api service', () => {
         .fetchMetadataVersionHistoryAsync('1', 2)
         .then(successHandler, failureHandler);
 
-      const req = http.expectOne('/version_history/metadata/1/2');
+      const req = http.expectOne('/version_history_handler/metadata/1/2');
       expect(req.request.method).toEqual('GET');
       req.flush(sampleMetadataVersionHistoryDict);
       flushMicrotasks();
@@ -153,7 +155,7 @@ describe('Version history backend api service', () => {
         .fetchMetadataVersionHistoryAsync('1', 2)
         .then(successHandler, failureHandler);
 
-      const req = http.expectOne('/version_history/metadata/1/2');
+      const req = http.expectOne('/version_history_handler/metadata/1/2');
       expect(req.request.method).toEqual('GET');
       req.flush({
         error: 'could not find the version history data'

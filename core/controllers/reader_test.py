@@ -3315,7 +3315,10 @@ class StateVersionHistoryHandlerUnitTests(test_utils.GenericTestBase):
             )
         )
         response_for_state_b = self.get_json(
-            '/version_history/state/%s/%s/%s' % (self.EXP_ID, 'b', 2)
+            '%s/%s/%s/%s' % (
+                feconf.STATE_VERSION_HISTORY_URL_PREFIX,
+                self.EXP_ID, 'b', 2
+            )
         )
 
         self.assertEqual(

@@ -55,10 +55,10 @@ export interface MetadataVersionHistoryResponse {
 })
 export class VersionHistoryBackendApiService {
   STATE_VERSION_HISTORY_URL_TEMPLATE = (
-    '/version_history/state/<exploration_id>/<state_name>/<version>');
+    '/version_history_handler/state/<exploration_id>/<state_name>/<version>');
 
   METADATA_VERSION_HISTORY_URL_TEMPLATE = (
-    '/version_history/metadata/<exploration_id>/<version>');
+    '/version_history_handler/metadata/<exploration_id>/<version>');
 
   constructor(
     private explorationMetadataObjectFactory: ExplorationMetadataObjectFactory,
