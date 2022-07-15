@@ -53,6 +53,7 @@ export interface TopicBackendDict {
   'practice_tab_is_displayed': boolean;
   'meta_tag_content': string;
   'page_title_fragment_for_web': string;
+  'skill_ids_for_diagnostic_test': string[];
 }
 
 import constants from 'assets/constants';
@@ -77,6 +78,7 @@ export class Topic {
   _practiceTabIsDisplayed: boolean;
   _metaTagContent: string;
   _pageTitleFragmentForWeb: string;
+  _skillsForDiagnosticTest: ShortSkillSummary[];
   storyReferenceObjectFactory: StoryReferenceObjectFactory;
   constructor(
       id: string | null,
@@ -97,7 +99,8 @@ export class Topic {
       storyReferenceObjectFactory: StoryReferenceObjectFactory,
       practiceTabIsDisplayed: boolean,
       metaTagContent: string,
-      pageTitleFragmentForWeb: string
+      pageTitleFragmentForWeb: string,
+      skillIdsForDiagnosticTest: string[]
   ) {
     this._id = id;
     this._name = name;
@@ -121,6 +124,11 @@ export class Topic {
     this._practiceTabIsDisplayed = practiceTabIsDisplayed;
     this._metaTagContent = metaTagContent;
     this._pageTitleFragmentForWeb = pageTitleFragmentForWeb;
+    this._skillsForDiagnosticTest = skillIdsForDiagnosticTest.map(
+      (skillId: string) => {
+        return ShortSkillSummary.create(
+          skillId, skillIdToDescriptionMap[skillId]);
+      });
   }
 
   // Returns 'null' when the topic is not yet fetched from the backend,
@@ -231,6 +239,10 @@ export class Topic {
       issues.push(
         'Topic url fragment should not be longer than ' +
         `${topicUrlFragmentCharLimit} characters.`);
+    }
+    if (this._skillsForDiagnosticTest.length === 0) {
+      issues.push(
+        'Skill for the diagnostic test in the topic should not be empty.')
     }
 
     let subtopics = this._subtopics;
@@ -545,6 +557,31 @@ export class Topic {
     return this._uncategorizedSkillSummaries.slice();
   }
 
+  getDiagnosticTestSkillSummaries(): ShortSkillSummary[] {
+    return this._skillsForDiagnosticTest.slice();
+  }
+
+  setDiagnosticTestSkillSummaries(
+      skillsForDiagnosticTest: ShortSkillSummary[]): void {
+    this._skillsForDiagnosticTest = skillsForDiagnosticTest;
+  }
+
+  getSkillSummariesThatAreNotInDiagnosticTest(): ShortSkillSummary[] {
+    let topicSkillSummaries = cloneDeep(this._uncategorizedSkillSummaries);
+    let subtopics = this._subtopics;
+    for (let i = 0; i < subtopics.length; i++) {
+      topicSkillSummaries = topicSkillSummaries.concat(
+        subtopics[i].getSkillSummaries());
+    }
+    let diagnosticTestSkillSummaries = this.getDiagnosticTestSkillSummaries();
+
+    return topicSkillSummaries.filter(object1 => {
+      return !diagnosticTestSkillSummaries.some(object2 => {
+        return object1.id === object2.id;
+      });
+    });
+  }
+
   // Reassigns all values within this topic to match the existing
   // topic. This is performed as a deep copy such that none of the
   // internal, bindable objects are changed within this topic.
@@ -560,6 +597,8 @@ export class Topic {
     this.setPracticeTabIsDisplayed(otherTopic.getPracticeTabIsDisplayed());
     this.setMetaTagContent(otherTopic.getMetaTagContent());
     this.setPageTitleFragmentForWeb(otherTopic.getPageTitleFragmentForWeb());
+    this.setDiagnosticTestSkillSummaries(
+      otherTopic.getDiagnosticTestSkillSummaries());
     this._version = otherTopic.getVersion();
     this._nextSubtopicId = otherTopic.getNextSubtopicId();
     this.clearAdditionalStoryReferences();
@@ -624,7 +663,8 @@ export class TopicObjectFactory {
       this.storyReferenceObjectFactory,
       topicBackendDict.practice_tab_is_displayed,
       topicBackendDict.meta_tag_content,
-      topicBackendDict.page_title_fragment_for_web
+      topicBackendDict.page_title_fragment_for_web,
+      topicBackendDict.skill_ids_for_diagnostic_test
     );
   }
 
@@ -637,7 +677,7 @@ export class TopicObjectFactory {
       null, 'Topic name loading', 'Abbrev. name loading',
       'Url Fragment loading', 'Topic description loading', 'en',
       [], [], [], 1, 1, [], null, '', {},
-      this.storyReferenceObjectFactory, false, '', ''
+      this.storyReferenceObjectFactory, false, '', '', []
     );
   }
 }

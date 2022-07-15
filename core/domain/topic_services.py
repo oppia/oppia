@@ -182,8 +182,8 @@ def apply_change_list(topic_id, change_list):
     modified_subtopic_pages_list = []
     modified_subtopic_pages = {}
     modified_subtopic_change_cmds = collections.defaultdict(list)
-
     for change in change_list:
+        print(change.cmd)
         if (change.cmd ==
                 subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY):
             if change.subtopic_id < topic.next_subtopic_id:
@@ -383,6 +383,7 @@ def _save_topic(committer_id, topic, commit_message, change_list):
     topic.validate(strict=topic_rights.topic_is_published)
 
     topic_model = topic_models.TopicModel.get(topic.id, strict=False)
+    print('In topic services 1', topic_model.skill_ids_for_diagnostic_test)
 
     # Topic model cannot be None as topic is passed as parameter here and that
     # is only possible if a topic model with that topic id exists. Also this is
@@ -425,6 +426,7 @@ def _save_topic(committer_id, topic, commit_message, change_list):
     topic_model.page_title_fragment_for_web = topic.page_title_fragment_for_web
     topic_model.skill_ids_for_diagnostic_test = (
         topic.skill_ids_for_diagnostic_test)
+    print('In topic services 2', topic_model.skill_ids_for_diagnostic_test)
     change_dicts = [change.to_dict() for change in change_list]
     topic_model.commit(committer_id, commit_message, change_dicts)
     caching_services.delete_multi(

@@ -1500,6 +1500,7 @@ class Topic:
                 will be used to update skill_ids_for_diagnostic_test field for
                 a topic.
         """
+        print("In topic domain", skill_ids_for_diagnostic_test)
         self.skill_ids_for_diagnostic_test = skill_ids_for_diagnostic_test
 
     def add_uncategorized_skill_id(

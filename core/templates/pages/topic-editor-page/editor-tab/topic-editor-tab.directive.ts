@@ -24,6 +24,10 @@ import { Subscription } from 'rxjs';
 // TODO(#9186): Change variable name to 'constants' once this file
 // is migrated to Angular.
 import topicConstants from 'assets/constants';
+import { ItemSelectionInputInteractionModule } from 'interactions/ItemSelectionInput/item-selection-input-interactions.module';
+import { clone, cloneDeep } from 'lodash';
+import { Skill } from 'domain/skill/SkillObjectFactory';
+import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 
 require(
   'components/common-layout-directives/common-elements/' +
@@ -132,6 +136,50 @@ angular.module('oppia').directive('topicEditorTab', [
             $scope.topicNameExists = false;
             $scope.topicUrlFragmentExists = false;
             $scope.hostname = WindowRef.nativeWindow.location.hostname;
+            $scope.availableSkillsForDiagnosticTest = $scope.topic.getSkillSummariesThatAreNotInDiagnosticTest();
+            $scope.selectedSkillsForDiagnosticTest = $scope.topic.getDiagnosticTestSkillSummaries()
+            $scope.isDiagnosticTestSkillsDropdownPresent = false;
+            $scope.isSelectedSkillsForDiagnosticTestEmpty = true;
+            $scope.selectedSkillForDiagnosticTest;
+
+            $scope.presentDiagnosticTestSkillDropdown = function() {
+              $scope.isDiagnosticTestSkillsDropdownPresent = true;
+            }
+            $scope.addSkillForDiagnosticTest = function(skillToAdd) {
+              console.log(skillToAdd);
+
+              $scope.selectedSkillsForDiagnosticTest.push(skillToAdd);
+              let j = 0;
+              for (let skill of $scope.availableSkillsForDiagnosticTest) {
+                if (skill.getId() === $scope.selectedSkillForDiagnosticTest.getId()) {
+                  $scope.availableSkillsForDiagnosticTest.splice(j, 1);
+                  break;
+                }
+                j++;
+              }
+              TopicUpdateService.updateDiagnosticTestSkills(
+                $scope.topic,
+                cloneDeep($scope.selectedSkillsForDiagnosticTest))
+              $scope.isDiagnosticTestSkillsDropdownPresent = false;
+              $scope.$applyAsync();
+            }
+
+            $scope.removeSkillFromDiagnosticTest = function(skillToRemove) {
+              let j = 0;
+              for (let skill of $scope.selectedSkillsForDiagnosticTest) {
+                if (skill.getId() === skillToRemove.getId()) {
+                  $scope.selectedSkillsForDiagnosticTest.splice(j, 1);
+                  break;
+                }
+                j++;
+              }
+              $scope.availableSkillsForDiagnosticTest.push(skillToRemove);
+
+              TopicUpdateService.updateDiagnosticTestSkills(
+                $scope.topic,
+                cloneDeep($scope.selectedSkillsForDiagnosticTest))
+              $scope.$applyAsync();
+            }
 
             $scope.editableDescriptionIsEmpty = (
               $scope.editableDescription === '');

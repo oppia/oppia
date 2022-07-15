@@ -353,17 +353,6 @@ class BaseHandler(webapp2.RequestHandler):
 
         url_path_args = self.request.route_kwargs
 
-        if (
-            handler_class_name in
-            handler_schema_constants.HANDLER_CLASS_NAMES_WITH_NO_SCHEMA
-        ):
-            # TODO(#13155): Remove this clause once all the handlers have had
-            # schema validation implemented.
-            if self.URL_PATH_ARGS_SCHEMAS or self.HANDLER_ARGS_SCHEMAS:
-                raise self.InternalErrorException(
-                    'Remove handler class name from '
-                    'HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS')
-            return
 
         handler_args = {}
         payload_arg_keys = []
@@ -390,6 +379,35 @@ class BaseHandler(webapp2.RequestHandler):
             else:
                 request_arg_keys.append(arg)
                 handler_args[arg] = self.request.get(arg)
+
+        print('\n'*3)
+        print('------------'*3)
+        print('Request url = ',self.request.uri)
+        print('Handler class name = ',handler_class_name)
+        print('handler_args = ',handler_args)
+        print('Arguments = ', self.request.arguments())
+        print('Iterating over arguments...')
+        for j in self.request.arguments():
+            print(j, self.request.get(j))
+        print('URL path elements = ', self.request.route_kwargs)
+        print('Request method = ',request_method)
+        print('HANDLER_ARGS_SCHEMAS =  ', self.HANDLER_ARGS_SCHEMAS)
+        print('URL_PATH_ARGS_SCHEMAS = , ', self.URL_PATH_ARGS_SCHEMAS)
+        print('GET_HANDLER_ERROR_RETURN_TYPE', self.GET_HANDLER_ERROR_RETURN_TYPE)
+        print('------------'*3)
+        print('\n'*3)
+
+        if (
+            handler_class_name in
+            handler_schema_constants.HANDLER_CLASS_NAMES_WITH_NO_SCHEMA
+        ):
+            # TODO(#13155): Remove this clause once all the handlers have had
+            # schema validation implemented.
+            if self.URL_PATH_ARGS_SCHEMAS or self.HANDLER_ARGS_SCHEMAS:
+                raise self.InternalErrorException(
+                    'Remove handler class name from '
+                    'HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS')
+            return
 
         # For html handlers, extra args are allowed (to accommodate
         # e.g. utm parameters which are not used by the backend but
