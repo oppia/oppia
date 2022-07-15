@@ -311,17 +311,17 @@ def get_multiple_exploration_rights_by_ids(
     """
     exp_rights_models = exp_models.ExplorationRightsModel.get_multi(
         exp_ids)
-    exp_models_list: List[Optional[rights_domain.ActivityRights]] = []
+    activity_rights_list: List[Optional[rights_domain.ActivityRights]] = []
 
     for model in exp_rights_models:
         if model is None:
-            exp_models_list.append(None)
+            activity_rights_list.append(None)
         else:
-            exp_models_list.append(
+            activity_rights_list.append(
                 get_activity_rights_from_model(
                     model, constants.ACTIVITY_TYPE_EXPLORATION))
 
-    return exp_models_list
+    return activity_rights_list
 
 
 def _get_activity_rights_where_user_is_owner(
@@ -562,7 +562,7 @@ def _get_activity_rights(
 
     Returns:
         ActivityRights|None. The rights object associated with the given
-        activity, and None if no rights object exists.
+        activity, or None if no rights object exists.
 
     Raises:
         Exception. The activity_type provided is unknown.
