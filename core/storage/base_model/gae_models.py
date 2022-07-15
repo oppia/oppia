@@ -59,6 +59,17 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import datastore_services
     from mypy_imports import transaction_services
+    from core.domain import change_domain  # pylint: disable=invalid-import # isort:skip
+
+    BaseCommitLogEntryCmdType = Union[
+        Sequence[Mapping[str, change_domain.AcceptableChangeDictTypes]],
+        Mapping[str, change_domain.AcceptableChangeDictTypes],
+        None
+    ]
+
+    BaseVersionedCommitCmdType = Sequence[
+        Mapping[str, change_domain.AcceptableChangeDictTypes]
+    ]
 
 transaction_services = models.Registry.import_transaction_services()
 datastore_services = models.Registry.import_datastore_services()
@@ -75,6 +86,17 @@ FETCH_BATCH_SIZE = 1000
 MAX_RETRIES = 10
 RAND_RANGE = (1 << 30) - 1
 ID_LENGTH = 12
+
+
+class SnapshotsMetaDataDict(TypedDict):
+    """Dictionary representing the snapshot metadata for versioned models."""
+
+    committer_id: str
+    commit_message: str
+    commit_cmds: List[Dict[str, change_domain.AcceptableChangeDictTypes]]
+    commit_type: str
+    version_number: int
+    created_on_ms: float
 
 
 # Types of deletion policies. The pragma comment is needed because Enums are
@@ -687,8 +709,6 @@ class BaseCommitLogEntryModel(BaseModel):
         """
         return cls.query(cls.user_id == user_id).get(keys_only=True) is not None
 
-    # TODO(#13523): Change 'commit_cmds' to domain object/TypedDict to
-    # remove Any from type-annotation below.
     @classmethod
     def create(
             cls: Type[SELF_BASE_COMMIT_LOG_ENTRY_MODEL],
@@ -697,7 +717,7 @@ class BaseCommitLogEntryModel(BaseModel):
             committer_id: str,
             commit_type: str,
             commit_message: str,
-            commit_cmds: Union[Dict[str, Any], List[Dict[str, Any]], None],
+            commit_cmds: BaseCommitLogEntryCmdType,
             status: str,
             community_owned: bool
     ) -> SELF_BASE_COMMIT_LOG_ENTRY_MODEL:
@@ -953,14 +973,12 @@ class VersionedModel(BaseModel):
         """
         return {}
 
-    # TODO(#13523): Change 'commit_cmds' to domain object/TypedDict to
-    # remove Any from type-annotation below.
     def compute_models_to_commit(
         self,
         committer_id: str,
         commit_type: str,
         commit_message: str,
-        commit_cmds: List[Dict[str, Any]],
+        commit_cmds: BaseVersionedCommitCmdType,
         # We expect Mapping because we want to allow models that inherit
         # from BaseModel as the values, if we used Dict this wouldn't
         # be allowed.
@@ -1227,13 +1245,11 @@ class VersionedModel(BaseModel):
             'The put() method is missing from the '
             'derived class. It should be implemented in the derived class.')
 
-    # TODO(#13523): Change 'commit_cmds' to domain object/TypedDict to
-    # remove Any from type-annotation below.
     def commit(
         self,
         committer_id: str,
         commit_message: str,
-        commit_cmds: List[Dict[str, Any]]
+        commit_cmds: BaseVersionedCommitCmdType
     ) -> None:
         """Saves a version snapshot and updates the model.
 
@@ -1314,7 +1330,7 @@ class VersionedModel(BaseModel):
                 'Reverting objects of type %s is not allowed.'
                 % model.__class__.__name__)
 
-        commit_cmds = [{
+        commit_cmds: List[Dict[str, Union[str, int]]] = [{
             'cmd': model.CMD_REVERT_COMMIT,
             'version_number': version_number
         }]
@@ -1542,15 +1558,13 @@ class VersionedModel(BaseModel):
         else:
             return cls.get_version(entity_id, version, strict=strict)
 
-    # TODO(#13523): Change 'snapshot' to domain object/TypedDict to
-    # remove Any from type-annotation below.
     @classmethod
     def get_snapshots_metadata(
             cls,
             model_instance_id: str,
             version_numbers: List[int],
             allow_deleted: bool = False
-    ) -> List[Dict[str, Any]]:
+    ) -> List[SnapshotsMetaDataDict]:
         """Gets a list of dicts, each representing a model snapshot.
 
         One dict is returned for each version number in the list of version

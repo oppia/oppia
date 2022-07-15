@@ -22,23 +22,30 @@ import copy
 
 from core import feconf
 from core import utils
-from core.domain import state_domain
 
 from typing import Any, Dict, List, Mapping, Union, cast
 
-# Union type defined from allowed types that a Dict can contain for its values.
-AcceptableChangeDictTypes = Union[
-    str,
-    bool,
-    int,
-    None,
-    List[str],
-    List[Dict[str, Any]],
-    Dict[str, Any],
-    state_domain.SubtitledHtmlDict,
-    List[state_domain.AnswerGroupDict],
-    state_domain.RecordedVoiceoversDict,
-]
+MYPY = False
+if MYPY: # pragma: no cover
+    from core.domain import platform_parameter_domain
+    from core.domain import state_domain
+
+    # Union type defined from allowed types that a Dict can contain
+    # for its values.
+    AcceptableChangeDictTypes = Union[
+        str,
+        bool,
+        int,
+        float,
+        None,
+        List[str],
+        List[Dict[str, Any]],
+        Dict[str, Any],
+        state_domain.SubtitledHtmlDict,
+        List[state_domain.AnswerGroupDict],
+        List[platform_parameter_domain.PlatformParameterRuleDict],
+        state_domain.RecordedVoiceoversDict,
+    ]
 
 
 def validate_cmd(

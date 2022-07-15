@@ -24,6 +24,7 @@ from core import feconf
 from core import utils
 from core.constants import constants
 from core.domain import activity_services
+from core.domain import change_domain
 from core.domain import rights_domain
 from core.domain import role_services
 from core.domain import subscription_services
@@ -32,7 +33,9 @@ from core.domain import user_domain
 from core.domain import user_services
 from core.platform import models
 
-from typing import Any, Dict, List, Optional, Sequence, Type, Union, overload
+from typing import (
+    Dict, List, Mapping, Optional, Sequence, Type, Union, overload
+)
 from typing_extensions import Literal
 
 MYPY = False
@@ -96,7 +99,7 @@ def _save_activity_rights(
     activity_rights: rights_domain.ActivityRights,
     activity_type: str,
     commit_message: str,
-    commit_cmds: List[Dict[str, Any]]
+    commit_cmds: Sequence[Mapping[str, change_domain.AcceptableChangeDictTypes]]
 ) -> None:
     """Saves an ExplorationRights or CollectionRights domain object to the
     datastore.
@@ -213,7 +216,7 @@ def update_activity_first_published_msec(
     activity_rights = _get_activity_rights(activity_type, activity_id)
     # Ruling out the possibility of None for mypy type checking.
     assert activity_rights is not None
-    commit_cmds = [{
+    commit_cmds: List[Dict[str, Union[str, Optional[float]]]] = [{
         'cmd': rights_domain.CMD_UPDATE_FIRST_PUBLISHED_MSEC,
         'old_first_published_msec': activity_rights.first_published_msec,
         'new_first_published_msec': first_published_msec
@@ -236,7 +239,7 @@ def create_new_exploration_rights(
     """
     exploration_rights = rights_domain.ActivityRights(
         exploration_id, [committer_id], [], [], [])
-    commit_cmds = [{'cmd': rights_domain.CMD_CREATE_NEW}]
+    commit_cmds: List[Dict[str, str]] = [{'cmd': rights_domain.CMD_CREATE_NEW}]
 
     exp_models.ExplorationRightsModel(
         id=exploration_rights.id,
@@ -1409,7 +1412,7 @@ def set_private_viewability_of_exploration(
             'but that is already the current value.' % viewable_if_private)
 
     exploration_rights.viewable_if_private = viewable_if_private
-    commit_cmds = [{
+    commit_cmds: List[Dict[str, Union[str, bool]]] = [{
         'cmd': rights_domain.CMD_CHANGE_PRIVATE_VIEWABILITY,
         'old_viewable_if_private': old_viewable_if_private,
         'new_viewable_if_private': viewable_if_private,
