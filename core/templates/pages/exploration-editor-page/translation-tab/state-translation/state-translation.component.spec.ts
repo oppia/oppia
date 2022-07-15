@@ -134,6 +134,7 @@ describe('State translation component', function() {
           }],
           outcome: {
             dest: 'unused',
+            dest_if_really_stuck: null,
             feedback: {
               content_id: 'feedback_1',
               html: ''
@@ -143,6 +144,7 @@ describe('State translation component', function() {
           rule_specs: [],
           outcome: {
             dest: 'unused',
+            dest_if_really_stuck: null,
             feedback: {
               content_id: 'feedback_2',
               html: ''
@@ -151,6 +153,7 @@ describe('State translation component', function() {
         }],
         default_outcome: {
           dest: 'default',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'default_outcome',
             html: 'Default Outcome'
@@ -221,6 +224,7 @@ describe('State translation component', function() {
         answer_groups: [],
         default_outcome: {
           dest: 'default',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'default_outcome',
             html: 'Default Outcome'
@@ -285,6 +289,7 @@ describe('State translation component', function() {
         answer_groups: [],
         default_outcome: {
           dest: 'default',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'default_outcome',
             html: 'Default Outcome'
@@ -999,6 +1004,7 @@ describe('State translation component', function() {
               rule_specs: [],
               outcome: {
                 dest: 'unused',
+                dest_if_really_stuck: null,
                 feedback: {
                   content_id: 'feedback_1',
                   html: ''
@@ -1010,6 +1016,7 @@ describe('State translation component', function() {
             }],
             default_outcome: {
               dest: 'default',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'default_outcome',
                 html: 'Default Outcome'
