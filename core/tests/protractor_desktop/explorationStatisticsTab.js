@@ -71,7 +71,7 @@ describe('Statistics tab', function() {
     await explorationEditorPage.navigateToMainTab();
     await explorationEditorMainTab.setStateName('One');
     await explorationEditorMainTab.setContent(
-      await forms.toRichText('Please write 1 in words.'));
+      await forms.toRichText('Please write 1 in words.'), true);
     await explorationEditorMainTab.setInteraction('TextInput');
     await explorationEditorMainTab.addResponse(
       'TextInput', await forms.toRichText('Good job'), 'Two', true, 'Equals',
@@ -82,7 +82,7 @@ describe('Statistics tab', function() {
 
     await explorationEditorMainTab.moveToState('Two');
     await explorationEditorMainTab.setContent(
-      await forms.toRichText('Please write 2 in words.'));
+      await forms.toRichText('Please write 2 in words.'), true);
     await explorationEditorMainTab.setInteraction('TextInput');
     await explorationEditorMainTab.addResponse(
       'TextInput', await forms.toRichText('Good job'), 'Three', true, 'Equals',
@@ -97,7 +97,7 @@ describe('Statistics tab', function() {
     });
     await explorationEditorMainTab.moveToState('Three');
     await explorationEditorMainTab.setContent(
-      await forms.toRichText('Please write 3 in words.'));
+      await forms.toRichText('Please write 3 in words.'), true);
     await explorationEditorMainTab.setInteraction('TextInput');
     await explorationEditorMainTab.addResponse(
       'TextInput', await forms.toRichText('Good job'), 'End', true, 'Equals',

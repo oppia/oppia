@@ -681,14 +681,14 @@ describe('Exploration history', function() {
     // First card.
     await explorationEditorMainTab.setStateName('first');
     await explorationEditorMainTab.setContent(await forms.toRichText(
-      'enter 6 to continue'));
+      'enter 6 to continue'), true);
     await explorationEditorMainTab.setInteraction('NumericInput');
     await explorationEditorMainTab.addResponse(
       'NumericInput', null, 'second', true, 'Equals', 6);
     // Second card.
     await explorationEditorMainTab.moveToState('second');
     await explorationEditorMainTab.setContent(
-      await forms.toRichText('card 2 second commit text'));
+      await forms.toRichText('card 2 second commit text'), true);
     await explorationEditorMainTab.setInteraction('Continue');
     var responseEditor = await explorationEditorMainTab.getResponseEditor(
       'default');
@@ -705,7 +705,7 @@ describe('Exploration history', function() {
     await explorationEditorMainTab.setStateName('third');
     await explorationEditorMainTab.moveToState('second');
     await explorationEditorMainTab.setContent(
-      await forms.toRichText('card 2 third commit text'));
+      await forms.toRichText('card 2 third commit text'), true);
     await explorationEditorPage.saveChanges();
     expectedHistoryStates = [{
       label: 'third (was: first)',
