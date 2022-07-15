@@ -1459,7 +1459,7 @@ class LearnerActionTests(test_utils.GenericTestBase):
         self.assertEqual(
             playthrough.actions[0].action_type, 'ExplorationStart1')
         self.assertEqual(
-            playthrough.actions[0].action_customization_args['new_key'], 5)
+            playthrough.actions[0].action_customization_args['new_key'], {'value': 5})
 
         # For other action types, no changes happen during migration.
         learner_action1 = stats_domain.LearnerAction('ExplorationQuit', {}, 1)
