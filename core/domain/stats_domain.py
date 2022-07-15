@@ -145,6 +145,7 @@ class ExplorationStatsFrontendDict(TypedDict):
     num_completions: int
     state_stats_mapping: Dict[str, Dict[str, int]]
 
+
 # In argument 'customization_args', we used Any type because it accepts the
 # values of customization args and that values can be of type str, int, Dict,
 # bool, List and other types too. So to make it generalize for every type of
