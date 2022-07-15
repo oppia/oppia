@@ -639,7 +639,7 @@ describe('Conversation skin component', () => {
     componentInstance.displayedCard = displayedCard;
 
     componentInstance.ngOnInit();
-    window.dispatchEvent(new Event('resize'));
+    windowRef.nativeWindow.onresize(null);
 
     mockOnHintConsumed.emit();
     mockOnSolutionViewedEventEmitter.emit();
@@ -732,6 +732,8 @@ describe('Conversation skin component', () => {
     componentInstance.displayedCard = displayedCard;
 
     componentInstance.ngOnInit();
+    windowRef.nativeWindow.onresize(null);
+    tick(100);
   }));
 
   it('should initialize component as logged out user', fakeAsync(() => {
@@ -817,6 +819,8 @@ describe('Conversation skin component', () => {
     componentInstance.displayedCard = displayedCard;
 
     componentInstance.ngOnInit();
+    windowRef.nativeWindow.onresize(null);
+    tick(100);
   }));
 
   it('should convert logged out progress to logged in progress when user ' +
