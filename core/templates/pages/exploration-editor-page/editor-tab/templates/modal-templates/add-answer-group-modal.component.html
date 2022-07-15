@@ -59,7 +59,6 @@
     <oppia-outcome-if-stuck-destination-editor [outcome]="tmpOutcome"
                                                (get-changes)="getChanges()"
                                                ng-if="!questionModeEnabled && destIfStuckFeatEnabled && !tmpOutcome.labelledAsCorrect"
-                                               [outcome-has-feedback]="!isLinearWithNoFeedback(tmpOutcome)"
                                                (add-state)="addState($event)">
     </oppia-outcome-if-stuck-destination-editor>
   </form>
