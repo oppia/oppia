@@ -193,6 +193,24 @@ describe('Change List Service when changes are mergable', () => {
     expect(saveSpy).toHaveBeenCalled();
   }));
 
+  it('should add Written Translation', fakeAsync(() => {
+    changeListService.changeListAddedTimeoutId = 10;
+    changeListService.explorationChangeList.length = 0;
+    changeListService.loadingMessage = null;
+    changeListService.addWrittenTranslation(
+      'contentId', 'dataFormat',
+      'languageCode', 'stateName', 'translationHtml');
+
+    let saveSpy = spyOn(
+      changeListService.autosaveInProgressEventEmitter, 'emit')
+      .and.callThrough();
+
+    changeListService.addState('state');
+    flush();
+
+    expect(saveSpy).toHaveBeenCalled();
+  }));
+
   it('should save changes after renaming a state ' +
     'when calling \'renameState\'', fakeAsync(() => {
     changeListService.changeListAddedTimeoutId = 10;

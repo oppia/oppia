@@ -1,8 +1,8 @@
 <div class="list-group skill-selector-editor">
-  <mat-card layout="row" class="list-view-item protractor-test-skill-select-header">
+  <mat-card layout="row" class="list-view-item e2e-test-skill-select-header">
     Search By Skill
     <input type="text"
-           class="form-control protractor-test-skill-name-input"
+           class="form-control e2e-test-skill-name-input"
            placeholder="Enter a skill name"
            [(ngModel)]="skillFilterText"
            (ngModelChange)="filterSkills($event)"
@@ -13,7 +13,7 @@
     <loading-dots></loading-dots>
   </div>
   <div class="skill-selector-item-container">
-    <div class="oppia-list-group-item-text list-group-item protractor-test-rte-skill-selector-item"
+    <div class="oppia-list-group-item-text list-group-item e2e-test-rte-skill-selector-item"
          *ngFor="let skill of skillsToShow"
          (click)="selectSkill(skill.id, skill.description)"
          [ngClass]="{'list-group-item-success': (skill.id === value)}">
@@ -21,19 +21,19 @@
       <div *ngIf="skill.id === value" class="oppia-skill-summary-text">
         <strong> Explanation </strong>
         <div class="skill-explanation-container">
-          <angular-html-bind-wrapper [htmlData]="skill.skill_contents.explanation.html">
-          </angular-html-bind-wrapper>
+          <oppia-rte-output-display [rteString]="skill.skill_contents.explanation.html">
+          </oppia-rte-output-display>
         </div>
         <strong> Worked Examples </strong>
         <ul>
           <li *ngFor="let example of skill.skill_contents.worked_examples" class="worked-example-container">
             <b> Question: </b>
-            <angular-html-bind-wrapper [htmlData]="example.question.html">
-            </angular-html-bind-wrapper>
+            <oppia-rte-output-display [rteString]="example.question.html">
+            </oppia-rte-output-display>
             <div class="worked-example-explanation-section">
               <b> Explanation: </b>
-              <angular-html-bind-wrapper [htmlData]="example.explanation.html">
-              </angular-html-bind-wrapper>
+              <oppia-rte-output-display [rteString]="example.explanation.html">
+              </oppia-rte-output-display>
             </div>
           </li>
         </ul>

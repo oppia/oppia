@@ -38,8 +38,11 @@ import { NumberWithUnitsRulesService } from './number-with-units-rules.service';
 })
 export class InteractiveNumberWithUnitsComponent
     implements OnInit, OnDestroy {
-  @Input() labelForFocusTarget: string;
-  @Input() savedSolution: InteractionAnswer;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() labelForFocusTarget!: string;
+  @Input() savedSolution!: InteractionAnswer;
   componentSubscriptions: Subscription = new Subscription();
   FORM_ERROR_TYPE: string = 'NUMBER_WITH_UNITS_FORMAT_ERROR';
   errorMessageI18nKey: string = '';
@@ -69,7 +72,8 @@ export class InteractiveNumberWithUnitsComponent
         this.errorMessageI18nKey = '';
         this.isValid = true;
       } catch (parsingError) {
-        this.errorMessageI18nKey = parsingError.message;
+        let error = parsingError as Error;
+        this.errorMessageI18nKey = error.message;
         this.isValid = false;
       }
       this.currentInteractionService.updateViewWithNewAnswer();
@@ -111,7 +115,8 @@ export class InteractiveNumberWithUnitsComponent
         numberWithUnits,
         this.numberWithUnitsRulesService as unknown as InteractionRulesService);
     } catch (parsingError) {
-      this.errorMessageI18nKey = parsingError.message;
+      let error = parsingError as Error;
+      this.errorMessageI18nKey = error.message;
       this.isValid = false;
     }
   }

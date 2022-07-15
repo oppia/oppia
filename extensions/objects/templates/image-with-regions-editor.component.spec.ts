@@ -149,8 +149,10 @@ describe('ImageWithRegionsEditorComponent', () => {
     spyOn(component, 'imageValueChanged').and.callThrough();
     spyOn(contextService, 'getEntityType').and.returnValue(
       AppConstants.ENTITY_TYPE.EXPLORATION);
+    spyOn(contextService, 'getEntityId').and.returnValue('skill_1');
     spyOn(contextService, 'getExplorationId').and.returnValue('exploration_id');
     spyOn(component.valueChanged, 'emit');
+    spyOn(component, 'getPreviewUrl');
 
     component.ngOnInit();
 

@@ -2,11 +2,11 @@
   <div *ngFor="let warning of (getWarnings() | limitTo:5)"
        class="toast oppia-toast-warning oppia-toast">
     <button type="button"
-            class="toast-close-button protractor-test-close-toast-warning"
+            class="toast-close-button e2e-test-close-toast-warning"
             (click)="deleteWarning(warning)"
             role="button">&times;
     </button>
-    <div class="toast-message protractor-test-toast-warning-message">
+    <div class="toast-message e2e-test-toast-warning-message">
       {{ warning.content }}
     </div>
   </div>
