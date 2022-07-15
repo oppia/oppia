@@ -1,10 +1,10 @@
-<span><pre>{{ answer.code }}</pre></span>
+<span><pre>{{ escapedAnswer.code }}</pre></span>
 
-<span *ngIf="answer.output">
+<span *ngIf="escapedAnswer.output">
   <h5>Output</h5>
-  <pre>{{ answer.output | truncateAtFirstLine }}</pre>
+  <pre>{{ escapedAnswer.output | truncateAtFirstLine }}</pre>
 </span>
 
-<span *ngIf="answer.error" [oppiaFocusOn]="errorFocusLabel">
-  <font color="red">Error: {{ answer.error }}</font><br>
+<span *ngIf="escapedAnswer.error" [oppiaFocusOn]="errorFocusLabel">
+  <font color="red">Error: {{ escapedAnswer.error }}</font><br>
 </span>
