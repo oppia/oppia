@@ -66,6 +66,9 @@
       ],
       "tests/*": [
         "core/templates/tests/*"
+      ],
+      "utility/*": [
+        "core/templates/utility/*"
       ]
     },
     "resolveJsonModule": true,

@@ -20,20 +20,19 @@ import 'zone.js';
 
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { AngularHtmlBindWrapperDirective } from './angular-html-bind-wrapper.directive';
-
+import { InteractionDisplayComponent } from './interaction-display.component';
 
 @NgModule({
   imports: [
     CommonModule,
   ],
   declarations: [
-    AngularHtmlBindWrapperDirective
+    InteractionDisplayComponent
   ],
   entryComponents: [
   ],
   exports: [
-    AngularHtmlBindWrapperDirective
+    InteractionDisplayComponent
   ],
 })
 
