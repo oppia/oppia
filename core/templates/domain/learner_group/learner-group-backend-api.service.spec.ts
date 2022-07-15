@@ -249,4 +249,30 @@ describe('Learner Group Backend API Service', () => {
       expect(failHandler).toHaveBeenCalledWith(401);
     })
   );
+
+  it('should successfully search new student to add', fakeAsync(() => {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+
+    const SEARCH_STUDENT_URL = (
+      '/learner_group_search_student_handler'
+    );
+    const sampleUserInfo = {
+      username: 'username1',
+      user_profile_picture_url: 'profile_picture_url1',
+      error: ''
+    };
+
+    learnerGroupBackendApiService.searchNewStudentToAddAsync(
+      'groupId', 'username1').then(successHandler, failHandler);
+
+    var req = httpTestingController.expectOne(SEARCH_STUDENT_URL);
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleUserInfo);
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(sampleUserInfo);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
 });

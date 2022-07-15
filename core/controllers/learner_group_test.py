@@ -690,3 +690,93 @@ class FacilitatorDashboardPageTests(test_utils.GenericTestBase):
             config_domain.LEARNER_GROUPS_ARE_ENABLED, True)
         self.get_html_response('/facilitator-dashboard')
         self.logout()
+
+
+class LearnerGroupSearchStudentHandler(test_utils.GenericTestBase):
+    """Tests searching a given user to invite to the learner group"""
+
+    def setUp(self):
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+
+    def test_searching_invalid_user(self):
+        params = {
+            'username': 'invalid_username',
+            'learner_group_id': 'groupId'
+        }
+        response = self.get_json(
+            '/learner-group-search-student-handler', params=params
+        )
+        
+        self.assertEqual(response['username'], 'invalid_username')
+        self.assertEqual(response['profile_picture_data_url'], '')
+        self.assertEqual(
+            response['error'],
+            'User with username invalid_username does not exist.'
+        )
+        self.logout()
+
+    def test_searching_user_to_add_being_the_owner(self):
+        params = {
+            'username': self.OWNER_USERNAME,
+            'learner_group_id': 'groupId'
+        }
+        response = self.get_json(
+            '/learner-group-search-student-handler', params=params
+        )
+        
+        self.assertEqual(response['username'], self.OWNER_USERNAME)
+        self.assertEqual(response['profile_picture_data_url'], '')
+        self.assertEqual(
+            response['error'],
+            'You cannot invite yourself to the group'
+        )
+        self.logout()
+
+    def test_searching_an_already_invited_user(self):
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
+        learner_group_services.create_learner_group(
+            'groupId', 'Group Title', 'Group Description',
+            [self.owner_id], [self.new_user_id], ['subtopic1'], [])
+        params = {
+            'username': self.NEW_USER_USERNAME,
+            'learner_group_id': 'groupId'
+        }
+        response = self.get_json(
+            '/learner-group-search-student-handler', params=params
+        )
+        
+        self.assertEqual(response['username'], self.NEW_USER_USERNAME)
+        self.assertEqual(response['profile_picture_data_url'], '')
+        self.assertEqual(
+            response['error'],
+            'User with username %s has already be invited to join the '
+            'learner group' % self.NEW_USER_USERNAME
+        )
+        self.logout()
+
+    def test_searching_a_valid_user_to_invite(self):
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
+        learner_group_services.create_learner_group(
+            'groupId', 'Group Title', 'Group Description',
+            [self.owner_id], [], ['subtopic1'], [])
+        params = {
+            'username': self.NEW_USER_USERNAME,
+            'learner_group_id': 'groupId'
+        }
+        response = self.get_json(
+            '/learner-group-search-student-handler', params=params
+        )
+        
+        user_settings = user_services.get_user_settings_from_username(
+            self.NEW_USER_USERNAME)
+        self.assertEqual(response['username'], user_settings.username)
+        self.assertEqual(
+            response['profile_picture_data_url'],
+            user_settings.profile_picture_data_url
+        )
+        self.assertEqual(response['error'], '')
+        self.logout()

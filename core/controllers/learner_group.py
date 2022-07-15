@@ -552,7 +552,7 @@ class LearnerGroupSearchStudentHandler(base.BaseHandler):
             self.render_json({
                 'username': user_settings.username,
                 'profile_picture_data_url': '',
-                'error': ('You cannot invite yourself to the group')
+                'error': 'You cannot invite yourself to the group'
             })
             return
 
