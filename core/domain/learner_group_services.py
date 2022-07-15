@@ -262,7 +262,13 @@ def get_matching_learner_group_syllabus_to_add(
         for classroom in all_classrooms_dict:
             if category and classroom['name'] == category:
                 matching_topic_ids.extend(classroom['topic_ids'])
-        matching_topics = topic_fetchers.get_topics_by_ids(matching_topic_ids)
+        matching_topics_with_none = (
+            topic_fetchers.get_topics_by_ids(matching_topic_ids)
+        )
+        for topic in matching_topics_with_none:
+            # Ruling out the possibility of None for mypy type checking.
+            assert topic is not None
+            matching_topics.append(topic)
     else:
         matching_topics = topic_fetchers.get_all_topics()
 
