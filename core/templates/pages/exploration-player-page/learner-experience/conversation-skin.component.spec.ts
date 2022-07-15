@@ -82,7 +82,8 @@ class MockWindowRef {
       pathname: '/path/name',
       reload: () => {}
     },
-    onresize: null,
+    onresize: () => {
+    },
     addEventListener(event: string, callback) {
       callback({returnValue: null});
     },
@@ -638,6 +639,7 @@ describe('Conversation skin component', () => {
     componentInstance.displayedCard = displayedCard;
 
     componentInstance.ngOnInit();
+    window.dispatchEvent(new Event('resize'));
 
     mockOnHintConsumed.emit();
     mockOnSolutionViewedEventEmitter.emit();
@@ -1788,5 +1790,16 @@ describe('Conversation skin component', () => {
     componentInstance.showProgressClearanceMessage = true;
 
     expect(componentInstance.isProgressClearanceMessageShown()).toBeTrue();
+  });
+
+  it('should update when submit button is enabled', () => {
+    componentInstance.submitButtonIsDisabled = false;
+    spyOn(componentInstance, 'isSubmitButtonDisabled').and.returnValue(
+      !componentInstance.submitButtonIsDisabled);
+
+    componentInstance.ngAfterViewChecked();
+
+    expect(componentInstance.submitButtonIsDisabled).toBeTrue();
+    expect(componentInstance.isSubmitButtonDisabled).toHaveBeenCalled();
   });
 });
