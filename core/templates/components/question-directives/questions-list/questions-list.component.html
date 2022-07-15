@@ -65,7 +65,10 @@
           <div *ngIf="!deletedQuestionIds.includes(questionSummaryForOneSkill.getQuestionSummary().getQuestionId())"
                (click)="editQuestion(questionSummaryForOneSkill.getQuestionSummary(), questionSummaryForOneSkill.getSkillDescription(), questionSummaryForOneSkill.getSkillDifficulty())">
             <div class="question-data">
-              <angular-html-bind-wrapper classStr="question-text" [htmlData]="questionSummaryForOneSkill.getQuestionSummary().getQuestionContent()"></angular-html-bind-wrapper>
+              <!-- Shivam PTAL -->
+              <oppia-rte-output-display classStr="question-text"
+                                         [rteString]="questionSummaryForOneSkill.getQuestionSummary().getQuestionContent()">
+              </oppia-rte-output-display>
               <span *ngIf="!showUnaddressedSkillMisconceptionWarning(questionSummaryForOneSkill.getQuestionSummary().getMisconceptionIds())">⚠️</span>
               <span (click)="deleteQuestionFromSkill(questionSummaryForOneSkill.getQuestionSummary().getQuestionId(), questionSummaryForOneSkill.getSkillDescription());$event.stopPropagation();"
                     class="link-off-icon">

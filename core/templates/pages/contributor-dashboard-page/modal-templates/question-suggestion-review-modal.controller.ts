@@ -17,6 +17,7 @@
  */
 
 import { ThreadMessage } from 'domain/feedback_message/ThreadMessage.model';
+import { QuestionSuggestionEditorModalComponent } from './question-suggestion-editor-modal.component';
 
 require('domain/skill/skill-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
@@ -32,21 +33,22 @@ require(
   'thread-data-backend-api.service.ts');
 
 angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
-  '$rootScope', '$scope', '$uibModal', '$uibModalInstance', 'ContextService',
+  '$rootScope', '$scope', '$uibModalInstance', 'ContextService',
   'ContributionOpportunitiesService', 'SkillBackendApiService',
   'SiteAnalyticsService', 'SuggestionModalService',
-  'ThreadDataBackendApiService', 'UrlInterpolationService',
-  'authorName', 'contentHtml', 'misconceptionsBySkill', 'question',
+  'ThreadDataBackendApiService',
+  'authorName', 'contentHtml', 'misconceptionsBySkill', 'NgbModal', 'question',
   'questionHeader', 'reviewable', 'skillDifficulty', 'skillRubrics',
   'suggestion', 'suggestionId', 'editSuggestionCallback',
   'ACTION_ACCEPT_SUGGESTION', 'ACTION_REJECT_SUGGESTION',
   'SKILL_DIFFICULTY_LABEL_TO_FLOAT',
   function(
-      $rootScope, $scope, $uibModal, $uibModalInstance, ContextService,
+      $rootScope, $scope, $uibModalInstance, ContextService,
       ContributionOpportunitiesService, SkillBackendApiService,
       SiteAnalyticsService, SuggestionModalService,
-      ThreadDataBackendApiService, UrlInterpolationService,
-      authorName, contentHtml, misconceptionsBySkill, question, questionHeader,
+      ThreadDataBackendApiService,
+      authorName, contentHtml, misconceptionsBySkill, NgbModal,
+      question, questionHeader,
       reviewable, skillDifficulty, skillRubrics,
       suggestion, suggestionId, editSuggestionCallback,
       ACTION_ACCEPT_SUGGESTION, ACTION_REJECT_SUGGESTION,
@@ -149,26 +151,23 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
       $uibModalInstance.dismiss();
       SkillBackendApiService.fetchSkillAsync(
         suggestion.change.skill_id).then((skillDict) => {
-        $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/contributor-dashboard-page/modal-templates/' +
-            'question-suggestion-editor-modal.directive.html'),
+        let modalRef = NgbModal.open(QuestionSuggestionEditorModalComponent, {
           size: 'lg',
           backdrop: 'static',
           keyboard: false,
-          resolve: {
-            suggestionId: () => suggestionId,
-            question: () => question,
-            questionId: () => '',
-            questionStateData: () => question.getStateData(),
-            skill: () => skillDict.skill,
-            skillDifficulty: () => skillDifficulty
-          },
-          controller: 'QuestionSuggestionEditorModalController'
-        }).result.then(function() {
+        });
+
+        modalRef.componentInstance.suggestionId = suggestionId;
+        modalRef.componentInstance.question = question;
+        modalRef.componentInstance.questionId = '';
+        modalRef.componentInstance.questionStateData = question.getStateData();
+        modalRef.componentInstance.skill = skillDict.skill;
+        modalRef.componentInstance.skillDifficulty = skillDifficulty;
+
+        modalRef.result.then(() => {
           editSuggestionCallback(
             suggestionId, suggestion, reviewable, question);
-        }, function() {
+        }, () => {
           ContextService.resetImageSaveDestination();
           editSuggestionCallback(suggestionId, suggestion, reviewable);
         });

@@ -59,20 +59,21 @@ require('services/site-analytics.service.ts');
 
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { QuestionsOpportunitiesSelectDifficultyModalComponent } from 'pages/topic-editor-page/modal-templates/questions-opportunities-select-difficulty-modal.component';
+import { QuestionSuggestionEditorModalComponent } from '../modal-templates/question-suggestion-editor-modal.component';
 
 angular.module('oppia').component('questionOpportunities', {
   template: require('./question-opportunities.component.html'),
   controller: [
-    '$rootScope', '$uibModal', 'AlertsService', 'ContextService',
+    '$rootScope', 'AlertsService', 'ContextService',
     'ContributionOpportunitiesService', 'NgbModal',
     'QuestionObjectFactory', 'QuestionUndoRedoService',
-    'SiteAnalyticsService', 'UrlInterpolationService',
+    'SiteAnalyticsService',
     'UserService', 'MAX_QUESTIONS_PER_SKILL',
     function(
-        $rootScope, $uibModal, AlertsService, ContextService,
+        $rootScope, AlertsService, ContextService,
         ContributionOpportunitiesService, NgbModal,
         QuestionObjectFactory, QuestionUndoRedoService,
-        SiteAnalyticsService, UrlInterpolationService,
+        SiteAnalyticsService,
         UserService, MAX_QUESTIONS_PER_SKILL) {
       const ctrl = this;
       let userIsLoggedIn = false;
@@ -107,23 +108,22 @@ angular.module('oppia').component('questionOpportunities', {
         const questionId = question.getId();
         const questionStateData = question.getStateData();
         QuestionUndoRedoService.clearChanges();
-        $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/contributor-dashboard-page/modal-templates/' +
-            'question-suggestion-editor-modal.directive.html'),
+
+
+        let modalRef = NgbModal.open(QuestionSuggestionEditorModalComponent, {
           size: 'lg',
           backdrop: 'static',
           keyboard: false,
-          resolve: {
-            suggestionId: () => '',
-            question: () => question,
-            questionId: () => questionId,
-            questionStateData: () => questionStateData,
-            skill: () => skill,
-            skillDifficulty: () => skillDifficulty
-          },
-          controller: 'QuestionSuggestionEditorModalController'
-        }).result.then(function() {}, function() {
+        });
+
+        modalRef.componentInstance.suggestionId = '';
+        modalRef.componentInstance.question = question;
+        modalRef.componentInstance.questionId = questionId;
+        modalRef.componentInstance.questionStateData = questionStateData;
+        modalRef.componentInstance.skill = skill;
+        modalRef.componentInstance.skillDifficulty = skillDifficulty;
+
+        modalRef.result.then(() => {}, () => {
           ContextService.resetImageSaveDestination();
           // Note to developers:
           // This callback is triggered when the Cancel button is clicked.

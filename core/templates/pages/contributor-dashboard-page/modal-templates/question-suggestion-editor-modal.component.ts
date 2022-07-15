@@ -26,17 +26,32 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmQuestionExitModalComponent } from 'components/question-directives/modal-templates/confirm-question-exit-modal.component';
 import { QuestionsOpportunitiesSelectDifficultyModalComponent } from 'pages/topic-editor-page/modal-templates/questions-opportunities-select-difficulty-modal.component';
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import { QuestionValidationService } from 'services/question-validation.service';
 import { ContributionAndReviewService } from '../services/contribution-and-review.service';
 import { AppConstants } from 'app.constants';
 
 @Component({
   selector: 'oppia-question-suggestion-editor-modal',
-  templateUrl: './'
+  templateUrl: './question-suggestion-editor-modal.component.html'
 })
 export class QuestionSuggestionEditorModalComponent
   extends ConfirmOrCancelModal implements OnInit {
+  @Input() question: any;
+  @Input() questionStateData: any;
+  @Input() questionId: any;
+  @Input() skill: any;
+  @Input() skillDifficulty: any;
+  @Input() suggestionId: any;
+
+  canEditQuestion: any;
+  newQuestionIsBeingCreated: any;
+  isEditing: any;
+  misconceptionsBySkill: any;
+  misconceptionsBySkill: any;
+  skillId: any;
+  skillDifficultyString: any;
+
   constructor(
     private questionUndoRedoService: QuestionUndoRedoService,
     private questionSuggestionBackendApiService:
@@ -87,7 +102,7 @@ export class QuestionSuggestionEditorModalComponent
 
     modalRef.componentInstance.skillId = this.skillId;
     modalRef.result.then((result) => {
-      if (this.this.alertsService.warnings.length === 0) {
+      if (this.alertsService.warnings.length === 0) {
         this.skillDifficulty = result.skillDifficulty;
         this.setDifficultyString(this.skillDifficulty);
       }
@@ -122,7 +137,7 @@ export class QuestionSuggestionEditorModalComponent
     if (this.isEditing) {
       const questionDict = this.question.toBackendDict(false);
       this.contributionAndReviewService.updateQuestionSuggestionAsync(
-        suggestionId,
+        this.suggestionId,
         this.skillDifficulty,
         questionDict.question_state_data,
         imagesData,
@@ -146,7 +161,7 @@ export class QuestionSuggestionEditorModalComponent
     this.ngbActiveModal.close();
   }
 
-  setDifficultyString(skillDifficulty: any): void {
+  setDifficultyString(skillDifficulty: unknown): void {
     this.skillDifficultyString = Object.entries(
       AppConstants.SKILL_DIFFICULTY_LABEL_TO_FLOAT).find(
       entry => entry[1] === skillDifficulty)[0];
@@ -155,21 +170,17 @@ export class QuestionSuggestionEditorModalComponent
   ngOnInit(): void {
     this.canEditQuestion = true;
     this.newQuestionIsBeingCreated = true;
-    this.question = question;
-    this.questionStateData = questionStateData;
-    this.questionId = questionId;
-    this.skill = skill;
-    this.skillDifficulty = skillDifficulty;
-    this.isEditing = suggestionId !== '' ? true : false;
+    this.isEditing = (
+      this.suggestionId !== '' ? true : false);
     this.misconceptionsBySkill = {};
     this.misconceptionsBySkill[this.skill.getId()] = (
       this.skill.getMisconceptions());
     this.contextService.setCustomEntityContext(
-      IMAGE_CONTEXT.QUESTION_SUGGESTIONS,
+      AppConstants.IMAGE_CONTEXT.QUESTION_SUGGESTIONS,
       this.skill.getId()
     );
 
-    this.setDifficultyString(skillDifficulty);
+    this.setDifficultyString(this.skillDifficulty);
 
     this.skillId = this.skill.getId();
   }
