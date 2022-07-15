@@ -594,24 +594,13 @@ def can_user_be_invited(
     if not learner_group:
         return (True, '')
     elif user_id in learner_group.student_user_ids:
-        return (
-            False, ('User with username %s is already a student.' % username)
-        )
+        return (False, 'User with username %s is already a '
+                'student.' % username)
     elif user_id in learner_group.invited_student_user_ids:
-        return (
-            False,
-            (
-                'User with username %s has already be invited to join the '
-                'learner group' % username
-            )
-        )
+        return (False, 'User with username %s has been already invited to '
+                'join the group' % username)
     elif user_id in learner_group.facilitator_user_ids:
-        return (
-            False,
-            (
-                'User with username %s is already a facilitator of the '
-                'learner group' % username
-            )
-        )
+        return (False, 'User with username %s is already a facilitator.' %
+                username)
 
     return (True, '')
