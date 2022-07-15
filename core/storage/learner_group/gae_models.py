@@ -23,7 +23,7 @@ import string
 
 from core.platform import models
 
-from typing import Dict, List
+from typing import Dict, List, Sequence
 from typing_extensions import Literal, TypedDict
 
 MYPY = False
@@ -286,3 +286,25 @@ class LearnerGroupModel(base_models.BaseModel):
 
         cls.update_timestamps_multi(learner_group_models_to_put)
         cls.put_multi(learner_group_models_to_put)
+
+    @classmethod
+    def get_by_facilitator_id(
+            cls, facilitator_id: str
+        ) -> Sequence[LearnerGroupModel]:
+        """Returns a list of all LearnerGroupModels that have the given
+        facilitator id.
+
+        Args:
+            facilitator_id: str. The id of the facilitator.
+
+        Returns:
+            list(LearnerGroupModel)|None. A list of all LearnerGroupModels that
+            have the given facilitator id or None if no such learner group
+            models exist.
+        """
+        found_models: Sequence[LearnerGroupModel] = cls.get_all().filter(
+            datastore_services.any_of(
+                cls.facilitator_user_ids == facilitator_id
+        )).fetch()
+
+        return found_models

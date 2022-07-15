@@ -465,6 +465,10 @@ CLASSROOM_PROMOS_ARE_ENABLED = ConfigProperty(
     'classroom_promos_are_enabled', BOOL_SCHEMA,
     'Show classroom promos.', False)
 
+LEARNER_GROUPS_ARE_ENABLED = ConfigProperty(
+    'learner_groups_are_enabled', BOOL_SCHEMA,
+    'Enable learner groups feature', False)
+
 BATCH_INDEX_FOR_MAILCHIMP = ConfigProperty(
     'batch_index_for_mailchimp', INT_SCHEMA,
     'Index of batch to populate mailchimp database.', 0)
