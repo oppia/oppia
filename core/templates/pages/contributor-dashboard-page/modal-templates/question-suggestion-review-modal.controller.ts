@@ -95,6 +95,7 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
     $scope.remainingContributionIds = Object.keys(
       suggestionIdToContribution
     );
+    $scope.remainingContributionIds.reverse();
     $scope.skippedContributionIds = [];
     $scope.allContributions = suggestionIdToContribution;
     $scope.allContributions[suggestionId] = $scope.currentSuggestion;
@@ -142,6 +143,18 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
     };
 
     $scope.refreshModalData = function() {
+      let nextContribution = $scope.allContributions[
+        $scope.currentSuggestionId];
+      $scope.suggestion = $scope.allContributions[
+        $scope.currentSuggestionId].suggestion;
+
+      $scope.isLastItem = $scope.remainingContributionIds.length === 0;
+      $scope.isFirstItem = $scope.skippedContributionIds.length === 0;
+
+      if (!nextContribution.details) {
+        SuggestionModalService.cancelSuggestion($uibModalInstance);
+        return;
+      }
       SkillBackendApiService.fetchSkillAsync(
         $scope.suggestion.change.skill_id
       ).then((skillDict) => {
@@ -149,6 +162,7 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
         var skill = skillDict.skill;
         misconceptionsBySkill[skill.getId()] = skill.getMisconceptions();
         $scope.misconceptionsBySkill = misconceptionsBySkill;
+        // Calling $scope.init() to set new modal data.
         $scope.init();
       });
     };
@@ -162,17 +176,6 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
 
       let lastContributionId = $scope.remainingContributionIds.pop();
       $scope.currentSuggestionId = lastContributionId;
-      let nextContribution = $scope.allContributions[lastContributionId];
-      $scope.suggestion = $scope.allContributions[
-        lastContributionId].suggestion;
-
-      $scope.isLastItem = $scope.remainingContributionIds.length === 0;
-      $scope.isFirstItem = $scope.skippedContributionIds.length === 0;
-
-      if (!nextContribution.details) {
-        SuggestionModalService.cancelSuggestion($uibModalInstance);
-        return;
-      }
 
       $scope.refreshModalData();
     };
@@ -186,17 +189,6 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
 
       let lastContributionId = $scope.skippedContributionIds.pop();
       $scope.currentSuggestionId = lastContributionId;
-      let nextContribution = $scope.allContributions[lastContributionId];
-      $scope.suggestion = $scope.allContributions[
-        lastContributionId].suggestion;
-
-      $scope.isLastItem = $scope.remainingContributionIds.length === 0;
-      $scope.isFirstItem = $scope.skippedContributionIds.length === 0;
-
-      if (!nextContribution.details) {
-        SuggestionModalService.cancelSuggestion($uibModalInstance);
-        return;
-      }
 
       $scope.refreshModalData();
     };
