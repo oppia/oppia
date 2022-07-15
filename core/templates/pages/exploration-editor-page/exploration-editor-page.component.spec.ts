@@ -474,16 +474,6 @@ describe('Exploration editor page component', function() {
         'Introduction');
     });
 
-    it('should load change list by draft changes successfully',
-      () => {
-        const loadSpy = spyOn(cls, 'loadAutosavedChangeList').and.returnValue();
-
-        $scope.$apply();
-
-        expect(loadSpy).toHaveBeenCalledWith(
-          explorationData.draft_changes);
-      });
-
     it('should navigate to main tab', fakeAsync(() => {
       spyOn(rs, 'isLocationSetToNonStateEditorTab').and.returnValue(null);
       spyOn(rs, 'getCurrentStateFromLocationPath').and.returnValue(null);
