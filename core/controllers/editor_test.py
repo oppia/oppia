@@ -356,6 +356,7 @@ interaction:
       value: 1
   default_outcome:
     dest: State A
+    dest_if_really_stuck: null
     feedback:
       content_id: default_outcome
       html: ''
@@ -399,6 +400,7 @@ interaction:
       value: 1
   default_outcome:
     dest: State B
+    dest_if_really_stuck: null
     feedback:
       content_id: default_outcome
       html: ''
@@ -442,6 +444,7 @@ interaction:
       value: 1
   default_outcome:
     dest: %s
+    dest_if_really_stuck: null
     feedback:
       content_id: default_outcome
       html: ''
@@ -487,6 +490,7 @@ interaction:
       value: 1
   default_outcome:
     dest: State A
+    dest_if_really_stuck: null
     feedback:
       content_id: default_outcome
       html: ''

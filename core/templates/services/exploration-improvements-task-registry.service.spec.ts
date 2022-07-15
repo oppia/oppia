@@ -114,6 +114,7 @@ describe('Exploration improvements task registrar service', () => {
         },
         default_outcome: {
           dest: 'new state',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'default_outcome',
             html: ''

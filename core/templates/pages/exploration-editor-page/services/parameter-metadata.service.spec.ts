@@ -107,6 +107,7 @@ describe('Parameter Metadata Service', () => {
                   refresher_exploration_id: null,
                   missing_prerequisite_skill_id: null,
                   dest: '',
+                  dest_if_really_stuck: null,
                   feedback: {
                     content_id: 'feedback_1',
                     html: '{{FeedbackValue}}'
@@ -119,6 +120,7 @@ describe('Parameter Metadata Service', () => {
                 refresher_exploration_id: null,
                 missing_prerequisite_skill_id: null,
                 dest: 'Hola',
+                dest_if_really_stuck: null,
                 feedback: {
                   content_id: '',
                   html: '',
@@ -165,6 +167,7 @@ describe('Parameter Metadata Service', () => {
                   refresher_exploration_id: null,
                   missing_prerequisite_skill_id: null,
                   dest: '',
+                  dest_if_really_stuck: null,
                   feedback: {
                     content_id: 'feedback_1',
                     html: '{{StateFeedbackValue}}'
@@ -177,6 +180,7 @@ describe('Parameter Metadata Service', () => {
                 refresher_exploration_id: null,
                 missing_prerequisite_skill_id: null,
                 dest: 'State',
+                dest_if_really_stuck: null,
                 feedback: {
                   content_id: 'default_outcome',
                   html: ''
@@ -223,6 +227,7 @@ describe('Parameter Metadata Service', () => {
                   refresher_exploration_id: null,
                   missing_prerequisite_skill_id: null,
                   dest: '',
+                  dest_if_really_stuck: null,
                   feedback: {
                     content_id: '',
                     html: ''
@@ -235,6 +240,7 @@ describe('Parameter Metadata Service', () => {
                 refresher_exploration_id: null,
                 missing_prerequisite_skill_id: null,
                 dest: 'State2',
+                dest_if_really_stuck: null,
                 feedback: {
                   content_id: 'default_outcome',
                   html: ''
@@ -281,6 +287,7 @@ describe('Parameter Metadata Service', () => {
                   refresher_exploration_id: null,
                   missing_prerequisite_skill_id: null,
                   dest: '',
+                  dest_if_really_stuck: null,
                   feedback: {
                     content_id: '',
                     html: ''
@@ -293,6 +300,7 @@ describe('Parameter Metadata Service', () => {
                 refresher_exploration_id: null,
                 missing_prerequisite_skill_id: null,
                 dest: 'State2',
+                dest_if_really_stuck: null,
                 feedback: {
                   content_id: '',
                   html: ''

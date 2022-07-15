@@ -29,6 +29,7 @@ import { ParamChangeBackendDict } from
 
 export interface OutcomeBackendDict {
   'dest': string;
+  'dest_if_really_stuck': string | null;
   'feedback': SubtitledHtmlBackendDict;
   'labelled_as_correct': boolean;
   'param_changes': readonly ParamChangeBackendDict[];
@@ -38,17 +39,20 @@ export interface OutcomeBackendDict {
 
 export class Outcome {
   dest: string;
+  destIfReallyStuck: string | null;
   feedback: SubtitledHtml;
   labelledAsCorrect: boolean;
   paramChanges: readonly ParamChangeBackendDict[];
   refresherExplorationId: string | null;
   missingPrerequisiteSkillId: string | null;
   constructor(
-      dest: string, feedback: SubtitledHtml, labelledAsCorrect: boolean,
+      dest: string, destIfReallyStuck: string | null, feedback: SubtitledHtml,
+      labelledAsCorrect: boolean,
       paramChanges: readonly ParamChangeBackendDict[],
       refresherExplorationId: string | null,
       missingPrerequisiteSkillId: string | null) {
     this.dest = dest;
+    this.destIfReallyStuck = destIfReallyStuck;
     this.feedback = feedback;
     this.labelledAsCorrect = labelledAsCorrect;
     this.paramChanges = paramChanges;
@@ -63,6 +67,7 @@ export class Outcome {
   toBackendDict(): OutcomeBackendDict {
     return {
       dest: this.dest,
+      dest_if_really_stuck: this.destIfReallyStuck,
       feedback: this.feedback.toBackendDict(),
       labelled_as_correct: this.labelledAsCorrect,
       param_changes: this.paramChanges,
@@ -99,6 +104,7 @@ export class OutcomeObjectFactory {
       paramChanges: readonly ParamChangeBackendDict[]): Outcome {
     return new Outcome(
       dest,
+      null,
       SubtitledHtml.createDefault(
         feedbackText, feedbackTextId),
       false,
@@ -110,6 +116,7 @@ export class OutcomeObjectFactory {
   createFromBackendDict(outcomeDict: OutcomeBackendDict): Outcome {
     return new Outcome(
       outcomeDict.dest,
+      outcomeDict.dest_if_really_stuck,
       SubtitledHtml.createFromBackendDict(
         outcomeDict.feedback),
       outcomeDict.labelled_as_correct,

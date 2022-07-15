@@ -98,6 +98,7 @@ describe('State Responses Component', () => {
   let defaultsOutcomesToSuppressWarnings = [
     {
       dest: 'State 4',
+      dest_if_really_stuck: null,
       feedback: {
         content_id: 'feedback_1',
         html: ''
@@ -109,6 +110,7 @@ describe('State Responses Component', () => {
     },
     {
       dest: 'State 5',
+      dest_if_really_stuck: null,
       feedback: {
         content_id: 'feedback_2',
         html: "Let's go to state 5 ImageAndRegion"
@@ -186,6 +188,7 @@ describe('State Responses Component', () => {
         {
           outcome: {
             dest: 'State',
+            dest_if_really_stuck: null,
             feedback: {
               html: '',
               content_id: 'This is a new feedback text',
@@ -208,6 +211,7 @@ describe('State Responses Component', () => {
       ],
       default_outcome: {
         dest: 'Hola',
+        dest_if_really_stuck: null,
         feedback: {
           content_id: '',
           html: '',
@@ -248,6 +252,7 @@ describe('State Responses Component', () => {
         }],
         outcome: {
           dest: 'State',
+          dest_if_really_stuck: null,
           feedback: {
             html: '',
             content_id: 'This is a new feedback text'
@@ -263,6 +268,7 @@ describe('State Responses Component', () => {
     ];
     defaultOutcome = outcomeObjectFactory.createFromBackendDict({
       dest: 'Hola',
+      dest_if_really_stuck: null,
       feedback: {
         content_id: '',
         html: ''
@@ -651,6 +657,7 @@ describe('State Responses Component', () => {
       true);
     let outcome = outcomeObjectFactory.createFromBackendDict({
       dest: 'State Name',
+      dest_if_really_stuck: null,
       feedback: {
         content_id: '',
         html: ''
@@ -675,6 +682,7 @@ describe('State Responses Component', () => {
       false);
     let outcome = outcomeObjectFactory.createFromBackendDict({
       dest: 'State Name',
+      dest_if_really_stuck: null,
       feedback: {
         content_id: '',
         html: ''
@@ -737,6 +745,7 @@ describe('State Responses Component', () => {
       true);
     let outcome = outcomeObjectFactory.createFromBackendDict({
       dest: 'State Name',
+      dest_if_really_stuck: null,
       feedback: {
         content_id: '',
         html: ''
@@ -783,6 +792,7 @@ describe('State Responses Component', () => {
           }],
           outcome: {
             dest: 'State',
+            dest_if_really_stuck: null,
             feedback: {
               html: '',
               content_id: 'This is a new feedback text'

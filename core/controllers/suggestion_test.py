@@ -1584,6 +1584,7 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                         ],
                         'outcome': {
                             'dest': None,
+                            'dest_if_really_stuck': None,
                             'feedback': {
                                 'html': '<p>assas</p>',
                                 'content_id': 'feedback_0'
@@ -1628,6 +1629,7 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                 },
                 'default_outcome': {
                     'dest': None,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'html': '<p>wer</p>',
                         'content_id': 'default_outcome'

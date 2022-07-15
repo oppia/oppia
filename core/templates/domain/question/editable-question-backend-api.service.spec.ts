@@ -73,6 +73,7 @@ describe('Editable question backend API service', function() {
             },
             default_outcome: {
               dest: null,
+              dest_if_really_stuck: null,
               feedback: {
                 html: 'Correct Answer'
               },

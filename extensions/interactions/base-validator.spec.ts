@@ -75,6 +75,7 @@ describe('Interaction validator', function() {
     otherState = 'Second State';
     goodOutcomeDest = oof.createFromBackendDict({
       dest: otherState,
+      dest_if_really_stuck: null,
       feedback: {
         html: '',
         audio_translations: {}
@@ -86,6 +87,7 @@ describe('Interaction validator', function() {
     });
     goodOutcomeFeedback = oof.createFromBackendDict({
       dest: currentState,
+      dest_if_really_stuck: null,
       feedback: {
         html: 'Feedback',
         audio_translations: {}
@@ -97,6 +99,7 @@ describe('Interaction validator', function() {
     });
     badOutcome = oof.createFromBackendDict({
       dest: currentState,
+      dest_if_really_stuck: null,
       feedback: {
         html: '',
         audio_translations: {}

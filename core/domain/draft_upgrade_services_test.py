@@ -160,6 +160,35 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             msg='Current schema version is %d but DraftUpgradeUtil.%s is '
             'unimplemented.' % (state_schema_version, conversion_fn_name))
 
+    def test_convert_states_v50_dict_to_v51_dict(self):
+        draft_change_list_v50 = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'content',
+                'new_value': 'new value'
+            })
+        ]
+        # Migrate exploration to state schema version 51.
+        self.create_and_migrate_new_exploration('50', '51')
+        migrated_draft_change_list_v51 = (
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                draft_change_list_v50, 1, 2, self.EXP_ID)
+        )
+        # Change draft change lists into a list of dicts so that it is
+        # easy to compare the whole draft change list.
+        draft_change_list_v50_dict_list = [
+            change.to_dict() for change in draft_change_list_v50
+        ]
+
+        migrated_draft_change_list_v51_dict_list = [
+            change.to_dict() for change in migrated_draft_change_list_v51
+        ]
+
+        self.assertEqual(
+            draft_change_list_v50_dict_list,
+            migrated_draft_change_list_v51_dict_list)
+
     def test_convert_states_v49_dict_to_v50_dict(self):
         draft_change_list_v49 = [
             exp_domain.ExplorationChange({

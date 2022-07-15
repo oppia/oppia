@@ -82,6 +82,7 @@ describe('State Interaction Stats Service', () => {
             }],
             outcome: {
               dest: 'Me Llamo',
+              dest_if_really_stuck: null,
               feedback: {content_id: 'feedback_1', html: '¡Buen trabajo!'},
               labelled_as_correct: true,
               param_changes: [],
@@ -101,6 +102,7 @@ describe('State Interaction Stats Service', () => {
             }],
             outcome: {
               dest: 'Me Llamo',
+              dest_if_really_stuck: null,
               feedback: {content_id: 'feedback_1', html: '¡Buen trabajo!'},
               labelled_as_correct: true,
               param_changes: [],
@@ -120,6 +122,7 @@ describe('State Interaction Stats Service', () => {
             }],
             outcome: {
               dest: 'Me Llamo',
+              dest_if_really_stuck: null,
               feedback: {content_id: 'feedback_1', html: '¡Buen trabajo!'},
               labelled_as_correct: true,
               param_changes: [],
@@ -142,6 +145,7 @@ describe('State Interaction Stats Service', () => {
         },
         default_outcome: {
           dest: 'Hola',
+          dest_if_really_stuck: null,
           feedback: {content_id: 'default_outcome', html: ''},
           labelled_as_correct: true,
           param_changes: [],

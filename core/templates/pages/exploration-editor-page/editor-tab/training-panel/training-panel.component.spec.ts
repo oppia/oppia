@@ -104,7 +104,7 @@ describe('Training Panel Component', () => {
     component.classification = {
       answerGroupIndex: 0,
       newOutcome: new Outcome(
-        'dest', null, true, [], '', '')
+        'dest', null, null, true, [], '', '')
     };
     component.addingNewResponse = false;
     component.answer = null;
@@ -129,9 +129,9 @@ describe('Training Panel Component', () => {
   it('should add new feedback and select it', () => {
     component.allOutcomes = [
       new Outcome(
-        'dest', null, true, [], '', ''),
+        'dest', null, null, true, [], '', ''),
       new Outcome(
-        'dest', null, true, [], '', '')
+        'dest', null, null, true, [], '', '')
     ];
     spyOn(responsesService, 'getAnswerGroupCount').and.returnValue(0);
     expect(component.allOutcomes.length).toBe(2);

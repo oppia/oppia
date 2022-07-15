@@ -93,6 +93,7 @@ describe('Responses Service', () => {
         {
           outcome: {
             dest: 'State',
+            dest_if_really_stuck: null,
             feedback: {
               html: '',
               content_id: 'This is a new feedback text',
@@ -109,6 +110,7 @@ describe('Responses Service', () => {
       ],
       default_outcome: {
         dest: 'Hola',
+        dest_if_really_stuck: null,
         feedback: {
           content_id: '',
           html: '',
@@ -125,7 +127,7 @@ describe('Responses Service', () => {
         },
         placeholder: {
           value: 1,
-        },
+        }
       },
       hints: [],
       solution: {
@@ -144,6 +146,7 @@ describe('Responses Service', () => {
         {
           outcome: {
             dest: '',
+            dest_if_really_stuck: null,
             feedback: {
               content_id: 'feedback_1',
               html: '',
@@ -168,6 +171,7 @@ describe('Responses Service', () => {
       ],
       default_outcome: {
         dest: 'Hola',
+        dest_if_really_stuck: null,
         feedback: {
           content_id: '',
           html: '',
@@ -184,7 +188,7 @@ describe('Responses Service', () => {
         },
         placeholder: {
           value: 1,
-        },
+        }
       },
       hints: [],
       solution: {
@@ -278,6 +282,7 @@ describe('Responses Service', () => {
       ],
       outcome: {
         dest: 'State',
+        destIfReallyStuck: null,
         feedback: new SubtitledHtml('', 'This is a new feedback text'),
         refresherExplorationId: 'test',
         missingPrerequisiteSkillId: 'test_skill_id',
@@ -332,6 +337,7 @@ describe('Responses Service', () => {
       ],
       outcome: {
         dest: 'State',
+        destIfReallyStuck: null,
         feedback: new SubtitledHtml('', 'This is a new feedback text'),
         refresherExplorationId: 'test',
         missingPrerequisiteSkillId: 'test_skill_id',
@@ -345,6 +351,7 @@ describe('Responses Service', () => {
       taggedSkillMisconceptionId: '',
       feedback: new SubtitledHtml('', 'This is a new feedback text'),
       dest: 'State',
+      dest_if_really_stuck: null,
       refresherExplorationId: 'test',
       missingPrerequisiteSkillId: 'test_skill_id',
       labelledAsCorrect: true,
@@ -399,6 +406,7 @@ describe('Responses Service', () => {
       ],
       outcome: {
         dest: 'State',
+        destIfReallyStuck: null,
         feedback: new SubtitledHtml('', 'This is a new feedback text'),
         refresherExplorationId: 'test',
         missingPrerequisiteSkillId: 'test_skill_id',
@@ -412,6 +420,7 @@ describe('Responses Service', () => {
       taggedSkillMisconceptionId: '',
       feedback: 'This is a new feedback text',
       dest: 'State',
+      dest_if_really_stuck: null,
       refresherExplorationId: '',
       missingPrerequisiteSkillId: '',
       labelledAsCorrect: true,

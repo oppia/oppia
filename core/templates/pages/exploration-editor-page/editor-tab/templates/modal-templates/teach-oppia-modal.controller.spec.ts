@@ -94,6 +94,7 @@ describe('Teach Oppia Modal Controller', function() {
         }],
         outcome: {
           dest: 'outcome 1',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'content_5',
             html: ''
@@ -107,6 +108,7 @@ describe('Teach Oppia Modal Controller', function() {
       }],
       default_outcome: {
         dest: 'Introduction',
+        dest_if_really_stuck: null,
         feedback: {
           content_id: 'default_outcome',
           html: 'This is a html feedback'

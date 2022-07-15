@@ -66,6 +66,7 @@ describe('Outcome object factory', () => {
     () => {
       const testOutcome = oof.createFromBackendDict({
         dest: 'A',
+        dest_if_really_stuck: null,
         feedback: {
           html: '<p>Hey</p>',
           content_id: 'feedback_1'
@@ -78,6 +79,7 @@ describe('Outcome object factory', () => {
 
       expect(testOutcome.toBackendDict()).toEqual({
         dest: 'A',
+        dest_if_really_stuck: null,
         feedback: {
           html: '<p>Hey</p>',
           content_id: 'feedback_1'

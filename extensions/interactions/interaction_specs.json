@@ -747,8 +747,7 @@
           ]
         },
         "default_value": 1
-      }
-    ],
+    }],
     "is_terminal": false,
     "default_outcome_heading": null,
     "rule_descriptions": {

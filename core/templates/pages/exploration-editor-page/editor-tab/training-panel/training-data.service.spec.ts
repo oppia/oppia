@@ -200,6 +200,7 @@ describe('Training Data Service', () => {
           ], null, ['trainingData 1'], null)
         ], [], null, new Outcome(
           'Hola',
+          null,
           new SubtitledHtml('<p> HTML string </p>', 'Id'),
           false,
           [],
@@ -209,6 +210,7 @@ describe('Training Data Service', () => {
         null, null, true, true, null, 7)
     )).toEqual([null, null, new Outcome(
       'Hola',
+      null,
       new SubtitledHtml('<p> HTML string </p>', 'Id'),
       false,
       [],

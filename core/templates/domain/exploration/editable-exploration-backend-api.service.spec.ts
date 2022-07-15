@@ -74,6 +74,7 @@ describe('Editable exploration backend API service', function() {
             default_outcome: {
               param_changes: [],
               dest: 'Introduction',
+              dest_if_really_stuck: null,
               feedback: {
                 html: '',
                 audio_translations: {}

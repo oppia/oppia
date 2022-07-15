@@ -75,6 +75,7 @@ describe('State card object factory', () => {
       },
       default_outcome: {
         dest: '(untitled state)',
+        dest_if_really_stuck: null,
         feedback: {
           content_id: 'default_outcome',
           html: ''

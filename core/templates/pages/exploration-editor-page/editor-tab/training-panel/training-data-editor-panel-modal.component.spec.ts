@@ -269,6 +269,7 @@ describe('Training Data Editor Panel Component', () => {
        .and.returnValue({
          outcome: new Outcome(
            'Hola',
+           null,
            new SubtitledHtml('<p>Saved Outcome</p>', 'Id'),
            false,
            [],
