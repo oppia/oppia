@@ -49,7 +49,15 @@ def assert_in_venv() -> None:
     """
     if 'GITHUB_ACTION' in os.environ:
         return
-    if sys.prefix == sys.base_prefix:
+    # There are two signals that a virtual environment is active:
+    # * When sys.prefix != sys.base_prefix
+    # * When sys.real_prefix exists
+    # If either is true, we are in a virtual environment. We also check that
+    # sys.real_prefix is Truthy to make testing easier.
+    if (
+        sys.prefix == sys.base_prefix
+        and not (hasattr(sys, 'real_prefix') and getattr(sys, 'real_prefix'))
+    ):
         raise AssertionError(
             'Oppia must be developed within a virtual environment.')
 

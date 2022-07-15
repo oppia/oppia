@@ -37,8 +37,20 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
             sys, 'prefix', '/home/user/.pyenv/versions/3.7.10')
         base_prefix_swap = self.swap(
             sys, 'base_prefix', '/home/user/.pyenv/versions/oppia')
+        real_prefix_swap = self.swap(sys, 'real_prefix', '')
         environ_swap = self.swap(os, 'environ', {})
-        with prefix_swap, base_prefix_swap, environ_swap:
+        with prefix_swap, base_prefix_swap, real_prefix_swap, environ_swap:
+            install_python_dev_dependencies.assert_in_venv()
+
+    def test_assert_in_venv_passes_when_in_venv_real_prefix(self) -> None:
+        prefix_swap = self.swap(
+            sys, 'prefix', '/home/user/.pyenv/versions/3.7.10')
+        base_prefix_swap = self.swap(
+            sys, 'base_prefix', '/home/user/.pyenv/versions/3.7.10')
+        real_prefix_swap = self.swap(
+            sys, 'real_prefix', '/home/user/.pyenv/versions/oppia')
+        environ_swap = self.swap(os, 'environ', {})
+        with prefix_swap, base_prefix_swap, real_prefix_swap, environ_swap:
             install_python_dev_dependencies.assert_in_venv()
 
     def test_assert_in_venv_fails_when_out_of_venv(self) -> None:
@@ -46,21 +58,24 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
             sys, 'prefix', '/home/user/.pyenv/versions/3.7.10')
         base_prefix_swap = self.swap(
             sys, 'base_prefix', '/home/user/.pyenv/versions/3.7.10')
+        real_prefix_swap = self.swap(sys, 'real_prefix', '')
         environ_swap = self.swap(os, 'environ', {})
         expected_error = (
             'Oppia must be developed within a virtual environment.')
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
                 AssertionError, expected_error):
-            with prefix_swap, base_prefix_swap, environ_swap:
-                install_python_dev_dependencies.assert_in_venv()
+            with prefix_swap, base_prefix_swap, real_prefix_swap:
+                with environ_swap:
+                    install_python_dev_dependencies.assert_in_venv()
 
     def test_assert_in_venv_passes_when_on_ci(self) -> None:
         prefix_swap = self.swap(
             sys, 'prefix', '/home/user/.pyenv/versions/3.7.10')
         base_prefix_swap = self.swap(
             sys, 'base_prefix', '/home/user/.pyenv/versions/3.7.10')
+        real_prefix_swap = self.swap(sys, 'real_prefix', '')
         environ_swap = self.swap(os, 'environ', {'GITHUB_ACTION': '1'})
-        with prefix_swap, base_prefix_swap, environ_swap:
+        with prefix_swap, base_prefix_swap, real_prefix_swap, environ_swap:
             install_python_dev_dependencies.assert_in_venv()
 
     def test_install_installation_tools(self) -> None:
