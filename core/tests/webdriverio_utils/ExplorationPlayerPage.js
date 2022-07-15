@@ -198,7 +198,7 @@ var ExplorationPlayerPage = function() {
   };
 
   this.expectExplorationToBeOver = async function() {
-    var conversationContent = await conversationContentSelector();
+    var conversationContent = await conversationContentsSelector();
     var lastElement = conversationContent.length - 1;
     await waitFor.visibilityOf(
       conversationContent[lastElement], 'Ending message not visible');
@@ -211,7 +211,7 @@ var ExplorationPlayerPage = function() {
   };
 
   this.expectExplorationToNotBeOver = async function() {
-    var conversationContent = await conversationContentSelector();
+    var conversationContent = await conversationContentsSelector();
     var lastElement = conversationContent.length - 1;
     await waitFor.visibilityOf(
       conversationContent[lastElement], 'Ending message not visible');

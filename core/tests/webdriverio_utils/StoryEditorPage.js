@@ -180,7 +180,7 @@ var StoryEditorPage = function() {
   };
 
   this.navigateToChapterWithName = async function(chapterName) {
-    var chapterNameSelector = $(`span=${chapterName}`);
+    var chapterNameSelector = $(`.e2e-test-chapter-title=${chapterName}`);
     await waitFor.visibilityOf(
       chapterNameSelector, 'Chapter name is taking too long to appear');
     var chapterTitles = await chapterTitlesSelector();

@@ -61,6 +61,10 @@ var suites = {
     './core/tests/webdriverio_desktop/topicAndStoryEditor.js'
   ],
 
+  topicAndStoryEditorFileUploadFeatures: [
+    './core/tests/webdriverio_desktop/topicAndStoryEditorFileUploadFeatures.js'
+  ],
+
   topicAndStoryViewer: [
     './core/tests/webdriverio_desktop/topicAndStoryViewer.js'
   ],

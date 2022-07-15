@@ -116,10 +116,6 @@ var suites = {
       'protractor_desktop/publicationAndLibrary.js'
     ],
 
-    topicAndStoryEditorFileUploadFeatures: [
-      'protractor_desktop/topicAndStoryEditorFileUploadFeatures.js'
-    ],
-
     topicsAndSkillsDashboard: [
       'protractor_desktop/topicsAndSkillsDashboard.js'
     ],

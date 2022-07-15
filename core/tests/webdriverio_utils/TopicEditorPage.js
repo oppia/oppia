@@ -195,7 +195,7 @@ var TopicEditorPage = function() {
 
   this.changeSubtopicTitle = async function(title) {
     await action.clear('Subtopic Title field', subtopicTitleField);
-    await action.setValue('Subtopic Title field', subtopicTitleField, 'title');
+    await action.setValue('Subtopic Title field', subtopicTitleField, title);
   };
 
   this.changeSubtopicPageContents = async function(content) {
