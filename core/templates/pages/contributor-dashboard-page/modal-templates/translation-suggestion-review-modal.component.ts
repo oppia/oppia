@@ -79,6 +79,11 @@ interface ActiveContributionDict {
   'suggestion': ActiveSuggestionDict;
 }
 
+enum ExpansionTabType {
+  'content' = 'content',
+  'translation' = 'translation'
+}
+
 
 @Component({
   selector: 'oppia-translation-suggestion-review-modal',
@@ -130,6 +135,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   isContentOverflowing: boolean = false;
   isTranslationExpanded: boolean = false;
   isTranslationOverflowing: boolean = false;
+
   @ViewChild('contentPanel')
     contentPanel!: RteOutputDisplayComponent;
 
@@ -178,8 +184,6 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     this.languageDescription = (
       this.languageUtilService.getAudioLanguageDescription(
         this.activeSuggestion.language_code));
-    this.activeContributionDetails = (
-      this.activeContribution.details as ActiveContributionDetailsDict);
     this.status = this.activeSuggestion.status;
     if (this.reviewable) {
       this.siteAnalyticsService
@@ -188,6 +192,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     delete this.suggestionIdToContribution[this.initialSuggestionId];
     this.remainingContributionIds = Object.keys(
       this.suggestionIdToContribution);
+    this.remainingContributionIds.reverse();
     this.isLastItem = this.remainingContributionIds.length === 0;
     this.allContributions = this.suggestionIdToContribution;
     this.allContributions[this.activeSuggestionId] = (
@@ -204,7 +209,11 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   }
 
   init(): void {
+    this.activeContribution = this.allContributions[
+      this.activeSuggestionId];
     this.refreshModalData();
+    this.isLastItem = this.remainingContributionIds.length === 0;
+    this.isFirstItem = this.skippedContributionIds.length === 0;
     this.userCanReviewTranslationSuggestionsInLanguages = [];
     this.languageCode = this.activeSuggestion.change.
       language_code;
@@ -261,10 +270,13 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     if (!this.reviewable) {
       this._getThreadMessagesAsync(this.activeSuggestionId);
     }
+    setTimeout(() => {
+      this.computePanelOverflowState();
+    }, 0);
   }
 
-  calculatePanelHeight(): void {
-    setTimeout(()=>{
+  computePanelOverflowState(): void {
+    setTimeout(() => {
       this.isContentOverflowing = (
         this.contentPanel.elementRef.nativeElement.offsetHeight >
         this.contentContainer.nativeElement.offsetHeight);
@@ -275,13 +287,13 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   }
 
   ngAfterViewInit(): void {
-    this.calculatePanelHeight();
+    this.computePanelOverflowState();
   }
 
-  toggleExpansionState(tab: string): void {
-    if (tab === 'content') {
+  toggleExpansionState(tab: ExpansionTabType): void {
+    if (tab === ExpansionTabType.content) {
       this.isContentExpanded = !this.isContentExpanded;
-    } else if (tab === 'translation') {
+    } else if (tab === ExpansionTabType.translation) {
       this.isTranslationExpanded = !this.isTranslationExpanded;
     }
   }
@@ -330,25 +342,29 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   }
 
   refreshModalData(): void {
+    // Close modal instance if the suggestion's corresponding opportunity
+    // is deleted. See issue #14234.
+    if (!this.activeContribution.details) {
+      this.activeModal.close(this.resolvedSuggestionIds);
+      return;
+    }
+    this.activeContributionDetails = this.activeContribution.details;
     this.activeSuggestion = this.activeContribution.suggestion;
     if (this.activeContribution.details === null) {
       return;
     }
-    this.activeContributionDetails = this.activeContribution.details;
     this.contextService.setCustomEntityContext(
       AppConstants.IMAGE_CONTEXT.EXPLORATION_SUGGESTIONS,
       this.activeSuggestion.target_id);
     this.subheading = (
-      `${this.activeContributionDetails.topic_name} / ` +
-      `${this.activeContributionDetails.story_title} / ` +
-      `${this.activeContributionDetails.chapter_title}`
+      `${this.activeContribution.details.topic_name} / ` +
+      `${this.activeContribution.details.story_title} / ` +
+      `${this.activeContribution.details.chapter_title}`
     );
-    // This is needed to re-calculate height of the panels.
-    this.calculatePanelHeight();
   }
 
-  gotoNextItem(): void {
-    let lastContributionId = this.remainingContributionIds.pop();
+  goToNextItem(): void {
+    const lastContributionId = this.remainingContributionIds.pop();
     // If the current item is the last item, do not navigate.
     if (lastContributionId === undefined) {
       return;
@@ -359,24 +375,12 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     }
 
     this.activeSuggestionId = lastContributionId;
-    this.activeContribution = this.allContributions[
-      lastContributionId];
-
-    this.isLastItem = this.remainingContributionIds.length === 0;
-    this.isFirstItem = this.skippedContributionIds.length === 0;
-
-    // Close modal instance if the suggestion's corresponding opportunity
-    // is deleted. See issue #14234.
-    if (!this.activeContribution.details) {
-      this.activeModal.close(this.resolvedSuggestionIds);
-      return;
-    }
 
     this.init();
   }
 
-  gotoPreviousItem(): void {
-    let lastContributionId = this.skippedContributionIds.pop();
+  goToPreviousItem(): void {
+    const lastContributionId = this.skippedContributionIds.pop();
     // If the current item is the first item, do not navigate.
     if (lastContributionId === undefined) {
       return;
@@ -387,23 +391,11 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     }
 
     this.activeSuggestionId = lastContributionId;
-    this.activeContribution = this.allContributions[
-      lastContributionId];
-
-    this.isLastItem = this.remainingContributionIds.length === 0;
-    this.isFirstItem = this.skippedContributionIds.length === 0;
-
-    // Close modal instance if the suggestion's corresponding opportunity
-    // is deleted. See issue #14234.
-    if (!this.activeContribution.details) {
-      this.activeModal.close(this.resolvedSuggestionIds);
-      return;
-    }
 
     this.init();
   }
 
-  processAndGotoNextItem(suggestionId: string): void {
+  resolveSuggestionAndUpdateModal(): void {
     this.resolvedSuggestionIds.push(this.activeSuggestionId);
 
     // Remove resolved contributions from the record.
@@ -415,7 +407,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       return;
     }
     // Else go the next item.
-    this.gotoNextItem();
+    this.goToNextItem();
   }
 
   acceptAndReviewNext(): void {
@@ -432,7 +424,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       this.activeSuggestion.target_id, this.activeSuggestionId,
       AppConstants.ACTION_ACCEPT_SUGGESTION,
       this.reviewMessage, this.finalCommitMessage,
-      this.processAndGotoNextItem.bind(this),
+      this.resolveSuggestionAndUpdateModal.bind(this),
       (error) => {
         this.rejectAndReviewNext('Invalid Suggestion');
         this.alertsService.clearWarnings();
@@ -454,7 +446,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
         this.activeSuggestion.target_id, this.activeSuggestionId,
         AppConstants.ACTION_REJECT_SUGGESTION,
         reviewMessage || this.reviewMessage, null,
-        this.processAndGotoNextItem.bind(this),
+        this.resolveSuggestionAndUpdateModal.bind(this),
         (error) => {
           this.alertsService.clearWarnings();
           this.alertsService.addWarning(

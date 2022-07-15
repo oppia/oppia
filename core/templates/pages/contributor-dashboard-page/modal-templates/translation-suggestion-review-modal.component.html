@@ -29,7 +29,7 @@
         <strong>Content to translate:</strong>
       </div>
       <div class="oppia-suggestion-review-panel"
-           [ngClass]="isContentExpanded ? 'oppia-expanded' : 'oppia-contracted'"
+           [ngClass]="isContentExpanded ? 'oppia-content-expanded' : 'oppia-content-collapsed'"
            #contentContainer>
         <ul *ngIf="contentTypeIsSetOfStrings">
           <li *ngFor="let item of displayExplorationContent(); index as idx">
@@ -58,7 +58,7 @@
         </button>
       </div>
       <div class="oppia-suggestion-review-panel oppia-content"
-           [ngClass]="isTranslationExpanded ? 'oppia-expanded' : 'oppia-contracted'"
+           [ngClass]="isTranslationExpanded ? 'oppia-content-expanded' : 'oppia-content-collapsed'"
            #translationContainer>
         <div>
           <oppia-rte-output-display [rteString]="translationHtml"
@@ -155,7 +155,7 @@
   <div class="oppia-review-buttons">
     <span ngbTooltip="Enter review message before rejecting"
           placement="bottom"
-          [disableTooltip]="!(reviewMessage.length == 0)">
+          [disableTooltip]="reviewMessage.length !== 0">
       <button class="btn btn-danger oppia-suggestion-resolve-button"
               *ngIf="reviewable"
               [disabled]="reviewMessage.length == 0 || reviewMessage.length > MAX_REVIEW_MESSAGE_LENGTH || resolvingSuggestion"
@@ -185,13 +185,13 @@
   <div class="oppia-pagination-container">
     <button type="button"
             class="oppia-pagination-button"
-            (click)="gotoPreviousItem()"
+            (click)="goToPreviousItem()"
             [disabled]="isFirstItem">
       <span class="material-icons">navigate_before</span>Previous
     </button>
     <button type="button"
             class="oppia-pagination-button"
-            (click)="gotoNextItem()"
+            (click)="goToNextItem()"
             [disabled]="isLastItem">
       Next<span class="material-icons">navigate_next</span>
     </button>
@@ -326,12 +326,12 @@
     .oppia-translation-panel {
       margin-top: 12px;
     }
-    .oppia-expanded {
+    .oppia-content-expanded {
       height: fit-content;
       max-height: none;
       overflow-y: hidden;
     }
-    .oppia-contracted {
+    .oppia-content-collapsed {
       max-height: 30vh;
       overflow-y: scroll;
     }

@@ -28,9 +28,15 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { ThreadDataBackendApiService } from 'pages/exploration-editor-page/feedback-tab/services/thread-data-backend-api.service';
 import { UserService } from 'services/user.service';
 import { UserInfo } from 'domain/user/user-info.model';
+import { RteOutputDisplayComponent } from 'rich_text_components/rte-output-display.component';
 
 class MockChangeDetectorRef {
   detectChanges(): void {}
+}
+
+enum ExpansionTabType {
+  'content' = 'content',
+  'translation' = 'translation'
 }
 
 describe('Translation Suggestion Review Modal Component', function() {
@@ -89,8 +95,10 @@ describe('Translation Suggestion Review Modal Component', function() {
 
     component.contentContainer = new ElementRef({offsetHeight: 150});
     component.translationContainer = new ElementRef({offsetHeight: 150});
-    component.contentPanel = new ElementRef({offsetHeight: 100});
-    component.translationPanel = new ElementRef({offsetHeight: 200});
+    component.contentPanel = new RteOutputDisplayComponent(
+      null, null, new ElementRef({offsetHeight: 200}), null);
+    component.translationPanel = new RteOutputDisplayComponent(
+      null, null, new ElementRef({offsetHeight: 200}), null);
   });
 
   describe('when reviewing suggestion', function() {
@@ -409,18 +417,18 @@ describe('Translation Suggestion Review Modal Component', function() {
     it('should toggle the expansion state for the content area', () => {
       spyOn(component, 'toggleExpansionState').and.callThrough();
       expect(component.isContentExpanded).toBeFalse();
-      component.toggleExpansionState('content');
+      component.toggleExpansionState(ExpansionTabType.content);
       expect(component.isContentExpanded).toBeTrue();
-      component.toggleExpansionState('content');
+      component.toggleExpansionState(ExpansionTabType.content);
       expect(component.isContentExpanded).toBeFalse();
     });
 
     it('should toggle the expansion state for the translation area', () => {
       spyOn(component, 'toggleExpansionState').and.callThrough();
       expect(component.isTranslationExpanded).toBeFalse();
-      component.toggleExpansionState('translation');
+      component.toggleExpansionState(ExpansionTabType.translation);
       expect(component.isTranslationExpanded).toBeTrue();
-      component.toggleExpansionState('translation');
+      component.toggleExpansionState(ExpansionTabType.translation);
       expect(component.isTranslationExpanded).toBeFalse();
     });
 
@@ -605,32 +613,32 @@ describe('Translation Suggestion Review Modal Component', function() {
         expect(component.isContentOverflowing).toBeFalse();
         expect(component.isTranslationOverflowing).toBeFalse();
 
-        component.contentPanel.nativeElement.offsetHeight = 100;
-        component.translationPanel.nativeElement.offsetHeight = 200;
+        component.contentPanel.elementRef.nativeElement.offsetHeight = 100;
+        component.translationPanel.elementRef.nativeElement.offsetHeight = 200;
         component.contentContainer.nativeElement.offsetHeight = 150;
         component.translationContainer.nativeElement.offsetHeight = 150;
 
-        component.calculatePanelHeight();
+        component.computePanelOverflowState();
         tick(0);
 
         expect(component.isContentOverflowing).toBeFalse();
         expect(component.isTranslationOverflowing).toBeTrue();
 
-        component.contentPanel.nativeElement.offsetHeight = 300;
+        component.contentPanel.elementRef.nativeElement.offsetHeight = 300;
 
-        component.calculatePanelHeight();
+        component.computePanelOverflowState();
         tick(0);
 
         expect(component.isContentOverflowing).toBeTrue();
         expect(component.isTranslationOverflowing).toBeTrue();
       }));
 
-    it('should determine panle height after view initialization', () => {
-      spyOn(component, 'calculatePanelHeight').and.callFake(() => {});
+    it('should determine panel height after view initialization', () => {
+      spyOn(component, 'computePanelOverflowState').and.callFake(() => {});
 
       component.ngAfterViewInit();
 
-      expect(component.calculatePanelHeight).toHaveBeenCalled();
+      expect(component.computePanelOverflowState).toHaveBeenCalled();
     });
   });
 
@@ -837,7 +845,7 @@ describe('Translation Suggestion Review Modal Component', function() {
       expect(component.skippedContributionIds.length).toEqual(0);
     });
 
-    it('should successfully naviagte between items', () => {
+    it('should successfully navigate between items', () => {
       component.suggestionIdToContribution = angular.copy(
         suggestionIdToContribution);
       component.ngOnInit();
@@ -849,15 +857,15 @@ describe('Translation Suggestion Review Modal Component', function() {
       expect(component.skippedContributionIds.length).toEqual(0);
       expect(component.activeSuggestionId).toEqual('suggestion_1');
 
-      component.gotoPreviousItem();
-      // As we are on the first item, gotoPreviousItem shouldn't navigate.
+      component.goToPreviousItem();
+      // As we are on the first item, goToPreviousItem shouldn't navigate.
       expect(component.isFirstItem).toBeTrue();
       expect(component.isLastItem).toBeFalse();
       expect(component.remainingContributionIds).toEqual(['suggestion_2']);
       expect(component.skippedContributionIds.length).toEqual(0);
       expect(component.activeSuggestionId).toEqual('suggestion_1');
 
-      component.gotoNextItem();
+      component.goToNextItem();
 
       expect(component.isFirstItem).toBeFalse();
       expect(component.isLastItem).toBeTrue();
@@ -866,15 +874,15 @@ describe('Translation Suggestion Review Modal Component', function() {
       expect(component.activeSuggestionId).toEqual('suggestion_2');
       expect(component.refreshModalData).toHaveBeenCalled();
 
-      component.gotoNextItem();
-      // As we are on the last item, gotoNextItem shoudn't navigate.
+      component.goToNextItem();
+      // As we are on the last item, goToNextItem shoudn't navigate.
       expect(component.isFirstItem).toBeFalse();
       expect(component.isLastItem).toBeTrue();
       expect(component.remainingContributionIds.length).toEqual(0);
       expect(component.skippedContributionIds).toEqual(['suggestion_1']);
       expect(component.activeSuggestionId).toEqual('suggestion_2');
 
-      component.gotoPreviousItem();
+      component.goToPreviousItem();
 
       expect(component.isFirstItem).toBeTrue();
       expect(component.isLastItem).toBeFalse();
@@ -892,7 +900,7 @@ describe('Translation Suggestion Review Modal Component', function() {
       spyOn(activeModal, 'close');
       component.allContributions.suggestion_2.details = null;
 
-      component.gotoNextItem();
+      component.goToNextItem();
 
       expect(activeModal.close).toHaveBeenCalledWith([]);
     });
@@ -904,13 +912,13 @@ describe('Translation Suggestion Review Modal Component', function() {
       component.ngOnInit();
       spyOn(activeModal, 'close');
 
-      component.gotoNextItem();
+      component.goToNextItem();
 
       expect(component.activeSuggestionId).toEqual('suggestion_2');
       // Delete the opportunity of the previous item.
       component.allContributions.suggestion_1.details = null;
 
-      component.gotoPreviousItem();
+      component.goToPreviousItem();
 
       expect(activeModal.close).toHaveBeenCalledWith([]);
     });
