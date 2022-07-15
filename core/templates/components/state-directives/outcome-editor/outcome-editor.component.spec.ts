@@ -507,7 +507,7 @@ describe('Outcome Editor Component', () => {
   it('should set refresher exploration ID as null on saving destination' +
     ' when state is not in self loop', () => {
     component.savedOutcome = new Outcome(
-      'Dest',
+      'Saved Dest',
       null,
       new SubtitledHtml('<p>Saved Outcome</p>', 'savedContentId'),
       false,
