@@ -119,16 +119,7 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
     this.ACTION_CLOSE = this.navigationService.ACTION_CLOSE;
     this.SUPPORTED_CONTENT_LANGUAGES = (
       this.languageUtilService.getLanguageIdsAndTexts());
-    this.SEARCH_DROPDOWN_TYPES = [
-      {
-        id: 'Skill',
-        text: 'Skill'
-      },
-      {
-        id: 'Story',
-        text: 'Story'
-      }
-    ];
+    this.SEARCH_DROPDOWN_TYPES = this.searchDropdownTypes();
     this.selectionDetails = {
       types: {
         description: '',
@@ -204,6 +195,16 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
         id: classroomName,
         text: this.constructTranslationIdsService.getClassroomTitleId(
           classroomName)
+      };
+    });
+  }
+
+  searchDropdownTypes(): SearchDropDownItems[] {
+    return constants.SEARCH_DROPDOWN_TYPES.map((typeName) => {
+      return {
+        id: typeName,
+        text: this.constructTranslationIdsService.getSyllabusTypeTitleId(
+          typeName)
       };
     });
   }

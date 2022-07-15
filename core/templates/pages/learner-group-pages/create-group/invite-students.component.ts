@@ -16,7 +16,7 @@
  * @fileoverview Component for the subtopic viewer.
  */
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AlertsService } from 'services/alerts.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
@@ -29,7 +29,7 @@ import { LearnerGroupInvitedUserInfo } from
   selector: 'oppia-invite-students',
   templateUrl: './invite-students.component.html'
 })
-export class InviteStudentsComponent implements OnInit {
+export class InviteStudentsComponent {
   @Input() learnerGroupID: string = '';
   @Input() invitedUsersInfo: LearnerGroupInvitedUserInfo[] = [];
   @Input() invitedUsernames: string[] = [];
@@ -42,7 +42,6 @@ export class InviteStudentsComponent implements OnInit {
   learnerGroupTitle: string;
   learnerGroupDescription: string;
   searchedUsername: string;
-  placeholderMessage: string;
   alertTimeout = 6000;
 
   constructor(
@@ -55,12 +54,6 @@ export class InviteStudentsComponent implements OnInit {
     return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
-  ngOnInit(): void {
-    this.placeholderMessage = (
-      'Add username of the student to invite and press enter'
-    );
-  }
-
   updateInvitedStudents(): void {
     this.updateLearnerGroupInvitedStudents.emit(
       this.invitedUsernames);
@@ -70,7 +63,7 @@ export class InviteStudentsComponent implements OnInit {
 
   onSearchQueryChangeExec(username: string): void {
     if (username) {
-      if (this.invitedUsernames.includes(username)) {
+      if (this.invitedUsernames.includes(username.toLowerCase())) {
         this.alertsService.addInfoMessage(
           'User with username ' + username + ' has been already invited.'
         );
@@ -96,6 +89,10 @@ export class InviteStudentsComponent implements OnInit {
     this.invitedUsernames = this.invitedUsernames.filter(
       (username) => username !== username);
     this.updateInvitedStudents();
+  }
+
+  getProfileImageDataUrl(dataUrl: string): string {
+    return decodeURIComponent(dataUrl);
   }
 }
 

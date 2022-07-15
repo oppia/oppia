@@ -7,7 +7,7 @@
     <input class="form-control"
            type="text"
            [(ngModel)]="learnerGroupTitle"
-           (ngModelChange)="updateLearnerGroupDetails($event)"
+           (ngModelChange)="updateGroupTitle($event)"
            tabindex="0"
            [attr.aria-invalid]="false"
            required="true">
@@ -18,7 +18,7 @@
               cols="50"
               [maxlength]="250"
               [(ngModel)]="learnerGroupDescription"
-              (ngModelChange)="updateLearnerGroupDetails($event)"
+              (ngModelChange)="updateGroupDescription($event)"
               class="form-control"
               autofocus
               required="true">

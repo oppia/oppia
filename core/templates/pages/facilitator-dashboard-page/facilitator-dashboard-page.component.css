@@ -55,7 +55,7 @@
   color: #00609c;
   font-size: 24px;
   font-style: normal;
-  font-weight: 400;
+  font-weight: 600;
   line-height: 28px;
 }
 
@@ -86,11 +86,12 @@
   border: 1px solid #e6e6e6;
   border-radius: 4px;
   box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.1);
-  padding: 20px;
+  padding: 20px 30px;
 }
 
 .oppia-learner-group-summary-card .oppia-learner-group-summary-card-info {
   color: #000;
+  position: relative;
 }
 
 .oppia-learner-group-summary-card .oppia-learner-group-summary-card-info:hover {
@@ -104,4 +105,25 @@
 .oppia-learner-group-summary-card-students {
   color: #555;
   font-size: 14px;
+}
+
+.oppia-learner-group-summary-card .fa-chevron-right {
+  position: absolute;
+  right: 0;
+  top: 40%;
+}
+
+@media screen and (max-width: 575px) {
+  .oppia-learner-groups-section-title-container {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .oppia-learner-group-summary-card-title {
+    font-size: 16px;
+  }
+
+  .oppia-learner-group-summary-card-students {
+    font-size: 12px;
+  }
 }

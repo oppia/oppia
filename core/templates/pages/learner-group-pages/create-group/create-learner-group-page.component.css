@@ -55,7 +55,7 @@
 
 .oppia-create-learner-group-progress {
   margin: auto;
-  margin-left: 40px;
+  margin-left: -30px;
   margin-top: 40px;
   max-width: 1120px;
 }
@@ -135,11 +135,7 @@
   transform: translate(-50%,-50%);
 }
 
-.oppia-learner-group-progressbar li.active .indicator {
-  border-color: #27635c;
-  color: #27635c;
-}
-
+.oppia-learner-group-progressbar li.active .indicator,
 .oppia-learner-group-progressbar li.completed .indicator {
   background-color: #27635c;
   border-color: #27635c;
@@ -241,6 +237,26 @@
   top: -140px;
 }
 
+.oppia-group-link {
+  margin-top: 20px;
+  text-align: center;
+}
+
 .oppia-group-link .fa-copy {
   cursor: pointer;
+}
+
+@media screen and (max-width: 575px) {
+  .oppia-learner-group-progressbar.horizontal li:before {
+    left: -30%;
+    width: 60%;
+  }
+
+  .oppia-group-link {
+    margin-top: none;
+  }
+
+  .oppia-large-avatar {
+    left: 27%
+  }
 }

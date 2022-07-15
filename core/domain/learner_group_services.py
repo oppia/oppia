@@ -21,7 +21,6 @@ from __future__ import annotations
 from core.constants import constants
 from core.domain import config_domain
 from core.domain import learner_group_domain
-from core.domain import learner_group_fetchers
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import subtopic_page_domain
@@ -269,7 +268,7 @@ def get_matching_learner_group_syllabus_to_add(
     keyword = keyword.lower()
     for topic in matching_topics:
         if language_code not in (
-            constants.DEFAULT_ADD_SYLLABUS_FILTER, language_code
+            constants.DEFAULT_ADD_SYLLABUS_FILTER, topic.language_code
         ):
             continue
 
@@ -588,19 +587,24 @@ def can_user_be_invited(
         otherwise.
         str. Error message if the user cannot be invited to the learner group.
     """
-    learner_group = learner_group_fetchers.get_learner_group_by_id(group_id)
-
     # Case of inviting to new learner group.
-    if not learner_group:
+    if not group_id:
         return (True, '')
-    elif user_id in learner_group.student_user_ids:
-        return (False, 'User with username %s is already a '
-                'student.' % username)
-    elif user_id in learner_group.invited_student_user_ids:
-        return (False, 'User with username %s has been already invited to '
-                'join the group' % username)
-    elif user_id in learner_group.facilitator_user_ids:
-        return (False, 'User with username %s is already a facilitator.' %
-                username)
+
+    learner_group_model = learner_group_models.LearnerGroupModel.get(
+        group_id, strict=True
+    )
+
+    if user_id in learner_group_model.student_user_ids:
+        return (
+            False, 'User with username %s is already a student.' % username)
+    elif user_id in learner_group_model.invited_student_user_ids:
+        return (
+            False, 'User with username %s has been already invited to '
+            'join the group' % username)
+    elif user_id in learner_group_model.facilitator_user_ids:
+        return (
+            False, 'User with username %s is already a facilitator.' % username
+        )
 
     return (True, '')

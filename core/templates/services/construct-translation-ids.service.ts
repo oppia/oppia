@@ -36,6 +36,11 @@ export class ConstructTranslationIdsService {
     return (
       'I18N_CLASSROOM_' + name.toUpperCase() + '_TITLE');
   }
+
+  getSyllabusTypeTitleId(name: string): string {
+    return (
+      'I18N_SYLLABUS_' + name.toUpperCase() + '_TITLE');
+  }
 }
 
 angular.module('oppia').factory(

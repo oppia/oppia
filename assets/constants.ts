@@ -77,6 +77,9 @@ export default {
   // These classrooms are shown in the add learner group syllabus filters.
   "SEARCH_DROPDOWN_CLASSROOMS": ["math"],
 
+  // These types are shown in the add learner group syllabus filters.
+  "SEARCH_DROPDOWN_TYPES": ["Skill", "Story"],
+
   // The default language code for an exploration.
   "DEFAULT_LANGUAGE_CODE": "en",
 

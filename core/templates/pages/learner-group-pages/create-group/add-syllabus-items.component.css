@@ -28,6 +28,11 @@
 .search-bar-float-left {
   border: 0.5px solid #bdbdbc;
   margin-top: 10px;
+  width: 100%;
+}
+
+.search-bar-float-left .dropdown-toggle {
+  width: 100%;
 }
 
 .oppia-add-learner-group-syllabus {
@@ -58,6 +63,7 @@
   display: grid;
   grid-gap: 12px;
   max-height: 300px;
+  min-height: 180px;
   overflow: auto;
   padding: 20px;
 }
@@ -68,6 +74,7 @@
   border-radius: 4px;
   box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.1);
   display: flex;
+  max-height: 80px;
   padding-right: 10px;
 }
 
@@ -110,7 +117,9 @@
 
 .added-syllabus-item-card .syllabus-item-title {
   font-size: 14px;
+  height: 52px;
   padding: 5px 8px;
+  width: 100%;
 }
 
 .remove-syllabus {
@@ -213,9 +222,12 @@
   line-height: 1.9;
   margin-top: 60px;
   text-align: center;
+  width: 100%;
 }
 
 .no-results-container {
+  align-self: center;
+  margin-top: -80px;
   text-align: center;
 }
 

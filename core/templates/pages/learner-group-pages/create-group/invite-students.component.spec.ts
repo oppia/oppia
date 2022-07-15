@@ -73,8 +73,6 @@ describe('InviteStudentsComponent', () => {
       spyOn(learnerGroupBackendApiService, 'searchNewStudentToAddAsync')
         .and.returnValue(Promise.resolve(userInfo));
 
-      component.ngOnInit();
-
       expect(component.invitedUsersInfo).toEqual([]);
       expect(component.invitedUsernames).toEqual([]);
 

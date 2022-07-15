@@ -13,7 +13,7 @@
   grid-gap: 20px;
 }
 
-.oppia-learner-group-invite-students .oppia-search-bar-input {
+.oppia-learner-group-invite-students .oppia-search-bar-text-input {
   margin-top: 15px;
   max-width: 560px;
 }
@@ -29,8 +29,12 @@
   padding: 20px;
 }
 
-.invited-students-title {
+.oppia-learner-group-invite-search-title {
   color: #00645c;
+}
+
+.invited-students-title {
+  font-size: 14px;
 }
 
 .invited-student-card {
@@ -38,8 +42,8 @@
   border: 1px solid #27635c;
   border-radius: 5px;
   display: flex;
-  flex-basis: 17%;
   gap: 15px;
+  height: 46px;
   padding: 10px;
   width: max-content;
 }
