@@ -2,7 +2,7 @@
 #
 #    python -m scripts.install_python_dev_dependencies
 #
-# to update `requirements.txt` and `third_party/python_libs` accordingly.
+# to update `requirements_dev.txt` and your current Python environment.
 Pillow==9.0.1
 PyGithub==1.55
 certifi==2021.10.8
