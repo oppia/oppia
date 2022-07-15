@@ -52,6 +52,7 @@ var urlToBe = async function(url) {
  * @param {string} errorMessage - Error message when element is not clickable.
  */
 var elementToBeClickable = async function(element, errorMessage) {
+  await element;
   await browser.waitUntil(
     until.elementToBeClickable(element),
     {
@@ -66,6 +67,7 @@ var elementToBeClickable = async function(element, errorMessage) {
  * @param {string} errorMessage - Error message when element is still visible.
  */
 var invisibilityOf = async function(element, errorMessage) {
+  await element;
   await browser.waitUntil(
     await until.invisibilityOf(element),
     {
@@ -78,7 +80,7 @@ var invisibilityOf = async function(element, errorMessage) {
  * Consider adding this method after each browser.url() call.
  */
 var pageToFullyLoad = async function() {
-  var loadingMessage = $('.e2e-test-loading-fullpage');
+  var loadingMessage = await $('.e2e-test-loading-fullpage');
   await browser.waitUntil(
     await until.invisibilityOf(loadingMessage),
     {
@@ -94,6 +96,7 @@ var pageToFullyLoad = async function() {
  *                                provided text.
  */
 var textToBePresentInElement = async function(element, text, errorMessage) {
+  await element;
   await browser.waitUntil(
     await until.textToBePresentInElement(element, text),
     {
@@ -108,6 +111,7 @@ var textToBePresentInElement = async function(element, text, errorMessage) {
  * @param {string} errorMessage - Error message when element is not present.
  */
 var presenceOf = async function(element, errorMessage) {
+  await element;
   await browser.waitUntil(
     await until.presenceOf(element),
     {
@@ -122,6 +126,7 @@ var presenceOf = async function(element, errorMessage) {
  * @param {string} errorMessage - Error message when element is invisible.
  */
 var visibilityOf = async function(element, errorMessage) {
+  await element;
   await browser.waitUntil(
     await until.visibilityOf(element),
     {
@@ -140,6 +145,7 @@ var visibilityOf = async function(element, errorMessage) {
 var elementAttributeToBe = async function(
     element, attribute, value, errorMessage
 ) {
+  await element;
   await browser.waitUntil(async function() {
     return await element.getAttribute(attribute) === value;
   },

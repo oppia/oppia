@@ -109,6 +109,9 @@ var TopicEditorPage = function() {
     '.e2e-test-topic-page-title-fragment-label');
   var uncategorizedSkillsContainer = $(
     '.e2e-test-uncategorized-skills-container');
+  var uncategorizedSkillsContainersSelector = function() {
+    return $$('.e2e-test-uncategorized-skills-container');
+  };
   var uncategorizedSkillCard = $('.e2e-test-uncategorized-skill-card');
   var uncategorizedSkillsSelector = function() {
     return $$('.e2e-test-uncategorized-skill-card');
@@ -331,7 +334,7 @@ var TopicEditorPage = function() {
   this.expectUncategorizedSkillsToBe = async function(skillDescriptions) {
     var uncategorizedSkills = await uncategorizedSkillsSelector();
     await waitFor.visibilityOf(
-      uncategorizedSkills[0],
+      uncategorizedSkillCard,
       'Uncategorized skills taking too long to appear.');
 
     for (var i = 0; i < uncategorizedSkills.length; i++) {
@@ -347,7 +350,7 @@ var TopicEditorPage = function() {
     var fromSubtopicColumn = await subtopicColumnsSelector()[subtopicIndex];
     var assignedSkills = await fromSubtopicColumn.$$(
       subtopicSkillDescriptionLocator);
-    var assignedSkillsLength = await assignedSkills.length;
+    var assignedSkillsLength = assignedSkills.length;
     var toMoveSkillIndex = -1;
     for (var i = 0; i < assignedSkillsLength; i++) {
       var assignedSkill = assignedSkills[i];
@@ -366,7 +369,12 @@ var TopicEditorPage = function() {
       subtopicIndex, skillDescription) {
     var assignedSkillToMove = await this.getTargetMoveSkill(
       subtopicIndex, skillDescription);
-    await dragAndDrop(assignedSkillToMove, uncategorizedSkillsContainer);
+    await waitFor.visibilityOf(
+      uncategorizedSkillsContainer,
+      'Skills Container takes too long to appear');
+    var uncategorizedSkillsContainers = (
+      await uncategorizedSkillsContainersSelector()[0]);
+    await dragAndDrop(assignedSkillToMove, uncategorizedSkillsContainers);
   };
 
   this.navigateToTopicEditorTab = async function() {
@@ -392,9 +400,11 @@ var TopicEditorPage = function() {
     await waitFor.visibilityOf(
       storyListTable, 'Story list table takes too long to appear.');
     var storyListItems = await storyListItemsSelector();
+    var storyListText = (
+      await storyListItems[index].$$('.e2e-test-story-title')[0]);
     var text = await action.getText(
       'Story List Text',
-      storyListItems[index].$$('.e2e-test-story-title')[0]);
+      storyListText);
     expect(text).toEqual(title);
   };
 
@@ -402,9 +412,10 @@ var TopicEditorPage = function() {
     await waitFor.visibilityOf(
       storyListTable, 'Story list table takes too long to appear.');
     var storyListItems = await storyListItemsSelector();
+    var storyListText = await storyListItems[index].$$(
+      '.e2e-test-story-publication-status');
     var text = await action.getText(
-      'Story List Text',
-      await storyListItems[index].$$('.e2e-test-story-publication-status')[0]);
+      'Story List Text', storyListText[0]);
     expect(text).toEqual(status);
   };
 
@@ -422,7 +433,7 @@ var TopicEditorPage = function() {
   this.navigateToStoryWithTitle = async function(storyName) {
     await waitFor.visibilityOf(
       storyListTable, 'Story list table takes too long to appear.');
-    var storyItem = $('.e2e-test-story-title=', storyName);
+    var storyItem = $(`.e2e-test-story-title=${storyName}`);
     await action.click('Story Item', storyItem);
     await waitFor.pageToFullyLoad();
     await waitFor.invisibilityOf(

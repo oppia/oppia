@@ -65,7 +65,7 @@ var submitAnswer = async function(elem, answer) {
   var inputElem = textInputElem.$('<input>');
   if (await textAreaElem.isExisting()) {
     await action.setValue('Text Area Input', textAreaElem, answer);
-    var submitAnswerBtn = await $('.e2e-test-submit-answer-button');
+    var submitAnswerBtn = $('.e2e-test-submit-answer-button');
     await submitAnswerBtn.scrollIntoView();
     await action.click('Submit Answer Button', submitAnswerBtn);
   } else {
@@ -76,7 +76,7 @@ var submitAnswer = async function(elem, answer) {
     if (await inputElem.isExisting()) {
       await action.clear('Text Input Element', inputElem);
       await action.setValue('Text Input Element', inputElem, answer);
-      var submitAnswerBtn = await $('.e2e-test-submit-answer-button');
+      var submitAnswerBtn = $('.e2e-test-submit-answer-button');
       await submitAnswerBtn.scrollIntoView();
       await action.click('Submit Answer Button', submitAnswerBtn);
     }

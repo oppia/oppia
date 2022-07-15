@@ -74,6 +74,7 @@ var StoryEditorPage = function() {
   };
   var nextChapterCard = $('.e2e-test-next-chapter-card');
   var warningIndicator = $('.e2e-test-warning-indicator');
+  var warningTextElement = $('.e2e-test-warnings-text');
   var warningTextElementsSelector = function() {
     return $$('.e2e-test-warnings-text');
   };
@@ -260,19 +261,17 @@ var StoryEditorPage = function() {
   };
 
   this.expectTitleToBe = async function(title) {
-    await waitFor.presenceOf(
+    await waitFor.visibilityOf(
       storyTitleField, 'Story Title Field takes too long to appear');
-    var storyTitleValue = await action.getAttribute(
-      'Story Title Filed', storyTitleField, 'value');
+    var storyTitleValue = await storyTitleField.getValue();
     expect(storyTitleValue).toEqual(title);
   };
 
   this.expectDescriptionToBe = async function(description) {
-    await waitFor.presenceOf(
+    await waitFor.visibilityOf(
       storyDescriptionField,
       'Story Description Field takes too long to appear');
-    var storyDescriptionValue = await action.getAttribute(
-      'Story Description Field', storyDescriptionField, 'value');
+    var storyDescriptionValue = await storyDescriptionField.getValue();
     expect(storyDescriptionValue).toEqual(description);
   };
 
@@ -408,7 +407,7 @@ var StoryEditorPage = function() {
     await action.click('Chapter Title Button', chapterTitleButton);
   };
 
-  this.expectNodeOutlineToMatch = function(nodeOutline) {
+  this.expectNodeOutlineToMatch = async function(nodeOutline) {
     var nodeOutlineEditorRteContent = (
       await nodeOutlineEditorRteContentSelector());
     var outlineEditorRteContentText = (
@@ -506,15 +505,15 @@ var StoryEditorPage = function() {
     await waitFor.visibilityOf(
       warningIndicator, 'Warning Indicator taking too long to appear.');
     await warningIndicator.moveTo();
-    var warningTextElements = await warningTextElementsSelector();
     await waitFor.visibilityOf(
-      warningTextElements[0],
+      warningTextElement,
       'Warning Text Elements taking too long to appear');
+    var warningTextElements = await warningTextElementsSelector();
     var warningElemCount = warningTextElements.length;
     var matchFound = false;
     for (var i = 0; i < warningElemCount; i++) {
       var text = await action.getText(
-        'Warning Text', warningTextElements.get(i));
+        'Warning Text', warningTextElements[i]);
       if (warning.test(text)) {
         matchFound = true;
         break;

@@ -26,11 +26,13 @@ var waitForAutosave = async function() {
 };
 
 var clear = async function(inputName, inputElement) {
+  await inputElement;
   await click(inputName, inputElement);
   await inputElement.clearValue();
 };
 
 var click = async function(elementName, clickableElement, elementIsMasked) {
+  await clickableElement;
   await waitFor.visibilityOf(
     clickableElement, `${elementName} is not visible.`);
   await waitFor.elementToBeClickable(
@@ -50,18 +52,21 @@ var click = async function(elementName, clickableElement, elementIsMasked) {
 };
 
 var getText = async function(elementName, element) {
+  await element;
   await waitFor.visibilityOf(
     element, `${elementName} is not visible for getText()`);
   return await element.getText();
 };
 
 var getAttribute = async function(elementName, element, attribute) {
+  await element;
   await waitFor.presenceOf(
     element, `${elementName} is not present for getAttribute(${attribute})`);
   return await element.getAttribute(attribute);
 };
 
 var select = async function(selectorName, selectorElement, optionToSelect) {
+  await selectorElement;
   await click(selectorName, selectorElement);
   var optionElement = await selectorElement.$(`option=${optionToSelect}`);
   await click(`${optionToSelect} in ${selectorName}`, optionElement);

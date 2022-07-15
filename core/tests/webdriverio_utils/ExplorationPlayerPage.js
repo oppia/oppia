@@ -33,7 +33,8 @@ var ExplorationPlayerPage = function() {
   var conversationSkinCardsContainer = $(
     '.e2e-test-conversation-skin-cards-container');
   var conversationInput = $('.e2e-test-conversation-input');
-  var conversationContentSelector = function() {
+  var conversationContent = $('.e2e-test-conversation-content');
+  var conversationContentsSelector = function() {
     return $$('.e2e-test-conversation-content');
   };
   var explorationHeader = $('.e2e-test-exploration-header');
@@ -185,14 +186,14 @@ var ExplorationPlayerPage = function() {
   //   handler.readItalicText('slanted');
   // can then be sent.
   this.expectContentToMatch = async function(richTextInstructions) {
-    var conversationContent = await conversationContentSelector();
-    var lastElement = conversationContent.length - 1;
     await waitFor.visibilityOf(
-      conversationContent[0], 'Conversation not visible');
+      conversationContent, 'Conversation not visible');
+    var conversationContents = await conversationContentsSelector();
+    var lastElement = conversationContents.length - 1;
     await waitFor.visibilityOf(
-      conversationContent[lastElement], 'Conversation not fully present');
+      conversationContents[lastElement], 'Conversation not fully present');
     await forms.expectRichText(
-      conversationContent[lastElement]
+      conversationContents[lastElement]
     ).toMatch(richTextInstructions);
   };
 
