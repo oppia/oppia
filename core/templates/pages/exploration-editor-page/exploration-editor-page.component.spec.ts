@@ -199,7 +199,7 @@ describe('Exploration editor page component', function() {
     rights: {},
     email_preferences: {},
     draft_changes: [{}, {}, {}],
-    is_version_of_draft_valid: null,
+    is_version_of_draft_valid: false,
     show_state_editor_tutorial_on_load: true,
     show_state_translation_tutorial_on_load: true
   };
@@ -342,6 +342,7 @@ describe('Exploration editor page component', function() {
         mockOpenTranslationTutorialEmitter);
 
       explorationData.is_version_of_draft_valid = false;
+      explorationData.draft_changes = ['data1', 'data2'];
 
       ctrl.$onInit();
     });
@@ -592,6 +593,7 @@ describe('Exploration editor page component', function() {
       spyOn(as, 'addInfoMessage');
       spyOn(as, 'addSuccessMessage');
       explorationData.is_version_of_draft_valid = false;
+      explorationData.draft_changes = ['data1', 'data2'];
 
       ctrl.$onInit();
     });
@@ -656,6 +658,7 @@ describe('Exploration editor page component', function() {
       spyOnProperty(esaves, 'onInitExplorationPage').and.returnValue(
         mockInitExplorationPageEmitter);
       explorationData.is_version_of_draft_valid = true;
+      explorationData.draft_changes = ['data1', 'data2'];
 
       ctrl.$onInit();
     });
@@ -835,6 +838,7 @@ describe('Exploration editor page component', function() {
         mockEnterEditorForTheFirstTime);
 
       explorationData.is_version_of_draft_valid = true;
+      explorationData.draft_changes = ['data1', 'data2'];
     });
 
     afterEach(() => {
