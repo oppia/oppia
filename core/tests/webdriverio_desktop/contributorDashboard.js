@@ -133,7 +133,7 @@ describe('Enable correctness feedback and set correctness', function() {
     await explorationEditorPage.navigateToMainTab();
     await explorationEditorMainTab.setStateName('First');
     await explorationEditorMainTab.setContent(await forms.toRichText(
-      'Select the right option.'));
+      'Select the right option.'), true);
 
     // Create interaction without closing the add response modal. Set
     // correctness in the modal.
@@ -440,10 +440,9 @@ describe('Core exploration functionality', function() {
     // this interaction does not have any customization options. To dismiss
     // this modal, user clicks 'Okay' implying that he/she has got the message.
     await explorationEditorMainTab.setInteraction('NumberWithUnits');
-    var testInteractionButton = element(by.css('.e2e-test-interaction'));
+    var testInteractionButton = $('.e2e-test-interaction');
     await action.click('Test Interaction Button', testInteractionButton);
-    var okayBtn = element(
-      by.css('.e2e-test-close-no-customization-modal'));
+    var okayBtn = $('.e2e-test-close-no-customization-modal');
     await action.click('Close \'No customization modal\' button', okayBtn);
 
     // Continue input has customization options. Therefore, on re-clicking, a
@@ -453,8 +452,7 @@ describe('Core exploration functionality', function() {
     await explorationEditorMainTab.deleteInteraction();
     await explorationEditorMainTab.setInteraction('Continue');
     await action.click('Test interaction button', testInteractionButton);
-    var saveInteractionBtn = element(
-      by.css('.e2e-test-save-interaction'));
+    var saveInteractionBtn = $('.e2e-test-save-interaction');
     await action.click('Save interaction button', saveInteractionBtn);
   });
 
