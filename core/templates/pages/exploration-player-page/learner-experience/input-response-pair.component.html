@@ -1,8 +1,8 @@
 <ng-template #popContent>
   <div class="oppia-answer-popup-container">
     <div class="oppia-answer-popup">
-      <angular-html-bind-wrapper [htmlData]="getAnswerHtml()">
-      </angular-html-bind-wrapper>
+      <oppia-rte-output-display [rteString]="getAnswerHtml()">
+      </oppia-rte-output-display>
     </div>
   </div>
 </ng-template>
@@ -14,14 +14,14 @@
     <div dir="auto" *ngIf="getShortAnswerHtml()"
          [ngbPopover]="popContent" triggers="manual" (click)="togglePopover()"
          class="oppia-popover" #popover="ngbPopover" [autoClose]="false">
-      <angular-html-bind-wrapper classStr="oppia-rte-viewer conversation-skin-learner-answer-content"
+      <oppia-interaction-display classStr="oppia-rte-viewer conversation-skin-learner-answer-content"
                                  [htmlData]="getShortAnswerHtml()">
-      </angular-html-bind-wrapper>
+      </oppia-interaction-display>
     </div>
     <div dir="auto" *ngIf="!getShortAnswerHtml()">
-      <angular-html-bind-wrapper classStr="oppia-rte-viewer conversation-skin-learner-answer-content"
+      <oppia-interaction-display classStr="oppia-rte-viewer conversation-skin-learner-answer-content"
                                  [htmlData]="getAnswerHtml()">
-      </angular-html-bind-wrapper>
+      </oppia-interaction-display>
     </div>
   </div>
   <div *ngIf="data.isHint">
@@ -47,11 +47,11 @@
   </div>
   <span id="getInputResponsePairId()"></span>
   <div dir="auto">
-    <angular-html-bind-wrapper *ngIf="data.oppiaResponse !== null"
-                               [htmlData]="data.oppiaResponse"
-                               [classStr]="'oppia-rte-viewer conversation-skin-oppia-feedback-content ' + (bottomSection ? 'e2e-test-conversation-feedback-latest' : '')"
-                               [ngStyle]="{'min-width': (isVideoRteElementPresentInResponse() ? '75%': 'inherit')}"
-                               [ngClass]="getFeedbackAudioHighlightClass()">
-    </angular-html-bind-wrapper>
+    <oppia-rte-output-display *ngIf="data.oppiaResponse !== null"
+                              [rteString]="data.oppiaResponse"
+                              [class]="'oppia-rte-viewer conversation-skin-oppia-feedback-content ' + (bottomSection ? 'e2e-test-conversation-feedback-latest' : '')"
+                              [ngStyle]="{'min-width': (isVideoRteElementPresentInResponse() ? '75%': 'inherit')}"
+                              [ngClass]="getFeedbackAudioHighlightClass()">
+    </oppia-rte-output-display>
   </div>
 </div>
