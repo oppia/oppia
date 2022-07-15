@@ -38,7 +38,7 @@ import { TopicsListComponent } from './topics-list/topics-list.component';
 import { DeleteTopicModalComponent } from './modals/delete-topic-modal.component';
 import { AssignSkillToTopicModalComponent } from './modals/assign-skill-to-topic-modal.component';
 import { MergeSkillModalComponent } from 'components/skill-selector/merge-skill-modal.component';
-import { DynamicContentModule } from 'components/angular-html-bind/dynamic-content.module';
+import { DynamicContentModule } from 'components/interaction-display/dynamic-content.module';
 import { TopicsAndSkillsDashboardPageComponent } from './topics-and-skills-dashboard-page.component';
 import { FormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';

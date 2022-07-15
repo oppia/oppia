@@ -292,6 +292,11 @@ export default {
 
   "TASK_TARGET_TYPE_STATE": "state",
 
+  // Filters for adding new syllabus items to learner groups.
+  "DEFAULT_ADD_SYLLABUS_FILTER": "All",
+  "LEARNER_GROUP_ADD_STORY_FILTER": "Story",
+  "LEARNER_GROUP_ADD_SKILL_FILTER": "Skill",
+
   // Roles in exploration.
   "ROLE_OWNER": "owner",
   "ROLE_EDITOR": "editor",
@@ -6026,6 +6031,9 @@ export default {
 
   // A regular expression for allowed entity id's.
   "ENTITY_ID_REGEX": "^[a-zA-Z0-9-_]{1,12}$",
+
+  // A regular expression for allowed learner group IDs.
+  "LEARNER_GROUP_ID_REGEX": "^[a-zA-Z]{1,12}$",
 
   // A regular expression for allowed characters in Title field for Blog Post.
   "VALID_BLOG_POST_TITLE_REGEX": "^[a-zA-Z0-9][a-zA-Z0-9 ]+(-[a-zA-Z0-9]+)*$",

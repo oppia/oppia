@@ -66,8 +66,8 @@ export class ResponseHeaderComponent {
     return this.stateEditorService.isInQuestionMode();
   }
 
-  getCurrentInteractionId(): string {
-    return this.stateInteractionIdService.savedMemento;
+  getCurrentInteractionId(): InteractionSpecsKey {
+    return this.stateInteractionIdService.savedMemento as InteractionSpecsKey;
   }
 
   isCorrectnessFeedbackEnabled(): boolean {
