@@ -728,6 +728,7 @@ describe('Exploration editor page component', function() {
     it('should react to initExplorationPage broadcasts', fakeAsync(() => {
       $scope.$apply();
       spyOn(ics, 'startCheckingConnection');
+      spyOn(rs, 'isLocationSetToNonStateEditorTab').and.returnValue(true);
       var successCallback = jasmine.createSpy('success');
       expect(ctrl.explorationEditorPageHasInitialized).toEqual(false);
       mockInitExplorationPageEmitter.emit(successCallback);

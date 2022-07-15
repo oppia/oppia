@@ -552,9 +552,15 @@ describe('Conversation skin component', () => {
     ).and.returnValue(Promise.resolve(true));
   }));
 
-  it('should create', () => {
-    expect(componentInstance).toBeDefined();
-  });
+  it('should create && adjust page height on resize of window',
+    fakeAsync(() => {
+      spyOn(componentInstance, 'adjustPageHeight').and.stub();
+      componentInstance.adjustPageHeightOnresize();
+      expect(componentInstance).toBeDefined();
+      windowRef.nativeWindow.onresize(null);
+      tick(200);
+      expect(componentInstance.adjustPageHeight).toHaveBeenCalled();
+    }));
 
   it('should initialize component', fakeAsync(() => {
     let collectionId = 'id';
