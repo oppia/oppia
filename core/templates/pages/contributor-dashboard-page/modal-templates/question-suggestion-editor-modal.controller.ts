@@ -16,152 +16,161 @@
  * @fileoverview Controller for question suggestion editor modal.
  */
 
-require(
-  'components/common-layout-directives/common-elements/' +
-  'confirm-or-cancel-modal.controller.ts');
-require('domain/editor/undo_redo/question-undo-redo.service.ts');
-require(
-  'pages/contributor-dashboard-page/services/' +
-  'question-suggestion-backend-api.service.ts');
-require('services/alerts.service.ts');
-require('services/context.service.ts');
-require('services/image-local-storage.service.ts');
-require('services/site-analytics.service.ts');
-
-import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import { QuestionUndoRedoService } from 'domain/editor/undo_redo/question-undo-redo.service';
+import { QuestionSuggestionBackendApiService } from 'pages/contributor-dashboard-page/services/question-suggestion-backend-api.service';
+import { AlertsService } from 'services/alerts.service';
+import { ContextService } from 'services/context.service';
+import { ImageLocalStorageService } from 'services/image-local-storage.service';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmQuestionExitModalComponent } from 'components/question-directives/modal-templates/confirm-question-exit-modal.component';
 import { QuestionsOpportunitiesSelectDifficultyModalComponent } from 'pages/topic-editor-page/modal-templates/questions-opportunities-select-difficulty-modal.component';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { QuestionValidationService } from 'services/question-validation.service';
+import { ContributionAndReviewService } from '../services/contribution-and-review.service';
+import { AppConstants } from 'app.constants';
 
-angular.module('oppia').controller('QuestionSuggestionEditorModalController', [
-  '$rootScope', '$scope', '$uibModalInstance', 'AlertsService',
-  'ContextService', 'ContributionAndReviewService', 'ImageLocalStorageService',
-  'NgbModal', 'QuestionSuggestionBackendApiService', 'QuestionUndoRedoService',
-  'QuestionValidationService', 'SiteAnalyticsService',
-  'question', 'questionId', 'questionStateData',
-  'skill', 'skillDifficulty', 'suggestionId', 'SKILL_DIFFICULTY_LABEL_TO_FLOAT',
-  'IMAGE_CONTEXT',
-  function(
-      $rootScope, $scope, $uibModalInstance, AlertsService,
-      ContextService, ContributionAndReviewService, ImageLocalStorageService,
-      NgbModal, QuestionSuggestionBackendApiService, QuestionUndoRedoService,
-      QuestionValidationService, SiteAnalyticsService,
-      question, questionId, questionStateData,
-      skill, skillDifficulty, suggestionId, SKILL_DIFFICULTY_LABEL_TO_FLOAT,
-      IMAGE_CONTEXT) {
-    $scope.canEditQuestion = true;
-    $scope.newQuestionIsBeingCreated = true;
-    $scope.question = question;
-    $scope.questionStateData = questionStateData;
-    $scope.questionId = questionId;
-    $scope.skill = skill;
-    $scope.skillDifficulty = skillDifficulty;
-    $scope.isEditing = suggestionId !== '' ? true : false;
-    $scope.misconceptionsBySkill = {};
-    $scope.misconceptionsBySkill[$scope.skill.getId()] = (
-      $scope.skill.getMisconceptions());
-    ContextService.setCustomEntityContext(
-      IMAGE_CONTEXT.QUESTION_SUGGESTIONS,
-      $scope.skill.getId()
-    );
-    $scope.setDifficultyString = function(skillDifficulty) {
-      $scope.skillDifficultyString = Object.entries(
-        SKILL_DIFFICULTY_LABEL_TO_FLOAT).find(
-        entry => entry[1] === skillDifficulty)[0];
-    };
-    $scope.setDifficultyString(skillDifficulty);
-    $scope.done = function() {
-      if (!$scope.isQuestionValid()) {
-        return;
-      }
-      if (!QuestionUndoRedoService.hasChanges()) {
-        AlertsService.addInfoMessage(
-          'No changes detected.', 5000);
-        return;
-      }
-      SiteAnalyticsService.registerContributorDashboardSubmitSuggestionEvent(
-        'Question');
-      var imagesData = ImageLocalStorageService.getStoredImagesData();
-      ImageLocalStorageService.flushStoredImagesData();
-      ContextService.resetImageSaveDestination();
-      if ($scope.isEditing) {
-        const questionDict = $scope.question.toBackendDict(false);
-        ContributionAndReviewService.updateQuestionSuggestionAsync(
-          suggestionId,
-          $scope.skillDifficulty,
-          questionDict.question_state_data,
-          imagesData,
-          () => {
-            AlertsService.addSuccessMessage('Updated question.');
+@Component({
+  selector: 'oppia-question-suggestion-editor-modal',
+  templateUrl: './'
+})
+export class QuestionSuggestionEditorModalComponent
+  extends ConfirmOrCancelModal implements OnInit {
+  constructor(
+    private questionUndoRedoService: QuestionUndoRedoService,
+    private questionSuggestionBackendApiService:
+      QuestionSuggestionBackendApiService,
+    private alertsService: AlertsService,
+    private contextService: ContextService,
+    private imageLocalStorageService: ImageLocalStorageService,
+    private siteAnalyticsService: SiteAnalyticsService,
+    private ngbModal: NgbModal,
+    private ngbActiveModal: NgbActiveModal,
+    private changeDetectorRef: ChangeDetectorRef,
+    private questionValidationService: QuestionValidationService,
+    private contributionAndReviewService: ContributionAndReviewService,
+  ) {
+    super(ngbActiveModal);
+  }
 
-            // TODO(#8521): Remove the use of $rootScope.$apply()
-            // once the controller is migrated to angular.
-            $rootScope.$applyAsync();
-          });
-      } else {
-        QuestionSuggestionBackendApiService.submitSuggestionAsync(
-          $scope.question, $scope.skill, $scope.skillDifficulty,
-          imagesData).then(
-          () => {
-            AlertsService.addSuccessMessage('Submitted question for review.');
-
-            // TODO(#8521): Remove the use of $rootScope.$apply()
-            // once the controller is migrated to angular.
-            $rootScope.$applyAsync();
-          });
-      }
-      $uibModalInstance.close();
-    };
-    // Checking if Question contains all requirements to enable
-    // Save and Publish Question.
-    $scope.isQuestionValid = function() {
-      return QuestionValidationService.isQuestionValid(
-        $scope.question, $scope.misconceptionsBySkill);
-    };
-    $scope.skillId = $scope.skill.getId();
-    $scope.onClickChangeDifficulty = function() {
-      const modalRef: NgbModalRef = NgbModal.open(
-        QuestionsOpportunitiesSelectDifficultyModalComponent, {
-          backdrop: true,
-        });
-      modalRef.componentInstance.skillId = $scope.skillId;
-      modalRef.result.then(function(result) {
-        if (AlertsService.warnings.length === 0) {
-          $scope.skillDifficulty = result.skillDifficulty;
-          $scope.setDifficultyString($scope.skillDifficulty);
-          $scope.$applyAsync();
-        }
-      }, function() {
+  cancel(): void {
+    if (this.questionUndoRedoService.hasChanges()) {
+      this.ngbModal.open(ConfirmQuestionExitModalComponent, {
+        backdrop: true,
+      }).result.then(() => {
+        this.ngbActiveModal.dismiss('cancel');
+        this.imageLocalStorageService.flushStoredImagesData();
+        this.contextService.resetImageSaveDestination();
+        this.changeDetectorRef.detectChanges();
+      }, () => {
         // Note to developers:
-        // This callback is triggered when the Cancel button is clicked.
+        // This callback is triggered when the cancel button is clicked.
         // No further action is needed.
       });
-    };
-
-    $scope.questionChanged = function() {
-      $rootScope.$applyAsync();
-    };
-
-    $scope.cancel = function() {
-      if (QuestionUndoRedoService.hasChanges()) {
-        NgbModal.open(ConfirmQuestionExitModalComponent, {
-          backdrop: true,
-        }).result.then(function() {
-          $uibModalInstance.dismiss('cancel');
-          ImageLocalStorageService.flushStoredImagesData();
-          ContextService.resetImageSaveDestination();
-          // TODO(#8521): Remove the use of $rootScope.$apply()
-          // once the controller is migrated to angular.
-          $rootScope.$apply();
-        }, function() {
-          // Note to developers:
-          // This callback is triggered when the cancel button is clicked.
-          // No further action is needed.
-        });
-      } else {
-        ImageLocalStorageService.flushStoredImagesData();
-        ContextService.resetImageSaveDestination();
-        $uibModalInstance.dismiss('cancel');
-      }
-    };
+    } else {
+      this.imageLocalStorageService.flushStoredImagesData();
+      this.contextService.resetImageSaveDestination();
+      this.ngbActiveModal.dismiss('cancel');
+    }
   }
-]);
+
+  questionChanged(): void {
+    this.changeDetectorRef.detectChanges();
+  }
+
+  onClickChangeDifficulty(): void {
+    const modalRef: NgbModalRef = this.ngbModal.open(
+      QuestionsOpportunitiesSelectDifficultyModalComponent, {
+        backdrop: true,
+      });
+
+    modalRef.componentInstance.skillId = this.skillId;
+    modalRef.result.then((result) => {
+      if (this.this.alertsService.warnings.length === 0) {
+        this.skillDifficulty = result.skillDifficulty;
+        this.setDifficultyString(this.skillDifficulty);
+      }
+    }, () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
+    });
+  }
+
+  // Checking if Question contains all requirements to enable
+  // Save and Publish Question.
+  isQuestionValid(): boolean {
+    return this.questionValidationService.isQuestionValid(
+      this.question, this.misconceptionsBySkill);
+  }
+
+  done(): void {
+    if (!this.isQuestionValid()) {
+      return;
+    }
+    if (!this.questionUndoRedoService.hasChanges()) {
+      this.alertsService.addInfoMessage(
+        'No changes detected.', 5000);
+      return;
+    }
+    this.siteAnalyticsService.registerContributorDashboardSubmitSuggestionEvent(
+      'Question');
+    var imagesData = this.imageLocalStorageService.getStoredImagesData();
+    this.imageLocalStorageService.flushStoredImagesData();
+    this.contextService.resetImageSaveDestination();
+    if (this.isEditing) {
+      const questionDict = this.question.toBackendDict(false);
+      this.contributionAndReviewService.updateQuestionSuggestionAsync(
+        suggestionId,
+        this.skillDifficulty,
+        questionDict.question_state_data,
+        imagesData,
+        () => {
+          this.alertsService.addSuccessMessage('Updated question.');
+
+          this.changeDetectorRef.detectChanges();
+        },
+        () => {});
+    } else {
+      this.questionSuggestionBackendApiService.submitSuggestionAsync(
+        this.question, this.skill, this.skillDifficulty,
+        imagesData).then(
+        () => {
+          this.alertsService.addSuccessMessage(
+            'Submitted question for review.');
+
+          this.changeDetectorRef.detectChanges();
+        });
+    }
+    this.ngbActiveModal.close();
+  }
+
+  setDifficultyString(skillDifficulty: any): void {
+    this.skillDifficultyString = Object.entries(
+      AppConstants.SKILL_DIFFICULTY_LABEL_TO_FLOAT).find(
+      entry => entry[1] === skillDifficulty)[0];
+  }
+
+  ngOnInit(): void {
+    this.canEditQuestion = true;
+    this.newQuestionIsBeingCreated = true;
+    this.question = question;
+    this.questionStateData = questionStateData;
+    this.questionId = questionId;
+    this.skill = skill;
+    this.skillDifficulty = skillDifficulty;
+    this.isEditing = suggestionId !== '' ? true : false;
+    this.misconceptionsBySkill = {};
+    this.misconceptionsBySkill[this.skill.getId()] = (
+      this.skill.getMisconceptions());
+    this.contextService.setCustomEntityContext(
+      IMAGE_CONTEXT.QUESTION_SUGGESTIONS,
+      this.skill.getId()
+    );
+
+    this.setDifficultyString(skillDifficulty);
+
+    this.skillId = this.skill.getId();
+  }
+}
