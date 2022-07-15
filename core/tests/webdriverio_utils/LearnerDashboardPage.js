@@ -49,9 +49,11 @@ var LearnerDashboardPage = function() {
   var topicNamesInLearnerStorySummaryTilesSelector = function() {
     return $$('.e2e-test-topic-name-in-learner-story-summary-tile');
   };
+  var feedbackExplorationTitleElement = $('.e2e-test-feedback-exploration');
   var feedbackExplorationTitleSelector = function() {
     return $$('.e2e-test-feedback-exploration');
   };
+  var subscriptionNameElement = $('.e2e-test-subscription-name');
   var subscriptionNameSelector = function() {
     return $$('.e2e-test-subscription-name');
   };
@@ -198,10 +200,10 @@ var LearnerDashboardPage = function() {
 
   this.expectSubscriptionFirstNameToMatch = async function(name) {
     await subscriptionSection.scrollIntoView();
-    var subscriptionName = await subscriptionNameSelector();
     await waitFor.visibilityOf(
-      subscriptionName[0],
+      subscriptionNameElement,
       'Subscription First Name takes too long to appear');
+    var subscriptionName = await subscriptionNameSelector();
     expect(await subscriptionName[0].getText()).toMatch(name);
   };
 
@@ -215,10 +217,10 @@ var LearnerDashboardPage = function() {
   };
 
   this.expectFeedbackExplorationTitleToMatch = async function(title) {
-    var feedbackExplorationTitle = await feedbackExplorationTitleSelector();
     await waitFor.visibilityOf(
-      feedbackExplorationTitle[0],
+      feedbackExplorationTitleElement,
       'Feedback Exploration Title takes too long to appear');
+    var feedbackExplorationTitle = await feedbackExplorationTitleSelector();
     expect(await feedbackExplorationTitle[0].getText()).toMatch(title);
   };
 

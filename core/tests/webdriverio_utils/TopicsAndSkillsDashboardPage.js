@@ -27,6 +27,7 @@ var TopicsAndSkillsDashboardPage = function() {
     return $$('.e2e-test-assign-skill-to-topic-button');
   };
   var assignSkillToTopicButton = $('.e2e-test-assign-skill-to-topic-button');
+  var assignedTopicNamesInput = $('.e2e-test-unassign-topic');
   var confirmMoveButton = $('.e2e-test-confirm-move-button');
   var confirmSkillCreationButton = $('.e2e-test-confirm-skill-creation-button');
   var confirmSkillsMergeButton = $('.e2e-test-confirm-skill-selection-button');
@@ -65,6 +66,7 @@ var TopicsAndSkillsDashboardPage = function() {
   };
   var topicFilterKeywordField = $('.e2e-test-select-keyword-dropdown');
   var topicFilterClassroomField = $('.e2e-test-select-classroom-dropdown');
+  var topicsListItems = $('.e2e-test-topics-list-item');
   var topicsListItemsSelector = function() {
     return $$('.e2e-test-topics-list-item');
   };
@@ -107,9 +109,8 @@ var TopicsAndSkillsDashboardPage = function() {
   this.waitForTopicsToLoad = async function() {
     await waitFor.visibilityOf(
       topicsTable, 'Topics table taking too long to appear');
-    var topicsListItems = await topicsListItemsSelector();
     await waitFor.visibilityOf(
-      topicsListItems[0], 'Topics list taking too long to appear');
+      topicsListItems, 'Topics list taking too long to appear');
   };
 
   this.isTopicTablePresent = async function() {
@@ -348,13 +349,12 @@ var TopicsAndSkillsDashboardPage = function() {
     await action.click('Unassign Skill Button', unassignSkillButton);
 
     await waitFor.modalPopupToAppear();
-    var assignedTopicNamesInput = await $$('.e2e-test-unassign-topic');
     await waitFor.visibilityOf(
-      assignedTopicNamesInput[0],
+      assignedTopicNamesInput,
       'Topic names in unassign skill from topics modal taking' +
       ' too long to appear.');
     var topicListItem = $(
-      '.e2e-test-unassign-topic-label=', topicName);
+      `.e2e-test-unassign-topic-label=${topicName}`);
     var assignedTopicInput = topicListItem.$(
       assignedTopicNameInputClass);
     await action.click('Assigned Topic Input', assignedTopicInput);

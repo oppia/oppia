@@ -67,9 +67,8 @@ var elementToBeClickable = async function(element, errorMessage) {
  * @param {string} errorMessage - Error message when element is still visible.
  */
 var invisibilityOf = async function(element, errorMessage) {
-  await element;
   await browser.waitUntil(
-    await until.invisibilityOf(element),
+    await until.invisibilityOf(await element),
     {
       timeout: DEFAULT_WAIT_TIME_MSECS,
       timeoutMsg: errorMessage

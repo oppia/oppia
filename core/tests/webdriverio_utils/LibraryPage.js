@@ -92,11 +92,13 @@ var LibraryPage = function() {
       allExplorationSummaryTile,
       'Library Page does not have any explorations');
 
-    var explorationCard = await allExplorationsTitled(explorationName)[0];
+    var explorationCardElement = $(
+      `.e2e-test-exp-summary-tile-title=${explorationName}`);
     await waitFor.visibilityOf(
-      explorationCard, 'Unable to find exploration ' + explorationName);
+      explorationCardElement, 'Unable to find exploration ' + explorationName);
     // The Exploration summary card is masked by a dummy element. Therefore, a
     // Javascript click is used.
+    var explorationCard = await allExplorationsTitled(explorationName)[0];
     await action.click('Exploration Card', explorationCard, true);
     await waitFor.pageToFullyLoad();
   };
@@ -116,12 +118,14 @@ var LibraryPage = function() {
     await waitFor.visibilityOf(
       allCollectionSummaryTile,
       'Library Page does not have any collections');
-    var collectionCard = await allCollectionsTitled(collectionName)[0];
+    var collectionCardElement = $(
+      `.e2e-test-collection-summary-tile-title=${collectionName}`);
     await waitFor.visibilityOf(
-      collectionCard,
+      collectionCardElement,
       'Unable to find collection ' + collectionName);
     // The Collection summary card is masked by a dummy element. Therefore, a
     // Javascript click is used.
+    var collectionCard = await allCollectionsTitled(collectionName)[0];
     await action.click('Collection Card', collectionCard, true);
     await waitFor.pageToFullyLoad();
   };

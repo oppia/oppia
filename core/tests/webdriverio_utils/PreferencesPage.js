@@ -40,6 +40,7 @@ var PreferencesPage = function() {
   var profilePhotoClickable = $('.e2e-test-photo-clickable');
   var profilePhotoCropper = $('.e2e-test-photo-crop .cropper-container');
   var profilePhotoUploadError = $('.e2e-test-upload-error');
+  var subscription = $('.e2e-test-subscription-name');
   var subscriptionsSelector = function() {
     return $$('.e2e-test-subscription-name');
   };
@@ -142,10 +143,10 @@ var PreferencesPage = function() {
   // might be abbreviated), rather than the text on the popover that appears
   // when hovering over the tile.
   this.expectDisplayedFirstSubscriptionToBe = async function(name) {
-    var subscriptions = await subscriptionsSelector();
     await waitFor.visibilityOf(
-      subscriptions[0],
-      'subscriptions[0] taking too long to appear.');
+      subscription,
+      'subscriptions taking too long to appear.');
+    var subscriptions = await subscriptionsSelector();
     expect(await subscriptions[0].getText()).toMatch(name);
   };
 

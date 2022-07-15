@@ -40,12 +40,20 @@ var suites = {
       'protractor_desktop/adminTabFeatures.js'
     ],
 
+    blogDashboard: [
+      'protractor_desktop/blogDashboard.js'
+    ],
+
     classroomPage: [
       'protractor_desktop/classroomPage.js'
     ],
 
     classroomPageFileUploadFeatures: [
       'protractor_desktop/classroomPageFileUploadFeatures.js'
+    ],
+
+    contributorDashboard: [
+      'protractor_desktop/contributorDashboard.js'
     ],
 
     coreEditorAndPlayerFeatures: [
