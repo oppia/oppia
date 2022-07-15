@@ -69,6 +69,14 @@ describe('Outcome Destination Editor', () => {
     stateEditorService = TestBed.inject(StateEditorService);
     stateGraphLayoutService = TestBed.inject(StateGraphLayoutService);
     userService = TestBed.inject(UserService);
+    component.outcome = new Outcome(
+      PLACEHOLDER_OUTCOME_DEST,
+      new SubtitledHtml('<p> HTML string </p>', 'Id'),
+      false,
+      [],
+      null,
+      null,
+    );
 
     spyOn(stateEditorService, 'isExplorationWhitelisted').and.returnValue(true);
   });
@@ -126,16 +134,26 @@ describe('Outcome Destination Editor', () => {
     }]);
   }));
 
+  it('should set outcome destination as active state if it is a self loop' +
+    ' when outcome destination details are saved', fakeAsync(() => {
+    component.outcome.dest = 'Hola';
+
+    let onSaveOutcomeDestDetailsEmitter = new EventEmitter();
+    spyOnProperty(stateEditorService, 'onSaveOutcomeDestDetails')
+      .and.returnValue(onSaveOutcomeDestDetailsEmitter);
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValues(
+      'Hola', 'Introduction');
+
+    component.ngOnInit();
+    tick(10);
+
+    onSaveOutcomeDestDetailsEmitter.emit();
+
+    expect(component.outcome.dest).toBe('Hola');
+  }));
+
   it('should add new state if outcome destination is a placeholder when' +
     ' outcome destination details are saved', fakeAsync(() => {
-    component.outcome = new Outcome(
-      PLACEHOLDER_OUTCOME_DEST,
-      new SubtitledHtml('<p> HTML string </p>', 'Id'),
-      false,
-      [],
-      null,
-      null,
-    );
     component.outcomeNewStateName = 'End';
     let onSaveOutcomeDestDetailsEmitter = new EventEmitter();
     spyOnProperty(stateEditorService, 'onSaveOutcomeDestDetails')
@@ -250,14 +268,6 @@ describe('Outcome Destination Editor', () => {
 
   it('should set focus to new state name input field on destination' +
     ' selector change', () => {
-    component.outcome = new Outcome(
-      PLACEHOLDER_OUTCOME_DEST,
-      new SubtitledHtml('<p> HTML string </p>', 'Id'),
-      false,
-      [],
-      null,
-      null,
-    );
     spyOn(focusManagerService, 'setFocus');
 
     component.onDestSelectorChange();
@@ -268,15 +278,6 @@ describe('Outcome Destination Editor', () => {
   });
 
   it('should check if new state is being created', () => {
-    component.outcome = new Outcome(
-      PLACEHOLDER_OUTCOME_DEST,
-      new SubtitledHtml('<p> HTML string </p>', 'Id'),
-      false,
-      [],
-      null,
-      null,
-    );
-
     expect(component.isCreatingNewState()).toBeTrue();
 
     component.outcome = new Outcome(
