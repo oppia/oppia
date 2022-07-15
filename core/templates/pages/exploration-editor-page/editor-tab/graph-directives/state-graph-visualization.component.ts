@@ -16,7 +16,7 @@
  * @fileoverview Component for the state graph visualization.
  */
 
-import { ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild, ViewChildren } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { StateGraphLayoutService } from 'components/graph-services/graph-layout.service';
 import { StateCardIsCheckpointService } from 'components/state-editor/state-editor-properties-services/state-card-is-checkpoint.service';
@@ -36,12 +36,10 @@ interface ElementDimensions {
   w: number;
 }
 
-
 @Component({
   selector: 'state-graph-visualization',
   templateUrl: './state-graph-visualization.component.html'
 })
-
 export class StateGraphVisualization
   implements OnInit, OnDestroy {
   @ViewChild('MainScreen') mainScreen: ElementRef;

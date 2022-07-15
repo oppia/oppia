@@ -35,9 +35,6 @@ require(
 require(
   'pages/contributor-dashboard-page/opportunities-list/' +
   'opportunities-list.component.ts');
-require(
-  'pages/contributor-dashboard-page/modal-templates/' +
-  'question-suggestion-editor-modal.controller.ts');
 
 require(
   'components/question-directives/questions-list/' +

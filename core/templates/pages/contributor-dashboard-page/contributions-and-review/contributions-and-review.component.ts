@@ -20,6 +20,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import { TranslationSuggestionReviewModalComponent } from '../modal-templates/translation-suggestion-review-modal.component';
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { Subscription } from 'rxjs';
+import { QuestionSuggestionReviewModalComponent } from '../modal-templates/question-suggestion-review-modal.component';
 
 require('base-components/base-content.component.ts');
 require(
@@ -37,9 +38,6 @@ require('objects/objectComponentsRequires.ts');
 require(
   'pages/contributor-dashboard-page/login-required-message/' +
   'login-required-message.component.ts');
-require(
-  'pages/contributor-dashboard-page/modal-templates/' +
-  'question-suggestion-review-modal.controller.ts');
 
 require(
   'pages/contributor-dashboard-page/services/' +
@@ -56,19 +54,19 @@ require(
 angular.module('oppia').component('contributionsAndReview', {
   template: require('./contributions-and-review.component.html'),
   controller: [
-    '$filter', '$rootScope', '$uibModal', 'AlertsService', 'ContextService',
+    '$filter', '$rootScope', 'AlertsService', 'ContextService',
     'ContributionAndReviewService', 'ContributionOpportunitiesService',
     'NgbModal', 'QuestionObjectFactory',
     'SkillBackendApiService', 'TranslationTopicService',
-    'UrlInterpolationService', 'UserService',
+    'UserService',
     'CORRESPONDING_DELETED_OPPORTUNITY_TEXT',
     'DEFAULT_OPPORTUNITY_TOPIC_NAME', 'IMAGE_CONTEXT',
     function(
-        $filter, $rootScope, $uibModal, AlertsService, ContextService,
+        $filter, $rootScope, AlertsService, ContextService,
         ContributionAndReviewService, ContributionOpportunitiesService,
         NgbModal, QuestionObjectFactory,
         SkillBackendApiService, TranslationTopicService,
-        UrlInterpolationService, UserService,
+        UserService,
         CORRESPONDING_DELETED_OPPORTUNITY_TEXT,
         DEFAULT_OPPORTUNITY_TOPIC_NAME, IMAGE_CONTEXT) {
       var ctrl = this;
@@ -200,9 +198,6 @@ angular.module('oppia').component('contributionsAndReview', {
       var _showQuestionSuggestionModal = function(
           suggestion, contributionDetails, reviewable,
           misconceptionsBySkill, question) {
-        var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/contributor-dashboard-page/modal-templates/' +
-          'question-suggestion-review.directive.html');
         var targetId = suggestion.target_id;
         var suggestionId = suggestion.suggestion_id;
         var authorName = suggestion.author_name;
@@ -213,51 +208,38 @@ angular.module('oppia').component('contributionsAndReview', {
         var skillRubrics = contributionDetails.skill_rubrics;
         var skillDifficulty = suggestion.change.skill_difficulty;
 
-        $uibModal.open({
-          templateUrl: _templateUrl,
+        const modalRef = NgbModal.open(QuestionSuggestionReviewModalComponent, {
           backdrop: 'static',
           size: 'lg',
-          resolve: {
-            suggestion: function() {
-              return cloneDeep(suggestion);
-            },
-            authorName: function() {
-              return authorName;
-            },
-            contentHtml: function() {
-              return contentHtml;
-            },
-            misconceptionsBySkill: function() {
-              return misconceptionsBySkill;
-            },
-            question: function() {
-              return question;
-            },
-            questionHeader: function() {
-              return questionHeader;
-            },
-            reviewable: function() {
-              return reviewable;
-            },
-            skillRubrics: function() {
-              return skillRubrics;
-            },
-            skillDifficulty: function() {
-              return skillDifficulty;
-            },
-            suggestionId: function() {
-              return suggestionId;
-            },
-            editSuggestionCallback: () => openQuestionSuggestionModal
-          },
-          controller: 'QuestionSuggestionReviewModalController'
-        }).result.then(function(result) {
+        });
+
+        modalRef.componentInstance.authorName = authorName;
+        modalRef.componentInstance.contentHtml = contentHtml;
+        modalRef.componentInstance.reviewable = reviewable;
+        modalRef.componentInstance.question = question;
+        modalRef.componentInstance.questionHeader = questionHeader;
+        modalRef.componentInstance.suggestion = cloneDeep(suggestion);
+        modalRef.componentInstance.skillRubrics = skillRubrics;
+        modalRef.componentInstance.suggestionId = suggestionId;
+        modalRef.componentInstance.skillDifficulty = skillDifficulty;
+        modalRef.componentInstance.misconceptionsBySkill = (
+          misconceptionsBySkill);
+
+        modalRef.componentInstance.editSuggestionEmitter.subscribe((value) => {
+          openQuestionSuggestionModal(
+            value.suggestionId,
+            value.suggestion,
+            value.reviewable,
+            value.question);
+        });
+
+        modalRef.result.then((result) => {
           ContributionAndReviewService.reviewSkillSuggestion(
             targetId, suggestionId, result.action, result.reviewMessage,
             result.skillDifficulty, resolveSuggestionSuccess, () => {
               AlertsService.addInfoMessage('Failed to submit suggestion.');
             });
-        }, function() {
+        }, () => {
           // Note to developers:
           // This callback is triggered when the Cancel button is clicked.
           // No further action is needed.
