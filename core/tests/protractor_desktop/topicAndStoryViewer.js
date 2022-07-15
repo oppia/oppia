@@ -206,6 +206,51 @@ describe('Topic and Story viewer functionality', function() {
     await users.logout();
   });
 
+  it('should dismiss sign-up section and load practice session page upon' +
+  'clicking the practice session card on the last state.', async function() {
+    await topicAndStoryViewerPage.get(
+      'math', 'topic-tasv-one', 'storyplayertasvone');
+
+    await topicAndStoryViewerPage.goToChapterIndex(0);
+    await explorationPlayerPage.submitAnswer('Continue', null);
+
+    await topicAndStoryViewerPage.waitForSignUpSection();
+    await topicAndStoryViewerPage.dismissSignUpSection();
+    await topicAndStoryViewerPage.waitForSignUpSectionToDisappear();
+
+    await waitFor.clientSideRedirection(async() => {
+      // Click the practice session card to trigger redirection.
+      await topicAndStoryViewerPage.goToPracticeSessionFromRecommendations();
+    }, (url) => {
+      // Wait until the URL has changed to that of the practice tab.
+      return (/practice/.test(url));
+    }, async() => {
+      // Wait until the practice tab is loaded.
+      await topicAndStoryViewerPage.waitForPracticeTabContainer();
+    });
+  });
+
+  it('should load the next chapter upon clicking the next chapter ' +
+    'card on the last state.',
+  async function() {
+    await topicAndStoryViewerPage.get(
+      'math', 'topic-tasv-one', 'storyplayertasvone');
+
+    await topicAndStoryViewerPage.goToChapterIndex(0);
+    await explorationPlayerPage.submitAnswer('Continue', null);
+
+    await waitFor.clientSideRedirection(async() => {
+      // Click the next chapter card to trigger redirection.
+      await topicAndStoryViewerPage.goToNextChapterFromRecommendations();
+    }, (url) => {
+      // Wait until the URL has changed to that of the next chapter.
+      return (/node_id=node_2/.test(url));
+    }, async() => {
+      // Wait until the conversation-skin of the next chapter is loaded.
+      await topicAndStoryViewerPage.waitForConversationSkinCardsContainer();
+    });
+  });
+
   it(
     'should check for topic description, stories and revision cards',
     async function() {

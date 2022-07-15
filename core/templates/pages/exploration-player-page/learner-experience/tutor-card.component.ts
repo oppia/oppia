@@ -48,7 +48,6 @@ import { CollectionSummary } from 'domain/collection/collection-summary.model';
 import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
 import { EndChapterCheckMarkComponent } from './end-chapter-check-mark.component';
 import { EndChapterConfettiComponent } from './end-chapter-confetti.component';
-import { PlatformFeatureService } from 'services/platform-feature.service';
 import { QuestionPlayerConfig } from './ratings-and-recommendations.component';
 
 const CHECK_MARK_HIDE_DELAY_IN_MSECS = 500;
@@ -152,7 +151,6 @@ export class TutorCardComponent {
     private userService: UserService,
     private windowDimensionsService: WindowDimensionsService,
     private windowRef: WindowRef,
-    private platformFeatureService: PlatformFeatureService,
     private renderer: Renderer2,
     private translateService: TranslateService
   ) {}
@@ -211,7 +209,6 @@ export class TutorCardComponent {
       this.updateDisplayedCard();
     }
     if (
-      this.platformFeatureService.status.EndChapterCelebration.isEnabled &&
       this.isOnTerminalCard() &&
       !this.animationHasPlayedOnce &&
       this.inStoryMode

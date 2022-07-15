@@ -31,7 +31,6 @@ import { LearnerViewRatingService } from '../services/learner-view-rating.servic
 import { ExplorationPlayerStateService } from './../services/exploration-player-state.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { TopicViewerDomainConstants } from 'domain/topic_viewer/topic-viewer-domain.constants';
-import { PlatformFeatureService } from 'services/platform-feature.service';
 import { LocalStorageService } from 'services/local-storage.service';
 import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
 import { ReadOnlyStoryNode } from 'domain/story_viewer/read-only-story-node.model';
@@ -91,7 +90,6 @@ export class RatingsAndRecommendationsComponent {
     private windowRef: WindowRef,
     private explorationPlayerStateService: ExplorationPlayerStateService,
     private urlInterpolationService: UrlInterpolationService,
-    private platformFeatureService: PlatformFeatureService,
     private localStorageService: LocalStorageService,
     private storyViewerBackendApiService: StoryViewerBackendApiService,
     private assetsBackendApiService: AssetsBackendApiService
@@ -180,10 +178,6 @@ export class RatingsAndRecommendationsComponent {
   isSignUpSectionHidden(): boolean {
     return this.localStorageService
       .getEndChapterSignUpSectionHiddenPreference() === 'true';
-  }
-
-  isEndChapterFeatureEnabled(): boolean {
-    return this.platformFeatureService.status.EndChapterCelebration.isEnabled;
   }
 }
 

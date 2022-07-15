@@ -29,22 +29,11 @@ import { MockLimitToPipe } from '../templates/information-card-modal.component.s
 import { RatingsAndRecommendationsComponent } from './ratings-and-recommendations.component';
 import { ExplorationPlayerStateService } from './../services/exploration-player-state.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { PlatformFeatureService } from 'services/platform-feature.service';
 import { LocalStorageService } from 'services/local-storage.service';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
 import { StoryPlaythrough } from 'domain/story_viewer/story-playthrough.model';
 import { ReadOnlyStoryNode } from 'domain/story_viewer/read-only-story-node.model';
-
-class MockPlatformFeatureService {
-  get status(): object {
-    return {
-      EndChapterCelebration: {
-        isEnabled: true
-      }
-    };
-  }
-}
 
 describe('Ratings and recommendations component', () => {
   let fixture: ComponentFixture<RatingsAndRecommendationsComponent>;
@@ -55,7 +44,6 @@ describe('Ratings and recommendations component', () => {
   let userService: UserService;
   let explorationPlayerStateService: ExplorationPlayerStateService;
   let urlInterpolationService: UrlInterpolationService;
-  let platformFeatureService: PlatformFeatureService;
   let localStorageService: LocalStorageService;
   let assetsBackendApiService: AssetsBackendApiService;
   let storyViewerBackendApiService: StoryViewerBackendApiService;
@@ -95,10 +83,6 @@ describe('Ratings and recommendations component', () => {
         StoryViewerBackendApiService,
         LocalStorageService,
         {
-          provide: PlatformFeatureService,
-          useClass: MockPlatformFeatureService
-        },
-        {
           provide: WindowRef,
           useClass: MockWindowRef
         }
@@ -117,7 +101,6 @@ describe('Ratings and recommendations component', () => {
     explorationPlayerStateService = TestBed.inject(
       ExplorationPlayerStateService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
-    platformFeatureService = TestBed.inject(PlatformFeatureService);
     localStorageService = TestBed.inject(LocalStorageService);
     assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
     storyViewerBackendApiService = TestBed.inject(
@@ -295,22 +278,5 @@ describe('Ratings and recommendations component', () => {
     getPreferenceSpy.and.returnValue(null);
 
     expect(componentInstance.isSignUpSectionHidden()).toBe(false);
-  });
-
-  it('should correctly determine if the feature is enabled or not', () => {
-    const featureSpy = (
-      spyOnProperty(platformFeatureService, 'status', 'get').and.callThrough());
-
-    expect(componentInstance.isEndChapterFeatureEnabled()).toBe(true);
-
-    featureSpy.and.returnValue(
-      {
-        EndChapterCelebration: {
-          isEnabled: false
-        }
-      }
-    );
-
-    expect(componentInstance.isEndChapterFeatureEnabled()).toBe(false);
   });
 });

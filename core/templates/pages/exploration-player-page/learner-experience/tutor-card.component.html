@@ -115,7 +115,7 @@
         </div>
       </div>
     </div>
-    <div *ngIf="platformFeatureService.status.EndChapterCelebration.isEnabled && isOnTerminalCard() && milestoneMessageIsToBeDisplayed && generateMilestoneMessage()">
+    <div *ngIf="isOnTerminalCard() && milestoneMessageIsToBeDisplayed && generateMilestoneMessage()">
       <div class="conversation-skin-milestone-message">
         <div class="milestone-message-star-container">
           <img [src]="getStaticImageUrl('/general/milestone-message-star-icon.svg')" class="star-icon">
