@@ -7,9 +7,9 @@
                 *ngFor="let choice of options; index as index"
                 value="{{(choice.id)}}"
                 (click)="updatedSelection()">
-      <angular-html-bind-wrapper classStr="oppia-html-select-option"
-                                 [htmlData]="choice.val">
-      </angular-html-bind-wrapper>
+      <oppia-rte-output-display class="oppia-html-select-option"
+                                [rteString]="choice.val">
+      </oppia-rte-output-display>
     </mat-option>
   </mat-select>
 </mat-form-field>

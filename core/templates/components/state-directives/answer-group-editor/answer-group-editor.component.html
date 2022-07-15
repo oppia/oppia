@@ -13,8 +13,8 @@
               {{rule | parameterizeRuleDescriptionPipe:getCurrentInteractionId():answerChoices}}...
             </span>
             <span *ngIf="getCurrentInteractionId() === 'MultipleChoiceInput'">
-              <angular-html-bind-wrapper classStr="oppia-multiple-choice-rule" [htmlData]="rule | parameterizeRuleDescriptionPipe:getCurrentInteractionId():answerChoices">
-              </angular-html-bind-wrapper>...
+              <oppia-rte-output-display class="oppia-multiple-choice-rule" [rteString]="rule | parameterizeRuleDescriptionPipe:getCurrentInteractionId():answerChoices">
+              </oppia-rte-output-display>...
             </span>
           </div>
         </a>
