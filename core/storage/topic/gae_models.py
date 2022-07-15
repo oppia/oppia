@@ -166,8 +166,8 @@ class TopicModel(base_models.VersionedModel):
     # Multiply and Divide'.
     page_title_fragment_for_web = datastore_services.StringProperty(
         required=True, indexed=True)
-    # The list of skill Ids that will be used from this topic to create the
-    # diagnostic test.
+    # These skills Id will be used to generate the diagnostic test that
+    # determines whether to recommend this topic to new learners.
     skill_ids_for_diagnostic_test = datastore_services.StringProperty(
         repeated=True, indexed=True)
 
