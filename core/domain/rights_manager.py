@@ -612,21 +612,20 @@ def check_can_access_activity(
     Returns:
         bool. Whether the given activity can be accessed by the given user.
     """
-    result: bool = False
     if activity_rights is None:
-        result = False
+        return False
     elif activity_rights.is_published():
-        result = bool(
+        return bool(
             role_services.ACTION_PLAY_ANY_PUBLIC_ACTIVITY in user.actions)
     elif activity_rights.is_private():
-        result = bool(
+        return bool(
             (role_services.ACTION_PLAY_ANY_PRIVATE_ACTIVITY in user.actions) or
             activity_rights.is_viewer(user.user_id) or
             activity_rights.is_owner(user.user_id) or
             activity_rights.is_editor(user.user_id) or
             activity_rights.is_voice_artist(user.user_id) or
             activity_rights.viewable_if_private)
-    return result
+    return False
 
 
 def check_can_edit_activity(
