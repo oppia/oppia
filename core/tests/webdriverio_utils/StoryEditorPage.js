@@ -107,8 +107,6 @@ var StoryEditorPage = function() {
     '.e2e-test-story-node-thumbnail .e2e-test-custom-photo');
   var chapterThumbnailButton = $(
     '.e2e-test-story-node-thumbnail .e2e-test-photo-button');
-  var createChapterThumbnailButton = $(
-    '.e2e-test-chapter-input-thumbnail .e2e-test-photo-button');
 
   this.get = async function(storyId) {
     await browser.url(EDITOR_URL_PREFIX + storyId);
