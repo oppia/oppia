@@ -505,7 +505,7 @@
   }
 }
 
-@media screen and (max-width: 768px) {
+@media screen and (min-width: 300px) and (max-width: 768px) {
   .nav-mobile-header-text-container {
     display: inline-block;
     font-size: 1px;
@@ -530,7 +530,7 @@
     white-space: nowrap;
     width: 100%;
   }
-  @media screen and (max-width: 600px) {
+  @media screen and (min-width: 769px) {
     .oppia-logo {
       left: 0;
       margin-left: 60px;
