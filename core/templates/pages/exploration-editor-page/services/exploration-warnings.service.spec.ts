@@ -137,6 +137,7 @@ describe('Exploration Warnings Service', () => {
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: '',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'feedback_1',
                 html: ''
@@ -149,6 +150,7 @@ describe('Exploration Warnings Service', () => {
             refresher_exploration_id: null,
             missing_prerequisite_skill_id: null,
             dest: 'Hola',
+            dest_if_really_stuck: null,
             feedback: {
               content_id: 'feedback',
               html: 'feedback',
@@ -227,6 +229,7 @@ describe('Exploration Warnings Service', () => {
                 refresher_exploration_id: null,
                 missing_prerequisite_skill_id: null,
                 dest: '',
+                dest_if_really_stuck: null,
                 feedback: {
                   content_id: 'feedback_1',
                   html: ''
@@ -243,6 +246,7 @@ describe('Exploration Warnings Service', () => {
                 refresher_exploration_id: null,
                 missing_prerequisite_skill_id: null,
                 dest: '',
+                dest_if_really_stuck: null,
                 feedback: {
                   content_id: 'feedback_1',
                   html: ''
@@ -255,6 +259,7 @@ describe('Exploration Warnings Service', () => {
             refresher_exploration_id: null,
             missing_prerequisite_skill_id: null,
             dest: 'Hola',
+            dest_if_really_stuck: null,
             feedback: {
               content_id: '',
               html: 'feedback',
@@ -344,6 +349,7 @@ describe('Exploration Warnings Service', () => {
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: '',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'feedback_1',
                 html: ''
@@ -358,6 +364,7 @@ describe('Exploration Warnings Service', () => {
             refresher_exploration_id: null,
             missing_prerequisite_skill_id: null,
             dest: 'Hola',
+            dest_if_really_stuck: null,
             feedback: {
               content_id: '',
               html: '',
@@ -440,6 +447,7 @@ describe('Exploration Warnings Service', () => {
                 refresher_exploration_id: null,
                 missing_prerequisite_skill_id: null,
                 dest: '',
+                dest_if_really_stuck: null,
                 feedback: {
                   content_id: 'feedback_1',
                   html: 'something'
@@ -454,6 +462,7 @@ describe('Exploration Warnings Service', () => {
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: 'Hola',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'something',
                 html: 'something',
@@ -559,6 +568,7 @@ describe('Exploration Warnings Service', () => {
                 refresher_exploration_id: null,
                 missing_prerequisite_skill_id: null,
                 dest: '',
+                dest_if_really_stuck: null,
                 feedback: {
                   content_id: 'feedback_1',
                   html: ''
@@ -571,6 +581,7 @@ describe('Exploration Warnings Service', () => {
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: 'Hola',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: '',
                 html: 'feedback',
@@ -670,6 +681,7 @@ describe('Exploration Warnings Service', () => {
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: '',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'feedback_1',
                 html: ''
@@ -684,6 +696,7 @@ describe('Exploration Warnings Service', () => {
             refresher_exploration_id: null,
             missing_prerequisite_skill_id: null,
             dest: 'State',
+            dest_if_really_stuck: null,
             feedback: {
               content_id: '',
               html: '',
@@ -784,6 +797,7 @@ describe('Exploration Warnings Service', () => {
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: '',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'feedback_1',
                 html: ''
@@ -796,6 +810,7 @@ describe('Exploration Warnings Service', () => {
             refresher_exploration_id: null,
             missing_prerequisite_skill_id: null,
             dest: 'Hola',
+            dest_if_really_stuck: null,
             feedback: {
               content_id: '',
               html: 'feedback',
@@ -853,6 +868,7 @@ describe('Exploration Warnings Service', () => {
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: '',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'feedback_1',
                 html: ''
@@ -865,6 +881,7 @@ describe('Exploration Warnings Service', () => {
             refresher_exploration_id: null,
             missing_prerequisite_skill_id: null,
             dest: 'State',
+            dest_if_really_stuck: null,
             feedback: {
               content_id: 'default_outcome',
               html: 'feedback'
@@ -957,6 +974,7 @@ describe('Exploration Warnings Service', () => {
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: '',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'feedback_1',
                 html: ''
@@ -969,6 +987,7 @@ describe('Exploration Warnings Service', () => {
             refresher_exploration_id: null,
             missing_prerequisite_skill_id: null,
             dest: 'Hola',
+            dest_if_really_stuck: null,
             feedback: {
               content_id: 'feedback',
               html: 'feedback',
@@ -1033,6 +1052,7 @@ describe('Exploration Warnings Service', () => {
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: '',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'feedback_1',
                 html: ''
@@ -1045,6 +1065,7 @@ describe('Exploration Warnings Service', () => {
             refresher_exploration_id: null,
             missing_prerequisite_skill_id: null,
             dest: 'End',
+            dest_if_really_stuck: null,
             feedback: {
               content_id: '',
               html: 'feedback',
@@ -1100,6 +1121,7 @@ describe('Exploration Warnings Service', () => {
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: '',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'feedback_2',
                 html: ''
@@ -1168,6 +1190,7 @@ describe('Exploration Warnings Service', () => {
                 refresher_exploration_id: null,
                 missing_prerequisite_skill_id: null,
                 dest: 'State1',
+                dest_if_really_stuck: null,
                 feedback: {
                   content_id: 'feedback_1',
                   html: ''
@@ -1184,6 +1207,7 @@ describe('Exploration Warnings Service', () => {
                 refresher_exploration_id: null,
                 missing_prerequisite_skill_id: null,
                 dest: 'State2',
+                dest_if_really_stuck: null,
                 feedback: {
                   content_id: 'feedback_2',
                   html: ''
@@ -1200,6 +1224,7 @@ describe('Exploration Warnings Service', () => {
                 refresher_exploration_id: null,
                 missing_prerequisite_skill_id: null,
                 dest: 'State3',
+                dest_if_really_stuck: null,
                 feedback: {
                   content_id: 'feedback_3',
                   html: ''
@@ -1252,6 +1277,7 @@ describe('Exploration Warnings Service', () => {
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: 'State4',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'feedback_2',
                 html: ''
@@ -1304,6 +1330,7 @@ describe('Exploration Warnings Service', () => {
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: 'State4',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'feedback_2',
                 html: ''
@@ -1356,6 +1383,7 @@ describe('Exploration Warnings Service', () => {
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: 'State4',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'feedback_2',
                 html: ''
@@ -1408,6 +1436,7 @@ describe('Exploration Warnings Service', () => {
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: 'State5',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'feedback_2',
                 html: ''
@@ -1460,6 +1489,7 @@ describe('Exploration Warnings Service', () => {
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: 'State6',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'feedback_2',
                 html: ''
@@ -1512,6 +1542,7 @@ describe('Exploration Warnings Service', () => {
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: 'State7',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'feedback_2',
                 html: ''
@@ -1564,6 +1595,7 @@ describe('Exploration Warnings Service', () => {
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: 'End',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'feedback_2',
                 html: ''
@@ -1614,6 +1646,7 @@ describe('Exploration Warnings Service', () => {
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest: '',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'feedback_2',
                 html: ''

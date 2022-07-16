@@ -17,7 +17,7 @@
  */
 
 import { EventEmitter } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
+import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
 import { EntityEditorBrowserTabsInfoDomainConstants } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info-domain.constants';
@@ -42,6 +42,8 @@ class MockNgbModalRef {
 
 describe('Skill editor page', function() {
   var ctrl = null;
+  let $location = null;
+  let $scope = null;
   var LocalStorageService = null;
   var PreventPageUnloadEventService = null;
   var SkillEditorRoutingService = null;
@@ -85,9 +87,14 @@ describe('Skill editor page', function() {
       $injector.get('SkillEditorStalenessDetectionService'));
     SkillEditorStateService = $injector.get('SkillEditorStateService');
     UndoRedoService = $injector.get('UndoRedoService');
+    $location = $injector.get('$location');
     UrlService = $injector.get('UrlService');
     $rootScope = $injector.get('$rootScope');
-    ctrl = $componentController('skillEditorPage');
+
+    $scope = $rootScope.$new();
+    ctrl = $componentController('skillEditorPage', {
+      $scope: $scope,
+    });
     skillObjectFactory = TestBed.inject(SkillObjectFactory);
   }));
 
@@ -144,13 +151,17 @@ describe('Skill editor page', function() {
   });
 
   it('should load skill based on its id in url when component is initialized',
-    function() {
+    fakeAsync(() => {
       spyOn(SkillEditorStateService, 'loadSkill').and.stub();
       spyOn(UrlService, 'getSkillIdFromUrl').and.returnValue('skill_1');
 
+      $location.path('null');
+      $scope.$apply();
+      tick();
+
       ctrl.$onInit();
       expect(SkillEditorStateService.loadSkill).toHaveBeenCalledWith('skill_1');
-    });
+    }));
 
   it('should trigger a digest loop when onSkillChange is emitted', () => {
     spyOnProperty(SkillEditorStateService, 'onSkillChange').and.returnValue(
