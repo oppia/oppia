@@ -1262,7 +1262,7 @@ class Story:
         """
         for node in story_contents_dict['nodes']:
             node['outline'] = (
-                html_validation_service.add_math_content_to_math_rte_components(  # type: ignore[no-untyped-call]
+                html_validation_service.add_math_content_to_math_rte_components(
                     node['outline']
                 )
             )
