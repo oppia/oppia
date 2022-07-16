@@ -526,7 +526,7 @@ var ExplorationEditorMainTab = function() {
     var explanationTextArea = await explanationTextAreaElement.$$('<p>')[0];
     await action.click('Explanation Text Area', explanationTextArea);
     var CKEditor = await ckEditorElement.$$(
-      'oppia-rte-resizer')[0];
+      '.oppia-rte-resizer')[0];
     await action.setValue(
       'Text CKEditor', CKEditor, solution.explanation);
     await action.click('Submit Solution Button', submitSolutionButton);
