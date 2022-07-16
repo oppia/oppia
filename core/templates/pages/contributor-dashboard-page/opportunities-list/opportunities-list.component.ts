@@ -48,6 +48,8 @@ export class OpportunitiesListComponent {
   @Input() labelRequired: boolean = false;
   @Input() progressBarRequired: boolean = false;
 
+  @Input() showOpportunityButton: boolean = true;
+
   @Output() clickActionButton: EventEmitter<string> = (
     new EventEmitter()
   );

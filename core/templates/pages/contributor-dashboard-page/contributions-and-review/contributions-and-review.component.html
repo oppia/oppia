@@ -61,11 +61,12 @@
     <div class="oppia-login-required" ng-if="!$ctrl.userDetailsLoading && !$ctrl.userIsLoggedIn">
       <login-required-message></login-required-message>
     </div>
-    <div class="oppia-login-required" ng-if="ctrl.userDetailsLoading || $ctrl.userIsLoggedIn">
+    <div class="oppia-login-required oppia-opportunities-list" ng-if="ctrl.userDetailsLoading || $ctrl.userIsLoggedIn">
       <oppia-opportunities-list ng-if="$ctrl.activeExplorationId === null && $ctrl.isReviewTranslationsTab()"
                                 [load-opportunities]="$ctrl.loadReviewableTranslationOpportunities"
                                 (click-action-button)="$ctrl.onClickReviewableTranslations($event)"
-                                [label-required]="!$ctrl.activeReviewTab">
+                                [label-required]="!$ctrl.activeReviewTab"
+                                [show-opportunity-button]="true">
       </oppia-opportunities-list>
       <div ng-if="$ctrl.activeExplorationId !== null || !$ctrl.isReviewTranslationsTab()">
         <div ng-if="$ctrl.isReviewTranslationsTab()" class="oppia-contributions-back-to-lessons-container">
@@ -80,7 +81,8 @@
                                   [load-more-opportunities]="$ctrl.loadMoreOpportunities"
                                   (click-action-button)="$ctrl.onClickViewSuggestion($event)"
                                   [label-required]="!$ctrl.activeReviewTab"
-                                  [opportunity-heading-truncation-length]="30">
+                                  [opportunity-heading-truncation-length]="30"
+                                  [show-opportunity-button]="false">
         </oppia-opportunities-list>
       </div>
     </div>
@@ -254,7 +256,19 @@
     width: 100%;
   }
 
+  @media only screen and (max-width: 1500px) {
+    contributions-and-review .oppia-contributions-navbar-button {
+      font-size: 1.6vw;
+    }
+    contributions-and-review .oppia-contributions-navbar-items-list::before {
+      font-size: 2vw;
+    }
+  }
+
   @media only screen and (max-width: 700px) {
+    .oppia-opportunities-list {
+      background-color: #e8e7e3;
+    }
     contributions-and-review .oppia-contributions-dropdown-section {
       align-items: center;
       display: flex;
@@ -275,15 +289,6 @@
     }
     contributions-and-review .oppia-contributions-show-review-container {
       width: 95%;
-    }
-  }
-
-  @media only screen and (min-width: 601px) and (max-width: 1500px) {
-    contributions-and-review .oppia-contributions-navbar-button {
-      font-size: 1.6vw;
-    }
-    contributions-and-review .oppia-contributions-navbar-items-list::before {
-      font-size: 2vw;
     }
   }
 
