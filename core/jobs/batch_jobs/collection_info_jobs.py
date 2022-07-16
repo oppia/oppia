@@ -34,15 +34,11 @@ if MYPY: # pragma: no cover
     from mypy_imports import feedback_models
     from mypy_imports import user_models
 
-(
-    collection_models,
-    feedback_models,
-    user_models
-) = models.Registry.import_models([
-    models.NAMES.collection,
-    models.NAMES.feedback,
-    models.NAMES.user
-])
+(collection_models, feedback_models, user_models) = (
+    models.Registry.import_models([
+        models.NAMES.collection, models.NAMES.feedback, models.NAMES.user
+    ])
+)
 
 
 class GetCollectionOwnersEmailsJob(base_jobs.JobBase):

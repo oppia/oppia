@@ -35,8 +35,9 @@ if MYPY: # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import user_models
 
-(auth_models, base_models, user_models) = models.Registry.import_models(
-    [models.NAMES.auth, models.NAMES.base_model, models.NAMES.user])
+(auth_models, base_models, user_models) = models.Registry.import_models([
+    models.NAMES.auth, models.NAMES.base_model, models.NAMES.user
+])
 
 
 class AuditAllStorageModelsJobTests(job_test_utils.JobTestBase):

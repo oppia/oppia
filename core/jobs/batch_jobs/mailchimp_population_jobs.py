@@ -38,8 +38,9 @@ if MYPY: # pragma: no cover
     from mypy_imports import config_models
     from mypy_imports import user_models
 
-(config_models, user_models) = models.Registry.import_models(
-    [models.NAMES.config, models.NAMES.user])
+(config_models, user_models) = models.Registry.import_models([
+    models.NAMES.config, models.NAMES.user
+])
 
 
 # TODO(#15613): Due to incomplete typing of apache_beam library and absences

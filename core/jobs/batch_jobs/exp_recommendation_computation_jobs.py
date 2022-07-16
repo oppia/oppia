@@ -37,8 +37,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import recommendations_models
 
 (exp_models, recommendations_models) = models.Registry.import_models([
-    models.NAMES.exploration,
-    models.NAMES.recommendations
+    models.NAMES.exploration, models.NAMES.recommendations
 ])
 
 datastore_services = models.Registry.import_datastore_services()
