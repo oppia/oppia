@@ -26,6 +26,7 @@ require('pages/topic-editor-page/topic-editor-page.component.ts');
 import { EventEmitter } from '@angular/core';
 import { Subtopic } from 'domain/topic/subtopic.model';
 import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
+import { StoryReference } from 'domain/topic/story-reference-object.model';
 
 describe('Topic editor page', function() {
   var ctrl = null;
@@ -38,7 +39,6 @@ describe('Topic editor page', function() {
   var TopicEditorStateService = null;
   var UrlService = null;
   var TopicObjectFactory = null;
-  var StoryReferenceObjectFactory = null;
   var topic = null;
 
   importAllAngularServices();
@@ -54,7 +54,6 @@ describe('Topic editor page', function() {
     TopicEditorStateService = $injector.get('TopicEditorStateService');
     UrlService = $injector.get('UrlService');
     TopicObjectFactory = $injector.get('TopicObjectFactory');
-    StoryReferenceObjectFactory = $injector.get('StoryReferenceObjectFactory');
 
     var subtopic = Subtopic.createFromTitle(1, 'subtopic1');
     subtopic._thumbnailFilename = 'b.svg';
@@ -65,8 +64,8 @@ describe('Topic editor page', function() {
     topic._subtopics = [subtopic];
     topic._thumbnailFilename = 'a.svg';
     topic._metaTagContent = 'topic';
-    var story1 = StoryReferenceObjectFactory.createFromStoryId('storyId1');
-    var story2 = StoryReferenceObjectFactory.createFromStoryId('storyId2');
+    var story1 = StoryReference.createFromStoryId('storyId1');
+    var story2 = StoryReference.createFromStoryId('storyId2');
     topic._canonicalStoryReferences = [story1, story2];
     topic.setName('New Name');
     topic.setUrlFragment('topic-url-fragment');

@@ -116,6 +116,7 @@ describe('Question update service', function() {
           }],
           outcome: {
             dest: 'Me Llamo',
+            dest_if_really_stuck: null,
             feedback: {
               content_id: 'feedback_1',
               html: 'buen trabajo!'
@@ -134,6 +135,7 @@ describe('Question update service', function() {
         },
         default_outcome: {
           dest: 'Hola',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'default_outcome',
             html: 'try again!'
@@ -178,6 +180,7 @@ describe('Question update service', function() {
           }],
           outcome: {
             dest: 'Me Llamo',
+            dest_if_really_stuck: null,
             feedback: {
               content_id: 'feedback_1',
               html: 'buen trabajo!'
@@ -196,6 +199,7 @@ describe('Question update service', function() {
         },
         default_outcome: {
           dest: 'Hola',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'default_outcome',
             html: 'try again!'

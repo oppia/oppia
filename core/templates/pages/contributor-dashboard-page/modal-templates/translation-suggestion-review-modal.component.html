@@ -2,7 +2,7 @@
   <div class="row align-items-start">
     <h3 class="col-3">Review translation</h3>
     <span title="{{ subheading }}"
-          class="col-8 pt-1 mt-4 oppia-translation-modal-subheading protractor-translation-suggestion-review-subheading"
+          class="col-8 pt-1 mt-4 oppia-translation-modal-subheading e2e-translation-suggestion-review-subheading"
           aria-hidden="false"> {{ subheading }}
     </span>
     <button type="button"
@@ -30,9 +30,9 @@
             {{ item }}
           </li>
         </ul>
-        <angular-html-bind-wrapper *ngIf="!contentTypeIsSetOfStrings"
-                                    [htmlData]="displayExplorationContent()">
-        </angular-html-bind-wrapper>
+        <oppia-rte-output-display *ngIf="!contentTypeIsSetOfStrings"
+                                  [rteString]="displayExplorationContent()">
+        </oppia-rte-output-display>
       </div>
     </div>
     <div class="oppia-suggestion-review-panel-container float-right">
@@ -46,8 +46,8 @@
       </div>
       <div class="oppia-suggestion-review-panel">
         <div>
-          <angular-html-bind-wrapper [htmlData]="translationHtml" *ngIf="!startedEditing">
-          </angular-html-bind-wrapper>
+          <oppia-rte-output-display [rteString]="translationHtml" *ngIf="!startedEditing">
+          </oppia-rte-output-display>
           <ul *ngIf="contentTypeIsSetOfStrings">
             <li *ngFor="let item of translationHtml; index as idx">
               {{ item }}
@@ -102,14 +102,14 @@
           {{ item }}
         </li>
       </ul>
-      <angular-html-bind-wrapper *ngIf="!contentTypeIsSetOfStrings"
-                                 [htmlData]="contentHtml">
-      </angular-html-bind-wrapper>
+      <oppia-rte-output-display *ngIf="!contentTypeIsSetOfStrings"
+                                [rteString]="contentHtml">
+      </oppia-rte-output-display>
     </div>
   </section>
   <div [hidden]="!reviewable" class="oppia-suggestion-review-message">
     Review message (required if rejecting):
-    <textarea class="protractor-test-suggestion-review-message w-100"
+    <textarea class="e2e-test-suggestion-review-message w-100"
               rows="3"
               [(ngModel)]="reviewMessage"
               [maxlength]="MAX_REVIEW_MESSAGE_LENGTH">

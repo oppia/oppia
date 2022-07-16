@@ -113,6 +113,9 @@ describe('Embedding', function() {
     '\'X-Frame-Options\' to \'deny\'.',
     'chrome-error:\/\/chromewebdata\/ - Failed to load resource: the server ' +
     'responded with a status of 400 ()',
+    'chrome-error:\/\/chromewebdata\/ 0 Refused to display ' +
+    '\'http:\/\/localhost:9001\/\' in a frame because it set ' +
+    '\'X-Frame-Options\' to \'deny\'.',
   ];
 
   beforeEach(function() {
@@ -133,7 +136,7 @@ describe('Embedding', function() {
       // iframes. see: https://github.com/angular/protractor/issues/4678
       // Current, work-around is to use browser.sleep() before executing
       // functions that require angular to be present inside the iframe.
-      // eslint-disable-next-line oppia/protractor-practices
+      // eslint-disable-next-line oppia/e2e-practices
       await browser.sleep(5000);
       await waitFor.pageToFullyLoad();
       await explorationPlayerPage.expectContentToMatch(
@@ -180,30 +183,30 @@ describe('Embedding', function() {
         TEST_PAGES[i].filename);
 
       await (await driver.findElement(by.css(
-        '.protractor-test-exploration-id-input-field')
+        '.e2e-test-exploration-id-input-field')
       )).sendKeys(explorationId);
 
       await (await driver.findElement(by.css(
-        '.protractor-test-exploration-id-submit-button')
+        '.e2e-test-exploration-id-submit-button')
       )).click();
 
       // Test of standard loading (new and old versions).
       await browser.switchTo().frame(
         await driver.findElement(
-          by.css('.protractor-test-standard > iframe')));
+          by.css('.e2e-test-standard > iframe')));
       await playCountingExploration(3);
       await browser.switchTo().defaultContent();
 
       if (TEST_PAGES[i].isVersion1) {
         // Test of deferred loading (old version).
         await driver.findElement(
-          by.css('.protractor-test-old-version > oppia > div > button')
+          by.css('.e2e-test-old-version > oppia > div > button')
         ).click();
       }
 
       await browser.switchTo().frame(
         await driver.findElement(
-          by.css('.protractor-test-old-version > iframe')));
+          by.css('.e2e-test-old-version > iframe')));
       await playCountingExploration(2);
       await browser.switchTo().defaultContent();
     }
@@ -265,25 +268,25 @@ describe('Embedding', function() {
           'embedding_tests_dev_i18n_0.0.1.html');
 
         await (await driver.findElement(by.css(
-          '.protractor-test-exploration-id-input-field')
+          '.e2e-test-exploration-id-input-field')
         )).sendKeys(explorationId);
 
         await (await driver.findElement(by.css(
-          '.protractor-test-exploration-id-submit-button')
+          '.e2e-test-exploration-id-submit-button')
         )).click();
 
         await browser.switchTo().frame(await driver.findElement(
-          by.css('.protractor-test-embedded-exploration > iframe')));
+          by.css('.e2e-test-embedded-exploration > iframe')));
         // Protractor's waitForAngularEnabled does not work well inside
         // iframes. see: https://github.com/angular/protractor/issues/4678
         // Current, work-around is to use browser.sleep() before executing
         // functions that require angular to be present inside the iframe.
-        // eslint-disable-next-line oppia/protractor-practices
+        // eslint-disable-next-line oppia/e2e-practices
         await browser.sleep(5000);
         await waitFor.pageToFullyLoad();
 
         expect(await (await driver.findElement(
-          by.css('.protractor-test-float-form-input'))).getAttribute(
+          by.css('.e2e-test-float-form-input'))).getAttribute(
           'placeholder')).toBe(expectedPlaceholder);
         await browser.switchTo().defaultContent();
       };

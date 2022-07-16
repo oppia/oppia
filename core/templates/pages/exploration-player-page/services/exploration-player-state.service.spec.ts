@@ -77,6 +77,22 @@ describe('Exploration Player State Service', () => {
       objective: '',
       correctness_feedback_enabled: false
     },
+    exploration_metadata: {
+      title: '',
+      category: '',
+      objective: '',
+      language_code: 'en',
+      tags: [],
+      blurb: '',
+      author_notes: '',
+      states_schema_version: 50,
+      init_state_name: 'state_name',
+      param_specs: {},
+      param_changes: [],
+      auto_tts_enabled: false,
+      correctness_feedback_enabled: false,
+      edits_allowed: true
+    },
     exploration_id: 'test_id',
     is_logged_in: true,
     session_id: 'test_session',
@@ -117,6 +133,7 @@ describe('Exploration Player State Service', () => {
         answer_groups: [{
           outcome: {
             dest: 'State 1',
+            dest_if_really_stuck: null,
             feedback: {
               content_id: 'feedback_1',
               html: '<p>Try Again.</p>'
@@ -136,6 +153,7 @@ describe('Exploration Player State Service', () => {
         {
           outcome: {
             dest: 'State 2',
+            dest_if_really_stuck: null,
             feedback: {
               content_id: 'feedback_2',
               html: '<p>Try Again.</p>'
@@ -154,6 +172,7 @@ describe('Exploration Player State Service', () => {
         }],
         default_outcome: {
           dest: null,
+          dest_if_really_stuck: null,
           labelled_as_correct: true,
           missing_prerequisite_skill_id: null,
           refresher_exploration_id: null,
@@ -655,4 +674,27 @@ describe('Exploration Player State Service', () => {
     explorationPlayerStateService.init();
     expect(explorationPlayerStateService.version).toBe(1);
   });
+
+  it('should tell if logged out learner progress is tracked', () => {
+    expect(explorationPlayerStateService.isLoggedOutLearnerProgressTracked())
+      .toBeFalse();
+    explorationPlayerStateService.trackLoggedOutLearnerProgress();
+    expect(explorationPlayerStateService.isLoggedOutLearnerProgressTracked())
+      .toBeTrue();
+  });
+
+  it('should set unique progress URL id correctly', fakeAsync(() => {
+    spyOn(
+      editableExplorationBackendApiService,
+      'recordProgressAndFetchUniqueProgressIdOfLoggedOutLearner')
+      .and.returnValue(Promise.resolve({
+        unique_progress_url_id: '123456'
+      }));
+    expect(explorationPlayerStateService.getUniqueProgressUrlId()).toBeNull();
+    explorationPlayerStateService.setLastCompletedCheckpoint('abc');
+    explorationPlayerStateService.setUniqueProgressUrlId();
+    tick(100);
+    expect(explorationPlayerStateService.getUniqueProgressUrlId()).toEqual(
+      '123456');
+  }));
 });

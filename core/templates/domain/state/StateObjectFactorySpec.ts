@@ -45,6 +45,7 @@ describe('State Object Factory', () => {
       answer_groups: [],
       default_outcome: {
         dest: 'Introduction',
+        dest_if_really_stuck: null,
         feedback: {
           content_id: 'default_outcome',
           html: ''
@@ -119,6 +120,7 @@ describe('State Object Factory', () => {
         },
         default_outcome: {
           dest: '(untitled state)',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'default_outcome',
             html: ''

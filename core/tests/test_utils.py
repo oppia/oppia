@@ -1644,13 +1644,14 @@ class GenericTestBase(AppEngineTestBase):
                     'html': '',
                 },
                 'dest': None,
+                'dest_if_really_stuck': None,
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None,
                 'labelled_as_correct': True,
             },
             'customization_args': {
                 'rows': {'value': 1},
-                'placeholder': {'value': 'Enter text here'},
+                'placeholder': {'value': 'Enter text here'}
             },
             'confirmed_unclassified_answers': [],
             'id': 'TextInput',
@@ -1815,6 +1816,7 @@ states:
       customization_args: {}
       default_outcome:
         dest: %s
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -1849,6 +1851,7 @@ states:
       customization_args: {}
       default_outcome:
         dest: New state
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -3490,7 +3493,7 @@ title: Title
                     'unicode_str': 'Enter text here',
                 },
             },
-            'rows': {'value': 1},
+            'rows': {'value': 1}
         })
         state.update_next_content_id_index(2)
         state.interaction.default_outcome.labelled_as_correct = True
@@ -3549,8 +3552,16 @@ class EmailMessageMock:
     """Mock for core.platform.models email services messages."""
 
     def __init__(
-            self, sender_email, recipient_email, subject, plaintext_body,
-            html_body, bcc=None, reply_to=None, recipient_variables=None):
+        self,
+        sender_email: str,
+        recipient_email: str,
+        subject: str,
+        plaintext_body: str,
+        html_body: str,
+        bcc: Optional[List[str]] = None,
+        reply_to: Optional[str] = None,
+        recipient_variables: Optional[Dict[str, Dict[str, str]]] = None
+    ) -> None:
         """Inits a mock email message with all the necessary data.
 
         Args:

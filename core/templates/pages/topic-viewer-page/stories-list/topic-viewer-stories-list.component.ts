@@ -24,20 +24,26 @@ import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-langu
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
 
+import './topic-viewer-stories-list.component.css';
+
+
 @Component({
   selector: 'stories-list',
   templateUrl: './topic-viewer-stories-list.component.html',
   styleUrls: []
 })
 export class StoriesListComponent implements OnInit {
-  @Input() canonicalStorySummaries: StorySummary[];
-  @Input() classroomUrlFragment: string;
-  @Input() topicUrlFragment: string;
-  @Input() topicName: string;
-  @Input() topicDescription: string;
-  @Input() topicId: string;
-  topicNameTranslationKey: string;
-  topicDescTranslationKey: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() canonicalStorySummaries!: StorySummary[];
+  @Input() classroomUrlFragment!: string;
+  @Input() topicUrlFragment!: string;
+  @Input() topicName!: string;
+  @Input() topicDescription!: string;
+  @Input() topicId!: string;
+  topicNameTranslationKey!: string;
+  topicDescTranslationKey!: string;
 
   constructor(
     private i18nLanguageCodeService: I18nLanguageCodeService,
@@ -69,10 +75,6 @@ export class StoriesListComponent implements OnInit {
 
   checkTabletView(): boolean {
     return this.windowDimensionsService.getWidth() < 768;
-  }
-
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 }
 angular.module('oppia').directive(
