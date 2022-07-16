@@ -12,88 +12,42 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-/**
- * @fileoverview Unit tests for State Responses Component.
- */
-
-import { EventEmitter, NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { EventEmitter } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
 import { AnswerGroupObjectFactory } from 'domain/exploration/AnswerGroupObjectFactory';
 import { Interaction, InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { Rule } from 'domain/exploration/RuleObjectFactory';
 import { MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFactory';
+import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { ResponsesService } from 'pages/exploration-editor-page/editor-tab/services/responses.service';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { StateCustomizationArgsService } from '../state-editor-properties-services/state-customization-args.service';
-import { AnswerChoice, StateEditorService } from '../state-editor-properties-services/state-editor.service';
-import { StateInteractionIdService } from '../state-editor-properties-services/state-interaction-id.service';
-import { AlertsService } from 'services/alerts.service';
-import { ExternalSaveService } from 'services/external-save.service';
-import { StateSolicitAnswerDetailsService } from '../state-editor-properties-services/state-solicit-answer-details.service';
-import { StateResponsesComponent } from './state-responses.component';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ParameterizeRuleDescriptionPipe } from 'filters/parameterize-rule-description.pipe';
-import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
 
-@Pipe({ name: 'parameterizeRuleDescriptionPipe' })
-class MockParameterizeRuleDescriptionPipe {
-  transform(
-      rule: Rule | null, interactionId: string | null,
-      choices: AnswerChoice[] | null): string {
-    return '';
-  }
-}
-@Pipe({ name: 'wrapTextWithEllipsis' })
-class MockWrapTextWithEllipsisPipe {
-  transform(input: string, characterCount: number): string {
-    return '';
-  }
-}
+/**
+ * @fileoverview Unit tests for StateResponsesComponent.
+ */
 
-@Pipe({ name: 'truncate' })
-class MockTruncatePipe {
-  transform(value: string, params: number): string {
-    return value;
-  }
-}
-
-@Pipe({ name: 'convertToPlainText' })
-class MockConvertToPlainTextPipe {
-  transform(value: string): string {
-    return value;
-  }
-}
-
-class MockNgbModal {
-  open() {
-    return {
-      result: Promise.resolve()
-    };
-  }
-}
-
-describe('State Responses Component', () => {
-  let component: StateResponsesComponent;
-  let fixture: ComponentFixture<StateResponsesComponent>;
-  let windowDimensionsService: WindowDimensionsService;
-  let stateEditorService: StateEditorService;
-  let responsesService: ResponsesService;
-  let stateInteractionIdService: StateInteractionIdService;
-  let stateCustomizationArgsService: StateCustomizationArgsService;
+describe('StateResponsesComponent', () => {
+  let ctrl = null;
+  let $rootScope = null;
+  let $scope = null;
+  let $uibModal = null;
+  let $q = null;
+  let WindowDimensionsService = null;
+  let StateEditorService = null;
+  let ResponsesService = null;
+  let StateInteractionIdService = null;
+  let StateCustomizationArgsService = null;
   let interactionObjectFactory: InteractionObjectFactory;
   let interactionData: Interaction;
   let outcomeObjectFactory: OutcomeObjectFactory;
   let answerGroupObjectFactory: AnswerGroupObjectFactory;
-  let misconceptionObjectFactory: MisconceptionObjectFactory;
-  let externalSaveService: ExternalSaveService;
-  let stateSolicitAnswerDetailsService: StateSolicitAnswerDetailsService;
-  let alertsService: AlertsService;
-  let ngbModal: NgbModal = null;
   let answerGroups;
   let defaultOutcome;
+  let misconceptionObjectFactory: MisconceptionObjectFactory;
+  let ExternalSaveService = null;
+  let StateSolicitAnswerDetailsService = null;
+  let AlertsService = null;
+  let ngbModal: NgbModal = null;
 
   let defaultsOutcomesToSuppressWarnings = [
     {
@@ -122,82 +76,107 @@ describe('State Responses Component', () => {
     }
   ];
 
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      declarations: [
-        StateResponsesComponent,
-        MockParameterizeRuleDescriptionPipe,
-        MockTruncatePipe,
-        MockConvertToPlainTextPipe,
-        MockWrapTextWithEllipsisPipe
-      ],
-      providers: [
-        WindowDimensionsService,
-        StateEditorService,
-        ResponsesService,
-        StateInteractionIdService,
-        StateCustomizationArgsService,
-        ExternalSaveService,
-        StateSolicitAnswerDetailsService,
-        AlertsService,
-        InteractionObjectFactory,
-        OutcomeObjectFactory,
-        AnswerGroupObjectFactory,
-        MisconceptionObjectFactory,
-        {
-          provide: NgbModal,
-          useClass: MockNgbModal
-        },
-        {
-          provide: ParameterizeRuleDescriptionPipe,
-          useClass: MockParameterizeRuleDescriptionPipe
-        },
-        {
-          provide: WrapTextWithEllipsisPipe,
-          useClass: MockWrapTextWithEllipsisPipe
-        }
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
-    }).compileComponents();
-  }));
+  beforeEach(angular.mock.module('oppia'));
+  importAllAngularServices();
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(StateResponsesComponent);
-    component = fixture.componentInstance;
-
-    interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
-    outcomeObjectFactory = TestBed.inject(OutcomeObjectFactory);
-    answerGroupObjectFactory = TestBed.inject(AnswerGroupObjectFactory);
-    misconceptionObjectFactory = TestBed.inject(MisconceptionObjectFactory);
+    interactionObjectFactory = TestBed.get(InteractionObjectFactory);
+    outcomeObjectFactory = TestBed.get(OutcomeObjectFactory);
+    answerGroupObjectFactory = TestBed.get(AnswerGroupObjectFactory);
+    misconceptionObjectFactory = TestBed.get(MisconceptionObjectFactory);
     ngbModal = TestBed.inject(NgbModal);
-    windowDimensionsService = TestBed.inject(WindowDimensionsService);
-    stateEditorService = TestBed.inject(StateEditorService);
-    responsesService = TestBed.inject(ResponsesService);
-    stateInteractionIdService = TestBed.inject(StateInteractionIdService);
-    stateSolicitAnswerDetailsService =
-      TestBed.inject(StateSolicitAnswerDetailsService);
-    alertsService = TestBed.inject(AlertsService);
-    stateCustomizationArgsService =
-      TestBed.inject(StateCustomizationArgsService);
-    externalSaveService = TestBed.inject(ExternalSaveService);
+  });
 
-    interactionData = interactionObjectFactory.createFromBackendDict({
-      id: 'TextInput',
-      answer_groups: [
-        {
-          outcome: {
-            dest: 'State',
-            dest_if_really_stuck: null,
-            feedback: {
-              html: '',
-              content_id: 'This is a new feedback text',
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('NgbModal', {
+      open: () => {
+        return {
+          result: Promise.resolve()
+        };
+      }
+    });
+  }));
+
+  beforeEach(angular.mock.inject(
+    function($injector, $componentController) {
+      $rootScope = $injector.get('$rootScope');
+      $scope = $rootScope.$new();
+      $uibModal = $injector.get('$uibModal');
+      $q = $injector.get('$q');
+      ngbModal = $injector.get('NgbModal');
+
+      WindowDimensionsService = $injector.get('WindowDimensionsService');
+      StateEditorService = $injector.get('StateEditorService');
+      ResponsesService = $injector.get('ResponsesService');
+      StateInteractionIdService = $injector.get('StateInteractionIdService');
+      StateCustomizationArgsService = $injector
+        .get('StateCustomizationArgsService');
+      ExternalSaveService = $injector.get('ExternalSaveService');
+      StateSolicitAnswerDetailsService = $injector
+        .get('StateSolicitAnswerDetailsService');
+      AlertsService = $injector.get('AlertsService');
+
+      interactionData = interactionObjectFactory.createFromBackendDict({
+        id: 'TextInput',
+        answer_groups: [
+          {
+            outcome: {
+              dest: 'State',
+              dest_if_really_stuck: null,
+              feedback: {
+                html: '',
+                content_id: 'This is a new feedback text',
+              },
+              refresher_exploration_id: 'test',
+              missing_prerequisite_skill_id: 'test_skill_id',
+              labelled_as_correct: false,
+              param_changes: [],
             },
-            refresher_exploration_id: 'test',
-            missing_prerequisite_skill_id: 'test_skill_id',
-            labelled_as_correct: false,
-            param_changes: [],
+            rule_specs: [{
+              rule_type: 'Contains',
+              inputs: {x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['abc']
+              }}
+            }],
+            training_data: [],
+            tagged_skill_misconception_id: 'misconception1',
           },
+        ],
+        default_outcome: {
+          dest: 'Hola',
+          dest_if_really_stuck: null,
+          feedback: {
+            content_id: '',
+            html: '',
+          },
+          labelled_as_correct: true,
+          param_changes: [],
+          refresher_exploration_id: 'test',
+          missing_prerequisite_skill_id: 'test_skill_id',
+        },
+        confirmed_unclassified_answers: [],
+        customization_args: {
+          rows: {
+            value: true,
+          },
+          placeholder: {
+            value: 1,
+          },
+        },
+        hints: [],
+        solution: {
+          answer_is_exclusive: true,
+          correct_answer: 'test_answer',
+          explanation: {
+            content_id: '2',
+            html: 'test_explanation1',
+          },
+        },
+      });
+
+      answerGroups = [answerGroupObjectFactory
+        .createFromBackendDict({
           rule_specs: [{
             rule_type: 'Contains',
             inputs: {x: {
@@ -205,328 +184,314 @@ describe('State Responses Component', () => {
               normalizedStrSet: ['abc']
             }}
           }],
+          outcome: {
+            dest: 'State',
+            dest_if_really_stuck: null,
+            feedback: {
+              html: '',
+              content_id: 'This is a new feedback text'
+            },
+            labelled_as_correct: false,
+            param_changes: [],
+            refresher_exploration_id: 'test',
+            missing_prerequisite_skill_id: 'test_skill_id'
+          },
           training_data: [],
-          tagged_skill_misconception_id: 'misconception1',
-        },
-      ],
-      default_outcome: {
+          tagged_skill_misconception_id: 'misconception1'
+        }, 'TextInput')
+      ];
+      defaultOutcome = outcomeObjectFactory.createFromBackendDict({
         dest: 'Hola',
         dest_if_really_stuck: null,
         feedback: {
           content_id: '',
-          html: '',
+          html: ''
         },
         labelled_as_correct: true,
         param_changes: [],
         refresher_exploration_id: 'test',
-        missing_prerequisite_skill_id: 'test_skill_id',
-      },
-      confirmed_unclassified_answers: [],
-      customization_args: {
-        rows: {
-          value: true,
-        },
-        placeholder: {
-          value: 1,
-        },
-      },
-      hints: [],
-      solution: {
-        answer_is_exclusive: true,
-        correct_answer: 'test_answer',
-        explanation: {
-          content_id: '2',
-          html: 'test_explanation1',
-        },
-      },
-    });
-
-    answerGroups = [answerGroupObjectFactory
-      .createFromBackendDict({
-        rule_specs: [{
-          rule_type: 'Contains',
-          inputs: {x: {
-            contentId: 'rule_input',
-            normalizedStrSet: ['abc']
-          }}
-        }],
-        outcome: {
-          dest: 'State',
-          dest_if_really_stuck: null,
-          feedback: {
-            html: '',
-            content_id: 'This is a new feedback text'
-          },
-          labelled_as_correct: false,
-          param_changes: [],
-          refresher_exploration_id: 'test',
-          missing_prerequisite_skill_id: 'test_skill_id'
-        },
-        training_data: [],
-        tagged_skill_misconception_id: 'misconception1'
-      }, 'TextInput')
-    ];
-    defaultOutcome = outcomeObjectFactory.createFromBackendDict({
-      dest: 'Hola',
-      dest_if_really_stuck: null,
-      feedback: {
-        content_id: '',
-        html: ''
-      },
-      labelled_as_correct: true,
-      param_changes: [],
-      refresher_exploration_id: 'test',
-      missing_prerequisite_skill_id: 'test_skill_id'
-    });
-  });
-
-
-  it('should sort state responses properly', () => {
-    component.answerGroups = answerGroups;
-    spyOn(responsesService, 'save').and.callFake(
-      (value, values, callback) => {
-        callback(null, null);
+        missing_prerequisite_skill_id: 'test_skill_id'
       });
-    spyOn(component.onSaveNextContentIdIndex, 'emit').and.stub();
-    spyOn(component.showMarkAllAudioAsNeedingUpdateModalIfRequired, 'emit')
-      .and.stub();
 
-    const event = {
-      previousIndex: 1,
-      currentIndex: 1,
-      container: undefined,
-      item: undefined,
-    };
-    component.drop(event);
-    component.sendOnSaveNextContentIdIndex(0);
-    component.sendshowMarkAllAudioAsNeedingUpdateModalIfRequired([]);
 
-    expect(responsesService.save).toHaveBeenCalled();
-    expect(component.onSaveNextContentIdIndex.emit).toHaveBeenCalledWith(0);
-    expect(
-      component.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit)
-      .toHaveBeenCalledWith([]);
-  });
+      ctrl = $componentController('stateResponses', {
+        $scope: $scope
+      });
+
+      ctrl.onSaveInteractionDefaultOutcome = jasmine.createSpy(
+        'saveInteraction', () => {});
+      ctrl.onSaveInteractionAnswerGroups = jasmine.createSpy(
+        'saveAnswerGroup', () => {});
+      ctrl.onResponsesInitialized = jasmine.createSpy(
+        'responseInitialized', () => {});
+      ctrl.refreshWarnings = () => jasmine.createSpy(
+        'refreshWarnings', () => {});
+      ctrl.onSaveInapplicableSkillMisconceptionIds = jasmine.createSpy(
+        'saveInapplicableSkillMisconceptionIds', () => {});
+      ctrl.onSaveSolicitAnswerDetails = jasmine.createSpy(
+        'saveSolicitAnswerDetails', () => {});
+      ctrl.onSaveNextContentIdIndex = jasmine.createSpy(
+        'saveNextContentIdIndex', () => {});
+    }));
 
   it('should set component properties on initialization', () => {
-    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(true);
-    spyOn(stateEditorService, 'getActiveStateName').and.returnValue('Hola');
-    spyOn(stateEditorService, 'getInapplicableSkillMisconceptionIds')
+    spyOn(WindowDimensionsService, 'isWindowNarrow').and.returnValue(true);
+    spyOn(StateEditorService, 'getActiveStateName').and.returnValue('Hola');
+    spyOn(StateEditorService, 'getInapplicableSkillMisconceptionIds')
       .and.returnValue(['id1']);
 
-    expect(component.responseCardIsShown).toBe(undefined);
-    expect(component.enableSolicitAnswerDetailsFeature).toBe(undefined);
-    expect(component.SHOW_TRAINABLE_UNRESOLVED_ANSWERS).toBe(undefined);
-    expect(component.stateName).toBe(undefined);
-    expect(component.misconceptionsBySkill).toEqual(undefined);
-    expect(component.inapplicableSkillMisconceptionIds).toEqual(undefined);
+    expect($scope.responseCardIsShown).toBe(undefined);
+    expect($scope.enableSolicitAnswerDetailsFeature).toBe(undefined);
+    expect($scope.SHOW_TRAINABLE_UNRESOLVED_ANSWERS).toBe(undefined);
+    expect($scope.stateName).toBe(undefined);
+    expect($scope.misconceptionsBySkill).toEqual(undefined);
+    expect($scope.inapplicableSkillMisconceptionIds).toEqual(undefined);
 
-    component.ngOnInit();
+    ctrl.$onInit();
 
-    expect(component.responseCardIsShown).toBe(false);
-    expect(component.enableSolicitAnswerDetailsFeature).toBe(true);
-    expect(component.SHOW_TRAINABLE_UNRESOLVED_ANSWERS).toBe(false);
-    expect(component.stateName).toBe('Hola');
-    expect(component.misconceptionsBySkill).toEqual({});
-    expect(component.inapplicableSkillMisconceptionIds).toEqual(['id1']);
+    expect($scope.responseCardIsShown).toBe(false);
+    expect($scope.enableSolicitAnswerDetailsFeature).toBe(true);
+    expect($scope.SHOW_TRAINABLE_UNRESOLVED_ANSWERS).toBe(false);
+    expect($scope.stateName).toBe('Hola');
+    expect($scope.misconceptionsBySkill).toEqual({});
+    expect($scope.inapplicableSkillMisconceptionIds).toEqual(['id1']);
 
-    component.ngOnDestroy();
+    ctrl.$onDestroy();
   });
 
   it('should subscribe to events on component initialization', () => {
-    spyOn(responsesService.onInitializeAnswerGroups, 'subscribe');
-    spyOn(stateInteractionIdService.onInteractionIdChanged, 'subscribe');
-    spyOn(responsesService.onAnswerGroupsChanged, 'subscribe');
-    spyOn(stateEditorService.onUpdateAnswerChoices, 'subscribe');
-    spyOn(stateEditorService.onHandleCustomArgsUpdate, 'subscribe');
-    spyOn(stateEditorService.onStateEditorInitialized, 'subscribe');
+    spyOn(ResponsesService.onInitializeAnswerGroups, 'subscribe');
+    spyOn(StateInteractionIdService.onInteractionIdChanged, 'subscribe');
+    spyOn(ResponsesService.onAnswerGroupsChanged, 'subscribe');
+    spyOn(StateEditorService.onUpdateAnswerChoices, 'subscribe');
+    spyOn(StateEditorService.onHandleCustomArgsUpdate, 'subscribe');
+    spyOn(StateEditorService.onStateEditorInitialized, 'subscribe');
 
-    component.ngOnInit();
+    ctrl.$onInit();
 
-    expect(responsesService.onInitializeAnswerGroups.subscribe)
+    expect(ResponsesService.onInitializeAnswerGroups.subscribe)
       .toHaveBeenCalled();
-    expect(stateInteractionIdService.onInteractionIdChanged.subscribe)
+    expect(StateInteractionIdService.onInteractionIdChanged.subscribe)
       .toHaveBeenCalled();
-    expect(responsesService.onAnswerGroupsChanged.subscribe).toHaveBeenCalled();
-    expect(stateEditorService.onUpdateAnswerChoices.subscribe)
+    expect(ResponsesService.onAnswerGroupsChanged.subscribe).toHaveBeenCalled();
+    expect(StateEditorService.onUpdateAnswerChoices.subscribe)
       .toHaveBeenCalled();
-    expect(stateEditorService.onHandleCustomArgsUpdate.subscribe)
+    expect(StateEditorService.onHandleCustomArgsUpdate.subscribe)
       .toHaveBeenCalled();
-    expect(stateEditorService.onStateEditorInitialized.subscribe)
+    expect(StateEditorService.onStateEditorInitialized.subscribe)
       .toHaveBeenCalled();
 
-    component.ngOnDestroy();
+    ctrl.$onDestroy();
   });
 
   it('should set answer group and default answer when answer' +
     ' groups are initialized', () => {
     let onInitializeAnswerGroupsEmitter = new EventEmitter();
-    spyOnProperty(responsesService, 'onInitializeAnswerGroups')
+    spyOnProperty(ResponsesService, 'onInitializeAnswerGroups')
       .and.returnValue(onInitializeAnswerGroupsEmitter);
-    spyOn(responsesService, 'changeActiveAnswerGroupIndex');
-    spyOn(component, 'isCurrentInteractionLinear').and.returnValue(true);
+    spyOn(ResponsesService, 'changeActiveAnswerGroupIndex');
+    spyOn($scope, 'isCurrentInteractionLinear').and.returnValue(true);
 
-    component.ngOnInit();
+    ctrl.$onInit();
 
     onInitializeAnswerGroupsEmitter.emit(interactionData);
 
-    expect(component.defaultOutcome).toEqual(defaultOutcome);
-    expect(component.answerGroups).toEqual(answerGroups);
-    expect(responsesService.changeActiveAnswerGroupIndex)
+    expect($scope.defaultOutcome).toEqual(defaultOutcome);
+    expect($scope.answerGroups).toEqual(answerGroups);
+    expect(ResponsesService.changeActiveAnswerGroupIndex)
       .toHaveBeenCalledWith(0);
 
-    component.ngOnDestroy();
+    ctrl.$onDestroy();
   });
 
   it('should re-initialize properties and open add answer group modal when' +
     ' interaction is changed to a non-linear and non-terminal one', () => {
     let onInteractionIdChangedEmitter = new EventEmitter();
-    spyOn(responsesService, 'getAnswerGroups').and.returnValue(answerGroups);
-    spyOn(responsesService, 'getActiveAnswerGroupIndex').and.returnValue(0);
-    spyOnProperty(stateInteractionIdService, 'onInteractionIdChanged')
+    spyOn(ResponsesService, 'getAnswerGroups').and.returnValue(answerGroups);
+    spyOn(ResponsesService, 'getActiveAnswerGroupIndex').and.returnValue(0);
+    spyOnProperty(StateInteractionIdService, 'onInteractionIdChanged')
       .and.returnValue(onInteractionIdChangedEmitter);
-    spyOn(responsesService, 'onInteractionIdChanged').and.callFake(
+    spyOn(ResponsesService, 'onInteractionIdChanged').and.callFake(
       (options, callback) => {
-        callback(null, null);
+        callback();
       });
-    spyOn(stateEditorService, 'isInQuestionMode').and.returnValue(true);
-    spyOn(responsesService, 'getDefaultOutcome').and.returnValue(
+    spyOn(StateEditorService, 'isInQuestionMode').and.returnValue(true);
+    spyOn(ResponsesService, 'getDefaultOutcome').and.returnValue(
       defaultOutcome);
-    spyOn(component, 'openAddAnswerGroupModal');
+    spyOn($scope, 'openAddAnswerGroupModal');
 
-    expect(component.answerGroups).toEqual(undefined);
-    expect(component.defaultOutcome).toEqual(undefined);
-    expect(component.activeAnswerGroupIndex).toBe(undefined);
+    expect($scope.answerGroups).toEqual(undefined);
+    expect($scope.defaultOutcome).toEqual(undefined);
+    expect($scope.activeAnswerGroupIndex).toBe(undefined);
 
-    component.ngOnInit();
+    ctrl.$onInit();
     onInteractionIdChangedEmitter.emit('ImageClickInput');
 
-    expect(component.answerGroups).toEqual(answerGroups);
-    expect(component.defaultOutcome).toEqual(defaultOutcome);
-    expect(component.activeAnswerGroupIndex).toBe(0);
-    expect(component.openAddAnswerGroupModal).toHaveBeenCalled();
+    expect($scope.answerGroups).toEqual(answerGroups);
+    expect($scope.defaultOutcome).toEqual(defaultOutcome);
+    expect($scope.activeAnswerGroupIndex).toBe(0);
+    expect($scope.openAddAnswerGroupModal).toHaveBeenCalled();
 
-    component.ngOnDestroy();
+    ctrl.$onDestroy();
   });
 
   it('should not open add answer group modal when interaction is' +
     ' changed to a linear and terminal one', () => {
     let onInteractionIdChangedEmitter = new EventEmitter();
-    spyOnProperty(stateInteractionIdService, 'onInteractionIdChanged')
+    spyOnProperty(StateInteractionIdService, 'onInteractionIdChanged')
       .and.returnValue(onInteractionIdChangedEmitter);
-    spyOn(component, 'openAddAnswerGroupModal');
+    spyOn($scope, 'openAddAnswerGroupModal');
 
-    component.ngOnInit();
+    ctrl.$onInit();
     onInteractionIdChangedEmitter.emit('Continue');
 
-    expect(component.openAddAnswerGroupModal).not.toHaveBeenCalled();
+    expect($scope.openAddAnswerGroupModal).not.toHaveBeenCalled();
 
-    component.ngOnDestroy();
+    ctrl.$onDestroy();
   });
 
   it('should get new answer groups, default outcome and verify/update' +
     ' inapplicable skill misconception ids on answer groups change', () => {
     let onAnswerGroupsChangedEmitter = new EventEmitter();
-    spyOn(responsesService, 'getAnswerGroups').and.returnValue(answerGroups);
-    spyOnProperty(responsesService, 'onAnswerGroupsChanged')
+    spyOn(ResponsesService, 'getAnswerGroups').and.returnValue(answerGroups);
+    spyOnProperty(ResponsesService, 'onAnswerGroupsChanged')
       .and.returnValue(onAnswerGroupsChangedEmitter);
-    spyOn(responsesService, 'getActiveAnswerGroupIndex').and.returnValue(0);
-    spyOn(responsesService, 'getDefaultOutcome').and.returnValue(
+    spyOn(ResponsesService, 'getActiveAnswerGroupIndex').and.returnValue(0);
+    spyOn(ResponsesService, 'getDefaultOutcome').and.returnValue(
       defaultOutcome);
-    spyOn(stateEditorService, 'getInapplicableSkillMisconceptionIds')
+    spyOn(StateEditorService, 'getInapplicableSkillMisconceptionIds')
       .and.returnValue(['misconception1']);
 
-    expect(component.answerGroups).toEqual(undefined);
-    expect(component.defaultOutcome).toEqual(undefined);
-    expect(component.activeAnswerGroupIndex).toBe(undefined);
-    expect(component.inapplicableSkillMisconceptionIds).toEqual(undefined);
+    expect($scope.answerGroups).toEqual(undefined);
+    expect($scope.defaultOutcome).toEqual(undefined);
+    expect($scope.activeAnswerGroupIndex).toBe(undefined);
+    expect($scope.inapplicableSkillMisconceptionIds).toEqual(undefined);
 
-    component.ngOnInit();
+    ctrl.$onInit();
 
-    expect(component.inapplicableSkillMisconceptionIds)
+    expect($scope.inapplicableSkillMisconceptionIds)
       .toEqual(['misconception1']);
 
     onAnswerGroupsChangedEmitter.emit();
 
-    expect(component.answerGroups).toEqual(answerGroups);
-    expect(component.defaultOutcome).toEqual(defaultOutcome);
-    expect(component.activeAnswerGroupIndex).toBe(0);
-    expect(component.inapplicableSkillMisconceptionIds).toEqual([]);
+    expect($scope.answerGroups).toEqual(answerGroups);
+    expect($scope.defaultOutcome).toEqual(defaultOutcome);
+    expect($scope.activeAnswerGroupIndex).toBe(0);
+    expect($scope.inapplicableSkillMisconceptionIds).toEqual([]);
 
-    component.ngOnDestroy();
+    ctrl.$onDestroy();
   });
 
   it('should update answer choices', () => {
     let onUpdateAnswerChoicesEmitter = new EventEmitter();
-    spyOnProperty(stateEditorService, 'onUpdateAnswerChoices')
+    spyOnProperty(StateEditorService, 'onUpdateAnswerChoices')
       .and.returnValue(onUpdateAnswerChoicesEmitter);
-    spyOn(responsesService, 'updateAnswerChoices');
+    spyOn(ResponsesService, 'updateAnswerChoices');
 
-    component.ngOnInit();
+    ctrl.$onInit();
     onUpdateAnswerChoicesEmitter.emit();
 
-    expect(responsesService.updateAnswerChoices).toHaveBeenCalled();
+    expect(ResponsesService.updateAnswerChoices).toHaveBeenCalled();
 
-    component.ngOnDestroy();
+    ctrl.$onDestroy();
   });
 
   it('should update custom arguments', () => {
     let onHandleCustomArgsUpdateEmitter = new EventEmitter();
-    spyOnProperty(stateEditorService, 'onHandleCustomArgsUpdate')
+    spyOnProperty(StateEditorService, 'onHandleCustomArgsUpdate')
       .and.returnValue(onHandleCustomArgsUpdateEmitter);
-    spyOn(responsesService, 'handleCustomArgsUpdate').and.callFake(
+    spyOn(ResponsesService, 'handleCustomArgsUpdate').and.callFake(
       (newAnswerChoices, callback) => {
-        callback(null);
+        callback();
       }
     );
-    spyOn(component.onSaveInteractionAnswerGroups, 'emit').and.stub();
 
-    component.ngOnInit();
+    ctrl.$onInit();
     onHandleCustomArgsUpdateEmitter.emit();
 
-    expect(component.onSaveInteractionAnswerGroups.emit).toHaveBeenCalled();
+    expect(ctrl.onSaveInteractionAnswerGroups).toHaveBeenCalled();
 
-    component.ngOnDestroy();
+    ctrl.$onDestroy();
   });
 
   it('should set misconceptions when state editor is initialized', () => {
     let onStateEditorInitializedEmitter = new EventEmitter();
-    spyOnProperty(stateEditorService, 'onStateEditorInitialized')
+    spyOnProperty(StateEditorService, 'onStateEditorInitialized')
       .and.returnValue(onStateEditorInitializedEmitter);
-    spyOn(stateEditorService, 'getMisconceptionsBySkill')
+    spyOn(StateEditorService, 'getMisconceptionsBySkill')
       .and.returnValue({
         skill1: [misconceptionObjectFactory.create(
           1, 'Misconception 1', 'note', '', false)]
       });
 
-    expect(component.misconceptionsBySkill).toBe(undefined);
-    expect(component.containsOptionalMisconceptions).toBe(undefined);
+    expect($scope.misconceptionsBySkill).toBe(undefined);
+    expect($scope.containsOptionalMisconceptions).toBe(undefined);
 
-    component.ngOnInit();
+    ctrl.$onInit();
     onStateEditorInitializedEmitter.emit();
 
-    expect(component.misconceptionsBySkill).toEqual({
+    expect($scope.misconceptionsBySkill).toEqual({
       skill1: [misconceptionObjectFactory.create(
         1, 'Misconception 1', 'note', '', false)]
     });
-    expect(component.containsOptionalMisconceptions).toBe(true);
+    expect($scope.containsOptionalMisconceptions).toBe(true);
 
-    component.ngOnDestroy();
+    ctrl.$onDestroy();
+  });
+
+  it('should set active answer group index as -1 when starting sorting', () => {
+    let ui = {
+      placeholder: {
+        height: () => {}
+      },
+      item: {
+        height: () => {}
+      }
+    };
+
+    spyOn(ResponsesService, 'getActiveAnswerGroupIndex').and.returnValue(-1);
+    spyOn(ExternalSaveService.onExternalSave, 'emit');
+
+    expect($scope.activeAnswerGroupIndex).toBe(undefined);
+
+    ctrl.$onInit();
+    $scope.ANSWER_GROUP_LIST_SORTABLE_OPTIONS.start('', ui);
+
+    expect($scope.activeAnswerGroupIndex).toBe(-1);
+    expect(ExternalSaveService.onExternalSave.emit).toHaveBeenCalled();
+
+    ctrl.$onDestroy();
+  });
+
+  it('should save answer groups and default outcome when sorting stops', () => {
+    spyOn(ResponsesService, 'save').and.callFake(
+      (answerGroups, defaultOutcome, callback) => {
+        callback(answerGroups, defaultOutcome);
+      }
+    );
+
+    ctrl.$onInit();
+    $scope.ANSWER_GROUP_LIST_SORTABLE_OPTIONS.stop();
+
+    expect(ctrl.onSaveInteractionAnswerGroups).toHaveBeenCalled();
+    expect(ctrl.onSaveInteractionDefaultOutcome).toHaveBeenCalled();
+
+    ctrl.$onDestroy();
   });
 
   it('should get static image URL', () => {
-    component.ngOnInit();
+    ctrl.$onInit();
 
-    expect(component.getStaticImageUrl('/image/url'))
+    expect($scope.getStaticImageUrl('/image/url'))
       .toBe('/assets/images/image/url');
 
-    component.ngOnDestroy();
+    ctrl.$onDestroy();
   });
 
   it('should check if state is in question mode', () => {
-    spyOn(stateEditorService, 'isInQuestionMode').and.returnValue(true);
+    spyOn(StateEditorService, 'isInQuestionMode').and.returnValue(true);
 
-    expect(component.isInQuestionMode()).toBe(true);
+    expect($scope.isInQuestionMode()).toBe(true);
   });
 
   it('should suppress default answer group warnings if each choice' +
@@ -564,11 +529,11 @@ describe('State Responses Component', () => {
         label: 'label2'
       }
     ];
-    stateInteractionIdService.savedMemento = 'MultipleChoiceInput';
-    spyOn(responsesService, 'getAnswerGroups').and.returnValue(answerGroups);
-    spyOn(responsesService, 'getAnswerChoices').and.returnValue(answerChoices);
+    StateInteractionIdService.savedMemento = 'MultipleChoiceInput';
+    spyOn(ResponsesService, 'getAnswerGroups').and.returnValue(answerGroups);
+    spyOn(ResponsesService, 'getAnswerChoices').and.returnValue(answerChoices);
 
-    expect(component.suppressDefaultAnswerGroupWarnings()).toBe(true);
+    expect($scope.suppressDefaultAnswerGroupWarnings()).toBe(true);
   });
 
   it('should suppress default answer group warnings if each choice' +
@@ -607,53 +572,52 @@ describe('State Responses Component', () => {
         }]
       }
     ];
-    stateInteractionIdService.savedMemento = 'ItemSelectionInput';
-    stateCustomizationArgsService.savedMemento = {
+    StateInteractionIdService.savedMemento = 'ItemSelectionInput';
+    StateCustomizationArgsService.savedMemento = {
       maxAllowableSelectionCount: {
         value: 1
       }
     };
-    spyOn(responsesService, 'getAnswerGroups').and.returnValue(answerGroups);
-    spyOn(responsesService, 'getAnswerChoices').and.returnValue(
-      answerChoices as unknown as AnswerChoice[]);
+    spyOn(ResponsesService, 'getAnswerGroups').and.returnValue(answerGroups);
+    spyOn(ResponsesService, 'getAnswerChoices').and.returnValue(answerChoices);
 
-    expect(component.suppressDefaultAnswerGroupWarnings()).toBe(true);
+    expect($scope.suppressDefaultAnswerGroupWarnings()).toBe(true);
   });
 
   it('should not suppress warnings for interactions other than multiple' +
     ' choice input or item selection input', () => {
-    stateInteractionIdService.savedMemento = 'TextInput';
+    StateInteractionIdService.savedMemento = 'TextInput';
 
-    expect(component.suppressDefaultAnswerGroupWarnings()).toBe(false);
+    expect($scope.suppressDefaultAnswerGroupWarnings()).toBe(false);
   });
 
   it('should save displayed value when solicit answer details' +
     ' are changed', () => {
-    spyOn(stateSolicitAnswerDetailsService, 'saveDisplayedValue');
-    spyOn(component.onSaveSolicitAnswerDetails, 'emit').and.stub();
-    component.ngOnInit();
+    spyOn(StateSolicitAnswerDetailsService, 'saveDisplayedValue');
 
-    component.onChangeSolicitAnswerDetails();
+    ctrl.$onInit();
 
-    expect(component.onSaveSolicitAnswerDetails.emit).toHaveBeenCalled();
-    expect(stateSolicitAnswerDetailsService.saveDisplayedValue)
+    $scope.onChangeSolicitAnswerDetails();
+
+    expect(ctrl.onSaveSolicitAnswerDetails).toHaveBeenCalled();
+    expect(StateSolicitAnswerDetailsService.saveDisplayedValue)
       .toHaveBeenCalled();
   });
 
   it('should check if outcome has no feedback with self loop', () => {
-    component.stateName = 'State Name';
+    $scope.stateName = 'State Name';
     let outcome1 = outcomeObjectFactory.createNew(
       'State Name', '1', '', []);
     let outcome2 = outcomeObjectFactory.createNew(
       'State Name', '1', 'Feedback Text', []);
 
-    expect(component.isSelfLoopWithNoFeedback(outcome1)).toBe(true);
-    expect(component.isSelfLoopWithNoFeedback(outcome2)).toBe(false);
-    expect(component.isSelfLoopWithNoFeedback(null)).toBe(false);
+    expect($scope.isSelfLoopWithNoFeedback(outcome1)).toBe(true);
+    expect($scope.isSelfLoopWithNoFeedback(outcome2)).toBe(false);
+    expect($scope.isSelfLoopWithNoFeedback(null)).toBe(false);
   });
 
   it('should check if outcome marked as correct has self loop', () => {
-    spyOn(stateEditorService, 'getCorrectnessFeedbackEnabled').and.returnValue(
+    spyOn(StateEditorService, 'getCorrectnessFeedbackEnabled').and.returnValue(
       true);
     let outcome = outcomeObjectFactory.createFromBackendDict({
       dest: 'State Name',
@@ -667,18 +631,18 @@ describe('State Responses Component', () => {
       refresher_exploration_id: 'test',
       missing_prerequisite_skill_id: 'test_skill_id'
     });
-    component.stateName = 'State Name';
+    $scope.stateName = 'State Name';
 
-    expect(component.isSelfLoopThatIsMarkedCorrect(outcome)).toBe(true);
+    expect($scope.isSelfLoopThatIsMarkedCorrect(outcome)).toBe(true);
 
-    component.stateName = 'Hola';
+    $scope.stateName = 'Hola';
 
-    expect(component.isSelfLoopThatIsMarkedCorrect(outcome)).toBe(false);
+    expect($scope.isSelfLoopThatIsMarkedCorrect(outcome)).toBe(false);
   });
 
   it('should check if outcome marked as correct has self loop and return' +
     ' false if correctness feedback is not enabled', () => {
-    spyOn(stateEditorService, 'getCorrectnessFeedbackEnabled').and.returnValue(
+    spyOn(StateEditorService, 'getCorrectnessFeedbackEnabled').and.returnValue(
       false);
     let outcome = outcomeObjectFactory.createFromBackendDict({
       dest: 'State Name',
@@ -692,56 +656,56 @@ describe('State Responses Component', () => {
       refresher_exploration_id: 'test',
       missing_prerequisite_skill_id: 'test_skill_id'
     });
-    component.stateName = 'State Name';
+    $scope.stateName = 'State Name';
 
-    expect(component.isSelfLoopThatIsMarkedCorrect(outcome)).toBe(false);
+    expect($scope.isSelfLoopThatIsMarkedCorrect(outcome)).toBe(false);
   });
 
   it('should show state name input if user is creating new state', () => {
     let outcome1 = outcomeObjectFactory.createNew('/', '', '', []);
     let outcome2 = outcomeObjectFactory.createNew('Hola', '', '', []);
 
-    expect(component.isCreatingNewState(outcome1)).toBe(true);
-    expect(component.isCreatingNewState(outcome2)).toBe(false);
+    expect($scope.isCreatingNewState(outcome1)).toBe(true);
+    expect($scope.isCreatingNewState(outcome2)).toBe(false);
   });
 
   it('should check if current interaction is non trivial', () => {
-    stateInteractionIdService.savedMemento = 'Continue';
+    StateInteractionIdService.savedMemento = 'Continue';
 
-    expect(component.isCurrentInteractionTrivial()).toBe(true);
+    expect($scope.isCurrentInteractionTrivial()).toBe(true);
 
-    stateInteractionIdService.savedMemento = 'TextInput';
+    StateInteractionIdService.savedMemento = 'TextInput';
 
-    expect(component.isCurrentInteractionTrivial()).toBe(false);
+    expect($scope.isCurrentInteractionTrivial()).toBe(false);
   });
 
   it('should check if the interaction is linear and has feedback', () => {
-    stateInteractionIdService.savedMemento = 'Continue';
+    StateInteractionIdService.savedMemento = 'Continue';
     let outcome1 = outcomeObjectFactory.createNew('Hola', '', '', []);
 
-    expect(component.isLinearWithNoFeedback(outcome1)).toBe(true);
+    expect($scope.isLinearWithNoFeedback(outcome1)).toBe(true);
 
-    stateInteractionIdService.savedMemento = 'Continue';
+    StateInteractionIdService.savedMemento = 'Continue';
     let outcome2 = outcomeObjectFactory.createNew('Hola', '', 'Right!', []);
 
-    expect(component.isLinearWithNoFeedback(outcome2)).toBe(false);
+    expect($scope.isLinearWithNoFeedback(outcome2)).toBe(false);
 
-    stateInteractionIdService.savedMemento = 'TextInput';
+    StateInteractionIdService.savedMemento = 'TextInput';
     let outcome3 = outcomeObjectFactory.createNew('Hola', '', '', []);
 
-    expect(component.isLinearWithNoFeedback(outcome3)).toBe(false);
+    expect($scope.isLinearWithNoFeedback(outcome3)).toBe(false);
 
-    stateInteractionIdService.savedMemento = 'TextInput';
+    StateInteractionIdService.savedMemento = 'TextInput';
     let outcome4 = outcomeObjectFactory.createNew('Hola', '', 'Wrong!', []);
 
-    expect(component.isLinearWithNoFeedback(outcome4)).toBe(false);
+    expect($scope.isLinearWithNoFeedback(outcome4)).toBe(false);
 
-    expect(component.isLinearWithNoFeedback(null)).toBe(false);
+    expect($scope.isLinearWithNoFeedback(null)).toBe(false);
   });
 
   it('should get outcome tooltip text', () => {
     // When outcome has self loop and is labelled correct.
-    spyOn(stateEditorService, 'getCorrectnessFeedbackEnabled').and.returnValue(
+    spyOn(StateEditorService, 'getCorrectnessFeedbackEnabled').and.returnValue(
       true);
     let outcome = outcomeObjectFactory.createFromBackendDict({
       dest: 'State Name',
@@ -755,126 +719,77 @@ describe('State Responses Component', () => {
       refresher_exploration_id: 'test',
       missing_prerequisite_skill_id: 'test_skill_id'
     });
-    component.stateName = 'State Name';
+    $scope.stateName = 'State Name';
 
-    expect(component.getOutcomeTooltip(outcome)).toBe(
+    expect($scope.getOutcomeTooltip(outcome)).toBe(
       'Self-loops should not be labelled as correct.');
 
     // When interaction is linear with no feedback.
-    stateInteractionIdService.savedMemento = 'Continue';
+    StateInteractionIdService.savedMemento = 'Continue';
     let outcome1 = outcomeObjectFactory.createNew('Hola', '', '', []);
 
-    expect(component.getOutcomeTooltip(outcome1)).toBe(
+    expect($scope.getOutcomeTooltip(outcome1)).toBe(
       'Please direct the learner to a different card.');
 
     // When interaction is not linear.
-    stateInteractionIdService.savedMemento = 'TextInput';
+    StateInteractionIdService.savedMemento = 'TextInput';
 
-    expect(component.getOutcomeTooltip(outcome1)).toBe(
+    expect($scope.getOutcomeTooltip(outcome1)).toBe(
       'Please give Oppia something useful to say,' +
       ' or direct the learner to a different card.');
   });
 
-  it('should open openAddAnswerGroupModal', fakeAsync(() => {
-    component.addState = () => {};
-    component.answerGroups = answerGroups;
-    spyOn(externalSaveService.onExternalSave, 'emit').and.stub();
-    spyOn(alertsService, 'clearWarnings').and.stub();
-    spyOn(answerGroupObjectFactory, 'createNew').and.returnValue(
-      answerGroupObjectFactory
-        .createFromBackendDict({
-          rule_specs: [{
-            rule_type: 'Contains',
-            inputs: {x: {
-              contentId: 'rule_input',
-              normalizedStrSet: ['abc']
-            }}
-          }],
-          outcome: {
-            dest: 'State',
-            dest_if_really_stuck: null,
-            feedback: {
-              html: '',
-              content_id: 'This is a new feedback text'
-            },
-            labelled_as_correct: false,
-            param_changes: [],
-            refresher_exploration_id: 'test',
-            missing_prerequisite_skill_id: 'test_skill_id'
-          },
-          training_data: [],
-          tagged_skill_misconception_id: 'misconception1'
-        }, 'TextInput')
-    );
-    stateInteractionIdService.savedMemento = 'MultipleChoiceInput';
-    spyOn(stateEditorService, 'getActiveStateName').and.returnValue('none');
-    spyOn(responsesService, 'save').and.callFake(
+  it('should open add response modal when user clicks on' +
+    ' \'+ ADD RESPONSE\' button', () => {
+    spyOn($uibModal, 'open').and.callThrough();
+
+    $scope.openAddAnswerGroupModal();
+
+    expect($uibModal.open).toHaveBeenCalled();
+  });
+
+  it('should open add response modal and save new answer groups' +
+    ' added by the user', () => {
+    spyOn(ResponsesService, 'save').and.callFake(
       (answerGroups, defaultOutcome, callback) => {
         callback(answerGroups, defaultOutcome);
       }
     );
-    spyOn(ngbModal, 'open').and.returnValues({
-      componentInstance: {
-        addState: {
-          subscribe(value) {
-            value();
-          }
-        },
-        currentInteractionId: 'currentInteractionId',
-        stateName: 'stateName'
-      },
-      result: Promise.resolve({
+    // Returning rejecting callback as the modal opens again, as reopen is true
+    // so we close it when it is opened for the second time.
+    spyOn($uibModal, 'open').and.returnValues({
+      result: $q.resolve({
         reopen: true,
         tmpRule: new Rule('', null, null),
         tmpOutcome: outcomeObjectFactory
           .createNew('Hola', '1', 'Feedback text', []),
         tmpTaggedSkillMisconceptionId: ''
       })
-    } as NgbModalRef,
-    {
-      componentInstance: {
-        addState: {
-          subscribe(value) {
-            value();
-          }
-        },
-        currentInteractionId: 'currentInteractionId',
-        stateName: 'stateName'
-      },
-      result: Promise.resolve({
-        reopen: false,
-        tmpRule: new Rule('', null, null),
-        tmpOutcome: outcomeObjectFactory
-          .createNew('Hola', '1', 'Feedback text', []),
-        tmpTaggedSkillMisconceptionId: ''
-      })
-    } as NgbModalRef
-    );
+    }, {
+      result: $q.reject()
+    });
+    $scope.answerGroups = [];
 
-    component.openAddAnswerGroupModal();
-    tick();
+    $scope.openAddAnswerGroupModal();
+    $scope.$apply();
 
-    expect(ngbModal.open).toHaveBeenCalled();
-    expect(responsesService.save).toHaveBeenCalled();
-  }));
+    expect($scope.answerGroups).toEqual([answerGroupObjectFactory.createNew(
+      [new Rule('', null, null)], outcomeObjectFactory.createNew(
+        'Hola', '1', 'Feedback text', []), [], ''
+    )]);
+    expect(ResponsesService.save).toHaveBeenCalled();
+  });
 
-  it('should open openAddAnswerGroupModal modal and call reject part', () => {
-    spyOn(ngbModal, 'open').and.returnValue({
-      componentInstance: {
-        addState: {
-          subscribe(value) {
-            return;
-          }
-        },
-        currentInteractionId: 'currentInteractionId',
-        stateName: 'stateName'
-      },
-      result: Promise.reject()
-    } as NgbModalRef);
+  it('should clear warnings when modal is closed', () => {
+    spyOn(AlertsService, 'clearWarnings');
+    spyOn($uibModal, 'open').and.returnValue({
+      result: $q.reject()
+    });
 
-    component.openAddAnswerGroupModal();
+    $scope.openAddAnswerGroupModal();
+    $scope.$apply();
 
-    expect(ngbModal.open).toHaveBeenCalled();
+    expect(AlertsService.clearWarnings).toHaveBeenCalledTimes(2);
   });
 
   it('should open delete answer group modal when user clicks' +
@@ -886,19 +801,20 @@ describe('State Responses Component', () => {
       evt: new Event('')
     };
 
-    component.deleteAnswerGroup(value);
+    $scope.deleteAnswerGroup(value);
 
     expect(ngbModal.open).toHaveBeenCalled();
   });
 
-  it('should delete answer group after modal is opened', fakeAsync(() => {
-    spyOn(responsesService, 'deleteAnswerGroup').and.callFake(
-      (value, callback) => {
-        callback(null);
+  it('should delete answer group after modal is opened', () => {
+    spyOn(ResponsesService, 'deleteAnswerGroup').and.callFake(
+      (number: string, callback: () => void) => {
+        callback();
       });
+    spyOn($rootScope, '$apply').and.callThrough();
     spyOn(ngbModal, 'open').and.returnValue(
       {
-        result: Promise.resolve()
+        result: $q.resolve()
       } as NgbModalRef
     );
 
@@ -907,19 +823,20 @@ describe('State Responses Component', () => {
       evt: new Event('')
     };
 
-    component.deleteAnswerGroup(value);
-    tick();
+    $scope.deleteAnswerGroup(value);
+    $scope.$apply();
 
     expect(ngbModal.open).toHaveBeenCalled();
-    expect(responsesService.deleteAnswerGroup)
+    expect($rootScope.$apply).toHaveBeenCalled();
+    expect(ResponsesService.deleteAnswerGroup)
       .toHaveBeenCalled();
-  }));
+  });
 
   it('should clear warnings when delete answer group modal is closed', () => {
-    spyOn(alertsService, 'clearWarnings');
+    spyOn(AlertsService, 'clearWarnings');
     spyOn(ngbModal, 'open').and.returnValue(
       {
-        result: Promise.reject()
+        result: $q.reject()
       } as NgbModalRef
     );
 
@@ -928,220 +845,213 @@ describe('State Responses Component', () => {
       evt: new Event('')
     };
 
-    component.deleteAnswerGroup(value);
+    $scope.deleteAnswerGroup(value);
+    $scope.$apply();
 
-    expect(alertsService.clearWarnings).toHaveBeenCalled();
+    expect(AlertsService.clearWarnings).toHaveBeenCalledTimes(2);
   });
 
   it('should update active answer group for newly tagged misconception', () => {
-    spyOn(responsesService, 'updateActiveAnswerGroup').and.callFake(
+    spyOn(ResponsesService, 'updateActiveAnswerGroup').and.callFake(
       ({taggedSkillMisconceptionId}, callback) => {
-        callback(null);
+        callback();
       }
     );
-    spyOn(component.onSaveInteractionAnswerGroups, 'emit').and.stub();
 
-    component.saveTaggedMisconception('misconception1', 'skill1');
+    $scope.saveTaggedMisconception('misconception1', 'skill1');
 
-    expect(component.onSaveInteractionAnswerGroups.emit).toHaveBeenCalled();
+    expect(ctrl.onSaveInteractionAnswerGroups).toHaveBeenCalled();
   });
 
   it('should update active answer group when feedback is changed', () => {
-    spyOn(responsesService, 'updateActiveAnswerGroup').and.callFake(
-      (feedback, callback) => {
-        callback(null);
+    spyOn(ResponsesService, 'updateActiveAnswerGroup').and.callFake(
+      ({feedback}, callback) => {
+        callback();
       }
     );
-    spyOn(component.onSaveInteractionAnswerGroups, 'emit').and.stub();
 
-    component.saveActiveAnswerGroupFeedback(defaultOutcome);
+    $scope.saveActiveAnswerGroupFeedback(defaultOutcome);
 
-    expect(component.onSaveInteractionAnswerGroups.emit).toHaveBeenCalled();
+    expect(ctrl.onSaveInteractionAnswerGroups).toHaveBeenCalled();
   });
 
   it('should update active answer group when destination is changed', () => {
-    spyOn(responsesService, 'updateActiveAnswerGroup')
-      .and.callFake((dest, callback) => {
-        callback(null);
+    spyOn(ResponsesService, 'updateActiveAnswerGroup')
+      .and.callFake(({dest, expId, skillId}, callback) => {
+        callback();
       });
-    spyOn(component.onSaveInteractionAnswerGroups, 'emit').and.stub();
 
-    component.saveActiveAnswerGroupDest(defaultOutcome);
+    $scope.saveActiveAnswerGroupDest(defaultOutcome);
 
-    expect(component.onSaveInteractionAnswerGroups.emit).toHaveBeenCalled();
+    expect(ctrl.onSaveInteractionAnswerGroups).toHaveBeenCalled();
   });
 
 
   it('should update active answer group when correctness' +
     ' label is changed', () => {
-    spyOn(responsesService, 'updateActiveAnswerGroup').and.callFake(
-      (labelledAsCorrect, callback) => {
-        callback(null);
+    spyOn(ResponsesService, 'updateActiveAnswerGroup').and.callFake(
+      ({labelledAsCorrect}, callback) => {
+        callback();
       }
     );
-    spyOn(component.onSaveInteractionAnswerGroups, 'emit').and.stub();
 
-    component.saveActiveAnswerGroupCorrectnessLabel(defaultOutcome);
+    $scope.saveActiveAnswerGroupCorrectnessLabel(defaultOutcome);
 
-    expect(component.onSaveInteractionAnswerGroups.emit).toHaveBeenCalled();
+    expect(ctrl.onSaveInteractionAnswerGroups).toHaveBeenCalled();
   });
 
 
   it('should update active answer group when answer rules are changed', () => {
-    spyOn(responsesService, 'updateActiveAnswerGroup').and.callFake(
+    spyOn(ResponsesService, 'updateActiveAnswerGroup').and.callFake(
       ({rules}, callback) => {
-        callback(null);
+        callback();
       }
     );
-    spyOn(component.onSaveInteractionAnswerGroups, 'emit').and.stub();
 
-    component.saveActiveAnswerGroupRules([new Rule('', null, null)]);
+    $scope.saveActiveAnswerGroupRules(new Rule('', null, null));
 
-    expect(component.onSaveInteractionAnswerGroups.emit).toHaveBeenCalled();
+    expect(ctrl.onSaveInteractionAnswerGroups).toHaveBeenCalled();
   });
 
 
   it('should update default outcome when default' +
     ' outcome feedback is changed', () => {
-    spyOn(responsesService, 'updateDefaultOutcome').and.callFake(
+    spyOn(ResponsesService, 'updateDefaultOutcome').and.callFake(
       ({feedback, dest}, callback) => {
-        callback(null);
+        callback();
       }
     );
-    spyOn(component.onSaveInteractionDefaultOutcome, 'emit').and.stub();
 
-    component.saveDefaultOutcomeFeedback(defaultOutcome);
+    $scope.saveDefaultOutcomeFeedback(defaultOutcome);
 
-    expect(component.onSaveInteractionDefaultOutcome.emit).toHaveBeenCalled();
+    expect(ctrl.onSaveInteractionDefaultOutcome).toHaveBeenCalled();
   });
 
   it('should update default outcome when default' +
     ' outcome destination is changed', () => {
-    spyOn(responsesService, 'updateDefaultOutcome')
-      .and.callFake((dest, callback) => {
-        callback(null);
+    spyOn(ResponsesService, 'updateDefaultOutcome')
+      .and.callFake(({dest, expId, skillId}, callback) => {
+        callback();
       });
-    spyOn(component.onSaveInteractionDefaultOutcome, 'emit').and.stub();
 
-    component.saveDefaultOutcomeDest(defaultOutcome);
+    $scope.saveDefaultOutcomeDest(defaultOutcome);
 
-    expect(component.onSaveInteractionDefaultOutcome.emit).toHaveBeenCalled();
+    expect(ctrl.onSaveInteractionDefaultOutcome).toHaveBeenCalled();
   });
 
   it('should update default outcome when default' +
     ' outcome correctness label is changed', () => {
-    spyOn(responsesService, 'updateDefaultOutcome').and.callFake(
+    spyOn(ResponsesService, 'updateDefaultOutcome').and.callFake(
       ({labelledAsCorrect}, callback) => {
-        callback(null);
+        callback();
       }
     );
-    spyOn(component.onSaveInteractionDefaultOutcome, 'emit').and.stub();
 
-    component.saveDefaultOutcomeCorrectnessLabel(defaultOutcome);
+    $scope.saveDefaultOutcomeCorrectnessLabel(defaultOutcome);
 
-    expect(component.onSaveInteractionDefaultOutcome.emit).toHaveBeenCalled();
+    expect(ctrl.onSaveInteractionDefaultOutcome).toHaveBeenCalled();
   });
 
   it('should return summary of answer group', () => {
-    expect(component.summarizeAnswerGroup(
+    expect($scope.summarizeAnswerGroup(
       answerGroupObjectFactory.createNew(
         [],
         outcomeObjectFactory.createNew('unused', '1', 'Feedback text', []),
-        [], '0'), '1', [], true))
-      .toBe('[] Feedback text');
+        [], '0'), '1', {}, true))
+      .toBe('[Answer] Feedback text');
 
-    expect(component.summarizeAnswerGroup(
+    expect($scope.summarizeAnswerGroup(
       answerGroupObjectFactory.createNew(
         [],
         outcomeObjectFactory.createNew('unused', '1', 'Feedback text', []),
-        [], '0'), '1', [], false))
+        [], '0'), '1', {}, false))
       .toBe('[Answer ] Feedback text');
   });
 
   it('should get summary default outcome when outcome is linear', () => {
-    expect(component.summarizeDefaultOutcome(
+    expect($scope.summarizeDefaultOutcome(
       outcomeObjectFactory.createNew(
         'unused', '1', 'Feedback Text', []), 'Continue', 0, true))
-      .toBe('[] Feedback Text');
+      .toBe('[When the button is clicked] Feedback Text');
   });
 
   it('should get summary default outcome when answer group count' +
     ' is greater than 0', () => {
-    expect(component.summarizeDefaultOutcome(
+    expect($scope.summarizeDefaultOutcome(
       outcomeObjectFactory.createNew(
         'unused', '1', 'Feedback Text', []), 'TextInput', 1, true))
-      .toBe('[] Feedback Text');
+      .toBe('[All other answers] Feedback Text');
   });
 
   it('should get summary default outcome when answer group count' +
     ' is equal to 0', () => {
-    expect(component.summarizeDefaultOutcome(
+    expect($scope.summarizeDefaultOutcome(
       outcomeObjectFactory.createNew(
         'unused', '1', 'Feedback Text', []), 'TextInput', 0, true))
-      .toBe('[] Feedback Text');
+      .toBe('[All answers] Feedback Text');
   });
 
   it('should get an empty summary when default outcome' +
     ' is a falsy value', () => {
-    expect(component.summarizeDefaultOutcome(null, 'Continue', 0, true))
+    expect($scope.summarizeDefaultOutcome(null, 'Continue', 0, true))
       .toBe('');
   });
 
   it('should check if outcome is looping', () => {
-    component.stateName = 'Hola';
-    expect(component.isOutcomeLooping(outcomeObjectFactory.createNew(
+    $scope.stateName = 'Hola';
+    expect($scope.isOutcomeLooping(outcomeObjectFactory.createNew(
       'Hola', '', '', []))).toBe(true);
-    expect(component.isOutcomeLooping(outcomeObjectFactory.createNew(
+    expect($scope.isOutcomeLooping(outcomeObjectFactory.createNew(
       'Second Last', '', '', []))).toBe(false);
   });
 
   it('should toggle response card', () => {
-    component.responseCardIsShown = true;
+    $scope.responseCardIsShown = true;
 
-    component.toggleResponseCard();
-    expect(component.responseCardIsShown).toBe(false);
+    $scope.toggleResponseCard();
+    expect($scope.responseCardIsShown).toBe(false);
 
-    component.toggleResponseCard();
-    expect(component.responseCardIsShown).toBe(true);
+    $scope.toggleResponseCard();
+    expect($scope.responseCardIsShown).toBe(true);
   });
 
   it('should check if no action is expected for misconception', () => {
-    spyOn(responsesService, 'getAnswerGroups').and.returnValue(answerGroups);
-    component.inapplicableSkillMisconceptionIds = ['misconception2'];
+    spyOn(ResponsesService, 'getAnswerGroups').and.returnValue(answerGroups);
+    $scope.inapplicableSkillMisconceptionIds = ['misconception2'];
 
     // Here, misconception1 is assigned to answerGroup, so no action is
     // expected.
-    expect(component.isNoActionExpected('misconception1')).toBe(true);
+    expect($scope.isNoActionExpected('misconception1')).toBe(true);
     // Here, misconception2 is not assigned to answerGroup but it is an
     // inapplicable skill misconception, so no action is expected.
-    expect(component.isNoActionExpected('misconception2')).toBe(true);
+    expect($scope.isNoActionExpected('misconception2')).toBe(true);
     // Here, misconception3 is neither inapplicable nor assigned to answerGroup
     // so action is expected.
-    expect(component.isNoActionExpected('misconceptions')).toBe(false);
+    expect($scope.isNoActionExpected('misconceptions')).toBe(false);
   });
 
   it('should update optional misconception id status when user' +
     ' marks it as applicable', () => {
-    component.inapplicableSkillMisconceptionIds = ['misconception1'];
+    $scope.inapplicableSkillMisconceptionIds = ['misconception1'];
 
-    component.updateOptionalMisconceptionIdStatus('misconception1', true);
+    $scope.updateOptionalMisconceptionIdStatus('misconception1', true);
 
-    expect(component.inapplicableSkillMisconceptionIds).toEqual([]);
+    expect($scope.inapplicableSkillMisconceptionIds).toEqual([]);
   });
 
   it('should update optional misconception id status when user' +
     ' marks it as applicable', () => {
-    component.inapplicableSkillMisconceptionIds = ['misconception1'];
+    $scope.inapplicableSkillMisconceptionIds = ['misconception1'];
 
-    component.updateOptionalMisconceptionIdStatus('misconception2', false);
+    $scope.updateOptionalMisconceptionIdStatus('misconception2', false);
 
-    expect(component.inapplicableSkillMisconceptionIds)
+    expect($scope.inapplicableSkillMisconceptionIds)
       .toEqual(['misconception1', 'misconception2']);
   });
 
   it('should get unaddressed misconception names', () => {
-    spyOn(responsesService, 'getAnswerGroups').and.returnValue(answerGroups);
-    component.misconceptionsBySkill = {
+    spyOn(ResponsesService, 'getAnswerGroups').and.returnValue(answerGroups);
+    $scope.misconceptionsBySkill = {
       skill1: [
         misconceptionObjectFactory.create(
           1, 'Misconception 1', 'note', '', false),
@@ -1150,7 +1060,7 @@ describe('State Responses Component', () => {
       ]
     };
 
-    expect(component.getUnaddressedMisconceptionNames())
+    expect($scope.getUnaddressedMisconceptionNames())
       .toEqual(['Misconception 2']);
   });
 });

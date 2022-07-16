@@ -33,17 +33,13 @@ interface DestinationChoice {
   text: string;
 }
 
-interface DestValidation {
-  isCreatingNewState: boolean;
-  value: string;
-}
 @Component({
   selector: 'oppia-outcome-destination-editor',
   templateUrl: './outcome-destination-editor.component.html'
 })
 export class OutcomeDestinationEditorComponent implements OnInit {
   @Output() addState: EventEmitter<string> = new EventEmitter<string>();
-  @Output() getChanges: EventEmitter<DestValidation> = new EventEmitter();
+  @Output() getChanges: EventEmitter<void> = new EventEmitter();
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -85,25 +81,16 @@ export class OutcomeDestinationEditorComponent implements OnInit {
   updateChanges($event: string): void {
     if ($event !== '') {
       this.outcomeNewStateName = $event;
+      this.getChanges.emit();
     }
-
-    let validation = {
-      isCreatingNewState: this.isCreatingNewState(),
-      value: $event
-    };
-    this.getChanges.emit(validation);
   }
 
   onDestSelectorChange(): void {
     if (this.outcome.dest === this.PLACEHOLDER_OUTCOME_DEST) {
       this.focusManagerService.setFocus('newStateNameInputField');
+    } else {
+      this.getChanges.emit();
     }
-
-    let validation = {
-      isCreatingNewState: this.isCreatingNewState(),
-      value: this.outcomeNewStateName
-    };
-    this.getChanges.emit(validation);
   }
 
   isCreatingNewState(): boolean {

@@ -38,10 +38,6 @@ export class CodeStringEditorComponent implements OnInit {
   warningText: string = '';
 
   ngOnInit(): void {
-    if (this.value === undefined) {
-      this.value = '';
-    }
-
     this._checkForWarnings();
     this.debounceInputSubject
       .pipe(debounceTime(50))
@@ -54,7 +50,7 @@ export class CodeStringEditorComponent implements OnInit {
   }
 
   private _checkForWarnings(): void {
-    if (this.value?.indexOf('\t') !== -1) {
+    if (this.value.indexOf('\t') !== -1) {
       this.warningText = 'Code may not contain tab characters.';
       return;
     }

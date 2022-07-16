@@ -55,7 +55,6 @@ var ExplorationEditorMainTab = function() {
   var interaction = $('.e2e-test-interaction');
   var interactionEditor = $('.e2e-test-interaction-editor');
   var interactionHtmlElement = $('.e2e-test-interaction-html');
-  var parameterElementButton = $('.e2e-test-main-html-select-selector');
   var interactionTab = function(tabId) {
     return $('.e2e-test-interaction-tab-' + tabId);
   };
@@ -68,8 +67,8 @@ var ExplorationEditorMainTab = function() {
       `.e2e-test-html-item-select-option=${optionNum}`);
   };
   var multipleChoiceAnswerOptions = function(optionNum) {
-    return $$(
-      `.e2e-test-html-select-selector=${optionNum}`)[0];
+    return $(
+      `.e2e-test-html-multiple-select-option=${optionNum}`);
   };
   var nodeLabelLocator = '.e2e-test-node-label';
   var openOutcomeDestEditor = $('.e2e-test-open-outcome-dest-editor');
@@ -730,12 +729,10 @@ var ExplorationEditorMainTab = function() {
 
       if (interactionId === 'MultipleChoiceInput') {
         // This is a special case as it uses a dropdown to set a NonnegativeInt.
-        await action.click(
-          'Parameter Element Button', parameterElementButton);
-
+        var parameterElementButton = parameterElement.$('<button>');
+        await action.click('Parameter Element Button', parameterElementButton);
         var multipleChoiceAnswerOption =
-          await multipleChoiceAnswerOptions(parameterValues[i]);
-
+          multipleChoiceAnswerOptions(parameterValues[i]);
         await action.click(
           'Multiple Choice Answer Option: ' + i,
           multipleChoiceAnswerOption);
@@ -799,7 +796,7 @@ var ExplorationEditorMainTab = function() {
     var ruleDescriptionInDropdown = ruleDescription;
     await action.click('Answer Description', answerDescription);
     var ruleDropdownElement = await $$(
-      `.e2e-test-rule-type-selector=${ruleDescriptionInDropdown}`)[0];
+      `.select2-results__option=${ruleDescriptionInDropdown}`)[0];
     await action.click('Rule Dropdown Element', ruleDropdownElement);
   };
 

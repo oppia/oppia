@@ -161,10 +161,6 @@ describe('ListOfSetsOfTranslatableHtmlContentIdsEditorComponent', () => {
   });
 
   it('should rearrage choices when user changes position of choices', () => {
-    component.value = undefined;
-
-    component.ngOnInit();
-
     component.choices = [
       {
         id: '<p>choice1</p>',

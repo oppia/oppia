@@ -18,7 +18,7 @@
  */
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { TestBed, waitForAsync } from '@angular/core/testing';
 import { TranslatableSetOfNormalizedStringEditorComponent } from './translatable-set-of-normalized-string-editor.component';
 
 // TODO(#11014): Add more extensive front end tests for object editors that rely
@@ -34,21 +34,14 @@ describe('TranslatableSetOfNormalizedStringEditor', () => {
     component = TestBed.createComponent(
       TranslatableSetOfNormalizedStringEditorComponent
     ).componentInstance;
-
-    component.ngOnInit();
+    component.value = { normalizedStrSet: '' };
+    component.updateValue('random val');
   }));
 
-  it('should initialize the schema', fakeAsync(() => {
-    component.value = { normalizedStrSet: 'random val' };
-    tick();
-
+  it('should initialize the schema', () => {
     component.updateValue('random val');
     component.getSchema();
     component.updateValue('abc');
     expect(component.value.normalizedStrSet).toBe('abc');
-  }));
-
-  it('should initialize the schema property value', fakeAsync(() => {
-    expect(component.value.normalizedStrSet).toBe('');
-  }));
+  });
 });

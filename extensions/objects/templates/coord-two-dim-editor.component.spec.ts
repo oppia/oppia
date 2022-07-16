@@ -35,14 +35,13 @@ describe('CoordTwoDimEditorComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(CoordTwoDimEditorComponent);
     component = fixture.componentInstance;
+
+    component.value = [0, 0];
   });
 
-  it('should initialize value [0, 0]', () => {
+  it('should create', () => {
     expect(component).toBeDefined();
-
     component.ngOnInit();
-
-    expect(component.value).toEqual([0, 0]);
   });
 
   it('should initialise component when world map interaction is edited', () => {
@@ -105,8 +104,6 @@ describe('CoordTwoDimEditorComponent', () => {
   });
 
   it('should add location when user clicks', () => {
-    component.ngOnInit();
-
     spyOn(component.valueChanged, 'emit');
     let e = {
       latlng: {
