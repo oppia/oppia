@@ -5,20 +5,24 @@
 
 <div class="version-diff-container">
   <mat-card class="version-diff-graph">
-    <state-graph-visualization class="e2e-test-history-graph diff-graph" [versionGraphData]="diffGraphData"
-      [nodeColors]="diffGraphNodeColors" [nodeSecondaryLabels]="diffGraphSecondaryLabels" [initStateId2]="v1InitStateId"
-      class="version-diff-container-graph" [linkPropertyMapping]="DIFF_GRAPH_LINK_PROPERTY_MAPPING"
-      (onClickFunction)="onClickStateInDiffGraph($event)">
-    </state-graph-visualization>
+    <state-graph-visualization class="e2e-test-history-graph diff-graph"
+                               [versionGraphData]="diffGraphData"
+                               [nodeColors]="diffGraphNodeColors"
+                               [nodeSecondaryLabels]="diffGraphSecondaryLabels"
+                               [initStateId2]="v1InitStateId"
+                               class="version-diff-container-graph"
+                               [linkPropertyMapping]="DIFF_GRAPH_LINK_PROPERTY_MAPPING"
+                               (onClickFunction)="onClickStateInDiffGraph($event)">
   </mat-card>
 
   <div class="version-diff-graph">
     <h3 class="exploration-graph-legend-heading">Exploration Graph Legend</h3>
     <mat-card class="legend-graph version-diff-graph" [hidden]="!diffGraphData">
-      <state-graph-visualization [versionGraphData]="legendGraph" [nodeColors]="LEGEND_GRAPH_COLORS"
-        [nodeSecondaryLabels]="LEGEND_GRAPH_SECONDARY_LABELS" [linkPropertyMapping]="LEGEND_GRAPH_LINK_PROPERTY_MAPPING"
-        id="legend-graph">
-      </state-graph-visualization>
+      <state-graph-visualization [versionGraphData]="legendGraph"
+                                 [nodeColors]="LEGEND_GRAPH_COLORS"
+                                 [nodeSecondaryLabels]="LEGEND_GRAPH_SECONDARY_LABELS"
+                                 [linkPropertyMapping]="LEGEND_GRAPH_LINK_PROPERTY_MAPPING"
+                                 id="legend-graph">
     </mat-card>
   </div>
 </div>
@@ -50,8 +54,7 @@
     font-weight: normal;
   }
 
-  version-diff-visualization .diff-graph,
-  version-diff-visualization .legend-graph {
+  .diff-graph, .legend-graph {
     border: 1px solid #707070;
   }
 </style>
