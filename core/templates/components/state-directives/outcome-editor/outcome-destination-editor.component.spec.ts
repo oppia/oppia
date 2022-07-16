@@ -252,8 +252,8 @@ describe('Outcome Destination Editor', () => {
   it('should set focus to new state name input field on destination' +
     ' selector change', () => {
     component.outcome = new Outcome(
-      null,
       PLACEHOLDER_OUTCOME_DEST,
+      null,
       new SubtitledHtml('<p> HTML string </p>', 'Id'),
       false,
       [],
@@ -271,8 +271,8 @@ describe('Outcome Destination Editor', () => {
 
   it('should check if new state is being created', () => {
     component.outcome = new Outcome(
-      null,
       PLACEHOLDER_OUTCOME_DEST,
+      null,
       new SubtitledHtml('<p> HTML string </p>', 'Id'),
       false,
       [],
