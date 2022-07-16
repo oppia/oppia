@@ -398,7 +398,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   resolveSuggestionAndUpdateModal(): void {
     this.resolvedSuggestionIds.push(this.activeSuggestionId);
 
-    // Remove resolved contributions from the record.
+    // Resolved contributions don't need to be displayed in the modal.
     delete this.allContributions[this.activeSuggestionId];
 
     // If the reviewed item was the last item, close the modal.
