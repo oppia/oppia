@@ -50,6 +50,10 @@ var ExplorationPlayerPage = function() {
   var nextCardButton = $('.e2e-test-continue-to-next-card-button');
   var pauseButton = $('.e2e-test-pause-circle');
   var playButton = $('.e2e-test-play-circle');
+  var ratingStar = $('.e2e-test-rating-star');
+  var ratingStarsSelector = function() {
+    return $$('.e2e-test-rating-star');
+  };
   var reportExplorationButton = $('.e2e-test-report-exploration-button');
   var returnToParentButton = $('.e2e-test-return-to-parent-button');
   let submitButton = $('.e2e-test-submit-report-button');
@@ -263,7 +267,9 @@ var ExplorationPlayerPage = function() {
   };
 
   this.rateExploration = async function(ratingValue) {
-    var ratingStars = await $$('.e2e-test-rating-star');
+    await waitFor.visibilityOf(
+      ratingStar, 'Rating stars takes too long to appear');
+    var ratingStars = await ratingStarsSelector();
     await action.click('Submit Button', ratingStars[ratingValue - 1]);
     await waitFor.visibilityOfSuccessToast(
       'Success toast for rating takes too long to appear.');

@@ -52,7 +52,6 @@ var urlToBe = async function(url) {
  * @param {string} errorMessage - Error message when element is not clickable.
  */
 var elementToBeClickable = async function(element, errorMessage) {
-  await element;
   await browser.waitUntil(
     await until.elementToBeClickable(element),
     {
