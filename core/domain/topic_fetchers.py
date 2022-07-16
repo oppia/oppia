@@ -417,9 +417,7 @@ def get_multi_topic_summaries(
     return topic_summaries
 
 
-def get_published_topic_summaries() -> List[
-    Optional[topic_domain.TopicSummary]
-]:
+def get_published_topic_summaries() -> List[topic_domain.TopicSummary]:
     """Returns the summaries of all published topics present in the datastore.
 
     Returns:
