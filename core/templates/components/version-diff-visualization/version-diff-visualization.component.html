@@ -4,9 +4,8 @@
 </div>
 
 <div class="version-diff-container">
-  <mat-card class="diff-graph version-diff-graph">
-    <state-graph-visualization class="e2e-test-history-graph"
-                               [versionGraphData]="diffGraphData"
+  <mat-card class="diff-graph version-diff-graph e2e-test-history-graph">
+    <state-graph-visualization [versionGraphData]="diffGraphData"
                                [nodeColors]="diffGraphNodeColors"
                                [nodeSecondaryLabels]="diffGraphSecondaryLabels"
                                [initStateId2]="v1InitStateId"

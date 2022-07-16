@@ -445,6 +445,7 @@ export class StateGraphVisualization
     this.directiveSubscriptions.add(
       this.routerService.onCenterGraph.subscribe(() => {
         this.centerGraph();
+        this.redrawGraph();
       })
     );
 

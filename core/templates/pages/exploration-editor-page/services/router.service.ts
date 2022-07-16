@@ -158,8 +158,6 @@ export class RouterService {
               if (pathType === this.SLUG_GUI) {
                 this.windowRef.nativeWindow.location.hash = path;
                 this.stateEditorRefreshService.onRefreshStateEditor.emit();
-                // Fire an event to center the Graph in the Editor.
-                this.centerGraphEventEmitter.emit();
               }
             } else {
               this._changeTab(
