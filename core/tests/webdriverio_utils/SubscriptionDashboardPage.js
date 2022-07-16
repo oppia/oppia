@@ -1,4 +1,4 @@
-// Copyright 2017 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,43 +14,47 @@
 
 /**
  * @fileoverview Page object for the subscription dashboard,
- * for use in Protractor tests.
+ * for use in WebdriverIO tests.
  */
 var action = require('./action.js');
 var waitFor = require('./waitFor.js');
 
 var SubscriptionDashboardPage = function() {
-  var subscriptionButton = element(
-    by.css('.e2e-test-subscription-button'));
-  var subscriptionName = element.all(
-    by.css('.e2e-test-subscription-name'));
-  var subscribeLabel = element(by.css('.e2e-test-subscribe-label'));
-  var unsubscribeLabel = element(by.css('.e2e-test-unsubscribe-label'));
+  var subscriptionButton = $('.e2e-test-subscription-button');
+  var subscribeLabel = $('.e2e-test-subscribe-label');
+  var subscriptionNameSelector = function() {
+    return $$('.e2e-test-subscription-name');
+  };
+  var unsubscribeLabel = $('.e2e-test-unsubscribe-label');
 
   this.navigateToUserSubscriptionPage = async function(userName) {
-    await browser.get('/profile/' + userName);
+    await browser.url('/profile/' + userName);
     await waitFor.pageToFullyLoad();
   };
 
   this.expectSubscriptionFirstNameToMatch = async function(name) {
-    var firstSubscriberNameElem = subscriptionName.first();
+    var subscriptionName = await subscriptionNameSelector();
+    var firstSubscriberNameElem = subscriptionName[0];
     await waitFor.visibilityOf(
       firstSubscriberNameElem, 'First Subscriber Name is not visible');
     expect(await firstSubscriberNameElem.getText()).toMatch(name);
   };
 
   this.expectSubscriptionLastNameToMatch = async function(name) {
-    var lastSubscriberNameElem = subscriptionName.last();
+    var subscriptionName = await subscriptionNameSelector();
+    var lastElement = subscriptionName.length - 1;
+    var lastSubscriberNameElem = subscriptionName[lastElement];
     await waitFor.visibilityOf(
       lastSubscriberNameElem, 'Last Subscriber Name is not visible');
     expect(await lastSubscriberNameElem.getText()).toMatch(name);
   };
 
   this.expectSubscriptionCountToEqual = async function(value) {
+    var subscriptionName = await subscriptionNameSelector();
     await waitFor.visibilityOf(
-      subscriptionName.first(),
+      subscriptionName[0],
       'Subscriber Name Card takes too long to appear');
-    expect(await subscriptionName.count()).toEqual(value);
+    expect(await subscriptionName.length).toEqual(value);
   };
 
   this.navigateToSubscriptionButton = async function() {

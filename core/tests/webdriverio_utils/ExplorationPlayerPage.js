@@ -19,6 +19,7 @@
 
 var forms = require('./forms.js');
 var waitFor = require('./waitFor.js');
+var action = require('./action.js');
 var interactions = require('../../../extensions/interactions/webdriverio.js');
 
 var ExplorationPlayerPage = function() {
@@ -27,6 +28,14 @@ var ExplorationPlayerPage = function() {
     return $$('.e2e-test-conversation-content');
   };
   var explorationHeader = $('.e2e-test-exploration-header');
+  var feedbackCloseButton = $('.e2e-test-exploration-feedback-close-button');
+  var feedbackPopupLink = $('.e2e-test-exploration-feedback-popup-link');
+  var feedbackSubmitButton = $('.e2e-test-exploration-feedback-submit-btn');
+  var feedbackTextArea = $('.e2e-test-exploration-feedback-textarea');
+  var ratingStar = $('.e2e-test-rating-star');
+  var ratingStarsSelector = function() {
+    return $$('.e2e-test-rating-star');
+  };
   var waitingForResponseElem = $('.e2e-test-input-response-loading-dots');
 
   // This verifies the question just asked, including formatting and
@@ -53,7 +62,7 @@ var ExplorationPlayerPage = function() {
     // TODO(#11969): Move this wait to interactions submitAnswer function.
     await waitFor.presenceOf(
       conversationInput, 'Conversation input takes too long to appear.');
-    // The .first() targets the inline interaction, if it exists. Otherwise,
+    // The [0] targets the inline interaction, if it exists. Otherwise,
     // it will get the supplemental interaction.
     await interactions.getInteraction(interactionId).submitAnswer(
       conversationInput, answerData);
@@ -71,6 +80,19 @@ var ExplorationPlayerPage = function() {
     ).toBe(name);
   };
 
+  this.rateExploration = async function(ratingValue) {
+    await waitFor.visibilityOf(
+      ratingStar, 'Rating stars takes too long to appear');
+    var ratingStars = await ratingStarsSelector();
+    await action.click('Submit Button', ratingStars[ratingValue - 1]);
+    await waitFor.visibilityOfSuccessToast(
+      'Success toast for rating takes too long to appear.');
+    await waitFor.elementToBeClickable(feedbackCloseButton);
+    await action.click('Feedback Close Button', feedbackCloseButton);
+    await waitFor.invisibilityOf(
+      feedbackCloseButton, 'Close Feedback button does not disappear');
+  };
+
   this.expectExplorationToNotBeOver = async function() {
     var conversationContent = await conversationContentSelector();
     var lastElement = conversationContent.length - 1;
@@ -79,6 +101,16 @@ var ExplorationPlayerPage = function() {
     expect(
       await conversationContent[lastElement].getText()
     ).not.toEqual('Congratulations, you have finished!');
+  };
+
+  this.submitFeedback = async function(feedback) {
+    await waitFor.elementToBeClickable(feedbackPopupLink);
+    await action.click('Feedback Popup Link', feedbackPopupLink);
+    await action.setValue('Feedback Text Area', feedbackTextArea, feedback);
+    await waitFor.elementToBeClickable(feedbackSubmitButton);
+    await action.click('Feedback Submit Button', feedbackSubmitButton);
+    await waitFor.invisibilityOf(
+      feedbackSubmitButton, 'Feedback popup takes too long to disappear');
   };
 };
 

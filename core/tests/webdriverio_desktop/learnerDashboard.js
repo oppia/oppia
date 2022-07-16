@@ -1,4 +1,4 @@
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,29 +16,29 @@
  * @fileoverview End-to-end tests for the learner dashboard page.
  */
 
-var general = require('../protractor_utils/general.js');
-var users = require('../protractor_utils/users.js');
-var workflow = require('../protractor_utils/workflow.js');
+var general = require('../webdriverio_utils/general.js');
+var users = require('../webdriverio_utils/users.js');
+var workflow = require('../webdriverio_utils/workflow.js');
 
 var TopicsAndSkillsDashboardPage =
-  require('../protractor_utils/TopicsAndSkillsDashboardPage.js');
+  require('../webdriverio_utils/TopicsAndSkillsDashboardPage.js');
 var ExplorationPlayerPage =
-  require('../protractor_utils/ExplorationPlayerPage.js');
+  require('../webdriverio_utils/ExplorationPlayerPage.js');
 var LearnerDashboardPage =
-  require('../protractor_utils/LearnerDashboardPage.js');
-var AdminPage = require('../protractor_utils/AdminPage.js');
-var TopicEditorPage = require('../protractor_utils/TopicEditorPage.js');
-var StoryEditorPage = require('../protractor_utils/StoryEditorPage.js');
-var LibraryPage = require('../protractor_utils/LibraryPage.js');
+  require('../webdriverio_utils/LearnerDashboardPage.js');
+var AdminPage = require('../webdriverio_utils/AdminPage.js');
+var TopicEditorPage = require('../webdriverio_utils/TopicEditorPage.js');
+var StoryEditorPage = require('../webdriverio_utils/StoryEditorPage.js');
+var LibraryPage = require('../webdriverio_utils/LibraryPage.js');
 var SubscriptionDashboardPage =
-  require('../protractor_utils/SubscriptionDashboardPage.js');
+  require('../webdriverio_utils/SubscriptionDashboardPage.js');
 var TopicAndStoryViewerPage = require(
-  '../protractor_utils/TopicAndStoryViewerPage.js');
-var forms = require('../protractor_utils/forms.js');
+  '../webdriverio_utils/TopicAndStoryViewerPage.js');
+var forms = require('../webdriverio_utils/forms.js');
 var ExplorationEditorPage =
-  require('../protractor_utils/ExplorationEditorPage.js');
-var Constants = require('../protractor_utils/ProtractorConstants.js');
-var SkillEditorPage = require('../protractor_utils/SkillEditorPage.js');
+  require('../webdriverio_utils/ExplorationEditorPage.js');
+var Constants = require('../webdriverio_utils/WebdriverioConstants.js');
+var SkillEditorPage = require('../webdriverio_utils/SkillEditorPage.js');
 
 describe('Learner dashboard functionality', function() {
   var explorationPlayerPage = null;
@@ -130,7 +130,8 @@ describe('Learner dashboard functionality', function() {
     await learnerDashboardPage.navigateToCommunityLessonsSection();
     // The last user (creatorName) that learner subsribes to is placed first
     // in the list.
-    await learnerDashboardPage.expectSubscriptionFirstNameToMatch('creator...');
+    await learnerDashboardPage.expectSubscriptionFirstNameToMatch(
+      'creator...');
     // The first user (collectionAdm) that learner subscribes to is placed
     // last in the list.
     await learnerDashboardPage.expectSubscriptionLastNameToMatch('collect...');
@@ -153,7 +154,8 @@ describe('Learner dashboard functionality', function() {
     await users.logout();
 
     await users.login('learner2@learnerDashboard.com');
-    var feedback = 'A good exploration. Would love to see a few more questions';
+    var feedback = 'A good exploration. Would love to see a few ' +
+      'more questions';
     await libraryPage.get();
     await libraryPage.findExploration('BUS101');
     await libraryPage.playExploration('BUS101');
@@ -249,7 +251,7 @@ describe('Learner dashboard functionality', function() {
     await storyEditorPage.returnToTopic();
     await topicEditorPage.expectStoryPublicationStatusToBe('Yes', 0);
 
-    var url = await browser.getCurrentUrl();
+    var url = await browser.getUrl();
     var topicId = url.split('/')[4].slice(0, -1);
     await general.closeCurrentTabAndSwitchTo(handle);
     await adminPage.editConfigProperty(
@@ -326,7 +328,7 @@ describe('Learner dashboard functionality', function() {
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
     await topicsAndSkillsDashboardPage.createTopic(
       TOPIC_NAME, TOPIC_URL_FRAGMENT_NAME, TOPIC_DESCRIPTION, false);
-    var url = await browser.getCurrentUrl();
+    var url = await browser.getUrl();
     var topicId = url.split('/')[4].slice(0, -1);
     await general.closeCurrentTabAndSwitchTo(handle);
     await adminPage.editConfigProperty(
@@ -346,7 +348,7 @@ describe('Learner dashboard functionality', function() {
     await skillEditorPage.addRubricExplanationForDifficulty(
       'Easy', 'Second explanation for easy difficulty.');
     await skillEditorPage.saveOrPublishSkill('Edited rubrics');
-    var url = await browser.getCurrentUrl();
+    var url = await browser.getUrl();
     skillId = url.split('/')[4];
     await skillEditorPage.get(skillId);
 
