@@ -16,33 +16,27 @@
  * @fileoverview Component for the selection dropdown with HTML content.
  */
 
-require('directives/angular-html-bind.directive.ts');
-require('domain/utilities/url-interpolation.service.ts');
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
-// This component allows user to put html into select's options.
-// 'options' should be an array of objects containing attributes 'id' and 'val'
-// Attribute 'val' is presented to the user. After user selection, the
-// corresponding attribute 'id' is assigned to 'selection'.
+@Component({
+  selector: 'oppia-html-select',
+  templateUrl: './html-select.component.html'
+})
+export class HtmlSelectComponent implements OnInit {
+  @Input() options: { id: string; val: string }[];
+  @Input() selection: number;
+  selectionAsString: string;
+  @Output() onSelectionChange = new EventEmitter();
 
-angular.module('oppia').component('htmlSelect', {
-  bindings: {
-    options: '=',
-    selection: '='
-  },
-  template: require(
-    'components/forms/custom-forms-directives/html-select.component.html'),
-  controller: ['$scope', function($scope) {
-    let ctrl = this;
-    $scope.select = function(id) {
-      ctrl.selection = id;
-    };
+  ngOnInit(): void {
+    this.selectionAsString = String(this.selection);
+    if (this.selection === null || this.selection === undefined) {
+      this.selection = Number(this.options[0].id);
+    }
+  }
 
-    $scope.getSelectionIndex = function() {
-      for (var index = 0; index < ctrl.options.length; index++) {
-        if (ctrl.options[index].id === ctrl.selection) {
-          return index;
-        }
-      }
-    };
-  }]
-});
+  updatedSelection(): void {
+    this.selection = Number(this.selectionAsString);
+    this.onSelectionChange.emit(this.selection);
+  }
+}
