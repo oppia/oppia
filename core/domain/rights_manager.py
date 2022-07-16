@@ -115,6 +115,12 @@ def _save_activity_rights(
     """
     activity_rights.validate()
 
+    # Ruling out the possibility of any other activity type.
+    assert (
+        (activity_type == constants.ACTIVITY_TYPE_COLLECTION or
+        activity_type == constants.ACTIVITY_TYPE_EXPLORATION) is True
+    )
+
     if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
         model: Union[
             exp_models.ExplorationRightsModel,
@@ -343,6 +349,12 @@ def _get_activity_rights_where_user_is_owner(
         list(ActivityRights). List of domain objects where the user has some
         role.
     """
+    # Ruling out the possibility of any other activity type.
+    assert (
+        (activity_type == constants.ACTIVITY_TYPE_COLLECTION or
+        activity_type == constants.ACTIVITY_TYPE_EXPLORATION) is True
+    )
+
     if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
         activity_rights_models: Sequence[
             Union[
