@@ -299,71 +299,39 @@
         </button>
         </md-list-item>
         <md-list-item>
-          <md-input-container>
-            <md-select ng-model="selectedSkillForDiagnosticTest" ng-change="addSkillForDiagnosticTest(selectedSkillForDiagnosticTest)"
+          <div class="oppia-diagnostic-test-dropdown" ng-show="isDiagnosticTestSkillsDropdownPresent">
+            <select ng-model="selectedSkillForDiagnosticTest" ng-change="addSkillForDiagnosticTest(selectedSkillForDiagnosticTest)"
                         aria-label="selection dropdown">
-                <md-option
+                <option
                   ng-repeat="skillSummary in availableSkillsForDiagnosticTest"
-                  ng-value="skillSummary"
-                  class="oppia-options">
+                  ng-value="skillSummary">
                   {{skillSummary.getDescription()}}
-                </md-option>
-            </md-select>
-            <button md-button
-                class="oppia-add-diagnostic-test-skills-button"
-                ng-click="presentDiagnosticTestSkillDropdown()"
-                ng-show="!isDiagnosticTestSkillsDropdownPresent"
-                ng-disabled="availableSkillsForDiagnosticTest.length === 0 || selectedSkillsForDiagnosticTest.length === 3">
-              <div class="oppia-flex">
-                  <md-icon aria-label="icon-button with a plus icon">add_circle</md-icon>
-                  <h4 class="oppia-button-text">Add diagnostic test skills</h4>
-              </div>
-            </button>
-            <span ng-if="!availableSkillsForDiagnosticTest.length" class="oppia-diagnostic-test-card-note"><em>(No eligible skills left for assignment.)</em></span>
-            <span ng-if="selectedSkillsForDiagnosticTest.length === 3" class="oppia-diagnostic-test-card-note"><em>(The maximum limit was reached for adding skills to the diagnostic test.)</em></span>
-            <span ng-if="selectedSkillsForDiagnosticTest.length === 0" class="oppia-diagnostic-test-card-note"><em>(Please add atleast 1 skill.)</em></span>
-          </md-input-container>
-        </md-list-item>
-      </md-list>
-      <!-- <div ng-repeat="skill in selectedSkillsForDiagnosticTest" class="oppia-diagnostic-test-skill-items">
-        <div class="oppia-diagnostic-test-skill-description">
-          <[skill.getDescription()]>
-        </div>
-        <button md-button  md-icon-button
+                </option>
+            </select>
+          </div>
+          <button md-button  md-icon-button
                 aria-label="Clear"
                 class="oppia-remove-diagnostic-test-skill-button"
-                ng-click="removeSkillFromDiagnosticTest(skill)">
+                ng-show="isDiagnosticTestSkillsDropdownPresent"
+                ng-click="removeSkillDropdownForDiagnosticTest()">
             <md-icon>close</md-icon>
-        </button>
-      </div> -->
-      <!-- <div>
-        <div ng-show="isDiagnosticTestSkillsDropdownPresent" class="oppia-diagnostic-test-dropdown">
-          <md-input-container>
-            <md-select ng-model="selectedSkillForDiagnosticTest" ng-change="addSkillForDiagnosticTest(selectedSkillForDiagnosticTest)"
-                        aria-label="selection dropdown">
-                <md-option
-                  ng-repeat="skillSummary in availableSkillsForDiagnosticTest"
-                  ng-value="skillSummary"
-                  class="oppia-options">
-                  {{skillSummary.getDescription()}}
-                </md-option>
-            </md-select>
-          </md-input-container>
-        </div>
-        <button md-button
-                class="oppia-add-diagnostic-test-skills-button"
-                ng-click="presentDiagnosticTestSkillDropdown()"
-                ng-show="!isDiagnosticTestSkillsDropdownPresent"
-                ng-disabled="availableSkillsForDiagnosticTest.length === 0 || selectedSkillsForDiagnosticTest.length === 3">
-          <div class="oppia-flex">
-              <md-icon aria-label="icon-button with a plus icon">add_circle</md-icon>
-              <h4 class="oppia-button-text">Add diagnostic test skills</h4>
-          </div>
-        </button>
-        <span ng-if="!availableSkillsForDiagnosticTest.length" class="oppia-diagnostic-test-card-note"><em>(No eligible skills left for assignment.)</em></span>
-        <span ng-if="selectedSkillsForDiagnosticTest.length === 3" class="oppia-diagnostic-test-card-note"><em>(The maximum limit was reached for adding skills to the diagnostic test.)</em></span>
-        <span ng-if="selectedSkillsForDiagnosticTest.length === 0" class="oppia-diagnostic-test-card-note"><em>(Please add atleast 1 skill.)</em></span>
-      </div> -->
+          <button md-button
+              class="oppia-add-diagnostic-test-skills-button"
+              ng-click="presentDiagnosticTestSkillDropdown()"
+              ng-show="!isDiagnosticTestSkillsDropdownPresent"
+              ng-disabled="availableSkillsForDiagnosticTest.length === 0 || selectedSkillsForDiagnosticTest.length === 3">
+            <div class="oppia-flex">
+                <md-icon aria-label="icon-button with a plus icon">add_circle</md-icon>
+                <h4 class="oppia-button-text">Add diagnostic test skills</h4>
+            </div>
+          </button>
+        </md-list-item>
+      </md-list>
+      <div class="oppia-diagnostic-test-card-note">
+        <span ng-if="!availableSkillsForDiagnosticTest.length"><em>(No more skills left for assignment.)</em></span>
+        <span ng-if="selectedSkillsForDiagnosticTest.length === 3"><em>(The maximum limit was reached for adding skills to the diagnostic test.)</em></span>
+        <span ng-if="selectedSkillsForDiagnosticTest.length === 0"><em>(Please add atleast 1 skill.)</em></span>
+      </div>
     </md-card>
   </div>
   <div class="topic-info-container">
@@ -716,7 +684,7 @@
   }
 
   .topic-editor .diagnostic-test-card-container {
-    margin-top: 64px;
+    margin: 64px 0px;
   }
 
   .topic-editor .practice-tab-info-circle {
@@ -737,9 +705,10 @@
   }
 
   .oppia-add-diagnostic-test-skills-button {
-    margin-top: 20px;
     width: fit-content;
     color: #00695e;
+    margin: 0px;
+    padding: 0px;
   }
 
   .oppia-flex {
@@ -755,10 +724,11 @@
 
   .oppia-button-text {
     padding: 10px;
+    margin: 0px;
   }
 
   .oppia-diagnostic-test-dropdown {
-    width: 100px;
+    width: 80%;
   }
 
   .oppia-remove-diagnostic-test-skill-button {
@@ -785,10 +755,6 @@
     justify-content: space-between;
     position: relative;
     width: auto;
-  }
-
-  .oppia-options {
-    z-index: 1;
   }
 
   @media screen and (max-width: 1200px) {

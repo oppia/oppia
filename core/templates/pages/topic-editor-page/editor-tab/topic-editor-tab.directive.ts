@@ -145,8 +145,15 @@ angular.module('oppia').directive('topicEditorTab', [
             $scope.presentDiagnosticTestSkillDropdown = function() {
               $scope.isDiagnosticTestSkillsDropdownPresent = true;
             }
+
+            $scope.removeSkillDropdownForDiagnosticTest = function() {
+              $scope.isDiagnosticTestSkillsDropdownPresent = false;
+            }
+
             $scope.addSkillForDiagnosticTest = function(skillToAdd) {
-              console.log(skillToAdd);
+              if (skillToAdd === null) {
+                return;
+              }
 
               $scope.selectedSkillsForDiagnosticTest.push(skillToAdd);
               let j = 0;
@@ -413,6 +420,7 @@ angular.module('oppia').directive('topicEditorTab', [
           $scope.deleteUncategorizedSkillFromTopic = function(skillSummary) {
             TopicUpdateService.removeUncategorizedSkill(
               $scope.topic, skillSummary);
+            $scope.removeSkillFromDiagnosticTest(skillSummary);
             ctrl.initEditor();
           };
 
