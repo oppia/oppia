@@ -50,6 +50,10 @@ var ExplorationPlayerPage = function() {
   var nextCardButton = $('.e2e-test-continue-to-next-card-button');
   var pauseButton = $('.e2e-test-pause-circle');
   var playButton = $('.e2e-test-play-circle');
+  var ratingStar = $('.e2e-test-rating-star');
+  var ratingStarsSelector = function() {
+    return $$('.e2e-test-rating-star');
+  };
   var reportExplorationButton = $('.e2e-test-report-exploration-button');
   var returnToParentButton = $('.e2e-test-return-to-parent-button');
   let submitButton = $('.e2e-test-submit-report-button');
