@@ -113,6 +113,9 @@ describe('Embedding', function() {
     '\'X-Frame-Options\' to \'deny\'.',
     'chrome-error:\/\/chromewebdata\/ - Failed to load resource: the server ' +
     'responded with a status of 400 ()',
+    'chrome-error:\/\/chromewebdata\/ 0 Refused to display ' +
+    '\'http:\/\/localhost:9001\/\' in a frame because it set ' +
+    '\'X-Frame-Options\' to \'deny\'.',
   ];
 
   beforeEach(function() {

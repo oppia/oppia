@@ -162,7 +162,7 @@ describe('Training Modal Component', () => {
     component.classification = {
       answerGroupIndex: 2,
       newOutcome: new Outcome(
-        'dest', null, true,
+        'dest', null, null, true,
         [],
         null, null
       )
@@ -192,7 +192,7 @@ describe('Training Modal Component', () => {
     component.classification = {
       answerGroupIndex: 1,
       newOutcome: new Outcome(
-        'dest', null, true,
+        'dest', null, null, true,
         [],
         null, null
       )
@@ -212,7 +212,7 @@ describe('Training Modal Component', () => {
     component.classification = {
       answerGroupIndex: 1,
       newOutcome: new Outcome(
-        'dest', null, true,
+        'dest', null, null, true,
         [],
         null, null
       )
