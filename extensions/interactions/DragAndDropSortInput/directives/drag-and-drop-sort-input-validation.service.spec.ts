@@ -63,6 +63,7 @@ describe('DragAndDropSortInputValidationService', () => {
 
     goodDefaultOutcome = oof.createFromBackendDict({
       dest: 'Second State',
+      dest_if_really_stuck: null,
       feedback: {
         html: '',
         content_id: ''
@@ -75,6 +76,7 @@ describe('DragAndDropSortInputValidationService', () => {
 
     customOutcome = oof.createFromBackendDict({
       dest: 'Third State',
+      dest_if_really_stuck: null,
       feedback: {
         html: '<p>great job!</p>',
         content_id: ''
