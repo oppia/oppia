@@ -244,6 +244,8 @@ var BlogDashboardPage = function() {
       var blogPostTile = blogPostTiles[i];
       var blogPostTitleContainer = await blogPostTile.$(
         '.e2e-test-blog-post-title');
+      await waitFor.elementToBeClickable(
+        blogPostTitleContainer, 'Blog Post title is not interactable');
       var blogPostTitle = await action.getText(
         `Blog Post Tile Title ${i}`, blogPostTitleContainer);
       if (blogPostTitle === title) {
@@ -273,6 +275,8 @@ var BlogDashboardPage = function() {
       var blogPostRow = blogPostListItems[i];
       var blogPostTitleContainer = await blogPostRow.$(
         '.e2e-test-blog-post-title');
+      await waitFor.elementToBeClickable(
+        blogPostTitleContainer, 'Blog Post title is not interactable');
       var blogPostTitle = await action.getText(
         `Blog Post Tile Title ${i}`, blogPostTitleContainer);
       if (blogPostTitle === title) {

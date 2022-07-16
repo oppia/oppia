@@ -43,6 +43,7 @@ var ExplorationEditorMainTab = function() {
   var editOutcomeDestAddExplorationId = $(
     '.e2e-test-add-refresher-exploration-id');
   var editOutcomeDestBubble = $('.e2e-test-dest-bubble');
+  var editOutcomeDestForm = $('.e2e-test-dest-form');
   var editOutcomeDestDropdownOptions = $(
     '.e2e-test-destination-selector-dropdown');
   var editorWelcomeModal = $('.e2e-test-welcome-modal');
@@ -69,7 +70,7 @@ var ExplorationEditorMainTab = function() {
   };
   var multipleChoiceAnswerOptions = function(optionNum) {
     return $$(
-      `.e2e-test-html-select-selector=${optionNum}`)[0];
+      `.e2e-test-html-select-selector=${optionNum}`);
   };
   var nodeLabelLocator = '.e2e-test-node-label';
   var openOutcomeDestEditor = $('.e2e-test-open-outcome-dest-editor');
@@ -438,8 +439,13 @@ var ExplorationEditorMainTab = function() {
 
     await editOutcomeDestDropdownOptions.selectByVisibleText(targetOption);
 
+    // 'End' is one of the keys name for setValue function, so to insert
+    // 'End' as a string we need to pass it as an array of string.
+    if (destName === 'End') {
+      destName = ['E', 'n', 'd'];
+    }
     if (createNewDest) {
-      var editOutcomeDestStateInput = editOutcomeDestBubble.$(
+      var editOutcomeDestStateInput = editOutcomeDestForm.$(
         '.e2e-test-add-state-input');
       await action.setValue(
         'Edit Outcome State Input', editOutcomeDestStateInput, destName);
@@ -735,7 +741,7 @@ var ExplorationEditorMainTab = function() {
           'Parameter Element Button', parameterElementButton);
 
         var multipleChoiceAnswerOption =
-          await multipleChoiceAnswerOptions(parameterValues[i]);
+          await multipleChoiceAnswerOptions(parameterValues[i])[0];
 
         await action.click(
           'Multiple Choice Answer Option: ' + i,

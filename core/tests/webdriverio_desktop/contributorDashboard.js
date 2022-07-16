@@ -109,9 +109,8 @@ describe('Enable correctness feedback and set correctness', function() {
     await explorationEditorMainTab.setInteraction('EndExploration');
 
     // Go back to mark the solution as correct.
-    await explorationEditorPage.navigateToMainTab();
     await explorationEditorMainTab.moveToState('First');
-    responseEditor = await explorationEditorMainTab.getResponseEditor(0);
+    var responseEditor = await explorationEditorMainTab.getResponseEditor(0);
     await responseEditor.markAsCorrect();
     await explorationEditorMainTab.expectTickMarkIsDisplayed();
     await explorationEditorPage.saveChanges();
@@ -130,7 +129,6 @@ describe('Enable correctness feedback and set correctness', function() {
     await explorationEditorPage.navigateToMainTab();
 
     // Go to main tab to create interactions.
-    await explorationEditorPage.navigateToMainTab();
     await explorationEditorMainTab.setStateName('First');
     await explorationEditorMainTab.setContent(await forms.toRichText(
       'Select the right option.'), true);
