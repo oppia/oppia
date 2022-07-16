@@ -5,31 +5,30 @@
 
 <div class="version-diff-container">
   <mat-card class="version-diff-graph">
-    <state-graph-visualization class="e2e-test-history-graph diff-graph"
-                               [versionGraphData]="diffGraphData"
-                               [nodeColors]="diffGraphNodeColors"
-                               [nodeSecondaryLabels]="diffGraphSecondaryLabels"
-                               [initStateId2]="v1InitStateId"
-                               class="version-diff-container-graph"
-                               [linkPropertyMapping]="DIFF_GRAPH_LINK_PROPERTY_MAPPING"
-                               (onClickFunction)="onClickStateInDiffGraph($event)">
+    <state-graph-visualization class="e2e-test-history-graph diff-graph" [versionGraphData]="diffGraphData"
+      [nodeColors]="diffGraphNodeColors" [nodeSecondaryLabels]="diffGraphSecondaryLabels" [initStateId2]="v1InitStateId"
+      class="version-diff-container-graph" [linkPropertyMapping]="DIFF_GRAPH_LINK_PROPERTY_MAPPING"
+      (onClickFunction)="onClickStateInDiffGraph($event)">
     </state-graph-visualization>
   </mat-card>
 
   <div class="version-diff-graph">
     <h3 class="exploration-graph-legend-heading">Exploration Graph Legend</h3>
     <mat-card class="legend-graph version-diff-graph" [hidden]="!diffGraphData">
-      <state-graph-visualization [versionGraphData]="legendGraph"
-                                 [nodeColors]="LEGEND_GRAPH_COLORS"
-                                 [nodeSecondaryLabels]="LEGEND_GRAPH_SECONDARY_LABELS"
-                                 [linkPropertyMapping]="LEGEND_GRAPH_LINK_PROPERTY_MAPPING"
-                                 id="legend-graph">
+      <state-graph-visualization [versionGraphData]="legendGraph" [nodeColors]="LEGEND_GRAPH_COLORS"
+        [nodeSecondaryLabels]="LEGEND_GRAPH_SECONDARY_LABELS" [linkPropertyMapping]="LEGEND_GRAPH_LINK_PROPERTY_MAPPING"
+        id="legend-graph">
       </state-graph-visualization>
     </mat-card>
   </div>
 </div>
 
 <style>
+  .mat-card.version-diff-graph {
+    padding: 0px;
+    margin: 0px;
+  }
+
   .version-diff-graph {
     position: relative;
     width: 100%;
@@ -39,16 +38,20 @@
   .legend-graph .node rect {
     pointer-events: none;
   }
+
   .legend-graph {
     position: initial;
     margin-top: 30px;
     right: -100px;
     top: 10px;
   }
+
   .exploration-graph-legend-heading {
     font-weight: normal;
   }
-  version-diff-visualization .diff-graph, version-diff-visualization .legend-graph {
+
+  version-diff-visualization .diff-graph,
+  version-diff-visualization .legend-graph {
     border: 1px solid #707070;
   }
 </style>
