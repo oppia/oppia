@@ -471,9 +471,9 @@ describe('Question Suggestion Review Modal Controller', function() {
         editSuggestionCallback: () => {}
       });
     }));
-    
+
     it('should allow users to navigate between suggestions', function() {
-      spyOn($scope, 'refreshModalData').and.callThrough();
+      spyOn($scope, 'refreshActiveContributionState').and.callThrough();
 
       expect($scope.currentSuggestionId).toEqual('1');
       expect($scope.skippedContributionIds.length).toEqual(0);
@@ -481,17 +481,17 @@ describe('Question Suggestion Review Modal Controller', function() {
       expect($scope.isLastItem).toBeFalse();
       expect($scope.isFirstItem).toBeTrue();
 
-      $scope.gotoNextItem();
+      $scope.goToNextItem();
       $scope.$apply();
 
-      expect($scope.refreshModalData).toHaveBeenCalled();
+      expect($scope.refreshActiveContributionState).toHaveBeenCalled();
       expect($scope.currentSuggestionId).toEqual('2');
       expect($scope.skippedContributionIds.length).toEqual(1);
       expect($scope.remainingContributionIds.length).toEqual(0);
       expect($scope.isLastItem).toBeTrue();
       expect($scope.isFirstItem).toBeFalse();
 
-      $scope.gotoNextItem();
+      $scope.goToNextItem();
       $scope.$apply();
 
       expect($scope.currentSuggestionId).toEqual('2');
@@ -500,17 +500,17 @@ describe('Question Suggestion Review Modal Controller', function() {
       expect($scope.isLastItem).toBeTrue();
       expect($scope.isFirstItem).toBeFalse();
 
-      $scope.gotoPreviousItem();
+      $scope.goToPreviousItem();
       $scope.$apply();
 
-      expect($scope.refreshModalData).toHaveBeenCalled();
+      expect($scope.refreshActiveContributionState).toHaveBeenCalled();
       expect($scope.currentSuggestionId).toEqual('1');
       expect($scope.skippedContributionIds.length).toEqual(0);
       expect($scope.remainingContributionIds.length).toEqual(1);
       expect($scope.isLastItem).toBeFalse();
       expect($scope.isFirstItem).toBeTrue();
 
-      $scope.gotoPreviousItem();
+      $scope.goToPreviousItem();
       $scope.$apply();
 
       expect($scope.currentSuggestionId).toEqual('1');
@@ -526,16 +526,16 @@ describe('Question Suggestion Review Modal Controller', function() {
         let details2 = $scope.allContributions['2'].details;
         $scope.allContributions['2'].details = null;
 
-        $scope.gotoNextItem();
+        $scope.goToNextItem();
         expect(cancelSuggestionSpy).toHaveBeenCalledWith(
           $uibModalInstance
         );
 
         $scope.allContributions['2'].details = details2;
-        $scope.gotoNextItem();
+        $scope.goToNextItem();
         $scope.allContributions['1'].details = null;
 
-        $scope.gotoPreviousItem();
+        $scope.goToPreviousItem();
         expect(cancelSuggestionSpy).toHaveBeenCalledWith(
           $uibModalInstance
         );

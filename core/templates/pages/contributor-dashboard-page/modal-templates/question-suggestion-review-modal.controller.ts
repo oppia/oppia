@@ -142,11 +142,10 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
       $scope.validationError = null;
     };
 
-    $scope.refreshModalData = function() {
+    $scope.refreshActiveContributionState = function() {
       let nextContribution = $scope.allContributions[
         $scope.currentSuggestionId];
-      $scope.suggestion = $scope.allContributions[
-        $scope.currentSuggestionId].suggestion;
+      $scope.suggestion = nextContribution.suggestion;
 
       $scope.isLastItem = $scope.remainingContributionIds.length === 0;
       $scope.isFirstItem = $scope.skippedContributionIds.length === 0;
@@ -162,35 +161,32 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
         var skill = skillDict.skill;
         misconceptionsBySkill[skill.getId()] = skill.getMisconceptions();
         $scope.misconceptionsBySkill = misconceptionsBySkill;
-        // Calling $scope.init() to set new modal data.
         $scope.init();
       });
     };
 
-    $scope.gotoNextItem = function() {
+    $scope.goToNextItem = function() {
       if ($scope.isLastItem) {
         return;
       }
       $scope.showQuestion = false;
       $scope.skippedContributionIds.push($scope.currentSuggestionId);
 
-      let lastContributionId = $scope.remainingContributionIds.pop();
-      $scope.currentSuggestionId = lastContributionId;
+      $scope.currentSuggestionId = $scope.remainingContributionIds.pop();
 
-      $scope.refreshModalData();
+      $scope.refreshActiveContributionState();
     };
 
-    $scope.gotoPreviousItem = function() {
+    $scope.goToPreviousItem = function() {
       if ($scope.isFirstItem) {
         return;
       }
       $scope.showQuestion = false;
       $scope.remainingContributionIds.push($scope.currentSuggestionId);
 
-      let lastContributionId = $scope.skippedContributionIds.pop();
-      $scope.currentSuggestionId = lastContributionId;
+      $scope.currentSuggestionId = $scope.skippedContributionIds.pop();
 
-      $scope.refreshModalData();
+      $scope.refreshActiveContributionState();
     };
 
     $scope.accept = function() {
