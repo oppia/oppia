@@ -5963,6 +5963,7 @@ export default {
       "answer_groups": [],
       "default_outcome": {
         "dest": "Introduction",
+        "dest_if_really_stuck": null,
         "feedback": {
           "content_id": "default_outcome",
           "html": ""
