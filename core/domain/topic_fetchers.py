@@ -177,6 +177,38 @@ def get_topic_from_model(
         topic_model.last_updated)
 
 
+@overload
+def get_topic_by_id(
+    topic_id: str
+) -> topic_domain.Topic: ...
+
+
+@overload
+def get_topic_by_id(
+    topic_id: str,
+    *,
+    version: Optional[int] = None
+) -> topic_domain.Topic: ...
+
+
+@overload
+def get_topic_by_id(
+    topic_id: str,
+    *,
+    strict: Literal[True],
+    version: Optional[int] = None
+) -> topic_domain.Topic: ...
+
+
+@overload
+def get_topic_by_id(
+    topic_id: str,
+    *,
+    strict: Literal[False],
+    version: Optional[int] = None
+) -> Optional[topic_domain.Topic]: ...
+
+
 def get_topic_by_id(
     topic_id: str, strict: bool = True, version: Optional[int] = None
 ) -> Optional[topic_domain.Topic]:
@@ -250,8 +282,7 @@ def get_topic_by_name(topic_name: str) -> Optional[topic_domain.Topic]:
     if topic_model is None:
         return None
 
-    topic: topic_domain.Topic = get_topic_from_model(topic_model)
-    return topic
+    return get_topic_from_model(topic_model)
 
 
 def get_topic_by_url_fragment(
@@ -400,7 +431,12 @@ def get_published_topic_summaries() -> List[
         topic_id
         for topic_id, topic_rights in topic_id_to_topic_rights.items()
         if topic_rights.topic_is_published]
-    return get_multi_topic_summaries(published_topic_ids)
+    topic_summaries_list = [
+        topic_summary for topic_summary in get_multi_topic_summaries(
+            published_topic_ids
+        ) if topic_summary is not None
+    ]
+    return topic_summaries_list
 
 
 def get_all_skill_ids_assigned_to_some_topic() -> Set[str]:
