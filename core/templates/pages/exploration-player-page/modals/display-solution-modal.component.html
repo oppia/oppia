@@ -5,21 +5,21 @@
 <div class="modal-body">
   <label>{{ shortAnswerHtml.prefix }} solution is: &nbsp; </label>
   <span>
-    <angular-html-bind-wrapper class="oppia-learner-hint-and-solution-modal-body"
-                                [htmlData]="shortAnswerHtml.answer">
-    </angular-html-bind-wrapper>
+    <oppia-interaction-display classStr="oppia-learner-hint-and-solution-modal-body"
+                               [htmlData]="shortAnswerHtml.answer">
+    </oppia-interaction-display>
   </span>
   <br>
   <br>
   <label> <span [innerHTML]="'I18N_SOLUTION_EXPLANATION_TITLE' | translate"></span> </label>
   <span>
-    <angular-html-bind-wrapper class="oppia-learner-hint-and-solution-modal-body"
-                                [htmlData]="solutionExplanationHtml">
-    </angular-html-bind-wrapper>
+    <oppia-rte-output-display class="oppia-learner-hint-and-solution-modal-body"
+                              [rteString]="solutionExplanationHtml">
+    </oppia-rte-output-display>
   </span>
 </div>
 
-<button class="oppia-learner-got-it-button protractor-test-learner-got-it-button md-button md-default-theme ml-auto"
+<button class="oppia-learner-got-it-button e2e-test-learner-got-it-button md-button md-default-theme ml-auto"
         (click)="closeModal()">
   <span [innerHTML]="'I18N_GOT_IT' | translate"></span>
 </button>

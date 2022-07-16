@@ -1193,6 +1193,29 @@ class Topic:
                         'Subtopic with title %s does not have any skills '
                         'linked.' % subtopic.title)
 
+        all_skill_ids = self.get_all_skill_ids()
+        skill_ids_for_diagnostic_that_are_not_in_topic = (
+            set(self.skill_ids_for_diagnostic_test) -
+            set(all_skill_ids))
+        if len(skill_ids_for_diagnostic_that_are_not_in_topic) > 0:
+            raise utils.ValidationError(
+                'The skill_ids %s are selected for the diagnostic test but they'
+                ' are not associated with any subtopic.' %
+                skill_ids_for_diagnostic_that_are_not_in_topic)
+
+        if (
+            strict and
+            len(self.skill_ids_for_diagnostic_test) == 0 and
+            len(all_skill_ids) > 0
+        ):
+            raise utils.ValidationError(
+                'The skill_ids_for_diagnostic_test field should not be empty.')
+
+        if len(self.skill_ids_for_diagnostic_test) > 3:
+            raise utils.ValidationError(
+                'The skill_ids_for_diagnostic_test field should contain at '
+                'most 3 skill_ids.')
+
         if strict:
             if len(self.subtopics) == 0:
                 raise utils.ValidationError(
@@ -1253,8 +1276,7 @@ class Topic:
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, 1,
             constants.DEFAULT_LANGUAGE_CODE, 0,
             feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION, '',
-            False, page_title_frag,
-            constants.DEFAULT_SKILL_IDS_FOR_DIAGNOSTIC_TEST)
+            False, page_title_frag, [])
 
     @classmethod
     def _convert_subtopic_v3_dict_to_v4_dict(
@@ -1498,7 +1520,7 @@ class Topic:
         Args:
             skill_ids_for_diagnostic_test: list(str). A list of skill_ids that
                 will be used to update skill_ids_for_diagnostic_test field for
-                a topic.
+                the topic.
         """
         print("In topic domain", skill_ids_for_diagnostic_test)
         self.skill_ids_for_diagnostic_test = skill_ids_for_diagnostic_test
@@ -1545,6 +1567,9 @@ class Topic:
             raise Exception(
                 'The skill id %s is not present in the topic.'
                 % uncategorized_skill_id)
+
+        if uncategorized_skill_id in self.skill_ids_for_diagnostic_test:
+            self.skill_ids_for_diagnostic_test.remove(uncategorized_skill_id)
         self.uncategorized_skill_ids.remove(uncategorized_skill_id)
 
     def get_all_subtopics(self) -> List[SubtopicDict]:

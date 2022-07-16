@@ -27,8 +27,7 @@ import { ShortSkillSummary } from
 import {
   StoryReferenceBackendDict,
   StoryReference,
-  StoryReferenceObjectFactory
-} from 'domain/topic/StoryReferenceObjectFactory';
+} from 'domain/topic/story-reference-object.model';
 import {
   SkillIdToDescriptionMap,
   Subtopic,
@@ -79,7 +78,6 @@ export class Topic {
   _metaTagContent: string;
   _pageTitleFragmentForWeb: string;
   _skillsForDiagnosticTest: ShortSkillSummary[];
-  storyReferenceObjectFactory: StoryReferenceObjectFactory;
   constructor(
       id: string | null,
       name: string,
@@ -96,7 +94,6 @@ export class Topic {
       thumbnailFilename: string | null,
       thumbnailBgColor: string,
       skillIdToDescriptionMap: SkillIdToDescriptionMap,
-      storyReferenceObjectFactory: StoryReferenceObjectFactory,
       practiceTabIsDisplayed: boolean,
       metaTagContent: string,
       pageTitleFragmentForWeb: string,
@@ -120,7 +117,6 @@ export class Topic {
     this._subtopics = cloneDeep(subtopics);
     this._thumbnailFilename = thumbnailFilename;
     this._thumbnailBgColor = thumbnailBgColor;
-    this.storyReferenceObjectFactory = storyReferenceObjectFactory;
     this._practiceTabIsDisplayed = practiceTabIsDisplayed;
     this._metaTagContent = metaTagContent;
     this._pageTitleFragmentForWeb = pageTitleFragmentForWeb;
@@ -442,7 +438,7 @@ export class Topic {
         'Given story id already present in canonical story ids.');
     }
     this._canonicalStoryReferences.push(
-      this.storyReferenceObjectFactory.createFromStoryId(storyId));
+      StoryReference.createFromStoryId(storyId));
   }
 
   removeCanonicalStory(storyId: string): void {
@@ -499,7 +495,7 @@ export class Topic {
         'Given story id already present in additional story ids.');
     }
     this._additionalStoryReferences.push(
-      this.storyReferenceObjectFactory.createFromStoryId(storyId));
+      StoryReference.createFromStoryId(storyId));
   }
 
   removeAdditionalStory(storyId: string): void {
@@ -630,8 +626,7 @@ export class Topic {
   providedIn: 'root'
 })
 export class TopicObjectFactory {
-  constructor(
-      private storyReferenceObjectFactory: StoryReferenceObjectFactory) {}
+  constructor() {}
 
   create(
       topicBackendDict: TopicBackendDict,
@@ -644,13 +639,13 @@ export class TopicObjectFactory {
     let canonicalStoryReferences =
         topicBackendDict.canonical_story_references.map(
           (reference: StoryReferenceBackendDict) => {
-            return this.storyReferenceObjectFactory.createFromBackendDict(
+            return StoryReference.createFromBackendDict(
               reference);
           });
     let additionalStoryReferences =
         topicBackendDict.additional_story_references.map(
           (reference: StoryReferenceBackendDict) => {
-            return this.storyReferenceObjectFactory.createFromBackendDict(
+            return StoryReference.createFromBackendDict(
               reference);
           });
     return new Topic(
@@ -664,7 +659,6 @@ export class TopicObjectFactory {
       subtopics, topicBackendDict.thumbnail_filename,
       topicBackendDict.thumbnail_bg_color,
       skillIdToDescriptionDict,
-      this.storyReferenceObjectFactory,
       topicBackendDict.practice_tab_is_displayed,
       topicBackendDict.meta_tag_content,
       topicBackendDict.page_title_fragment_for_web,
@@ -680,8 +674,7 @@ export class TopicObjectFactory {
     return new Topic(
       null, 'Topic name loading', 'Abbrev. name loading',
       'Url Fragment loading', 'Topic description loading', 'en',
-      [], [], [], 1, 1, [], null, '', {},
-      this.storyReferenceObjectFactory, false, '', '', []
+      [], [], [], 1, 1, [], null, '', {}, false, '', '', []
     );
   }
 }

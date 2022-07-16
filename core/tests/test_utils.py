@@ -1644,13 +1644,14 @@ class GenericTestBase(AppEngineTestBase):
                     'html': '',
                 },
                 'dest': None,
+                'dest_if_really_stuck': None,
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None,
                 'labelled_as_correct': True,
             },
             'customization_args': {
                 'rows': {'value': 1},
-                'placeholder': {'value': 'Enter text here'},
+                'placeholder': {'value': 'Enter text here'}
             },
             'confirmed_unclassified_answers': [],
             'id': 'TextInput',
@@ -1815,6 +1816,7 @@ states:
       customization_args: {}
       default_outcome:
         dest: %s
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -1849,6 +1851,7 @@ states:
       customization_args: {}
       default_outcome:
         dest: New state
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -3106,9 +3109,7 @@ title: Title
             language_code=constants.DEFAULT_LANGUAGE_CODE,
             meta_tag_content='topic meta tag content',
             practice_tab_is_displayed=False,
-            page_title_fragment_for_web='topic page title',
-            skill_ids_for_diagnostic_test=(
-                constants.DEFAULT_SKILL_IDS_FOR_DIAGNOSTIC_TEST)):
+            page_title_fragment_for_web='topic page title'):
         """Creates an Oppia Topic and saves it.
 
         Args:
@@ -3139,8 +3140,6 @@ title: Title
                 displayed.
             page_title_fragment_for_web: str. The page title fragment for the
                 topic.
-            skill_ids_for_diagnostic_test: list(str). The list of skill_id that
-                will be used from a topic in the diagnostic test.
 
         Returns:
             Topic. A newly-created topic.
@@ -3155,6 +3154,10 @@ title: Title
         ]
         uncategorized_skill_ids = uncategorized_skill_ids or []
         subtopics = subtopics or []
+        skill_ids_for_diagnostic_test = []
+        for subtopic in subtopics:
+            skill_ids_for_diagnostic_test.extend(subtopic.skill_ids)
+
         topic = topic_domain.Topic(
             topic_id, name, abbreviated_name, url_fragment, thumbnail_filename,
             thumbnail_bg_color, thumbnail_size_in_bytes, description,
@@ -3490,7 +3493,7 @@ title: Title
                     'unicode_str': 'Enter text here',
                 },
             },
-            'rows': {'value': 1},
+            'rows': {'value': 1}
         })
         state.update_next_content_id_index(2)
         state.interaction.default_outcome.labelled_as_correct = True
@@ -3549,8 +3552,16 @@ class EmailMessageMock:
     """Mock for core.platform.models email services messages."""
 
     def __init__(
-            self, sender_email, recipient_email, subject, plaintext_body,
-            html_body, bcc=None, reply_to=None, recipient_variables=None):
+        self,
+        sender_email: str,
+        recipient_email: str,
+        subject: str,
+        plaintext_body: str,
+        html_body: str,
+        bcc: Optional[List[str]] = None,
+        reply_to: Optional[str] = None,
+        recipient_variables: Optional[Dict[str, Dict[str, str]]] = None
+    ) -> None:
         """Inits a mock email message with all the necessary data.
 
         Args:
