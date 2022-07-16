@@ -51,6 +51,7 @@ var TopicsAndSkillsDashboardPage = function() {
   var skillEditOptionsSelector = function() {
     return $$('.e2e-test-skill-edit-box');
   };
+  var skillsListItem = $('.e2e-test-skills-list-item');
   var skillsListItemsSelector = function() {
     return $$('.e2e-test-skills-list-item');
   };
@@ -410,12 +411,16 @@ var TopicsAndSkillsDashboardPage = function() {
     if (!number) {
       await waitFor.visibilityOf(
         noSkillsPresentMessage,
-        'No skills present message taking to long to appear.');
+        'No skills present message taking too long to appear.');
       expect(await noSkillsPresentMessage.isDisplayed()).toBe(true);
       return;
+    } else {
+      await waitFor.visibilityOf(
+        skillsListItem,
+        'Skills are taking too long to appear.');
+      var skillsListItems = await skillsListItemsSelector();
+      expect(skillsListItems.length).toEqual(number);
     }
-    var skillsListItems = await skillsListItemsSelector();
-    expect(skillsListItems.length).toEqual(number);
   };
 
   this.searchSkillByName = async function(name) {
