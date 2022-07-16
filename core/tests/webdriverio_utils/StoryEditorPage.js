@@ -25,11 +25,7 @@ var workflow = require('../webdriverio_utils/workflow.js');
 
 var StoryEditorPage = function() {
   var EDITOR_URL_PREFIX = '/story_editor/';
-<<<<<<< HEAD
   var backToStoryEditorButton = $('.e2e-test-back-to-story-editor-button');
-=======
-  var thumbnailContainer = $('.e2e-test-thumbnail-container');
->>>>>>> 8d8a5c31e5fc43d70dd16327778c673b5a482014
   var returnToTopicButton = $('.e2e-test-return-to-topic-button');
   var saveStoryButton = $('.e2e-test-save-story-button');
   var commitMessageField = $('.e2e-test-commit-message-input');
@@ -37,17 +33,13 @@ var StoryEditorPage = function() {
   var createChapterButton = $('.e2e-test-add-chapter-button');
   var newChapterTitleField = $('.e2e-test-new-chapter-title-field');
   var newChapterExplorationField = $('.e2e-test-chapter-exploration-input');
-<<<<<<< HEAD
   var notesEditor = $('.e2e-test-story-notes-rte');
   var openStoryNotesEditorButton = $(
     '.e2e-test-open-story-notes-editor-button');
-=======
->>>>>>> 8d8a5c31e5fc43d70dd16327778c673b5a482014
   var confirmChapterCreationButton = $(
     '.e2e-test-confirm-chapter-creation-button');
   var publishStoryButton = $('.e2e-test-publish-story-button');
   var unpublishStoryButton = $('.e2e-test-unpublish-story-button');
-<<<<<<< HEAD
   var saveStoryNotesEditorButton = $('.e2e-test-save-story-notes-button');
   var storyDescriptionField = $('.e2e-test-story-description-field');
   var storyNotes = $('.e2e-test-story-notes');
@@ -62,16 +54,10 @@ var StoryEditorPage = function() {
   var confirmDeleteChapterButton = $('.e2e-test-confirm-delete-chapter-button');
   var cancelChapterCreationButton = $(
     '.e2e-test-cancel-chapter-creation-button');
-=======
-  var backToStoryEditorButton = $('.e2e-test-back-to-story-editor-button');
-  var storyMetaTagContentField = $('.e2e-test-story-meta-tag-content-field');
-  var storyMetaTagContentLabel = $('.e2e-test-story-meta-tag-content-label');
->>>>>>> 8d8a5c31e5fc43d70dd16327778c673b5a482014
 
   /*
    * CHAPTER
    */
-<<<<<<< HEAD
   var addPrerequisiteSkillButton = $('.e2e-test-add-prerequisite-skill');
   var addAcquiredSkillButton = $('.e2e-test-add-acquired-skill');
   var selectSkillModalHeader = $('.e2e-test-skill-select-header');
@@ -120,24 +106,12 @@ var StoryEditorPage = function() {
     '.e2e-test-story-node-thumbnail .e2e-test-photo-button');
   var createChapterThumbnailButton = $(
     '.e2e-test-chapter-input-thumbnail .e2e-test-photo-button');
-=======
-  var chapterTitlesSelector = function() {
-    return $$('.e2e-test-chapter-title');
-  };
-  var nodeDescriptionInputField = $('.e2e-test-add-chapter-description');
-  var nodeOutlineEditor = $('.e2e-test-add-chapter-outline');
-  var nodeOutlineFinalizeCheckbox = $('.e2e-test-finalize-outline');
-  var nodeOutlineSaveButton = $('.e2e-test-node-outline-save-button');
-  var createChapterThumbnailButton = $(
-    '.e2e-test-chapter-input-thumbnail .e2e-test-photo-button');
->>>>>>> 8d8a5c31e5fc43d70dd16327778c673b5a482014
 
   this.get = async function(storyId) {
     await browser.url(EDITOR_URL_PREFIX + storyId);
     await waitFor.pageToFullyLoad();
   };
 
-<<<<<<< HEAD
   this.getStoryThumbnailSource = async function() {
     return await workflow.getImageSource(storyThumbnailImageElement);
   };
@@ -154,36 +128,6 @@ var StoryEditorPage = function() {
   this.submitChapterThumbnail = async function(imgPath, resetExistingImage) {
     return await workflow.submitImage(
       chapterThumbnailButton, thumbnailContainer, imgPath, resetExistingImage);
-=======
-  this.returnToTopic = async function() {
-    await general.scrollToTop();
-    await action.click('Return to topic button', returnToTopicButton);
-    await waitFor.pageToFullyLoad();
-  };
-
-  this.updateMetaTagContent = async function(newMetaTagContent) {
-    await action.setValue(
-      'Update Meta Tag Content', storyMetaTagContentField, newMetaTagContent);
-    await action.click('Meta Tag Content label', storyMetaTagContentLabel);
-  };
-
-  this.saveStory = async function(commitMessage) {
-    await action.click('Save Story Button', saveStoryButton);
-    await waitFor.visibilityOf(
-      commitMessageField, 'Commit message modal takes too long to appear.');
-    await commitMessageField.setValue(commitMessage);
-
-    await action.click('Close Save Modal button', closeSaveModalButton);
-    await waitFor.invisibilityOf(
-      closeSaveModalButton,
-      'Commit message modal takes too long to disappear.');
-    await waitFor.pageToFullyLoad();
-    // Wait for the "Save Draft" button to be reset.
-    await waitFor.visibilityOf(
-      saveStoryButton, 'Save Story Button taking too long to appear.');
-    await waitFor.textToBePresentInElement(
-      saveStoryButton, 'Save Draft', 'Story could not be saved.');
->>>>>>> 8d8a5c31e5fc43d70dd16327778c673b5a482014
   };
 
   this.publishStory = async function() {
@@ -198,7 +142,6 @@ var StoryEditorPage = function() {
       'Unpublish message modal takes too long to disappear.');
   };
 
-<<<<<<< HEAD
   this.deleteChapterWithIndex = async function(index) {
     var chapterEditOptions = await chapterEditOptionsSelector();
     await waitFor.visibilityOf(
@@ -210,8 +153,6 @@ var StoryEditorPage = function() {
       'Confirm delete chapter button', confirmDeleteChapterButton);
   };
 
-=======
->>>>>>> 8d8a5c31e5fc43d70dd16327778c673b5a482014
   this.createNewChapter = async function(title, explorationId, imgPath) {
     await general.scrollToTop();
     await action.click(
@@ -228,7 +169,6 @@ var StoryEditorPage = function() {
     await general.scrollToTop();
   };
 
-<<<<<<< HEAD
   this.cancelChapterCreation = async function() {
     await action.click(
       'Cancel chapter creation button', cancelChapterCreationButton);
@@ -239,8 +179,6 @@ var StoryEditorPage = function() {
     await action.click('Discard changes button', discardChangesButton);
   };
 
-=======
->>>>>>> 8d8a5c31e5fc43d70dd16327778c673b5a482014
   this.navigateToChapterWithName = async function(chapterName) {
     var chapterTitle = $(`.e2e-test-chapter-title=${chapterName}`);
     await waitFor.visibilityOf(
@@ -273,7 +211,6 @@ var StoryEditorPage = function() {
     await action.click('Back to story editor tab', backToStoryEditorButton);
   };
 
-<<<<<<< HEAD
   this.expectChaptersListToBe = async function(chapters) {
     await this.expectNumberOfChaptersToBe(chapters.length);
     for (var i = 0; i < chapters.length; i++) {
@@ -411,13 +348,6 @@ var StoryEditorPage = function() {
     );
     await action.click('Exploration Id Save button', explorationIdSaveButton);
   };
-=======
-  this.expectNumberOfChaptersToBe = async function(count) {
-    var chapterTitles = await chapterTitlesSelector();
-    expect(await chapterTitles.length).toEqual(count);
-  };
-
->>>>>>> 8d8a5c31e5fc43d70dd16327778c673b5a482014
 
   this.changeNodeDescription = async function(nodeDescription) {
     // Function scrollToTop is added to prevent nodeDescriptionInputField from
@@ -426,7 +356,6 @@ var StoryEditorPage = function() {
     await waitFor.visibilityOf(
       nodeDescriptionInputField,
       'NodeDescriptionInputField takes too long to be visible');
-<<<<<<< HEAD
     await action.clear(
       'Node Description Input', nodeDescriptionInputField);
     await action.setValue(
@@ -455,10 +384,6 @@ var StoryEditorPage = function() {
         'e2e-test-exploration-id-input')[0].value;
     });
     await expect(explorationId).toEqual(id);
-=======
-    await nodeDescriptionInputField.clearValue();
-    await nodeDescriptionInputField.setValue(nodeDescription);
->>>>>>> 8d8a5c31e5fc43d70dd16327778c673b5a482014
   };
 
   this.changeNodeOutline = async function(richTextInstructions) {
@@ -472,7 +397,6 @@ var StoryEditorPage = function() {
     await action.click('Node outline save button', nodeOutlineSaveButton);
     await action.click('Finalize outline', nodeOutlineFinalizeCheckbox);
   };
-<<<<<<< HEAD
 
   this.navigateToChapterByIndex = async function(index) {
     // Function scrollToTop is added to prevent chapterTitles from being hidden
@@ -597,8 +521,6 @@ var StoryEditorPage = function() {
     }
     expect(matchFound).toBe(true);
   };
-=======
->>>>>>> 8d8a5c31e5fc43d70dd16327778c673b5a482014
 };
 
 exports.StoryEditorPage = StoryEditorPage;
