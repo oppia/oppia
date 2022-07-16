@@ -263,7 +263,9 @@ var ExplorationPlayerPage = function() {
   };
 
   this.rateExploration = async function(ratingValue) {
-    var ratingStars = await $$('.e2e-test-rating-star');
+    await waitFor.visibilityOf(
+      ratingStar, 'Rating stars takes too long to appear');
+    var ratingStars = await ratingStarsSelector();
     await action.click('Submit Button', ratingStars[ratingValue - 1]);
     await waitFor.visibilityOfSuccessToast(
       'Success toast for rating takes too long to appear.');
@@ -302,6 +304,16 @@ var ExplorationPlayerPage = function() {
     await waitFor.visibilityOf(
       correctFeedbackElement,
       'Correct feedback footer takes too long to appear');
+  };
+
+  this.submitFeedback = async function(feedback) {
+    await waitFor.elementToBeClickable(feedbackPopupLink);
+    await action.click('Feedback Popup Link', feedbackPopupLink);
+    await action.setValue('Feedback Text Area', feedbackTextArea, feedback);
+    await waitFor.elementToBeClickable(feedbackSubmitButton);
+    await action.click('Feedback Submit Button', feedbackSubmitButton);
+    await waitFor.invisibilityOf(
+      feedbackSubmitButton, 'Feedback popup takes too long to disappear');
   };
 };
 

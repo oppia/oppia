@@ -29,7 +29,7 @@ var DEFAULT_WAIT_TIME_MSECS_FOR_NEW_TAB = 15000;
 
 var alertToBePresent = async() => {
   await browser.waitUntil(
-    until.alertIsPresent(),
+    await until.alertIsPresent(),
     {
       timeout: DEFAULT_WAIT_TIME_MSECS,
       timeoutMsg: 'Alert box took too long to appear.'
