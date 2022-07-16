@@ -556,9 +556,12 @@ describe('Conversation skin component', () => {
     fakeAsync(() => {
       spyOn(componentInstance, 'adjustPageHeight').and.stub();
       componentInstance.adjustPageHeightOnresize();
+
       expect(componentInstance).toBeDefined();
+
       windowRef.nativeWindow.onresize(null);
       tick(200);
+
       expect(componentInstance.adjustPageHeight).toHaveBeenCalled();
     }));
 
