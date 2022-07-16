@@ -48,22 +48,22 @@ from core.domain import playthrough_issue_registry  # pylint: disable=invalid-im
 # NOTE TO DEVELOPERS: All other state answer data model entities must not ever
 # store this session ID unless it was created by the 2017 answer migration job
 # (see #1205). Also, this string must never change.
-MIGRATED_STATE_ANSWER_SESSION_ID_2017 = 'migrated_state_answer_session_id_2017'
-MIGRATED_STATE_ANSWER_TIME_SPENT_IN_SEC = 0.0
+MIGRATED_STATE_ANSWER_SESSION_ID_2017: Final = 'migrated_state_answer_session_id_2017'
+MIGRATED_STATE_ANSWER_TIME_SPENT_IN_SEC: Final = 0.0
 
 # These values dictate the types of calculation objects stored in
 # StateAnswersCalcOutput.
-CALC_OUTPUT_TYPE_ANSWER_FREQUENCY_LIST = 'AnswerFrequencyList'
-CALC_OUTPUT_TYPE_CATEGORIZED_ANSWER_FREQUENCY_LISTS = (
+CALC_OUTPUT_TYPE_ANSWER_FREQUENCY_LIST: Final = 'AnswerFrequencyList'
+CALC_OUTPUT_TYPE_CATEGORIZED_ANSWER_FREQUENCY_LISTS: Final = (
     'CategorizedAnswerFrequencyLists')
 
 # The maximum size in bytes the learner_answer_info_list can take
 # in LearnerAnswerDetails.
-MAX_LEARNER_ANSWER_INFO_LIST_BYTE_SIZE = 900000
+MAX_LEARNER_ANSWER_INFO_LIST_BYTE_SIZE: Final = 900000
 
 # The maximum size in bytes the answer_details can take in
 # LearnerAnswerInfo.
-MAX_ANSWER_DETAILS_BYTE_SIZE = 10000
+MAX_ANSWER_DETAILS_BYTE_SIZE: Final = 10000
 
 
 class SubmittedAnswerDict(TypedDict):
@@ -1256,10 +1256,6 @@ class ExplorationIssue:
                     '%s' % type(playthrough_id))
 
 
-# In argument 'customization_args', we used Any type because it accepts the
-# values of customization args and that values can be of type str, int, Dict,
-# bool, List and other types too. So to make it generalize for every type of
-# values, we used Any here.
 class LearnerAction:
     """Domain object representing a learner action."""
 
