@@ -211,10 +211,12 @@
   <div ng-if="$ctrl.activeTabName === 'myContributionTab' || !$ctrl.activeTabName">
     <contributions-and-review></contributions-and-review>
   </div>
-  <div ng-if="$ctrl.activeTabName === 'submitQuestionTab'" class="oppia-opportunities">
+  <div ng-if="$ctrl.activeTabName === 'submitQuestionTab'"
+       class="oppia-opportunities">
     <question-opportunities></question-opportunities>
   </div>
-  <div ng-if="$ctrl.activeTabName === 'translateTextTab'" class="oppia-opportunities">
+  <div ng-if="$ctrl.activeTabName === 'translateTextTab'"
+       class="oppia-opportunities">
     <oppia-translation-opportunities></oppia-translation-opportunities>
   </div>
 </div>
@@ -249,7 +251,7 @@
     margin-right: 10px;
   }
   .oppia-opportunities {
-    margin-top: 20px;
+    margin: 20px 10px 0 10px;
   }
   .oppia-user-and-rights {
     display: flex;
