@@ -13,6 +13,7 @@
                                class="version-diff-container-graph"
                                [linkPropertyMapping]="DIFF_GRAPH_LINK_PROPERTY_MAPPING"
                                (onClickFunction)="onClickStateInDiffGraph($event)">
+    </state-graph-visualization>
   </mat-card>
 
   <div class="version-diff-graph">
@@ -23,6 +24,7 @@
                                  [nodeSecondaryLabels]="LEGEND_GRAPH_SECONDARY_LABELS"
                                  [linkPropertyMapping]="LEGEND_GRAPH_LINK_PROPERTY_MAPPING"
                                  id="legend-graph">
+      </state-graph-visualization>                                
     </mat-card>
   </div>
 </div>
