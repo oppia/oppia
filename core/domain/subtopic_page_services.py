@@ -329,7 +329,8 @@ def delete_subtopic_page(
 def get_topic_ids_from_subtopic_page_ids(
     subtopic_page_ids: List[str]
 ) -> List[str]:
-    """Returns the topic ids corresponding to the given set of subtopic page ids.
+    """Returns the topic ids corresponding to the given set of subtopic page
+    ids.
 
     Args:
         subtopic_page_ids: list(str). The ids of the subtopic pages.
