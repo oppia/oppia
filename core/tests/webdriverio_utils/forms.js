@@ -119,7 +119,7 @@ var ListEditor = function(elem) {
   // NOTE: this returns a promise, not an integer.
   var _getLength = async function() {
     var items =
-      await $$(
+      await elem.$$(
         '#e2e-test-schema-based-list-editor-table-row');
     return items.length;
   };
@@ -133,7 +133,7 @@ var ListEditor = function(elem) {
     var addListEntryButton = elem.$(addListEntryLocator);
     await action.click('Add List Entry Button', addListEntryButton);
     if (objectType !== null) {
-      return await getEditor(objectType)(await $$(
+      return await getEditor(objectType)(await elem.$$(
         '.e2e-test-schema-based-list-editor-table-data')[listLength]);
     }
   };
@@ -148,7 +148,7 @@ var ListEditor = function(elem) {
 
   return {
     editItem: async function(index, objectType) {
-      var item = await $$(
+      var item = await elem.$$(
         '.e2e-test-schema-based-list-editor-table-data')[index];
 
       var editor = getEditor(objectType);
@@ -158,7 +158,7 @@ var ListEditor = function(elem) {
     deleteItem: deleteItem,
     // This will add or delete list elements as necessary.
     setLength: async function(desiredLength) {
-      var startingLength = await $$(
+      var startingLength = await elem.$$(
         '#e2e-test-schema-based-list-editor-table-row').length;
       for (var i = startingLength; i < desiredLength; i++) {
         await addItem();
@@ -308,7 +308,7 @@ var UnicodeEditor = function(elem) {
       await action.clear('Input Field', await elem.$('<input>'));
       await action.setValue(
         'Input Field',
-        await elem.$('<input>'), text);
+        elem.$('<input>'), text);
     }
   };
 };
