@@ -111,8 +111,8 @@ def _create_models_for_thread_and_first_message(
     Args:
         entity_type: str. The type of entity the feedback thread is linked to.
         entity_id: str. The id of the entity.
-        original_author_id: str. The author id who starts this thread, or None
-            if the author is anonymous.
+        original_author_id: str|None. The author id who starts this thread, or
+            None if the author is anonymous.
         subject: str. The subject of this thread.
         text: str. The text of the feedback message. This may be ''.
         has_suggestion: bool. Whether this thread has a related learner
@@ -156,8 +156,8 @@ def create_thread(
     Args:
         entity_type: str. The type of entity the feedback thread is linked to.
         entity_id: str. The id of the entity.
-        original_author_id: str. The author id who starts this thread, or None
-            if the author is anonymous.
+        original_author_id: str|None. The author id who starts this thread, or
+            None if the author is anonymous.
         subject: str. The subject of this thread.
         text: str. The text of the feedback message. This may be ''.
         has_suggestion: bool. Whether the thread has a suggestion attached to
@@ -185,7 +185,7 @@ def create_message(
 
     Args:
         thread_id: str. The thread id the message belongs to.
-        author_id: str. The author id who creates this message, or None
+        author_id: str|None. The author id who creates this message, or None
             if the author is anonymous.
         updated_status: str|None. One of STATUS_CHOICES. New thread status.
             Must be supplied if this is the first message of a thread. For the
@@ -226,8 +226,8 @@ def create_messages(
 
     Args:
         thread_ids: list(str). The thread ids to append the messages to.
-        author_id: str. The id of the author who creates the messages, or None
-            if the author is anonymous.
+        author_id: str|None. The id of the author who creates the messages, or
+            None if the author is anonymous.
         updated_status: str|None. One of STATUS_CHOICES. Applied to each thread.
             Must be supplied if this is the first message of the threads.
             Otherwise, this property should only exist when the status
