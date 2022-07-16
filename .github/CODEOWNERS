@@ -700,6 +700,7 @@
 /core/tests/protractor_utils/ @oppia/automated-qa-reviewers
 /core/tests/protractor_desktop/ @oppia/automated-qa-reviewers
 /core/tests/protractor/ @oppia/automated-qa-reviewers
+/core/tests/protractor.conf.js @oppia/automated-qa-reviewers
 /core/tests/webdriverio_utils/ @oppia/automated-qa-reviewers
 /core/tests/webdriverio_desktop/ @oppia/automated-qa-reviewers
 /core/tests/webdriverio/ @oppia/automated-qa-reviewers
