@@ -131,6 +131,13 @@ import { TrainingPanelComponent } from 'pages/exploration-editor-page/editor-tab
 import { TrainingModalComponent } from 'pages/exploration-editor-page/editor-tab/training-panel/training-modal.component';
 import { TrainingDataEditorPanelComponent } from 'pages/exploration-editor-page/editor-tab/training-panel/training-data-editor-panel-modal.component';
 import { TestInteractionPanel } from 'pages/exploration-editor-page/editor-tab/test-interaction-panel/test-interaction-panel.component';
+import { RuleEditorComponent } from './state-directives/rule-editor/rule-editor.component';
+import { HtmlSelectComponent } from './forms/custom-forms-directives/html-select.component';
+import { RuleTypeSelector } from './state-directives/rule-editor/rule-type-selector.directive';
+import { AddAnswerGroupModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-answer-group-modal.component';
+import { AnswerGroupEditor } from './state-directives/answer-group-editor/answer-group-editor.component';
+import { StateResponsesComponent } from './state-editor/state-responses-editor/state-responses.component';
+import { StateEditorComponent } from './state-editor/state-editor.component';
 
 // Pipes.
 import { StringUtilityPipesModule } from 'filters/string-utility-filters/string-utility-pipes.module';
@@ -279,7 +286,14 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     TrainingPanelComponent,
     TrainingModalComponent,
     TrainingDataEditorPanelComponent,
-    TestInteractionPanel
+    TestInteractionPanel,
+    RuleEditorComponent,
+    HtmlSelectComponent,
+    RuleTypeSelector,
+    AddAnswerGroupModalComponent,
+    AnswerGroupEditor,
+    StateResponsesComponent,
+    StateEditorComponent
   ],
 
   entryComponents: [
@@ -380,7 +394,14 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     TrainingPanelComponent,
     TrainingModalComponent,
     TrainingDataEditorPanelComponent,
-    TestInteractionPanel
+    TestInteractionPanel,
+    RuleEditorComponent,
+    HtmlSelectComponent,
+    RuleTypeSelector,
+    AddAnswerGroupModalComponent,
+    AnswerGroupEditor,
+    StateResponsesComponent,
+    StateEditorComponent
   ],
 
   exports: [
@@ -490,7 +511,14 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     TrainingPanelComponent,
     TrainingModalComponent,
     TrainingDataEditorPanelComponent,
-    TestInteractionPanel
+    TestInteractionPanel,
+    RuleEditorComponent,
+    HtmlSelectComponent,
+    RuleTypeSelector,
+    AddAnswerGroupModalComponent,
+    AnswerGroupEditor,
+    StateResponsesComponent,
+    StateEditorComponent
   ],
 })
 
