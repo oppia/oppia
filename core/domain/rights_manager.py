@@ -33,9 +33,7 @@ from core.domain import user_domain
 from core.domain import user_services
 from core.platform import models
 
-from typing import (
-    Dict, List, Mapping, Optional, Sequence, Union, overload
-)
+from typing import Dict, List, Mapping, Optional, Sequence, Union, overload
 from typing_extensions import Literal
 
 MYPY = False
