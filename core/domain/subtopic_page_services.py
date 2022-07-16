@@ -337,10 +337,10 @@ def get_topic_ids_from_subtopic_page_ids(
     Returns:
         list(str). The topic ids corresponding to the given subtopic page ids.
     """
-    return list({
+    return list(dict.fromkeys([
         subtopic_page_id.split(':')[0] for subtopic_page_id in
-        subtopic_page_ids
-    })
+        subtopic_page_ids]
+    ))
 
 
 def get_multi_users_subtopic_pages_progress(
