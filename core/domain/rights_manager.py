@@ -967,7 +967,10 @@ def _assign_role(
     ]:
         raise Exception('Invalid role: %s' % new_role)
 
-    # Ruling out the possibility of None for mypy type checking.
+    # Here, we are asserting that `activity_rights` is not going to be
+    # a None value, because if `activity_rights` is a None value then
+    # `user_can_assign_role` is assigned with a `False` value and if
+    # `user_can_assign_role` is `False` an exception is raised above.
     assert activity_rights is not None
 
     # TODO(#12369): Currently, only exploration allows reassigning users to
@@ -1096,7 +1099,10 @@ def _deassign_role(
         raise Exception(
             'UnauthorizedUserException: Could not deassign role.')
 
-    # Ruling out the possibility of None for mypy type checking.
+    # Here, we are asserting that `activity_rights` is not going to be
+    # a None value, because if `activity_rights` is a None value then
+    # `user_can_deassign_role` is assigned with a `False` value and if
+    # `user_can_deassign_role` is `False` an exception is raised above.
     assert activity_rights is not None
 
     if activity_rights.is_owner(removed_user_id):
@@ -1165,7 +1171,10 @@ def _release_ownership_of_activity(
         raise Exception(
             'The ownership of this %s cannot be released.' % activity_type)
 
-    # Ruling out the possibility of None for mypy type checking.
+    # Here we are asserting that `activity_rights` is not going to be a
+    # none value, because if `activity_rights` is a None value then method
+    # `check_can_release_ownership()` is going to return a `False` and due
+    # to a `False` value an exception is raised above.
     assert activity_rights is not None
 
     activity_rights.community_owned = True
@@ -1202,7 +1211,13 @@ def _change_activity_status(
         commit_message: str. The human-written commit message for this change.
     """
     activity_rights = _get_activity_rights(activity_type, activity_id)
-    # Ruling out the possibility of None for mypy type checking.
+
+    # The method `_change_activity_status` is used a helper function in
+    # `_publish_activity` and `_unpublish_activity` methods, and there we
+    # are already checking if the `activity_rights` is None or not, and if
+    # `activity_rights` is none then there we are throwing an exception.
+    # So, to just narrow down the type from Optional[ActivityRights] to
+    # ActivityRights of `activity_rights`. We used assertion here.
     assert activity_rights is not None
     old_status = activity_rights.status
     activity_rights.status = new_status
