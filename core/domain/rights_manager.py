@@ -117,8 +117,10 @@ def _save_activity_rights(
 
     # Ruling out the possibility of any other activity type.
     assert (
-        (activity_type == constants.ACTIVITY_TYPE_COLLECTION or
-        activity_type == constants.ACTIVITY_TYPE_EXPLORATION) is True
+        activity_type in (
+            constants.ACTIVITY_TYPE_COLLECTION,
+            constants.ACTIVITY_TYPE_EXPLORATION
+        )
     )
 
     if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
@@ -351,8 +353,10 @@ def _get_activity_rights_where_user_is_owner(
     """
     # Ruling out the possibility of any other activity type.
     assert (
-        (activity_type == constants.ACTIVITY_TYPE_COLLECTION or
-        activity_type == constants.ACTIVITY_TYPE_EXPLORATION) is True
+        activity_type in (
+            constants.ACTIVITY_TYPE_COLLECTION,
+            constants.ACTIVITY_TYPE_EXPLORATION
+        )
     )
 
     if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
