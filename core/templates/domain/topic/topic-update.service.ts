@@ -807,11 +807,11 @@ export class TopicUpdateService {
     let oldSkillIdsForDiagnosticTest = oldSkillsForDiagnosticTest.map((
           skillSummary: ShortSkillSummary) => {
         return skillSummary.getId();
-      });
+    });
     let newSkillIdsForDiagnosticTest = newSkillsForDiagnosticTest.map((
       skillSummary: ShortSkillSummary) => {
         return skillSummary.getId();
-      });
+    });
 
     this._applyTopicPropertyChange(
       topic,

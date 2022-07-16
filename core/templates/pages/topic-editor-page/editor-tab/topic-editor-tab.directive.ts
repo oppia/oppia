@@ -24,10 +24,7 @@ import { Subscription } from 'rxjs';
 // TODO(#9186): Change variable name to 'constants' once this file
 // is migrated to Angular.
 import topicConstants from 'assets/constants';
-import { ItemSelectionInputInteractionModule } from 'interactions/ItemSelectionInput/item-selection-input-interactions.module';
-import { clone, cloneDeep } from 'lodash';
-import { Skill } from 'domain/skill/SkillObjectFactory';
-import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
+import { cloneDeep } from 'lodash';
 
 require(
   'components/common-layout-directives/common-elements/' +
@@ -158,7 +155,7 @@ angular.module('oppia').directive('topicEditorTab', [
               $scope.selectedSkillsForDiagnosticTest.push(skillToAdd);
               let j = 0;
               for (let skill of $scope.availableSkillsForDiagnosticTest) {
-                if (skill.getId() === $scope.selectedSkillForDiagnosticTest.getId()) {
+                if (skill.getId() === skillToAdd.getId()) {
                   $scope.availableSkillsForDiagnosticTest.splice(j, 1);
                   break;
                 }

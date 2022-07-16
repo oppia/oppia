@@ -648,4 +648,21 @@ describe('Topic editor tab directive', function() {
     topicReinitializedEventEmitter.emit();
     expect(ctrl.initEditor).toHaveBeenCalledTimes(2);
   });
+
+  it('should call the TopicUpdateService if skillId is added in the ' +
+     'diagnostic test', function() {
+    console.log('Started the test\n\n');
+    var updateSkillIdForDiagosticTestSpy = spyOn(
+      TopicUpdateService, 'updateDiagnosticTestSkills');
+    $scope.addSkillForDiagnosticTest(skillSummary);
+    expect(updateSkillIdForDiagosticTestSpy).toHaveBeenCalled()
+  });
+
+  it('should not call the TopicUpdateService if null skill is added in the' +
+     ' diagnostic test', function() {
+    var updateSkillIdForDiagosticTestSpy = spyOn(
+      TopicUpdateService, 'updateDiagnosticTestSkills');
+    $scope.addSkillForDiagnosticTest(null);
+    expect(updateSkillIdForDiagosticTestSpy).not.toHaveBeenCalled();
+  });
 });

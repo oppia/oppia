@@ -65,7 +65,8 @@ describe('Topic object factory', () => {
       language_code: 'en',
       meta_tag_content: 'topic meta tag content',
       practice_tab_is_displayed: false,
-      page_title_fragment_for_web: 'topic page title'
+      page_title_fragment_for_web: 'topic page title',
+      skill_ids_for_diagnostic_test: ['skill_1']
     };
     let skillIdToDescriptionDict = {
       skill_1: 'Description 1',
@@ -148,6 +149,18 @@ describe('Topic object factory', () => {
     expect(topic.getAdditionalStoryReferences()).toEqual([]);
     expect(topic.getCanonicalStoryReferences()).toEqual([]);
     expect(topic.getUncategorizedSkillSummaries()).toEqual([]);
+    expect(topic.getDiagnosticTestSkillSummaries()).toEqual([]);
+  });
+
+  it('should be able to correctly update skill Ids for the diagnostic test',
+     () => {
+    var skillSummary1 = ShortSkillSummary.create('skill_1', 'Description 1');
+    var skillSummary2 = ShortSkillSummary.create('skill_1', 'Description 1');
+    expect(_sampleTopic.getDiagnosticTestSkillSummaries()).toEqual(
+      [skillSummary1]);
+    _sampleTopic.setDiagnosticTestSkillSummaries([skillSummary2]);
+    expect(_sampleTopic.getDiagnosticTestSkillSummaries()).toEqual(
+      [skillSummary2]);
   });
 
   it('should correctly remove the various array elements', () => {
@@ -196,7 +209,8 @@ describe('Topic object factory', () => {
       }],
       practice_tab_is_displayed: false,
       meta_tag_content: 'second topic meta tag content',
-      page_title_fragment_for_web: 'topic page title'
+      page_title_fragment_for_web: 'topic page title',
+      skill_ids_for_diagnostic_test: []
     }, {
       skill_1: 'Description 1',
       skill_2: 'Description 2',
