@@ -5,10 +5,10 @@
           class="oppia-translation-modal-subheading e2e-translation-suggestion-review-subheading"
           aria-hidden="false"> {{ subheading }}
     </span>
-    <span title="{{ activeContributionDetails.chapter_title }}"
+    <span title="{{ activeContribution.details.chapter_title }}"
           class="oppia-translation-modal-subheading-lesson protractor-translation-suggestion-review-subheading"
           aria-hidden="false">
-      {{ activeContributionDetails.chapter_title }}
+      {{ activeContribution.details.chapter_title }}
     </span>
     <button type="button"
             class="close oppia-close-button-position"
@@ -43,7 +43,7 @@
       </div>
       <div class="oppia-collapse-content"
            *ngIf="isContentOverflowing"
-           (click)="toggleExpansionState('content')">
+           (click)="toggleExpansionState(0)">
         {{ isContentExpanded ? "View Less" : "View More" }}
       </div>
     </div>
@@ -104,7 +104,7 @@
       </div>
       <div class="oppia-collapse-content"
            *ngIf="isTranslationOverflowing"
-           (click)="toggleExpansionState('translation')">
+           (click)="toggleExpansionState(1)">
         {{ isTranslationExpanded ? "View Less" : "View More" }}
       </div>
     </div>

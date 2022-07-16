@@ -80,8 +80,8 @@ interface ActiveContributionDict {
 }
 
 enum ExpansionTabType {
-  'content' = 'content',
-  'translation' = 'translation'
+  CONTENT,
+  TRANSLATION
 }
 
 
@@ -95,7 +95,6 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   activeContribution!: ActiveContributionDict;
-  activeContributionDetails!: ActiveContributionDetailsDict;
   authorName!: string;
   activeSuggestion!: ActiveSuggestionDict;
   activeSuggestionId!: string;
@@ -211,7 +210,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   init(): void {
     this.activeContribution = this.allContributions[
       this.activeSuggestionId];
-    this.refreshModalData();
+    this.refreshActiveContributionState();
     this.isLastItem = this.remainingContributionIds.length === 0;
     this.isFirstItem = this.skippedContributionIds.length === 0;
     this.userCanReviewTranslationSuggestionsInLanguages = [];
@@ -291,9 +290,9 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   }
 
   toggleExpansionState(tab: ExpansionTabType): void {
-    if (tab === ExpansionTabType.content) {
+    if (tab === ExpansionTabType.CONTENT) {
       this.isContentExpanded = !this.isContentExpanded;
-    } else if (tab === ExpansionTabType.translation) {
+    } else if (tab === ExpansionTabType.TRANSLATION) {
       this.isTranslationExpanded = !this.isTranslationExpanded;
     }
   }
@@ -341,14 +340,13 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     }
   }
 
-  refreshModalData(): void {
+  refreshActiveContributionState(): void {
     // Close modal instance if the suggestion's corresponding opportunity
     // is deleted. See issue #14234.
     if (!this.activeContribution.details) {
       this.activeModal.close(this.resolvedSuggestionIds);
       return;
     }
-    this.activeContributionDetails = this.activeContribution.details;
     this.activeSuggestion = this.activeContribution.suggestion;
     if (this.activeContribution.details === null) {
       return;
@@ -369,7 +367,8 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     if (lastContributionId === undefined) {
       return;
     }
-    // This prevents resolved contributions from getting added to the list.
+    // Don't add resolved contributions to the skippedContributionIds beacuse
+    // we don't want to show resolved suggestions when navigating back.
     if (!this.resolvedSuggestionIds.includes(this.activeSuggestionId)) {
       this.skippedContributionIds.push(this.activeSuggestionId);
     }
@@ -385,7 +384,8 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     if (lastContributionId === undefined) {
       return;
     }
-    // This prevents resolved contributions from getting added to the list.
+    // Don't add resolved contributions to the remainingContributionIds beacuse
+    // we don't want to show resolved suggestions when navigating forward.
     if (!this.resolvedSuggestionIds.includes(this.activeSuggestionId)) {
       this.remainingContributionIds.push(this.activeSuggestionId);
     }
@@ -406,7 +406,6 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       this.activeModal.close(this.resolvedSuggestionIds);
       return;
     }
-    // Else go the next item.
     this.goToNextItem();
   }
 

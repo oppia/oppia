@@ -35,8 +35,8 @@ class MockChangeDetectorRef {
 }
 
 enum ExpansionTabType {
-  'content' = 'content',
-  'translation' = 'translation'
+  CONTENT,
+  TRANSLATION
 }
 
 describe('Translation Suggestion Review Modal Component', function() {
@@ -417,18 +417,18 @@ describe('Translation Suggestion Review Modal Component', function() {
     it('should toggle the expansion state for the content area', () => {
       spyOn(component, 'toggleExpansionState').and.callThrough();
       expect(component.isContentExpanded).toBeFalse();
-      component.toggleExpansionState(ExpansionTabType.content);
+      component.toggleExpansionState(ExpansionTabType.CONTENT);
       expect(component.isContentExpanded).toBeTrue();
-      component.toggleExpansionState(ExpansionTabType.content);
+      component.toggleExpansionState(ExpansionTabType.CONTENT);
       expect(component.isContentExpanded).toBeFalse();
     });
 
     it('should toggle the expansion state for the translation area', () => {
       spyOn(component, 'toggleExpansionState').and.callThrough();
       expect(component.isTranslationExpanded).toBeFalse();
-      component.toggleExpansionState(ExpansionTabType.translation);
+      component.toggleExpansionState(ExpansionTabType.TRANSLATION);
       expect(component.isTranslationExpanded).toBeTrue();
-      component.toggleExpansionState(ExpansionTabType.translation);
+      component.toggleExpansionState(ExpansionTabType.TRANSLATION);
       expect(component.isTranslationExpanded).toBeFalse();
     });
 
@@ -849,7 +849,7 @@ describe('Translation Suggestion Review Modal Component', function() {
       component.suggestionIdToContribution = angular.copy(
         suggestionIdToContribution);
       component.ngOnInit();
-      spyOn(component, 'refreshModalData').and.callThrough();
+      spyOn(component, 'refreshActiveContributionState').and.callThrough();
 
       expect(component.isFirstItem).toBeTrue();
       expect(component.isLastItem).toBeFalse();
@@ -872,7 +872,7 @@ describe('Translation Suggestion Review Modal Component', function() {
       expect(component.remainingContributionIds.length).toEqual(0);
       expect(component.skippedContributionIds).toEqual(['suggestion_1']);
       expect(component.activeSuggestionId).toEqual('suggestion_2');
-      expect(component.refreshModalData).toHaveBeenCalled();
+      expect(component.refreshActiveContributionState).toHaveBeenCalled();
 
       component.goToNextItem();
       // As we are on the last item, goToNextItem shoudn't navigate.
@@ -889,7 +889,7 @@ describe('Translation Suggestion Review Modal Component', function() {
       expect(component.remainingContributionIds).toEqual(['suggestion_2']);
       expect(component.skippedContributionIds.length).toEqual(0);
       expect(component.activeSuggestionId).toEqual('suggestion_1');
-      expect(component.refreshModalData).toHaveBeenCalled();
+      expect(component.refreshActiveContributionState).toHaveBeenCalled();
     });
 
     it('should close the modal if the opportunity is' +
