@@ -22,6 +22,15 @@ var waitFor = require('./waitFor.js');
 
 var TopicAndStoryViewerPage = function() {
   var lessonTrack = $('.e2e-test-lesson-track');
+  var nextChapterButton = $('.e2e-test-recommended-next-chapter-button');
+  var startPracticeButton = $(
+    '.e2e-test-start-practice-from-recommendations-button');
+  var endChapterSignUpSection = $('.e2e-test-end-chapter-sign-up-section');
+  var conversationSkinCardsContainer = $(
+    '.e2e-test-conversation-skin-cards-container');
+  var dismissSignUpSectionButton = $(
+    '.e2e-test-dismiss-sign-up-section-button');
+  var practicetabContainer = $('.e2e-test-practice-tab-container');
   var practiceSessionContainer = $('.e2e-test-practice-session-container');
   var chapterTitleListSelector = function() {
     return $$('.e2e-test-chapter-title');
@@ -48,6 +57,21 @@ var TopicAndStoryViewerPage = function() {
     await waitFor.pageToFullyLoad();
   };
 
+  this.goToNextChapterFromRecommendations = async function() {
+    await action.click('Next chapter button', nextChapterButton);
+    await waitFor.pageToFullyLoad();
+  };
+
+  this.goToPracticeSessionFromRecommendations = async function() {
+    await action.click('Start practice button', startPracticeButton);
+    await waitFor.pageToFullyLoad();
+  };
+
+  this.dismissSignUpSection = async function() {
+    await action.click(
+      'Don\'t show me again button', dismissSignUpSectionButton);
+  };
+
   this.expectCompletedLessonCountToBe = async function(count) {
     var lessonCompletedIcons = await lessonCompletedIconsSelector();
     await waitFor.visibilityOf(
@@ -60,6 +84,29 @@ var TopicAndStoryViewerPage = function() {
     await waitFor.visibilityOf(
       lessonTrack, 'Lesson track takes too long to be visible.');
     expect(lessonUncompletedIcons.length).toEqual(count);
+  };
+
+  this.waitForConversationSkinCardsContainer = async function() {
+    await waitFor.visibilityOf(
+      conversationSkinCardsContainer,
+      'Conversation skin cards container takes too long to be visible.');
+  };
+
+  this.waitForSignUpSection = async function() {
+    await waitFor.visibilityOf(
+      endChapterSignUpSection, 'Sign up section takes too long to be visible.');
+  };
+
+  this.waitForSignUpSectionToDisappear = async function() {
+    await waitFor.invisibilityOf(
+      endChapterSignUpSection,
+      'Sign up section takes too long to disappear.');
+  };
+
+  this.waitForPracticeTabContainer = async function() {
+    await waitFor.visibilityOf(
+      practicetabContainer,
+      'Practice tab container takes too long to be visible.');
   };
 
   this.waitForPracticeSessionContainer = async function() {
