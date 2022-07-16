@@ -29,8 +29,8 @@ from core.constants import constants
 from core.domain import customization_args_util
 from core.domain import exp_domain
 
-from typing import Any, Dict, Final, List, Optional, Union
-from typing_extensions import Literal, TypedDict
+from typing import Any, Dict, List, Optional, Union
+from typing_extensions import Final, Literal, TypedDict
 
 from core.domain import action_registry  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import interaction_registry  # pylint: disable=invalid-import-from # isort:skip
