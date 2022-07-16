@@ -26,7 +26,7 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmQuestionExitModalComponent } from 'components/question-directives/modal-templates/confirm-question-exit-modal.component';
 import { QuestionsOpportunitiesSelectDifficultyModalComponent } from 'pages/topic-editor-page/modal-templates/questions-opportunities-select-difficulty-modal.component';
-import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { QuestionValidationService } from 'services/question-validation.service';
 import { ContributionAndReviewService } from '../services/contribution-and-review.service';
 import { AppConstants } from 'app.constants';
@@ -62,7 +62,6 @@ export class QuestionSuggestionEditorModalComponent
     private siteAnalyticsService: SiteAnalyticsService,
     private ngbModal: NgbModal,
     private ngbActiveModal: NgbActiveModal,
-    private changeDetectorRef: ChangeDetectorRef,
     private questionValidationService: QuestionValidationService,
     private contributionAndReviewService: ContributionAndReviewService,
   ) {
@@ -77,7 +76,6 @@ export class QuestionSuggestionEditorModalComponent
         this.ngbActiveModal.dismiss('cancel');
         this.imageLocalStorageService.flushStoredImagesData();
         this.contextService.resetImageSaveDestination();
-        this.changeDetectorRef.detectChanges();
       }, () => {
         // Note to developers:
         // This callback is triggered when the cancel button is clicked.
@@ -91,7 +89,7 @@ export class QuestionSuggestionEditorModalComponent
   }
 
   questionChanged(): void {
-    this.changeDetectorRef.detectChanges();
+    // Shivam PTAL.
   }
 
   onClickChangeDifficulty(): void {
@@ -143,8 +141,6 @@ export class QuestionSuggestionEditorModalComponent
         imagesData,
         () => {
           this.alertsService.addSuccessMessage('Updated question.');
-
-          this.changeDetectorRef.detectChanges();
         },
         () => {});
     } else {
@@ -154,8 +150,6 @@ export class QuestionSuggestionEditorModalComponent
         () => {
           this.alertsService.addSuccessMessage(
             'Submitted question for review.');
-
-          this.changeDetectorRef.detectChanges();
         });
     }
     this.ngbActiveModal.close();

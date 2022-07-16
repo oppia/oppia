@@ -53,6 +53,7 @@ require(
 require('services/alerts.service.ts');
 require('services/context.service.ts');
 require('services/site-analytics.service.ts');
+require('services/ngb-modal.service.ts');
 
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { QuestionsOpportunitiesSelectDifficultyModalComponent } from 'pages/topic-editor-page/modal-templates/questions-opportunities-select-difficulty-modal.component';

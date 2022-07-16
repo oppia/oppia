@@ -73,7 +73,7 @@ interface ActiveSuggestionDict {
 
 // Details are null if suggestion's corresponding opportunity is deleted.
 // See issue #14234.
-interface ActiveContributionDict {
+export interface ActiveContributionDict {
   'details': ActiveContributionDetailsDict | null;
   'suggestion': ActiveSuggestionDict;
 }

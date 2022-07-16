@@ -30,6 +30,8 @@ import { SuggestionModalService } from 'services/suggestion-modal.service';
 import { ThreadDataBackendApiService } from 'pages/exploration-editor-page/feedback-tab/services/thread-data-backend-api.service';
 import { AppConstants } from 'app.constants';
 import { ParamDict } from 'services/suggestion-modal.service';
+import { MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
+import { Question } from 'domain/question/QuestionObjectFactory';
 
 interface QuestionSuggestionModalValue {
   suggestionId: any;
@@ -46,14 +48,14 @@ export class QuestionSuggestionReviewModalComponent
   extends ConfirmOrCancelModal implements OnInit {
   @Input() authorName: any;
   @Input() contentHtml: any;
-  @Input() reviewable: any;
-  @Input() question: any;
+  @Input() reviewable: boolean;
+  @Input() question: Question;
   @Input() questionHeader: any;
   @Input() suggestion: any;
   @Input() skillRubrics: any;
   @Input() suggestionId: any;
   @Input() skillDifficulty: any;
-  @Input() misconceptionsBySkill: any;
+  @Input() misconceptionsBySkill: MisconceptionSkillMap;
 
   @Output() editSuggestionEmitter = (
     new EventEmitter<QuestionSuggestionModalValue>());

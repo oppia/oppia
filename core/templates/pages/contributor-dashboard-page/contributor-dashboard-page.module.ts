@@ -48,6 +48,7 @@ import { TranslationModalComponent } from './modal-templates/translation-modal.c
 import { TranslationOpportunitiesComponent } from './translation-opportunities/translation-opportunities.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
+import { ContributionsAndReview } from './contributions-and-review/contributions-and-review.component';
 
 @NgModule({
   imports: [
@@ -74,7 +75,8 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
     TranslationOpportunitiesComponent,
     TranslationSuggestionReviewModalComponent,
     TranslationTopicSelectorComponent,
-    TranslationModalComponent
+    TranslationModalComponent,
+    ContributionsAndReview
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
@@ -86,7 +88,8 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
     TranslationOpportunitiesComponent,
     TranslationSuggestionReviewModalComponent,
     TranslationTopicSelectorComponent,
-    TranslationModalComponent
+    TranslationModalComponent,
+    ContributionsAndReview
   ],
   providers: [
     {
