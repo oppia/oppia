@@ -42,11 +42,6 @@ from typing import ( # isort:skip
     overload
 )
 
-MYPY = False
-if MYPY: # pragma: no cover
-    # Here, change_domain is imported only for typing checking.
-    from core.domain import change_domain  # pylint: disable=invalid-import # isort:skip
-
 SELF_BASE_MODEL = TypeVar(  # pylint: disable=invalid-name
     'SELF_BASE_MODEL', bound='BaseModel')
 SELF_BASE_HUMAN_MAINTAINED_MODEL = TypeVar(  # pylint: disable=invalid-name
@@ -62,8 +57,20 @@ SELF_BASE_SNAPSHOT_CONTENT_MODEL = TypeVar(  # pylint: disable=invalid-name
 
 MYPY = False
 if MYPY: # pragma: no cover
+    from core.domain import change_domain  # pylint: disable=invalid-import # isort:skip
     from mypy_imports import datastore_services
     from mypy_imports import transaction_services
+
+    BaseCommitLogEntryCmdType = Union[
+        Sequence[Mapping[str, change_domain.AcceptableChangeDictTypes]],
+        Mapping[str, change_domain.AcceptableChangeDictTypes],
+        None
+    ]
+
+    BaseVersionedCommitCmdType = Sequence[
+        Mapping[str, change_domain.AcceptableChangeDictTypes]
+    ]
+
 
 transaction_services = models.Registry.import_transaction_services()
 datastore_services = models.Registry.import_datastore_services()
@@ -80,17 +87,6 @@ FETCH_BATCH_SIZE = 1000
 MAX_RETRIES = 10
 RAND_RANGE = (1 << 30) - 1
 ID_LENGTH = 12
-
-
-BaseCommitLogEntryCmdType = Union[
-    Sequence[Mapping[str, change_domain.AcceptableChangeDictTypes]],
-    Mapping[str, change_domain.AcceptableChangeDictTypes],
-    None
-]
-
-BaseVersionedCommitCmdType = Sequence[
-    Mapping[str, change_domain.AcceptableChangeDictTypes]
-]
 
 
 class SnapshotsMetaDataDict(TypedDict):

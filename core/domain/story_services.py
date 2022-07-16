@@ -39,6 +39,8 @@ from core.domain import suggestion_services
 from core.domain import topic_fetchers
 from core.platform import models
 
+from typing import List, Optional
+
 (exp_models, story_models, user_models,) = models.Registry.import_models(
     [models.NAMES.exploration, models.NAMES.story, models.NAMES.user])
 transaction_services = models.Registry.import_transaction_services()
@@ -543,7 +545,11 @@ def is_story_published_and_present_in_topic(story):
 
 
 def update_story(
-        committer_id, story_id, change_list, commit_message):
+    committer_id: str,
+    story_id: str,
+    change_list: List[story_domain.StoryChange],
+    commit_message: Optional[str]
+) -> None:
     """Updates a story. Commits changes.
 
     # NOTE: This function should not be called on its own. Access it

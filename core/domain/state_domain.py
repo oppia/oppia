@@ -55,6 +55,15 @@ class AnswerGroupDict(TypedDict):
     tagged_skill_misconception_id: Optional[str]
 
 
+AllowedInputValueTypes = Union[
+    str,
+    int,
+    List[str],
+    List[List[str]],
+    Dict[str, Union[str, List[str]]]
+]
+
+
 class AnswerGroup(translation_domain.BaseTranslatableObject):
     """Value object for an answer group. Answer groups represent a set of rules
     dictating whether a shared feedback should be shared with the user. These
@@ -2358,7 +2367,7 @@ class RuleSpecDict(TypedDict):
     """Dictionary representing the RuleSpec object."""
 
     rule_type: str
-    inputs: Mapping[str, Union[str, int, List[str], List[List[str]]]]
+    inputs: Mapping[str, AllowedInputValueTypes]
 
 
 class RuleSpec(translation_domain.BaseTranslatableObject):
@@ -2367,7 +2376,7 @@ class RuleSpec(translation_domain.BaseTranslatableObject):
     def __init__(
         self,
         rule_type: str,
-        inputs: Mapping[str, Union[str, int, List[str], List[List[str]]]]
+        inputs: Mapping[str, AllowedInputValueTypes]
     ) -> None:
         """Initializes a RuleSpec domain object.
 

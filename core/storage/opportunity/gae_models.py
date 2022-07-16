@@ -93,7 +93,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
             page_size: int,
             urlsafe_start_cursor: Optional[str],
             language_code: str,
-            topic_name: str
+            topic_name: Optional[str]
     ) -> Tuple[
         Sequence[ExplorationOpportunitySummaryModel], Optional[str], bool
     ]:
