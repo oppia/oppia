@@ -118,13 +118,16 @@ def _save_activity_rights(
     activity_rights.validate()
 
     if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
-        model_cls: Union[
-            Type[exp_models.ExplorationRightsModel],
-            Type[collection_models.CollectionRightsModel]
-        ] = exp_models.ExplorationRightsModel
+        model: Union[
+            exp_models.ExplorationRightsModel,
+            collection_models.CollectionRightsModel
+        ] = exp_models.ExplorationRightsModel.get(
+            activity_rights.id, strict=True
+        )
     elif activity_type == constants.ACTIVITY_TYPE_COLLECTION:
-        model_cls = collection_models.CollectionRightsModel
-    model = model_cls.get(activity_rights.id, strict=True)
+        model = collection_models.CollectionRightsModel.get(
+            activity_rights.id, strict=True
+        )
 
     model.owner_ids = activity_rights.owner_ids
     model.editor_ids = activity_rights.editor_ids
@@ -343,23 +346,23 @@ def _get_activity_rights_where_user_is_owner(
         role.
     """
     if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
-        rights_model_class: Union[
-            Type[exp_models.ExplorationRightsModel],
-            Type[collection_models.CollectionRightsModel]
-        ] = exp_models.ExplorationRightsModel
+        activity_rights_models: Sequence[
+            Union[
+                collection_models.CollectionRightsModel,
+                exp_models.ExplorationRightsModel
+            ]
+        ] = exp_models.ExplorationRightsModel.query(
+            datastore_services.any_of(
+                exp_models.ExplorationRightsModel.owner_ids == user_id
+            )
+        ).fetch()
     elif activity_type == constants.ACTIVITY_TYPE_COLLECTION:
-        rights_model_class = collection_models.CollectionRightsModel
+        activity_rights_models = collection_models.CollectionRightsModel.query(
+            datastore_services.any_of(
+                collection_models.CollectionRightsModel.owner_ids == user_id
+            )
+        ).fetch()
 
-    activity_rights_models: Sequence[
-        Union[
-            collection_models.CollectionRightsModel,
-            exp_models.ExplorationRightsModel
-        ]
-    ] = rights_model_class.query(
-        datastore_services.any_of(
-            rights_model_class.owner_ids == user_id
-        )
-    ).fetch()
     return [
         get_activity_rights_from_model(activity_rights_model, activity_type)
         for activity_rights_model in activity_rights_models
