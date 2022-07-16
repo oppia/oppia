@@ -329,18 +329,21 @@ def delete_subtopic_page(
 def get_topic_ids_from_subtopic_page_ids(
     subtopic_page_ids: List[str]
 ) -> List[str]:
-    """Returns the topic ids corresponding to the given subtopic page ids.
+    """Returns the topic ids corresponding to the given set of subtopic page
+    ids.
 
     Args:
         subtopic_page_ids: list(str). The ids of the subtopic pages.
 
     Returns:
         list(str). The topic ids corresponding to the given subtopic page ids.
+        The returned list of topic ids is deduplicated and ordered
+        alphabetically.
     """
-    return list({
+    return sorted(list({
         subtopic_page_id.split(':')[0] for subtopic_page_id in
         subtopic_page_ids
-    })
+    }))
 
 
 def get_multi_users_subtopic_pages_progress(
