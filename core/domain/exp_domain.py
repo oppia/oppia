@@ -1019,7 +1019,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
             solution = (
                 state_domain.Solution.from_dict(idict['id'], idict['solution'])
                 if idict['solution'] is not None and idict['id'] is not None
-                else None)
+                else None
+            )
 
             customization_args = (
                 state_domain.InteractionInstance.  # type: ignore[no-untyped-call]
