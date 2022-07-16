@@ -4,8 +4,8 @@
 </div>
 
 <div class="version-diff-container">
-  <mat-card class="version-diff-graph">
-    <state-graph-visualization class="e2e-test-history-graph diff-graph"
+  <mat-card class="diff-graph version-diff-graph">
+    <state-graph-visualization class="e2e-test-history-graph"
                                [versionGraphData]="diffGraphData"
                                [nodeColors]="diffGraphNodeColors"
                                [nodeSecondaryLabels]="diffGraphSecondaryLabels"
@@ -16,8 +16,8 @@
     </state-graph-visualization>
   </mat-card>
 
+  <h4 class="exploration-graph-legend-heading">Exploration Graph Legend:</h4>
   <div class="version-diff-graph">
-    <h3 class="exploration-graph-legend-heading">Exploration Graph Legend</h3>
     <mat-card class="legend-graph version-diff-graph" [hidden]="!diffGraphData">
       <state-graph-visualization [versionGraphData]="legendGraph"
                                  [nodeColors]="LEGEND_GRAPH_COLORS"
@@ -34,21 +34,26 @@
     position: relative;
     width: 100%;
     height: 100%;
+    margin-bottom: 0px;
+    padding-bottom: 0px;
   }
 
   .legend-graph .node rect {
     pointer-events: none;
   }
+
   .legend-graph {
     position: initial;
-    margin-top: 30px;
     right: -100px;
     top: 10px;
   }
+
   .exploration-graph-legend-heading {
     font-weight: normal;
+    margin-top: 10px;
   }
-  version-diff-visualization .diff-graph, version-diff-visualization .legend-graph {
+
+  .diff-graph, .legend-graph {
     border: 1px solid #707070;
   }
 </style>
