@@ -29,12 +29,28 @@ var suites = {
     './core/tests/webdriverio_desktop/collections.js'
   ],
 
+  creatorDashboard: [
+    './core/tests/webdriverio_desktop/creatorDashboard.js'
+  ],
+
   learner: [
     './core/tests/webdriverio/learnerFlow.js'
   ],
 
+  learnerDashboard: [
+    './core/tests/webdriverio_desktop/learnerDashboard.js'
+  ],
+
+  preferences: [
+    './core/tests/webdriverio_desktop/preferences.js'
+  ],
+
   profileFeatures: [
     './core/tests/webdriverio_desktop/profileFeatures.js'
+  ],
+
+  subscriptions: [
+    './core/tests/webdriverio/subscriptionsFlow.js'
   ],
 
   users: [
@@ -130,7 +146,7 @@ exports.config = {
   // Define all options that are relevant for the WebdriverIO instance here
   //
   // Level of logging verbosity: trace | debug | info | warn | error | silent.
-  logLevel: 'info',
+  logLevel: 'warn',
 
   // Set a base URL in order to shorten url command calls. If your `url`
   // parameter starts with `/`, the base url gets prepended, not including

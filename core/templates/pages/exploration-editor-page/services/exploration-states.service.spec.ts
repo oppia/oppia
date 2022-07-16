@@ -84,6 +84,7 @@ describe('ExplorationStatesService', () => {
       }],
       outcome: {
         dest: 'Me Llamo',
+        dest_if_really_stuck: null,
         feedback: {
           content_id: 'feedback_1',
           html: 'buen trabajo!',
@@ -123,6 +124,7 @@ describe('ExplorationStatesService', () => {
           },
           default_outcome: {
             dest: 'Me Llamo',
+            dest_if_really_stuck: null,
             feedback: {
               content_id: 'feedback_1',
               html: 'buen trabajo!',

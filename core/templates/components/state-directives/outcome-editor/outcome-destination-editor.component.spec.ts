@@ -71,6 +71,7 @@ describe('Outcome Destination Editor', () => {
     userService = TestBed.inject(UserService);
     component.outcome = new Outcome(
       PLACEHOLDER_OUTCOME_DEST,
+      null,
       new SubtitledHtml('<p> HTML string </p>', 'Id'),
       false,
       [],
@@ -282,6 +283,7 @@ describe('Outcome Destination Editor', () => {
 
     component.outcome = new Outcome(
       'Introduction',
+      null,
       new SubtitledHtml('<p> HTML string </p>', 'Id'),
       false,
       [],
@@ -295,6 +297,7 @@ describe('Outcome Destination Editor', () => {
   it('should emit changes on destination selector change', () => {
     component.outcome = new Outcome(
       'Introduction',
+      null,
       new SubtitledHtml('<p> HTML string </p>', 'Id'),
       false,
       [],
@@ -322,6 +325,7 @@ describe('Outcome Destination Editor', () => {
     () => {
       component.outcome = new Outcome(
         'Introduction',
+        null,
         new SubtitledHtml('<p> HTML string </p>', 'Id'),
         false,
         [],
