@@ -92,6 +92,7 @@ describe('Exploration editor page component', function() {
   var gds = null;
   var pts = null;
   var rs = null;
+  let autosaveInfoModalsService = null;
   var sas = null;
   var sers = null;
   var ses = null;
@@ -298,6 +299,7 @@ describe('Exploration editor page component', function() {
     stfts = $injector.get('StateTutorialFirstTimeService');
     tds = $injector.get('ThreadDataBackendApiService');
     userService = $injector.get('UserService');
+    autosaveInfoModalsService = $injector.get('AutosaveInfoModalsService');
     ueps = $injector.get('UserExplorationPermissionsService');
     focusManagerService = $injector.get('FocusManagerService');
 
@@ -332,6 +334,9 @@ describe('Exploration editor page component', function() {
         .and.returnValue($q.resolve({canEdit: true, canVoiceover: true}));
       spyOnProperty(rs, 'onRefreshTranslationTab')
         .and.returnValue(mockRefreshTranslationTabEventEmitter);
+      spyOn(autosaveInfoModalsService, 'showVersionMismatchModal').and.stub();
+      spyOn(cls, 'getChangeList').and.stub();
+      spyOn($rootScope, '$applyAsync').and.stub();
       spyOn(userService, 'getUserInfoAsync')
         .and.returnValue($q.resolve(new UserInfo(
           ['USER_ROLE'], true, true, false, false, false, null, null, null,
