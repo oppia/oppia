@@ -710,13 +710,13 @@ def main(args=None):
         _print_summary_of_error_messages(lint_messages)
         linter_utils.print_failure_message('\n'.join([
             '---------------------------',
-            'Checks Not Passed.',
+            'Linter Checks Failed.',
             '---------------------------']))
         sys.exit(1)
     else:
         linter_utils.print_success_message('\n'.join([
             '---------------------------',
-            'All Checks Passed.',
+            'All Linter Checks Passed.',
             '---------------------------']))
 
 

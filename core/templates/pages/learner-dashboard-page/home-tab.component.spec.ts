@@ -164,10 +164,6 @@ describe('Home tab Component', () => {
       .toEqual('I18N_LEARNER_DASHBOARD_MORNING_GREETING');
   });
 
-  it('should get RTL language status correctly', () => {
-    expect(component.isLanguageRTL()).toBeTrue();
-  });
-
   it('should get time of day as afternoon', () => {
     var baseTime = new Date();
     baseTime.setHours(15);
@@ -230,6 +226,15 @@ describe('Home tab Component', () => {
   it('should not show empty learn something new tab' +
     '\'when goal selection limit is not reached\'', () => {
     component.goalTopicsLength = 0;
+    expect(component.isGoalLimitReached()).toBeFalse();
+  });
+
+  it('should not show empty learn something new tab' +
+    '\'when goal selection limit is reached and goal selection limit' +
+    ' is not reached\'', () => {
+    component.goalTopicsLength = 2;
+    component.currentGoalsLength = 0;
+    component.goalTopicsLength = 3;
     expect(component.isGoalLimitReached()).toBeFalse();
   });
 });
