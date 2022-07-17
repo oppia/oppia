@@ -445,8 +445,8 @@ class ExpStateAuditChecksJob(base_jobs.JobBase):
                     # Validates filepath extension is svg.
                     if (
                         file_with_value != 'Not found' and
-                        len(file_with_value) > 0 and
-                        file_with_value[-3:] != 'svg'
+                        len(file_with_value) > 4 and
+                        file_with_value[-4:] != '.svg'
                     ):
                         rte_image_errors.append(
                             f'State - {state_name} Image tag filepath value '
@@ -508,12 +508,12 @@ class ExpStateAuditChecksJob(base_jobs.JobBase):
                             start_value != 'Not found' and
                             end_value != 'Not found'
                         )
-                        and int(start_value) > int(end_value)
+                        and float(start_value) > float(end_value)
                     ):
                         rte_video_errors.append(
                             f'State - {state_name} Video tag at '
-                            f'index {idx}, start value {int(start_value)} '
-                            f'is greater than end value {int(end_value)}'
+                            f'index {idx}, start value {float(start_value)} '
+                            f'is greater than end value {float(end_value)}'
                         )
 
             states_with_values.append(
