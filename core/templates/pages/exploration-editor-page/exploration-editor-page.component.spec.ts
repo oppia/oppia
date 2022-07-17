@@ -736,6 +736,7 @@ describe('Exploration editor page component', function() {
     it('should react to initExplorationPage broadcasts', fakeAsync(() => {
       $scope.$apply();
       spyOn(ics, 'startCheckingConnection');
+      spyOn(cls, 'loadAutosavedChangeList');
       spyOn(rs, 'isLocationSetToNonStateEditorTab').and.returnValue(true);
       var successCallback = jasmine.createSpy('success');
       expect(ctrl.explorationEditorPageHasInitialized).toEqual(false);
@@ -752,6 +753,7 @@ describe('Exploration editor page component', function() {
       $scope.$apply();
       tick();
 
+      expect(cls.loadAutosavedChangeList).toHaveBeenCalled();
       expect(ctrl.explorationEditorPageHasInitialized).toEqual(true);
       expect(successCallback).toHaveBeenCalled();
     }));
