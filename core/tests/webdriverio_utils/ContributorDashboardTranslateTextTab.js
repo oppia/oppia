@@ -22,6 +22,7 @@ var waitFor = require('./waitFor.js');
 
 var ContributorDashboardTranslateTextTab = function() {
   var selectorContainer = $('.e2e-test-language-selector');
+  var selectedLanguageElement = $('.e2e-test-language-selector-selected');
   var featuredLanguageElementsSelector = function() {
     return selectorContainer.$$('.e2e-test-featured-language');
   };
@@ -96,10 +97,8 @@ var ContributorDashboardTranslateTextTab = function() {
       selectorContainer,
       'Selector Container took too long to load'
     );
-    var selectedLanguageElement = selectorContainer.$(
-      '.e2e-test-language-selector-selected');
-    expect(await selectedLanguageElement.getAttribute('innerText'))
-      .toEqual(language);
+    var selectedLanguageText = await selectedLanguageElement.getHTML(false);
+    expect(selectedLanguageText).toEqual(language);
   };
 };
 
