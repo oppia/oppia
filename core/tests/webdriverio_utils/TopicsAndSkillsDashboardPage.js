@@ -186,6 +186,9 @@ var TopicsAndSkillsDashboardPage = function() {
     var handles = await browser.getWindowHandles();
     initialHandles = handles;
     var parentHandle = await browser.getWindowHandle();
+    await waitFor.visibilityOf(
+      createTopicButton,
+      'Create Topic Button takes too long to appear.');
     await action.click('Create Topic button', createTopicButton);
     await waitFor.visibilityOf(
       topicNameField,
