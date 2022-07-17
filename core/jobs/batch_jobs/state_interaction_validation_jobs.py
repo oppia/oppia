@@ -532,7 +532,24 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
                             rule_spec.rule_type == (
                                 'IsEquivalentToAndInSimplestForm')
                         ):
-                            rule_value_f = int(rule_spec.inputs['f'])
+                            rule_value_f = rule_spec.inputs['f'].strip()
+                            if '/' in rule_value_f:
+                                rule_value_f = rule_value_f.split('/')
+                                # For values like '1 3/2'
+                                if len(rule_value_f[0].strip().split()) > 1:
+                                    value_1 = rule_value_f[0].strip().split()
+                                    value_2 = rule_value_f[1]
+
+                                    rule_value_f = (((float(value_2)*float(
+                                        value_1[0]))+ float(
+                                            value_1[1])) / float(value_2))
+                                # For values like '1/2'
+                                else:
+                                    rule_value_f = (
+                                        float(rule_value_f[0]) / float(rule_value_f[1]))
+                            else:
+                                rule_value_f = float(rule_value_f)
+
                             (
                                 ExpStateInteractionValidationJob.
                                 _set_lower_and_upper_bounds(
@@ -542,7 +559,24 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
                             )
 
                         if rule_spec.rule_type == 'IsGreaterThan':
-                            rule_value_f = int(rule_spec.inputs['f'])
+                            rule_value_f = rule_spec.inputs['f'].strip()
+                            if '/' in rule_value_f:
+                                rule_value_f = rule_value_f.split('/')
+                                # For values like '1 3/2'
+                                if len(rule_value_f[0].strip().split()) > 1:
+                                    value_1 = rule_value_f[0].strip().split()
+                                    value_2 = rule_value_f[1]
+
+                                    rule_value_f = (((float(value_2)*float(
+                                        value_1[0]))+ float(
+                                            value_1[1])) / float(value_2))
+                                # For values like '1/2'
+                                else:
+                                    rule_value_f = (
+                                        float(rule_value_f[0]) / float(rule_value_f[1]))
+                            else:
+                                rule_value_f = float(rule_value_f)
+
                             (
                                 ExpStateInteractionValidationJob.
                                 _set_lower_and_upper_bounds(
@@ -552,7 +586,24 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
                             )
 
                         if rule_spec.rule_type == 'IsLessThan':
-                            rule_value_f = int(rule_spec.inputs['f'])
+                            rule_value_f = rule_spec.inputs['f'].strip()
+                            if '/' in rule_value_f:
+                                rule_value_f = rule_value_f.split('/')
+                                # For values like '1 3/2'
+                                if len(rule_value_f[0].strip().split()) > 1:
+                                    value_1 = rule_value_f[0].strip().split()
+                                    value_2 = rule_value_f[1]
+
+                                    rule_value_f = (((float(value_2)*float(
+                                        value_1[0]))+ float(
+                                            value_1[1])) / float(value_2))
+                                # For values like '1/2'
+                                else:
+                                    rule_value_f = (
+                                        float(rule_value_f[0]) / float(rule_value_f[1]))
+                            else:
+                                rule_value_f = float(rule_value_f)
+
                             (
                                 ExpStateInteractionValidationJob.
                                 _set_lower_and_upper_bounds(
