@@ -30,6 +30,7 @@ import { TranslationLanguageService } from 'pages/exploration-editor-page/transl
 import { ContributionAndReviewService } from './services/contribution-and-review.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import AppConstants from 'assets/constants';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 
 interface TabsDetails {
   submitQuestionTab: {
@@ -44,7 +45,7 @@ interface TabsDetails {
 export class ContributorDashboardPageComponent
   implements OnInit {
   defaultHeaderVisible: boolean;
-  profilePictureDataUrl: string;
+  profilePictureDataUrl: SafeUrl | string | undefined;
   username: string;
   userInfoIsLoading: boolean;
   userIsLoggedIn: boolean;
@@ -70,6 +71,7 @@ export class ContributorDashboardPageComponent
     private translationLanguageService: TranslationLanguageService,
     private contributionAndReviewService: ContributionAndReviewService,
     private focusManagerService: FocusManagerService,
+    private sanitizer: DomSanitizer
   ) {}
 
   onTabClick(activeTabName: string): void {
@@ -196,7 +198,9 @@ export class ContributorDashboardPageComponent
 
     this.userService.getProfileImageDataUrlAsync().then(
       (dataUrl) => {
-        this.profilePictureDataUrl = dataUrl;
+        this.profilePictureDataUrl = this.sanitizer
+          // eslint-disable-next-line oppia/no-bypass-security-phrase
+          .bypassSecurityTrustResourceUrl(dataUrl);
       });
 
     this.topicName = (

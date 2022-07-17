@@ -238,7 +238,8 @@ export class ContributionsAndReview
     modalRef.result.then((result) => {
       this.contributionAndReviewService.reviewSkillSuggestion(
         targetId, suggestionId, result.action, result.reviewMessage,
-        result.skillDifficulty, this.resolveSuggestionSuccess, () => {
+        result.skillDifficulty, this.resolveSuggestionSuccess.bind(this),
+        () => {
           this.alertsService.addInfoMessage('Failed to submit suggestion.');
         });
     }, () => {});
