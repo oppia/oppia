@@ -35,7 +35,7 @@ with the same id on the page. -->
               <text text-anchor="middle" [attr.x]="node.xLabel" [attr.y]="node.yLabel">
                 <tspan *ngIf="isCheckpoint(node.id)" alignment-baseline="central">&#11088;</tspan>
                 <tspan class="e2e-test-node-label">
-                  <tspan alignment-baseline="central">{{getTruncatedLabel(node.label)}}</tspan>
+                  <tspan alignment-baseline="central">{{getTruncatedLabel(node.label) + ' '}}</tspan>
                   <tspan [attr.x]="node.xLabel" dy="1em" class="oppia-box-fill">{{getTruncatedLabel(node.secondaryLabel)}}</tspan>
                 </tspan>
               </text>
