@@ -628,6 +628,7 @@ describe('Conversation skin component', () => {
     spyOn(questionPlayerEngineService, 'getCurrentQuestion');
     spyOn(questionPlayerStateService, 'solutionViewed');
     spyOn(imagePreloaderService, 'onStateChange');
+    spyOn(componentInstance, 'fetchCompletedChaptersCount');
     spyOn(statsReportingService, 'recordExplorationCompleted');
     spyOn(statsReportingService, 'recordExplorationActuallyStarted');
     spyOn(
@@ -710,6 +711,7 @@ describe('Conversation skin component', () => {
     spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
       .and.returnValue(Promise.resolve(new Collection(
         '', '', '', '', [], null, '', 6, 8, [])));
+    spyOn(componentInstance, 'fetchCompletedChaptersCount').and.callThrough();
     spyOn(
       learnerDashboardBackendApiService,
       'fetchLearnerCompletedChaptersCountDataAsync').and.returnValue(
@@ -815,6 +817,7 @@ describe('Conversation skin component', () => {
     spyOn(questionPlayerEngineService, 'getCurrentQuestion');
     spyOn(questionPlayerStateService, 'solutionViewed');
     spyOn(imagePreloaderService, 'onStateChange');
+    spyOn(componentInstance, 'fetchCompletedChaptersCount');
     spyOn(statsReportingService, 'recordExplorationCompleted');
     spyOn(statsReportingService, 'recordExplorationActuallyStarted');
     spyOn(
@@ -993,6 +996,36 @@ describe('Conversation skin component', () => {
     expect(componentInstance.isSubmitButtonDisabled()).toBeTrue();
     expect(componentInstance.isSubmitButtonDisabled()).toBeFalse();
   });
+
+  it('should fetch completed chapters count if user is logged in',
+    fakeAsync(() => {
+      spyOn(
+        learnerDashboardBackendApiService,
+        'fetchLearnerCompletedChaptersCountDataAsync').and.returnValue(
+        Promise.resolve({
+          completedChaptersCount: 1,
+        }));
+      componentInstance.isLoggedIn = false;
+
+      componentInstance.fetchCompletedChaptersCount();
+      tick();
+
+      expect(
+        learnerDashboardBackendApiService
+          .fetchLearnerCompletedChaptersCountDataAsync).not.toHaveBeenCalled();
+      expect(componentInstance.completedChaptersCount).toBeUndefined();
+
+      componentInstance.isLoggedIn = true;
+
+      componentInstance.fetchCompletedChaptersCount();
+      tick();
+
+      expect(
+        learnerDashboardBackendApiService
+          .fetchLearnerCompletedChaptersCountDataAsync).toHaveBeenCalled();
+
+      expect(componentInstance.completedChaptersCount).toEqual(1);
+    }));
 
   it('should tell if collection allows guest progress', () => {
     expect(componentInstance.doesCollectionAllowsGuestProgress('')).toBeFalse();

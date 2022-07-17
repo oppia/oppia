@@ -378,12 +378,7 @@ export class ConversationSkinComponent {
           );
       }
 
-      if (this.isLoggedIn) {
-        this.learnerDashboardBackendApiService
-          .fetchLearnerCompletedChaptersCountDataAsync().then((data) => {
-            this.completedChaptersCount = data.completedChaptersCount;
-          });
-      }
+      this.fetchCompletedChaptersCount();
 
       // We do not save checkpoints progress for iframes.
       if (this.CHECKPOINTS_FEATURE_IS_ENABLED &&
@@ -472,6 +467,15 @@ export class ConversationSkinComponent {
 
   getCanAskLearnerForAnswerInfo(): boolean {
     return this.learnerAnswerInfoService.getCanAskLearnerForAnswerInfo();
+  }
+
+  fetchCompletedChaptersCount(): void {
+    if (this.isLoggedIn) {
+      this.learnerDashboardBackendApiService
+        .fetchLearnerCompletedChaptersCountDataAsync().then((data) => {
+          this.completedChaptersCount = data.completedChaptersCount;
+        });
+    }
   }
 
   initLearnerAnswerInfoService(
