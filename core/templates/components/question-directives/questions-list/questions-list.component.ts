@@ -37,10 +37,6 @@ require(
 require(
   'components/skill-selector/skill-selector.component.ts');
 
-require(
-  'components/question-directives/modal-templates/' +
-  'question-editor-modal.controller.ts');
-
 require('domain/editor/undo_redo/question-undo-redo.service.ts');
 require('domain/question/editable-question-backend-api.service.ts');
 require('domain/question/QuestionObjectFactory.ts');
@@ -49,7 +45,6 @@ require('domain/skill/skill-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('filters/format-rte-preview.filter.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
-require('pages/skill-editor-page/services/question-creation.service.ts');
 require('pages/skill-editor-page/services/skill-editor-routing.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('services/alerts.service.ts');
@@ -269,7 +264,7 @@ angular.module('oppia').component('questionsList', {
         ctrl.question =
           QuestionObjectFactory.createDefaultQuestion(skillIds);
         ctrl.questionId = ctrl.question.getId();
-        ctrl.questionStateData = ctrl.question.getStateData();
+        ctrl.questionStateData = ctrl.question?.getStateData();
         ctrl.questionIsBeingUpdated = false;
         ctrl.newQuestionIsBeingCreated = true;
       };
@@ -411,7 +406,7 @@ angular.module('oppia').component('questionsList', {
             }
             ctrl.question = angular.copy(response.questionObject);
             ctrl.questionId = ctrl.question.getId();
-            ctrl.questionStateData = ctrl.question.getStateData();
+            ctrl.questionStateData = ctrl.question?.getStateData();
             ctrl.questionIsBeingUpdated = true;
             ctrl.newQuestionIsBeingCreated = false;
             ctrl.openQuestionEditor();
@@ -510,7 +505,7 @@ angular.module('oppia').component('questionsList', {
       };
 
       ctrl.showSolutionCheckpoint = function() {
-        const interactionId = ctrl.question.getStateData().interaction.id;
+        const interactionId = ctrl.question?.getStateData().interaction.id;
         return (
           interactionId && INTERACTION_SPECS[
             interactionId].can_have_solution);

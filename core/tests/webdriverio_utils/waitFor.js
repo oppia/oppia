@@ -25,15 +25,26 @@ var Constants = require('./WebdriverioConstants');
 // server since the mobile tests are run on a real
 // mobile device.
 var DEFAULT_WAIT_TIME_MSECS = browser.isMobile ? 20000 : 10000;
-
+var DEFAULT_WAIT_TIME_MSECS_FOR_NEW_TAB = 15000;
 
 var alertToBePresent = async() => {
   await browser.waitUntil(
-    until.alertIsPresent(),
+    await until.alertIsPresent(),
     {
       timeout: DEFAULT_WAIT_TIME_MSECS,
       timeoutMsg: 'Alert box took too long to appear.'
     });
+};
+
+// Wait for current url to change to a specific url.
+var urlToBe = async function(url) {
+  await browser.waitUntil(async function() {
+    return await browser.getUrl() === url;
+  },
+  {
+    timeout: DEFAULT_WAIT_TIME_MSECS,
+    timeoutMsg: 'Url takes too long to change'
+  });
 };
 
 /**
@@ -42,7 +53,7 @@ var alertToBePresent = async() => {
  */
 var elementToBeClickable = async function(element, errorMessage) {
   await browser.waitUntil(
-    until.elementToBeClickable(element),
+    await until.elementToBeClickable(element),
     {
       timeout: DEFAULT_WAIT_TIME_MSECS,
       timeoutMsg: errorMessage
@@ -138,6 +149,35 @@ var elementAttributeToBe = async function(
   });
 };
 
+/**
+* Wait for new tab is opened
+*/
+var newTabToBeCreated = async function(errorMessage, urlToMatch) {
+  await browser.waitUntil(async function() {
+    var handles = await browser.getWindowHandles();
+    await browser.switchToWindow(await handles.pop());
+    var url = await browser.getUrl();
+    return await url.match(urlToMatch);
+  },
+  {
+    timeout: DEFAULT_WAIT_TIME_MSECS_FOR_NEW_TAB,
+    timeoutMsg: errorMessage
+  });
+};
+
+/**
+ * @param {string} url - URL to redirect
+ */
+var urlRedirection = async function(url) {
+  // Checks that the current URL matches the expected text.
+  await browser.waitUntil(
+    await until.urlIs(url),
+    {
+      timeout: DEFAULT_WAIT_TIME_MSECS,
+      timeoutMsg: 'URL redirection took too long'
+    });
+};
+
 var visibilityOfInfoToast = async function(errorMessage) {
   var toastInfoElement = $('.toast-info');
   await visibilityOf(toastInfoElement, errorMessage);
@@ -211,6 +251,7 @@ var clientSideRedirection = async function(
 
 exports.DEFAULT_WAIT_TIME_MSECS = DEFAULT_WAIT_TIME_MSECS;
 exports.alertToBePresent = alertToBePresent;
+exports.urlToBe = urlToBe;
 exports.elementToBeClickable = elementToBeClickable;
 exports.invisibilityOf = invisibilityOf;
 exports.pageToFullyLoad = pageToFullyLoad;
@@ -225,4 +266,6 @@ exports.visibilityOfSuccessToast = visibilityOfSuccessToast;
 exports.fadeInToComplete = fadeInToComplete;
 exports.modalPopupToAppear = modalPopupToAppear;
 exports.fileToBeDownloaded = fileToBeDownloaded;
+exports.newTabToBeCreated = newTabToBeCreated;
+exports.urlRedirection = urlRedirection;
 exports.clientSideRedirection = clientSideRedirection;
