@@ -93,10 +93,7 @@ describe('FacilitatorDashboardPageComponent', () => {
 
   it('should initialize', fakeAsync(() => {
     spyOn(component, 'subscribeToOnLangChange');
-    spyOn(translateService.onLangChange, 'subscribe').and.callFake((callb) => {
-      callb();
-      return null;
-    });
+    spyOn(translateService.onLangChange, 'subscribe');
     spyOn(
       facilitatorDashboardBackendApiService,
       'fetchTeacherDashboardLearnerGroupsAsync'

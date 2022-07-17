@@ -250,11 +250,13 @@ describe('AddSyllabusItemsComponent', () => {
   });
 
   it('should open submenu', () => {
+    const clickEvent = new KeyboardEvent('click');
     spyOn(navigationService, 'openSubmenu');
 
-    component.openSubmenu(null, null);
+    component.openSubmenu(clickEvent, 'category');
 
-    expect(navigationService.openSubmenu).toHaveBeenCalled();
+    expect(navigationService.openSubmenu).toHaveBeenCalledWith(
+      clickEvent, 'category');
   });
 
   it('should toggle selection', () => {
@@ -353,10 +355,7 @@ describe('AddSyllabusItemsComponent', () => {
     spyOn(languageUtilService, 'getLanguageIdsAndTexts').and.returnValue([]);
     spyOn(component, 'updateSelectionDetails');
     spyOn(component, 'refreshSearchBarLabels');
-    spyOn(translateService.onLangChange, 'subscribe').and.callFake((callb) => {
-      callb();
-      return null;
-    });
+    spyOn(translateService.onLangChange, 'subscribe');
     component.searchQueryChanged = {
       pipe: (param1, parm2) => {
         return {

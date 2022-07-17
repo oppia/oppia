@@ -707,7 +707,7 @@ class LearnerGroupSearchStudentHandler(test_utils.GenericTestBase):
             'learner_group_id': 'groupId'
         }
         response = self.get_json(
-            '/learner-group-search-student-handler', params=params
+            '/learner_group_search_student_handler', params=params
         )
 
         self.assertEqual(response['username'], 'invalid_username')

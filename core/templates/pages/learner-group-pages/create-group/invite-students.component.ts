@@ -39,9 +39,7 @@ export class InviteStudentsComponent {
   @Output() updateLearnerGroupInvitedStudentsInfo:
     EventEmitter<LearnerGroupInvitedUserInfo[]> = new EventEmitter();
 
-  learnerGroupTitle: string;
-  learnerGroupDescription: string;
-  searchedUsername: string;
+  searchedUsername: string = '';
   alertTimeout = 6000;
 
   constructor(
