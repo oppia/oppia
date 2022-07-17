@@ -17,7 +17,7 @@ var chromedriverPath =
 
 // To record videos of the failed test suites locally,
 // update the value of LOCAL_VIDEO_RECORDING_IS_ENABLED to 1.
-var LOCAL_VIDEO_RECORDING_IS_ENABLED = 0;
+var LOCAL_VIDEO_RECORDING_IS_ENABLED = 1;
 
 var suites = {
   full: [
