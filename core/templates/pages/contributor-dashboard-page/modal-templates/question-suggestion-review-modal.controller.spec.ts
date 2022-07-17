@@ -65,20 +65,16 @@ describe('Question Suggestion Review Modal Controller', function() {
           cmd: 'create_new_fully_specified_question',
           question_dict: {
             id: '1',
-            inapplicable_skill_misconception_ids: [],
-            language_code: 'en',
-            linked_skill_ids: ['skill1'],
-            question_state_data_schema_version: 50,
-            version: 1,
             question_state_data: {
               content: {
-                html: contentHtml,
+                html: 'Question 1',
                 content_id: 'content_1'
               },
               interaction: {
                 answer_groups: [{
                   outcome: {
                     dest: 'outcome 1',
+                    dest_if_really_stuck: null,
                     feedback: {
                       content_id: 'content_5',
                       html: ''
@@ -101,6 +97,7 @@ describe('Question Suggestion Review Modal Controller', function() {
                 },
                 default_outcome: {
                   dest: null,
+                  dest_if_really_stuck: null,
                   feedback: {
                     html: 'Correct Answer',
                     content_id: 'content_2'
@@ -131,7 +128,7 @@ describe('Question Suggestion Review Modal Controller', function() {
               written_translations: {
                 translations_mapping: {}
               },
-            }
+            },
           },
           skill_difficulty: skillDifficulty,
           skill_id: 'skill_1'
@@ -152,20 +149,16 @@ describe('Question Suggestion Review Modal Controller', function() {
           cmd: 'create_new_fully_specified_question',
           question_dict: {
             id: '2',
-            inapplicable_skill_misconception_ids: [],
-            language_code: 'en',
-            linked_skill_ids: ['skill2'],
-            question_state_data_schema_version: 50,
-            version: 1,
             question_state_data: {
               content: {
-                html: contentHtml,
+                html: 'Question 1',
                 content_id: 'content_1'
               },
               interaction: {
                 answer_groups: [{
                   outcome: {
                     dest: 'outcome 1',
+                    dest_if_really_stuck: null,
                     feedback: {
                       content_id: 'content_5',
                       html: ''
@@ -188,6 +181,7 @@ describe('Question Suggestion Review Modal Controller', function() {
                 },
                 default_outcome: {
                   dest: null,
+                  dest_if_really_stuck: null,
                   feedback: {
                     html: 'Correct Answer',
                     content_id: 'content_2'
@@ -218,7 +212,7 @@ describe('Question Suggestion Review Modal Controller', function() {
               written_translations: {
                 translations_mapping: {}
               },
-            }
+            },
           },
           skill_difficulty: skillDifficulty,
           skill_id: 'skill_1'
