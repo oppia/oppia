@@ -74,6 +74,10 @@ var LearnerDashboardPage = function() {
   };
 
   this.navigateToCommunityLessonsSection = async function() {
+    await waitFor.visibilityOf(
+      communityLessonsSection,
+      'Commmunity lesson section takes too long to appear'
+    );
     await action.click('Community Lessons Section', communityLessonsSection);
   };
 
