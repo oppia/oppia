@@ -93,7 +93,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.STORY_ID = 'story'
         self.USER_ID = 'user'
         self.SKILL_ID = 'skill'
-        self.QUESTION_ID = question_services.get_new_question_id()  # type: ignore[no-untyped-call]
+        self.QUESTION_ID = question_services.get_new_question_id()
         self.THREAD_ID = 'exploration.exp1.thread_1'
 
         # Since a valid exploration is created here, it has EndExploration
@@ -593,7 +593,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.save_new_question(  # type: ignore[no-untyped-call]
             self.QUESTION_ID, self.USER_ID,
             self._create_valid_question_data('ABC'), [self.SKILL_ID])  # type: ignore[no-untyped-call]
-        question_services.create_new_question_skill_link(  # type: ignore[no-untyped-call]
+        question_services.create_new_question_skill_link(
             self.USER_ID, self.QUESTION_ID, self.SKILL_ID, 0.3)
 
         opportunity_services.create_skill_opportunity(
@@ -751,7 +751,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             self.QUESTION_ID, self.USER_ID,
             self._create_valid_question_data('ABC'), [self.SKILL_ID])  # type: ignore[no-untyped-call]
 
-        question_services.create_new_question_skill_link(  # type: ignore[no-untyped-call]
+        question_services.create_new_question_skill_link(
             self.USER_ID, self.QUESTION_ID, self.SKILL_ID, 0.3)
 
         skill_opportunities, _, _ = (
@@ -768,7 +768,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             self.QUESTION_ID, self.USER_ID,
             self._create_valid_question_data('ABC'), ['skill_2'])  # type: ignore[no-untyped-call]
 
-        question_services.link_multiple_skills_for_question(  # type: ignore[no-untyped-call]
+        question_services.link_multiple_skills_for_question(
             self.USER_ID, self.QUESTION_ID, [self.SKILL_ID], [0.3])
 
         skill_opportunities, _, _ = (
@@ -783,7 +783,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             self.QUESTION_ID, self.USER_ID,
             self._create_valid_question_data('ABC'), [self.SKILL_ID])  # type: ignore[no-untyped-call]
 
-        question_services.delete_question(self.USER_ID, self.QUESTION_ID)  # type: ignore[no-untyped-call]
+        question_services.delete_question(self.USER_ID, self.QUESTION_ID)
 
         skill_opportunities, _, _ = (
             opportunity_services.get_skill_opportunities(None))
@@ -799,10 +799,10 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.save_new_question(  # type: ignore[no-untyped-call]
             self.QUESTION_ID, self.USER_ID,
             self._create_valid_question_data('ABC'), ['skill_2'])  # type: ignore[no-untyped-call]
-        question_services.create_new_question_skill_link(  # type: ignore[no-untyped-call]
+        question_services.create_new_question_skill_link(
             self.USER_ID, self.QUESTION_ID, self.SKILL_ID, 0.3)
 
-        question_services.delete_question_skill_link(  # type: ignore[no-untyped-call]
+        question_services.delete_question_skill_link(
             self.USER_ID, self.QUESTION_ID, self.SKILL_ID)
 
         skill_opportunities, _, _ = (
