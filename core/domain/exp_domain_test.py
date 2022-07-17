@@ -11645,11 +11645,11 @@ class ExplorationMetadataDomainUnitTests(test_utils.GenericTestBase):
     def test_metadata_properties_are_synced(self):
         swapped_metadata_properties = self.swap(
             constants, 'METADATA_PROPERTIES', [
-                "title", "category", "objective", "language_code",
-                "blurb", "author_notes", "states_schema_version",
-                "init_state_name", "param_specs", "param_changes",
-                "auto_tts_enabled", "correctness_feedback_enabled",
-                "edits_allowed"
+                'title', 'category', 'objective', 'language_code',
+                'blurb', 'author_notes', 'states_schema_version',
+                'init_state_name', 'param_specs', 'param_changes',
+                'auto_tts_enabled', 'correctness_feedback_enabled',
+                'edits_allowed'
             ]
         )
         error_message = (
@@ -11667,11 +11667,11 @@ class ExplorationMetadataDomainUnitTests(test_utils.GenericTestBase):
 
         swapped_metadata_properties = self.swap(
             constants, 'METADATA_PROPERTIES', [
-                "title", "category", "objective", "language_code", "tags",
-                "blurb", "author_notes", "states_schema_version",
-                "init_state_name", "param_specs", "param_changes",
-                "auto_tts_enabled", "correctness_feedback_enabled",
-                "edits_allowed", "new_property"
+                'title', 'category', 'objective', 'language_code', 'tags',
+                'blurb', 'author_notes', 'states_schema_version',
+                'init_state_name', 'param_specs', 'param_changes',
+                'auto_tts_enabled', 'correctness_feedback_enabled',
+                'edits_allowed', 'new_property'
             ]
         )
         error_message = (
