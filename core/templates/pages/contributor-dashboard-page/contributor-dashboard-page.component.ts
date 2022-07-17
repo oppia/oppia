@@ -30,7 +30,8 @@ import { TranslationLanguageService } from 'pages/exploration-editor-page/transl
 import { ContributionAndReviewService } from './services/contribution-and-review.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import AppConstants from 'assets/constants';
-import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import { SafeUrl } from '@angular/platform-browser';
+import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 
 interface TabsDetails {
   submitQuestionTab: {
@@ -71,7 +72,7 @@ export class ContributorDashboardPageComponent
     private translationLanguageService: TranslationLanguageService,
     private contributionAndReviewService: ContributionAndReviewService,
     private focusManagerService: FocusManagerService,
-    private sanitizer: DomSanitizer
+    private svgSanitizerService: SvgSanitizerService
   ) {}
 
   onTabClick(activeTabName: string): void {
@@ -198,9 +199,8 @@ export class ContributorDashboardPageComponent
 
     this.userService.getProfileImageDataUrlAsync().then(
       (dataUrl) => {
-        this.profilePictureDataUrl = this.sanitizer
-          // eslint-disable-next-line oppia/no-bypass-security-phrase
-          .bypassSecurityTrustResourceUrl(dataUrl);
+        this.profilePictureDataUrl = this.svgSanitizerService
+          .getTrustedSvgResourceUrl(dataUrl);
       });
 
     this.topicName = (
