@@ -27,7 +27,8 @@ var waitForAutosave = async function() {
 
 var clear = async function(inputName, inputElement) {
   await click(inputName, inputElement);
-  await inputElement.clearValue();
+  let elem = await inputElement;
+  await elem.clearValue();
 };
 
 var click = async function(elementName, clickableElement, elementIsMasked) {
@@ -41,24 +42,27 @@ var click = async function(elementName, clickableElement, elementIsMasked) {
   // (x, y). Other element would receive the click: B.
   // It is expected that the masked element receives the click. Therefore, a
   // Javascript click action is used here to avoid the error.
+  let elem = await clickableElement;
   if (elementIsMasked) {
     await browser.execute(
-      '$(arguments[0]).click()', clickableElement);
+      '$(arguments[0]).click()', elem);
   } else {
-    await clickableElement.click();
+    await elem.click();
   }
 };
 
 var getText = async function(elementName, element) {
   await waitFor.visibilityOf(
     element, `${elementName} is not visible for getText()`);
-  return await element.getText();
+  let elem = await element;
+  return await elem.getText();
 };
 
 var getAttribute = async function(elementName, element, attribute) {
   await waitFor.presenceOf(
     element, `${elementName} is not present for getAttribute(${attribute})`);
-  return await element.getAttribute(attribute);
+  let elem = await element;
+  return await elem.getAttribute(attribute);
 };
 
 var select = async function(selectorName, selectorElement, optionToSelect) {
@@ -69,13 +73,13 @@ var select = async function(selectorName, selectorElement, optionToSelect) {
 
 var matSelect = async function(selectorName, selectorElement, optionToSelect) {
   await click(selectorName, selectorElement);
-  var optionElement = $(`.mat-option-text=${optionToSelect}`);
+  var optionElement = await $(`.mat-option-text=${optionToSelect}`);
   await click(`${optionToSelect} in ${selectorName}`, optionElement);
 };
 
 var select2 = async function(selectorName, selectorElement, optionToSelect) {
   await click(selectorName, selectorElement);
-  var select2Results = $('.select2-results');
+  var select2Results = await $('.select2-results');
   await waitFor.visibilityOf(
     select2Results, `${selectorName} options are not visible.`);
   var option = select2Results.$(`li=${optionToSelect}`);
@@ -89,7 +93,8 @@ var setValue = async function(
   if (clickInputElement) {
     await click(inputName, inputElement);
   }
-  await inputElement.setValue(keys);
+  let elem = await inputElement;
+  await elem.setValue(keys);
 };
 
 // This method send a sequence of key strokes to an element without clearing
@@ -99,7 +104,8 @@ var addValue = async function(
   if (clickInputElement) {
     await click(inputName, inputElement);
   }
-  await inputElement.addValue(keys);
+  let elem = await inputElement;
+  await elem.addValue(keys);
 };
 
 exports.clear = clear;

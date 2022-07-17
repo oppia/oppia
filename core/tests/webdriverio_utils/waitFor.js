@@ -53,7 +53,7 @@ var urlToBe = async function(url) {
  */
 var elementToBeClickable = async function(element, errorMessage) {
   await browser.waitUntil(
-    await until.elementToBeClickable(element),
+    await until.elementToBeClickable(await element),
     {
       timeout: DEFAULT_WAIT_TIME_MSECS,
       timeoutMsg: errorMessage
@@ -67,7 +67,7 @@ var elementToBeClickable = async function(element, errorMessage) {
  */
 var invisibilityOf = async function(element, errorMessage) {
   await browser.waitUntil(
-    await until.invisibilityOf(element),
+    await until.invisibilityOf(await element),
     {
       timeout: DEFAULT_WAIT_TIME_MSECS,
       timeoutMsg: errorMessage
@@ -95,7 +95,7 @@ var pageToFullyLoad = async function() {
  */
 var textToBePresentInElement = async function(element, text, errorMessage) {
   await browser.waitUntil(
-    await until.textToBePresentInElement(element, text),
+    await until.textToBePresentInElement(await element, text),
     {
       timeout: DEFAULT_WAIT_TIME_MSECS,
       timeoutMsg: errorMessage
@@ -109,7 +109,7 @@ var textToBePresentInElement = async function(element, text, errorMessage) {
  */
 var presenceOf = async function(element, errorMessage) {
   await browser.waitUntil(
-    await until.presenceOf(element),
+    await until.presenceOf(await element),
     {
       timeout: DEFAULT_WAIT_TIME_MSECS,
       timeoutMsg: errorMessage
@@ -123,7 +123,7 @@ var presenceOf = async function(element, errorMessage) {
  */
 var visibilityOf = async function(element, errorMessage) {
   await browser.waitUntil(
-    await until.visibilityOf(element),
+    await until.visibilityOf(await element),
     {
       timeout: DEFAULT_WAIT_TIME_MSECS,
       timeoutMsg: errorMessage
@@ -140,8 +140,9 @@ var visibilityOf = async function(element, errorMessage) {
 var elementAttributeToBe = async function(
     element, attribute, value, errorMessage
 ) {
+  let elem = await element;
   await browser.waitUntil(async function() {
-    return await element.getAttribute(attribute) === value;
+    return await elem.getAttribute(attribute) === value;
   },
   {
     timeout: DEFAULT_WAIT_TIME_MSECS,

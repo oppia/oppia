@@ -68,7 +68,6 @@ var TopicEditorPage = function() {
   var subtopicSkillDescriptionLocator = '.e2e-test-subtopic-skill-description';
   var confirmSubtopicCreationButton = $(
     '.e2e-test-confirm-subtopic-creation-button');
-  var thumbnailContainer = $('.e2e-test-thumbnail-container');
   var storyThumbnailButton = $(
     '.e2e-test-thumbnail-editor .e2e-test-photo-button');
   var addSubtopicButton = $('.e2e-test-add-subtopic-button');
@@ -85,8 +84,6 @@ var TopicEditorPage = function() {
     return $$('.e2e-test-story-list-item');
   };
   var storyListTable = $('.e2e-test-story-list-table');
-  var storyThumbnailButton = $(
-    '.e2e-test-thumbnail-editor .e2e-test-photo-button');
   var subtopicColumnsSelector = function() {
     return $$('.e2e-test-subtopic-column');
   };
@@ -99,7 +96,6 @@ var TopicEditorPage = function() {
     '.e2e-test-subtopic-thumbnail .e2e-test-custom-photo');
   var subtopicThumbnailButton = $(
     '.e2e-test-subtopic-thumbnail .e2e-test-photo-button');
-  var thumbnailContainer = $('.e2e-test-thumbnail-container');
   var thumbnailContainer = $('.e2e-test-thumbnail-container');
   var topicMetaTagContentField = $('.e2e-test-topic-meta-tag-content-field');
   var topicMetaTagContentLabel = $('.e2e-test-topic-meta-tag-content-label');
