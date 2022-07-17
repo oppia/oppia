@@ -11543,6 +11543,41 @@ class ExplorationChangesMergeabilityUnitTests(
 
 class ExplorationMetadataDomainUnitTests(test_utils.GenericTestBase):
 
+    def _require_metadata_properties_to_be_synced(self):
+        """Raises error if there is a new metadata property in the Exploration
+        object and it is not added in the ExplorationMetadata domain object.
+
+        Raises:
+            Exception. All the metadata properties are not synced.
+        """
+        exploration = exp_domain.Exploration.create_default_exploration('0')
+        exploration_dict = exploration.to_dict()
+        for key in exploration_dict:
+            if (
+                key not in constants.NON_METADATA_PROPERTIES and
+                key not in constants.METADATA_PROPERTIES
+            ):
+                raise Exception(
+                    'Looks like a new property %s was added to the Exploration'
+                    ' domain object. Please include this property in '
+                    'constants.METADATA_PROPERTIES if you want to use this '
+                    'as a metadata property. Otherwise, add this in the '
+                    'constants.NON_METADATA_PROPERTIES if you don\'t want '
+                    'to use this as a metadata property.' % (key)
+                )
+
+        exploration_metadata = exploration.get_metadata()
+        exploration_metadata_dict = exploration_metadata.to_dict()
+        for metadata_property in constants.METADATA_PROPERTIES:
+            if metadata_property not in exploration_metadata_dict:
+                raise Exception(
+                    'A new metadata property %s was added to the Exploration '
+                    'domain object but not included in the '
+                    'ExplorationMetadata domain object. Please inlcude this '
+                    'new property in the ExplorationMetadata domain object '
+                    'also.' % (metadata_property)
+                )
+
     def test_exploration_metadata_gets_created(self):
         exploration = exp_domain.Exploration.create_default_exploration('0')
         exploration.update_param_specs({
@@ -11606,6 +11641,50 @@ class ExplorationMetadataDomainUnitTests(test_utils.GenericTestBase):
         }
 
         self.assertEqual(actual_metadata_dict, expected_metadata_dict)
+
+    def test_metadata_properties_are_synced(self):
+        swapped_metadata_properties = self.swap(
+            constants, 'METADATA_PROPERTIES', [
+                "title", "category", "objective", "language_code",
+                "blurb", "author_notes", "states_schema_version",
+                "init_state_name", "param_specs", "param_changes",
+                "auto_tts_enabled", "correctness_feedback_enabled",
+                "edits_allowed"
+            ]
+        )
+        error_message = (
+            'Looks like a new property tags was added to the Exploration'
+            ' domain object. Please include this property in '
+            'constants.METADATA_PROPERTIES if you want to use this '
+            'as a metadata property. Otherwise, add this in the '
+            'constants.NON_METADATA_PROPERTIES if you don\'t want '
+            'to use this as a metadata property.'
+        )
+        with swapped_metadata_properties, self.assertRaisesRegex(
+            Exception, error_message
+        ):
+            self._require_metadata_properties_to_be_synced()
+
+        swapped_metadata_properties = self.swap(
+            constants, 'METADATA_PROPERTIES', [
+                "title", "category", "objective", "language_code", "tags",
+                "blurb", "author_notes", "states_schema_version",
+                "init_state_name", "param_specs", "param_changes",
+                "auto_tts_enabled", "correctness_feedback_enabled",
+                "edits_allowed", "new_property"
+            ]
+        )
+        error_message = (
+            'A new metadata property %s was added to the Exploration '
+            'domain object but not included in the '
+            'ExplorationMetadata domain object. Please inlcude this '
+            'new property in the ExplorationMetadata domain object '
+            'also.' % ('new_property')
+        )
+        with swapped_metadata_properties, self.assertRaisesRegex(
+            Exception, error_message
+        ):
+            self._require_metadata_properties_to_be_synced()
 
 
 class MetadataVersionHistoryDomainUnitTests(test_utils.GenericTestBase):

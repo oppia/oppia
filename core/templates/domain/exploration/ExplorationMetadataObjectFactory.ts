@@ -40,6 +40,12 @@ export interface ExplorationMetadataBackendDict {
 }
 
 export class ExplorationMetadata {
+  /**
+   * The properties of this domain object are required to be synced with the
+   * properties mentioned in constants.METADATA_PROPERTIES. If you have
+   * modified constants.METADATA_PROPERTIES, make sure to include them here
+   * also or the frontend tests will fail.
+   */
   _title: string;
   _category: string;
   _objective: string;
