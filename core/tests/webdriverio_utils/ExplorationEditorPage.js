@@ -56,9 +56,6 @@ var ExplorationEditorPage = function() {
   var explorationMetadataModalHeaderElement = $(
     '.e2e-test-metadata-modal-header');
   var modalContentElement = $('.modal-content');
-  var neutralElementSelector = function() {
-    return $$('.e2e-test-neutral-element');
-  };
   var promptModalElement = $('.e2e-test-save-prompt-modal');
   var selectionRenderedElement = $('.select2-selection__rendered');
   var sharePublishModalElement = $('.e2e-test-share-publish-modal');
@@ -352,8 +349,6 @@ var ExplorationEditorPage = function() {
   this.navigateToMainTab = async function() {
     await action.waitForAutosave();
     await action.click('Main tab button', navigateToMainTabButton);
-    var neutralElement = await neutralElementSelector()[0];
-    await action.click('Neutral element', neutralElement);
     await waitFor.pageToFullyLoad();
   };
 
