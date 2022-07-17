@@ -63,11 +63,20 @@
     <div class="oppia-login-required" *ngIf="!userDetailsLoading && !userIsLoggedIn">
       <login-required-message></login-required-message>
     </div>
+<<<<<<< HEAD
     <div class="oppia-login-required" *ngIf="userDetailsLoading || userIsLoggedIn">
       <oppia-opportunities-list *ngIf="activeExplorationId === null && isReviewTranslationsTab()"
                                 [loadOpportunities]="loadReviewableTranslationOpportunities"
                                 (clickActionButton)="onClickReviewableTranslations($event)"
                                 [labelRequired]="!activeReviewTab">
+=======
+    <div class="oppia-login-required oppia-opportunities-list" ng-if="ctrl.userDetailsLoading || $ctrl.userIsLoggedIn">
+      <oppia-opportunities-list ng-if="$ctrl.activeExplorationId === null && $ctrl.isReviewTranslationsTab()"
+                                [load-opportunities]="$ctrl.loadReviewableTranslationOpportunities"
+                                (click-action-button)="$ctrl.onClickReviewableTranslations($event)"
+                                [label-required]="!$ctrl.activeReviewTab"
+                                [show-opportunity-button]="true">
+>>>>>>> upstream/develop
       </oppia-opportunities-list>
       <div *ngIf="activeExplorationId !== null || !isReviewTranslationsTab()">
         <div *ngIf="isReviewTranslationsTab()" class="oppia-contributions-back-to-lessons-container">
@@ -78,11 +87,20 @@
           </button>
           <div class="oppia-contributions-back-button-label">Back to lessons</div>
         </div>
+<<<<<<< HEAD
         <oppia-opportunities-list [loadOpportunities]="loadOpportunities"
                                   [loadMoreOpportunities]="loadMoreOpportunities"
                                   (clickActionButton)="onClickViewSuggestion($event)"
                                   [labelRequired]="!activeReviewTab"
                                   [opportunityHeadingTruncationLength]="30">
+=======
+        <oppia-opportunities-list [load-opportunities]="$ctrl.loadOpportunities"
+                                  [load-more-opportunities]="$ctrl.loadMoreOpportunities"
+                                  (click-action-button)="$ctrl.onClickViewSuggestion($event)"
+                                  [label-required]="!$ctrl.activeReviewTab"
+                                  [opportunity-heading-truncation-length]="30"
+                                  [show-opportunity-button]="false">
+>>>>>>> upstream/develop
         </oppia-opportunities-list>
       </div>
     </div>
@@ -270,7 +288,20 @@
     width: 100%;
   }
 
+  @media only screen and (max-width: 1500px) {
+    contributions-and-review .oppia-contributions-navbar-button {
+      font-size: 1.6vw;
+    }
+    contributions-and-review .oppia-contributions-navbar-items-list::before {
+      font-size: 2vw;
+    }
+  }
+
   @media only screen and (max-width: 700px) {
+    .oppia-opportunities-list {
+      background-color: #e8e7e3;
+    }
+
     .oppia-contributions-dropdown-section {
       align-items: center;
       display: flex;
@@ -294,6 +325,7 @@
     }
   }
 
+<<<<<<< HEAD
   @media only screen and (min-width: 601px) and (max-width: 1500px) {
     .oppia-contributions-navbar-button {
       font-size: 1.6vw;
@@ -303,6 +335,8 @@
     }
   }
 
+=======
+>>>>>>> upstream/develop
   @media only screen and (max-width: 420px) {
     .dropdown-label {
       font-size: 18px;
