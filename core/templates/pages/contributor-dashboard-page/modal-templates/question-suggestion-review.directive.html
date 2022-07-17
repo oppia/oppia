@@ -4,7 +4,7 @@
       <[questionHeader]>
     </h3>
     <h3 class="oppia-mobile-question-header" title="<[questionHeader]>">
-      <[questionHeader | wrapTextWithEllipsis: 20]>
+      <[questionHeader | wrapTextWithEllipsis: 25]>
     </h3>
     <h4 class="author-header"
         ng-if="reviewable">
@@ -190,10 +190,7 @@
   @media only screen and (max-width: 700px) {
     .oppia-suggestion-review-container {
       padding: 10px 0;
-    }
-    .oppia-difficulty-title {
-      font-size: 18px;
-    }
+    }    
   }
 
   @media only screen and (max-width: 535px) {
@@ -212,6 +209,9 @@
     }
     .oppia-suggestion-review-message, .oppia-skill-explanation {
       font-size: 16px;
+    }
+    .oppia-difficulty-title {
+      font-size: 18px;
     }
   }
 </style>
