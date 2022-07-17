@@ -184,20 +184,8 @@ var StoryEditorPage = function() {
     var chapterTitle = $(`.e2e-test-chapter-title=${chapterName}`);
     await waitFor.visibilityOf(
       chapterTitle, 'Chapter name is taking too long to appear');
-    var chapterTitles = await chapterTitlesSelector();
-    var chapterIndex = -1;
-    var chapterText = '';
-    for (var i = 0; i < chapterTitles.length; i++) {
-      chapterText = await action.getText(
-        'Chapter Title Element', chapterTitles[i]);
-      if (chapterText === chapterName) {
-        chapterIndex = i;
-        break;
-      }
-    }
-    expect(chapterIndex).not.toEqual(-1);
 
-    await action.click('Chapter list item', chapterTitles[i]);
+    await action.click('Chapter list item', chapterTitle);
     await waitFor.pageToFullyLoad();
     await waitFor.visibilityOf(
       nodeOutlineEditor, 'Chapter editor is taking too long to appear.');
