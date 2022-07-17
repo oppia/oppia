@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,10 +15,11 @@
 /**
  * @fileoverview End-to-end tests for user preferences.
  */
-var PreferencesPage = require('../protractor_utils/PreferencesPage.js');
-var general = require('../protractor_utils/general.js');
-var users = require('../protractor_utils/users.js');
-var waitFor = require('../protractor_utils/waitFor.js');
+
+var PreferencesPage = require('../webdriverio_utils/PreferencesPage.js');
+var general = require('../webdriverio_utils/general.js');
+var users = require('../webdriverio_utils/users.js');
+var waitFor = require('../webdriverio_utils/waitFor.js');
 
 describe('Preferences', function() {
   var preferencesPage = null;
@@ -148,13 +149,11 @@ describe('Preferences', function() {
       await preferencesPage.get();
       await preferencesPage.selectCreatorDashboard();
       await general.goToHomePage();
-      expect(await browser.getCurrentUrl()).toEqual(
-        'http://localhost:9001/creator-dashboard');
+      await waitFor.urlToBe('http://localhost:9001/creator-dashboard');
       await preferencesPage.get();
       await preferencesPage.selectLearnerDashboard();
       await general.goToHomePage();
-      expect(await browser.getCurrentUrl()).toEqual(
-        'http://localhost:9001/learner-dashboard');
+      await waitFor.urlToBe('http://localhost:9001/learner-dashboard');
     });
 
   it('should navigate to account deletion page',
@@ -163,8 +162,7 @@ describe('Preferences', function() {
       await users.login('delete@page.com');
       await preferencesPage.get();
       await preferencesPage.clickDeleteAccountButton();
-      expect(await browser.getCurrentUrl()).toEqual(
-        'http://localhost:9001/delete-account');
+      await waitFor.urlToBe('http://localhost:9001/delete-account');
     });
 
   it('should export account data',

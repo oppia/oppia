@@ -5908,6 +5908,11 @@ export default {
   // page.
   "OPPORTUNITIES_PAGE_SIZE": 10,
 
+  // The breakpoint for mobile view for contributor dashboard in px.
+  // This value must be the same as the one specified in
+  // opportunities-list-item.component.html.
+  "OPPORTUNITIES_LIST_ITEM_MOBILE_BREAKPOINT": 700,
+
   // Represents the string value indicating "All topics" in the Contributor
   // Dashboard topic selector.
   "TOPIC_SENTINEL_NAME_ALL": "All",
@@ -5969,6 +5974,7 @@ export default {
       "answer_groups": [],
       "default_outcome": {
         "dest": "Introduction",
+        "dest_if_really_stuck": null,
         "feedback": {
           "content_id": "default_outcome",
           "html": ""
