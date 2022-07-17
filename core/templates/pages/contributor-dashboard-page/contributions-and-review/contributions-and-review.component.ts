@@ -406,17 +406,16 @@ export class ContributionsAndReview
     this.activeExplorationId = null;
   }
 
-  loadOpportunities(): Promise<unknown> | object {
+  loadContributions(shouldResetOffset: boolean): unknown {
     if (!this.activeTabType || !this.activeSuggestionType) {
       return new Promise((resolve, reject) => {
         resolve({opportunitiesDicts: [], more: false});
       });
     }
-
     const fetchFunction = this.tabNameToOpportunityFetchFunction[
       this.activeSuggestionType][this.activeTabType];
 
-    return fetchFunction(true).then((response) => {
+    return fetchFunction(shouldResetOffset).then((response) => {
       Object.keys(response.suggestionIdToDetails).forEach(id => {
         this.contributions[id] = response.suggestionIdToDetails[id];
       });
@@ -428,26 +427,12 @@ export class ContributionsAndReview
     });
   }
 
-  loadMoreOpportunities(): Promise<unknown> | object {
-    if (!this.activeTabType || !this.activeSuggestionType) {
-      return new Promise((resolve, reject) => {
-        resolve({opportunitiesDicts: [], more: false});
-      });
-    }
+  loadOpportunities(): unknown {
+    return this.loadContributions(/* Param shouldResetOffset= */ true);
+  }
 
-    const fetchFunction = this.tabNameToOpportunityFetchFunction[
-      this.activeSuggestionType][this.activeTabType];
-
-    return fetchFunction(false).then((response) => {
-      Object.keys(response.suggestionIdToDetails).forEach(id => {
-        this.contributions[id] = response.suggestionIdToDetails[id];
-      });
-      return {
-        opportunitiesDicts: this.getContributionSummaries(
-          response.suggestionIdToDetails),
-        more: response.more
-      };
-    });
+  loadMoreOpportunities(): unknown {
+    return this.loadContributions(/* Param shouldResetOffset= */ false);
   }
 
   closeDropdownWhenClickedOutside(clickEvent: {target: Node}): void {

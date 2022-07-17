@@ -65,7 +65,7 @@
     </div>
     <div class="oppia-login-required" *ngIf="userDetailsLoading || userIsLoggedIn">
       <oppia-opportunities-list *ngIf="activeExplorationId === null && isReviewTranslationsTab()"
-                                [loadOpportunities]="loadReviewableTranslationOpportunities"
+                                [loadOpportunities]="loadReviewableTranslationOpportunities.bind(this)"
                                 (clickActionButton)="onClickReviewableTranslations($event)"
                                 [labelRequired]="!activeReviewTab">
       </oppia-opportunities-list>
@@ -78,8 +78,8 @@
           </button>
           <div class="oppia-contributions-back-button-label">Back to lessons</div>
         </div>
-        <oppia-opportunities-list [loadOpportunities]="loadOpportunities"
-                                  [loadMoreOpportunities]="loadMoreOpportunities"
+        <oppia-opportunities-list [loadOpportunities]="loadOpportunities.bind(this)"
+                                  [loadMoreOpportunities]="loadMoreOpportunities.bind(this)"
                                   (clickActionButton)="onClickViewSuggestion($event)"
                                   [labelRequired]="!activeReviewTab"
                                   [opportunityHeadingTruncationLength]="30">
