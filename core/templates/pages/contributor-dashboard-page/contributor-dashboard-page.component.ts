@@ -212,6 +212,7 @@ export class ContributorDashboardPageComponent
       });
 
     this.activeTabName = 'myContributionTab';
+
     this.tabsDetails = (
       ContributorDashboardConstants.CONTRIBUTOR_DASHBOARD_TABS_DETAILS);
     this.OPPIA_AVATAR_LINK_URL = (

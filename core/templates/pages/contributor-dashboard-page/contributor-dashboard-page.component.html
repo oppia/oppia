@@ -2,22 +2,23 @@
   <div class="oppia-contributor-home">
     <div class="oppia-opportunities-tabs">
       <ul class="oppia-opportunities-tabs-list">
-        <li [ngClass]="{'oppia-active-opportunities-tab': value.tabName === activeTabName}"
+        <li [ngClass]="{'oppia-active-opportunities-tab': item.key === activeTabName}"
             class="oppia-opportunities-tab-item"
-            *ngFor="let value of tabsDetails | keyvalue"
-            [attr.aria-label]="value.ariaLabel">
-          <div *ngIf="value.enabled">
+            *ngFor="let item of tabsDetails | keyvalue"
+            [attr.aria-label]="item.value.ariaLabel">
+          <div *ngIf="item.value.enabled">
             <a role="button"
-               (click)="onTabClick(value.tabName)"
+               (click)="onTabClick(item.key)"
                href=""
-               class="oppia-opportunities-tabs-text e2e-test-{{value.tabName}}">
-              {{value.tabName}}
+               class="oppia-opportunities-tabs-text e2e-test-{{item.key}}">
+              {{item.value.tabName}}
             </a>
             <div class="oppia-active-tab-hilighter"></div>
           </div>
         </li>
       </ul>
     </div>
+
     <div [ngClass]="{'oppia-translate-y': defaultHeaderVisible, 'oppia-contributor-dashboard-header': !defaultHeaderVisible}">
       <div class="oppia-opportunities-tab-customization-container">
         <div class="oppia-opportunities-tab-header"
