@@ -29,11 +29,15 @@ var ExplorationEditorFeedbackTab = function() {
   var feedbackBackButton = $('.e2e-test-oppia-feedback-back-button');
   var feedbackResponseTextArea = $('.e2e-test-feedback-response-textarea');
   var suggestionRowClassName = '.e2e-test-oppia-feedback-tab-row';
+  var suggestionRowClassNameElementSelector = function() {
+    return $$('.e2e-test-oppia-feedback-tab-row');
+  };
   var feedbackSubjectClassName = (
     '.e2e-test-exploration-feedback-subject');
   var suggestionCommitMessageInput = $('.e2e-test-suggestion-commit-message');
   var suggestionReviewMessageInput = $('.e2e-test-suggestion-review-message');
   var feedbackStatusDropdown = $('.e2e-test-oppia-feedback-status-menu');
+  var feedbackMessage = $('.e2e-test-exploration-feedback');
   var feedbackMessagesSelector = function() {
     return $$('.e2e-test-exploration-feedback');
   };
@@ -74,7 +78,8 @@ var ExplorationEditorFeedbackTab = function() {
 
   this.getSuggestionThreads = async function() {
     var threads = [];
-    var suggestionRowClassNameElement = await $$(suggestionRowClassName)[0];
+    var suggestionRowClassNameElement = (
+      await suggestionRowClassNameElementSelector[0]);
     await waitFor.visibilityOf(
       suggestionRowClassNameElement,
       'No suggestion threads are visible');
@@ -95,7 +100,8 @@ var ExplorationEditorFeedbackTab = function() {
 
   this.readFeedbackMessages = async function() {
     var messages = [];
-    var suggestionRowClassNameElement = await $$(suggestionRowClassName)[0];
+    var suggestionRowClassNameElement = (
+      await suggestionRowClassNameElementSelector[0]);
     await waitFor.visibilityOf(
       suggestionRowClassNameElement,
       'No feedback messages are visible.');
@@ -161,9 +167,9 @@ var ExplorationEditorFeedbackTab = function() {
   };
 
   this.readFeedbackMessagesFromThread = async function() {
-    var feedbackMessages = await feedbackMessagesSelector();
     await waitFor.visibilityOf(
-      feedbackMessages[0], 'Feedback message text is not visible');
+      feedbackMessage, 'Feedback message text is not visible');
+    var feedbackMessages = await feedbackMessagesSelector();
     return feedbackMessages;
   };
 

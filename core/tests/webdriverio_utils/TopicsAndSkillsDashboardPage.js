@@ -27,6 +27,9 @@ var TopicsAndSkillsDashboardPage = function() {
     return $$('.e2e-test-assign-skill-to-topic-button');
   };
   var assignSkillToTopicButton = $('.e2e-test-assign-skill-to-topic-button');
+  var assignedTopicNamesInputSelector = function() {
+    return $$('.e2e-test-unassign-topic');
+  };
   var confirmMoveButton = $('.e2e-test-confirm-move-button');
   var confirmSkillCreationButton = $('.e2e-test-confirm-skill-creation-button');
   var confirmSkillsMergeButton = $('.e2e-test-confirm-skill-selection-button');
@@ -46,6 +49,9 @@ var TopicsAndSkillsDashboardPage = function() {
   var openConceptCardExplanationButton = $('.e2e-test-open-concept-card');
   var openSkillEditorButtonsSelector = function() {
     return $$('.e2e-test-open-skill-editor');
+  };
+  var skillDescriptionsElementSelector = function() {
+    return $$('.e2e-test-skill-description');
   };
   var skillDescriptionField = $('.e2e-test-skill-description-field');
   var skillEditOptionsSelector = function() {
@@ -352,13 +358,13 @@ var TopicsAndSkillsDashboardPage = function() {
     await action.click('Unassign Skill Button', unassignSkillButton);
 
     await waitFor.modalPopupToAppear();
-    var assignedTopicNamesInput = await $$('.e2e-test-unassign-topic');
+    var assignedTopicNamesInput = await assignedTopicNamesInputSelector();
     await waitFor.visibilityOf(
       assignedTopicNamesInput[0],
       'Topic names in unassign skill from topics modal taking' +
       ' too long to appear.');
     var topicListItem = $(
-      '.e2e-test-unassign-topic-label=', topicName);
+      `.e2e-test-unassign-topic-label=${topicName}`);
     var assignedTopicInput = topicListItem.$(
       assignedTopicNameInputClass);
     await action.click('Assigned Topic Input', assignedTopicInput);
@@ -390,7 +396,7 @@ var TopicsAndSkillsDashboardPage = function() {
   };
 
   this.getTopicsCount = async function() {
-    var topicsListItems = await $$('.e2e-test-topics-list-item');
+    var topicsListItems = await topicsListItemsSelector();
     return topicsListItems.length;
   };
 
@@ -404,7 +410,7 @@ var TopicsAndSkillsDashboardPage = function() {
 
   this.expectSkillDescriptionToBe = async function(description, index) {
     await this.waitForSkillsToLoad();
-    var skillDescriptionsElement = await $$('.e2e-test-skill-description');
+    var skillDescriptionsElement = await skillDescriptionsElementSelector();
     var text = await action.getText(
       'Skill Description Element', skillDescriptionsElement[index]);
     expect(text).toEqual(description);

@@ -14,8 +14,10 @@
 
 /**
  * @fileoverview Page object for the exploration editor's stats tab, for use in
- * Protractor tests.
+ * Webdriverio tests.
  */
+
+var action = require('./action');
 
 var ExplorationEditorStatsTab = function() {
   /**
@@ -30,19 +32,26 @@ var ExplorationEditorStatsTab = function() {
      * Workflows
      */
   var _getNumPassersby = async function() {
-    return await numPassersby.getText();
+    var numPasserByText = await action.getText(
+      'Number Passer By', numPassersby);
+    return numPasserByText;
   };
 
   var _getIssueText = async function(issueIndex) {
-    return await _getIssueElement(issueIndex).getText();
+    var issueElement = _getIssueElement(issueIndex);
+    var issueElementText = await action.getText(
+      'Issue Element', issueElement);
+    return issueElementText;
   };
 
   var _getIssueTitle = async function() {
-    return await issueTitle.getText();
+    var issueTitleText = await action.getText(
+      'Issue Title Element', issueTitle);
+    return issueTitleText;
   };
 
   var _getIssueElement = function(issueIndex) {
-    return $(issueElementStr + issueIndex.toString());
+    return $(`${issueElementStr}${issueIndex.toString()}`);
   };
 
   this.expectNumPassersbyToBe = async function(numPassersby) {
@@ -51,7 +60,8 @@ var ExplorationEditorStatsTab = function() {
 
   this.clickIssue = async function(issueIndex, expectedIssueText) {
     expect(await _getIssueText(issueIndex)).toMatch(expectedIssueText);
-    await _getIssueElement(issueIndex).click();
+    var issueElement = _getIssueElement(issueIndex);
+    await action.click('Issue Element', issueElement);
   };
 
   this.expectIssueTitleToBe = async function(issueTitle) {
@@ -59,7 +69,7 @@ var ExplorationEditorStatsTab = function() {
   };
 
   this.markResolved = async function() {
-    await resolveBtn.click();
+    await action.click('Resolve Button', resolveBtn);
   };
 };
 

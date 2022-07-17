@@ -22,6 +22,12 @@ var action = require('./action.js');
 
 var SubTopicViewerPage = function() {
   var conceptCardExplanation = $('.e2e-test-concept-card-explanation');
+  var conceptCardListSelector = function() {
+    return $$('.e2e-test-subtopic-tile');
+  };
+  var subTopicTileListSelector = function() {
+    return $$('.e2e-test-subtopic-tile');
+  };
 
   this.get = async function(subTopicName) {
     await waitFor.pageToFullyLoad();
@@ -33,7 +39,7 @@ var SubTopicViewerPage = function() {
   };
 
   this.expectRevisionCardCountToBe = async function(count) {
-    var subTopicTileList = await $$('.e2e-test-subtopic-tile');
+    var subTopicTileList = await subTopicTileListSelector();
     if (count === 0) {
       expect(subTopicTileList.length).toEqual(0);
     } else {
@@ -45,7 +51,7 @@ var SubTopicViewerPage = function() {
   };
 
   this.expectConceptCardCountToBe = async function(count) {
-    var conceptCardList = await $$('.e2e-test-concept-card-link');
+    var conceptCardList = await conceptCardListSelector();
     if (count === 0) {
       expect(conceptCardList.length).toEqual(0);
     } else {
@@ -57,7 +63,7 @@ var SubTopicViewerPage = function() {
   };
 
   this.getConceptCard = async function() {
-    var conceptCardList = await $$('.e2e-test-concept-card-link');
+    var conceptCardList = await conceptCardListSelector();
     var conceptCardElement = conceptCardList[0];
     await action.click('Concept card link', conceptCardElement);
     await waitFor.pageToFullyLoad();
@@ -67,7 +73,8 @@ var SubTopicViewerPage = function() {
     await waitFor.visibilityOf(
       conceptCardExplanation,
       'Concept card explanation takes too long to be visible.');
-    var text = await conceptCardExplanation.getText();
+    var text = await action.getText(
+      'Concept Card Explanation', conceptCardExplanation);
     expect(text).toEqual(description);
   };
 };

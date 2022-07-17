@@ -21,11 +21,14 @@ var waitFor = require('./waitFor.js');
 var action = require('./action.js');
 
 var TopicViewerPage = function() {
-  var topicDescription = $('.e2e-test-topic-description');
-  var startPracticeButton = $('.e2e-test-practice-start-button');
-  var revisionTabLink = $('.e2e-test-revision-tab-link');
-  var practiceTabLink = $('.e2e-test-practice-tab-link');
   var messageOnCompletion = $('.e2e-test-practice-complete-message');
+  var practiceTabLink = $('.e2e-test-practice-tab-link');
+  var revisionTabLink = $('.e2e-test-revision-tab-link');
+  var startPracticeButton = $('.e2e-test-practice-start-button');
+  var storySummaryTitleListElement = function() {
+    return $$('.e2e-test-story-summary-title');
+  };
+  var topicDescription = $('.e2e-test-topic-description');
 
   this.get = async function(classroomUrlFragment, topicName) {
     await browser.url(`/learn/${classroomUrlFragment}`);
@@ -46,7 +49,7 @@ var TopicViewerPage = function() {
   };
 
   this.expectStoryCountToBe = async function(count) {
-    var storySummaryTitleList = await $$('.e2e-test-story-summary-title');
+    var storySummaryTitleList = await storySummaryTitleListElement();
     if (count === 0) {
       expect(storySummaryTitleList.length).toEqual(0);
     } else {

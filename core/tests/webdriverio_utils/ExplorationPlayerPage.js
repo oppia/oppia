@@ -103,7 +103,7 @@ var ExplorationPlayerPage = function() {
   this.expectNextCardButtonTextToBe = async function(text) {
     await waitFor.visibilityOf(
       nextCardButton, 'Next Card Button not showing up.');
-    var buttonText = await nextCardButton.getText();
+    var buttonText = await action.getText('Next Card Button', nextCardButton);
     expect(buttonText).toMatch(text);
   };
 
@@ -117,7 +117,8 @@ var ExplorationPlayerPage = function() {
     let textArea = $('<textarea>');
     await action.sendKeys('Text Area', textArea, 'Reporting this exploration');
     await action.click('Submit Button', submitButton);
-    let afterSubmitText = await flaggedSuccessElement.getText();
+    let afterSubmitText = await action.getText(
+      'Flagged Success Element', flaggedSuccessElement);
     expect(afterSubmitText).toMatch(
       'Your report has been forwarded to the moderators for review.');
   };
@@ -202,25 +203,33 @@ var ExplorationPlayerPage = function() {
   };
 
   this.expectExplorationToBeOver = async function() {
-    var conversationContent = await conversationContentsSelector();
-    var lastElement = conversationContent.length - 1;
     await waitFor.visibilityOf(
-      conversationContent[lastElement], 'Ending message not visible');
+      conversationContent, 'Conversation not visible');
+    var conversationContents = await conversationContentsSelector();
+    var lastElement = conversationContents.length - 1;
+    await waitFor.visibilityOf(
+      conversationContents[lastElement], 'Ending message not visible');
     await waitFor.textToBePresentInElement(
-      conversationContent[lastElement], 'Congratulations, you have finished!',
+      conversationContents[lastElement], 'Congratulations, you have finished!',
       'Ending Message Not Visible');
+    let conversationContentText = await action.getText(
+      'Conversation Content Element', conversationContents[lastElement]);
     expect(
-      await (conversationContent[lastElement].getText())
+      conversationContentText
     ).toEqual('Congratulations, you have finished!');
   };
 
   this.expectExplorationToNotBeOver = async function() {
-    var conversationContent = await conversationContentsSelector();
-    var lastElement = conversationContent.length - 1;
     await waitFor.visibilityOf(
-      conversationContent[lastElement], 'Ending message not visible');
+      conversationContent, 'Conversation not visible');
+    var conversationContents = await conversationContentsSelector();
+    var lastElement = conversationContents.length - 1;
+    await waitFor.visibilityOf(
+      conversationContents[lastElement], 'Ending message not visible');
+    let conversationContentText = await action.getText(
+      'Conversation Content Element', conversationContents[lastElement]);
     expect(
-      await conversationContent[lastElement].getText()
+      conversationContentText
     ).not.toEqual('Congratulations, you have finished!');
   };
 
@@ -253,8 +262,10 @@ var ExplorationPlayerPage = function() {
       explorationHeader, 'Exploration Header taking too long to appear.');
     await waitFor.textToBePresentInElement(
       explorationHeader, name, 'No Header Text');
+    var ExplorationHeaderText = await action.getText(
+      'Exploration Header', explorationHeader);
     expect(
-      await explorationHeader.getText()
+      ExplorationHeaderText
     ).toBe(name);
   };
 
@@ -262,7 +273,7 @@ var ExplorationPlayerPage = function() {
       ratingValue) {
     await waitFor.elementToBeClickable(explorationInfoIcon);
     await action.click('Exploration Info Icon', explorationInfoIcon);
-    var value = await infoCardRating.getText();
+    var value = await action.getText('Info Card Rating', infoCardRating);
     expect(value).toBe(ratingValue);
   };
 
