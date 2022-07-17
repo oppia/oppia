@@ -33,24 +33,31 @@ interface DestinationChoice {
   text: string;
 }
 
+interface DestValidation {
+  isCreatingNewState: boolean;
+  value: string;
+}
 @Component({
   selector: 'oppia-outcome-destination-editor',
   templateUrl: './outcome-destination-editor.component.html'
 })
 export class OutcomeDestinationEditorComponent implements OnInit {
-  @Input() outcome: Outcome;
-  @Input() outcomeHasFeedback: boolean;
   @Output() addState: EventEmitter<string> = new EventEmitter<string>();
-  @Output() getChanges: EventEmitter<void> = new EventEmitter();
+  @Output() getChanges: EventEmitter<DestValidation> = new EventEmitter();
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() outcome!: Outcome;
+  @Input() outcomeHasFeedback!: boolean;
+  explorationAndSkillIdPattern!: RegExp;
+  newStateNamePattern!: RegExp;
+  destinationChoices!: DestinationChoice[];
+  maxLen!: number;
+  outcomeNewStateName!: string;
+  currentStateName!: string;
   directiveSubscriptions: Subscription = new Subscription();
-  canAddPrerequisiteSkill: boolean;
-  canEditRefresherExplorationId: boolean;
-  explorationAndSkillIdPattern: RegExp;
-  newStateNamePattern: RegExp;
-  destinationChoices: DestinationChoice[];
-  maxLen: number;
-  outcomeNewStateName: string;
-  currentStateName: string = null;
+  canAddPrerequisiteSkill: boolean = false;
+  canEditRefresherExplorationId: boolean = false;
   ENABLE_PREREQUISITE_SKILLS: boolean = (
     AppConstants.ENABLE_PREREQUISITE_SKILLS);
 
@@ -78,16 +85,25 @@ export class OutcomeDestinationEditorComponent implements OnInit {
   updateChanges($event: string): void {
     if ($event !== '') {
       this.outcomeNewStateName = $event;
-      this.getChanges.emit();
     }
+
+    let validation = {
+      isCreatingNewState: this.isCreatingNewState(),
+      value: $event
+    };
+    this.getChanges.emit(validation);
   }
 
   onDestSelectorChange(): void {
     if (this.outcome.dest === this.PLACEHOLDER_OUTCOME_DEST) {
       this.focusManagerService.setFocus('newStateNameInputField');
-    } else {
-      this.getChanges.emit();
     }
+
+    let validation = {
+      isCreatingNewState: this.isCreatingNewState(),
+      value: this.outcomeNewStateName
+    };
+    this.getChanges.emit(validation);
   }
 
   isCreatingNewState(): boolean {
@@ -98,13 +114,16 @@ export class OutcomeDestinationEditorComponent implements OnInit {
   updateOptionNames(): void {
     // The seTimeout is being used here to update the view.
     setTimeout(() => {
-      this.currentStateName = this.stateEditorService.getActiveStateName();
-      let questionModeEnabled = this.stateEditorService.isInQuestionMode();
+      let activeStateName = this.stateEditorService.getActiveStateName();
+      if (activeStateName === null) {
+        throw new Error('Active state name is null');
+      }
+      this.currentStateName = activeStateName;
       // This is a list of objects, each with an ID and name. These
       // represent all states, as well as an option to create a
       // new state.
       this.destinationChoices = [{
-        id: (questionModeEnabled ? null : this.currentStateName),
+        id: this.currentStateName,
         text: '(try again)'
       }];
 
@@ -130,7 +149,7 @@ export class OutcomeDestinationEditorComponent implements OnInit {
         }
 
         // Higher scores come later.
-        let allStateScores = {};
+        let allStateScores: {[stateName: string]: number} = {};
         let unarrangedStateCount = 0;
         for (let i = 0; i < allStateNames.length; i++) {
           stateName = allStateNames[i];
@@ -163,12 +182,10 @@ export class OutcomeDestinationEditorComponent implements OnInit {
         }
       }
 
-      if (!questionModeEnabled) {
-        this.destinationChoices.push({
-          id: this.PLACEHOLDER_OUTCOME_DEST,
-          text: 'A New Card Called...'
-        });
-      }
+      this.destinationChoices.push({
+        id: this.PLACEHOLDER_OUTCOME_DEST,
+        text: 'A New Card Called...'
+      });
     // This value of 10ms is arbitrary, it has no significance.
     }, 10);
   }
@@ -176,9 +193,6 @@ export class OutcomeDestinationEditorComponent implements OnInit {
   ngOnInit(): void {
     this.directiveSubscriptions.add(
       this.stateEditorService.onSaveOutcomeDestDetails.subscribe(() => {
-        if (this.isSelfLoop()) {
-          this.outcome.dest = this.stateEditorService.getActiveStateName();
-        }
         // Create new state if specified.
         if (this.outcome.dest === this.PLACEHOLDER_OUTCOME_DEST) {
           this.editorFirstTimeEventsService
@@ -186,8 +200,6 @@ export class OutcomeDestinationEditorComponent implements OnInit {
 
           let newStateName = this.outcomeNewStateName;
           this.outcome.dest = newStateName;
-
-          delete this.outcomeNewStateName;
 
           this.addState.emit(newStateName);
         }
@@ -200,7 +212,7 @@ export class OutcomeDestinationEditorComponent implements OnInit {
     this.canAddPrerequisiteSkill = (
       this.ENABLE_PREREQUISITE_SKILLS &&
       this.stateEditorService.isExplorationWhitelisted());
-    this.canEditRefresherExplorationId = null;
+    this.canEditRefresherExplorationId = false;
     this.userService.getUserInfoAsync().then((userInfo) => {
       // We restrict editing of refresher exploration IDs to
       // admins/moderators for now, since the feature is still in

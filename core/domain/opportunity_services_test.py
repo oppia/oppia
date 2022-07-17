@@ -114,7 +114,8 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             [topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_ADD_SUBTOPIC,
                 'subtopic_id': 1,
-                'title': 'Sample'
+                'title': 'Sample',
+                'url_fragment': 'dummy-fragment'
             })]
         )
         topic_services.save_new_topic(self.owner_id, topic)
@@ -365,6 +366,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         answer_group_dict = {
             'outcome': {
                 'dest': 'Introduction',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': '<p>Feedback</p>'

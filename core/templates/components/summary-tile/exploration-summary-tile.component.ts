@@ -160,7 +160,9 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
   checkIfMobileCardToBeShown(): void {
     let currentPageUrl = this.urlService.getPathname();
     this.mobileCardToBeShown = (
-      !this.isWindowLarge && (currentPageUrl === '/community-library'));
+      !this.isWindowLarge && ((
+        currentPageUrl === '/community-library') ||
+        currentPageUrl.includes('/explore')));
   }
 
   setHoverState(hoverState: boolean): void {

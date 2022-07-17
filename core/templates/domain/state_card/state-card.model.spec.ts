@@ -22,7 +22,7 @@ import { AudioTranslationLanguageService } from
   'pages/exploration-player-page/services/audio-translation-language.service';
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
-import { InteractionBackendDict, InteractionObjectFactory } from
+import { Interaction, InteractionBackendDict, InteractionObjectFactory } from
   'domain/exploration/InteractionObjectFactory';
 import { StateCard } from
   'domain/state_card/state-card.model';
@@ -75,6 +75,7 @@ describe('State card object factory', () => {
       },
       default_outcome: {
         dest: '(untitled state)',
+        dest_if_really_stuck: null,
         feedback: {
           content_id: 'default_outcome',
           html: ''
@@ -125,7 +126,10 @@ describe('State card object factory', () => {
       'content', audioTranslationLanguageService);
     _sampleCard2 = StateCard.createNewCard(
       'State 2', '<p>Content</p>', '',
-      null, null, writtenTranslationsObjectFactory.createEmpty(),
+      // Use unknown type conversion to test that the interaction is not
+      // required to be a string.
+      null as unknown as Interaction, null as unknown as RecordedVoiceovers,
+      writtenTranslationsObjectFactory.createEmpty(),
       'content', audioTranslationLanguageService);
   });
 

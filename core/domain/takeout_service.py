@@ -27,16 +27,16 @@ from core.domain import takeout_domain
 from core.domain import user_services
 from core.platform import models
 
-(
-    base_models, collection_models, email_models,
-    exploration_models, feedback_models, topic_models,
-    suggestion_models, user_models) = models.Registry.import_models(
-        [models.NAMES.base_model, models.NAMES.collection, models.NAMES.email,
-         models.NAMES.exploration, models.NAMES.feedback, models.NAMES.topic,
-         models.NAMES.suggestion, models.NAMES.user])
+from typing import List, Type
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import base_models
+
+(base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 
-def get_models_which_should_be_exported():
+def get_models_which_should_be_exported() -> List[Type[base_models.BaseModel]]:
     """Returns list of models to export.
 
     Returns:
@@ -59,7 +59,7 @@ def get_models_which_should_be_exported():
             not model_class.__name__ in exempt_base_classes]
 
 
-def export_data_for_user(user_id):
+def export_data_for_user(user_id: str) -> takeout_domain.TakeoutData:
     """Exports selected models according to model defined export_data functions.
 
     Args:
@@ -75,7 +75,7 @@ def export_data_for_user(user_id):
     Raises:
         NotImplementedError. Takeout for profile users is not implemented.
     """
-    user_settings = user_services.get_user_settings(user_id)
+    user_settings = user_services.get_user_settings(user_id, strict=False)
     if user_settings is not None and (
             feconf.ROLE_ID_MOBILE_LEARNER in user_settings.roles):
         raise NotImplementedError(
@@ -112,7 +112,7 @@ def export_data_for_user(user_id):
             'profile_picture_filename'
         )
     ]
-    takeout_image_files = []
+    takeout_image_files: List[takeout_domain.TakeoutImage] = []
     for replacement_instruction in replacement_instructions:
         dictionary_path = replacement_instruction.dictionary_path
         replacement_filename = replacement_instruction.export_filename
@@ -127,6 +127,8 @@ def export_data_for_user(user_id):
         image_key = dictionary_path[-1]
         image_data = pointer[image_key]
         if image_data is not None:
+            # Ruling out the possibility of Any for mypy type checking.
+            assert isinstance(image_data, str)
             takeout_image_files.append(
                 takeout_domain.TakeoutImage(image_data, replacement_filename))
             pointer[image_key] = replacement_filename

@@ -17,7 +17,7 @@
  */
 
 import constants from 'assets/constants';
-import { Component, HostListener, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, HostListener, Input, OnInit, ViewChild } from '@angular/core';
 import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
 import { LearnerDashboardActivityBackendApiService } from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
 import { LearnerDashboardActivityIds } from 'domain/learner_dashboard/learner-dashboard-activity-ids.model';
@@ -28,6 +28,9 @@ import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { Subscription } from 'rxjs';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+
+import './goals-tab.component.css';
+
 
  @Component({
    selector: 'oppia-goals-tab',
@@ -43,19 +46,23 @@ export class GoalsTabComponent implements OnInit {
     private deviceInfoService: DeviceInfoService) {
   }
 
-  @Input() currentGoals: LearnerTopicSummary[];
-  @Input() editGoals: LearnerTopicSummary[];
-  @Input() completedGoals: LearnerTopicSummary[];
-  @Input() untrackedTopics: Record<string, LearnerTopicSummary[]>;
-  @Input() partiallyLearntTopicsList: LearnerTopicSummary[];
-  @Input() learntToPartiallyLearntTopics: string[];
-  @ViewChild('dropdown', {'static': false}) dropdownRef;
-  learnerDashboardActivityIds: LearnerDashboardActivityIds;
-  MAX_CURRENT_GOALS_LENGTH: number;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() currentGoals!: LearnerTopicSummary[];
+  @Input() editGoals!: LearnerTopicSummary[];
+  @Input() completedGoals!: LearnerTopicSummary[];
+  @Input() untrackedTopics!: Record<string, LearnerTopicSummary[]>;
+  @Input() partiallyLearntTopicsList!: LearnerTopicSummary[];
+  @Input() learntToPartiallyLearntTopics!: string[];
+
+  @ViewChild('dropdown', {'static': false}) dropdownRef?: ElementRef;
+  learnerDashboardActivityIds!: LearnerDashboardActivityIds;
+  MAX_CURRENT_GOALS_LENGTH!: number;
+  currentGoalsStoryIsShown!: boolean[];
   pawImageUrl: string = '';
   bookImageUrl: string = '';
   starImageUrl: string = '';
-  currentGoalsStoryIsShown: boolean[];
   topicBelongToCurrentGoals: boolean[] = [];
   topicIdsInCompletedGoals: string[] = [];
   topicIdsInCurrentGoals: string[] = [];
@@ -131,10 +138,6 @@ export class GoalsTabComponent implements OnInit {
     }
   }
 
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
-  }
-
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
@@ -146,7 +149,7 @@ export class GoalsTabComponent implements OnInit {
     return false;
   }
 
-  toggleStory(index: string): void {
+  toggleStory(index: number): void {
     this.currentGoalsStoryIsShown[index] = !(
       this.currentGoalsStoryIsShown[index]);
   }

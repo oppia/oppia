@@ -1,6 +1,3 @@
-<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/pages/participation-playbook/playbook.component.css" as="style">
-<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/pages/participation-playbook/playbook.component.rtl.css" as="style">
-
 <div class="playbook">
   <div class="oppia-static-header">
     <h1 [innerHTML]="'I18N_PLAYBOOK_HEADING' | translate"></h1>
@@ -73,7 +70,7 @@
                   [innerHTML]="'I18N_ACTION_CREATE_EXPLORATION' | translate">
                 </a>
                 <a href="/community-library"
-                   [routerLink]="communityLibraryUrl"
+                   [smartRouterLink]="communityLibraryUrl"
                    class="btn oppia-about-button"
                    [innerHTML]="'I18N_ACTION_BROWSE_EXPLORATIONS' | translate">
                 </a>
@@ -87,7 +84,3 @@
   <div class="oppia-footer-padding-below-banner">
   </div>
 </div>
-
-<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
-<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/participation-playbook/playbook.component.css">
-<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/participation-playbook/playbook.component.rtl.css">
