@@ -21,14 +21,14 @@
 
 <div class="modal-body">
   <div class="oppia-question-details">
-    <strong>Selected Difficulty: <[skillDifficultyLabel]></strong>
+    <strong class="oppia-difficulty-title">Selected Difficulty: <[skillDifficultyLabel]></strong>
     <div ng-if="skillRubricExplanations.length > 0">
-      <strong title="Use these notes to make sure your question is at the right difficulty.">
+      <strong class="oppia-skill-rubrics" title="Use these notes to make sure your question is at the right difficulty.">
         Notes from Skill Rubric
       </strong>
       <ul>
         <li ng-repeat="explanation in skillRubricExplanations">
-          <span ng-bind-html="explanation"></span>
+          <span class="oppia-skill-explanation" ng-bind-html="explanation"></span>
         </li>
       </ul>
     </div>
@@ -191,16 +191,26 @@
     .oppia-suggestion-review-container {
       padding: 10px 0;
     }
+    .oppia-difficulty-title {
+      font-size: 18px;
+    }
   }
 
   @media only screen and (max-width: 535px) {
     .oppia-mobile-question-header {
       display: block;
+      font-size: 20px;
+    }
+    .modal-header {
+      padding-bottom: 0;
     }
     .oppia-question-header {
       display: none;
     }
-    .oppia-suggestion-review-message {
+    .oppia-skill-rubrics {
+      font-size: 18px;
+    }
+    .oppia-suggestion-review-message, .oppia-skill-explanation {
       font-size: 16px;
     }
   }
