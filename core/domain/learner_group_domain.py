@@ -20,6 +20,9 @@ from __future__ import annotations
 
 from core import utils
 
+from core.domain import story_domain
+from core.domain import subtopic_page_domain
+
 from typing import List
 from typing_extensions import TypedDict
 
@@ -126,3 +129,11 @@ class LearnerGroup:
             raise utils.ValidationError(
                 'Learner group facilitator cannot be invited to '
                 'join the group.')
+
+
+class LearnerGroupSyllabusDict(TypedDict):
+    """Dictionary reperesentation of learner group syllabus."""
+
+    story_summary_dicts: List[
+        story_domain.LearnerGroupSyllabusStorySummaryDict]
+    subtopic_summary_dicts: List[subtopic_page_domain.SubtopicPageSummaryDict]

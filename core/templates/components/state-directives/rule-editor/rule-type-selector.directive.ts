@@ -13,93 +13,74 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the rule type selector.
+ * @fileoverview Component for the rule type selector.
  */
 
-require(
-  'filters/string-utility-filters/replace-inputs-with-ellipses.filter.ts');
-require('filters/string-utility-filters/truncate-at-first-ellipsis.filter.ts');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-property.service.ts');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-interaction-id.service');
-require('third-party-imports/select2.import.ts');
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
+import { ReplaceInputsWithEllipsesPipe } from 'filters/string-utility-filters/replace-inputs-with-ellipses.pipe';
+import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 
-angular.module('oppia').directive('ruleTypeSelector', [function() {
-  return {
-    restrict: 'E',
-    scope: {},
-    bindToController: {
-      localValue: '@',
-      onSelectionChange: '&'
-    },
-    template: '<select></select>',
-    controllerAs: '$ctrl',
-    controller: [
-      '$element', '$filter', '$scope',
-      'StateInteractionIdService', 'INTERACTION_SPECS',
-      function(
-          $element, $filter, $scope,
-          StateInteractionIdService, INTERACTION_SPECS) {
-        var ctrl = this;
-        ctrl.$onInit = function() {
-          var choices = [];
+interface Choice {
+  id: unknown;
+  text: string;
+}
 
-          var ruleTypesToDescriptions = INTERACTION_SPECS[
-            StateInteractionIdService.savedMemento].rule_descriptions;
-          var equalToIndex = null;
-          var idx = 0;
-          for (var ruleType in ruleTypesToDescriptions) {
-            if (ruleType.includes('Equal') || ruleType.includes('Exactly')) {
-              equalToIndex = idx;
-            }
-            choices.push({
-              id: ruleType,
-              text: $filter('replaceInputsWithEllipses')(
-                ruleTypesToDescriptions[ruleType])
-            });
-            idx++;
-          }
-          // If the 'Equals' rule is not the first one, swap it with the first
-          // rule, so the equals rule is always the default one selected in the
-          // editor.
-          if (equalToIndex) {
-            [choices[0], choices[equalToIndex]] = [
-              choices[equalToIndex], choices[0]];
-          }
-          var select2Node = $element[0].firstChild;
-          $(select2Node).select2({
-            allowClear: false,
-            data: choices,
-            // Suppress the search box.
-            minimumResultsForSearch: -1,
-            width: '100%',
-            dropdownParent: $(select2Node).parent(),
-            templateSelection: function(object) {
-              return $filter('truncateAtFirstEllipsis')(object.text);
-            }
-          });
+@Component({
+  selector: 'oppia-rule-type-selector',
+  templateUrl: './rule-type-selector.component.html'
+})
+export class RuleTypeSelector implements OnInit {
+  @Input() localValue;
+  @Output() onSelectionChange = new EventEmitter();
+  choices: Choice[] = [];
 
-          // Select the first choice by default.
-          if (!ctrl.localValue) {
-            ctrl.localValue = choices[0].id;
-            ctrl.onSelectionChange()(ctrl.localValue);
-          }
+  constructor(
+    private stateInteractionIdService: StateInteractionIdService,
+    private replaceInputsWithEllipsesPipe: ReplaceInputsWithEllipsesPipe,
+  ) {}
 
-          // Initialize the dropdown.
-          $(select2Node).val(ctrl.localValue).trigger('change');
+  selectedRule($event: Event): void {
+    this.onSelectionChange.emit(this.localValue);
+  }
 
-          $(select2Node).on('change', function(e) {
-            ctrl.onSelectionChange()($(select2Node).val());
-            // This is needed to propagate the change and display input fields
-            // for parameterizing the rule. Otherwise, the input fields do not
-            // get updated when the rule type is changed.
-            $scope.$apply();
-          });
-        };
+  ngOnInit(): void {
+    let ruleTypesToDescriptions = INTERACTION_SPECS[
+      this.stateInteractionIdService.savedMemento].rule_descriptions;
+
+    let equalToIndex = null;
+    let idx = 0;
+    for (let ruleType in ruleTypesToDescriptions) {
+      if (ruleType.includes('Equal') || ruleType.includes('Exactly')) {
+        equalToIndex = idx;
       }
-    ]
-  };
-}]);
+
+      this.choices.push({
+        id: ruleType,
+        text: this.replaceInputsWithEllipsesPipe.transform(
+          ruleTypesToDescriptions[ruleType])
+      });
+      idx++;
+    }
+    // If the 'Equals' rule is not the first one, swap it with the first
+    // rule, so the equals rule is always the default one selected in the
+    // editor.
+    if (equalToIndex) {
+      [this.choices[0], this.choices[equalToIndex]] = [
+        this.choices[equalToIndex], this.choices[0]];
+    }
+
+    if (this.localValue === null || this.localValue === undefined) {
+      this.localValue = this.choices[0].id;
+    }
+
+    this.onSelectionChange.emit(this.localValue);
+  }
+}
+
+
+angular.module('oppia').directive('oppiaRuleTypeSelector',
+  downgradeComponent({
+    component: RuleTypeSelector
+  }) as angular.IDirectiveFactory);
