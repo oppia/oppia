@@ -409,8 +409,6 @@ class EditableTopicDataHandler(base.BaseHandler):
         includes editing its html data as of now).
         """
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
-        print(topic.to_dict())
-        print('\n'*5)
 
         version = self.normalized_payload.get('version')
         self._require_valid_version(version, topic.version)
@@ -435,8 +433,6 @@ class EditableTopicDataHandler(base.BaseHandler):
             raise self.InvalidInputException(e)
 
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
-        print(topic.to_dict())
-
 
         skill_id_to_description_dict, deleted_skill_ids = (
             skill_services.get_descriptions_of_skills(

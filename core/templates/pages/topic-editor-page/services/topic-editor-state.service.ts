@@ -242,8 +242,7 @@ export class TopicEditorStateService {
         newBackendTopicObject.skillQuestionCountDict);
       this._updateGroupedSkillSummaries(
         newBackendTopicObject.groupedSkillSummaries);
-      console.log(newBackendTopicObject.skillIdToDescriptionDict)
-        this._updateTopic(
+      this._updateTopic(
         newBackendTopicObject.topicDict,
         newBackendTopicObject.skillIdToDescriptionDict
       );
