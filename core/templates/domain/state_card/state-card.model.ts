@@ -137,7 +137,7 @@ export class StateCard {
         !InteractionSpecsConstants.INTERACTION_SPECS[
           interactionId as InteractionSpecsKey].is_terminal &&
         !InteractionSpecsConstants.INTERACTION_SPECS[
-          interactionId as InteractionSpecsKey]?.is_linear
+          interactionId as InteractionSpecsKey].is_linear
       );
     }
     return false;
