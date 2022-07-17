@@ -32,12 +32,19 @@ import { AppConstants } from 'app.constants';
 import { ParamDict } from 'services/suggestion-modal.service';
 import { MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
 import { Question } from 'domain/question/QuestionObjectFactory';
+import { SuggestionBackendDict } from 'domain/suggestion/suggestion.model';
+import { State } from 'domain/state/StateObjectFactory';
 
 interface QuestionSuggestionModalValue {
-  suggestionId: any;
-  suggestion: any;
-  reviewable: any;
-  question: any;
+  suggestionId: string;
+  suggestion: SuggestionBackendDict;
+  reviewable: boolean;
+  question: Question;
+}
+
+interface SkillRubrics {
+  difficulty: string;
+  explanations: string[] | string;
 }
 
 @Component({
@@ -46,28 +53,28 @@ interface QuestionSuggestionModalValue {
 })
 export class QuestionSuggestionReviewModalComponent
   extends ConfirmOrCancelModal implements OnInit {
-  @Input() authorName: any;
-  @Input() contentHtml: any;
+  @Input() authorName: string;
+  @Input() contentHtml: string;
   @Input() reviewable: boolean;
   @Input() question: Question;
-  @Input() questionHeader: any;
-  @Input() suggestion: any;
-  @Input() skillRubrics: any;
-  @Input() suggestionId: any;
-  @Input() skillDifficulty: any;
+  @Input() questionHeader: string;
+  @Input() suggestion: SuggestionBackendDict;
+  @Input() skillRubrics: SkillRubrics[];
+  @Input() suggestionId: string;
+  @Input() skillDifficulty: number;
   @Input() misconceptionsBySkill: MisconceptionSkillMap;
 
   @Output() editSuggestionEmitter = (
     new EventEmitter<QuestionSuggestionModalValue>());
 
   reviewMessage: string;
-  questionStateData: any;
-  questionId: any;
-  canEditQuestion: any;
-  skillDifficultyLabel: any;
-  skillRubricExplanations: any;
-  suggestionIsRejected: any;
-  validationError: any;
+  questionStateData: State;
+  questionId: string;
+  canEditQuestion: boolean;
+  skillDifficultyLabel: string;
+  skillRubricExplanations: string | string[];
+  suggestionIsRejected: boolean;
+  validationError: unknown;
 
   constructor(
     private skillBackendApiService: SkillBackendApiService,
@@ -147,7 +154,7 @@ export class QuestionSuggestionReviewModalComponent
         action: AppConstants.ACTION_ACCEPT_SUGGESTION,
         reviewMessage: this.reviewMessage,
         skillDifficulty: this.skillDifficulty
-      } as unknown as any);
+      });
   }
 
   init(): void {
@@ -159,7 +166,7 @@ export class QuestionSuggestionReviewModalComponent
     }
   }
 
-  invertMap(originalMap: any): any {
+  invertMap(originalMap: unknown): unknown {
     return Object.keys(originalMap).reduce(
       (invertedMap, key) => {
         invertedMap[originalMap[key]] = key;
@@ -169,13 +176,13 @@ export class QuestionSuggestionReviewModalComponent
     );
   }
 
-  getSkillDifficultyLabel(): any {
+  getSkillDifficultyLabel(): string {
     const skillDifficultyFloatToLabel = this.invertMap(
       AppConstants.SKILL_DIFFICULTY_LABEL_TO_FLOAT);
     return skillDifficultyFloatToLabel[this.skillDifficulty];
   }
 
-  getRubricExplanation(skillDifficultyLabel: any): string {
+  getRubricExplanation(skillDifficultyLabel: string): string[] | string {
     for (const rubric of this.skillRubrics) {
       if (rubric.difficulty === skillDifficultyLabel) {
         return rubric.explanations;
@@ -185,7 +192,7 @@ export class QuestionSuggestionReviewModalComponent
     return 'This rubric has not yet been specified.';
   }
 
-  _getThreadMessagesAsync(threadId: string): any {
+  _getThreadMessagesAsync(threadId: string): unknown {
     return this.threadDataBackendApiService.fetchMessagesAsync(
       threadId).then((response) => {
       const threadMessageBackendDicts = response.messages;

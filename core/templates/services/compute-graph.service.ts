@@ -25,6 +25,7 @@ import { States } from 'domain/exploration/StatesObjectFactory';
 export interface GraphLink {
   source: string;
   target: string;
+  linkProperty?: string;
 }
 
 export interface GraphNodes {

@@ -23,6 +23,13 @@ import { StateDiffModalComponent } from 'pages/exploration-editor-page/modal-tem
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
+interface LegendGraph {
+ nodes: object;
+ links: unknown[];
+ finalStateIds?: string[];
+ initStateId?: string;
+}
+
 @Component({
   selector: 'oppia-version-diff-visualization',
   templateUrl: './version-diff-visualization.component.html'
@@ -88,7 +95,7 @@ export class VersionDiffVisualizationComponent implements OnInit {
   v1InitStateId: unknown;
   diffGraphSecondaryLabels: unknown;
   DIFF_GRAPH_LINK_PROPERTY_MAPPING: unknown;
-  legendGraph: any;
+  legendGraph: LegendGraph;
   LEGEND_GRAPH_COLORS: unknown;
   LEGEND_GRAPH_SECONDARY_LABELS: unknown;
   LEGEND_GRAPH_LINK_PROPERTY_MAPPING: unknown;

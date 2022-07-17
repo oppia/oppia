@@ -30,6 +30,11 @@ import { Component, Input, OnInit } from '@angular/core';
 import { QuestionValidationService } from 'services/question-validation.service';
 import { ContributionAndReviewService } from '../services/contribution-and-review.service';
 import { AppConstants } from 'app.constants';
+import { MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
+import { Skill } from 'domain/skill/SkillObjectFactory';
+import { Question } from 'domain/question/QuestionObjectFactory';
+import { State } from 'domain/state/StateObjectFactory';
+import { SkillDifficulty } from 'domain/skill/skill-difficulty.model';
 
 @Component({
   selector: 'oppia-question-suggestion-editor-modal',
@@ -37,20 +42,19 @@ import { AppConstants } from 'app.constants';
 })
 export class QuestionSuggestionEditorModalComponent
   extends ConfirmOrCancelModal implements OnInit {
-  @Input() question: any;
-  @Input() questionStateData: any;
-  @Input() questionId: any;
-  @Input() skill: any;
-  @Input() skillDifficulty: any;
-  @Input() suggestionId: any;
+  @Input() question: Question;
+  @Input() questionStateData: State;
+  @Input() questionId: string;
+  @Input() skill: Skill;
+  @Input() skillDifficulty: SkillDifficulty | string;
+  @Input() suggestionId: string;
 
-  canEditQuestion: any;
-  newQuestionIsBeingCreated: any;
-  isEditing: any;
-  misconceptionsBySkill: any;
-  misconceptionsBySkill: any;
-  skillId: any;
-  skillDifficultyString: any;
+  canEditQuestion: boolean;
+  newQuestionIsBeingCreated: boolean;
+  isEditing: boolean;
+  misconceptionsBySkill: MisconceptionSkillMap;
+  skillId: string;
+  skillDifficultyString: string;
 
   constructor(
     private questionUndoRedoService: QuestionUndoRedoService,
@@ -136,7 +140,7 @@ export class QuestionSuggestionEditorModalComponent
       const questionDict = this.question.toBackendDict(false);
       this.contributionAndReviewService.updateQuestionSuggestionAsync(
         this.suggestionId,
-        this.skillDifficulty,
+        this.skillDifficulty as string,
         questionDict.question_state_data,
         imagesData,
         () => {
@@ -145,7 +149,7 @@ export class QuestionSuggestionEditorModalComponent
         () => {});
     } else {
       this.questionSuggestionBackendApiService.submitSuggestionAsync(
-        this.question, this.skill, this.skillDifficulty,
+        this.question, this.skill, this.skillDifficulty as SkillDifficulty,
         imagesData).then(
         () => {
           this.alertsService.addSuccessMessage(

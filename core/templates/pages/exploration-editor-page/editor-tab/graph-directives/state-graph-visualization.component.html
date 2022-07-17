@@ -12,13 +12,13 @@ with the same id on the page. -->
   <svg class="oppia-graph-viz" width="100%" height="100%">
     <g>
       <rect #MainScreen id="pannableRect" class="pannable-rect" *ngIf="allowPanning"
-              [attr.width]="'100%'" [attr.height]="'100%'">
+            [attr.width]="'100%'" [attr.height]="'100%'">
       </rect>
       <g>
         <g [attr.transform]="overallTransformStr" width="100%" height="100%">
           <g class="pannable-child" [attr.transform]="innerTransformStr">
             <g class="widthLocation" *ngFor="let link of augmentedLinks">
-              <path class="link e2e-test-link" *ngIf="link.d" [attr.d]="link.d" marker-end="url(#arrowhead)" style="{{link.style}}">
+              <path class="link e2e-test-link" *ngIf="link.d" [attr.d]="link.d" marker-end="url(#arrowhead)" [attr.style]="link.style">
               </path>
             </g>
 
@@ -27,9 +27,9 @@ with the same id on the page. -->
                     class="e2e-test-node-background {{node.nodeClass}}"
                     [attr.x]="node.x0" [attr.y]="node.y0"
                     [ngClass]="{'clickable': canNavigateToNode(node.id)}"
-                    style="{{node.style}}"
+                    [attr.style]="node.style"
                     (click)="sendOnClickFunctionData(node.id)"
-                    [attr.aria-label]='"Switch to " + getNodeTitle(node) + "Card"'>
+                    [attr.aria-label]="'Switch to ' + getNodeTitle(node) + 'Card'">
               </rect>
               <title>{{getNodeTitle(node)}}</title>
               <text text-anchor="middle" [attr.x]="node.xLabel" [attr.y]="node.yLabel">
@@ -42,11 +42,11 @@ with the same id on the page. -->
               <g *ngIf="getNodeErrorMessage(node.label) && (showWarningSign || showTranslationWarnings)"
                  ngbTooltip="{{getNodeErrorMessage(node.label)}}"
                  placement="top">
-                <rect (click)="sendOnClickFunctionData(node.id)" class="clickable oppia-error-message-fill"
+                <rect (click)="sendOnClickFunctionData(node.id)" class="oppia-graph-warning-message clickable oppia-error-message-fill"
                       width="22" height="22"
                       [attr.x]="node.x0" [attr.y]="node.y0 - 8"
                       [attr.transform]="getHighlightTransform(node.x0, node.y0)"
-                      style=" fill: yellow; z-index: 10000;"
+                      [attr.style]="'fill: yellow; z-index: 10000;'"
                       [attr.aria-label]="getNodeErrorMessage(node.label)">
                 </rect>
                 <text fill="firebrick" text-anchor="middle" [attr.x]="node.x0 + 11"
@@ -80,7 +80,7 @@ with the same id on the page. -->
             </rect>
 
             <text [attr.x]="GRAPH_WIDTH - 200" y="60">
-              {{opacityMap.legend}}
+              {{ opacityMap.legend }}
             </text>
           </g>
         </g>
@@ -90,20 +90,25 @@ with the same id on the page. -->
 </div>
 
 <style>
+  .clickable.oppia-error-message-fill {
+    fill: yellow;
+    z-index: 10000
+  }
+
   .oppia-graph-viz {
+    left: 0;
     position: absolute;
-    top:0;
-    left:0;
+    top: 0;
     z-index: 5;
   }
 
   .oppia-graph-viz .pannable-rect {
-    height: 100%;
-    width: 100%;
     cursor: move;
     fill: none;
     fill-opacity: 0;
+    height: 100%;
     pointer-events: all;
+    width: 100%;
   }
   .oppia-graph-viz path.link {
     fill: none;
@@ -172,9 +177,9 @@ with the same id on the page. -->
   }
 
   .oppia-graph-resize-button {
-    position: absolute;
     border: 0;
-    padding: 9px 10px 6px 10px;    
+    padding: 9px 10px 6px 10px;
+    position: absolute;
     right: 2px;
     top: 2px;
     z-index: 99;

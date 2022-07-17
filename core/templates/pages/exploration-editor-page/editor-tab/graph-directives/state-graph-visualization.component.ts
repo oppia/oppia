@@ -30,12 +30,40 @@ import * as d3 from 'd3';
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
 import { AppConstants } from 'app.constants';
 import { GraphDataService } from 'pages/exploration-editor-page/services/graph-data.service';
+import { GraphNodes, GraphLink, GraphData } from 'services/compute-graph.service';
+import cloneDeep from 'lodash/cloneDeep';
+import { AugmentedLink, NodeDataDict } from 'components/graph-services/graph-layout.service';
 
 interface ElementDimensions {
   h: number;
   w: number;
 }
 
+interface NodeTitle {
+  secondaryLabel: string;
+  label: string;
+  reachableFromEnd: boolean;
+  reachable: boolean;
+}
+
+interface NodeData {
+  depth: number;
+  offset: number;
+  reachable: boolean;
+  y0: number;
+  x0: number;
+  yLabel: number;
+  xLabel: number;
+  height: number;
+  width: number;
+  id: string;
+  label: string;
+  reachableFromEnd: boolean;
+  style: string;
+  secondaryLabel: string;
+  nodeClass: string;
+  canDelete: boolean;
+}
 @Component({
   selector: 'state-graph-visualization',
   templateUrl: './state-graph-visualization.component.html'
@@ -57,7 +85,7 @@ export class StateGraphVisualization
     deleted: string;
   };
 
-  @Input() versionGraphData: any;
+  @Input() versionGraphData: GraphData;
   @Input() maximize: boolean = false;
   // Object whose keys are node ids and whose values are node colors.
   @Input() nodeColors: object;
@@ -87,8 +115,7 @@ export class StateGraphVisualization
   };
 
   initStateId: string;
-  finalStateIds: string;
-  nodeData: NodeDataDict;
+  finalStateIds: string[];
   // The translation applied when the graph is first loaded.
   origTranslations = [0, 0];
   graphLoaded: boolean;
@@ -98,9 +125,10 @@ export class StateGraphVisualization
   VIEWPORT_HEIGHT: string;
   VIEWPORT_X: string;
   VIEWPORT_Y: string;
+  nodeData: NodeDataDict;
   augmentedLinks: AugmentedLink[];
-  nodeList: any;
-  graphData: any
+  nodeList: NodeData[];
+  graphData: GraphData;
   overallTransformStr: string;
   innerTransformStr: string;
   switch: boolean = false;
@@ -280,7 +308,7 @@ export class StateGraphVisualization
     this.centerGraph();
   }
 
-  getNodeTitle(node: any): string {
+  getNodeTitle(node: NodeTitle): string {
     let warning = '';
     if (node.reachable === false) {
       warning = 'Warning: this state is unreachable.';
@@ -327,14 +355,14 @@ export class StateGraphVisualization
   }
 
   drawGraph(
-      nodes: any, originalLinks: any,
-      initStateId: any, finalStateIds: any): any {
+      nodes: GraphNodes, originalLinks: GraphLink[],
+      initStateId: string, finalStateIds: string[]): void {
     this.initStateId = initStateId;
     this.finalStateIds = finalStateIds;
-    let links = angular.copy(originalLinks);
+    let links = cloneDeep(originalLinks);
 
     this.nodeData = this.stateGraphLayoutService.computeLayout(
-      nodes, links, initStateId, angular.copy(finalStateIds));
+      nodes, links, initStateId, cloneDeep(finalStateIds));
 
     this.GRAPH_WIDTH = this.stateGraphLayoutService.getGraphWidth(
       AppConstants.MAX_NODES_PER_ROW, AppConstants.MAX_NODE_LABEL_LENGTH);
@@ -412,7 +440,7 @@ export class StateGraphVisualization
         'normal-node');
 
       this.nodeData[nodeId].canDelete = (nodeId !== initStateId);
-      this.nodeList.push(this.nodeData[nodeId]);
+      this.nodeList.push(this.nodeData[nodeId] as unknown as NodeData);
     }
 
     this.overallTransformStr = 'translate(0,0)';
@@ -497,4 +525,3 @@ angular.module('oppia').directive('stateGraphVisualization',
    downgradeComponent({
      component: StateGraphVisualization
    }) as angular.IDirectiveFactory);
-

@@ -40,10 +40,11 @@ interface GraphAdjacencyLists {
   [node: string]: string[];
 }
 
-interface AugmentedLink {
+export interface AugmentedLink {
   source: NodeData;
   target: NodeData;
   d?: string;
+  style?: string;
 }
 
 interface NodeData {
@@ -59,9 +60,13 @@ interface NodeData {
   id: string;
   label: string;
   reachableFromEnd: boolean;
+  style: string;
+  secondaryLabel: string;
+  nodeClass: string;
+  canDelete: boolean;
 }
 
-interface NodeDataDict {
+export interface NodeDataDict {
   [nodeId: string]: NodeData;
 }
 

@@ -406,7 +406,7 @@ export class ContributionsAndReview
     this.activeExplorationId = null;
   }
 
-  loadOpportunities(): any {
+  loadOpportunities(): Promise<unknown> | object {
     if (!this.activeTabType || !this.activeSuggestionType) {
       return new Promise((resolve, reject) => {
         resolve({opportunitiesDicts: [], more: false});
@@ -428,7 +428,7 @@ export class ContributionsAndReview
     });
   }
 
-  loadMoreOpportunities(): any {
+  loadMoreOpportunities(): Promise<unknown> | object {
     if (!this.activeTabType || !this.activeSuggestionType) {
       return new Promise((resolve, reject) => {
         resolve({opportunitiesDicts: [], more: false});
