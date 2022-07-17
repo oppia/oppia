@@ -214,6 +214,12 @@ export class ConversationSkinComponent {
     private learnerDashboardBackendApiService: LearnerDashboardBackendApiService
   ) {}
 
+  adjustPageHeightOnresize(): void {
+    this.windowRef.nativeWindow.onresize = () => {
+      this.adjustPageHeight(false, null);
+    };
+  }
+
   ngOnInit(): void {
     this._editorPreviewMode = this.contextService.isInExplorationEditorPage();
 
@@ -346,9 +352,7 @@ export class ConversationSkinComponent {
         this.localStorageService.removeUniqueProgressIdOfLoggedOutLearner();
       }
 
-      this.windowRef.nativeWindow.onresize = () => {
-        this.adjustPageHeight(false, null);
-      };
+      this.adjustPageHeightOnresize();
 
       this.currentInteractionService.setOnSubmitFn(
         this.submitAnswer.bind(this));
