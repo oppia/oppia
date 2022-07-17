@@ -200,6 +200,7 @@ describe('Topic editor functionality', function() {
       await topicEditorPage.addSubtopic(
         'Subtopic 1', 'subtopic-two', '../data/test2_svg.svg',
         'Subtopic1 Content');
+      await topicEditorPage.addDiagnosticTestSkill('Skill 2');
       await topicEditorPage.saveTopic('Added subtopic.');
 
       await topicEditorPage.navigateToTopicEditorTab();

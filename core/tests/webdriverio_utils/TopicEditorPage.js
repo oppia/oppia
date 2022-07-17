@@ -46,6 +46,10 @@ var TopicEditorPage = function() {
   var saveRearrangedSkillsButton = $('.e2e-test-save-rearrange-skills');
   var saveTopicButton = $('.e2e-test-save-topic-button');
   var showSchemaEditorElement = $('.e2e-test-show-schema-editor');
+  var addNewDiagnosticTestSkillButton = $('.e2e-add-diagnostic-test-skill');
+  var diagnosticTestSkillSelector = $('.e2e-diagnostic-test-skill-selector');
+  var removeDiagnosticTestButtonElement = $(
+    '.e2e-remove-skill-from-diagnostic-test');
   var storyListItemsSelector = function() {
     return $$('.e2e-test-story-list-item');
   };
@@ -256,6 +260,16 @@ var TopicEditorPage = function() {
         'Uncategorized Skill Text', uncategorizedSkill);
       expect(skillDescriptions[i]).toEqual(text);
     }
+  };
+
+  this.addDiagnosticTestSkill = async function(skillId) {
+    await action.click(
+      'Add new diagnostic test', addNewDiagnosticTestSkillButton);
+    await action.select(
+      'New skill selector', diagnosticTestSkillSelector, skillId);
+    await waitFor.visibilityOf(
+      removeDiagnosticTestButtonElement,
+      'Diagnostic test skill removal button takes too long to appear.');
   };
 };
 
