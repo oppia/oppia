@@ -74,7 +74,7 @@ export class RouterService {
   }
 
   _changeTab(newPath: string): void {
-    if (newPath === undefined) {
+    if (newPath === undefined || newPath === '') {
       this._changeTab('/');
       return;
     }
