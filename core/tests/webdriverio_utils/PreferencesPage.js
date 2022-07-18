@@ -77,7 +77,7 @@ var PreferencesPage = function() {
   };
 
   this.editUserBio = async function(bio) {
-    await action.setValue('User bio field', userBioElement, bio);
+    await action.addValue('User bio field', userBioElement, bio);
     await saveNewChanges('User Bio');
   };
 
