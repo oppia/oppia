@@ -27,11 +27,20 @@ from typing import Any, Dict, List, Mapping, Union, cast
 
 MYPY = False
 if MYPY: # pragma: no cover
+    # Modules imported under the `if MYPY` clause is imported only for
+    # type checking purposes and they are not expected to be executed
+    # at runtime.
     from core.domain import platform_parameter_domain
     from core.domain import state_domain
 
-    # Union type defined from allowed types that a Dict can contain
-    # for its values.
+    # After importing modules under the `if MYPY` clause they are not
+    # executed at runtime. So, to avoid `attribute is not defined` error
+    # at runtime while importing the types from these modules, we defined
+    # `AcceptableChangeDictTypes` under the same `if` clause. So that 
+    # `AcceptableChangeDictTypes` is not executed at runtime and do not
+    # give any error.
+    # Here, `AcceptableChangeDictTypes` is a union type defined from allowed
+    # types that a Dict can contain for its values.
     AcceptableChangeDictTypes = Union[
         str,
         bool,

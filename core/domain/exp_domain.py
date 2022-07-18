@@ -2939,7 +2939,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
             'states': {state_name: state.to_dict()
                        for (state_name, state) in self.states.items()}
         })
-        return exploration_dict
+        exploration_dict_deepcopy = copy.deepcopy(exploration_dict)
+        return exploration_dict_deepcopy
 
     def serialize(self) -> str:
         """Returns the object serialized as a JSON string.
