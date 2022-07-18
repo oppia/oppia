@@ -21,9 +21,9 @@ var action = require('./action.js');
 var waitFor = require('./waitFor.js');
 
 var ContributorDashboardAdminPage = function() {
-  var CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION = 'TRANSLATION';
+  var CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION = 'REVIEW_TRANSLATION';
   var CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER = 'VOICEOVER';
-  var CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION = 'QUESTION';
+  var CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION = 'REVIEW_QUESTION';
   var CATEGORY_SUBMIT_QUESTION = 'SUBMIT_QUESTION';
 
   var addContributionRightsForm = $('.e2e-test-add-contribution-rights-form');

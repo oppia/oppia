@@ -97,7 +97,7 @@ var ContributorDashboardTranslateTextTab = function() {
       selectorContainer,
       'Selector Container took too long to load'
     );
-    var selectedLanguageText = await selectedLanguageElement.getHTML(false);
+    var selectedLanguageText = await selectedLanguageElement.getText();
     expect(selectedLanguageText).toEqual(language);
   };
 };

@@ -110,6 +110,7 @@ describe('Contributor dashboard page', function() {
     await contributorDashboardAdminPage.assignQuestionContributor('user0');
     await contributorDashboardAdminPage.assignQuestionContributor('user1');
     await contributorDashboardAdminPage.assignQuestionReviewer('user1');
+    await users.logout();
   });
 
   it('should allow user to switch to translate text tab', async function() {
@@ -118,7 +119,6 @@ describe('Contributor dashboard page', function() {
     await contributorDashboardTranslateTextTab.changeLanguage(GERMAN_LANGUAGE);
     await contributorDashboardTranslateTextTab.expectSelectedLanguageToBe(
       GERMAN_LANGUAGE);
-    await users.logout();
   });
 
   it('should persist user\'s preferred translation language across sessions',

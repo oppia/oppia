@@ -54,6 +54,13 @@ var ContributorDashboardPage = function() {
 
   var reviewRightsDiv = $('.e2e-test-review-rights');
 
+  var checkOpportunityToBeNull = function(opportunity) {
+    if (opportunity === null) {
+      return true;
+    }
+    return false;
+  };
+
   this.get = async function() {
     await browser.url('/contributor-dashboard');
     await waitFor.visibilityOf(
@@ -186,7 +193,8 @@ var ContributorDashboardPage = function() {
     await this.waitForOpportunitiesToLoad();
     var opportunity = await _getOpportunityWithHeadingAndSubheading(
       expectedHeading, expectedSubheading);
-    expect(opportunity).not.toBe(null);
+    var isOpportunityNull = checkOpportunityToBeNull(opportunity);
+    expect(isOpportunityNull).toBeFalse();
 
     if (expectedLabel !== null) {
       var labelElement = opportunity.$(opportunityLabelCss);
@@ -215,7 +223,8 @@ var ContributorDashboardPage = function() {
     await waitFor.visibilityOf(
       opportunity,
       'Opportunity taking too long to appear.');
-    expect(opportunity).not.toBe(null);
+    var isOpportunityNull = checkOpportunityToBeNull(opportunity);
+    expect(isOpportunityNull).toBeFalse();
     await action.click(
       'Opportunity action button',
       opportunity.$(opportunityActionButtonCss));
