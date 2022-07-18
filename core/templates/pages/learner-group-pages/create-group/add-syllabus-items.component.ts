@@ -80,7 +80,7 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
   ACTION_CLOSE!: string;
   SUPPORTED_CONTENT_LANGUAGES!: LanguageIdAndText[];
   SEARCH_DROPDOWN_TYPES!: SearchDropDownItems[];
-  selectionDetails: SyllabusSelectionDetails;
+  selectionDetails!: SyllabusSelectionDetails;
   SEARCH_DROPDOWN_CATEGORIES!: SearchDropDownItems[];
   KEYBOARD_EVENT_TO_KEY_CODES!: {};
   directiveSubscriptions: Subscription = new Subscription();
@@ -89,7 +89,7 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
   translationData: Record<string, number> = {};
   activeMenuName: string = '';
   searchIsInProgress = false;
-  syllabusFilter: LearnerGroupSyllabusFilter;
+  syllabusFilter!: LearnerGroupSyllabusFilter;
 
   constructor(
     private i18nLanguageCodeService: I18nLanguageCodeService,

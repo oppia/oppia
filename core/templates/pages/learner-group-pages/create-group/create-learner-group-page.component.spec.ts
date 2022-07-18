@@ -124,10 +124,7 @@ describe('CreateLearnerGroupPageComponent', () => {
 
   it('should initialize', fakeAsync(() => {
     spyOn(component, 'subscribeToOnLangChange');
-    spyOn(translateService.onLangChange, 'subscribe').and.callFake((callb) => {
-      callb();
-      return null;
-    });
+    spyOn(translateService.onLangChange, 'subscribe');
 
     component.ngOnInit();
     tick();

@@ -48,7 +48,7 @@ export class CreateLearnerGroupPageComponent implements OnInit, OnDestroy {
   LEARNER_GROUP_CREATION_SECTION_I18N_IDS = (
     LearnerGroupPagesConstants.LEARNER_GROUP_CREATION_SECTION_I18N_IDS);
 
-  activeSection: string;
+  activeSection!: string;
   furthestReachedSectionNumber: number = 1;
   learnerGroupTitle: string = '';
   learnerGroupDescription: string = '';

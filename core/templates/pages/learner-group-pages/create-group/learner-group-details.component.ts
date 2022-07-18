@@ -26,8 +26,8 @@ import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
   templateUrl: './learner-group-details.component.html'
 })
 export class LearnerGroupDetailsComponent {
-  @Input() learnerGroupTitle: string = '';
-  @Input() learnerGroupDescription: string = '';
+  @Input() learnerGroupTitle!: string;
+  @Input() learnerGroupDescription!: string;
   @Output() updateLearnerGroupTitle: EventEmitter<string> = new EventEmitter();
   @Output() updateLearnerGroupDesc: EventEmitter<string> = new EventEmitter();
 

@@ -50,6 +50,7 @@
       <div class="oppia-prev-section-container oppia-prev-section-button"
            [ngClass]="{'no-syllabus-items': isAddSyllabusNextButtonDisabled()}"
            (click)="setActiveSection(LEARNER_GROUP_CREATION_SECTION_I18N_IDS.GROUP_DETAILS, 1)">
+        <span>&lt;</span>
         <span translate="I18N_LEARNER_GROUP_CREATION_PREV_BUTTON_TEXT"></span>
       </div>
       <div class="oppia-next-section-container">
@@ -72,6 +73,7 @@
       </oppia-invite-students>
       <div class="oppia-prev-section-container oppia-prev-section-button"
            (click)="setActiveSection(LEARNER_GROUP_CREATION_SECTION_I18N_IDS.ADD_SYLLABUS_ITEMS, 1)">
+        <span>&lt;</span>
         <span translate="I18N_LEARNER_GROUP_CREATION_PREV_BUTTON_TEXT"></span>
       </div>
       <div class="oppia-next-section-container oppia-next-section-button active"

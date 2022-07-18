@@ -36,7 +36,6 @@ import { ConstructTranslationIdsService } from
   'services/construct-translation-ids.service';
 import { LearnerGroupSyllabus } from
   'domain/learner_group/learner-group-syllabus.model';
-import { Subject } from 'rxjs';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 
 @Pipe({name: 'truncate'})
@@ -356,15 +355,6 @@ describe('AddSyllabusItemsComponent', () => {
     spyOn(component, 'updateSelectionDetails');
     spyOn(component, 'refreshSearchBarLabels');
     spyOn(translateService.onLangChange, 'subscribe');
-    component.searchQueryChanged = {
-      pipe: (param1, parm2) => {
-        return {
-          subscribe(callb) {
-            callb();
-          }
-        };
-      }
-    } as Subject<string>;
 
     component.ngOnInit();
     tick();
