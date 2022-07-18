@@ -1479,6 +1479,7 @@ class OutcomeDict(TypedDict):
     """Dictionary representing the Outcome object."""
 
     dest: Optional[str]
+    dest_if_really_stuck: Optional[str]
     feedback: SubtitledHtmlDict
     labelled_as_correct: bool
     param_changes: List[param_domain.ParamChangeDict]
