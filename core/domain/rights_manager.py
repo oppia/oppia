@@ -20,7 +20,6 @@ from __future__ import annotations
 
 import logging
 
-from core import feconf
 from core import utils
 from core.constants import constants
 from core.domain import activity_services
@@ -577,7 +576,7 @@ def _get_activity_rights(
             constants.ACTIVITY_TYPE_EXPLORATION,
             constants.ACTIVITY_TYPE_COLLECTION.
         activity_id: str. ID of the activity.
-        strict: bool. whether to fail noisily if the activity_rights
+        strict: bool. Whether to fail noisily if the activity_rights
             doesn't exist for the given activity_id.
 
     Returns:
@@ -1173,7 +1172,6 @@ def _release_ownership_of_activity(
             'refused permission.' % (committer_id, activity_type, activity_id))
         raise Exception(
             'The ownership of this %s cannot be released.' % activity_type)
-
 
     activity_rights.community_owned = True
     activity_rights.owner_ids = []
