@@ -660,6 +660,7 @@ class ExpStateInteractionValidationJobTests(
               'EXP_1_STATE_3': self.EXP_1_STATE_3,
               'EXP_1_STATE_4': self.EXP_1_STATE_4,
               'EXP_1_STATE_5': self.EXP_1_STATE_5,
+              'EXP_1_STATE_6': self.EXP_1_STATE_6,
               'EXP_1_STATE_7': self.EXP_1_STATE_7,
             }
         )

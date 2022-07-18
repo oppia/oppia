@@ -33,7 +33,6 @@ from core.platform import models
 import apache_beam as beam
 import bs4
 from typing import Dict, List
-import sys
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -368,8 +367,8 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
         for state_name, state in exp_states.items():
             if state.interaction.id == 'NumericInput':
                 numeric_input_interaction_values = []
-                lower_infinity = ~sys.maxsize
-                upper_infinity = sys.maxsize
+                lower_infinity = float('-inf')
+                upper_infinity = float('inf')
                 answer_groups = state.interaction.answer_groups
                 ranges = []
                 for answer_group in answer_groups:
@@ -386,7 +385,7 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
                             'ub_inclusive': False
                         }
                         if rule_spec.rule_type == 'IsLessThanOrEqualTo':
-                            rule_value = int(rule_spec.inputs['x'])
+                            rule_value = float(rule_spec.inputs['x'])
                             (
                                 ExpStateInteractionValidationJob.
                                 _set_lower_and_upper_bounds(
@@ -396,7 +395,7 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
                             )
 
                         if rule_spec.rule_type == 'IsGreaterThanOrEqualTo':
-                            rule_value = int(rule_spec.inputs['x'])
+                            rule_value = float(rule_spec.inputs['x'])
                             (
                                 ExpStateInteractionValidationJob.
                                 _set_lower_and_upper_bounds(
@@ -406,7 +405,7 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
                             )
 
                         if rule_spec.rule_type == 'Equals':
-                            rule_value = int(rule_spec.inputs['x'])
+                            rule_value = float(rule_spec.inputs['x'])
                             (
                                 ExpStateInteractionValidationJob.
                                 _set_lower_and_upper_bounds(
@@ -416,7 +415,7 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
                             )
 
                         if rule_spec.rule_type == 'IsLessThan':
-                            rule_value = int(rule_spec.inputs['x'])
+                            rule_value = float(rule_spec.inputs['x'])
                             (
                                 ExpStateInteractionValidationJob.
                                 _set_lower_and_upper_bounds(
@@ -426,8 +425,8 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
                             )
 
                         if rule_spec.rule_type == 'IsWithinTolerance':
-                            rule_value_x = int(rule_spec.inputs['x'])
-                            rule_value_tol = int(rule_spec.inputs['tol'])
+                            rule_value_x = float(rule_spec.inputs['x'])
+                            rule_value_tol = float(rule_spec.inputs['tol'])
                             (
                                 ExpStateInteractionValidationJob.
                                 _set_lower_and_upper_bounds(
@@ -437,7 +436,7 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
                             )
 
                         if rule_spec.rule_type == 'IsGreaterThan':
-                            rule_value = int(rule_spec.inputs['x'])
+                            rule_value = float(rule_spec.inputs['x'])
                             (
                                 ExpStateInteractionValidationJob.
                                 _set_lower_and_upper_bounds(
@@ -447,8 +446,8 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
                             )
 
                         if rule_spec.rule_type == 'IsInclusivelyBetween':
-                            rule_value_a = int(rule_spec.inputs['a'])
-                            rule_value_b = int(rule_spec.inputs['b'])
+                            rule_value_a = float(rule_spec.inputs['a'])
+                            rule_value_b = float(rule_spec.inputs['b'])
                             (
                                 ExpStateInteractionValidationJob.
                                 _set_lower_and_upper_bounds(
@@ -502,8 +501,8 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
         for state_name, state in exp_states.items():
             if state.interaction.id == 'FractionInput':
                 fraction_input_interaction_values = []
-                lower_infinity = ~sys.maxsize
-                upper_infinity = sys.maxsize
+                lower_infinity = float('-inf')
+                upper_infinity = float('inf')
                 answer_groups = state.interaction.answer_groups
                 ranges = []
                 matched_denominator_list = []
@@ -535,18 +534,21 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
                             rule_value_f = rule_spec.inputs['f'].strip()
                             if '/' in rule_value_f:
                                 rule_value_f = rule_value_f.split('/')
-                                # For values like '1 3/2'
+                                # For values like '1 3/2'.
                                 if len(rule_value_f[0].strip().split()) > 1:
                                     value_1 = rule_value_f[0].strip().split()
                                     value_2 = rule_value_f[1]
 
-                                    rule_value_f = (((float(value_2)*float(
-                                        value_1[0]))+ float(
-                                            value_1[1])) / float(value_2))
-                                # For values like '1/2'
+                                    rule_value_f = (
+                                        float(value_1[0]) +
+                                        float(value_1[1]) / float(value_2)
+                                    )
+                                # For values like '1/2'.
                                 else:
                                     rule_value_f = (
-                                        float(rule_value_f[0]) / float(rule_value_f[1]))
+                                        float(rule_value_f[0]) / float(
+                                            rule_value_f[1])
+                                    )
                             else:
                                 rule_value_f = float(rule_value_f)
 
@@ -562,18 +564,21 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
                             rule_value_f = rule_spec.inputs['f'].strip()
                             if '/' in rule_value_f:
                                 rule_value_f = rule_value_f.split('/')
-                                # For values like '1 3/2'
+                                # For values like '1 3/2'.
                                 if len(rule_value_f[0].strip().split()) > 1:
                                     value_1 = rule_value_f[0].strip().split()
                                     value_2 = rule_value_f[1]
 
-                                    rule_value_f = (((float(value_2)*float(
-                                        value_1[0]))+ float(
-                                            value_1[1])) / float(value_2))
-                                # For values like '1/2'
+                                    rule_value_f = (
+                                        float(value_1[0]) +
+                                        float(value_1[1]) / float(value_2)
+                                    )
+                                # For values like '1/2'.
                                 else:
                                     rule_value_f = (
-                                        float(rule_value_f[0]) / float(rule_value_f[1]))
+                                        float(rule_value_f[0]) / float(
+                                            rule_value_f[1])
+                                    )
                             else:
                                 rule_value_f = float(rule_value_f)
 
@@ -589,18 +594,21 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
                             rule_value_f = rule_spec.inputs['f'].strip()
                             if '/' in rule_value_f:
                                 rule_value_f = rule_value_f.split('/')
-                                # For values like '1 3/2'
+                                # For values like '1 3/2'.
                                 if len(rule_value_f[0].strip().split()) > 1:
                                     value_1 = rule_value_f[0].strip().split()
                                     value_2 = rule_value_f[1]
 
-                                    rule_value_f = (((float(value_2)*float(
-                                        value_1[0]))+ float(
-                                            value_1[1])) / float(value_2))
-                                # For values like '1/2'
+                                    rule_value_f = (
+                                        float(value_1[0]) +
+                                        float(value_1[1]) / float(value_2)
+                                    )
+                                # For values like '1/2'.
                                 else:
                                     rule_value_f = (
-                                        float(rule_value_f[0]) / float(rule_value_f[1]))
+                                        float(rule_value_f[0]) / float(
+                                            rule_value_f[1])
+                                    )
                             else:
                                 rule_value_f = float(rule_value_f)
 
@@ -1035,8 +1043,11 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
     invalid_end_interac = []
     @staticmethod
     def filter_invalid_end_interac(exp, exp_id_list):
+        """
+        """
         states = exp.states
         found_invalid = False
+        exp_end_interac_values = []
         for state_name, state in states.items():
             if state.interaction.id == 'EndExploration':
                 invalid_state_exp_ids = []
@@ -1051,12 +1062,14 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
                         invalid_state_exp_ids.append(exp_id)
                 if len(invalid_state_exp_ids) > 0:
                     (
-                        ExpStateInteractionValidationJob.
-                        invalid_end_interac.append(
+                        exp_end_interac_values.append(
                             {'state_name': state_name,
                             'invalid_exps': invalid_state_exp_ids}
                         )
                     )
+        ExpStateInteractionValidationJob.invalid_end_interac.append(
+            {exp.id: exp_end_interac_values}
+        )
         return found_invalid
 
     @staticmethod
@@ -1087,8 +1100,12 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
         return errored_values
 
     @staticmethod
-    def reset_invalid_end_interac_value(exp):
-        ExpStateInteractionValidationJob.invalid_end_interac = []
+    def get_invalid_end_interac_values(exp):
+        """
+        """
+        for ele in ExpStateInteractionValidationJob.invalid_end_interac:
+            if exp.id in ele.keys():
+                return ele[exp.id]
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         all_explorations = (
@@ -1330,14 +1347,21 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
             | 'Map id, invalid interac and created_on date' >> beam.Map(
                 lambda exp: (
                     exp.id, exp.created_on.date(),
-                    ExpStateInteractionValidationJob.invalid_end_interac
+                    (
+                        ExpStateInteractionValidationJob.
+                        get_invalid_end_interac_values
+                    )
                 )
             )
-            | 'Reset invalid_end_interac' >> beam.Map(
-                (
-                    ExpStateInteractionValidationJob.
-                    reset_invalid_end_interac_value
+            | 'Remove empty values for state end interc' >> beam.MapTuple(
+                lambda exp_id, exp_created_on, exp_end_interc_errors: (
+                    exp_id, exp_created_on, self.remove_empty_values(
+                        exp_end_interc_errors)
                 )
+            )
+            | 'Filter invalid exps errored text interac states'
+            >> beam.Filter(
+                lambda exp_values: len(exp_values[2]) > 0
             )
         )
 
