@@ -62,7 +62,6 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'QuestionSkillLinkHandler',
     'QuestionsListHandler',
     'RecentCommitsHandler',
-    'RecommendationsHandler',
     'ResubmitSuggestionHandler',
     'SkillDataHandler',
     'SkillDescriptionHandler',

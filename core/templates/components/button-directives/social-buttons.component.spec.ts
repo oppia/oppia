@@ -19,11 +19,9 @@
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { SocialButtonsComponent } from './social-buttons.component';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { TestBed, waitForAsync } from '@angular/core/testing';
 
 describe('SocialButtonsComponent', () => {
-  let component: SocialButtonsComponent;
-  let fixture: ComponentFixture<SocialButtonsComponent>;
   let i18nLanguageCodeService: I18nLanguageCodeService;
 
   beforeEach(waitForAsync(() => {
@@ -35,14 +33,8 @@ describe('SocialButtonsComponent', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(SocialButtonsComponent);
-    component = fixture.componentInstance;
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
       true);
-  });
-
-  it('should get RTL language status correctly', () => {
-    expect(component.isLanguageRTL()).toBeTrue();
   });
 });

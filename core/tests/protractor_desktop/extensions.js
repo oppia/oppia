@@ -133,7 +133,7 @@ describe('Interactions', function() {
 
     await explorationEditorMainTab.setStateName('first');
     await explorationEditorMainTab.setContent(
-      await forms.toRichText('some content'));
+      await forms.toRichText('some content'), true);
     await explorationEditorPage.saveChanges();
 
     var defaultOutcomeSet = false;
@@ -149,9 +149,9 @@ describe('Interactions', function() {
         // Delete any leftover rules that may remain from previous tests of the
         // same interaction, so they won't interfere with the current test.
         var deleteResponseButton = element(by.css(
-          '.protractor-test-delete-response'));
+          '.e2e-test-delete-response'));
         var confirmDeleteResponseButton = element(by.css(
-          '.protractor-test-confirm-delete-response'));
+          '.e2e-test-confirm-delete-response'));
         if (await deleteResponseButton.isPresent()) {
           await action.click('Delete Response button', deleteResponseButton);
           await action.click(
@@ -186,9 +186,9 @@ describe('Interactions', function() {
         }
         // Dismiss conversation help card.
         var clearHelpcardButton = element(by.css(
-          '.protractor-test-close-help-card-button'));
+          '.e2e-test-close-help-card-button'));
         var helpCard = element(
-          by.css('.protractor-test-conversation-skin-help-card'));
+          by.css('.e2e-test-conversation-skin-help-card'));
         var isPresent = await clearHelpcardButton.isPresent();
         if (isPresent) {
           await action.click('Clear Helper Button', clearHelpcardButton);
@@ -222,7 +222,7 @@ describe('Interactions', function() {
     await workflow.createExploration(true);
     await explorationEditorMainTab.setStateName('Graph');
     await explorationEditorMainTab.setContent(await forms.toRichText(
-      'Draw a complete graph with the given vertices.'));
+      'Draw a complete graph with the given vertices.'), true);
     var graphDictForInput = {
       vertices: [[277, 77], [248, 179], [405, 144]]
     };
@@ -245,7 +245,7 @@ describe('Interactions', function() {
     await explorationEditorMainTab.setContent(async function(richTextEditor) {
       await richTextEditor.appendPlainText(
         'Please simplify the following expression: 16x^{4}/4x^2');
-    });
+    }, true);
 
     await explorationEditorMainTab.setInteraction(
       'AlgebraicExpressionInput', ['x']);
@@ -309,7 +309,7 @@ describe('Interactions', function() {
     await workflow.createExploration(true);
     await explorationEditorMainTab.setStateName('Graph');
     await explorationEditorMainTab.setContent(await forms.toRichText(
-      'Draw a complete graph with the given vertices.'));
+      'Draw a complete graph with the given vertices.'), true);
     var graphDictForInput = {
       vertices: [[277, 77], [248, 179], [405, 144]]
     };
@@ -330,7 +330,7 @@ describe('Interactions', function() {
 
     await explorationEditorMainTab.moveToState('CodeRepl');
     await explorationEditorMainTab.setContent(await forms.toRichText(
-      'this is card 2 with non-inline interaction'));
+      'this is card 2 with non-inline interaction'), true);
     await explorationEditorMainTab.setInteraction('CodeRepl');
     await explorationEditorMainTab.addResponse(
       'CodeRepl', await forms.toRichText('Nice. Press continue button'),

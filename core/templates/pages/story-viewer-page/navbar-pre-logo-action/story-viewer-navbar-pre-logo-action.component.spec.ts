@@ -40,6 +40,7 @@ class MockUrlService {
 
 let component: StoryViewerNavbarPreLogoActionComponent;
 let fixture: ComponentFixture<StoryViewerNavbarPreLogoActionComponent>;
+let urlService: UrlService;
 
 describe('Subtopic viewer navbar breadcrumb component', () => {
   beforeEach(fakeAsync(() => {
@@ -73,6 +74,7 @@ describe('Subtopic viewer navbar breadcrumb component', () => {
 
   beforeEach(() => {
     fixture = TestBed.createComponent(StoryViewerNavbarPreLogoActionComponent);
+    urlService = TestBed.inject(UrlService);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
@@ -88,6 +90,15 @@ describe('Subtopic viewer navbar breadcrumb component', () => {
       expect(component.topicName).toBe('topic_1');
     });
   }));
+
+  it('should throw error if story url fragment is not present', () => {
+    spyOn(
+      urlService, 'getStoryUrlFragmentFromLearnerUrl').and.returnValue(null);
+
+    expect(() => {
+      component.ngOnInit();
+    }).toThrowError('Story url fragment is null');
+  });
 
   it('should get topic url after component is initialized', () => {
     component.ngOnInit();

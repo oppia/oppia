@@ -30,8 +30,11 @@ import { PageTitleService } from 'services/page-title.service';
   templateUrl: './error-page-root.component.html'
 })
 export class ErrorPageRootComponent implements OnDestroy {
+  // This property is initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  statusCode!: string;
   directiveSubscriptions = new Subscription();
-  statusCode: string;
 
   constructor(
     private pageTitleService: PageTitleService,
@@ -43,8 +46,8 @@ export class ErrorPageRootComponent implements OnDestroy {
     let bodyTag = (
       this.windowRef.nativeWindow.document.getElementsByTagName('body'));
     // Read status code from errorCode attribute on body tag.
-    this.statusCode = bodyTag[0].getAttribute('errorCode') ?
-      bodyTag[0].getAttribute('errorCode') : '404';
+    let errorCode = bodyTag[0].getAttribute('errorCode');
+    this.statusCode = errorCode ? errorCode : '404';
     // Update the default page title.
     this.directiveSubscriptions.add(
       this.translateService.onLangChange.subscribe(() => {

@@ -22,10 +22,12 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { ReadOnlyExplorationBackendApiService, FetchExplorationBackendResponse } from
   'domain/exploration/read-only-exploration-backend-api.service';
+import { VersionedExplorationCachingService } from 'pages/exploration-editor-page/services/versioned-exploration-caching.service';
 
 describe('Read only exploration backend API service', () => {
   let roebas: ReadOnlyExplorationBackendApiService;
   let httpTestingController: HttpTestingController;
+  let versionedExplorationCachingService: VersionedExplorationCachingService;
   let sampleDataResults: FetchExplorationBackendResponse = {
     exploration_id: '0',
     is_logged_in: true,
@@ -61,6 +63,7 @@ describe('Read only exploration backend API service', () => {
             default_outcome: {
               param_changes: [],
               dest: 'Introduction',
+              dest_if_really_stuck: null,
               feedback: {
                 html: '',
                 content_id: 'content'
@@ -74,6 +77,22 @@ describe('Read only exploration backend API service', () => {
           }
         }
       }
+    },
+    exploration_metadata: {
+      title: 'Exploration',
+      category: 'Algebra',
+      objective: 'To learn',
+      language_code: 'en',
+      tags: [],
+      blurb: '',
+      author_notes: '',
+      states_schema_version: 50,
+      init_state_name: 'Introduction',
+      param_specs: {},
+      param_changes: [],
+      auto_tts_enabled: false,
+      correctness_feedback_enabled: true,
+      edits_allowed: true
     },
     version: 1,
     can_edit: true,
@@ -93,8 +112,10 @@ describe('Read only exploration backend API service', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
     });
-    roebas = TestBed.get(ReadOnlyExplorationBackendApiService);
-    httpTestingController = TestBed.get(HttpTestingController);
+    roebas = TestBed.inject(ReadOnlyExplorationBackendApiService);
+    httpTestingController = TestBed.inject(HttpTestingController);
+    versionedExplorationCachingService = TestBed.inject(
+      VersionedExplorationCachingService);
   });
 
   afterEach(() => {
@@ -118,7 +139,10 @@ describe('Read only exploration backend API service', () => {
     }));
 
   it('should successfully fetch an existing exploration with version from' +
-    ' the backend', fakeAsync(() => {
+    ' the backend and cache it if not already', fakeAsync(() => {
+    spyOn(
+      versionedExplorationCachingService, 'cacheVersionedExplorationData'
+    ).and.callThrough();
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
 
@@ -126,6 +150,46 @@ describe('Read only exploration backend API service', () => {
 
     let req = httpTestingController.expectOne(
       '/explorehandler/init/0?v=1');
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleDataResults);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
+    expect(failHandler).not.toHaveBeenCalled();
+    expect(
+      versionedExplorationCachingService.cacheVersionedExplorationData
+    ).toHaveBeenCalledWith('0', 1, sampleDataResults);
+  }));
+
+  it('should use cached exploration data with version if the data is ' +
+  'already cached', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    versionedExplorationCachingService.cacheVersionedExplorationData(
+      '0', 1, sampleDataResults);
+    roebas.fetchExplorationAsync('0', 1).then(successHandler, failHandler);
+
+    httpTestingController.expectNone(
+      '/explorehandler/init/0?v=1');
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(
+      versionedExplorationCachingService
+        .retrieveCachedVersionedExplorationData('0', 1));
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should successfully fetch an existing exploration from a unique' +
+    ' URL progress id', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    roebas.fetchExplorationAsync('0', null, '123456').then(
+      successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      '/explorehandler/init/0?pid=123456');
     expect(req.request.method).toEqual('GET');
     req.flush(sampleDataResults);
     flushMicrotasks();
@@ -222,6 +286,7 @@ describe('Read only exploration backend API service', () => {
     roebas.cacheExploration('0', {
       can_edit: true,
       exploration: null,
+      exploration_metadata: null,
       exploration_id: '0',
       is_logged_in: true,
       session_id: 'sessionId',
@@ -250,6 +315,7 @@ describe('Read only exploration backend API service', () => {
     expect(successHandler).toHaveBeenCalledWith({
       can_edit: true,
       exploration: null,
+      exploration_metadata: null,
       exploration_id: '0',
       is_logged_in: true,
       session_id: 'sessionId',
@@ -275,6 +341,7 @@ describe('Read only exploration backend API service', () => {
     roebas.cacheExploration('0', {
       can_edit: true,
       exploration: null,
+      exploration_metadata: null,
       exploration_id: '0',
       is_logged_in: true,
       session_id: 'sessionId',
@@ -296,4 +363,47 @@ describe('Read only exploration backend API service', () => {
     roebas.deleteExplorationFromCache('0');
     expect(roebas.isCached('0')).toBe(false);
   }));
+
+  it('should handle successCallback for fetch checkpoints feature status',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+
+      roebas.fetchCheckpointsFeatureIsEnabledStatus().then(
+        successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/checkpoints_feature_status_handler');
+      expect(req.request.method).toEqual('GET');
+      req.flush({checkpoints_feature_is_enabled: false});
+
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalledWith(false);
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
+
+  it('should handle errorCallback for fetch checkpoints feature status',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+
+      roebas.fetchCheckpointsFeatureIsEnabledStatus().then(
+        successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/checkpoints_feature_status_handler');
+      expect(req.request.method).toEqual('GET');
+      req.flush('Invalid request', {
+        status: 400,
+        statusText: 'Invalid request'
+      });
+
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalled();
+    })
+  );
 });

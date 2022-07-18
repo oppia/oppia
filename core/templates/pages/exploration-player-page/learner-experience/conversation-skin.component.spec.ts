@@ -47,6 +47,7 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { LoaderService } from 'services/loader.service';
+import { LocalStorageService } from 'services/local-storage.service';
 import { MessengerService } from 'services/messenger.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
@@ -73,12 +74,15 @@ import { QuestionPlayerEngineService } from '../services/question-player-engine.
 import { RefresherExplorationConfirmationModalService } from '../services/refresher-exploration-confirmation-modal.service';
 import { StatsReportingService } from '../services/stats-reporting.service';
 import { ConversationSkinComponent } from './conversation-skin.component';
+import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
 
 class MockWindowRef {
   nativeWindow = {
     location: {
       pathname: '/path/name',
       reload: () => {}
+    },
+    onresize: () => {
     },
     addEventListener(event: string, callback) {
       callback({returnValue: null});
@@ -99,6 +103,8 @@ describe('Conversation skin component', () => {
   let contentTranslationManagerService: ContentTranslationManagerService;
   let contextService: ContextService;
   let currentInteractionService: CurrentInteractionService;
+  let editableExplorationBackendApiService:
+    EditableExplorationBackendApiService;
   let explorationEngineService: ExplorationEngineService;
   let explorationPlayerStateService: ExplorationPlayerStateService;
   let explorationRecommendationsService:
@@ -113,6 +119,7 @@ describe('Conversation skin component', () => {
   let learnerAnswerInfoService: LearnerAnswerInfoService;
   let learnerParamsService: LearnerParamsService;
   let loaderService: LoaderService;
+  let localStorageService: LocalStorageService;
   let messengerService: MessengerService;
   let numberAttemptsService: NumberAttemptsService;
   let playerCorrectnessFeedbackEnabledService:
@@ -191,6 +198,7 @@ describe('Conversation skin component', () => {
                   html: '<p>Good Job</p>'
                 },
                 param_changes: [],
+                dest_if_really_stuck: null,
                 dest: 'Mid'
               },
               training_data: [],
@@ -219,6 +227,7 @@ describe('Conversation skin component', () => {
               html: '<p>Try again.</p>'
             },
             param_changes: [],
+            dest_if_really_stuck: null,
             dest: 'Start'
           }
         },
@@ -314,6 +323,7 @@ describe('Conversation skin component', () => {
                   html: ' <p>Good Job</p>'
                 },
                 param_changes: [],
+                dest_if_really_stuck: null,
                 dest: 'End'
               },
               training_data: [],
@@ -342,6 +352,7 @@ describe('Conversation skin component', () => {
               html: '<p>try again.</p>'
             },
             param_changes: [],
+            dest_if_really_stuck: null,
             dest: 'Mid'
           }
         },
@@ -382,6 +393,22 @@ describe('Conversation skin component', () => {
       objective: 'To learn',
       states: explorationDict.states
     },
+    exploration_metadata: {
+      title: 'Exploration',
+      category: 'Algebra',
+      objective: 'To learn',
+      language_code: 'en',
+      tags: [],
+      blurb: '',
+      author_notes: '',
+      states_schema_version: 50,
+      init_state_name: 'Introduction',
+      param_specs: {},
+      param_changes: [],
+      auto_tts_enabled: false,
+      correctness_feedback_enabled: true,
+      edits_allowed: true
+    },
     version: 2,
     can_edit: true,
     preferred_audio_language_code: 'en',
@@ -411,6 +438,22 @@ describe('Conversation skin component', () => {
       objective: 'To learn',
       states: explorationDict.states
     },
+    exploration_metadata: {
+      title: 'Exploration',
+      category: 'Algebra',
+      objective: 'To learn',
+      language_code: 'en',
+      tags: [],
+      blurb: '',
+      author_notes: '',
+      states_schema_version: 50,
+      init_state_name: 'Introduction',
+      param_specs: {},
+      param_changes: [],
+      auto_tts_enabled: false,
+      correctness_feedback_enabled: true,
+      edits_allowed: true
+    },
     version: 2,
     can_edit: true,
     preferred_audio_language_code: 'en',
@@ -425,6 +468,7 @@ describe('Conversation skin component', () => {
     most_recently_reached_checkpoint_state_name: null,
     most_recently_reached_checkpoint_exp_version: 2
   };
+  let uniqueProgressIdResponse = '123456';
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -458,6 +502,8 @@ describe('Conversation skin component', () => {
       ContentTranslationManagerService);
     contextService = TestBed.inject(ContextService);
     currentInteractionService = TestBed.inject(CurrentInteractionService);
+    editableExplorationBackendApiService = TestBed.inject(
+      EditableExplorationBackendApiService);
     explorationEngineService = TestBed.inject(ExplorationEngineService);
     explorationPlayerStateService = TestBed.inject(
       ExplorationPlayerStateService);
@@ -476,6 +522,7 @@ describe('Conversation skin component', () => {
     learnerAnswerInfoService = TestBed.inject(LearnerAnswerInfoService);
     learnerParamsService = TestBed.inject(LearnerParamsService);
     loaderService = TestBed.inject(LoaderService);
+    localStorageService = TestBed.inject(LocalStorageService);
     messengerService = TestBed.inject(MessengerService);
     numberAttemptsService = TestBed.inject(NumberAttemptsService);
     playerCorrectnessFeedbackEnabledService = TestBed.inject(
@@ -499,11 +546,24 @@ describe('Conversation skin component', () => {
     readOnlyExplorationBackendApiService = TestBed.inject(
       ReadOnlyExplorationBackendApiService);
     stateObjectFactory = TestBed.inject(StateObjectFactory);
+    spyOn(
+      readOnlyExplorationBackendApiService,
+      'fetchCheckpointsFeatureIsEnabledStatus'
+    ).and.returnValue(Promise.resolve(true));
   }));
 
-  it('should create', () => {
-    expect(componentInstance).toBeDefined();
-  });
+  it('should create && adjust page height on resize of window',
+    fakeAsync(() => {
+      spyOn(componentInstance, 'adjustPageHeight').and.stub();
+      componentInstance.adjustPageHeightOnresize();
+
+      expect(componentInstance).toBeDefined();
+
+      windowRef.nativeWindow.onresize(null);
+      tick(200);
+
+      expect(componentInstance.adjustPageHeight).toHaveBeenCalled();
+    }));
 
   it('should initialize component', fakeAsync(() => {
     let collectionId = 'id';
@@ -525,6 +585,7 @@ describe('Conversation skin component', () => {
         false, false, false, '', '', '', true)));
     spyOn(urlService, 'getCollectionIdFromExplorationUrl')
       .and.returnValues(collectionId, null);
+    spyOn(urlService, 'getPidFromUrl').and.returnValue(null);
 
     spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
       .and.returnValue(Promise.resolve(new Collection(
@@ -560,6 +621,11 @@ describe('Conversation skin component', () => {
       .and.returnValue(Promise.resolve(explorationResponse));
     spyOn(explorationEngineService, 'getShortestPathToState')
       .and.returnValue(['Start', 'Mid']);
+    spyOn(
+      editableExplorationBackendApiService,
+      'recordProgressAndFetchUniqueProgressIdOfLoggedOutLearner')
+      .and.returnValue(Promise.resolve(
+        {unique_progress_url_id: uniqueProgressIdResponse}));
 
     let mockOnHintConsumed = new EventEmitter();
     let mockOnSolutionViewedEventEmitter = new EventEmitter();
@@ -582,6 +648,7 @@ describe('Conversation skin component', () => {
     componentInstance.displayedCard = displayedCard;
 
     componentInstance.ngOnInit();
+    windowRef.nativeWindow.onresize(null);
 
     mockOnHintConsumed.emit();
     mockOnSolutionViewedEventEmitter.emit();
@@ -594,7 +661,7 @@ describe('Conversation skin component', () => {
     spyOn(alertsService, 'addWarning');
     componentInstance.ngOnInit();
 
-    TestBed.inject(WindowRef).nativeWindow.onresize(null);
+    windowRef.nativeWindow.onresize(null);
     tick(1000);
   }));
 
@@ -617,6 +684,7 @@ describe('Conversation skin component', () => {
         false, false, false, '', '', '', true)));
     spyOn(urlService, 'getCollectionIdFromExplorationUrl')
       .and.returnValues(collectionId, null);
+    spyOn(urlService, 'getPidFromUrl').and.returnValue(null);
 
     spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
       .and.returnValue(Promise.resolve(new Collection(
@@ -673,6 +741,189 @@ describe('Conversation skin component', () => {
     componentInstance.displayedCard = displayedCard;
 
     componentInstance.ngOnInit();
+    windowRef.nativeWindow.onresize(null);
+    tick(100);
+  }));
+
+  it('should initialize component as logged out user', fakeAsync(() => {
+    let collectionId = 'id';
+    let expId = 'exp_id';
+    let isInPreviewMode = false;
+    let isIframed = false;
+    let collectionSummary = {
+      is_admin: true,
+      summaries: [],
+      user_email: '',
+      is_topic_manager: false,
+      username: true
+    };
+    let expResponse = sampleExpResponse;
+    expResponse.is_logged_in = false;
+    spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve(new UserInfo(
+        [], false, false,
+        false, false, false, '', '', '', false)));
+    spyOn(urlService, 'getCollectionIdFromExplorationUrl')
+      .and.returnValues(collectionId, null);
+    spyOn(urlService, 'getPidFromUrl').and.returnValue(null);
+
+    spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
+      .and.returnValue(Promise.resolve(new Collection(
+        '', '', '', '', [], null, '', 6, 8, [])));
+    spyOn(explorationEngineService, 'getExplorationId').and.returnValue(expId);
+    spyOn(explorationEngineService, 'isInPreviewMode')
+      .and.returnValue(isInPreviewMode);
+    spyOn(urlService, 'isIframed').and.returnValue(isIframed);
+    spyOn(loaderService, 'showLoadingScreen');
+    spyOn(urlInterpolationService, 'getStaticImageUrl')
+      .and.returnValue('oppia_avatar_url');
+    spyOn(explorationPlayerStateService, 'isInQuestionPlayerMode')
+      .and.returnValues(true, false);
+    spyOn(componentInstance, 'initializePage');
+    spyOn(collectionPlayerBackendApiService, 'fetchCollectionSummariesAsync')
+      .and.returnValue(
+        Promise.resolve(collectionSummary));
+    spyOn(questionPlayerStateService, 'hintUsed');
+    spyOn(questionPlayerEngineService, 'getCurrentQuestion');
+    spyOn(questionPlayerStateService, 'solutionViewed');
+    spyOn(imagePreloaderService, 'onStateChange');
+    spyOn(statsReportingService, 'recordExplorationCompleted');
+    spyOn(statsReportingService, 'recordExplorationActuallyStarted');
+    spyOn(
+      guestCollectionProgressService, 'recordExplorationCompletedInCollection');
+    spyOn(componentInstance, 'doesCollectionAllowsGuestProgress')
+      .and.returnValue(true);
+    spyOn(statsReportingService, 'recordMaybeLeaveEvent');
+    spyOn(playerTranscriptService, 'getLastStateName').and.returnValue('');
+    spyOn(learnerParamsService, 'getAllParams').and.returnValue({});
+    spyOn(messengerService, 'sendMessage');
+    spyOn(readOnlyExplorationBackendApiService, 'loadLatestExplorationAsync')
+      .and.returnValue(Promise.resolve(expResponse));
+    spyOn(
+      editableExplorationBackendApiService,
+      'recordProgressAndFetchUniqueProgressIdOfLoggedOutLearner')
+      .and.returnValue(Promise.resolve(
+        {unique_progress_url_id: uniqueProgressIdResponse}));
+
+    let mockOnHintConsumed = new EventEmitter();
+    let mockOnSolutionViewedEventEmitter = new EventEmitter();
+    let mockOnPlayerStateChange = new EventEmitter();
+
+    spyOnProperty(hintsAndSolutionManagerService, 'onHintConsumed')
+      .and.returnValue(mockOnHintConsumed);
+    spyOnProperty(
+      hintsAndSolutionManagerService, 'onSolutionViewedEventEmitter')
+      .and.returnValue(mockOnSolutionViewedEventEmitter);
+    spyOnProperty(explorationPlayerStateService, 'onPlayerStateChange')
+      .and.returnValue(mockOnPlayerStateChange);
+
+    componentInstance.nextCard = new StateCard(
+      null, null, null, new Interaction(
+        [], [], null, null, [], 'EndExploration', null),
+      [], null, null, '', null);
+    componentInstance.isLoggedIn = false;
+    componentInstance.isIframed = false;
+    componentInstance.hasInteractedAtLeastOnce = true;
+    componentInstance.displayedCard = displayedCard;
+
+    componentInstance.ngOnInit();
+    windowRef.nativeWindow.onresize(null);
+    tick(100);
+  }));
+
+  it('should convert logged out progress to logged in progress when user ' +
+  'signs in', fakeAsync(() => {
+    let collectionId = 'id';
+    let expId = 'exp_id';
+    let isInPreviewMode = false;
+    let isIframed = false;
+    let collectionSummary = {
+      is_admin: true,
+      summaries: [],
+      user_email: '',
+      is_topic_manager: false,
+      username: true
+    };
+    spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve(new UserInfo(
+        [], false, false,
+        false, false, false, '', '', '', true)));
+    spyOn(urlService, 'getCollectionIdFromExplorationUrl')
+      .and.returnValues(collectionId, null);
+    spyOn(urlService, 'getPidFromUrl').and.returnValue(null);
+
+    spyOn(readOnlyCollectionBackendApiService, 'loadCollectionAsync')
+      .and.returnValue(Promise.resolve(new Collection(
+        '', '', '', '', [], null, '', 6, 8, [])));
+    spyOn(explorationEngineService, 'getExplorationId').and.returnValue(expId);
+    spyOn(explorationEngineService, 'isInPreviewMode')
+      .and.returnValue(isInPreviewMode);
+    spyOn(urlService, 'isIframed').and.returnValue(isIframed);
+    spyOn(loaderService, 'showLoadingScreen');
+    spyOn(urlInterpolationService, 'getStaticImageUrl')
+      .and.returnValue('oppia_avatar_url');
+    spyOn(explorationPlayerStateService, 'isInQuestionPlayerMode')
+      .and.returnValues(true, false);
+    spyOn(componentInstance, 'initializePage');
+    spyOn(collectionPlayerBackendApiService, 'fetchCollectionSummariesAsync')
+      .and.returnValue(
+        Promise.resolve(collectionSummary));
+    spyOn(questionPlayerStateService, 'hintUsed');
+    spyOn(questionPlayerEngineService, 'getCurrentQuestion');
+    spyOn(questionPlayerStateService, 'solutionViewed');
+    spyOn(imagePreloaderService, 'onStateChange');
+    spyOn(statsReportingService, 'recordExplorationCompleted');
+    spyOn(statsReportingService, 'recordExplorationActuallyStarted');
+    spyOn(
+      guestCollectionProgressService, 'recordExplorationCompletedInCollection');
+    spyOn(componentInstance, 'doesCollectionAllowsGuestProgress')
+      .and.returnValue(true);
+    spyOn(statsReportingService, 'recordMaybeLeaveEvent');
+    spyOn(playerTranscriptService, 'getLastStateName').and.returnValue('');
+    spyOn(learnerParamsService, 'getAllParams').and.returnValue({});
+    spyOn(messengerService, 'sendMessage');
+    spyOn(readOnlyExplorationBackendApiService, 'loadLatestExplorationAsync')
+      .and.returnValue(Promise.resolve(sampleExpResponse));
+    spyOn(
+      editableExplorationBackendApiService,
+      'changeLoggedOutProgressToLoggedInProgressAsync')
+      .and.returnValue(Promise.resolve());
+
+    let mockOnHintConsumed = new EventEmitter();
+    let mockOnSolutionViewedEventEmitter = new EventEmitter();
+    let mockOnPlayerStateChange = new EventEmitter();
+
+    spyOnProperty(hintsAndSolutionManagerService, 'onHintConsumed')
+      .and.returnValue(mockOnHintConsumed);
+    spyOnProperty(
+      hintsAndSolutionManagerService, 'onSolutionViewedEventEmitter')
+      .and.returnValue(mockOnSolutionViewedEventEmitter);
+    spyOnProperty(explorationPlayerStateService, 'onPlayerStateChange')
+      .and.returnValue(mockOnPlayerStateChange);
+    spyOn(localStorageService, 'getUniqueProgressIdOfLoggedOutLearner')
+      .and.returnValue('abcdef');
+    spyOn(localStorageService, 'removeUniqueProgressIdOfLoggedOutLearner');
+
+    componentInstance.nextCard = new StateCard(
+      null, null, null, new Interaction(
+        [], [], null, null, [], 'EndExploration', null),
+      [], null, null, '', null);
+    componentInstance.isLoggedIn = true;
+    componentInstance.isIframed = false;
+    componentInstance.hasInteractedAtLeastOnce = true;
+    componentInstance.displayedCard = displayedCard;
+
+    componentInstance.ngOnInit();
+    tick(100);
+
+    expect(
+      editableExplorationBackendApiService
+        .changeLoggedOutProgressToLoggedInProgressAsync).toHaveBeenCalled();
+    expect(
+      localStorageService.
+        removeUniqueProgressIdOfLoggedOutLearner).toHaveBeenCalled();
   }));
 
   it('should show alert when collection summaries are not loaded',
@@ -684,6 +935,9 @@ describe('Conversation skin component', () => {
       spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(true);
       spyOn(urlService, 'getCollectionIdFromExplorationUrl').and.returnValue(
         'collection_id');
+      spyOn(urlService, 'getPidFromUrl').and.returnValue(null);
+      spyOn(localStorageService, 'getUniqueProgressIdOfLoggedOutLearner')
+        .and.returnValue(null);
       spyOn(collectionPlayerBackendApiService, 'fetchCollectionSummariesAsync')
         .and.returnValue(Promise.reject());
       spyOn(alertsService, 'addWarning');
@@ -765,6 +1019,7 @@ describe('Conversation skin component', () => {
     spyOn(explorationPlayerStateService.onPlayerStateChange, 'emit');
     spyOn(focusManagerService, 'setFocusIfOnDesktop');
     spyOn(loaderService, 'hideLoadingScreen');
+    spyOn(urlService, 'getPidFromUrl').and.returnValue(null);
     spyOn(explorationPlayerStateService, 'getLanguageCode')
       .and.returnValues('en', 'en', 'en', 'pq');
     spyOn(explorationPlayerStateService, 'initializeQuestionPlayer')
@@ -803,6 +1058,7 @@ describe('Conversation skin component', () => {
     componentInstance.isLoggedIn = true;
     componentInstance.isIframed = false;
     componentInstance.alertMessageTimeout = 5;
+    componentInstance.CHECKPOINTS_FEATURE_IS_ENABLED = true;
 
     componentInstance.initializePage();
     tick(100);
@@ -880,13 +1136,6 @@ describe('Conversation skin component', () => {
 
     expect(componentInstance.getContentFocusLabel(index)).toEqual(
       ExplorationPlayerConstants.CONTENT_FOCUS_LABEL_PREFIX + index);
-  });
-
-  it('should tell if language is RTL', () => {
-    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL')
-      .and.returnValue(true);
-
-    expect(componentInstance.isLanguageRTL()).toBeTrue();
   });
 
   it('should reload exploration', () => {
@@ -1554,5 +1803,16 @@ describe('Conversation skin component', () => {
     componentInstance.showProgressClearanceMessage = true;
 
     expect(componentInstance.isProgressClearanceMessageShown()).toBeTrue();
+  });
+
+  it('should update when submit button is enabled', () => {
+    componentInstance.submitButtonIsDisabled = false;
+    spyOn(componentInstance, 'isSubmitButtonDisabled').and.returnValue(
+      !componentInstance.submitButtonIsDisabled);
+
+    componentInstance.ngAfterViewChecked();
+
+    expect(componentInstance.submitButtonIsDisabled).toBeTrue();
+    expect(componentInstance.isSubmitButtonDisabled).toHaveBeenCalled();
   });
 });

@@ -28,7 +28,7 @@ from core.tests import test_utils
 from typing import Dict, List, Optional, Union
 from typing_extensions import Final
 
-ServerModes = parameter_domain.ServerModes
+ServerMode = parameter_domain.ServerMode
 
 
 class PlatformParameterChangeTests(test_utils.GenericTestBase):
@@ -65,22 +65,24 @@ class PlatformParameterChangeTests(test_utils.GenericTestBase):
     def test_param_change_object_with_extra_attribute_in_cmd_raises_exception(
         self
     ) -> None:
+        param_change_dict: Dict[str, Union[str, List[str]]] = {
+            'cmd': self.CMD_EDIT_RULES,
+            'new_rules': [],
+            'invalid': 'invalid'
+        }
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'The following extra attributes are present: invalid'):
-            parameter_domain.PlatformParameterChange({
-                'cmd': self.CMD_EDIT_RULES,
-                'new_rules': [],
-                'invalid': 'invalid'
-            })
+            parameter_domain.PlatformParameterChange(param_change_dict)
 
     def test_param_change_object_with_valid_data_success(self) -> None:
+        param_change_dict: Dict[str, Union[str, List[str]]] = {
+            'cmd': self.CMD_EDIT_RULES,
+            'new_rules': []
+        }
         param_change_object = (
-            parameter_domain.PlatformParameterChange({
-                'cmd': self.CMD_EDIT_RULES,
-                'new_rules': []
-            }))
-
+            parameter_domain.PlatformParameterChange(param_change_dict)
+        )
         self.assertEqual(
             param_change_object.cmd, self.CMD_EDIT_RULES)
         self.assertEqual(
@@ -109,13 +111,13 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'app_version': '1.0.0',
             },
             {
-                'server_mode': ServerModes.DEV,
+                'server_mode': ServerMode.DEV,
             },
         )
         self.assertEqual(context.platform_type, 'Android')
         self.assertEqual(context.browser_type, None)
         self.assertEqual(context.app_version, '1.0.0')
-        self.assertEqual(context.server_mode, ServerModes.DEV)
+        self.assertEqual(context.server_mode, ServerMode.DEV)
 
     def test_is_valid_with_invalid_platform_type_returns_false(self) -> None:
         context = parameter_domain.EvaluationContext.from_dict(
@@ -125,7 +127,7 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'app_version': '1.0.0',
             },
             {
-                'server_mode': ServerModes.DEV,
+                'server_mode': ServerMode.DEV,
             },
         )
         self.assertFalse(context.is_valid)
@@ -138,7 +140,7 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'app_version': '1.0.0',
             },
             {
-                'server_mode': ServerModes.DEV,
+                'server_mode': ServerMode.DEV,
             },
         )
         self.assertTrue(context.is_valid)
@@ -151,7 +153,7 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'app_version': None,
             },
             {
-                'server_mode': ServerModes.DEV,
+                'server_mode': ServerMode.DEV,
             },
         )
         self.assertTrue(context.is_valid)
@@ -164,7 +166,7 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'app_version': '3.0.0',
             },
             {
-                'server_mode': ServerModes.DEV,
+                'server_mode': ServerMode.DEV,
             },
         )
         self.assertTrue(context.is_valid)
@@ -177,7 +179,7 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'app_version': '1.0.0',
             },
             {
-                'server_mode': ServerModes.DEV,
+                'server_mode': ServerMode.DEV,
             },
         )
         context.validate()
@@ -192,7 +194,7 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'app_version': '1.0.0',
             },
             {
-                'server_mode': ServerModes.DEV,
+                'server_mode': ServerMode.DEV,
             },
         )
         # No exception should be raised since invalid platform types are
@@ -207,7 +209,7 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'app_version': '1.0.0',
             },
             {
-                'server_mode': ServerModes.DEV,
+                'server_mode': ServerMode.DEV,
             },
         )
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
@@ -222,7 +224,7 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'app_version': 'a.a.a',
             },
             {
-                'server_mode': ServerModes.DEV,
+                'server_mode': ServerMode.DEV,
             },
         )
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
@@ -239,7 +241,7 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'app_version': '1.0.0.0',
             },
             {
-                'server_mode': ServerModes.DEV,
+                'server_mode': ServerMode.DEV,
             },
         )
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
@@ -256,7 +258,7 @@ class EvaluationContextTests(test_utils.GenericTestBase):
                 'app_version': '1.0.0-abcedef-invalid',
             },
             {
-                'server_mode': ServerModes.DEV,
+                'server_mode': ServerMode.DEV,
             },
         )
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
@@ -274,7 +276,7 @@ class EvaluationContextTests(test_utils.GenericTestBase):
             },
             {
                 # The expected type of 'server_mode' key is Enum defined under
-                # the name ServerModes, but for testing purpose we are providing
+                # the name ServerMode, but for testing purpose we are providing
                 # namedtuple (MockEnum) which causes MyPy to throw error. Thus
                 # to avoid the error, we used ignore here.
                 'server_mode': mock_enum,  # type: ignore[typeddict-item]
@@ -306,7 +308,7 @@ class PlatformParameterFilterTests(test_utils.GenericTestBase):
                 'app_version': app_version,
             },
             {
-                'server_mode': getattr(ServerModes, mode),
+                'server_mode': getattr(ServerMode, mode),
             },
         )
 
@@ -1526,7 +1528,7 @@ class PlatformParameterRuleTests(test_utils.GenericTestBase):
                 'app_version': '1.2.3',
             },
             {
-                'server_mode': ServerModes.DEV,
+                'server_mode': ServerMode.DEV,
             },
         )
         self.assertTrue(rule.evaluate(context))
@@ -1548,7 +1550,7 @@ class PlatformParameterRuleTests(test_utils.GenericTestBase):
                 'app_version': '1.2.3',
             },
             {
-                'server_mode': ServerModes.DEV,
+                'server_mode': ServerMode.DEV,
             },
         )
         self.assertFalse(rule.evaluate(context))
@@ -1889,7 +1891,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                 'app_version': '1.2.3',
             },
             {
-                'server_mode': ServerModes.DEV,
+                'server_mode': ServerMode.DEV,
             },
         )
         self.assertEqual(parameter.evaluate(dev_context), '222')
@@ -1924,7 +1926,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                 'app_version': '1.2.3',
             },
             {
-                'server_mode': ServerModes.PROD,
+                'server_mode': ServerMode.PROD,
             },
         )
         self.assertEqual(parameter.evaluate(prod_context), '111')
@@ -1961,7 +1963,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                 'app_version': '1.2.3',
             },
             {
-                'server_mode': ServerModes.DEV,
+                'server_mode': ServerMode.DEV,
             },
         )
         self.assertEqual(parameter.evaluate(dev_context), '111')
@@ -1998,7 +2000,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
                 'app_version': '1.2.3',
             },
             {
-                'server_mode': ServerModes.DEV,
+                'server_mode': ServerMode.DEV,
             },
         )
         self.assertEqual(parameter.evaluate(dev_context), '111')
