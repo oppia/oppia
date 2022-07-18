@@ -171,11 +171,12 @@ class ExpStateAuditChecksJob(base_jobs.JobBase):
                         f'{default_outcome.refresher_exploration_id}'
                     )
 
-            states_with_values.append(
-                {'state_name': state_name,
-                'invalid_refresher_exploration_id': (
-                    invalid_refresher_exploration_id)
-                }
+            if len(invalid_refresher_exploration_id) > 0:
+                states_with_values.append(
+                    {'state_name': state_name,
+                    'invalid_refresher_exploration_id': (
+                        invalid_refresher_exploration_id)
+                    }
             )
 
         return states_with_values
@@ -215,12 +216,13 @@ class ExpStateAuditChecksJob(base_jobs.JobBase):
                         f'than 20 or it is None, the value is {str(text_value)}'
                     )
 
-            states_with_values.append(
-                {
-                    'state_name': state_name,
-                    'continue_interaction_invalid_values': (
-                        continue_interaction_invalid_values)
-                }
+            if len(continue_interaction_invalid_values) > 0:
+                states_with_values.append(
+                    {
+                        'state_name': state_name,
+                        'continue_interaction_invalid_values': (
+                            continue_interaction_invalid_values)
+                    }
             )
 
         return states_with_values
@@ -270,14 +272,15 @@ class ExpStateAuditChecksJob(base_jobs.JobBase):
                                     f'or greter than max_selection_value.'
                                 )
 
-            states_with_values.append(
-                {
-                    'state_name': state_name,
-                    'item_selec_interaction_values': (
-                        item_selec_interaction_values
-                    )
-                }
-            )
+            if len(item_selec_interaction_values) > 0:
+                states_with_values.append(
+                    {
+                        'state_name': state_name,
+                        'item_selec_interaction_values': (
+                            item_selec_interaction_values
+                        )
+                    }
+                )
 
         return states_with_values
 
@@ -346,14 +349,15 @@ class ExpStateAuditChecksJob(base_jobs.JobBase):
                                     f'setting is turned off.'
                                 )
 
-            states_with_values.append(
-                {
-                    'state_name': state_name,
-                    'drag_drop_interaction_values': (
-                        drag_drop_interaction_values
-                    )
-                }
-            )
+            if len(drag_drop_interaction_values) > 0:
+                states_with_values.append(
+                    {
+                        'state_name': state_name,
+                        'drag_drop_interaction_values': (
+                            drag_drop_interaction_values
+                        )
+                    }
+                )
 
         return states_with_values
 
@@ -454,12 +458,13 @@ class ExpStateAuditChecksJob(base_jobs.JobBase):
                             f'having value {file_with_value}.'
                         )
 
-            states_with_values.append(
-                {
-                    'state_name': state_name,
-                    'rte_image_errors': rte_image_errors
-                }
-            )
+            if len(rte_image_errors) > 0:
+                states_with_values.append(
+                    {
+                        'state_name': state_name,
+                        'rte_image_errors': rte_image_errors
+                    }
+                )
         return states_with_values
 
     @staticmethod
@@ -516,40 +521,14 @@ class ExpStateAuditChecksJob(base_jobs.JobBase):
                             f'is greater than end value {float(end_value)}'
                         )
 
-            states_with_values.append(
-                {
-                    'state_name': state_name,
-                    'rte_video_errors': rte_video_errors
-                }
-            )
+            if len(rte_video_errors) > 0:
+                states_with_values.append(
+                    {
+                        'state_name': state_name,
+                        'rte_video_errors': rte_video_errors
+                    }
+                )
         return states_with_values
-
-    @staticmethod
-    def remove_empty_values(
-        errored_values: List[dict[str, list]]
-    ) -> List[Dict[str, List[Dict[str, List[str]]]]]:
-        """Remove the empty arrays
-
-        Args:
-            errored_values: list[dict]. The list of dictionaries
-                containing the errored values.
-
-        Returns:
-            errored_values: list[dict]. The list of dictionaries
-            containing the errored values with removed empty.
-        """
-        values_to_remove = []
-        for ele in errored_values:
-            for key, value in list(ele.items()):
-                if len(value) == 0:
-                    ele.pop(key)
-            if len(ele) == 1:
-                values_to_remove.append(ele)
-
-        for ele in values_to_remove:
-            errored_values.remove(ele)
-
-        return errored_values
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         all_explorations = (
@@ -655,15 +634,9 @@ class ExpStateAuditChecksJob(base_jobs.JobBase):
                 lambda exp_id, exp_states, exp_created_on: (
                     exp_id,
                     self.filter_invalid_ref_exp_id(exp_states),
-                    exp_created_on))
-            | 'Remove empty values for ref exp id' >> beam.MapTuple(
-                lambda exp_id, exp_ref_errors, exp_created_on: (
-                    exp_id, self.remove_empty_values(exp_ref_errors),
-                    exp_created_on.date()
-                )
-            )
-            | 'Filter invalid curated exps for ref exp id' >> beam.Filter(
-                lambda exp_values: len(exp_values[1]) > 0
+                    exp_created_on.date()))
+            | 'Remove empty values for ref exp id' >> beam.Filter(
+                lambda exp: len(exp[1]) > 0
             )
         )
 
@@ -694,17 +667,10 @@ class ExpStateAuditChecksJob(base_jobs.JobBase):
                 lambda exp_id, exp_states, exp_created_on: (
                     exp_id,
                     self.filter_invalid_ref_exp_id(exp_states),
-                    exp_created_on))
+                    exp_created_on.date()))
             | 'Remove empty private exps having invalid ref_exp_id'
-            >> beam.MapTuple(
-                lambda exp_id, exp_ref_errors, exp_created_on: (
-                    exp_id, self.remove_empty_values(exp_ref_errors),
-                    exp_created_on.date()
-                )
-            )
-            | 'Filter invalid private exps having invalid ref_exp_id'
             >> beam.Filter(
-                lambda exp_values: len(exp_values[1]) > 0
+                lambda exp: len(exp[1]) > 0
             )
         )
 
@@ -736,17 +702,10 @@ class ExpStateAuditChecksJob(base_jobs.JobBase):
                 lambda exp_id, exp_states, exp_created_on: (
                     exp_id,
                     self.filter_invalid_ref_exp_id(exp_states),
-                    exp_created_on))
+                    exp_created_on.date()))
             | 'Remove empty public exps having invalid ref_exp_id'
-            >> beam.MapTuple(
-                lambda exp_id, exp_ref_errors, exp_created_on: (
-                    exp_id, self.remove_empty_values(exp_ref_errors),
-                    exp_created_on.date()
-                )
-            )
-            | 'Filter invalid public exps having invalid ref_exp_id'
             >> beam.Filter(
-                lambda exp_values: len(exp_values[1]) > 0
+                lambda exp: len(exp[1]) > 0
             )
         )
 
@@ -778,15 +737,10 @@ class ExpStateAuditChecksJob(base_jobs.JobBase):
                 lambda exp_id, exp_states, exp_created_on: (
                     exp_id,
                     self.filter_invalid_cont_interac(exp_states),
-                    exp_created_on))
-            | 'Remove empty values for cont interac' >> beam.MapTuple(
-                lambda exp_id, exp_cont_errors, exp_created_on: (
-                    exp_id, self.remove_empty_values(exp_cont_errors),
-                    exp_created_on.date()
-                )
-            )
-            | 'Filter invalid curated exps for cont interac' >> beam.Filter(
-                lambda exp_values: len(exp_values[1]) > 0
+                    exp_created_on.date()))
+            | 'Remove empty values for curated exp cont interac'
+            >> beam.Filter(
+                lambda exp: len(exp[1]) > 0
             )
         )
 
@@ -817,17 +771,10 @@ class ExpStateAuditChecksJob(base_jobs.JobBase):
                 lambda exp_id, exp_states, exp_created_on: (
                     exp_id,
                     self.filter_invalid_cont_interac(exp_states),
-                    exp_created_on))
-            | 'Remove empty private exps having invalid cont interac'
-            >> beam.MapTuple(
-                lambda exp_id, exp_cont_errors, exp_created_on: (
-                    exp_id, self.remove_empty_values(exp_cont_errors),
-                    exp_created_on.date()
-                )
-            )
-            | 'Filter invalid private exps having invalid cont interac'
+                    exp_created_on.date()))
+            | 'Remove empty values for private exp cont interac'
             >> beam.Filter(
-                lambda exp_values: len(exp_values[1]) > 0
+                lambda exp: len(exp[1]) > 0
             )
         )
 
@@ -859,17 +806,10 @@ class ExpStateAuditChecksJob(base_jobs.JobBase):
                 lambda exp_id, exp_states, exp_created_on: (
                     exp_id,
                     self.filter_invalid_cont_interac(exp_states),
-                    exp_created_on))
-            | 'Remove empty public exps having invalid cont interac'
-            >> beam.MapTuple(
-                lambda exp_id, exp_cont_errors, exp_created_on: (
-                    exp_id, self.remove_empty_values(exp_cont_errors),
-                    exp_created_on.date()
-                )
-            )
-            | 'Filter invalid public exps having invalid cont interac'
+                    exp_created_on.date()))
+            | 'Remove empty values for public exp cont interac'
             >> beam.Filter(
-                lambda exp_values: len(exp_values[1]) > 0
+                lambda exp: len(exp[1]) > 0
             )
         )
 
@@ -902,16 +842,10 @@ class ExpStateAuditChecksJob(base_jobs.JobBase):
                 lambda exp_id, exp_states, exp_created_on: (
                     exp_id,
                     self.filter_invalid_item_selec_interac(exp_states),
-                    exp_created_on))
-            | 'Remove empty values for item selec interac' >> beam.MapTuple(
-                lambda exp_id, exp_item_errors, exp_created_on: (
-                    exp_id, self.remove_empty_values(exp_item_errors),
-                    exp_created_on.date()
-                )
-            )
-            | 'Filter invalid curated exps for item selec interac'
+                    exp_created_on.date()))
+            | 'Remove empty values for curated exp item selec interac'
             >> beam.Filter(
-                lambda exp_values: len(exp_values[1]) > 0
+                lambda exp: len(exp[1]) > 0
             )
         )
 
@@ -946,17 +880,10 @@ class ExpStateAuditChecksJob(base_jobs.JobBase):
                 lambda exp_id, exp_states, exp_created_on: (
                     exp_id,
                     self.filter_invalid_item_selec_interac(exp_states),
-                    exp_created_on))
+                    exp_created_on.date()))
             | 'Remove empty values for private exp item selec interac'
-            >> beam.MapTuple(
-                lambda exp_id, exp_item_errors, exp_created_on: (
-                    exp_id, self.remove_empty_values(exp_item_errors),
-                    exp_created_on.date()
-                )
-            )
-            | 'Filter invalid private exps for item selec interac'
             >> beam.Filter(
-                lambda exp_values: len(exp_values[1]) > 0
+                lambda exp: len(exp[1]) > 0
             )
         )
 
@@ -991,17 +918,10 @@ class ExpStateAuditChecksJob(base_jobs.JobBase):
                 lambda exp_id, exp_states, exp_created_on: (
                     exp_id,
                     self.filter_invalid_item_selec_interac(exp_states),
-                    exp_created_on))
+                    exp_created_on.date()))
             | 'Remove empty values for public exp item selec interac'
-            >> beam.MapTuple(
-                lambda exp_id, exp_item_errors, exp_created_on: (
-                    exp_id, self.remove_empty_values(exp_item_errors),
-                    exp_created_on.date()
-                )
-            )
-            | 'Filter invalid public exps for item selec interac'
             >> beam.Filter(
-                lambda exp_values: len(exp_values[1]) > 0
+                lambda exp: len(exp[1]) > 0
             )
         )
 
@@ -1036,16 +956,10 @@ class ExpStateAuditChecksJob(base_jobs.JobBase):
                 lambda exp_id, exp_states, exp_created_on: (
                     exp_id,
                     self.filter_invalid_drag_drop_interac(exp_states),
-                    exp_created_on))
-            | 'Remove empty values for drag drop interac' >> beam.MapTuple(
-                lambda exp_id, exp_drag_errors, exp_created_on: (
-                    exp_id, self.remove_empty_values(exp_drag_errors),
-                    exp_created_on.date()
-                )
-            )
-            | 'Filter invalid curated exps for drag drop interac'
+                    exp_created_on.date()))
+            | 'Remove empty values for drag drop interac'
             >> beam.Filter(
-                lambda exp_values: len(exp_values[1]) > 0
+                lambda exp: len(exp[1]) > 0
             )
         )
 
@@ -1080,17 +994,10 @@ class ExpStateAuditChecksJob(base_jobs.JobBase):
                 lambda exp_id, exp_states, exp_created_on: (
                     exp_id,
                     self.filter_invalid_drag_drop_interac(exp_states),
-                    exp_created_on))
+                    exp_created_on.date()))
             | 'Remove empty values for private exp drag drop interac'
-            >> beam.MapTuple(
-                lambda exp_id, exp_drag_errors, exp_created_on: (
-                    exp_id, self.remove_empty_values(exp_drag_errors),
-                    exp_created_on.date()
-                )
-            )
-            | 'Filter invalid private exps for drag drop interac'
             >> beam.Filter(
-                lambda exp_values: len(exp_values[1]) > 0
+                lambda exp: len(exp[1]) > 0
             )
         )
 
@@ -1125,17 +1032,10 @@ class ExpStateAuditChecksJob(base_jobs.JobBase):
                 lambda exp_id, exp_states, exp_created_on: (
                     exp_id,
                     self.filter_invalid_drag_drop_interac(exp_states),
-                    exp_created_on))
+                    exp_created_on.date()))
             | 'Remove empty values for public exp drag drop interac'
-            >> beam.MapTuple(
-                lambda exp_id, exp_drag_errors, exp_created_on: (
-                    exp_id, self.remove_empty_values(exp_drag_errors),
-                    exp_created_on.date()
-                )
-            )
-            | 'Filter invalid public exps for drag drop interac'
             >> beam.Filter(
-                lambda exp_values: len(exp_values[1]) > 0
+                lambda exp: len(exp[1]) > 0
             )
         )
 
@@ -1170,16 +1070,10 @@ class ExpStateAuditChecksJob(base_jobs.JobBase):
                 lambda exp_id, exp_states, exp_created_on: (
                     exp_id,
                     self.filter_invalid_rte_image_tag(exp_states),
-                    exp_created_on))
-            | 'Remove empty values for rte image tag' >> beam.MapTuple(
-                lambda exp_id, exp_image_errors, exp_created_on: (
-                    exp_id, self.remove_empty_values(exp_image_errors),
-                    exp_created_on.date()
-                )
-            )
-            | 'Filter invalid curated exps for rte image tag'
+                    exp_created_on.date()))
+            | 'Remove empty values for rte image tag'
             >> beam.Filter(
-                lambda exp_values: len(exp_values[1]) > 0
+                lambda exp: len(exp[1]) > 0
             )
         )
 
@@ -1214,17 +1108,10 @@ class ExpStateAuditChecksJob(base_jobs.JobBase):
                 lambda exp_id, exp_states, exp_created_on: (
                     exp_id,
                     self.filter_invalid_rte_image_tag(exp_states),
-                    exp_created_on))
+                    exp_created_on.date()))
             | 'Remove empty values for private exp rte image tag'
-            >> beam.MapTuple(
-                lambda exp_id, exp_image_errors, exp_created_on: (
-                    exp_id, self.remove_empty_values(exp_image_errors),
-                    exp_created_on.date()
-                )
-            )
-            | 'Filter invalid private exps for rte image tag'
             >> beam.Filter(
-                lambda exp_values: len(exp_values[1]) > 0
+                lambda exp: len(exp[1]) > 0
             )
         )
 
@@ -1259,17 +1146,10 @@ class ExpStateAuditChecksJob(base_jobs.JobBase):
                 lambda exp_id, exp_states, exp_created_on: (
                     exp_id,
                     self.filter_invalid_rte_image_tag(exp_states),
-                    exp_created_on))
+                    exp_created_on.date()))
             | 'Remove empty values for public exp rte image tag'
-            >> beam.MapTuple(
-                lambda exp_id, exp_image_errors, exp_created_on: (
-                    exp_id, self.remove_empty_values(exp_image_errors),
-                    exp_created_on.date()
-                )
-            )
-            | 'Filter invalid public exps for rte image tag'
             >> beam.Filter(
-                lambda exp_values: len(exp_values[1]) > 0
+                lambda exp: len(exp[1]) > 0
             )
         )
 
@@ -1304,16 +1184,10 @@ class ExpStateAuditChecksJob(base_jobs.JobBase):
                 lambda exp_id, exp_states, exp_created_on: (
                     exp_id,
                     self.filter_invalid_rte_video_tag(exp_states),
-                    exp_created_on))
-            | 'Remove empty values for rte video tag' >> beam.MapTuple(
-                lambda exp_id, exp_video_errors, exp_created_on: (
-                    exp_id, self.remove_empty_values(exp_video_errors),
-                    exp_created_on.date()
-                )
-            )
-            | 'Filter invalid curated exps for rte video tag'
+                    exp_created_on.date()))
+            | 'Remove empty values for rte video tag'
             >> beam.Filter(
-                lambda exp_values: len(exp_values[1]) > 0
+                lambda exp: len(exp[1]) > 0
             )
         )
 
@@ -1348,17 +1222,10 @@ class ExpStateAuditChecksJob(base_jobs.JobBase):
                 lambda exp_id, exp_states, exp_created_on: (
                     exp_id,
                     self.filter_invalid_rte_video_tag(exp_states),
-                    exp_created_on))
+                    exp_created_on.date()))
             | 'Remove empty values for private exp rte video tag'
-            >> beam.MapTuple(
-                lambda exp_id, exp_video_errors, exp_created_on: (
-                    exp_id, self.remove_empty_values(exp_video_errors),
-                    exp_created_on.date()
-                )
-            )
-            | 'Filter invalid private exps for rte video tag'
             >> beam.Filter(
-                lambda exp_values: len(exp_values[1]) > 0
+                lambda exp: len(exp[1]) > 0
             )
         )
 
@@ -1393,17 +1260,10 @@ class ExpStateAuditChecksJob(base_jobs.JobBase):
                 lambda exp_id, exp_states, exp_created_on: (
                     exp_id,
                     self.filter_invalid_rte_video_tag(exp_states),
-                    exp_created_on))
+                    exp_created_on.date()))
             | 'Remove empty values for public exp rte video tag'
-            >> beam.MapTuple(
-                lambda exp_id, exp_video_errors, exp_created_on: (
-                    exp_id, self.remove_empty_values(exp_video_errors),
-                    exp_created_on.date()
-                )
-            )
-            | 'Filter invalid public exps for rte video tag'
             >> beam.Filter(
-                lambda exp_values: len(exp_values[1]) > 0
+                lambda exp: len(exp[1]) > 0
             )
         )
 
