@@ -23,7 +23,7 @@ var action = require('./action.js');
 var SubTopicViewerPage = function() {
   var conceptCardExplanation = $('.e2e-test-concept-card-explanation');
   var conceptCardListSelector = function() {
-    return $$('.e2e-test-subtopic-tile');
+    return $$('.e2e-test-concept-card-link');
   };
   var subTopicTileListSelector = function() {
     return $$('.e2e-test-subtopic-tile');
