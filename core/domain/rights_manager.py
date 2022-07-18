@@ -478,7 +478,7 @@ def get_collection_rights(
 
 @overload
 def get_collection_rights(
-    collection_id: str, *, strict: bool = True
+    collection_id: str, *, strict: bool = False
 ) -> Optional[rights_domain.ActivityRights]: ...
 
 

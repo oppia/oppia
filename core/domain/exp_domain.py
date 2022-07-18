@@ -3826,21 +3826,21 @@ class ExplorationMetadata:
     """Class to represent the exploration metadata properties."""
 
     def __init__(
-    self,
-    title: str,
-    category: str,
-    objective: str,
-    language_code: str,
-    tags: List[str],
-    blurb: str,
-    author_notes: str,
-    states_schema_version: int,
-    init_state_name: str,
-    param_specs: Dict[str, param_domain.ParamSpec],
-    param_changes: List[param_domain.ParamChange],
-    auto_tts_enabled: bool,
-    correctness_feedback_enabled: bool,
-    edits_allowed: bool
+        self,
+        title: str,
+        category: str,
+        objective: str,
+        language_code: str,
+        tags: List[str],
+        blurb: str,
+        author_notes: str,
+        states_schema_version: int,
+        init_state_name: str,
+        param_specs: Dict[str, param_domain.ParamSpec],
+        param_changes: List[param_domain.ParamChange],
+        auto_tts_enabled: bool,
+        correctness_feedback_enabled: bool,
+        edits_allowed: bool
     ) -> None:
         """Initializes an ExplorationMetadata domain object.
 

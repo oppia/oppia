@@ -70,14 +70,10 @@ DEFAULT_SUGGESTION_THREAD_SUBJECT: Final = 'Suggestion from a learner'
 DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE: Final = ''
 
 TARGET_TYPE_TO_TARGET_MODEL: Dict[str, Type[base_models.BaseModel]] = {
-    feconf.ENTITY_TYPE_EXPLORATION: (
-        exp_models.ExplorationModel),
-    feconf.ENTITY_TYPE_QUESTION: (
-        question_models.QuestionModel),
-    feconf.ENTITY_TYPE_SKILL: (
-        skill_models.SkillModel),
-    feconf.ENTITY_TYPE_TOPIC: (
-        topic_models.TopicModel)
+    feconf.ENTITY_TYPE_EXPLORATION: exp_models.ExplorationModel,
+    feconf.ENTITY_TYPE_QUESTION: question_models.QuestionModel,
+    feconf.ENTITY_TYPE_SKILL: skill_models.SkillModel,
+    feconf.ENTITY_TYPE_TOPIC: topic_models.TopicModel
 }
 
 

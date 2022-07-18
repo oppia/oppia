@@ -150,7 +150,7 @@ class ActivityRightsTests(test_utils.GenericTestBase):
             self.owner, None))
 
     def test_check_cannot_publish_activity_with_cloned_from(self) -> None:
-        self.activity_rights.cloned_from = 'True'
+        self.activity_rights.cloned_from = 'abcdefg'
         self.assertFalse(rights_manager.check_can_publish_activity(
             self.owner, self.activity_rights))
 
