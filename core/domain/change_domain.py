@@ -36,7 +36,7 @@ if MYPY: # pragma: no cover
     # After importing modules under the `if MYPY` clause they are not
     # executed at runtime. So, to avoid `attribute is not defined` error
     # at runtime while importing the types from these modules, we defined
-    # `AcceptableChangeDictTypes` under the same `if` clause. So that 
+    # `AcceptableChangeDictTypes` under the same `if` clause. So that
     # `AcceptableChangeDictTypes` is not executed at runtime and do not
     # give any error.
     # Here, `AcceptableChangeDictTypes` is a union type defined from allowed

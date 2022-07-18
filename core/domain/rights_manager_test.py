@@ -873,7 +873,6 @@ class CollectionRightsTests(test_utils.GenericTestBase):
         self.assertFalse(rights_manager.check_can_access_activity(
             self.user_moderator, collection_rights))
 
-
     def test_ownership_of_collection(self) -> None:
         self.save_new_default_collection(self.COLLECTION_ID, self.user_id_a)
 
