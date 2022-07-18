@@ -197,7 +197,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     this.allContributions[this.activeSuggestionId] = (
       this.activeContribution);
 
-    this.init();
+    this.setModalData();
     // The 'html' value is passed as an object as it is required for
     // schema-based-editor. Otherwise the corrrectly updated value for
     // the translation is not received from the editor when the translation
@@ -207,7 +207,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     };
   }
 
-  init(): void {
+  setModalData(): void {
     this.activeContribution = this.allContributions[
       this.activeSuggestionId];
     this.refreshActiveContributionState();
@@ -375,7 +375,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
 
     this.activeSuggestionId = lastContributionId;
 
-    this.init();
+    this.setModalData();
   }
 
   goToPreviousItem(): void {
@@ -392,7 +392,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
 
     this.activeSuggestionId = lastContributionId;
 
-    this.init();
+    this.setModalData();
   }
 
   resolveSuggestionAndUpdateModal(): void {

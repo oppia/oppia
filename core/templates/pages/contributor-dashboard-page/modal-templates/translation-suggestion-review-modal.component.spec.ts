@@ -34,11 +34,6 @@ class MockChangeDetectorRef {
   detectChanges(): void {}
 }
 
-enum ExpansionTabType {
-  CONTENT,
-  TRANSLATION
-}
-
 describe('Translation Suggestion Review Modal Component', function() {
   let fixture: ComponentFixture<TranslationSuggestionReviewModalComponent>;
   let component: TranslationSuggestionReviewModalComponent;
@@ -211,7 +206,7 @@ describe('Translation Suggestion Review Modal Component', function() {
           .returnValue(Promise.resolve(defaultUserInfo));
 
         expect(() => {
-          component.ngOnInit();
+          component.setModalData();
           tick();
         }).toThrowError();
       }));
@@ -414,21 +409,45 @@ describe('Translation Suggestion Review Modal Component', function() {
         expect(component.startedEditing).toBe(false);
       });
 
-    it('should toggle the expansion state for the content area', () => {
+    it('should expand the content area', () => {
       spyOn(component, 'toggleExpansionState').and.callThrough();
+      // The content area is contracted by default.
       expect(component.isContentExpanded).toBeFalse();
-      component.toggleExpansionState(ExpansionTabType.CONTENT);
+      // The content area should expand when the users clicks
+      // on the 'View More' button.
+      component.toggleExpansionState(0);
+
       expect(component.isContentExpanded).toBeTrue();
-      component.toggleExpansionState(ExpansionTabType.CONTENT);
+    });
+
+    it('should contract the content area', () => {
+      spyOn(component, 'toggleExpansionState').and.callThrough();
+      component.isContentExpanded = true;
+      // The content area should contract when the users clicks
+      // on the 'View Less' button.
+      component.toggleExpansionState(0);
+
       expect(component.isContentExpanded).toBeFalse();
     });
 
-    it('should toggle the expansion state for the translation area', () => {
+    it('should expand the translation area', () => {
       spyOn(component, 'toggleExpansionState').and.callThrough();
+      // The translation area is contracted by default.
       expect(component.isTranslationExpanded).toBeFalse();
-      component.toggleExpansionState(ExpansionTabType.TRANSLATION);
+      // The translation area should expand when the users clicks
+      // on the 'View More' button.
+      component.toggleExpansionState(1);
+
       expect(component.isTranslationExpanded).toBeTrue();
-      component.toggleExpansionState(ExpansionTabType.TRANSLATION);
+    });
+
+    it('should contract the translation area', () => {
+      spyOn(component, 'toggleExpansionState').and.callThrough();
+      component.isTranslationExpanded = true;
+      // The translation area should contract when the users clicks
+      // on the 'View Less' button.
+      component.toggleExpansionState(1);
+
       expect(component.isTranslationExpanded).toBeFalse();
     });
 
@@ -594,7 +613,7 @@ describe('Translation Suggestion Review Modal Component', function() {
           .and.returnValue(Promise.resolve({messages: messages}));
 
         component.ngOnInit();
-        component.init();
+        component.setModalData();
         tick();
 
         expect(component.activeSuggestionId).toBe('suggestion_1');
@@ -610,25 +629,27 @@ describe('Translation Suggestion Review Modal Component', function() {
 
     it('should correctly determine whether the panel data is overflowing',
       fakeAsync(() => {
+        // Pre-check.
+        // The default values for the overflow states are false.
         expect(component.isContentOverflowing).toBeFalse();
         expect(component.isTranslationOverflowing).toBeFalse();
-
+        // Setup.
         component.contentPanel.elementRef.nativeElement.offsetHeight = 100;
         component.translationPanel.elementRef.nativeElement.offsetHeight = 200;
         component.contentContainer.nativeElement.offsetHeight = 150;
         component.translationContainer.nativeElement.offsetHeight = 150;
-
+        // Action.
         component.computePanelOverflowState();
         tick(0);
-
+        // Expectations.
         expect(component.isContentOverflowing).toBeFalse();
         expect(component.isTranslationOverflowing).toBeTrue();
-
+        // Change panel height to simulate changing of the modal data.
         component.contentPanel.elementRef.nativeElement.offsetHeight = 300;
-
+        // Action.
         component.computePanelOverflowState();
         tick(0);
-
+        // Expectations.
         expect(component.isContentOverflowing).toBeTrue();
         expect(component.isTranslationOverflowing).toBeTrue();
       }));
@@ -990,7 +1011,7 @@ describe('Translation Suggestion Review Modal Component', function() {
       html: '<p>In Hindi</p>'
     };
 
-    beforeEach(() => {
+    beforeEach(fakeAsync(() => {
       component.initialSuggestionId = 'suggestion_2';
       component.subheading = subheading;
       component.reviewable = reviewable;
@@ -998,7 +1019,8 @@ describe('Translation Suggestion Review Modal Component', function() {
         suggestionIdToContribution);
       component.editedContent = editedContent;
       component.ngOnInit();
-    });
+      tick();
+    }));
 
     it('should get html schema', () => {
       expect(component.getHtmlSchema()).toEqual({
