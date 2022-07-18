@@ -24,6 +24,7 @@ import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { AppConstants } from 'app.constants';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
+import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
 
 interface DeleteValue {
   index: number;
@@ -35,18 +36,21 @@ interface DeleteValue {
   templateUrl: './response-header.component.html'
 })
 export class ResponseHeaderComponent {
-  @Input() index: number;
-  @Input() summary: string;
-  @Input() shortSummary: string;
-  @Input() isActive: boolean;
-  @Input() outcome: Outcome;
-  @Input() numRules: number;
-  @Input() isResponse: boolean;
-  @Input() correctnessFeedbackEnabled: boolean;
-  @Input() showWarning: boolean;
-  @Input() defaultOutcome: boolean;
   @Output() delete = new EventEmitter<DeleteValue>();
   @Output() navigateToState = new EventEmitter<string>();
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() index!: number;
+  @Input() summary!: string;
+  @Input() shortSummary!: string;
+  @Input() isActive!: boolean;
+  @Input() outcome!: Outcome;
+  @Input() numRules!: number;
+  @Input() isResponse!: boolean;
+  @Input() correctnessFeedbackEnabled!: boolean;
+  @Input() showWarning!: boolean;
+  @Input() defaultOutcome!: boolean;
 
   constructor(
     private stateEditorService: StateEditorService,
@@ -62,18 +66,18 @@ export class ResponseHeaderComponent {
     return this.stateEditorService.isInQuestionMode();
   }
 
-  getCurrentInteractionId(): string {
-    return this.stateInteractionIdService.savedMemento;
+  getCurrentInteractionId(): InteractionSpecsKey {
+    return this.stateInteractionIdService.savedMemento as InteractionSpecsKey;
   }
 
   isCorrectnessFeedbackEnabled(): boolean {
     return this.stateEditorService.getCorrectnessFeedbackEnabled();
   }
 
-  // This returns false if the current interaction ID is null.
   isCurrentInteractionLinear(): boolean {
-    const interactionId = this.getCurrentInteractionId();
-    return interactionId && INTERACTION_SPECS[interactionId].is_linear;
+    let interactionId = this.getCurrentInteractionId();
+    return Boolean(interactionId) && INTERACTION_SPECS[
+      interactionId as InteractionSpecsKey].is_linear;
   }
 
   isCorrect(): boolean {

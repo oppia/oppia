@@ -226,7 +226,7 @@
     </li>
 
     <li [ngClass]="{'active': currentUrl === '/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}'}">
-      <div (click)="togglelearnSubmenu(); stopclickfurther($event)" class="oppia-sidebar-expandable-button protractor-mobile-test-learn" >
+      <div (click)="togglelearnSubmenu(); stopclickfurther($event)" class="oppia-sidebar-expandable-button e2e-mobile-test-learn" >
         <i class="fas fa-angle-down oppia-sidebar-expand-icon expand-icon oppia-sidebar-menu-icon-transition"
           [ngClass]="{'oppia-sidebar-menu-icon-transition': learnSubmenuIsShown}">
         </i>
@@ -246,7 +246,7 @@
                  alt="learn-math-logo">
           </picture>
         </div>
-        <a href="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}" routerLink="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}" class="protractor-mobile-test-mathematics-link mb-1">
+        <a href="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}" smartRouterLink="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}" class="e2e-mobile-test-mathematics-link mb-1">
           <span>{{ 'I18N_SIDEBAR_CLASSROOM_BASIC_MATHS' | translate }}</span>
           <p class="oppia-sidebar-learn-subtext mt-2">{{ 'I18N_SIDEBAR_MATH_FOUNDATIONS_DESCRIPTION' | translate }}</p>
         </a>
@@ -265,14 +265,16 @@
           </div>
         </div>
         <div class="submenu-notop-margin">
-          <a href="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}" routerLink="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}" class="protractor-mobile-test-mathematics-link">
+          <a href="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}"
+             smartRouterLink="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}"
+             class="e2e-mobile-test-mathematics-link">
             <span class="learn-submenu-links">{{ 'I18N_SIDEBAR_SUBMENU_SEE_ALL_LESSONS' | translate }}</span>
             <i class="fas fa-arrow-right oppia-sidebar-menu-icon float-none learn-submenu-links"></i>
           </a>
         </div>
       </div>
       <div [hidden]="!learnSubmenuIsShown" class="oppia-community-library-section">
-        <a href="/community-library" [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE" class="protractor-mobile-test-library-link">
+        <a href="/community-library" [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE" class="e2e-mobile-test-library-link">
           <p class="oppia-sidebar-learn-subtext mb-2">{{ 'I18N_SIDEBAR_SUBMENU_COMMUNITY_LIBRARY_DESCRIPTION' | translate }}</p>
           <span class="learn-submenu-links">{{ 'I18N_SIDEBAR_SUBMENU_COMMUNITY_LIBRARY' | translate }}</span>
           <i class="fas fa-arrow-right oppia-sidebar-menu-icon float-none learn-submenu-links"></i>
@@ -282,8 +284,8 @@
 
     <li [ngClass]="{'active': currentUrl === '/about'}" class="oppia-sidebar-rows">
       <a href="/about"
-         [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.ABOUT.ROUTE"
-         class="protractor-mobile-test-about-link text-uppercase">
+         [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.ABOUT.ROUTE"
+         class="e2e-mobile-test-about-link text-uppercase">
         <span >{{ 'I18N_SIDEBAR_ABOUT_LINK' | translate }}</span>
       </a>
     </li>
@@ -296,28 +298,28 @@
       </div>
       <div [hidden]="!getinvolvedSubmenuIsShown">
         <div class="oppia-sidebar-submenu-upperborder">
-          <a href="/partnerships" [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS.ROUTE">
+          <a href="/partnerships" [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS.ROUTE">
             <i class="fas fa-globe oppia-sidebar-submenu-icon partnerships-icon"></i>
             <span class="oppia-sidebar-submenu-title">{{ 'I18N_SIDEBAR_PARTNERSHIPS' | translate }}</span>
             <p class="oppia-sidebar-submenu-text">{{ 'I18N_SIDEBAR_PARTNERSHIPS_DESCRIPTION' | translate }}</p>
           </a>
         </div>
         <div class="oppia-sidebar-submenu-upperborder">
-          <a href="/volunteer" routerLink="/volunteer">
+          <a href="/volunteer" smartRouterLink="/volunteer">
             <i class="fas fa-user-friends oppia-sidebar-submenu-icon volunteer-icon"></i>
             <span class="oppia-sidebar-submenu-title">{{ 'I18N_SIDEBAR_VOLUNTEER' | translate }}</span>
             <p class="oppia-sidebar-submenu-text">{{ 'I18N_SIDEBAR_VOLUNTEER_DESCRIPTION' | translate }}</p>
           </a>
         </div>
         <div class="oppia-sidebar-submenu-upperborder">
-          <a href="/donate" [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE">
+          <a href="/donate" [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE">
             <i class="fas fa-heart oppia-sidebar-submenu-icon donate-icon"></i>
             <span class="oppia-sidebar-submenu-title">{{ 'I18N_SIDEBAR_DONATE' | translate }}</span>
             <p class="oppia-sidebar-submenu-text">{{ 'I18N_SIDEBAR_DONATE_DESCRIPTION' | translate }}</p>
           </a>
         </div>
         <div class="oppia-sidebar-submenu-upperborder">
-          <a href="/contact" [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.CONTACT.ROUTE">
+          <a href="/contact" [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.CONTACT.ROUTE">
             <i class="fas fa-envelope oppia-sidebar-submenu-icon contact-icon"></i>
             <span class="oppia-sidebar-submenu-title">{{ 'I18N_SIDEBAR_CONTACT_US' | translate }}</span>
             <p class="oppia-sidebar-submenu-text">{{ 'I18N_SIDEBAR_CONTACT_US_DESCRIPTION' | translate }}</p>
@@ -328,16 +330,16 @@
 
     <li [ngClass]="{'active': currentUrl === '/about-foundation'}" class="oppia-sidebar-rows">
       <a href="/about-foundation"
-         [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.ABOUT_FOUNDATION.ROUTE"
-         class="protractor-mobile-test-about-link text-uppercase">
+         [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.ABOUT_FOUNDATION.ROUTE"
+         class="e2e-mobile-test-about-link text-uppercase">
         <span >{{ 'I18N_SIDEBAR_ABOUT_OPPIA_FOUNDATION' | translate }}</span>
       </a>
     </li>
 
     <li [ngClass]="{'active': currentUrl === '/donate'}" class="oppia-sidebar-rows">
       <a href="/donate"
-         [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE"
-         class="protractor-mobile-test-donate-link text-uppercase">
+         [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE"
+         class="e2e-mobile-test-donate-link text-uppercase">
         <span>{{ 'I18N_SIDEBAR_DONATE' | translate }}</span>
       </a>
     </li>

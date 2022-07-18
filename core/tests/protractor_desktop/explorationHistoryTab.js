@@ -33,6 +33,7 @@ describe('Exploration history', function() {
   var explorationPlayerPage = null;
   var explorationEditorHistoryTab = null;
   var explorationEditorMainTab = null;
+  var explorationEditorSettingsTab = null;
 
   // Constants for colors of nodes in history graph.
   var COLOR_ADDED = 'rgb(78, 162, 78)';
@@ -45,6 +46,7 @@ describe('Exploration history', function() {
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorHistoryTab = explorationEditorPage.getHistoryTab();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
+    explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 
@@ -64,7 +66,7 @@ describe('Exploration history', function() {
     await users.logout();
   });
 
-  it('should display the history', async function() {
+  it('should display the history of the states', async function() {
     await users.createUser('user@historyTab.com', 'userHistoryTab');
     await users.login('user@historyTab.com');
     await workflow.createExploration(true);
@@ -92,24 +94,24 @@ describe('Exploration history', function() {
 
     var VERSION_1_STATE_1_CONTENTS = {
       1: {
-        text: 'card_is_checkpoint: true',
-        highlighted: false
-      },
-      2: {
-        text: 'classifier_model_id: null',
-        highlighted: false
-      },
-      3: {
         text: 'content:',
         highlighted: false
       },
-      4: {
+      2: {
+        text: '  html: \'\'',
+        highlighted: true
+      },
+      3: {
         text: '  content_id: content',
         highlighted: false
       },
+      4: {
+        text: 'classifier_model_id: null',
+        highlighted: false
+      },
       5: {
-        text: '  html: \'\'',
-        highlighted: true
+        text: 'linked_skill_id: null',
+        highlighted: false
       },
       6: {
         text: 'interaction:',
@@ -121,7 +123,7 @@ describe('Exploration history', function() {
       },
       8: {
         text: '  confirmed_unclassified_answers: []',
-        highlighted: false
+        highlighted: true
       },
       9: {
         text: '  customization_args: {}',
@@ -138,11 +140,11 @@ describe('Exploration history', function() {
         highlighted: true
       },
       12: {
-        text: '    feedback:',
+        text: '    dest_if_really_stuck: null',
         highlighted: false
       },
       13: {
-        text: '      content_id: default_outcome',
+        text: '    feedback:',
         highlighted: false
       },
       14: {
@@ -150,11 +152,11 @@ describe('Exploration history', function() {
         highlighted: false
       },
       15: {
-        text: '    labelled_as_correct: false',
+        text: '      content_id: default_outcome',
         highlighted: false
       },
       16: {
-        text: '    missing_prerequisite_skill_id: null',
+        text: '    labelled_as_correct: false',
         highlighted: false
       },
       17: {
@@ -166,47 +168,47 @@ describe('Exploration history', function() {
         highlighted: false
       },
       19: {
-        text: '  hints: []',
+        text: '    missing_prerequisite_skill_id: null',
         highlighted: false
       },
       20: {
+        text: '  hints: []',
+        highlighted: false
+      },
+      21: {
         text: '  id: null',
         highlighted: true
       },
-      21: {
+      22: {
         text: '  solution: null',
         highlighted: false
       },
-      22: {
-        text: 'linked_skill_id: null',
-        highlighted: false
-      },
       23: {
-        text: 'next_content_id_index: 0',
-        highlighted: true
-      },
-      24: {
         text: 'param_changes: []',
         highlighted: false
       },
-      25: {
+      24: {
         text: 'recorded_voiceovers:',
         highlighted: false
       },
-      26: {
+      25: {
         text: '  voiceovers_mapping:',
         highlighted: false
       },
-      27: {
+      26: {
         text: '    content: {}',
         highlighted: false
       },
-      28: {
+      27: {
         text: '    default_outcome: {}',
         highlighted: true
       },
-      29: {
+      28: {
         text: 'solicit_answer_details: false',
+        highlighted: false
+      },
+      29: {
+        text: 'card_is_checkpoint: true',
         highlighted: false
       },
       30: {
@@ -223,9 +225,13 @@ describe('Exploration history', function() {
       },
       33: {
         text: '    default_outcome: {}',
-        highlighted: true
+        highlighted: false
       },
       34: {
+        text: 'next_content_id_index: 0',
+        highlighted: true
+      },
+      35: {
         text: '',
         highlighted: false
       }
@@ -233,24 +239,24 @@ describe('Exploration history', function() {
 
     var VERSION_2_STATE_1_CONTENTS = {
       1: {
-        text: 'card_is_checkpoint: true',
-        highlighted: false
-      },
-      2: {
-        text: 'classifier_model_id: null',
-        highlighted: false
-      },
-      3: {
         text: 'content:',
         highlighted: false
       },
-      4: {
+      2: {
+        text: '  html: <p>enter 6 to continue</p>',
+        highlighted: true
+      },
+      3: {
         text: '  content_id: content',
         highlighted: false
       },
+      4: {
+        text: 'classifier_model_id: null',
+        highlighted: false
+      },
       5: {
-        text: '  html: <p>enter 6 to continue</p>',
-        highlighted: true
+        text: 'linked_skill_id: null',
+        highlighted: false
       },
       6: {
         text: 'interaction:',
@@ -261,136 +267,136 @@ describe('Exploration history', function() {
         highlighted: true
       },
       8: {
-        text: '  - outcome:',
+        text: '    - rule_specs:',
         highlighted: true
       },
       9: {
-        text: '      dest: second',
+        text: '        - rule_type: Equals',
         highlighted: true
       },
       10: {
-        text: '      feedback:',
+        text: '          inputs:',
         highlighted: true
       },
       11: {
-        text: '        content_id: feedback_1',
+        text: '            x: 6',
         highlighted: true
       },
       12: {
-        text: '        html: \'\'',
+        text: '      outcome:',
         highlighted: true
       },
       13: {
-        text: '      labelled_as_correct: false',
+        text: '        dest: second',
         highlighted: true
       },
       14: {
-        text: '      missing_prerequisite_skill_id: null',
+        text: '        dest_if_really_stuck: null',
         highlighted: true
       },
       15: {
-        text: '      param_changes: []',
+        text: '        feedback:',
         highlighted: true
       },
       16: {
-        text: '      refresher_exploration_id: null',
+        text: '          html: \'\'',
         highlighted: true
       },
       17: {
-        text: '    rule_specs:',
+        text: '          content_id: feedback_1',
         highlighted: true
       },
       18: {
-        text: '    - inputs:',
+        text: '        labelled_as_correct: false',
         highlighted: true
       },
       19: {
-        text: '        x: 6',
+        text: '        param_changes: []',
         highlighted: true
       },
       20: {
-        text: '      rule_type: Equals',
+        text: '        refresher_exploration_id: null',
         highlighted: true
       },
       21: {
-        text: '    tagged_skill_misconception_id: null',
+        text: '        missing_prerequisite_skill_id: null',
         highlighted: true
       },
       22: {
-        text: '    training_data: []',
+        text: '      training_data: []',
         highlighted: true
       },
       23: {
-        text: '  confirmed_unclassified_answers: []',
-        highlighted: false
+        text: '      tagged_skill_misconception_id: null',
+        highlighted: true
       },
       24: {
-        text: '  customization_args:',
+        text: '  confirmed_unclassified_answers: []',
         highlighted: true
       },
       25: {
-        text: '    requireNonnegativeInput:',
+        text: '  customization_args:',
         highlighted: true
       },
       26: {
-        text: '      value: false',
+        text: '    requireNonnegativeInput:',
         highlighted: true
       },
       27: {
+        text: '      value: false',
+        highlighted: true
+      },
+      28: {
         text: '  default_outcome:',
         highlighted: false
       },
-      28: {
+      29: {
         text: '    dest: first',
         highlighted: true
       },
-      29: {
-        text: '    feedback:',
-        highlighted: false
-      },
       30: {
-        text: '      content_id: default_outcome',
+        text: '    dest_if_really_stuck: null',
         highlighted: false
       },
       31: {
-        text: '      html: \'\'',
+        text: '    feedback:',
         highlighted: false
       },
       32: {
-        text: '    labelled_as_correct: false',
+        text: '      html: \'\'',
         highlighted: false
       },
       33: {
-        text: '    missing_prerequisite_skill_id: null',
+        text: '      content_id: default_outcome',
         highlighted: false
       },
       34: {
-        text: '    param_changes: []',
+        text: '    labelled_as_correct: false',
         highlighted: false
       },
       35: {
-        text: '    refresher_exploration_id: null',
+        text: '    param_changes: []',
         highlighted: false
       },
       36: {
-        text: '  hints: []',
+        text: '    refresher_exploration_id: null',
         highlighted: false
       },
       37: {
-        text: '  id: NumericInput',
-        highlighted: true
+        text: '    missing_prerequisite_skill_id: null',
+        highlighted: false
       },
       38: {
-        text: '  solution: null',
+        text: '  hints: []',
         highlighted: false
       },
       39: {
-        text: 'linked_skill_id: null',
-        highlighted: false
+        text: '  id: NumericInput',
+        highlighted: true
       },
       40: {
-        text: 'next_content_id_index: 2',
-        highlighted: true
+        text: '  solution: null',
+        highlighted: false
       },
       41: {
         text: 'param_changes: []',
@@ -421,71 +427,80 @@ describe('Exploration history', function() {
         highlighted: false
       },
       48: {
-        text: 'written_translations:',
+        text: 'card_is_checkpoint: true',
         highlighted: false
       },
       49: {
-        text: '  translations_mapping:',
+        text: 'written_translations:',
         highlighted: false
       },
       50: {
-        text: '    content: {}',
+        text: '  translations_mapping:',
         highlighted: false
       },
       51: {
-        text: '    default_outcome: {}',
-        highlighted: true
+        text: '    content: {}',
+        highlighted: false
       },
       52: {
+        text: '    default_outcome: {}',
+        highlighted: false
+      },
+      53: {
         text: '    feedback_1: {}',
         highlighted: true
       },
-      53: {
+      54: {
+        text: 'next_content_id_index: 2',
+        highlighted: true
+      },
+      55: {
         text: '',
         highlighted: false
       }
     };
 
     var STATE_2_STRING =
-      'card_is_checkpoint: false\n' +
-      'classifier_model_id: null\n' +
       'content:\n' +
-      '  content_id: content\n' +
       '  html: <p>this is card 2</p>\n' +
+      '  content_id: content\n' +
+      'classifier_model_id: null\n' +
+      'linked_skill_id: null\n' +
       'interaction:\n' +
       '  answer_groups: []\n' +
       '  confirmed_unclassified_answers: []\n' +
       '  customization_args:\n' +
       '    buttonText:\n' +
       '      value:\n' +
-      '        content_id: ca_buttonText_0\n' +
       '        unicode_str: Continue\n' +
+      '        content_id: ca_buttonText_0\n' +
       '  default_outcome:\n' +
       '    dest: final card\n' +
+      '    dest_if_really_stuck: null\n' +
       '    feedback:\n' +
-      '      content_id: default_outcome\n' +
       '      html: \'\'\n' +
+      '      content_id: default_outcome\n' +
       '    labelled_as_correct: false\n' +
-      '    missing_prerequisite_skill_id: null\n' +
       '    param_changes: []\n' +
       '    refresher_exploration_id: null\n' +
+      '    missing_prerequisite_skill_id: null\n' +
       '  hints: []\n' +
       '  id: Continue\n' +
       '  solution: null\n' +
-      'linked_skill_id: null\n' +
-      'next_content_id_index: 1\n' +
       'param_changes: []\n' +
       'recorded_voiceovers:\n' +
       '  voiceovers_mapping:\n' +
-      '    ca_buttonText_0: {}\n' +
       '    content: {}\n' +
       '    default_outcome: {}\n' +
+      '    ca_buttonText_0: {}\n' +
       'solicit_answer_details: false\n' +
+      'card_is_checkpoint: false\n' +
       'written_translations:\n' +
       '  translations_mapping:\n' +
-      '    ca_buttonText_0: {}\n' +
       '    content: {}\n' +
       '    default_outcome: {}\n' +
+      '    ca_buttonText_0: {}\n' +
+      'next_content_id_index: 1\n' +
       '';
 
     var expectedHistoryStates = [{
@@ -601,6 +616,62 @@ describe('Exploration history', function() {
     await users.logout();
   });
 
+  it('should show the history of exploration metadata', async function() {
+    await users.createUser('user3@historyTab.com', 'user3HistoryTab');
+    await users.login('user3@historyTab.com');
+    await workflow.createExploration(true);
+
+    var METADATA_1_STRING = (
+      'title: \'\'\n' +
+      'category: \'\'\n' +
+      'objective: \'\'\n' +
+      'language_code: en\n' +
+      'tags: []\n' +
+      'blurb: \'\'\n' +
+      'author_notes: \'\'\n' +
+      'states_schema_version: 51\n' +
+      'init_state_name: Introduction\n' +
+      'param_specs: {}\n' +
+      'param_changes: []\n' +
+      'auto_tts_enabled: false\n' +
+      'correctness_feedback_enabled: true\n' +
+      'edits_allowed: true\n' +
+      ''
+    );
+
+    var METADATA_2_STRING = (
+      'title: Dummy Exploration\n' +
+      'category: Algorithms\n' +
+      'objective: Learn more about Oppia\n' +
+      'language_code: en\n' +
+      'tags: []\n' +
+      'blurb: \'\'\n' +
+      'author_notes: \'\'\n' +
+      'states_schema_version: 51\n' +
+      'init_state_name: Introduction\n' +
+      'param_specs: {}\n' +
+      'param_changes: []\n' +
+      'auto_tts_enabled: false\n' +
+      'correctness_feedback_enabled: true\n' +
+      'edits_allowed: true\n' +
+      ''
+    );
+
+    await explorationEditorPage.navigateToSettingsTab();
+    await explorationEditorSettingsTab.setTitle('Dummy Exploration');
+    await explorationEditorSettingsTab.setCategory('Algorithms');
+    await explorationEditorSettingsTab.setObjective('Learn more about Oppia');
+    await explorationEditorSettingsTab.setLanguage('English');
+    await explorationEditorPage.saveChanges();
+    await explorationEditorPage.navigateToHistoryTab();
+    var historyGraph = await explorationEditorHistoryTab.getHistoryGraph();
+    await historyGraph.selectTwoVersions('1', '2');
+    await historyGraph.openExplorationMetadataHistory();
+    await historyGraph.expectTextToMatch(METADATA_1_STRING, METADATA_2_STRING);
+    await historyGraph.closeExplorationMetadataHistory();
+    await users.logout();
+  });
+
   it('should revert to old exploration commit', async function() {
     await users.createUser('user2@historyTab.com', 'user2HistoryTab');
     await users.login('user2@historyTab.com');
@@ -610,14 +681,14 @@ describe('Exploration history', function() {
     // First card.
     await explorationEditorMainTab.setStateName('first');
     await explorationEditorMainTab.setContent(await forms.toRichText(
-      'enter 6 to continue'));
+      'enter 6 to continue'), true);
     await explorationEditorMainTab.setInteraction('NumericInput');
     await explorationEditorMainTab.addResponse(
       'NumericInput', null, 'second', true, 'Equals', 6);
     // Second card.
     await explorationEditorMainTab.moveToState('second');
     await explorationEditorMainTab.setContent(
-      await forms.toRichText('card 2 second commit text'));
+      await forms.toRichText('card 2 second commit text'), true);
     await explorationEditorMainTab.setInteraction('Continue');
     var responseEditor = await explorationEditorMainTab.getResponseEditor(
       'default');
@@ -634,7 +705,7 @@ describe('Exploration history', function() {
     await explorationEditorMainTab.setStateName('third');
     await explorationEditorMainTab.moveToState('second');
     await explorationEditorMainTab.setContent(
-      await forms.toRichText('card 2 third commit text'));
+      await forms.toRichText('card 2 third commit text'), true);
     await explorationEditorPage.saveChanges();
     expectedHistoryStates = [{
       label: 'third (was: first)',

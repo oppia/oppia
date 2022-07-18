@@ -32,7 +32,7 @@ var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
-var lostChangesModal = element(by.css('.protractor-test-lost-changes-modal'));
+var lostChangesModal = element(by.css('.e2e-test-lost-changes-modal'));
 
 describe('Full exploration editor', function() {
   var explorationPlayerPage = null;
@@ -71,14 +71,14 @@ describe('Full exploration editor', function() {
 
       var postTutorialPopover = element(by.css('.ng-joyride .popover-content'));
       var stateEditButton = element(
-        by.css('.protractor-test-edit-content-pencil-button'));
+        by.css('.e2e-test-edit-content-pencil-button'));
       await waitFor.invisibilityOf(
         postTutorialPopover, 'Post-tutorial popover does not disappear.');
       await action.click('State Edit Button', stateEditButton);
       var stateEditorTag = element(
-        by.css('.protractor-test-state-content-editor'));
+        by.css('.e2e-test-state-content-editor'));
       var stateContentEditor = stateEditorTag.element(
-        by.css('.protractor-test-state-content-editor'));
+        by.css('.e2e-test-state-content-editor'));
       await waitFor.visibilityOf(
         stateContentEditor,
         'stateContentEditor taking too long to appear to set content');
@@ -87,7 +87,7 @@ describe('Full exploration editor', function() {
       var content = 'line1\n\n\n\nline2\n\n\n\nline3\n\n\nline4';
 
       var heightMessage = element(
-        by.css('.protractor-test-card-height-limit-warning'));
+        by.css('.e2e-test-card-height-limit-warning'));
       await richTextEditor.appendPlainText(content);
       expect(await heightMessage.isPresent()).toBe(false);
 
@@ -103,7 +103,7 @@ describe('Full exploration editor', function() {
         heightMessage, 'Card height limit message not displayed');
 
       var hideHeightWarningIcon = element(
-        by.css('.protractor-test-hide-card-height-warning-icon'));
+        by.css('.e2e-test-hide-card-height-warning-icon'));
       await action.click('Hide Height Warning icon', hideHeightWarningIcon);
       await waitFor.invisibilityOf(
         heightMessage, 'Height message taking too long to disappear.');
@@ -260,7 +260,7 @@ describe('Full exploration editor', function() {
       // Create an exploration with multiple groups.
       await explorationEditorMainTab.setStateName('first card');
       await explorationEditorMainTab.setContent(await forms.toRichText(
-        'How are you feeling?'));
+        'How are you feeling?'), true);
       await explorationEditorMainTab.setInteraction('TextInput');
       await explorationEditorMainTab.addResponse(
         'TextInput', await forms.toRichText('You must be happy!'),

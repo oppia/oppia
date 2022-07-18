@@ -1,9 +1,6 @@
-<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/pages/exploration-player-page/learner-experience/supplemental-card.component.css" as="style">
-<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/pages/exploration-player-page/learner-experience/supplemental-card.component.rtl.css" as="style">
-
 <div class="conversation-skin-supplemental-card">
   <div *ngIf="helpCardHtml"
-       class="conversation-skin-help-card help-card-standard protractor-test-conversation-skin-help-card"
+       class="conversation-skin-help-card help-card-standard e2e-test-conversation-skin-help-card"
        [ngStyle]="!isHelpCardTall() ? {'top': helpCardBottomPosition + 'px'} : {}"
        #helpCard>
     <a [ngClass]="{'oppia-disabled-image-link': (OPPIA_AVATAR_LINK_URL === null)}"
@@ -13,16 +10,15 @@
       <img class="conversation-skin-oppia-avatar"
            [src]="OPPIA_AVATAR_IMAGE_URL" alt="">
     </a>
-    <button type="button" class="conversation-skin-close-help-card-button protractor-test-close-help-card-button"
+    <button type="button" class="conversation-skin-close-help-card-button e2e-test-close-help-card-button"
             (click)="clearHelpCard()" *ngIf="!helpCardHasContinueButton">
       <i class="material-icons md-18">&#xE5CD;</i>
     </button>
     <div>
-      <angular-html-bind-wrapper classStr="oppia-rte-viewer conversation-skin-help-card-content protractor-test-conversation-feedback-latest"
-                                 [htmlData]="helpCardHtml"
-                                 [parentScope]="this"
-                                 [ngClass]="getFeedbackAudioHighlightClass()">
-      </angular-html-bind-wrapper>
+      <oppia-rte-output-display class="oppia-rte-viewer conversation-skin-help-card-content e2e-test-conversation-feedback-latest"
+                                [rteString]="helpCardHtml"
+                                [ngClass]="getFeedbackAudioHighlightClass()">
+      </oppia-rte-output-display>
     </div>
     <br>
     <oppia-continue-button *ngIf="helpCardHasContinueButton"
@@ -37,13 +33,9 @@
   correctly. More details about the class can be found in extensions/interactions/
   DragAndDropSortInput/directives/drag-and-drop-sort-input-interaction.component.html-->
   <div class="conversation-skin-interaction-container" #interactionContainer>
-    <angular-html-bind-wrapper classStr="protractor-test-conversation-input"
+    <oppia-interaction-display classStr="e2e-test-conversation-input"
                                [parentScope]="this"
                                [htmlData]="currentDisplayedCard.getInteractionHtml()">
-    </angular-html-bind-wrapper>
+    </oppia-interaction-display>
   </div>
 </div>
-
-<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
-<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/exploration-player-page/learner-experience/supplemental-card.component.css">
-<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/exploration-player-page/learner-experience/supplemental-card.component.rtl.css">

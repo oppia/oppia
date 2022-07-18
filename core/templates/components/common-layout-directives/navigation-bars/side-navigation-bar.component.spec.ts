@@ -19,7 +19,10 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { HttpClientModule } from '@angular/common/http';
 import { ComponentFixture, TestBed, fakeAsync, tick, waitForAsync } from '@angular/core/testing';
-import { MockRouterModule } from 'hybrid-router-module-provider';
+import { APP_BASE_HREF } from '@angular/common';
+import { RouterModule } from '@angular/router';
+
+import { SmartRouterModule } from 'hybrid-router-module-provider';
 import { ClassroomData } from 'domain/classroom/classroom-data.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
@@ -72,7 +75,8 @@ describe('Side Navigation Bar Component', () => {
         HttpClientTestingModule,
         // TODO(#13443): Remove hybrid router module provider once all pages are
         // migrated to angular router.
-        MockRouterModule
+        SmartRouterModule,
+        RouterModule.forRoot([])
       ],
       declarations: [
         SideNavigationBarComponent,
@@ -86,6 +90,10 @@ describe('Side Navigation Bar Component', () => {
         {
           provide: UrlInterpolationService,
           useClass: MockUrlInterpolationService
+        },
+        {
+          provide: APP_BASE_HREF,
+          useValue: '/'
         }
       ]
     });
@@ -252,9 +260,5 @@ describe('Side Navigation Bar Component', () => {
     hackyStoryTitleTranslationIsDisplayed =
       componentInstance.isHackyTopicTitleTranslationDisplayed(0);
     expect(hackyStoryTitleTranslationIsDisplayed).toBe(true);
-  });
-
-  it('should get RTL language status correctly', () => {
-    expect(componentInstance.isLanguageRTL()).toEqual(true);
   });
 });
