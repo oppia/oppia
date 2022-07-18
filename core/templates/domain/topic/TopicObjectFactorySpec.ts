@@ -153,15 +153,15 @@ describe('Topic object factory', () => {
   });
 
   it('should be able to correctly update skill Ids for the diagnostic test',
-     () => {
-    var skillSummary1 = ShortSkillSummary.create('skill_1', 'Description 1');
-    var skillSummary2 = ShortSkillSummary.create('skill_1', 'Description 1');
-    expect(_sampleTopic.getDiagnosticTestSkillSummaries()).toEqual(
-      [skillSummary1]);
-    _sampleTopic.setDiagnosticTestSkillSummaries([skillSummary2]);
-    expect(_sampleTopic.getDiagnosticTestSkillSummaries()).toEqual(
-      [skillSummary2]);
-  });
+    () => {
+      var skillSummary1 = ShortSkillSummary.create('skill_1', 'Description 1');
+      var skillSummary2 = ShortSkillSummary.create('skill_1', 'Description 1');
+      expect(_sampleTopic.getDiagnosticTestSkillSummaries()).toEqual(
+        [skillSummary1]);
+      _sampleTopic.setDiagnosticTestSkillSummaries([skillSummary2]);
+      expect(_sampleTopic.getDiagnosticTestSkillSummaries()).toEqual(
+        [skillSummary2]);
+    });
 
   it('should correctly remove the various array elements', () => {
     _sampleTopic.removeCanonicalStory('story_1');

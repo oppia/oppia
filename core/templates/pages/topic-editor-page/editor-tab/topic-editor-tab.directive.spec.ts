@@ -651,11 +651,10 @@ describe('Topic editor tab directive', function() {
 
   it('should call the TopicUpdateService if skillId is added in the ' +
      'diagnostic test', function() {
-    console.log('Started the test\n\n');
     var updateSkillIdForDiagosticTestSpy = spyOn(
       TopicUpdateService, 'updateDiagnosticTestSkills');
     $scope.addSkillForDiagnosticTest(skillSummary);
-    expect(updateSkillIdForDiagosticTestSpy).toHaveBeenCalled()
+    expect(updateSkillIdForDiagosticTestSpy).toHaveBeenCalled();
   });
 
   it('should not call the TopicUpdateService if null skill is added in the' +

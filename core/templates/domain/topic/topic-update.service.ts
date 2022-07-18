@@ -805,12 +805,12 @@ export class TopicUpdateService {
     let oldSkillsForDiagnosticTest = cloneDeep(
       topic.getDiagnosticTestSkillSummaries())
     let oldSkillIdsForDiagnosticTest = oldSkillsForDiagnosticTest.map((
-          skillSummary: ShortSkillSummary) => {
-        return skillSummary.getId();
+        skillSummary: ShortSkillSummary) => {
+      return skillSummary.getId();
     });
     let newSkillIdsForDiagnosticTest = newSkillsForDiagnosticTest.map((
-      skillSummary: ShortSkillSummary) => {
-        return skillSummary.getId();
+        skillSummary: ShortSkillSummary) => {
+      return skillSummary.getId();
     });
 
     this._applyTopicPropertyChange(
@@ -819,7 +819,7 @@ export class TopicUpdateService {
       newSkillIdsForDiagnosticTest,
       oldSkillIdsForDiagnosticTest,
       (changeDict, topic) => {
-          topic.setDiagnosticTestSkillSummaries(newSkillsForDiagnosticTest);
+        topic.setDiagnosticTestSkillSummaries(newSkillsForDiagnosticTest);
       }, (changeDict, topic) => {
         topic.setDiagnosticTestSkillSummaries(oldSkillsForDiagnosticTest);
       });

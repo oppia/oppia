@@ -277,50 +277,56 @@
       </div>
     </md-card>
      <md-card class="item-list-card diagnostic-test-card-container oppia-mobile-collapsible-card">
-      <div class="item-list-card-header oppia-mobile-collapsible-card-header" ng-click="togglePreviewListCards()">
+      <div class="item-list-card-header oppia-mobile-collapsible-card-header"
+           ng-click="togglePreviewListCards()">
         <h3>Diagnostic test</h3>
           <em>
             <strong>Description:</strong> Add up to 3 key skills (the order doesn't matter) that a learner who has completed this topic should have mastered. These skills will be used to generate the diagnostic test that determines whether to recommend this topic to new learners.
           </em>
       </div>
-      <div ng-if="selectedSkillsForDiagnosticTest.length" class="oppia-diagnostic-test-skill-list-header">
+      <div class="oppia-diagnostic-test-skill-list-header"
+           ng-if="selectedSkillsForDiagnosticTest.length">
         <strong>Diagnostic test skills</strong>
       </div>
       <md-list>
-        <md-list-item ng-repeat="skill in selectedSkillsForDiagnosticTest" class="oppia-diagnostic-test-skill-items">
+        <md-list-item class="oppia-diagnostic-test-skill-items"
+                      ng-repeat="skill in selectedSkillsForDiagnosticTest">
           <span class="oppia-diagnostic-test-skill-description">
             {{skill.getDescription()}}
           </span>
-          <button md-button  md-icon-button
-                aria-label="Clear"
-                class="oppia-remove-diagnostic-test-skill-button e2e-remove-skill-from-diagnostic-test"
-                ng-click="removeSkillFromDiagnosticTest(skill)">
+          <button class="oppia-remove-diagnostic-test-skill-button e2e-test-remove-skill-from-diagnostic-test"
+                  ng-click="removeSkillFromDiagnosticTest(skill)"
+                  md-button
+                  md-icon-button
+                  aria-label="Clear">
             <md-icon>close</md-icon>
-        </button>
+          </button>
         </md-list-item>
         <md-list-item>
-          <div class="oppia-diagnostic-test-dropdown" ng-show="isDiagnosticTestSkillsDropdownPresent">
-            <select ng-model="selectedSkillForDiagnosticTest" ng-change="addSkillForDiagnosticTest(selectedSkillForDiagnosticTest)"
-                        aria-label="selection dropdown"
-                        class="e2e-diagnostic-test-skill-selector">
-                <option
-                  ng-repeat="skillSummary in availableSkillsForDiagnosticTest"
-                  ng-value="skillSummary">
+          <div class="oppia-diagnostic-test-dropdown"
+               ng-show="isDiagnosticTestSkillsDropdownPresent">
+            <select class="e2e-test-diagnostic-test-skill-selector"
+                    ng-model="selectedSkillForDiagnosticTest"
+                    ng-change="addSkillForDiagnosticTest(selectedSkillForDiagnosticTest)"
+                    aria-label="selection dropdown">
+                <option ng-repeat="skillSummary in availableSkillsForDiagnosticTest"
+                        ng-value="skillSummary">
                   {{skillSummary.getDescription()}}
                 </option>
             </select>
           </div>
-          <button md-button  md-icon-button
-                aria-label="Clear"
-                class="oppia-remove-diagnostic-test-skill-button"
-                ng-show="isDiagnosticTestSkillsDropdownPresent"
-                ng-click="removeSkillDropdownForDiagnosticTest()">
+          <button class="oppia-remove-diagnostic-test-skill-button"
+                  md-button  md-icon-button
+                  aria-label="Clear"
+                  ng-show="isDiagnosticTestSkillsDropdownPresent"
+                  ng-click="removeSkillDropdownForDiagnosticTest()">
             <md-icon>close</md-icon>
-          <button md-button
-              class="oppia-add-diagnostic-test-skills-button e2e-add-diagnostic-test-skill"
-              ng-click="presentDiagnosticTestSkillDropdown()"
-              ng-show="!isDiagnosticTestSkillsDropdownPresent"
-              ng-disabled="availableSkillsForDiagnosticTest.length === 0 || selectedSkillsForDiagnosticTest.length === 3">
+          </button>
+          <button class="oppia-add-diagnostic-test-skills-button e2e-test-add-diagnostic-test-skill"
+                  md-button
+                  ng-click="presentDiagnosticTestSkillDropdown()"
+                  ng-show="!isDiagnosticTestSkillsDropdownPresent"
+                  ng-disabled="availableSkillsForDiagnosticTest.length === 0 || selectedSkillsForDiagnosticTest.length === 3">
             <div class="oppia-flex">
                 <md-icon aria-label="icon-button with a plus icon">add_circle</md-icon>
                 <h4 class="oppia-button-text">Add diagnostic test skills</h4>
@@ -685,7 +691,8 @@
   }
 
   .topic-editor .diagnostic-test-card-container {
-    margin: 64px 0px;
+    margin-top: 64px;
+    margin-bottom: 64px;
   }
 
   .topic-editor .practice-tab-info-circle {
@@ -706,10 +713,10 @@
   }
 
   .oppia-add-diagnostic-test-skills-button {
-    width: fit-content;
     color: #00695e;
-    margin: 0px;
-    padding: 0px;
+    /* margin: 0px;
+    padding: 0px; */
+    width: fit-content;
   }
 
   .oppia-flex {
@@ -724,8 +731,8 @@
   }
 
   .oppia-button-text {
+    /* margin: 0px; */
     padding: 10px;
-    margin: 0px;
   }
 
   .oppia-diagnostic-test-dropdown {
@@ -749,11 +756,11 @@
   }
 
   .oppia-diagnostic-test-skill-items {
-    padding: 8px 10px 8px 32px;
     align-items: center;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
+    padding: 8px 10px 8px 32px;
     position: relative;
     width: auto;
   }

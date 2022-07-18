@@ -24,7 +24,7 @@ import { Subscription } from 'rxjs';
 // TODO(#9186): Change variable name to 'constants' once this file
 // is migrated to Angular.
 import topicConstants from 'assets/constants';
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 
 require(
   'components/common-layout-directives/common-elements/' +
@@ -133,19 +133,21 @@ angular.module('oppia').directive('topicEditorTab', [
             $scope.topicNameExists = false;
             $scope.topicUrlFragmentExists = false;
             $scope.hostname = WindowRef.nativeWindow.location.hostname;
-            $scope.availableSkillsForDiagnosticTest = $scope.topic.getSkillSummariesThatAreNotInDiagnosticTest();
-            $scope.selectedSkillsForDiagnosticTest = $scope.topic.getDiagnosticTestSkillSummaries()
+            $scope.availableSkillsForDiagnosticTest = (
+              $scope.topic.getSkillSummariesThatAreNotInDiagnosticTest());
+            $scope.selectedSkillsForDiagnosticTest = (
+              $scope.topic.getDiagnosticTestSkillSummaries());
             $scope.isDiagnosticTestSkillsDropdownPresent = false;
             $scope.isSelectedSkillsForDiagnosticTestEmpty = true;
             $scope.selectedSkillForDiagnosticTest;
 
             $scope.presentDiagnosticTestSkillDropdown = function() {
               $scope.isDiagnosticTestSkillsDropdownPresent = true;
-            }
+            };
 
             $scope.removeSkillDropdownForDiagnosticTest = function() {
               $scope.isDiagnosticTestSkillsDropdownPresent = false;
-            }
+            };
 
             $scope.addSkillForDiagnosticTest = function(skillToAdd) {
               if (skillToAdd === null) {
@@ -163,10 +165,10 @@ angular.module('oppia').directive('topicEditorTab', [
               }
               TopicUpdateService.updateDiagnosticTestSkills(
                 $scope.topic,
-                cloneDeep($scope.selectedSkillsForDiagnosticTest))
+                cloneDeep($scope.selectedSkillsForDiagnosticTest));
               $scope.isDiagnosticTestSkillsDropdownPresent = false;
               $scope.$applyAsync();
-            }
+            };
 
             $scope.removeSkillFromDiagnosticTest = function(skillToRemove) {
               let j = 0;
@@ -181,9 +183,9 @@ angular.module('oppia').directive('topicEditorTab', [
 
               TopicUpdateService.updateDiagnosticTestSkills(
                 $scope.topic,
-                cloneDeep($scope.selectedSkillsForDiagnosticTest))
+                cloneDeep($scope.selectedSkillsForDiagnosticTest));
               $scope.$applyAsync();
-            }
+            };
 
             $scope.editableDescriptionIsEmpty = (
               $scope.editableDescription === '');

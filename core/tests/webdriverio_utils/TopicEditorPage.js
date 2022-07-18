@@ -46,10 +46,12 @@ var TopicEditorPage = function() {
   var saveRearrangedSkillsButton = $('.e2e-test-save-rearrange-skills');
   var saveTopicButton = $('.e2e-test-save-topic-button');
   var showSchemaEditorElement = $('.e2e-test-show-schema-editor');
-  var addNewDiagnosticTestSkillButton = $('.e2e-add-diagnostic-test-skill');
-  var diagnosticTestSkillSelector = $('.e2e-diagnostic-test-skill-selector');
+  var addNewDiagnosticTestSkillButton = $(
+    '.e2e-test-add-diagnostic-test-skill');
+  var diagnosticTestSkillSelector = $(
+    '.e2e-test-diagnostic-test-skill-selector');
   var removeDiagnosticTestButtonElement = $(
-    '.e2e-remove-skill-from-diagnostic-test');
+    '.e2e-test-remove-skill-from-diagnostic-test');
   var storyListItemsSelector = function() {
     return $$('.e2e-test-story-list-item');
   };

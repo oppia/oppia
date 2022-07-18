@@ -217,13 +217,13 @@ describe('Topic update service', function() {
     topicUpdateService.updateDiagnosticTestSkills(
       _sampleTopic, [_firstSkillSummary]);
     expect(_sampleTopic.getDiagnosticTestSkillSummaries()).toEqual(
-      [_firstSkillSummary])
+      [_firstSkillSummary]);
     expect(undoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'update_topic_property',
       property_name: 'skill_ids_for_diagnostic_test',
       new_value: ['skill_1'],
       old_value: []
-    }])
+    }]);
   });
 
   it('should set/unset changes to a topic\'s name', () => {

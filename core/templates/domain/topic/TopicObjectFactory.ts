@@ -238,11 +238,12 @@ export class Topic {
     }
     if (this._skillsForDiagnosticTest.length === 0) {
       issues.push(
-        'Skill for the diagnostic test in the topic should not be empty.')
+        'Skill for the diagnostic test in the topic should not be empty.');
     }
     if (this._skillsForDiagnosticTest.length > 3) {
       issues.push(
-        'At most 3 skill should be added for the diagnostic test in the topic.')
+        'At most 3 skill should be added for the diagnostic test in ' +
+        'the topic.');
     }
 
     let subtopics = this._subtopics;

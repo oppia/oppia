@@ -117,11 +117,11 @@ var TopicEditorPage = function() {
     by.css('.e2e-test-skill-difficulty-easy'));
   var storyTitleClassname = '.e2e-test-story-title';
   var addNewDiagnosticTestSkillButton = element(
-    by.css('.e2e-add-diagnostic-test-skill'));
+    by.css('.e2e-test-add-diagnostic-test-skill'));
   var diagnosticTestSkillSelector = element(
-    by.css('.e2e-diagnostic-test-skill-selector'));
+    by.css('.e2e-test-diagnostic-test-skill-selector'));
   var removeDiagnosticTestButtonElement = element(
-    by.css('.e2e-remove-skill-from-diagnostic-test'));
+    by.css('.e2e-test-remove-skill-from-diagnostic-test'));
 
   var dragAndDrop = async function(fromElement, toElement) {
     await browser.executeScript(dragAndDropScript, fromElement, toElement);
