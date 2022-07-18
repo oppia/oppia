@@ -40,14 +40,6 @@ var suites = {
       'protractor_desktop/adminTabFeatures.js'
     ],
 
-    classroomPage: [
-      'protractor_desktop/classroomPage.js'
-    ],
-
-    classroomPageFileUploadFeatures: [
-      'protractor_desktop/classroomPageFileUploadFeatures.js'
-    ],
-
     contributorDashboard: [
       'protractor_desktop/contributorDashboard.js'
     ],
@@ -110,10 +102,6 @@ var suites = {
 
     publication: [
       'protractor_desktop/publicationAndLibrary.js'
-    ],
-
-    topicsAndSkillsDashboard: [
-      'protractor_desktop/topicsAndSkillsDashboard.js'
     ],
 
     skillEditor: [

@@ -27,6 +27,7 @@ var TopicsAndSkillsDashboardPage = function() {
     return $$('.e2e-test-assign-skill-to-topic-button');
   };
   var assignSkillToTopicButton = $('.e2e-test-assign-skill-to-topic-button');
+  var assignedTopicNameInputClass = '.e2e-test-unassign-topic';
   var assignedTopicNamesInput = $('.e2e-test-unassign-topic');
   var confirmMoveButton = $('.e2e-test-confirm-move-button');
   var confirmSkillCreationButton = $('.e2e-test-confirm-skill-creation-button');
@@ -47,6 +48,9 @@ var TopicsAndSkillsDashboardPage = function() {
   var openConceptCardExplanationButton = $('.e2e-test-open-concept-card');
   var openSkillEditorButtonsSelector = function() {
     return $$('.e2e-test-open-skill-editor');
+  };
+  var skillDescriptionsElementSelector = function() {
+    return $$('.e2e-test-skill-description');
   };
   var skillDescriptionField = $('.e2e-test-skill-description-field');
   var skillEditOptionsSelector = function() {
@@ -221,7 +225,7 @@ var TopicsAndSkillsDashboardPage = function() {
     await waitFor.visibilityOf(
       topicNameFieldElement, 'Topic Editor is taking too long to appear.');
     if (shouldCloseTopicEditor) {
-      await browser.closewindow();
+      await browser.closeWindow();
       await browser.switchToWindow(parentHandle);
       await waitFor.invisibilityOf(
         confirmTopicCreationButton,
@@ -387,7 +391,7 @@ var TopicsAndSkillsDashboardPage = function() {
   };
 
   this.getTopicsCount = async function() {
-    var topicsListItems = await $$('.e2e-test-topics-list-item');
+    var topicsListItems = await topicsListItemsSelector();
     return topicsListItems.length;
   };
 
@@ -401,7 +405,7 @@ var TopicsAndSkillsDashboardPage = function() {
 
   this.expectSkillDescriptionToBe = async function(description, index) {
     await this.waitForSkillsToLoad();
-    var skillDescriptionsElement = await $$('.e2e-test-skill-description');
+    var skillDescriptionsElement = await skillDescriptionsElementSelector();
     var text = await action.getText(
       'Skill Description Element', skillDescriptionsElement[index]);
     expect(text).toEqual(description);

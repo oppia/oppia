@@ -153,6 +153,8 @@ RERUN_POLICIES = {
 
 SUITES_MIGRATED_TO_WEBDRIVERIO = [
     'blogDashboard',
+    'classroomPage',
+    'classroomPageFileUploadFeatures',
     'collections',
     'contributorDashboard',
     'creatorDashboard',
@@ -162,6 +164,7 @@ SUITES_MIGRATED_TO_WEBDRIVERIO = [
     'profileFeatures',
     'profileMenu',
     'subscriptions',
+    'topicsAndSkillsDashboard',
     'topicAndStoryEditor',
     'topicAndStoryEditorFileUploadFeatures',
     'topicAndStoryViewer',
@@ -174,8 +177,6 @@ SUITES_STILL_IN_PROTRACTOR = [
     'additionalEditorFeaturesModals',
     'additionalPlayerFeatures',
     'adminPage',
-    'classroomPage',
-    'classroomPageFileUploadFeatures',
     'coreEditorAndPlayerFeatures',
     'embedding',
     'explorationImprovementsTab',
@@ -192,7 +193,6 @@ SUITES_STILL_IN_PROTRACTOR = [
     'navigation',
     'playVoiceovers',
     'publication',
-    'topicsAndSkillsDashboard',
     'skillEditor',
     'wipeout',
 ]

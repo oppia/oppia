@@ -29,6 +29,14 @@ var suites = {
     './core/tests/webdriverio_desktop/blogDashboard.js'
   ],
 
+  classroomPage: [
+    './core/tests/webdriverio_desktop/classroomPage.js'
+  ],
+
+  classroomPageFileUploadFeatures: [
+    './core/tests/webdriverio_desktop/classroomPageFileUploadFeatures.js'
+  ],
+
   collections: [
     './core/tests/webdriverio_desktop/collections.js'
   ],
@@ -63,6 +71,10 @@ var suites = {
 
   subscriptions: [
     './core/tests/webdriverio/subscriptionsFlow.js'
+  ],
+
+  topicsAndSkillsDashboard: [
+    './core/tests/webdriverio_desktop/topicsAndSkillsDashboard.js'
   ],
 
   topicAndStoryEditor: [
