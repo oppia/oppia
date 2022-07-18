@@ -2835,10 +2835,10 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.owner_id, end_state_name='End')
         init_state_name = exploration.init_state_name
-        event_services.StartExplorationEventHandler.record(  # type: ignore[no-untyped-call]
+        event_services.StartExplorationEventHandler.record(
             self.EXP_ID, 1, init_state_name, self.USER_SESSION_ID, {},
             feconf.PLAY_TYPE_NORMAL)
-        event_services.StatsEventsHandler.record(  # type: ignore[no-untyped-call]
+        event_services.StatsEventsHandler.record(
             self.EXP_ID, 1, {
                 'num_starts': 1,
                 'num_actual_starts': 0,
@@ -2857,7 +2857,7 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.owner_id, end_state_name='End')
         init_state_name = exploration.init_state_name
-        event_services.StartExplorationEventHandler.record(  # type: ignore[no-untyped-call]
+        event_services.StartExplorationEventHandler.record(
             self.EXP_ID, 1, init_state_name, self.USER_SESSION_ID, {},
             feconf.PLAY_TYPE_NORMAL)
         self.assertEqual(
@@ -2883,10 +2883,10 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.owner_id, end_state_name='End')
         init_state_name = exploration.init_state_name
-        event_services.StartExplorationEventHandler.record(  # type: ignore[no-untyped-call]
+        event_services.StartExplorationEventHandler.record(
             self.EXP_ID, 1, init_state_name, self.USER_SESSION_ID, {},
             feconf.PLAY_TYPE_NORMAL)
-        event_services.StatsEventsHandler.record(  # type: ignore[no-untyped-call]
+        event_services.StatsEventsHandler.record(
             self.EXP_ID, 1, {
                 'num_starts': 1,
                 'num_actual_starts': 0,
@@ -2966,10 +2966,10 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
             exploration = self.save_new_valid_exploration(
                 self.EXP_ID, self.owner_id, end_state_name='End')
             init_state_name = exploration.init_state_name
-            event_services.StartExplorationEventHandler.record(  # type: ignore[no-untyped-call]
+            event_services.StartExplorationEventHandler.record(
                 self.EXP_ID, 1, init_state_name, self.USER_SESSION_ID, {},
                 feconf.PLAY_TYPE_NORMAL)
-            event_services.StatsEventsHandler.record(  # type: ignore[no-untyped-call]
+            event_services.StatsEventsHandler.record(
                 self.EXP_ID, 1, {
                     'num_starts': 1,
                     'num_actual_starts': 0,
