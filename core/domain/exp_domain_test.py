@@ -11643,6 +11643,8 @@ class ExplorationMetadataDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(actual_metadata_dict, expected_metadata_dict)
 
     def test_metadata_properties_are_synced(self):
+        self._require_metadata_properties_to_be_synced()
+
         swapped_metadata_properties = self.swap(
             constants, 'METADATA_PROPERTIES', [
                 'title', 'category', 'objective', 'language_code',
