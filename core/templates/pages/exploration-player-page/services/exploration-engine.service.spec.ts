@@ -121,6 +121,7 @@ describe('Exploration engine service ', () => {
                     html: '<p>Good Job</p>'
                   },
                   param_changes: [],
+                  dest_if_really_stuck: null,
                   dest: 'Mid'
                 },
                 training_data: [],
@@ -149,6 +150,7 @@ describe('Exploration engine service ', () => {
                 html: '<p>Try again.</p>'
               },
               param_changes: [],
+              dest_if_really_stuck: null,
               dest: 'Start'
             }
           },
@@ -244,6 +246,7 @@ describe('Exploration engine service ', () => {
                     html: ' <p>Good Job</p>'
                   },
                   param_changes: [],
+                  dest_if_really_stuck: null,
                   dest: 'End'
                 },
                 training_data: [],
@@ -272,6 +275,7 @@ describe('Exploration engine service ', () => {
                 html: '<p>try again.</p>'
               },
               param_changes: [],
+              dest_if_really_stuck: null,
               dest: 'Mid'
             }
           },
@@ -474,6 +478,7 @@ describe('Exploration engine service ', () => {
       let answerClassificationResult = new AnswerClassificationResult(
         outcomeObjectFactory.createFromBackendDict({
           dest: 'Mid',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'feedback_1',
             html: 'Answer is correct!'
@@ -514,6 +519,7 @@ describe('Exploration engine service ', () => {
       let answerClassificationResult = new AnswerClassificationResult(
         outcomeObjectFactory.createFromBackendDict({
           dest: 'Mid',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'feedback_1',
             html: 'Answer is correct!'
@@ -554,6 +560,7 @@ describe('Exploration engine service ', () => {
       let answerClassificationResult = new AnswerClassificationResult(
         outcomeObjectFactory.createFromBackendDict({
           dest: 'Mid',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'feedback_1',
             html: null
@@ -595,6 +602,7 @@ describe('Exploration engine service ', () => {
       let answerClassificationResult = new AnswerClassificationResult(
         outcomeObjectFactory.createFromBackendDict({
           dest: 'Mid',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'feedback_1',
             html: 'feedback'
@@ -639,6 +647,7 @@ describe('Exploration engine service ', () => {
       let answerClassificationResult = new AnswerClassificationResult(
         outcomeObjectFactory.createFromBackendDict({
           dest: 'Mid',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'feedback_1',
             html: 'feedback'
@@ -772,6 +781,7 @@ describe('Exploration engine service ', () => {
     let answerClassificationResult = new AnswerClassificationResult(
       outcomeObjectFactory.createFromBackendDict({
         dest: 'Mid',
+        dest_if_really_stuck: null,
         feedback: {
           content_id: 'feedback_1',
           html: 'Answer is correct!'
