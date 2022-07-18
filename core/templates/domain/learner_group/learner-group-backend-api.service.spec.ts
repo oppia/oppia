@@ -255,7 +255,8 @@ describe('Learner Group Backend API Service', () => {
     var failHandler = jasmine.createSpy('fail');
 
     const SEARCH_STUDENT_URL = (
-      '/learner_group_search_student_handler'
+      '/learner_group_search_student_handler?username=username1&' +
+      'learner_group_id=groupId'
     );
     const sampleUserInfo = {
       username: 'username1',
