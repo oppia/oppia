@@ -276,13 +276,13 @@
         </div>
       </div>
     </md-card>
-     <md-card class="item-list-card diagnostic-test-card-container oppia-mobile-collapsible-card">
+    <md-card class="item-list-card diagnostic-test-card-container oppia-mobile-collapsible-card">
       <div class="item-list-card-header oppia-mobile-collapsible-card-header"
            ng-click="togglePreviewListCards()">
         <h3>Diagnostic test</h3>
-          <em>
-            <strong>Description:</strong> Add up to 3 key skills (the order doesn't matter) that a learner who has completed this topic should have mastered. These skills will be used to generate the diagnostic test that determines whether to recommend this topic to new learners.
-          </em>
+        <em>
+          <strong>Description:</strong> Add up to 3 key skills (the order doesn't matter) that a learner who has completed this topic should have mastered. These skills will be used to generate the diagnostic test that determines whether to recommend this topic to new learners.
+        </em>
       </div>
       <div class="oppia-diagnostic-test-skill-list-header"
            ng-if="selectedSkillsForDiagnosticTest.length">
@@ -309,10 +309,10 @@
                     ng-model="selectedSkillForDiagnosticTest"
                     ng-change="addSkillForDiagnosticTest(selectedSkillForDiagnosticTest)"
                     aria-label="selection dropdown">
-                <option ng-repeat="skillSummary in availableSkillsForDiagnosticTest"
-                        ng-value="skillSummary">
-                  {{skillSummary.getDescription()}}
-                </option>
+              <option ng-repeat="skillSummary in availableSkillsForDiagnosticTest"
+                      ng-value="skillSummary">
+                {{skillSummary.getDescription()}}
+              </option>
             </select>
           </div>
           <button class="oppia-remove-diagnostic-test-skill-button"
@@ -328,8 +328,8 @@
                   ng-show="!isDiagnosticTestSkillsDropdownPresent"
                   ng-disabled="availableSkillsForDiagnosticTest.length === 0 || selectedSkillsForDiagnosticTest.length === 3">
             <div class="oppia-flex">
-                <md-icon aria-label="icon-button with a plus icon">add_circle</md-icon>
-                <h4 class="oppia-button-text">Add diagnostic test skills</h4>
+              <md-icon aria-label="icon-button with a plus icon">add_circle</md-icon>
+              <h4 class="oppia-button-text">Add diagnostic test skills</h4>
             </div>
           </button>
         </md-list-item>
@@ -691,8 +691,8 @@
   }
 
   .topic-editor .diagnostic-test-card-container {
-    margin-top: 64px;
     margin-bottom: 64px;
+    margin-top: 64px;
   }
 
   .topic-editor .practice-tab-info-circle {
@@ -714,8 +714,6 @@
 
   .oppia-add-diagnostic-test-skills-button {
     color: #00695e;
-    /* margin: 0px;
-    padding: 0px; */
     width: fit-content;
   }
 
@@ -731,7 +729,6 @@
   }
 
   .oppia-button-text {
-    /* margin: 0px; */
     padding: 10px;
   }
 

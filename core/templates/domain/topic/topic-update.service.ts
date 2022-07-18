@@ -803,7 +803,7 @@ export class TopicUpdateService {
   updateDiagnosticTestSkills(
       topic: Topic, newSkillsForDiagnosticTest: ShortSkillSummary[]): void {
     let oldSkillsForDiagnosticTest = cloneDeep(
-      topic.getDiagnosticTestSkillSummaries())
+      topic.getDiagnosticTestSkillSummaries());
     let oldSkillIdsForDiagnosticTest = oldSkillsForDiagnosticTest.map((
         skillSummary: ShortSkillSummary) => {
       return skillSummary.getId();
