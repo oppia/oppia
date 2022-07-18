@@ -2701,7 +2701,9 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             question.question_state_data_schema_version,
             feconf.CURRENT_STATE_SCHEMA_VERSION)
 
-        answer_group_object = question.question_state_data.interaction.answer_groups[0]
+        answer_group_object = (
+            question.question_state_data.interaction.answer_groups[0]
+        )
         rule_spec = answer_group_object.rule_specs[0]
         self.assertEqual(
             rule_spec.inputs['x'],
@@ -2800,7 +2802,9 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             question.question_state_data_schema_version,
             feconf.CURRENT_STATE_SCHEMA_VERSION)
 
-        answer_group_object = question.question_state_data.interaction.answer_groups[0]
+        answer_group_object = (
+            question.question_state_data.interaction.answer_groups[0]
+        )
         rule_spec = answer_group_object.rule_specs[0]
         self.assertEqual(
             rule_spec.inputs['x'],

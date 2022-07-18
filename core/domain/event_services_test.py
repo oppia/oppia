@@ -36,8 +36,8 @@ from core.tests import test_utils
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import datastore_services
-    from mypy_imports import stats_models
     from mypy_imports import feedback_models
+    from mypy_imports import stats_models
     from mypy_imports import user_models
 
 (
