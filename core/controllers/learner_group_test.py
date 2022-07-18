@@ -664,11 +664,17 @@ class CreateLearnerGroupPageTests(test_utils.GenericTestBase):
 class FacilitatorDashboardPageTests(test_utils.GenericTestBase):
     """Checks the access and rendering of the facilitator dashboard page."""
 
+    def setUp(self):
+        super(FacilitatorDashboardPageTests, self).setUp()
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.login(self.NEW_USER_EMAIL)
+
     def test_page_with_disabled_learner_groups_leads_to_404(self):
         config_services.set_property(
             'admin', 'learner_groups_are_enabled', False)
         self.get_html_response(
             feconf.FACILITATOR_DASHBOARD_PAGE_URL, expected_status_int=404)
+        self.logout()
 
     def test_page_with_enabled_learner_groups_loads_correctly(self):
         config_services.set_property(
@@ -678,6 +684,7 @@ class FacilitatorDashboardPageTests(test_utils.GenericTestBase):
         response.mustcontain(
             '<oppia-facilitator-dashboard-page>'
             '</oppia-facilitator-dashboard-page>')
+        self.logout()
 
 
 class LearnerGroupSearchStudentHandlerTests(test_utils.GenericTestBase):
