@@ -1203,14 +1203,6 @@ class Topic:
                 ' are not associated with any subtopic.' %
                 skill_ids_for_diagnostic_that_are_not_in_topic)
 
-        if (
-            strict and
-            len(self.skill_ids_for_diagnostic_test) == 0 and
-            len(all_skill_ids) > 0
-        ):
-            raise utils.ValidationError(
-                'The skill_ids_for_diagnostic_test field should not be empty.')
-
         if len(self.skill_ids_for_diagnostic_test) > 3:
             raise utils.ValidationError(
                 'The skill_ids_for_diagnostic_test field should contain at '
