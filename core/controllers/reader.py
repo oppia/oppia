@@ -1870,7 +1870,11 @@ class StateVersionHistoryHandler(base.BaseHandler):
         },
         'state_name': {
             'schema': {
-                'type': 'basestring'
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': constants.MAX_STATE_NAME_LENGTH
+                }]
             }
         },
         'version': {
