@@ -1043,7 +1043,14 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
     invalid_end_interac = []
     @staticmethod
     def filter_invalid_end_interac(exp, exp_id_list):
-        """
+        """Filter invalid end interaction states.
+
+        Args:
+            exp: exp_domain.Exploration. The exploration.
+            exp_id_list: List[str]. List of all exploration ids.
+
+        Returns:
+            found_invalid: bool. Returns True if invalid exploration.
         """
         states = exp.states
         found_invalid = False
@@ -1101,7 +1108,14 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
 
     @staticmethod
     def get_invalid_end_interac_values(exp):
-        """
+        """Return the errored value of the current exploration.
+
+        Args:
+            exp: exp_domain.Exploration. The exploration.
+
+        Returns:
+            List[Dict[str, Any]]. The list of dictionaries
+            containing the errored values.
         """
         for ele in ExpStateInteractionValidationJob.invalid_end_interac:
             if exp.id in ele.keys():
