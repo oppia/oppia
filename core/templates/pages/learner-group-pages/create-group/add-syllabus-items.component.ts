@@ -92,6 +92,7 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
   activeMenuName: string = '';
   searchIsInProgress = false;
   syllabusFilter!: LearnerGroupSyllabusFilter;
+  debounceTimeout = 1000;
 
   constructor(
     private windowDimensionsService: WindowDimensionsService,
@@ -151,9 +152,10 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
     this.refreshSearchBarLabels();
 
     this.searchQueryChanged
-      .pipe(debounceTime(1000), distinctUntilChanged())
-      .subscribe(model => {
-        this.searchQuery = model;
+      .pipe(debounceTime(this.debounceTimeout))
+      .pipe(distinctUntilChanged())
+      .subscribe(value => {
+        this.searchQuery = value;
         this.onSearchQueryChangeExec();
       });
 

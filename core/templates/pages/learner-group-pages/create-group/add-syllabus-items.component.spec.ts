@@ -298,17 +298,23 @@ describe('AddSyllabusItemsComponent', () => {
     expect(component.isSearchInProgress()).toBe(true);
   });
 
-  it ('should search', () => {
+  it ('should search', fakeAsync(() => {
+    component.debounceTimeout = 50;
+    component.searchQuery = 'hello';
+    component.ngOnInit();
+
     const search = {
       target: {
         value: 'search'
       }
     };
 
-    spyOn(component.searchQueryChanged, 'next');
+    spyOn(component, 'onSearchQueryChangeExec');
     component.searchToBeExec(search);
-    expect(component.searchQueryChanged.next).toHaveBeenCalled();
-  });
+    tick(1000);
+    expect(component.searchQuery).toBe('search');
+    expect(component.onSearchQueryChangeExec).toHaveBeenCalled();
+  }));
 
   it('should execute search when search query is changed',
     fakeAsync(() => {
@@ -356,6 +362,16 @@ describe('AddSyllabusItemsComponent', () => {
     expect(component.refreshSearchBarLabels).toHaveBeenCalled();
     expect(translateService.onLangChange.subscribe).toHaveBeenCalled();
   }));
+
+  it('should call refresh search bar labels whenever the language is ' +
+  'changed', () => {
+    component.ngOnInit();
+    spyOn(component, 'refreshSearchBarLabels');
+
+    translateService.onLangChange.emit();
+
+    expect(component.refreshSearchBarLabels).toHaveBeenCalled();
+  });
 
   it('should get subtopic thumbnail url', () => {
     spyOn(assetsBackendApiService, 'getThumbnailUrlForPreview')

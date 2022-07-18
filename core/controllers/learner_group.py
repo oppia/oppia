@@ -476,11 +476,7 @@ class FacilitatorDashboardPage(base.BaseHandler):
     @acl_decorators.can_access_learner_groups
     def get(self):
         """Handles GET requests."""
-        learner_groups_are_enabled = (
-            config_domain.LEARNER_GROUPS_ARE_ENABLED.value
-        )
-
-        if not learner_groups_are_enabled:
+        if not config_domain.LEARNER_GROUPS_ARE_ENABLED.value:
             raise self.PageNotFoundException
 
         self.render_template('facilitator-dashboard-page.mainpage.html')
@@ -497,11 +493,7 @@ class CreateLearnerGroupPage(base.BaseHandler):
     @acl_decorators.can_access_learner_groups
     def get(self):
         """Handles GET requests."""
-        learner_groups_are_enabled = (
-            config_domain.LEARNER_GROUPS_ARE_ENABLED.value
-        )
-
-        if not learner_groups_are_enabled:
+        if not config_domain.LEARNER_GROUPS_ARE_ENABLED.value:
             raise self.PageNotFoundException
 
         self.render_template('create-learner-group-page.mainpage.html')

@@ -20,7 +20,7 @@ import json
 
 from core import feconf
 from core.constants import constants
-from core.domain import config_domain
+from core.domain import config_services
 from core.domain import learner_group_fetchers
 from core.domain import learner_group_services
 from core.domain import skill_services
@@ -639,61 +639,38 @@ class LearnerGroupStudentProgressHandlerTests(test_utils.GenericTestBase):
 class CreateLearnerGroupPageTests(test_utils.GenericTestBase):
     """Checks the access and rendering of the create learner group page."""
 
-    def setUp(self):
-        super(CreateLearnerGroupPageTests, self).setUp()
-        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
-
-    def test_create_learner_page_access_without_logging_in(self):
-        """Tests access to the Create Learner Group page."""
+    def test_page_with_disabled_learner_groups_leads_to_404(self):
+        config_services.set_property(
+            'admin', 'learner_groups_are_enabled', False)
         self.get_html_response(
-            '/create-learner-group', expected_status_int=302
-        )
+            feconf.CREATE_LEARNER_GROUP_PAGE_URL, expected_status_int=404)
 
-    def test_create_learner_page_access_with_feature_flag_off(self):
-        self.login(self.VIEWER_EMAIL)
-        self.set_config_property(
-            config_domain.LEARNER_GROUPS_ARE_ENABLED, False)
-        self.get_html_response(
-            '/create-learner-group', expected_status_int=404
-        )
-        self.logout()
-
-    def test_create_learner_page_access_with_feature_flag_on(self):
-        self.login(self.VIEWER_EMAIL)
-        self.set_config_property(
-            config_domain.LEARNER_GROUPS_ARE_ENABLED, True)
-        self.get_html_response('/create-learner-group')
-        self.logout()
+    def test_page_with_enabled_learner_groups_loads_correctly(self):
+        config_services.set_property(
+            'admin', 'learner_groups_are_enabled', True)
+        response = self.get_html_response(feconf.CREATE_LEARNER_GROUP_PAGE_URL)
+        response.mustcontain(
+            '<oppia-create-learner-group-page>'
+            '</oppia-create-learner-group-page>')
 
 
 class FacilitatorDashboardPageTests(test_utils.GenericTestBase):
     """Checks the access and rendering of the facilitator dashboard page."""
 
-    def setUp(self):
-        super(FacilitatorDashboardPageTests, self).setUp()
-        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
-
-    def test_facilitator_dashboard_page_access_without_logging_in(self):
-        """Tests access to the facilitator dashboard page."""
+    def test_page_with_disabled_learner_groups_leads_to_404(self):
+        config_services.set_property(
+            'admin', 'learner_groups_are_enabled', False)
         self.get_html_response(
-            '/facilitator-dashboard', expected_status_int=302
-        )
+            feconf.FACILITATOR_DASHBOARD_PAGE_URL, expected_status_int=404)
 
-    def test_facilitator_dashboard_page_access_with_feature_flag_off(self):
-        self.login(self.VIEWER_EMAIL)
-        self.set_config_property(
-            config_domain.LEARNER_GROUPS_ARE_ENABLED, False)
-        self.get_html_response(
-            '/facilitator-dashboard', expected_status_int=404
-        )
-        self.logout()
-
-    def test_facilitator_dashboard_page_access_with_feature_flag_on(self):
-        self.login(self.VIEWER_EMAIL)
-        self.set_config_property(
-            config_domain.LEARNER_GROUPS_ARE_ENABLED, True)
-        self.get_html_response('/facilitator-dashboard')
-        self.logout()
+    def test_page_with_enabled_learner_groups_loads_correctly(self):
+        config_services.set_property(
+            'admin', 'learner_groups_are_enabled', True)
+        response = self.get_html_response(
+            feconf.FACILITATOR_DASHBOARD_PAGE_URL)
+        response.mustcontain(
+            '<oppia-facilitator-dashboard-page>'
+            '</oppia-facilitator-dashboard-page>')
 
 
 class LearnerGroupSearchStudentHandlerTests(test_utils.GenericTestBase):
