@@ -240,6 +240,8 @@ exports.config = {
     // If a test fails then only the error will be defined and
     // the screenshot will be taken and saved.
     if (error) {
+      // eslint-disable-next-line no-console
+      console.log('######ERROR#######');
       var dirPath = path.resolve(
         '__dirname', '..', '..', 'webdriverio-screenshots/');
       try {
