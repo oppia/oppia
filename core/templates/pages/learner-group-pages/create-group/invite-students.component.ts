@@ -19,11 +19,13 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AlertsService } from 'services/alerts.service';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { LearnerGroupBackendApiService } from
   'domain/learner_group/learner-group-backend-api.service';
 import { LearnerGroupInvitedUserInfo } from
   'domain/learner_group/learner-group-user-progress.model';
+
+import './invite-students.component.css';
+
 
 @Component({
   selector: 'oppia-invite-students',
@@ -44,13 +46,8 @@ export class InviteStudentsComponent {
 
   constructor(
     private alertsService: AlertsService,
-    private i18nLanguageCodeService: I18nLanguageCodeService,
     private learnerGroupBackendApiService: LearnerGroupBackendApiService
   ) {}
-
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
-  }
 
   updateInvitedStudents(): void {
     this.updateLearnerGroupInvitedStudents.emit(

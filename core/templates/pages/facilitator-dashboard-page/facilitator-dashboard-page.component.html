@@ -1,8 +1,5 @@
-<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/pages/facilitator-dashboard-page/facilitator-dashboard-page.component.css" as="style">
-<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/pages/facilitator-dashboard-page/facilitator-dashboard-page.component.rtl.css" as="style">
-
 <background-banner></background-banner>
-<div class="oppia-facilitator-dashboard-container position-relative">
+<div class="oppia-facilitator-dashboard position-relative">
   <div class="oppia-facilitator-dashboard-container-card">
     <div class="oppia-facilitator-dashboard-title">
       <span translate="I18N_TOPNAV_FACILITATOR_DASHBOARD"></span>
@@ -45,6 +42,3 @@
     </div>
   </div>
 </div>
-<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
-<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/facilitator-dashboard-page/facilitator-dashboard-page.component.css">
-<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/facilitator-dashboard-page/facilitator-dashboard-page.component.rtl.css">

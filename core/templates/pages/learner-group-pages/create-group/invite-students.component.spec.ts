@@ -20,7 +20,6 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { InviteStudentsComponent } from './invite-students.component';
 import { LearnerGroupBackendApiService } from
   'domain/learner_group/learner-group-backend-api.service';
@@ -30,7 +29,6 @@ describe('InviteStudentsComponent', () => {
   let component: InviteStudentsComponent;
   let fixture: ComponentFixture<InviteStudentsComponent>;
   let alertsService: AlertsService;
-  let i18nLanguageCodeService: I18nLanguageCodeService;
   let learnerGroupBackendApiService: LearnerGroupBackendApiService;
 
   const userInfo = {
@@ -52,20 +50,12 @@ describe('InviteStudentsComponent', () => {
   });
 
   beforeEach(() => {
-    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     alertsService = TestBed.inject(AlertsService);
     learnerGroupBackendApiService = TestBed.inject(
       LearnerGroupBackendApiService);
     fixture = TestBed.createComponent(InviteStudentsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
-  });
-
-  it('should get RTL language status correctly', () => {
-    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
-      true);
-
-    expect(component.isLanguageRTL()).toBeTrue();
   });
 
   it('should search new students to add to the learner group',

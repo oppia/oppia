@@ -639,6 +639,10 @@ class LearnerGroupStudentProgressHandlerTests(test_utils.GenericTestBase):
 class CreateLearnerGroupPageTests(test_utils.GenericTestBase):
     """Checks the access and rendering of the create learner group page."""
 
+    def setUp(self):
+        super(CreateLearnerGroupPageTests, self).setUp()
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+
     def test_create_learner_page_access_without_logging_in(self):
         """Tests access to the Create Learner Group page."""
         self.get_html_response(
@@ -646,7 +650,6 @@ class CreateLearnerGroupPageTests(test_utils.GenericTestBase):
         )
 
     def test_create_learner_page_access_with_feature_flag_off(self):
-        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
         self.set_config_property(
             config_domain.LEARNER_GROUPS_ARE_ENABLED, False)
@@ -656,7 +659,6 @@ class CreateLearnerGroupPageTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_create_learner_page_access_with_feature_flag_on(self):
-        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
         self.set_config_property(
             config_domain.LEARNER_GROUPS_ARE_ENABLED, True)
@@ -667,6 +669,10 @@ class CreateLearnerGroupPageTests(test_utils.GenericTestBase):
 class FacilitatorDashboardPageTests(test_utils.GenericTestBase):
     """Checks the access and rendering of the facilitator dashboard page."""
 
+    def setUp(self):
+        super(FacilitatorDashboardPageTests, self).setUp()
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+
     def test_facilitator_dashboard_page_access_without_logging_in(self):
         """Tests access to the facilitator dashboard page."""
         self.get_html_response(
@@ -674,7 +680,6 @@ class FacilitatorDashboardPageTests(test_utils.GenericTestBase):
         )
 
     def test_facilitator_dashboard_page_access_with_feature_flag_off(self):
-        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
         self.set_config_property(
             config_domain.LEARNER_GROUPS_ARE_ENABLED, False)
@@ -684,7 +689,6 @@ class FacilitatorDashboardPageTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_facilitator_dashboard_page_access_with_feature_flag_on(self):
-        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
         self.set_config_property(
             config_domain.LEARNER_GROUPS_ARE_ENABLED, True)
@@ -692,14 +696,16 @@ class FacilitatorDashboardPageTests(test_utils.GenericTestBase):
         self.logout()
 
 
-class LearnerGroupSearchStudentHandler(test_utils.GenericTestBase):
+class LearnerGroupSearchStudentHandlerTests(test_utils.GenericTestBase):
     """Tests searching a given user to invite to the learner group"""
 
     def setUp(self):
+        super(LearnerGroupSearchStudentHandlerTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
+        self.login(self.OWNER_EMAIL)
 
     def test_searching_invalid_user(self):
         params = {
@@ -724,7 +730,7 @@ class LearnerGroupSearchStudentHandler(test_utils.GenericTestBase):
             'learner_group_id': 'groupId'
         }
         response = self.get_json(
-            '/learner-group-search-student-handler', params=params
+            '/learner_group_search_student_handler', params=params
         )
 
         self.assertEqual(response['username'], self.OWNER_USERNAME)
@@ -744,21 +750,19 @@ class LearnerGroupSearchStudentHandler(test_utils.GenericTestBase):
             'learner_group_id': 'groupId'
         }
         response = self.get_json(
-            '/learner-group-search-student-handler', params=params
+            '/learner_group_search_student_handler', params=params
         )
 
         self.assertEqual(response['username'], self.NEW_USER_USERNAME)
         self.assertEqual(response['profile_picture_data_url'], '')
         self.assertEqual(
             response['error'],
-            'User with username %s has already be invited to join the '
-            'learner group' % self.NEW_USER_USERNAME
+            'User with username %s has been already invited to join the '
+            'group' % self.NEW_USER_USERNAME
         )
         self.logout()
 
     def test_searching_a_valid_user_to_invite(self):
-        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
-        self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
         learner_group_services.create_learner_group(
             'groupId', 'Group Title', 'Group Description',
             [self.owner_id], [], ['subtopic1'], [])
@@ -767,7 +771,7 @@ class LearnerGroupSearchStudentHandler(test_utils.GenericTestBase):
             'learner_group_id': 'groupId'
         }
         response = self.get_json(
-            '/learner-group-search-student-handler', params=params
+            '/learner_group_search_student_handler', params=params
         )
 
         user_settings = user_services.get_user_settings_from_username(

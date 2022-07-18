@@ -19,7 +19,8 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import './learner-group-details.component.css';
+
 
 @Component({
   selector: 'oppia-learner-group-details',
@@ -31,13 +32,7 @@ export class LearnerGroupDetailsComponent {
   @Output() updateLearnerGroupTitle: EventEmitter<string> = new EventEmitter();
   @Output() updateLearnerGroupDesc: EventEmitter<string> = new EventEmitter();
 
-  constructor(
-    private i18nLanguageCodeService: I18nLanguageCodeService
-  ) {}
-
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
-  }
+  constructor() {}
 
   updateGroupTitle(title: string): void {
     this.learnerGroupTitle = title;

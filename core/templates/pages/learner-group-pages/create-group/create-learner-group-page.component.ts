@@ -22,7 +22,6 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { LoaderService } from 'services/loader.service';
 import { PageTitleService } from 'services/page-title.service';
 import { LearnerGroupPagesConstants } from '../learner-group-pages.constants';
@@ -37,6 +36,9 @@ import { LearnerGroupInvitedUserInfo } from
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+
+import './create-learner-group-page.component.css';
+
 
 @Component({
   selector: 'oppia-create-learner-group-page',
@@ -61,7 +63,6 @@ export class CreateLearnerGroupPageComponent implements OnInit, OnDestroy {
   learnerGroupUrl: string = '';
 
   constructor(
-    private i18nLanguageCodeService: I18nLanguageCodeService,
     private loaderService: LoaderService,
     private pageTitleService: PageTitleService,
     private translateService: TranslateService,
@@ -76,10 +77,6 @@ export class CreateLearnerGroupPageComponent implements OnInit, OnDestroy {
       this.LEARNER_GROUP_CREATION_SECTION_I18N_IDS.GROUP_DETAILS
     );
     this.subscribeToOnLangChange();
-  }
-
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   subscribeToOnLangChange(): void {

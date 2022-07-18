@@ -21,7 +21,6 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { LoaderService } from 'services/loader.service';
 import { PageTitleService } from 'services/page-title.service';
 import { LearnerGroupPagesConstants } from
@@ -33,6 +32,9 @@ import { FacilitatorDashboardBackendApiService } from
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
+import './facilitator-dashboard-page.component.css';
+
+
 @Component({
   selector: 'oppia-facilitator-dashboard-page',
   templateUrl: './facilitator-dashboard-page.component.html',
@@ -43,7 +45,6 @@ export class FacilitatorDashboardPageComponent implements OnInit, OnDestroy {
   shortLearnerGroupSummaries: ShortLearnerGroupSummary[] = [];
 
   constructor(
-    private i18nLanguageCodeService: I18nLanguageCodeService,
     private pageTitleService: PageTitleService,
     private translateService: TranslateService,
     private facilitatorDashboardBackendApiService:
@@ -51,10 +52,6 @@ export class FacilitatorDashboardPageComponent implements OnInit, OnDestroy {
     private urlInterpolationService: UrlInterpolationService,
     private loaderService: LoaderService
   ) {}
-
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
-  }
 
   subscribeToOnLangChange(): void {
     this.directiveSubscriptions.add(

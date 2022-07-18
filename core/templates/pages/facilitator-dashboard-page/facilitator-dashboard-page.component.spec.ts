@@ -21,7 +21,6 @@ import { ComponentFixture, fakeAsync, TestBed, tick } from
   '@angular/core/testing';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { LearnerGroupPagesConstants } from
   'pages/learner-group-pages/learner-group-pages.constants';
 import { UrlInterpolationService } from
@@ -44,7 +43,6 @@ class MockTranslateService {
 describe('FacilitatorDashboardPageComponent', () => {
   let component: FacilitatorDashboardPageComponent;
   let fixture: ComponentFixture<FacilitatorDashboardPageComponent>;
-  let i18nLanguageCodeService: I18nLanguageCodeService;
   let urlInterpolationService: UrlInterpolationService;
   let translateService: TranslateService;
   let facilitatorDashboardBackendApiService:
@@ -80,7 +78,6 @@ describe('FacilitatorDashboardPageComponent', () => {
   });
 
   beforeEach(() => {
-    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     translateService = TestBed.inject(TranslateService);
     pageTitleService = TestBed.inject(PageTitleService);
@@ -128,13 +125,6 @@ describe('FacilitatorDashboardPageComponent', () => {
       'I18N_FACILITATOR_DASHBOARD_PAGE_TITLE');
     expect(pageTitleService.setDocumentTitle).toHaveBeenCalledWith(
       'I18N_FACILITATOR_DASHBOARD_PAGE_TITLE');
-  });
-
-  it('should get RTL language status correctly', () => {
-    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
-      true);
-
-    expect(component.isLanguageRTL()).toBeTrue();
   });
 
   it('should get learner group page url correctly', () => {

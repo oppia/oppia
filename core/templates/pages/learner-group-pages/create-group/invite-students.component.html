@@ -1,7 +1,4 @@
-<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/pages/learner-group-pages/create-group/invite-students.component.css" as="style">
-<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/pages/learner-group-pages/create-group/invite-students.component.rtl.css" as="style">
-
-<div class="oppia-learner-group-invite-students">
+<div class="oppia-invite-students">
   <div class="form-group">
     <b><span class="oppia-learner-group-invite-search-title" translate="I18N_LEARNER_GROUP_INVITE_STUDENTS_BY_USERNAME"></span></b>
     <input type="text"
@@ -28,7 +25,3 @@
     </div>
   </div>
 </div>
-
-<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
-<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/learner-group-pages/create-group/invite-students.component.css">
-<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/learner-group-pages/create-group/invite-students.component.rtl.css">

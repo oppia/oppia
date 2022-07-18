@@ -1,12 +1,9 @@
-<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/pages/learner-group-pages/create-group/create-learner-group-page.component.css" as="style">
-<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/pages/learner-group-pages/create-group/create-learner-group-page.component.rtl.css" as="style">
-
-<div *ngIf="!learnerGroup" class="oppia-create-learner-group-container position-relative">
+<div *ngIf="!learnerGroup" class="oppia-create-learner-group position-relative">
   <div class="oppia-create-learner-group-title">
     <span translate="I18N_CREATE_LEARNER_GROUP"></span>
   </div>
   <div class="oppia-create-learner-group-progress">
-    <ul class="oppia-learner-group-progressbar horizontal">
+    <ul class="oppia-learner-group-progressbar">
       <li [ngClass]="getProgressTabStatusClass(1)">
         <span *ngIf="getProgressTabStatusClass(1) != 'completed'" class="indicator">1</span>
         <span *ngIf="getProgressTabStatusClass(1) == 'completed'" class="indicator checkmark"></span>
@@ -93,6 +90,3 @@
     &nbsp;&nbsp;<i class="far fa-copy" (click)="copyCreatedGroupUrl()"></i>
   </div>
 </div>
-<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
-<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/learner-group-pages/create-group/create-learner-group-page.component.css">
-<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/learner-group-pages/create-group/create-learner-group-page.component.rtl.css">

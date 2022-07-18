@@ -24,7 +24,6 @@ import { Subject, Subscription } from 'rxjs';
 
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { LanguageIdAndText, LanguageUtilService } from
   'domain/utilities/language-util.service';
 import { NavigationService } from 'services/navigation.service';
@@ -42,6 +41,9 @@ import { LearnerGroupSubtopicSummary } from
   'domain/learner_group/learner-group-subtopic-summary.model';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { AppConstants } from 'app.constants';
+
+import './add-syllabus-items.component.css';
+
 
 interface SearchDropDownItems {
   id: string;
@@ -92,7 +94,6 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
   syllabusFilter!: LearnerGroupSyllabusFilter;
 
   constructor(
-    private i18nLanguageCodeService: I18nLanguageCodeService,
     private windowDimensionsService: WindowDimensionsService,
     private translateService: TranslateService,
     private navigationService: NavigationService,
@@ -105,10 +106,6 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
 
   isMobileViewActive(): boolean {
     return this.windowDimensionsService.getWidth() <= 766;
-  }
-
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   ngOnInit(): void {

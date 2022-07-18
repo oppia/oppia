@@ -21,12 +21,10 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { LearnerGroupDetailsComponent } from './learner-group-details.component';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 describe('LearnerGroupDetailsComponent', () => {
   let component: LearnerGroupDetailsComponent;
   let fixture: ComponentFixture<LearnerGroupDetailsComponent>;
-  let i18nLanguageCodeService: I18nLanguageCodeService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -41,17 +39,9 @@ describe('LearnerGroupDetailsComponent', () => {
   });
 
   beforeEach(() => {
-    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     fixture = TestBed.createComponent(LearnerGroupDetailsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
-  });
-
-  it('should get RTL language status correctly', () => {
-    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
-      true);
-
-    expect(component.isLanguageRTL()).toBeTrue();
   });
 
   it('should update learner group title', () => {

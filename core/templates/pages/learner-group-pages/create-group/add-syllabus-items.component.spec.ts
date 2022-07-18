@@ -20,7 +20,6 @@ import { EventEmitter, NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { AddSyllabusItemsComponent } from './add-syllabus-items.component';
 import { NavigationService } from 'services/navigation.service';
 import { TranslateService } from '@ngx-translate/core';
@@ -86,7 +85,6 @@ class MockNavigationService {
 describe('AddSyllabusItemsComponent', () => {
   let component: AddSyllabusItemsComponent;
   let fixture: ComponentFixture<AddSyllabusItemsComponent>;
-  let i18nLanguageCodeService: I18nLanguageCodeService;
   let navigationService: NavigationService;
   let translateService: TranslateService;
   let windowDimensionsService: WindowDimensionsService;
@@ -217,7 +215,6 @@ describe('AddSyllabusItemsComponent', () => {
       }
     };
 
-    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     navigationService = TestBed.inject(NavigationService);
     translateService = TestBed.inject(TranslateService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
@@ -230,13 +227,6 @@ describe('AddSyllabusItemsComponent', () => {
     fixture = TestBed.createComponent(AddSyllabusItemsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
-  });
-
-  it('should get RTL language status correctly', () => {
-    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
-      true);
-
-    expect(component.isLanguageRTL()).toBeTrue();
   });
 
   it('should determine if mobile view is active', () => {
