@@ -22,7 +22,6 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 
-import { ContextService } from 'services/context.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { LoaderService } from 'services/loader.service';
 import { PageTitleService } from 'services/page-title.service';
@@ -62,7 +61,6 @@ export class CreateLearnerGroupPageComponent implements OnInit, OnDestroy {
   learnerGroupUrl: string = '';
 
   constructor(
-    private contextService: ContextService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private loaderService: LoaderService,
     private pageTitleService: PageTitleService,
@@ -196,7 +194,6 @@ export class CreateLearnerGroupPageComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
-    this.contextService.removeCustomEntityContext();
   }
 }
 

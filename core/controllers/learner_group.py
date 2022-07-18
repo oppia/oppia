@@ -533,7 +533,7 @@ class LearnerGroupSearchStudentHandler(base.BaseHandler):
 
     @acl_decorators.can_access_learner_groups
     def get(self):
-        """Handles GET requests for learner group syllabus views."""
+        """Handles GET requests."""
 
         username: str = self.normalized_request.get('username')
         learner_group_id: str = self.normalized_request.get('learner_group_id')
