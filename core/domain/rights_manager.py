@@ -252,6 +252,12 @@ def get_exploration_rights(
 ) -> Optional[rights_domain.ActivityRights]: ...
 
 
+@overload
+def get_exploration_rights(
+    exploration_id: str, *, strict: bool = False
+) -> Optional[rights_domain.ActivityRights]: ...
+
+
 def get_exploration_rights(
     exploration_id: str, strict: bool = True
 ) -> Optional[rights_domain.ActivityRights]:
@@ -471,6 +477,12 @@ def get_collection_rights(
 ) -> Optional[rights_domain.ActivityRights]: ...
 
 
+@overload
+def get_collection_rights(
+    collection_id: str, *, strict: bool = True
+) -> Optional[rights_domain.ActivityRights]: ...
+
+
 def get_collection_rights(
     collection_id: str, strict: bool = True
 ) -> Optional[rights_domain.ActivityRights]:
@@ -536,8 +548,26 @@ def is_collection_public(collection_id: str) -> bool:
     return collection_rights.status == rights_domain.ACTIVITY_STATUS_PUBLIC
 
 
+@overload
+def _get_activity_rights(
+    activity_type: str, activity_id: str, *, strict: Literal[True]
+) -> rights_domain.ActivityRights: ...
+
+
+@overload
 def _get_activity_rights(
     activity_type: str, activity_id: str
+) -> Optional[rights_domain.ActivityRights]: ...
+
+
+@overload
+def _get_activity_rights(
+    activity_type: str, activity_id: str, *, strict: Literal[False]
+) -> Optional[rights_domain.ActivityRights]: ...
+
+
+def _get_activity_rights(
+    activity_type: str, activity_id: str, strict: bool = False
 ) -> Optional[rights_domain.ActivityRights]:
     """Retrieves the rights object for the given activity
     based on its type.
@@ -547,6 +577,8 @@ def _get_activity_rights(
             constants.ACTIVITY_TYPE_EXPLORATION,
             constants.ACTIVITY_TYPE_COLLECTION.
         activity_id: str. ID of the activity.
+        strict: bool. whether to fail noisily if the activity_rights
+            doesn't exist for the given activity_id.
 
     Returns:
         ActivityRights|None. The rights object associated with the given
@@ -556,13 +588,14 @@ def _get_activity_rights(
         Exception. The activity_type provided is unknown.
     """
     if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
-        return get_exploration_rights(activity_id, strict=False)
+        activity_rights = get_exploration_rights(activity_id, strict=strict)
     elif activity_type == constants.ACTIVITY_TYPE_COLLECTION:
-        return get_collection_rights(activity_id, strict=False)
+        activity_rights = get_collection_rights(activity_id, strict=strict)
     else:
         raise Exception(
             'Cannot get activity rights for unknown activity type: %s' % (
                 activity_type))
+    return activity_rights
 
 
 def check_can_access_activity(
@@ -1130,7 +1163,9 @@ def _release_ownership_of_activity(
         Exception. The committer does not have release rights.
     """
     committer_id = committer.user_id
-    activity_rights = _get_activity_rights(activity_type, activity_id)
+    activity_rights = _get_activity_rights(
+        activity_type, activity_id, strict=True
+    )
 
     if not check_can_release_ownership(committer, activity_rights):
         logging.error(
@@ -1139,11 +1174,6 @@ def _release_ownership_of_activity(
         raise Exception(
             'The ownership of this %s cannot be released.' % activity_type)
 
-    # Here we are asserting that `activity_rights` is not going to be a
-    # none value, because if `activity_rights` is a None value then method
-    # `check_can_release_ownership()` is going to return a `False` and due
-    # to a `False` value an exception is raised above.
-    assert activity_rights is not None
 
     activity_rights.community_owned = True
     activity_rights.owner_ids = []
@@ -1178,15 +1208,10 @@ def _change_activity_status(
         new_status: str. The new status of the activity.
         commit_message: str. The human-written commit message for this change.
     """
-    activity_rights = _get_activity_rights(activity_type, activity_id)
+    activity_rights = _get_activity_rights(
+        activity_type, activity_id, strict=True
+    )
 
-    # The method `_change_activity_status` is used a helper function in
-    # `_publish_activity` and `_unpublish_activity` methods, and there we
-    # are already checking if the `activity_rights` is None or not, and if
-    # `activity_rights` is none then there we are throwing an exception.
-    # So, to just narrow down the type from Optional[ActivityRights] to
-    # ActivityRights of `activity_rights`. We used assertion here.
-    assert activity_rights is not None
     old_status = activity_rights.status
     activity_rights.status = new_status
     if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
