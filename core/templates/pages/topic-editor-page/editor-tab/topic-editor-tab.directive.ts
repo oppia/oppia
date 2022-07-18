@@ -155,13 +155,13 @@ angular.module('oppia').directive('topicEditorTab', [
               }
 
               $scope.selectedSkillsForDiagnosticTest.push(skillToAdd);
-              let j = 0;
+              let j = -1;
               for (let skill of $scope.availableSkillsForDiagnosticTest) {
+                j++;
                 if (skill.getId() === skillToAdd.getId()) {
                   $scope.availableSkillsForDiagnosticTest.splice(j, 1);
                   break;
                 }
-                j++;
               }
               TopicUpdateService.updateDiagnosticTestSkills(
                 $scope.topic,
@@ -171,13 +171,13 @@ angular.module('oppia').directive('topicEditorTab', [
             };
 
             $scope.removeSkillFromDiagnosticTest = function(skillToRemove) {
-              let j = 0;
+              let j = -1;
               for (let skill of $scope.selectedSkillsForDiagnosticTest) {
+                j++;
                 if (skill.getId() === skillToRemove.getId()) {
                   $scope.selectedSkillsForDiagnosticTest.splice(j, 1);
                   break;
                 }
-                j++;
               }
               $scope.availableSkillsForDiagnosticTest.push(skillToRemove);
 

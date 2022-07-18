@@ -657,6 +657,25 @@ describe('Topic editor tab directive', function() {
     expect(updateSkillIdForDiagosticTestSpy).toHaveBeenCalled();
   });
 
+  it('should call the TopicUpdateService if any skillId is removed from the ' +
+     'diagnostic test', function() {
+    var updateSkillIdForDiagosticTestSpy = spyOn(
+      TopicUpdateService, 'updateDiagnosticTestSkills');
+    $scope.selectedSkillsForDiagnosticTest = [skillSummary];
+
+    $scope.removeSkillFromDiagnosticTest(skillSummary);
+    expect(updateSkillIdForDiagosticTestSpy).toHaveBeenCalled();
+  });
+
+  it('should be able to present diagnostic test dropdown selector correctly',
+    function() {
+      $scope.presentDiagnosticTestSkillDropdown();
+      expect($scope.isDiagnosticTestSkillsDropdownPresent).toBeTrue();
+
+      $scope.removeSkillDropdownForDiagnosticTest();
+      expect($scope.isDiagnosticTestSkillsDropdownPresent).toBeFalse();
+    });
+
   it('should not call the TopicUpdateService if null skill is added in the' +
      ' diagnostic test', function() {
     var updateSkillIdForDiagosticTestSpy = spyOn(

@@ -110,6 +110,28 @@ describe('Topic object factory', () => {
     ]);
   });
 
+  it('should warn user when no skill Ids were added for the diagnostic test',
+    () => {
+      _sampleTopic._skillsForDiagnosticTest = [];
+      expect(_sampleTopic.validate()).toEqual([
+        'Skill for the diagnostic test in the topic should not be empty.'
+      ]);
+    });
+
+  it('should warn user when no skill Ids were added for the diagnostic test',
+    () => {
+      var shortSkillSummaries = [
+        ShortSkillSummary.create('skill 1', 'description 1'),
+        ShortSkillSummary.create('skill 2', 'description 2'),
+        ShortSkillSummary.create('skill 3', 'description 3'),
+        ShortSkillSummary.create('skill 4', 'description 4'),
+      ];
+      _sampleTopic._skillsForDiagnosticTest = shortSkillSummaries;
+      expect(_sampleTopic.validate()).toEqual([
+        'At most 3 skill should be added for the diagnostic test in the topic.'
+      ]);
+    });
+
   it('should warn user if duplicate stories are present', () => {
     _sampleTopic._canonicalStoryReferences = [
       StoryReference.createFromBackendDict({
@@ -162,6 +184,19 @@ describe('Topic object factory', () => {
       expect(_sampleTopic.getDiagnosticTestSkillSummaries()).toEqual(
         [skillSummary2]);
     });
+
+  it('should be able to get all the available skillIds for assignment in the ' +
+     'diagnostic test', () => {
+    var shortSkillSummaries1 = ShortSkillSummary.create(
+      'skill_1', 'Description 1');
+    var shortSkillSummaries2 = ShortSkillSummary.create(
+      'skill_2', 'Description 2');
+    var shortSkillSummaries3 = ShortSkillSummary.create(
+      'skill_3', 'Description 3');
+    _sampleTopic._skillsForDiagnosticTest = [shortSkillSummaries1];
+    expect(_sampleTopic.getSkillSummariesThatAreNotInDiagnosticTest()).toEqual(
+      [shortSkillSummaries2, shortSkillSummaries3]);
+  });
 
   it('should correctly remove the various array elements', () => {
     _sampleTopic.removeCanonicalStory('story_1');

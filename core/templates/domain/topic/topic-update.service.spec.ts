@@ -213,7 +213,7 @@ describe('Topic update service', function() {
 
   it('should create a proper backend change dict for updating the skill Ids ' +
      'for diagnostic test', function() {
-    _sampleTopic.setDiagnosticTestSkillSummaries([]);
+    _sampleTopic.setDiagnosticTestSkillSummaries([_secondSkillSummary]);
     topicUpdateService.updateDiagnosticTestSkills(
       _sampleTopic, [_firstSkillSummary]);
     expect(_sampleTopic.getDiagnosticTestSkillSummaries()).toEqual(
@@ -222,8 +222,11 @@ describe('Topic update service', function() {
       cmd: 'update_topic_property',
       property_name: 'skill_ids_for_diagnostic_test',
       new_value: ['skill_1'],
-      old_value: []
+      old_value: ['skill_2']
     }]);
+    undoRedoService.undoChange(_sampleTopic);
+    expect(_sampleTopic.getDiagnosticTestSkillSummaries()).toEqual(
+      [_secondSkillSummary]);
   });
 
   it('should set/unset changes to a topic\'s name', () => {
