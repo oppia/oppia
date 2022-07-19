@@ -67,6 +67,8 @@ export class AddAnswerGroupModalComponent
    isInvalid: boolean;
    modalId = Symbol();
    validation: boolean = false;
+   destIfStuckFeatEnabled: boolean =
+      AppConstants.DEST_IF_REALLY_STUCK_FEAT_ENABLED
 
    constructor(
      private ngbActiveModal: NgbActiveModal,

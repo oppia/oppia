@@ -32,13 +32,18 @@ interface DestinationChoice {
   text: string;
 }
 
+interface DestValidation {
+  isCreatingNewState: boolean;
+  value: string;
+}
+
 @Component({
   selector: 'oppia-outcome-if-stuck-destination-editor',
   templateUrl: './outcome-if-stuck-destination-editor.component.html'
 })
 export class OutcomeIfStuckDestinationEditorComponent implements OnInit {
   @Output() addState: EventEmitter<string> = new EventEmitter<string>();
-  @Output() getChanges: EventEmitter<void> = new EventEmitter();
+  @Output() getChanges: EventEmitter<DestValidation> = new EventEmitter();
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -67,17 +72,24 @@ export class OutcomeIfStuckDestinationEditorComponent implements OnInit {
   updateChanges($event: string): void {
     if ($event.length > 0) {
       this.outcomeNewStateName = $event;
-      this.getChanges.emit();
+      let validation = {
+        isCreatingNewState: this.isCreatingNewState(),
+        value: $event
+      };
+      this.getChanges.emit(validation);
     }
   }
 
   onDestIfStuckSelectorChange(): void {
-    if (this.outcome.destIfReallyStuck ===
-          this.PLACEHOLDER_OUTCOME_DEST_IF_STUCK) {
+    if (this.outcome.destIfReallyStuck === this.PLACEHOLDER_OUTCOME_DEST_IF_STUCK) {
       this.focusManagerService.setFocus('newStateNameInputField');
-    } else {
-      this.getChanges.emit();
     }
+
+    let validation = {
+      isCreatingNewState: this.isCreatingNewState(),
+      value: this.outcomeNewStateName
+    };
+    this.getChanges.emit(validation);
   }
 
   isCreatingNewState(): boolean {

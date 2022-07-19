@@ -79,6 +79,11 @@ export class StateGraphLayoutService {
 
   getGraphAsAdjacencyLists(
       nodes: GraphNodes, links: GraphLink[]): GraphAdjacencyLists {
+    console.log('\n\n\n\n');
+    console.log(nodes);
+    console.log('\n\n\n\n');
+    console.log(links);
+    console.log('\n\n\n\n');
     var adjacencyLists: GraphAdjacencyLists = {};
 
     for (var nodeId in nodes) {
