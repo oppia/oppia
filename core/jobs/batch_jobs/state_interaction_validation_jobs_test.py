@@ -643,15 +643,6 @@ class ExpStateInteractionValidationJobTests(
     EXP_1_STATE_7 = state_domain.State.create_default_state(
         'EXP_1_STATE_7', is_initial_state=False).to_dict()
     EXP_1_STATE_7['content']['html'] = (
-      # '<oppia-noninteractive-link></oppia-noninteractive-link>'
-      # '<oppia-noninteractive-math></oppia-noninteractive-math>'
-      # '<oppia-noninteractive-math math_content-with-value=\'{Not empty}\'>'
-      # '</oppia-noninteractive-math>'
-      # '<oppia-noninteractive-skillreview></oppia-noninteractive-skillreview>'
-      # '<oppia-noninteractive-image></oppia-noninteractive-image>'
-      # '<oppia-noninteractive-video></oppia-noninteractive-video>'
-      # '<oppia-noninteractive-math math_content-with-value=\"{&amp;quot;raw_latex&amp;quot;:&amp;quot;\\\\frac{x}{y}&amp;quot;,&amp;quot;svg_filename&amp;quot;:&amp;quot;mathImg_20220719_180938_poux1ztcku_height_3d205_width_1d784_vertical_1d306.svg&amp;quot;}\"></oppia-noninteractive-math>'
-      # '<p>dffddfdffdfd</p>\n\n<p>&nbsp;</p>\n<oppia-noninteractive-image></oppia-noninteractive-image>\n\n<p>&nbsp;</p>\n\n<p>&nbsp;</p>\n\n<p><oppia-noninteractive-link></oppia-noninteractive-link><oppia-noninteractive-math></oppia-noninteractive-math><oppia-noninteractive-skillreview></oppia-noninteractive-skillreview></p><oppia-noninteractive-video></oppia-noninteractive-video>'
       '<p>dffddfdffdfd</p>\n\n<p>&nbsp;</p>\n<oppia-noninteractive-image>'
       '</oppia-noninteractive-image>\n\n<p>&nbsp;</p>\n\n<p>&nbsp;</p>\n\n<p>'
       '<oppia-noninteractive-link></oppia-noninteractive-link>'
