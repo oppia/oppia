@@ -266,6 +266,7 @@ class LearnerGroupSearchSyllabusHandlerTests(test_utils.GenericTestBase):
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-url')]
         topic.next_subtopic_id = 2
+        topic.skill_ids_for_diagnostic_test = ['skill_id_1']
         topic_services.save_new_topic(self.admin_id, topic)
         self.save_new_story(
             self.STORY_ID_0, self.admin_id, self.TOPIC_ID_0,
@@ -290,6 +291,7 @@ class LearnerGroupSearchSyllabusHandlerTests(test_utils.GenericTestBase):
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-url-one')]
         topic.next_subtopic_id = 2
+        topic.skill_ids_for_diagnostic_test = ['skill_id_1']
 
         topic_services.save_new_topic(self.admin_id, topic)
         self.save_new_story(

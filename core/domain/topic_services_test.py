@@ -694,6 +694,12 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 topic_domain.TOPIC_PROPERTY_PAGE_TITLE_FRAGMENT_FOR_WEB),
             'old_value': '',
             'new_value': 'topic page title'
+        }), topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+            'property_name': (
+                topic_domain.TOPIC_PROPERTY_SKILL_IDS_FOR_DIAGNOSTIC_TEST),
+            'old_value': ['test_skill_id'],
+            'new_value': []
         })]
         topic_services.update_topic_and_subtopic_pages(
             self.user_id_admin, self.TOPIC_ID, changelist,
@@ -710,6 +716,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic.practice_tab_is_displayed, True)
         self.assertEqual(topic.meta_tag_content, 'topic meta tag content')
         self.assertEqual(topic.page_title_fragment_for_web, 'topic page title')
+        self.assertEqual(topic.skill_ids_for_diagnostic_test, [])
         self.assertEqual(topic_summary.version, 3)
         self.assertEqual(topic_summary.thumbnail_filename, 'thumbnail.svg')
         self.assertEqual(topic_summary.thumbnail_bg_color, '#C6DCDA')
@@ -864,8 +871,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 'old_subtopic_id': None,
                 'new_subtopic_id': 2,
                 'skill_id': self.skill_id_1
-            })
-        ]
+            })]
         topic_services.update_topic_and_subtopic_pages(
             self.user_id_admin, self.TOPIC_ID, changelist,
             'Added and removed a subtopic.')
@@ -1169,8 +1175,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 'new_value': 'new-subtopic',
                 'old_value': '',
                 'subtopic_id': 2
-            })
-        ]
+            })]
         topic_services.update_topic_and_subtopic_pages(
             self.user_id_admin, self.TOPIC_ID, changelist,
             'Updated subtopic skill ids.')
@@ -1242,8 +1247,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 'cmd': topic_domain.CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC,
                 'subtopic_id': self.subtopic_id,
                 'skill_id': self.skill_id_1
-            })
-        ]
+            })]
         topic_services.update_topic_and_subtopic_pages(
             self.user_id_admin, self.TOPIC_ID, changelist,
             'Updated subtopic skill ids.')
@@ -1277,12 +1281,20 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         published_topic_ids = topic_services.filter_published_topic_ids([
             self.TOPIC_ID, 'invalid_id'])
         self.assertEqual(len(published_topic_ids), 0)
-        changelist = [topic_domain.TopicChange({
-            'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
-            'old_subtopic_id': None,
-            'new_subtopic_id': self.subtopic_id,
-            'skill_id': 'skill_1'
-        })]
+        changelist = [
+            topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
+                'old_subtopic_id': None,
+                'new_subtopic_id': self.subtopic_id,
+                'skill_id': 'skill_1'
+            }),
+            topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+                'property_name': (
+                    topic_domain.TOPIC_PROPERTY_SKILL_IDS_FOR_DIAGNOSTIC_TEST),
+                'old_value': [],
+                'new_value': ['skill_1']
+            })]
         topic_services.update_topic_and_subtopic_pages(
             self.user_id_admin, self.TOPIC_ID, changelist,
             'Updated subtopic skill ids.')
@@ -1295,12 +1307,20 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
     def test_publish_and_unpublish_topic(self):
         topic_rights = topic_fetchers.get_topic_rights(self.TOPIC_ID)
         self.assertFalse(topic_rights.topic_is_published)
-        changelist = [topic_domain.TopicChange({
-            'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
-            'old_subtopic_id': None,
-            'new_subtopic_id': self.subtopic_id,
-            'skill_id': 'skill_1'
-        })]
+        changelist = [
+            topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
+                'old_subtopic_id': None,
+                'new_subtopic_id': self.subtopic_id,
+                'skill_id': 'skill_1'
+            }),
+            topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+                'property_name': (
+                    topic_domain.TOPIC_PROPERTY_SKILL_IDS_FOR_DIAGNOSTIC_TEST),
+                'old_value': [],
+                'new_value': ['skill_1']
+            })]
         topic_services.update_topic_and_subtopic_pages(
             self.user_id_admin, self.TOPIC_ID, changelist,
             'Updated subtopic skill ids.')
@@ -1573,12 +1593,20 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
     def test_cannot_update_topic_and_subtopic_pages_with_empty_commit_message(
             self):
-        changelist = [topic_domain.TopicChange({
-            'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
-            'old_subtopic_id': None,
-            'new_subtopic_id': self.subtopic_id,
-            'skill_id': 'skill_1'
-        })]
+        changelist = [
+            topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
+                'old_subtopic_id': None,
+                'new_subtopic_id': self.subtopic_id,
+                'skill_id': 'skill_1'
+            }),
+            topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+                'property_name': (
+                    topic_domain.TOPIC_PROPERTY_SKILL_IDS_FOR_DIAGNOSTIC_TEST),
+                'old_value': [],
+                'new_value': ['skill_1']
+            })]
         # Test can have an empty commit message when not published.
         topic_services.update_topic_and_subtopic_pages(
             self.user_id_admin, self.TOPIC_ID, changelist,
@@ -1598,12 +1626,20 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
     def test_cannot_publish_a_published_topic(self):
         topic_rights = topic_fetchers.get_topic_rights(self.TOPIC_ID)
         self.assertFalse(topic_rights.topic_is_published)
-        changelist = [topic_domain.TopicChange({
-            'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
-            'old_subtopic_id': None,
-            'new_subtopic_id': self.subtopic_id,
-            'skill_id': 'skill_1'
-        })]
+        changelist = [
+            topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
+                'old_subtopic_id': None,
+                'new_subtopic_id': self.subtopic_id,
+                'skill_id': 'skill_1'
+            }),
+            topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+                'property_name': (
+                    topic_domain.TOPIC_PROPERTY_SKILL_IDS_FOR_DIAGNOSTIC_TEST),
+                'old_value': [],
+                'new_value': ['skill_1']
+            })]
         topic_services.update_topic_and_subtopic_pages(
             self.user_id_admin, self.TOPIC_ID, changelist,
             'Updated subtopic skill ids.')

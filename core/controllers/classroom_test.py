@@ -77,6 +77,7 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-three')]
         public_topic.next_subtopic_id = 2
+        public_topic.skill_ids_for_diagnostic_test = ['skill_id_1']
         topic_services.save_new_topic(admin_id, public_topic)
         topic_services.publish_topic(topic_id_2, admin_id)
 

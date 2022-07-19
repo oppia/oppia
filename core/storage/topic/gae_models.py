@@ -166,6 +166,12 @@ class TopicModel(base_models.VersionedModel):
     # Multiply and Divide'.
     page_title_fragment_for_web = datastore_services.StringProperty(
         required=True, indexed=True)
+    # A diagnostic test contains a set of questions covering multiple topics and
+    # based on the user's performance in the test, a topic is recommended to
+    # them. Now, this field is used for listing the skill IDs from which the
+    # questions should be fetched for the diagnostic test.
+    skill_ids_for_diagnostic_test = datastore_services.StringProperty(
+        repeated=True, indexed=True)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -313,6 +319,8 @@ class TopicModel(base_models.VersionedModel):
             'practice_tab_is_displayed':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'url_fragment': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'skill_ids_for_diagnostic_test':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
 

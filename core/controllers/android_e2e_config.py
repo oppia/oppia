@@ -138,6 +138,7 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
         topic.update_subtopic_thumbnail_bg_color(1, '#FFFFFF')
         topic.update_subtopic_url_fragment(1, 'suburl')
         topic.move_skill_id_to_subtopic(None, 1, skill_id)
+        topic.update_skill_ids_for_diagnostic_test([skill_id])
         subtopic_page = (
             subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
                 1, topic_id))
