@@ -289,7 +289,7 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
         state.update_interaction_hints(hints_list)
         state.update_interaction_default_outcome(
             state_domain.Outcome(
-                None, state_domain.SubtitledHtml(
+                None, None, state_domain.SubtitledHtml(
                     'feedback_id', '<p>Dummy Feedback</p>'),
                 True, [], None, None
             )

@@ -64,6 +64,7 @@ describe('Graph Data Service', () => {
             }],
             outcome: {
               dest: 'Me Llamo',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'feedback_1',
                 html: 'buen trabajo!',
@@ -87,6 +88,7 @@ describe('Graph Data Service', () => {
           },
           default_outcome: {
             dest: 'Hola',
+            dest_if_really_stuck: null,
             feedback: {
               content_id: 'default_outcome',
               html: 'try again!',

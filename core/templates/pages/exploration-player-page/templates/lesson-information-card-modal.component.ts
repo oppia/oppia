@@ -35,6 +35,9 @@ import { I18nLanguageCodeService, TranslationKeyType } from
   'services/i18n-language-code.service';
 import { ExplorationPlayerStateService } from '../services/exploration-player-state.service';
 
+import './lesson-information-card-modal.component.css';
+
+
  @Component({
    selector: 'oppia-lesson-information-card-modal',
    templateUrl: './lesson-information-card-modal.component.html'
