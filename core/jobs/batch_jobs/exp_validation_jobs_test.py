@@ -748,35 +748,43 @@ class ExpStateValidationJobTests(
     EXP_3_STATE_1 = state_domain.State.create_default_state(
         'EXP_3_STATE_1', is_initial_state=True).to_dict()
     EXP_3_STATE_1['content']['html'] = (
-    '"<p><oppia-noninteractive-link' +
-    ' text-with-value=\"&amp;quot;&amp;quot;\"' +
-    ' url-with-value=\"&amp;quot;http://www.example.com&amp;quot;\">' +
-    '</oppia-noninteractive-link></p>\n\n<p><oppia-noninteractive-math' +
-    ' math_content-with-value=\"{&amp;quot;raw_latex&amp;quot;:&amp;quot;' +
-    '&amp;quot;,&amp;quot;svg_filename&amp;quot;:&amp;quot;' +
-    'mathImg.svgas&amp;quot;}\"></oppia-noninteractive-math>' +
-    '<oppia-noninteractive-skillreview skill_id-with-value=' +
-    '\"&amp;quot;&amp;quot;\" text-with-value=\"&amp;quot;' +
-    '&amp;quot;\"></oppia-noninteractive-skillreview>&nbsp;heading' +
-    '</p><oppia-noninteractive-image alt-with-value=\"&amp;quot;' +
+    '"<p><oppia-noninteractive-link'
+    ' text-with-value=\"&amp;quot;&amp;quot;\"'
+    ' url-with-value=\"&amp;quot;http://www.example.com&amp;quot;\">'
+    '</oppia-noninteractive-link></p>\n\n<p><oppia-noninteractive-math'
+    ' math_content-with-value=\"{&amp;quot;raw_latex&amp;quot;:&amp;quot;'
+    '&amp;quot;,&amp;quot;svg_filename&amp;quot;:&amp;quot;'
+    'mathImg.svgas&amp;quot;}\"></oppia-noninteractive-math>'
+    '<oppia-noninteractive-skillreview skill_id-with-value='
+    '\"&amp;quot;&amp;quot;\" text-with-value=\"&amp;quot;'
+    '&amp;quot;\"></oppia-noninteractive-skillreview>&nbsp;heading'
+    '</p><oppia-noninteractive-image alt-with-value=\"&amp;quot;'
     'bbb&amp;quot;\" caption-with-value=\"&amp;quot;aaaaaaaaaaaaaaaaaaaaaaaaaa'
-    + 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-    + 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-    '&amp;quot;\" filepath-with-value=\"&amp;quot;img_1' +
-    '.svgg&amp;quot;\"></oppia-noninteractive-image>' +
-    '<oppia-noninteractive-image alt-with-value=\"&amp;quot;' +
-    'aaaaaaaaaaaaaaaaaaaa&amp;quot;\" caption-with-value=' +
-    '\"&amp;quot;&amp;quot;\" filepath-with-value=\"&amp;quot;' +
-    'img_2_0xmbq9hwfz_height_276_width_490.svg&amp;quot;\">' +
-    '</oppia-noninteractive-image><oppia-noninteractive-video ' +
-    'autoplay-with-value=\"true\" end-with-value=\"11\" ' +
-    'start-with-value=\"13\"' +
-    ' video_id-with-value=\"&amp;quot;Ntcw0H0hwPU&amp;' +
-    'quot;\"></oppia-noninteractive-video>' +
-    '"<oppia-noninteractive-video ' +
-    'autoplay-with-value=\"&amp;quot;&amp;quot;\" end-with-value=\"11\" ' +
-    'start-with-value=\"10\"' +
-    ' video_id-with-value=\"&amp;quot;&amp;' +
+    'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+    'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+    'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+    'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+    'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+    'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+    'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+    'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+    'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+    'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+    '&amp;quot;\" filepath-with-value=\"&amp;quot;img_1'
+    '.svgg&amp;quot;\"></oppia-noninteractive-image>'
+    '<oppia-noninteractive-image alt-with-value=\"&amp;quot;'
+    'aaaaaaaaaaaaaaaaaaaa&amp;quot;\" caption-with-value='
+    '\"&amp;quot;&amp;quot;\" filepath-with-value=\"&amp;quot;'
+    'img_2_0xmbq9hwfz_height_276_width_490.svg&amp;quot;\">'
+    '</oppia-noninteractive-image><oppia-noninteractive-video '
+    'autoplay-with-value=\"true\" end-with-value=\"11\" '
+    'start-with-value=\"13\"'
+    ' video_id-with-value=\"&amp;quot;Ntcw0H0hwPU&amp;'
+    'quot;\"></oppia-noninteractive-video>'
+    '"<oppia-noninteractive-video '
+    'autoplay-with-value=\"&amp;quot;&amp;quot;\" end-with-value=\"11\" '
+    'start-with-value=\"10\"'
+    ' video_id-with-value=\"&amp;quot;&amp;'
     'quot;\"></oppia-noninteractive-video>'
     )
 
@@ -985,13 +993,13 @@ class ExpStateValidationJobTests(
       {
         'rule_specs': [
           {
-            'rule_type': 'HasFractionalPartExactlyEqualTo',
+            'rule_type': 'IsExactlyEqualTo',
             'inputs': {
               'f': {
                 'isNegative': False,
                 'wholeNumber': 3,
-                'numerator': 1,
-                'denominator': 2
+                'numerator': 0,
+                'denominator': 0
               }
             }
           }
@@ -1408,7 +1416,7 @@ class ExpStateValidationJobTests(
               f'[{{\'state_name\': \'EXP_3_STATE_1\', '
               f'\'rte_components_errors\':'
               f' [\'State - EXP_3_STATE_1 Image tag caption value is greater '
-              f'than 160 having value img_1.svgg.\', \'State - '
+              f'than 500 having value img_1.svgg.\', \'State - '
               f'EXP_3_STATE_1 Image tag alt value is '
               f'less than 5 having value img_1.svgg.\', '
               f'\'State - EXP_3_STATE_1 Link tag text value is either empty '
@@ -1548,7 +1556,7 @@ class ExpStateValidationJobTests(
             f'[{{\'state_name\': \'EXP_3_STATE_1\', '
             f'\'rte_components_errors\':'
             f' [\'State - EXP_3_STATE_1 Image tag caption value is greater '
-            f'than 160 having value img_1.svgg.\', \'State - '
+            f'than 500 having value img_1.svgg.\', \'State - '
             f'EXP_3_STATE_1 Image tag alt value is '
             f'less than 5 having value img_1.svgg.\', '
             f'\'State - EXP_3_STATE_1 Link tag text value is either empty '

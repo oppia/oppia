@@ -121,8 +121,8 @@ class ExpStateValidationJob(base_jobs.JobBase):
                     # Validates filepath extension is svg.
                     if (
                         file_with_value != 'Not found' and
-                        len(file_with_value) > 0 and
-                        file_with_value[-3:] != 'svg'
+                        len(file_with_value) > 4 and
+                        file_with_value[-4:] != '.svg'
                     ):
                         rte_image_errors.append(
                             f'State - {key} Image tag filepath value '
@@ -189,11 +189,11 @@ class ExpStateValidationJob(base_jobs.JobBase):
 
                     if (
                         cap_with_value != 'Not found' and
-                        len(cap_with_value) > 160
+                        len(cap_with_value) > 500
                     ):
                         rte_components_errors.append(
                             f'State - {key} Image tag caption value '
-                            f'is greater than 160 '
+                            f'is greater than 500 '
                             f'having value {file_with_value}.'
                         )
 
@@ -224,7 +224,7 @@ class ExpStateValidationJob(base_jobs.JobBase):
 
                     if (
                         svg_filename != 'Not found' and
-                        svg_filename[-3:] != 'svg'
+                        svg_filename[-4:] != '.svg'
                     ):
                         rte_components_errors.append(
                             f'State - {key} Math tag svg_filename '
@@ -378,8 +378,9 @@ class ExpStateValidationJob(base_jobs.JobBase):
             simplest form setting is turned on
             - All rules should have solutions in proper form if the
             allow improper fraction setting is turned off
-            - All rules should have solutions without integer parts
-            when the allow nonzero integer parts setting is turned off
+            - Fraction input `exactly equal` rule specs should have
+            solutions without integer parts when the allow nonzero
+            integer parts setting is turned off
             - Fractional denominator should be > 0
 
         Args:
@@ -419,42 +420,46 @@ class ExpStateValidationJob(base_jobs.JobBase):
                 whole = rule_spec.inputs['f']['wholeNumber']
 
                 # Validates if the denominator is greater than zero.
-                if den <= 0:
-                    fraction_interaction_invalid_values.append(
-                        f'The rule {rule_spec_index} of answer '
-                        f'group {ans_group_index} has '
-                        f'denominator less than or equal to zero.'
-                    )
+                if whole == 0:
+                    if den <= 0:
+                        fraction_interaction_invalid_values.append(
+                            f'The rule {rule_spec_index} of answer '
+                            f'group {ans_group_index} has '
+                            f'denominator less than or equal to zero.'
+                        )
 
                 # Validates if the solution in simplest form.
                 if require_simple_form:
-                    d = math.gcd(num, den)
-                    val_num = num // d
-                    val_den = den // d
-                    if val_num != num and val_den != den:
-                        fraction_interaction_invalid_values.append(
-                            f'The rule {rule_spec_index} of '
-                            f'answer group {ans_group_index} do '
-                            f'not have value in simple form'
-                        )
+                    if whole == 0:
+                        d = math.gcd(num, den)
+                        val_num = num // d
+                        val_den = den // d
+                        if val_num != num and val_den != den:
+                            fraction_interaction_invalid_values.append(
+                                f'The rule {rule_spec_index} of '
+                                f'answer group {ans_group_index} do '
+                                f'not have value in simple form'
+                            )
 
                 # Validates if the solution in proper frac form.
                 if not allow_imp_frac:
-                    if den <= num:
-                        fraction_interaction_invalid_values.append(
-                            f'The rule {rule_spec_index} of '
-                            f'answer group {ans_group_index} do '
-                            f'not have value in proper fraction'
-                        )
+                    if whole == 0:
+                        if den <= num:
+                            fraction_interaction_invalid_values.append(
+                                f'The rule {rule_spec_index} of '
+                                f'answer group {ans_group_index} do '
+                                f'not have value in proper fraction'
+                            )
 
-                # Validates if the solution is without integ part.
-                if not allow_non_zero_integ_part:
-                    if whole != 0:
-                        fraction_interaction_invalid_values.append(
-                            f'The rule {rule_spec_index} of '
-                            f'answer group {ans_group_index} has '
-                            f'non zero integer part.'
-                        )
+                # Validates if the rule exactly equal is without integ part.
+                if rule_spec.rule_type == 'IsExactlyEqualTo':
+                    if not allow_non_zero_integ_part:
+                        if whole != 0:
+                            fraction_interaction_invalid_values.append(
+                                f'The rule {rule_spec_index} of '
+                                f'answer group {ans_group_index} has '
+                                f'non zero integer part.'
+                            )
 
             # Validates if the frac den is > 0.
             if rule_spec.rule_type == 'HasDenominatorEqualTo':
@@ -650,7 +655,7 @@ class ExpStateValidationJob(base_jobs.JobBase):
         choice_empty = False
         choice_duplicate = False
         for choice in choices:
-            if choice.html == '<p></p>':
+            if choice.html == '<p></p>' or choice.html == '':
                 choice_empty = True
             if choice.html in seen_choices:
                 choice_duplicate = True
@@ -748,7 +753,7 @@ class ExpStateValidationJob(base_jobs.JobBase):
         choice_empty = False
         choice_duplicate = False
         for choice in choices:
-            if choice.html == '<p></p>':
+            if choice.html == '<p></p>' or choice.html == '':
                 choice_empty = True
             if choice.html in seen_choices:
                 choice_duplicate = True
@@ -902,7 +907,7 @@ class ExpStateValidationJob(base_jobs.JobBase):
         choice_empty = False
         choice_duplicate = False
         for choice in choices:
-            if choice.html == '<p></p>':
+            if choice.html == '<p></p>' or choice.html == '':
                 choice_empty = True
             if choice.html in seen_choices:
                 choice_duplicate = True
