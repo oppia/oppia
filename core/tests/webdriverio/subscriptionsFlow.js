@@ -1,4 +1,4 @@
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,14 +17,14 @@
  * and mobile.
  */
 
-var general = require('../protractor_utils/general.js');
-var users = require('../protractor_utils/users.js');
+var general = require('../webdriverio_utils/general.js');
+var users = require('../webdriverio_utils/users.js');
 
 var CreatorDashboardPage =
-  require('../protractor_utils/CreatorDashboardPage.js');
-var PreferencesPage = require('../protractor_utils/PreferencesPage.js');
+  require('../webdriverio_utils/CreatorDashboardPage.js');
+var PreferencesPage = require('../webdriverio_utils/PreferencesPage.js');
 var SubscriptionDashboardPage =
-  require('../protractor_utils/SubscriptionDashboardPage.js');
+  require('../webdriverio_utils/SubscriptionDashboardPage.js');
 
 describe('Subscriptions functionality', function() {
   var creatorDashboardPage = null;
