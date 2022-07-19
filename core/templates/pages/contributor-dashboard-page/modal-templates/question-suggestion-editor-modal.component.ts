@@ -92,10 +92,6 @@ export class QuestionSuggestionEditorModalComponent
     }
   }
 
-  questionChanged(): void {
-    // Shivam PTAL.
-  }
-
   onClickChangeDifficulty(): void {
     const modalRef: NgbModalRef = this.ngbModal.open(
       QuestionsOpportunitiesSelectDifficultyModalComponent, {

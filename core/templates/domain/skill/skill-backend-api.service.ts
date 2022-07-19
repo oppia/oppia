@@ -40,7 +40,7 @@ interface FetchSkillBackendResponse {
   };
 }
 
-interface FetchSkillResponse {
+export interface FetchSkillResponse {
   skill: Skill;
   assignedSkillTopicData: {
     [topicName: string]: string;

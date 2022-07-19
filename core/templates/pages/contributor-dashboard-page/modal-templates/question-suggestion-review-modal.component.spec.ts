@@ -13,536 +13,427 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for QuestionSuggestionReviewModalController.
+ * @fileoverview Unit tests for QuestionSuggestionReviewModalcomponent.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
-// TODO(#7222): Remove usage of importAllAngularServices once upgraded to
-// Angular 8.
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, waitForAsync, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { FetchSkillResponse, SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
+import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { SuggestionModalService } from 'services/suggestion-modal.service';
+import { QuestionSuggestionReviewModalComponent } from './question-suggestion-review-modal.component';
+import { ThreadDataBackendApiService, ThreadMessages } from 'pages/exploration-editor-page/feedback-tab/services/thread-data-backend-api.service';
+import { SuggestionBackendDict } from 'domain/suggestion/suggestion.model';
+import { ContextService } from 'services/context.service';
 
-describe('Question Suggestion Review Modal Controller', function() {
-  let $scope = null;
-  let $http = null;
-  var $q = null;
-  var $uibModal = null;
-  let $uibModalInstance = null;
-  let QuestionObjectFactory = null;
-  let SiteAnalyticsService = null;
-  let SuggestionModalService = null;
-  let acceptSuggestionSpy = null;
-  let rejectSuggestionSpy = null;
+class MockActiveModal {
+  close(): void {
+    return;
+  }
+
+  dismiss(): void {
+    return;
+  }
+}
+
+class MockNgbModal {
+  open() {
+    return {
+      result: Promise.resolve()
+    };
+  }
+}
+
+describe('Question Suggestion Review Modal component', () => {
+  let component: QuestionSuggestionReviewModalComponent;
+  let fixture: ComponentFixture<QuestionSuggestionReviewModalComponent>;
+  let ngbModal: NgbModal;
+  let questionObjectFactory: QuestionObjectFactory;
+  let siteAnalyticsService: SiteAnalyticsService;
+  let suggestionModalService: SuggestionModalService;
+  let skillBackendApiService: SkillBackendApiService;
+  let skillObjectFactory: SkillObjectFactory;
+  let contextService: ContextService;
   let cancelSuggestionSpy = null;
-  let skillBackendApiService = null;
-  let skillObjectFactory = null;
-
+  let threadDataBackendApiService: ThreadDataBackendApiService;
   const authorName = 'Username 1';
   const contentHtml = 'Content html';
-  const misconceptionsBySkill = [];
   let question = null;
   const questionHeader = 'Question header';
   const reviewable = true;
   const skillDifficulty = 0.3;
   const suggestionId = '123';
   let suggestion = null;
-  importAllAngularServices();
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    const ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      declarations: [
+        QuestionSuggestionReviewModalComponent
+      ],
+      providers: [
+        {
+          provide: NgbModal,
+          useClass: MockNgbModal
+        },
+        ThreadDataBackendApiService,
+        {
+          provide: NgbActiveModal,
+          useClass: MockActiveModal
+        },
+        ContextService
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   }));
 
-  beforeEach(angular.mock.inject(function($injector) {
-    SuggestionModalService = $injector.get('SuggestionModalService');
-    acceptSuggestionSpy = spyOn(SuggestionModalService, 'acceptSuggestion');
-    rejectSuggestionSpy = spyOn(SuggestionModalService, 'rejectSuggestion');
-    cancelSuggestionSpy = spyOn(SuggestionModalService, 'cancelSuggestion');
-  }));
 
-  describe('when skill rubrics is specified', function() {
-    const skillRubrics = [{
+  beforeEach(() => {
+    fixture = TestBed.createComponent(QuestionSuggestionReviewModalComponent);
+    component = fixture.componentInstance;
+
+    suggestionModalService = TestBed.inject(SuggestionModalService);
+    cancelSuggestionSpy = spyOn(suggestionModalService, 'cancelSuggestion');
+
+    component.authorName = 'Username 1';
+    component.contentHtml = 'Content html';
+    component.question = null;
+    component.questionHeader = 'Question header';
+    component.reviewable = true;
+    component.skillDifficulty = 0.3;
+    component.suggestionId = '123';
+    component.suggestion = null;
+    component.skillDifficulty = skillDifficulty;
+    component.suggestionId = suggestionId;
+    component.suggestion = suggestion;
+
+    ngbModal = TestBed.inject(NgbModal);
+    skillBackendApiService = TestBed.inject(SkillBackendApiService);
+    skillObjectFactory = TestBed.inject(SkillObjectFactory);
+    questionObjectFactory = TestBed.inject(QuestionObjectFactory);
+    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
+    threadDataBackendApiService = TestBed.inject(
+      ThreadDataBackendApiService);
+    contextService = TestBed.inject(
+      ContextService);
+    spyOn(
+      siteAnalyticsService,
+      'registerContributorDashboardViewSuggestionForReview');
+
+    component.question = questionObjectFactory.createFromBackendDict({
+      id: '1',
+      question_state_data_schema_version: null,
+      language_code: null,
+      version: null,
+      linked_skill_ids: null,
+      inapplicable_skill_misconception_ids: null,
+      question_state_data: {
+        classifier_model_id: null,
+        solicit_answer_details: null,
+        card_is_checkpoint: null,
+        linked_skill_id: null,
+        next_content_id_index: null,
+        content: {
+          html: 'Question 1',
+          content_id: 'content_1'
+        },
+        interaction: {
+          answer_groups: [{
+            outcome: {
+              dest: 'outcome 1',
+              dest_if_really_stuck: null,
+              feedback: {
+                content_id: 'content_5',
+                html: ''
+              },
+              labelled_as_correct: true,
+              param_changes: [],
+              missing_prerequisite_skill_id: null,
+              refresher_exploration_id: null
+            },
+            rule_specs: [],
+            training_data: null,
+            tagged_skill_misconception_id: null,
+          }],
+          confirmed_unclassified_answers: [],
+          customization_args: {
+            placeholder: {
+              value: {
+                content_id: 'ca_placeholder_0',
+                unicode_str: ''
+              }
+            },
+            rows: { value: 1 }
+          },
+          default_outcome: {
+            dest: null,
+            dest_if_really_stuck: null,
+            feedback: {
+              html: 'Correct Answer',
+              content_id: 'content_2'
+            },
+            param_changes: [],
+            labelled_as_correct: true,
+            refresher_exploration_id: null,
+            missing_prerequisite_skill_id: null,
+          },
+          hints: [{
+            hint_content: {
+              html: 'Hint 1',
+              content_id: 'content_3'
+            }
+          }],
+          solution: {
+            correct_answer: 'This is the correct answer',
+            answer_is_exclusive: false,
+            explanation: {
+              html: 'Solution explanation',
+              content_id: 'content_4'
+            }
+          },
+          id: 'TextInput'
+        },
+        param_changes: [],
+        recorded_voiceovers: {
+          voiceovers_mapping: {}
+        },
+        written_translations: {
+          translations_mapping: {}
+        },
+      },
+    });
+    spyOn(skillBackendApiService, 'fetchSkillAsync').and.returnValue(
+      Promise.resolve({
+        skill: skillObjectFactory.createFromBackendDict({
+          id: 'skill1',
+          description: 'test description 1',
+          misconceptions: [{
+            id: 2,
+            name: 'test name',
+            notes: 'test notes',
+            feedback: 'test feedback',
+            must_be_addressed: true
+          }],
+          rubrics: [{
+            difficulty: 'Easy',
+            explanations: ['explanation']
+          }],
+          skill_contents: {
+            explanation: {
+              html: 'test explanation',
+              content_id: 'explanation',
+            },
+            worked_examples: [],
+            recorded_voiceovers: {
+              voiceovers_mapping: {}
+            }
+          },
+          language_code: 'en',
+          version: 3,
+          prerequisite_skill_ids: ['skill_1'],
+          all_questions_merged: false,
+          next_misconception_id: 0,
+          superseding_skill_id: ''
+        })
+      } as FetchSkillResponse));
+
+    component.suggestion = {
+      status: 'accepted',
+      change: {
+        skill_id: 'skill_1'
+      }
+    } as SuggestionBackendDict;
+
+    component.skillRubrics = [{
       explanations: ['explanation'],
       difficulty: 'Easy'
     }];
 
-    beforeEach(angular.mock.inject(function($injector, $controller) {
-      const $rootScope = $injector.get('$rootScope');
-      const $http = $injector.get('$http');
-      $q = $injector.get('$q');
-      $uibModal = $injector.get('$uibModal');
-      skillBackendApiService = $injector.get('SkillBackendApiService');
-      skillObjectFactory = $injector.get('SkillObjectFactory');
-      QuestionObjectFactory = $injector.get('QuestionObjectFactory');
-      SiteAnalyticsService = $injector.get('SiteAnalyticsService');
+    component.ngOnInit();
+  });
 
-      $uibModalInstance = jasmine.createSpyObj(
-        '$uibModalInstance', ['close', 'dismiss']);
 
-      spyOn(
-        SiteAnalyticsService,
-        'registerContributorDashboardViewSuggestionForReview');
+  describe('when skill rubrics is specified', () => {
+    it('should open edit question modal when clicking on' +
+      ' edit button', fakeAsync(() => {
+      class MockNgbModalRef {
+        componentInstance = {
+          suggestionId: suggestionId,
+          question: question,
+          questionId: '',
+          questionStateData: question.getStateData(),
+          skill: null,
+          skillDifficulty: 0.3
+        };
+      }
 
-      question = QuestionObjectFactory.createFromBackendDict({
-        id: '1',
-        question_state_data: {
-          content: {
-            html: 'Question 1',
-            content_id: 'content_1'
-          },
-          interaction: {
-            answer_groups: [{
-              outcome: {
-                dest: 'outcome 1',
-                dest_if_really_stuck: null,
-                feedback: {
-                  content_id: 'content_5',
-                  html: ''
-                },
-                labelled_as_correct: true,
-                param_changes: [],
-                refresher_exploration_id: null
-              },
-              rule_specs: [],
-            }],
-            confirmed_unclassified_answers: [],
-            customization_args: {
-              placeholder: {
-                value: {
-                  content_id: 'ca_placeholder_0',
-                  unicode_str: ''
-                }
-              },
-              rows: { value: 1 }
-            },
-            default_outcome: {
-              dest: null,
-              dest_if_really_stuck: null,
-              feedback: {
-                html: 'Correct Answer',
-                content_id: 'content_2'
-              },
-              param_changes: [],
-              labelled_as_correct: true
-            },
-            hints: [{
-              hint_content: {
-                html: 'Hint 1',
-                content_id: 'content_3'
-              }
-            }],
-            solution: {
-              correct_answer: 'This is the correct answer',
-              answer_is_exclusive: false,
-              explanation: {
-                html: 'Solution explanation',
-                content_id: 'content_4'
-              }
-            },
-            id: 'TextInput'
-          },
-          param_changes: [],
-          recorded_voiceovers: {
-            voiceovers_mapping: {}
-          },
-          written_translations: {
-            translations_mapping: {}
-          },
-        },
+      spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        return (
+            { componentInstance: MockNgbModalRef,
+              result: Promise.resolve()
+            }) as NgbModalRef;
       });
-      spyOn(skillBackendApiService, 'fetchSkillAsync').and.returnValue(
-        $q.resolve({
-          skill: skillObjectFactory.createFromBackendDict({
-            id: 'skill1',
-            description: 'test description 1',
-            misconceptions: [{
-              id: '2',
-              name: 'test name',
-              notes: 'test notes',
-              feedback: 'test feedback',
-              must_be_addressed: true
-            }],
-            rubrics: [{
-              difficulty: 'Easy',
-              explanations: ['explanation']
-            }],
-            skill_contents: {
-              explanation: {
-                html: 'test explanation',
-                content_id: 'explanation',
-              },
-              worked_examples: [],
-              recorded_voiceovers: {
-                voiceovers_mapping: {}
-              }
-            },
-            language_code: 'en',
-            version: 3,
-            prerequisite_skill_ids: ['skill_1']
-          })
-        }));
 
-      suggestion = {
-        status: 'accepted',
-        change: {
-          skill_id: 'skill_1'
-        }
-      };
+      component.edit();
+      tick();
 
-      $scope = $rootScope.$new();
-      $controller('QuestionSuggestionReviewModalController', {
-        $http: $http,
-        $scope: $scope,
-        $uibModalInstance: $uibModalInstance,
-        authorName: authorName,
-        contentHtml: contentHtml,
-        misconceptionsBySkill: misconceptionsBySkill,
-        question: question,
-        questionHeader: questionHeader,
-        reviewable: reviewable,
-        skillDifficulty: skillDifficulty,
-        skillRubrics: skillRubrics,
-        suggestion: suggestion,
-        suggestionId: suggestionId,
-        editSuggestionCallback: () => {}
-      });
+      expect(ngbModal.open).toHaveBeenCalled();
     }));
 
     it('should open edit question modal when clicking on' +
-      ' edit button', function() {
-      spyOn($uibModal, 'open').and.callThrough();
+      ' edit button', fakeAsync(() => {
+      spyOn(contextService, 'resetImageSaveDestination').and.stub();
+      class MockNgbModalRef {
+        componentInstance = {
+          suggestionId: suggestionId,
+          question: question,
+          questionId: '',
+          questionStateData: question.getStateData(),
+          skill: null,
+          skillDifficulty: 0.3
+        };
+      }
 
-      $scope.edit();
-      $scope.$apply();
-
-      expect($uibModal.open).toHaveBeenCalled();
-    });
-
-    it('should return nothing when edit question modal is' +
-      ' resolved', function() {
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.resolve({})
+      spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        return (
+            { componentInstance: MockNgbModalRef,
+              result: Promise.reject()
+            }) as NgbModalRef;
       });
 
-      $scope.edit();
-      $scope.$apply();
+      component.edit();
+      tick();
 
-      expect($uibModal.open).toHaveBeenCalled();
-    });
+      expect(contextService.resetImageSaveDestination).toHaveBeenCalled();
+      expect(ngbModal.open).toHaveBeenCalled();
+    }));
 
-    it('should initialize $scope properties after controller is initialized',
-      function() {
-        expect($scope.authorName).toBe(authorName);
-        expect($scope.contentHtml).toBe(contentHtml);
-        expect($scope.reviewable).toBe(reviewable);
-        expect($scope.reviewMessage).toBe('');
-        expect($scope.question).toEqual(question);
-        expect($scope.questionHeader).toBe(questionHeader);
-        expect($scope.questionStateData).toEqual(question.getStateData());
-        expect($scope.questionId).toEqual(question.getId());
-        expect($scope.canEditQuestion).toBe(false);
-        expect($scope.misconceptionsBySkill).toEqual(misconceptionsBySkill);
-        expect($scope.skillDifficultyLabel).toBe('Easy');
-        expect($scope.skillRubricExplanations).toEqual(['explanation']);
+    it('should return nothing when edit question modal is' +
+      ' resolved', fakeAsync(() => {
+      class MockNgbModalRef {
+        componentInstance = {
+          suggestionId: suggestionId,
+          question: question,
+          questionId: '',
+          questionStateData: question.getStateData(),
+          skill: null,
+          skillDifficulty: 0.3
+        };
+      }
+
+      spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        return (
+            { componentInstance: MockNgbModalRef,
+              result: Promise.resolve()
+            }) as NgbModalRef;
+      });
+
+      component.edit();
+      tick();
+
+      expect(ngbModal.open).toHaveBeenCalled();
+    }));
+
+    it('should initialize properties after component is initialized',
+      () => {
+        expect(component.authorName).toBe(authorName);
+        expect(component.contentHtml).toBe(contentHtml);
+        expect(component.reviewable).toBe(reviewable);
+        expect(component.reviewMessage).toBe('');
+        expect(component.questionHeader).toBe(questionHeader);
+        expect(component.canEditQuestion).toBe(false);
+        expect(component.skillDifficultyLabel).toBe('Easy');
+        expect(component.skillRubricExplanations).toEqual(['explanation']);
       });
 
     it('should register Contributor Dashboard view suggestion for review' +
-      ' event after controller is initialized', function() {
+      ' event after component is initialized', () => {
       expect(
-        // eslint-disable-next-line max-len
-        SiteAnalyticsService.registerContributorDashboardViewSuggestionForReview)
+        siteAnalyticsService
+          .registerContributorDashboardViewSuggestionForReview)
         .toHaveBeenCalledWith('Question');
     });
 
     it('should reset validation error message when user updates question',
-      function() {
-        $scope.validationError = 'This is an error message';
-        $scope.questionChanged();
-        expect($scope.validationError).toBe(null);
+      () => {
+        component.validationError = 'This is an error message';
+        component.questionChanged();
+        expect(component.validationError).toBe(null);
       });
 
     it('should accept suggestion in suggestion modal when clicking accept' +
-      ' suggestion', function() {
+      ' suggestion', fakeAsync(() => {
       spyOn(
-        SiteAnalyticsService,
+        siteAnalyticsService,
         'registerContributorDashboardAcceptSuggestion');
-      $scope.reviewMessage = 'Review message example';
+      component.reviewMessage = 'Review message example';
 
-      $scope.accept();
+      component.accept();
+      tick();
 
       expect(
-        SiteAnalyticsService.registerContributorDashboardAcceptSuggestion)
+        siteAnalyticsService.registerContributorDashboardAcceptSuggestion)
         .toHaveBeenCalledWith('Question');
-      expect(acceptSuggestionSpy).toHaveBeenCalledWith(
-        $uibModalInstance, {
-          action: 'accept',
-          reviewMessage: 'Review message example',
-          skillDifficulty: 0.3
-        });
-    });
+    }));
 
     it('should reject suggestion in suggestion modal when clicking reject' +
-    ' suggestion button', function() {
+    ' suggestion button', fakeAsync(() => {
       spyOn(
-        SiteAnalyticsService,
+        siteAnalyticsService,
         'registerContributorDashboardRejectSuggestion');
-      $scope.reviewMessage = 'Review message example';
+      component.reviewMessage = 'Review message example';
 
-      $scope.reject();
+      component.reject();
+      tick();
 
       expect(
-        SiteAnalyticsService.registerContributorDashboardRejectSuggestion)
+        siteAnalyticsService.registerContributorDashboardRejectSuggestion)
         .toHaveBeenCalledWith('Question');
-      expect(rejectSuggestionSpy).toHaveBeenCalledWith(
-        $uibModalInstance, {
-          action: 'reject',
-          reviewMessage: 'Review message example'
-        });
-    });
+    }));
 
     it('should cancel suggestion in suggestion modal when clicking cancel' +
-    ' suggestion button', function() {
-      $scope.cancel();
+    ' suggestion button', () => {
+      component.cancel();
 
-      expect(cancelSuggestionSpy).toHaveBeenCalledWith(
-        $uibModalInstance);
+      expect(cancelSuggestionSpy).toHaveBeenCalled();
     });
   });
 
-  describe('when skill rubrics is not specified', function() {
-    const skillRubrics = [];
+  it('should initialize properties after component is initialized',
+    () => {
+      component.skillRubrics = [];
 
-    beforeEach(angular.mock.inject(function($injector, $controller) {
-      const $rootScope = $injector.get('$rootScope');
-      QuestionObjectFactory = $injector.get('QuestionObjectFactory');
-
-      $uibModalInstance = jasmine.createSpyObj(
-        '$uibModalInstance', ['close', 'dismiss']);
-
-      question = QuestionObjectFactory.createFromBackendDict({
-        id: '1',
-        question_state_data: {
-          content: {
-            html: 'Question 1',
-            content_id: 'content_1'
-          },
-          interaction: {
-            answer_groups: [{
-              outcome: {
-                dest: 'outcome 1',
-                dest_if_really_stuck: null,
-                feedback: {
-                  content_id: 'content_5',
-                  html: ''
-                },
-                labelled_as_correct: true,
-                param_changes: [],
-                refresher_exploration_id: null
-              },
-              rule_specs: [],
-            }],
-            confirmed_unclassified_answers: [],
-            customization_args: {
-              placeholder: {
-                value: {
-                  content_id: 'ca_placeholder_0',
-                  unicode_str: ''
-                }
-              },
-              rows: { value: 1 }
-            },
-            default_outcome: {
-              dest: null,
-              dest_if_really_stuck: null,
-              feedback: {
-                html: 'Correct Answer',
-                content_id: 'content_2'
-              },
-              param_changes: [],
-              labelled_as_correct: true
-            },
-            hints: [{
-              hint_content: {
-                html: 'Hint 1',
-                content_id: 'content_3'
-              }
-            }],
-            solution: {
-              correct_answer: 'This is the correct answer',
-              answer_is_exclusive: false,
-              explanation: {
-                html: 'Solution explanation',
-                content_id: 'content_4'
-              }
-            },
-            id: 'TextInput'
-          },
-          param_changes: [],
-          recorded_voiceovers: {
-            voiceovers_mapping: {}
-          },
-          written_translations: {
-            translations_mapping: {}
-          },
-        },
-      });
-
-      $scope = $rootScope.$new();
-      suggestion = { status: 'accepted' };
-      $controller('QuestionSuggestionReviewModalController', {
-        $http: $http,
-        $scope: $scope,
-        $uibModalInstance: $uibModalInstance,
-        authorName: authorName,
-        contentHtml: contentHtml,
-        misconceptionsBySkill: misconceptionsBySkill,
-        question: question,
-        questionHeader: questionHeader,
-        reviewable: reviewable,
-        skillDifficulty: skillDifficulty,
-        skillRubrics: skillRubrics,
-        suggestion: suggestion,
-        suggestionId: suggestionId,
-        editSuggestionCallback: () => {}
-      });
-    }));
-
-    it('should initialize $scope properties after controller is initialized',
-      function() {
-        expect($scope.skillRubricExplanations).toBe(
-          'This rubric has not yet been specified.');
-      });
-  });
-
-  describe('when a suggestion is rejected', function() {
-    let $rootScope = null;
-    let $q = null;
-    let ThreadDataBackendApiService = null;
-
-    beforeEach(angular.mock.inject(function($injector, $controller) {
-      $rootScope = $injector.get('$rootScope');
-      $q = $injector.get('$q');
-      ThreadDataBackendApiService = $injector.get(
-        'ThreadDataBackendApiService');
-
-      const skillRubrics = [{
-        explanations: ['explanation'],
-        difficulty: 'Easy'
-      }];
-
-      QuestionObjectFactory = $injector.get('QuestionObjectFactory');
-
-      $uibModalInstance = jasmine.createSpyObj(
-        '$uibModalInstance', ['close', 'dismiss']);
-
-      question = QuestionObjectFactory.createFromBackendDict({
-        id: '1',
-        question_state_data: {
-          content: {
-            html: 'Question 1',
-            content_id: 'content_1'
-          },
-          interaction: {
-            answer_groups: [{
-              outcome: {
-                dest: 'outcome 1',
-                dest_if_really_stuck: null,
-                feedback: {
-                  content_id: 'content_5',
-                  html: ''
-                },
-                labelled_as_correct: true,
-                param_changes: [],
-                refresher_exploration_id: null
-              },
-              rule_specs: [],
-            }],
-            confirmed_unclassified_answers: [],
-            customization_args: {
-              placeholder: {
-                value: {
-                  content_id: 'ca_placeholder_0',
-                  unicode_str: ''
-                }
-              },
-              rows: { value: 1 }
-            },
-            default_outcome: {
-              dest: null,
-              dest_if_really_stuck: null,
-              feedback: {
-                html: 'Correct Answer',
-                content_id: 'content_2'
-              },
-              param_changes: [],
-              labelled_as_correct: true
-            },
-            hints: [{
-              hint_content: {
-                html: 'Hint 1',
-                content_id: 'content_3'
-              }
-            }],
-            solution: {
-              correct_answer: 'This is the correct answer',
-              answer_is_exclusive: false,
-              explanation: {
-                html: 'Solution explanation',
-                content_id: 'content_4'
-              }
-            },
-            id: 'TextInput'
-          },
-          param_changes: [],
-          recorded_voiceovers: {
-            voiceovers_mapping: {}
-          },
-          written_translations: {
-            translations_mapping: {}
-          },
-        },
-      });
-
-      $scope = $rootScope.$new();
-      suggestion = { status: 'rejected' };
-      $controller('QuestionSuggestionReviewModalController', {
-        $scope: $scope,
-        $uibModalInstance: $uibModalInstance,
-        authorName: authorName,
-        contentHtml: contentHtml,
-        misconceptionsBySkill: misconceptionsBySkill,
-        question: question,
-        questionHeader: questionHeader,
-        reviewable: false,
-        skillDifficulty: skillDifficulty,
-        skillRubrics: skillRubrics,
-        suggestion: suggestion,
-        suggestionId: suggestionId,
-        editSuggestionCallback: () => {}
-      });
-    }));
-
-    it('should fetch the rejection message', function() {
-      const messages = [
-        { text: 'Question submitted.' },
-        { text: 'This is a rejection.' }
-      ];
-
-      const fetchMessagesAsyncSpy = spyOn(
-        ThreadDataBackendApiService, 'fetchMessagesAsync')
-        .and.returnValue($q.resolve({
-          messages: messages
-        }));
-
-      $scope.init();
-      $rootScope.$apply();
-
-      expect(fetchMessagesAsyncSpy).toHaveBeenCalledWith('123');
-      expect($scope.reviewMessage).toBe('This is a rejection.');
+      expect(component.getRubricExplanation('nothing')).toBe(
+        'This rubric has not yet been specified.');
     });
-  });
+
+  it('should fetch the rejection message', fakeAsync(() => {
+    component.skillRubrics = [{
+      explanations: ['explanation'],
+      difficulty: 'Easy'
+    }];
+
+    const messages = [
+      { text: 'Question submitted.' },
+      { text: 'This is a rejection.' }
+    ];
+    component.reviewable = false;
+    component.suggestionIsRejected = true;
+
+    const fetchMessagesAsyncSpy = spyOn(
+      threadDataBackendApiService, 'fetchMessagesAsync')
+      .and.returnValue(Promise.resolve({
+        messages: messages
+      } as ThreadMessages));
+
+    component.init();
+    tick();
+
+    expect(fetchMessagesAsyncSpy).toHaveBeenCalledWith('123');
+    expect(component.reviewMessage).toBe('This is a rejection.');
+  }));
 });

@@ -39,7 +39,7 @@ interface ElementDimensions {
   w: number;
 }
 
-interface NodeTitle {
+export interface NodeTitle {
   secondaryLabel: string;
   label: string;
   reachableFromEnd: boolean;
@@ -74,7 +74,7 @@ export class StateGraphVisualization
 
   @Input() allowPanning;
   @Input() centerAtCurrentState;
-  @Input() currentStateId;
+  @Input() currentStateId: string;
   // Id of a second initial state, which will be styled as an initial
   // state.
   @Input() initStateId2: unknown;
@@ -320,7 +320,7 @@ export class StateGraphVisualization
 
     let tooltip = node.label;
 
-    if (node.hasOwnProperty('secondaryLabel')) {
+    if ('secondaryLabel' in node) {
       tooltip += ' ' + node.secondaryLabel;
     }
 
@@ -391,10 +391,9 @@ export class StateGraphVisualization
     for (let i = 0; i < this.augmentedLinks.length; i++) {
     // Style links if link properties and style mappings are
     // provided.
-      if (links[i].hasOwnProperty('linkProperty') &&
+      if ('linkProperty' in links[i] &&
         this.linkPropertyMapping) {
-        if (this.linkPropertyMapping.hasOwnProperty(
-          links[i].linkProperty)) {
+        if (links[i].linkProperty in this.linkPropertyMapping) {
           this.augmentedLinks[i].style = (
             this.linkPropertyMapping[links[i].linkProperty]);
         }
@@ -421,7 +420,7 @@ export class StateGraphVisualization
 
       // Add secondary label if it exists.
       if (this.nodeSecondaryLabels) {
-        if (this.nodeSecondaryLabels.hasOwnProperty(nodeId)) {
+        if (nodeId in this.nodeSecondaryLabels) {
           this.nodeData[nodeId].secondaryLabel = (
             this.nodeSecondaryLabels[nodeId]);
           this.nodeData[nodeId].height *= 1.1;
@@ -464,7 +463,7 @@ export class StateGraphVisualization
       warnings =
       this.explorationWarningsService.getAllStateRelatedWarnings();
     }
-    if (warnings.hasOwnProperty(nodeLabel)) {
+    if (nodeLabel in warnings) {
       return warnings[nodeLabel][0].toString();
     }
   }

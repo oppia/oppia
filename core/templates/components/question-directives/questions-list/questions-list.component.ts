@@ -454,10 +454,6 @@ export class QuestionsListComponent implements OnInit, OnDestroy, OnChanges {
     );
   }
 
-  questionChanged(): void {
-    // $rootScope.$applyAsync();
-  }
-
   showUnaddressedSkillMisconceptionWarning(
       skillMisconceptionIds: string[]): boolean {
     let skillId = this.selectedSkillId;
@@ -473,7 +469,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy, OnChanges {
       actualMisconceptionIds.sort(), expectedMisconceptionIds.sort());
   }
 
-  saveAndPublishQuestion(commitMessage: string): void {
+  saveAndPublishQuestion(commitMessage: string | null): void {
     let validationErrors = this.question.getValidationErrorMessage();
     let unaddressedMisconceptions = (
       this.question.getUnaddressedMisconceptionNames(

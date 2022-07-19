@@ -559,6 +559,7 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
+
 angular.module('oppia').directive('oppiaQuestionPlayer',
   downgradeComponent({
     component: QuestionPlayerComponent
