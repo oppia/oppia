@@ -29,7 +29,7 @@ from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.platform import models
 
-from typing import List, Optional
+from typing import List, Optional, Sequence
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -261,7 +261,9 @@ def get_matching_learner_group_syllabus_to_add(
         for classroom in all_classrooms_dict:
             if category and classroom['name'] == category:
                 matching_topic_ids.extend(classroom['topic_ids'])
-        matching_topics_with_none = (
+        matching_topics_with_none: Sequence[
+            Optional[topic_domain.Topic]
+        ] = (
             topic_fetchers.get_topics_by_ids(matching_topic_ids)
         )
     else:
