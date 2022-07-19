@@ -1,8 +1,8 @@
 require('dotenv').config();
-const video = require('wdio-video-reporter');
 var FirebaseAdmin = require('firebase-admin');
 var path = require('path');
 var fs = require('fs');
+var childProcess = require('child_process');
 var Constants = require('./webdriverio_utils/WebdriverioConstants');
 var DOWNLOAD_PATH = path.resolve(__dirname, Constants.DOWNLOAD_PATH);
 var args = process.argv;
@@ -57,38 +57,6 @@ var suites = {
     './core/tests/webdriverio_desktop/userJourneys.js'
   ],
 };
-
-reportersArray = [
-  ['spec', {
-    showPreface: false,
-    realtimeReporting: true,
-  }]
-];
-
-if ((process.env.GITHUB_ACTIONS &&
-    // eslint-disable-next-line eqeqeq
-    process.env.VIDEO_RECORDING_IS_ENABLED == 1) ||
-    LOCAL_VIDEO_RECORDING_IS_ENABLED === 1) {
-  videoReporter = [video, {
-    outputDir: '../webdriverio-video',
-    // Enable saveAllVideos if you want to save the videos
-    // of the tests that pass as well.
-    saveAllVideos: false,
-    videoSlowdownMultiplier: 3,
-  }];
-
-  reportersArray.push(videoReporter);
-  // eslint-disable-next-line no-console
-  console.log(
-    'Videos of the failed tests can be viewed ' +
-    'in ../webdriverio-video');
-} else {
-  // eslint-disable-next-line no-console
-  console.log(
-    'Videos will not be recorded for this suite either because videos' +
-    ' have been disabled for it (using environment variables) or' +
-    ' because it\'s on CircleCI');
-}
 
 // A reference configuration file.
 exports.config = {
@@ -183,7 +151,12 @@ exports.config = {
   // Test reporter for stdout.
   // The only one supported by default is 'dot'
   // see also: https://webdriver.io/docs/dot-reporter
-  reporters: reportersArray,
+  reporters: [
+    ['spec', {
+      showPreface: false,
+      realtimeReporting: true,
+    }]
+  ],
 
   isMobile: false,
 
@@ -211,6 +184,71 @@ exports.config = {
    * @param {Object}         browser instance of created browser/device session
    */
   before: function() {
+    // Enable ALL_VIDEOS if you want success videos to be saved.
+    const ALL_VIDEOS = false;
+
+    // Only running video recorder on Github Actions, since running it on
+    // CicleCI causes RAM issues (meaning very high flakiness).
+
+    if ((process.env.GITHUB_ACTIONS &&
+      process.env.VIDEO_RECORDING_IS_ENABLED === 1) ||
+      LOCAL_VIDEO_RECORDING_IS_ENABLED === 1) {
+      jasmine.getEnv().addReporter({
+        specStarted: function(result) {
+          let ffmpegArgs = [
+            '-y',
+            '-r', '30',
+            '-f', 'x11grab',
+            '-s', '1285x1000',
+            '-i', process.env.DISPLAY,
+            '-g', '300',
+            '-loglevel', '16',
+          ];
+          const uniqueString = Math.random().toString(36).substring(2, 8);
+          var name = uniqueString + '.mp4';
+          var dirPath = path.resolve(
+            '__dirname', '..', '..', 'webdriverio-video/');
+          try {
+            fs.mkdirSync(dirPath, { recursive: true });
+          } catch (err) {}
+          vidPath = path.resolve(dirPath, name);
+          // eslint-disable-next-line no-console
+          console.log(
+            'Test name: ' + result.fullName + ' has video path ' + vidPath);
+          ffmpegArgs.push(vidPath);
+          spw = childProcess.spawn('ffmpeg', ffmpegArgs);
+          spw.on('message', (message) => {
+            // eslint-disable-next-line no-console
+            console.log(`ffmpeg stdout: ${message}`);
+          });
+          spw.on('error', (errorMessage) => {
+            console.error(`ffmpeg stderr: ${errorMessage}`);
+          });
+          spw.on('close', (code) => {
+            // eslint-disable-next-line no-console
+            console.log(`ffmpeg exited with code ${code}`);
+          });
+        },
+        specDone: function(result) {
+          spw.kill();
+          if (
+            result.status === 'passed' && !ALL_VIDEOS &&
+            fs.existsSync(vidPath)) {
+            fs.unlinkSync(vidPath);
+            // eslint-disable-next-line no-console
+            console.log(
+              `Video for test: ${result.fullName}` +
+              'was deleted successfully (test passed).');
+          }
+        },
+      });
+    } else {
+      // eslint-disable-next-line no-console
+      console.log(
+        'Videos will not be recorded for this suite either because videos' +
+        ' have been disabled for it (using environment variables) or' +
+        ' because it\'s on CircleCI');
+    }
     // Set a wide enough window size for the navbar in the library pages to
     // display fully.
     browser.setWindowSize(1285, 1000);
