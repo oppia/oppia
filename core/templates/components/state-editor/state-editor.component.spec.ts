@@ -184,6 +184,7 @@ describe('State Editor Component', () => {
         answer_groups: [],
         default_outcome: {
           dest: 'default',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'default_outcome',
             html: ''

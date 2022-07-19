@@ -247,7 +247,7 @@ describe('Contributor dashboard page', function() {
     await contributorDashboardPage.navigateToSubmitQuestionTab();
     await contributorDashboardPage.waitForOpportunitiesToLoad();
     await contributorDashboardPage.expectOpportunityWithPropertiesToExist(
-      SKILL_DESCRIPTIONS[0], TOPIC_NAMES[0], null, '(0.00%)');
+      SKILL_DESCRIPTIONS[0], TOPIC_NAMES[0], null, '(0%)');
 
     // Submit suggestion as user0.
     await contributorDashboardPage.clickOpportunityActionButton(
@@ -289,7 +289,7 @@ describe('Contributor dashboard page', function() {
     await contributorDashboardPage.waitForOpportunitiesToLoad();
     // After acceptance, progress percentage should be 1/50 = 2%.
     await contributorDashboardPage.expectOpportunityWithPropertiesToExist(
-      SKILL_DESCRIPTIONS[0], TOPIC_NAMES[0], null, '(10.00%)');
+      SKILL_DESCRIPTIONS[0], TOPIC_NAMES[0], null, '(10%)');
     await users.logout();
 
     // Validate the contribution status changed.
@@ -309,7 +309,7 @@ describe('Contributor dashboard page', function() {
     await contributorDashboardPage.navigateToSubmitQuestionTab();
     await contributorDashboardPage.waitForOpportunitiesToLoad();
     await contributorDashboardPage.expectOpportunityWithPropertiesToExist(
-      SKILL_DESCRIPTIONS[0], TOPIC_NAMES[0], null, '(10.00%)');
+      SKILL_DESCRIPTIONS[0], TOPIC_NAMES[0], null, '(10%)');
 
     // Submit suggestion as user0.
     await contributorDashboardPage.clickOpportunityActionButton(
@@ -352,7 +352,7 @@ describe('Contributor dashboard page', function() {
     await contributorDashboardPage.navigateToSubmitQuestionTab();
     await contributorDashboardPage.waitForOpportunitiesToLoad();
     await contributorDashboardPage.expectOpportunityWithPropertiesToExist(
-      SKILL_DESCRIPTIONS[0], TOPIC_NAMES[0], null, '(10.00%)');
+      SKILL_DESCRIPTIONS[0], TOPIC_NAMES[0], null, '(10%)');
     await users.logout();
 
     // Validate the contribution status changed.

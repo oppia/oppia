@@ -105,6 +105,7 @@ describe('Answer Classification Service', () => {
           answer_groups: [{
             outcome: {
               dest: 'outcome 1',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'feedback_1',
                 html: ''
@@ -126,6 +127,7 @@ describe('Answer Classification Service', () => {
           }, {
             outcome: {
               dest: 'outcome 2',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'feedback_2',
                 html: ''
@@ -163,6 +165,7 @@ describe('Answer Classification Service', () => {
           }],
           default_outcome: {
             dest: 'default',
+            dest_if_really_stuck: null,
             feedback: {
               content_id: 'default_outcome',
               html: ''
@@ -272,6 +275,7 @@ describe('Answer Classification Service', () => {
         stateDict.interaction.answer_groups = [{
           outcome: {
             dest: 'outcome 1',
+            dest_if_really_stuck: null,
             feedback: {
               content_id: 'feedback_1',
               html: ''
@@ -382,6 +386,7 @@ describe('Answer Classification Service', () => {
           answer_groups: [{
             outcome: {
               dest: 'outcome 1',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'feedback_1',
                 html: ''
@@ -403,6 +408,7 @@ describe('Answer Classification Service', () => {
           }, {
             outcome: {
               dest: 'outcome 2',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'feedback_2',
                 html: ''
@@ -433,6 +439,7 @@ describe('Answer Classification Service', () => {
           }],
           default_outcome: {
             dest: 'default',
+            dest_if_really_stuck: null,
             feedback: {
               content_id: 'default_outcome',
               html: ''
@@ -560,6 +567,7 @@ describe('Answer Classification Service', () => {
           answer_groups: [{
             outcome: {
               dest: 'outcome 1',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'feedback_1',
                 html: ''
@@ -582,6 +590,7 @@ describe('Answer Classification Service', () => {
           }, {
             outcome: {
               dest: 'outcome 2',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'feedback_2',
                 html: ''
@@ -604,6 +613,7 @@ describe('Answer Classification Service', () => {
           }],
           default_outcome: {
             dest: 'default',
+            dest_if_really_stuck: null,
             feedback: {
               content_id: 'default_outcome',
               html: ''
