@@ -106,9 +106,9 @@ class MigrateStoryJobTests(job_test_utils.JobTestBase):
             'next_node_id': 'node_2222'
         }
         self.broken_contents = copy.deepcopy(self.latest_contents)
-        # The expected type of `description` key is string but here for testing
-        # purposes we are providing a integer value, which causes MyPy to throw
-        # an error. Thus to silent the error, we used ignore here.
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
         self.broken_contents['nodes'][0]['description'] = 123  # type: ignore[arg-type]
 
         self.unmigrated_contents = copy.deepcopy(self.latest_contents)
