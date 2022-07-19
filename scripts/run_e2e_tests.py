@@ -160,15 +160,18 @@ SUITES_MIGRATED_TO_WEBDRIVERIO = [
     'creatorDashboard',
     'learner',
     'learnerDashboard',
+    'navigation',
     'preferences',
     'profileFeatures',
     'profileMenu',
+    'skillEditor',
     'subscriptions',
     'topicsAndSkillsDashboard',
     'topicAndStoryEditor',
     'topicAndStoryEditorFileUploadFeatures',
     'topicAndStoryViewer',
     'users',
+    'wipeout',
 ]
 
 SUITES_STILL_IN_PROTRACTOR = [
@@ -190,11 +193,8 @@ SUITES_STILL_IN_PROTRACTOR = [
     'fileUploadExtensions',
     'learner',
     'library',
-    'navigation',
     'playVoiceovers',
     'publication',
-    'skillEditor',
-    'wipeout',
 ]
 
 

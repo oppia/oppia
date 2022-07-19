@@ -88,10 +88,6 @@ var suites = {
       'protractor/libraryFlow.js'
     ],
 
-    navigation: [
-      'protractor_desktop/navigation.js'
-    ],
-
     playVoiceovers: [
       'protractor_desktop/playVoiceovers.js'
     ],
@@ -99,14 +95,6 @@ var suites = {
     publication: [
       'protractor_desktop/publicationAndLibrary.js'
     ],
-
-    skillEditor: [
-      'protractor_desktop/skillEditor.js'
-    ],
-
-    wipeout: [
-      'protractor_desktop/wipeout.js',
-    ]
   };
 
 // A reference configuration file.

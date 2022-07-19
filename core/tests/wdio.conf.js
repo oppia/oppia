@@ -57,6 +57,10 @@ var suites = {
     './core/tests/webdriverio_desktop/learnerDashboard.js'
   ],
 
+  navigation: [
+    './core/tests/webdriverio_desktop/navigation.js'
+  ],
+
   preferences: [
     './core/tests/webdriverio_desktop/preferences.js'
   ],
@@ -67,6 +71,10 @@ var suites = {
 
   profileMenu: [
     './core/tests/webdriverio/profileMenuFlow.js'
+  ],
+
+  skillEditor: [
+    './core/tests/webdriverio_desktop/skillEditor.js'
   ],
 
   subscriptions: [
@@ -92,6 +100,10 @@ var suites = {
   users: [
     './core/tests/webdriverio_desktop/userJourneys.js'
   ],
+
+  wipeout: [
+    './core/tests/webdriverio_desktop/wipeout.js'
+  ]
 };
 
 reportersArray = [
