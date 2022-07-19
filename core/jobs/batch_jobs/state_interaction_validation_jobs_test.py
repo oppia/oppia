@@ -55,16 +55,16 @@ class ExpStateInteractionValidationJobTests(
         {
           'rule_specs': [
             {
-              "rule_type": "IsLessThanOrEqualTo",
-              "inputs": {
-                "x": 7
+              'rule_type': 'IsLessThanOrEqualTo',
+              'inputs': {
+                'x': 7
               }
             },
             {
-              "rule_type": "IsInclusivelyBetween",
-              "inputs": {
-                "a": 3,
-                "b": 5
+              'rule_type': 'IsInclusivelyBetween',
+              'inputs': {
+                'a': 3,
+                'b': 5
               }
             }
           ],
@@ -112,479 +112,479 @@ class ExpStateInteractionValidationJobTests(
         'EXP_1_STATE_2', is_initial_state=True).to_dict()
 
     EXP_1_STATE_2['interaction'] = {
-      "id": "FractionInput",
-      "customization_args": {
-        "requireSimplestForm": {
-          "value": False
+      'id': 'FractionInput',
+      'customization_args': {
+        'requireSimplestForm': {
+          'value': False
         },
-        "allowImproperFraction": {
-          "value": True
+        'allowImproperFraction': {
+          'value': True
         },
-        "allowNonzeroIntegerPart": {
-          "value": True
+        'allowNonzeroIntegerPart': {
+          'value': True
         },
-        "customPlaceholder": {
-          "value": {
-            "content_id": "ca_customPlaceholder_0",
-            "unicode_str": ""
+        'customPlaceholder': {
+          'value': {
+            'content_id': 'ca_customPlaceholder_0',
+            'unicode_str': ''
           }
         }
       },
-      "answer_groups": [
+      'answer_groups': [
         {
-          "rule_specs": [
+          'rule_specs': [
             {
-              "rule_type": "HasDenominatorEqualTo",
-              "inputs": {
-                "x": 1
+              'rule_type': 'HasDenominatorEqualTo',
+              'inputs': {
+                'x': 1
               }
             },
             {
-              "rule_type": "HasFractionalPartExactlyEqualTo",
-              "inputs": {
-                "f": {
-                  "isNegative": False,
-                  "wholeNumber": 0,
-                  "numerator": 2,
-                  "denominator": 1
+              'rule_type': 'HasFractionalPartExactlyEqualTo',
+              'inputs': {
+                'f': {
+                  'isNegative': False,
+                  'wholeNumber': 0,
+                  'numerator': 2,
+                  'denominator': 1
                 }
               }
             }
           ],
-          "outcome": {
-            "dest": "EXP_1_STATE_2",
-            "feedback": {
-              "content_id": "feedback_1",
-              "html": "<p>cvcv</p>"
+          'outcome': {
+            'dest': 'EXP_1_STATE_2',
+            'feedback': {
+              'content_id': 'feedback_1',
+              'html': '<p>cvcv</p>'
             },
-            "labelled_as_correct": False,
-            "param_changes": [],
-            "refresher_exploration_id": None,
-            "missing_prerequisite_skill_id": None,
+            'labelled_as_correct': False,
+            'param_changes': [],
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None,
             'dest_if_really_stuck': None
           },
-          "training_data": [],
-          "tagged_skill_misconception_id": None
+          'training_data': [],
+          'tagged_skill_misconception_id': None
         }
       ],
-      "default_outcome": {
-        "dest": "EXP_1_STATE_2",
-        "feedback": {
-          "content_id": "default_outcome",
-          "html": "<p>df</p>"
+      'default_outcome': {
+        'dest': 'EXP_1_STATE_2',
+        'feedback': {
+          'content_id': 'default_outcome',
+          'html': '<p>df</p>'
         },
-        "labelled_as_correct": False,
-        "param_changes": [],
-        "refresher_exploration_id": None,
-        "missing_prerequisite_skill_id": None,
+        'labelled_as_correct': False,
+        'param_changes': [],
+        'refresher_exploration_id': None,
+        'missing_prerequisite_skill_id': None,
         'dest_if_really_stuck': None
       },
-      "confirmed_unclassified_answers": [],
-      "hints": [],
-      "solution": None
+      'confirmed_unclassified_answers': [],
+      'hints': [],
+      'solution': None
     }
 
     EXP_1_STATE_3 = state_domain.State.create_default_state(
       'EXP_1_STATE_3', is_initial_state=False).to_dict()
 
     EXP_1_STATE_3['interaction'] = {
-      "id": "ItemSelectionInput",
-      "customization_args": {
-        "minAllowableSelectionCount": {
-          "value": 1
+      'id': 'ItemSelectionInput',
+      'customization_args': {
+        'minAllowableSelectionCount': {
+          'value': 1
         },
-        "maxAllowableSelectionCount": {
-          "value": 2
+        'maxAllowableSelectionCount': {
+          'value': 2
         },
-        "choices": {
-          "value": [
+        'choices': {
+          'value': [
             {
-              "content_id": "ca_choices_13",
-              "html": "<p>1</p>"
+              'content_id': 'ca_choices_13',
+              'html': '<p>1</p>'
             },
             {
-              "content_id": "ca_choices_14",
-              "html": "<p>2</p>"
+              'content_id': 'ca_choices_14',
+              'html': '<p>2</p>'
             },
             {
-              "content_id": "ca_choices_15",
-              "html": "<p>3</p>"
+              'content_id': 'ca_choices_15',
+              'html': '<p>3</p>'
             }
           ]
         }
       },
-      "answer_groups": [
+      'answer_groups': [
         {
-          "rule_specs": [
+          'rule_specs': [
             {
-              "rule_type": "Equals",
-              "inputs": {
-                "x": [
-                  "ca_choices_13",
-                  "ca_choices_14"
+              'rule_type': 'Equals',
+              'inputs': {
+                'x': [
+                  'ca_choices_13',
+                  'ca_choices_14'
                 ]
               }
             }
           ],
-          "outcome": {
-            "dest": "EXP_1_STATE_3",
-            "feedback": {
-              "content_id": "feedback_16",
-              "html": ""
+          'outcome': {
+            'dest': 'EXP_1_STATE_3',
+            'feedback': {
+              'content_id': 'feedback_16',
+              'html': ''
             },
-            "labelled_as_correct": False,
-            "param_changes": [],
-            "refresher_exploration_id": None,
-            "missing_prerequisite_skill_id": None,
+            'labelled_as_correct': False,
+            'param_changes': [],
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None,
             'dest_if_really_stuck': None
           },
-          "training_data": [],
-          "tagged_skill_misconception_id": None
+          'training_data': [],
+          'tagged_skill_misconception_id': None
         },
         {
-          "rule_specs": [
+          'rule_specs': [
             {
-              "rule_type": "Equals",
-              "inputs": {
-                "x": [
-                  "ca_choices_13",
-                  "ca_choices_14"
+              'rule_type': 'Equals',
+              'inputs': {
+                'x': [
+                  'ca_choices_13',
+                  'ca_choices_14'
                 ]
               }
             }
           ],
-          "outcome": {
-            "dest": "EXP_1_STATE_3",
-            "feedback": {
-              "content_id": "feedback_16",
-              "html": ""
+          'outcome': {
+            'dest': 'EXP_1_STATE_3',
+            'feedback': {
+              'content_id': 'feedback_16',
+              'html': ''
             },
-            "labelled_as_correct": False,
-            "param_changes": [],
-            "refresher_exploration_id": None,
-            "missing_prerequisite_skill_id": None,
+            'labelled_as_correct': False,
+            'param_changes': [],
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None,
             'dest_if_really_stuck': None
           },
-          "training_data": [],
-          "tagged_skill_misconception_id": None
+          'training_data': [],
+          'tagged_skill_misconception_id': None
         }
       ],
-      "default_outcome": {
-        "dest": "EXP_1_STATE_3",
-        "feedback": {
-          "content_id": "default_outcome",
-          "html": "<p>fd</p>"
+      'default_outcome': {
+        'dest': 'EXP_1_STATE_3',
+        'feedback': {
+          'content_id': 'default_outcome',
+          'html': '<p>fd</p>'
         },
-        "labelled_as_correct": False,
-        "param_changes": [],
-        "refresher_exploration_id": None,
-        "missing_prerequisite_skill_id": None,
+        'labelled_as_correct': False,
+        'param_changes': [],
+        'refresher_exploration_id': None,
+        'missing_prerequisite_skill_id': None,
         'dest_if_really_stuck': None
       },
-      "confirmed_unclassified_answers": [],
-      "hints": [],
-      "solution": None
+      'confirmed_unclassified_answers': [],
+      'hints': [],
+      'solution': None
     }
 
     EXP_1_STATE_4 = state_domain.State.create_default_state(
       'EXP_1_STATE_4', is_initial_state=False).to_dict()
 
     EXP_1_STATE_4['interaction'] = {
-      "id": "DragAndDropSortInput",
-      "customization_args": {
-        "choices": {
-          "value": [
+      'id': 'DragAndDropSortInput',
+      'customization_args': {
+        'choices': {
+          'value': [
             {
-              "content_id": "ca_choices_17",
-              "html": "<p>1</p>"
+              'content_id': 'ca_choices_17',
+              'html': '<p>1</p>'
             },
             {
-              "content_id": "ca_choices_18",
-              "html": "<p>2</p>"
+              'content_id': 'ca_choices_18',
+              'html': '<p>2</p>'
             },
             {
-              "content_id": "ca_choices_19",
-              "html": "<p>3</p>"
+              'content_id': 'ca_choices_19',
+              'html': '<p>3</p>'
             },
             {
-              "content_id": "ca_choices_20",
-              "html": "<p>4</p>"
+              'content_id': 'ca_choices_20',
+              'html': '<p>4</p>'
             }
           ]
         },
-        "allowMultipleItemsInSamePosition": {
-          "value": True
+        'allowMultipleItemsInSamePosition': {
+          'value': True
         }
       },
-      "answer_groups": [
+      'answer_groups': [
         {
-          "rule_specs": [
+          'rule_specs': [
             {
-              "rule_type": "HasElementXAtPositionY",
-              "inputs": {
-                "x": "ca_choices_18",
-                "y": 2
+              'rule_type': 'HasElementXAtPositionY',
+              'inputs': {
+                'x': 'ca_choices_18',
+                'y': 2
               }
             }
           ],
-          "outcome": {
-            "dest": "EXP_1_STATE_4",
-            "feedback": {
-              "content_id": "feedback_22",
-              "html": ""
+          'outcome': {
+            'dest': 'EXP_1_STATE_4',
+            'feedback': {
+              'content_id': 'feedback_22',
+              'html': ''
             },
-            "labelled_as_correct": False,
-            "param_changes": [],
-            "refresher_exploration_id": None,
-            "missing_prerequisite_skill_id": None,
+            'labelled_as_correct': False,
+            'param_changes': [],
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None,
             'dest_if_really_stuck': None
           },
-          "training_data": [],
-          "tagged_skill_misconception_id": None
+          'training_data': [],
+          'tagged_skill_misconception_id': None
         },
         {
-          "rule_specs": [
+          'rule_specs': [
             {
-              "rule_type": "IsEqualToOrdering",
-              "inputs": {
-                "x": [
+              'rule_type': 'IsEqualToOrdering',
+              'inputs': {
+                'x': [
                   [
-                    "ca_choices_17"
+                    'ca_choices_17'
                   ],
                   [
-                    "ca_choices_18"
+                    'ca_choices_18'
                   ],
                   [
-                    "ca_choices_19"
+                    'ca_choices_19'
                   ],
                   [
-                    "ca_choices_20"
+                    'ca_choices_20'
                   ]
                 ]
               }
             }
           ],
-          "outcome": {
-            "dest": "EXP_1_STATE_4",
-            "feedback": {
-              "content_id": "feedback_21",
-              "html": ""
+          'outcome': {
+            'dest': 'EXP_1_STATE_4',
+            'feedback': {
+              'content_id': 'feedback_21',
+              'html': ''
             },
-            "labelled_as_correct": False,
-            "param_changes": [],
-            "refresher_exploration_id": None,
-            "missing_prerequisite_skill_id": None,
+            'labelled_as_correct': False,
+            'param_changes': [],
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None,
             'dest_if_really_stuck': None
           },
-          "training_data": [],
-          "tagged_skill_misconception_id": None
+          'training_data': [],
+          'tagged_skill_misconception_id': None
         },
         {
-          "rule_specs": [
+          'rule_specs': [
             {
-              "rule_type": "IsEqualToOrderingWithOneItemAtIncorrectPosition",
-              "inputs": {
-                "x": [
+              'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
+              'inputs': {
+                'x': [
                   [
-                    "ca_choices_4",
-                    "ca_choices_6"
+                    'ca_choices_4',
+                    'ca_choices_6'
                   ],
                   [
-                    "ca_choices_5"
+                    'ca_choices_5'
                   ],
                   [
-                    "ca_choices_7"
+                    'ca_choices_7'
                   ]
                 ]
               }
             }
           ],
-          "outcome": {
-            "dest": "EXP_1_STATE_4",
-            "feedback": {
-              "content_id": "feedback_8",
-              "html": ""
+          'outcome': {
+            'dest': 'EXP_1_STATE_4',
+            'feedback': {
+              'content_id': 'feedback_8',
+              'html': ''
             },
-            "labelled_as_correct": False,
-            "param_changes": [],
-            "refresher_exploration_id": None,
-            "missing_prerequisite_skill_id": None,
+            'labelled_as_correct': False,
+            'param_changes': [],
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None,
             'dest_if_really_stuck': None
           },
-          "training_data": [],
-          "tagged_skill_misconception_id": None
+          'training_data': [],
+          'tagged_skill_misconception_id': None
         },
         {
-          "rule_specs": [
+          'rule_specs': [
             {
-              "rule_type": "IsEqualToOrdering",
-              "inputs": {
-                "x": [
+              'rule_type': 'IsEqualToOrdering',
+              'inputs': {
+                'x': [
                   [
-                    "ca_choices_4"
+                    'ca_choices_4'
                   ],
                   [
-                    "ca_choices_5",
-                    "ca_choices_6"
+                    'ca_choices_5',
+                    'ca_choices_6'
                   ],
                   [
-                    "ca_choices_7"
+                    'ca_choices_7'
                   ]
                 ]
               }
             }
           ],
-          "outcome": {
-            "dest": "EXP_1_STATE_4",
-            "feedback": {
-              "content_id": "feedback_9",
-              "html": ""
+          'outcome': {
+            'dest': 'EXP_1_STATE_4',
+            'feedback': {
+              'content_id': 'feedback_9',
+              'html': ''
             },
-            "labelled_as_correct": False,
-            "param_changes": [],
-            "refresher_exploration_id": None,
-            "missing_prerequisite_skill_id": None,
+            'labelled_as_correct': False,
+            'param_changes': [],
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None,
             'dest_if_really_stuck': None
           },
-          "training_data": [],
-          "tagged_skill_misconception_id": None
+          'training_data': [],
+          'tagged_skill_misconception_id': None
         }
       ],
-      "default_outcome": {
-        "dest": "EXP_1_STATE_4",
-        "feedback": {
-          "content_id": "default_outcome",
-          "html": "<p>fd</p>"
+      'default_outcome': {
+        'dest': 'EXP_1_STATE_4',
+        'feedback': {
+          'content_id': 'default_outcome',
+          'html': '<p>fd</p>'
         },
-        "labelled_as_correct": False,
-        "param_changes": [],
-        "refresher_exploration_id": None,
-        "missing_prerequisite_skill_id": None,
+        'labelled_as_correct': False,
+        'param_changes': [],
+        'refresher_exploration_id': None,
+        'missing_prerequisite_skill_id': None,
         'dest_if_really_stuck': None
       },
-      "confirmed_unclassified_answers": [],
-      "hints": [],
-      "solution": None
+      'confirmed_unclassified_answers': [],
+      'hints': [],
+      'solution': None
     }
 
     EXP_1_STATE_5 = state_domain.State.create_default_state(
       'EXP_1_STATE_5', is_initial_state=False).to_dict()
 
     EXP_1_STATE_5['interaction'] = {
-      "id": "TextInput",
-      "customization_args": {
-        "placeholder": {
-          "value": {
-            "content_id": "ca_placeholder_23",
-            "unicode_str": ""
+      'id': 'TextInput',
+      'customization_args': {
+        'placeholder': {
+          'value': {
+            'content_id': 'ca_placeholder_23',
+            'unicode_str': ''
           }
         },
-        "rows": {
-          "value": 11
+        'rows': {
+          'value': 11
         }
       },
-      "answer_groups": [
+      'answer_groups': [
         {
-          "rule_specs": [
+          'rule_specs': [
             {
-              "rule_type": "Contains",
-              "inputs": {
-                "x": {
-                  "contentId": "rule_input_27",
-                  "normalizedStrSet": [
-                    "hello",
-                    "abc",
-                    "def"
+              'rule_type': 'Contains',
+              'inputs': {
+                'x': {
+                  'contentId': 'rule_input_27',
+                  'normalizedStrSet': [
+                    'hello',
+                    'abc',
+                    'def'
                   ]
                 }
               }
             },
             {
-              "rule_type": "StartsWith",
-              "inputs": {
-                "x": {
-                  "contentId": "rule_input_26",
-                  "normalizedStrSet": [
-                    "helloooo",
-                    "dgfg"
+              'rule_type': 'StartsWith',
+              'inputs': {
+                'x': {
+                  'contentId': 'rule_input_26',
+                  'normalizedStrSet': [
+                    'helloooo',
+                    'dgfg'
                   ]
                 }
               }
             }
           ],
-          "outcome": {
-            "dest": "2",
-            "feedback": {
-              "content_id": "feedback_24",
-              "html": ""
+          'outcome': {
+            'dest': '2',
+            'feedback': {
+              'content_id': 'feedback_24',
+              'html': ''
             },
-            "labelled_as_correct": False,
-            "param_changes": [],
-            "refresher_exploration_id": None,
-            "missing_prerequisite_skill_id": None,
+            'labelled_as_correct': False,
+            'param_changes': [],
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None,
             'dest_if_really_stuck': None
           },
-          "training_data": [],
-          "tagged_skill_misconception_id": None
+          'training_data': [],
+          'tagged_skill_misconception_id': None
         },
         {
-          "rule_specs": [
+          'rule_specs': [
             {
-              "rule_type": "StartsWith",
-              "inputs": {
-                "x": {
-                  "contentId": "rule_input_30",
-                  "normalizedStrSet": [
-                    "exci",
-                    "deve"
+              'rule_type': 'StartsWith',
+              'inputs': {
+                'x': {
+                  'contentId': 'rule_input_30',
+                  'normalizedStrSet': [
+                    'exci',
+                    'deve'
                   ]
                 }
               }
             },
             {
-              "rule_type": "FuzzyEquals",
-              "inputs": {
-                "x": {
-                  "contentId": "rule_input_29",
-                  "normalizedStrSet": [
-                    "exciting",
-                    "developer"
+              'rule_type': 'FuzzyEquals',
+              'inputs': {
+                'x': {
+                  'contentId': 'rule_input_29',
+                  'normalizedStrSet': [
+                    'exciting',
+                    'developer'
                   ]
                 }
               }
             }
           ],
-          "outcome": {
-            "dest": "EXP_1_STATE_5",
-            "feedback": {
-              "content_id": "feedback_28",
-              "html": ""
+          'outcome': {
+            'dest': 'EXP_1_STATE_5',
+            'feedback': {
+              'content_id': 'feedback_28',
+              'html': ''
             },
-            "labelled_as_correct": False,
-            "param_changes": [],
-            "refresher_exploration_id": None,
-            "missing_prerequisite_skill_id": None,
+            'labelled_as_correct': False,
+            'param_changes': [],
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None,
             'dest_if_really_stuck': None
           },
-          "training_data": [],
-          "tagged_skill_misconception_id": None
+          'training_data': [],
+          'tagged_skill_misconception_id': None
         }
       ],
-      "default_outcome": {
-        "dest": "EXP_1_STATE_5",
-        "feedback": {
-          "content_id": "default_outcome",
-          "html": "<p>fd</p>"
+      'default_outcome': {
+        'dest': 'EXP_1_STATE_5',
+        'feedback': {
+          'content_id': 'default_outcome',
+          'html': '<p>fd</p>'
         },
-        "labelled_as_correct": False,
-        "param_changes": [],
-        "refresher_exploration_id": None,
-        "missing_prerequisite_skill_id": None,
+        'labelled_as_correct': False,
+        'param_changes': [],
+        'refresher_exploration_id': None,
+        'missing_prerequisite_skill_id': None,
         'dest_if_really_stuck': None
       },
-      "confirmed_unclassified_answers": [],
-      "hints": [],
-      "solution": None
+      'confirmed_unclassified_answers': [],
+      'hints': [],
+      'solution': None
     }
 
     EXP_1_STATE_6 = state_domain.State.create_default_state(
@@ -643,11 +643,28 @@ class ExpStateInteractionValidationJobTests(
     EXP_1_STATE_7 = state_domain.State.create_default_state(
         'EXP_1_STATE_7', is_initial_state=False).to_dict()
     EXP_1_STATE_7['content']['html'] = (
-      '<oppia-noninteractive-link></oppia-noninteractive-link>' +
-      '<oppia-noninteractive-math></oppia-noninteractive-math>' +
-      '<oppia-noninteractive-skillreview></oppia-noninteractive-skillreview>' +
-      '<oppia-noninteractive-image></oppia-noninteractive-image>' +
-      '<oppia-noninteractive-video></oppia-noninteractive-video>'
+      # '<oppia-noninteractive-link></oppia-noninteractive-link>'
+      # '<oppia-noninteractive-math></oppia-noninteractive-math>'
+      # '<oppia-noninteractive-math math_content-with-value=\'{Not empty}\'>'
+      # '</oppia-noninteractive-math>'
+      # '<oppia-noninteractive-skillreview></oppia-noninteractive-skillreview>'
+      # '<oppia-noninteractive-image></oppia-noninteractive-image>'
+      # '<oppia-noninteractive-video></oppia-noninteractive-video>'
+      # '<oppia-noninteractive-math math_content-with-value=\"{&amp;quot;raw_latex&amp;quot;:&amp;quot;\\\\frac{x}{y}&amp;quot;,&amp;quot;svg_filename&amp;quot;:&amp;quot;mathImg_20220719_180938_poux1ztcku_height_3d205_width_1d784_vertical_1d306.svg&amp;quot;}\"></oppia-noninteractive-math>'
+      # '<p>dffddfdffdfd</p>\n\n<p>&nbsp;</p>\n<oppia-noninteractive-image></oppia-noninteractive-image>\n\n<p>&nbsp;</p>\n\n<p>&nbsp;</p>\n\n<p><oppia-noninteractive-link></oppia-noninteractive-link><oppia-noninteractive-math></oppia-noninteractive-math><oppia-noninteractive-skillreview></oppia-noninteractive-skillreview></p><oppia-noninteractive-video></oppia-noninteractive-video>'
+      '<p>dffddfdffdfd</p>\n\n<p>&nbsp;</p>\n<oppia-noninteractive-image>'
+      '</oppia-noninteractive-image>\n\n<p>&nbsp;</p>\n\n<p>&nbsp;</p>\n\n<p>'
+      '<oppia-noninteractive-link></oppia-noninteractive-link>'
+      '<oppia-noninteractive-math math_content-with-value=\"{&amp;quot;'
+      'svg_filename&amp;quot;:&amp;quot;mathImg_20220719_221502_sr5wjlbtbn_'
+      'height_3d205_width_1d784_vertical_1d306.svg&amp;quot;}\"></oppia-'
+      'noninteractive-math><oppia-noninteractive-skillreview></oppia-'
+      'noninteractive-skillreview></p><oppia-noninteractive-video>'
+      '</oppia-noninteractive-video>'
+      '<oppia-noninteractive-math math_content-with-value=\"{&amp;quot;'
+      'raw_latex&amp;quot;:&amp;quot;abcde&amp;quot;}\"></oppia-'
+      'noninteractive-math>'
+      '<oppia-noninteractive-math></oppia-noninteractive-math>'
     )
 
     EXP_2_STATE_1 = state_domain.State.create_default_state(
@@ -775,9 +792,12 @@ class ExpStateInteractionValidationJobTests(
             f'EXP_1_STATE_7 having RTE link tag do not have '
             f'text-with-value attribute\', \'State - EXP_1_STATE_7 having '
             f'RTE link tag do not have url-with-value attribute\', \'State - '
+            f'EXP_1_STATE_7 having RTE math tag do not have '
+            f'raw-latex attribute\', \'State - '
             f'EXP_1_STATE_7 having RTE math tag do not have svg-filename '
             f'attribute\', \'State - EXP_1_STATE_7 having RTE math tag do '
-            f'not have raw-latex attribute\', \'State - EXP_1_STATE_7 having '
+            f'not have math_content-with-value attribute\', '
+            f'\'State - EXP_1_STATE_7 having '
             f'RTE skillreview tag do not have text-with-value attribute\', '
             f'\'State - EXP_1_STATE_7 having RTE skillreview tag do not have '
             f'skill_id-with-value attribute\', \'State - EXP_1_STATE_7 having '

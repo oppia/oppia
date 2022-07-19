@@ -26,7 +26,6 @@ from core.domain import rte_component_registry
 from core.domain import state_domain
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
-from core.jobs.transforms import job_result_transforms
 from core.jobs.types import job_run_result
 from core.platform import models
 
@@ -77,7 +76,7 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
                         attr_val = html.unescape(component_tag[attr])
                         customization_args[attr] = json.loads(attr_val)
                     except Exception:
-                        continue
+                        customization_args[attr] = 'Not found'
 
                 component = {
                     'id': tag_name,
@@ -115,26 +114,34 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
             for rte_component in rte_components:
                 # Validates image tag attributes exists.
                 if rte_component['id'] == 'oppia-noninteractive-image':
-                    try:
+                    if (
+                        'caption-with-value' not in
+                        rte_component['customization_args'] or
                         rte_component['customization_args'][
-                            'caption-with-value']
-                    except Exception:
+                            'caption-with-value'] == 'Not found'
+                    ):
                         rte_components_errors.append(
                             f'State - {key} having RTE image tag do not '
                             f'have cap-with-value attribute'
                         )
-                    try:
+
+                    if (
+                        'alt-with-value' not in
+                        rte_component['customization_args'] or
                         rte_component['customization_args'][
-                            'alt-with-value']
-                    except Exception:
+                            'alt-with-value'] == 'Not found'
+                    ):
                         rte_components_errors.append(
                             f'State - {key} having RTE image tag do not '
                             f'have alt-with-value attribute'
                         )
-                    try:
+
+                    if (
+                        'filepath-with-value' not in
+                        rte_component['customization_args'] or
                         rte_component['customization_args'][
-                            'filepath-with-value']
-                    except Exception:
+                            'filepath-with-value'] == 'Not found'
+                    ):
                         rte_components_errors.append(
                             f'State - {key} having RTE image tag do not '
                             f'have filepath-with-value attribute'
@@ -142,42 +149,64 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
 
                 # Validates math tag attributes exists.
                 elif rte_component['id'] == 'oppia-noninteractive-math':
-                    try:
-                        rte_component['customization_args'][
-                            'math_content-with-value']['svg_filename']
-                    except Exception:
-                        rte_components_errors.append(
-                            f'State - {key} having RTE math tag do not '
-                            f'have svg-filename attribute'
-                        )
 
-                    try:
+                    if (
                         rte_component['customization_args'][
-                            'math_content-with-value']['raw_latex']
-                    except Exception:
+                            'math_content-with-value'] == 'Not found'
+                    ):
                         rte_components_errors.append(
                             f'State - {key} having RTE math tag do not '
-                            f'have raw-latex attribute'
+                            f'have math_content-with-value attribute'
                         )
+                    else:
+                        if (
+                            'svg_filename' not in
+                            rte_component['customization_args'][
+                                'math_content-with-value'] or
+                            rte_component['customization_args'][
+                                'math_content-with-value'][
+                                    'svg_filename'] == 'Not found'
+                        ):
+                            rte_components_errors.append(
+                                f'State - {key} having RTE math tag do not '
+                                f'have svg-filename attribute'
+                            )
+
+                        if (
+                            'raw_latex' not in
+                            rte_component['customization_args'][
+                                'math_content-with-value'] or
+                            rte_component['customization_args'][
+                                'math_content-with-value'][
+                                    'raw_latex'] == 'Not found'
+                        ):
+                            rte_components_errors.append(
+                                f'State - {key} having RTE math tag do not '
+                                f'have raw-latex attribute'
+                            )
 
                 # Validates skillreview tag attributes exists.
                 elif (
                     rte_component['id'] ==
                     'oppia-noninteractive-skillreview'
                 ):
-                    try:
+                    if (
+                        'text-with-value' not in
+                        rte_component['customization_args'] or
                         rte_component['customization_args'][
-                            'text-with-value']
-                    except Exception:
+                            'text-with-value'] == 'Not found'
+                    ):
                         rte_components_errors.append(
                             f'State - {key} having RTE skillreview tag do not '
                             f'have text-with-value attribute'
                         )
 
-                    try:
+                    if (
+                        'skill_id-with-value' not in
+                        rte_component['customization_args'] or
                         rte_component['customization_args'][
-                            'skill_id-with-value']
-                    except Exception:
+                            'skill_id-with-value'] == 'Not found'
+                    ):
                         rte_components_errors.append(
                             f'State - {key} having RTE skillreview tag do not '
                             f'have skill_id-with-value attribute'
@@ -185,39 +214,45 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
 
                 # Validates video tag attributes exists.
                 elif rte_component['id'] == 'oppia-noninteractive-video':
-                    try:
-                        rte_component['customization_args']['start-with-value']
-                    except Exception:
+                    if (
+                        'start-with-value' not in
+                        rte_component['customization_args'] or
+                        rte_component['customization_args'][
+                            'start-with-value'] == 'Not found'
+                    ):
                         rte_components_errors.append(
                             f'State - {key} having RTE video tag do not '
                             f'have start-with-value attribute'
                         )
 
-                    try:
-                        rte_component['customization_args']['end-with-value']
-                    except Exception:
+                    if (
+                        'end-with-value' not in
+                        rte_component['customization_args'] or
+                        rte_component['customization_args'][
+                            'end-with-value'] == 'Not found'
+                    ):
                         rte_components_errors.append(
                             f'State - {key} having RTE video tag do not '
                             f'have end-with-value attribute'
                         )
 
-                    try:
-                        (
-                            rte_component['customization_args']
-                            ['video_id-with-value']
-                        )
-                    except Exception:
+                    if (
+                        'video_id-with-value' not in
+                        rte_component['customization_args'] or
+                        rte_component['customization_args'][
+                            'video_id-with-value'] == 'Not found'
+                    ):
                         rte_components_errors.append(
                             f'State - {key} having RTE video tag do not '
                             f'have video_id-with-value attribute'
                         )
 
-                    try:
-                        (
-                            rte_component['customization_args']
-                            ['autoplay-with-value']
-                        )
-                    except Exception:
+                    if (
+                        'autoplay-with-value' not in
+                        rte_component['customization_args'] or
+                        rte_component['customization_args'][
+                            'autoplay-with-value'] == 'Not found'
+                    ):
                         rte_components_errors.append(
                             f'State - {key} having RTE video tag do not '
                             f'have autoplay-with-value attribute'
@@ -225,17 +260,23 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
 
                 # Validates link tag attributes exists.
                 elif rte_component['id'] == 'oppia-noninteractive-link':
-                    try:
-                        rte_component['customization_args']['text-with-value']
-                    except Exception:
+                    if (
+                        'text-with-value' not in
+                        rte_component['customization_args'] or
+                        rte_component['customization_args'][
+                            'text-with-value'] == 'Not found'
+                    ):
                         rte_components_errors.append(
                             f'State - {key} having RTE link tag do not '
                             f'have text-with-value attribute'
                         )
 
-                    try:
-                        rte_component['customization_args']['url-with-value']
-                    except Exception:
+                    if (
+                        'url-with-value' not in
+                        rte_component['customization_args'] or
+                        rte_component['customization_args'][
+                            'url-with-value'] == 'Not found'
+                    ):
                         rte_components_errors.append(
                             f'State - {key} having RTE link tag do not '
                             f'have url-with-value attribute'
@@ -257,20 +298,20 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
     ) -> None:
         """Sets the lower and upper bounds for the range_var, mainly
         we need to set the range so to keep track if any other rule's
-        range lies in between or not to prevent redundancy.
+        range lies in between or not to prevent redundancy
 
         Args:
             range_var: dict[str, Any]. To keep track of each rule's
                 ans group index, rule spec index, lower bound, upper bound,
                 lb inclusive, ub inclusive.
 
-            lower_bound: int. The lower bound
+            lower_bound: int. The lower bound.
 
-            upper_bound: int. The upper bound
+            upper_bound: int. The upper bound.
 
-            lb_inclusive: bool. If lower bound is inclusive
+            lb_inclusive: bool. If lower bound is inclusive.
 
-            ub_inclusive: bool. If upper bound is inclusive
+            ub_inclusive: bool. If upper bound is inclusive.
         """
         range_var['lower_bound'] = lower_bound
         range_var['upper_bound'] = upper_bound
@@ -278,15 +319,15 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
         range_var['ub_inclusive'] = ub_inclusive
 
     @staticmethod
-    def _is_enclosed_by(range_var, range) -> bool:
-        """Checks whether the ranges of rules enclosed or not.
+    def _is_enclosed_by(range_var, range_ele) -> bool:
+        """Checks whether the ranges of rules enclosed or not
 
         Args:
             range_var: dict[str, Any]. To keep track of each rule's
                 ans group index, rule spec index, lower bound, upper bound,
                 lb inclusive, ub inclusive.
 
-            range: dict[str, Any]. To keep track of other rule's
+            range_ele: dict[str, Any]. To keep track of other rule's
                 ans group index, rule spec index, lower bound, upper bound,
                 lb inclusive, ub inclusive.
 
@@ -294,22 +335,23 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
             is_enclosed: bool. Returns True if both rule's ranges are enclosed.
         """
         if (
-            range['lower_bound'] == None or range_var['lower_bound'] == None
-            or range['upper_bound'] == None or range_var['upper_bound'] == None
+            range_ele['lower_bound'] is None or range_var['lower_bound'] is None
+            or range_ele['upper_bound'] is None or (
+                range_var['upper_bound'] is None)
         ):
             return False
 
         lb_satisfied = (
-            range['lower_bound'] < range_var['lower_bound'] or
-            (range['lower_bound'] == range_var['lower_bound'] and (
-                not range_var['lb_inclusive'] or range['lb_inclusive'])
+            range_ele['lower_bound'] < range_var['lower_bound'] or
+            (range_ele['lower_bound'] == range_var['lower_bound'] and (
+                not range_var['lb_inclusive'] or range_ele['lb_inclusive'])
             )
         )
 
         ub_satisfied = (
-            range['upper_bound'] > range_var['upper_bound'] or
-            (range['upper_bound'] == range_var['upper_bound'] and (
-                not range_var['ub_inclusive'] or range['ub_inclusive'])
+            range_ele['upper_bound'] > range_var['upper_bound'] or
+            (range_ele['upper_bound'] == range_var['upper_bound'] and (
+                not range_var['ub_inclusive'] or range_ele['ub_inclusive'])
             )
         )
 
@@ -322,11 +364,11 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
         rule type
 
         Args:
-            earlier_rule: state_domain.RuleSpec. Previous rule
-            later_rule: state_domain.RuleSpec. Current rule
+            earlier_rule: state_domain.RuleSpec. Previous rule.
+            later_rule: state_domain.RuleSpec. Current rule.
 
         Returns:
-            bool. Returns True if the rules passes the range criteria check
+            bool. Returns True if the rules passes the range criteria check.
         """
         if (
             (
@@ -431,8 +473,8 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
                             (
                                 ExpStateInteractionValidationJob.
                                 _set_lower_and_upper_bounds(
-                                    range_var, rule_value_x-rule_value_tol,
-                                    rule_value_x-rule_value_tol, True, True
+                                    range_var, rule_value_x - rule_value_tol,
+                                    rule_value_x + rule_value_tol, True, True
                                 )
                             )
 
@@ -456,10 +498,10 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
                                     rule_value_b, True, True
                                 )
                             )
-                        for range in ranges:
+                        for range_ele in ranges:
                             if (
                                 ExpStateInteractionValidationJob.
-                                _is_enclosed_by(range_var, range)
+                                _is_enclosed_by(range_var, range_ele)
                             ):
                                 numeric_input_interaction_values.append(
                                     f'Rule {rule_spec_index} from answer '
@@ -528,10 +570,10 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
                         }
 
                         if (
-                            rule_spec.rule_type == 'IsEquivalentTo' or
-                            rule_spec.rule_type == 'IsExactlyEqualTo' or
-                            rule_spec.rule_type == (
-                                'IsEquivalentToAndInSimplestForm')
+                            rule_spec.rule_type in (
+                                'IsEquivalentTo', 'IsExactlyEqualTo',
+                                'IsEquivalentToAndInSimplestForm'
+                            )
                         ):
                             rule_value_f = rule_spec.inputs['f'].strip()
                             if '/' in rule_value_f:
@@ -626,14 +668,14 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
                             rule_value_x = int(rule_spec.inputs['x'])
                             matched_denominator['denominator'] = rule_value_x
 
-                        for range in ranges:
+                        for range_ele in ranges:
                             if (
                                 ExpStateInteractionValidationJob.
-                                _is_enclosed_by(range_var, range)
+                                _is_enclosed_by(range_var, range_ele)
                             ):
                                 earlier_rule = (
-                                    answer_groups[range['ans_group_index']]
-                                    .rule_specs[range['rule_spec_index']]
+                                    answer_groups[range_ele['ans_group_index']]
+                                    .rule_specs[range_ele['rule_spec_index']]
                                 )
                                 if (
                                     ExpStateInteractionValidationJob.
@@ -769,7 +811,7 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
                     for ele in ele_x_at_y_rules:
                         ele_position = ele['position']
                         ele_element = ele['element']
-                        rule_choice = rule_spec.inputs['x'][ele_position-1]
+                        rule_choice = rule_spec.inputs['x'][ele_position - 1]
 
                         if len(rule_choice) > 1:
                             for choice in rule_choice:
@@ -825,18 +867,18 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
                     )
 
                 if rule_spec.rule_type == 'IsEqualToOrdering':
-                    dict = {}
+                    dictionary = {}
                     for layer_idx, layer in enumerate(
                         rule_spec.inputs['x']
                     ):
                         for item in layer:
-                            dict[item] = layer_idx
+                            dictionary[item] = layer_idx
 
                     for ele in equal_ordering_one_at_incorec_posn:
                         wrong_positions = 0
                         for layer_idx, layer in enumerate(ele):
                             for item in layer:
-                                if layer_idx != dict[item]:
+                                if layer_idx != dictionary[item]:
                                     wrong_positions += 1
                         if wrong_positions <= 1:
                             drag_drop_interaction_values.append(
@@ -1047,6 +1089,7 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
         return states_with_values
 
     invalid_end_interac = []
+
     @staticmethod
     def filter_invalid_end_interac(exp, exp_id_list):
         """Filter invalid end interaction states.
