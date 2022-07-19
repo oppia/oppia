@@ -74,7 +74,8 @@ class ExpStateAuditChecksJobTests(job_test_utils.JobTestBase):
             'labelled_as_correct': False,
             'param_changes': [],
             'refresher_exploration_id': 'Not None',
-            'missing_prerequisite_skill_id': None
+            'missing_prerequisite_skill_id': None,
+            'dest_if_really_stuck': None
           },
           'training_data': [],
           'tagged_skill_misconception_id': None
@@ -89,7 +90,8 @@ class ExpStateAuditChecksJobTests(job_test_utils.JobTestBase):
         'labelled_as_correct': False,
         'param_changes': [],
         'refresher_exploration_id': 'Not None',
-        'missing_prerequisite_skill_id': None
+        'missing_prerequisite_skill_id': None,
+        'dest_if_really_stuck': None
       },
       'confirmed_unclassified_answers': [],
       'hints': [],
@@ -145,7 +147,8 @@ class ExpStateAuditChecksJobTests(job_test_utils.JobTestBase):
             'labelled_as_correct': False,
             'param_changes': [],
             'refresher_exploration_id': None,
-            'missing_prerequisite_skill_id': None
+            'missing_prerequisite_skill_id': None,
+            'dest_if_really_stuck': None
           },
           'training_data': [],
           'tagged_skill_misconception_id': None
@@ -160,7 +163,8 @@ class ExpStateAuditChecksJobTests(job_test_utils.JobTestBase):
         'labelled_as_correct': False,
         'param_changes': [],
         'refresher_exploration_id': None,
-        'missing_prerequisite_skill_id': None
+        'missing_prerequisite_skill_id': None,
+        'dest_if_really_stuck': None
       },
       'confirmed_unclassified_answers': [],
       'hints': [],
@@ -225,7 +229,8 @@ class ExpStateAuditChecksJobTests(job_test_utils.JobTestBase):
           'labelled_as_correct': False,
           'param_changes': [],
           'refresher_exploration_id': None,
-          'missing_prerequisite_skill_id': None
+          'missing_prerequisite_skill_id': None,
+          'dest_if_really_stuck': None
         },
         'training_data': [],
         'tagged_skill_misconception_id': None
@@ -240,7 +245,8 @@ class ExpStateAuditChecksJobTests(job_test_utils.JobTestBase):
         'labelled_as_correct': False,
         'param_changes': [],
         'refresher_exploration_id': None,
-        'missing_prerequisite_skill_id': None
+        'missing_prerequisite_skill_id': None,
+        'dest_if_really_stuck': None
       },
       'confirmed_unclassified_answers': [],
       'hints': [],
@@ -298,7 +304,8 @@ class ExpStateAuditChecksJobTests(job_test_utils.JobTestBase):
             'labelled_as_correct': False,
             'param_changes': [],
             'refresher_exploration_id': 'Not None',
-            'missing_prerequisite_skill_id': None
+            'missing_prerequisite_skill_id': None,
+            'dest_if_really_stuck': None
           },
           'training_data': [],
           'tagged_skill_misconception_id': None
@@ -313,7 +320,8 @@ class ExpStateAuditChecksJobTests(job_test_utils.JobTestBase):
         'labelled_as_correct': False,
         'param_changes': [],
         'refresher_exploration_id': 'Not None',
-        'missing_prerequisite_skill_id': None
+        'missing_prerequisite_skill_id': None,
+        'dest_if_really_stuck': None
       },
       'confirmed_unclassified_answers': [],
       'hints': [],
@@ -369,7 +377,8 @@ class ExpStateAuditChecksJobTests(job_test_utils.JobTestBase):
             'labelled_as_correct': False,
             'param_changes': [],
             'refresher_exploration_id': None,
-            'missing_prerequisite_skill_id': None
+            'missing_prerequisite_skill_id': None,
+            'dest_if_really_stuck': None
           },
           'training_data': [],
           'tagged_skill_misconception_id': None
@@ -384,7 +393,8 @@ class ExpStateAuditChecksJobTests(job_test_utils.JobTestBase):
         'labelled_as_correct': False,
         'param_changes': [],
         'refresher_exploration_id': None,
-        'missing_prerequisite_skill_id': None
+        'missing_prerequisite_skill_id': None,
+        'dest_if_really_stuck': None
       },
       'confirmed_unclassified_answers': [],
       'hints': [],
@@ -449,7 +459,8 @@ class ExpStateAuditChecksJobTests(job_test_utils.JobTestBase):
           'labelled_as_correct': False,
           'param_changes': [],
           'refresher_exploration_id': None,
-          'missing_prerequisite_skill_id': None
+          'missing_prerequisite_skill_id': None,
+          'dest_if_really_stuck': None
         },
         'training_data': [],
         'tagged_skill_misconception_id': None
@@ -464,7 +475,8 @@ class ExpStateAuditChecksJobTests(job_test_utils.JobTestBase):
         'labelled_as_correct': False,
         'param_changes': [],
         'refresher_exploration_id': None,
-        'missing_prerequisite_skill_id': None
+        'missing_prerequisite_skill_id': None,
+        'dest_if_really_stuck': None
       },
       'confirmed_unclassified_answers': [],
       'hints': [],
@@ -522,7 +534,8 @@ class ExpStateAuditChecksJobTests(job_test_utils.JobTestBase):
             'labelled_as_correct': False,
             'param_changes': [],
             'refresher_exploration_id': 'Not None',
-            'missing_prerequisite_skill_id': None
+            'missing_prerequisite_skill_id': None,
+            'dest_if_really_stuck': None
           },
           'training_data': [],
           'tagged_skill_misconception_id': None
@@ -537,7 +550,8 @@ class ExpStateAuditChecksJobTests(job_test_utils.JobTestBase):
         'labelled_as_correct': False,
         'param_changes': [],
         'refresher_exploration_id': 'Not None',
-        'missing_prerequisite_skill_id': None
+        'missing_prerequisite_skill_id': None,
+        'dest_if_really_stuck': None
       },
       'confirmed_unclassified_answers': [],
       'hints': [],
@@ -593,7 +607,8 @@ class ExpStateAuditChecksJobTests(job_test_utils.JobTestBase):
             'labelled_as_correct': False,
             'param_changes': [],
             'refresher_exploration_id': None,
-            'missing_prerequisite_skill_id': None
+            'missing_prerequisite_skill_id': None,
+            'dest_if_really_stuck': None
           },
           'training_data': [],
           'tagged_skill_misconception_id': None
@@ -608,7 +623,8 @@ class ExpStateAuditChecksJobTests(job_test_utils.JobTestBase):
         'labelled_as_correct': False,
         'param_changes': [],
         'refresher_exploration_id': None,
-        'missing_prerequisite_skill_id': None
+        'missing_prerequisite_skill_id': None,
+        'dest_if_really_stuck': None
       },
       'confirmed_unclassified_answers': [],
       'hints': [],
@@ -673,7 +689,8 @@ class ExpStateAuditChecksJobTests(job_test_utils.JobTestBase):
           'labelled_as_correct': False,
           'param_changes': [],
           'refresher_exploration_id': None,
-          'missing_prerequisite_skill_id': None
+          'missing_prerequisite_skill_id': None,
+          'dest_if_really_stuck': None
         },
         'training_data': [],
         'tagged_skill_misconception_id': None
@@ -688,7 +705,8 @@ class ExpStateAuditChecksJobTests(job_test_utils.JobTestBase):
         'labelled_as_correct': False,
         'param_changes': [],
         'refresher_exploration_id': None,
-        'missing_prerequisite_skill_id': None
+        'missing_prerequisite_skill_id': None,
+        'dest_if_really_stuck': None
       },
       'confirmed_unclassified_answers': [],
       'hints': [],
@@ -914,7 +932,7 @@ class ExpStateAuditChecksJobTests(job_test_utils.JobTestBase):
                 f'and the invalid curated exp RTE video tag errors are '
                 f'[{{\'state_name\': \'EXP_1_STATE_4\', \'rte_video_errors\': '
                 f'[\'State - EXP_1_STATE_4 Video tag at index 2, start value '
-                f'13 is greater than end value 11\']}}]'
+                f'13.0 is greater than end value 11.0\']}}]'
             ),
             job_run_result.JobRunResult.as_stdout(
                 'NUMBER OF CURATED EXPS WITH INVALID ITEM SELEC ' +
@@ -1001,7 +1019,7 @@ class ExpStateAuditChecksJobTests(job_test_utils.JobTestBase):
                 f'and the invalid private exp RTE video tag errors are '
                 f'[{{\'state_name\': \'EXP_2_STATE_4\', \'rte_video_errors\': '
                 f'[\'State - EXP_2_STATE_4 Video tag at index 2, start value '
-                f'13 is greater than end value 11\']}}]'
+                f'13.0 is greater than end value 11.0\']}}]'
             ),
             job_run_result.JobRunResult.as_stdout(
                 'NUMBER OF PRIVATE EXPS WITH INVALID ITEM SELEC ' +
@@ -1088,7 +1106,7 @@ class ExpStateAuditChecksJobTests(job_test_utils.JobTestBase):
                 f'and the invalid public exp RTE video tag errors are '
                 f'[{{\'state_name\': \'EXP_3_STATE_4\', \'rte_video_errors\': '
                 f'[\'State - EXP_3_STATE_4 Video tag at index 2, start value '
-                f'13 is greater than end value 11\']}}]'
+                f'13.0 is greater than end value 11.0\']}}]'
             ),
             job_run_result.JobRunResult.as_stdout(
                 'NUMBER OF PUBLIC EXPS WITH INVALID ITEM SELEC ' +
