@@ -123,13 +123,28 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
 
         self.cmd_token_list = []
         def mock_check_call(cmd_tokens, **unsued_kwargs):  # pylint: disable=unused-argument
-            self.cmd_token_list.append(cmd_tokens[2:])
+            if cmd_tokens and cmd_tokens[0].endswith('python'):
+                # Some commands use the path to the Python executable. To make
+                # specifying expected commands easier, replace these with just
+                # "python".
+                cmd_tokens[0] = 'python'
+            self.cmd_token_list.append(cmd_tokens)
             return scripts_test_utils.PopenStub()
+
+        def mock_run(cmd_tokens, **_kwargs):
+            if cmd_tokens and cmd_tokens[0].endswith('python'):
+                # Some commands use the path to the Python executable. To make
+                # specifying expected commands easier, replace these with just
+                # "python".
+                cmd_tokens[0] = 'python'
+            self.cmd_token_list.append(cmd_tokens)
+            return ''
 
         self.swap_check_call = self.swap(
             subprocess, 'check_call', mock_check_call)
         self.swap_Popen = self.swap(
             subprocess, 'Popen', mock_check_call)
+        self.swap_run = self.swap(subprocess, 'run', mock_run)
 
         class MockErrorProcess:
 
@@ -141,7 +156,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 return '', 'can\'t combine user with prefix'
 
         def mock_check_call_error(cmd_tokens, **kwargs):  # pylint: disable=unused-argument
-            self.cmd_token_list.append(cmd_tokens[2:])
+            self.cmd_token_list.append(cmd_tokens)
             if kwargs.get('encoding') != 'utf-8':
                 raise AssertionError(
                     'Popen should have been called with encoding="utf-8"')
@@ -245,7 +260,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
 
         with self.swap_check_call, self.swap_Popen, swap_remove_dir:
             with self.open_file_swap, swap_get_mismatches:
-                with swap_validate_metadata_directories:
+                with swap_validate_metadata_directories, self.swap_run:
                     install_python_prod_dependencies.main()
 
         self.assertEqual(removed_dirs, [common.THIRD_PARTY_PYTHON_LIBS_DIR])
@@ -253,9 +268,12 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.cmd_token_list,
             [
-                ['scripts.regenerate_requirements', '--no-emit-index-url'],
                 [
-                    'pip', 'install', '--target',
+                    'pip-compile', 'requirements.in', '--output-file',
+                    'requirements.txt',
+                ],
+                [
+                    'python', '-m', 'pip', 'install', '--target',
                     common.THIRD_PARTY_PYTHON_LIBS_DIR,
                     '--no-dependencies',
                     '-r', common.COMPILED_REQUIREMENTS_FILE_PATH,
@@ -292,33 +310,39 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
 
         with self.swap_check_call, self.swap_Popen, self.open_file_swap:
             with swap_get_mismatches, swap_validate_metadata_directories:
-                install_python_prod_dependencies.main()
+                with self.swap_run:
+                    install_python_prod_dependencies.main()
 
         self.assertEqual(
             self.cmd_token_list,
             [
-                ['scripts.regenerate_requirements', '--no-emit-index-url'],
                 [
-                    'pip', 'install',
+                    'pip-compile', 'requirements.in', '--output-file',
+                    'requirements.txt',
+                ],
+                [
+                    'python', '-m', 'pip', 'install',
                     '%s#egg=git-dep1' % (
                         self.get_git_version_string('git-dep1', 'a')),
                     '--target', common.THIRD_PARTY_PYTHON_LIBS_DIR,
                     '--upgrade', '--no-dependencies',
                 ],
                 [
-                    'pip', 'install',
+                    'python', '-m', 'pip', 'install',
                     '%s#egg=git-dep2' % (
                         self.get_git_version_string('git-dep2', 'a')),
                     '--target', common.THIRD_PARTY_PYTHON_LIBS_DIR,
                     '--upgrade', '--no-dependencies',
                 ],
                 [
-                    'pip', 'install', '%s==%s' % ('flask', '1.1.0.1'),
+                    'python', '-m', 'pip', 'install',
+                    '%s==%s' % ('flask', '1.1.0.1'),
                     '--target', common.THIRD_PARTY_PYTHON_LIBS_DIR,
                     '--upgrade', '--no-dependencies',
                 ],
                 [
-                    'pip', 'install', '%s==%s' % ('six', '1.16.0'),
+                    'python', '-m', 'pip', 'install',
+                    '%s==%s' % ('six', '1.16.0'),
                     '--target', common.THIRD_PARTY_PYTHON_LIBS_DIR,
                     '--upgrade', '--no-dependencies',
                 ],
@@ -353,7 +377,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         swap_remove_dir = self.swap(shutil, 'rmtree', mock_remove_dir)
         with self.swap_check_call, self.swap_Popen, swap_remove_dir:
             with self.open_file_swap, swap_get_mismatches:
-                with swap_validate_metadata_directories:
+                with swap_validate_metadata_directories, self.swap_run:
                     install_python_prod_dependencies.main()
 
         self.assertEqual(
@@ -366,9 +390,12 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.cmd_token_list,
             [
-                ['scripts.regenerate_requirements', '--no-emit-index-url'],
                 [
-                    'pip', 'install', '--target',
+                    'pip-compile', 'requirements.in', '--output-file',
+                    'requirements.txt',
+                ],
+                [
+                    'python', '-m', 'pip', 'install', '--target',
                     common.THIRD_PARTY_PYTHON_LIBS_DIR,
                     '--no-dependencies', '-r',
                     common.COMPILED_REQUIREMENTS_FILE_PATH,
@@ -378,25 +405,6 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         )
 
     def test_main_adds_comment_to_start_of_requirements(self):
-        check_function_calls = {
-            'subprocess_call_is_called': False
-        }
-        expected_check_function_calls = {
-            'subprocess_call_is_called': True
-        }
-        def mock_call(unused_cmd_tokens, *args, **kwargs):  # pylint: disable=unused-argument
-            check_function_calls['subprocess_call_is_called'] = True
-            class Ret:
-                """Return object with required attributes."""
-
-                def __init__(self):
-                    self.returncode = 0
-                def communicate(self):
-                    """Return required method."""
-                    return '', ''
-
-            return Ret()
-
         def mock_get_mismatches():
             return {}
         def mock_validate_metadata_directories():
@@ -408,7 +416,6 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             install_python_prod_dependencies,
             'get_mismatches',
             mock_get_mismatches)
-        swap_call = self.swap(subprocess, 'check_call', mock_call)
 
         expected_lines = [
             '# Developers: Please do not modify this auto-generated file.'
@@ -418,7 +425,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         ]
         self.assertEqual(self.file_arr, [])
 
-        with self.swap_check_call, self.open_file_swap, swap_call:
+        with self.swap_check_call, self.open_file_swap, self.swap_run:
             with swap_get_mismatches, swap_validate_metadata_directories:
                 install_python_prod_dependencies.main()
 
@@ -427,27 +434,14 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             expected_lines
         )
 
-        self.assertEqual(check_function_calls, expected_check_function_calls)
+        self.assertEqual(self.cmd_token_list, [
+            [
+                'pip-compile', 'requirements.in', '--output-file',
+                'requirements.txt'
+            ],
+        ])
 
     def test_main_without_library_mismatches_calls_correct_functions(self):
-        check_function_calls = {
-            'subprocess_call_is_called': False
-        }
-        expected_check_function_calls = {
-            'subprocess_call_is_called': True
-        }
-        def mock_call(unused_cmd_tokens, *args, **kwargs):  # pylint: disable=unused-argument
-            check_function_calls['subprocess_call_is_called'] = True
-            class Ret:
-                """Return object with required attributes."""
-
-                def __init__(self):
-                    self.returncode = 0
-                def communicate(self):
-                    """Return required method."""
-                    return '', ''
-
-            return Ret()
 
         def mock_get_mismatches():
             return {}
@@ -464,13 +458,17 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         swap_get_mismatches = self.swap(
             install_python_prod_dependencies, 'get_mismatches',
             mock_get_mismatches)
-        swap_call = self.swap(subprocess, 'check_call', mock_call)
         swap_print = self.swap(builtins, 'print', mock_print)
-        with swap_call, swap_get_mismatches, swap_print, self.open_file_swap:
-            with swap_validate_metadata_directories:
+        with self.swap_run, swap_get_mismatches, swap_print:
+            with swap_validate_metadata_directories, self.open_file_swap:
                 install_python_prod_dependencies.main()
 
-        self.assertEqual(check_function_calls, expected_check_function_calls)
+        self.assertEqual(self.cmd_token_list, [
+            [
+                'pip-compile', 'requirements.in', '--output-file',
+                'requirements.txt'
+            ],
+        ])
         self.assertEqual(print_statements, [
             'Checking if pip is installed on the local machine',
             'Regenerating "requirements.txt" file...',
@@ -527,30 +525,36 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
 
         with self.swap_check_call, self.swap_Popen, swap_get_mismatches:
             with swap_validate_metadata_directories, self.open_file_swap:
-                with swap_rm_tree, swap_list_dir, swap_is_dir:
+                with swap_rm_tree, swap_list_dir, swap_is_dir, self.swap_run:
                     install_python_prod_dependencies.main()
 
         self.assertItemsEqual(
             self.cmd_token_list,
             [
-                ['scripts.regenerate_requirements', '--no-emit-index-url'],
                 [
-                    'pip', 'install', '%s==%s' % ('flask', '1.1.1'),
+                    'pip-compile', 'requirements.in', '--output-file',
+                    'requirements.txt',
+                ],
+                [
+                    'python', '-m', 'pip', 'install',
+                    '%s==%s' % ('flask', '1.1.1'),
                     '--target', common.THIRD_PARTY_PYTHON_LIBS_DIR,
                     '--upgrade', '--no-dependencies',
                 ],
                 [
-                    'pip', 'install', '%s==%s' % ('webencodings', '1.1.1'),
+                    'python', '-m', 'pip', 'install',
+                    '%s==%s' % ('webencodings', '1.1.1'),
                     '--target', common.THIRD_PARTY_PYTHON_LIBS_DIR,
                     '--upgrade', '--no-dependencies',
                 ],
                 [
-                    'pip', 'install', '%s==%s' % ('six', '1.16.0'),
+                    'python', '-m', 'pip', 'install',
+                    '%s==%s' % ('six', '1.16.0'),
                     '--target', common.THIRD_PARTY_PYTHON_LIBS_DIR,
                     '--upgrade', '--no-dependencies',
                 ],
                 [
-                    'pip', 'install',
+                    'python', '-m', 'pip', 'install',
                     '%s==%s' % ('google-cloud-datastore', '1.15.0'),
                     '--target', common.THIRD_PARTY_PYTHON_LIBS_DIR,
                     '--upgrade', '--no-dependencies',

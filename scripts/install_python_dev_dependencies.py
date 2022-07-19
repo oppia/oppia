@@ -86,26 +86,28 @@ def install_dev_dependencies() -> None:
     )
 
 
-def compile_dev_dependencies() -> bool:
-    """Generate COMPILED_REQUIREMENTS_DEV_FILE_PATH file.
+def compile_pip_requirements(
+        requirements_path: str, compiled_path: str) -> bool:
+    """Compile a requirements.txt file.
+
+    Args:
+        requirements_path: str. Path to the requirements.in file.
+        compiled_path: str. Path to the requirements.txt file.
 
     Returns:
         bool. Whether the compiled dev requirements file was changed.
     """
     with open(
-        COMPILED_REQUIREMENTS_DEV_FILE_PATH, 'r', encoding='utf-8'
+        compiled_path, 'r', encoding='utf-8'
     ) as f:
         old_compiled = f.read()
     subprocess.run(
-        [
-            'pip-compile', REQUIREMENTS_DEV_FILE_PATH, '--output-file',
-            COMPILED_REQUIREMENTS_DEV_FILE_PATH
-        ],
+        ['pip-compile', requirements_path, '--output-file', compiled_path],
         check=True,
         encoding='utf-8',
     )
     with open(
-        COMPILED_REQUIREMENTS_DEV_FILE_PATH, 'r', encoding='utf-8'
+        compiled_path, 'r', encoding='utf-8'
     ) as f:
         new_compiled = f.read()
 
@@ -117,7 +119,8 @@ def main(cli_args: Optional[List[str]] = None) -> None:
     args = _PARSER.parse_args(cli_args)
     assert_in_venv()
     install_installation_tools()
-    not_compiled = compile_dev_dependencies()
+    not_compiled = compile_pip_requirements(
+        REQUIREMENTS_DEV_FILE_PATH, COMPILED_REQUIREMENTS_DEV_FILE_PATH)
     install_dev_dependencies()
     if args.assert_compiled and not_compiled:
         raise RuntimeError(

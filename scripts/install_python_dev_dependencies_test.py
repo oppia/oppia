@@ -123,7 +123,7 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
         with run_swap:
             install_python_dev_dependencies.install_dev_dependencies()
 
-    def test_compile_dev_dependencies_no_change(self) -> None:
+    def test_compile_pip_requirements_no_change(self) -> None:
 
         def mock_run(
                 *_args: Tuple[Any],
@@ -159,10 +159,11 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
 
         with run_swap, open_swap:
             change = (
-                install_python_dev_dependencies.compile_dev_dependencies())
+                install_python_dev_dependencies.compile_pip_requirements(
+                    'requirements_dev.in', 'requirements_dev.txt'))
         self.assertFalse(change)
 
-    def test_compile_dev_dependencies_change(self) -> None:
+    def test_compile_pip_requirements_change(self) -> None:
 
         def mock_run(
                 *_args: Tuple[Any],
@@ -201,14 +202,15 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
 
         with run_swap, open_swap:
             change = (
-                install_python_dev_dependencies.compile_dev_dependencies())
+                install_python_dev_dependencies.compile_pip_requirements(
+                    'requirements_dev.in', 'requirements_dev.txt'))
         self.assertTrue(change)
 
     def test_main_passes_with_no_assert_and_no_change(self) -> None:
         def mock_func() -> None:
             pass
 
-        def mock_compile() -> bool:
+        def mock_compile(*_args: Any) -> bool:
             return False
 
         assert_swap = self.swap_with_checks(
@@ -218,7 +220,7 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
             'install_installation_tools', mock_func)
         compile_swap = self.swap_with_checks(
             install_python_dev_dependencies,
-            'compile_dev_dependencies', mock_compile)
+            'compile_pip_requirements', mock_compile)
         install_dependencies_swap = self.swap_with_checks(
             install_python_dev_dependencies,
             'install_dev_dependencies', mock_func)
@@ -231,7 +233,7 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
         def mock_func() -> None:
             pass
 
-        def mock_compile() -> bool:
+        def mock_compile(*_args: Any) -> bool:
             return False
 
         assert_swap = self.swap_with_checks(
@@ -241,7 +243,7 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
             'install_installation_tools', mock_func)
         compile_swap = self.swap_with_checks(
             install_python_dev_dependencies,
-            'compile_dev_dependencies', mock_compile)
+            'compile_pip_requirements', mock_compile)
         install_dependencies_swap = self.swap_with_checks(
             install_python_dev_dependencies,
             'install_dev_dependencies', mock_func)
@@ -255,7 +257,7 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
         def mock_func() -> None:
             pass
 
-        def mock_compile() -> bool:
+        def mock_compile(*_args: Any) -> bool:
             return True
 
         assert_swap = self.swap_with_checks(
@@ -265,7 +267,7 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
             'install_installation_tools', mock_func)
         compile_swap = self.swap_with_checks(
             install_python_dev_dependencies,
-            'compile_dev_dependencies', mock_compile)
+            'compile_pip_requirements', mock_compile)
         install_dependencies_swap = self.swap_with_checks(
             install_python_dev_dependencies,
             'install_dev_dependencies', mock_func)
@@ -278,7 +280,7 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
         def mock_func() -> None:
             pass
 
-        def mock_compile() -> bool:
+        def mock_compile(*_args: Any) -> bool:
             return True
 
         assert_swap = self.swap_with_checks(
@@ -288,7 +290,7 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
             'install_installation_tools', mock_func)
         compile_swap = self.swap_with_checks(
             install_python_dev_dependencies,
-            'compile_dev_dependencies', mock_compile)
+            'compile_pip_requirements', mock_compile)
         install_dependencies_swap = self.swap_with_checks(
             install_python_dev_dependencies,
             'install_dev_dependencies', mock_func)
