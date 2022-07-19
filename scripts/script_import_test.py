@@ -47,8 +47,10 @@ class InstallThirdPartyLibsImportTests(test_utils.GenericTestBase):
                 'pip==22.1.1', 'pip-tools==6.6.2', 'setuptools==58.5.3')
         ]
         expected_commands += [
-            ['pip-compile', 'requirements_dev.in', '--output-file',
-             'requirements_dev.txt'],
+            [
+                'pip-compile', '--no-emit-index-url', 'requirements_dev.in',
+                '--output-file', 'requirements_dev.txt',
+            ],
             ['pip-sync', 'requirements_dev.txt'],
         ]
         self.assertEqual(commands, expected_commands)
