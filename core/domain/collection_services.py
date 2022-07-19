@@ -1091,6 +1091,9 @@ def publish_collection_and_update_user_profiles(
     Args:
         committer: UserActionsInfo. UserActionsInfo object for the committer.
         collection_id: str. ID of the collection to be published.
+
+    Raises:
+        Exception. If no collection summary model exists for the given id.
     """
     rights_manager.publish_collection(committer, collection_id)  # type: ignore[no-untyped-call]
     contribution_time_msec = utils.get_current_time_in_millisecs()
