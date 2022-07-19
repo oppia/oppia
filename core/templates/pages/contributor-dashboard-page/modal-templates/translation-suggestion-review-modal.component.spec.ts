@@ -34,7 +34,7 @@ class MockChangeDetectorRef {
   detectChanges(): void {}
 }
 
-//eslint-disable-next-line oppia/no-test-blockers
+// eslint-disable-next-line oppia/no-test-blockers
 fdescribe('Translation Suggestion Review Modal Component', function() {
   let fixture: ComponentFixture<TranslationSuggestionReviewModalComponent>;
   let component: TranslationSuggestionReviewModalComponent;
