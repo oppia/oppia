@@ -139,8 +139,8 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
         run_swap = self.swap_with_checks(
             subprocess, 'run', mock_run, expected_args=[
                 ([
-                    'pip-compile', 'requirements_dev.in',
-                    '--output-file', 'requirements_dev.txt'
+                    'pip-compile', '--no-emit-index-url', 'requirements_dev.in',
+                    '--output-file', 'requirements_dev.txt',
                 ],),
             ],
             expected_kwargs=[
@@ -182,8 +182,8 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
         run_swap = self.swap_with_checks(
             subprocess, 'run', mock_run, expected_args=[
                 ([
-                    'pip-compile', 'requirements_dev.in',
-                    '--output-file', 'requirements_dev.txt'
+                    'pip-compile', '--no-emit-index-url', 'requirements_dev.in',
+                    '--output-file', 'requirements_dev.txt',
                 ],),
             ],
             expected_kwargs=[

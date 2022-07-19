@@ -269,8 +269,8 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             self.cmd_token_list,
             [
                 [
-                    'pip-compile', 'requirements.in', '--output-file',
-                    'requirements.txt',
+                    'pip-compile', '--no-emit-index-url', 'requirements.in',
+                    '--output-file', 'requirements.txt',
                 ],
                 [
                     'python', '-m', 'pip', 'install', '--target',
@@ -317,8 +317,8 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             self.cmd_token_list,
             [
                 [
-                    'pip-compile', 'requirements.in', '--output-file',
-                    'requirements.txt',
+                    'pip-compile', '--no-emit-index-url', 'requirements.in',
+                    '--output-file', 'requirements.txt',
                 ],
                 [
                     'python', '-m', 'pip', 'install',
@@ -391,8 +391,8 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             self.cmd_token_list,
             [
                 [
-                    'pip-compile', 'requirements.in', '--output-file',
-                    'requirements.txt',
+                    'pip-compile', '--no-emit-index-url', 'requirements.in',
+                    '--output-file', 'requirements.txt',
                 ],
                 [
                     'python', '-m', 'pip', 'install', '--target',
@@ -436,8 +436,8 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
 
         self.assertEqual(self.cmd_token_list, [
             [
-                'pip-compile', 'requirements.in', '--output-file',
-                'requirements.txt'
+                'pip-compile', '--no-emit-index-url', 'requirements.in',
+                '--output-file', 'requirements.txt',
             ],
         ])
 
@@ -465,8 +465,8 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
 
         self.assertEqual(self.cmd_token_list, [
             [
-                'pip-compile', 'requirements.in', '--output-file',
-                'requirements.txt'
+                'pip-compile', '--no-emit-index-url', 'requirements.in',
+                '--output-file', 'requirements.txt',
             ],
         ])
         self.assertEqual(print_statements, [
@@ -532,8 +532,8 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             self.cmd_token_list,
             [
                 [
-                    'pip-compile', 'requirements.in', '--output-file',
-                    'requirements.txt',
+                    'pip-compile', '--no-emit-index-url', 'requirements.in',
+                    '--output-file', 'requirements.txt',
                 ],
                 [
                     'python', '-m', 'pip', 'install',
