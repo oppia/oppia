@@ -152,6 +152,7 @@ describe('Topic and Story viewer functionality', function() {
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.editTopic('Topic TASV1');
     await topicEditorPage.togglePracticeTab();
+    await topicEditorPage.addDiagnosticTestSkill('Skill TASV1');
     await topicEditorPage.addSubtopic(
       'Subtopic TASV1', 'subtopic-tasv-one', Constants.TEST_SVG_PATH,
       'Subtopic content');

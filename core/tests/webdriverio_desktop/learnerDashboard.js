@@ -276,6 +276,9 @@ describe('Learner dashboard functionality', function() {
       'Learner Dashboard Skill 1', TOPIC_NAME);
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.navigateToTopicWithIndex(0);
+
+    await topicEditorPage.addDiagnosticTestSkill('Learner Dashboard Skill 1');
+
     await topicEditorPage.addSubtopic(
       'Learner Dashboard Subtopic 1', 'ld-subtopic-one',
       '../data/test2_svg.svg', 'Subtopic content');
@@ -386,6 +389,7 @@ describe('Learner dashboard functionality', function() {
       'Learner Dashboard Skill 2', TOPIC_NAME);
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.editTopic(TOPIC_NAME);
+    await topicEditorPage.addDiagnosticTestSkill('Learner Dashboard Skill 2');
     await topicEditorPage.addSubtopic(
       'Learner Dashboard Subtopic 2', 'ld-subtopic-two',
       Constants.TEST_SVG_PATH, 'Subtopic content');

@@ -87,6 +87,9 @@ describe('Classroom page functionality', function() {
         'Skill 1', 'Topic 1');
       await topicsAndSkillsDashboardPage.get();
       await topicsAndSkillsDashboardPage.navigateToTopicWithIndex(0);
+
+      await topicEditorPage.addDiagnosticTestSkill('Skill 1');
+
       await topicEditorPage.addSubtopic(
         'Subtopic 1', 'subtopic-one', '../data/test2_svg.svg',
         'Subtopic content');
