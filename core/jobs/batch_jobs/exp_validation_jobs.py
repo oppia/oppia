@@ -22,12 +22,12 @@ import html
 import json
 import math
 
+from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import rte_component_registry
-from core.domain import state_domain, exp_domain
+from core.domain import state_domain
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
-from core.jobs.transforms import job_result_transforms
 from core.jobs.types import job_run_result
 from core.platform import models
 
@@ -1207,8 +1207,10 @@ class ExpStateValidationJob(base_jobs.JobBase):
         Optional[opportunity_models.ExplorationOpportunitySummaryModel]
     ]) -> bool:
         """Returns whether the exp model is curated or not.
+
         Args:
             model_pair: tuple. The pair of exp and opportunity models.
+
         Returns:
             bool. Returns whether the exp model is curated or not.
         """
@@ -1220,8 +1222,10 @@ class ExpStateValidationJob(base_jobs.JobBase):
     ]) -> exp_domain.Exploration:
         """Returns the exploration domain object from the curated
         exploration model.
+
         Args:
             model_pair: tuple. The pair of exp and opportunity models.
+
         Returns:
             bool. Returns whether the exp model is curated or not.
         """
@@ -1236,8 +1240,10 @@ class ExpStateValidationJob(base_jobs.JobBase):
         Optional[opportunity_models.ExplorationOpportunitySummaryModel]
     ]:
         """Returns the pair of exp and opportunity models.
+
         Args:
             models_list_pair: tuple. The pair of models list.
+
         Returns:
             tuple. The pair of exp and opportunity models.
         """

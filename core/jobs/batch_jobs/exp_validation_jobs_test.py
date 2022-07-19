@@ -68,7 +68,8 @@ class ExpStateValidationJobTests(
             'labelled_as_correct': True,
             'param_changes': [],
             'refresher_exploration_id': 'Not None',
-            'missing_prerequisite_skill_id': None
+            'missing_prerequisite_skill_id': None,
+            'dest_if_really_stuck': None
           },
           'training_data': [],
           'tagged_skill_misconception_id': 'Not None'
@@ -83,7 +84,8 @@ class ExpStateValidationJobTests(
         'labelled_as_correct': False,
         'param_changes': [],
         'refresher_exploration_id': 'Not None',
-        'missing_prerequisite_skill_id': None
+        'missing_prerequisite_skill_id': None,
+        'dest_if_really_stuck': None
       },
       'confirmed_unclassified_answers': [],
       'hints': [
@@ -126,7 +128,8 @@ class ExpStateValidationJobTests(
             'labelled_as_correct': True,
             'param_changes': [],
             'refresher_exploration_id': None,
-            'missing_prerequisite_skill_id': None
+            'missing_prerequisite_skill_id': None,
+            'dest_if_really_stuck': None
           },
           'training_data': [],
           'tagged_skill_misconception_id': None
@@ -141,7 +144,8 @@ class ExpStateValidationJobTests(
         'labelled_as_correct': False,
         'param_changes': [],
         'refresher_exploration_id': None,
-        'missing_prerequisite_skill_id': None
+        'missing_prerequisite_skill_id': None,
+        'dest_if_really_stuck': None
       },
       'confirmed_unclassified_answers': [],
       'hints': [
@@ -187,7 +191,8 @@ class ExpStateValidationJobTests(
             'labelled_as_correct': False,
             'param_changes': [],
             'refresher_exploration_id': None,
-            'missing_prerequisite_skill_id': None
+            'missing_prerequisite_skill_id': None,
+            'dest_if_really_stuck': None
           },
           'training_data': [],
           'tagged_skill_misconception_id': None
@@ -202,7 +207,8 @@ class ExpStateValidationJobTests(
         'labelled_as_correct': False,
         'param_changes': [],
         'refresher_exploration_id': None,
-        'missing_prerequisite_skill_id': None
+        'missing_prerequisite_skill_id': None,
+        'dest_if_really_stuck': None
       },
       'confirmed_unclassified_answers': [],
       'hints': [],
@@ -238,7 +244,8 @@ class ExpStateValidationJobTests(
             'labelled_as_correct': False,
             'param_changes': [],
             'refresher_exploration_id': None,
-            'missing_prerequisite_skill_id': None
+            'missing_prerequisite_skill_id': None,
+            'dest_if_really_stuck': None
           },
           'training_data': [],
           'tagged_skill_misconception_id': None
@@ -253,7 +260,8 @@ class ExpStateValidationJobTests(
         'labelled_as_correct': False,
         'param_changes': [],
         'refresher_exploration_id': None,
-        'missing_prerequisite_skill_id': None
+        'missing_prerequisite_skill_id': None,
+        'dest_if_really_stuck': None
       },
       'confirmed_unclassified_answers': [],
       'hints': [],
@@ -300,7 +308,8 @@ class ExpStateValidationJobTests(
             'labelled_as_correct': False,
             'param_changes': [],
             'refresher_exploration_id': None,
-            'missing_prerequisite_skill_id': None
+            'missing_prerequisite_skill_id': None,
+            'dest_if_really_stuck': None
           },
           'training_data': [],
           'tagged_skill_misconception_id': None
@@ -315,7 +324,8 @@ class ExpStateValidationJobTests(
         'labelled_as_correct': False,
         'param_changes': [],
         'refresher_exploration_id': None,
-        'missing_prerequisite_skill_id': None
+        'missing_prerequisite_skill_id': None,
+        'dest_if_really_stuck': None
       },
       'confirmed_unclassified_answers': [],
       'hints': [],
@@ -366,7 +376,8 @@ class ExpStateValidationJobTests(
             'labelled_as_correct': False,
             'param_changes': [],
             'refresher_exploration_id': None,
-            'missing_prerequisite_skill_id': None
+            'missing_prerequisite_skill_id': None,
+            'dest_if_really_stuck': None
           },
           'training_data': [],
           'tagged_skill_misconception_id': None
@@ -389,7 +400,8 @@ class ExpStateValidationJobTests(
             'labelled_as_correct': False,
             'param_changes': [],
             'refresher_exploration_id': None,
-            'missing_prerequisite_skill_id': None
+            'missing_prerequisite_skill_id': None,
+            'dest_if_really_stuck': None
           },
           'training_data': [],
           'tagged_skill_misconception_id': None
@@ -418,7 +430,8 @@ class ExpStateValidationJobTests(
             'labelled_as_correct': False,
             'param_changes': [],
             'refresher_exploration_id': None,
-            'missing_prerequisite_skill_id': None
+            'missing_prerequisite_skill_id': None,
+            'dest_if_really_stuck': None
           },
           'training_data': [],
           'tagged_skill_misconception_id': None
@@ -433,7 +446,8 @@ class ExpStateValidationJobTests(
         'labelled_as_correct': False,
         'param_changes': [],
         'refresher_exploration_id': None,
-        'missing_prerequisite_skill_id': None
+        'missing_prerequisite_skill_id': None,
+        'dest_if_really_stuck': None
       },
       'confirmed_unclassified_answers': [],
       'hints': [],
@@ -469,7 +483,8 @@ class ExpStateValidationJobTests(
             'labelled_as_correct': False,
             'param_changes': [],
             'refresher_exploration_id': None,
-            'missing_prerequisite_skill_id': None
+            'missing_prerequisite_skill_id': None,
+            'dest_if_really_stuck': None
           },
           'training_data': [],
           'tagged_skill_misconception_id': None
@@ -493,7 +508,8 @@ class ExpStateValidationJobTests(
             'labelled_as_correct': False,
             'param_changes': [],
             'refresher_exploration_id': None,
-            'missing_prerequisite_skill_id': None
+            'missing_prerequisite_skill_id': None,
+            'dest_if_really_stuck': None
           },
           'training_data': [],
           'tagged_skill_misconception_id': None
@@ -508,7 +524,8 @@ class ExpStateValidationJobTests(
         'labelled_as_correct': False,
         'param_changes': [],
         'refresher_exploration_id': None,
-        'missing_prerequisite_skill_id': None
+        'missing_prerequisite_skill_id': None,
+        'dest_if_really_stuck': None
       },
       'confirmed_unclassified_answers': [],
       'hints': [],
@@ -558,7 +575,8 @@ class ExpStateValidationJobTests(
             'labelled_as_correct': False,
             'param_changes': [],
             'refresher_exploration_id': None,
-            'missing_prerequisite_skill_id': None
+            'missing_prerequisite_skill_id': None,
+            'dest_if_really_stuck': None
           },
           'training_data': [],
           'tagged_skill_misconception_id': None
@@ -600,7 +618,8 @@ class ExpStateValidationJobTests(
             'labelled_as_correct': False,
             'param_changes': [],
             'refresher_exploration_id': None,
-            'missing_prerequisite_skill_id': None
+            'missing_prerequisite_skill_id': None,
+            'dest_if_really_stuck': None
           },
           'training_data': [],
           'tagged_skill_misconception_id': None
@@ -615,7 +634,8 @@ class ExpStateValidationJobTests(
         'labelled_as_correct': False,
         'param_changes': [],
         'refresher_exploration_id': None,
-        'missing_prerequisite_skill_id': None
+        'missing_prerequisite_skill_id': None,
+        'dest_if_really_stuck': None
       },
       'confirmed_unclassified_answers': [],
       'hints': [],
@@ -675,7 +695,8 @@ class ExpStateValidationJobTests(
             'labelled_as_correct': False,
             'param_changes': [],
             'refresher_exploration_id': None,
-            'missing_prerequisite_skill_id': None
+            'missing_prerequisite_skill_id': None,
+            'dest_if_really_stuck': None
           },
           'training_data': [],
           'tagged_skill_misconception_id': None
@@ -700,7 +721,8 @@ class ExpStateValidationJobTests(
             'labelled_as_correct': False,
             'param_changes': [],
             'refresher_exploration_id': None,
-            'missing_prerequisite_skill_id': None
+            'missing_prerequisite_skill_id': None,
+            'dest_if_really_stuck': None
           },
           'training_data': [],
           'tagged_skill_misconception_id': None
@@ -715,7 +737,8 @@ class ExpStateValidationJobTests(
         'labelled_as_correct': False,
         'param_changes': [],
         'refresher_exploration_id': None,
-        'missing_prerequisite_skill_id': None
+        'missing_prerequisite_skill_id': None,
+        'dest_if_really_stuck': None
       },
       'confirmed_unclassified_answers': [],
       'hints': [],
@@ -806,7 +829,8 @@ class ExpStateValidationJobTests(
           'labelled_as_correct': False,
           'param_changes': [],
           'refresher_exploration_id': None,
-          'missing_prerequisite_skill_id': None
+          'missing_prerequisite_skill_id': None,
+          'dest_if_really_stuck': None
         },
         'training_data': [],
         'tagged_skill_misconception_id': None
@@ -830,7 +854,8 @@ class ExpStateValidationJobTests(
           'labelled_as_correct': False,
           'param_changes': [],
           'refresher_exploration_id': None,
-          'missing_prerequisite_skill_id': None
+          'missing_prerequisite_skill_id': None,
+          'dest_if_really_stuck': None
         },
         'training_data': [],
         'tagged_skill_misconception_id': None
@@ -845,7 +870,8 @@ class ExpStateValidationJobTests(
         'labelled_as_correct': False,
         'param_changes': [],
         'refresher_exploration_id': None,
-        'missing_prerequisite_skill_id': None
+        'missing_prerequisite_skill_id': None,
+        'dest_if_really_stuck': None
       },
       'confirmed_unclassified_answers': [],
       'hints': [],
@@ -897,7 +923,8 @@ class ExpStateValidationJobTests(
           'labelled_as_correct': False,
           'param_changes': [],
           'refresher_exploration_id': None,
-          'missing_prerequisite_skill_id': None
+          'missing_prerequisite_skill_id': None,
+          'dest_if_really_stuck': None
         },
         'training_data': [],
         'tagged_skill_misconception_id': None
@@ -925,7 +952,8 @@ class ExpStateValidationJobTests(
           'labelled_as_correct': False,
           'param_changes': [],
           'refresher_exploration_id': None,
-          'missing_prerequisite_skill_id': None
+          'missing_prerequisite_skill_id': None,
+          'dest_if_really_stuck': None
         },
         'training_data': [],
         'tagged_skill_misconception_id': None
@@ -948,7 +976,8 @@ class ExpStateValidationJobTests(
           'labelled_as_correct': False,
           'param_changes': [],
           'refresher_exploration_id': None,
-          'missing_prerequisite_skill_id': None
+          'missing_prerequisite_skill_id': None,
+          'dest_if_really_stuck': None
         },
         'training_data': [],
         'tagged_skill_misconception_id': None
@@ -976,7 +1005,8 @@ class ExpStateValidationJobTests(
           'labelled_as_correct': False,
           'param_changes': [],
           'refresher_exploration_id': None,
-          'missing_prerequisite_skill_id': None
+          'missing_prerequisite_skill_id': None,
+          'dest_if_really_stuck': None
         },
         'training_data': [],
         'tagged_skill_misconception_id': None
@@ -999,7 +1029,8 @@ class ExpStateValidationJobTests(
           'labelled_as_correct': False,
           'param_changes': [],
           'refresher_exploration_id': None,
-          'missing_prerequisite_skill_id': None
+          'missing_prerequisite_skill_id': None,
+          'dest_if_really_stuck': None
         },
         'training_data': [],
         'tagged_skill_misconception_id': None
@@ -1014,7 +1045,8 @@ class ExpStateValidationJobTests(
         'labelled_as_correct': False,
         'param_changes': [],
         'refresher_exploration_id': None,
-        'missing_prerequisite_skill_id': None
+        'missing_prerequisite_skill_id': None,
+        'dest_if_really_stuck': None
       },
       'confirmed_unclassified_answers': [],
       'hints': [],
@@ -1053,7 +1085,8 @@ class ExpStateValidationJobTests(
         'labelled_as_correct': False,
         'param_changes': [],
         'refresher_exploration_id': None,
-        'missing_prerequisite_skill_id': None
+        'missing_prerequisite_skill_id': None,
+        'dest_if_really_stuck': None
       },
       'confirmed_unclassified_answers': [],
       'hints': [],
@@ -1240,30 +1273,30 @@ class ExpStateValidationJobTests(
         ])
 
     def test_run_with_state_validation(self) -> None:
-      self.put_multi([self.exp_1])
-      self.assert_job_output_is([
-        job_run_result.JobRunResult.as_stderr(
-          f'The id of exp is 1, created on {str(self.YEAR_AGO_DATE)}'
-          f', and the state erroneous data are '
-          f'[{{\'state_name\': \'EXP_1_STATE_1\', '
-          f'\'tagged_skill_misconception_ids\': [\'The '
-          f'tagged_skill_misconception_id of answer group 0 is not None.\']'
-          f', \'not_single_rule_spec\': '
-          f'[\'There is no rule present in answer group 0, atleast one '
-          f'is required.\'], \'invalid_refresher_exploration_id\': '
-          f'[\'The refresher_exploration_id of answer group 0 is not '
-          f'None.\', \'The refresher_exploration_id of default '
-          f'outcome is not None.\'], '
-          f'\'invalid_destinations\': [\'The destination '
-          f'Not valid state of answer group 0 is not valid.\'], '
-          f'\'invalid_default_outcome_dest\': [\'The destination of default'
-          f' outcome is not valid, the value is Not valid state\']}}, '
-          f'{{\'state_name\': \'EXP_1_STATE_2\','
-          f' \'wrong_labelled_as_correct_values\': [\'The value of '
-          f'labelled_as_correct of answer group 0 is True but the '
-          f'destination is the state itself.\']}}]'
-        )
-      ])
+        self.put_multi([self.exp_1])
+        self.assert_job_output_is([
+          job_run_result.JobRunResult.as_stderr(
+            f'The id of exp is 1, created on {str(self.YEAR_AGO_DATE)}'
+            f', and the state erroneous data are '
+            f'[{{\'state_name\': \'EXP_1_STATE_1\', '
+            f'\'tagged_skill_misconception_ids\': [\'The '
+            f'tagged_skill_misconception_id of answer group 0 is not None.\']'
+            f', \'not_single_rule_spec\': '
+            f'[\'There is no rule present in answer group 0, atleast one '
+            f'is required.\'], \'invalid_refresher_exploration_id\': '
+            f'[\'The refresher_exploration_id of answer group 0 is not '
+            f'None.\', \'The refresher_exploration_id of default '
+            f'outcome is not None.\'], '
+            f'\'invalid_destinations\': [\'The destination '
+            f'Not valid state of answer group 0 is not valid.\'], '
+            f'\'invalid_default_outcome_dest\': [\'The destination of default'
+            f' outcome is not valid, the value is Not valid state\']}}, '
+            f'{{\'state_name\': \'EXP_1_STATE_2\','
+            f' \'wrong_labelled_as_correct_values\': [\'The value of '
+            f'labelled_as_correct of answer group 0 is True but the '
+            f'destination is the state itself.\']}}]'
+          )
+        ])
 
     def test_run_with_state_drag_frac_interaction_validation(self) -> None:
         self.put_multi([self.exp_5])
