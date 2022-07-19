@@ -469,7 +469,7 @@ def delete_exp_opportunities_corresponding_to_story(story_id: str) -> None:
     ] = exp_opprtunity_model_class.get_all().filter(
         exp_opprtunity_model_class.story_id == story_id
     ).fetch()
-    exp_opprtunity_model_class.delete_multi(exp_opportunity_models)  # type: ignore[arg-type]
+    exp_opprtunity_model_class.delete_multi(list(exp_opportunity_models))
 
 
 def get_translation_opportunities(

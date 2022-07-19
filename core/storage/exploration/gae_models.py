@@ -310,7 +310,7 @@ class ExplorationModel(base_models.VersionedModel):
                 change.
             commit_type: str. The type of commit. Possible values are in
                 core.storage.base_models.COMMIT_TYPE_CHOICES.
-            commit_message: str. The commit description message or None for
+            commit_message: str|None. The commit description message or None for
                 unpublished explorations.
             commit_cmds: list(dict). A list of commands, describing changes
                 made in this model, which should give sufficient information to
@@ -780,7 +780,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
                 change.
             commit_type: str. The type of commit. Possible values are in
                 core.storage.base_models.COMMIT_TYPE_CHOICES.
-            commit_message: str. The commit description message or None for
+            commit_message: str|None. The commit description message or None for
                 unpublished explorations.
             commit_cmds: list(dict). A list of commands, describing changes
                 made in this model, should give sufficient information to

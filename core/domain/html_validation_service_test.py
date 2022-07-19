@@ -34,7 +34,7 @@ from typing_extensions import TypedDict
 
 
 class SvgDiagramTestCaseDict(TypedDict):
-    """Dict representing the test case Dictionary."""
+    """Dict representing the test case SVG content Dictionary."""
 
     html_content: str
     expected_output: bool
