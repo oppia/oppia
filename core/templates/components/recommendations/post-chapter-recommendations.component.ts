@@ -22,7 +22,7 @@ import { UrlService } from 'services/contextual/url.service';
 import { PracticeSessionPageConstants } from 'pages/practice-session-page/practice-session-page.constants';
 @Component({
   selector: 'oppia-post-chapter-recommendations',
-  template: require('./post-chapter-recommendations.component.html'),
+  templateUrl: './post-chapter-recommendations.component.html',
 })
 export class PostChapterRecommendationsComponent {
   // The below property will be undefined when the current chapter
