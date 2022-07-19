@@ -717,7 +717,7 @@ class BaseCommitLogEntryModel(BaseModel):
             version: int,
             committer_id: str,
             commit_type: str,
-            commit_message: str,
+            commit_message: Optional[str],
             commit_cmds: BaseCommitLogEntryCmdType,
             status: str,
             community_owned: bool
@@ -734,7 +734,7 @@ class BaseCommitLogEntryModel(BaseModel):
                 change.
             commit_type: str. The type of commit. Possible values are in
                 core.storage.base_models.COMMIT_TYPE_CHOICES.
-            commit_message: str. The commit description message.
+            commit_message: str|None. The commit description message.
             commit_cmds: list(dict). A list of commands, describing changes
                 made in this model, which should give sufficient information to
                 reconstruct the commit. Each dict always contains:
@@ -978,7 +978,7 @@ class VersionedModel(BaseModel):
         self,
         committer_id: str,
         commit_type: str,
-        commit_message: str,
+        commit_message: Optional[str],
         commit_cmds: BaseVersionedCommitCmdType,
         # We expect Mapping because we want to allow models that inherit
         # from BaseModel as the values, if we used Dict this wouldn't
@@ -991,7 +991,7 @@ class VersionedModel(BaseModel):
             committer_id: str. The user_id of the user who committed the change.
             commit_type: str. Unique identifier of commit type. Possible values
                 are in COMMIT_TYPE_CHOICES.
-            commit_message: str. The commit description message.
+            commit_message: str|None. The commit description message.
             commit_cmds: list(dict). A list of commands, describing changes
                 made in this model, should give sufficient information to
                 reconstruct the commit. Dict always contains:
@@ -1249,14 +1249,14 @@ class VersionedModel(BaseModel):
     def commit(
         self,
         committer_id: str,
-        commit_message: str,
+        commit_message: Optional[str],
         commit_cmds: BaseVersionedCommitCmdType
     ) -> None:
         """Saves a version snapshot and updates the model.
 
         Args:
             committer_id: str. The user_id of the user who committed the change.
-            commit_message: str. The commit description message.
+            commit_message: str|None. The commit description message.
             commit_cmds: list(dict). A list of commands, describing changes
                 made in this model, should give sufficient information to
                 reconstruct the commit. Dict always contains:
