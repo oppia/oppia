@@ -106,7 +106,6 @@ import { QuestionMisconceptionSelectorComponent } from './question-directives/qu
 import { ConversationSkinComponent } from 'pages/exploration-player-page/learner-experience/conversation-skin.component';
 import { EndChapterCheckMarkComponent } from 'pages/exploration-player-page/learner-experience/end-chapter-check-mark.component';
 import { EndChapterConfettiComponent } from 'pages/exploration-player-page/learner-experience/end-chapter-confetti.component';
-import { PostChapterRecommendationsComponent } from 'pages/exploration-player-page/learner-experience/post-chapter-recommendations.component';
 import { RatingsAndRecommendationsComponent } from 'pages/exploration-player-page/learner-experience/ratings-and-recommendations.component';
 import { LearnerAnswerInfoCard } from 'pages/exploration-player-page/learner-experience/learner-answer-info-card.component';
 import { FeedbackPopupComponent } from 'pages/exploration-player-page/layout-directives/feedback-popup.component';
@@ -204,7 +203,6 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     ConversationSkinComponent,
     EndChapterCheckMarkComponent,
     EndChapterConfettiComponent,
-    PostChapterRecommendationsComponent,
     ConversationSkinEmbedComponent,
     CreateNewSkillModalComponent,
     CreateActivityModalComponent,
@@ -313,7 +311,6 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     ConversationSkinComponent,
     EndChapterCheckMarkComponent,
     EndChapterConfettiComponent,
-    PostChapterRecommendationsComponent,
     ConversationSkinEmbedComponent,
     CreateNewSkillModalComponent,
     CreateActivityModalComponent,
@@ -439,7 +436,6 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     ConversationSkinComponent,
     EndChapterCheckMarkComponent,
     EndChapterConfettiComponent,
-    PostChapterRecommendationsComponent,
     ConversationSkinEmbedComponent,
     CreateNewSkillModalComponent,
     CreateActivityModalComponent,

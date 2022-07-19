@@ -53,7 +53,6 @@ TEST_FEATURES_LIST = [
 # Names of features in prod stage, the corresponding feature flag instances must
 # be in prod stage otherwise it will cause a test error in the backend test.
 PROD_FEATURES_LIST = [
-    params.PARAM_NAMES.end_chapter_celebration,
 ]
 
 # Names of features that should not be used anymore, e.g. features that are
