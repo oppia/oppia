@@ -31,6 +31,10 @@ import { ExplorationPlayerStateService } from './../services/exploration-player-
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { PlatformFeatureService } from 'services/platform-feature.service';
 import { LocalStorageService } from 'services/local-storage.service';
+import { AssetsBackendApiService } from 'services/assets-backend-api.service';
+import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
+import { StoryPlaythrough } from 'domain/story_viewer/story-playthrough.model';
+import { ReadOnlyStoryNode } from 'domain/story_viewer/read-only-story-node.model';
 
 class MockPlatformFeatureService {
   get status(): object {
@@ -53,6 +57,8 @@ describe('Ratings and recommendations component', () => {
   let urlInterpolationService: UrlInterpolationService;
   let platformFeatureService: PlatformFeatureService;
   let localStorageService: LocalStorageService;
+  let assetsBackendApiService: AssetsBackendApiService;
+  let storyViewerBackendApiService: StoryViewerBackendApiService;
 
   const mockNgbPopover = jasmine.createSpyObj(
     'NgbPopover', ['close', 'toggle']);
@@ -85,6 +91,8 @@ describe('Ratings and recommendations component', () => {
         UserService,
         ExplorationPlayerStateService,
         UrlInterpolationService,
+        AssetsBackendApiService,
+        StoryViewerBackendApiService,
         LocalStorageService,
         {
           provide: PlatformFeatureService,
@@ -111,6 +119,9 @@ describe('Ratings and recommendations component', () => {
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     platformFeatureService = TestBed.inject(PlatformFeatureService);
     localStorageService = TestBed.inject(LocalStorageService);
+    assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
+    storyViewerBackendApiService = TestBed.inject(
+      StoryViewerBackendApiService);
   });
 
   it('should populate internal properties and subscribe to event' +
@@ -118,6 +129,12 @@ describe('Ratings and recommendations component', () => {
     const collectionId = 'collection_id';
     const userRating = 5;
     const mockOnRatingUpdated = new EventEmitter<void>();
+    const readOnlyStoryNode1 = new ReadOnlyStoryNode(
+      'node_1', '', '', [], [], [], '', false, '',
+      null, false, 'bg_color_1', 'filename_1');
+    const readOnlyStoryNode2 = new ReadOnlyStoryNode(
+      'node_2', '', '', [], [], [], '', false, '',
+      null, false, 'bg_color_2', 'filename_2');
 
     expect(componentInstance.inStoryMode).toBe(undefined);
     expect(componentInstance.storyViewerUrl).toBe(undefined);
@@ -137,16 +154,31 @@ describe('Ratings and recommendations component', () => {
       'dummy_story_viewer_page_url');
     spyOnProperty(learnerViewRatingService, 'onRatingUpdated').and.returnValue(
       mockOnRatingUpdated);
+    spyOn(componentInstance, 'getIconUrl').and.returnValue('thumbnail_url');
+    spyOn(urlService, 'getUrlParams').and.returnValue({
+      story_url_fragment: 'story_url_fragment',
+      topic_url_fragment: 'topic_url_fragment',
+      classroom_url_fragment: 'classroom_url_fragment',
+      node_id: 'node_1'
+    });
+    spyOn(storyViewerBackendApiService, 'fetchStoryDataAsync').and.returnValue(
+      Promise.resolve(new StoryPlaythrough(
+        'story_id', [readOnlyStoryNode1, readOnlyStoryNode2], '', '', '', '')));
 
     componentInstance.questionPlayerConfig = null;
 
     componentInstance.ngOnInit();
     mockOnRatingUpdated.emit();
-    tick();
+    tick(1000);
 
     expect(explorationPlayerStateService.isInStoryChapterMode)
       .toHaveBeenCalled();
     expect(componentInstance.inStoryMode).toBe(true);
+    expect(componentInstance.storyId).toBe('story_id');
+    expect(componentInstance.nextStoryNode).toBe(readOnlyStoryNode2);
+    expect(componentInstance.getIconUrl).toHaveBeenCalledWith(
+      'story_id', 'filename_2');
+    expect(componentInstance.nextStoryNodeIconUrl).toBe('thumbnail_url');
     expect(urlInterpolationService.interpolateUrl).toHaveBeenCalled();
     expect(componentInstance.storyViewerUrl).toBe(
       'dummy_story_viewer_page_url');
@@ -156,25 +188,35 @@ describe('Ratings and recommendations component', () => {
     expect(componentInstance.collectionId).toEqual(collectionId);
   }));
 
-  it('should not generate story page url if not in story mode',
-    fakeAsync(() => {
-      expect(componentInstance.inStoryMode).toBe(undefined);
-      expect(componentInstance.storyViewerUrl).toBe(undefined);
+  it('should not generate story page url and determine the next story node' +
+  'if not in story mode', fakeAsync(() => {
+    expect(componentInstance.inStoryMode).toBe(undefined);
+    expect(componentInstance.storyViewerUrl).toBe(undefined);
 
-      spyOn(explorationPlayerStateService, 'isInStoryChapterMode')
-        .and.returnValue(false);
-      spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
-        'dummy_story_viewer_page_url');
+    spyOn(explorationPlayerStateService, 'isInStoryChapterMode')
+      .and.returnValue(false);
+    spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
+      'dummy_story_viewer_page_url');
 
-      componentInstance.ngOnInit();
-      tick();
+    componentInstance.ngOnInit();
+    tick();
 
-      expect(explorationPlayerStateService.isInStoryChapterMode)
-        .toHaveBeenCalled();
-      expect(componentInstance.inStoryMode).toBe(false);
-      expect(urlInterpolationService.interpolateUrl).not.toHaveBeenCalled();
-      expect(componentInstance.storyViewerUrl).toBe(undefined);
-    }));
+    expect(explorationPlayerStateService.isInStoryChapterMode)
+      .toHaveBeenCalled();
+    expect(componentInstance.inStoryMode).toBe(false);
+    expect(urlInterpolationService.interpolateUrl).not.toHaveBeenCalled();
+    expect(componentInstance.storyViewerUrl).toBe(undefined);
+  }));
+
+  it('should obtain next chapter thumbnail url', () => {
+    spyOn(assetsBackendApiService, 'getThumbnailUrlForPreview')
+      .and.returnValue('dummy_thumbnail_url');
+
+    expect(componentInstance.getIconUrl('story_id', 'thumbnail_filename'))
+      .toBe('dummy_thumbnail_url');
+    expect(assetsBackendApiService.getThumbnailUrlForPreview)
+      .toHaveBeenCalledWith('story', 'story_id', 'thumbnail_filename');
+  });
 
   it('should toggle popover when user clicks on rating stars', () => {
     componentInstance.feedbackPopOver = mockNgbPopover;

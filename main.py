@@ -397,6 +397,9 @@ URLS = [
         r'%s' % feconf.LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL,
         learner_dashboard.LearnerDashboardTopicsAndStoriesProgressHandler),
     get_redirect_route(
+        r'%s' % feconf.LEARNER_COMPLETED_CHAPTERS_COUNT_DATA_URL,
+        learner_dashboard.LearnerCompletedChaptersCountHandler),
+    get_redirect_route(
         r'%s' % feconf.LEARNER_DASHBOARD_COLLECTION_DATA_URL,
         learner_dashboard.LearnerDashboardCollectionsProgressHandler),
     get_redirect_route(
