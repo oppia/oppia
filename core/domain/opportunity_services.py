@@ -33,7 +33,7 @@ from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.platform import models
 
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Sequence, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -334,25 +334,26 @@ def update_exploration_opportunities_with_story_changes(
         exp_ids: list(str). A list of exploration IDs whose exploration
             opportunity summary models need to be updated.
     """
-    exp_opportunity_models = (
+    exp_opportunity_models_with_none = (
         opportunity_models.ExplorationOpportunitySummaryModel.get_multi(
             exp_ids))
 
     exploration_opportunity_summary_list = []
 
-    for exp_opportunity_model in exp_opportunity_models:
-        if exp_opportunity_model is not None:
-            exploration_opportunity_summary = (
-                get_exploration_opportunity_summary_from_model(
-                    exp_opportunity_model))
-            exploration_opportunity_summary.story_title = story.title
-            node = story.story_contents.get_node_with_corresponding_exp_id(
-                exploration_opportunity_summary.id)
-            exploration_opportunity_summary.chapter_title = node.title
-            exploration_opportunity_summary.validate()
+    for exp_opportunity_model in exp_opportunity_models_with_none:
+        # Ruling out the possibility of None for mypy type checking.
+        assert exp_opportunity_model is not None
+        exploration_opportunity_summary = (
+            get_exploration_opportunity_summary_from_model(
+                exp_opportunity_model))
+        exploration_opportunity_summary.story_title = story.title
+        node = story.story_contents.get_node_with_corresponding_exp_id(
+            exploration_opportunity_summary.id)
+        exploration_opportunity_summary.chapter_title = node.title
+        exploration_opportunity_summary.validate()
 
-            exploration_opportunity_summary_list.append(
-                exploration_opportunity_summary)
+        exploration_opportunity_summary_list.append(
+            exploration_opportunity_summary)
 
     _save_multi_exploration_opportunity_summary(
         exploration_opportunity_summary_list)
@@ -463,13 +464,11 @@ def delete_exp_opportunities_corresponding_to_story(story_id: str) -> None:
     """
     exp_opprtunity_model_class = (
         opportunity_models.ExplorationOpportunitySummaryModel)
-    exp_opportunity_models = exp_opprtunity_model_class.get_all().filter(
+    exp_opportunity_models: Sequence[
+        opportunity_models.ExplorationOpportunitySummaryModel
+    ] = exp_opprtunity_model_class.get_all().filter(
         exp_opprtunity_model_class.story_id == story_id
-    )
-    # TODO(Sahil): Before merging the PR please confirm the behavior. Because
-    # above only filter is used which does not return any iterable value instead
-    # it return instance of Query and delete_multi() can only accept List of
-    # models.
+    ).fetch()
     exp_opprtunity_model_class.delete_multi(exp_opportunity_models)  # type: ignore[arg-type]
 
 

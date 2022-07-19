@@ -831,7 +831,7 @@ def validate_exps_in_collection_are_public(
 def _save_collection(
     committer_id: str,
     collection: collection_domain.Collection,
-    commit_message: str,
+    commit_message: Optional[str],
     change_list: Sequence[Mapping[str, change_domain.AcceptableChangeDictTypes]]
 ) -> None:
     """Validates a collection and commits it to persistent storage. If
@@ -841,7 +841,8 @@ def _save_collection(
     Args:
         committer_id: str. ID of the given committer.
         collection: Collection. The collection domain object to be saved.
-        commit_message: str. The commit message.
+        commit_message: str|None. The commit message or None if unpublished
+            collection is provided.
         change_list: list(dict). List of changes applied to a collection. Each
             entry in change_list is a dict that represents a CollectionChange.
 
@@ -1094,8 +1095,11 @@ def publish_collection_and_update_user_profiles(
     rights_manager.publish_collection(committer, collection_id)  # type: ignore[no-untyped-call]
     contribution_time_msec = utils.get_current_time_in_millisecs()
     collection_summary = get_collection_summary_by_id(collection_id)
-    # Ruling out the possibility of None for mypy type checking.
-    assert collection_summary is not None
+    if collection_summary is None:
+        raise Exception(
+            'No collection summary model exists for the give id: %s'
+            % collection_id
+        )
     contributor_ids = collection_summary.contributor_ids
     for contributor in contributor_ids:
         user_services.update_first_contribution_msec_if_not_set(
@@ -1135,8 +1139,6 @@ def update_collection(
 
     collection = apply_change_list(collection_id, change_list)
 
-    # Ruling out the possibility of None for mypy type checking.
-    assert commit_message is not None
     _save_collection(committer_id, collection, commit_message, change_list)
     regenerate_collection_summary_with_new_contributor(
         collection.id, committer_id)

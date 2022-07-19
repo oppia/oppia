@@ -308,8 +308,9 @@ def get_questions_by_skill_ids(
     questions_with_none = question_fetchers.get_questions_by_ids(question_ids)
     questions: List[question_domain.Question] = []
     for question in questions_with_none:
-        if question is not None:
-            questions.append(question)
+        # Ruling out the possibility of None for mypy type checking.
+        assert question is not None
+        questions.append(question)
 
     return questions
 
@@ -508,14 +509,7 @@ def replace_skill_id_for_all_questions(
     old_questions = question_models.QuestionModel.get_multi(list(question_ids))
     new_questions = []
     for question in old_questions:
-        # The return type of `QuestionModel.get_multi` method is
-        # List[Optional[QuestionModel]] because this method can return
-        # none if model instance is not found for the given id. But from
-        # the above implementation we can assure that the return value of
-        # `QuestionModel.get_multi` is never going to contain none values,
-        # because above we are passing question_ids only for existing models.
-        # So, to just narrow down the type from List[Optional[...]] to
-        # List[...] for MyPy type checking, we used assertion here.
+        # Ruling out the possibility of None for mypy type checking.
         assert question is not None
         new_question = copy.deepcopy(question)
         new_question.linked_skill_ids.remove(curr_skill_id)
@@ -866,8 +860,9 @@ def untag_deleted_misconceptions(
     question_skill_links = get_question_skill_links_of_skill(
         skill_id, skill_description)
     question_ids = [model.question_id for model in question_skill_links]
-    questions = question_fetchers.get_questions_by_ids(question_ids)
-    for question in questions:
+    questions_with_none = question_fetchers.get_questions_by_ids(question_ids)
+    for question in questions_with_none:
+        # Ruling out the possibility of None for mypy type checking.
         assert question is not None
         change_list = []
         inapplicable_skill_misconception_ids = (

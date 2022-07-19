@@ -111,9 +111,9 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         question = question_services.get_question_by_id(self.question_id)
 
         self.assertEqual(question.id, self.question_id)
-        question_with = question_services.get_question_by_id(
+        question_with_none = question_services.get_question_by_id(
             'question_id', strict=False)
-        self.assertIsNone(question_with)
+        self.assertIsNone(question_with_none)
 
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'Entity for class QuestionModel with id question_id '

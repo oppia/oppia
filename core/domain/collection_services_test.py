@@ -755,6 +755,21 @@ class CollectionSummaryQueriesUnitTests(CollectionServicesUnitTests):
         self.assertEqual(summaries[4].title, 'Learning basic verbs in Spanish')
         self.assertEqual(summaries[5].title, 'Private collection in Spanish')
 
+    def test_get_collection_summaries_with_no_query_dash_dash(self) -> None:
+        system_user = user_services.get_system_user()
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            Exception,
+            'No collection summary model exists for the give id:'
+            ' Invalid_collection_id'
+        ):
+            with self.swap_to_always_return(
+                rights_manager, 'publish_collection', True
+            ):
+                collection_services.publish_collection_and_update_user_profiles(
+                    system_user,
+                    'Invalid_collection_id'
+                )
+
     def test_get_collection_summaries_with_no_query(self) -> None:
         # An empty query should return all collections.
         (col_ids, search_cursor) = (
