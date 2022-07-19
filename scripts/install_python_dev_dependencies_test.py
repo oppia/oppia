@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright 2019 The Oppia Authors. All Rights Reserved.
+# Copyright 2022 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -87,7 +87,8 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
         installed_tools = {}
 
         def mock_run(
-                args: List[str], check: bool, encoding: str) -> None:
+            args: List[str], check: bool, encoding: str,
+        ) -> None:
             package, version = args[-1].split('==')
             assert package not in installed_tools
             installed_tools[package] = version
@@ -107,8 +108,8 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
     def test_install_dev_dependencies(self) -> None:
 
         def mock_run(
-                *_args: Tuple[Any],
-                **_kwargs: Dict[Any, Any]) -> None:  # pylint: disable=unused-argument
+            *_args: Tuple[Any], **_kwargs: Dict[Any, Any],
+        ) -> None:  # pylint: disable=unused-argument
             pass
 
         run_swap = self.swap_with_checks(
@@ -126,8 +127,8 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
     def test_compile_pip_requirements_no_change(self) -> None:
 
         def mock_run(
-                *_args: Tuple[Any],
-                **_kwargs: Dict[Any, Any]) -> None:  # pylint: disable=unused-argument
+            *_args: Tuple[Any], **_kwargs: Dict[Any, Any],
+        ) -> None:  # pylint: disable=unused-argument
             pass
 
         def mock_open(
@@ -166,8 +167,8 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
     def test_compile_pip_requirements_change(self) -> None:
 
         def mock_run(
-                *_args: Tuple[Any],
-                **_kwargs: Dict[Any, Any]) -> None:  # pylint: disable=unused-argument
+            *_args: Tuple[Any], **_kwargs: Dict[Any, Any],
+        ) -> None:  # pylint: disable=unused-argument
             pass
 
         counter = []

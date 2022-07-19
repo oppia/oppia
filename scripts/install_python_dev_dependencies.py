@@ -87,7 +87,8 @@ def install_dev_dependencies() -> None:
 
 
 def compile_pip_requirements(
-        requirements_path: str, compiled_path: str) -> bool:
+    requirements_path: str, compiled_path: str
+) -> bool:
     """Compile a requirements.txt file.
 
     Args:
@@ -97,18 +98,17 @@ def compile_pip_requirements(
     Returns:
         bool. Whether the compiled dev requirements file was changed.
     """
-    with open(
-        compiled_path, 'r', encoding='utf-8'
-    ) as f:
+    with open(compiled_path, 'r', encoding='utf-8') as f:
         old_compiled = f.read()
     subprocess.run(
-        ['pip-compile', requirements_path, '--output-file', compiled_path],
+        [
+            'pip-compile', '--no-emit-index-url', requirements_path,
+            '--output-file', compiled_path,
+        ],
         check=True,
         encoding='utf-8',
     )
-    with open(
-        compiled_path, 'r', encoding='utf-8'
-    ) as f:
+    with open(compiled_path, 'r', encoding='utf-8') as f:
         new_compiled = f.read()
 
     return old_compiled != new_compiled
