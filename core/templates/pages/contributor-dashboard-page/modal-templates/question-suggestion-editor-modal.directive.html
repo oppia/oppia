@@ -1,6 +1,6 @@
 <div class="oppia-question-suggestion-editor-modal">
   <div class="modal-header">
-    <h3><[skill.getDescription()]></h3>
+    <h3 class="oppia-modal-header"><[skill.getDescription()]></h3>
   </div>
 
   <div class="modal-body">
@@ -18,7 +18,7 @@
         </h3>
         <ul>
           <li ng-repeat="explanation in skill.getRubricExplanations(skillDifficultyString)">
-            <span ng-bind-html="explanation" class="d-block mt-1"></span>
+            <span ng-bind-html="explanation" class="d-block mt-1 oppia-explanation"></span>
           </li>
         </ul>
       </div>
@@ -83,12 +83,21 @@
     padding: 0 50px;
   }
   }
-  @media only screen and (max-width: 510px) {
+  @media only screen and (max-width: 500px) {
     .oppia-question-editor-section {
-    padding: 0;
-  }
-  .oppia-question-suggestion-editor-modal {
-    padding: 0;
-  }
+      padding: 0;
+    }
+    .oppia-question-suggestion-editor-modal {
+      padding: 0;
+    }
+    h3 {
+      font-size: 20px;
+    }
+    .oppia-question-editor-section h3 {
+      font-size: 18px;
+    }
+    .oppia-explanation {
+      font-size: 16px;
+    }
   }
 </style>
