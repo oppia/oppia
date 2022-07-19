@@ -37,10 +37,11 @@ import { MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
 import { Rubric } from 'domain/skill/rubric.model';
 import { AppConstants } from 'app.constants';
 
-interface Suggestion {
+
+export interface Suggestion {
   change: {
     skill_id: string;
-    translation_html: string;
+    translation_html: string | string[];
     question_dict: QuestionBackendDict;
     skill_difficulty: string[];
   };
@@ -66,6 +67,11 @@ interface TranslationContributionsSummaryList {
   actionButtonTitle: string;
 }
 
+interface OpportunitiesDictsObject {
+  opportunitiesDicts: unknown;
+  more: unknown;
+}
+
 interface ContributionDetails {
   skill_description: string;
   skill_rubrics: Rubric[];
@@ -75,6 +81,11 @@ interface ContributionTabs {
   suggestionType: string;
   text: string;
   enabled: boolean;
+}
+
+interface SuggestionIdToSuggestions {
+  suggestion: Suggestion;
+  details: unknown;
 }
 
 @Component({
@@ -116,7 +127,7 @@ export class ContributionsAndReview
   ) {}
 
   getQuestionContributionsSummary(
-      suggestionIdToSuggestions: unknown[]):
+      suggestionIdToSuggestions: SuggestionIdToSuggestions[]):
       QuestionContributionsSummaryList[] {
     let questionContributionsSummaryList = [];
     Object.keys(suggestionIdToSuggestions).forEach((key) => {
@@ -134,7 +145,7 @@ export class ContributionsAndReview
       let requiredData = {
         id: suggestion.suggestion_id,
         heading: this.formatRtePreviewPipe.transform(
-          change.question_dict.question_state_data.content.html),
+          change.question_dict?.question_state_data.content.html),
         subheading: subheading,
         labelText: this.SUGGESTION_LABELS[suggestion.status].text,
         labelColor: this.SUGGESTION_LABELS[suggestion.status].color,
@@ -334,7 +345,7 @@ export class ContributionsAndReview
   }
 
   getContributionSummaries(
-      suggestionIdToSuggestions: unknown[]
+      suggestionIdToSuggestions: SuggestionIdToSuggestions[]
   ): TranslationContributionsSummaryList[] |
     QuestionContributionsSummaryList[] {
     if (this.activeSuggestionType === this.SUGGESTION_TYPE_TRANSLATE) {
@@ -376,7 +387,7 @@ export class ContributionsAndReview
     this.dropdownShown = !this.dropdownShown;
   }
 
-  loadReviewableTranslationOpportunities(): object {
+  loadReviewableTranslationOpportunities(): Promise<OpportunitiesDictsObject> {
     return this.contributionOpportunitiesService
       .getReviewableTranslationOpportunitiesAsync(
         this.translationTopicService.getActiveTopicName())
@@ -407,7 +418,8 @@ export class ContributionsAndReview
     this.activeExplorationId = null;
   }
 
-  loadContributions(shouldResetOffset: boolean): unknown {
+  loadContributions(shouldResetOffset: boolean):
+    Promise<OpportunitiesDictsObject> {
     if (!this.activeTabType || !this.activeSuggestionType) {
       return new Promise((resolve, reject) => {
         resolve({opportunitiesDicts: [], more: false});
@@ -428,11 +440,11 @@ export class ContributionsAndReview
     });
   }
 
-  loadOpportunities(): unknown {
+  loadOpportunities(): Promise<OpportunitiesDictsObject> {
     return this.loadContributions(/* Param shouldResetOffset= */ true);
   }
 
-  loadMoreOpportunities(): unknown {
+  loadMoreOpportunities(): Promise<OpportunitiesDictsObject> {
     return this.loadContributions(/* Param shouldResetOffset= */ false);
   }
 

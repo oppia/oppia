@@ -13,13 +13,27 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for QuestionSuggestionEditorModalController.
+ * @fileoverview Unit tests for QuestionSuggestionEditorModalComponent.
  */
-// TODO(#7222): Remove usage of importAllAngularServices once upgraded to
-// Angular 8.
+
 import { fakeAsync, tick } from '@angular/core/testing';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { ContextService } from 'services/context.service';
+import { QuestionSuggestionEditorModalComponent } from './question-suggestion-editor-modal.component';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { ContributionAndReviewService } from '../services/contribution-and-review.service';
+import { QuestionSuggestionBackendApiService } from '../services/question-suggestion-backend-api.service';
+import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import { QuestionUndoRedoService } from 'domain/editor/undo_redo/question-undo-redo.service';
+import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
+import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
+import { AlertsService } from 'services/alerts.service';
+import { CsrfTokenService } from 'services/csrf-token.service';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
 
 class MockNgbModalRef {
   componentInstance: {
@@ -27,428 +41,390 @@ class MockNgbModalRef {
   };
 }
 
-describe('Question Suggestion Editor Modal Controller', function() {
-  let $uibModal = null;
-  let $uibModalInstance = null;
-  let $q = null;
-  let $scope = null;
-  let $flushPendingTasks = null;
-  let AlertsService = null;
-  let ContributionAndReviewService = null;
-  let CsrfTokenService = null;
-  let ngbModal: NgbModal;
-  let QuestionObjectFactory = null;
-  let QuestionSuggestionBackendApiService = null;
-  let QuestionUndoRedoService = null;
-  let SiteAnalyticsService = null;
-  let SkillObjectFactory = null;
-  let StateEditorService = null;
+class MockActiveModal {
+  close(): void {
+    return;
+  }
 
+  dismiss(): void {
+    return;
+  }
+}
+
+class MockNgbModal {
+  open() {
+    return {
+      result: Promise.resolve()
+    };
+  }
+}
+
+class MockContributionAndReviewService {
+  updateQuestionSuggestionAsync(
+      suggestionId, skillDifficulty, questionStateData, imagesData) {
+    return {
+      then: (successCallback, errorCallback) => {
+        successCallback();
+      }
+    };
+  }
+}
+
+class MockQuestionSuggestionBackendApiService {
+  submitSuggestionAsync(
+      question, associatedSkill, skillDifficulty, imagesData) {
+    return {
+      then: (successCallback, errorCallback) => {
+        successCallback();
+      }
+    };
+  }
+}
+
+class MockAlertsService {
+  warnings = [];
+
+  addInfoMessage(value1, value2) {}
+
+  addSuccessMessage(value) {}
+}
+
+describe('Question Suggestion Editor Modal Component', () => {
+  let component: QuestionSuggestionEditorModalComponent;
+  let fixture: ComponentFixture<QuestionSuggestionEditorModalComponent>;
+  let ngbActiveModal: NgbActiveModal;
+  let alertsService: AlertsService;
+  let contributionAndReviewService: ContributionAndReviewService;
+  let csrfTokenService = null;
+  let ngbModal: NgbModal;
+  let questionObjectFactory = null;
+  let questionUndoRedoService = null;
+  let siteAnalyticsService = null;
+  let skillObjectFactory = null;
+  let stateEditorService = null;
   let question = null;
   let questionId = null;
   let questionStateData = null;
   let skill = null;
   let skillDifficulty = 0.3;
-  let suggestionId = null;
-  importAllAngularServices();
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('NgbModal', {
-      open: () => {
-        return {
-          result: Promise.resolve()
-        };
-      }
-    });
-  }));
-
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.service('QuestionSuggestionBackendApiService', function() {
-      this.submitSuggestionAsync = function(
-          question, associatedSkill, skillDifficulty, imagesData) {
-        return {
-          then: (successCallback, errorCallback) => {
-            successCallback();
-          }
-        };
-      };
-    });
-    $provide.service('ContributionAndReviewService', function() {
-      this.updateQuestionSuggestionAsync = function(
-          suggestionId, skillDifficulty, questionStateData, imagesData) {
-        return {
-          then: (successCallback, errorCallback) => {
-            successCallback();
-          }
-        };
-      };
-    });
-  }));
-
-  describe('when question is valid', function() {
-    beforeEach(angular.mock.inject(function($injector, $controller) {
-      $uibModal = $injector.get('$uibModal');
-      ngbModal = $injector.get('NgbModal');
-      $q = $injector.get('$q');
-      const $rootScope = $injector.get('$rootScope');
-      $flushPendingTasks = $injector.get('$flushPendingTasks');
-      AlertsService = $injector.get('AlertsService');
-      CsrfTokenService = $injector.get('CsrfTokenService');
-      QuestionObjectFactory = $injector.get('QuestionObjectFactory');
-      ContributionAndReviewService =
-      $injector.get('ContributionAndReviewService');
-      QuestionSuggestionBackendApiService =
-      $injector.get('QuestionSuggestionBackendApiService');
-      QuestionUndoRedoService = $injector.get('QuestionUndoRedoService');
-      SiteAnalyticsService = $injector.get('SiteAnalyticsService');
-      SkillObjectFactory = $injector.get('SkillObjectFactory');
-      StateEditorService = $injector.get('StateEditorService');
-
-      $uibModalInstance = jasmine.createSpyObj(
-        '$uibModalInstance', ['close', 'dismiss']);
-
-      spyOn(CsrfTokenService, 'getTokenAsync')
-        .and.returnValue($q.resolve('sample-csrf-token'));
-
-      const skillContentsDict = {
-        explanation: {
-          html: 'test explanation',
-          content_id: 'explanation',
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      declarations: [
+        QuestionSuggestionEditorModalComponent
+      ],
+      providers: [
+        ContextService,
+        UrlInterpolationService,
+        {
+          provide: NgbActiveModal,
+          useClass: MockActiveModal
         },
-        worked_examples: [],
-        recorded_voiceovers: {
-          voiceovers_mapping: {}
-        }
-      };
+        {
+          provide: NgbModal,
+          useClass: MockNgbModal
+        },
+        {
+          provide: ContributionAndReviewService,
+          useClass: MockContributionAndReviewService
+        },
+        {
+          provide: QuestionSuggestionBackendApiService,
+          useClass: MockQuestionSuggestionBackendApiService
+        },
+        {
+          provide: AlertsService,
+          useClass: MockAlertsService
+        },
+        CsrfTokenService,
+        QuestionObjectFactory,
+        QuestionUndoRedoService,
+        SiteAnalyticsService,
+        SkillObjectFactory,
+        StateEditorService
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
+  }));
 
-      const skillDict = {
-        id: '1',
-        description: 'test description',
-        misconceptions: [{
-          id: '2',
-          name: 'test name',
-          notes: 'test notes',
-          feedback: 'test feedback',
-          must_be_addressed: false
-        }],
-        rubrics: [],
-        skill_contents: skillContentsDict,
-        language_code: 'en',
-        version: 3,
-      };
-      skill = SkillObjectFactory.createFromBackendDict(skillDict);
-      question = QuestionObjectFactory.createFromBackendDict({
-        id: skill.getId(),
-        question_state_data: {
-          content: {
-            html: 'Question 1',
-            content_id: 'content_1'
-          },
-          interaction: {
-            answer_groups: [{
-              outcome: {
-                dest: 'outcome 1',
-                dest_if_really_stuck: null,
-                feedback: {
-                  content_id: 'content_5',
-                  html: ''
-                },
-                labelled_as_correct: true,
-                param_changes: [],
-                refresher_exploration_id: null
-              },
-              rule_specs: [],
-            }],
-            confirmed_unclassified_answers: [],
-            customization_args: {
-              placeholder: {
-                value: {
-                  content_id: 'ca_placeholder_0',
-                  unicode_str: ''
-                }
-              },
-              rows: { value: 1 }
-            },
-            default_outcome: {
-              dest: null,
+  beforeEach(() => {
+    fixture = TestBed.createComponent(QuestionSuggestionEditorModalComponent);
+    component = fixture.componentInstance;
+
+    alertsService = TestBed.inject(AlertsService);
+    csrfTokenService = TestBed.inject(CsrfTokenService);
+    questionObjectFactory = TestBed.inject(QuestionObjectFactory);
+    contributionAndReviewService = TestBed.inject(ContributionAndReviewService);
+    questionUndoRedoService = TestBed.inject(QuestionUndoRedoService);
+    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
+    skillObjectFactory = TestBed.inject(SkillObjectFactory);
+    stateEditorService = TestBed.inject(StateEditorService);
+    ngbModal = TestBed.inject(NgbModal);
+    ngbActiveModal = TestBed.inject(NgbActiveModal);
+
+    spyOn(csrfTokenService, 'getTokenAsync')
+      .and.returnValue(Promise.resolve('sample-csrf-token'));
+
+    const skillContentsDict = {
+      explanation: {
+        html: 'test explanation',
+        content_id: 'explanation',
+      },
+      worked_examples: [],
+      recorded_voiceovers: {
+        voiceovers_mapping: {}
+      }
+    };
+
+    const skillDict = {
+      id: '1',
+      description: 'test description',
+      misconceptions: [{
+        id: '2',
+        name: 'test name',
+        notes: 'test notes',
+        feedback: 'test feedback',
+        must_be_addressed: false
+      }],
+      rubrics: [],
+      skill_contents: skillContentsDict,
+      language_code: 'en',
+      version: 3,
+    };
+    skill = skillObjectFactory.createFromBackendDict(skillDict);
+    component.skill = skill;
+    question = questionObjectFactory.createFromBackendDict({
+      id: skill.getId(),
+      question_state_data: {
+        content: {
+          html: 'Question 1',
+          content_id: 'content_1'
+        },
+        interaction: {
+          answer_groups: [{
+            outcome: {
+              dest: 'outcome 1',
               dest_if_really_stuck: null,
               feedback: {
-                html: 'Correct Answer',
-                content_id: 'content_2'
+                content_id: 'content_5',
+                html: ''
               },
+              labelled_as_correct: true,
               param_changes: [],
-              labelled_as_correct: true
+              refresher_exploration_id: null
             },
-            hints: [{
-              hint_content: {
-                html: 'Hint 1',
-                content_id: 'content_3'
-              }
-            }],
-            solution: {
-              correct_answer: 'This is the correct answer',
-              answer_is_exclusive: false,
-              explanation: {
-                html: 'Solution explanation',
-                content_id: 'content_4'
+            rule_specs: [],
+          }],
+          confirmed_unclassified_answers: [],
+          customization_args: {
+            placeholder: {
+              value: {
+                content_id: 'ca_placeholder_0',
+                unicode_str: ''
               }
             },
-            id: 'TextInput'
+            rows: { value: 1 }
           },
-          param_changes: [],
-          recorded_voiceovers: {
-            voiceovers_mapping: {}
+          default_outcome: {
+            dest: null,
+            dest_if_really_stuck: null,
+            feedback: {
+              html: 'Correct Answer',
+              content_id: 'content_2'
+            },
+            param_changes: [],
+            labelled_as_correct: true
           },
-          written_translations: {
-            translations_mapping: {}
+          hints: [{
+            hint_content: {
+              html: 'Hint 1',
+              content_id: 'content_3'
+            }
+          }],
+          solution: {
+            correct_answer: 'This is the correct answer',
+            answer_is_exclusive: false,
+            explanation: {
+              html: 'Solution explanation',
+              content_id: 'content_4'
+            }
           },
+          id: 'TextInput'
         },
-        inapplicable_skill_misconception_ids: ['1-2']
-      });
-      questionId = question.getId();
-      questionStateData = question.getStateData();
-      suggestionId = 1;
+        param_changes: [],
+        recorded_voiceovers: {
+          voiceovers_mapping: {}
+        },
+        written_translations: {
+          translations_mapping: {}
+        },
+      },
+      inapplicable_skill_misconception_ids: ['1-2']
+    });
+    component.question = question;
+    questionId = question.getId();
+    component.questionId = question.getId();
+    questionStateData = question.getStateData();
+    component.questionStateData = question.getStateData();
+    component.suggestionId = '1';
 
-      spyOn(StateEditorService, 'isCurrentSolutionValid').and.returnValue(true);
+    spyOn(stateEditorService, 'isCurrentSolutionValid').and.returnValue(true);
+  });
 
-      $scope = $rootScope.$new();
-      $controller('QuestionSuggestionEditorModalController', {
-        $scope: $scope,
-        $uibModalInstance: $uibModalInstance,
-        question: question,
-        questionId: questionId,
-        questionStateData: questionStateData,
-        skill: skill,
-        skillDifficulty: skillDifficulty,
-        suggestionId: suggestionId
-      });
-    }));
+  afterEach(() => {
+    fixture.destroy();
+  });
 
-    it('should initialize $scope properties after controller is initialized',
-      function() {
-        expect($scope.canEditQuestion).toBe(true);
-        expect($scope.newQuestionIsBeingCreated).toBe(true);
-        expect($scope.question).toEqual(question);
-        expect($scope.questionId).toBe(questionId);
-        expect($scope.questionStateData).toEqual(questionStateData);
-        expect($scope.skillDifficulty).toBe(skillDifficulty);
-        expect($scope.skillDifficultyString).toBe('Easy');
-        expect($scope.skill).toEqual(skill);
-      });
+  it('should initialize $scope properties after component is initialized',
+    () => {
+      spyOn(component, 'isQuestionValid').and.returnValue(false);
+      spyOn(component, 'setDifficultyString').and.stub();
 
-    it('should evaluate question validity', function() {
-      expect($scope.isQuestionValid()).toBe(true);
+      component.ngOnInit();
+      component.done();
+
+      expect(component.canEditQuestion).toBe(true);
+      expect(component.newQuestionIsBeingCreated).toBe(true);
+      expect(component.question).toEqual(question);
+      expect(component.questionId).toEqual(questionId);
+      expect(component.questionStateData).toEqual(questionStateData);
+      expect(component.skill).toEqual(skill);
     });
 
-    it('should update the question', function() {
-      spyOn(ContributionAndReviewService, 'updateQuestionSuggestionAsync')
+  it('should evaluate question validity', () => {
+    expect(component.isQuestionValid()).toBe(true);
+  });
+
+  it('should update the question', () => {
+    spyOn(contributionAndReviewService, 'updateQuestionSuggestionAsync')
+      .and.callFake((
+          suggestionId, skillDifficulty, questionStateData, imagesData,
+          successCallback, errorCallback) => {
+        successCallback(null);
+        return null;
+      });
+    spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(true);
+    component.question = question;
+    component.skillDifficulty = skillDifficulty;
+    component.isEditing = true;
+
+    component.done();
+
+    expect(contributionAndReviewService.updateQuestionSuggestionAsync)
+      .toHaveBeenCalled();
+  });
+
+  it('should fail to update the question when no changes are made',
+    () => {
+      spyOn(contributionAndReviewService, 'updateQuestionSuggestionAsync')
         .and.callFake((
             suggestionId, skillDifficulty, questionStateData, imagesData,
             successCallback, errorCallback) => {
-          successCallback();
+          successCallback(null);
+          return null;
         });
-      spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(true);
-      $scope.question = question;
-      $scope.skillDifficulty = skillDifficulty;
-      $scope.isEditing = true;
+      spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(false);
+      spyOn(alertsService, 'addInfoMessage');
 
-      $scope.done();
+      component.done();
 
-      expect(ContributionAndReviewService.updateQuestionSuggestionAsync)
-        .toHaveBeenCalled();
+      expect(alertsService.addInfoMessage)
+        .toHaveBeenCalledWith('No changes detected.', 5000);
     });
 
-    it('should fail to update the question when no changes are made',
-      function() {
-        spyOn(ContributionAndReviewService, 'updateQuestionSuggestionAsync')
-          .and.callFake((
-              suggestionId, skillDifficulty, questionStateData, imagesData,
-              successCallback, errorCallback) => {
-            successCallback();
-          });
-        spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(false);
-        spyOn(AlertsService, 'addInfoMessage');
-        $scope.done();
-        expect(AlertsService.addInfoMessage)
-          .toHaveBeenCalledWith('No changes detected.', 5000);
-      });
+  it('should show alert when suggestion is submitted', () => {
+    spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(true);
+    spyOn(alertsService, 'addSuccessMessage');
+    component.isEditing = false;
+    component.done();
+    expect(alertsService.addSuccessMessage)
+      .toHaveBeenCalledWith('Submitted question for review.');
+  });
 
-    it('should show alert when suggestion is submitted', function() {
-      spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(true);
-      spyOn(AlertsService, 'addSuccessMessage');
-      $scope.isEditing = false;
-      $scope.done();
-      expect(AlertsService.addSuccessMessage)
-        .toHaveBeenCalledWith('Submitted question for review.');
-    });
+  it('should register Contributor Dashboard submit suggestion event on' +
+      ' submit', () => {
+    spyOn(
+      siteAnalyticsService,
+      'registerContributorDashboardSubmitSuggestionEvent');
+    component.isEditing = false;
+    spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(true);
+    component.done();
+    expect(
+      siteAnalyticsService.registerContributorDashboardSubmitSuggestionEvent)
+      .toHaveBeenCalledWith('Question');
+  });
 
-    it('should register Contributor Dashboard submit suggestion event on' +
-      ' submit', function() {
-      spyOn(
-        SiteAnalyticsService,
-        'registerContributorDashboardSubmitSuggestionEvent');
-      $scope.isEditing = false;
-      spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(true);
-      $scope.done();
-      expect(
-        SiteAnalyticsService.registerContributorDashboardSubmitSuggestionEvent)
-        .toHaveBeenCalledWith('Question');
-    });
+  it('should dismiss modal if there is no pending changes', () => {
+    spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(false);
+    component.cancel();
+  });
 
-    it('should dismiss modal if there is no pending changes', function() {
-      spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(false);
-      $scope.cancel();
-      expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
-    });
-
-    it('should dismiss modal if there is pending changes which won\'t be' +
+  it('should dismiss modal if there is pending changes which won\'t be' +
       ' saved', fakeAsync(() => {
-      spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(true);
-      spyOn(ngbModal, 'open').and.returnValue({
-        componentInstance: MockNgbModalRef,
-        result: $q.resolve()
-      } as NgbModalRef);
+    let ngbSpy = spyOn(ngbActiveModal, 'dismiss').and.stub();
+    spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(true);
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: MockNgbModalRef,
+      result: Promise.resolve()
+    } as NgbModalRef);
 
-      $scope.cancel();
-      tick();
-      $scope.$apply();
+    component.cancel();
+    tick();
 
-      expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
-    }));
+    expect(ngbSpy).toHaveBeenCalledWith('cancel');
+  }));
 
-    it('should not dismiss modal if there is pending changes which will be' +
-      ' saved', function() {
-      spyOn(QuestionUndoRedoService, 'hasChanges').and.returnValue(true);
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.reject()
-      });
-      $scope.cancel();
-      $scope.$apply();
+  it('should not dismiss modal if there is pending changes which will be' +
+      ' saved', () => {
+    let ngbSpy = spyOn(ngbActiveModal, 'dismiss').and.stub();
+    spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(true);
+    spyOn(ngbModal, 'open').and.returnValue({
+      result: Promise.reject()
+    } as NgbModalRef);
+    component.cancel();
 
-      expect($uibModalInstance.dismiss).not.toHaveBeenCalledWith('cancel');
-    });
+    expect(ngbSpy).not.toHaveBeenCalledWith('cancel');
+  });
 
-    it('should open skill difficulty selection modal on clicking' +
-        ' change difficulty icon', fakeAsync(() => {
-      var uibSpy = spyOn(ngbModal, 'open').and.returnValue({
-        componentInstance: MockNgbModalRef,
-        result: $q.resolve()
-      } as NgbModalRef);
-
-      $scope.onClickChangeDifficulty();
-      tick();
-      $scope.$apply();
-      $flushPendingTasks();
-
-      expect(uibSpy).toHaveBeenCalled();
-    }));
-
-    it('should change skill difficulty when skill difficulty' +
+  it('should change skill difficulty when skill difficulty' +
       ' is edited via skill difficulty modal', fakeAsync(() => {
-      spyOn(ngbModal, 'open').and.returnValue({
-        componentInstance: MockNgbModalRef,
-        result: $q.resolve({
-          skillDifficulty: 0.6
-        })
-      } as NgbModalRef);
+    spyOn(component, 'setDifficultyString').and.stub();
+    spyOn(ngbActiveModal, 'dismiss').and.stub();
+    spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(true);
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: MockNgbModalRef,
+      result: Promise.resolve({
+        skillDifficulty: '0.6'
+      })
+    } as NgbModalRef);
 
-      $scope.onClickChangeDifficulty();
-      tick();
-      $scope.$apply();
-      $flushPendingTasks();
+    component.onClickChangeDifficulty();
+    tick();
 
-      expect($scope.skillDifficulty).toBe(0.6);
-      expect($scope.skillDifficultyString).toBe('Medium');
-    }));
+    expect(component.skillDifficulty).toBe('0.6');
+  }));
 
-    it('should set the correct skill difficulty string', function() {
-      $scope.setDifficultyString(0.6);
-      expect($scope.skillDifficultyString).toBe('Medium');
-      $scope.setDifficultyString(0.9);
-      expect($scope.skillDifficultyString).toBe('Hard');
-      $scope.setDifficultyString(0.3);
-      expect($scope.skillDifficultyString).toBe('Easy');
-    });
-
-    it('should dismiss modal if cancel button is clicked', fakeAsync(() => {
-      spyOn(ngbModal, 'open').and.returnValue({
-        componentInstance: MockNgbModalRef,
-        result: $q.reject()
-      } as NgbModalRef);
-
-      $scope.onClickChangeDifficulty();
-      $scope.cancel();
-      tick();
-      $scope.$apply();
-
-      expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
-    }));
+  it('should set the correct skill difficulty string', () => {
+    component.setDifficultyString(0.6);
+    expect(component.skillDifficultyString).toBe('Medium');
+    component.setDifficultyString(0.9);
+    expect(component.skillDifficultyString).toBe('Hard');
+    component.setDifficultyString(0.3);
+    expect(component.skillDifficultyString).toBe('Easy');
   });
-  describe('when question is not valid', function() {
-    beforeEach(angular.mock.inject(function($injector, $controller) {
-      $uibModal = $injector.get('$uibModal');
-      $q = $injector.get('$q');
-      const $rootScope = $injector.get('$rootScope');
-      QuestionObjectFactory = $injector.get('QuestionObjectFactory');
-      QuestionSuggestionBackendApiService =
-      $injector.get('QuestionSuggestionBackendApiService');
-      QuestionUndoRedoService = $injector.get('QuestionUndoRedoService');
-      SkillObjectFactory = $injector.get('SkillObjectFactory');
 
-      $uibModalInstance = jasmine.createSpyObj(
-        '$uibModalInstance', ['close', 'dismiss']);
+  it('should dismiss modal if cancel button is clicked', fakeAsync(() => {
+    let ngbSpy = spyOn(ngbActiveModal, 'dismiss').and.stub();
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: MockNgbModalRef,
+      result: Promise.reject()
+    } as NgbModalRef);
 
-      const skillContentsDict = {
-        explanation: {
-          html: 'test explanation',
-          content_id: 'explanation',
-        },
-        worked_examples: [],
-        recorded_voiceovers: {
-          voiceovers_mapping: {}
-        }
-      };
+    component.onClickChangeDifficulty();
+    component.cancel();
+    tick();
 
-      const skillDict = {
-        id: '1',
-        description: 'test description',
-        misconceptions: [],
-        rubrics: [],
-        skill_contents: skillContentsDict,
-        language_code: 'en',
-        version: 3,
-      };
-      skill = SkillObjectFactory.createFromBackendDict(skillDict);
-      question = QuestionObjectFactory.createDefaultQuestion([skill.getId()]);
-      questionId = question.getId();
-      questionStateData = question.getStateData();
-      suggestionId = 1;
-
-      $scope = $rootScope.$new();
-      $controller('QuestionSuggestionEditorModalController', {
-        $scope: $scope,
-        $uibModalInstance: $uibModalInstance,
-        question: question,
-        questionId: questionId,
-        questionStateData: questionStateData,
-        skill: skill,
-        skillDifficulty: skillDifficulty,
-        suggestionId: suggestionId
-      });
-    }));
-
-    it('should evaluate question validity', function() {
-      expect($scope.isQuestionValid()).toBe(false);
-    });
-
-    it('should not submit question', function() {
-      spyOn(QuestionSuggestionBackendApiService, 'submitSuggestionAsync')
-        .and.callThrough();
-      $scope.done();
-
-      expect(QuestionSuggestionBackendApiService.submitSuggestionAsync).not
-        .toHaveBeenCalled();
-      expect($uibModalInstance.close).not.toHaveBeenCalled();
-    });
-  });
+    expect(ngbSpy).toHaveBeenCalledWith('cancel');
+  }));
 });

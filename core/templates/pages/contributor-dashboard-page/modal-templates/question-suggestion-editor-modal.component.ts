@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for question suggestion editor modal.
+ * @fileoverview component for question suggestion editor modal.
  */
 
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
@@ -46,7 +46,7 @@ export class QuestionSuggestionEditorModalComponent
   @Input() questionStateData: State;
   @Input() questionId: string;
   @Input() skill: Skill;
-  @Input() skillDifficulty: SkillDifficulty | string;
+  @Input() skillDifficulty: SkillDifficulty | string | number;
   @Input() suggestionId: string;
 
   canEditQuestion: boolean;

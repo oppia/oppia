@@ -56,8 +56,7 @@ class MockTruncatePipe {
   }
 }
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('State Graph Visualization Component when graph is redrawn', () => {
+describe('State Graph Visualization Component when graph is redrawn', () => {
   let component: StateGraphVisualization;
   let fixture: ComponentFixture<StateGraphVisualization>;
   var explorationWarningsService: ExplorationWarningsService;
