@@ -17,7 +17,7 @@
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, flush, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { TranslationSuggestionReviewModalComponent } from './translation-suggestion-review-modal.component';
 import { ChangeDetectorRef, ElementRef, NO_ERRORS_SCHEMA } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
@@ -206,9 +206,10 @@ describe('Translation Suggestion Review Modal Component', function() {
           .returnValue(Promise.resolve(defaultUserInfo));
 
         expect(() => {
-          component.setModalData();
+          component.ngOnInit();
           tick();
         }).toThrowError();
+        flush();
       }));
 
     it('should initialize $scope properties after controller is initialized',

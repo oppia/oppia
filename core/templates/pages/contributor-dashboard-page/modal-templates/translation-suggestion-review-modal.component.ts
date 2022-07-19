@@ -343,14 +343,11 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   refreshActiveContributionState(): void {
     // Close modal instance if the suggestion's corresponding opportunity
     // is deleted. See issue #14234.
-    if (!this.activeContribution.details) {
+    if (this.activeContribution.details === null) {
       this.activeModal.close(this.resolvedSuggestionIds);
       return;
     }
     this.activeSuggestion = this.activeContribution.suggestion;
-    if (this.activeContribution.details === null) {
-      return;
-    }
     this.contextService.setCustomEntityContext(
       AppConstants.IMAGE_CONTEXT.EXPLORATION_SUGGESTIONS,
       this.activeSuggestion.target_id);
