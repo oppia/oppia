@@ -29,6 +29,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MaterialModule } from 'modules/material.module';
 import { ObjectComponentsModule } from 'objects/object-components.module';
 import { SharedFormsModule } from './forms/shared-forms.module';
+import { RecommendationsModule } from './recommendations/recommendations.module';
 import { CommonElementsModule } from './common-layout-directives/common-elements/common-elements.module';
 import { RichTextComponentsModule } from 'rich_text_components/rich-text-components.module';
 import { CodeMirrorModule } from './code-mirror/codemirror.module';
@@ -175,6 +176,7 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     RichTextComponentsModule,
     SearchBarModule,
     SharedFormsModule,
+    RecommendationsModule,
     StringUtilityPipesModule,
     AngularFireModule.initializeApp(AuthService.firebaseConfig),
     AngularFireAuthModule,
