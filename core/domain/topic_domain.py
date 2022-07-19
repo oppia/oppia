@@ -1200,7 +1200,7 @@ class Topic:
         if len(skill_ids_for_diagnostic_that_are_not_in_topic) > 0:
             raise utils.ValidationError(
                 'The skill_ids %s are selected for the diagnostic test but they'
-                ' are not associated with any subtopic.' %
+                ' are not associated with the topic.' %
                 skill_ids_for_diagnostic_that_are_not_in_topic)
 
         if len(self.skill_ids_for_diagnostic_test) > 3:

@@ -855,7 +855,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic.update_skill_ids_for_diagnostic_test(['test_skill_id'])
         error_msg = (
             'The skill_ids {\'test_skill_id\'} are selected for the '
-            'diagnostic test but they are not associated with any subtopic.')
+            'diagnostic test but they are not associated with the topic.')
         self._assert_validation_error(error_msg)
 
     def test_max_skill_ids_for_diagnostic_test_validation(self) -> None:
