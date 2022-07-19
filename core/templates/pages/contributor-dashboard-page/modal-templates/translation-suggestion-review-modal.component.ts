@@ -197,7 +197,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     this.allContributions[this.activeSuggestionId] = (
       this.activeContribution);
 
-    this.setModalData();
+    this.refreshActiveContributionState();
     // The 'html' value is passed as an object as it is required for
     // schema-based-editor. Otherwise the corrrectly updated value for
     // the translation is not received from the editor when the translation
@@ -207,10 +207,26 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     };
   }
 
-  setModalData(): void {
+  refreshActiveContributionState(): void {
     this.activeContribution = this.allContributions[
       this.activeSuggestionId];
-    this.refreshActiveContributionState();
+
+    // Close modal instance if the suggestion's corresponding opportunity
+    // is deleted. See issue #14234.
+    if (this.activeContribution.details === null) {
+      this.activeModal.close(this.resolvedSuggestionIds);
+      return;
+    }
+    this.activeSuggestion = this.activeContribution.suggestion;
+    this.contextService.setCustomEntityContext(
+      AppConstants.IMAGE_CONTEXT.EXPLORATION_SUGGESTIONS,
+      this.activeSuggestion.target_id);
+    this.subheading = (
+      `${this.activeContribution.details.topic_name} / ` +
+        `${this.activeContribution.details.story_title} / ` +
+        `${this.activeContribution.details.chapter_title}`
+    );
+
     this.isLastItem = this.remainingContributionIds.length === 0;
     this.isFirstItem = this.skippedContributionIds.length === 0;
     this.userCanReviewTranslationSuggestionsInLanguages = [];
@@ -340,24 +356,6 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     }
   }
 
-  refreshActiveContributionState(): void {
-    // Close modal instance if the suggestion's corresponding opportunity
-    // is deleted. See issue #14234.
-    if (this.activeContribution.details === null) {
-      this.activeModal.close(this.resolvedSuggestionIds);
-      return;
-    }
-    this.activeSuggestion = this.activeContribution.suggestion;
-    this.contextService.setCustomEntityContext(
-      AppConstants.IMAGE_CONTEXT.EXPLORATION_SUGGESTIONS,
-      this.activeSuggestion.target_id);
-    this.subheading = (
-      `${this.activeContribution.details.topic_name} / ` +
-      `${this.activeContribution.details.story_title} / ` +
-      `${this.activeContribution.details.chapter_title}`
-    );
-  }
-
   goToNextItem(): void {
     const lastContributionId = this.remainingContributionIds.pop();
     // If the current item is the last item, do not navigate.
@@ -372,7 +370,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
 
     this.activeSuggestionId = lastContributionId;
 
-    this.setModalData();
+    this.refreshActiveContributionState();
   }
 
   goToPreviousItem(): void {
@@ -389,7 +387,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
 
     this.activeSuggestionId = lastContributionId;
 
-    this.setModalData();
+    this.refreshActiveContributionState();
   }
 
   resolveSuggestionAndUpdateModal(): void {
