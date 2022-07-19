@@ -241,12 +241,13 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
                             f'have url-with-value attribute'
                         )
 
-            states_with_values.append(
-                {
-                    'state_name': key,
-                    'rte_components_errors': rte_components_errors
-                }
-            )
+            if len(rte_components_errors) > 0:
+                states_with_values.append(
+                    {
+                        'state_name': key,
+                        'rte_components_errors': rte_components_errors
+                    }
+                )
         return states_with_values
 
     @staticmethod
@@ -468,13 +469,14 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
                                 )
                         ranges.append(range_var)
 
-                states_with_values.append(
-                    {
-                        'state_name': state_name,
-                        'numeric_input_interaction_values': (
-                            numeric_input_interaction_values)
-                    }
-                )
+                if len(numeric_input_interaction_values) > 0:
+                    states_with_values.append(
+                        {
+                            'state_name': state_name,
+                            'numeric_input_interaction_values': (
+                                numeric_input_interaction_values)
+                        }
+                    )
 
         return states_with_values
 
@@ -669,13 +671,14 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
                         ranges.append(range_var)
                         matched_denominator_list.append(matched_denominator)
 
-                states_with_values.append(
-                    {
-                        'state_name': state_name,
-                        'fraction_input_interaction_values': (
-                            fraction_input_interaction_values)
-                    }
-                )
+                if len(fraction_input_interaction_values) > 0:
+                    states_with_values.append(
+                        {
+                            'state_name': state_name,
+                            'fraction_input_interaction_values': (
+                                fraction_input_interaction_values)
+                        }
+                    )
 
         return states_with_values
 
@@ -719,13 +722,14 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
                             else:
                                 equals_rule_values.append(rule_spec_x)
 
-                states_with_values.append(
-                    {
-                        'state_name': state_name,
-                        'item_selec_interaction_values': (
-                            item_selec_interaction_values)
-                    }
-                )
+                if len(item_selec_interaction_values) > 0:
+                    states_with_values.append(
+                        {
+                            'state_name': state_name,
+                            'item_selec_interaction_values': (
+                                item_selec_interaction_values)
+                        }
+                    )
 
         return states_with_values
 
@@ -883,13 +887,14 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
                     _equals_should_come_before_misplace_by_one_rule(state)
                 )
 
-                states_with_values.append(
-                    {
-                        'state_name': state_name,
-                        'drag_drop_interaction_values': (
-                            drag_drop_interaction_values)
-                    }
-                )
+                if len(drag_drop_interaction_values) > 0:
+                    states_with_values.append(
+                        {
+                            'state_name': state_name,
+                            'drag_drop_interaction_values': (
+                                drag_drop_interaction_values)
+                        }
+                    )
 
         return states_with_values
 
@@ -1030,13 +1035,14 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
                     _starts_with_should_come_after(state)
                 )
 
-                states_with_values.append(
-                    {
-                        'state_name': state_name,
-                        'text_input_interaction_values': (
-                            text_input_interaction_values)
-                    }
-                )
+                if len(text_input_interaction_values) > 0:
+                    states_with_values.append(
+                        {
+                            'state_name': state_name,
+                            'text_input_interaction_values': (
+                                text_input_interaction_values)
+                        }
+                    )
 
         return states_with_values
 
@@ -1074,37 +1080,11 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
                             'invalid_exps': invalid_state_exp_ids}
                         )
                     )
-        ExpStateInteractionValidationJob.invalid_end_interac.append(
-            {exp.id: exp_end_interac_values}
-        )
+        if len(exp_end_interac_values) > 0:
+            ExpStateInteractionValidationJob.invalid_end_interac.append(
+                {exp.id: exp_end_interac_values}
+            )
         return found_invalid
-
-    @staticmethod
-    def remove_empty_values(
-        errored_values: List[dict[str, list]]
-    ) -> List[Dict[str, List[Dict[str, List[str]]]]]:
-        """Remove the empty arrays
-
-        Args:
-            errored_values: list[dict]. The list of dictionaries
-                containing the errored values.
-
-        Returns:
-            errored_values: list[dict]. The list of dictionaries
-            containing the errored values with removed empty.
-        """
-        values_to_remove = []
-        for ele in errored_values:
-            for key, value in list(ele.items()):
-                if len(value) == 0:
-                    ele.pop(key)
-            if len(ele) == 1:
-                values_to_remove.append(ele)
-
-        for ele in values_to_remove:
-            errored_values.remove(ele)
-
-        return errored_values
 
     @staticmethod
     def get_invalid_end_interac_values(exp):
@@ -1120,6 +1100,7 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
         for ele in ExpStateInteractionValidationJob.invalid_end_interac:
             if exp.id in ele.keys():
                 return ele[exp.id]
+        return None
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         all_explorations = (
@@ -1150,17 +1131,12 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
                 lambda exp_id, exp_states, exp_created_on: (
                     exp_id,
                     self.filter_invalid_state_rte_values(exp_states),
-                    exp_created_on
-                )
-            )
-            | 'Remove empty values for rte' >> beam.MapTuple(
-                lambda exp_id, exp_states_rte_errors, exp_created_on: (
-                    exp_id, self.remove_empty_values(exp_states_rte_errors),
                     exp_created_on.date()
                 )
             )
-            | 'Filter invalid exps for RTE' >> beam.Filter(
-                lambda exp_values: len(exp_values[1]) > 0
+            | 'Remove empty values for rte'
+            >> beam.Filter(
+                lambda exp: len(exp[1]) > 0
             )
         )
 
@@ -1186,16 +1162,9 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
                     exp_created_on.date()
                 )
             )
-            | 'Remove empty values for state numeric interc' >> beam.MapTuple(
-                lambda exp_id, exp_numeric_interc_errors, exp_created_on: (
-                    exp_id, self.remove_empty_values(
-                        exp_numeric_interc_errors),
-                    exp_created_on
-                )
-            )
-            | 'Filter invalid exps errored numeric interac states'
+            | 'Remove empty values for state numeric interc'
             >> beam.Filter(
-                lambda exp_values: len(exp_values[1]) > 0
+                lambda exp: len(exp[1]) > 0
             )
         )
 
@@ -1221,16 +1190,9 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
                     exp_created_on.date()
                 )
             )
-            | 'Remove empty values for state fraction interc' >> beam.MapTuple(
-                lambda exp_id, exp_fraction_interc_errors, exp_created_on: (
-                    exp_id, self.remove_empty_values(
-                        exp_fraction_interc_errors),
-                    exp_created_on
-                )
-            )
-            | 'Filter invalid exps errored fraction interac states'
+            | 'Remove empty values for state fraction interc'
             >> beam.Filter(
-                lambda exp_values: len(exp_values[1]) > 0
+                lambda exp: len(exp[1]) > 0
             )
         )
 
@@ -1256,16 +1218,9 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
                     exp_created_on.date()
                 )
             )
-            | 'Remove empty values for state item interc' >> beam.MapTuple(
-                lambda exp_id, exp_item_interc_errors, exp_created_on: (
-                    exp_id, self.remove_empty_values(
-                        exp_item_interc_errors),
-                    exp_created_on
-                )
-            )
-            | 'Filter invalid exps errored item interac states'
+            | 'Remove empty values for state item interc'
             >> beam.Filter(
-                lambda exp_values: len(exp_values[1]) > 0
+                lambda exp: len(exp[1]) > 0
             )
         )
 
@@ -1291,16 +1246,9 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
                     exp_created_on.date()
                 )
             )
-            | 'Remove empty values for state drag interc' >> beam.MapTuple(
-                lambda exp_id, exp_drag_interc_errors, exp_created_on: (
-                    exp_id, self.remove_empty_values(
-                        exp_drag_interc_errors),
-                    exp_created_on
-                )
-            )
-            | 'Filter invalid exps errored drag drop interac states'
+            | 'Remove empty values for state drag interc'
             >> beam.Filter(
-                lambda exp_values: len(exp_values[1]) > 0
+                lambda exp: len(exp[1]) > 0
             )
         )
 
@@ -1326,16 +1274,9 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
                     exp_created_on.date()
                 )
             )
-            | 'Remove empty values for state text interc' >> beam.MapTuple(
-                lambda exp_id, exp_text_interc_errors, exp_created_on: (
-                    exp_id, self.remove_empty_values(
-                        exp_text_interc_errors),
-                    exp_created_on
-                )
-            )
-            | 'Filter invalid exps errored text interac states'
+            | 'Remove empty values for state text interc'
             >> beam.Filter(
-                lambda exp_values: len(exp_values[1]) > 0
+                lambda exp: len(exp[1]) > 0
             )
         )
 
@@ -1362,20 +1303,12 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
                 lambda exp: (
                     exp.id, exp.created_on.date(),
                     (
-                        ExpStateInteractionValidationJob.
-                        get_invalid_end_interac_values
+                        self.get_invalid_end_interac_values(exp)
                     )
                 )
             )
-            | 'Remove empty values for state end interc' >> beam.MapTuple(
-                lambda exp_id, exp_created_on, exp_end_interc_errors: (
-                    exp_id, exp_created_on, self.remove_empty_values(
-                        exp_end_interc_errors)
-                )
-            )
-            | 'Filter invalid exps errored text interac states'
-            >> beam.Filter(
-                lambda exp_values: len(exp_values[2]) > 0
+            | 'Remove the valid explorations' >> beam.Filter(
+                lambda exp: exp[2] is not None
             )
         )
 

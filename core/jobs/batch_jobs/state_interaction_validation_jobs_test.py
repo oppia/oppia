@@ -39,6 +39,7 @@ class ExpStateInteractionValidationJobTests(
     )
 
     EXPLORATION_ID_1 = '1'
+    EXPLORATION_ID_2 = '2'
 
     EXP_1_STATE_1 = state_domain.State.create_default_state(
         'EXP_1_STATE_1', is_initial_state=True).to_dict()
@@ -76,7 +77,8 @@ class ExpStateInteractionValidationJobTests(
             'labelled_as_correct': False,
             'param_changes': [],
             'refresher_exploration_id': None,
-            'missing_prerequisite_skill_id': None
+            'missing_prerequisite_skill_id': None,
+            'dest_if_really_stuck': None
           },
           'training_data': [],
           'tagged_skill_misconception_id': None
@@ -91,7 +93,8 @@ class ExpStateInteractionValidationJobTests(
         'labelled_as_correct': False,
         'param_changes': [],
         'refresher_exploration_id': None,
-        'missing_prerequisite_skill_id': None
+        'missing_prerequisite_skill_id': None,
+        'dest_if_really_stuck': None
       },
       'confirmed_unclassified_answers': [],
       'hints': [
@@ -157,7 +160,8 @@ class ExpStateInteractionValidationJobTests(
             "labelled_as_correct": False,
             "param_changes": [],
             "refresher_exploration_id": None,
-            "missing_prerequisite_skill_id": None
+            "missing_prerequisite_skill_id": None,
+            'dest_if_really_stuck': None
           },
           "training_data": [],
           "tagged_skill_misconception_id": None
@@ -172,7 +176,8 @@ class ExpStateInteractionValidationJobTests(
         "labelled_as_correct": False,
         "param_changes": [],
         "refresher_exploration_id": None,
-        "missing_prerequisite_skill_id": None
+        "missing_prerequisite_skill_id": None,
+        'dest_if_really_stuck': None
       },
       "confirmed_unclassified_answers": [],
       "hints": [],
@@ -230,7 +235,8 @@ class ExpStateInteractionValidationJobTests(
             "labelled_as_correct": False,
             "param_changes": [],
             "refresher_exploration_id": None,
-            "missing_prerequisite_skill_id": None
+            "missing_prerequisite_skill_id": None,
+            'dest_if_really_stuck': None
           },
           "training_data": [],
           "tagged_skill_misconception_id": None
@@ -256,7 +262,8 @@ class ExpStateInteractionValidationJobTests(
             "labelled_as_correct": False,
             "param_changes": [],
             "refresher_exploration_id": None,
-            "missing_prerequisite_skill_id": None
+            "missing_prerequisite_skill_id": None,
+            'dest_if_really_stuck': None
           },
           "training_data": [],
           "tagged_skill_misconception_id": None
@@ -271,7 +278,8 @@ class ExpStateInteractionValidationJobTests(
         "labelled_as_correct": False,
         "param_changes": [],
         "refresher_exploration_id": None,
-        "missing_prerequisite_skill_id": None
+        "missing_prerequisite_skill_id": None,
+        'dest_if_really_stuck': None
       },
       "confirmed_unclassified_answers": [],
       "hints": [],
@@ -328,7 +336,8 @@ class ExpStateInteractionValidationJobTests(
             "labelled_as_correct": False,
             "param_changes": [],
             "refresher_exploration_id": None,
-            "missing_prerequisite_skill_id": None
+            "missing_prerequisite_skill_id": None,
+            'dest_if_really_stuck': None
           },
           "training_data": [],
           "tagged_skill_misconception_id": None
@@ -364,7 +373,8 @@ class ExpStateInteractionValidationJobTests(
             "labelled_as_correct": False,
             "param_changes": [],
             "refresher_exploration_id": None,
-            "missing_prerequisite_skill_id": None
+            "missing_prerequisite_skill_id": None,
+            'dest_if_really_stuck': None
           },
           "training_data": [],
           "tagged_skill_misconception_id": None
@@ -398,7 +408,8 @@ class ExpStateInteractionValidationJobTests(
             "labelled_as_correct": False,
             "param_changes": [],
             "refresher_exploration_id": None,
-            "missing_prerequisite_skill_id": None
+            "missing_prerequisite_skill_id": None,
+            'dest_if_really_stuck': None
           },
           "training_data": [],
           "tagged_skill_misconception_id": None
@@ -432,7 +443,8 @@ class ExpStateInteractionValidationJobTests(
             "labelled_as_correct": False,
             "param_changes": [],
             "refresher_exploration_id": None,
-            "missing_prerequisite_skill_id": None
+            "missing_prerequisite_skill_id": None,
+            'dest_if_really_stuck': None
           },
           "training_data": [],
           "tagged_skill_misconception_id": None
@@ -447,7 +459,8 @@ class ExpStateInteractionValidationJobTests(
         "labelled_as_correct": False,
         "param_changes": [],
         "refresher_exploration_id": None,
-        "missing_prerequisite_skill_id": None
+        "missing_prerequisite_skill_id": None,
+        'dest_if_really_stuck': None
       },
       "confirmed_unclassified_answers": [],
       "hints": [],
@@ -508,7 +521,8 @@ class ExpStateInteractionValidationJobTests(
             "labelled_as_correct": False,
             "param_changes": [],
             "refresher_exploration_id": None,
-            "missing_prerequisite_skill_id": None
+            "missing_prerequisite_skill_id": None,
+            'dest_if_really_stuck': None
           },
           "training_data": [],
           "tagged_skill_misconception_id": None
@@ -549,7 +563,8 @@ class ExpStateInteractionValidationJobTests(
             "labelled_as_correct": False,
             "param_changes": [],
             "refresher_exploration_id": None,
-            "missing_prerequisite_skill_id": None
+            "missing_prerequisite_skill_id": None,
+            'dest_if_really_stuck': None
           },
           "training_data": [],
           "tagged_skill_misconception_id": None
@@ -564,7 +579,8 @@ class ExpStateInteractionValidationJobTests(
         "labelled_as_correct": False,
         "param_changes": [],
         "refresher_exploration_id": None,
-        "missing_prerequisite_skill_id": None
+        "missing_prerequisite_skill_id": None,
+        'dest_if_really_stuck': None
       },
       "confirmed_unclassified_answers": [],
       "hints": [],
@@ -600,7 +616,8 @@ class ExpStateInteractionValidationJobTests(
             'labelled_as_correct': False,
             'param_changes': [],
             'refresher_exploration_id': None,
-            'missing_prerequisite_skill_id': None
+            'missing_prerequisite_skill_id': None,
+            'dest_if_really_stuck': None
           },
           'training_data': [],
           'tagged_skill_misconception_id': None
@@ -615,7 +632,8 @@ class ExpStateInteractionValidationJobTests(
         'labelled_as_correct': False,
         'param_changes': [],
         'refresher_exploration_id': None,
-        'missing_prerequisite_skill_id': None
+        'missing_prerequisite_skill_id': None,
+        'dest_if_really_stuck': None
       },
       'confirmed_unclassified_answers': [],
       'hints': [],
@@ -631,6 +649,59 @@ class ExpStateInteractionValidationJobTests(
       '<oppia-noninteractive-image></oppia-noninteractive-image>' +
       '<oppia-noninteractive-video></oppia-noninteractive-video>'
     )
+
+    EXP_2_STATE_1 = state_domain.State.create_default_state(
+        'EXP_2_STATE_1', is_initial_state=False).to_dict()
+
+    EXP_2_STATE_1['interaction'] = {
+      'id': 'EndExploration',
+      'customization_args': {
+        'recommendedExplorationIds': {
+          'value': ['1']
+        }
+      },
+      'answer_groups': [
+        {
+          'rule_specs': [
+            {
+              'rule_type': 'Equals',
+              'inputs': {
+                'x': 0
+              }
+            }
+          ],
+          'outcome': {
+            'dest': 'EXP_2_STATE_1',
+            'feedback': {
+              'content_id': 'feedback_4',
+              'html': '<p>good</p>'
+            },
+            'labelled_as_correct': False,
+            'param_changes': [],
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None,
+            'dest_if_really_stuck': None
+          },
+          'training_data': [],
+          'tagged_skill_misconception_id': None
+        }
+      ],
+      'default_outcome': {
+        'dest': 'EXP_2_STATE_1',
+        'feedback': {
+          'content_id': 'default_outcome',
+          'html': ''
+        },
+        'labelled_as_correct': False,
+        'param_changes': [],
+        'refresher_exploration_id': None,
+        'missing_prerequisite_skill_id': None,
+        'dest_if_really_stuck': None
+      },
+      'confirmed_unclassified_answers': [],
+      'hints': [],
+      'solution': None
+    }
 
     TODAY_DATE = datetime.datetime.utcnow()
     YEAR_AGO_DATE = (TODAY_DATE - datetime.timedelta(weeks=52)).date()
@@ -661,7 +732,28 @@ class ExpStateInteractionValidationJobTests(
               'EXP_1_STATE_4': self.EXP_1_STATE_4,
               'EXP_1_STATE_5': self.EXP_1_STATE_5,
               'EXP_1_STATE_6': self.EXP_1_STATE_6,
-              'EXP_1_STATE_7': self.EXP_1_STATE_7,
+              'EXP_1_STATE_7': self.EXP_1_STATE_7
+            }
+        )
+
+        self.exp_2 = self.create_model(
+            exp_models.ExplorationModel,
+            id=self.EXPLORATION_ID_2,
+            title='new title',
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            category=feconf.DEFAULT_EXPLORATION_CATEGORY,
+            objective=feconf.DEFAULT_EXPLORATION_OBJECTIVE,
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            tags=['Topic'],
+            blurb='blurb',
+            author_notes='author notes',
+            states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
+            param_specs={},
+            param_changes=[],
+            auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
+            correctness_feedback_enabled=False,
+            states={
+              'EXP_2_STATE_1': self.EXP_2_STATE_1
             }
         )
 
@@ -669,7 +761,7 @@ class ExpStateInteractionValidationJobTests(
         self.assert_job_output_is([])
 
     def test_run_with_state_validation(self) -> None:
-        self.put_multi([self.exp_1])
+        self.put_multi([self.exp_1, self.exp_2])
         self.assert_job_output_is([
           job_run_result.JobRunResult.as_stderr(
             f'The id of exp is 1, created on {str(self.YEAR_AGO_DATE)}, '
@@ -744,5 +836,11 @@ class ExpStateInteractionValidationJobTests(
             f'\'numeric_input_interaction_values\': [\'Rule 1 from answer '
             f'group 0 will never be matched because it is made '
             f'redundant by the above rules\']}}]'
+          ),
+          job_run_result.JobRunResult.as_stderr(
+            f'The id of exp is 1, created on {str(self.YEAR_AGO_DATE)}, '
+            f'and the invalid end interac values are [{{\'state_name\': '
+            f'\'EXP_1_STATE_6\', \'invalid_exps\': [\'EXP_1\', \'EXP_2\', '
+            f'\'EXP_5\', \'EXP_4\']}}]'
           )
         ])
