@@ -40,10 +40,6 @@ var suites = {
       'protractor_desktop/adminTabFeatures.js'
     ],
 
-    contributorDashboard: [
-      'protractor_desktop/contributorDashboard.js'
-    ],
-
     coreEditorAndPlayerFeatures: [
       'protractor_desktop/coreEditorAndPlayerFeatures.js'
     ],

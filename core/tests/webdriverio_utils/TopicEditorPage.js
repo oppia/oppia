@@ -42,6 +42,10 @@ var TopicEditorPage = function() {
   var newStoryUrlFragmentField = $('.e2e-test-new-story-url-fragment-field');
   var newSubtopicEditorElement = $('.e2e-test-new-subtopic-editor');
   var pageEditor = $('.e2e-test-edit-subtopic-page-contents');
+  var questionItem = $('.e2e-test-question-list-item');
+  var questionItemsSelector = function() {
+    return $$('.e2e-test-question-list-item');
+  };
   var questionsTabButton = $('.e2e-test-questions-tab-button');
   var saveQuestionButton = $('.e2e-test-save-question-button');
   var subtopicColumnsSelector = function() {
@@ -158,7 +162,9 @@ var TopicEditorPage = function() {
   this.expectNumberOfQuestionsForSkillWithDescriptionToBe = async function(
       count, skillDescription) {
     await selectSkillDropdown.selectByVisibleText(skillDescription);
-    var questionItems = await $$('.e2e-test-question-list-item');
+    await waitFor.visibilityOf(
+      questionItem, 'Question takes too long to appear');
+    var questionItems = await questionItemsSelector();
     await waitFor.visibilityOf(
       questionItems[0], 'Question takes too long to appear');
     expect(questionItems.length).toEqual(count);

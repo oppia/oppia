@@ -132,7 +132,7 @@ var TopicsAndSkillsDashboardPage = function() {
     await action.click(
       'Merge skill button', mergeSkillsButton);
 
-    var skill = $(`.e2e-test-skills-list-item=${newSkillName}`);
+    var skill = $(`.e2e-test-skills-list-item*=${newSkillName}`);
     await action.click('Skill radio button', skill);
     await action.click(
       'Confirm Skills Merge button', confirmSkillsMergeButton);
@@ -271,7 +271,7 @@ var TopicsAndSkillsDashboardPage = function() {
     await this.waitForTopicsToLoad();
     await this.filterTopicsByKeyword(topicName);
     var topicEditOptions = await topicEditOptionsSelector();
-    expect(await topicEditOptions.length).toEqual(1);
+    expect(topicEditOptions.length).toEqual(1);
     await action.click(
       'Topic edit option', topicEditOptions[0]);
     await action.click('Delete topic button', deleteTopicButton);

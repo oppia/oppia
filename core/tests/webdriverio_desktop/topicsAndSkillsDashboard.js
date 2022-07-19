@@ -97,6 +97,7 @@ describe('Topics and skills dashboard functionality', function() {
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.filterTopicsByKeyword(TOPIC_NAME);
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
+    await topicsAndSkillsDashboardPage.resetTopicFilters();
     await topicsAndSkillsDashboardPage.deleteTopicWithName(TOPIC_NAME);
     let topicsTableIsPresent = (
       await topicsAndSkillsDashboardPage.isTopicTablePresent());
@@ -126,8 +127,8 @@ describe('Topics and skills dashboard functionality', function() {
 
     await topicsAndSkillsDashboardPage.get();
     let topicsCount = await topicsAndSkillsDashboardPage.getTopicsCount();
-    await topicsAndSkillsDashboardPage.filterTopicsByKeyword(TOPIC_ALPHA);
-    await topicsAndSkillsDashboardPage.filterTopicsByKeyword(TOPIC_BETA);
+    await topicsAndSkillsDashboardPage.filterTopicsByKeyword(
+      TOPIC_ALPHA + '\n' + ' ' + TOPIC_BETA);
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(2);
     await topicsAndSkillsDashboardPage.resetTopicFilters();
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(topicsCount);
