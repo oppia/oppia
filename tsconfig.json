@@ -38,7 +38,10 @@
       "objects/*": ["extensions/objects/*"],
       "filters/*": ["core/templates/filters/*"],
       "static/*": ["third_party/static/*"],
-      "tests/*": ["core/templates/tests/*"]
+      "tests/*": ["core/templates/tests/*"],
+      "stream": ["./node_modules/stream-browserify"],
+      "zlib": ["./node_modules/browserify-zlib"],
+      "path": ["./node_modules/path-browserify"]
     }
   },
   "files": [
@@ -52,6 +55,7 @@
     "core/tests",
     "extensions/classifiers/proto",
     "**/*.spec.ts",
+    "**/*Spec.ts",
     "**/*.ajs.ts",
     "core/templates/tests/unit-test-utils.ajs.ts"
   ],

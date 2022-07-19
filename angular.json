@@ -17,6 +17,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
+            "allowedCommonJsDependencies": ["path", "stream", "zlib"],
             "outputPath": "dist/oppia-angular",
             "index": "src/index.html",
             "main": "src/main.ts",
@@ -28,7 +29,9 @@
               "src/assets"
             ],
             "styles": [
-              "src/styles.scss"
+              "src/styles.scss",
+              "src/css/oppia.css",
+              "src/css/oppia-material.css"
             ],
             "scripts": []
           },

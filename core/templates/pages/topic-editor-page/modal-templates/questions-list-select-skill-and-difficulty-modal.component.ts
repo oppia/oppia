@@ -115,6 +115,11 @@ export class QuestionsListSelectSkillAndDifficultyModalComponent
     }
   }
 
+  changeSkillWithDifficulty(
+      newSkillWithDifficulty: SkillDifficulty, idx: number): void {
+    this.linkedSkillsWithDifficulty[idx] = newSkillWithDifficulty;
+  }
+
   goToSelectSkillView(): void {
     this.currentMode = this.MODE_SELECT_SKILL;
   }

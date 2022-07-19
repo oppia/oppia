@@ -51,4 +51,4 @@ class OppiaLightweightRootPage(base.BaseHandler):
     @acl_decorators.open_access # type: ignore[misc]
     def get(self, **kwargs: Dict[str, str]) -> None:
         """Handles GET requests."""
-        self.render_template('lightweight-oppia-root.mainpage.html') # type: ignore[no-untyped-call]
+        self.render_template('index.html') # type: ignore[no-untyped-call]
