@@ -305,9 +305,9 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
                 ans group index, rule spec index, lower bound, upper bound,
                 lb inclusive, ub inclusive.
 
-            lower_bound: int. The lower bound.
+            lower_bound: float. The lower bound.
 
-            upper_bound: int. The upper bound.
+            upper_bound: float. The upper bound.
 
             lb_inclusive: bool. If lower bound is inclusive.
 
@@ -319,42 +319,53 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
         range_var['ub_inclusive'] = ub_inclusive
 
     @staticmethod
-    def _is_enclosed_by(range_var, range_ele) -> bool:
+    def _is_enclosed_by(range_compare_to, range_compare_with) -> bool:
         """Checks whether the ranges of rules enclosed or not
 
         Args:
-            range_var: dict[str, Any]. To keep track of each rule's
+            range_compare_to: dict[str, Any]. To keep track of each rule's
                 ans group index, rule spec index, lower bound, upper bound,
-                lb inclusive, ub inclusive.
-
-            range_ele: dict[str, Any]. To keep track of other rule's
+                lb inclusive, ub inclusive, It represents the variable for
+                which we have to check the range.
+            range_compare_with: dict[str, Any]. To keep track of other rule's
                 ans group index, rule spec index, lower bound, upper bound,
-                lb inclusive, ub inclusive.
+                lb inclusive, ub inclusive, It is the variable to which the
+                range is compared.
 
         Returns:
             is_enclosed: bool. Returns True if both rule's ranges are enclosed.
         """
         if (
-            range_ele['lower_bound'] is None or range_var['lower_bound'] is None
-            or range_ele['upper_bound'] is None or (
-                range_var['upper_bound'] is None)
+            range_compare_with['lower_bound'] is None or 
+            range_compare_to['lower_bound'] is None or 
+            range_compare_with['upper_bound'] is None or
+            range_compare_to['upper_bound'] is None
         ):
             return False
-
         lb_satisfied = (
-            range_ele['lower_bound'] < range_var['lower_bound'] or
-            (range_ele['lower_bound'] == range_var['lower_bound'] and (
-                not range_var['lb_inclusive'] or range_ele['lb_inclusive'])
+            range_compare_with['lower_bound'] < range_compare_to[
+                'lower_bound'] or
+            (
+                range_compare_with['lower_bound'] == range_compare_to[
+                    'lower_bound'] and
+                (
+                    not range_compare_to['lb_inclusive'] or 
+                    range_compare_with['lb_inclusive']
+                )
             )
         )
-
         ub_satisfied = (
-            range_ele['upper_bound'] > range_var['upper_bound'] or
-            (range_ele['upper_bound'] == range_var['upper_bound'] and (
-                not range_var['ub_inclusive'] or range_ele['ub_inclusive'])
+            range_compare_with['upper_bound'] > range_compare_to[
+                'upper_bound'] or
+            (
+                range_compare_with['upper_bound'] == range_compare_to[
+                    'upper_bound'] and 
+                (
+                    not range_compare_to['ub_inclusive'] or 
+                    range_compare_with['ub_inclusive']
+                )
             )
         )
-
         is_enclosed = lb_satisfied and ub_satisfied
         return is_enclosed
 
@@ -370,22 +381,12 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
         Returns:
             bool. Returns True if the rules passes the range criteria check.
         """
-        if (
-            (
-                earlier_rule.rule_type == 'IsExactlyEqualTo' and
-                later_rule.rule_type == 'IsExactlyEqualTo'
-            ) or
-            (
-                earlier_rule.rule_type == 'IsExactlyEqualTo' and
-                later_rule.rule_type == 'IsEquivalentTo'
-            ) or
-            (
-                earlier_rule.rule_type == 'IsExactlyEqualTo' and
-                later_rule.rule_type == 'IsEquivalentToAndInSimplestForm'
-            )
-        ):
-            return False
-        return True
+        if earlier_rule.rule_type != 'IsExactlyEqualTo':
+            return True
+        return later_rule.rule_type in (
+            'IsExactlyEqualTo', 'IsEquivalentTo',
+            'IsEquivalentToAndInSimplestForm'
+        )
 
     @staticmethod
     def filter_invalid_numeric_input_interaction(
@@ -406,12 +407,12 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
             containing the errored values.
         """
         states_with_values = []
+        lower_infinity = float('-inf')
+        upper_infinity = float('inf')
 
         for state_name, state in exp_states.items():
             if state.interaction.id == 'NumericInput':
                 numeric_input_interaction_values = []
-                lower_infinity = float('-inf')
-                upper_infinity = float('inf')
                 answer_groups = state.interaction.answer_groups
                 ranges = []
                 for answer_group in answer_groups:
@@ -523,6 +524,39 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
         return states_with_values
 
     @staticmethod
+    def _get_rule_value_f(rule_spec):
+        """Return rule values from the rule_spec
+
+        Args:
+            rule_spec: state_domain.RuleSpec. rule spec of an answer group.
+
+        Returns:
+            rule_value_f: float. The value of the rule spec.
+        """
+        rule_value_f = rule_spec.inputs['f'].strip()
+        if '/' in rule_value_f:
+            rule_value_f = rule_value_f.split('/')
+            # For values like '1 3/2'.
+            if len(rule_value_f[0].strip().split()) > 1:
+                value_1 = rule_value_f[0].strip().split()
+                value_2 = rule_value_f[1]
+
+                rule_value_f = (
+                    float(value_1[0]) +
+                    float(value_1[1]) / float(value_2)
+                )
+            # For values like '1/2'.
+            else:
+                rule_value_f = (
+                    float(rule_value_f[0]) / float(
+                        rule_value_f[1])
+                )
+        else:
+            rule_value_f = float(rule_value_f)
+
+        return rule_value_f
+
+    @staticmethod
     def filter_invalid_fraction_input_interaction(
         exp_states: Dict[str, state_domain.State]
     ) -> List[Dict[str, List[Dict[str, List[str]]]]]:
@@ -543,184 +577,153 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
         states_with_values = []
 
         for state_name, state in exp_states.items():
-            if state.interaction.id == 'FractionInput':
-                fraction_input_interaction_values = []
-                lower_infinity = float('-inf')
-                upper_infinity = float('inf')
-                answer_groups = state.interaction.answer_groups
-                ranges = []
-                matched_denominator_list = []
-                for answer_group in answer_groups:
-                    ans_group_index = str(answer_groups.index(answer_group))
-                    for rule_spec in answer_group.rule_specs:
-                        rule_spec_index = str(answer_group.rule_specs.index(
-                            rule_spec))
-                        range_var = {
-                            'ans_group_index': int(ans_group_index),
-                            'rule_spec_index': int(rule_spec_index),
-                            'lower_bound': None,
-                            'upper_bound': None,
-                            'lb_inclusive': False,
-                            'ub_inclusive': False
-                        }
-                        matched_denominator = {
-                            'ans_group_index': int(ans_group_index),
-                            'rule_spec_index': int(rule_spec_index),
-                            'denominator': 0
-                        }
+            if state.interaction.id != 'FractionInput':
+                continue
+            fraction_input_interaction_values = []
+            lower_infinity = float('-inf')
+            upper_infinity = float('inf')
+            answer_groups = state.interaction.answer_groups
+            ranges = []
+            matched_denominator_list = []
+            for answer_group in answer_groups:
+                ans_group_index = str(answer_groups.index(answer_group))
+                for rule_spec in answer_group.rule_specs:
+                    rule_spec_index = str(answer_group.rule_specs.index(
+                        rule_spec))
+                    range_var = {
+                        'ans_group_index': int(ans_group_index),
+                        'rule_spec_index': int(rule_spec_index),
+                        'lower_bound': None,
+                        'upper_bound': None,
+                        'lb_inclusive': False,
+                        'ub_inclusive': False
+                    }
+                    matched_denominator = {
+                        'ans_group_index': int(ans_group_index),
+                        'rule_spec_index': int(rule_spec_index),
+                        'denominator': 0
+                    }
 
+                    if (
+                        rule_spec.rule_type in (
+                            'IsEquivalentTo', 'IsExactlyEqualTo',
+                            'IsEquivalentToAndInSimplestForm'
+                        )
+                    ):
+                        rule_value_f = (
+                            ExpStateInteractionValidationJob.
+                            _get_rule_value_f(rule_spec)
+                        )
+
+                        (
+                            ExpStateInteractionValidationJob.
+                            _set_lower_and_upper_bounds(
+                                range_var, rule_value_f,
+                                rule_value_f, True, True
+                            )
+                        )
+
+                    if rule_spec.rule_type == 'IsGreaterThan':
+                        rule_value_f = (
+                            ExpStateInteractionValidationJob.
+                            _get_rule_value_f(rule_spec)
+                        )
+
+                        (
+                            ExpStateInteractionValidationJob.
+                            _set_lower_and_upper_bounds(
+                                range_var, rule_value_f,
+                                upper_infinity, False, False
+                            )
+                        )
+
+                    if rule_spec.rule_type == 'IsLessThan':
+                        rule_value_f = rule_spec.inputs['f'].strip()
+                        if '/' in rule_value_f:
+                            rule_value_f = rule_value_f.split('/')
+                            # For values like '1 3/2'.
+                            if len(rule_value_f[0].strip().split()) > 1:
+                                value_1 = rule_value_f[0].strip().split()
+                                value_2 = rule_value_f[1]
+
+                                rule_value_f = (
+                                    float(value_1[0]) +
+                                    float(value_1[1]) / float(value_2)
+                                )
+                            # For values like '1/2'.
+                            else:
+                                rule_value_f = (
+                                    float(rule_value_f[0]) / float(
+                                        rule_value_f[1])
+                                )
+                        else:
+                            rule_value_f = float(rule_value_f)
+
+                        (
+                            ExpStateInteractionValidationJob.
+                            _set_lower_and_upper_bounds(
+                                range_var, lower_infinity,
+                                rule_value_f, False, False
+                            )
+                        )
+
+                    if rule_spec.rule_type == 'HasDenominatorEqualTo':
+                        rule_value_x = int(rule_spec.inputs['x'])
+                        matched_denominator['denominator'] = rule_value_x
+
+                    for range_ele in ranges:
                         if (
-                            rule_spec.rule_type in (
-                                'IsEquivalentTo', 'IsExactlyEqualTo',
-                                'IsEquivalentToAndInSimplestForm'
-                            )
+                            ExpStateInteractionValidationJob.
+                            _is_enclosed_by(range_var, range_ele)
                         ):
-                            rule_value_f = rule_spec.inputs['f'].strip()
-                            if '/' in rule_value_f:
-                                rule_value_f = rule_value_f.split('/')
-                                # For values like '1 3/2'.
-                                if len(rule_value_f[0].strip().split()) > 1:
-                                    value_1 = rule_value_f[0].strip().split()
-                                    value_2 = rule_value_f[1]
-
-                                    rule_value_f = (
-                                        float(value_1[0]) +
-                                        float(value_1[1]) / float(value_2)
-                                    )
-                                # For values like '1/2'.
-                                else:
-                                    rule_value_f = (
-                                        float(rule_value_f[0]) / float(
-                                            rule_value_f[1])
-                                    )
-                            else:
-                                rule_value_f = float(rule_value_f)
-
-                            (
-                                ExpStateInteractionValidationJob.
-                                _set_lower_and_upper_bounds(
-                                    range_var, rule_value_f,
-                                    rule_value_f, True, True
-                                )
+                            earlier_rule = (
+                                answer_groups[range_ele['ans_group_index']]
+                                .rule_specs[range_ele['rule_spec_index']]
                             )
-
-                        if rule_spec.rule_type == 'IsGreaterThan':
-                            rule_value_f = rule_spec.inputs['f'].strip()
-                            if '/' in rule_value_f:
-                                rule_value_f = rule_value_f.split('/')
-                                # For values like '1 3/2'.
-                                if len(rule_value_f[0].strip().split()) > 1:
-                                    value_1 = rule_value_f[0].strip().split()
-                                    value_2 = rule_value_f[1]
-
-                                    rule_value_f = (
-                                        float(value_1[0]) +
-                                        float(value_1[1]) / float(value_2)
-                                    )
-                                # For values like '1/2'.
-                                else:
-                                    rule_value_f = (
-                                        float(rule_value_f[0]) / float(
-                                            rule_value_f[1])
-                                    )
-                            else:
-                                rule_value_f = float(rule_value_f)
-
-                            (
-                                ExpStateInteractionValidationJob.
-                                _set_lower_and_upper_bounds(
-                                    range_var, rule_value_f,
-                                    upper_infinity, False, False
-                                )
-                            )
-
-                        if rule_spec.rule_type == 'IsLessThan':
-                            rule_value_f = rule_spec.inputs['f'].strip()
-                            if '/' in rule_value_f:
-                                rule_value_f = rule_value_f.split('/')
-                                # For values like '1 3/2'.
-                                if len(rule_value_f[0].strip().split()) > 1:
-                                    value_1 = rule_value_f[0].strip().split()
-                                    value_2 = rule_value_f[1]
-
-                                    rule_value_f = (
-                                        float(value_1[0]) +
-                                        float(value_1[1]) / float(value_2)
-                                    )
-                                # For values like '1/2'.
-                                else:
-                                    rule_value_f = (
-                                        float(rule_value_f[0]) / float(
-                                            rule_value_f[1])
-                                    )
-                            else:
-                                rule_value_f = float(rule_value_f)
-
-                            (
-                                ExpStateInteractionValidationJob.
-                                _set_lower_and_upper_bounds(
-                                    range_var, lower_infinity,
-                                    rule_value_f, False, False
-                                )
-                            )
-
-                        if rule_spec.rule_type == 'HasDenominatorEqualTo':
-                            rule_value_x = int(rule_spec.inputs['x'])
-                            matched_denominator['denominator'] = rule_value_x
-
-                        for range_ele in ranges:
                             if (
                                 ExpStateInteractionValidationJob.
-                                _is_enclosed_by(range_var, range_ele)
-                            ):
-                                earlier_rule = (
-                                    answer_groups[range_ele['ans_group_index']]
-                                    .rule_specs[range_ele['rule_spec_index']]
+                                _should_check_range_criteria(
+                                    earlier_rule, rule_spec
                                 )
-                                if (
-                                    ExpStateInteractionValidationJob.
-                                    _should_check_range_criteria(
-                                        earlier_rule, rule_spec
-                                    )
-                                ):
-                                    fraction_input_interaction_values.append(
-                                        f'Rule {rule_spec_index} from answer '
-                                        f'group {ans_group_index} of '
-                                        f'FractionInput interaction will '
-                                        f'never be matched because it is '
-                                        f'made redundant by the above rules'
-                                    )
-
-                        for den in matched_denominator_list:
-                            if (
-                                den is not None and rule_spec.rule_type ==
-                                'HasFractionalPartExactlyEqualTo'
                             ):
-                                if (
-                                    den['denominator'] ==
-                                    rule_spec.inputs['f']['denominator']
-                                ):
-                                    fraction_input_interaction_values.append(
-                                        f'Rule {rule_spec_index} from answer '
-                                        f'group {ans_group_index} of '
-                                        f'FractionInput interaction having '
-                                        f'rule type HasFractionalPart'
-                                        f'ExactlyEqualTo will '
-                                        f'never be matched because it is '
-                                        f'made redundant by the above rules'
-                                    )
+                                fraction_input_interaction_values.append(
+                                    f'Rule {rule_spec_index} from answer '
+                                    f'group {ans_group_index} of '
+                                    f'FractionInput interaction will '
+                                    f'never be matched because it is '
+                                    f'made redundant by the above rules'
+                                )
 
-                        ranges.append(range_var)
-                        matched_denominator_list.append(matched_denominator)
+                    for den in matched_denominator_list:
+                        if (
+                            den is not None and rule_spec.rule_type ==
+                            'HasFractionalPartExactlyEqualTo'
+                        ):
+                            if (
+                                den['denominator'] ==
+                                rule_spec.inputs['f']['denominator']
+                            ):
+                                fraction_input_interaction_values.append(
+                                    f'Rule {rule_spec_index} from answer '
+                                    f'group {ans_group_index} of '
+                                    f'FractionInput interaction having '
+                                    f'rule type HasFractionalPart'
+                                    f'ExactlyEqualTo will '
+                                    f'never be matched because it is '
+                                    f'made redundant by the above rules'
+                                )
 
-                if len(fraction_input_interaction_values) > 0:
-                    states_with_values.append(
-                        {
-                            'state_name': state_name,
-                            'fraction_input_interaction_values': (
-                                fraction_input_interaction_values)
-                        }
-                    )
+                    ranges.append(range_var)
+                    matched_denominator_list.append(matched_denominator)
+
+            if len(fraction_input_interaction_values) > 0:
+                states_with_values.append(
+                    {
+                        'state_name': state_name,
+                        'fraction_input_interaction_values': (
+                            fraction_input_interaction_values)
+                    }
+                )
 
         return states_with_values
 
@@ -743,35 +746,36 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
         """
         states_with_values = []
         for state_name, state in exp_states.items():
-            if state.interaction.id == 'ItemSelectionInput':
-                # None of the answer groups should be the same.
-                item_selec_interaction_values = []
-                equals_rule_values = []
-                answer_groups = state.interaction.answer_groups
-                for answer_group in answer_groups:
-                    ans_group_index = str(answer_groups.index(answer_group))
-                    for rule_spec in answer_group.rule_specs:
-                        rule_spec_index = str(answer_group.rule_specs.index(
-                            rule_spec))
-                        if rule_spec.rule_type == 'Equals':
-                            rule_spec_x = rule_spec.inputs['x']
-                            if rule_spec_x in equals_rule_values:
-                                item_selec_interaction_values.append(
-                                    f'Rule {rule_spec_index} from answer '
-                                    f'group {ans_group_index} of '
-                                    f'ItemSelectionInput have same rules.'
-                                )
-                            else:
-                                equals_rule_values.append(rule_spec_x)
+            if state.interaction.id != 'ItemSelectionInput':
+                continue
+            # None of the answer groups should be the same.
+            item_selec_interaction_values = []
+            equals_rule_values = []
+            answer_groups = state.interaction.answer_groups
+            for answer_group in answer_groups:
+                ans_group_index = str(answer_groups.index(answer_group))
+                for rule_spec in answer_group.rule_specs:
+                    rule_spec_index = str(answer_group.rule_specs.index(
+                        rule_spec))
+                    if rule_spec.rule_type == 'Equals':
+                        rule_spec_x = rule_spec.inputs['x']
+                        if rule_spec_x in equals_rule_values:
+                            item_selec_interaction_values.append(
+                                f'Rule {rule_spec_index} from answer '
+                                f'group {ans_group_index} of '
+                                f'ItemSelectionInput have same rules.'
+                            )
+                        else:
+                            equals_rule_values.append(rule_spec_x)
 
-                if len(item_selec_interaction_values) > 0:
-                    states_with_values.append(
-                        {
-                            'state_name': state_name,
-                            'item_selec_interaction_values': (
-                                item_selec_interaction_values)
-                        }
-                    )
+            if len(item_selec_interaction_values) > 0:
+                states_with_values.append(
+                    {
+                        'state_name': state_name,
+                        'item_selec_interaction_values': (
+                            item_selec_interaction_values)
+                    }
+                )
 
         return states_with_values
 
@@ -914,29 +918,30 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
         """
         states_with_values = []
         for state_name, state in exp_states.items():
-            if state.interaction.id == 'DragAndDropSortInput':
-                drag_drop_interaction_values = []
+            if state.interaction.id != 'DragAndDropSortInput':
+                continue
+            drag_drop_interaction_values = []
 
-                # `==` should come before `idx(a) == b`.
-                drag_drop_interaction_values += (
-                    ExpStateInteractionValidationJob.
-                    _equals_should_come_before_idx_rule(state)
+            # `==` should come before `idx(a) == b`.
+            drag_drop_interaction_values += (
+                ExpStateInteractionValidationJob.
+                _equals_should_come_before_idx_rule(state)
+            )
+
+            # `==` should come before `== +/- 1`.
+            drag_drop_interaction_values += (
+                ExpStateInteractionValidationJob.
+                _equals_should_come_before_misplace_by_one_rule(state)
+            )
+
+            if len(drag_drop_interaction_values) > 0:
+                states_with_values.append(
+                    {
+                        'state_name': state_name,
+                        'drag_drop_interaction_values': (
+                            drag_drop_interaction_values)
+                    }
                 )
-
-                # `==` should come before `== +/- 1`.
-                drag_drop_interaction_values += (
-                    ExpStateInteractionValidationJob.
-                    _equals_should_come_before_misplace_by_one_rule(state)
-                )
-
-                if len(drag_drop_interaction_values) > 0:
-                    states_with_values.append(
-                        {
-                            'state_name': state_name,
-                            'drag_drop_interaction_values': (
-                                drag_drop_interaction_values)
-                        }
-                    )
 
         return states_with_values
 
@@ -1052,46 +1057,47 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
         states_with_values = []
 
         for state_name, state in exp_states.items():
-            if state.interaction.id == 'TextInput':
-                text_input_interaction_values = []
+            if state.interaction.id != 'TextInput':
+                continue
+            text_input_interaction_values = []
 
-                # Text input height >= 1 and <= 10.
-                rows_value = int(
-                    state.interaction.customization_args['rows'].value
-                )
-                if rows_value < 1 or rows_value > 10:
-                    text_input_interaction_values.append(
-                        f'Rows having value {rows_value} is either '
-                        f'less than 1 or greater than 10.'
-                    )
-
-                # Contains should come after other rule where its a substring.
-                text_input_interaction_values += (
-                    ExpStateInteractionValidationJob.
-                    _contains_should_come_after(state)
+            # Text input height >= 1 and <= 10.
+            rows_value = int(
+                state.interaction.customization_args['rows'].value
+            )
+            if rows_value < 1 or rows_value > 10:
+                text_input_interaction_values.append(
+                    f'Rows having value {rows_value} is either '
+                    f'less than 1 or greater than 10.'
                 )
 
-                # Starts with should come after other rule where its a prefix.
-                text_input_interaction_values += (
-                    ExpStateInteractionValidationJob.
-                    _starts_with_should_come_after(state)
-                )
+            # Contains should come after other rule where its a substring.
+            text_input_interaction_values += (
+                ExpStateInteractionValidationJob.
+                _contains_should_come_after(state)
+            )
 
-                if len(text_input_interaction_values) > 0:
-                    states_with_values.append(
-                        {
-                            'state_name': state_name,
-                            'text_input_interaction_values': (
-                                text_input_interaction_values)
-                        }
-                    )
+            # Starts with should come after other rule where its a prefix.
+            text_input_interaction_values += (
+                ExpStateInteractionValidationJob.
+                _starts_with_should_come_after(state)
+            )
+
+            if len(text_input_interaction_values) > 0:
+                states_with_values.append(
+                    {
+                        'state_name': state_name,
+                        'text_input_interaction_values': (
+                            text_input_interaction_values)
+                    }
+                )
 
         return states_with_values
 
     invalid_end_interac = []
 
     @staticmethod
-    def filter_invalid_end_interac(exp, exp_id_list):
+    def filter_invalid_end_interaction(exp, exp_id_list):
         """Filter invalid end interaction states.
 
         Args:
@@ -1105,24 +1111,25 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
         found_invalid = False
         exp_end_interac_values = []
         for state_name, state in states.items():
-            if state.interaction.id == 'EndExploration':
-                invalid_state_exp_ids = []
-                recc_exp_ids = (
-                    state.interaction.customization_args
-                    ['recommendedExplorationIds'].value
-                )
+            if state.interaction.id != 'EndExploration':
+                continue
+            invalid_state_exp_ids = []
+            recc_exp_ids = (
+                state.interaction.customization_args
+                ['recommendedExplorationIds'].value
+            )
 
-                for exp_id in recc_exp_ids:
-                    found_invalid = True
-                    if exp_id not in exp_id_list:
-                        invalid_state_exp_ids.append(exp_id)
-                if len(invalid_state_exp_ids) > 0:
-                    (
-                        exp_end_interac_values.append(
-                            {'state_name': state_name,
-                            'invalid_exps': invalid_state_exp_ids}
-                        )
+            for exp_id in recc_exp_ids:
+                found_invalid = True
+                if exp_id not in exp_id_list:
+                    invalid_state_exp_ids.append(exp_id)
+            if len(invalid_state_exp_ids) > 0:
+                (
+                    exp_end_interac_values.append(
+                        {'state_name': state_name,
+                        'invalid_exps': invalid_state_exp_ids}
                     )
+                )
         if len(exp_end_interac_values) > 0:
             ExpStateInteractionValidationJob.invalid_end_interac.append(
                 {exp.id: exp_end_interac_values}
@@ -1130,7 +1137,7 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
         return found_invalid
 
     @staticmethod
-    def get_invalid_end_interac_values(exp):
+    def get_invalid_end_interaction_values(exp):
         """Return the errored value of the current exploration.
 
         Args:
@@ -1177,8 +1184,7 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
                     exp_created_on.date()
                 )
             )
-            | 'Remove empty values for rte'
-            >> beam.Filter(
+            | 'Remove empty values for rte' >> beam.Filter(
                 lambda exp: len(exp[1]) > 0
             )
         )
@@ -1339,15 +1345,13 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
         invalid_exps_with_state_end_interac = (
             all_explorations
             | 'Filter invalid end interac' >> beam.Filter(
-                ExpStateInteractionValidationJob.filter_invalid_end_interac,
+                self.filter_invalid_end_interaction,
                 beam.pvalue.AsList(exp_ids_pcoll)
             )
             | 'Map id, invalid interac and created_on date' >> beam.Map(
                 lambda exp: (
                     exp.id, exp.created_on.date(),
-                    (
-                        self.get_invalid_end_interac_values(exp)
-                    )
+                    self.get_invalid_end_interaction_values(exp)
                 )
             )
             | 'Remove the valid explorations' >> beam.Filter(
