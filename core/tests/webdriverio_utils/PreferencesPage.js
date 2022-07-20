@@ -23,7 +23,6 @@ var workflow = require('../webdriverio_utils/workflow.js');
 
 var PreferencesPage = function() {
   var USER_PREFERENCES_URL = '/preferences';
-
   var audioLanguageSelector = $('.e2e-test-audio-language-selector');
   var createrDashboardRadio = $('.e2e-test-creator-dashboard-radio');
   var customProfilePhoto = $('.e2e-test-custom-photo');

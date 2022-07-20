@@ -74,6 +74,8 @@ import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-su
 import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
 import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
+import { PlatformFeatureService } from 'services/platform-feature.service';
+import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 
 import './conversation-skin.component.css';
 
@@ -148,6 +150,10 @@ export class ConversationSkinComponent {
   mostRecentlyReachedCheckpoint: string;
   showProgressClearanceMessage: boolean = false;
   alertMessageTimeout = 6000;
+  // 'completedChaptersCount' is fetched via a HTTP request.
+  // Until the response is received, it remains undefined.
+  completedChaptersCount: number | undefined;
+  chapterIsCompletedForTheFirstTime: boolean = false;
   CHECKPOINTS_FEATURE_IS_ENABLED: boolean = false;
   pidInUrl: string;
   submitButtonIsDisabled = true;
@@ -205,8 +211,16 @@ export class ConversationSkinComponent {
     private editableExplorationBackendApiService:
       EditableExplorationBackendApiService,
     private readOnlyExplorationBackendApiService:
-      ReadOnlyExplorationBackendApiService
+      ReadOnlyExplorationBackendApiService,
+    private platformFeatureService: PlatformFeatureService,
+    private learnerDashboardBackendApiService: LearnerDashboardBackendApiService
   ) {}
+
+  adjustPageHeightOnresize(): void {
+    this.windowRef.nativeWindow.onresize = () => {
+      this.adjustPageHeight(false, null);
+    };
+  }
 
   ngOnInit(): void {
     this._editorPreviewMode = this.contextService.isInExplorationEditorPage();
@@ -340,9 +354,7 @@ export class ConversationSkinComponent {
         this.localStorageService.removeUniqueProgressIdOfLoggedOutLearner();
       }
 
-      this.windowRef.nativeWindow.onresize = () => {
-        this.adjustPageHeight(false, null);
-      };
+      this.adjustPageHeightOnresize();
 
       this.currentInteractionService.setOnSubmitFn(
         this.submitAnswer.bind(this));
@@ -365,6 +377,8 @@ export class ConversationSkinComponent {
             }
           );
       }
+
+      this.fetchCompletedChaptersCount();
 
       // We do not save checkpoints progress for iframes.
       if (this.CHECKPOINTS_FEATURE_IS_ENABLED &&
@@ -453,6 +467,15 @@ export class ConversationSkinComponent {
 
   getCanAskLearnerForAnswerInfo(): boolean {
     return this.learnerAnswerInfoService.getCanAskLearnerForAnswerInfo();
+  }
+
+  fetchCompletedChaptersCount(): void {
+    if (this.isLoggedIn) {
+      this.learnerDashboardBackendApiService
+        .fetchLearnerCompletedChaptersCountDataAsync().then((data) => {
+          this.completedChaptersCount = data.completedChaptersCount;
+        });
+    }
   }
 
   initLearnerAnswerInfoService(
@@ -609,6 +632,10 @@ export class ConversationSkinComponent {
         return result;
       }
     }
+  }
+
+  isEndChapterCelebrationFeatureEnabled(): boolean {
+    return this.platformFeatureService.status.EndChapterCelebration.isEnabled;
   }
 
   reloadExploration(): void {
@@ -907,6 +934,18 @@ export class ConversationSkinComponent {
                     story_url_fragment: storyUrlFragment
                   });
             }
+            this.learnerDashboardBackendApiService
+              .fetchLearnerCompletedChaptersCountDataAsync().then(
+                (responseData) => {
+                  let newCompletedChaptersCount = (
+                    responseData.completedChaptersCount);
+                  if (
+                    newCompletedChaptersCount !== this.completedChaptersCount
+                  ) {
+                    this.completedChaptersCount = newCompletedChaptersCount;
+                    this.chapterIsCompletedForTheFirstTime = true;
+                  }
+                });
           });
         } else {
           let loginRedirectUrl = this.urlInterpolationService.interpolateUrl(
