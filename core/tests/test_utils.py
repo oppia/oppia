@@ -1143,17 +1143,12 @@ class TestBase(unittest.TestCase):
         the generator will immediately raise StopIteration, and contextlib will
         raise a RuntimeError.
         """
-        had_attribute = hasattr(obj, attr)
-        if had_attribute:
-            original = getattr(obj, attr)
+        original = getattr(obj, attr)
         setattr(obj, attr, newvalue)
         try:
             yield
         finally:
-            if had_attribute:
-                setattr(obj, attr, original)
-            else:
-                delattr(obj, attr)
+            setattr(obj, attr, original)
 
     @contextlib.contextmanager
     def swap_to_always_return(self, obj, attr, value=None):

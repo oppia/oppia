@@ -419,13 +419,6 @@ class TestUtilsTests(test_utils.GenericTestBase):
 
         self.assertEqual(logs, ['3', '4'])
 
-    def test_swap_nonexistent_attribute(self):
-        obj = mock.Mock(spec=[])
-        self.assertFalse(hasattr(obj, 'test'))
-        with self.swap(obj, 'test', 'value'):
-            self.assertEqual(obj.test, 'value')
-        self.assertFalse(hasattr(obj, 'test'))
-
     def test_swap_to_always_return_without_value_uses_none(self):
         obj = mock.Mock()
         obj.func = lambda: obj
