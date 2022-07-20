@@ -114,7 +114,7 @@ var CollectionEditorPage = function() {
   // Set collection category.
   this.setCategory = async function(category) {
     await action.click('Category filter', categoryFilterDropdown);
-    var dropdownOption = $(`.mat-option-text=${category}`);
+    var dropdownOption = await $(`.mat-option-text=${category}`);
     await action.click(
       'category option: ' + category, dropdownOption);
   };
