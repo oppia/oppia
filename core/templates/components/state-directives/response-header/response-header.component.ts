@@ -66,8 +66,8 @@ export class ResponseHeaderComponent {
     return this.stateEditorService.isInQuestionMode();
   }
 
-  getCurrentInteractionId(): string {
-    return this.stateInteractionIdService.savedMemento;
+  getCurrentInteractionId(): InteractionSpecsKey {
+    return this.stateInteractionIdService.savedMemento as InteractionSpecsKey;
   }
 
   isCorrectnessFeedbackEnabled(): boolean {
@@ -76,7 +76,7 @@ export class ResponseHeaderComponent {
 
   isCurrentInteractionLinear(): boolean {
     let interactionId = this.getCurrentInteractionId();
-    return interactionId !== null && INTERACTION_SPECS[
+    return Boolean(interactionId) && INTERACTION_SPECS[
       interactionId as InteractionSpecsKey].is_linear;
   }
 
