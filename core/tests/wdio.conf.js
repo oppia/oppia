@@ -197,7 +197,7 @@ exports.config = {
     // CicleCI causes RAM issues (meaning very high flakiness).
 
     if (process.env.GITHUB_ACTIONS &&
-      process.env.VIDEO_RECORDING_IS_ENABLED === 1) {
+      process.env.VIDEO_RECORDING_IS_ENABLED == 1) {
       let ffmpegArgs = [
         '-y',
         '-r', '30',
@@ -228,6 +228,7 @@ exports.config = {
         // eslint-disable-next-line no-console
         console.log(`ffmpeg exited with code ${code}`);
       });
+      console.log('############################################')
     }
     // Set a wide enough window size for the navbar in the library pages to
     // display fully.
