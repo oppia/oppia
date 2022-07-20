@@ -33,6 +33,9 @@ import { AppConstants } from 'app.constants';
 import constants from 'assets/constants';
 import { ListSchema, UnicodeSchema } from 'services/schema-default-value.service';
 import { UserContributionRightsDataBackendDict } from 'services/user-backend-api.service';
+// This throws "TS2307". We need to
+// suppress this error because rte-output-display is not strictly typed yet.
+// @ts-ignore
 import { RteOutputDisplayComponent } from 'rich_text_components/rte-output-display.component';
 
 interface HTMLSchema {
@@ -254,6 +257,10 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
             author_name
         );
       });
+    this.reviewMessage = '';
+    if (!this.reviewable) {
+      this._getThreadMessagesAsync(this.activeSuggestionId);
+    }
     this.isContentExpanded = false;
     this.isTranslationExpanded = false;
     this.errorMessage = '';
@@ -281,10 +288,6 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       this.activeSuggestion.change.data_format ===
         'set_of_unicode_string'
     );
-    this.reviewMessage = '';
-    if (!this.reviewable) {
-      this._getThreadMessagesAsync(this.activeSuggestionId);
-    }
     setTimeout(() => {
       this.computePanelOverflowState();
     }, 0);

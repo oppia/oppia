@@ -81,6 +81,9 @@
       "./node_modules/@types"
     ]
   },
+  "exclude": [
+    "core/templates/pages/contributor-dashboard-page/modal-templates/translation-suggestion-review-modal.component.ts"
+  ],
   "include": [
     "core",
     "extensions",

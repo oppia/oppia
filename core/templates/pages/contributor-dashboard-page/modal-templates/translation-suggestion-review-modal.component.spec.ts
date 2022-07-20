@@ -28,14 +28,16 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { ThreadDataBackendApiService } from 'pages/exploration-editor-page/feedback-tab/services/thread-data-backend-api.service';
 import { UserService } from 'services/user.service';
 import { UserInfo } from 'domain/user/user-info.model';
+// This throws "TS2307". We need to
+// suppress this error because rte-output-display is not strictly typed yet.
+// @ts-ignore
 import { RteOutputDisplayComponent } from 'rich_text_components/rte-output-display.component';
 
 class MockChangeDetectorRef {
   detectChanges(): void {}
 }
 
-// eslint-disable-next-line oppia/no-test-blockers
-fdescribe('Translation Suggestion Review Modal Component', function() {
+describe('Translation Suggestion Review Modal Component', function() {
   let fixture: ComponentFixture<TranslationSuggestionReviewModalComponent>;
   let component: TranslationSuggestionReviewModalComponent;
   let alertsService: AlertsService;
@@ -99,7 +101,7 @@ fdescribe('Translation Suggestion Review Modal Component', function() {
 
   describe('when reviewing suggestion', function() {
     const reviewable = true;
-    const subheading = 'subheading_title';
+    const subheading = 'topic_1 / story_1 / chapter_1';
     const suggestion1 = {
       author_name: 'author_name',
       language_code: 'language_code',
@@ -522,7 +524,7 @@ fdescribe('Translation Suggestion Review Modal Component', function() {
 
   describe('when viewing suggestion', function() {
     const reviewable = false;
-    const subheading = 'subheading_title';
+    const subheading = 'topic_1 / story_1 / chapter_1';
 
     const suggestion1 = {
       suggestion_id: 'suggestion_1',
@@ -629,7 +631,7 @@ fdescribe('Translation Suggestion Review Modal Component', function() {
         expect(component.activeSuggestionId).toBe('suggestion_1');
         expect(component.activeSuggestion).toEqual(suggestion1);
         expect(component.reviewable).toBe(reviewable);
-        expect(component.subheading).toBe('subheading_title');
+        expect(component.subheading).toBe('topic_1 / story_1 / chapter_1');
         // Suggestion 1's exploration_content_html does not match its
         // content_html.
         expect(component.hasExplorationContentChanged()).toBe(true);
@@ -676,7 +678,7 @@ fdescribe('Translation Suggestion Review Modal Component', function() {
   describe('when reviewing suggestions' +
     ' with deleted opportunites', function() {
     const reviewable = false;
-    const subheading = 'subheading_title';
+    const subheading = 'topic_1 / story_1 / chapter_1';
 
     const suggestion1 = {
       suggestion_id: 'suggestion_1',
@@ -721,7 +723,11 @@ fdescribe('Translation Suggestion Review Modal Component', function() {
 
     const contribution1 = {
       suggestion: suggestion1,
-      details: null
+      details: {
+        topic_name: 'topic_1',
+        story_title: 'story_1',
+        chapter_title: 'chapter_1'
+      }
     };
 
     const deletedContribution = {
@@ -779,7 +785,7 @@ fdescribe('Translation Suggestion Review Modal Component', function() {
 
   describe('when navigating through suggestions', function() {
     const reviewable = false;
-    const subheading = 'subheading_title';
+    const subheading = 'topic_1 / story_1 / chapter_1';
 
     const suggestion1 = {
       suggestion_id: 'suggestion_1',
@@ -957,7 +963,7 @@ fdescribe('Translation Suggestion Review Modal Component', function() {
 
   describe('when set the schema constant', function() {
     const reviewable = true;
-    const subheading = 'subheading_title';
+    const subheading = 'topic_1 / story_1 / chapter_1';
     const suggestion1 = {
       suggestion_id: 'suggestion_1',
       target_id: '1',
