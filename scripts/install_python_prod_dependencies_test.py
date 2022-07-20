@@ -123,7 +123,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
 
         self.cmd_token_list = []
         def mock_check_call(cmd_tokens, **unsued_kwargs):  # pylint: disable=unused-argument
-            if cmd_tokens and cmd_tokens[0].endswith('python'):
+            if cmd_tokens and cmd_tokens[0].endswith('%spython' % os.path.sep):
                 # Some commands use the path to the Python executable. To make
                 # specifying expected commands easier, replace these with just
                 # "python".

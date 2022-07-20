@@ -32,7 +32,7 @@ from typing import Any, Dict, List, Tuple
 
 class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
 
-    def test_assert_in_venv_passes_when_in_venv(self) -> None:
+    def test_check_python_env_passes_when_in_venv(self) -> None:
         prefix_swap = self.swap(
             sys, 'prefix', '/home/user/.pyenv/versions/3.7.10')
         base_prefix_swap = self.swap(
@@ -40,9 +40,9 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
         real_prefix_swap = self.swap(sys, 'real_prefix', '')
         environ_swap = self.swap(os, 'environ', {})
         with prefix_swap, base_prefix_swap, real_prefix_swap, environ_swap:
-            install_python_dev_dependencies.assert_in_venv()
+            install_python_dev_dependencies.check_python_env()
 
-    def test_assert_in_venv_passes_when_in_venv_real_prefix(self) -> None:
+    def test_check_python_env_passes_when_in_venv_real_prefix(self) -> None:
         prefix_swap = self.swap(
             sys, 'prefix', '/home/user/.pyenv/versions/3.7.10')
         base_prefix_swap = self.swap(
@@ -51,9 +51,9 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
             sys, 'real_prefix', '/home/user/.pyenv/versions/oppia')
         environ_swap = self.swap(os, 'environ', {})
         with prefix_swap, base_prefix_swap, real_prefix_swap, environ_swap:
-            install_python_dev_dependencies.assert_in_venv()
+            install_python_dev_dependencies.check_python_env()
 
-    def test_assert_in_venv_fails_when_out_of_venv(self) -> None:
+    def test_check_python_env_fails_when_out_of_venv(self) -> None:
         prefix_swap = self.swap(
             sys, 'prefix', '/home/user/.pyenv/versions/3.7.10')
         base_prefix_swap = self.swap(
@@ -66,9 +66,9 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
                 AssertionError, expected_error):
             with prefix_swap, base_prefix_swap, real_prefix_swap:
                 with environ_swap:
-                    install_python_dev_dependencies.assert_in_venv()
+                    install_python_dev_dependencies.check_python_env()
 
-    def test_assert_in_venv_passes_when_on_ci(self) -> None:
+    def test_check_python_env_passes_when_on_ci(self) -> None:
         prefix_swap = self.swap(
             sys, 'prefix', '/home/user/.pyenv/versions/3.7.10')
         base_prefix_swap = self.swap(
@@ -76,7 +76,7 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
         real_prefix_swap = self.swap(sys, 'real_prefix', '')
         environ_swap = self.swap(os, 'environ', {'GITHUB_ACTION': '1'})
         with prefix_swap, base_prefix_swap, real_prefix_swap, environ_swap:
-            install_python_dev_dependencies.assert_in_venv()
+            install_python_dev_dependencies.check_python_env()
 
     def test_install_installation_tools(self) -> None:
         expected_tools = {
@@ -84,26 +84,30 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
             'pip-tools': '6.6.2',
             'setuptools': '58.5.3',
         }
-        installed_tools = {}
+        installed_tools: Dict[str, str] = {}
 
         def mock_run(
             args: List[str], check: bool, encoding: str,
         ) -> None:
             package, version = args[-1].split('==')
-            assert package not in installed_tools
+            self.assertNotIn(package, installed_tools)
             installed_tools[package] = version
-            assert args == [
-                sys.executable, '-m', 'pip', 'install',
-                f'{package}=={version}']
-            assert check
-            assert encoding == 'utf-8'
+            self.assertEqual(
+                args,
+                [
+                    sys.executable, '-m', 'pip', 'install',
+                    f'{package}=={version}',
+                ],
+            )
+            self.assertTrue(check)
+            self.assertEqual(encoding, 'utf-8')
 
         run_swap = self.swap(subprocess, 'run', mock_run)
 
         with run_swap:
             install_python_dev_dependencies.install_installation_tools()
 
-        assert installed_tools == expected_tools
+        self.assertEqual(installed_tools, expected_tools)
 
     def test_install_dev_dependencies(self) -> None:
 
@@ -215,7 +219,7 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
             return False
 
         assert_swap = self.swap_with_checks(
-            install_python_dev_dependencies, 'assert_in_venv', mock_func)
+            install_python_dev_dependencies, 'check_python_env', mock_func)
         install_tools_swap = self.swap_with_checks(
             install_python_dev_dependencies,
             'install_installation_tools', mock_func)
@@ -238,7 +242,7 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
             return False
 
         assert_swap = self.swap_with_checks(
-            install_python_dev_dependencies, 'assert_in_venv', mock_func)
+            install_python_dev_dependencies, 'check_python_env', mock_func)
         install_tools_swap = self.swap_with_checks(
             install_python_dev_dependencies,
             'install_installation_tools', mock_func)
@@ -262,7 +266,7 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
             return True
 
         assert_swap = self.swap_with_checks(
-            install_python_dev_dependencies, 'assert_in_venv', mock_func)
+            install_python_dev_dependencies, 'check_python_env', mock_func)
         install_tools_swap = self.swap_with_checks(
             install_python_dev_dependencies,
             'install_installation_tools', mock_func)
@@ -285,7 +289,7 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
             return True
 
         assert_swap = self.swap_with_checks(
-            install_python_dev_dependencies, 'assert_in_venv', mock_func)
+            install_python_dev_dependencies, 'check_python_env', mock_func)
         install_tools_swap = self.swap_with_checks(
             install_python_dev_dependencies,
             'install_installation_tools', mock_func)

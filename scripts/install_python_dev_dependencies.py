@@ -41,13 +41,12 @@ _PARSER.add_argument(
     help='Assert that the dev requirements file is already compiled.')
 
 
-def assert_in_venv() -> None:
-    """Raise an error if we are not in a virtual environment.
-
-    No error is raised if we are running on GitHub Actions because a
-    virtual environment is unnecessary there.
-    """
+def check_python_env() -> None:
+    """Raise an error if we are not in a virtual environment or on CI."""
     if 'GITHUB_ACTION' in os.environ:
+        # The GITHUB_ACTION environment variable indicates we are running on
+        # GitHub Actions according to
+        # https://docs.github.com/en/actions/learn-github-actions/environment-variables.
         return
     # There are two signals that a virtual environment is active:
     # * When sys.prefix != sys.base_prefix
@@ -117,7 +116,7 @@ def compile_pip_requirements(
 def main(cli_args: Optional[List[str]] = None) -> None:
     """Install all dev dependencies."""
     args = _PARSER.parse_args(cli_args)
-    assert_in_venv()
+    check_python_env()
     install_installation_tools()
     not_compiled = compile_pip_requirements(
         REQUIREMENTS_DEV_FILE_PATH, COMPILED_REQUIREMENTS_DEV_FILE_PATH)
