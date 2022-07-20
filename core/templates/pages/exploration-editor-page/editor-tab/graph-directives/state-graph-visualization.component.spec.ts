@@ -330,14 +330,35 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
     flush();
   }));
 
-  xit('should throw error', fakeAsync(() => {
-    component.currentStateId = undefined;
+  it('should throw error', fakeAsync(() => {
+    component.currentStateId = 'currentStateId';
     component.centerAtCurrentState = true;
     component.allowPanning = false;
-
-    component.getCenterGraph();
+    component.origTranslations = [0, 0];
+    component.nodeData = {
+      data: {
+        depth: 3,
+        offset: 0,
+        reachable: true,
+        y0: 10,
+        x0: 10,
+        yLabel: 5,
+        xLabel: 5,
+        height: 10,
+        width: 100,
+        id: 'node_1',
+        label: 'This is a label for node 3',
+        reachableFromEnd: false,
+        secondaryLabel: '2nd',
+        style: 'string',
+        nodeClass: 'string',
+        canDelete: true
+      }
+    };
+    component.centerGraph();
     tick();
 
+    expect(component.origTranslations).toEqual([0, 0]);
     flush();
   }));
 

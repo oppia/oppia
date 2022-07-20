@@ -248,16 +248,13 @@ export class StateGraphVisualization
         let dimensions = this.getElementDimensions();
 
         // Center the graph at the node representing the current state.
-        try {
-          this.origTranslations[0] = (
-            dimensions.w / 2 - this.nodeData[this.currentStateId].x0 -
-            this.nodeData[this.currentStateId].width / 2);
-        } catch (error) {
-          error.message += (
-            `\ncurrentStateId: ${ this.currentStateId }` +
-          `\nnodeData: ${ this.nodeData }`);
-          throw error;
+        if (!this.nodeData[this.currentStateId]) {
+          return;
         }
+
+        this.origTranslations[0] = (
+          dimensions.w / 2 - this.nodeData[this.currentStateId].x0 -
+          this.nodeData[this.currentStateId].width / 2);
 
         this.origTranslations[1] = (
           dimensions.h / 2 - this.nodeData[this.currentStateId].y0 -
