@@ -32,7 +32,6 @@ import { CurrentInteractionService } from 'pages/exploration-player-page/service
 import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
 import { PlayerTranscriptService } from 'pages/exploration-player-page/services/player-transcript.service';
 import { MultipleChoiceInputRulesService } from './multiple-choice-input-rules.service';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 import '../static/multiple_choice_input.css';
 
@@ -58,7 +57,6 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
       InteractionAttributesExtractorService,
     private multipleChoiceInputRulesService: MultipleChoiceInputRulesService,
     private audioTranslationManagerService: AudioTranslationManagerService,
-    private i18nLanguageCodeService: I18nLanguageCodeService,
     private playerPositionService: PlayerPositionService,
     private playerTranscriptService: PlayerTranscriptService
   ) { }
@@ -155,10 +153,6 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
     this.answer = null;
     this.currentInteractionService.registerCurrentInteraction(
       () => this.submitAnswer(), () => this.validityCheckFn());
-  }
-
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   isQuestionOnceAnswered(): boolean {

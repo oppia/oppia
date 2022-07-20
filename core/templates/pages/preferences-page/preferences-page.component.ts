@@ -115,10 +115,6 @@ export class PreferencesPageComponent {
     this._saveDataItem('user_bio', userBio);
   }
 
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
-  }
-
   registerBioChanged(): void {
     this.preventPageUnloadEventService.addListener();
   }

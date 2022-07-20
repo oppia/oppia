@@ -259,12 +259,6 @@ describe('Preferences Page Component', () => {
       expect(componentInstance.canReceiveEmailUpdates).toBeFalse();
     }));
 
-    it('should get RTL language status correctly', () => {
-      spyOn(
-        i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(true);
-      expect(componentInstance.isLanguageRTL()).toBeTrue();
-    });
-
     it('should save preferred language codes', fakeAsync(() => {
       componentInstance.savePreferredLanguageCodes(['en', 'hi']);
       tick();

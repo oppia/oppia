@@ -43,6 +43,10 @@
 .progress-nav-bar .oppia-arrow {
   font-size: 19px;
   padding-top: 1.5px;
+  -moz-transform: scaleX(1) /*rtl:scaleX(-1)*/;
+  -o-transform: scaleX(1) /*rtl:scaleX(-1)*/;
+  -webkit-transform: scaleX(1) /*rtl:scaleX(-1)*/;
+  transform: scaleX(1) /*rtl:scaleX(-1)*/;
 }
 .progress-nav-bar .oppia-nav-button.oppia-nav-left-button {
   margin: 0 12px 12px 12px;
@@ -69,7 +73,7 @@
   text-align: left;
 }
 
-.material-icons {
+.progress-nav-bar .material-icons {
   -moz-transform: scaleX(1) /*rtl:scaleX(-1)*/;
   -o-transform: scaleX(1) /*rtl:scaleX(-1)*/;
   -webkit-transform: scaleX(1) /*rtl:scaleX(-1)*/;

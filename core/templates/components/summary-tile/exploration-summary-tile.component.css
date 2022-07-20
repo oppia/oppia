@@ -3,13 +3,13 @@
   compilation, here are some additional rules that can be added to the CSS files:
   https://rtlcss.com/learn/usage-guide/control-directives .
 */
-.oppia-exploration-dashboard-card {
+oppia-exploration-summary-tile .oppia-exploration-dashboard-card {
   position: relative;
   text-align: left;
   z-index: 5;
 }
 
-.oppia-play-exploration-button {
+oppia-exploration-summary-tile .oppia-play-exploration-button {
   display: block;
   margin: auto;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
@@ -18,11 +18,11 @@
   user-select: none;
 }
 
-.oppia-return-to-parent-button {
+oppia-exploration-summary-tile .oppia-return-to-parent-button {
   margin-top: 12px;
 }
 
-.oppia-arrow-icon {
+oppia-exploration-summary-tile .oppia-arrow-icon {
   font-size: 19px;
   padding-top: 1.5px;
   -moz-transform: scaleX(1) /*rtl:scaleX(-1)*/;
@@ -31,7 +31,7 @@
   transform: scaleX(1) /*rtl:scaleX(-1)*/;
 }
 
-.oppia-learner-confirm-button {
+oppia-exploration-summary-tile .oppia-learner-confirm-button {
   background: #0d48a1;
   color: #fff;
   font-size: 16px;
@@ -39,25 +39,25 @@
   padding: 6px 12px;
 }
 
-.mobile-activity-summary-card {
+oppia-exploration-summary-tile .mobile-activity-summary-card {
   box-shadow: slategrey 2px 4px 4px 0;
   padding: 0 0 0 0;
 }
 
-.mobile-exploration-card-image-container {
+oppia-exploration-summary-tile .mobile-exploration-card-image-container {
   align-self: center;
   width: 63px;
 }
 
-.mobile-exploration-card-image {
+oppia-exploration-summary-tile .mobile-exploration-card-image {
   height: 100%;
   width: auto;
 }
 
-.views-text {
+oppia-exploration-summary-tile .views-text {
   margin-left: 6px;
 }
 
-.thumbnail-image {
+oppia-exploration-summary-tile .thumbnail-image {
   display: block;
 }

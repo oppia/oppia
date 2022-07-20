@@ -29,8 +29,7 @@
               class="oppia-learner-confirm-button e2e-test-continue-button oppia-autofocus"
               oppiaFocusOn="continue-btn">
         {{ interactionCustomizationArgs.buttonText.value.unicode }}
-        <i *ngIf="!isLanguageRTL()" class="fas fa-arrow-right oppia-arrow"></i>
-        <i *ngIf="isLanguageRTL()" class="fas fa-arrow-left oppia-arrow"></i>
+        <i class="fas fa-arrow-right oppia-arrow"></i>
       </button>
       <button mat-button
               *ngIf="shouldGenericSubmitButtonBeShown()"

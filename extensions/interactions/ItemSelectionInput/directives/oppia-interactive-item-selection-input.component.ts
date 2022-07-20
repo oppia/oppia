@@ -34,7 +34,6 @@ import { PlayerPositionService } from 'pages/exploration-player-page/services/pl
 import { PlayerTranscriptService } from 'pages/exploration-player-page/services/player-transcript.service';
 import { StateCard } from 'domain/state_card/state-card.model';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
 import '../static/item_selection_input.css';
 
@@ -70,7 +69,6 @@ export class InteractiveItemSelectionInputComponent implements OnInit {
     private interactionAttributesExtractorService:
       InteractionAttributesExtractorService,
     private itemSelectionInputRulesService: ItemSelectionInputRulesService,
-    private i18nLanguageCodeService: I18nLanguageCodeService,
     private audioTranslationManagerService: AudioTranslationManagerService,
     private playerPositionService: PlayerPositionService,
     private playerTranscriptService: PlayerTranscriptService
@@ -137,10 +135,6 @@ export class InteractiveItemSelectionInputComponent implements OnInit {
     this.notEnoughSelections = this.minAllowableSelectionCount > 0;
     this.currentInteractionService.registerCurrentInteraction(
       this.submitAnswer.bind(this), this.validityCheckFn.bind(this));
-  }
-
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   getContentId(): string {
