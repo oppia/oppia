@@ -94,6 +94,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'other-subtopic-url')]
         topic.next_subtopic_id = 3
+        topic.skill_ids_for_diagnostic_test = ['skill_id_1']
         topic_services.save_new_topic(self.admin_id, topic) # type: ignore[no-untyped-call]
 
         # Publish the topic and its stories.
