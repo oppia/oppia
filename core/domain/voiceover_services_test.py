@@ -77,7 +77,7 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
         ) for i in range(2)]
 
         for exp in explorations:
-            self.publish_exploration(self.owner_id, exp.id)  # type: ignore[no-untyped-call]
+            self.publish_exploration(self.owner_id, exp.id)
 
         topic = topic_domain.Topic.create_default_topic(
             self.TOPIC_ID, 'topic', 'abbrev', 'description', 'fragm')
@@ -95,12 +95,12 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
         story = story_domain.Story.create_default_story(
             self.STORY_ID, 'A story', 'Description', self.TOPIC_ID,
             'a-story')
-        story_services.save_new_story(self.owner_id, story)  # type: ignore[no-untyped-call]
+        story_services.save_new_story(self.owner_id, story)
         topic_services.add_canonical_story(  # type: ignore[no-untyped-call]
             self.owner_id, self.TOPIC_ID, self.STORY_ID)
         topic_services.publish_story(  # type: ignore[no-untyped-call]
             self.TOPIC_ID, self.STORY_ID, self.admin_id)
-        story_services.update_story(  # type: ignore[no-untyped-call]
+        story_services.update_story(
             self.owner_id, self.STORY_ID, [story_domain.StoryChange({
                 'cmd': 'add_story_node',
                 'node_id': 'node_1',

@@ -59,7 +59,7 @@ class InformSubscribersTest(test_utils.EmailTestBase):
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)  # type: ignore[no-untyped-call]
         self.user_id_2 = self.get_user_id_from_email(self.USER_EMAIL_2)  # type: ignore[no-untyped-call]
 
-        self.exploration = self.save_new_default_exploration(  # type: ignore[no-untyped-call]
+        self.exploration = self.save_new_default_exploration(
             'A', self.editor_id, title='Title')
 
         self.can_send_emails_ctx = self.swap(

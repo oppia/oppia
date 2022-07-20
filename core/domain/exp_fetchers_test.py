@@ -47,11 +47,11 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
         super(ExplorationRetrievalTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
-        self.exploration_1 = self.save_new_default_exploration(  # type: ignore[no-untyped-call]
+        self.exploration_1 = self.save_new_default_exploration(
             self.EXP_1_ID, self.owner_id, title='Aa')
-        self.exploration_2 = self.save_new_default_exploration(  # type: ignore[no-untyped-call]
+        self.exploration_2 = self.save_new_default_exploration(
             self.EXP_2_ID, self.owner_id, title='Bb')
-        self.exploration_3 = self.save_new_default_exploration(  # type: ignore[no-untyped-call]
+        self.exploration_3 = self.save_new_default_exploration(
             self.EXP_3_ID, self.owner_id, title='Cc')
 
     def test_get_exploration_summaries_matching_ids(self) -> None:
@@ -338,7 +338,7 @@ class LoggedOutUserProgressTests(test_utils.GenericTestBase):
         super(LoggedOutUserProgressTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
-        self.exploration_1 = self.save_new_default_exploration(  # type: ignore[no-untyped-call]
+        self.exploration_1 = self.save_new_default_exploration(
             self.EXP_1_ID, self.owner_id, title='Aa')
 
     def test_get_logged_out_user_progress(self) -> None:
