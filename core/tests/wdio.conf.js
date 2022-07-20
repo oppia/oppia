@@ -15,9 +15,11 @@ var chromeVersion = (args[0] == 'DEBUG=true') ? args[6] : args[5];
 var chromedriverPath =
 './node_modules/webdriver-manager/selenium/chromedriver_' + chromeVersion;
 
-// To record videos of the failed test suites locally,
-// update the value of LOCAL_VIDEO_RECORDING_IS_ENABLED to 1.
-var LOCAL_VIDEO_RECORDING_IS_ENABLED = 0;
+var spw = null;
+var vidPath = '';
+// Enable ALL_VIDEOS if you want success videos to be saved.
+const ALL_VIDEOS = false;
+
 
 var suites = {
   full: [
@@ -176,6 +178,13 @@ exports.config = {
   // If one of them returns with a promise, WebdriverIO will wait until that
   // promise got resolved to continue.
   /**
+     * Gets executed once before all workers get launched.
+     * @param {Object} config wdio configuration object
+     * @param {Array.<Object>} capabilities list of capabilities details
+     */
+  onPrepare: function(config, capabilities) {
+  },
+  /**
    * Gets executed before test execution begins. At this point you can access
    * to all global variables like `browser`. It is the perfect place to
    * define custom commands.
@@ -184,70 +193,41 @@ exports.config = {
    * @param {Object}         browser instance of created browser/device session
    */
   before: function() {
-    // Enable ALL_VIDEOS if you want success videos to be saved.
-    const ALL_VIDEOS = false;
-
     // Only running video recorder on Github Actions, since running it on
     // CicleCI causes RAM issues (meaning very high flakiness).
 
-    if ((process.env.GITHUB_ACTIONS &&
-      process.env.VIDEO_RECORDING_IS_ENABLED === 1) ||
-      LOCAL_VIDEO_RECORDING_IS_ENABLED === 1) {
-      jasmine.getEnv().addReporter({
-        specStarted: function(result) {
-          let ffmpegArgs = [
-            '-y',
-            '-r', '30',
-            '-f', 'x11grab',
-            '-s', '1285x1000',
-            '-i', process.env.DISPLAY,
-            '-g', '300',
-            '-loglevel', '16',
-          ];
-          const uniqueString = Math.random().toString(36).substring(2, 8);
-          var name = uniqueString + '.mp4';
-          var dirPath = path.resolve(
-            '__dirname', '..', '..', 'webdriverio-video/');
-          try {
-            fs.mkdirSync(dirPath, { recursive: true });
-          } catch (err) {}
-          vidPath = path.resolve(dirPath, name);
-          // eslint-disable-next-line no-console
-          console.log(
-            'Test name: ' + result.fullName + ' has video path ' + vidPath);
-          ffmpegArgs.push(vidPath);
-          spw = childProcess.spawn('ffmpeg', ffmpegArgs);
-          spw.on('message', (message) => {
-            // eslint-disable-next-line no-console
-            console.log(`ffmpeg stdout: ${message}`);
-          });
-          spw.on('error', (errorMessage) => {
-            console.error(`ffmpeg stderr: ${errorMessage}`);
-          });
-          spw.on('close', (code) => {
-            // eslint-disable-next-line no-console
-            console.log(`ffmpeg exited with code ${code}`);
-          });
-        },
-        specDone: function(result) {
-          spw.kill();
-          if (
-            result.status === 'passed' && !ALL_VIDEOS &&
-            fs.existsSync(vidPath)) {
-            fs.unlinkSync(vidPath);
-            // eslint-disable-next-line no-console
-            console.log(
-              `Video for test: ${result.fullName}` +
-              'was deleted successfully (test passed).');
-          }
-        },
+    if (process.env.GITHUB_ACTIONS &&
+      process.env.VIDEO_RECORDING_IS_ENABLED === 1) {
+      let ffmpegArgs = [
+        '-y',
+        '-r', '30',
+        '-f', 'x11grab',
+        '-s', '1285x1000',
+        '-i', process.env.DISPLAY,
+        '-g', '300',
+        '-loglevel', '16',
+      ];
+      const uniqueString = Math.random().toString(36).substring(2, 8);
+      var name = uniqueString + '.mp4';
+      var dirPath = path.resolve(
+        '__dirname', '..', '..', 'webdriverio-video/');
+      try {
+        fs.mkdirSync(dirPath, { recursive: true });
+      } catch (err) {}
+      vidPath = path.resolve(dirPath, name);
+      ffmpegArgs.push(vidPath);
+      spw = childProcess.spawn('ffmpeg', ffmpegArgs);
+      spw.on('message', (message) => {
+        // eslint-disable-next-line no-console
+        console.log(`ffmpeg stdout: ${message}`);
       });
-    } else {
-      // eslint-disable-next-line no-console
-      console.log(
-        'Videos will not be recorded for this suite either because videos' +
-        ' have been disabled for it (using environment variables) or' +
-        ' because it\'s on CircleCI');
+      spw.on('error', (errorMessage) => {
+        console.error(`ffmpeg stderr: ${errorMessage}`);
+      });
+      spw.on('close', (code) => {
+        // eslint-disable-next-line no-console
+        console.log(`ffmpeg exited with code ${code}`);
+      });
     }
     // Set a wide enough window size for the navbar in the library pages to
     // display fully.
@@ -278,8 +258,6 @@ exports.config = {
     // If a test fails then only the error will be defined and
     // the screenshot will be taken and saved.
     if (error) {
-      // eslint-disable-next-line no-console
-      console.log('######ERROR#######');
       var dirPath = path.resolve(
         '__dirname', '..', '..', 'webdriverio-screenshots/');
       try {
@@ -292,6 +270,23 @@ exports.config = {
       var filePath = path.join(screenshotPath, fileName);
       // Save screenshot.
       await browser.saveScreenshot(filePath);
+    }
+  },
+  /**
+    * Gets executed after all tests are done. You still have access to all
+    * global variables from the test.
+    * @param {Number} result 0 - test pass, 1 - test fail
+    * @param {Array.<Object>} capabilities list of capabilities details
+    * @param {Array.<String>} specs List of spec file paths that ran
+    */
+  after: function(result, capabilities, specs) {
+    spw.kill();
+    if (result === 0 && !ALL_VIDEOS && fs.existsSync(vidPath)) {
+      fs.unlinkSync(vidPath);
+      // eslint-disable-next-line no-console
+      console.log(
+        `Video for test: ${specs}` +
+        'was deleted successfully (test passed).');
     }
   },
 };
