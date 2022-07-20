@@ -243,7 +243,7 @@ describe('Playing the exploration', function() {
       await backButton.click();
       await waitFor.pageToFullyLoad();
       await explorationPlayerPage.expectContentToMatch(
-        await forms.toRichText('card 1'));
+        await forms.toRichText('card 2'));
 
       // Test next button.
       var nextButton = nextButtonSelector();
