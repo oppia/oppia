@@ -157,6 +157,8 @@ var TopicEditorPage = function() {
 
   this.expectNumberOfQuestionsForSkillWithDescriptionToBe = async function(
       count, skillDescription) {
+    await waitFor.visibilityOf(
+      selectSkillDropdown, 'Select Skill dropdown takes too long to appear');
     await selectSkillDropdown.selectByVisibleText(skillDescription);
     var questionItems = await $$('.e2e-test-question-list-item');
     await waitFor.visibilityOf(
