@@ -168,6 +168,42 @@ oppia-tutor-card .conversation-skin-inline-interaction .conversation-skin-user-a
   top: 14px;
 }
 
+oppia-tutor-card .conversation-skin-milestone-message {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+  padding: 0 20px;
+}
+
+oppia-tutor-card .conversation-skin-milestone-message .milestone-message-star-container {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  height: 72px;
+  justify-content: center;
+  margin-right: 10px;
+  width: 72px;
+}
+
+oppia-tutor-card .conversation-skin-milestone-message .milestone-message-star-container .star-icon {
+  position: absolute;
+  transform: scale(1.5);
+}
+
+.conversation-skin-milestone-message .completed-chapter-count {
+  font-weight: 500;
+  margin-top: 9px;
+  position: relative;
+}
+
+oppia-tutor-card .conversation-skin-milestone-message .milestone-message-text {
+  font-size: 1.1em;
+  font-weight: 800;
+  margin-top: 9px;
+  text-align: center;
+}
+
 oppia-tutor-card .oppia-conversation-skin-inline-interaction {
   opacity: 0.8;
 }

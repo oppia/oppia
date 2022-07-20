@@ -99,6 +99,9 @@ interface LearnerDashboardFeedbackUpdatesDataBackendDict {
   'paginated_threads_list': FeedbackThreadSummaryBackendDict[][];
 }
 
+interface LearnerCompletedChaptersCountDataBackendDict {
+  'completed_chapters_count': number;
+}
 
 interface LearnerDashboardTopicsAndStoriesData {
   completedStoriesList: StorySummary[];
@@ -136,6 +139,9 @@ interface LearnerDashboardFeedbackUpdatesData {
   paginatedThreadsList: FeedbackThreadSummaryBackendDict[][];
 }
 
+interface LearnerCompletedChaptersCountData {
+  completedChaptersCount: number;
+}
 
 export interface AddMessagePayload {
   'updated_status': boolean;
@@ -295,6 +301,22 @@ export class LearnerDashboardBackendApiService {
     });
   }
 
+  async _fetchLearnerCompletedChaptersCountDataAsync():
+  Promise<LearnerCompletedChaptersCountData> {
+    return new Promise((resolve, reject) => {
+      this.http.get<LearnerCompletedChaptersCountDataBackendDict>(
+        '/learnercompletedchapterscounthandler/data').toPromise().then(
+        chapterCompletionData => {
+          resolve({
+            completedChaptersCount: (
+              chapterCompletionData.completed_chapters_count)
+          });
+        }, errorResponse => {
+          reject(errorResponse.status);
+        });
+    });
+  }
+
   getUntrackedTopics(
       untrackedTopics: Record<string,
       LearnerTopicSummaryBackendDict[]>): Record<string,
@@ -329,6 +351,11 @@ export class LearnerDashboardBackendApiService {
   Promise<LearnerDashboardFeedbackUpdatesData> {
     return this._fetchLearnerDashboardFeedbackUpdatesDataAsync(
       paginatedThreadsList);
+  }
+
+  async fetchLearnerCompletedChaptersCountDataAsync():
+  Promise<LearnerCompletedChaptersCountData> {
+    return this._fetchLearnerCompletedChaptersCountDataAsync();
   }
 
   async addNewMessageAsync(

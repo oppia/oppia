@@ -8,7 +8,7 @@
       <select class="form-control oppia-form-control e2e-test-destination-selector-dropdown"
               [(ngModel)]="outcome.dest"
               (ngModelChange)="onDestSelectorChange()">
-        <option *ngFor="let choice of destinationChoices" [value]="choice.id">{{ choice.text }}</option>
+        <option class="e2e-test-afterward-dest-selector" *ngFor="let choice of destinationChoices" [value]="choice.id">{{ choice.text }}</option>
       </select>
     </span>
   </div>

@@ -128,6 +128,44 @@ def get_user_id_from_username(username: str) -> Optional[str]:
         return user_model.id
 
 
+def get_multi_user_ids_from_usernames(
+    usernames: List[str]
+) -> List[Optional[str]]:
+    """Gets the user_ids for a given list of usernames.
+
+    Args:
+        usernames: list(str). Identifiable usernames to display in the UI.
+
+    Returns:
+        list(str|None). Return the list of user ids corresponding to given
+        usernames.
+        """
+    if len(usernames) == 0:
+        return []
+
+    normalized_usernames = [
+        user_domain.UserSettings.normalize_username(username)
+        for username in usernames
+    ]
+
+    found_models: Sequence[user_models.UserSettingsModel] = (
+        user_models.UserSettingsModel.query(
+            user_models.UserSettingsModel.normalized_username.IN(
+                normalized_usernames
+            )
+        ).fetch()
+    )
+
+    username_to_user_id_map = {
+        model.normalized_username: model.id for model in found_models
+    }
+
+    return [
+        username_to_user_id_map.get(username)
+        for username in normalized_usernames
+    ]
+
+
 def get_user_settings_from_username(
     username: str
 ) -> Optional[user_domain.UserSettings]:

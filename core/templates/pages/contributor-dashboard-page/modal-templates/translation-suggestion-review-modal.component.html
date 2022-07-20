@@ -30,9 +30,9 @@
             {{ item }}
           </li>
         </ul>
-        <angular-html-bind-wrapper *ngIf="!contentTypeIsSetOfStrings"
-                                    [htmlData]="displayExplorationContent()">
-        </angular-html-bind-wrapper>
+        <oppia-rte-output-display *ngIf="!contentTypeIsSetOfStrings"
+                                  [rteString]="displayExplorationContent()">
+        </oppia-rte-output-display>
       </div>
     </div>
     <div class="oppia-suggestion-review-panel-container float-right">
@@ -46,8 +46,8 @@
       </div>
       <div class="oppia-suggestion-review-panel">
         <div>
-          <angular-html-bind-wrapper [htmlData]="translationHtml" *ngIf="!startedEditing">
-          </angular-html-bind-wrapper>
+          <oppia-rte-output-display [rteString]="translationHtml" *ngIf="!startedEditing">
+          </oppia-rte-output-display>
           <ul *ngIf="contentTypeIsSetOfStrings">
             <li *ngFor="let item of translationHtml; index as idx">
               {{ item }}
@@ -102,9 +102,9 @@
           {{ item }}
         </li>
       </ul>
-      <angular-html-bind-wrapper *ngIf="!contentTypeIsSetOfStrings"
-                                 [htmlData]="contentHtml">
-      </angular-html-bind-wrapper>
+      <oppia-rte-output-display *ngIf="!contentTypeIsSetOfStrings"
+                                [rteString]="contentHtml">
+      </oppia-rte-output-display>
     </div>
   </section>
   <div [hidden]="!reviewable" class="oppia-suggestion-review-message">
