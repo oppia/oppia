@@ -48,10 +48,6 @@ var suites = {
       'protractor_desktop/classroomPageFileUploadFeatures.js'
     ],
 
-    contributorDashboard: [
-      'protractor_desktop/contributorDashboard.js'
-    ],
-
     coreEditorAndPlayerFeatures: [
       'protractor_desktop/coreEditorAndPlayerFeatures.js'
     ],
