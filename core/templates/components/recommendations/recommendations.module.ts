@@ -1,4 +1,4 @@
-// Copyright 2021 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,29 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
 /**
- * @fileoverview Module for the dynamic content rendering components.
+ * @fileoverview Module for the recommendations components.
  */
-import 'core-js/es7/reflect';
-import 'zone.js';
 
-import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { AngularHtmlBindWrapperDirective } from './angular-html-bind-wrapper.directive';
+import { CommonModule } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
 
+import { PostChapterRecommendationsComponent } from './post-chapter-recommendations.component';
 
 @NgModule({
   imports: [
     CommonModule,
+    TranslateModule,
   ],
   declarations: [
-    AngularHtmlBindWrapperDirective
-  ],
-  entryComponents: [
+    PostChapterRecommendationsComponent,
   ],
   exports: [
-    AngularHtmlBindWrapperDirective
-  ],
+    PostChapterRecommendationsComponent,
+  ]
 })
 
-export class DynamicContentModule { }
+export class RecommendationsModule { }

@@ -36,14 +36,19 @@ describe('TranslatableSetOfUnicodeStringEditor', () => {
     component = TestBed.createComponent(
       TranslatableSetOfUnicodeStringEditorComponent
     ).componentInstance;
-    component.value = { unicodeStrSet: '' };
-    component.updateValue('random val');
+
+    component.ngOnInit();
   }));
 
   it('should initialize the schema', () => {
+    component.value = { unicodeStrSet: 'random val' };
     component.updateValue('random val');
     component.getSchema();
     component.updateValue('abc');
     expect(component.value.unicodeStrSet).toBe('abc');
+  });
+
+  it('should initialize the schema property value', () => {
+    expect(component.value.unicodeStrSet).toBe('');
   });
 });

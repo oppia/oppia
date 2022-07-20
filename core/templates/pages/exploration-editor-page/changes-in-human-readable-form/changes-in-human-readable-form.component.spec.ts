@@ -451,6 +451,7 @@ describe('Changes in Human Readable Form Component', () => {
       new_value: {
         outcome: outcomeObjectFactory.createFromBackendDict({
           dest: 'outcome 2',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'feedback_2',
             html: 'Html'
@@ -506,6 +507,7 @@ describe('Changes in Human Readable Form Component', () => {
       new_value: {
         outcome: outcomeObjectFactory.createFromBackendDict({
           dest: 'outcome 2',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'feedback_2',
             html: 'Html'
@@ -522,6 +524,7 @@ describe('Changes in Human Readable Form Component', () => {
       old_value: {
         outcome: outcomeObjectFactory.createFromBackendDict({
           dest: 'outcome 1',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'feedback_2',
             html: 'Html'
@@ -578,6 +581,7 @@ describe('Changes in Human Readable Form Component', () => {
       old_value: {
         outcome: outcomeObjectFactory.createFromBackendDict({
           dest: 'outcome 1',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'feedback_2',
             html: 'Html'
@@ -633,6 +637,7 @@ describe('Changes in Human Readable Form Component', () => {
       new_value: (
         outcomeObjectFactory.createFromBackendDict({
           dest: 'outcome 2',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'feedback_2',
             html: 'Html'
@@ -701,6 +706,7 @@ describe('Changes in Human Readable Form Component', () => {
       old_value: (
         outcomeObjectFactory.createFromBackendDict({
           dest: 'outcome 1',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'feedback_2',
             html: 'Html'
@@ -758,6 +764,7 @@ describe('Changes in Human Readable Form Component', () => {
       old_value: {
         outcome: outcomeObjectFactory.createFromBackendDict({
           dest: 'outcome 1',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'feedback_2',
             html: 'Html'

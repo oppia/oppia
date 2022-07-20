@@ -451,3 +451,41 @@ class SubtopicPageChangeTests(test_utils.GenericTestBase):
             subtopic_page_change_dict)
         self.assertEqual(
             subtopic_page_change_object.to_dict(), subtopic_page_change_dict)
+
+
+class SubtopicPageSummaryTests(test_utils.GenericTestBase):
+
+    SUBTOPIC_ID = 1
+    SUBTOPIC_TITLE = 'subtopic_title'
+    TOPIC_ID = 'topic_id'
+    TOPIC_TITLE = 'topic_title'
+    SUBTOPIC_MASTERY = 0.5
+
+    def setUp(self) -> None:
+        super(SubtopicPageSummaryTests, self).setUp()
+
+        self.subtopic_page_summary = subtopic_page_domain.SubtopicPageSummary(
+            self.SUBTOPIC_ID, self.SUBTOPIC_TITLE, self.TOPIC_ID,
+            self.TOPIC_TITLE, 'thumbnail_filename', 'red',
+            self.SUBTOPIC_MASTERY
+        )
+
+    def test_to_dict(self) -> None:
+        subtopic_page_summary_dict = self.subtopic_page_summary.to_dict()
+
+        self.assertEqual(
+            subtopic_page_summary_dict['subtopic_id'], self.SUBTOPIC_ID
+        )
+        self.assertEqual(
+            subtopic_page_summary_dict['subtopic_title'], self.SUBTOPIC_TITLE
+        )
+        self.assertEqual(
+            subtopic_page_summary_dict['parent_topic_id'], self.TOPIC_ID
+        )
+        self.assertEqual(
+            subtopic_page_summary_dict['parent_topic_name'], self.TOPIC_TITLE
+        )
+        self.assertEqual(
+            subtopic_page_summary_dict['subtopic_mastery'],
+            self.SUBTOPIC_MASTERY
+        )
