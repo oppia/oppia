@@ -31,7 +31,9 @@ AcceptableChangeDictTypes = Union[
     str,
     bool,
     int,
+    None,
     List[str],
+    Dict[str, Any],
     List[state_domain.AnswerGroupDict],
     state_domain.RecordedVoiceoversDict,
     # This Dict type is added to allow BaseChange to accept customization_args.

@@ -2066,7 +2066,9 @@ class WrittenTranslations:
         """
         return list(sorted(self.translations_mapping.keys()))
 
-    def get_translated_content(self, content_id, language_code):
+    def get_translated_content(
+        self, content_id: str, language_code: str
+    ) -> str:
         """Returns the translated content for the given content_id in the given
         language.
 
