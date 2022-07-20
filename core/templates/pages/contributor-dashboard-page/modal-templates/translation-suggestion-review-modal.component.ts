@@ -33,7 +33,7 @@ import { AppConstants } from 'app.constants';
 import constants from 'assets/constants';
 import { ListSchema, UnicodeSchema } from 'services/schema-default-value.service';
 import { UserContributionRightsDataBackendDict } from 'services/user-backend-api.service';
-import { RteOutputDisplayComponent } from 'extensions/rich_text_components/rte-output-display.component';
+import { RteOutputDisplayComponent } from 'rich_text_components/rte-output-display.component';
 
 interface HTMLSchema {
   'type': string;

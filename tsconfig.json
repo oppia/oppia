@@ -50,6 +50,7 @@
   "include": ["core", "extensions", "typings"],
   "exclude": [
     "core/tests",
-    "extensions/classifiers/proto"
+    "extensions/classifiers/proto",
+    "core/templates/pages/contributor-dashboard-page/modal-templates/translation-suggestion-review-modal.component.ts"
   ]
 }
