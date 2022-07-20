@@ -26,8 +26,9 @@ var TopicsAndSkillsDashboardPage = function() {
   var assignSkillToTopicButtonsSelector = function() {
     return $$('.e2e-test-assign-skill-to-topic-button');
   };
-  var assignSkillToTopicButton = $('.e2e-test-assign-skill-to-topic-button');
-  var assignedTopicNamesInput = $('.e2e-test-unassign-topic');
+  var assignedTopicNamesInputSelector = function() {
+    return $$('.e2e-test-unassign-topic');
+  };
   var confirmMoveButton = $('.e2e-test-confirm-move-button');
   var confirmSkillCreationButton = $('.e2e-test-confirm-skill-creation-button');
   var confirmSkillsMergeButton = $('.e2e-test-confirm-skill-selection-button');
@@ -168,10 +169,10 @@ var TopicsAndSkillsDashboardPage = function() {
   this.assignSkillToTopic = async function(skillName, topicName) {
     await this.waitForSkillsToLoad();
     await this.searchSkillByName(skillName);
-    await waitFor.visibilityOf(
-      assignSkillToTopicButton,
-      'Assign skill to topic buttons taking too long to appear');
     var assignSkillToTopicButtons = await assignSkillToTopicButtonsSelector();
+    await waitFor.visibilityOf(
+      assignSkillToTopicButtons[0],
+      'Assign skill to topic buttons taking too long to appear');
     expect(assignSkillToTopicButtons.length).toEqual(1);
     await action.click(
       'Assign skill to topic button', assignSkillToTopicButtons[0]);
@@ -356,8 +357,9 @@ var TopicsAndSkillsDashboardPage = function() {
     await action.click('Unassign Skill Button', unassignSkillButton);
 
     await waitFor.modalPopupToAppear();
+    var assignedTopicNamesInput = await assignedTopicNamesInputSelector();
     await waitFor.visibilityOf(
-      assignedTopicNamesInput,
+      assignedTopicNamesInput[0],
       'Topic names in unassign skill from topics modal taking' +
       ' too long to appear.');
     var topicListItem = $(
