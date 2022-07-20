@@ -103,7 +103,7 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
     $scope.isLastItem = $scope.remainingContributionIds.length === 0;
     $scope.isFirstItem = $scope.skippedContributionIds.length === 0;
 
-    $scope.init = function() {
+    $scope.refreshContributionState = function() {
       $scope.suggestion = (
         $scope.allContributions[$scope.currentSuggestionId].suggestion);
       $scope.question = QuestionObjectFactory.createFromBackendDict(
@@ -136,7 +136,7 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
       $rootScope.$applyAsync();
     };
 
-    $scope.init();
+    $scope.refreshContributionState();
 
     $scope.questionChanged = function() {
       $scope.validationError = null;
@@ -161,7 +161,7 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
         var skill = skillDict.skill;
         misconceptionsBySkill[skill.getId()] = skill.getMisconceptions();
         $scope.misconceptionsBySkill = misconceptionsBySkill;
-        $scope.init();
+        $scope.refreshContributionState();
       });
     };
 

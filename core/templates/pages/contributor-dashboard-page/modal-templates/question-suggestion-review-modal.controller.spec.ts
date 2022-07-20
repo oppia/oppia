@@ -606,7 +606,7 @@ describe('Question Suggestion Review Modal Controller', function() {
           messages: messages
         }));
 
-      $scope.init();
+      $scope.refreshContributionState();
       $rootScope.$apply();
 
       expect(fetchMessagesAsyncSpy).toHaveBeenCalledWith('1');
