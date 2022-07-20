@@ -48,6 +48,9 @@ var TopicsAndSkillsDashboardPage = function() {
   var openSkillEditorButtonsSelector = function() {
     return $$('.e2e-test-open-skill-editor');
   };
+  var skillDescriptionsElementSelector = function() {
+    return $$('.e2e-test-skill-description');
+  };
   var skillDescriptionField = $('.e2e-test-skill-description-field');
   var skillEditOptionsSelector = function() {
     return $$('.e2e-test-skill-edit-box');
@@ -187,6 +190,9 @@ var TopicsAndSkillsDashboardPage = function() {
     var handles = await browser.getWindowHandles();
     initialHandles = handles;
     var parentHandle = await browser.getWindowHandle();
+    await waitFor.visibilityOf(
+      createTopicButton,
+      'Create Topic Button takes too long to appear.');
     await action.click('Create Topic button', createTopicButton);
     await waitFor.visibilityOf(
       topicNameField,
@@ -387,7 +393,7 @@ var TopicsAndSkillsDashboardPage = function() {
   };
 
   this.getTopicsCount = async function() {
-    var topicsListItems = await $$('.e2e-test-topics-list-item');
+    var topicsListItems = await topicsListItemsSelector();
     return topicsListItems.length;
   };
 
@@ -401,7 +407,7 @@ var TopicsAndSkillsDashboardPage = function() {
 
   this.expectSkillDescriptionToBe = async function(description, index) {
     await this.waitForSkillsToLoad();
-    var skillDescriptionsElement = await $$('.e2e-test-skill-description');
+    var skillDescriptionsElement = await skillDescriptionsElementSelector();
     var text = await action.getText(
       'Skill Description Element', skillDescriptionsElement[index]);
     expect(text).toEqual(description);
@@ -414,13 +420,12 @@ var TopicsAndSkillsDashboardPage = function() {
         'No skills present message taking too long to appear.');
       expect(await noSkillsPresentMessage.isDisplayed()).toBe(true);
       return;
-    } else {
-      await waitFor.visibilityOf(
-        skillsListItem,
-        'Skills are taking too long to appear.');
-      var skillsListItems = await skillsListItemsSelector();
-      expect(skillsListItems.length).toEqual(number);
     }
+    await waitFor.visibilityOf(
+      skillsListItem,
+      'Skills are taking too long to appear.');
+    var skillsListItems = await skillsListItemsSelector();
+    expect(skillsListItems.length).toEqual(number);
   };
 
   this.searchSkillByName = async function(name) {

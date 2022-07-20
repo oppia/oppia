@@ -182,6 +182,9 @@ var RealEditor = function(elem) {
 
 var RichTextEditor = async function(elem) {
   var rteElements = await elem.$$('.e2e-test-rte');
+  var modalDialogElementsSelector = function() {
+    return $$('.modal-dialog');
+  };
 
   var closeRteComponentButtonLocator = (
     '.e2e-test-close-rich-text-component-editor');
@@ -249,7 +252,7 @@ var RichTextEditor = async function(elem) {
       await _clickToolbarButton(
         'cke_button__oppia' + componentName.toLowerCase());
 
-      var modalDialogElements = await $$('.modal-dialog');
+      var modalDialogElements = await modalDialogElementsSelector();
       var modalDialogLength = modalDialogElements.length;
       // The currently active modal is the last in the DOM.
       var modal = modalDialogElements[modalDialogLength - 1];
