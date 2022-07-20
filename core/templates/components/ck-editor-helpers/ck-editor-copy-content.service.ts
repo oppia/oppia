@@ -144,7 +144,7 @@ export class CkEditorCopyContentService {
       const valueMatcher = /([\w-]+)(-with-value=")([^"]+)(")/g;
 
       let match;
-      let startupData: {[id: string]: string} = {};
+      let startupData: {[id: string]: string | boolean} = {};
 
       while ((match = valueMatcher.exec(html)) !== null) {
         const key = match[1];
@@ -164,6 +164,7 @@ export class CkEditorCopyContentService {
         startupData[key] = JSON.parse(
           this.htmlEscaperService.escapedStrToUnescapedStr(value));
       }
+      startupData.isCopied = true;
 
       editor.execCommand(widgetName, { startupData });
     }
