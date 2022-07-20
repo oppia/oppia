@@ -242,7 +242,7 @@ export class Topic {
     }
     if (this._skillsForDiagnosticTest.length > 3) {
       issues.push(
-        'At most 3 skill should be added for the diagnostic test in ' +
+        'At most 3 skills should be added for the diagnostic test in ' +
         'the topic.');
     }
 

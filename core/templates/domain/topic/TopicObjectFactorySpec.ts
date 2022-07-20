@@ -128,7 +128,7 @@ describe('Topic object factory', () => {
       ];
       _sampleTopic._skillsForDiagnosticTest = shortSkillSummaries;
       expect(_sampleTopic.validate()).toEqual([
-        'At most 3 skill should be added for the diagnostic test in the topic.'
+        'At most 3 skills should be added for the diagnostic test in the topic.'
       ]);
     });
 

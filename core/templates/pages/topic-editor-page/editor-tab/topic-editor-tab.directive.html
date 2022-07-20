@@ -280,6 +280,8 @@
       <div class="item-list-card-header oppia-mobile-collapsible-card-header"
            ng-click="togglePreviewListCards()">
         <h3>Diagnostic test</h3>
+      </div>
+      <div>
         <em>
           <strong>Description:</strong> Add up to 3 key skills (the order doesn't matter) that a learner who has completed this topic should have mastered. These skills will be used to generate the diagnostic test that determines whether to recommend this topic to new learners.
         </em>
@@ -303,9 +305,9 @@
           </button>
         </md-list-item>
         <md-list-item>
-          <div class="oppia-diagnostic-test-dropdown"
-               ng-show="isDiagnosticTestSkillsDropdownPresent">
-            <select class="e2e-test-diagnostic-test-skill-selector"
+          <mat-form-field class="oppia-diagnostic-test-dropdown-div"
+                          ng-show="isDiagnosticTestSkillsDropdownPresent">
+            <select class="oppia-diagnostic-test-dropdown e2e-test-diagnostic-test-skill-selector"
                     ng-model="selectedSkillForDiagnosticTest"
                     ng-change="addSkillForDiagnosticTest(selectedSkillForDiagnosticTest)"
                     aria-label="selection dropdown">
@@ -314,7 +316,7 @@
                 {{skillSummary.getDescription()}}
               </option>
             </select>
-          </div>
+          </mat-form-field>
           <button class="oppia-remove-diagnostic-test-skill-button"
                   md-button  md-icon-button
                   aria-label="Clear"
@@ -714,6 +716,8 @@
 
   .oppia-add-diagnostic-test-skills-button {
     color: #00695e;
+    margin-left: 0;
+    padding-left: 0;
     width: fit-content;
   }
 
@@ -729,11 +733,16 @@
   }
 
   .oppia-button-text {
+    margin-bottom: 0;
     padding: 10px;
   }
 
-  .oppia-diagnostic-test-dropdown {
+  .oppia-diagnostic-test-dropdown-div {
     width: 80%;
+  }
+
+  .oppia-diagnostic-test-dropdown {
+    width: 50%;
   }
 
   .oppia-remove-diagnostic-test-skill-button {
