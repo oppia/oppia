@@ -226,6 +226,7 @@ describe('Contributor dashboard page', function() {
     await action.click('Copy button', copyButton);
     await action.click('Image', images[0]);
     await action.click('Done', doneButton);
+    images = await $$('.e2e-test-image');
     expect(images.length).toEqual(2);
 
     // Copy tool should not copy image on pressing 'Cancel'.
