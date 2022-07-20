@@ -217,7 +217,7 @@ var CreatorDashboardPage = function() {
     var expSummaryRowTitleElements = (
       await expSummaryRowTitleElementsSelector());
     await waitFor.visibilityOf(
-      expSummaryRowTitleElement[0],
+      expSummaryRowTitleElements[0],
       'Unable to find exploration titles');
     return expSummaryRowTitleElements;
   };
@@ -237,7 +237,7 @@ var CreatorDashboardPage = function() {
     var expSummaryRowFeedbackElements = (
       await expSummaryRowFeedbackElementsSelector());
     await waitFor.visibilityOf(
-      expSummaryRowFeedbackElement[0],
+      expSummaryRowFeedbackElements[0],
       'Unable to find exploration feedbacks');
     return expSummaryRowFeedbackElements;
   };
