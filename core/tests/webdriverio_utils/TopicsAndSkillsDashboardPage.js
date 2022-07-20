@@ -423,13 +423,12 @@ var TopicsAndSkillsDashboardPage = function() {
         'No skills present message taking too long to appear.');
       expect(await noSkillsPresentMessage.isDisplayed()).toBe(true);
       return;
-    } else {
-      await waitFor.visibilityOf(
-        skillsListItem,
-        'Skills are taking too long to appear.');
-      var skillsListItems = await skillsListItemsSelector();
-      expect(skillsListItems.length).toEqual(number);
     }
+    await waitFor.visibilityOf(
+      skillsListItem,
+      'Skills are taking too long to appear.');
+    var skillsListItems = await skillsListItemsSelector();
+    expect(skillsListItems.length).toEqual(number);
   };
 
   this.searchSkillByName = async function(name) {
