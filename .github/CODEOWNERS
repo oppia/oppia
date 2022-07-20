@@ -219,6 +219,7 @@
 /core/templates/components/state-directives/ @oppia/lace-frontend-reviewers
 /core/templates/components/graph-services/ @oppia/lace-frontend-reviewers
 /core/templates/components/on-screen-keyboard/ @oppia/interaction-and-rte-reviewers
+/core/templates/components/recommendations/ @oppia/lace-frontend-reviewers
 /core/templates/components/save-pending-changes/ @oppia/lace-frontend-reviewers
 /core/templates/components/stale-tab-info/ @oppia/lace-frontend-reviewers
 /core/templates/components/unsaved-changes-status-info/ @oppia/lace-frontend-reviewers
