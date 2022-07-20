@@ -47,7 +47,7 @@ def check_python_env_is_suitable() -> None:
     We want developers to use a virtual environment when developing locally so
     that our scripts don't change their global Python environments. On CI
     however, it's okay to change the global environment since the checks are
-    running in an epehmeral virtual machine. Therefore, a "suitable" Python
+    running in an ephemeral virtual machine. Therefore, a "suitable" Python
     environment is one that either is on CI or is a virtual environment.
     """
     if 'GITHUB_ACTION' in os.environ:
