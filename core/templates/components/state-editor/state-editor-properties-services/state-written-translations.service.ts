@@ -16,7 +16,7 @@
  * @fileoverview A data service that stores the written translations.
  */
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable, OnChanges, SimpleChanges } from '@angular/core';
+import { Injectable } from '@angular/core';
 
 import { AlertsService } from 'services/alerts.service';
 import { StatePropertyService } from
@@ -30,14 +30,10 @@ import { WrittenTranslations } from
   providedIn: 'root'
 })
 export class StateWrittenTranslationsService extends
-  StatePropertyService<WrittenTranslations> implements OnChanges {
+  StatePropertyService<WrittenTranslations> {
   constructor(alertsService: AlertsService, utilsService: UtilsService) {
     super(alertsService, utilsService);
     this.setterMethodKey = 'saveWrittenTranslation';
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    console.error('my changes');
   }
 }
 

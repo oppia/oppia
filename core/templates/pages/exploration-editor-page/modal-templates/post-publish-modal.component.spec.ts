@@ -20,7 +20,8 @@
 import { Component, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
 import { ContextService } from 'services/context.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { PostPublishModalComponent } from 'pages/exploration-editor-page/modal-templates/post-publish-modal.component';
@@ -87,6 +88,20 @@ describe('Post Publish Modal Controller', function() {
     }).compileComponents();
   }));
 
+  beforeEach(() => {
+    fixture = TestBed.createComponent(PostPublishModalComponent);
+    component = fixture.componentInstance;
+
+    ngbActiveModal = TestBed.inject(NgbActiveModal);
+    contextService = TestBed.inject(ContextService);
+    windowRef = TestBed.inject(WindowRef);
+    windowRef = (windowRef as unknown) as jasmine.SpyObj<WindowRef>;
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
+    spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
+    spyOn(urlInterpolationService, 'getStaticImageUrl')
+      .and.returnValue(address);
+    fixture.detectChanges();
+  });
 
   it('should evaluate exploration id when component is initialized', () => {
     expect(component.congratsImgUrl).toBe(address);

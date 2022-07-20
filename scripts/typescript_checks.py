@@ -126,7 +126,6 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/components/rubrics-editor/rubrics-editor.component.spec.ts',
     'core/templates/components/rubrics-editor/rubrics-editor.component.ts',
     'core/templates/components/shared-component.module.ts',
-    'core/templates/components/skill-selector/questions-list-select-skill-modal.controller.spec.ts',
     'core/templates/components/skills-mastery-list/skills-mastery-list-concept-card-modal.controller.spec.ts',
     'core/templates/components/state-directives/answer-group-editor/answer-group-editor.component.spec.ts',
     'core/templates/components/state-directives/answer-group-editor/answer-group-editor.component.ts',

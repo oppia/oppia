@@ -32,6 +32,7 @@ import { SkillOpportunity } from 'domain/opportunity/skill-opportunity.model';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { QuestionsOpportunitiesSelectDifficultyModalComponent } from 'pages/topic-editor-page/modal-templates/questions-opportunities-select-difficulty-modal.component';
 import { AlertsService } from 'services/alerts.service';
+import { TranslationOpportunity } from '../modal-templates/translation-modal.component';
 
 interface Opportunities {
   opportunities: SkillOpportunity[];
@@ -112,14 +113,20 @@ export class QuestionOpportunitiesComponent implements OnInit {
     });
   }
 
-  loadMoreOpportunities(): unknown {
+  loadMoreOpportunities(): Promise<{
+    opportunitiesDicts: TranslationOpportunity[];
+    more: boolean;
+  }> {
     return (
       this.contributionOpportunitiesService
         .getMoreSkillOpportunitiesAsync().then(
           this.getPresentableOpportunitiesData.bind(this)));
   }
 
-  loadOpportunities(): unknown {
+  loadOpportunities(): Promise<{
+    opportunitiesDicts: TranslationOpportunity[];
+    more: boolean;
+  }> {
     return (
       this.contributionOpportunitiesService
         .getSkillOpportunitiesAsync().then(
@@ -159,6 +166,7 @@ export class QuestionOpportunitiesComponent implements OnInit {
     });
   }
 }
+
 angular.module('oppia').directive('oppiaQuestionOpportunities',
   downgradeComponent({
     component: QuestionOpportunitiesComponent

@@ -17,7 +17,7 @@
  */
 
 import { EventEmitter, NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
-import { ComponentFixture, fakeAsync, flush, flushMicrotasks, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, flush, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { StateGraphLayoutService } from 'components/graph-services/graph-layout.service';
 import * as d3 from 'd3';
 import { of } from 'rxjs';
@@ -338,7 +338,6 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
     component.getCenterGraph();
     tick();
 
-    
     flush();
   }));
 
@@ -427,5 +426,3 @@ describe('State Graph Visualization Component when graph is redrawn', () => {
     expect(component.overallTransformStr).toBe('translate(0,0)');
   }));
 });
-
-

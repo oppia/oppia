@@ -24,9 +24,6 @@ import { WindowRef } from 'services/contextual/window-ref.service';
   providedIn: 'root'
 })
 export class SkillEditorRoutingService {
-  static creatingNewQuestion(creatingNewQuestion: any) {
-    throw new Error('Method not implemented.');
-  }
   MAIN_TAB = 'main';
   QUESTIONS_TAB = 'questions';
   PREVIEW_TAB = 'preview';
