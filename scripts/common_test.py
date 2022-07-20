@@ -44,11 +44,11 @@ from typing_extensions import Literal
 from . import common
 
 
-# The pool_size argument is required by Requester.__init__(), but it is
-# missing from the typing definition in Requester.pyi.  We therefore
-# disable type checking here. A PR was open to PyGithub to fix this, but it was
-# closed due to inactivity (the project does not seem very active). Here is the
-# PR: https://github.com/PyGithub/PyGithub/pull/2151.
+# The pool_size argument is required by Requester.__init__(), but it is missing
+# from the typing definition in Requester.pyi.  We therefore disable type
+# checking here. A PR was opened to PyGithub to fix this, but it was closed due
+# to inactivity (the project does not seem very active). Here is the PR:
+# https://github.com/PyGithub/PyGithub/pull/2151.
 _MOCK_REQUESTER = github.Requester.Requester(  # type: ignore
     login_or_token=None,
     password=None,

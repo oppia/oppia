@@ -57,7 +57,7 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
             else:
                 delattr(sys, 'real_prefix')
 
-    def test_check_python_env_passes_when_in_venv(self) -> None:
+    def test_check_python_env_is_suitable_passes_when_in_venv(self) -> None:
         prefix_swap = self.swap(
             sys, 'prefix', '/home/user/.pyenv/versions/3.7.10')
         base_prefix_swap = self.swap(
@@ -65,9 +65,11 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
         real_prefix_manager = self.sys_real_prefix_context('')
         environ_swap = self.swap(os, 'environ', {})
         with prefix_swap, base_prefix_swap, real_prefix_manager, environ_swap:
-            install_python_dev_dependencies.check_python_env()
+            install_python_dev_dependencies.check_python_env_is_suitable()
 
-    def test_check_python_env_passes_when_in_venv_real_prefix(self) -> None:
+    def test_check_python_env_is_suitable_passes_when_in_venv_real_prefix(
+        self
+    ) -> None:
         prefix_swap = self.swap(
             sys, 'prefix', '/home/user/.pyenv/versions/3.7.10')
         base_prefix_swap = self.swap(
@@ -76,9 +78,9 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
             '/home/user/.pyenv/versions/oppia')
         environ_swap = self.swap(os, 'environ', {})
         with prefix_swap, base_prefix_swap, real_prefix_manager, environ_swap:
-            install_python_dev_dependencies.check_python_env()
+            install_python_dev_dependencies.check_python_env_is_suitable()
 
-    def test_check_python_env_fails_when_out_of_venv(self) -> None:
+    def test_check_python_env_is_suitable_fails_when_out_of_venv(self) -> None:
         prefix_swap = self.swap(
             sys, 'prefix', '/home/user/.pyenv/versions/3.7.10')
         base_prefix_swap = self.swap(
@@ -88,12 +90,16 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
         expected_error = (
             'Oppia must be developed within a virtual environment.')
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
-                AssertionError, expected_error):
+            AssertionError, expected_error
+        ):
             with prefix_swap, base_prefix_swap, real_prefix_manager:
                 with environ_swap:
-                    install_python_dev_dependencies.check_python_env()
+                    (
+                        install_python_dev_dependencies
+                        .check_python_env_is_suitable()
+                    )
 
-    def test_check_python_env_passes_when_on_ci(self) -> None:
+    def test_check_python_env_is_suitable_passes_when_on_ci(self) -> None:
         prefix_swap = self.swap(
             sys, 'prefix', '/home/user/.pyenv/versions/3.7.10')
         base_prefix_swap = self.swap(
@@ -101,7 +107,7 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
         real_prefix_manager = self.sys_real_prefix_context('')
         environ_swap = self.swap(os, 'environ', {'GITHUB_ACTION': '1'})
         with prefix_swap, base_prefix_swap, real_prefix_manager, environ_swap:
-            install_python_dev_dependencies.check_python_env()
+            install_python_dev_dependencies.check_python_env_is_suitable()
 
     def test_install_installation_tools(self) -> None:
         expected_tools = {
@@ -244,7 +250,8 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
             return False
 
         assert_swap = self.swap_with_checks(
-            install_python_dev_dependencies, 'check_python_env', mock_func)
+            install_python_dev_dependencies, 'check_python_env_is_suitable',
+            mock_func)
         install_tools_swap = self.swap_with_checks(
             install_python_dev_dependencies,
             'install_installation_tools', mock_func)
@@ -267,7 +274,8 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
             return False
 
         assert_swap = self.swap_with_checks(
-            install_python_dev_dependencies, 'check_python_env', mock_func)
+            install_python_dev_dependencies, 'check_python_env_is_suitable',
+            mock_func)
         install_tools_swap = self.swap_with_checks(
             install_python_dev_dependencies,
             'install_installation_tools', mock_func)
@@ -291,7 +299,8 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
             return True
 
         assert_swap = self.swap_with_checks(
-            install_python_dev_dependencies, 'check_python_env', mock_func)
+            install_python_dev_dependencies, 'check_python_env_is_suitable',
+            mock_func)
         install_tools_swap = self.swap_with_checks(
             install_python_dev_dependencies,
             'install_installation_tools', mock_func)
@@ -314,7 +323,8 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
             return True
 
         assert_swap = self.swap_with_checks(
-            install_python_dev_dependencies, 'check_python_env', mock_func)
+            install_python_dev_dependencies, 'check_python_env_is_suitable',
+            mock_func)
         install_tools_swap = self.swap_with_checks(
             install_python_dev_dependencies,
             'install_installation_tools', mock_func)

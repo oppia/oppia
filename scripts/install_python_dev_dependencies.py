@@ -41,8 +41,15 @@ _PARSER.add_argument(
     help='Assert that the dev requirements file is already compiled.')
 
 
-def check_python_env() -> None:
-    """Raise an error if we are not in a virtual environment or on CI."""
+def check_python_env_is_suitable() -> None:
+    """Raise an error if we are not in a virtual environment or on CI.
+
+    We want developers to use a virtual environment when developing locally so
+    that our scripts don't change their global Python environments. On CI
+    however, it's okay to change the global environment since the checks are
+    running in an epehmeral virtual machine. Therefore, a "suitable" Python
+    environment is one that either is on CI or is a virtual environment.
+    """
     if 'GITHUB_ACTION' in os.environ:
         # The GITHUB_ACTION environment variable indicates we are running on
         # GitHub Actions according to
@@ -116,7 +123,7 @@ def compile_pip_requirements(
 def main(cli_args: Optional[List[str]] = None) -> None:
     """Install all dev dependencies."""
     args = _PARSER.parse_args(cli_args)
-    check_python_env()
+    check_python_env_is_suitable()
     install_installation_tools()
     not_compiled = compile_pip_requirements(
         REQUIREMENTS_DEV_FILE_PATH, COMPILED_REQUIREMENTS_DEV_FILE_PATH)
