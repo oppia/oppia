@@ -186,10 +186,21 @@
     </div>
   </div>
 
-  <div *ngIf="isEditable">
-    <strong>The answers in this group are correct</strong>
+  <div class="oppia-outcome-container" *ngIf="isEditable">    
     <div *ngIf="outcome">
-      <input class="ml-2 e2e-test-editor-correctness-toggle" type="checkbox" [(ngModel)]="outcome.labelledAsCorrect" (change)="onChangeCorrectnessLabel()">
+      <input class="mr-2 e2e-test-editor-correctness-toggle" type="checkbox" [(ngModel)]="outcome.labelledAsCorrect" (change)="onChangeCorrectnessLabel()">
     </div>
+    <strong>The answers in this group are correct</strong>
   </div>
 </div>
+
+<style>
+  .oppia-outcome-container {
+    display: flex;
+  }
+  @media screen and (max-width: 500px) {
+    strong {
+      font-size: 18px;
+    }
+  }
+</style>

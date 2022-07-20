@@ -46,7 +46,6 @@
                                        [defaultOutcome]="false"
                                        [numRules]="answerGroup.rules?.length"
                                        [isResponse]="true"
-                                       (delete)="deleteAnswerGroup($event)"
                                        (navigateToState)="navigateToState.emit($event)">
                 </oppia-response-header>
               </a>
@@ -70,6 +69,13 @@
                                                (showMarkAllAudioAsNeedingUpdateModalIfRequired)="sendshowMarkAllAudioAsNeedingUpdateModalIfRequired($event)">
                     </oppia-answer-group-editor>
                   </div>
+                
+                <div class="btn btn-danger oppia-delete-response"
+                     *ngIf="editabilityService.isEditable()"
+                     (click)="deleteAnswerGroup($event, index)">
+                  Delete Response
+                </div>
+                
                 </div>
               </div>
             </div>
@@ -189,6 +195,9 @@
 </div>
 
 <style>
+  .oppia-delete-response {
+    margin: 10px 0;
+  }
   .option-list-default {
     border: solid 1px #ccc;
     border-radius: 4px;
@@ -328,8 +337,8 @@
   }
 
   @media screen and (max-width: 768px) {
-    state-responses .state-response-container {
-      padding: 15px 10px;
+    .state-response-container {
+      padding: 15px 21px;
     }
     state-responses .solicit-answer-checkbox {
       width: 100%;
