@@ -655,7 +655,7 @@ class ExpStateValidationJob(base_jobs.JobBase):
         choice_empty = False
         choice_duplicate = False
         for choice in choices:
-            if choice.html == '<p></p>' or choice.html == '':
+            if choice.html in ('<p></p>', ''):
                 choice_empty = True
             if choice.html in seen_choices:
                 choice_duplicate = True
@@ -753,7 +753,7 @@ class ExpStateValidationJob(base_jobs.JobBase):
         choice_empty = False
         choice_duplicate = False
         for choice in choices:
-            if choice.html == '<p></p>' or choice.html == '':
+            if choice.html in ('<p></p>', ''):
                 choice_empty = True
             if choice.html in seen_choices:
                 choice_duplicate = True
@@ -907,7 +907,7 @@ class ExpStateValidationJob(base_jobs.JobBase):
         choice_empty = False
         choice_duplicate = False
         for choice in choices:
-            if choice.html == '<p></p>' or choice.html == '':
+            if choice.html in ('<p></p>', ''):
                 choice_empty = True
             if choice.html in seen_choices:
                 choice_duplicate = True
