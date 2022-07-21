@@ -548,7 +548,7 @@ def update_story(
     committer_id: str,
     story_id: str,
     change_list: List[story_domain.StoryChange],
-    commit_message: Optional[str]
+    commit_message: str
 ) -> None:
     """Updates a story. Commits changes.
 
