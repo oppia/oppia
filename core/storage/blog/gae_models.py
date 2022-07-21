@@ -14,7 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Models for storing data related to blog posts."""
+"""Models for storing data related to blog posts. The author can edit both
+published and draft blog post at any time. Hence, functionality for reverting
+back to earlier versions is not being built in. All models are therefore not
+versioned."""
 
 from __future__ import annotations
 
