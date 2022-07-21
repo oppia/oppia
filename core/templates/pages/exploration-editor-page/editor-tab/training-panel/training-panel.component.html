@@ -4,8 +4,8 @@
   </div>
 
   <div>
-    <angular-html-bind-wrapper [htmlData]="answerTemplate">
-    </angular-html-bind-wrapper>
+    <oppia-interaction-display [htmlData]="answerTemplate">
+    </oppia-interaction-display>
   </div>
 
   <br>
@@ -20,8 +20,8 @@
                   (click)="selectAnswerGroupIndex(index)"
                   [ngClass]="{'trained-feedback-selected': index == selectedAnswerGroupIndex}">
             <span *ngIf="!outcome.feedback.isEmpty()">
-              <angular-html-bind-wrapper [htmlData]="outcome.feedback.html">
-              </angular-html-bind-wrapper>
+              <oppia-interaction-display [htmlData]="outcome.feedback.html">
+              </oppia-interaction-display>
             </span>
             <span *ngIf="outcome.feedback.isEmpty()">
               <em>(No feedback)</em>

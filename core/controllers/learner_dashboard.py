@@ -24,6 +24,7 @@ from core.controllers import base
 from core.domain import exp_fetchers
 from core.domain import feedback_services
 from core.domain import learner_progress_services
+from core.domain import story_fetchers
 from core.domain import subscription_services
 from core.domain import suggestion_services
 from core.domain import summary_services
@@ -126,6 +127,37 @@ class LearnerDashboardTopicsAndStoriesProgressHandler(base.BaseHandler):
                 learnt_to_partially_learnt_topics),
         })
         self.render_json(self.values)
+
+
+class LearnerCompletedChaptersCountHandler(base.BaseHandler):
+    """Provides the number of chapters completed by the user."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+    @acl_decorators.can_access_learner_dashboard
+    def get(self):
+        """Handles GET requests."""
+        learner_progress_in_topics_and_stories = (
+            learner_progress_services.get_topics_and_stories_progress(
+                self.user_id)[0])
+
+        all_topic_summary_dicts = (
+            learner_progress_services.get_displayable_topic_summary_dicts(
+                self.user_id,
+                learner_progress_in_topics_and_stories.all_topic_summaries))
+
+        completed_chapters_count = 0
+        for topic in all_topic_summary_dicts:
+            for story in topic['canonical_story_summary_dict']:
+                completed_chapters_count += (
+                    len(story_fetchers.get_completed_nodes_in_story(
+                        self.user_id, story['id'])))
+
+        self.render_json({
+            'completed_chapters_count': completed_chapters_count,
+        })
 
 
 class LearnerDashboardCollectionsProgressHandler(base.BaseHandler):

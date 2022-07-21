@@ -165,7 +165,7 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
                 'does not match the latest schema version %s' % (
                     self.EXP_1_ID,
                     '1',
-                    '50',
+                    '51',
                     '60'
                 )
         )
@@ -443,6 +443,7 @@ states:
           value: 1
       default_outcome:
         dest: End
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''

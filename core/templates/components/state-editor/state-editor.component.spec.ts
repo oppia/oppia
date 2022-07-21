@@ -16,94 +16,157 @@
  * @fileoverview Unit test for State Editor Component.
  */
 
-import { EventEmitter } from '@angular/core';
-import { fakeAsync, tick } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { State } from 'domain/state/StateObjectFactory';
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { StateEditorService } from './state-editor-properties-services/state-editor.service';
+import { StateInteractionIdService } from './state-editor-properties-services/state-interaction-id.service';
+import { StateEditorComponent } from './state-editor.component';
 
-describe('StateEditorComponent', () => {
-  let ctrl = null;
-  let $rootScope = null;
-  let $scope = null;
+describe('State Editor Component', () => {
+  let component: StateEditorComponent;
+  let fixture: ComponentFixture<StateEditorComponent>;
+  let windowDimensionsService: WindowDimensionsService;
+  let stateEditorService: StateEditorService;
+  let stateInteractionIdService: StateInteractionIdService;
 
-  let WindowDimensionsService = null;
-  let StateEditorService = null;
-  let StateInteractionIdService = null;
-
-  beforeEach(angular.mock.module('oppia'));
-  importAllAngularServices();
-
-  afterEach(() => {
-    ctrl.$onDestroy();
-  });
-
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
-
-    WindowDimensionsService = $injector.get('WindowDimensionsService');
-    StateEditorService = $injector.get('StateEditorService');
-    StateInteractionIdService = $injector.get('StateInteractionIdService');
-
-    ctrl = $componentController('stateEditor', {
-      $scope: $scope
-    });
-
-    spyOn(StateEditorService, 'getActiveStateName').and.returnValue(
-      'Introduction');
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      declarations: [
+        StateEditorComponent
+      ],
+      providers: [
+        WindowDimensionsService,
+        StateEditorService,
+        StateInteractionIdService,
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   }));
 
+  beforeEach(() => {
+    fixture = TestBed.createComponent(StateEditorComponent);
+    component = fixture.componentInstance;
+
+    windowDimensionsService = TestBed.inject(WindowDimensionsService);
+    stateEditorService = TestBed.inject(StateEditorService);
+    stateInteractionIdService = TestBed.inject(StateInteractionIdService);
+
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
+      'Introduction');
+  });
+
+  afterEach(() => {
+    component.ngOnDestroy();
+  });
+
+  it('should emit values properly', () => {
+    spyOn(component.recomputeGraph, 'emit').and.stub();
+    spyOn(component.onSaveLinkedSkillId, 'emit').and.stub();
+    spyOn(component.onSaveSolicitAnswerDetails, 'emit').and.stub();
+    spyOn(component.onSaveHints, 'emit').and.stub();
+    spyOn(component.refreshWarnings, 'emit').and.stub();
+    spyOn(component.onSaveInteractionDefaultOutcome, 'emit').and.stub();
+    spyOn(component.onSaveInteractionAnswerGroups, 'emit').and.stub();
+    spyOn(component.onSaveInapplicableSkillMisconceptionIds, 'emit').and.stub();
+    spyOn(component.navigateToState, 'emit').and.stub();
+    spyOn(component.onSaveSolution, 'emit').and.stub();
+    spyOn(component.onSaveNextContentIdIndex, 'emit').and.stub();
+    spyOn(component.onSaveInteractionCustomizationArgs, 'emit').and.stub();
+    spyOn(component.onSaveInteractionId, 'emit').and.stub();
+    spyOn(component.showMarkAllAudioAsNeedingUpdateModalIfRequired, 'emit')
+      .and.stub();
+    spyOn(component.onSaveStateContent, 'emit').and.stub();
+
+    component.sendRecomputeGraph();
+    component.sendOnSaveLinkedSkillId('');
+    component.sendOnSaveSolicitAnswerDetails(false);
+    component.sendOnSaveHints([]);
+    component.sendRefreshWarnings();
+    component.sendOnSaveInteractionDefaultOutcome(null);
+    component.sendOnSaveInteractionAnswerGroups([]);
+    component.sendOnSaveInapplicableSkillMisconceptionIds([]);
+    component.sendNavigateToState('');
+    component.sendOnSaveSolution(null);
+    component.sendOnSaveNextContentIdIndex(null);
+    component.sendOnSaveInteractionCustomizationArgs('');
+    component.sendOnSaveInteractionId('');
+    component.sendShowMarkAllAudioAsNeedingUpdateModalIfRequired([]);
+    component.sendOnSaveStateContent(null);
+
+    expect(component.recomputeGraph.emit).toHaveBeenCalled();
+    expect(component.onSaveLinkedSkillId.emit).toHaveBeenCalled();
+    expect(component.onSaveSolicitAnswerDetails.emit).toHaveBeenCalled();
+    expect(component.onSaveHints.emit).toHaveBeenCalled();
+    expect(component.refreshWarnings.emit).toHaveBeenCalled();
+    expect(component.onSaveInteractionDefaultOutcome.emit).toHaveBeenCalled();
+    expect(component.onSaveInteractionAnswerGroups.emit).toHaveBeenCalled();
+    expect(component.onSaveInapplicableSkillMisconceptionIds.emit)
+      .toHaveBeenCalled();
+    expect(component.navigateToState.emit).toHaveBeenCalled();
+    expect(component.onSaveSolution.emit).toHaveBeenCalled();
+    expect(component.onSaveNextContentIdIndex.emit).toHaveBeenCalled();
+    expect(component.onSaveInteractionCustomizationArgs.emit)
+      .toHaveBeenCalled();
+    expect(component.onSaveInteractionId.emit).toHaveBeenCalled();
+    expect(component.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit)
+      .toHaveBeenCalled();
+    expect(component.onSaveStateContent.emit).toHaveBeenCalled();
+  });
+
   it('should set component properties initialization', () => {
-    spyOn(WindowDimensionsService, 'isWindowNarrow').and.returnValue(false);
+    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
 
-    expect($scope.oppiaBlackImgUrl).toBe(undefined);
-    expect($scope.currentStateIsTerminal).toBe(undefined);
-    expect($scope.conceptCardIsShown).toBe(undefined);
-    expect($scope.windowIsNarrow).toBe(undefined);
-    expect($scope.interactionIdIsSet).toBe(undefined);
-    expect($scope.stateName).toBe(undefined);
+    expect(component.oppiaBlackImgUrl).toBe(undefined);
+    expect(component.currentStateIsTerminal).toBe(undefined);
+    expect(component.conceptCardIsShown).toBe(undefined);
+    expect(component.windowIsNarrow).toBe(undefined);
+    expect(component.interactionIdIsSet).toBe(undefined);
+    expect(component.stateName).toBe(undefined);
 
-    ctrl.$onInit();
+    component.ngOnInit();
 
-    expect($scope.oppiaBlackImgUrl)
+    expect(component.oppiaBlackImgUrl)
       .toBe('/assets/images/avatar/oppia_avatar_100px.svg');
-    expect($scope.currentStateIsTerminal).toBe(false);
-    expect($scope.conceptCardIsShown).toBe(true);
-    expect($scope.windowIsNarrow).toBe(false);
-    expect($scope.interactionIdIsSet).toBe(false);
-    expect($scope.stateName).toBe('Introduction');
+    expect(component.currentStateIsTerminal).toBe(false);
+    expect(component.conceptCardIsShown).toBe(true);
+    expect(component.windowIsNarrow).toBe(false);
+    expect(component.interactionIdIsSet).toBe(false);
+    expect(component.stateName).toBe('Introduction');
   });
 
   it('should update interaction visibility when interaction is changed', () => {
     let onInteractionIdChangedEmitter = new EventEmitter();
-    spyOnProperty(StateInteractionIdService, 'onInteractionIdChanged')
+    spyOnProperty(stateInteractionIdService, 'onInteractionIdChanged')
       .and.returnValue(onInteractionIdChangedEmitter);
 
-    expect($scope.interactionIdIsSet).toBe(undefined);
-    expect($scope.currentInteractionCanHaveSolution).toBe(undefined);
-    expect($scope.currentStateIsTerminal).toBe(undefined);
+    expect(component.interactionIdIsSet).toBe(undefined);
+    expect(component.currentInteractionCanHaveSolution).toBe(undefined);
+    expect(component.currentStateIsTerminal).toBe(undefined);
 
-    ctrl.$onInit();
+    component.ngOnInit();
 
     onInteractionIdChangedEmitter.emit('TextInput');
-    $scope.$apply();
 
-    expect($scope.interactionIdIsSet).toBe(true);
-    expect($scope.currentInteractionCanHaveSolution).toBe(true);
-    expect($scope.currentStateIsTerminal).toBe(false);
+    expect(component.interactionIdIsSet).toBe(true);
+    expect(component.currentInteractionCanHaveSolution).toBe(true);
+    expect(component.currentStateIsTerminal).toBe(false);
   });
 
   it('should toggle concept card', () => {
-    expect($scope.conceptCardIsShown).toBe(undefined);
+    expect(component.conceptCardIsShown).toBe(undefined);
 
-    $scope.conceptCardIsShown = true;
-    $scope.toggleConceptCard();
+    component.conceptCardIsShown = true;
+    component.toggleConceptCard();
 
-    expect($scope.conceptCardIsShown).toBe(false);
+    expect(component.conceptCardIsShown).toBe(false);
 
-    $scope.toggleConceptCard();
+    component.toggleConceptCard();
 
-    expect($scope.conceptCardIsShown).toBe(true);
+    expect(component.conceptCardIsShown).toBe(true);
   });
 
   it('should initialize services when component is reinitialized', () => {
@@ -121,6 +184,7 @@ describe('StateEditorComponent', () => {
         answer_groups: [],
         default_outcome: {
           dest: 'default',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'default_outcome',
             html: ''
@@ -140,27 +204,26 @@ describe('StateEditorComponent', () => {
         }
       },
     };
-    spyOnProperty(StateEditorService, 'onStateEditorInitialized')
+    spyOnProperty(stateEditorService, 'onStateEditorInitialized')
       .and.returnValue(onStateEditorInitializedEmitter);
 
-    ctrl.$onInit();
+    component.ngOnInit();
 
-    expect($scope.servicesInitialized).toBe(false);
+    expect(component.servicesInitialized).toBe(false);
 
     onStateEditorInitializedEmitter.emit(stateData);
-    $scope.$apply();
 
-    expect($scope.servicesInitialized).toBe(true);
+    expect(component.servicesInitialized).toBe(true);
   });
 
   it('should throw error if state data is not defined and' +
     ' component is reinitialized', fakeAsync(() => {
     let onStateEditorInitializedEmitter = new EventEmitter<State>();
     let stateData = undefined;
-    spyOnProperty(StateEditorService, 'onStateEditorInitialized')
+    spyOnProperty(stateEditorService, 'onStateEditorInitialized')
       .and.returnValue(onStateEditorInitializedEmitter);
 
-    ctrl.$onInit();
+    component.ngOnInit();
 
     expect(() => {
       onStateEditorInitializedEmitter.emit(stateData);
@@ -169,18 +232,10 @@ describe('StateEditorComponent', () => {
   }));
 
   it('should reinitialize editor when responses change', () => {
-    spyOn(StateEditorService.onStateEditorInitialized, 'emit').and.stub();
+    spyOn(stateEditorService.onStateEditorInitialized, 'emit').and.stub();
 
-    $scope.reinitializeEditor();
+    component.reinitializeEditor();
 
-    expect(StateEditorService.onStateEditorInitialized.emit).toHaveBeenCalled();
-  });
-
-  it('should update the changes', function() {
-    spyOn($rootScope, '$applyAsync');
-
-    $scope.getSolutionChange();
-
-    expect($rootScope.$applyAsync).toHaveBeenCalled();
+    expect(stateEditorService.onStateEditorInitialized.emit).toHaveBeenCalled();
   });
 });

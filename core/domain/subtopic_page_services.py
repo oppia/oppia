@@ -22,10 +22,12 @@ import copy
 
 from core import feconf
 from core.domain import change_domain
+from core.domain import skill_services
 from core.domain import subtopic_page_domain
+from core.domain import topic_fetchers
 from core.platform import models
 
-from typing import List, Optional, overload
+from typing import Dict, List, Optional, overload
 from typing_extensions import Literal
 
 MYPY = False
@@ -322,3 +324,100 @@ def delete_subtopic_page(
     subtopic_models.SubtopicPageModel.get(subtopic_page_id).delete(
         committer_id, feconf.COMMIT_MESSAGE_SUBTOPIC_PAGE_DELETED,
         force_deletion=force_deletion)
+
+
+def get_topic_ids_from_subtopic_page_ids(
+    subtopic_page_ids: List[str]
+) -> List[str]:
+    """Returns the topic ids corresponding to the given set of subtopic page
+    ids.
+
+    Args:
+        subtopic_page_ids: list(str). The ids of the subtopic pages.
+
+    Returns:
+        list(str). The topic ids corresponding to the given subtopic page ids.
+        The returned list of topic ids is deduplicated and ordered
+        alphabetically.
+    """
+    return sorted(list({
+        subtopic_page_id.split(':')[0] for subtopic_page_id in
+        subtopic_page_ids
+    }))
+
+
+def get_multi_users_subtopic_pages_progress(
+    user_ids: List[str],
+    subtopic_page_ids: List[str]
+) -> Dict[str, List[subtopic_page_domain.SubtopicPageSummaryDict]]:
+    """Returns the progress of the given user on the given subtopic pages.
+
+    Args:
+        user_ids: list(str). The ids of the users.
+        subtopic_page_ids: list(str). The ids of the subtopic pages.
+
+    Returns:
+        dict(str, list(SubtopicPageSummaryDict)). User IDs as keys and Subtopic
+        Page Summary domain object dictionaries containing details of the
+        subtopic page and users mastery in it as values.
+    """
+
+    topic_ids = get_topic_ids_from_subtopic_page_ids(subtopic_page_ids)
+    topics = topic_fetchers.get_topics_by_ids(topic_ids)
+
+    all_skill_ids_lists = [
+        topic.get_all_skill_ids() for topic in topics if topic
+    ]
+    all_skill_ids = list(
+        {
+            skill_id for skill_list in all_skill_ids_lists
+            for skill_id in skill_list
+        }
+    )
+
+    all_users_skill_mastery_dicts = (
+        skill_services.get_multi_users_skills_mastery(
+            user_ids, all_skill_ids
+        )
+    )
+
+    all_users_subtopic_prog_summaries: Dict[
+        str, List[subtopic_page_domain.SubtopicPageSummaryDict]
+    ] = {user_id: [] for user_id in user_ids}
+    for topic in topics:
+        # Ruling out the possibility of None for mypy type checking.
+        assert topic is not None
+        for subtopic in topic.subtopics:
+            subtopic_page_id = '{}:{}'.format(topic.id, subtopic.id)
+            if subtopic_page_id not in subtopic_page_ids:
+                continue
+            for user_id, skills_mastery_dict in (
+                all_users_skill_mastery_dicts.items()
+            ):
+                skill_mastery_dict = {
+                    skill_id: mastery
+                    for skill_id, mastery in skills_mastery_dict.items()
+                    if mastery is not None and (
+                        skill_id in subtopic.skill_ids
+                    )
+                }
+                subtopic_mastery: Optional[float] = None
+
+                # Subtopic mastery is average of skill masteries.
+                if skill_mastery_dict:
+                    subtopic_mastery = (
+                        sum(skill_mastery_dict.values()) /
+                        len(skill_mastery_dict)
+                    )
+
+                all_users_subtopic_prog_summaries[user_id].append({
+                    'subtopic_id': subtopic.id,
+                    'subtopic_title': subtopic.title,
+                    'parent_topic_id': topic.id,
+                    'parent_topic_name': topic.name,
+                    'thumbnail_filename': subtopic.thumbnail_filename,
+                    'thumbnail_bg_color': subtopic.thumbnail_bg_color,
+                    'subtopic_mastery': subtopic_mastery
+                })
+
+    return all_users_subtopic_prog_summaries

@@ -18,7 +18,6 @@
 
 from __future__ import annotations
 
-
 import argparse
 import os
 import site
@@ -72,8 +71,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/skill_services_test.py',
     'core/domain/state_domain.py',
     'core/domain/state_domain_test.py',
-    'core/domain/stats_domain.py',
-    'core/domain/stats_domain_test.py',
     'core/domain/stats_services.py',
     'core/domain/stats_services_test.py',
     'core/domain/suggestion_registry.py',
@@ -82,8 +79,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/suggestion_services_test.py',
     'core/domain/summary_services.py',
     'core/domain/summary_services_test.py',
-    'core/domain/topic_fetchers.py',
-    'core/domain/topic_fetchers_test.py',
     'core/domain/topic_services.py',
     'core/domain/topic_services_test.py',
     'core/domain/wipeout_service.py',
@@ -116,8 +111,8 @@ NOT_FULLY_COVERED_FILES = [
     'scripts/extend_index_yaml_test.py',
     'scripts/flake_checker.py',
     'scripts/flake_checker_test.py',
-    'scripts/install_backend_python_libs.py',
-    'scripts/install_backend_python_libs_test.py',
+    'scripts/install_python_prod_dependencies.py',
+    'scripts/install_python_prod_dependencies_test.py',
     'scripts/install_third_party_libs.py',
     'scripts/install_third_party_libs_test.py',
     'scripts/install_third_party.py',
