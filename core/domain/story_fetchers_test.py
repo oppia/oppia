@@ -214,7 +214,7 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(user_stories_progress[0]['topic_name'], 'Topic')
 
-        story_services.record_completed_node_in_story_context( # type: ignore[no-untyped-call]
+        story_services.record_completed_node_in_story_context(
             self.USER_ID, self.story_id, self.NODE_ID_1)
 
         all_users_stories_progress = (

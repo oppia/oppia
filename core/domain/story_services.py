@@ -506,7 +506,7 @@ def _save_story(
 
     story.validate()
     corresponding_topic = (
-        topic_fetchers.get_topic_by_id(story.corresponding_topic_id))  # type: ignore[no-untyped-call]
+        topic_fetchers.get_topic_by_id(story.corresponding_topic_id))
     validate_prerequisite_skills_in_story_contents(
         corresponding_topic.get_all_skill_ids(), story.story_contents)
 
@@ -560,7 +560,7 @@ def is_story_published_and_present_in_topic(story: story_domain.Story) -> bool:
         ValidationError. The story does not belong to any valid topic.
         Exception. The story does not belong to the expected topic.
     """
-    topic = topic_fetchers.get_topic_by_id(  # type: ignore[no-untyped-call]
+    topic = topic_fetchers.get_topic_by_id(
         story.corresponding_topic_id, strict=False)
     if topic is None:
         raise utils.ValidationError(

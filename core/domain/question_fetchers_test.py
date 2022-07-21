@@ -72,7 +72,7 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
         assert questions[0] is not None
         self.assertEqual(len(questions), 1)
         self.assertEqual(
-            questions[0].to_dict(), self.question.to_dict())  # type: ignore[no-untyped-call]
+            questions[0].to_dict(), self.question.to_dict())
 
     def test_get_no_questions_with_no_skill_ids(self) -> None:
         questions, _ = (
@@ -98,7 +98,7 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
         assert questions[0] is not None
         self.assertEqual(len(questions), 1)
         self.assertEqual(
-            questions[0].to_dict(), question_1.to_dict())  # type: ignore[no-untyped-call]
+            questions[0].to_dict(), question_1.to_dict())
 
     def test_get_questions_by_ids(self) -> None:
         question_id_2 = question_services.get_new_question_id()  # type: ignore[no-untyped-call]

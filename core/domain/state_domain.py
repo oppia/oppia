@@ -47,7 +47,11 @@ from core.domain import translatable_object_registry  # pylint: disable=invalid-
 
 
 AllowedRuleSpecInputTypes = Union[
-    str, int, List[str], List[List[str]]
+    str,
+    int,
+    List[str],
+    List[List[str]],
+    Dict[str, Union[str, List[str]]]
 ]
 
 
@@ -1475,6 +1479,7 @@ class OutcomeDict(TypedDict):
     """Dictionary representing the Outcome object."""
 
     dest: str
+    dest_if_really_stuck: Optional[str]
     feedback: SubtitledHtmlDict
     labelled_as_correct: bool
     param_changes: List[param_domain.ParamChangeDict]

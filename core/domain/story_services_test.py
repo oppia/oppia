@@ -66,7 +66,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.user_id_admin = (
             self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))  # type: ignore[no-untyped-call]
         self.STORY_ID = story_services.get_new_story_id()
-        self.TOPIC_ID = topic_fetchers.get_new_topic_id()  # type: ignore[no-untyped-call]
+        self.TOPIC_ID = topic_fetchers.get_new_topic_id()
         self.topic = self.save_new_topic(  # type: ignore[no-untyped-call]
             self.TOPIC_ID, self.USER_ID, name='Topic',
             abbreviated_name='topic-one', url_fragment='topic-one',
@@ -506,7 +506,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
     def test_update_story_with_invalid_corresponding_topic_id_value(
         self
     ) -> None:
-        topic_id = topic_fetchers.get_new_topic_id()  # type: ignore[no-untyped-call]
+        topic_id = topic_fetchers.get_new_topic_id()
         story_id = story_services.get_new_story_id()
         self.save_new_story(story_id, self.USER_ID, topic_id)
         changelist = [
@@ -525,7 +525,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 self.USER_ID, story_id, changelist, 'Added node.')
 
     def test_update_story_which_not_corresponding_topic_id(self) -> None:
-        topic_id = topic_fetchers.get_new_topic_id()  # type: ignore[no-untyped-call]
+        topic_id = topic_fetchers.get_new_topic_id()
         story_id = story_services.get_new_story_id()
         self.save_new_topic(  # type: ignore[no-untyped-call]
             topic_id, self.USER_ID, name='A New Topic',
@@ -552,7 +552,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 self.USER_ID, story_id, changelist, 'Added node.')
 
     def test_update_story_schema(self) -> None:
-        topic_id = topic_fetchers.get_new_topic_id()  # type: ignore[no-untyped-call]
+        topic_id = topic_fetchers.get_new_topic_id()
         story_id = story_services.get_new_story_id()
         self.save_new_topic(  # type: ignore[no-untyped-call]
             topic_id, self.USER_ID, name='A New Topic',
@@ -1089,7 +1089,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(story.url_fragment, 'updated-title')
 
     def test_cannot_update_story_if_url_fragment_already_exists(self) -> None:
-        topic_id = topic_fetchers.get_new_topic_id()  # type: ignore[no-untyped-call]
+        topic_id = topic_fetchers.get_new_topic_id()
         story_id = story_services.get_new_story_id()
         self.save_new_story(
             story_id, self.USER_ID, topic_id,
@@ -1642,7 +1642,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 
     def test_get_story_by_version(self) -> None:
-        topic_id = topic_fetchers.get_new_topic_id()  # type: ignore[no-untyped-call]
+        topic_id = topic_fetchers.get_new_topic_id()
         story_id = story_services.get_new_story_id()
         self.save_new_topic(  # type: ignore[no-untyped-call]
             topic_id, self.USER_ID, name='A different topic',
@@ -2031,7 +2031,7 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
         self.USER_ID = 'user'
 
         self.owner_id = 'owner'
-        self.TOPIC_ID = topic_fetchers.get_new_topic_id()  # type: ignore[no-untyped-call]
+        self.TOPIC_ID = topic_fetchers.get_new_topic_id()
         self.save_new_topic(  # type: ignore[no-untyped-call]
             self.TOPIC_ID, self.USER_ID, name='New Topic',
             abbreviated_name='topic-two', url_fragment='topic-two',
@@ -2278,7 +2278,7 @@ class StoryContentsMigrationTests(test_utils.GenericTestBase):
 
     def test_migrate_story_contents_to_latest_schema(self) -> None:
         story_id = story_services.get_new_story_id()
-        topic_id = topic_fetchers.get_new_topic_id()  # type: ignore[no-untyped-call]
+        topic_id = topic_fetchers.get_new_topic_id()
         user_id = 'user_id'
         self.save_new_topic(  # type: ignore[no-untyped-call]
             topic_id, user_id, name='Topic',

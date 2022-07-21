@@ -255,8 +255,12 @@ class Question(translation_domain.BaseTranslatableObject):
         Returns:
             State. The corresponding State domain object.
         """
+        # The argument `default_dest_state_name` of create_default_state method
+        # can only accept string values but here we are providing None which
+        # causes MyPy to throw `Incompatible argument type` error. Thus to avoid
+        # the error, we used ignore here.
         return state_domain.State.create_default_state(
-            None, is_initial_state=True)
+            None, is_initial_state=True)  # type: ignore[arg-type]
 
     @classmethod
     def _convert_state_v27_dict_to_v28_dict(
@@ -879,15 +883,20 @@ class Question(translation_domain.BaseTranslatableObject):
                 'interaction']['answer_groups']
             for answer_group_dict in answer_group_dicts:
                 rule_type_to_inputs: Dict[
-                    str, Set[str]
+                    str, Set[state_domain.AllowedRuleSpecInputTypes]
                 ] = collections.defaultdict(set)
                 for rule_spec_dict in answer_group_dict['rule_specs']:
                     rule_type = rule_spec_dict['rule_type']
                     rule_inputs = rule_spec_dict['inputs']['x']
                     rule_type_to_inputs[rule_type].add(rule_inputs)
+                # The expected type for 'inputs' key is
+                # Dict[str, AllowedRuleSpecInputTypes] but here we are
+                # assigning Dict[str, List[AllowedRuleSpecInputTypes]]
+                # which causes MyPy to throw `incompatible type` error.
+                # Thus to avoid the error, we used ignore here.
                 answer_group_dict['rule_specs'] = [{
                     'rule_type': rule_type,
-                    'inputs': {'x': list(rule_type_to_inputs[rule_type])}
+                    'inputs': {'x': list(rule_type_to_inputs[rule_type])}  # type: ignore[dict-item]
                 } for rule_type in rule_type_to_inputs]
 
         return question_state_dict
@@ -953,17 +962,22 @@ class Question(translation_domain.BaseTranslatableObject):
                 for rule_spec_dict in answer_group_dict['rule_specs']:
                     content_id = content_id_counter.generate_content_id(
                         'rule_input_')
+                    # The expected type for `rule_spec_dict['inputs']['x']`
+                    # is Dict[str, AllowedRuleSpecInputTypes] but here we
+                    # giving Dict[str, Dit[str, AllowedRuleSpecInputTypes]]
+                    # values which causes MyPy to throw `incompatible type`
+                    # error. Thus to avoid the error, we used ignore here.
+                    # Convert to TranslatableSetOfNormalizedString.
                     if interaction_id == 'TextInput':
-                        # Convert to TranslatableSetOfNormalizedString.
                         rule_spec_dict['inputs']['x'] = {
                             'contentId': content_id,
-                            'normalizedStrSet': rule_spec_dict['inputs']['x']
+                            'normalizedStrSet': rule_spec_dict['inputs']['x']  # type: ignore[dict-item]
                         }
                     elif interaction_id == 'SetInput':
                         # Convert to TranslatableSetOfUnicodeString.
                         rule_spec_dict['inputs']['x'] = {
                             'contentId': content_id,
-                            'unicodeStrSet': rule_spec_dict['inputs']['x']
+                            'unicodeStrSet': rule_spec_dict['inputs']['x']  # type: ignore[dict-item]
                         }
             question_state_dict['next_content_id_index'] = (
                 content_id_counter.next_content_id_index)
@@ -1342,7 +1356,9 @@ class Question(translation_domain.BaseTranslatableObject):
         return question_state_dict
 
     @classmethod
-    def _convert_state_v50_dict_to_v51_dict(cls, question_state_dict):
+    def _convert_state_v50_dict_to_v51_dict(
+        cls, question_state_dict: state_domain.StateDict
+    ) -> state_domain.StateDict:
         """Converts from version 50 to 51. Version 51 adds a new
         dest_if_really_stuck field to Outcome class to redirect learners
         to a state for strengthening concepts when they get really stuck.
@@ -1632,8 +1648,8 @@ class QuestionSummary:
         question_content: str,
         misconception_ids: List[str],
         interaction_id: str,
-        question_model_created_on: Optional[datetime.datetime] = None,
-        question_model_last_updated: Optional[datetime.datetime] = None
+        question_model_created_on: datetime.datetime,
+        question_model_last_updated: datetime.datetime
     ) -> None:
         """Constructs a Question Summary domain object.
 

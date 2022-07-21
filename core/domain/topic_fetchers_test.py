@@ -74,8 +74,8 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
             additional_story_ids=[self.story_id_3],
             uncategorized_skill_ids=[self.skill_id_1, self.skill_id_2],
             subtopics=[], next_subtopic_id=1)
-        self.save_new_story(self.story_id_1, self.user_id, self.TOPIC_ID)  # type: ignore[no-untyped-call]
-        self.save_new_story(  # type: ignore[no-untyped-call]
+        self.save_new_story(self.story_id_1, self.user_id, self.TOPIC_ID)
+        self.save_new_story(
             self.story_id_3,
             self.user_id,
             self.TOPIC_ID,
@@ -146,7 +146,7 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
             self.assertIn(topic_key, topic_id_list)
 
     def test_get_canonical_story_dicts(self) -> None:
-        self.save_new_story(self.story_id_2, self.user_id, self.TOPIC_ID)  # type: ignore[no-untyped-call]
+        self.save_new_story(self.story_id_2, self.user_id, self.TOPIC_ID)
         topic_services.publish_story(  # type: ignore[no-untyped-call]
             self.TOPIC_ID, self.story_id_1, self.user_id_admin)
         topic_services.publish_story(  # type: ignore[no-untyped-call]
@@ -423,7 +423,7 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         # Unpublished topics should not be returned.
         topic_summaries = topic_fetchers.get_published_topic_summaries()
         self.assertEqual(len(topic_summaries), 0)
-
+        old_value: List[str] = []
         # Publish the topic.
         changelist = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
@@ -434,7 +434,7 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
             'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
             'property_name': (
                 topic_domain.TOPIC_PROPERTY_SKILL_IDS_FOR_DIAGNOSTIC_TEST),
-            'old_value': [],
+            'old_value': old_value,
             'new_value': [self.skill_id_1]
         })]
         topic_services.update_topic_and_subtopic_pages(  # type: ignore[no-untyped-call]

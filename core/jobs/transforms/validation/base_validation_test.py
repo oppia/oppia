@@ -471,7 +471,7 @@ class ValidateModelDomainObjectInstancesTests(job_test_utils.PipelinedTestBase):
             init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
             states={
                 feconf.DEFAULT_INIT_STATE_NAME: (
-                    state_domain.State.create_default_state(  # type: ignore[no-untyped-call]
+                    state_domain.State.create_default_state(
                         feconf.DEFAULT_INIT_STATE_NAME, is_initial_state=True
                     ).to_dict()),
             },
@@ -488,7 +488,7 @@ class ValidateModelDomainObjectInstancesTests(job_test_utils.PipelinedTestBase):
             init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
             states={
                 feconf.DEFAULT_INIT_STATE_NAME: (
-                    state_domain.State.create_default_state(  # type: ignore[no-untyped-call]
+                    state_domain.State.create_default_state(
                         'end', is_initial_state=True
                     ).to_dict()),
             },
