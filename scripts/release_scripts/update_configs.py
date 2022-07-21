@@ -27,7 +27,8 @@ import argparse
 import getpass
 import os
 import re
-import sys
+
+import github
 
 # TODO(#15567): The order can be fixed after Literal in utils.py is loaded
 # from typing instead of typing_extensions, this will be possible after
@@ -35,12 +36,6 @@ import sys
 from .. import common  # isort:skip  # pylint: disable=wrong-import-position
 from core import utils  # isort:skip  # pylint: disable=wrong-import-position
 
-_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-_PY_GITHUB_PATH = os.path.join(
-    _PARENT_DIR, 'oppia_tools', 'PyGithub-%s' % common.PYGITHUB_VERSION)
-sys.path.insert(0, _PY_GITHUB_PATH)
-
-import github  # isort:skip pylint: disable=wrong-import-position
 
 CONSTANTS_CONFIG_PATH = os.path.join(
     os.getcwd(), os.pardir, 'release-scripts', 'constants_updates.config')
