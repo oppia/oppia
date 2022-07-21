@@ -87,7 +87,7 @@ class StatsEventsHandler(BaseEventHandler):
         corresponds to the latest version of the exploration.
         """
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
-        return bool(exploration.version == exp_version)
+        return exploration.version == exp_version
 
     # We have ignored [override] here because the signature of this method
     # doesn't match with BaseEventHandler._handle_event().
