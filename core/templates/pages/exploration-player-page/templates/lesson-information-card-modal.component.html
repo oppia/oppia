@@ -29,13 +29,15 @@
             {{ idx + 1 }}
           </div>
         </div>
-        <button type="button"
-                class="btn btn-secondary save-progress-btn"
-                *ngIf="!userIsLoggedIn"
-                [ngClass]="{'disabled oppia-disabled-link': checkpointStatusArray[0] === 'in-progress'}"
-                (click)="saveLoggedOutProgress()">
-              {{ 'I18N_SAVE_PROGRESS_TEXT' | translate }}
-        </button>
+        <div class="save-progress-btn-container">
+          <button type="button"
+                  class="btn btn-secondary save-progress-btn"
+                  *ngIf="!userIsLoggedIn"
+                  [ngClass]="{'disabled oppia-disabled-link': checkpointStatusArray[0] === 'in-progress'}"
+                  (click)="saveLoggedOutProgress()">
+            {{ 'I18N_SAVE_PROGRESS_TEXT' | translate }}
+          </button>
+        </div>
         <p *ngIf="explorationIsPrivate" class="private-card-info">{{ 'I18N_PLAYER_IS_PRIVATE' | translate }}</p>
 
         <ul *ngIf="!explorationIsPrivate" class="card-metrics row space-between center">
@@ -120,6 +122,9 @@
   <i class="material-icons md-18">&#xE5CD;</i>
   <span class="oppia-icon-accessibility-label">Close</span>
 </button>
+<div *ngIf="saveProgressMenuIsShown && !userIsLoggedIn"
+     class="save-progress-menu-backdrop">
+</div>
 <div class="save-progress-menu"
      *ngIf="saveProgressMenuIsShown && !userIsLoggedIn">
   <h3>{{ 'I18N_SAVE_PROGRESS_TEXT' | translate }}</h3>

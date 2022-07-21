@@ -286,17 +286,36 @@ mat-card.oppia-lesson-info-card {
   z-index: 0;
 }
 
+.oppia-lesson-info-card .save-progress-btn-container {
+  display: flex;
+  justify-content: center;
+}
+
 .oppia-lesson-info-card .save-progress-btn {
   background-color: #00645c;
+  border-radius: 7px;
   color: #fff;
   cursor: pointer;
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  height: 40px;
   margin-top: 20px;
+  width: 170px;
 }
 
 .progress-bar-label-text {
   color: #00645c;
   font-size: 0.9em;
   margin-bottom: 15px;
+}
+
+.save-progress-menu-backdrop {
+  background-color: rgba(0, 0, 0, 0.5);
+  bottom: 0;
+  left: 0;
+  position: fixed;
+  right: 0;
+  top: 0;
+  z-index: 3;
 }
 
 .save-progress-menu {
@@ -310,6 +329,7 @@ mat-card.oppia-lesson-info-card {
   top: 8vh;
   transform: translateX(-50%);
   width: 100%;
+  z-index: 4;
 }
 
 .save-progress-menu h3 {
