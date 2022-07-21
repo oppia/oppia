@@ -47,18 +47,31 @@
   </div>
 
   <div class="modal-footer">
-    <button class="btn btn-secondary" ng-click="cancel()">Cancel</button>
-    <button ng-if="newQuestionIsBeingCreated"
-            title="To Save please add: interaction, hint, solution and address all misconceptions"
-            class="btn btn-success e2e-test-save-question-button"
-            ng-click="done()"
-            ng-disabled="!isQuestionValid()">
-      <[isEditing ? 'Update' : 'Submit']> Question
+    <button class="btn btn-secondary"
+            ng-click="onClickChangeDifficulty()">
+      Go Back
     </button>
+    <div class="oppia-buttons-right">
+      <button class="btn btn-secondary"
+              ng-click="cancel()">
+        Cancel
+      </button>
+      <button ng-if="newQuestionIsBeingCreated"
+              title="To Save please add: interaction, hint, solution and address all misconceptions"
+              class="btn btn-success e2e-test-save-question-button"
+              ng-click="done()"
+              ng-disabled="!isQuestionValid()">
+        <[isEditing ? 'Update' : 'Submit']> Question
+      </button>
+    </div>
   </div>
 </div>
 
 <style>
+  .modal-footer {
+    display: flex;
+    justify-content: space-between;
+  }
   .oppia-close-button {
     top: 3px;
   }
@@ -104,6 +117,20 @@
     }
     .oppia-explanation {
       font-size: 16px;
+    }
+  }
+  @media only screen and (max-width: 350px) {
+    .modal-footer, .oppia-buttons-right {
+      display: flex;
+      flex-direction: column;
+    }
+    .oppia-buttons-right {
+      align-items: center;
+      width: 100%;
+    }
+    .modal-footer .btn {
+      margin-bottom: 10px;
+      width: 50%;
     }
   }
 </style>

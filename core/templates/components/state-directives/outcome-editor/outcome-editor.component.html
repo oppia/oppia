@@ -76,7 +76,7 @@
   <div class="oppia-rule-save-cancel-buttons">
     <div class="float-right">
       <button type="button"
-              class="btn btn-secondary mr-2"
+              class="btn btn-secondary mr-2 mb-2"
               (click)="cancelThisFeedbackEdit()">
         Cancel
       </button>
@@ -186,7 +186,7 @@
     </div>
   </div>
 
-  <div class="oppia-outcome-container" *ngIf="isEditable">    
+  <div class="oppia-outcome-container" *ngIf="isEditable">
     <div *ngIf="outcome">
       <input class="mr-2 e2e-test-editor-correctness-toggle" type="checkbox" [(ngModel)]="outcome.labelledAsCorrect" (change)="onChangeCorrectnessLabel()">
     </div>
