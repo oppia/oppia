@@ -423,7 +423,7 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         # Unpublished topics should not be returned.
         topic_summaries = topic_fetchers.get_published_topic_summaries()
         self.assertEqual(len(topic_summaries), 0)
-
+        old_value: List[str] = []
         # Publish the topic.
         changelist = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
@@ -434,7 +434,7 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
             'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
             'property_name': (
                 topic_domain.TOPIC_PROPERTY_SKILL_IDS_FOR_DIAGNOSTIC_TEST),
-            'old_value': [],
+            'old_value': old_value,
             'new_value': [self.skill_id_1]
         })]
         topic_services.update_topic_and_subtopic_pages(  # type: ignore[no-untyped-call]
