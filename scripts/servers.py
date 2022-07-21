@@ -23,12 +23,13 @@ import re
 import shutil
 import signal
 import subprocess
-import sys
 import threading
 
 from core import feconf
 from core import utils
 from scripts import common
+
+import psutil
 
 
 @contextlib.contextmanager
@@ -61,11 +62,6 @@ def managed_process(
     Raises:
         Exception. The process exited unexpectedly.
     """
-    # TODO(#11549): Move this to top of the file.
-    if common.PSUTIL_DIR not in sys.path:
-        sys.path.insert(1, common.PSUTIL_DIR)
-    import psutil
-
     get_proc_info = lambda p: (
         '%s(name="%s", pid=%d)' % (human_readable_name, p.name(), p.pid)
         if p.is_running() else '%s(pid=%d)' % (human_readable_name, p.pid))
@@ -504,15 +500,6 @@ def managed_portserver():
     Yields:
         psutil.Popen. The Popen subprocess object.
     """
-    # TODO(#11549): Move this to top of the file.
-    if common.PSUTIL_DIR not in sys.path:
-        # Our unit tests already configure sys.path correctly, but the
-        # standalone scripts do not. Because of this, the following line cannot
-        # be covered. This is fine since we want to cleanup this code anyway in
-        # #11549.
-        sys.path.insert(1, common.PSUTIL_DIR) # pragma: no cover
-    import psutil
-
     # Check if a socket file exists. This file can exist when previous instance
     # of the portserver did not close properly. We need to remove as otherwise
     # the portserver will fail to start.

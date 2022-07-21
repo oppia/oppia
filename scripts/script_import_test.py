@@ -24,7 +24,6 @@ in start, then adding the same import statement in a test function
 
 from __future__ import annotations
 
-import os
 import subprocess
 import sys
 
@@ -34,51 +33,24 @@ from core.tests import test_utils
 class InstallThirdPartyLibsImportTests(test_utils.GenericTestBase):
     """Tests import of install third party libs."""
 
-    def setUp(self):
-        super(InstallThirdPartyLibsImportTests, self).setUp()
-        self.commands = []
-        def mock_popen_error_call(unused_cmd_tokens, *args, **kwargs): # pylint: disable=unused-argument
-            class Ret(test_utils.GenericTestBase):
-                """Return object that gives user-prefix error."""
-
-                def __init__(self):  # pylint: disable=super-init-not-called
-                    self.returncode = 1
-                def communicate(self):
-                    """Return user-prefix error as stderr."""
-                    return b'', b'can\'t combine user with prefix'
-            return Ret()
-        def mock_check_call(cmd_tokens):
-            self.commands.extend(cmd_tokens)
-        self.Popen_swap = self.swap(
-            subprocess, 'Popen', mock_popen_error_call)
-        self.check_call_swap = self.swap(
-            subprocess, 'check_call', mock_check_call)
-
     def test_import_with_missing_packages(self):
-        def mock_exists(unused_path):
-            return False
-        exists_swap = self.swap(os.path, 'exists', mock_exists)
-        with self.Popen_swap, self.check_call_swap, exists_swap:
+        commands = []
+        def mock_run(cmd_tokens, *_args, **_kwargs):
+            commands.append(cmd_tokens)
+        run_swap = self.swap(subprocess, 'run', mock_run)
+
+        with run_swap:
             from scripts import install_third_party_libs  # isort:skip pylint: disable=unused-import,line-too-long
-        self.assertEqual(
-            self.commands, [
-                sys.executable, '-m', 'pip', 'install', 'pyyaml==6.0',
-                '--target', '../oppia_tools/pyyaml-6.0',
-                '--user', '--prefix=', '--system',
-                sys.executable, '-m', 'pip', 'install',
-                'future==0.18.2', '--target',
-                'third_party/python_libs',
-                '--user', '--prefix=', '--system',
-                sys.executable, '-m', 'pip', 'install',
-                'six==1.16.0', '--target',
-                'third_party/python_libs',
-                '--user', '--prefix=', '--system',
-                sys.executable, '-m', 'pip', 'install',
-                'certifi==2021.10.8', '--target',
-                '../oppia_tools/certifi-2021.10.8',
-                '--user', '--prefix=', '--system',
-                sys.executable, '-m', 'pip', 'install',
-                'typing-extensions==4.0.1', '--target',
-                'third_party/python_libs', '--user',
-                '--prefix=', '--system',
-            ])
+        expected_commands = [
+            [sys.executable, '-m', 'pip', 'install', version_string]
+            for version_string in (
+                'pip==22.1.1', 'pip-tools==6.6.2', 'setuptools==58.5.3')
+        ]
+        expected_commands += [
+            [
+                'pip-compile', '--no-emit-index-url', 'requirements_dev.in',
+                '--output-file', 'requirements_dev.txt',
+            ],
+            ['pip-sync', 'requirements_dev.txt'],
+        ]
+        self.assertEqual(commands, expected_commands)

@@ -44,21 +44,6 @@ AFFIRMATIVE_CONFIRMATIONS = ['y', 'ye', 'yes']
 
 CURRENT_PYTHON_BIN = sys.executable
 
-# Versions of libraries used in devflow.
-COVERAGE_VERSION = '6.1.2'
-ESPRIMA_VERSION = '4.0.1'
-ISORT_VERSION = '5.10.1'
-PYCODESTYLE_VERSION = '2.8.0'
-PSUTIL_VERSION = '5.8.0'
-PYLINT_VERSION = '2.11.1'
-PYLINT_QUOTES_VERSION = '0.2.4'
-PYGITHUB_VERSION = '1.55'
-WEBTEST_VERSION = '3.0.0'
-PIP_TOOLS_VERSION = '6.6.2'
-GRPCIO_VERSION = '1.41.1'
-PROTOBUF_VERSION = '3.13.0'
-SETUPTOOLS_VERSION = '58.5.3'
-
 # Node version.
 NODE_VERSION = '16.13.0'
 
@@ -70,9 +55,9 @@ PILLOW_VERSION = '9.0.1'
 
 # Buf version.
 BUF_VERSION = '0.29.0'
-# Protoc is the compiler for protobuf files and the version must be same as
-# the version of protobuf library being used.
-PROTOC_VERSION = PROTOBUF_VERSION
+
+# Must match the version of protobuf in requirements_dev.in.
+PROTOC_VERSION = '3.13.0'
 
 # IMPORTANT STEPS FOR DEVELOPERS TO UPGRADE REDIS:
 # 1. Download the new version of the redis cli.
@@ -103,20 +88,12 @@ GOOGLE_CLOUD_SDK_HOME = os.path.join(
 GOOGLE_APP_ENGINE_SDK_HOME = os.path.join(
     GOOGLE_CLOUD_SDK_HOME, 'platform', 'google_appengine')
 GOOGLE_CLOUD_SDK_BIN = os.path.join(GOOGLE_CLOUD_SDK_HOME, 'bin')
-ISORT_PATH = os.path.join(OPPIA_TOOLS_DIR, 'isort-%s' % ISORT_VERSION)
 WEBPACK_BIN_PATH = (
     os.path.join(CURR_DIR, 'node_modules', 'webpack', 'bin', 'webpack.js'))
 DEV_APPSERVER_PATH = (
     os.path.join(GOOGLE_CLOUD_SDK_BIN, 'dev_appserver.py'))
 GCLOUD_PATH = os.path.join(GOOGLE_CLOUD_SDK_BIN, 'gcloud')
 NODE_PATH = os.path.join(OPPIA_TOOLS_DIR, 'node-%s' % NODE_VERSION)
-PYLINT_PATH = os.path.join(OPPIA_TOOLS_DIR, 'pylint-%s' % PYLINT_VERSION)
-PYCODESTYLE_PATH = os.path.join(
-    OPPIA_TOOLS_DIR, 'pycodestyle-%s' % PYCODESTYLE_VERSION)
-PYLINT_QUOTES_PATH = os.path.join(
-    OPPIA_TOOLS_DIR, 'pylint-quotes-%s' % PYLINT_QUOTES_VERSION)
-PY_GITHUB_PATH = os.path.join(
-    OPPIA_TOOLS_DIR, 'PyGithub-%s' % PYGITHUB_VERSION)
 NODE_MODULES_PATH = os.path.join(CURR_DIR, 'node_modules')
 FRONTEND_DIR = os.path.join(CURR_DIR, 'core', 'templates')
 YARN_PATH = os.path.join(OPPIA_TOOLS_DIR, 'yarn-%s' % YARN_VERSION)
@@ -124,7 +101,6 @@ FIREBASE_PATH = os.path.join(
     NODE_MODULES_PATH, 'firebase-tools', 'lib', 'bin', 'firebase.js')
 OS_NAME = platform.system()
 ARCHITECTURE = platform.machine()
-PSUTIL_DIR = os.path.join(OPPIA_TOOLS_DIR, 'psutil-%s' % PSUTIL_VERSION)
 REDIS_SERVER_PATH = os.path.join(
     OPPIA_TOOLS_DIR, 'redis-cli-%s' % REDIS_CLI_VERSION,
     'src', 'redis-server')
@@ -138,7 +114,6 @@ CLOUD_DATASTORE_EMULATOR_DATA_DIR = (
 FIREBASE_EMULATOR_CACHE_DIR = (
     os.path.join(CURR_DIR, os.pardir, 'firebase_emulator_cache'))
 
-sys.path.insert(0, PY_GITHUB_PATH)
 # By specifying this condition, we are importing the below module only while
 # type checking, not in runtime.
 MYPY = False
@@ -206,15 +181,7 @@ NODEMODULES_WDIO_BIN_PATH = (
 
 DIRS_TO_ADD_TO_SYS_PATH = [
     GOOGLE_APP_ENGINE_SDK_HOME,
-    PYLINT_PATH,
-    os.path.join(OPPIA_TOOLS_DIR, 'webtest-%s' % WEBTEST_VERSION),
-    os.path.join(OPPIA_TOOLS_DIR, 'Pillow-%s' % PILLOW_VERSION),
-    os.path.join(OPPIA_TOOLS_DIR, 'protobuf-%s' % PROTOBUF_VERSION),
-    PSUTIL_DIR,
     os.path.join(CURR_DIR, 'proto_files'),
-    os.path.join(OPPIA_TOOLS_DIR, 'grpcio-%s' % GRPCIO_VERSION),
-    os.path.join(OPPIA_TOOLS_DIR, 'setuptools-%s' % '36.6.0'),
-    PY_GITHUB_PATH,
     CURR_DIR,
     THIRD_PARTY_PYTHON_LIBS_DIR,
 ]

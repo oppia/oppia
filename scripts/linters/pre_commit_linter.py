@@ -120,35 +120,7 @@ _PARSER.add_argument(
     '--shard',
     help='Name of shard to run lint checks for')
 
-_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-
-_PATHS_TO_INSERT = [
-    os.getcwd(),
-    os.path.join(
-        common.GOOGLE_APP_ENGINE_SDK_HOME, 'lib', 'yaml-3.10'),
-    os.path.join(
-        common.GOOGLE_APP_ENGINE_SDK_HOME, 'lib', 'jinja2-2.6'),
-    os.path.join(
-        common.GOOGLE_APP_ENGINE_SDK_HOME),
-    os.path.join(
-        _PARENT_DIR, 'oppia_tools', 'webtest-%s' % common.WEBTEST_VERSION),
-    os.path.join(
-        _PARENT_DIR, 'oppia_tools', 'PyGithub-%s' % common.PYGITHUB_VERSION),
-    os.path.join(
-        _PARENT_DIR, 'oppia_tools',
-        'setuptools-%s' % common.SETUPTOOLS_VERSION),
-    os.path.join(
-        _PARENT_DIR, 'oppia_tools', 'Pillow-%s' % common.PILLOW_VERSION),
-    os.path.join(
-        _PARENT_DIR, 'oppia_tools', 'protobuf-%s' % common.PROTOBUF_VERSION),
-    os.path.join(
-        _PARENT_DIR, 'oppia_tools', 'psutil-%s' % common.PSUTIL_VERSION),
-    os.path.join(
-        _PARENT_DIR, 'oppia_tools', 'pip-tools-%s' % common.PIP_TOOLS_VERSION),
-    common.THIRD_PARTY_PYTHON_LIBS_DIR
-]
-
-for path in _PATHS_TO_INSERT:
+for path in common.DIRS_TO_ADD_TO_SYS_PATH:
     sys.path.insert(0, path)
 
 

@@ -12,7 +12,7 @@ core.domain.auth_services_test
 core.domain.opportunity_services_test
 core.domain.feedback_domain_test
 core.domain.blog_domain_test
-scripts.install_backend_python_libs_test
+scripts.install_python_prod_dependencies_test
 core.domain.subtopic_page_domain_test
 core.storage.skill.gae_models_test
 core.storage.topic.gae_models_test
