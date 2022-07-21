@@ -578,8 +578,10 @@ def migrate_state_training_jobs(
         exp_id, version=exp_version)
     interaction_id = exploration.states[state_name].interaction.id
 
-    # Ruling out the possibility of None for mypy type checking.
-    assert interaction_id is not None
+    if interaction_id is None:
+        raise Exception(
+            'Interaction id does not exist for state_name: %s' % state_name
+        )
     algorithm_id = feconf.INTERACTION_CLASSIFIER_MAPPING[
         interaction_id]['algorithm_id']
     algorithm_version = feconf.INTERACTION_CLASSIFIER_MAPPING[
