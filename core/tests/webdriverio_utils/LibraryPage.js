@@ -88,15 +88,14 @@ var LibraryPage = function() {
 
   this.playExploration = async function(explorationName) {
     await waitFor.pageToFullyLoad();
+    var allExplorationSummaryTile = await $$('.e2e-test-exp-summary-tile');
     await waitFor.visibilityOf(
-      allExplorationSummaryTile,
+      allExplorationSummaryTile[0],
       'Library Page does not have any explorations');
 
-    var explorationCardElement = $(
-      `.e2e-test-exp-summary-tile-title=${explorationName}`);
-    await waitFor.visibilityOf(
-      explorationCardElement, 'Unable to find exploration ' + explorationName);
     var explorationCard = await allExplorationsTitled(explorationName)[0];
+    await waitFor.visibilityOf(
+      explorationCard, 'Unable to find exploration ' + explorationName);
     // The Exploration summary card is masked by a dummy element. Therefore, a
     // Javascript click is used.
     await action.click('Exploration Card', explorationCard, true);
