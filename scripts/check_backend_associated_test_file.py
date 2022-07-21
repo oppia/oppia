@@ -72,7 +72,7 @@ FILES_WITHOUT_ASSOCIATED_TEST_FILES = [
 ]
 
 
-def _is_path_ignored(path_to_check):
+def _is_path_ignored(path_to_check) -> bool:
     """Checks whether the given path is ignored by git.
 
     Args:
