@@ -18,7 +18,6 @@
 
 from __future__ import annotations
 
-
 import argparse
 import os
 import site
@@ -119,8 +118,8 @@ NOT_FULLY_COVERED_FILES = [
     'scripts/extend_index_yaml_test.py',
     'scripts/flake_checker.py',
     'scripts/flake_checker_test.py',
-    'scripts/install_backend_python_libs.py',
-    'scripts/install_backend_python_libs_test.py',
+    'scripts/install_python_prod_dependencies.py',
+    'scripts/install_python_prod_dependencies_test.py',
     'scripts/install_third_party_libs.py',
     'scripts/install_third_party_libs_test.py',
     'scripts/install_third_party.py',
