@@ -199,8 +199,6 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
       stateData.content = cloneDeep(displayedValue);
       this.interactionIsShown = true;
     });
-
-    // Shivam PTAL.
   }
 
   _init(): void {

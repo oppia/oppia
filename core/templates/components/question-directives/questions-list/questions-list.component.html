@@ -64,7 +64,6 @@
           <div *ngIf="!deletedQuestionIds.includes(questionSummaryForOneSkill.getQuestionSummary().getQuestionId())"
                (click)="editQuestion(questionSummaryForOneSkill.getQuestionSummary(), questionSummaryForOneSkill.getSkillDescription(), questionSummaryForOneSkill.getSkillDifficulty())">
             <div class="question-data">
-              <!-- Shivam PTAL -->
               <oppia-rte-output-display classStr="question-text"
                                          [rteString]="questionSummaryForOneSkill.getQuestionSummary().getQuestionContent()">
               </oppia-rte-output-display>
