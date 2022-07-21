@@ -29,7 +29,7 @@ from core import utils
 from core.tests import test_utils
 
 from . import common
-from . import install_backend_python_libs
+from . import install_python_prod_dependencies
 from . import pre_push_hook
 
 
@@ -804,7 +804,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
             self.assertEqual(error_code, 1)
 
         swap_get_mismatches = self.swap(
-            install_backend_python_libs, 'get_mismatches',
+            install_python_prod_dependencies, 'get_mismatches',
             mock_get_mismatches)
         swap_sys_exit = self.swap(sys, 'exit', mock_exit_error)
         with self.print_swap, swap_sys_exit, swap_get_mismatches:
@@ -841,7 +841,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
             self.assertEqual(error_code, 1)
 
         swap_get_mismatches = self.swap(
-            install_backend_python_libs, 'get_mismatches',
+            install_python_prod_dependencies, 'get_mismatches',
             mock_get_mismatches)
         swap_sys_exit = self.swap(sys, 'exit', mock_exit_error)
         with self.print_swap, swap_sys_exit, swap_get_mismatches:
@@ -868,7 +868,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
         def mock_get_mismatches():
             return {}
         swap_get_mismatches = self.swap(
-            install_backend_python_libs,
+            install_python_prod_dependencies,
             'get_mismatches',
             mock_get_mismatches)
 
