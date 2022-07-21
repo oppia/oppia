@@ -42,7 +42,7 @@ import sys
 # the current working directory so that Git knows where to find python_utils.
 sys.path.append(os.getcwd())
 from scripts import common  # isort:skip  # pylint: disable=wrong-import-position
-from scripts import install_backend_python_libs # isort:skip  # pylint: disable=wrong-import-position
+from scripts import install_python_prod_dependencies # isort:skip  # pylint: disable=wrong-import-position
 
 GitRef = collections.namedtuple(
     'GitRef', ['local_ref', 'local_sha1', 'remote_ref', 'remote_sha1'])
@@ -462,7 +462,7 @@ def check_for_backend_python_library_inconsistencies():
     If any inconsistencies are found, the script displays the inconsistencies
     and exits.
     """
-    mismatches = install_backend_python_libs.get_mismatches()
+    mismatches = install_python_prod_dependencies.get_mismatches()
 
     if mismatches:
         print(
