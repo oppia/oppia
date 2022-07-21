@@ -60,7 +60,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
             self.CURRICULUM_ADMIN_EMAIL)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME]) # type: ignore[no-untyped-call]
 
-        self.TOPIC_ID = topic_fetchers.get_new_topic_id()  # type: ignore[no-untyped-call]
+        self.TOPIC_ID = topic_fetchers.get_new_topic_id()
 
         self.subtopic_page = (
             subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
@@ -78,7 +78,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
             subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
                 self.TOPIC_ID, 1))
 
-        self.TOPIC_ID_1 = topic_fetchers.get_new_topic_id()  # type: ignore[no-untyped-call]
+        self.TOPIC_ID_1 = topic_fetchers.get_new_topic_id()
         # Set up topic and subtopic.
         topic = topic_domain.Topic.create_default_topic(
             self.TOPIC_ID_1, 'Place Values', 'abbrev', 'description', 'fragm')
