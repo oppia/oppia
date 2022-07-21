@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Backend services related to fetch learner groups to display
- * on the teacher dashboard.
+ * on the facilitator dashboard.
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
