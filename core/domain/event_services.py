@@ -64,7 +64,7 @@ class BaseEventHandler:
 
     # Here both the arguments are annotated with Any type because in child
     # classes this method can be redefined with any number of named and keyword
-    # arguments with different kind of types.
+    # arguments with different kinds of types.
     @classmethod
     def record(cls, *args: Any, **kwargs: Any) -> None:
         """Process incoming events.

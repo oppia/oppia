@@ -132,7 +132,7 @@ class SubtopicPageModel(base_models.VersionedModel):
         committer_id: str,
         commit_type: str,
         commit_message: str,
-        commit_cmds: base_models.BaseVersionedCommitCmdType,
+        commit_cmds: base_models.VersionedAllowedCommitCmdTypes,
         # We expect Mapping because we want to allow models that inherit
         # from BaseModel as the values, if we used Dict this wouldn't
         # be allowed.
