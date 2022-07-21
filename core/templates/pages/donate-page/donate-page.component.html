@@ -141,7 +141,23 @@
     font-size: 0.825em;
   }
 
-  @media only screen and (max-width: 1160px) {
+  @media (max-width: 600px) {
+    .oppia-donation-card-content-wide {
+      display: flex;
+      flex-direction: column-reverse;
+      width: 100%;
+    }
+    .donate-page .oppia-donate-info {
+      width: 100%;
+    }
+    .donate-page .oppia-donate-options {
+      width: 100%;
+    }
+    .oppia-donate-info, .oppia-donate-options {
+      flex: 1;
+    }
+  }
+  @media only screen and (max-width: 1160px) and (min-width: 600px) {
     .oppia-donation-card-content-wide {
       display: flex;
       flex-direction: row-reverse;
