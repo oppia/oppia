@@ -86,6 +86,7 @@ exports.config = {
     browserName: 'chrome',
     'goog:chromeOptions': {
       args: [
+        'headless',
         '--lang=en-EN',
         '--window-size=1285x1000',
         // These arguments let us simulate recording from a microphone.
@@ -115,7 +116,7 @@ exports.config = {
   // Define all options that are relevant for the WebdriverIO instance here
   //
   // Level of logging verbosity: trace | debug | info | warn | error | silent.
-  logLevel: 'info',
+  logLevel: 'warn',
 
   // Set a base URL in order to shorten url command calls. If your `url`
   // parameter starts with `/`, the base url gets prepended, not including
