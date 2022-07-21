@@ -87,7 +87,8 @@ var ExplorationPlayerPage = function() {
     await action.click('Submit Button', ratingStars[ratingValue - 1]);
     await waitFor.visibilityOfSuccessToast(
       'Success toast for rating takes too long to appear.');
-    await waitFor.elementToBeClickable(feedbackCloseButton);
+    await waitFor.elementToBeClickable(
+      feedbackCloseButton, 'Feedback close button is not clickable');
     await action.click('Feedback Close Button', feedbackCloseButton);
     await waitFor.invisibilityOf(
       feedbackCloseButton, 'Close Feedback button does not disappear');
@@ -104,10 +105,12 @@ var ExplorationPlayerPage = function() {
   };
 
   this.submitFeedback = async function(feedback) {
-    await waitFor.elementToBeClickable(feedbackPopupLink);
+    await waitFor.elementToBeClickable(
+      feedbackPopupLink, 'Feedback popup link is not clickable');
     await action.click('Feedback Popup Link', feedbackPopupLink);
     await action.setValue('Feedback Text Area', feedbackTextArea, feedback);
-    await waitFor.elementToBeClickable(feedbackSubmitButton);
+    await waitFor.elementToBeClickable(
+      feedbackSubmitButton, 'Feedback submit button is not clikable');
     await action.click('Feedback Submit Button', feedbackSubmitButton);
     await waitFor.invisibilityOf(
       feedbackSubmitButton, 'Feedback popup takes too long to disappear');

@@ -201,6 +201,8 @@ var LearnerDashboardPage = function() {
   };
 
   this.expectSubscriptionFirstNameToMatch = async function(name) {
+    await waitFor.visibilityOf(
+      subscriptionSection, 'Subscription section takes too long to appear');
     await subscriptionSection.scrollIntoView();
     var subscriptionName = await subscriptionNameSelector();
     await waitFor.visibilityOf(
