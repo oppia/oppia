@@ -273,7 +273,8 @@ var ExplorationEditorMainTab = function() {
         headerElem = defaultResponseTab;
       } else {
         var responseTab = await $$('.e2e-test-response-tab');
-        await waitFor.visibilityOf(responseTab[0]);
+        await waitFor.visibilityOf(
+          responseTab[0], 'Response tab is not visible');
         headerElem = responseTab[responseNum];
       }
 
