@@ -25,6 +25,10 @@ var suites = {
     './core/tests/webdriverio_desktop/**/*.js',
   ],
 
+  additionalEditorFeatures: [
+    './core/tests/webdriverio_desktop/additionalEditorFeatures.js'
+  ],
+
   additionalPlayerFeatures: [
     './core/tests/webdriverio_desktop/additionalPlayerFeatures.js'
   ],
