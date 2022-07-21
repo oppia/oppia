@@ -46,6 +46,11 @@ from core.domain import translatable_object_registry  # pylint: disable=invalid-
 # with 'invalid-import-from'.
 
 
+AllowedRuleSpecInputTypes = Union[
+    str, int, List[str], List[List[str]]
+]
+
+
 class AnswerGroupDict(TypedDict):
     """Dictionary representing the AnswerGroup object."""
 
@@ -2360,7 +2365,7 @@ class RuleSpecDict(TypedDict):
     """Dictionary representing the RuleSpec object."""
 
     rule_type: str
-    inputs: Mapping[str, Union[str, int, List[str], List[List[str]]]]
+    inputs: Dict[str, AllowedRuleSpecInputTypes]
 
 
 class RuleSpec(translation_domain.BaseTranslatableObject):
@@ -3803,7 +3808,10 @@ class State(translation_domain.BaseTranslatableObject):
 
     @classmethod
     def create_default_state(
-            cls, default_dest_state_name, is_initial_state=False):
+        cls,
+        default_dest_state_name: str,
+        is_initial_state: bool = False
+    ) -> State:
         """Return a State domain object with default value.
 
         Args:
