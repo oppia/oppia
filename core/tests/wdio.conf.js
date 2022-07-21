@@ -20,7 +20,6 @@ var vidPath = '';
 // Enable ALL_VIDEOS if you want success videos to be saved.
 const ALL_VIDEOS = false;
 
-
 var suites = {
   full: [
     './core/tests/webdriverio/**/*.js',
