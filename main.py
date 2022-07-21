@@ -48,6 +48,7 @@ from core.controllers import improvements
 from core.controllers import incoming_app_feedback_report
 from core.controllers import learner_dashboard
 from core.controllers import learner_goals
+from core.controllers import learner_group
 from core.controllers import learner_playlist
 from core.controllers import library
 from core.controllers import moderator
@@ -395,6 +396,9 @@ URLS = [
     get_redirect_route(
         r'%s' % feconf.LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL,
         learner_dashboard.LearnerDashboardTopicsAndStoriesProgressHandler),
+    get_redirect_route(
+        r'%s' % feconf.LEARNER_COMPLETED_CHAPTERS_COUNT_DATA_URL,
+        learner_dashboard.LearnerCompletedChaptersCountHandler),
     get_redirect_route(
         r'%s' % feconf.LEARNER_DASHBOARD_COLLECTION_DATA_URL,
         learner_dashboard.LearnerDashboardCollectionsProgressHandler),
@@ -927,7 +931,29 @@ URLS = [
     get_redirect_route(
         r'/topics_and_skills_dashboard/categorized_and_untriaged_skills_data',
         topics_and_skills_dashboard
-            .CategorizedAndUntriagedSkillsDataHandler)
+            .CategorizedAndUntriagedSkillsDataHandler),
+
+    get_redirect_route(
+        r'/create_learner_group_handler',
+        learner_group.CreateLearnerGroupHandler),
+    get_redirect_route(
+        r'/update_learner_group_handler/<learner_group_id>',
+        learner_group.LearnerGroupHandler),
+    get_redirect_route(
+        r'/delete_learner_group_handler/<learner_group_id>',
+        learner_group.LearnerGroupHandler),
+    get_redirect_route(
+        r'%s' % feconf.FACILITATOR_DASHBOARD_HANDLER,
+        learner_group.FacilitatorDashboardHandler),
+    get_redirect_route(
+        r'/facilitator_view_of_learner_group_handler/<learner_group_id>',
+        learner_group.FacilitatorLearnerGroupViewHandler),
+    get_redirect_route(
+        r'/learner_group_search_syllabus_handler/<learner_group_id>',
+        learner_group.LearnerGroupSearchSyllabusHandler),
+    get_redirect_route(
+        r'/learner_group_user_progress_handler/<learner_group_id>',
+        learner_group.LearnerGroupStudentProgressHandler)
 ]
 
 # Adding redirects for topic landing pages.

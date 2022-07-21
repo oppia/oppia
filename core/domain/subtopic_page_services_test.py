@@ -21,11 +21,14 @@ from __future__ import annotations
 import re
 
 from core import feconf
+from core.constants import constants
+from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
+from core.domain import topic_services
 from core.platform import models
 from core.tests import test_utils
 
@@ -51,7 +54,14 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super(SubtopicPageServicesUnitTests, self).setUp()
-        self.TOPIC_ID = topic_fetchers.get_new_topic_id()  # type: ignore[no-untyped-call]
+        self.signup(
+            self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email( # type: ignore[no-untyped-call]
+            self.CURRICULUM_ADMIN_EMAIL)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME]) # type: ignore[no-untyped-call]
+
+        self.TOPIC_ID = topic_fetchers.get_new_topic_id()
+
         self.subtopic_page = (
             subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
                 self.subtopic_id, self.TOPIC_ID))
@@ -67,6 +77,28 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
         self.subtopic_page_id = (
             subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
                 self.TOPIC_ID, 1))
+
+        self.TOPIC_ID_1 = topic_fetchers.get_new_topic_id()
+        # Set up topic and subtopic.
+        topic = topic_domain.Topic.create_default_topic(
+            self.TOPIC_ID_1, 'Place Values', 'abbrev', 'description', 'fragm')
+        topic.thumbnail_filename = 'thumbnail.svg'
+        topic.thumbnail_bg_color = '#C6DCDA'
+        topic.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Naming Numbers', ['skill_id_1'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                'dummy-subtopic-url'),
+            topic_domain.Subtopic(
+                2, 'Subtopic Name', ['skill_id_2'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                'other-subtopic-url')]
+        topic.next_subtopic_id = 3
+        topic.skill_ids_for_diagnostic_test = ['skill_id_1']
+        topic_services.save_new_topic(self.admin_id, topic) # type: ignore[no-untyped-call]
+
+        # Publish the topic and its stories.
+        topic_services.publish_topic(self.TOPIC_ID_1, self.admin_id) # type: ignore[no-untyped-call]
 
     def test_get_subtopic_page_from_model(self) -> None:
         subtopic_page_model = subtopic_models.SubtopicPageModel.get(
@@ -601,3 +633,49 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
             assert_raises_regexp_context_manager):
             subtopic_page_services.get_subtopic_page_from_model(
                 subtopic_page_model)
+
+    def test_get_topic_ids_from_subtopic_page_ids(self) -> None:
+        topic_ids = (
+            subtopic_page_services.get_topic_ids_from_subtopic_page_ids(
+                ['topic1:subtopic1', 'topic2:subtopic2', 'topic1:subtopic3']
+            )
+        )
+
+        self.assertEqual(topic_ids, ['topic1', 'topic2'])
+
+    def test_get_multi_users_subtopic_pages_progress(self) -> None:
+        degree_of_mastery = 0.5
+        student_id_1 = 'student_1'
+        student_id_2 = 'student_2'
+
+        # Add some subtopic progress for the student.
+        skill_services.create_user_skill_mastery( # type: ignore[no-untyped-call]
+            student_id_1, 'skill_id_1', degree_of_mastery
+        )
+
+        subtopic_page_id = '{}:{}'.format(self.TOPIC_ID_1, 1)
+        progress = (
+            subtopic_page_services.get_multi_users_subtopic_pages_progress(
+                [student_id_1, student_id_2], [subtopic_page_id]
+            )
+        )
+
+        student_1_progress = progress[student_id_1]
+        student_2_progress = progress[student_id_2]
+
+        self.assertEqual(len(student_1_progress), 1)
+        self.assertEqual(len(student_2_progress), 1)
+        self.assertEqual(student_1_progress[0]['subtopic_id'], 1)
+        self.assertEqual(
+            student_1_progress[0]['subtopic_title'], 'Naming Numbers'
+        )
+        self.assertEqual(
+            student_1_progress[0]['parent_topic_id'], self.TOPIC_ID_1
+        )
+        self.assertEqual(
+            student_1_progress[0]['parent_topic_name'], 'Place Values'
+        )
+        self.assertEqual(
+            student_1_progress[0]['subtopic_mastery'], degree_of_mastery
+        )
+        self.assertIsNone(student_2_progress[0]['subtopic_mastery'])

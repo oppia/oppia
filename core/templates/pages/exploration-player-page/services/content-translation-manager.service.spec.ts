@@ -60,6 +60,7 @@ describe('Content translation manager service', () => {
 
     let defaultOutcomeDict = {
       dest: 'dest_default',
+      dest_if_really_stuck: null,
       feedback: {
         content_id: 'default_outcome',
         html: '<p>en default outcome</p>'
@@ -81,6 +82,7 @@ describe('Content translation manager service', () => {
       }],
       outcome: {
         dest: 'dest_1',
+        dest_if_really_stuck: null,
         feedback: {
           content_id: 'outcome_1',
           html: '<p>en feedback</p>'
@@ -431,6 +433,7 @@ describe('Content translation manager service', () => {
         }],
         outcome: {
           dest: 'dest_1',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'outcome_1',
             html: '<p>en feedback</p>'
