@@ -1,0 +1,36 @@
+/*
+  NOTE to developers: We generate RTL CSS from this file in the webpack
+  compilation, here are sme additional rules that can be added to the CSS files:
+  https://rtlcss.com/learn/usage-guide/control-directives .
+*/
+
+.oppia-learner-group-overview {
+  margin: 40px auto 0;
+  text-align: left;
+  width: 80%;
+}
+
+.oppia-learner-group-overview .learner-group-summary-card {
+  background: #fff;
+  display: flex;
+  margin: 40px auto 0;
+  padding: 25px;
+  text-align: center;
+  width: 85%;
+}
+
+.oppia-learner-group-overview .learner-group-summary-card .students-info,
+.oppia-learner-group-overview .learner-group-summary-card .assigned-skills-info,
+.oppia-learner-group-overview .learner-group-summary-card .assigned-stories-info {
+  color: #00645c;
+  font-size: 14px;
+  text-align: center;
+  width: 33.3%;
+}
+
+.oppia-learner-group-overview .learner-group-summary-card .students-count,
+.oppia-learner-group-overview .learner-group-summary-card .assigned-skills-count,
+.oppia-learner-group-overview .learner-group-summary-card .assigned-stories-count {
+  font-family: 'Capriola';
+  font-size: 26px;
+}

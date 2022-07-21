@@ -565,3 +565,36 @@ class LearnerGroupSearchStudentHandler(base.BaseHandler):
             'profile_picture_data_url': user_settings.profile_picture_data_url,
             'error': ''
         })
+
+class EditLearnerGroupPage(base.BaseHandler):
+    """Page for editing a learner group."""
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'group_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.LEARNER_GROUP_ID_REGEX
+                }]
+            },
+            'default_value': None
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
+    @acl_decorators.can_access_learner_groups
+    def get(self, group_id):
+        """Handles GET requests."""
+        if not config_domain.LEARNER_GROUPS_ARE_ENABLED.value:
+            raise self.PageNotFoundException
+
+        is_valid_request = learner_group_services.is_user_facilitator(
+            self.user_id, group_id)
+
+        if not is_valid_request:
+            raise self.PageNotFoundException
+
+        self.render_template('edit-learner-group-page.mainpage.html')

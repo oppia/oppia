@@ -1052,6 +1052,7 @@ VALIDATE_STORY_EXPLORATIONS_URL_PREFIX = '/validate_story_explorations'
 FACILITATOR_DASHBOARD_HANDLER = '/facilitator_dashboard_handler'
 FACILITATOR_DASHBOARD_PAGE_URL = '/facilitator-dashboard'
 CREATE_LEARNER_GROUP_PAGE_URL = '/create-learner-group'
+EDIT_LEARNER_GROUP_PAGE_URL = '/edit-group'
 
 # Event types.
 EVENT_TYPE_ALL_STATS = 'all_stats'
