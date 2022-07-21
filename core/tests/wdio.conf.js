@@ -178,13 +178,6 @@ exports.config = {
   // If one of them returns with a promise, WebdriverIO will wait until that
   // promise got resolved to continue.
   /**
-     * Gets executed once before all workers get launched.
-     * @param {Object} config wdio configuration object
-     * @param {Array.<Object>} capabilities list of capabilities details
-     */
-  onPrepare: function(config, capabilities) {
-  },
-  /**
    * Gets executed before test execution begins. At this point you can access
    * to all global variables like `browser`. It is the perfect place to
    * define custom commands.
@@ -197,6 +190,7 @@ exports.config = {
     // CicleCI causes RAM issues (meaning very high flakiness).
 
     if (process.env.GITHUB_ACTIONS &&
+      // eslint-disable-next-line eqeqeq
       process.env.VIDEO_RECORDING_IS_ENABLED == 1) {
       let ffmpegArgs = [
         '-y',
@@ -228,7 +222,6 @@ exports.config = {
         // eslint-disable-next-line no-console
         console.log(`ffmpeg exited with code ${code}`);
       });
-      console.log('############################################')
     }
     // Set a wide enough window size for the navbar in the library pages to
     // display fully.
@@ -281,13 +274,17 @@ exports.config = {
     * @param {Array.<String>} specs List of spec file paths that ran
     */
   after: function(result, capabilities, specs) {
-    spw.kill();
-    if (result === 0 && !ALL_VIDEOS && fs.existsSync(vidPath)) {
-      fs.unlinkSync(vidPath);
-      // eslint-disable-next-line no-console
-      console.log(
-        `Video for test: ${specs}` +
-        'was deleted successfully (test passed).');
+    if (process.env.GITHUB_ACTIONS &&
+      // eslint-disable-next-line eqeqeq
+      process.env.VIDEO_RECORDING_IS_ENABLED == 1) {
+      spw.kill();
+      if (result === 0 && !ALL_VIDEOS && fs.existsSync(vidPath)) {
+        fs.unlinkSync(vidPath);
+        // eslint-disable-next-line no-console
+        console.log(
+          `Video for test: ${specs}` +
+          'was deleted successfully (test passed).');
+      }
     }
   },
 };

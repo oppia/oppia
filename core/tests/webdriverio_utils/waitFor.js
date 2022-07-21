@@ -78,7 +78,7 @@ var invisibilityOf = async function(element, errorMessage) {
  * Consider adding this method after each browser.url() call.
  */
 var pageToFullyLoad = async function() {
-  var loadingMessage = await $('.e2e-test-loading-fullpage');
+  var loadingMessage = $('.e2e-test-loading-fullpage');
   await browser.waitUntil(
     await until.invisibilityOf(loadingMessage),
     {
