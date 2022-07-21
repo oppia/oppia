@@ -72,7 +72,7 @@ FILES_WITHOUT_ASSOCIATED_TEST_FILES = [
 ]
 
 
-def _is_path_ignored(path_to_check: str) -> bool:
+def check_if_path_ignored(path_to_check: str) -> bool:
     """Checks whether the given path is ignored by git.
 
     Args:
@@ -98,7 +98,7 @@ def main() -> None:
         for file in files:
             full_path = os.path.join(root, file)
             _, file_extension = os.path.splitext(full_path)
-            if file_extension == '.py' and not _is_path_ignored(full_path):
+            if file_extension == '.py' and not check_if_path_ignored(full_path):
                 all_backend_files.append(full_path)
 
     all_backend_files.sort()
