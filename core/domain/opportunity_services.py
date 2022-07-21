@@ -237,7 +237,7 @@ def add_new_exploration_opportunities(
             given story.
     """
     story = story_fetchers.get_story_by_id(story_id)
-    topic = topic_fetchers.get_topic_by_id(story.corresponding_topic_id)  # type: ignore[no-untyped-call]
+    topic = topic_fetchers.get_topic_by_id(story.corresponding_topic_id)
     _create_exploration_opportunities(story, topic, exp_ids)
 
 
@@ -962,7 +962,7 @@ def regenerate_opportunities_related_to_topic(
         opportunity_models.ExplorationOpportunitySummaryModel.delete_multi(
             list(exp_opportunity_models))
 
-    topic = topic_fetchers.get_topic_by_id(topic_id)  # type: ignore[no-untyped-call]
+    topic = topic_fetchers.get_topic_by_id(topic_id)
     story_ids = topic.get_canonical_story_ids()
     stories_with_none = story_fetchers.get_stories_by_ids(story_ids)
     stories: List[story_domain.Story] = []
