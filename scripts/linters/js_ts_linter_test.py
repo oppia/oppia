@@ -23,23 +23,14 @@ import os
 import re
 import shutil
 import subprocess
-import sys
 
 from core.tests import test_utils
 
+import esprima
+
 from . import js_ts_linter
 from . import pre_commit_linter
-from .. import common
 
-CURR_DIR = os.path.abspath(os.getcwd())
-OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, os.pardir, 'oppia_tools')
-
-ESPRIMA_PATH = os.path.join(
-    OPPIA_TOOLS_DIR, 'esprima-%s' % common.ESPRIMA_VERSION)
-
-sys.path.insert(1, ESPRIMA_PATH)
-
-import esprima  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
 
 NAME_SPACE = multiprocessing.Manager().Namespace()
 PROCESSES = multiprocessing.Manager().dict()
