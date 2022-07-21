@@ -214,17 +214,10 @@ describe('Topic and Story viewer functionality', function() {
     await topicAndStoryViewerPage.goToChapterIndex(0);
     await explorationPlayerPage.submitAnswer('Continue', null);
 
-    var endChapterSignUpSection = element(
-      by.css('.e2e-test-end-chapter-sign-up-section'));
-    await waitFor.visibilityOf(
-      endChapterSignUpSection, 'Sign up section takes too long to be visible.');
+    await topicAndStoryViewerPage.waitForSignUpSection();
     await topicAndStoryViewerPage.dismissSignUpSection();
-    await waitFor.invisibilityOf(
-      endChapterSignUpSection,
-      'Sign up section takes too long to disappear.');
+    await topicAndStoryViewerPage.waitForSignUpSectionToDisappear();
 
-    var practicetabContainer = element(
-      by.css('.e2e-test-practice-tab-container'));
     await waitFor.clientSideRedirection(async() => {
       // Click the practice session card to trigger redirection.
       await topicAndStoryViewerPage.goToPracticeSessionFromRecommendations();
@@ -233,9 +226,7 @@ describe('Topic and Story viewer functionality', function() {
       return (/practice/.test(url));
     }, async() => {
       // Wait until the practice tab is loaded.
-      await waitFor.visibilityOf(
-        practicetabContainer,
-        'Practice tab container takes too long to be visible.');
+      await topicAndStoryViewerPage.waitForPracticeTabContainer();
     });
   });
 
@@ -248,8 +239,6 @@ describe('Topic and Story viewer functionality', function() {
     await topicAndStoryViewerPage.goToChapterIndex(0);
     await explorationPlayerPage.submitAnswer('Continue', null);
 
-    var conversationSkinCardsContainer = element(
-      by.css('.e2e-test-conversation-skin-cards-container'));
     await waitFor.clientSideRedirection(async() => {
       // Click the next chapter card to trigger redirection.
       await topicAndStoryViewerPage.goToNextChapterFromRecommendations();
@@ -258,9 +247,7 @@ describe('Topic and Story viewer functionality', function() {
       return (/node_id=node_2/.test(url));
     }, async() => {
       // Wait until the conversation-skin of the next chapter is loaded.
-      await waitFor.visibilityOf(
-        conversationSkinCardsContainer,
-        'Conversation skin cards container takes too long to be visible.');
+      await topicAndStoryViewerPage.waitForConversationSkinCardsContainer();
     });
   });
 
