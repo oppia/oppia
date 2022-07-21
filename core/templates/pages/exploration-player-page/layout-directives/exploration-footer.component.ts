@@ -38,6 +38,7 @@ import { LearnerViewInfoBackendApiService } from '../services/learner-view-info-
 import { PlayerPositionService } from '../services/player-position.service';
 import { PlayerTranscriptService } from '../services/player-transcript.service';
 import { LessonInformationCardModalComponent } from '../templates/lesson-information-card-modal.component';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 
 import './exploration-footer.component.css';
 
@@ -90,7 +91,8 @@ export class ExplorationFooterComponent {
     private explorationEngineService: ExplorationEngineService,
     private userService: UserService,
     private editableExplorationBackendApiService:
-      EditableExplorationBackendApiService
+      EditableExplorationBackendApiService,
+    private urlInterpolationService: UrlInterpolationService
   ) {}
 
   ngOnInit(): void {
@@ -229,6 +231,10 @@ export class ExplorationFooterComponent {
           this.explorationId);
       });
     }
+  }
+
+  getStaticImageUrl(imagePath: string): string {
+    return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
   ngOnDestroy(): void {

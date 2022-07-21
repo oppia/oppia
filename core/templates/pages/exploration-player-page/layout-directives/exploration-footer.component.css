@@ -17,7 +17,7 @@
 
 .oppia-exploration-footer .exploration-footer-img {
   height: 60px;
-  margin: -25px 0 0 10px;
+  margin: -31px 5px 0 10px;
   width: 60px;
 }
 
@@ -243,8 +243,11 @@
 }
 
 .oppia-footer-info-icon {
+  background-color: #fff;
+  border-radius: 50%;
+  color: #094142;
   font-size: 20px;
-  margin-right: 5px;
+  margin-left: 7px;
 }
 
 .oppia-lesson-info {
@@ -258,6 +261,7 @@
 .oppia-lesson-info-h1 {
   color: #fff;
   display: inline;
+  font-family: "Roboto", Arial, sans-serif;
   font-size: 17px;
   font-weight: normal;
 }
