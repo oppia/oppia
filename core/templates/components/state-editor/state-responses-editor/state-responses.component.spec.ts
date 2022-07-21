@@ -881,12 +881,9 @@ describe('State Responses Component', () => {
     ' on delete button', () => {
     spyOn(ngbModal, 'open').and.callThrough();
 
-    const value = {
-      index: 0,
-      evt: new Event('')
-    };
+    const event = new Event('');
 
-    component.deleteAnswerGroup(value);
+    component.deleteAnswerGroup(event, 0);
 
     expect(ngbModal.open).toHaveBeenCalled();
   });
@@ -902,12 +899,9 @@ describe('State Responses Component', () => {
       } as NgbModalRef
     );
 
-    const value = {
-      index: 0,
-      evt: new Event('')
-    };
+    const event = new Event('');
 
-    component.deleteAnswerGroup(value);
+    component.deleteAnswerGroup(event, 0);
     tick();
 
     expect(ngbModal.open).toHaveBeenCalled();
@@ -923,12 +917,9 @@ describe('State Responses Component', () => {
       } as NgbModalRef
     );
 
-    const value = {
-      index: 0,
-      evt: new Event('')
-    };
+    const event = new Event('');
 
-    component.deleteAnswerGroup(value);
+    component.deleteAnswerGroup(event, 0);
 
     expect(alertsService.clearWarnings).toHaveBeenCalled();
   });

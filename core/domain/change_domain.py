@@ -31,6 +31,7 @@ AcceptableChangeDictTypes = Union[
     str,
     bool,
     int,
+    None,
     List[str],
     List[state_domain.AnswerGroupDict],
     state_domain.RecordedVoiceoversDict,

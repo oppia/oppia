@@ -129,7 +129,7 @@ export class StateHintsEditorComponent implements OnInit {
   isCurrentInteractionLinear(): boolean {
     const interactionId = this.stateInteractionIdService.savedMemento;
     if (interactionId) {
-      return INTERACTION_SPECS[interactionId as InteractionSpecsKey]?.is_linear;
+      return INTERACTION_SPECS[interactionId as InteractionSpecsKey].is_linear;
     }
     return false;
   }
