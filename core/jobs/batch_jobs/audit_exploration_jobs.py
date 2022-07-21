@@ -74,10 +74,13 @@ class ExpStateAuditChecksJob(base_jobs.JobBase):
         - Start value is before end value (RTE video)
     """
 
-    def filter_curated_explorations(self, model_pair: Tuple[
-        Optional[exp_models.ExplorationModel],
-        Optional[opportunity_models.ExplorationOpportunitySummaryModel]
-    ]) -> bool:
+    def filter_curated_explorations(
+        self,
+        model_pair: Tuple[
+            Optional[exp_models.ExplorationModel],
+            Optional[opportunity_models.ExplorationOpportunitySummaryModel]
+        ]
+    ) -> bool:
         """Returns whether the exp model is curated or not.
 
         Args:
@@ -88,10 +91,13 @@ class ExpStateAuditChecksJob(base_jobs.JobBase):
         """
         return (model_pair[0] is not None) and (model_pair[1] is not None)
 
-    def get_exploration_from_models(self, model_pair: Tuple[
-        exp_models.ExplorationModel,
-        opportunity_models.ExplorationOpportunitySummaryModel
-    ]) -> exp_domain.Exploration:
+    def get_exploration_from_models(
+        self,
+        model_pair: Tuple[
+            exp_models.ExplorationModel,
+            opportunity_models.ExplorationOpportunitySummaryModel
+        ]
+    ) -> exp_domain.Exploration:
         """Returns the exploration domain object from the curated
         exploration model.
 
@@ -104,10 +110,12 @@ class ExpStateAuditChecksJob(base_jobs.JobBase):
         return exp_fetchers.get_exploration_from_model(model_pair[0])
 
     def convert_into_model_pair(
-      self, models_list_pair: Tuple[
+      self,
+      models_list_pair: Tuple[
           List[exp_models.ExplorationModel],
           List[opportunity_models.ExplorationOpportunitySummaryModel]
-    ]) -> Tuple[
+        ]
+    ) -> Tuple[
         Optional[exp_models.ExplorationModel],
         Optional[opportunity_models.ExplorationOpportunitySummaryModel]
     ]:
@@ -205,10 +213,8 @@ class ExpStateAuditChecksJob(base_jobs.JobBase):
                     state.interaction.customization_args
                     ['buttonText'].value.unicode_str)
                 if (
-                    (
-                        text_value == '' or len(text_value) > 20 or
-                        text_value is None
-                    )
+                    text_value == '' or len(text_value) > 20 or
+                    text_value is None
                 ):
                     continue_interaction_invalid_values.append(
                         f'The text value is invalid, either '
