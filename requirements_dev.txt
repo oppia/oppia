@@ -73,16 +73,11 @@ soupsieve==2.3.2.post1
     # via beautifulsoup4
 toml==0.10.2
     # via pylint
-typed-ast==1.5.4
-    # via astroid
 typing-extensions==4.0.1
-    # via
-    #   -r requirements_dev.in
-    #   astroid
-    #   pylint
+    # via -r requirements_dev.in
 urllib3==1.26.9
     # via requests
-waitress==2.1.1
+waitress==2.1.2
     # via webtest
 webob==1.8.7
     # via webtest
