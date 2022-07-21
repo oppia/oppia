@@ -32,10 +32,6 @@ var suites = {
       'protractor_desktop/additionalEditorFeaturesModals.js'
     ],
 
-    additionalPlayerFeatures: [
-      'protractor_desktop/additionalPlayerFeatures.js'
-    ],
-
     adminPage: [
       'protractor_desktop/adminTabFeatures.js'
     ],

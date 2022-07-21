@@ -31,6 +31,7 @@ var LibraryPage = function() {
   var allExplorationSummaryTileSelector = function() {
     return $$('.e2e-test-exp-summary-tile');
   };
+  var explorationObjective = $('.e2e-test-exp-summary-tile-objective');
   var expHoverElement = $('.e2e-test-exploration-dashboard-card');
   var expSummaryTileTitleLocator = '.e2e-test-exp-summary-tile-title';
   var mainHeader = $('.e2e-test-library-main-header');
@@ -149,14 +150,12 @@ var LibraryPage = function() {
     await waitFor.visibilityOf(
       allCollectionSummaryTile,
       'Library Page does not have any collections');
-    var collectionCardElement = $(
-      `.e2e-test-collection-summary-tile-title=${collectionName}`);
+    var collectionCard = await allCollectionsTitled(collectionName)[0];
     await waitFor.visibilityOf(
-      collectionCardElement,
+      collectionCard,
       'Unable to find collection ' + collectionName);
     // The Collection summary card is masked by a dummy element. Therefore, a
     // Javascript click is used.
-    var collectionCard = await allCollectionsTitled(collectionName)[0];
     await action.click('Collection Card', collectionCard, true);
     await waitFor.pageToFullyLoad();
   };

@@ -25,6 +25,10 @@ var suites = {
     './core/tests/webdriverio_desktop/**/*.js',
   ],
 
+  additionalPlayerFeatures: [
+    './core/tests/webdriverio_desktop/additionalPlayerFeatures.js'
+  ],
+
   blogDashboard: [
     './core/tests/webdriverio_desktop/blogDashboard.js'
   ],

@@ -204,12 +204,12 @@ var ExplorationEditorPage = function() {
       expLanguageSelectorElement.$('option:checked'));
     await waitFor.visibilityOf(
       expTitle, 'Exploration Goal taking too long to appear');
-    var expTitleValue = await action.getAttribute(
-      'Exploration Title', expTitle, 'value');
+    var expTitleValue = await action.getValue(
+      'Exploration Title', expTitle);
     expect(expTitleValue).toMatch(title);
     expect(explorationCategory).toMatch(category);
-    var expObjectiveValue = await action.getAttribute(
-      'Exploration Objective', expObjective, 'value');
+    var expObjectiveValue = await action.getValue(
+      'Exploration Objective', expObjective);
     expect(expObjectiveValue).toMatch(objective);
     expect(explorationLanguage).toMatch(language);
     var expTagsSelectionChoiceElements = (

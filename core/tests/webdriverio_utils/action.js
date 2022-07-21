@@ -61,6 +61,13 @@ var getAttribute = async function(elementName, element, attribute) {
   return await element.getAttribute(attribute);
 };
 
+var getValue = async function(elementName, element) {
+  await waitFor.presenceOf(
+    element, `${elementName} is not present for getValue()`);
+  return await element.getValue();
+};
+
+
 var select = async function(selectorName, selectorElement, optionToSelect) {
   await waitFor.visibilityOf(
     selectorElement,
@@ -108,6 +115,7 @@ exports.clear = clear;
 exports.click = click;
 exports.getText = getText;
 exports.getAttribute = getAttribute;
+exports.getValue = getValue;
 exports.select = select;
 exports.select2 = select2;
 exports.matSelect = matSelect;

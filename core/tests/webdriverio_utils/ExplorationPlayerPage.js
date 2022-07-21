@@ -115,7 +115,7 @@ var ExplorationPlayerPage = function() {
     await action.click('Radio Button', radioButton);
     // eslint-disable-next-line oppia/e2e-practices
     let textArea = $('<textarea>');
-    await action.sendKeys('Text Area', textArea, 'Reporting this exploration');
+    await action.setValue('Text Area', textArea, 'Reporting this exploration');
     await action.click('Submit Button', submitButton);
     let afterSubmitText = await action.getText(
       'Flagged Success Element', flaggedSuccessElement);
