@@ -73,21 +73,22 @@ FILES_WITHOUT_ASSOCIATED_TEST_FILES = [
 
 
 def _is_path_ignored(path_to_check):
-        """Checks whether the given path is ignored by git.
+    """Checks whether the given path is ignored by git.
 
-        Args:
-            path_to_check: str. A path to a file or a dir.
+    Args:
+        path_to_check: str. A path to a file or a dir.
 
-        Returns:
-            bool. Whether the given path is ignored by git.
-        """
-        command = ['git', 'check-ignore', '-q', path_to_check]
+    Returns:
+        bool. Whether the given path is ignored by git.
+    """
+    command = ['git', 'check-ignore', '-q', path_to_check]
 
-        # The "git check-ignore <path>" command returns 0 when the path is
-        # ignored otherwise it returns 1. subprocess.call then returns this
-        # returncode.
+    # The "git check-ignore <path>" command returns 0 when the path is
+    # ignored otherwise it returns 1. subprocess.call then returns this
+    # returncode.
 
-        return subprocess.call(command) == 0
+    return subprocess.call(command) == 0
+
 
 def main() -> None:
     """Finds the non-empty backend files that lack an associated test file."""
