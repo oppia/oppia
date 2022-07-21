@@ -112,6 +112,7 @@ otherwise they will interfere with the iframed conversation skin directive. */
 
 .oppia-conversation-skin-next-lesson-text-container {
   cursor: default;
+  margin-left: 10px;
   margin-right: 10px;
 }
 
