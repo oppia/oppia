@@ -22,6 +22,12 @@ oppia-exploration-summary-tile .oppia-return-to-parent-button {
   margin-top: 12px;
 }
 
+/*
+  The comment in the section below is an rtlcss value directive mentioned here:
+  https://rtlcss.com/learn/usage-guide/value-directives/, which tells rtlcss
+  to replace the value of the input style to whatever is specified in the
+  comment.
+*/
 oppia-exploration-summary-tile .oppia-arrow-icon {
   font-size: 19px;
   padding-top: 1.5px;

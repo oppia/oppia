@@ -40,6 +40,13 @@
   min-width: 36px;
   padding: 6px;
 }
+
+/*
+  The comment in the section below is an rtlcss value directive mentioned here:
+  https://rtlcss.com/learn/usage-guide/value-directives/, which tells rtlcss
+  to replace the value of the input style to whatever is specified in the
+  comment.
+*/
 .progress-nav-bar .oppia-arrow {
   font-size: 19px;
   padding-top: 1.5px;
