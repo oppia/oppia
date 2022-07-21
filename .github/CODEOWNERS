@@ -742,6 +742,8 @@
 /core/domain/user*.py @seanlip
 /requirements.txt @vojtechjelinek
 /requirements.in @vojtechjelinek
+/requirements_dev.txt @vojtechjelinek
+/requirements_dev.in @vojtechjelinek
 /dependencies.json @vojtechjelinek
 /package.json @vojtechjelinek
 /yarn.lock @vojtechjelinek

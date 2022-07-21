@@ -27,8 +27,8 @@ import json
 import os
 import random
 import re
+import ssl
 import string
-import sys
 import time
 import unicodedata
 import urllib.parse
@@ -38,21 +38,14 @@ import zlib
 from core import feconf
 from core.constants import constants
 
+import certifi
+import yaml
+
 from typing import ( # isort:skip
     IO, Any, BinaryIO, Callable, Dict, Iterable, Iterator, List, Optional,
     TextIO, Tuple, TypeVar, Union, overload)
 from typing_extensions import Literal # isort:skip
 
-_YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-6.0')
-sys.path.insert(0, _YAML_PATH)
-
-_CERTIFI_PATH = os.path.join(
-    os.getcwd(), '..', 'oppia_tools', 'certifi-2021.10.8')
-sys.path.insert(0, _CERTIFI_PATH)
-
-import yaml  # isort:skip  # pylint: disable=wrong-import-position
-import certifi  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-import ssl  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 DATETIME_FORMAT = '%m/%d/%Y, %H:%M:%S:%f'
 ISO_8601_DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%fz'
