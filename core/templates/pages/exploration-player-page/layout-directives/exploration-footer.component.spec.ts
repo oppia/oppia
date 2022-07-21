@@ -46,6 +46,8 @@ import { AudioTranslationLanguageService } from '../services/audio-translation-l
 import { UserInfo } from 'domain/user/user-info.model';
 import { UserService } from 'services/user.service';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+
 
 describe('ExplorationFooterComponent', () => {
   let component: ExplorationFooterComponent;
@@ -69,6 +71,7 @@ describe('ExplorationFooterComponent', () => {
   let writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory;
   let audioTranslationLanguageService: AudioTranslationLanguageService;
   let userService: UserService;
+  let urlInterpolationService: UrlInterpolationService;
 
   let mockResultsLoadedEventEmitter = new EventEmitter<boolean>();
 
@@ -84,6 +87,7 @@ describe('ExplorationFooterComponent', () => {
         QuestionPlayerStateService,
         LearnerViewInfoBackendApiService,
         LoggerService,
+        UrlInterpolationService
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -113,6 +117,7 @@ describe('ExplorationFooterComponent', () => {
     audioTranslationLanguageService = TestBed.inject(
       AudioTranslationLanguageService);
     userService = TestBed.inject(UserService);
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
     fixture = TestBed.createComponent(ExplorationFooterComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -529,6 +534,16 @@ describe('ExplorationFooterComponent', () => {
     expect(learnerViewInfoBackendApiService.fetchLearnerInfoAsync)
       .toHaveBeenCalled();
   }));
+
+  it('should get footer image url', () => {
+    spyOn(urlInterpolationService, 'getStaticImageUrl').and.returnValue(
+      'dummy_image_url');
+
+    expect(component.getStaticImageUrl('general/apple.svg'))
+      .toEqual('dummy_image_url');
+    expect(urlInterpolationService.getStaticImageUrl).toHaveBeenCalledWith(
+      'general/apple.svg');
+  });
 
   it('should get checkpoint index from state name', fakeAsync(() => {
     spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
