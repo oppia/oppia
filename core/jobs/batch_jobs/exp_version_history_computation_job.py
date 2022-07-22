@@ -302,7 +302,27 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
             versioned_explorations[0] = exp_v1
             versioned_explorations[exp_version - 1] = exp_vlatest
 
-            for version in range(1, exp_version + 1):
+            commit_log_model_v1 = commit_log_models[0]
+            committer_id_v1 = commit_log_model_v1.user_id
+            states_vh_at_v1 = {
+                state_name: state_domain.StateVersionHistory(
+                    None, None, committer_id_v1
+                )
+                for state_name in exp_v1.states
+            }
+            metadata_vh_at_v1 = exp_domain.MetadataVersionHistory(
+                None, committer_id_v1
+            )
+            committer_ids_at_v1 = [committer_id_v1]
+            vh_model_at_v1 = self._get_updated_version_history_model(
+                version_history_models[0],
+                exp_v1.id, 1, committer_id_v1,
+                states_vh_at_v1, metadata_vh_at_v1, committer_ids_at_v1
+            )
+            vh_model_at_v1.update_timestamps()
+            version_history_models[0] = vh_model_at_v1
+
+            for version in range(2, exp_version + 1):
                 commit_log_model = commit_log_models[version - 1]
                 committer_id: str = commit_log_model.user_id
                 change_list: List[exp_domain.ExplorationChange] = []
@@ -310,18 +330,98 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                     change_list.append(exp_domain.ExplorationChange(
                         change_dict
                     ))
-
-                if version == 1:
-                    new_states_vh = {
-                        state_name: state_domain.StateVersionHistory(
-                            None, None, committer_id
-                        )
-                        for state_name in exp_v1.states
-                    }
-                    new_metadata_vh = exp_domain.MetadataVersionHistory(
-                        None, committer_id
+                old_exploration = versioned_explorations[version - 2]
+                # If the change list contains evert commit, we have to
+                # handle it separately.
+                revert_to_version = self._check_for_revert_commit(
+                    change_list
+                )
+                if revert_to_version is not None:
+                    # If the revert to version number is invalid, we cannot
+                    # generate the further version history models
+                    # correctly. Hence, an empty list is returned
+                    # indicating that the version history of this
+                    # exploration cannot be shown to the user.
+                    if (
+                        revert_to_version <= 0 or
+                        revert_to_version >= version
+                    ):
+                        return (exp_id, [])
+                    new_exploration = copy.deepcopy(
+                        versioned_explorations[revert_to_version - 1]
                     )
-                    new_committer_ids = [committer_id]
+                    new_exploration.version = version
+                    revert_to_vh_model = (
+                        version_history_models[revert_to_version - 1]
+                    )
+                    new_vh_model = self._get_reverted_version_history_model(
+                        revert_to_vh_model,
+                        version_history_models[version - 1],
+                        exp_id, version
+                    )
+                    new_vh_model.update_timestamps()
+                    version_history_models[version - 1] = new_vh_model
+                    versioned_explorations[version - 1] = new_exploration
+                else:
+                    # The generation of the new exploration is placed under
+                    # a try/except block because sometimes the change list
+                    # may be invalid for some explorations and in those
+                    # cases, we cannot compute the version history for
+                    # those explorations. If we have an invalid change list
+                    # in any version of the exploration, we cannot show its
+                    # version history to the users.
+                    try:
+                        new_exploration = (
+                            exp_services.apply_change_list_to_exploration(
+                                old_exploration, version - 1, change_list
+                            )
+                        )
+                        new_exploration.version = version
+                    except Exception:
+                        # If any error is thrown while applying the change
+                        # list, we just return an empty array indicating
+                        # that no models were created for this exploration.
+                        return (exp_id, [])
+
+                    old_states = old_exploration.states
+                    new_states = new_exploration.states
+                    old_metadata = old_exploration.get_metadata()
+                    new_metadata = new_exploration.get_metadata()
+
+                    old_vh_model = version_history_models[version - 2]
+                    old_states_vh = {
+                        state_name: (
+                            state_domain.StateVersionHistory.from_dict(
+                                state_vh_dict
+                            )
+                        )
+                        for state_name, state_vh_dict in
+                        old_vh_model.state_version_history.items()
+                    }
+                    old_metadata_vh = exp_domain.MetadataVersionHistory(
+                        old_vh_model.metadata_last_edited_version_number,
+                        old_vh_model.metadata_last_edited_committer_id
+                    )
+
+                    new_states_vh = (
+                        exp_services.update_states_version_history(
+                            old_states_vh, change_list, old_states,
+                            new_states, version, committer_id
+                        )
+                    )
+                    new_metadata_vh = (
+                        exp_services.update_metadata_version_history(
+                            old_metadata_vh, change_list, old_metadata,
+                            new_metadata, version, committer_id
+                        )
+                    )
+                    new_committer_ids = (
+                        exp_services.get_updated_committer_ids(
+                            new_states_vh,
+                            new_metadata_vh.last_edited_committer_id
+                        )
+                    )
+
                     new_vh_model = self._get_updated_version_history_model(
                         version_history_models[version - 1],
                         exp_id, version, committer_id,
@@ -329,107 +429,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                     )
                     new_vh_model.update_timestamps()
                     version_history_models[version - 1] = new_vh_model
-                else:
-                    old_exploration = versioned_explorations[version - 2]
-                    # If the change list contains evert commit, we have to
-                    # handle it separately.
-                    revert_to_version = self._check_for_revert_commit(
-                        change_list
-                    )
-                    if revert_to_version is not None:
-                        # If the revert to version number is invalid, we cannot
-                        # generate the further version history models
-                        # correctly. Hence, an empty list is returned
-                        # indicating that the version history of this
-                        # exploration cannot be shown to the user.
-                        if (
-                            revert_to_version <= 0 or
-                            revert_to_version >= version
-                        ):
-                            return (exp_id, [])
-                        new_exploration = copy.deepcopy(
-                            versioned_explorations[revert_to_version - 1]
-                        )
-                        new_exploration.version = version
-                        revert_to_vh_model = (
-                            version_history_models[revert_to_version - 1]
-                        )
-                        new_vh_model = self._get_reverted_version_history_model(
-                            revert_to_vh_model,
-                            version_history_models[version - 1],
-                            exp_id, version
-                        )
-                        new_vh_model.update_timestamps()
-                        version_history_models[version - 1] = new_vh_model
-                        versioned_explorations[version - 1] = new_exploration
-                    else:
-                        # The generation of the new exploration is placed under
-                        # a try/except block because sometimes the change list
-                        # may be invalid for some explorations and in those
-                        # cases, we cannot compute the version history for
-                        # those explorations. If we have an invalid change list
-                        # in any version of the exploration, we cannot show its
-                        # version history to the users.
-                        try:
-                            new_exploration = (
-                                exp_services.apply_change_list_to_exploration(
-                                    old_exploration, version - 1, change_list
-                                )
-                            )
-                            new_exploration.version = version
-                        except Exception:
-                            # If any error is thrown while applying the change
-                            # list, we just return an empty array indicating
-                            # that no models were created for this exploration.
-                            return (exp_id, [])
-
-                        old_states = old_exploration.states
-                        new_states = new_exploration.states
-                        old_metadata = old_exploration.get_metadata()
-                        new_metadata = new_exploration.get_metadata()
-
-                        old_vh_model = version_history_models[version - 2]
-                        old_states_vh = {
-                            state_name: (
-                                state_domain.StateVersionHistory.from_dict(
-                                    state_vh_dict
-                                )
-                            )
-                            for state_name, state_vh_dict in
-                            old_vh_model.state_version_history.items()
-                        }
-                        old_metadata_vh = exp_domain.MetadataVersionHistory(
-                            old_vh_model.metadata_last_edited_version_number,
-                            old_vh_model.metadata_last_edited_committer_id
-                        )
-
-                        new_states_vh = (
-                            exp_services.update_states_version_history(
-                                old_states_vh, change_list, old_states,
-                                new_states, version, committer_id
-                            )
-                        )
-                        new_metadata_vh = (
-                            exp_services.update_metadata_version_history(
-                                old_metadata_vh, change_list, old_metadata,
-                                new_metadata, version, committer_id
-                            )
-                        )
-                        new_committer_ids = (
-                            exp_services.get_updated_committer_ids(
-                                new_states_vh,
-                                new_metadata_vh.last_edited_committer_id
-                            )
-                        )
-
-                        new_vh_model = self._get_updated_version_history_model(
-                            version_history_models[version - 1],
-                            exp_id, version, committer_id,
-                            new_states_vh, new_metadata_vh, new_committer_ids
-                        )
-                        new_vh_model.update_timestamps()
-                        version_history_models[version - 1] = new_vh_model
-                        versioned_explorations[version - 1] = new_exploration
+                    versioned_explorations[version - 1] = new_exploration
 
             return (exp_id, version_history_models)
 
