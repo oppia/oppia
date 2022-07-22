@@ -569,6 +569,9 @@ def migrate_state_training_jobs(
             object containing exploration to training job id mapping. This
             mapping is used to figure out jobs that need to be re-submitted,
             added or removed.
+
+    Raises:
+        Exception. Interaction id does not exist for invalid state_name.
     """
     exp_id = state_training_jobs_mapping.exp_id
     exp_version = state_training_jobs_mapping.exp_version

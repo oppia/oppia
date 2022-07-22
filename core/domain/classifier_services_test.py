@@ -25,7 +25,7 @@ import os
 
 from core import feconf
 from core import utils
-from core.domain import classifier_domain, state_domain
+from core.domain import classifier_domain
 from core.domain import classifier_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
@@ -851,7 +851,9 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
         new_job_id = new_job.job_id
         self.assertEqual(old_job_id, new_job_id)
 
-    def test_migrate_state_training_jobs_with_invalid_interaction_id(self) -> None:
+    def test_migrate_state_training_jobs_with_invalid_interaction_id(
+        self
+    ) -> None:
         """Test the migrate_state_training_jobs method."""
 
         exploration = self.save_new_valid_exploration(
