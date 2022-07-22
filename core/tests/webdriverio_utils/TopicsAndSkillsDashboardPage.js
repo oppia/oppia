@@ -173,6 +173,7 @@ var TopicsAndSkillsDashboardPage = function() {
     await waitFor.visibilityOf(
       assignSkillToTopicButtons[0],
       'Assign skill to topic buttons taking too long to appear');
+    var assignSkillToTopicButtons = await assignSkillToTopicButtonsSelector();
     expect(assignSkillToTopicButtons.length).toEqual(1);
     await action.click(
       'Assign skill to topic button', assignSkillToTopicButtons[0]);
