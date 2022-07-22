@@ -450,18 +450,17 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
             )
             return exp_model_at_v1
 
-    def filter_valid_exploration_models_at_v1(
+    def filter_valid_exploration_models(
         self, exp_model: exp_models.ExplorationModel
     ) -> bool:
-        """Returns true if the exploration model at v1 is valid for calculation
+        """Returns true if the exploration model at is valid for calculation
         of version history.
 
         Args:
-            exp_model: exp_models.ExplorationModel. The exploration model at
-                version 1.
+            exp_model: exp_models.ExplorationModel. The exploration model.
 
         Returns:
-            bool. Whether the exploration model at v1 can be used for
+            bool. Whether the exploration model at can be used for
             calculation of version history.
         """
         try:
@@ -476,6 +475,8 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
             | 'Get all ExplorationModels' >> ndb_io.GetModels(
                 exp_models.ExplorationModel.get_all(include_deleted=False)
             )
+            | 'Filter valid exploration models at latest version' >>
+                beam.Filter(self.filter_valid_exploration_models)
             | 'Create key-value pairs with id and exp models' >>
                 beam.Map(lambda model: (model.id, model))
         )
@@ -491,7 +492,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
         valid_explorations_v1 = (
             explorations_at_v1
             | 'Filter the valid exploration models at v1' >> beam.Filter(
-                self.filter_valid_exploration_models_at_v1
+                self.filter_valid_exploration_models
             )
             | 'Create key-value pairs with id and exp models at v1' >>
                 beam.Map(lambda model: (model.id, model))
@@ -501,7 +502,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
             explorations_at_v1
             | 'Filter the invalid exploration models at v1' >> beam.Filter(
                 lambda model: (
-                    not self.filter_valid_exploration_models_at_v1(model)
+                    not self.filter_valid_exploration_models(model)
                 )
             )
         )
