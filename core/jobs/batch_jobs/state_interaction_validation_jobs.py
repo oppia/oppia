@@ -1098,7 +1098,7 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
         """Filter invalid end interaction states.
 
         Args:
-            exp: exp_domain.Exploration. The exploration.
+            exp_states: state_domain.State. The exploration states.
             exp_id_list: List[str]. List of all exploration ids.
 
         Returns:
