@@ -38,7 +38,7 @@ var customizeComponent = async function(
 var expectComponentDetailsToMatch = async function(
     elem, youtubeId, startTime, endTime, ifAutoplay) {
   var youtubePlayer = await elem.element(
-    by.css('.protractor-test-youtube-player'));
+    by.css('.e2e-test-youtube-player'));
   var videoInfo = await elem.element(by.tagName('iframe')).getAttribute('src');
   expect(videoInfo).toMatch(youtubeId);
   const startSeconds = await youtubePlayer.getAttribute(

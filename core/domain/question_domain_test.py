@@ -344,6 +344,11 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         state.interaction.default_outcome.dest = 'abc'
         self._assert_validation_error(
             'Expected all answer groups to have destination as None.')
+        state.interaction.default_outcome.dest = None
+        state.interaction.default_outcome.dest_if_really_stuck = 'pqr'
+        self._assert_validation_error(
+            'Expected all answer groups to have destination for the '
+            'stuck learner as None.')
         state.interaction.default_outcome.labelled_as_correct = False
         self._assert_validation_error(
             'Expected at least one answer group to have a correct answer')
@@ -358,6 +363,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             state_domain.AnswerGroup.from_dict({
                 'outcome': {
                     'dest': 'abc',
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'feedback_1',
                         'html': '<p>Feedback</p>'
@@ -383,6 +389,38 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
         self._assert_validation_error(
             'Expected all answer groups to have destination as None.')
+
+        state.interaction.answer_groups = [
+            state_domain.AnswerGroup.from_dict({
+                'outcome': {
+                    'dest': None,
+                    'dest_if_really_stuck': 'pqr',
+                    'feedback': {
+                        'content_id': 'feedback_1',
+                        'html': '<p>Feedback</p>'
+                    },
+                    'labelled_as_correct': True,
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None
+                },
+                'rule_specs': [{
+                    'inputs': {
+                        'x': {
+                            'contentId': 'rule_input_4',
+                            'normalizedStrSet': ['Test']
+                        }
+                    },
+                    'rule_type': 'Contains'
+                }],
+                'training_data': [],
+                'tagged_skill_misconception_id': None
+            })
+        ]
+
+        self._assert_validation_error(
+            'Expected all answer groups to have destination for the '
+            'stuck learner as None.')
 
     def test_validate_invalid_list_of_inapplicable_skill_misconception_ids(
             self):
@@ -1728,6 +1766,62 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             }
         )
 
+    def test_question_state_dict_conversion_from_v49_to_v50(self):
+        question_data = (
+            question_domain.Question.create_default_question_state().to_dict())
+
+        question_data['interaction']['id'] = 'AlgebraicExpressionInput'
+        question_data['interaction']['customization_args'] = {
+            'customOskLetters': ['a', 'b', 'c']
+        }
+        question_data['interaction']['answer_groups'] = [{
+            'outcome': {
+                'dest': 'abc',
+                'feedback': {
+                    'content_id': 'feedback_2',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': True,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': 'a - b'
+                },
+                'rule_type': 'ContainsSomeOf'
+            }, {
+                'inputs': {
+                    'x': 'a - b',
+                    'y': []
+                },
+                'rule_type': 'MatchesExactlyWith'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }]
+
+        test_value = {
+            'state': question_data,
+            'state_schema_version': 49
+        }
+
+        question_domain.Question.update_state_from_model(
+            test_value, test_value['state_schema_version'])
+
+        self.assertEqual(test_value['state_schema_version'], 50)
+
+        rule_specs = test_value[
+            'state']['interaction']['answer_groups'][0]['rule_specs']
+        self.assertEqual(len(rule_specs), 1)
+        self.assertEqual(rule_specs[0]['rule_type'], 'MatchesExactlyWith')
+        self.assertEqual(
+            test_value['state']['interaction']['customization_args'], {
+                'allowedVariables': ['a', 'b', 'c']
+            }
+        )
+
     def test_get_all_translatable_content_for_question(self):
         """Get all translatable fields from exploration."""
         translatable_contents = [
@@ -1744,6 +1838,39 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                 '<p>This is a hint.</p>',
                 '<p>This is a solution.</p>'
             ])
+
+    def test_question_state_dict_conversion_from_v50_to_v51(self):
+        question_data = (
+            question_domain.Question.create_default_question_state().to_dict())
+
+        question_data['interaction']['answer_groups'] = [
+            {
+                'outcome': {
+                    'feedback': {
+                        'content_id': 'content_id'
+                    }
+                }
+            }
+        ]
+
+        test_value = {
+            'state': question_data,
+            'state_schema_version': 50
+        }
+
+        question_domain.Question.update_state_from_model(
+            test_value, test_value['state_schema_version'])
+
+        self.assertEqual(test_value['state_schema_version'], 51)
+
+        default_outcome_dict = test_value['state']['interaction']['default_outcome'] # pylint: disable=line-too-long
+        outcome_dict = test_value['state']['interaction']['answer_groups'][0]['outcome'] # pylint: disable=line-too-long
+
+        self.assertIn('dest_if_really_stuck', default_outcome_dict)
+        self.assertEqual(default_outcome_dict['dest_if_really_stuck'], None)
+
+        self.assertIn('dest_if_really_stuck', outcome_dict)
+        self.assertEqual(outcome_dict['dest_if_really_stuck'], None)
 
 
 class QuestionSummaryTest(test_utils.GenericTestBase):

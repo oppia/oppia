@@ -16,11 +16,14 @@
  * @fileoverview Component for the main page of the story viewer.
  */
 
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, OnDestroy } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { TranslateService } from '@ngx-translate/core';
+import { Subscription } from 'rxjs';
+
 import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { UrlService } from 'services/contextual/url.service';
-import { downgradeComponent } from '@angular/upgrade/static';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { UserService } from 'services/user.service';
 import { AppConstants } from 'app.constants';
@@ -31,6 +34,9 @@ import { AlertsService } from 'services/alerts.service';
 import { StoryPlaythrough } from 'domain/story_viewer/story-playthrough.model';
 import { ReadOnlyStoryNode } from 'domain/story_viewer/read-only-story-node.model';
 import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
+
+import './story-viewer-page.component.css';
+
 
 interface IconParametersArray {
   thumbnailIconUrl: string;
@@ -43,29 +49,33 @@ interface IconParametersArray {
   selector: 'oppia-story-viewer-page',
   templateUrl: './story-viewer-page.component.html'
 })
-export class StoryViewerPageComponent implements OnInit {
-  @ViewChild('overlay') overlay: ElementRef<HTMLDivElement>;
-  @ViewChild('skip') skipButton: ElementRef<HTMLButtonElement>;
+export class StoryViewerPageComponent implements OnInit, OnDestroy {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @ViewChild('overlay') overlay!: ElementRef<HTMLDivElement>;
+  @ViewChild('skip') skipButton!: ElementRef<HTMLButtonElement>;
+  storyPlaythroughObject!: StoryPlaythrough;
+  storyId!: string;
+  topicUrlFragment!: string;
+  classroomUrlFragment!: string;
+  storyUrlFragment!: string;
+  storyTitle!: string;
+  storyTitleTranslationKey!: string;
+  storyDescription!: string;
+  storyDescTranslationKey!: string;
+  pathIconParameters!: IconParametersArray[];
+  topicName!: string;
+  thumbnailFilename!: string;
+  thumbnailBgColor!: string;
+  storyNodes!: ReadOnlyStoryNode[];
+  iconUrl!: string;
+  directiveSubscriptions = new Subscription();
   showLoginOverlay: boolean = true;
-  storyPlaythroughObject: StoryPlaythrough;
-  storyId: string;
-  storyIsLoaded: boolean;
-  isLoggedIn: boolean;
-  topicUrlFragment: string;
-  classroomUrlFragment: string;
-  storyUrlFragment: string;
-  storyTitle: string;
-  storyTitleTranslationKey: string;
-  storyDescription: string;
-  storyDescTranslationKey: string;
-  pathIconParameters: IconParametersArray[];
-  topicName: string;
-  thumbnailFilename: string;
-  thumbnailBgColor: string;
-  storyNodes: ReadOnlyStoryNode[];
+  storyIsLoaded: boolean = false;
+  isLoggedIn: boolean = false;
   storyNodesTitleTranslationKeys: string[] = [];
   storyNodesDescTranslationKeys: string[] = [];
-  iconUrl: string;
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
@@ -76,7 +86,8 @@ export class StoryViewerPageComponent implements OnInit {
     private loaderService: LoaderService,
     private storyViewerBackendApiService: StoryViewerBackendApiService,
     private pageTitleService: PageTitleService,
-    private alertsService: AlertsService
+    private alertsService: AlertsService,
+    private translateService: TranslateService
   ) {}
 
   focusSkipButton(eventTarget: Element, isLoggedIn: boolean): void {
@@ -92,10 +103,6 @@ export class StoryViewerPageComponent implements OnInit {
 
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
-  }
-
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   showChapters(): boolean {
@@ -152,12 +159,33 @@ export class StoryViewerPageComponent implements OnInit {
     result = this.urlService.addField(
       result, 'classroom_url_fragment',
       this.urlService.getClassroomUrlFragmentFromLearnerUrl());
-    result = this.urlService.addField(
-      result, 'story_url_fragment',
+    let storyUrlFragment = (
       this.urlService.getStoryUrlFragmentFromLearnerUrl());
+    if (storyUrlFragment === null) {
+      throw new Error('Story url fragment is null');
+    }
+    result = this.urlService.addField(
+      result, 'story_url_fragment', storyUrlFragment);
     result = this.urlService.addField(
       result, 'node_id', node.getId());
     return result;
+  }
+
+  subscribeToOnLangChange(): void {
+    this.directiveSubscriptions.add(
+      this.translateService.onLangChange.subscribe(() => {
+        this.setPageTitle();
+      })
+    );
+  }
+
+  setPageTitle(): void {
+    let translatedTitle = this.translateService.instant(
+      'I18N_STORY_VIEWER_PAGE_TITLE', {
+        topicName: this.topicName,
+        storyTitle: this.storyTitle
+      });
+    this.pageTitleService.setDocumentTitle(translatedTitle);
   }
 
   ngOnInit(): void {
@@ -170,8 +198,12 @@ export class StoryViewerPageComponent implements OnInit {
       this.urlService.getTopicUrlFragmentFromLearnerUrl());
     this.classroomUrlFragment = (
       this.urlService.getClassroomUrlFragmentFromLearnerUrl());
-    this.storyUrlFragment = (
+    let storyUrlFragment = (
       this.urlService.getStoryUrlFragmentFromLearnerUrl());
+    if (storyUrlFragment === null) {
+      throw new Error('Story url fragment is null');
+    }
+    this.storyUrlFragment = storyUrlFragment;
     this.loaderService.showLoadingScreen('Loading');
     this.storyViewerBackendApiService.fetchStoryDataAsync(
       this.topicUrlFragment,
@@ -183,11 +215,16 @@ export class StoryViewerPageComponent implements OnInit {
         this.storyNodes = this.storyPlaythroughObject.getStoryNodes();
         this.storyId = this.storyPlaythroughObject.getStoryId();
         this.topicName = this.storyPlaythroughObject.topicName;
-        this.pageTitleService.setDocumentTitle(
-          `Learn ${this.topicName} | ${storyDataDict.title} | Oppia`);
         this.pageTitleService.updateMetaTag(
           storyDataDict.getMetaTagContent());
         this.storyTitle = storyDataDict.title;
+
+        // The onLangChange event is initially fired before the story is
+        // loaded. Hence the first setpageTitle() call needs to made
+        // manually, and the onLangChange subscription is added after
+        // the story is loaded.
+        this.setPageTitle();
+        this.subscribeToOnLangChange();
         this.storyTitleTranslationKey = (
           this.i18nLanguageCodeService
             .getStoryTranslationKey(
@@ -231,6 +268,10 @@ export class StoryViewerPageComponent implements OnInit {
     // background color and icon url for the icons generated on the
     // path.
     this.pathIconParameters = [];
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
   }
 
   isHackyStoryTitleTranslationDisplayed(): boolean {

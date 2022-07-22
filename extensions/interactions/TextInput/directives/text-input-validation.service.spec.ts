@@ -24,7 +24,7 @@ import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
 import { Outcome, OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { Rule, RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { SubtitledUnicode } from 'domain/exploration/SubtitledUnicodeObjectFactory';
-import { TextInputValidationService, Validators } from 'interactions/TextInput/directives/text-input-validation.service';
+import { TextInputValidationService, Validator } from 'interactions/TextInput/directives/text-input-validation.service';
 import { TextInputCustomizationArgs } from 'interactions/customization-args-defs';
 
 describe('TextInputValidationService', () => {
@@ -54,13 +54,14 @@ describe('TextInputValidationService', () => {
     let customizationArgSpecs =
      INTERACTION_SPECS.TextInput.customization_arg_specs;
     let rowsSpecs = customizationArgSpecs[1];
-    const validators = rowsSpecs.schema.validators as Validators[];
+    const validators = rowsSpecs.schema.validators as Validator[];
     minRows = validators[0].min_value;
     maxRows = validators[1].max_value;
 
     currentState = 'First State';
     goodDefaultOutcome = oof.createFromBackendDict({
       dest: 'Second State',
+      dest_if_really_stuck: null,
       feedback: {
         html: '',
         content_id: null

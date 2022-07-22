@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import datetime
 
+from core import android_validation_constants
 from core import feconf
 from core import utils
 from core.constants import constants
@@ -38,24 +39,25 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
         self.topic = topic_domain.Topic.create_default_topic(
-            self.topic_id, 'Name', 'abbrev', 'description')
+            self.topic_id, 'Name', 'abbrev', 'description', 'fragm')
         self.topic.subtopics = [
             topic_domain.Subtopic(
                 1, 'Title', ['skill_id_1'], 'image.svg',
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-url')]
         self.topic.next_subtopic_id = 2
+        self.topic.skill_ids_for_diagnostic_test = ['skill_id_1']
 
         self.user_id_a = self.get_user_id_from_email('a@example.com')  # type: ignore[no-untyped-call]
         self.user_id_b = self.get_user_id_from_email('b@example.com')  # type: ignore[no-untyped-call]
 
-        self.user_a = user_services.get_user_actions_info(self.user_id_a)  # type: ignore[no-untyped-call]
-        self.user_b = user_services.get_user_actions_info(self.user_id_b)  # type: ignore[no-untyped-call]
+        self.user_a = user_services.get_user_actions_info(self.user_id_a)
+        self.user_b = user_services.get_user_actions_info(self.user_id_b)
 
     def test_create_default_topic(self) -> None:
         """Tests the create_default_topic() function."""
         topic = topic_domain.Topic.create_default_topic(
-            self.topic_id, 'Name', 'abbrev', 'description')
+            self.topic_id, 'Name', 'abbrev', 'description', 'fragm')
         expected_topic_dict: topic_domain.TopicDict = {
             'id': self.topic_id,
             'name': 'Name',
@@ -77,7 +79,8 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             'version': 0,
             'practice_tab_is_displayed': False,
             'meta_tag_content': '',
-            'page_title_fragment_for_web': ''
+            'page_title_fragment_for_web': 'fragm',
+            'skill_ids_for_diagnostic_test': []
         }
         self.assertEqual(topic.to_dict(), expected_topic_dict)
 
@@ -477,6 +480,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic.thumbnail_bg_color = (
             constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
         self.topic.subtopics[0].skill_ids = []
+        self.topic.skill_ids_for_diagnostic_test = []
         self._assert_strict_validation_error(
             'Subtopic with title Title does not have any skills linked')
 
@@ -490,6 +494,22 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             'ijklmnopqrstuvwxyz')
         self._assert_validation_error(
             'Expected subtopic title to be less than 64 characters')
+
+    def test_subtopic_url_fragment_validation(self) -> None:
+        self.topic.subtopics[0].url_fragment = 'a' * 26
+        self._assert_validation_error(
+            'Expected subtopic url fragment to be less '
+            'than or equal to %d characters' %
+            android_validation_constants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT)
+
+        self.topic.subtopics[0].url_fragment = ''
+        self._assert_validation_error(
+            'Expected subtopic url fragment to be non '
+            'empty')
+
+        self.topic.subtopics[0].url_fragment = 'invalidFragment'
+        self._assert_validation_error(
+            'Invalid url fragment: %s' % self.topic.subtopics[0].url_fragment)
 
     def test_thumbnail_filename_validation_for_subtopic(self) -> None:
         self._assert_valid_thumbnail_filename_for_subtopic(
@@ -562,6 +582,22 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic.name = 'Very long and therefore invalid topic name'
         self._assert_validation_error(
             'Topic name should be at most 39 characters')
+
+    def test_validation_fails_with_story_is_published_set_to_non_bool_value(
+        self
+    ) -> None:
+        self.topic.canonical_story_references = [
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id')
+        ]
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
+        # Here, a bool value is expected but for test purpose we're assigning it
+        # a string type. Thus to avoid MyPy error, we added an ignore here.
+        self.topic.canonical_story_references[0].story_is_published = 'no' # type: ignore[assignment]
+        self._assert_validation_error(
+            'story_is_published value should be boolean type')
 
     def test_validation_fails_with_empty_url_fragment(self) -> None:
         self.topic.url_fragment = ''
@@ -802,6 +838,57 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             topic_domain.Topic.deserialize(
                 self.topic.serialize()).to_dict())
 
+    def test_skill_ids_for_diagnostic_test_update(self) -> None:
+        """Checks the update method for the skill_ids_for_diagnostic_test field
+        for a topic.
+        """
+        self.topic.subtopics[0].skill_ids = []
+        self.assertEqual(
+            self.topic.skill_ids_for_diagnostic_test, ['skill_id_1'])
+        self.topic.update_skill_ids_for_diagnostic_test([])
+        self.assertEqual(self.topic.skill_ids_for_diagnostic_test, [])
+
+    def test_skill_ids_for_diagnostic_test_validation(self) -> None:
+        """Checks the validation of skill_ids_for_diagnostic_test field
+        for a topic.
+        """
+        self.topic.update_skill_ids_for_diagnostic_test(['test_skill_id'])
+        error_msg = (
+            'The skill_ids {\'test_skill_id\'} are selected for the '
+            'diagnostic test but they are not associated with the topic.')
+        self._assert_validation_error(error_msg)
+
+    def test_max_skill_ids_for_diagnostic_test_validation(self) -> None:
+        """Validates maximum length for the skill_ids_for_diagnostic_test field
+        for a topic.
+        """
+        skill_ids = ['skill_1', 'skill_2', 'skill_3', 'skill_4']
+        self.topic.subtopics[0].skill_ids = skill_ids
+        self.topic.skill_ids_for_diagnostic_test = skill_ids
+        error_msg = (
+            'The skill_ids_for_diagnostic_test field should contain at most 3 '
+            'skill_ids.')
+        self._assert_validation_error(error_msg)
+
+    def test_removing_uncatgorized_skill_removes_diagnostic_test_skill_if_any(
+        self
+    ) -> None:
+        """Validates the skill id removal from uncategorized skills must also
+        remove from the diagnostic tests if any.
+        """
+        self.assertEqual(self.topic.uncategorized_skill_ids, [])
+
+        self.topic.remove_skill_id_from_subtopic(1, 'skill_id_1')
+        self.assertEqual(
+            self.topic.skill_ids_for_diagnostic_test, ['skill_id_1'])
+        self.assertEqual(self.topic.uncategorized_skill_ids, ['skill_id_1'])
+        self.assertEqual(
+            self.topic.skill_ids_for_diagnostic_test, ['skill_id_1'])
+
+        self.topic.remove_uncategorized_skill_id('skill_id_1')
+        self.assertEqual(self.topic.uncategorized_skill_ids, [])
+        self.assertEqual(self.topic.skill_ids_for_diagnostic_test, [])
+
 
 class TopicChangeTests(test_utils.GenericTestBase):
 
@@ -833,6 +920,7 @@ class TopicChangeTests(test_utils.GenericTestBase):
                 'cmd': 'add_subtopic',
                 'title': 'title',
                 'subtopic_id': 'subtopic_id',
+                'url_fragment': 'url-fragment',
                 'invalid': 'invalid'
             })
 
@@ -880,12 +968,14 @@ class TopicChangeTests(test_utils.GenericTestBase):
         topic_change_object = topic_domain.TopicChange({
             'cmd': 'add_subtopic',
             'subtopic_id': 'subtopic_id',
-            'title': 'title'
+            'title': 'title',
+            'url_fragment': 'url-fragment'
         })
 
         self.assertEqual(topic_change_object.cmd, 'add_subtopic')
         self.assertEqual(topic_change_object.subtopic_id, 'subtopic_id')
         self.assertEqual(topic_change_object.title, 'title')
+        self.assertEqual(topic_change_object.url_fragment, 'url-fragment')
 
     def test_topic_change_object_with_delete_subtopic(self) -> None:
         topic_change_object = topic_domain.TopicChange({

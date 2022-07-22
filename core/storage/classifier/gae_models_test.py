@@ -26,7 +26,7 @@ from core.domain import classifier_domain
 from core.platform import models
 from core.tests import test_utils
 
-from typing import List, cast
+from typing import List
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -82,8 +82,6 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
         training_job = (
             classifier_models.ClassifierTrainingJobModel.get(job_id)
         )
-        # Ruling out the possibility of None for mypy type checking.
-        assert training_job is not None
 
         self.assertEqual(training_job.algorithm_id, 'TextClassifier')
         self.assertEqual(training_job.interaction_id, 'TextInput')
@@ -269,8 +267,6 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
         training_job1 = (
             classifier_models.ClassifierTrainingJobModel.get(job_ids[0])
         )
-        # Ruling out the possibility of None for mypy type checking.
-        assert training_job1 is not None
 
         self.assertEqual(
             training_job1.algorithm_id,
@@ -291,8 +287,6 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
         training_job2 = (
             classifier_models.ClassifierTrainingJobModel.get(job_ids[1])
         )
-        # Ruling out the possibility of None for mypy type checking.
-        assert training_job2 is not None
 
         self.assertEqual(
             training_job2.algorithm_id,
@@ -387,8 +381,6 @@ class StateTrainingJobsMappingModelUnitTests(test_utils.GenericTestBase):
 
         mapping = classifier_models.StateTrainingJobsMappingModel.get(
             mapping_id)
-        # Ruling out the possibility of None for mypy type checking.
-        assert mapping is not None
 
         self.assertEqual(mapping.exp_id, 'exp_id1')
         self.assertEqual(mapping.exp_version, 2)
@@ -456,19 +448,16 @@ class StateTrainingJobsMappingModelUnitTests(test_utils.GenericTestBase):
             classifier_domain.StateTrainingJobsMapping(
                 u'1', 2, 'Home', {'algorithm_id': 'job_id2'}))
 
-        state_training_jobs_mappings_model = cast(
-            List[classifier_models.StateTrainingJobsMappingModel],
-            state_training_jobs_mappings)
         mapping_ids = (
             classifier_models.StateTrainingJobsMappingModel.create_multi(
-                state_training_jobs_mappings_model))
+                state_training_jobs_mappings
+            )
+        )
         self.assertEqual(len(mapping_ids), 2)
 
         mapping1 = (
             classifier_models.StateTrainingJobsMappingModel.get(
                 mapping_ids[0]))
-        # Ruling out the possibility of None for mypy type checking.
-        assert mapping1 is not None
 
         self.assertEqual(mapping1.exp_id, '1')
         self.assertEqual(mapping1.exp_version, 1)
@@ -479,8 +468,6 @@ class StateTrainingJobsMappingModelUnitTests(test_utils.GenericTestBase):
         mapping2 = (
             classifier_models.StateTrainingJobsMappingModel.get(
                 mapping_ids[1]))
-        # Ruling out the possibility of None for mypy type checking.
-        assert mapping2 is not None
 
         self.assertEqual(mapping2.exp_id, '1')
         self.assertEqual(mapping2.exp_version, 2)

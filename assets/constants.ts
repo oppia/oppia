@@ -77,8 +77,6 @@ export default {
   // The default language code for an exploration.
   "DEFAULT_LANGUAGE_CODE": "en",
 
-  "RTL_LANGUAGE_CODES": ["ar"],
-
   // Hacky translation keys for classroom, topic, skill, exploration
   // and subtopic names and descriptions. Needs to be updated whenever
   // any new class, topic, skill, exploration or subtopic is added or a
@@ -293,6 +291,11 @@ export default {
   "TASK_ENTITY_TYPE_EXPLORATION": "exploration",
 
   "TASK_TARGET_TYPE_STATE": "state",
+
+  // Filters for adding new syllabus items to learner groups.
+  "DEFAULT_ADD_SYLLABUS_FILTER": "All",
+  "LEARNER_GROUP_ADD_STORY_FILTER": "Story",
+  "LEARNER_GROUP_ADD_SKILL_FILTER": "Skill",
 
   // Roles in exploration.
   "ROLE_OWNER": "owner",
@@ -5265,7 +5268,7 @@ export default {
     "decimal_separator": "."
   }, {
     "id": "fr",
-    "text": "français (French)",
+    "text": "français",
     "direction": "ltr",
     "decimal_separator": ","
   }, {
@@ -5280,17 +5283,17 @@ export default {
     "decimal_separator": ","
   }, {
     "id": "uk",
-    "text": "украї́нська мо́ва (Ukrainian)",
+    "text": "украї́нська мо́ва",
     "direction": "ltr",
     "decimal_separator": ","
   }, {
     "id": "sk",
-    "text": "slovenčina (Slovak)",
+    "text": "slovenčina",
     "direction": "ltr",
     "decimal_separator": ","
   }, {
     "id": "nl",
-    "text": "Nederlands (Dutch)",
+    "text": "Nederlands",
     "direction": "ltr",
     "decimal_separator": ","
   }, {
@@ -5305,7 +5308,7 @@ export default {
     "decimal_separator": ","
   }, {
     "id": "tr",
-    "text": "Türkçe (Turkish)",
+    "text": "Türkçe",
     "direction": "ltr",
     "decimal_separator": ","
   }, {
@@ -5887,7 +5890,7 @@ export default {
 
   "MAX_SKILLS_PER_QUESTION": 3,
 
-  "MAX_QUESTIONS_PER_SKILL": 50,
+  "MAX_QUESTIONS_PER_SKILL": 10,
 
   "NUM_EXPLORATIONS_PER_REVIEW_TEST": 3,
 
@@ -5898,6 +5901,15 @@ export default {
   // The default number of opportunities to show on the contributor dashboard
   // page.
   "OPPORTUNITIES_PAGE_SIZE": 10,
+
+  // The breakpoint for mobile view for contributor dashboard in px.
+  // This value must be the same as the one specified in
+  // opportunities-list-item.component.html.
+  "OPPORTUNITIES_LIST_ITEM_MOBILE_BREAKPOINT": 700,
+
+  // Represents the string value indicating "All topics" in the Contributor
+  // Dashboard topic selector.
+  "TOPIC_SENTINEL_NAME_ALL": "All",
 
   // The following character limit constraints follow from
   // android_validation_constants.py. Both have to be kept in sync.
@@ -5956,6 +5968,7 @@ export default {
       "answer_groups": [],
       "default_outcome": {
         "dest": "Introduction",
+        "dest_if_really_stuck": null,
         "feedback": {
           "content_id": "default_outcome",
           "html": ""
@@ -6025,6 +6038,9 @@ export default {
   // A regular expression for allowed entity id's.
   "ENTITY_ID_REGEX": "^[a-zA-Z0-9-_]{1,12}$",
 
+  // A regular expression for allowed learner group IDs.
+  "LEARNER_GROUP_ID_REGEX": "^[a-zA-Z]{1,12}$",
+
   // A regular expression for allowed characters in Title field for Blog Post.
   "VALID_BLOG_POST_TITLE_REGEX": "^[a-zA-Z0-9][a-zA-Z0-9 ]+(-[a-zA-Z0-9]+)*$",
 
@@ -6093,8 +6109,8 @@ export default {
     "upsilon", "phi", "chi", "psi", "omega", "Gamma", "Delta", "Theta",
     "Lambda", "Xi", "Pi", "Sigma", "Phi", "Psi", "Omega"],
 
-  // Allowed letters in the OSK.
-  "VALID_CUSTOM_OSK_LETTERS": [
+  // Valid allowed letters for math lessons.
+  "VALID_ALLOWED_VARIABLES": [
     "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o",
     "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "A", "B", "C", "D",
     "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S",
@@ -6168,6 +6184,9 @@ export default {
 
   // Maximum allowed length of a state name.
   "MAX_STATE_NAME_LENGTH": 50,
+
+  // Maximum allowed length of unique progress url ID.
+  "MAX_PROGRESS_URL_ID_LENGTH": 6,
 
   "PLATFORM_PARAMETER_ALLOWED_BROWSER_TYPES": [
     "Chrome", "Edge", "Safari", "Firefox", "Others"],
@@ -6288,7 +6307,7 @@ export default {
   "PAGES_REGISTERED_WITH_FRONTEND": {
     "ABOUT": {
       "ROUTE": "about",
-      "TITLE": "About | Oppia",
+      "TITLE": "I18N_ABOUT_PAGE_TITLE",
       "META": [
         {
           "PROPERTY_TYPE": "itemprop",
@@ -6309,31 +6328,9 @@ export default {
       "TITLE": "About the Oppia Foundation | Oppia",
       "META": []
     },
-    "CLASSROOM": {
-      "ROUTE": "learn/:classroom_url_fragment",
-      "TITLE": "Oppia",
-      // Some routes contain url fragments, as syntax for url fragments are
-      // different for angular router and backend. They have to be registered
-      // manually in the backend. Please use angular router syntax here.
-      "MANUALLY_REGISTERED_WITH_BACKEND": true,
-      "META": [
-        {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "description",
-          // eslint-disable-next-line max-len
-          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it"
-        },
-        {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "og:description",
-          // eslint-disable-next-line max-len
-          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it"
-        }
-      ]
-    },
     "CONTACT": {
       "ROUTE": "contact",
-      "TITLE": "Contact | Oppia",
+      "TITLE": "I18N_CONTACT_PAGE_TITLE",
       "META": [
         {
           "PROPERTY_TYPE": "itemprop",
@@ -6369,7 +6366,7 @@ export default {
     },
     "GET_STARTED": {
       "ROUTE": "get-started",
-      "TITLE": "Get Started | Oppia",
+      "TITLE": "I18N_GET_STARTED_PAGE_TITLE",
       "META": [
         {
           "PROPERTY_TYPE": "itemprop",
@@ -6385,7 +6382,7 @@ export default {
     },
     "LICENSE": {
       "ROUTE": "license",
-      "TITLE": "License Page | Oppia",
+      "TITLE": "I18N_LICENSE_PAGE_TITLE",
       "META": [
         {
           "PROPERTY_TYPE": "itemprop",
@@ -6401,12 +6398,12 @@ export default {
     },
     "LOGIN": {
       "ROUTE": "login",
-      "TITLE": "Sign in | Oppia",
+      "TITLE": "I18N_LOGIN_PAGE_TITLE",
       "META": []
     },
     "LOGOUT": {
       "ROUTE": "logout",
-      "TITLE": "Logout | Oppia",
+      "TITLE": "I18N_LOGOUT_PAGE_BROWSER_TAB_TITLE",
       "META": []
     },
     "PARTNERSHIPS": {
@@ -6416,7 +6413,7 @@ export default {
     },
     "PLAYBOOK": {
       "ROUTE": "creator-guidelines",
-      "TITLE": "Creator Guidelines | Oppia",
+      "TITLE": "I18N_PLAYBOOK_PAGE_TITLE",
       "META": [
         {
           "PROPERTY_TYPE": "itemprop",
@@ -6434,12 +6431,12 @@ export default {
     },
     "PRIVACY": {
       "ROUTE": "privacy-policy",
-      "TITLE": "Privacy Policy | Oppia",
+      "TITLE": "I18N_PRIVACY_POLICY_PAGE_TITLE",
       "META": []
     },
     "SIGNUP": {
       "ROUTE": "signup",
-      "TITLE": "Join the community - Oppia",
+      "TITLE": "I18N_SIGNUP_PAGE_TITLE",
       "MANUALLY_REGISTERED_WITH_BACKEND": true,
       "META": [
         {
@@ -6456,7 +6453,7 @@ export default {
     },
     "TEACH": {
       "ROUTE": "teach",
-      "TITLE": "Guide to Oppia for Parents and Teachers | Oppia",
+      "TITLE": "I18N_TEACH_PAGE_TITLE",
       "META": [
         {
           "PROPERTY_TYPE": "itemprop",
@@ -6474,7 +6471,7 @@ export default {
     },
     "TERMS": {
       "ROUTE": "terms",
-      "TITLE": "Terms of Use | Oppia",
+      "TITLE": "I18N_TERMS_PAGE_TITLE",
       "META": [
         {
           "PROPERTY_TYPE": "itemprop",
@@ -6492,7 +6489,7 @@ export default {
     },
     "THANKS": {
       "ROUTE": "thanks",
-      "TITLE": "Thanks | Oppia",
+      "TITLE": "I18N_THANKS_PAGE_TITLE",
       "META": [
         {
           "PROPERTY_TYPE": "itemprop",
@@ -6508,7 +6505,7 @@ export default {
     },
     "DELETE_ACCOUNT": {
       "ROUTE": "delete-account",
-      "TITLE": "Delete Account | Oppia",
+      "TITLE": "I18N_DELETE_ACCOUNT_PAGE_TITLE",
       "META": []
     },
     "LIBRARY_INDEX": {
@@ -6585,12 +6582,12 @@ export default {
     },
     "PENDING_ACCOUNT_DELETION": {
       "ROUTE": "pending-account-deletion",
-      "TITLE": "Pending Account Deletion | Oppia",
+      "TITLE": "I18N_PENDING_ACCOUNT_DELETION_PAGE_TITLE",
       "META": []
     },
     "PREFERENCES": {
       "ROUTE": "preferences",
-      "TITLE": "Preferences | Oppia",
+      "TITLE": "I18N_PREFERENCES_PAGE_BROWSER_TAB_TITLE",
       "META": [
         {
           "PROPERTY_TYPE": "itemprop",
@@ -6606,7 +6603,7 @@ export default {
     },
     "PROFILE": {
       "ROUTE": "profile/:username_fragment",
-      "TITLE": "Profile | Oppia",
+      "TITLE": "I18N_PROFILE_PAGE_TITLE",
       // Some routes contain url fragments, as syntax for url fragments are
       // different for angular router and backend. They have to be registered
       // manually in the backend. Please use angular router syntax here.
@@ -6615,25 +6612,7 @@ export default {
     },
     "RELEASE_COORDINATOR_PAGE": {
       "ROUTE": "release-coordinator",
-      "TITLE": "Oppia Release Coordinator Panel",
-      "META": [
-        {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "description",
-          // eslint-disable-next-line max-len
-          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
-        },
-        {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "og:description",
-          // eslint-disable-next-line max-len
-          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
-        }
-      ]
-    },
-    "SPLASH": {
-      "ROUTE": "",
-      "TITLE": "Oppia | Free, Online and Interactive Lessons for Anyone",
+      "TITLE": "I18N_RELEASE_COORDINATOR_PAGE_TITLE",
       "META": [
         {
           "PROPERTY_TYPE": "itemprop",
@@ -6663,6 +6642,48 @@ export default {
       "ROUTE": "volunteer",
       "TITLE": "Volunteer | Oppia",
       "META": []
+    },
+    "CLASSROOM": {
+      "ROUTE": "learn/:classroom_url_fragment",
+      "TITLE": "Oppia",
+      "LIGHTWEIGHT": true,
+      // Some routes contain url fragments, as syntax for url fragments are
+      // different for angular router and backend. They have to be registered
+      // manually in the backend. Please use angular router syntax here.
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it"
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it"
+        }
+      ]
+    },
+    "SPLASH": {
+      "ROUTE": "",
+      "TITLE": "Oppia | Free, Online and Interactive Lessons for Anyone",
+      "LIGHTWEIGHT": true,
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        }
+      ]
     }
   },
 
@@ -6725,5 +6746,7 @@ export default {
   "EMULATOR_MODE": true,
   "ASSET_TYPE_AUDIO": "audio",
   "ASSET_TYPE_IMAGE": "image",
-  "ASSET_TYPE_THUMBNAIL": "thumbnail"
+  "ASSET_TYPE_THUMBNAIL": "thumbnail",
+
+  "FAVICON_ALERT_PATH": "/assets/images/favicon_alert/favicon_alert.ico"
 } as const;

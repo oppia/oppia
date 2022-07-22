@@ -51,6 +51,9 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             self.exp_id, self.exp_version, [])
         self.playthrough_id = stats_models.PlaythroughModel.create(
             'exp_id1', 1, 'EarlyQuit', {}, [])
+        self.save_new_valid_exploration(
+            self.exp_id, 'admin', title='Title 1', end_state_name='End',
+            correctness_feedback_enabled=True)
 
     def test_get_exploration_stats_with_new_exp_id(self):
         exploration_stats = stats_services.get_exploration_stats(
@@ -139,7 +142,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             exploration_stats.state_stats_mapping[
                 '🙂'].num_times_solution_viewed_v2, 1)
 
-    def test_update_stats_throws_if_model_is_missing_entirely(self):
+    def test_update_stats_throws_if_exp_version_is_not_latest(self):
         """Test the update_stats method."""
         aggregated_stats = {
             'num_starts': 1,
@@ -157,8 +160,43 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             }
         }
 
-        with self.assertRaisesRegex(Exception, 'id="nullid.1" does not exist'):
-            stats_services.update_stats('nullid', 1, aggregated_stats)
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            'exp_id1', 2)
+        self.assertEqual(exploration_stats, None)
+
+        stats_services.update_stats('exp_id1', 2, aggregated_stats)
+
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            'exp_id1', 2)
+        self.assertEqual(exploration_stats, None)
+
+    def test_update_stats_throws_if_stats_model_is_missing_entirely(self):
+        """Test the update_stats method."""
+        aggregated_stats = {
+            'num_starts': 1,
+            'num_actual_starts': 1,
+            'num_completions': 1,
+            'state_stats_mapping': {
+                'Home': {
+                    'total_hit_count': 1,
+                    'first_hit_count': 1,
+                    'total_answers_count': 1,
+                    'useful_feedback_count': 1,
+                    'num_times_solution_viewed': 1,
+                    'num_completions': 1
+                },
+            }
+        }
+        stats_models.ExplorationStatsModel.get_model('exp_id1', 1).delete()
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            'exp_id1', 1)
+        self.assertEqual(exploration_stats, None)
+
+        with self.assertRaisesRegex(
+            Exception,
+            'ExplorationStatsModel id="exp_id1.1" does not exist'
+        ):
+            stats_services.update_stats('exp_id1', 1, aggregated_stats)
 
     def test_update_stats_throws_if_model_is_missing_state_stats(self):
         """Test the update_stats method."""
@@ -216,13 +254,53 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
             'exp_id1', 1)
-        self.assertEqual(exploration_stats.state_stats_mapping, {})
+        self.assertEqual(exploration_stats.state_stats_mapping, {
+            'End': stats_domain.StateStats.create_default(),
+            'Introduction': stats_domain.StateStats.create_default()
+        })
 
         stats_services.update_stats('exp_id1', 1, aggregated_stats)
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
             'exp_id1', 1)
-        self.assertEqual(exploration_stats.state_stats_mapping, {})
+        self.assertEqual(exploration_stats.state_stats_mapping, {
+            'End': stats_domain.StateStats.create_default(),
+            'Introduction': stats_domain.StateStats.create_default()
+        })
+
+    def test_update_stats_returns_if_aggregated_stats_type_is_invalid(self):
+        """Tests that the update_stats returns if a state name is undefined."""
+        aggregated_stats = {
+            'num_starts': '1',
+            'num_actual_starts': 1,
+            'num_completions': 1,
+            'state_stats_mapping': {
+                'undefined': {
+                    'total_hit_count': 1,
+                    'first_hit_count': 1,
+                    'total_answers_count': 1,
+                    'useful_feedback_count': 1,
+                    'num_times_solution_viewed': 1,
+                    'num_completions': 1
+                },
+            }
+        }
+
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            'exp_id1', 1)
+        self.assertEqual(exploration_stats.state_stats_mapping, {
+            'End': stats_domain.StateStats.create_default(),
+            'Introduction': stats_domain.StateStats.create_default()
+        })
+
+        stats_services.update_stats('exp_id1', 1, aggregated_stats)
+
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            'exp_id1', 1)
+        self.assertEqual(exploration_stats.state_stats_mapping, {
+            'End': stats_domain.StateStats.create_default(),
+            'Introduction': stats_domain.StateStats.create_default()
+        })
 
     def test_update_stats_throws_if_model_is_using_unicode_state_name(self):
         """Test the update_stats method."""
@@ -675,7 +753,10 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         self.assertEqual(exploration_stats.num_actual_starts_v2, 0)
         self.assertEqual(exploration_stats.num_completions_v1, 0)
         self.assertEqual(exploration_stats.num_completions_v2, 0)
-        self.assertEqual(exploration_stats.state_stats_mapping, {})
+        self.assertEqual(exploration_stats.state_stats_mapping, {
+            'End': stats_domain.StateStats.create_default(),
+            'Introduction': stats_domain.StateStats.create_default()
+        })
 
     def test_get_playthrough_from_model(self):
         """Test the get_playthrough_from_model method."""
@@ -699,7 +780,10 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         self.assertEqual(exploration_stats.num_actual_starts_v2, 0)
         self.assertEqual(exploration_stats.num_completions_v1, 0)
         self.assertEqual(exploration_stats.num_completions_v2, 0)
-        self.assertEqual(exploration_stats.state_stats_mapping, {})
+        self.assertEqual(exploration_stats.state_stats_mapping, {
+            'End': stats_domain.StateStats.create_default(),
+            'Introduction': stats_domain.StateStats.create_default()
+        })
 
     def test_create_stats_model(self):
         """Test the create_stats_model method."""
@@ -717,7 +801,10 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         self.assertEqual(exploration_stats.num_actual_starts_v2, 0)
         self.assertEqual(exploration_stats.num_completions_v1, 0)
         self.assertEqual(exploration_stats.num_completions_v2, 0)
-        self.assertEqual(exploration_stats.state_stats_mapping, {})
+        self.assertEqual(exploration_stats.state_stats_mapping, {
+            'End': stats_domain.StateStats.create_default(),
+            'Introduction': stats_domain.StateStats.create_default()
+        })
 
         # Test create method with different state_stats_mapping.
         exploration_stats.state_stats_mapping = {
@@ -1457,42 +1544,50 @@ class AnswerEventTests(test_utils.GenericTestBase):
             'answer': 'answer1', 'time_spent_in_sec': 5.0,
             'answer_group_index': 0, 'rule_spec_index': 0,
             'classification_categorization': 'explicit', 'session_id': 'sid1',
-            'interaction_id': 'TextInput', 'params': {}
+            'interaction_id': 'TextInput', 'params': {}, 'answer_str': None,
+            'rule_spec_str': None
         }, {
             'answer': 'answer1', 'time_spent_in_sec': 5.0,
             'answer_group_index': 0, 'rule_spec_index': 1,
             'classification_categorization': 'explicit', 'session_id': 'sid2',
-            'interaction_id': 'TextInput', 'params': {}
+            'interaction_id': 'TextInput', 'params': {}, 'answer_str': None,
+            'rule_spec_str': None
         }, {
             'answer': {'x': 1.0, 'y': 5.0}, 'time_spent_in_sec': 5.0,
             'answer_group_index': 1, 'rule_spec_index': 0,
             'classification_categorization': 'explicit', 'session_id': 'sid1',
-            'interaction_id': 'TextInput', 'params': {}
+            'interaction_id': 'TextInput', 'params': {}, 'answer_str': None,
+            'rule_spec_str': None
         }, {
             'answer': 10, 'time_spent_in_sec': 5.0, 'answer_group_index': 2,
             'rule_spec_index': 0, 'classification_categorization': 'explicit',
-            'session_id': 'sid1', 'interaction_id': 'TextInput', 'params': {}
+            'session_id': 'sid1', 'interaction_id': 'TextInput', 'params': {},
+            'answer_str': None, 'rule_spec_str': None
         }, {
             'answer': [{'a': 'some', 'b': 'text'}, {'a': 1.0, 'c': 2.0}],
             'time_spent_in_sec': 5.0, 'answer_group_index': 3,
             'rule_spec_index': 0, 'classification_categorization': 'explicit',
-            'session_id': 'sid1', 'interaction_id': 'TextInput', 'params': {}
+            'session_id': 'sid1', 'interaction_id': 'TextInput', 'params': {},
+            'answer_str': None, 'rule_spec_str': None
         }]
         expected_submitted_answer_list2 = [{
             'answer': [2, 4, 8], 'time_spent_in_sec': 5.0,
             'answer_group_index': 2, 'rule_spec_index': 0,
             'classification_categorization': 'explicit', 'session_id': 'sid3',
-            'interaction_id': 'TextInput', 'params': {}
+            'interaction_id': 'TextInput', 'params': {}, 'answer_str': None,
+            'rule_spec_str': None
         }, {
             'answer': self.UNICODE_TEST_STRING, 'time_spent_in_sec': 5.0,
             'answer_group_index': 1, 'rule_spec_index': 1,
             'classification_categorization': 'explicit', 'session_id': 'sid4',
-            'interaction_id': 'TextInput', 'params': {}
+            'interaction_id': 'TextInput', 'params': {}, 'answer_str': None,
+            'rule_spec_str': None
         }]
         expected_submitted_answer_list3 = [{
             'answer': None, 'time_spent_in_sec': 5.0, 'answer_group_index': 1,
             'rule_spec_index': 1, 'classification_categorization': 'explicit',
-            'session_id': 'sid5', 'interaction_id': 'Continue', 'params': {}
+            'session_id': 'sid5', 'interaction_id': 'Continue', 'params': {},
+            'answer_str': None, 'rule_spec_str': None
         }]
 
         state_answers = stats_services.get_state_answers(
@@ -1546,7 +1641,9 @@ class RecordAnswerTests(test_utils.GenericTestBase):
             'classification_categorization': 'explicit',
             'session_id': 'a_session_id_val',
             'interaction_id': 'TextInput',
-            'params': {}
+            'params': {},
+            'answer_str': None,
+            'rule_spec_str': None
         }])
 
     def test_record_and_retrieve_single_answer(self):
@@ -1579,7 +1676,9 @@ class RecordAnswerTests(test_utils.GenericTestBase):
             'classification_categorization': 'explicit',
             'session_id': 'a_session_id_val',
             'interaction_id': 'TextInput',
-            'params': {}
+            'params': {},
+            'answer_str': None,
+            'rule_spec_str': None
         }])
 
     def test_record_and_retrieve_single_answer_with_preexisting_entry(self):
@@ -1602,7 +1701,9 @@ class RecordAnswerTests(test_utils.GenericTestBase):
             'classification_categorization': 'explicit',
             'session_id': 'a_session_id_val',
             'interaction_id': 'TextInput',
-            'params': {}
+            'params': {},
+            'answer_str': None,
+            'rule_spec_str': None
         }])
 
         stats_services.record_answer(
@@ -1629,7 +1730,9 @@ class RecordAnswerTests(test_utils.GenericTestBase):
             'classification_categorization': 'explicit',
             'session_id': 'a_session_id_val',
             'interaction_id': 'TextInput',
-            'params': {}
+            'params': {},
+            'answer_str': None,
+            'rule_spec_str': None
         }, {
             'answer': 'some text',
             'time_spent_in_sec': 10.0,
@@ -1638,7 +1741,9 @@ class RecordAnswerTests(test_utils.GenericTestBase):
             'classification_categorization': 'explicit',
             'session_id': 'a_session_id_val',
             'interaction_id': 'TextInput',
-            'params': {}
+            'params': {},
+            'answer_str': None,
+            'rule_spec_str': None
         }])
 
     def test_record_many_answers(self):
@@ -1680,7 +1785,9 @@ class RecordAnswerTests(test_utils.GenericTestBase):
             'classification_categorization': 'explicit',
             'session_id': 'session_id_v',
             'interaction_id': 'TextInput',
-            'params': {}
+            'params': {},
+             'answer_str': None,
+            'rule_spec_str': None
         }, {
             'answer': 'answer ccc',
             'time_spent_in_sec': 3.0,
@@ -1689,7 +1796,9 @@ class RecordAnswerTests(test_utils.GenericTestBase):
             'classification_categorization': 'explicit',
             'session_id': 'session_id_v',
             'interaction_id': 'TextInput',
-            'params': {}
+            'params': {},
+            'answer_str': None,
+            'rule_spec_str': None
         }, {
             'answer': 'answer bbbbb',
             'time_spent_in_sec': 7.5,
@@ -1698,7 +1807,9 @@ class RecordAnswerTests(test_utils.GenericTestBase):
             'classification_categorization': 'explicit',
             'session_id': 'session_id_v',
             'interaction_id': 'TextInput',
-            'params': {}
+            'params': {},
+            'answer_str': None,
+            'rule_spec_str': None
         }])
 
     def test_record_answers_exceeding_one_shard(self):
@@ -1771,7 +1882,9 @@ class RecordAnswerTests(test_utils.GenericTestBase):
             'classification_categorization': 'explicit',
             'session_id': 'a_session_id_val',
             'interaction_id': 'TextInput',
-            'params': {}
+            'params': {},
+            'answer_str': None,
+            'rule_spec_str': None
         }])
 
         submitted_answer_list = [
@@ -1807,7 +1920,9 @@ class RecordAnswerTests(test_utils.GenericTestBase):
             'classification_categorization': 'explicit',
             'session_id': 'a_session_id_val',
             'interaction_id': 'TextInput',
-            'params': {}
+            'params': {},
+            'answer_str': None,
+            'rule_spec_str': None
         }, {
             'answer': 'answer aaa',
             'time_spent_in_sec': 10.0,
@@ -1816,7 +1931,9 @@ class RecordAnswerTests(test_utils.GenericTestBase):
             'classification_categorization': 'explicit',
             'session_id': 'session_id_v',
             'interaction_id': 'TextInput',
-            'params': {}
+            'params': {},
+            'answer_str': None,
+            'rule_spec_str': None
         }, {
             'answer': 'answer ccccc',
             'time_spent_in_sec': 3.0,
@@ -1825,7 +1942,9 @@ class RecordAnswerTests(test_utils.GenericTestBase):
             'classification_categorization': 'explicit',
             'session_id': 'session_id_v',
             'interaction_id': 'TextInput',
-            'params': {}
+            'params': {},
+            'answer_str': None,
+            'rule_spec_str': None
         }, {
             'answer': 'answer bbbbbbb',
             'time_spent_in_sec': 7.5,
@@ -1834,7 +1953,9 @@ class RecordAnswerTests(test_utils.GenericTestBase):
             'classification_categorization': 'explicit',
             'session_id': 'session_id_v',
             'interaction_id': 'TextInput',
-            'params': {}
+            'params': {},
+            'answer_str': None,
+            'rule_spec_str': None
         }])
 
 
@@ -1939,7 +2060,7 @@ class SampleAnswerTests(test_utils.GenericTestBase):
         model = stats_models.StateAnswersModel.get('%s:%s:%s:%s' % (
             self.exploration.id, str(self.exploration.version),
             self.exploration.init_state_name, '0'))
-        self.assertEqual(model.shard_count, 1)
+        self.assertGreater(model.shard_count, 1)
 
         # Verify that the list of sample answers returned contains fewer than
         # 100 answers, although a total of 100 answers were submitted.

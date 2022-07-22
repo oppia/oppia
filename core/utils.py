@@ -27,8 +27,8 @@ import json
 import os
 import random
 import re
+import ssl
 import string
-import sys
 import time
 import unicodedata
 import urllib.parse
@@ -38,17 +38,14 @@ import zlib
 from core import feconf
 from core.constants import constants
 
-from typing import (
+import certifi
+import yaml
+
+from typing import ( # isort:skip
     IO, Any, BinaryIO, Callable, Dict, Iterable, Iterator, List, Optional,
     TextIO, Tuple, TypeVar, Union, overload)
-from typing_extensions import Literal
+from typing_extensions import Literal # isort:skip
 
-_YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-6.0')
-sys.path.insert(0, _YAML_PATH)
-
-import yaml  # isort:skip  # pylint: disable=wrong-import-position
-import certifi  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-import ssl  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 DATETIME_FORMAT = '%m/%d/%Y, %H:%M:%S:%f'
 ISO_8601_DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%fz'
@@ -62,7 +59,6 @@ TextModeTypes = Literal['r', 'w', 'a', 'x', 'r+', 'w+', 'a+']
 BinaryModeTypes = Literal['rb', 'wb', 'ab', 'xb', 'r+b', 'w+b', 'a+b', 'x+b']
 
 # TODO(#13059): We will be ignoring no-untyped-call and no-any-return here
-# because python_utils is untyped and will be removed in python3.
 # These will be removed after python3 migration and adding stubs for new python3
 # libraries.
 
@@ -334,8 +330,9 @@ def get_random_int(upper_bound: int) -> int:
     Returns:
         int. Randomly generated integer less than the upper_bound.
     """
-    assert upper_bound >= 0 and isinstance(upper_bound, int)
-
+    assert upper_bound >= 0 and isinstance(upper_bound, int), (
+        'Only positive integers allowed'
+    )
     generator = random.SystemRandom()
     return generator.randrange(0, stop=upper_bound)
 
@@ -349,8 +346,9 @@ def get_random_choice(alist: List[T]) -> T:
     Returns:
         *. Random element choosen from the passed input list.
     """
-    assert isinstance(alist, list) and len(alist) > 0
-
+    assert isinstance(alist, list) and len(alist) > 0, (
+        'Only non-empty lists allowed'
+    )
     index = get_random_int(len(alist))
     return alist[index]
 
@@ -608,6 +606,10 @@ def get_human_readable_time_string(time_msec: float) -> str:
     """
     # Ignoring arg-type because we are preventing direct usage of 'str' for
     # Python3 compatibilty.
+
+    assert time_msec >= 0, (
+        'Time cannot be negative'
+    )
     return time.strftime(
         '%B %d %H:%M:%S', time.gmtime(time_msec / 1000.0))
 
@@ -761,7 +763,7 @@ def require_valid_name(
     for character in constants.INVALID_NAME_CHARS:
         if character in name:
             raise ValidationError(
-                'Invalid character %s in %s: %s' %
+                r'Invalid character %s in %s: %s' %
                 (character, name_type, name))
 
 
@@ -901,9 +903,13 @@ def require_valid_page_title_fragment_for_web(
     Raises:
         ValidationError. Page title fragment is not a string.
         ValidationError. Page title fragment is too lengthy.
+        ValidationError. Page title fragment is too small.
     """
     max_chars_in_page_title_frag_for_web = (
         constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB)
+    min_chars_in_page_title_frag_for_web = (
+        constants.MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB)
+
     if not isinstance(page_title_fragment_for_web, str):
         raise ValidationError(
             'Expected page title fragment to be a string, received %s'
@@ -912,6 +918,11 @@ def require_valid_page_title_fragment_for_web(
         raise ValidationError(
             'Page title fragment should not be longer than %s characters.'
             % constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB)
+    if len(page_title_fragment_for_web) < min_chars_in_page_title_frag_for_web:
+        raise ValidationError(
+            'Page title fragment should not be shorter than %s characters.'
+            % constants.MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB
+        )
 
 
 def capitalize_string(input_string: str) -> str:

@@ -72,6 +72,14 @@ export class MathExpressionContentEditorComponent implements OnInit {
     // that an existing math expression is being edited. In this case, the
     // editor template can be initialised with the actual values instead of
     // default ones.
+    if (!this.value) {
+      this.value = {
+        raw_latex: '',
+        svg_filename: '',
+        svgFile: '',
+        mathExpressionSvgIsBeingProcessed: false
+      };
+    }
     if (this.value.svg_filename && this.value.raw_latex) {
       this.localValue.label = this.value.raw_latex;
       this.value.mathExpressionSvgIsBeingProcessed = false;
@@ -80,7 +88,7 @@ export class MathExpressionContentEditorComponent implements OnInit {
       this.value.mathExpressionSvgIsBeingProcessed = true;
     }
     this.valueChanged.emit(this.value);
-    if (this.value && this.value.raw_latex) {
+    if (this.value.raw_latex) {
       this.localValue.label = this.value.raw_latex;
     }
     this.directiveSubscriptions.add(
@@ -210,7 +218,7 @@ export class MathExpressionContentEditorComponent implements OnInit {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.value &&
       changes.value.currentValue.raw_latex !==
-      changes.value.previousValue.raw_latex) {
+      changes.value.previousValue?.raw_latex) {
       this.localValue = {
         label: this.value.raw_latex || '',
       };

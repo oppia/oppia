@@ -1,9 +1,6 @@
-<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/components/common-layout-directives/common-elements/attribution-guide.component.css" as="style">
-<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/components/common-layout-directives/common-elements/attribution-guide.component.rtl.css" as="style">
-
 <div class="oppia-attribution-guide" *ngIf="!checkMobileView()">
   <div class="oppia-cc-icon oppia-transition-200" *ngIf="!deviceUsedIsMobile && !iframed">
-    <div class="oppia-neutral-element protractor-test-neutral-element"></div>
+    <div class="oppia-neutral-element e2e-test-neutral-element"></div>
 
     <a class="oppia-attribution-image-link" rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/">
       <img alt="Creative Commons License" class="oppia-creative-commons-image" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png">
@@ -93,7 +90,3 @@
     </div>
   </div>
 </div>
-
-<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
-<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/components/common-layout-directives/common-elements/attribution-guide.component.css">
-<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/components/common-layout-directives/common-elements/attribution-guide.component.rtl.css">

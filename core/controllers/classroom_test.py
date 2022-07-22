@@ -46,7 +46,8 @@ class ClassroomPageTests(BaseClassroomControllerTests):
 
     def test_any_user_can_access_classroom_page(self):
         response = self.get_html_response('/learn/math')
-        self.assertIn('<oppia-root></oppia-root>', response)
+        self.assertIn(
+            '<lightweight-oppia-root></lightweight-oppia-root>', response)
 
 
 class ClassroomDataHandlerTests(BaseClassroomControllerTests):
@@ -61,11 +62,11 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
         topic_id_2 = topic_fetchers.get_new_topic_id()
         private_topic = topic_domain.Topic.create_default_topic(
             topic_id_1, 'private_topic_name',
-            'private-topic-name', 'description')
+            'private-topic-name', 'description', 'fragm')
         topic_services.save_new_topic(admin_id, private_topic)
         public_topic = topic_domain.Topic.create_default_topic(
             topic_id_2, 'public_topic_name',
-            'public-topic-name', 'description')
+            'public-topic-name', 'description', 'fragm')
         public_topic.thumbnail_filename = 'Topic.svg'
         public_topic.thumbnail_bg_color = (
             constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
@@ -76,6 +77,7 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-three')]
         public_topic.next_subtopic_id = 2
+        public_topic.skill_ids_for_diagnostic_test = ['skill_id_1']
         topic_services.save_new_topic(admin_id, public_topic)
         topic_services.publish_topic(topic_id_2, admin_id)
 

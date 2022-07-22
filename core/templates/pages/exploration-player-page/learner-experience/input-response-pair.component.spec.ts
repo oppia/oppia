@@ -96,6 +96,7 @@ describe('InputResponsePairComponent', () => {
             {
               outcome: {
                 dest: 'State',
+                dest_if_really_stuck: null,
                 feedback: {
                   html: '',
                   content_id: 'This is a new feedback text',
@@ -112,6 +113,7 @@ describe('InputResponsePairComponent', () => {
           ],
           default_outcome: {
             dest: 'Hola',
+            dest_if_really_stuck: null,
             feedback: {
               content_id: '',
               html: '',
@@ -175,10 +177,6 @@ describe('InputResponsePairComponent', () => {
     };
 
     expect(component.isVideoRteElementPresentInResponse()).toBeFalse();
-  });
-
-  it('should get RTL language status correctly', () => {
-    expect(component.isLanguageRTL()).toBeTrue();
   });
 
   it('should get answer html for the displayed card', () => {
@@ -289,9 +287,9 @@ describe('InputResponsePairComponent', () => {
 
   it('should determine if a string is a number', ()=>{
     let number = '-12.4';
-    expect(component.isNumber(number)).toEqual(true);
+    expect(component.isStringifiedNumber(number)).toEqual(true);
     number = 'ab12';
-    expect(component.isNumber(number)).toEqual(false);
+    expect(component.isStringifiedNumber(number)).toEqual(false);
   });
 
   it('should convert answer to a local format if it is a number', ()=>{

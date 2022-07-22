@@ -47,9 +47,9 @@
             </span>
           </div>
         </div>
-        <div @fade class="oppia-thumbnail-container protractor-test-thumbnail-container" *ngIf="uploadedImage"
+        <div @fade class="oppia-thumbnail-container e2e-test-thumbnail-container" *ngIf="uploadedImage"
              [ngStyle]="{'background': previewDescriptionBgColor, 'color': previewDescriptionBgColor ? '#FFFFFF' : '', 'width': aspectRatio === '4:3' ? '248px' : '320px' }">
-          <button class="btn btn-secondary oppia-thumbnail-reset-button protractor-thumbnail-reset-button protractor-test-thumbnail-reset-button" (click)="reset()">
+          <button class="btn btn-secondary oppia-thumbnail-reset-button e2e-thumbnail-reset-button e2e-test-thumbnail-reset-button" (click)="reset()">
             <i class="material-icons oppia-vcenter">&#xE14C;</i>
           </button>
           <div>
@@ -76,7 +76,7 @@
 
   <div class="modal-footer">
     <button class="btn btn-secondary" (click)="cancel()" [innerHTML]="'I18N_MODAL_CANCEL_BUTTON' | translate"></button>
-    <button class="btn btn-success protractor-test-photo-upload-submit"
+    <button class="btn btn-success e2e-test-photo-upload-submit"
             (click)="confirm()"
             [disabled]="!uploadedImage || !thumbnailHasChanged">
       Add Thumbnail

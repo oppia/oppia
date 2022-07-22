@@ -330,7 +330,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.publish_exploration(owner_id, '0')
 
         topic = topic_domain.Topic.create_default_topic(
-            topic_id, 'topic', 'abbrev', 'description')
+            topic_id, 'topic', 'abbrev', 'description', 'fragm')
         topic.thumbnail_filename = 'thumbnail.svg'
         topic.thumbnail_bg_color = '#C6DCDA'
         topic.subtopics = [
@@ -339,6 +339,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-three')]
         topic.next_subtopic_id = 2
+        topic.skill_ids_for_diagnostic_test = ['skill_id_1']
         topic_services.save_new_topic(owner_id, topic)
         topic_services.publish_topic(topic_id, self.admin_id)
 
@@ -390,6 +391,106 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         new_creation_time = all_opportunity_models[0].created_on
 
         self.assertLess(old_creation_time, new_creation_time)
+
+    def test_rollback_exploration_to_safe_state_action(self):
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+
+        self.save_new_valid_exploration(
+            '0', owner_id, title='title', end_state_name='End State',
+            correctness_feedback_enabled=True)
+        exp_services.update_exploration(
+            owner_id, '0', [exp_domain.ExplorationChange({
+            'new_value': {
+                'content_id': 'content',
+                'html': 'content 1'
+            },
+            'state_name': 'Introduction',
+            'old_value': {
+                'content_id': 'content',
+                'html': ''
+            },
+            'cmd': 'edit_state_property',
+            'property_name': 'content'
+            })], 'Update 1')
+        exp_services.update_exploration(
+            owner_id, '0', [exp_domain.ExplorationChange({
+            'new_value': {
+                'content_id': 'content',
+                'html': 'content 1'
+            },
+            'state_name': 'Introduction',
+            'old_value': {
+                'content_id': 'content',
+                'html': ''
+            },
+            'cmd': 'edit_state_property',
+            'property_name': 'content'
+            })], 'Update 2')
+        exp_services.update_exploration(
+            owner_id, '0', [exp_domain.ExplorationChange({
+            'new_value': {
+                'content_id': 'content',
+                'html': 'content 1'
+            },
+            'state_name': 'Introduction',
+            'old_value': {
+                'content_id': 'content',
+                'html': ''
+            },
+            'cmd': 'edit_state_property',
+            'property_name': 'content'
+            })], 'Update 3')
+        exp_services.update_exploration(
+            owner_id, '0', [exp_domain.ExplorationChange({
+            'new_value': {
+                'content_id': 'content',
+                'html': 'content 1'
+            },
+            'state_name': 'Introduction',
+            'old_value': {
+                'content_id': 'content',
+                'html': ''
+            },
+            'cmd': 'edit_state_property',
+            'property_name': 'content'
+            })], 'Update 4')
+
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        result = self.post_json(
+            '/adminhandler', {
+                'action': 'rollback_exploration_to_safe_state',
+                'exp_id': '0'
+            }, csrf_token=csrf_token)
+
+        self.assertEqual(
+            result, {
+                'version': 5
+            })
+
+        snapshot_content_model = (
+            exp_models.ExplorationSnapshotContentModel.get(
+                '0-5', strict=False))
+        snapshot_content_model.delete()
+        snapshot_metadata_model = (
+            exp_models.ExplorationSnapshotMetadataModel.get(
+                '0-4', strict=False))
+        snapshot_metadata_model.delete()
+
+        result = self.post_json(
+            '/adminhandler', {
+                'action': 'rollback_exploration_to_safe_state',
+                'exp_id': '0'
+            }, csrf_token=csrf_token)
+
+        self.assertEqual(
+            result, {
+                'version': 3
+            })
 
     def test_admin_topics_csv_download_handler(self):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
@@ -1128,7 +1229,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
 
         topic_id = topic_fetchers.get_new_topic_id()
         subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
-            1, 'Subtopic Title 1')
+            1, 'Subtopic Title 1', 'url-frag-one')
         subtopic_1.skill_ids = ['skill_id_1']
         subtopic_1.url_fragment = 'sub-one-frag'
         self.save_new_topic(

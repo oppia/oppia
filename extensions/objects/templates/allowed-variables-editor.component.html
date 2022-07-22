@@ -1,0 +1,180 @@
+<div class="e2e-test-custom-letters-div custom-letters-div">
+  <div class="oppia-custom-selected-letters">
+    <div *ngFor="let letter of value">
+      {{ letter }}
+    </div>
+  </div>
+  <p class="letter-counter">You can still add {{ getRemainingLettersCount() }} more letter(s).</p>
+  <div class="oppia-custom-letters-navbar">
+    <button [attr.class]="(currentTab === latinTab) ? 'oppia-custom-letters-tab-active' : 'oppia-custom-letters-tab-inactive'" (click)="currentTab = latinTab">
+      abc
+    </button>
+    <button [attr.class]="(currentTab === greekTab) ? 'oppia-custom-letters-tab-active' : 'oppia-custom-letters-tab-inactive'" (click)="currentTab = greekTab">
+      αβγ
+    </button>
+  </div>
+  <div class="oppia-custom-letters">
+    <div *ngIf="currentTab === latinTab && lettersAreLowercase" class="oppia-custom-letters-latin-lower">
+      <div class="oppia-custom-letters-row-1">
+        <button id="custom-letter-{{ letter }}" [attr.class]="(value?.indexOf(letter) === -1) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" *ngFor="let letter of latinLowerCase[0]" (click)="updateLettersList(letter)">
+          {{ letter }}
+        </button>
+      </div>
+      <div class="oppia-custom-letters-row-2">
+        <button id="custom-letter-{{ letter }}" [attr.class]="(value?.indexOf(letter) === -1) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" *ngFor="let letter of latinLowerCase[1]" (click)="updateLettersList(letter)">
+          {{ letter }}
+        </button>
+      </div>
+      <div class="oppia-custom-letters-row-3">
+        <button [attr.class]="(lettersAreLowercase) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" (click)="lettersAreLowercase = !lettersAreLowercase">
+          <i class="fa fa-arrow-up"></i>
+        </button>
+        <button id="custom-letter-{{ letter }}" [attr.class]="(value?.indexOf(letter) === -1) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" *ngFor="let letter of latinLowerCase[2]" (click)="updateLettersList(letter)">
+          {{ letter }}
+        </button>
+      </div>
+    </div>
+    <div *ngIf="currentTab === latinTab && !lettersAreLowercase" class="oppia-custom-letters-latin-lower">
+      <div class="oppia-custom-letters-row-1">
+        <button id="custom-letter-{{ letter }}" [attr.class]="(value?.indexOf(letter) === -1) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" *ngFor="let letter of latinUpperCase[0]" (click)="updateLettersList(letter)">
+          {{ letter }}
+        </button>
+      </div>
+      <div class="oppia-custom-letters-row-2">
+        <button id="custom-letter-{{ letter }}" [attr.class]="(value?.indexOf(letter) === -1) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" *ngFor="let letter of latinUpperCase[1]" (click)="updateLettersList(letter)">
+          {{ letter }}
+        </button>
+      </div>
+      <div class="oppia-custom-letters-row-3">
+        <button [attr.class]="(lettersAreLowercase) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" (click)="lettersAreLowercase = !lettersAreLowercase">
+          <i class="fa fa-arrow-up"></i>
+        </button>
+        <button id="custom-letter-{{ letter }}" [attr.class]="(value?.indexOf(letter) === -1) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" *ngFor="let letter of latinUpperCase[2]" (click)="updateLettersList(letter)">
+          {{ letter }}
+        </button>
+      </div>
+    </div>
+    <div *ngIf="currentTab === greekTab && lettersAreLowercase" class="oppia-custom-letters-latin-lower">
+      <div class="oppia-custom-letters-row-1">
+        <button [attr.class]="(value?.indexOf(letter) === -1) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" *ngFor="let letter of greekLowerCase[0]" (click)="updateLettersList(letter)">
+          {{ letter }}
+        </button>
+      </div>
+      <div class="oppia-custom-letters-row-2">
+        <button [attr.class]="(value?.indexOf(letter) === -1) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" *ngFor="let letter of greekLowerCase[1]" (click)="updateLettersList(letter)">
+          {{ letter }}
+        </button>
+      </div>
+      <div class="oppia-custom-letters-row-3">
+        <button [attr.class]="(lettersAreLowercase) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" (click)="lettersAreLowercase = !lettersAreLowercase">
+          <i class="fa fa-arrow-up"></i>
+        </button>
+        <button [attr.class]="(value?.indexOf(letter) === -1) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" *ngFor="let letter of greekLowerCase[2]" (click)="updateLettersList(letter)">
+          {{ letter }}
+        </button>
+      </div>
+    </div>
+    <div *ngIf="currentTab === greekTab && !lettersAreLowercase" class="oppia-custom-letters-latin-lower">
+      <div class="oppia-custom-letters-row-1">
+        <button [attr.class]="(value?.indexOf(letter) === -1) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" *ngFor="let letter of greekUpperCase[0]" (click)="updateLettersList(letter)">
+          {{ letter }}
+        </button>
+      </div>
+      <div class="oppia-custom-letters-row-2">
+        <button [attr.class]="(lettersAreLowercase) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" (click)="lettersAreLowercase = !lettersAreLowercase">
+          <i class="fa fa-arrow-up"></i>
+        </button>
+        <button [attr.class]="(value?.indexOf(letter) === -1) ? 'oppia-custom-letters-inactive' : 'oppia-custom-letters-active'" *ngFor="let letter of greekUpperCase[1]" (click)="updateLettersList(letter)">
+          {{ letter }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .oppia-custom-selected-letters {
+    border: 2px solid #b8b8b8;
+    border-radius: 5px;
+    margin-top: 13px;
+    min-height: 55px;
+    padding: 10px 0;
+    text-align: center;
+  }
+
+  .oppia-custom-selected-letters div {
+    background-color: inherit;
+    border-radius: 5px;
+    color: #696969;
+    display: initial;
+    font-family: 'Noto Serif', serif;
+    font-size: 20px;
+    margin: 0 10px;
+  }
+
+  .letter-counter {
+    font-size: 15px;
+    margin: 15px 0;
+    text-align: end;
+  }
+
+  .oppia-custom-letters-navbar {
+    margin-top: 15px;
+    text-align: center;
+  }
+
+  .oppia-custom-letters-navbar button {
+    background-color: inherit;
+    border: none;
+    font-family: 'Noto Serif', serif;
+    font-size: 20px;
+    margin: 0 10px;
+    outline: none;
+    padding-bottom: 5px;
+  }
+
+  button.oppia-custom-letters-tab-active {
+    color: #399e80;
+  }
+
+  .oppia-custom-letters-tab-inactive {
+    color: #696969;
+  }
+
+  .oppia-custom-letters {
+    padding: 10px 0;
+    text-align: center;
+  }
+
+  .oppia-custom-letters button {
+    border-radius: 5px;
+    font-family: 'Noto Serif', serif;
+    font-size: 20px;
+    margin: 3px 0;
+    outline: none;
+    padding: 11.2px 0;
+    position: relative;
+    top: 0;
+    transition: all ease 0.3s;
+    width: 10%;
+  }
+
+  .oppia-custom-letters button:active {
+    box-shadow: 0 3px 0 #696969;
+    top: 3px;
+  }
+
+  .oppia-custom-letters-active {
+    background-color: #399e80;
+    border: 1px solid #10423d;
+    box-shadow: 0 5px 0 #10423d;
+    color: #fff;
+  }
+
+  .oppia-custom-letters-inactive {
+    background-color: inherit;
+    border: 1px solid #b8b8b8;
+    box-shadow: 0 5px 0 #696969;
+    color: #696969;
+  }
+</style>

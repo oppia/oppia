@@ -22,12 +22,16 @@ import os
 import subprocess
 import sys
 
-from core.constants import constants
-from scripts import build
-from scripts import common
-from scripts import flake_checker
-from scripts import install_third_party_libs
-from scripts import servers
+# TODO(#15567): This can be removed after Literal in utils.py is loaded
+# from typing instead of typing_extensions, this will be possible after
+# we migrate to Python 3.8.
+from scripts import common  # isort:skip pylint: disable=wrong-import-position, unused-import
+
+from core.constants import constants  # isort:skip
+from scripts import build  # isort:skip
+from scripts import flake_checker  # isort:skip
+from scripts import install_third_party_libs  # isort:skip
+from scripts import servers  # isort:skip
 
 MAX_RETRY_COUNT = 3
 GOOGLE_APP_ENGINE_PORT = 9001
@@ -147,6 +151,52 @@ RERUN_POLICIES = {
     'full': RERUN_POLICY_NEVER,
 }
 
+SUITES_MIGRATED_TO_WEBDRIVERIO = [
+    'collections',
+    'creatorDashboard',
+    'learner',
+    'learnerDashboard',
+    'preferences',
+    'profileFeatures',
+    'subscriptions',
+    'users',
+]
+
+SUITES_STILL_IN_PROTRACTOR = [
+    'accessibility',
+    'additionalEditorFeatures',
+    'additionalEditorFeaturesModals',
+    'additionalPlayerFeatures',
+    'adminPage',
+    'blogDashboard',
+    'classroomPage',
+    'classroomPageFileUploadFeatures',
+    'contributorDashboard',
+    'coreEditorAndPlayerFeatures',
+    'embedding',
+    'explorationImprovementsTab',
+    'explorationFeedbackTab',
+    'explorationHistoryTab',
+    'explorationStatisticsTab',
+    'explorationTranslationTab',
+    'extensions',
+    'featureGating',
+    'fileUploadFeatures',
+    'fileUploadExtensions',
+    'learner',
+    'library',
+    'navigation',
+    'playVoiceovers',
+    'profileMenu',
+    'publication',
+    'topicAndStoryEditor',
+    'topicAndStoryEditorFileUploadFeatures',
+    'topicsAndSkillsDashboard',
+    'skillEditor',
+    'topicAndStoryViewer',
+    'wipeout',
+]
+
 
 def is_oppia_server_already_running():
     """Check if the ports are taken by any other processes. If any one of
@@ -261,21 +311,62 @@ def run_tests(args):
                 'PORTSERVER_ADDRESS': common.PORTSERVER_SOCKET_FILEPATH,
             }))
 
-        stack.enter_context(servers.managed_webdriver_server(
-            chrome_version=args.chrome_driver_version))
+        if args.suite == 'full':
+            stack.enter_context(servers.managed_webdriver_server(
+                chrome_version=args.chrome_driver_version))
 
-        proc = stack.enter_context(servers.managed_protractor_server(
-            suite_name=args.suite,
-            dev_mode=dev_mode,
-            debug_mode=args.debug_mode,
-            sharding_instances=args.sharding_instances,
-            stdout=subprocess.PIPE))
+            print('Protractor suites are starting to run')
+            proc = stack.enter_context(servers.managed_protractor_server(
+                suite_name=args.suite,
+                dev_mode=dev_mode,
+                debug_mode=args.debug_mode,
+                sharding_instances=args.sharding_instances,
+                stdout=subprocess.PIPE))
 
-        print(
-            'Servers have come up.\n'
-            'Note: If ADD_SCREENSHOT_REPORTER is set to true in '
-            'core/tests/protractor.conf.js, you can view screenshots of the '
-            'failed tests in ../protractor-screenshots/')
+            print('WebdriverIO suites are starting to run')
+            proc = stack.enter_context(servers.managed_webdriverio_server(
+                suite_name=args.suite,
+                dev_mode=dev_mode,
+                debug_mode=args.debug_mode,
+                chrome_version=args.chrome_driver_version,
+                sharding_instances=args.sharding_instances,
+                stdout=subprocess.PIPE))
+
+        elif args.suite in SUITES_MIGRATED_TO_WEBDRIVERIO:
+            proc = stack.enter_context(servers.managed_webdriverio_server(
+                suite_name=args.suite,
+                dev_mode=dev_mode,
+                debug_mode=args.debug_mode,
+                chrome_version=args.chrome_driver_version,
+                sharding_instances=args.sharding_instances,
+                stdout=subprocess.PIPE))
+
+            print(
+                'Servers have come up.\n'
+                'Note: You can view screenshots of failed tests '
+                'in ../webdriverio-screenshots/')
+
+        elif args.suite in SUITES_STILL_IN_PROTRACTOR:
+            stack.enter_context(servers.managed_webdriver_server(
+                chrome_version=args.chrome_driver_version))
+
+            proc = stack.enter_context(servers.managed_protractor_server(
+                suite_name=args.suite,
+                dev_mode=dev_mode,
+                debug_mode=args.debug_mode,
+                sharding_instances=args.sharding_instances,
+                stdout=subprocess.PIPE))
+
+            print(
+                'Servers have come up.\n'
+                'Note: You can view screenshots of the failed tests '
+                'in ../protractor-screenshots/')
+
+        else:
+            print(
+                'The suite requested to run does not exist'
+                'Please provide a valid suite name')
+            sys.exit(1)
 
         output_lines = []
         while True:

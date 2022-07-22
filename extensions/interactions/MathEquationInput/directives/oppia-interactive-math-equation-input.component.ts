@@ -38,12 +38,15 @@ import constants from 'assets/constants';
   templateUrl: './math-equation-input-interaction.component.html'
 })
 export class InteractiveMathEquationInput implements OnInit {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() savedSolution!: InteractionAnswer;
+  @Input() useFractionForDivisionWithValue!: string;
+  @Input() allowedVariablesWithValue!: string;
   value: string = '';
   hasBeenTouched: boolean = false;
   warningText: string = '';
-  @Input() savedSolution: InteractionAnswer;
-  @Input() useFractionForDivisionWithValue;
-  @Input() customOskLettersWithValue;
 
   constructor(
     private currentInteractionService: CurrentInteractionService,
@@ -65,7 +68,7 @@ export class InteractiveMathEquationInput implements OnInit {
       this.value = this.mathInteractionsService.replaceAbsSymbolWithText(
         this.value);
       let answerIsValid = this.mathInteractionsService.validateEquation(
-        this.value, this.guppyInitializationService.getCustomOskLetters());
+        this.value, this.guppyInitializationService.getAllowedVariables());
       this.warningText = this.mathInteractionsService.getWarningText();
       return answerIsValid;
     }
@@ -99,9 +102,9 @@ export class InteractiveMathEquationInput implements OnInit {
       (this.savedSolution as string) !==
       undefined ? this.savedSolution as string : ''
     );
-    this.guppyInitializationService.setCustomOskLetters(
+    this.guppyInitializationService.setAllowedVariables(
       this.htmlEscaperService.escapedJsonToObj(
-        this.customOskLettersWithValue) as unknown as string[]);
+        this.allowedVariablesWithValue) as unknown as string[]);
     let eventType = (
       this.deviceInfoService.isMobileUserAgent() &&
       this.deviceInfoService.hasTouchEvents()) ? 'focus' : 'change';

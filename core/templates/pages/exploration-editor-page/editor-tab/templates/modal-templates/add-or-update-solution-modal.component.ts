@@ -62,8 +62,9 @@ export class AddOrUpdateSolutionModalComponent
   answerIsValid!: boolean;
   correctAnswerEditorHtml!: string;
   data!: SolutionInterface;
-  savedMemento!: InteractionAnswer;
-  solutionType!: Solution;
+  // These properties are null until a solution is specified or removed.
+  savedMemento!: InteractionAnswer | null;
+  solutionType!: Solution | null;
   tempAnsOption!: string;
   EMPTY_SOLUTION_DATA!: SolutionInterface;
   COMPONENT_NAME_SOLUTION: string = AppConstants.COMPONENT_NAME_SOLUTION;
@@ -111,21 +112,8 @@ export class AddOrUpdateSolutionModalComponent
     return Boolean(solExplanation.length > 3000);
   }
 
-  // Remove this function once the schema based editor
-  // is migrated to Angular 8+.
-  getSchema(): HtmlFormSchema {
-    return this.EXPLANATION_FORM_SCHEMA;
-  }
-
   onAnswerChange(): void {
     this.data.answerIsExclusive = (this.tempAnsOption === this.ansOptions[0]);
-  }
-
-  updateLocalHtml($event: string): void {
-    if (this.data.explanationHtml !== $event) {
-      this.data.explanationHtml = $event;
-      this.changeDetectorRef.detectChanges();
-    }
   }
 
   isSubmitButtonDisabled(): boolean {
@@ -153,8 +141,12 @@ export class AddOrUpdateSolutionModalComponent
 
   ngOnInit(): void {
     this.solutionType = this.stateSolutionService.savedMemento;
-    this.savedMemento = (
-      this.stateSolutionService.savedMemento?.correctAnswer);
+    if (this.solutionType) {
+      this.savedMemento = (
+        this.solutionType?.correctAnswer);
+    } else {
+      this.savedMemento = null;
+    }
     this.correctAnswerEditorHtml = (
       this.explorationHtmlFormatterService.getInteractionHtml(
         this.stateInteractionIdService.savedMemento,
@@ -172,12 +164,12 @@ export class AddOrUpdateSolutionModalComponent
     };
     this.data = this.solutionType ? {
       answerIsExclusive: (
-        this.stateSolutionService.savedMemento.answerIsExclusive),
+        this.solutionType.answerIsExclusive),
       correctAnswer: undefined,
       explanationHtml: (
-        this.stateSolutionService.savedMemento.explanation.html),
+        this.solutionType.explanation.html),
       explanationContentId: (
-        this.stateSolutionService.savedMemento.explanation.contentId)
+        this.solutionType.explanation.contentId)
     } : cloneDeep(this.EMPTY_SOLUTION_DATA);
     this.currentInteractionService.setOnSubmitFn(
       (answer: InteractionAnswer) => {

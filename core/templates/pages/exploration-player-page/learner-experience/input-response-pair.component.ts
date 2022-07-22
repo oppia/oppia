@@ -32,6 +32,11 @@ import { PlayerTranscriptService } from '../services/player-transcript.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { NumberConversionService } from 'services/number-conversion.service';
+import isNumber from 'lodash/isNumber';
+import isString from 'lodash/isString';
+
+import './input-response-pair.component.css';
+
 
 @Component({
   selector: 'oppia-input-response-pair',
@@ -78,11 +83,7 @@ export class InputResponsePairComponent {
       this.playerPositionService.getDisplayedCardIndex());
   }
 
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
-  }
-
-  isNumber(value: string): boolean {
+  isStringifiedNumber(value: string): boolean {
     const validRegex = /.*[^0-9.\-].*/g;
     if (validRegex.test(value)) {
       return false;
@@ -92,7 +93,7 @@ export class InputResponsePairComponent {
 
   convertAnswerToLocalFormat(data: string): string {
     // We need to use the numberConversionService, only if the data is number.
-    if (!this.isNumber(data)) {
+    if (isString(data) ? !this.isStringifiedNumber(data) : !isNumber(data)) {
       return data;
     }
 

@@ -519,7 +519,7 @@ class TranslationContributionStatsHandlerTest(test_utils.GenericTestBase):
             topic_name: str. Topic name.
         """
         topic = topic_domain.Topic.create_default_topic(
-            topic_id, topic_name, 'abbrev', 'description')
+            topic_id, topic_name, 'abbrev', 'description', 'fragm')
         topic.thumbnail_filename = 'thumbnail.svg'
         topic.thumbnail_bg_color = '#C6DCDA'
         topic.subtopics = [
@@ -528,6 +528,7 @@ class TranslationContributionStatsHandlerTest(test_utils.GenericTestBase):
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-three')]
         topic.next_subtopic_id = 2
+        topic.skill_ids_for_diagnostic_test = ['skill_id_3']
         topic_services.save_new_topic(self.admin_id, topic)
         topic_services.publish_topic(topic_id, self.admin_id)
 

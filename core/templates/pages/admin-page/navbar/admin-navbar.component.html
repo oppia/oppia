@@ -54,10 +54,10 @@
 <div class="admin-navbar">
   <nav class="navbar navbar-default navbar-light oppia-navbar oppia-prevent-selection oppia-navbar-admin" role="navigation">
     <div class="navbar-container oppia-navbar-container">
-      <div class="navbar-header protractor-test-navbar-header float-left">
+      <div class="navbar-header e2e-test-navbar-header float-left">
         <a class="oppia-navbar-brand-name oppia-transition-200 float-left"
            href="/community-library"
-           [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE">
+           [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE">
           <picture>
             <source type="image/webp" [srcset]="getStaticImageUrl('/logo/288x128_logo_white.webp')">
             <source type="image/png" [srcset]="getStaticImageUrl('/logo/288x128_logo_white.png')">
@@ -78,7 +78,7 @@
           <li>
             <ul class="nav oppia-navbar-tabs-admin oppia-admin-page-dropdown">
               <li ngbDropdown class="nav-item dropdown float-right" [ngClass]="{'open' : dropdownMenuIsActive}">
-                <a ngbDropdownToggle class="nav-link dropdown-toggle oppia-navbar-tab oppia-navbar-dropdown-toggle protractor-test-navbar-dropdown-toggle"
+                <a ngbDropdownToggle class="nav-link dropdown-toggle oppia-navbar-tab oppia-navbar-dropdown-toggle e2e-test-navbar-dropdown-toggle"
                    data-toggle="dropdown"
                    (mouseenter)="activateDropdownMenu()"
                    (mouseleave)="deactivateDropdownMenu()">
@@ -111,7 +111,7 @@
                 </a>
               </li>
               <li class="nav-item oppia-clickable-navbar-element float-right">
-                <a class="nav-link oppia-navbar-tab protractor-test-admin-config-tab"
+                <a class="nav-link oppia-navbar-tab e2e-test-admin-config-tab"
                    [href]="ADMIN_TAB_URLS.CONFIG"
                    [ngClass]="{'active': isConfigTabOpen()}"
                    ngbTooltip="Config"
@@ -121,7 +121,7 @@
                 </a>
               </li>
               <li class="nav-item oppia-clickable-navbar-element float-right">
-                <a class="nav-link oppia-navbar-tab protractor-test-admin-features-tab"
+                <a class="nav-link oppia-navbar-tab e2e-test-admin-features-tab"
                    [href]="ADMIN_TAB_URLS.FEATURES"
                    [ngClass]="{'active': isFeaturesTabOpen()}"
                    ngbTooltip="Features"
@@ -131,7 +131,7 @@
                 </a>
               </li>
               <li class="nav-item oppia-clickable-navbar-element float-right">
-                <a class="nav-link oppia-navbar-tab protractor-test-admin-roles-tab"
+                <a class="nav-link oppia-navbar-tab e2e-test-admin-roles-tab"
                    [href]="ADMIN_TAB_URLS.ROLES"
                    [ngClass]="{'active': isRolesTabOpen()}"
                    ngbTooltip="Roles"
@@ -155,7 +155,7 @@
           <li>
             <ul class="nav oppia-navbar-tabs-admin">
               <li ngbDropdown class="nav-item dropdown float-right" [ngClass]="{'open' : profileDropdownIsActive}">
-                <a ngbDropdownToggle class="nav-link oppia-navbar-dropdown-toggle protractor-test-navbar-dropdown-toggle"
+                <a ngbDropdownToggle class="nav-link oppia-navbar-dropdown-toggle e2e-test-navbar-dropdown-toggle"
                    data-toggle="dropdown"
                    (mouseenter)="activateProfileDropdown()"
                    (mouseleave)="deactivateProfileDropdown()">
@@ -195,7 +195,7 @@
                   <li>
                     <a (click)="onMouseoutProfilePictureOrDropdown($event)"
                        href="/preferences"
-                       [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PREFERENCES.ROUTE"
+                       [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PREFERENCES.ROUTE"
                        class="dropdown-item oppia-dropdown-item-text">
                       Preferences
                     </a>
@@ -222,7 +222,7 @@
                   <li>
                     <a (click)="onMouseoutProfilePictureOrDropdown($event)"
                        [href]="logoutUrl"
-                       [routerLink]="logoutUrl"
+                       [smartRouterLink]="logoutUrl"
                        class="dropdown-item oppia-dropdown-item-text">
                       Logout
                     </a>

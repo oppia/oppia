@@ -36,6 +36,7 @@ from core.domain import translation_domain
 from extensions import domain
 
 from pylatexenc import latex2text
+from typing_extensions import TypedDict
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
@@ -129,6 +130,13 @@ class QuestionSuggestionChange(change_domain.BaseChange):
             'user_id_attribute_names': []
         }
     ]
+
+
+class VersionedQuestionStateDict(TypedDict):
+    """Dictionary representing the versioned State object for Question."""
+
+    state_schema_version: int
+    state: state_domain.StateDict
 
 
 class Question(translation_domain.BaseTranslatableObject):
@@ -1142,7 +1150,8 @@ class Question(translation_domain.BaseTranslatableObject):
 
         state_domain.State.convert_html_fields_in_state(
             question_state_dict,
-            html_validation_service.convert_svg_diagram_tags_to_image_tags)
+            html_validation_service.convert_svg_diagram_tags_to_image_tags,
+            state_schema_version=46)
         return question_state_dict
 
     @classmethod
@@ -1188,6 +1197,76 @@ class Question(translation_domain.BaseTranslatableObject):
                     'value': False
                 }
             })
+        return question_state_dict
+
+    @classmethod
+    def _convert_state_v49_dict_to_v50_dict(cls, question_state_dict):
+        """Converts from version 49 to 50. Version 50 removes rules from
+        explorations that use one of the following rules:
+        [ContainsSomeOf, OmitsSomeOf, MatchesWithGeneralForm]. It also renames
+        `customOskLetters` cust arg to `allowedVariables`.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+        if question_state_dict[
+                'interaction']['id'] in exp_domain.MATH_INTERACTION_TYPES:
+            filtered_answer_groups = []
+            for answer_group_dict in question_state_dict[
+                    'interaction']['answer_groups']:
+                filtered_rule_specs = []
+                for rule_spec_dict in answer_group_dict['rule_specs']:
+                    rule_type = rule_spec_dict['rule_type']
+                    if rule_type not in (
+                            exp_domain.MATH_INTERACTION_DEPRECATED_RULES):
+                        filtered_rule_specs.append(
+                            copy.deepcopy(rule_spec_dict))
+                answer_group_dict['rule_specs'] = filtered_rule_specs
+                if len(filtered_rule_specs) > 0:
+                    filtered_answer_groups.append(
+                        copy.deepcopy(answer_group_dict))
+            question_state_dict[
+                'interaction']['answer_groups'] = filtered_answer_groups
+
+            # Renaming cust arg.
+            customization_args = question_state_dict[
+                'interaction']['customization_args']
+            customization_args['allowedVariables'] = []
+            if 'customOskLetters' in customization_args:
+                customization_args['allowedVariables'] = copy.deepcopy(
+                    customization_args['customOskLetters'])
+                del customization_args['customOskLetters']
+
+        return question_state_dict
+
+    @classmethod
+    def _convert_state_v50_dict_to_v51_dict(cls, question_state_dict):
+        """Converts from version 50 to 51. Version 51 adds a new
+        dest_if_really_stuck field to Outcome class to redirect learners
+        to a state for strengthening concepts when they get really stuck.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+
+        answer_groups = question_state_dict['interaction']['answer_groups']
+        for answer_group in answer_groups:
+            answer_group['outcome']['dest_if_really_stuck'] = None
+
+        if question_state_dict['interaction']['default_outcome'] is not None:
+            question_state_dict[
+                'interaction']['default_outcome']['dest_if_really_stuck'] = None
+
         return question_state_dict
 
     @classmethod
@@ -1291,18 +1370,24 @@ class Question(translation_domain.BaseTranslatableObject):
         interaction_specs = interaction_registry.Registry.get_all_specs()
         at_least_one_correct_answer = False
         dest_is_specified = False
+        dest_if_stuck_is_specified = False
         interaction = self.question_state_data.interaction
         for answer_group in interaction.answer_groups:
             if answer_group.outcome.labelled_as_correct:
                 at_least_one_correct_answer = True
             if answer_group.outcome.dest is not None:
                 dest_is_specified = True
+            if answer_group.outcome.dest_if_really_stuck is not None:
+                dest_if_stuck_is_specified = True
 
         if interaction.default_outcome.labelled_as_correct:
             at_least_one_correct_answer = True
 
         if interaction.default_outcome.dest is not None:
             dest_is_specified = True
+
+        if interaction.default_outcome.dest_if_really_stuck is not None:
+            dest_if_stuck_is_specified = True
 
         if not at_least_one_correct_answer:
             raise utils.ValidationError(
@@ -1313,6 +1398,12 @@ class Question(translation_domain.BaseTranslatableObject):
         if dest_is_specified:
             raise utils.ValidationError(
                 'Expected all answer groups to have destination as None.'
+            )
+
+        if dest_if_stuck_is_specified:
+            raise utils.ValidationError(
+                'Expected all answer groups to have destination for the '
+                'stuck learner as None.'
             )
 
         if not interaction.hints:

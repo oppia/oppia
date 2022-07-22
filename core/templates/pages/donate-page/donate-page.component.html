@@ -1,5 +1,5 @@
 <div class="donate-page">
-  <div class="oppia-page-card oppia-static-content protractor-test-donate-page">
+  <div class="oppia-page-card oppia-static-content e2e-test-donate-page">
     <div class="oppia-donation-card-content-wide">
       <div class="oppia-donate-options">
         <div *ngIf="windowIsNarrow">
@@ -12,7 +12,7 @@
           <form ngNoForm action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
             <input type="hidden" name="cmd" value="_s-xclick">
             <input type="hidden" name="hosted_button_id" value="UWKTY87SYU766">
-            <button type="submit" class="btn oppia-donate-options-button protractor-test-paypal-donate-button" tabindex="0" (click)="onDonateThroughPayPal()">
+            <button type="submit" class="btn oppia-donate-options-button e2e-test-paypal-donate-button" tabindex="0" (click)="onDonateThroughPayPal()">
               PayPal
             </button>
           </form>
@@ -21,7 +21,7 @@
           <form ngNoForm action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
             <input type="hidden" name="cmd" value="_s-xclick">
             <input type="hidden" name="hosted_button_id" value="UWKTY87SYU766">
-            <button class="btn oppia-donate-options-button protractor-test-credit-card-donate-button" tabindex="0" (click)="onDonateThroughPayPal()">
+            <button class="btn oppia-donate-options-button e2e-test-credit-card-donate-button" tabindex="0" (click)="onDonateThroughPayPal()">
               Credit Card
             </button>
           </form>
@@ -141,7 +141,23 @@
     font-size: 0.825em;
   }
 
-  @media only screen and (max-width: 1160px) {
+  @media (max-width: 600px) {
+    .oppia-donation-card-content-wide {
+      display: flex;
+      flex-direction: column-reverse;
+      width: 100%;
+    }
+    .donate-page .oppia-donate-info {
+      width: 100%;
+    }
+    .donate-page .oppia-donate-options {
+      width: 100%;
+    }
+    .oppia-donate-info, .oppia-donate-options {
+      flex: 1;
+    }
+  }
+  @media only screen and (max-width: 1160px) and (min-width: 600px) {
     .oppia-donation-card-content-wide {
       display: flex;
       flex-direction: row-reverse;

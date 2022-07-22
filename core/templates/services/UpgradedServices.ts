@@ -438,8 +438,6 @@ import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import { StoryEditorNavigationService } from
   'pages/story-editor-page/services/story-editor-navigation.service';
 import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
-import { StoryReferenceObjectFactory } from
-  'domain/topic/StoryReferenceObjectFactory';
 import { StoryViewerBackendApiService } from
   'domain/story_viewer/story-viewer-backend-api.service';
 import { SubtitledUnicodeObjectFactory } from
@@ -621,8 +619,6 @@ export class UpgradedServices {
     upgradedServices['StateGraphLayoutService'] = new StateGraphLayoutService();
     upgradedServices['StateNameService'] = new StateNameService();
     upgradedServices['StoryObjectFactory'] = new StoryObjectFactory();
-    upgradedServices['StoryReferenceObjectFactory'] =
-      new StoryReferenceObjectFactory();
     upgradedServices['SubtitledUnicodeObjectFactory'] =
       new SubtitledUnicodeObjectFactory();
     upgradedServices['SuggestionModalService'] = new SuggestionModalService();
@@ -768,7 +764,9 @@ export class UpgradedServices {
       new SetInputValidationService(
         upgradedServices['baseInteractionValidationService']);
     upgradedServices['SkillCreationBackendApiService'] =
-        new SkillCreationBackendApiService(upgradedServices['HttpClient']);
+        new SkillCreationBackendApiService(
+          upgradedServices['HttpClient'],
+          upgradedServices['ImageLocalStorageService']);
     upgradedServices['StateTopAnswersStatsObjectFactory'] =
         new StateTopAnswersStatsObjectFactory();
     upgradedServices['SpeechSynthesisChunkerService'] =
@@ -888,8 +886,7 @@ export class UpgradedServices {
       new SuggestionThreadObjectFactory();
     upgradedServices['TextInputRulesService'] = new TextInputRulesService(
       upgradedServices['NormalizeWhitespacePipe']);
-    upgradedServices['TopicObjectFactory'] = new TopicObjectFactory(
-      upgradedServices['StoryReferenceObjectFactory']);
+    upgradedServices['TopicObjectFactory'] = new TopicObjectFactory();
     upgradedServices['UrlInterpolationService'] = new UrlInterpolationService(
       upgradedServices['AlertsService'], upgradedServices['UrlService'],
       upgradedServices['UtilsService']);
@@ -968,7 +965,8 @@ export class UpgradedServices {
     upgradedServices['ContributionOpportunitiesBackendApiService'] =
       new ContributionOpportunitiesBackendApiService(
         upgradedServices['UrlInterpolationService'],
-        upgradedServices['HttpClient']);
+        upgradedServices['HttpClient'],
+        upgradedServices['UserService']);
     upgradedServices['CreatorDashboardBackendApiService'] =
       new CreatorDashboardBackendApiService(
         upgradedServices['HttpClient'],
@@ -1063,7 +1061,8 @@ export class UpgradedServices {
         upgradedServices['StateEditorService']);
     upgradedServices['SkillCreationBackendApiService'] =
       new SkillCreationBackendApiService(
-        upgradedServices['HttpClient']);
+        upgradedServices['HttpClient'],
+        upgradedServices['ImageLocalStorageService']);
     upgradedServices['SkillMasteryBackendApiService'] =
       new SkillMasteryBackendApiService(
         upgradedServices['HttpClient']);
@@ -1108,8 +1107,7 @@ export class UpgradedServices {
         upgradedServices['CountVectorizerService'],
         upgradedServices['SVMPredictionService'],
         upgradedServices['TextInputTokenizer']);
-    upgradedServices['TopicObjectFactory'] = new TopicObjectFactory(
-      upgradedServices['StoryReferenceObjectFactory']);
+    upgradedServices['TopicObjectFactory'] = new TopicObjectFactory();
     upgradedServices['TopicCreationBackendApiService'] =
       new TopicCreationBackendApiService(upgradedServices['HttpClient']);
     upgradedServices['TopicsAndSkillsDashboardBackendApiService'] =

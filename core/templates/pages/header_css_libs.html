@@ -1,19 +1,49 @@
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+<link rel="preconnect" href="https://storage.googleapis.com" crossorigin>
+
 <link rel="preload" href="/third_party/generated/webfonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/third_party/generated/webfonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
 
-<link rel="stylesheet" type="text/css" media="screen"
-      href="https://fonts.googleapis.com/css2?family=Capriola&family=Roboto:wght@400;500;700&family=Noto+Serif:ital@0;1&display=swap">
-<link rel="stylesheet" type="text/css" media="screen"
-      href="https://fonts.googleapis.com/icon?family=Material+Icons&display=swap">
+<link rel="preload"
+      media="screen"
+      href="https://fonts.googleapis.com/css2?family=Capriola&family=Roboto:wght@400;500;700&family=Noto+Serif:ital@0;1&display=swap"
+      as="style"
+      onload="this.onload=null;this.rel='stylesheet'">
+<% if (!htmlWebpackPlugin.options.lightweight) { %>
+  <link rel="preload"
+        media="screen"
+        href="https://fonts.googleapis.com/icon?family=Material+Icons&display=swap"
+        as="style"
+        onload="this.onload=null;this.rel='stylesheet'">
+<% } %>
 <% if (webpackConfig.mode == 'production') { %>
-  <link rel="stylesheet" type="text/css" media="screen"
-        href="/third_party/generated/css/third_party.min.css">
+  <link rel="preload"
+        href="/third_party/generated/css/third_party.min.css"
+        as="style"
+        onload="this.onload=null;this.rel='stylesheet'">
+  <% if (!htmlWebpackPlugin.options.lightweight) { %>
+    <link rel="preload"
+          href="/third_party/static/bower-material-1.1.19/angular-material.min.css"
+          as="style"
+          onload="this.onload=null;this.rel='stylesheet'">
+  <% } %>
 <% } else { %>
-  <link rel="stylesheet" type="text/css" media="screen"
-        href="/third_party/generated/css/third_party.css">
+  <link rel="preload"
+        href="/third_party/generated/css/third_party.css"
+        as="style"
+        onload="this.onload=null;this.rel='stylesheet'">
+  <% if (!htmlWebpackPlugin.options.lightweight) { %>
+    <link rel="preload"
+          href="/third_party/static/bower-material-1.1.19/angular-material.css"
+          as="style"
+          onload="this.onload=null;this.rel='stylesheet'">
+  <% } %>
 <% } %>
 
 <link rel="stylesheet" type="text/css" media="screen"
       href="/templates/css/oppia.css">
-<link rel="stylesheet" type="text/css" media="screen"
-      href="/templates/css/oppia-material.css">
+
+<% if (!htmlWebpackPlugin.options.lightweight) { %>
+  <link rel="stylesheet" type="text/css" media="screen"
+        href="/templates/css/oppia-material.css">
+<% } %>

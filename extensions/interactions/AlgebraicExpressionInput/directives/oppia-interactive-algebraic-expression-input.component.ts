@@ -40,13 +40,16 @@ import { TranslateService } from '@ngx-translate/core';
 })
 export class AlgebraicExpressionInputInteractionComponent
     implements OnInit, OnDestroy {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() savedSolution!: InteractionAnswer;
+  @Input() useFractionForDivisionWithValue!: string;
+  @Input() allowedVariablesWithValue: string = '';
   value: string = '';
   hasBeenTouched = false;
   viewIsDestroyed: boolean = false;
   warningText: string = '';
-  @Input() customOskLettersWithValue: string = '';
-  @Input() savedSolution: InteractionAnswer;
-  @Input() useFractionForDivisionWithValue: string;
 
   constructor(
     private algebraicExpressionInputRulesService:
@@ -71,7 +74,7 @@ export class AlgebraicExpressionInputInteractionComponent
         this.value);
       let answerIsValid = (
         this.mathInteractionsService.validateAlgebraicExpression(
-          this.value, this.guppyInitializationService.getCustomOskLetters()));
+          this.value, this.guppyInitializationService.getAllowedVariables()));
       this.warningText = this.mathInteractionsService.getWarningText();
       return answerIsValid;
     }
@@ -93,9 +96,9 @@ export class AlgebraicExpressionInputInteractionComponent
     this.guppyConfigurationService.init();
     this.guppyConfigurationService.changeDivSymbol(
       JSON.parse(this.useFractionForDivisionWithValue || 'false'));
-    this.guppyInitializationService.setCustomOskLetters(
+    this.guppyInitializationService.setAllowedVariables(
       this.htmlEscaperService.escapedJsonToObj(
-        this.customOskLettersWithValue) as string[]
+        this.allowedVariablesWithValue) as string[]
     );
     let translatedPlaceholder = this.translateService.instant(
       constants.MATH_INTERACTION_PLACEHOLDERS.AlgebraicExpressionInput);

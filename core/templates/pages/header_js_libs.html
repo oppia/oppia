@@ -1,8 +1,16 @@
-<script src="/third_party/static/jquery-3.5.1/jquery.min.js"></script>
-<script src="/third_party/static/jqueryui-1.12.1/jquery-ui.min.js"></script>
 <script async src="https://www.googletagmanager.com/gtag/js"></script>
-<script async src="https://www.googleoptimize.com/optimize.js?id=OPT-57KK7PG"></script>
-<script src="/third_party/static/jquery-ui-touch-punch-0.3.1/jquery.ui.touch-punch-improved.js"></script>
+<!-- This code is used for inserting webpack bundles
+    https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates -->
+<% for (var chunk in htmlWebpackPlugin.files.js) { %>
+  <link rel="preload" as="script" href="<%= htmlWebpackPlugin.files.js[chunk] %>">
+<% } %>
+
+<% if (!htmlWebpackPlugin.options.lightweight) { %>
+  <script src="/third_party/static/jquery-3.5.1/jquery.min.js"></script>
+  <script src="/third_party/static/jqueryui-1.12.1/jquery-ui.min.js"></script>
+  <script src="/third_party/static/jquery-ui-touch-punch-0.3.1/jquery.ui.touch-punch-improved.js"></script>
+<% } %>
+
 <% if (htmlWebpackPlugin.options.hybrid && webpackConfig.mode == 'production') { %>
   <script src="/third_party/static/angularjs-1.8.2/angular.min.js"></script>
 <% } else if (htmlWebpackPlugin.options.hybrid) { %>

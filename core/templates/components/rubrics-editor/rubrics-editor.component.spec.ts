@@ -16,12 +16,10 @@
  * @fileoverview Unit tests for RubricsEditorComponent.
  */
 
-import { ChangeDetectorRef } from '@angular/core';
+import { ChangeDetectorRef, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
-import { AngularHtmlBindWrapperDirective } from 'components/angular-html-bind/angular-html-bind-wrapper.directive';
 import { SkillCreationService } from 'components/entity-creation-services/skill-creation.service';
-import { SchemaBasedEditorDirective } from 'components/forms/schema-based-editors/schema-based-editor.directive';
 import { Rubric } from 'domain/skill/rubric.model';
 import { RubricsEditorComponent } from './rubrics-editor.component';
 
@@ -29,7 +27,11 @@ describe('Rubrics Editor Component', () => {
   let fixture: ComponentFixture<RubricsEditorComponent>;
   let componentInstance: RubricsEditorComponent;
   let difficulty: string = 'medium';
-  let rubrics: Rubric[] = [new Rubric(difficulty, [])];
+  let rubrics: Rubric[] = [
+    new Rubric('easy', []),
+    new Rubric(difficulty, []),
+    new Rubric('hard', [])
+  ];
   let skillCreationService: SkillCreationService;
 
   beforeEach(waitForAsync(() => {
@@ -38,14 +40,13 @@ describe('Rubrics Editor Component', () => {
         FormsModule
       ],
       declarations: [
-        RubricsEditorComponent,
-        SchemaBasedEditorDirective,
-        AngularHtmlBindWrapperDirective
+        RubricsEditorComponent
       ],
       providers: [
         SkillCreationService,
         ChangeDetectorRef
-      ]
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   }));
 
@@ -135,7 +136,7 @@ describe('Rubrics Editor Component', () => {
     let newExplanation: string = 'new';
     componentInstance.ngOnInit();
     componentInstance.editableExplanations[difficulty][index] = '';
-    componentInstance.rubric = rubrics[0];
+    componentInstance.rubric = rubrics[1];
     componentInstance.updateExplanation(newExplanation, index);
     expect(componentInstance.editableExplanations[difficulty][index])
       .toEqual(newExplanation);

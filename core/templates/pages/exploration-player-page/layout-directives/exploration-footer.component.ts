@@ -21,6 +21,7 @@ import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { QuestionPlayerStateService } from 'components/question-directives/question-player/services/question-player-state.service';
+import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
 import { FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
 import { ExplorationSummaryBackendApiService } from 'domain/summary/exploration-summary-backend-api.service';
@@ -31,10 +32,15 @@ import { LoggerService } from 'services/contextual/logger.service';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { UserService } from 'services/user.service';
 import { ExplorationEngineService } from '../services/exploration-engine.service';
 import { LearnerViewInfoBackendApiService } from '../services/learner-view-info-backend-api.service';
 import { PlayerPositionService } from '../services/player-position.service';
+import { PlayerTranscriptService } from '../services/player-transcript.service';
 import { LessonInformationCardModalComponent } from '../templates/lesson-information-card-modal.component';
+
+import './exploration-footer.component.css';
+
 
 @Component({
   selector: 'oppia-exploration-footer',
@@ -60,6 +66,12 @@ export class ExplorationFooterComponent {
   expInfo: LearnerExplorationSummaryBackendDict;
   completedWidth: number = 0;
   expStates: StateObjectsBackendDict;
+  completedCheckpointsCount: number = 0;
+  lastCheckpointWasCompleted: boolean = false;
+  learnerHasViewedLessonInfoTooltip: boolean = false;
+  userIsLoggedIn: boolean = false;
+  footerIsInQuestionPlayerMode: boolean = false;
+  CHECKPOINTS_FEATURE_IS_ENABLED = false;
 
   constructor(
     private contextService: ContextService,
@@ -74,8 +86,12 @@ export class ExplorationFooterComponent {
       ReadOnlyExplorationBackendApiService,
     private learnerViewInfoBackendApiService: LearnerViewInfoBackendApiService,
     private loggerService: LoggerService,
+    private playerTranscriptService: PlayerTranscriptService,
     private playerPositionService: PlayerPositionService,
-    private explorationEngineService: ExplorationEngineService
+    private explorationEngineService: ExplorationEngineService,
+    private userService: UserService,
+    private editableExplorationBackendApiService:
+      EditableExplorationBackendApiService
   ) {}
 
   ngOnInit(): void {
@@ -90,6 +106,9 @@ export class ExplorationFooterComponent {
     try {
       this.explorationId = this.contextService.getExplorationId();
       this.iframed = this.urlService.isIframed();
+      this.userService.getUserInfoAsync().then((userInfo) => {
+        this.userIsLoggedIn = userInfo.isLoggedIn();
+      });
       this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
       this.resizeSubscription = this.windowDimensionsService.getResizeEvent()
         .subscribe(evt => {
@@ -117,8 +136,6 @@ export class ExplorationFooterComponent {
             }
           });
       }
-      // Fetching the number of checkpoints.
-      this.getCheckpointCount(this.explorationId);
     } catch (err) { }
 
     if (this.contextService.isInQuestionPlayerMode()) {
@@ -126,6 +143,19 @@ export class ExplorationFooterComponent {
         .subscribe((resultsLoaded: boolean) => {
           this.hintsAndSolutionsAreSupported = !resultsLoaded;
         });
+      this.footerIsInQuestionPlayerMode = true;
+    } else if (this.explorationId) {
+      this.readOnlyExplorationBackendApiService
+        .fetchCheckpointsFeatureIsEnabledStatus().then(
+          (checkpointsFeatureIsEnabled) => {
+            this.CHECKPOINTS_FEATURE_IS_ENABLED = checkpointsFeatureIsEnabled;
+            if (this.CHECKPOINTS_FEATURE_IS_ENABLED) {
+              // Fetching the number of checkpoints.
+              this.getCheckpointCount();
+              this.setLearnerHasViewedLessonInfoTooltip();
+            }
+          }
+        );
     }
   }
 
@@ -134,36 +164,42 @@ export class ExplorationFooterComponent {
       windowClass: 'oppia-modal-lesson-information-card'
     });
 
-    let displayedCardIndex = this.playerPositionService.getDisplayedCardIndex();
-
     modalRef.componentInstance.checkpointCount = this.checkpointCount;
-    // Note to developers:
-    // The checkpointArray is used to track the number of
-    // completedCheckpoints. For the first card, 1 is pushed
-    // since the first card is always a checkpoint. For
-    // displayedCardindex > 1, 1 is pushed if the card is a
-    // checkpoint, else 0 is pushed.
-    let completedCheckpoints = 0;
-    for (let i = 0; i <= displayedCardIndex; i++) {
-      completedCheckpoints = completedCheckpoints + this.checkpointArray[i];
-    }
-    this.completedWidth = (
-      (100 / (this.checkpointCount)) * completedCheckpoints
+
+    let mostRecentlyReachedCheckpointIndex = (
+      this.getMostRecentlyReachedCheckpointIndex()
     );
 
+    this.completedCheckpointsCount = mostRecentlyReachedCheckpointIndex - 1;
+
+    let displayedCardIndex = (
+      this.playerPositionService.getDisplayedCardIndex()
+    );
     if (displayedCardIndex > 0) {
       let state = this.explorationEngineService.getState();
-      if (state.cardIsCheckpoint) {
-        this.checkpointArray.push(1);
-      } else {
-        this.checkpointArray.push(0);
+      let stateCard = this.explorationEngineService.getStateCardByName(
+        state.name);
+      if (stateCard.isTerminal()) {
+        this.completedCheckpointsCount += 1;
       }
-    } else {
-      this.checkpointArray.push(1);
     }
+
+    if (this.completedCheckpointsCount === this.checkpointCount) {
+      this.lastCheckpointWasCompleted = true;
+    }
+
+    this.completedWidth = (
+      (100 / (this.checkpointCount)) * this.completedCheckpointsCount
+    );
+
+    if (this.lastCheckpointWasCompleted) {
+      this.completedWidth = 100;
+    }
+
     modalRef.componentInstance.completedWidth = this.completedWidth;
     modalRef.componentInstance.contributorNames = this.contributorNames;
     modalRef.componentInstance.expInfo = this.expInfo;
+    modalRef.componentInstance.userIsLoggedIn = this.userIsLoggedIn;
 
     modalRef.result.then(() => {}, () => {
       // Note to developers:
@@ -178,6 +214,12 @@ export class ExplorationFooterComponent {
     let includePrivateExplorations = JSON.stringify(true);
     if (this.expInfo) {
       this.openInformationCardModal();
+
+      // Update user has viewed lesson info modal once if
+      // lesson info modal button is clicked.
+      if (!this.learnerHasViewedLessonInfoTooltip) {
+        this.learnerHasViewedLessonInfo();
+      }
     } else {
       this.learnerViewInfoBackendApiService.fetchLearnerInfoAsync(
         stringifiedExpIds,
@@ -199,9 +241,23 @@ export class ExplorationFooterComponent {
     }
   }
 
-  async getCheckpointCount(explorationId: string): Promise<void> {
+  getMostRecentlyReachedCheckpointIndex(): number {
+    let checkpointIndex = 0;
+    let numberOfCards = this.playerTranscriptService.getNumCards();
+    for (let i = 0; i < numberOfCards; i++) {
+      let stateName = this.playerTranscriptService.getCard(i).getStateName();
+      let correspondingState = this.explorationEngineService.
+        getStateFromStateName(stateName);
+      if (correspondingState.cardIsCheckpoint) {
+        checkpointIndex++;
+      }
+    }
+    return checkpointIndex;
+  }
+
+  async getCheckpointCount(): Promise<void> {
     return this.readOnlyExplorationBackendApiService
-      .fetchExplorationAsync(explorationId, null).then(
+      .fetchExplorationAsync(this.explorationId, null).then(
         (response: FetchExplorationBackendResponse) => {
           this.expStates = response.exploration.states;
           let count = 0;
@@ -216,6 +272,27 @@ export class ExplorationFooterComponent {
 
   isLanguageRTL(): boolean {
     return this.i18nLanguageCodeService.isCurrentLanguageRTL();
+  }
+
+  async setLearnerHasViewedLessonInfoTooltip(): Promise<void> {
+    return this.readOnlyExplorationBackendApiService
+      .fetchExplorationAsync(this.explorationId, null).then(
+        (response: FetchExplorationBackendResponse) => {
+          this.learnerHasViewedLessonInfoTooltip = (
+            response.has_viewed_lesson_info_modal_once);
+        });
+  }
+
+  learnerHasViewedLessonInfo(): void {
+    this.learnerHasViewedLessonInfoTooltip = true;
+    if (this.userIsLoggedIn) {
+      this.editableExplorationBackendApiService
+        .recordLearnerHasViewedLessonInfoModalOnce();
+    }
+  }
+
+  hasLearnerHasViewedLessonInfoTooltip(): boolean {
+    return this.learnerHasViewedLessonInfoTooltip;
   }
 }
 

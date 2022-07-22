@@ -44,7 +44,7 @@ from core.platform import models
 transaction_services = models.Registry.import_transaction_services()
 
 
-def get_new_story_id():
+def get_new_story_id() -> str:
     """Returns a new story id.
 
     Returns:
@@ -368,6 +368,17 @@ def validate_explorations_for_story(exp_ids, strict):
                     'Exploration with ID %s is not public. Please publish '
                     'explorations before adding them to a story.'
                     % exp_id)
+                if strict:
+                    raise utils.ValidationError(error_string)
+                validation_error_messages.append(error_string)
+
+    if exps_dict:
+        for exp_id, exp in exps_dict.items():
+            if exp.category not in constants.ALL_CATEGORIES:
+                error_string = (
+                    'All explorations in a story should be of a '
+                    'default category. The exploration with ID %s has'
+                    ' an invalid category %s.' % (exp_id, exp.category))
                 if strict:
                     raise utils.ValidationError(error_string)
                 validation_error_messages.append(error_string)

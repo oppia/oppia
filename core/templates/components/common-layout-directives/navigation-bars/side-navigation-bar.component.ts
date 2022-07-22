@@ -105,6 +105,14 @@ export class SideNavigationBarComponent {
     });
   }
 
+  navigateToLearnerDashboard(): void {
+    if (this.currentUrl === '/learner-dashboard') {
+      this.sidebarStatusService.closeSidebar();
+      return;
+    }
+    this.windowRef.nativeWindow.location.href = '/learner-dashboard';
+  }
+
   stopclickfurther(event: Event): void {
     event.stopPropagation();
   }
@@ -127,10 +135,6 @@ export class SideNavigationBarComponent {
     setTimeout(() => {
       this.windowRef.nativeWindow.location.href = classroomUrl;
     }, 150);
-  }
-
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   isHackyTopicTitleTranslationDisplayed(index: number): boolean {

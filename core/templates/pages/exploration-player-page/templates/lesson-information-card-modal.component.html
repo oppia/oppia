@@ -1,45 +1,137 @@
 <mat-card class="oppia-lesson-info-card">
-  <div class="oppia-lesson-info-content">
-    <p class="oppia-story-title" *ngIf="hasStoryTitle && !isHackyStoryTitleTranslationDisplayed()">
-      {{ storyTitle }}
-    </p>
-    <p class="oppia-story-title" *ngIf="hasStoryTitle && isHackyStoryTitleTranslationDisplayed()">
-      {{ storyTitleTranslationKey | translate}}
-    </p>
-    <hr>
-    <h3 class="oppia-exploration-header" *ngIf="!isHackyExpTitleTranslationDisplayed()">
-      {{ expTitle }}
-    </h3>
-    <h3 class="oppia-exploration-header" *ngIf="isHackyExpTitleTranslationDisplayed()">
-      {{ expTitleTranslationKey | translate }}
-    </h3>
-    <h4 class="oppia-exploration-description" *ngIf="!isHackyExpDescTranslationDisplayed()">
-      {{ expDesc | truncateAndCapitalize: 90 }}
-    </h4>
-    <h4 class="oppia-exploration-description" *ngIf="isHackyExpDescTranslationDisplayed()">
-      {{ expDescTranslationKey | translate | truncateAndCapitalize: 90 }}
-    </h4>
-    <p class="progress-text">Progress</p>
-    <div class="progress">
-      <div class="progress-bar-separator-container">
-        <div class="progress-bar-separator"
-             *ngFor="let i of separatorArray;"
-             [style.width.%]="100 / checkpointCount">
+  <div class="oppia-lesson-info-content" [ngClass]="{'oppia-non-story-mode' : !storyTitleIsPresent}">
+    <div *ngIf="storyTitleIsPresent">
+      <p class="oppia-story-title" *ngIf="storyTitleIsPresent && !isHackyStoryTitleTranslationDisplayed()">
+        {{ storyTitle }}
+      </p>
+      <p class="oppia-story-title" *ngIf="storyTitleIsPresent && isHackyStoryTitleTranslationDisplayed()">
+        {{ storyTitleTranslationKey | translate}}
+      </p>
+      <hr *ngIf="storyTitleIsPresent">
+      <div class="oppia-lesson-info-content-inner-container">
+        <h3 class="oppia-exploration-header" *ngIf="!isHackyExpTitleTranslationDisplayed()">
+          {{ expTitle }}
+        </h3>
+        <h3 class="oppia-exploration-header" *ngIf="isHackyExpTitleTranslationDisplayed()">
+          {{ expTitleTranslationKey | translate }}
+        </h3>
+        <div class="oppia-lesson-exploration-progress-info">
+          <h4 class="oppia-exploration-description" *ngIf="!isHackyExpDescTranslationDisplayed()">
+            {{ expDesc | truncateAndCapitalize: 90 }}
+          </h4>
+          <h4 class="oppia-exploration-description" *ngIf="isHackyExpDescTranslationDisplayed()">
+            {{ expDescTranslationKey | translate | truncateAndCapitalize: 90 }}
+          </h4>
+          <p class="progress-text">Progress</p>
+          <div class="progress" [ngStyle]="{ 'flex-direction': isLanguageRTL() ? 'row-reverse' : 'row' }">
+            <div class="progress-bar-separator-container">
+              <div class="progress-bar-separator"
+                   *ngFor="let i of separatorArray;"
+                   [style.width.%]="100 / checkpointCount">
+              </div>
+            </div>
+            <div class="lesson-progress-bar completed-checkpoints-progress-bar"
+                 role="progressbar"
+                 [style.width.%]="completedWidth">
+            </div>
+            <div *ngIf="completedWidth != 100"
+                 class="lesson-progress-bar started-checkpoint-progress-bar"
+                 role="progressbar"
+                 [style.width.%]="100 / checkpointCount">
+            </div>
+            <div *ngIf="completedWidth == 100"
+                 class="lesson-progress-bar started-checkpoint-progress-bar"
+                 role="progressbar"
+                 [style.width.%]="0">
+            </div>
+          </div>
+          <div class="oppia-lesson-info-card-buttons">
+            <button type="button"
+                    class="btn btn-secondary restart-lesson-btn"
+                    *ngIf="userIsLoggedIn"
+                    [ngClass]="{'disabled oppia-disabled-link': !completedWidth}"
+                    (click)="restartExploration()">
+              {{ 'I18N_RESTART_EXPLORATION_BUTTON' | translate }}
+            </button>
+            <button type="button"
+                    class="btn btn-secondary save-progress-btn"
+                    *ngIf="!userIsLoggedIn"
+                    [ngClass]="{'disabled oppia-disabled-link': !completedWidth}"
+                    (click)="saveLoggedOutProgress()">
+              {{ 'I18N_SAVE_PROGRESS_TEXT' | translate }}
+            </button>
+          </div>
+        </div>
+        <div class="oppia-lesson-info-card-authors">
+          <div (click)="toggleLessonAuthorsSubmenu()" class="authors-title">{{ 'I18N_LESSON_AUTHORS_DROPDOWN_TITLE' | translate }}</div>
+          <div [hidden]="!lessonAuthorsSubmenuIsShown" class="authors-dropdown-menu">
+            <div *ngFor="let name of contributorNames" ngbDropdownItem>{{ name }}</div>
+          </div>
         </div>
       </div>
-      <div class="lesson-progress-bar completed-checkpoints-progress-bar"
-           role="progressbar"
-           [style.width.%]="completedWidth">
-      </div>
-      <div *ngIf="completedWidth != 100"
-           class="lesson-progress-bar started-checkpoint-progress-bar"
-           role="progressbar"
-           [style.width.%]="100 / checkpointCount">
-      </div>
-      <div *ngIf="completedWidth == 100"
-           class="lesson-progress-bar started-checkpoint-progress-bar"
-           role="progressbar"
-           [style.width.%]="0">
+    </div>
+    <div *ngIf="!storyTitleIsPresent">
+      <h3 class="oppia-exploration-header" *ngIf="!isHackyExpTitleTranslationDisplayed()">
+        {{ expTitle }}
+      </h3>
+      <hr *ngIf="!storyTitleIsPresent">
+      <div class="oppia-lesson-info-content-inner-container">
+        <h3 class="oppia-exploration-header" *ngIf="isHackyExpTitleTranslationDisplayed()">
+          {{ expTitleTranslationKey | translate }}
+        </h3>
+        <div class="oppia-lesson-exploration-progress-info">
+          <h4 class="oppia-exploration-description" *ngIf="!isHackyExpDescTranslationDisplayed()">
+            {{ expDesc | truncateAndCapitalize: 90 }}
+          </h4>
+          <h4 class="oppia-exploration-description" *ngIf="isHackyExpDescTranslationDisplayed()">
+            {{ expDescTranslationKey | translate | truncateAndCapitalize: 90 }}
+          </h4>
+          <p class="progress-text">Progress</p>
+          <div class="progress" [ngStyle]="{ 'flex-direction': isLanguageRTL() ? 'row-reverse' : 'row' }">
+            <div class="progress-bar-separator-container">
+              <div class="progress-bar-separator"
+                   *ngFor="let i of separatorArray;"
+                   [style.width.%]="100 / checkpointCount">
+              </div>
+            </div>
+            <div class="lesson-progress-bar completed-checkpoints-progress-bar"
+                 role="progressbar"
+                 [style.width.%]="completedWidth">
+            </div>
+            <div *ngIf="completedWidth != 100"
+                 class="lesson-progress-bar started-checkpoint-progress-bar"
+                 role="progressbar"
+                 [style.width.%]="100 / checkpointCount">
+            </div>
+            <div *ngIf="completedWidth == 100"
+                 class="lesson-progress-bar started-checkpoint-progress-bar"
+                 role="progressbar"
+                 [style.width.%]="0">
+            </div>
+          </div>
+          <div class="oppia-lesson-info-card-buttons">
+            <button type="button"
+                    class="btn btn-secondary restart-lesson-btn"
+                    *ngIf="userIsLoggedIn"
+                    [ngClass]="{'disabled oppia-disabled-link': !completedWidth}"
+                    (click)="restartExploration()">
+              {{ 'I18N_RESTART_EXPLORATION_BUTTON' | translate }}
+            </button>
+            <button type="button"
+                    class="btn btn-secondary save-progress-btn"
+                    *ngIf="!userIsLoggedIn"
+                    [ngClass]="{'disabled oppia-disabled-link': !completedWidth}"
+                    (click)="saveLoggedOutProgress()">
+              {{ 'I18N_SAVE_PROGRESS_TEXT' | translate }}
+            </button>
+          </div>
+        </div>
+        <div class="oppia-lesson-info-card-authors">
+          <div (click)="toggleLessonAuthorsSubmenu()" class="authors-title">{{ 'I18N_LESSON_AUTHORS_DROPDOWN_TITLE' | translate }}</div>
+          <div [hidden]="!lessonAuthorsSubmenuIsShown" class="authors-dropdown-menu">
+            <div *ngFor="let name of contributorNames" ngbDropdownItem>{{ name }}</div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -48,116 +140,33 @@
   <i class="material-icons md-18">&#xE5CD;</i>
   <span class="oppia-icon-accessibility-label">Close</span>
 </button>
-<div ngbDropdown>
-  <div ngbDropdownToggle class="authors-title">{{ 'I18N_LESSON_AUTHORS_DROPDOWN_TITLE' | translate }}</div>
-  <div ngbDropdownMenu class="dropdown-menu authors-dropdown-menu">
-    <div *ngFor="let name of contributorNames" ngbDropdownItem>{{ name }}</div>
+<div class="save-progress-menu"
+     *ngIf="saveProgressMenuIsShown && !userIsLoggedIn">
+  <h3>{{ 'I18N_SAVE_PROGRESS_TEXT' | translate }}</h3>
+  <div class="sign-in-box">
+    <p>{{ 'I18N_SAVE_EXPLORATION_PROGRESS_TEXT_1' | translate }}</p>
+    <button type="button"
+            class="btn btn-secondary create-account-btn"
+            (click)="onLoginButtonClicked()">
+          {{ 'I18N_CREATE_ACCOUNT' | translate }}
+    </button>
+    <p class="sign-in-text">{{ 'I18N_SAVE_EXPLORATION_PROGRESS_TEXT_2' | translate }}<a class="sign-in-link" (click)="onLoginButtonClicked()">{{ 'I18N_TOPNAV_SIGN_IN' | translate }}</a></p>
   </div>
+  <div class="separator">
+    <div class="bars"></div>
+    <div class="mid">or</div>
+    <div class="bars"></div>
+  </div>
+  <div class="uid-box">
+    <p class="guide-text">{{ 'I18N_SAVE_EXPLORATION_PROGRESS_TEXT_3' | translate }}<br>{{ 'I18N_SAVE_EXPLORATION_PROGRESS_TEXT_4' | translate }}</p>
+    <p class="copy-text">{{ 'I18N_SAVE_EXPLORATION_PROGRESS_TEXT_5' | translate }}</p>
+    <div class="uid-copy" [ngStyle]="{ 'flex-direction': isLanguageRTL() ? 'row-reverse' : 'row' }">
+      <div class="unique-progress-id">{{ loggedOutProgressUniqueUrl }}</div>
+      <button type="button" class="btn btn-secondary uid-copy-btn" (click)="copyProgressUrl()">Copy</button>
+    </div>
+  </div>
+  <button type="button" class="save-progress-close-button" (click)="closeSaveProgressMenu()">
+    <i class="material-icons md-24">&#xE5CD;</i>
+    <span class="oppia-icon-accessibility-label">Close</span>
+  </button>
 </div>
-
-<style>
-  .authors-title {
-    color: #00645c;
-    cursor: pointer;
-    font-size: 14px;
-    margin-top: 5px;
-    padding-bottom: 2px;
-    text-align: center;
-  }
-
-  .authors-dropdown-menu {
-    border: 0;
-    margin: 0;
-    max-height: 50px;
-    max-width: 350px;
-    min-width: 269px;
-    overflow-y: auto;
-    padding-top: 2px;
-    right: 0;
-    width: 100%;
-  }
-
-  .oppia-exploration-header {
-    font-size: 17px;
-    font-weight: normal;
-    margin: 10px 0 10px 0;
-  }
-
-  .oppia-lesson-info-card {
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-    padding: 10px;
-    padding-bottom: 16px;
-  }
-
-  .oppia-story-title {
-      color: #3b3b3b;
-      font-family: "Capriola", "Roboto", Arial, sans-serif;
-      font-size: 13px;
-      margin-bottom: -10px;
-  }
-
-  .oppia-lesson-info-content {
-      padding: 12px;
-      padding-bottom: 0;
-  }
-
-  .oppia-exploration-description {
-      color: #333;
-      font-size: 15px;
-      font-weight: normal;
-      padding-bottom: 10px;
-  }
-
-  .progress {
-      background: #f0ffff;
-      border: 1px solid #707070;
-      border-radius: 10px;
-      height: 10px;
-      position: relative;
-      transition: none;
-  }
-
-  .progress-text {
-      color: #000;
-      font-size: 12px;
-      margin-bottom: 2px;
-      margin-left: 5px;
-  }
-
-  .oppia-close-popover-button {
-    outline: none;
-    padding: 0;
-    right: 0;
-    top: 0;
-  }
-
-  .lesson-progress-bar {
-      left: 0;
-      width: 0;
-  }
-
-  .completed-checkpoints-progress-bar {
-      background-color: #2d4a9d;
-      transition: none;
-  }
-
-  .started-checkpoint-progress-bar {
-      background-color: #2d4a9d99;
-      transition: none;
-  }
-
-  .progress-bar-separator {
-      border: 1px solid #707070;
-      height: 10px;
-      z-index: 1;
-  }
-
-  .progress-bar-separator-container {
-      display: flex;
-      height: 10px;
-      position: absolute;
-      width: 100%;
-      z-index: 0;
-  }
-</style>

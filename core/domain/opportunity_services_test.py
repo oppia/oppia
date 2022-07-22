@@ -88,7 +88,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             '%s' % i,
             self.owner_id,
             title='title %d' % i,
-            category='category%d' % i,
+            category=constants.ALL_CATEGORIES[i],
             end_state_name='End State',
             correctness_feedback_enabled=True
         ) for i in range(5)]
@@ -97,7 +97,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             self.publish_exploration(self.owner_id, exp.id)
 
         topic = topic_domain.Topic.create_default_topic(
-            self.TOPIC_ID, 'topic', 'abbrev', 'description')
+            self.TOPIC_ID, 'topic', 'abbrev', 'description', 'fragm')
         topic.thumbnail_filename = 'thumbnail.svg'
         topic.thumbnail_bg_color = '#C6DCDA'
         topic.subtopics = [
@@ -106,6 +106,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-url')]
         topic.next_subtopic_id = 2
+        topic.skill_ids_for_diagnostic_test = ['skill_id_1']
         subtopic_page = (
             subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
                 1, self.TOPIC_ID))
@@ -114,7 +115,8 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             [topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_ADD_SUBTOPIC,
                 'subtopic_id': 1,
-                'title': 'Sample'
+                'title': 'Sample',
+                'url_fragment': 'dummy-fragment'
             })]
         )
         topic_services.save_new_topic(self.owner_id, topic)
@@ -365,6 +367,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         answer_group_dict = {
             'outcome': {
                 'dest': 'Introduction',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': '<p>Feedback</p>'
@@ -789,7 +792,7 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
             '%s' % i,
             self.owner_id,
             title='title %d' % i,
-            category='category%d' % i,
+            category=constants.ALL_CATEGORIES[i],
             end_state_name='End State',
             correctness_feedback_enabled=True
         ) for i in range(5)]
@@ -798,7 +801,7 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
             self.publish_exploration(self.owner_id, exp.id)
 
         topic = topic_domain.Topic.create_default_topic(
-            self.TOPIC_ID, 'topic', 'abbrev', 'description')
+            self.TOPIC_ID, 'topic', 'abbrev', 'description', 'fragm')
         topic.thumbnail_filename = 'thumbnail.svg'
         topic.thumbnail_bg_color = '#C6DCDA'
         topic.subtopics = [
@@ -807,6 +810,7 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-url')]
         topic.next_subtopic_id = 2
+        topic.skill_ids_for_diagnostic_test = ['skill_id_1']
         topic_services.save_new_topic(self.owner_id, topic)
         topic_services.publish_topic(self.TOPIC_ID, self.admin_id)
 

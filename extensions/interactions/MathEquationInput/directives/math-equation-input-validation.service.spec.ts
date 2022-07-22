@@ -58,6 +58,7 @@ describe('MathEquationInputValidationService', () => {
     currentState = 'First State';
     goodDefaultOutcome = oof.createFromBackendDict({
       dest: 'Second State',
+      dest_if_really_stuck: null,
       feedback: {
         html: '',
         content_id: ''
@@ -70,7 +71,7 @@ describe('MathEquationInputValidationService', () => {
 
     customizationArgs = {
       useFractionForDivision: false,
-      customOskLetters: {
+      allowedVariables: {
         value: ['x', 'y', 'm', 'x', 'c', 'a', 'b']
       }
     };
@@ -202,7 +203,7 @@ describe('MathEquationInputValidationService', () => {
     ];
     customizationArgs = {
       useFractionForDivision: false,
-      customOskLetters: {
+      allowedVariables: {
         value: ['y', 'a', 'b']
       }
     };
@@ -228,7 +229,7 @@ describe('MathEquationInputValidationService', () => {
     ];
     customizationArgs = {
       useFractionForDivision: false,
-      customOskLetters: {
+      allowedVariables: {
         value: ['y', 'x', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i']
       }
     };

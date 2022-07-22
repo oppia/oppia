@@ -42,7 +42,7 @@ import sys
 # the current working directory so that Git knows where to find python_utils.
 sys.path.append(os.getcwd())
 from scripts import common  # isort:skip  # pylint: disable=wrong-import-position
-from scripts import install_backend_python_libs # isort:skip  # pylint: disable=wrong-import-position
+from scripts import install_python_prod_dependencies # isort:skip  # pylint: disable=wrong-import-position
 
 GitRef = collections.namedtuple(
     'GitRef', ['local_ref', 'local_sha1', 'remote_ref', 'remote_sha1'])
@@ -61,6 +61,8 @@ PYTHON_CMD = 'python'
 OPPIA_PARENT_DIR = os.path.join(FILE_DIR, os.pardir, os.pardir, os.pardir)
 FRONTEND_TEST_CMDS = [
     PYTHON_CMD, '-m', 'scripts.run_frontend_tests', '--check_coverage']
+BACKEND_ASSOCIATED_TEST_FILE_CHECK_CMD = [
+    PYTHON_CMD, '-m', 'scripts.check_backend_associated_test_file']
 CI_PROTRACTOR_CHECK_CMDS = [
     PYTHON_CMD, '-m', 'scripts.check_e2e_tests_are_captured_in_ci']
 TYPESCRIPT_CHECKS_CMDS = [PYTHON_CMD, '-m', 'scripts.typescript_checks']
@@ -460,7 +462,7 @@ def check_for_backend_python_library_inconsistencies():
     If any inconsistencies are found, the script displays the inconsistencies
     and exits.
     """
-    mismatches = install_backend_python_libs.get_mismatches()
+    mismatches = install_python_prod_dependencies.get_mismatches()
 
     if mismatches:
         print(
@@ -517,6 +519,7 @@ def main(args=None):
         with ChangedBranch(branch):
             if not modified_files and not files_to_lint:
                 continue
+
             if files_to_lint:
                 lint_status = start_linter(files_to_lint)
                 if lint_status != 0:
@@ -530,6 +533,15 @@ def main(args=None):
                     'Push failed, please correct the mypy type annotation '
                     'issues above.')
                 sys.exit(mypy_check_status)
+
+            backend_associated_test_file_check_status = (
+                run_script_and_get_returncode(
+                    BACKEND_ASSOCIATED_TEST_FILE_CHECK_CMD))
+            if backend_associated_test_file_check_status != 0:
+                print(
+                    'Push failed due to some backend files lacking an '
+                    'associated test file.')
+                sys.exit(1)
 
             typescript_checks_status = 0
             if does_diff_include_ts_files(files_to_lint):

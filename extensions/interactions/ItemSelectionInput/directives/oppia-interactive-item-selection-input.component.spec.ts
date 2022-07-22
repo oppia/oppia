@@ -23,15 +23,28 @@ import { BrowserCheckerService } from 'domain/utilities/browser-checker.service'
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
+import { PlayerTranscriptService } from 'pages/exploration-player-page/services/player-transcript.service';
+import { Interaction } from 'domain/exploration/InteractionObjectFactory';
+import { WrittenTranslations } from 'domain/exploration/WrittenTranslationsObjectFactory';
+import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
+import { AudioTranslationLanguageService } from 'pages/exploration-player-page/services/audio-translation-language.service';
+import { StateCard } from 'domain/state_card/state-card.model';
+import { ItemSelectionAnswer } from 'interactions/answer-defs';
+import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 
 describe('oppiaInteractiveItemSelectionInput', function() {
   let component: InteractiveItemSelectionInputComponent;
   let fixture: ComponentFixture<InteractiveItemSelectionInputComponent>;
   let browserCheckerService: BrowserCheckerService;
   let currentInteractionService: CurrentInteractionService;
+  let playerTranscriptService: PlayerTranscriptService;
+  let displayedCard: StateCard;
 
   class MockInteractionAttributesExtractorService {
-    getValuesFromAttributes(interactionId, attributes) {
+    getValuesFromAttributes(
+        interactionId: InteractionSpecsKey, attributes: Record<string, string>
+    ) {
       return {
         choices: {
           value: JSON.parse(attributes.choicesWithValue)
@@ -47,8 +60,11 @@ describe('oppiaInteractiveItemSelectionInput', function() {
   }
 
   class MockCurrentInteractionService {
-    onSubmit(answer, rulesService) {}
-    registerCurrentInteraction(submitAnswerFn, validateExpressionFn) {
+    onSubmit(
+        answer: ItemSelectionAnswer, rulesService: CurrentInteractionService) {}
+
+    registerCurrentInteraction(
+        submitAnswerFn: Function, validateExpressionFn: Function) {
       submitAnswerFn();
       validateExpressionFn();
     }
@@ -79,7 +95,17 @@ describe('oppiaInteractiveItemSelectionInput', function() {
     browserCheckerService = TestBed.inject(BrowserCheckerService);
     currentInteractionService = TestBed.inject(CurrentInteractionService);
     fixture = TestBed.createComponent(InteractiveItemSelectionInputComponent);
+    playerTranscriptService = TestBed.inject(PlayerTranscriptService);
     component = fixture.componentInstance;
+
+    let contentId: string = 'content_id';
+    let interaction = {} as Interaction;
+    let writtenTranslations = {} as WrittenTranslations;
+    let recordedVoiceovers = new RecordedVoiceovers({});
+    let audioTranslation = {} as AudioTranslationLanguageService;
+    displayedCard = new StateCard(
+      'test_name', 'content', 'interaction', interaction, [],
+      recordedVoiceovers, writtenTranslations, contentId, audioTranslation);
   });
 
   describe('when only one choice is allowed to be selected', () => {
@@ -103,6 +129,7 @@ describe('oppiaInteractiveItemSelectionInput', function() {
     });
 
     it('should initialise component when user adds interaction', () => {
+      spyOn(playerTranscriptService, 'getCard').and.returnValue(displayedCard);
       component.ngOnInit();
 
       expect(component.choices).toEqual([
@@ -120,8 +147,22 @@ describe('oppiaInteractiveItemSelectionInput', function() {
       expect(component.notEnoughSelections).toBeTrue();
     });
 
+    it('should throw error if content id is null', () => {
+      component.choicesValue = [
+        {
+          html: 'choice 1',
+          _contentId: null
+        },
+      ] as SubtitledHtml[];
+
+      expect(() => {
+        component.getContentId();
+      }).toThrowError('Content id is null');
+    });
+
     it('should deselect previously selected option and select the option' +
     ' checked by the user', () => {
+      spyOn(playerTranscriptService, 'getCard').and.returnValue(displayedCard);
       let dummyMouseEvent = new MouseEvent('Mouse');
       spyOn(browserCheckerService, 'isMobileDevice').and.returnValue(false);
       spyOn(document, 'querySelector')
@@ -140,7 +181,7 @@ describe('oppiaInteractiveItemSelectionInput', function() {
             remove: () => {
               return;
             },
-            contains: (text) => {
+            contains: (text: string) => {
               return true;
             }
           }
@@ -154,7 +195,7 @@ describe('oppiaInteractiveItemSelectionInput', function() {
             remove: () => {
               return;
             },
-            contains: (text) => {
+            contains: (text: string) => {
               return true;
             }
           }
@@ -179,6 +220,7 @@ describe('oppiaInteractiveItemSelectionInput', function() {
 
     it('should not submit answer when user click an option if user is using a' +
     ' mobile', () => {
+      spyOn(playerTranscriptService, 'getCard').and.returnValue(displayedCard);
       let dummyMouseEvent = new MouseEvent('Mouse');
       spyOn(browserCheckerService, 'isMobileDevice').and.returnValue(true);
       spyOn(document, 'querySelector')
@@ -211,7 +253,7 @@ describe('oppiaInteractiveItemSelectionInput', function() {
             remove: () => {
               return;
             },
-            contains: (text) => {
+            contains: (text: string) => {
               return true;
             }
           }
@@ -256,6 +298,7 @@ describe('oppiaInteractiveItemSelectionInput', function() {
     });
 
     it('should initialise component when user adds interaction', () => {
+      spyOn(playerTranscriptService, 'getCard').and.returnValue(displayedCard);
       component.ngOnInit();
       expect(component.choices).toEqual([
         'choice 1', 'choice 2', 'choice 3'
@@ -273,6 +316,7 @@ describe('oppiaInteractiveItemSelectionInput', function() {
     });
 
     it('should toggle checkbox when user clicks checkbox', () => {
+      spyOn(playerTranscriptService, 'getCard').and.returnValue(displayedCard);
       component.ngOnInit();
       component.userSelections = {
         'choice 1': true,
@@ -280,7 +324,7 @@ describe('oppiaInteractiveItemSelectionInput', function() {
         'choice 3': false
       };
       expect(component.selectionCount).toBeUndefined();
-      expect(component.newQuestion).toBeUndefined();
+      expect(component.newQuestion).toBeFalse();
       expect(component.preventAdditionalSelections).toBeFalse();
       expect(component.notEnoughSelections).toBeTrue();
 
@@ -298,6 +342,7 @@ describe('oppiaInteractiveItemSelectionInput', function() {
 
     it('should prevent users from selecting more options when' +
     ' \'maxAllowableSelectionCount\' has been reached', () => {
+      spyOn(playerTranscriptService, 'getCard').and.returnValue(displayedCard);
       component.ngOnInit();
       component.userSelections = {
         'choice 1': true,

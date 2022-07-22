@@ -33,7 +33,6 @@ from core.domain import opportunity_services
 from core.domain import skill_fetchers
 from core.domain import state_domain
 from core.domain import suggestion_services
-from core.domain import topic_fetchers
 
 
 class SuggestionHandler(base.BaseHandler):
@@ -355,7 +354,7 @@ class ReviewableSuggestionsHandler(SuggestionsProviderHandler):
                     }]
                 }
             },
-            'topic_name': {
+            'exploration_id': {
                 'schema': {
                     'type': 'basestring'
                 },
@@ -376,24 +375,7 @@ class ReviewableSuggestionsHandler(SuggestionsProviderHandler):
             target_type, suggestion_type)
         limit = self.normalized_request.get('limit')
         offset = self.normalized_request.get('offset')
-        topic_name = self.normalized_request.get('topic_name')
-
-        opportunity_summary_exp_ids_specific_to_topic = None
-        if (topic_name is not None) and (
-                topic_name != feconf.ALL_LITERAL_CONSTANT):
-            topic = topic_fetchers.get_topic_by_name(topic_name)
-            if topic is None:
-                raise self.InvalidInputException(
-                    'The supplied input topic: %s is not valid' % topic_name)
-
-            exploration_opportunity_summaries = (
-                opportunity_services.
-                get_exploration_opportunity_summaries_by_topic_id(
-                    topic.id))
-
-            opportunity_summary_exp_ids_specific_to_topic = [
-                opportunity.id for opportunity
-                in exploration_opportunity_summaries]
+        exploration_id = self.normalized_request.get('exploration_id')
 
         suggestions = []
         next_offset = 0
@@ -402,7 +384,7 @@ class ReviewableSuggestionsHandler(SuggestionsProviderHandler):
                 suggestion_services.
                 get_reviewable_translation_suggestions_by_offset(
                     self.user_id,
-                    opportunity_summary_exp_ids_specific_to_topic,
+                    [exploration_id],
                     limit, offset))
         elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
             suggestions, next_offset = (
@@ -470,6 +452,27 @@ class UserSubmittedSuggestionsHandler(SuggestionsProviderHandler):
         suggestions, next_offset = (
             suggestion_services.get_submitted_suggestions_by_offset(
             self.user_id, suggestion_type, limit, offset))
+        if suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
+            translatable_suggestions = (
+                suggestion_services
+                .get_suggestions_with_translatable_explorations(
+                    suggestions))
+            while (
+                len(suggestions) > 0 and
+                len(translatable_suggestions) == 0
+            ):
+                # If all of the fetched suggestions are filtered out, then keep
+                # fetching until we have some suggestions to return or there
+                # are no more results.
+                suggestions, next_offset = (
+                    suggestion_services.get_submitted_suggestions_by_offset(
+                    self.user_id, suggestion_type, limit, next_offset))
+                translatable_suggestions = (
+                    suggestion_services
+                    .get_suggestions_with_translatable_explorations(
+                        suggestions))
+            suggestions = translatable_suggestions
+
         self._render_suggestions(target_type, suggestions, next_offset)
 
 
@@ -645,7 +648,10 @@ def _get_target_id_to_skill_opportunity_dict(suggestions):
 
 
 def _construct_exploration_suggestions(suggestions):
-    """Returns exploration suggestions with current exploration content.
+    """Returns exploration suggestions with current exploration content. This
+    method assumes that the supplied suggestions represent changes that are
+    still valid, e.g. the suggestions refer to content that still exist in the
+    linked exploration.
 
     Args:
         suggestions: list(BaseSuggestion). A list of suggestions.
@@ -653,35 +659,18 @@ def _construct_exploration_suggestions(suggestions):
     Returns:
         list(dict). List of suggestion dicts with an additional
         exploration_content_html field representing the target
-        exploration's current content. If the given suggestion refers to an
-        invalid content ID in the current exploration (this can happen if that
-        content was deleted after the suggestion was made), the corresponding
-        suggestion dict will be omitted from the return value.
+        exploration's current content.
     """
+    suggestion_dicts = []
     exp_ids = {suggestion.target_id for suggestion in suggestions}
     exp_id_to_exp = exp_fetchers.get_multiple_explorations_by_id(list(exp_ids))
-
-    suggestion_dicts = []
     for suggestion in suggestions:
         exploration = exp_id_to_exp[suggestion.target_id]
-        available_states = exploration.states
-        content_id_exists = False
-
-        # Checks whether the state name within change object of the suggestion
-        # is actually available in the target entity being suggested to and
-        # then find the availability of the content ID in the translatable
-        # content. See more - https://github.com/oppia/oppia/issues/14339
-        if suggestion.change.state_name in available_states:
-            content_id_exists = available_states[
-                suggestion.change.state_name].has_content_id(
-                    suggestion.change.content_id)
-
-        if content_id_exists and exploration.edits_allowed:
-            content_html = exploration.get_content_html(
-                suggestion.change.state_name, suggestion.change.content_id)
-            suggestion_dict = suggestion.to_dict()
-            suggestion_dict['exploration_content_html'] = content_html
-            suggestion_dicts.append(suggestion_dict)
+        content_html = exploration.get_content_html(
+            suggestion.change.state_name, suggestion.change.content_id)
+        suggestion_dict = suggestion.to_dict()
+        suggestion_dict['exploration_content_html'] = content_html
+        suggestion_dicts.append(suggestion_dict)
     return suggestion_dicts
 
 

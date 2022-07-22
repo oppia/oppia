@@ -29,6 +29,11 @@ import { InteractionAttributesExtractorService } from 'interactions/interaction-
 import { InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
 import { ItemSelectionInputRulesService } from 'interactions/ItemSelectionInput/directives/item-selection-input-rules.service';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import { AudioTranslationManagerService } from 'pages/exploration-player-page/services/audio-translation-manager.service';
+import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
+import { PlayerTranscriptService } from 'pages/exploration-player-page/services/player-transcript.service';
+import { StateCard } from 'domain/state_card/state-card.model';
+import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 
 @Component({
   selector: 'oppia-interactive-item-selection-input',
@@ -36,26 +41,36 @@ import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
   styleUrls: []
 })
 export class InteractiveItemSelectionInputComponent implements OnInit {
-  @Input() choicesWithValue: string;
-  @Input() maxAllowableSelectionCountWithValue: string;
-  @Input() minAllowableSelectionCountWithValue: string;
-  choices: string[];
-  choicesValue: SubtitledHtml[];
-  displayCheckboxes: boolean;
-  maxAllowableSelectionCount: number;
-  minAllowableSelectionCount: number;
-  newQuestion: boolean;
-  notEnoughSelections: boolean;
-  preventAdditionalSelections: boolean;
-  selectionCount: number;
-  userSelections: {[key: string]: boolean};
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() choicesWithValue!: string;
+  @Input() maxAllowableSelectionCountWithValue!: string;
+  @Input() minAllowableSelectionCountWithValue!: string;
+  choices!: string[];
+  choicesValue!: SubtitledHtml[];
+  maxAllowableSelectionCount!: number;
+  minAllowableSelectionCount!: number;
+  selectionCount!: number;
+  userSelections!: Record<string, boolean>;
+  displayedCard!: StateCard;
+  recordedVoiceovers!: RecordedVoiceovers;
+  COMPONENT_NAME_RULE_INPUT!: string;
+  displayCheckboxes: boolean = false;
+  newQuestion: boolean = false;
+  notEnoughSelections: boolean = false;
+  preventAdditionalSelections: boolean = false;
 
   constructor(
     private browserCheckerService: BrowserCheckerService,
     private currentInteractionService: CurrentInteractionService,
     private interactionAttributesExtractorService:
       InteractionAttributesExtractorService,
-    private itemSelectionInputRulesService: ItemSelectionInputRulesService) {}
+    private itemSelectionInputRulesService: ItemSelectionInputRulesService,
+    private audioTranslationManagerService: AudioTranslationManagerService,
+    private playerPositionService: PlayerPositionService,
+    private playerTranscriptService: PlayerTranscriptService
+  ) {}
 
   ngOnInit(): void {
     const {
@@ -87,6 +102,26 @@ export class InteractiveItemSelectionInputComponent implements OnInit {
       this.userSelections[this.choices[i]] = false;
     }
 
+    // Setup voiceover.
+    this.displayedCard = this.playerTranscriptService.getCard(
+      this.playerPositionService.getDisplayedCardIndex());
+    if (this.displayedCard) {
+      this.recordedVoiceovers = this.displayedCard.getRecordedVoiceovers();
+
+      // Combine labels for voiceover.
+      let combinedChoiceLabels = '';
+      for (const choiceLabel of this.choices) {
+        combinedChoiceLabels += this.audioTranslationManagerService
+          .cleanUpHTMLforVoiceover(choiceLabel);
+      }
+
+      // Say the choices aloud if autoplay is enabled.
+      this.audioTranslationManagerService.setSequentialAudioTranslations(
+        this.recordedVoiceovers.getBindableVoiceovers(this.getContentId()),
+        combinedChoiceLabels, this.COMPONENT_NAME_RULE_INPUT
+      );
+    }
+
     this.displayCheckboxes = this.maxAllowableSelectionCount > 1;
 
     // The following indicates that the number of answers is more than
@@ -98,6 +133,15 @@ export class InteractiveItemSelectionInputComponent implements OnInit {
     this.notEnoughSelections = this.minAllowableSelectionCount > 0;
     this.currentInteractionService.registerCurrentInteraction(
       this.submitAnswer.bind(this), this.validityCheckFn.bind(this));
+  }
+
+  getContentId(): string {
+    let contentId = this.choicesValue[0]._contentId;
+    if (contentId === null) {
+      throw new Error('Content id is null');
+    } else {
+      return contentId;
+    }
   }
 
   onToggleCheckbox(): void {

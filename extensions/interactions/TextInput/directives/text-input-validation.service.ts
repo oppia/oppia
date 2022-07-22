@@ -50,7 +50,7 @@ export type RequireOnlyOne<T, Keys extends keyof T> =
        & Partial<Record<Exclude<Keys, K>, undefined>>
      }[Keys];
 
-export type Validators = RequireOnlyOne<MinMaxValue, 'min_value' | 'max_value'>;
+export type Validator = RequireOnlyOne<MinMaxValue, 'min_value' | 'max_value'>;
 
 interface Warning {
   type: string;
@@ -94,7 +94,7 @@ export class TextInputValidationService {
       let textSpecs = InteractionSpecsConstants.INTERACTION_SPECS.TextInput;
       let customizationArgSpecs = textSpecs.customization_arg_specs;
       let rowsSpecs = customizationArgSpecs[1];
-      let validators = rowsSpecs.schema.validators as Validators[];
+      let validators = rowsSpecs.schema.validators as Validator[];
       let minRows = validators[0].min_value;
       let maxRows = validators[1].max_value;
       if ((maxRows && minRows) && (rows < minRows || rows > maxRows)) {
@@ -193,7 +193,8 @@ export class TextInputValidationService {
             (seenString) => textInputRulesService.Equals(
               seenString, {x: {
                 contentId: null, normalizedStrSet: currentStrings
-              }}))) {
+              },
+              contentId: null}))) {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
               message: `Rule ${ruleIndex + 1} from answer group ` +
@@ -204,7 +205,8 @@ export class TextInputValidationService {
             (seenString) => textInputRulesService.FuzzyEquals(
               seenString, {x: {
                 contentId: null, normalizedStrSet: currentStrings
-              }}))) {
+              },
+              contentId: null}))) {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
               message: `Rule ${ruleIndex + 1} from answer group ` +
@@ -218,7 +220,8 @@ export class TextInputValidationService {
             (seenString) => textInputRulesService.FuzzyEquals(
               seenString, {x: {
                 contentId: null, normalizedStrSet: currentStrings
-              }}))) {
+              },
+              contentId: null}))) {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.ERROR,
               message: `Rule ${ruleIndex + 1} from answer group ` +

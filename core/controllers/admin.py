@@ -91,7 +91,8 @@ class AdminHandler(base.BaseHandler):
                         'save_config_properties', 'revert_config_property',
                         'upload_topic_similarities',
                         'regenerate_topic_related_opportunities',
-                        'update_feature_flag_rules'
+                        'update_feature_flag_rules',
+                        'rollback_exploration_to_safe_state'
                     ]
                 },
                 # TODO(#13331): Remove default_value when it is confirmed that,
@@ -168,6 +169,12 @@ class AdminHandler(base.BaseHandler):
                         'type': 'object_dict',
                         'object_class': parameter_domain.PlatformParameterRule
                     }
+                },
+                'default_value': None
+            },
+            'exp_id': {
+                'schema': {
+                    'type': 'basestring'
                 },
                 'default_value': None
             }
@@ -268,6 +275,13 @@ class AdminHandler(base.BaseHandler):
                 result = {
                     'opportunities_count': opportunities_count
                 }
+            elif action == 'rollback_exploration_to_safe_state':
+                exp_id = self.normalized_payload.get('exp_id')
+                version = (
+                    exp_services.rollback_exploration_to_safe_state(exp_id))
+                result = {
+                    'version': version
+                }
             elif action == 'update_feature_flag_rules':
                 feature_name = self.normalized_payload.get('feature_name')
                 new_rules = self.normalized_payload.get('new_rules')
@@ -365,7 +379,7 @@ class AdminHandler(base.BaseHandler):
         state.update_interaction_hints(hints_list)
         state.update_interaction_default_outcome(
             state_domain.Outcome(
-                None, state_domain.SubtitledHtml(
+                None, None, state_domain.SubtitledHtml(
                     'feedback_id', '<p>Dummy Feedback</p>'),
                 True, [], None, None
             )
@@ -447,15 +461,17 @@ class AdminHandler(base.BaseHandler):
                 self.user_id, question_id_3, skill_id_3, 0.7)
 
             topic_1 = topic_domain.Topic.create_default_topic(
-                topic_id_1, 'Dummy Topic 1', 'dummy-topic-one', 'description')
+                topic_id_1, 'Dummy Topic 1', 'dummy-topic-one', 'description',
+                'fragm')
             topic_2 = topic_domain.Topic.create_default_topic(
-                topic_id_2, 'Empty Topic', 'empty-topic', 'description')
+                topic_id_2, 'Empty Topic', 'empty-topic', 'description',
+                'fragm')
 
             topic_1.add_canonical_story(story_id)
             topic_1.add_uncategorized_skill_id(skill_id_1)
             topic_1.add_uncategorized_skill_id(skill_id_2)
             topic_1.add_uncategorized_skill_id(skill_id_3)
-            topic_1.add_subtopic(1, 'Dummy Subtopic Title')
+            topic_1.add_subtopic(1, 'Dummy Subtopic Title', 'dummysubtopic')
             topic_1.move_skill_id_to_subtopic(None, 1, skill_id_2)
             topic_1.move_skill_id_to_subtopic(None, 1, skill_id_3)
 
@@ -552,7 +568,8 @@ class AdminHandler(base.BaseHandler):
                 [topic_domain.TopicChange({
                     'cmd': topic_domain.CMD_ADD_SUBTOPIC,
                     'subtopic_id': 1,
-                    'title': 'Dummy Subtopic Title'
+                    'title': 'Dummy Subtopic Title',
+                    'url_fragment': 'dummy-fragment'
                 })]
             )
 

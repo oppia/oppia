@@ -24,11 +24,12 @@ import { NgModule } from '@angular/core';
 import { AngularFireModule } from '@angular/fire';
 import { AngularFireAuth, AngularFireAuthModule, USE_EMULATOR } from '@angular/fire/auth';
 import { CustomFormsComponentsModule } from './forms/custom-forms-directives/custom-form-components.module';
-import { DynamicContentModule } from './angular-html-bind/dynamic-content.module';
+import { DynamicContentModule } from './interaction-display/dynamic-content.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MaterialModule } from 'modules/material.module';
 import { ObjectComponentsModule } from 'objects/object-components.module';
 import { SharedFormsModule } from './forms/shared-forms.module';
+import { RecommendationsModule } from './recommendations/recommendations.module';
 import { CommonElementsModule } from './common-layout-directives/common-elements/common-elements.module';
 import { RichTextComponentsModule } from 'rich_text_components/rich-text-components.module';
 import { CodeMirrorModule } from './code-mirror/codemirror.module';
@@ -62,6 +63,7 @@ import { TopicsAndSkillsDashboardNavbarBreadcrumbComponent } from 'pages/topics-
 import { ThreadTableComponent } from 'pages/exploration-editor-page/feedback-tab/thread-table/thread-table.component';
 import { SummaryListHeaderComponent } from './state-directives/answer-group-editor/summary-list-header.component';
 import { LearnerDashboardIconsComponent } from 'pages/learner-dashboard-page/learner-dashboard-icons.component';
+import { OutcomeEditorComponent } from './state-directives/outcome-editor/outcome-editor.component';
 import { OutcomeFeedbackEditorComponent } from './state-directives/outcome-editor/outcome-feedback-editor.component';
 import { OnScreenKeyboardComponent } from './on-screen-keyboard/on-screen-keyboard.component';
 import { RubricsEditorComponent } from './rubrics-editor/rubrics-editor.component';
@@ -102,6 +104,8 @@ import { SavePendingChangesModalComponent } from './save-pending-changes/save-pe
 import { AddHintModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-hint-modal.component';
 import { QuestionMisconceptionSelectorComponent } from './question-directives/question-misconception-selector/question-misconception-selector.component';
 import { ConversationSkinComponent } from 'pages/exploration-player-page/learner-experience/conversation-skin.component';
+import { EndChapterCheckMarkComponent } from 'pages/exploration-player-page/learner-experience/end-chapter-check-mark.component';
+import { EndChapterConfettiComponent } from 'pages/exploration-player-page/learner-experience/end-chapter-confetti.component';
 import { RatingsAndRecommendationsComponent } from 'pages/exploration-player-page/learner-experience/ratings-and-recommendations.component';
 import { LearnerAnswerInfoCard } from 'pages/exploration-player-page/learner-experience/learner-answer-info-card.component';
 import { FeedbackPopupComponent } from 'pages/exploration-player-page/layout-directives/feedback-popup.component';
@@ -124,6 +128,17 @@ import { SolutionEditor } from './state-directives/solution-editor/solution-edit
 import { OutcomeDestinationEditorComponent } from './state-directives/outcome-editor/outcome-destination-editor.component';
 import { StateSolutionEditorComponent } from './state-editor/state-solution-editor/state-solution-editor.component';
 import { StateInteractionEditorComponent } from './state-editor/state-interaction-editor/state-interaction-editor.component';
+import { TrainingPanelComponent } from 'pages/exploration-editor-page/editor-tab/training-panel/training-panel.component';
+import { TrainingModalComponent } from 'pages/exploration-editor-page/editor-tab/training-panel/training-modal.component';
+import { TrainingDataEditorPanelComponent } from 'pages/exploration-editor-page/editor-tab/training-panel/training-data-editor-panel-modal.component';
+import { TestInteractionPanel } from 'pages/exploration-editor-page/editor-tab/test-interaction-panel/test-interaction-panel.component';
+import { RuleEditorComponent } from './state-directives/rule-editor/rule-editor.component';
+import { HtmlSelectComponent } from './forms/custom-forms-directives/html-select.component';
+import { RuleTypeSelector } from './state-directives/rule-editor/rule-type-selector.directive';
+import { AddAnswerGroupModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-answer-group-modal.component';
+import { AnswerGroupEditor } from './state-directives/answer-group-editor/answer-group-editor.component';
+import { StateResponsesComponent } from './state-editor/state-responses-editor/state-responses.component';
+import { StateEditorComponent } from './state-editor/state-editor.component';
 
 // Pipes.
 import { StringUtilityPipesModule } from 'filters/string-utility-filters/string-utility-pipes.module';
@@ -134,7 +149,9 @@ import { SummarizeNonnegativeNumberPipe } from 'filters/summarize-nonnegative-nu
 import { AuthService } from 'services/auth.service';
 
 // Miscellaneous.
-import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
+import { SmartRouterModule } from 'hybrid-router-module-provider';
+import { StaleTabInfoModalComponent } from './stale-tab-info/stale-tab-info-modal.component';
+import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status-info/unsaved-changes-status-info-modal.component';
 
 @NgModule({
   imports: [
@@ -145,9 +162,9 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     CustomFormsComponentsModule,
     CommonElementsModule,
     CodeMirrorModule,
-    // TODO(#13443): Remove hybrid router module provider once all pages are
+    // TODO(#13443): Remove smart router module provider once all pages are
     // migrated to angular router.
-    HybridRouterModuleProvider.provide(),
+    SmartRouterModule,
     MaterialModule,
     NgBootstrapModule,
     DynamicContentModule,
@@ -156,8 +173,10 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     RichTextComponentsModule,
     ObjectComponentsModule,
     OppiaCkEditor4Module,
+    RichTextComponentsModule,
     SearchBarModule,
     SharedFormsModule,
+    RecommendationsModule,
     StringUtilityPipesModule,
     AngularFireModule.initializeApp(AuthService.firebaseConfig),
     AngularFireAuthModule,
@@ -182,6 +201,8 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     ContinueButtonComponent,
     ContentLanguageSelectorComponent,
     ConversationSkinComponent,
+    EndChapterCheckMarkComponent,
+    EndChapterConfettiComponent,
     ConversationSkinEmbedComponent,
     CreateNewSkillModalComponent,
     CreateActivityModalComponent,
@@ -210,6 +231,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     MultiSelectionFieldComponent,
     OnScreenKeyboardComponent,
     OutcomeDestinationEditorComponent,
+    OutcomeEditorComponent,
     OutcomeFeedbackEditorComponent,
     ProfileLinkImageComponent,
     ProfileLinkTextComponent,
@@ -260,7 +282,20 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     SolutionEditor,
     SolutionExplanationEditor,
     StateSolutionEditorComponent,
-    StateInteractionEditorComponent
+    StateInteractionEditorComponent,
+    StaleTabInfoModalComponent,
+    UnsavedChangesStatusInfoModalComponent,
+    TrainingPanelComponent,
+    TrainingModalComponent,
+    TrainingDataEditorPanelComponent,
+    TestInteractionPanel,
+    RuleEditorComponent,
+    HtmlSelectComponent,
+    RuleTypeSelector,
+    AddAnswerGroupModalComponent,
+    AnswerGroupEditor,
+    StateResponsesComponent,
+    StateEditorComponent
   ],
 
   entryComponents: [
@@ -274,6 +309,8 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     ConceptCardComponent,
     ContentLanguageSelectorComponent,
     ConversationSkinComponent,
+    EndChapterCheckMarkComponent,
+    EndChapterConfettiComponent,
     ConversationSkinEmbedComponent,
     CreateNewSkillModalComponent,
     CreateActivityModalComponent,
@@ -307,6 +344,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     ExplorationEmbedButtonModalComponent,
     LearnerAnswerInfoCard,
     OutcomeDestinationEditorComponent,
+    OutcomeEditorComponent,
     OutcomeFeedbackEditorComponent,
     HintAndSolutionButtonsComponent,
     HintEditorComponent,
@@ -352,7 +390,20 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     SolutionEditor,
     SolutionExplanationEditor,
     StateSolutionEditorComponent,
-    StateInteractionEditorComponent
+    StateInteractionEditorComponent,
+    StaleTabInfoModalComponent,
+    UnsavedChangesStatusInfoModalComponent,
+    TrainingPanelComponent,
+    TrainingModalComponent,
+    TrainingDataEditorPanelComponent,
+    TestInteractionPanel,
+    RuleEditorComponent,
+    HtmlSelectComponent,
+    RuleTypeSelector,
+    AddAnswerGroupModalComponent,
+    AnswerGroupEditor,
+    StateResponsesComponent,
+    StateEditorComponent
   ],
 
   exports: [
@@ -383,6 +434,8 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     ContinueButtonComponent,
     ContentLanguageSelectorComponent,
     ConversationSkinComponent,
+    EndChapterCheckMarkComponent,
+    EndChapterConfettiComponent,
     ConversationSkinEmbedComponent,
     CreateNewSkillModalComponent,
     CreateActivityModalComponent,
@@ -415,6 +468,7 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     RubricsEditorComponent,
     OnScreenKeyboardComponent,
     OutcomeDestinationEditorComponent,
+    OutcomeEditorComponent,
     OutcomeFeedbackEditorComponent,
     ProgressNavComponent,
     StateContentEditorComponent,
@@ -456,6 +510,17 @@ import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
     SolutionExplanationEditor,
     StateSolutionEditorComponent,
     StateInteractionEditorComponent,
+    TrainingPanelComponent,
+    TrainingModalComponent,
+    TrainingDataEditorPanelComponent,
+    TestInteractionPanel,
+    RuleEditorComponent,
+    HtmlSelectComponent,
+    RuleTypeSelector,
+    AddAnswerGroupModalComponent,
+    AnswerGroupEditor,
+    StateResponsesComponent,
+    StateEditorComponent
   ],
 })
 

@@ -70,12 +70,19 @@ class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
         changelist = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_ADD_SUBTOPIC,
             'title': 'Title',
-            'subtopic_id': 1
+            'subtopic_id': 1,
+            'url_fragment': 'dummy-subtopic'
         }), topic_domain.TopicChange({
             'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
             'old_subtopic_id': None,
             'new_subtopic_id': 1,
             'skill_id': self.skill_id
+        }), topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+            'property_name': (
+                topic_domain.TOPIC_PROPERTY_SKILL_IDS_FOR_DIAGNOSTIC_TEST),
+            'old_value': [],
+            'new_value': [self.skill_id]
         })]
         topic_services.update_topic_and_subtopic_pages(
             self.admin_id, self.topic_id, changelist, 'Added subtopic.')
@@ -575,7 +582,8 @@ class TopicEditorTests(
             }, {
                 'cmd': 'add_subtopic',
                 'subtopic_id': 2,
-                'title': 'Title2'
+                'title': 'Title2',
+                'url_fragment': 'subtopic-fragment-two'
             }, {
                 'cmd': 'update_subtopic_property',
                 'property_name': 'url_fragment',
@@ -798,7 +806,8 @@ class TopicEditorTests(
             }, {
                 'cmd': 'add_subtopic',
                 'subtopic_id': 2,
-                'title': 'Title2'
+                'title': 'Title2',
+                'url_fragment': 'subtopic-frag-two'
             }, {
                 'cmd': 'update_subtopic_property',
                 'property_name': 'url_fragment',

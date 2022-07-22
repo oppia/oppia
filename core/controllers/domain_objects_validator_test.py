@@ -165,6 +165,7 @@ class ValidateStateDictInStateYamlHandler(test_utils.GenericTestBase):
                         'html': ''
                     },
                     'dest': 'State A',
+                    'dest_if_really_stuck': None,
                     'refresher_exploration_id': None,
                     'missing_prerequisite_skill_id': None,
                     'labelled_as_correct': False
@@ -244,22 +245,3 @@ class ValidateSuggestionImagesTests(test_utils.GenericTestBase):
             ) as f:
                 files[filename] = f.read()
         domain_objects_validator.validate_suggestion_images(files)
-
-
-class ValidateParamsDict(test_utils.GenericTestBase):
-    """Tests to validate the data type of params"""
-
-    def test_invalid_type_raises_exception(self):
-        incorrect_type = 13
-        with self.assertRaisesRegex(
-            Exception, 'Excepted dict, received %s' % incorrect_type):
-            domain_objects_validator.validate_params_dict(incorrect_type)
-
-        incorrect_type = 'param1'
-        with self.assertRaisesRegex(
-            Exception, 'Excepted dict, received %s' % incorrect_type):
-            domain_objects_validator.validate_params_dict(incorrect_type)
-
-    def test_valid_type_raises_no_exception(self):
-        correct_type = {}
-        domain_objects_validator.validate_params_dict(correct_type)

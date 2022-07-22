@@ -13,9 +13,9 @@
                 <div class="col-2">
                   <schema-based-editor [localValue]="data[customizationArgSpec.backend_attr]"
                                        (localValueChange)="updateQueryData($event, customizationArgSpec.backend_attr)"
-                                       [schema]="getSchema(customizationArgSpec)"
-                                       [notRequired]="isFieldRequired.bind(this)"
-                                       class="protractor-test-email-dashboard-input-{{ idx }}">
+                                       [schema]="customizationArgSpec.schema"
+                                       [notRequired]="isRequired"
+                                       class="e2e-test-email-dashboard-input-{{ idx }}">
                   </schema-based-editor>
                 </div>
               </div>
@@ -23,7 +23,7 @@
             <input type="submit"
                    value="submit query"
                    [disabled]="areAllInputsEmpty()"
-                   class="protractor-test-submit-query-button">
+                   class="e2e-test-submit-query-button">
             <input type="reset" value="reset" (click)="resetForm()">
           </form>
         </mat-card>
@@ -50,10 +50,10 @@
           <td>{{ q.id }}</td>
           <td>{{ q.createdOn }}</td>
           <td>{{ q.submitterUsername }}</td>
-          <td class="protractor-test-status-{{ idx }}">{{ q.status }}</td>
-          <td class="protractor-test-number-of-users-{{ idx }}">{{ q.numQualifiedUsers }}</td>
+          <td class="e2e-test-status-{{ idx }}">{{ q.status }}</td>
+          <td class="e2e-test-number-of-users-{{ idx }}">{{ q.numQualifiedUsers }}</td>
           <td>
-            <button (click)="recheckStatus(idx)" class="protractor-test-check-status-button-{{ idx }}">
+            <button (click)="recheckStatus(idx)" class="e2e-test-check-status-button-{{ idx }}">
               Re-check status
             </button>
           </td>
