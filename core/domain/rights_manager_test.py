@@ -281,6 +281,13 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.assertFalse(rights_manager.check_can_delete_activity(
             self.user_b, exp_rights))
 
+    def test_get_activity_rights_raise_error_for_invalid_activity_type(
+        self
+    ) -> None:
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            Exception, 'Cannot get activity rights for unknown activity'):
+            rights_manager._get_activity_rights('invalid_type', self.user_id_a)
+
     def test_inviting_playtester_to_exploration(self) -> None:
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
         exp_services.save_new_exploration(self.user_id_a, exp)  # type: ignore[no-untyped-call]
@@ -808,6 +815,23 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             self.user_a, self.EXP_ID, self.user_id_b)
         exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
         self.assertFalse(exp_rights.is_editor(self.user_id_b))
+
+    def test_deassign_editor_is_successful_with_commit_message_having_anonymous(
+        self
+    ) -> None:
+        exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
+        exp_services.save_new_exploration(self.user_id_a, exp)  # type: ignore[no-untyped-call]
+
+        rights_manager.assign_role_for_exploration(
+            self.user_a, self.EXP_ID, self.user_id_b, rights_domain.ROLE_EDITOR)
+        exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
+        self.assertTrue(exp_rights.is_editor(self.user_id_b))
+
+        with self.swap_to_always_return(user_services, 'get_usernames', [None]):
+            rights_manager.deassign_role_for_exploration(
+                self.user_a, self.EXP_ID, self.user_id_b)
+            exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
+            self.assertFalse(exp_rights.is_editor(self.user_id_b))
 
     def test_deassign_owner_is_successful(self) -> None:
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)

@@ -1123,6 +1123,7 @@ def _deassign_role(
             % (activity_type, activity_id))
 
     assignee_username = user_services.get_usernames([removed_user_id])[0]
+    print(assignee_username)
     if assignee_username is None:
         assignee_username = 'ANONYMOUS'
     commit_message = 'Remove %s from role %s for %s' % (
