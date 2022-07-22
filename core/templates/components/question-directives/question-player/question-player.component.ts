@@ -13,26 +13,26 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the questions player directive.
+ * @fileoverview Component for the questions player directive.
  */
 
 import { Component, Input, OnDestroy, OnInit, SecurityContext } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { Subscription } from 'rxjs';
-import { QuestionPlayerConceptCardModalComponent } from './question-player-concept-card-modal.component';
-import { SkillMasteryModalComponent } from './skill-mastery-modal.component';
 import { DomSanitizer } from '@angular/platform-browser';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { ExplorationPlayerStateService } from 'pages/exploration-player-page/services/exploration-player-state.service';
+import { Location } from '@angular/common';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
 import { PreventPageUnloadEventService } from 'services/prevent-page-unload-event.service';
+import { QuestionPlayerConceptCardModalComponent } from './question-player-concept-card-modal.component';
+import { QuestionPlayerConstants } from 'components/question-directives/question-player/question-player.constants';
 import { QuestionPlayerStateService } from './services/question-player-state.service';
+import { SkillMasteryBackendApiService } from 'domain/skill/skill-mastery-backend-api.service';
+import { SkillMasteryModalComponent } from './skill-mastery-modal.component';
+import { State } from 'domain/state/StateObjectFactory';
+import { Subscription } from 'rxjs';
 import { UserService } from 'services/user.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { QuestionPlayerConstants } from 'components/question-directives/question-player/question-player.constants';
-import { SkillMasteryBackendApiService } from 'domain/skill/skill-mastery-backend-api.service';
-import { Location } from '@angular/common';
-import { State } from 'domain/state/StateObjectFactory';
 
 interface QuestionData {
   linkedSkillIds: string[];
@@ -56,6 +56,15 @@ interface MasteryChangePerQuestion {
 interface ScorePerSkill {
   score: number;
   total: number;
+  description: string;
+}
+
+interface ScorePerSkillMapping {
+  [skillId: string]: ScorePerSkill;
+}
+
+interface MasteryPerSkillMapping {
+  [key: string]: number;
 }
 
 @Component({
@@ -73,24 +82,24 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
   totalScore: number;
   allQuestions: number;
   finalCorrect: number;
-  scorePerSkillMapping: object;
+  scorePerSkillMapping: ScorePerSkillMapping;
   testIsPassed: boolean;
-  masteryPerSkillMapping: {[key: string]: number};
+  masteryPerSkillMapping: MasteryPerSkillMapping;
   failedSkillIds: string[];
   userIsLoggedIn: boolean;
   canCreateCollections: boolean;
 
   constructor(
-    private _sanitizer: DomSanitizer,
+    private explorationPlayerStateService: ExplorationPlayerStateService,
+    private location: Location,
+    private ngbModal: NgbModal,
+    private playerPositionService: PlayerPositionService,
     private preventPageUnloadEventService: PreventPageUnloadEventService,
     private questionPlayerStateService: QuestionPlayerStateService,
-    private userService: UserService,
-    private playerPositionService: PlayerPositionService,
-    private explorationPlayerStateService: ExplorationPlayerStateService,
-    private windowRef: WindowRef,
-    private ngbModal: NgbModal,
     private skillMasteryBackendApiService: SkillMasteryBackendApiService,
-    private location: Location
+    private userService: UserService,
+    private windowRef: WindowRef,
+    private _sanitizer: DomSanitizer
   ) {}
 
   calculateScores(questionStateData: State): void {

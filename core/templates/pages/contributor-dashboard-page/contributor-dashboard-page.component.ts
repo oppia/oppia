@@ -16,22 +16,22 @@
  * @fileoverview Component for the contributor dashboard page.
  */
 
-import { Component, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { ContributorDashboardConstants } from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
-import { TranslationTopicService } from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
-import { LocalStorageService } from 'services/local-storage.service';
-import { UserService } from 'services/user.service';
-import { ContributionOpportunitiesService } from './services/contribution-opportunities.service';
-import { LanguageUtilService } from 'domain/utilities/language-util.service';
-import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
-import { ContributionAndReviewService } from './services/contribution-and-review.service';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import AppConstants from 'assets/constants';
+import { Component, OnInit } from '@angular/core';
+import { ContributionAndReviewService } from './services/contribution-and-review.service';
+import { ContributionOpportunitiesService } from './services/contribution-opportunities.service';
+import { ContributorDashboardConstants } from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
+import { LanguageUtilService } from 'domain/utilities/language-util.service';
+import { LocalStorageService } from 'services/local-storage.service';
 import { SafeUrl } from '@angular/platform-browser';
 import { SvgSanitizerService } from 'services/svg-sanitizer.service';
+import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
+import { TranslationTopicService } from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { UserService } from 'services/user.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 interface TabsDetails {
   submitQuestionTab: {
@@ -46,7 +46,7 @@ interface TabsDetails {
 export class ContributorDashboardPageComponent
   implements OnInit {
   defaultHeaderVisible: boolean;
-  profilePictureDataUrl: SafeUrl | string | undefined;
+  profilePictureDataUrl: SafeUrl | string;
   username: string;
   userInfoIsLoading: boolean;
   userIsLoggedIn: boolean;
@@ -62,17 +62,17 @@ export class ContributorDashboardPageComponent
   activeTabName: string;
 
   constructor(
-    private windowRef: WindowRef,
-    private localStorageService: LocalStorageService,
-    private userService: UserService,
-    private translationTopicService: TranslationTopicService,
-    private contributionOpportunitiesService: ContributionOpportunitiesService,
-    private urlInterpolationService: UrlInterpolationService,
-    private languageUtilService: LanguageUtilService,
-    private translationLanguageService: TranslationLanguageService,
     private contributionAndReviewService: ContributionAndReviewService,
+    private contributionOpportunitiesService: ContributionOpportunitiesService,
     private focusManagerService: FocusManagerService,
-    private svgSanitizerService: SvgSanitizerService
+    private languageUtilService: LanguageUtilService,
+    private localStorageService: LocalStorageService,
+    private svgSanitizerService: SvgSanitizerService,
+    private translationLanguageService: TranslationLanguageService,
+    private translationTopicService: TranslationTopicService,
+    private urlInterpolationService: UrlInterpolationService,
+    private userService: UserService,
+    private windowRef: WindowRef,
   ) {}
 
   onTabClick(activeTabName: string): void {

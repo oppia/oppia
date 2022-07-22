@@ -18,24 +18,24 @@
 
 import cloneDeep from 'lodash/cloneDeep';
 import { ActiveContributionDict, TranslationSuggestionReviewModalComponent } from '../modal-templates/translation-suggestion-review-modal.component';
-import { NgbModalRef, NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { Subscription } from 'rxjs';
-import { QuestionSuggestionReviewModalComponent } from '../modal-templates/question-suggestion-review-modal.component';
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { ContextService } from 'services/context.service';
-import { ContributorDashboardConstants } from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
-import { ContributionOpportunitiesService } from '../services/contribution-opportunities.service';
-import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
-import { TranslationTopicService } from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
 import { AlertsService } from 'services/alerts.service';
-import { UserService } from 'services/user.service';
-import { ContributionAndReviewService } from '../services/contribution-and-review.service';
-import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe';
-import { Question, QuestionBackendDict, QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
-import { MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
-import { Rubric } from 'domain/skill/rubric.model';
 import { AppConstants } from 'app.constants';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ContextService } from 'services/context.service';
+import { ContributionAndReviewService } from '../services/contribution-and-review.service';
+import { ContributionOpportunitiesService } from '../services/contribution-opportunities.service';
+import { ContributorDashboardConstants } from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe';
+import { MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
+import { NgbModalRef, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Question, QuestionBackendDict, QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
+import { QuestionSuggestionReviewModalComponent } from '../modal-templates/question-suggestion-review-modal.component';
+import { Rubric } from 'domain/skill/rubric.model';
+import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
+import { Subscription } from 'rxjs';
+import { TranslationTopicService } from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
+import { UserService } from 'services/user.service';
 
 
 export interface Suggestion {
@@ -50,15 +50,7 @@ export interface Suggestion {
   author_name: string;
 }
 
-interface QuestionContributionsSummaryList {
-  id: string;
-  heading: string;
-  subheading: string;
-  labelText: string;
-  labelColor: string;
-  actionButtonTitle: string;
-}
-interface TranslationContributionsSummaryList {
+export interface QuestionContributionsSummaryList {
   id: string;
   heading: string;
   subheading: string;
@@ -67,25 +59,64 @@ interface TranslationContributionsSummaryList {
   actionButtonTitle: string;
 }
 
-interface OpportunitiesDictsObject {
+export interface TranslationContributionsSummaryList {
+  id: string;
+  heading: string;
+  subheading: string;
+  labelText: string;
+  labelColor: string;
+  actionButtonTitle: string;
+}
+
+export interface OpportunitiesDictsObject {
   opportunitiesDicts: unknown;
   more: unknown;
 }
 
-interface ContributionDetails {
+export interface ContributionDetails {
   skill_description: string;
   skill_rubrics: Rubric[];
 }
 
-interface ContributionTabs {
+export interface ContributionTabs {
   suggestionType: string;
   text: string;
   enabled: boolean;
 }
 
-interface SuggestionIdToSuggestions {
+export interface SuggestionIdToSuggestions {
   suggestion: Suggestion;
-  details: unknown;
+  details: string;
+}
+
+export interface SUGGESTION_LABELS {
+  [key: string]: {
+    text: string;
+    color: string;
+  };
+}
+
+export interface SuggestionContributions {
+  suggestion_type: string;
+  suggestion_id: string;
+  target_id: string;
+  change: {
+    content_html: string;
+    translation_html: string;
+  };
+  status: string;
+}
+
+export interface Contributions {
+  [key: string]: {
+    details: object | string;
+    suggestion: SuggestionContributions;
+  };
+}
+
+export interface ReviewTabs {
+  suggestionType: string;
+  text: string;
 }
 
 @Component({
@@ -101,29 +132,29 @@ export class ContributionsAndReview
   TAB_TYPE_CONTRIBUTIONS: string;
   TAB_TYPE_REVIEWS: string;
   activeExplorationId: string;
-  SUGGESTION_LABELS: object;
-  contributions: object;
+  SUGGESTION_LABELS: SUGGESTION_LABELS;
+  contributions: Contributions[] | Contributions;
   userDetailsLoading: boolean;
   userIsLoggedIn: boolean;
   activeTabType: string;
   activeSuggestionType: string;
   dropdownShown: boolean;
   activeDropdownTabChoice: string;
-  reviewTabs: object[];
+  reviewTabs: ReviewTabs[];
   contributionTabs: ContributionTabs[];
   tabNameToOpportunityFetchFunction: unknown;
 
   constructor(
-    private ngbModal: NgbModal,
-    private contributionAndReviewService: ContributionAndReviewService,
-    private contributionOpportunitiesService: ContributionOpportunitiesService,
     private alertsService: AlertsService,
     private contextService: ContextService,
+    private contributionAndReviewService: ContributionAndReviewService,
+    private contributionOpportunitiesService: ContributionOpportunitiesService,
+    private formatRtePreviewPipe: FormatRtePreviewPipe,
+    private ngbModal: NgbModal,
+    private questionObjectFactory: QuestionObjectFactory,
     private skillBackendApiService: SkillBackendApiService,
     private translationTopicService: TranslationTopicService,
     private userService: UserService,
-    private formatRtePreviewPipe: FormatRtePreviewPipe,
-    private questionObjectFactory: QuestionObjectFactory,
   ) {}
 
   getQuestionContributionsSummary(
@@ -377,7 +408,6 @@ export class ContributionsAndReview
     this.contributionAndReviewService.setActiveSuggestionType(suggestionType);
     this.activeDropdownTabChoice = this.getActiveDropdownTabChoice();
     this.dropdownShown = false;
-    this.contributions = {};
     this.activeExplorationId = null;
     this.contributionOpportunitiesService
       .reloadOpportunitiesEventEmitter.emit();

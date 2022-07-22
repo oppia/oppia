@@ -276,7 +276,7 @@ describe('Question Suggestion Editor Modal Component', () => {
     fixture.destroy();
   });
 
-  it('should initialize $scope properties after component is initialized',
+  it('should initialize component properties after component is initialized',
     () => {
       spyOn(component, 'isQuestionValid').and.returnValue(false);
       spyOn(component, 'setDifficultyString').and.stub();

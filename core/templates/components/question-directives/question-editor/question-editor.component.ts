@@ -16,55 +16,56 @@
  * @fileoverview Component for the questions editor component.
  */
 
+import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { Subscription } from 'rxjs';
+import { EditabilityService } from 'services/editability.service';
+import { Hint } from 'domain/exploration/HintObjectFactory';
+import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
+import { LoaderService } from 'services/loader.service';
 import { MarkAllAudioAndTranslationsAsNeedingUpdateModalComponent } from 'components/forms/forms-templates/mark-all-audio-and-translations-as-needing-update-modal.component';
+import { MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
+import { Question } from 'domain/question/QuestionObjectFactory';
+import { QuestionUpdateService } from 'domain/question/question-update.service';
+import { Solution } from 'domain/exploration/SolutionObjectFactory';
+import { SolutionValidityService } from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
+import { State } from 'domain/state/StateObjectFactory';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import { EditabilityService } from 'services/editability.service';
-import { SolutionValidityService } from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
-import { LoaderService } from 'services/loader.service';
-import { QuestionUpdateService } from 'domain/question/question-update.service';
-import cloneDeep from 'lodash/cloneDeep';
+import { Subscription } from 'rxjs';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
-import { Hint } from 'domain/exploration/HintObjectFactory';
-import { Solution } from 'domain/exploration/SolutionObjectFactory';
-import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
-import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
-import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
-import { Question } from 'domain/question/QuestionObjectFactory';
-import { State } from 'domain/state/StateObjectFactory';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import cloneDeep from 'lodash/cloneDeep';
 
 @Component({
   selector: 'oppia-question-editor',
   templateUrl: './question-editor.component.html'
 })
 export class QuestionEditorComponent implements OnInit, OnDestroy {
-  @Input() questionId: unknown;
-  @Input() misconceptionsBySkill: object;
   @Input() canEditQuestion: boolean;
+  @Input() misconceptionsBySkill: MisconceptionSkillMap;
   @Input() question: Question;
+  @Input() questionId: string;
   @Input() questionStateData: State;
-  @Output() questionChanged = new EventEmitter();
+  @Output() questionChanged = new EventEmitter<void>();
 
   directiveSubscriptions = new Subscription();
-  oppiaBlackImgUrl: string;
   interactionIsShown: boolean;
+  oppiaBlackImgUrl: string;
   stateEditorInitialized: boolean;
 
   constructor(
-    private urlInterpolationService: UrlInterpolationService,
-    private stateEditorService: StateEditorService,
-    private stateInteractionIdService: StateInteractionIdService,
+    private changeDetectionRef: ChangeDetectorRef,
     private editabilityService: EditabilityService,
-    private solutionValidityService: SolutionValidityService,
     private loaderService: LoaderService,
     private ngbModal: NgbModal,
-    private changeDetectionRef: ChangeDetectorRef,
     private questionUpdateService: QuestionUpdateService,
+    private solutionValidityService: SolutionValidityService,
+    private stateEditorService: StateEditorService,
+    private stateInteractionIdService: StateInteractionIdService,
+    private urlInterpolationService: UrlInterpolationService,
   ) { }
 
   showMarkAllAudioAsNeedingUpdateModalIfRequired(contentIds: string[]): void {

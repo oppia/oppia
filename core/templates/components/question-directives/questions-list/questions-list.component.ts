@@ -16,37 +16,38 @@
  * @fileoverview Component for the questions list.
  */
 
-import { ChangeDetectorRef, Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { ContextService } from 'services/context.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { CategorizedSkills, SelectSkillModalComponent } from 'components/skill-selector/select-skill-modal.component';
-import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
-import { SkillDifficulty } from 'domain/skill/skill-difficulty.model';
-import { Subscription } from 'rxjs';
-import { ConfirmQuestionExitModalComponent } from '../modal-templates/confirm-question-exit-modal.component';
-import { QuestionEditorSaveModalComponent } from '../modal-templates/question-editor-save-modal.component';
-import { EditableQuestionBackendApiService } from 'domain/question/editable-question-backend-api.service';
-import { QuestionSummaryForOneSkill } from 'domain/question/question-summary-for-one-skill-object.model';
-import { SkillEditorRoutingService } from 'pages/skill-editor-page/services/skill-editor-routing.service';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { QuestionsListService } from 'services/questions-list.service';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
-import { AppConstants } from 'app.constants';
-import { UtilsService } from 'services/utils.service';
-import { QuestionUndoRedoService } from 'domain/editor/undo_redo/question-undo-redo.service';
 import { AlertsService } from 'services/alerts.service';
+import { AppConstants } from 'app.constants';
+import { CategorizedSkills, SelectSkillModalComponent } from 'components/skill-selector/select-skill-modal.component';
+import { ChangeDetectorRef, Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
+import { ConfirmQuestionExitModalComponent } from '../modal-templates/confirm-question-exit-modal.component';
+import { ContextService } from 'services/context.service';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { EditableQuestionBackendApiService } from 'domain/question/editable-question-backend-api.service';
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
-import { Question, QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { MisconceptionObjectFactory, MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
-import { QuestionValidationService } from 'services/question-validation.service';
-import { State } from 'domain/state/StateObjectFactory';
-import INTERACTION_SPECS from 'interactions/interaction_specs.json';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { Question, QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
+import { QuestionEditorSaveModalComponent } from '../modal-templates/question-editor-save-modal.component';
+import { QuestionsListService } from 'services/questions-list.service';
 import { QuestionSummary } from 'domain/question/question-summary-object.model';
-import { SkillSummary } from 'domain/skill/skill-summary.model';
+import { QuestionSummaryForOneSkill } from 'domain/question/question-summary-for-one-skill-object.model';
+import { QuestionUndoRedoService } from 'domain/editor/undo_redo/question-undo-redo.service';
+import { QuestionValidationService } from 'services/question-validation.service';
+import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
+import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
+import { SkillDifficulty } from 'domain/skill/skill-difficulty.model';
+import { SkillEditorRoutingService } from 'pages/skill-editor-page/services/skill-editor-routing.service';
 import { SkillLinkageModificationsArray } from 'domain/question/editable-question-backend-api.service';
+import { SkillSummary } from 'domain/skill/skill-summary.model';
+import { State } from 'domain/state/StateObjectFactory';
+import { Subscription } from 'rxjs';
+import { UtilsService } from 'services/utils.service';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import INTERACTION_SPECS from 'interactions/interaction_specs.json';
+import { Rubric } from 'domain/skill/rubric.model';
 
 interface GroupedSkillSummaries {
   current: unknown[];
@@ -58,58 +59,58 @@ interface GroupedSkillSummaries {
   templateUrl: './questions-list.component.html'
 })
 export class QuestionsListComponent implements OnInit, OnDestroy, OnChanges {
-  @Input() skillDescriptionsAreShown: boolean;
-  @Input() selectSkillModalIsShown: boolean;
   @Input() allSkillSummaries: ShortSkillSummary[];
   @Input() canEditQuestion: boolean;
-  @Input() skillIdToRubricsObject: object;
-  @Input() selectedSkillId: string;
   @Input() groupedSkillSummaries: GroupedSkillSummaries;
+  @Input() selectedSkillId: string;
+  @Input() selectSkillModalIsShown: boolean;
+  @Input() skillIdToRubricsObject: Record<string, Rubric>;
   @Input() skillsCategorizedByTopics: CategorizedSkills;
   @Input() untriagedSkillSummaries: SkillSummary[];
+  @Input() skillDescriptionsAreShown: boolean;
 
-  directiveSubscriptions = new Subscription();
-  showDifficultyChoices: boolean;
-  associatedSkillSummaries;
-  editorIsOpen: boolean;
-  deletedQuestionIds;
-  questionIsBeingUpdated: boolean;
-  difficultyCardIsShown: boolean;
-  questionIsBeingSaved: boolean;
-  question: Question;
-  questionId: string | null;
-  questionStateData: State;
-  newQuestionIsBeingCreated: boolean;
-  newQuestionSkillIds: string[];
-  linkedSkillsWithDifficulty: SkillDifficulty[];
-  isSkillDifficultyChanged: boolean;
-  newQuestionSkillDifficulties: number[] | number;
-  skillLinkageModificationsArray: SkillLinkageModificationsArray[];
-  misconceptionsBySkill: MisconceptionSkillMap;
+  associatedSkillSummaries: ShortSkillSummary[];
+  deletedQuestionIds: string[];
   difficulty: number;
+  difficultyCardIsShown: boolean;
+  editorIsOpen: boolean;
+  isSkillDifficultyChanged: boolean;
+  linkedSkillsWithDifficulty: SkillDifficulty[];
   misconceptionIdsForSelectedSkill: unknown[];
+  misconceptionsBySkill: MisconceptionSkillMap;
+  newQuestionIsBeingCreated: boolean;
+  newQuestionSkillDifficulties: number[] | number;
+  newQuestionSkillIds: string[];
+  question: Question;
   questionEditorIsShown: boolean;
+  questionId: string | null;
+  questionIsBeingSaved: boolean;
+  questionIsBeingUpdated: boolean;
+  questionStateData: State;
   questionSummariesForOneSkill: QuestionSummaryForOneSkill[] = [];
+  showDifficultyChoices: boolean;
+  skillLinkageModificationsArray: SkillLinkageModificationsArray[];
+  directiveSubscriptions = new Subscription();
 
   constructor(
-    private questionsListService: QuestionsListService,
-    private focusManagerService: FocusManagerService,
-    private windowDimensionsService: WindowDimensionsService,
+    private alertsService: AlertsService,
+    private changeDetectorRef: ChangeDetectorRef,
+    private contextService: ContextService,
     private editableQuestionBackendApiService:
       EditableQuestionBackendApiService,
-    private contextService: ContextService,
-    private windowRef: WindowRef,
-    private ngbModal: NgbModal,
-    private skillEditorRoutingService: SkillEditorRoutingService,
-    private skillBackendApiService: SkillBackendApiService,
-    private utilsService: UtilsService,
-    private alertsService: AlertsService,
+    private focusManagerService: FocusManagerService,
     private imageLocalStorageService: ImageLocalStorageService,
-    private questionUndoRedoService: QuestionUndoRedoService,
     private misconceptionObjectFactory: MisconceptionObjectFactory,
+    private ngbModal: NgbModal,
     private questionObjectFactory: QuestionObjectFactory,
+    private questionsListService: QuestionsListService,
+    private questionUndoRedoService: QuestionUndoRedoService,
     private questionValidationService: QuestionValidationService,
-    private changeDetectorRef: ChangeDetectorRef,
+    private skillBackendApiService: SkillBackendApiService,
+    private skillEditorRoutingService: SkillEditorRoutingService,
+    private utilsService: UtilsService,
+    private windowDimensionsService: WindowDimensionsService,
+    private windowRef: WindowRef,
   ) { }
 
   ngOnChanges(changes: SimpleChanges): void {

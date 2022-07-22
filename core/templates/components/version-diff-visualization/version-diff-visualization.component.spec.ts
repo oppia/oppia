@@ -177,7 +177,13 @@ describe('Version Diff Visualization Component', () => {
             stateProperty: 'invalid',
             originalStateName: 'A'
           }
-        }
+        },
+        v2States: null,
+        v1States: null,
+        finalStateIds: null,
+        v2InitStateId: null,
+        links: null,
+        v1InitStateId: null,
       }
     );
 
@@ -230,7 +236,11 @@ describe('Version Diff Visualization Component', () => {
         v1States: {
           A: {},
           B: {}
-        }
+        },
+        finalStateIds: null,
+        v2InitStateId: null,
+        links: null,
+        v1InitStateId: null,
       }
     );
 

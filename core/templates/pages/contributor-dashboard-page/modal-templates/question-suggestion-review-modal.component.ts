@@ -16,25 +16,24 @@
  * @fileoverview Component for question suggestion review modal.
  */
 
+import { AppConstants } from 'app.constants';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { ContextService } from 'services/context.service';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { ThreadMessage } from 'domain/feedback_message/ThreadMessage.model';
-import { QuestionSuggestionEditorModalComponent } from './question-suggestion-editor-modal.component';
-import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
+import { ContextService } from 'services/context.service';
 import { ContributionOpportunitiesService } from 'pages/contributor-dashboard-page/services/contribution-opportunities.service';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
+import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { ParamDict } from 'services/suggestion-modal.service';
+import { Question } from 'domain/question/QuestionObjectFactory';
+import { QuestionSuggestionEditorModalComponent } from './question-suggestion-editor-modal.component';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
+import { State } from 'domain/state/StateObjectFactory';
+import { SuggestionBackendDict } from 'domain/suggestion/suggestion.model';
 import { SuggestionModalService } from 'services/suggestion-modal.service';
 import { ThreadDataBackendApiService } from 'pages/exploration-editor-page/feedback-tab/services/thread-data-backend-api.service';
-import { AppConstants } from 'app.constants';
-import { ParamDict } from 'services/suggestion-modal.service';
-import { MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
-import { Question } from 'domain/question/QuestionObjectFactory';
-import { SuggestionBackendDict } from 'domain/suggestion/suggestion.model';
-import { State } from 'domain/state/StateObjectFactory';
-
+import { ThreadMessage } from 'domain/feedback_message/ThreadMessage.model';
 interface QuestionSuggestionModalValue {
   suggestionId: string;
   suggestion: SuggestionBackendDict;
@@ -77,14 +76,14 @@ export class QuestionSuggestionReviewModalComponent
   validationError: unknown;
 
   constructor(
-    private skillBackendApiService: SkillBackendApiService,
-    private contributionOpportunitiesService: ContributionOpportunitiesService,
-    private siteAnalyticsService: SiteAnalyticsService,
-    private suggestionModalService: SuggestionModalService,
-    private threadDataBackendApiService: ThreadDataBackendApiService,
     private contextService: ContextService,
+    private contributionOpportunitiesService: ContributionOpportunitiesService,
     private ngbActiveModal: NgbActiveModal,
     private ngbModal: NgbModal,
+    private siteAnalyticsService: SiteAnalyticsService,
+    private skillBackendApiService: SkillBackendApiService,
+    private suggestionModalService: SuggestionModalService,
+    private threadDataBackendApiService: ThreadDataBackendApiService,
   ) {
     super(ngbActiveModal);
   }

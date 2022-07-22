@@ -64,6 +64,18 @@ interface NodeData {
   nodeClass: string;
   canDelete: boolean;
 }
+interface NodeColors {
+  [nodeId: string]: string;
+}
+
+interface NodeSecondaryLabels {
+  [key: string]: string;
+}
+
+interface OpacityMap {
+  [key: string]: number;
+}
+
 @Component({
   selector: 'state-graph-visualization',
   templateUrl: './state-graph-visualization.component.html'
@@ -72,13 +84,13 @@ export class StateGraphVisualization
   implements OnInit, OnDestroy {
   @ViewChild('MainScreen') mainScreen: ElementRef;
 
-  @Input() allowPanning;
-  @Input() centerAtCurrentState;
+  @Input() allowPanning: boolean;
+  @Input() centerAtCurrentState: boolean;
   @Input() currentStateId: string;
   // Id of a second initial state, which will be styled as an initial
   // state.
-  @Input() initStateId2: unknown;
-  @Input() isEditable;
+  @Input() initStateId2: string;
+  @Input() isEditable: string;
   // Object which maps linkProperty to a style.
   @Input() linkPropertyMapping: {
     added: string;
@@ -88,13 +100,13 @@ export class StateGraphVisualization
   @Input() versionGraphData: GraphData;
   @Input() maximize: boolean = false;
   // Object whose keys are node ids and whose values are node colors.
-  @Input() nodeColors: object;
+  @Input() nodeColors: NodeColors;
   // A value which is the color of all nodes.
-  @Input() nodeFill;
+  @Input() nodeFill: string;
   // Object whose keys are node ids with secondary labels and whose
   // values are secondary labels. If this is undefined, it means no nodes
   // have secondary labels.
-  @Input() nodeSecondaryLabels: object;
+  @Input() nodeSecondaryLabels: NodeSecondaryLabels;
   // Function called when node is clicked. Should take a parameter
   // node.id.
   @Output() onClickFunction = new EventEmitter<string>();
@@ -102,9 +114,9 @@ export class StateGraphVisualization
   @Output() onMaximizeFunction = new EventEmitter<void>();
   // Object whose keys are ids of nodes, and whose values are the
   // corresponding node opacities.
-  @Input() opacityMap;
-  @Input() showWarningSign;
-  @Input() showTranslationWarnings;
+  @Input() opacityMap: OpacityMap;
+  @Input() showWarningSign: boolean;
+  @Input() showTranslationWarnings: boolean;
 
   directiveSubscriptions = new Subscription();
   graphBounds = {
@@ -135,16 +147,16 @@ export class StateGraphVisualization
   check: boolean = false;
 
   constructor(
+    private changeDetectorRef: ChangeDetectorRef,
     private explorationStatesService: ExplorationStatesService,
     private explorationWarningsService: ExplorationWarningsService,
+    private graphDataService: GraphDataService,
     private routerService: RouterService,
     private stateCardIsCheckpointService: StateCardIsCheckpointService,
     private stateGraphLayoutService: StateGraphLayoutService,
     private translationStatusService: TranslationStatusService,
-    private windowDimensionsService: WindowDimensionsService,
     private truncate: TruncatePipe,
-    private graphDataService: GraphDataService,
-    private changeDetectorRef: ChangeDetectorRef,
+    private windowDimensionsService: WindowDimensionsService,
   ) { }
 
   sendOnMaximizeFunction(): void {

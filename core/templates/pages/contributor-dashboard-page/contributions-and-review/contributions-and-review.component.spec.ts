@@ -20,7 +20,7 @@ import { ComponentFixture, fakeAsync, flush, TestBed, tick, waitForAsync } from 
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ExplorationOpportunitySummary } from 'domain/opportunity/exploration-opportunity-summary.model';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { ContributionsAndReview } from './contributions-and-review.component';
+import { ContributionsAndReview, SuggestionContributions } from './contributions-and-review.component';
 import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
 import { TranslationTopicService } from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
 import { MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFactory';
@@ -643,7 +643,8 @@ describe('Contributions and review component', () => {
 
       component.contributions = {
         suggestion_id: {
-          details: contributionDetails
+          details: contributionDetails,
+          suggestion: null,
         }
       };
       component.openQuestionSuggestionModal(
@@ -713,9 +714,10 @@ describe('Contributions and review component', () => {
       component.SUGGESTION_TYPE_QUESTION = 'SUGGESTION';
       component.contributions = {
         SUGGESTION: {
+          details: null,
           suggestion: {
             suggestion_type: 'SUGGESTION'
-          }
+          } as SuggestionContributions
         }
       };
 

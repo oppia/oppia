@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the visualization of the diff between two
+ * @fileoverview Component for the visualization of the diff between two
  *   versions of an exploration.
  */
 
@@ -23,11 +23,67 @@ import { StateDiffModalComponent } from 'pages/exploration-editor-page/modal-tem
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
+interface NodesData {
+  [key: string]: {
+    newestStateName: string;
+    stateProperty: string;
+    originalStateName: string;
+  };
+}
+
 interface LegendGraph {
  nodes: object;
  links: unknown[];
  finalStateIds?: string[];
  initStateId?: string;
+}
+
+interface DiffNodeData {
+  nodes: NodesData;
+  v2States: object;
+  v1States: object;
+  finalStateIds: string[];
+  v2InitStateId: string;
+  links: string[];
+  v1InitStateId: string;
+}
+
+interface DIFF_GRAPH_LINK_PROPERTY_MAPPING {
+  added: string;
+  deleted: string;
+}
+
+interface LEGEND_GRAPH_COLORS {
+  Added: string;
+  Deleted: string;
+  Changed: string;
+  'Changed/renamed': string;
+  Renamed: string;
+  Unchanged: string;
+}
+
+interface LEGEND_GRAPH_LINK_PROPERTY_MAPPING {
+  hidden: string;
+}
+
+interface LEGEND_GRAPH_SECONDARY_LABELS {
+  'Changed/renamed': string;
+  Renamed: string;
+}
+
+interface DiffGraphSecondaryLabels {
+  [nodeId: string]: string;
+}
+
+interface DiffGraphNodeColors {
+  [nodeId: string]: string;
+}
+
+interface DiffGraphData {
+  nodes: object;
+  links: string[];
+  initStateId: string;
+  finalStateIds: string[];
 }
 
 @Component({
@@ -53,7 +109,7 @@ export class VersionDiffVisualizationComponent implements OnInit {
   // - v1States: the states dict for the earlier version of the
   // exploration
   // - v2States: the states dict for the later version of the exploration.
-  @Input() diffData;
+  @Input() diffData: DiffNodeData;
 
   // The header for the pane of the state comparison modal corresponding
   // to the earlier version of the exploration.
@@ -64,41 +120,41 @@ export class VersionDiffVisualizationComponent implements OnInit {
   @Input() laterVersionHeader: string;
 
   // Constants for color of nodes in diff graph.
-  COLOR_ADDED = '#4EA24E';
-  COLOR_DELETED = '#DC143C';
-  COLOR_CHANGED = '#1E90FF';
-  COLOR_UNCHANGED = 'beige';
-  COLOR_RENAMED_UNCHANGED = '#FFD700';
+  COLOR_ADDED: string = '#4EA24E';
+  COLOR_DELETED: string = '#DC143C';
+  COLOR_CHANGED: string = '#1E90FF';
+  COLOR_UNCHANGED: string = 'beige';
+  COLOR_RENAMED_UNCHANGED: string = '#FFD700';
 
   // Constants for names in legend.
-  NODE_TYPE_ADDED = 'Added';
-  NODE_TYPE_DELETED = 'Deleted';
-  NODE_TYPE_CHANGED = 'Changed';
-  NODE_TYPE_CHANGED_RENAMED = 'Changed/renamed';
-  NODE_TYPE_RENAMED = 'Renamed';
-  NODE_TYPE_UNCHANGED = 'Unchanged';
+  NODE_TYPE_ADDED: string = 'Added';
+  NODE_TYPE_DELETED: string = 'Deleted';
+  NODE_TYPE_CHANGED: string = 'Changed';
+  NODE_TYPE_CHANGED_RENAMED: string = 'Changed/renamed';
+  NODE_TYPE_RENAMED: string = 'Renamed';
+  NODE_TYPE_UNCHANGED: string = 'Unchanged';
 
-  STATE_PROPERTY_ADDED = 'added';
-  STATE_PROPERTY_DELETED = 'deleted';
-  STATE_PROPERTY_CHANGED = 'changed';
-  STATE_PROPERTY_UNCHANGED = 'unchanged';
+  STATE_PROPERTY_ADDED: string = 'added';
+  STATE_PROPERTY_DELETED: string = 'deleted';
+  STATE_PROPERTY_CHANGED: string = 'changed';
+  STATE_PROPERTY_UNCHANGED: string = 'unchanged';
 
   // Object whose keys are legend node names and whose values are
   // 'true' or false depending on whether the state property is used in
   // the diff graph. (Will be used to generate legend).
-  _stateTypeUsed = {};
-  diffGraphNodes = {};
-  nodesData;
+  _stateTypeUsed: object = {};
+  diffGraphNodes: object = {};
+  nodesData: NodesData;
 
-  diffGraphData: unknown;
-  diffGraphNodeColors: unknown;
-  v1InitStateId: unknown;
-  diffGraphSecondaryLabels: unknown;
-  DIFF_GRAPH_LINK_PROPERTY_MAPPING: unknown;
+  diffGraphData: DiffGraphData;
+  diffGraphNodeColors: DiffGraphNodeColors;
+  v1InitStateId: string;
+  diffGraphSecondaryLabels: DiffGraphSecondaryLabels;
+  DIFF_GRAPH_LINK_PROPERTY_MAPPING: DIFF_GRAPH_LINK_PROPERTY_MAPPING;
   legendGraph: LegendGraph;
-  LEGEND_GRAPH_COLORS: unknown;
-  LEGEND_GRAPH_SECONDARY_LABELS: unknown;
-  LEGEND_GRAPH_LINK_PROPERTY_MAPPING: unknown;
+  LEGEND_GRAPH_COLORS: LEGEND_GRAPH_COLORS;
+  LEGEND_GRAPH_SECONDARY_LABELS: LEGEND_GRAPH_SECONDARY_LABELS;
+  LEGEND_GRAPH_LINK_PROPERTY_MAPPING: LEGEND_GRAPH_LINK_PROPERTY_MAPPING;
 
   constructor(
     private ngbModal: NgbModal,
@@ -171,7 +227,6 @@ export class VersionDiffVisualizationComponent implements OnInit {
     this._stateTypeUsed[this.NODE_TYPE_UNCHANGED] = false;
     this._stateTypeUsed[this.NODE_TYPE_RENAMED] = false;
     this._stateTypeUsed[this.NODE_TYPE_CHANGED_RENAMED] = false;
-    this.LEGEND_GRAPH_COLORS = {};
     this.LEGEND_GRAPH_COLORS[this.NODE_TYPE_ADDED] = this.COLOR_ADDED;
     this.LEGEND_GRAPH_COLORS[this.NODE_TYPE_DELETED] = this.COLOR_DELETED;
     this.LEGEND_GRAPH_COLORS[this.NODE_TYPE_CHANGED] = this.COLOR_CHANGED;
@@ -181,7 +236,6 @@ export class VersionDiffVisualizationComponent implements OnInit {
     this.LEGEND_GRAPH_COLORS[this.NODE_TYPE_CHANGED_RENAMED] = (
       this.COLOR_CHANGED);
 
-    this.LEGEND_GRAPH_SECONDARY_LABELS = {};
     this.LEGEND_GRAPH_SECONDARY_LABELS[this.NODE_TYPE_CHANGED_RENAMED] = (
       '(was: Old name)');
     this.LEGEND_GRAPH_SECONDARY_LABELS[this.NODE_TYPE_RENAMED] = (

@@ -17,11 +17,11 @@
  */
 
 import { Component, Input, OnInit } from '@angular/core';
+import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { UrlService } from 'services/contextual/url.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 @Component({
   selector: 'oppia-question-player-concept-card-modal',

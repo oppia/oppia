@@ -16,29 +16,41 @@
  * @fileoverview Component for question opportunities.
  */
 
+import constants from 'assets/constants';
+import { AlertsService } from 'services/alerts.service';
 import { Component, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
 import { ContextService } from 'services/context.service';
 import { ContributionOpportunitiesService } from '../services/contribution-opportunities.service';
-import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
-import { QuestionUndoRedoService } from 'domain/editor/undo_redo/question-undo-redo.service';
-import { UserService } from 'services/user.service';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { QuestionSuggestionEditorModalComponent } from '../modal-templates/question-suggestion-editor-modal.component';
-import constants from 'assets/constants';
-import { SkillDifficulty } from 'domain/skill/skill-difficulty.model';
-import { Skill } from 'domain/skill/SkillObjectFactory';
-import { SkillOpportunity } from 'domain/opportunity/skill-opportunity.model';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { QuestionsOpportunitiesSelectDifficultyModalComponent } from 'pages/topic-editor-page/modal-templates/questions-opportunities-select-difficulty-modal.component';
-import { AlertsService } from 'services/alerts.service';
+import { QuestionSuggestionEditorModalComponent } from '../modal-templates/question-suggestion-editor-modal.component';
+import { QuestionUndoRedoService } from 'domain/editor/undo_redo/question-undo-redo.service';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { Skill } from 'domain/skill/SkillObjectFactory';
+import { SkillDifficulty } from 'domain/skill/skill-difficulty.model';
+import { SkillOpportunity } from 'domain/opportunity/skill-opportunity.model';
 import { TranslationOpportunity } from '../modal-templates/translation-modal.component';
+import { UserService } from 'services/user.service';
 
 interface Opportunities {
   opportunities: SkillOpportunity[];
-  more: unknown;
+  more: boolean;
 }
 
+interface OpportunitiesData {
+  id: string;
+  heading: string;
+  subheading: string;
+  progressPercentage: string;
+  actionButtonTitle: string;
+}
+
+interface PresentableOpportunitiesData {
+  opportunitiesDicts: OpportunitiesData[];
+  more: boolean;
+}
 @Component({
   selector: 'oppia-question-opportunities',
   templateUrl: './question-opportunities.component.html'
@@ -48,18 +60,18 @@ export class QuestionOpportunitiesComponent implements OnInit {
   allOpportunities = [];
 
   constructor(
+    private alertsService: AlertsService,
     private contextService: ContextService,
     private contributionOpportunitiesService: ContributionOpportunitiesService,
+    private ngbModal: NgbModal,
     private questionObjectFactory: QuestionObjectFactory,
     private questionUndoRedoService: QuestionUndoRedoService,
-    private userService: UserService,
-    private ngbModal: NgbModal,
     private siteAnalyticsService: SiteAnalyticsService,
-    private alertsService: AlertsService,
+    private userService: UserService,
   ) {}
 
   getPresentableOpportunitiesData(
-      opportunitiesObject: Opportunities): object {
+      opportunitiesObject: Opportunities): PresentableOpportunitiesData {
     let opportunitiesDicts = [];
     let more = opportunitiesObject.more;
 

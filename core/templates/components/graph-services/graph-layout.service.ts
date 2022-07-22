@@ -47,7 +47,7 @@ export interface AugmentedLink {
   style?: string;
 }
 
-interface NodeData {
+export interface NodeData {
   depth: number;
   offset: number;
   reachable: boolean;

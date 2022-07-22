@@ -141,6 +141,8 @@ export class RouterService {
       }
     }
 
+    // Fire an event to center the Graph in the
+    // Editor Tabs, Translation Tab, History Tab.
     this.centerGraphEventEmitter.emit();
   }
 
