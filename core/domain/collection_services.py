@@ -1388,8 +1388,6 @@ def load_demo(collection_id: str) -> None:
 
     yaml_content = utils.get_file_contents(demo_filepath)
 
-    # Ruling out the possibility of bytes for mypy type checking.
-    assert isinstance(yaml_content, str)
     collection = save_new_collection_from_yaml(
         feconf.SYSTEM_COMMITTER_ID, yaml_content, collection_id)
 
