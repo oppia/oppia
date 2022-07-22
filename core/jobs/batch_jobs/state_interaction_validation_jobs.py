@@ -359,7 +359,7 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
                 'upper_bound'] or
             (
                 range_compare_with['upper_bound'] == range_compare_to[
-                    'upper_bound'] and 
+                    'upper_bound'] and
                 (
                     not range_compare_to['ub_inclusive'] or
                     range_compare_with['ub_inclusive']
