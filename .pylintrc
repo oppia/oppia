@@ -124,7 +124,6 @@ disable=abstract-method,
 # TODO(#12912): Remove these after the Python 3 migration.
         arg-name-for-non-keyword-arg,
         arguments-renamed,
-        consider-using-dict-items,
         consider-using-with,
         import-outside-toplevel,
         non-explicit-keyword-args,
