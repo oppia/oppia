@@ -488,7 +488,7 @@ class ComputeExplorationVersionHistoryJobTests(
             self.assert_job_output_is([
                 job_run_result.JobRunResult.as_stdout('ALL EXPS SUCCESS: 1'),
                 job_run_result.JobRunResult.as_stdout(
-                    'EXPS HAVING OUTDATED STATES SCHEMA SUCCESS: 1'
+                    'EXPS VLATEST HAVING OUTDATED STATES SCHEMA SUCCESS: 1'
                 ),
                 job_run_result.JobRunResult.as_stderr(
                     'Version history cannot be calculated for %s' % (

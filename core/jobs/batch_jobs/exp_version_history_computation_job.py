@@ -475,14 +475,27 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
             | 'Get all ExplorationModels' >> ndb_io.GetModels(
                 exp_models.ExplorationModel.get_all(include_deleted=False)
             )
-            | 'Filter valid exploration models at latest version' >>
+        )
+
+        valid_explorations_vlatest = (
+            all_explorations_vlatest
+            | 'Filter valid exploration models at vlatest' >>
                 beam.Filter(self.filter_valid_exploration_models)
             | 'Create key-value pairs with id and exp models' >>
                 beam.Map(lambda model: (model.id, model))
         )
 
-        explorations_at_v1 = (
+        invalid_explorations_vlatest = (
             all_explorations_vlatest
+            | 'Filter invalid exploration models at vlatest' >> beam.Filter(
+                lambda model: (
+                    not self.filter_valid_exploration_models(model)
+                )
+            )
+        )
+
+        explorations_at_v1 = (
+            valid_explorations_vlatest
             | 'Get the exploration ids' >>
                 beam.Map(lambda model: model[0])
             | 'Get the ExplorationModels at v1' >>
@@ -508,7 +521,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
         )
 
         all_commit_logs = (
-            all_explorations_vlatest
+            valid_explorations_vlatest
             | 'Get all ExplorationCommitLogEntryModels' >> ndb_io.GetModels(
                 exp_models.ExplorationCommitLogEntryModel.get_all(
                     include_deleted=False
@@ -533,7 +546,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
         model_groups = (
             ({
                 'exp_models_v1': valid_explorations_v1,
-                'exp_models_vlatest': all_explorations_vlatest,
+                'exp_models_vlatest': valid_explorations_vlatest,
                 'commit_log_models': all_commit_logs,
                 'version_history_models': all_version_history_models
             })
@@ -592,17 +605,34 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
         # version and cannot be converted from older schema versions to the
         # latest one which is required while calculating version histories.
         # Due to this, their version histories cannot be calculated.
-        report_number_of_invalid_exps = (
+        report_number_of_invalid_exps_v1 = (
             invalid_explorations_v1
             | 'Count invalid queried explorations' >>
                 job_result_transforms.CountObjectsToJobRunResult(
-                    'EXPS HAVING OUTDATED STATES SCHEMA'
+                    'EXPS V1 HAVING OUTDATED STATES SCHEMA'
                 )
         )
 
-        report_details_of_invalid_exps = (
+        report_details_of_invalid_exps_v1 = (
             invalid_explorations_v1
             | 'Save info on invalid explorations' >> beam.Map(
+                lambda model: job_run_result.JobRunResult.as_stderr(
+                    'Version history cannot be calculated for %s' % (model.id)
+                )
+            )
+        )
+
+        report_number_of_invalid_exps_vlatest = (
+            invalid_explorations_vlatest
+            | 'Count invalid explorations at vlatest' >>
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'EXPS VLATEST HAVING OUTDATED STATES SCHEMA'
+                )
+        )
+
+        report_details_of_invalid_exps_vlatest = (
+            invalid_explorations_vlatest
+            | 'Save info on invalid explorations at vlatest' >> beam.Map(
                 lambda model: job_run_result.JobRunResult.as_stderr(
                     'Version history cannot be calculated for %s' % (model.id)
                 )
@@ -664,8 +694,10 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
         return (
             (
                 report_number_of_exps_queried,
-                report_number_of_invalid_exps,
-                report_details_of_invalid_exps,
+                report_number_of_invalid_exps_vlatest,
+                report_details_of_invalid_exps_vlatest,
+                report_number_of_invalid_exps_v1,
+                report_details_of_invalid_exps_v1,
                 report_exps_count_for_which_version_history_can_be_computed,
                 report_number_of_exps_with_invalid_change_list,
                 report_details_of_exps_having_invalid_change_list,
