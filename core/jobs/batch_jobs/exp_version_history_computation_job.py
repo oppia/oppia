@@ -433,22 +433,48 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
 
             return (exp_id, version_history_models)
 
-    def _get_exploration_model_at_v1(
-        self, exp_id: str
+    def _get_exploration_snapshot_models(
+        self, snapshot_ids: List[str]
+    ) -> List[Optional[exp_models.ExplorationSnapshotContentModel]]:
+        """Gets the exploration snapshot models from given ids
+
+        Args:
+            snapshot_ids: List[str]. The snapshot ids.
+
+        Returns:
+            ExplorationSnapshotContentModel. The exploration snapshot content
+            model.
+        """
+        with datastore_services.get_ndb_context():
+            snapshot_models = (
+                exp_models.ExplorationSnapshotContentModel.get_multi(
+                    snapshot_ids
+                )
+            )
+            return snapshot_models
+
+    def _get_exploration_at_v1(
+        self, snapshot_model: exp_models.ExplorationSnapshotContentModel
     ) -> exp_models.ExplorationModel:
         """Returns the exploration model with given id at version 1.
 
         Args:
-            exp_id: str. The id of the exploration.
+            snapshot_model: ExplorationSnapshotContentModel. The snapshot
+                content model at v1.
 
         Returns:
             ExplorationModel. The exploration model at version 1.
         """
         with datastore_services.get_ndb_context():
-            exp_model_at_v1 = exp_models.ExplorationModel.get_version(
-                exp_id, 1, strict=False
+            snapshot_dict = snapshot_model.content
+            reconstituted_model = exp_models.ExplorationModel(
+                id=snapshot_model.get_unversioned_instance_id()
+            )._reconstitute(  # pylint: disable=protected-access
+                snapshot_dict
             )
-            return exp_model_at_v1
+            reconstituted_model.created_on = snapshot_model.created_on
+            reconstituted_model.last_updated = snapshot_model.last_updated
+            return reconstituted_model
 
     def filter_valid_exploration_models(
         self, exp_model: exp_models.ExplorationModel
@@ -498,8 +524,17 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
             valid_explorations_vlatest
             | 'Get the exploration ids' >>
                 beam.Map(lambda model: model[0])
-            | 'Get the ExplorationModels at v1' >>
-                beam.Map(self._get_exploration_model_at_v1)
+            | 'Get the snapshot ids at v1' >> beam.Map(lambda exp_id: (
+                exp_models.ExplorationModel.get_snapshot_id(exp_id, 1)
+            ))
+            | 'Combine the snapshot ids into a list' >> beam.combiners.ToList()
+            | 'Get the snapshot models at v1' >>
+                beam.Map(self._get_exploration_snapshot_models)
+            | 'Flatten the snapshot models' >> beam.FlatMap(lambda x: x)
+            | 'Filter the snapshot models without None' >>
+                beam.Filter(lambda model: model is not None)
+            | 'Get reconstituted explorations at v1' >>
+                beam.Map(self._get_exploration_at_v1)
         )
 
         valid_explorations_v1 = (
