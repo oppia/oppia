@@ -594,7 +594,7 @@ class ExpStateInteractionValidationJobTests(
       'id': 'EndExploration',
       'customization_args': {
         'recommendedExplorationIds': {
-          'value': ['EXP_1', 'EXP_2', 'EXP_5', 'EXP_4']
+          'value': ['EXP_1', 'EXP_2', 'EXP_5', 'EXP_4', '1']
         }
       },
       'answer_groups': [

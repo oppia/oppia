@@ -1094,10 +1094,7 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
 
         return states_with_values
 
-    invalid_end_interac = []
-
-    @staticmethod
-    def filter_invalid_end_interaction(exp, exp_id_list):
+    def filter_invalid_end_interactions(self, exp_states, exp_id_list):
         """Filter invalid end interaction states.
 
         Args:
@@ -1105,12 +1102,11 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
             exp_id_list: List[str]. List of all exploration ids.
 
         Returns:
-            found_invalid: bool. Returns True if invalid exploration.
+            states_with_values: list[dict]. The list of dictionaries
+            containing the errored values.
         """
-        states = exp.states
-        found_invalid = False
-        exp_end_interac_values = []
-        for state_name, state in states.items():
+        states_with_values = []
+        for state_name, state in exp_states.items():
             if state.interaction.id != 'EndExploration':
                 continue
             invalid_state_exp_ids = []
@@ -1120,37 +1116,18 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
             )
 
             for exp_id in recc_exp_ids:
-                found_invalid = True
                 if exp_id not in exp_id_list:
                     invalid_state_exp_ids.append(exp_id)
             if len(invalid_state_exp_ids) > 0:
                 (
-                    exp_end_interac_values.append(
-                        {'state_name': state_name,
-                        'invalid_exps': invalid_state_exp_ids}
+                    states_with_values.append(
+                        {
+                            'state_name': state_name,
+                            'invalid_exps': invalid_state_exp_ids
+                        }
                     )
                 )
-        if len(exp_end_interac_values) > 0:
-            ExpStateInteractionValidationJob.invalid_end_interac.append(
-                {exp.id: exp_end_interac_values}
-            )
-        return found_invalid
-
-    @staticmethod
-    def get_invalid_end_interaction_values(exp):
-        """Return the errored value of the current exploration.
-
-        Args:
-            exp: exp_domain.Exploration. The exploration.
-
-        Returns:
-            List[Dict[str, Any]]. The list of dictionaries
-            containing the errored values.
-        """
-        for ele in ExpStateInteractionValidationJob.invalid_end_interac:
-            if exp.id in ele.keys():
-                return ele[exp.id]
-        return None
+        return states_with_values
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         all_explorations = (
@@ -1344,25 +1321,22 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
 
         invalid_exps_with_state_end_interac = (
             all_explorations
-            | 'Filter invalid end interac' >> beam.Filter(
-                self.filter_invalid_end_interaction,
-                beam.pvalue.AsList(exp_ids_pcoll)
+            | 'Filter invalid end interac' >> beam.Map(
+                lambda exp, errored_data: (
+                    exp.id, self.filter_invalid_end_interactions(
+                        exp.states, errored_data), exp.created_on.date()
+                    ), errored_data=beam.pvalue.AsList(exp_ids_pcoll)
             )
-            | 'Map id, invalid interac and created_on date' >> beam.Map(
-                lambda exp: (
-                    exp.id, exp.created_on.date(),
-                    self.get_invalid_end_interaction_values(exp)
-                )
-            )
-            | 'Remove the valid explorations' >> beam.Filter(
-                lambda exp: exp[2] is not None
+            | 'Remove empty values for state end interaction'
+            >> beam.Filter(
+                lambda exp: len(exp[1]) > 0
             )
         )
 
         report_invalid_state_end_interac = (
             invalid_exps_with_state_end_interac
             | 'Show info for invalid end interac' >> beam.MapTuple(
-                lambda exp_id, exp_created_on, invalid_values: (
+                lambda exp_id, invalid_values, exp_created_on: (
                     job_run_result.JobRunResult.as_stderr(
                         f'The id of exp is {exp_id}, '
                         f'created on {exp_created_on}, and the invalid '
