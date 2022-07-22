@@ -580,7 +580,7 @@ class CommitLogEntryModelTests(test_utils.GenericTestBase):
     def test_get_commit(self) -> None:
         model1 = TestCommitLogEntryModel.create(
             entity_id='id', committer_id='user',
-            commit_cmds={}, commit_type='create',
+            commit_cmds=[], commit_type='create',
             commit_message='New commit created.', version=1,
             status=constants.ACTIVITY_STATUS_PUBLIC, community_owned=False
         )
@@ -601,13 +601,13 @@ class CommitLogEntryModelTests(test_utils.GenericTestBase):
     def test_get_all_commits(self) -> None:
         model1 = TestCommitLogEntryModel.create(
             entity_id='id', committer_id='user',
-            commit_cmds={}, commit_type='create',
+            commit_cmds=[], commit_type='create',
             commit_message='New commit created.', version=1,
             status=constants.ACTIVITY_STATUS_PUBLIC, community_owned=False
         )
         model2 = TestCommitLogEntryModel.create(
             entity_id='id', committer_id='user',
-            commit_cmds={}, commit_type='edit',
+            commit_cmds=[], commit_type='edit',
             commit_message='New commit created.', version=2,
             status=constants.ACTIVITY_STATUS_PUBLIC, community_owned=False
         )
