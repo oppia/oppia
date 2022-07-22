@@ -128,6 +128,13 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             rights_manager.check_can_manage_voice_artist_in_activity(
                 self.user_a, None))
 
+    def test_check_can_modify_core_activity_roles_for_none_activity(
+        self
+    ) -> None:
+        self.assertFalse(
+            rights_manager.check_can_modify_core_activity_roles(
+                self.user_a, None))
+
     def test_non_splash_page_demo_exploration(self) -> None:
         # Note: there is no difference between permissions for demo
         # explorations, whether or not they are on the splash page.
@@ -345,6 +352,17 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             user_with_public_activity_rights, exp_rights))
         self.assertTrue(rights_manager.check_can_delete_activity(
             user_with_public_activity_rights, exp_rights))
+
+    def test_assign_role_for_exploration_raises_error_for_invalid_activity_id(
+        self
+    ) -> None:
+        exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
+        exp_services.save_new_exploration(self.user_id_a, exp)  # type: ignore[no-untyped-call]
+
+        with self.assertRaisesRegex(Exception, 'No activity_rights exists'):  # type: ignore[no-untyped-call]
+            rights_manager.assign_role_for_exploration(
+                self.user_b, 'abcdefg', self.user_id_c,
+                rights_domain.ROLE_VIEWER)
 
     def test_setting_rights_of_exploration(self) -> None:
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
@@ -742,6 +760,17 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(Exception, 'Invalid role: invalid_role'):  # type: ignore[no-untyped-call]
             rights_manager.assign_role_for_exploration(
                 self.user_a, self.EXP_ID, self.user_id_b, 'invalid_role')
+
+    def test_deassign_role_for_exploration_raise_error_with_invalid_activity_id(
+        self
+    ) -> None:
+        exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
+        exp_services.save_new_exploration(self.user_id_a, exp)  # type: ignore[no-untyped-call]
+
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            Exception, 'No activity_rights exists for the given activity_id'):
+            rights_manager.deassign_role_for_exploration(
+                self.user_b, 'abcdefg', self.user_id_a)
 
     def test_deassign_without_rights_fails(self) -> None:
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)

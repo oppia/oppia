@@ -929,14 +929,20 @@ def _assign_role(
         Exception. The user can already view the activity.
         Exception. The activity is already publicly viewable.
         Exception. The role is invalid.
+        Exception. No activity_rights exists for the invalid activity id.
     """
     committer_id = committer.user_id
     activity_rights = _get_activity_rights(activity_type, activity_id)
 
+    if activity_rights is None:
+        raise Exception(
+            'No activity_rights exists for the given activity_id: %s' %
+            activity_id
+        )
+
     if (
             new_role == rights_domain.ROLE_VOICE_ARTIST and
-            activity_type == constants.ACTIVITY_TYPE_EXPLORATION and
-            activity_rights is not None
+            activity_type == constants.ACTIVITY_TYPE_EXPLORATION
     ):
         if activity_rights.is_published():
             user_can_assign_role = check_can_manage_voice_artist_in_activity(
@@ -966,12 +972,6 @@ def _assign_role(
             rights_domain.ROLE_VIEWER
     ]:
         raise Exception('Invalid role: %s' % new_role)
-
-    # Here, we are asserting that `activity_rights` is not going to be
-    # a None value, because if `activity_rights` is a None value then
-    # `user_can_assign_role` is assigned with a `False` value and if
-    # `user_can_assign_role` is `False` an exception is raised above.
-    assert activity_rights is not None
 
     # TODO(#12369): Currently, only exploration allows reassigning users to
     # any role. We are expecting to remove the below check and allow this
@@ -1076,12 +1076,18 @@ def _deassign_role(
     Raises:
         Exception. UnauthorizedUserException: Could not deassign role.
         Exception. This user does not have any role for the given activity.
+        Exception. No activity_rights exists for the invalid activity id.
     """
     committer_id = committer.user_id
     activity_rights = _get_activity_rights(activity_type, activity_id)
 
+    if activity_rights is None:
+        raise Exception(
+            'No activity_rights exists for the given activity_id: %s' %
+            activity_id
+        )
+
     if (
-            activity_rights is not None and
             activity_rights.is_voice_artist(removed_user_id) and
             activity_type == constants.ACTIVITY_TYPE_EXPLORATION
     ):
@@ -1098,12 +1104,6 @@ def _deassign_role(
                 committer_id, removed_user_id, activity_id))
         raise Exception(
             'UnauthorizedUserException: Could not deassign role.')
-
-    # Here, we are asserting that `activity_rights` is not going to be
-    # a None value, because if `activity_rights` is a None value then
-    # `user_can_deassign_role` is assigned with a `False` value and if
-    # `user_can_deassign_role` is `False` an exception is raised above.
-    assert activity_rights is not None
 
     if activity_rights.is_owner(removed_user_id):
         old_role = rights_domain.ROLE_OWNER
