@@ -31,6 +31,7 @@ import { QuestionPlayerStateService } from './services/question-player-state.ser
 import { Location } from '@angular/common';
 import { UserInfo } from 'domain/user/user-info.model';
 import { State } from 'domain/state/StateObjectFactory';
+
 class MockNgbModal {
   open() {
     return {
