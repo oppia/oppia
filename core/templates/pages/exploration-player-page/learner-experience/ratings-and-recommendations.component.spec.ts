@@ -33,8 +33,10 @@ import { PlatformFeatureService } from 'services/platform-feature.service';
 import { LocalStorageService } from 'services/local-storage.service';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
+import { TopicViewerBackendApiService } from 'domain/topic_viewer/topic-viewer-backend-api.service';
 import { StoryPlaythrough } from 'domain/story_viewer/story-playthrough.model';
 import { ReadOnlyStoryNode } from 'domain/story_viewer/read-only-story-node.model';
+import { ReadOnlyTopic } from 'domain/topic_viewer/read-only-topic-object.factory';
 
 class MockPlatformFeatureService {
   get status(): object {
@@ -59,6 +61,7 @@ describe('Ratings and recommendations component', () => {
   let localStorageService: LocalStorageService;
   let assetsBackendApiService: AssetsBackendApiService;
   let storyViewerBackendApiService: StoryViewerBackendApiService;
+  let topicViewerBackendApiService: TopicViewerBackendApiService;
 
   const mockNgbPopover = jasmine.createSpyObj(
     'NgbPopover', ['close', 'toggle']);
@@ -93,6 +96,7 @@ describe('Ratings and recommendations component', () => {
         UrlInterpolationService,
         AssetsBackendApiService,
         StoryViewerBackendApiService,
+        TopicViewerBackendApiService,
         LocalStorageService,
         {
           provide: PlatformFeatureService,
@@ -122,6 +126,8 @@ describe('Ratings and recommendations component', () => {
     assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
     storyViewerBackendApiService = TestBed.inject(
       StoryViewerBackendApiService);
+    topicViewerBackendApiService = TestBed.inject(
+      TopicViewerBackendApiService);
   });
 
   it('should populate internal properties and subscribe to event' +
@@ -138,6 +144,7 @@ describe('Ratings and recommendations component', () => {
 
     expect(componentInstance.inStoryMode).toBe(undefined);
     expect(componentInstance.storyViewerUrl).toBe(undefined);
+    expect(componentInstance.practiceQuestionsAreEnabled).toBe(false);
 
     spyOn(urlService, 'getCollectionIdFromExplorationUrl').and.returnValue(
       collectionId);
@@ -164,6 +171,10 @@ describe('Ratings and recommendations component', () => {
     spyOn(storyViewerBackendApiService, 'fetchStoryDataAsync').and.returnValue(
       Promise.resolve(new StoryPlaythrough(
         'story_id', [readOnlyStoryNode1, readOnlyStoryNode2], '', '', '', '')));
+    spyOn(topicViewerBackendApiService, 'fetchTopicDataAsync').and.returnValue(
+      Promise.resolve(new ReadOnlyTopic(
+        'topic_name', 'topic_Id', 'description',
+        [], [], [], [], {}, {}, true, 'metatag', 'page_title_fragment')));
 
     componentInstance.questionPlayerConfig = null;
 
@@ -182,6 +193,7 @@ describe('Ratings and recommendations component', () => {
     expect(urlInterpolationService.interpolateUrl).toHaveBeenCalled();
     expect(componentInstance.storyViewerUrl).toBe(
       'dummy_story_viewer_page_url');
+    expect(componentInstance.practiceQuestionsAreEnabled).toBe(true);
     expect(componentInstance.userRating).toEqual(userRating);
     expect(alertsService.addSuccessMessage).toHaveBeenCalled();
     expect(learnerViewRatingService.getUserRating).toHaveBeenCalled();

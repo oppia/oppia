@@ -6,7 +6,7 @@
     <div *ngIf="nextStoryNodeTitle" class="recommendation-card-wrapper">
       <div class="recommendation-card">
         <svg width="192" height="150" class="recommendation-card-svg">
-          <title>Next chapter card image</title>
+          <title>Next chapter card</title>
           <a [attr.href]="nextStoryNodeLink">
             <rect width="192"
                   height="150"
@@ -30,10 +30,10 @@
       </p>
     </div>
     <p *ngIf="nextStoryNodeTitle" class="or-text">Or</p>
-    <div class="recommendation-card-wrapper">
+    <div *ngIf="practiceQuestionsAreEnabled" class="recommendation-card-wrapper">
       <div class="recommendation-card">
         <svg width="192" height="150" class="recommendation-card-svg">
-          <title>Practice session card image</title>
+          <title>Practice session card</title>
           <a [attr.href]="getPracticeTabUrl()">
             <rect width="192"
                   height="150"
@@ -53,6 +53,29 @@
         {{ 'I18N_END_CHAPTER_PRACTICE_SESSION_TEXT' | translate }}
       </p>
     </div>
+    <div *ngIf="!practiceQuestionsAreEnabled" class="recommendation-card-wrapper">
+      <div class="recommendation-card">
+        <svg width="192" height="150" class="recommendation-card-svg">
+          <title>Revision card</title>
+          <a [attr.href]="getRevisionTabUrl()">
+            <rect width="192"
+                  height="150"
+                  [attr.fill]="'#be563c'">
+            </rect>
+            <image x="17"
+                   y="20"
+                   height="180"
+                   width="240"
+                   class="revision-icon"
+                   [attr.xlink:href]="getStaticImageUrl('/icons/review_icon_24px.svg')">
+            </image>
+          </a>
+        </svg>
+      </div>
+      <p [ngStyle]="{'font-style': 'italic'}">
+        {{ 'I18N_END_CHAPTER_REVISION_TAB_TEXT' | translate }}
+      </p>
+    </div>
   </div>
 </div>
 
@@ -61,7 +84,7 @@
     margin-bottom: 30px;
   }
   .post-chapter-recommendations-container .post-chapter-recommendation-text {
-    font-size: 1.4em;
+    font-size: 1.2em;
     text-align: center;
   }
   .post-chapter-recommendations-container .post-chapter-recommendation-cards-container {
@@ -86,6 +109,9 @@
     transform: scale(0.8);
   }
   .post-chapter-recommendation-cards-container .practice-icon {
+    transform: scale(0.7);
+  }
+  .post-chapter-recommendation-cards-container .revision-icon {
     transform: scale(0.7);
   }
   .post-chapter-recommendation-cards-container p {
