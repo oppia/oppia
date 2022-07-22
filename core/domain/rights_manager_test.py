@@ -286,7 +286,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
     ) -> None:
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'Cannot get activity rights for unknown activity'):
-            rights_manager._get_activity_rights('invalid_type', self.user_id_a)
+            rights_manager._get_activity_rights('invalid_type', self.user_id_a)  # pylint: disable=protected-access
 
     def test_inviting_playtester_to_exploration(self) -> None:
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
