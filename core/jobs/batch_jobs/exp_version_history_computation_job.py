@@ -467,9 +467,9 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
         """
         with datastore_services.get_ndb_context():
             snapshot_dict = snapshot_model.content
-            reconstituted_model = exp_models.ExplorationModel(
-                id=snapshot_model.get_unversioned_instance_id()
-            )._reconstitute(  # pylint: disable=protected-access
+            exp_id = snapshot_model.get_unversioned_instance_id()
+            model_class = exp_models.ExplorationModel
+            reconstituted_model = model_class(id=exp_id)._reconstitute(  # pylint: disable=protected-access
                 snapshot_dict
             )
             reconstituted_model.created_on = snapshot_model.created_on
