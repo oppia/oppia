@@ -40,14 +40,17 @@ import { UserService } from 'services/user.service';
 
 export interface Suggestion {
   change: {
-    skill_id: string;
+    skill_id?: string;
+    content_html: string;
     translation_html: string | string[];
-    question_dict: QuestionBackendDict;
-    skill_difficulty: string[];
+    question_dict?: QuestionBackendDict;
+    skill_difficulty?: string[];
   };
+  status: string;
+  suggestion_type: string;
   target_id: string;
   suggestion_id: string;
-  author_name: string;
+  author_name?: string;
 }
 
 export interface QuestionContributionsSummaryList {
@@ -76,6 +79,9 @@ export interface OpportunitiesDictsObject {
 export interface ContributionDetails {
   skill_description: string;
   skill_rubrics: Rubric[];
+  chapter_title: string;
+  story_title: string;
+  topic_name: string;
 }
 
 export interface ContributionTabs {
@@ -109,8 +115,8 @@ export interface SuggestionContributions {
 
 export interface Contributions {
   [key: string]: {
-    details: object | string;
-    suggestion: SuggestionContributions;
+    details: ContributionDetails | string;
+    suggestion: Suggestion;
   };
 }
 
@@ -133,14 +139,14 @@ export class ContributionsAndReview
   TAB_TYPE_REVIEWS: string;
   activeExplorationId: string;
   SUGGESTION_LABELS: SUGGESTION_LABELS;
-  contributions: Contributions[] | Contributions;
+  contributions: Contributions;
   userDetailsLoading: boolean;
   userIsLoggedIn: boolean;
   activeTabType: string;
   activeSuggestionType: string;
   dropdownShown: boolean;
   activeDropdownTabChoice: string;
-  reviewTabs: ReviewTabs[];
+  reviewTabs: ReviewTabs[] = [];
   contributionTabs: ContributionTabs[];
   tabNameToOpportunityFetchFunction: unknown;
 
@@ -290,7 +296,8 @@ export class ContributionsAndReview
   _showTranslationSuggestionModal(
       suggestionIdToContribution: Record<string, ActiveContributionDict>,
       initialSuggestionId: string, reviewable: boolean): void {
-    let details = this.contributions[initialSuggestionId].details;
+    let details = (
+      this.contributions[initialSuggestionId].details as ContributionDetails);
     let subheading = (
       details.topic_name + ' / ' + details.story_title +
       ' / ' + details.chapter_title);
@@ -350,7 +357,7 @@ export class ContributionsAndReview
       let skill = skillDict.skill;
       misconceptionsBySkill[skill.getId()] = skill.getMisconceptions();
       this._showQuestionSuggestionModal(
-        suggestion, contributionDetails, reviewable,
+        suggestion, contributionDetails as ContributionDetails, reviewable,
         misconceptionsBySkill, question);
     });
   }
@@ -515,7 +522,6 @@ export class ContributionsAndReview
     this.TAB_TYPE_REVIEWS = 'reviews';
     this.activeExplorationId = null;
 
-    this.contributions = [];
     this.userDetailsLoading = true;
     this.userIsLoggedIn = false;
     this.activeTabType = '';

@@ -152,8 +152,8 @@ export class VersionDiffVisualizationComponent implements OnInit {
   diffGraphSecondaryLabels: DiffGraphSecondaryLabels;
   DIFF_GRAPH_LINK_PROPERTY_MAPPING: DIFF_GRAPH_LINK_PROPERTY_MAPPING;
   legendGraph: LegendGraph;
-  LEGEND_GRAPH_COLORS: LEGEND_GRAPH_COLORS;
-  LEGEND_GRAPH_SECONDARY_LABELS: LEGEND_GRAPH_SECONDARY_LABELS;
+  LEGEND_GRAPH_COLORS: LEGEND_GRAPH_COLORS | object;
+  LEGEND_GRAPH_SECONDARY_LABELS: LEGEND_GRAPH_SECONDARY_LABELS | object;
   LEGEND_GRAPH_LINK_PROPERTY_MAPPING: LEGEND_GRAPH_LINK_PROPERTY_MAPPING;
 
   constructor(
@@ -227,6 +227,7 @@ export class VersionDiffVisualizationComponent implements OnInit {
     this._stateTypeUsed[this.NODE_TYPE_UNCHANGED] = false;
     this._stateTypeUsed[this.NODE_TYPE_RENAMED] = false;
     this._stateTypeUsed[this.NODE_TYPE_CHANGED_RENAMED] = false;
+    this.LEGEND_GRAPH_COLORS = {};
     this.LEGEND_GRAPH_COLORS[this.NODE_TYPE_ADDED] = this.COLOR_ADDED;
     this.LEGEND_GRAPH_COLORS[this.NODE_TYPE_DELETED] = this.COLOR_DELETED;
     this.LEGEND_GRAPH_COLORS[this.NODE_TYPE_CHANGED] = this.COLOR_CHANGED;
@@ -236,6 +237,7 @@ export class VersionDiffVisualizationComponent implements OnInit {
     this.LEGEND_GRAPH_COLORS[this.NODE_TYPE_CHANGED_RENAMED] = (
       this.COLOR_CHANGED);
 
+    this.LEGEND_GRAPH_SECONDARY_LABELS = {};
     this.LEGEND_GRAPH_SECONDARY_LABELS[this.NODE_TYPE_CHANGED_RENAMED] = (
       '(was: Old name)');
     this.LEGEND_GRAPH_SECONDARY_LABELS[this.NODE_TYPE_RENAMED] = (

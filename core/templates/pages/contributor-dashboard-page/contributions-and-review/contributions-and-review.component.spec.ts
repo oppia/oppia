@@ -20,7 +20,7 @@ import { ComponentFixture, fakeAsync, flush, TestBed, tick, waitForAsync } from 
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ExplorationOpportunitySummary } from 'domain/opportunity/exploration-opportunity-summary.model';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { ContributionsAndReview, SuggestionContributions } from './contributions-and-review.component';
+import { ContributionDetails, ContributionsAndReview, Suggestion } from './contributions-and-review.component';
 import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
 import { TranslationTopicService } from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
 import { MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFactory';
@@ -643,12 +643,12 @@ describe('Contributions and review component', () => {
 
       component.contributions = {
         suggestion_id: {
-          details: contributionDetails,
+          details: contributionDetails as ContributionDetails,
           suggestion: null,
         }
       };
       component.openQuestionSuggestionModal(
-        'suggestion_id', suggestion,
+        'suggestion_id', suggestion as Suggestion,
         false,
         question);
 
@@ -694,7 +694,7 @@ describe('Contributions and review component', () => {
         author_name: 'string;',
       };
 
-      component.getTranslationSuggestionHeading(suggestion);
+      component.getTranslationSuggestionHeading(suggestion as Suggestion);
       component.resolveSuggestionSuccess('suggestion_id');
       tick();
 
@@ -716,8 +716,15 @@ describe('Contributions and review component', () => {
         SUGGESTION: {
           details: null,
           suggestion: {
-            suggestion_type: 'SUGGESTION'
-          } as SuggestionContributions
+            suggestion_type: 'SUGGESTION',
+            suggestion_id: '',
+            target_id: 'target_id',
+            change: {
+              content_html: '',
+              translation_html: '',
+            },
+            status: '',
+          }
         }
       };
 
@@ -892,7 +899,7 @@ describe('Contributions and review component', () => {
           inapplicable_skill_misconception_ids: ['abc-2']
         });
       component._showQuestionSuggestionModal(
-        suggestion, contributionDetails,
+        suggestion as Suggestion, contributionDetails as ContributionDetails,
         false,
         null,
         question);
@@ -954,7 +961,6 @@ describe('Contributions and review component', () => {
     it('should return empty list if tab is not initialized', () => {
       component.activeTabType = null;
       component.loadContributions(null).then(({opportunitiesDicts, more}) => {
-        expect(component.contributions).toEqual({});
         expect(opportunitiesDicts).toEqual([]);
         expect(more).toEqual(false);
       });
@@ -964,7 +970,6 @@ describe('Contributions and review component', () => {
       () => {
         component.activeTabType = null;
         component.loadContributions(null).then(({opportunitiesDicts, more}) => {
-          expect(component.contributions).toEqual({});
           expect(opportunitiesDicts).toEqual([]);
           expect(more).toEqual(false);
         });
@@ -1139,7 +1144,7 @@ describe('Contributions and review component', () => {
 
       spyOn(formatRtePreviewPipe, 'transform').and.returnValue('heading');
       component.getQuestionContributionsSummary([{
-        suggestion: suggestion,
+        suggestion: suggestion as Suggestion,
         details: null,
       }]);
 
