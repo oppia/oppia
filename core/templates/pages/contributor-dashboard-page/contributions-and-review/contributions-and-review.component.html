@@ -25,7 +25,7 @@
           Contributions
         </div>
         <div class="oppia-contributions-dropdown-list-option"
-             *ngIf="tab.enabled">
+             *ngIf="tab?.enabled">
           <div *ngFor="let tab of contributionTabs"
                (click)="switchToTab(TAB_TYPE_CONTRIBUTIONS, tab.suggestionType)"
                [ngClass]="isActiveTab(TAB_TYPE_CONTRIBUTIONS, tab.suggestionType) ? 'oppia-contributions-dropdown-list-option-selected' : ''">
@@ -50,7 +50,7 @@
     <div class="oppia-contributions-side-navbar-part" *ngIf="userIsLoggedIn">
       <div class="oppia-contributions-navbar-items-list" navbar-label="Contributions">
         <div class="oppia-contributions-navbar-item" *ngFor="let tab of contributionTabs">
-          <button *ngIf="tab.enabled"
+          <button *ngIf="tab?.enabled"
                   class="oppia-contributions-navbar-button"
                   (click)="switchToTab(TAB_TYPE_CONTRIBUTIONS, tab.suggestionType)"
                   [ngClass]="isActiveTab(TAB_TYPE_CONTRIBUTIONS, tab.suggestionType) ? 'oppia-contributions-active-navbar' : ''">{{tab.text}}

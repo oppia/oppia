@@ -1,7 +1,7 @@
 <div>
   <div class="oppia-contributor-home">
     <div class="oppia-opportunities-tabs">
-      <ul class="oppia-opportunities-tabs-list">
+      <ul class="oppia-opportunities-tabs-list" *ngIf="tabsDetails">
         <li [ngClass]="{'oppia-active-opportunities-tab': item.key === activeTabName}"
             class="oppia-opportunities-tab-item"
             *ngFor="let item of tabsDetails | keyvalue"

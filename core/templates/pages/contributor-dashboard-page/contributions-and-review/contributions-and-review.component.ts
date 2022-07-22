@@ -471,6 +471,8 @@ export class ContributionsAndReview
     const fetchFunction = this.tabNameToOpportunityFetchFunction[
       this.activeSuggestionType][this.activeTabType];
 
+    this.contributions = {};
+
     return fetchFunction(shouldResetOffset).then((response) => {
       Object.keys(response.suggestionIdToDetails).forEach(id => {
         this.contributions[id] = response.suggestionIdToDetails[id];
