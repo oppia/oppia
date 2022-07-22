@@ -29,7 +29,7 @@ from core.domain import stats_services
 from core.domain import taskqueue_services
 from core.platform import models
 
-from typing import Any, Dict, Optional, Union
+from typing import Any, Callable, Dict, Optional, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -51,16 +51,10 @@ class BaseEventHandler:
     # subclasses and considered immutable.
     EVENT_TYPE: Optional[str] = None
 
-    # Here both the arguments are annotated with Any type because in child
-    # classes this method can be redefined with any number of named and keyword
-    # arguments with different kind of types.
-    @classmethod
-    def _handle_event(cls, *args: Any, **kwargs: Any) -> None:
-        """Perform in-request processing of an incoming event."""
-        raise NotImplementedError(
-            'Subclasses of BaseEventHandler should implement the '
-            '_handle_event() method, using explicit arguments '
-            '(no *args or **kwargs).')
+    # Here, `_handle_event` is added only to inform MyPy that
+    # method `_handle_event` is always going to exists and it
+    # has type Callable[..., None].
+    _handle_event: Callable[..., None]
 
     # Here both the arguments are annotated with Any type because in child
     # classes this method can be redefined with any number of named and keyword
@@ -70,7 +64,18 @@ class BaseEventHandler:
         """Process incoming events.
 
         Callers of event handlers should call this method, not _handle_event().
+
+        Raises:
+            NotImplementedError. The method _handle_event is not implemented in
+                derived classes.
         """
+        if getattr(cls, '_handle_event', None) is None:
+            raise NotImplementedError(
+                'Subclasses of BaseEventHandler should implement the '
+                '_handle_event() method, using explicit arguments '
+                '(no *args or **kwargs).'
+            )
+
         cls._handle_event(*args, **kwargs)
 
 
@@ -89,15 +94,16 @@ class StatsEventsHandler(BaseEventHandler):
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
         return exploration.version == exp_version
 
-    # We have ignored [override] here because the signature of this method
-    # doesn't match with BaseEventHandler._handle_event().
     @classmethod
-    def _handle_event(  # type: ignore[override]
+    def _handle_event(
         cls,
         exploration_id: str,
         exp_version: int,
         aggregated_stats: Dict[str, Dict[str, Union[int, str]]]
     ) -> None:
+        """Handle events for incremental update to analytics models using
+        aggregated stats data.
+        """
         if 'undefined' in aggregated_stats['state_stats_mapping']:
             logging.error(
                 'Aggregated stats contains an undefined state name: %s'
@@ -116,10 +122,8 @@ class AnswerSubmissionEventHandler(BaseEventHandler):
 
     EVENT_TYPE: str = feconf.EVENT_TYPE_ANSWER_SUBMITTED
 
-    # We have ignored [override] here because the signature of this method
-    # doesn't match with BaseEventHandler._handle_event().
     @classmethod
-    def _handle_event(  # type: ignore[override]
+    def _handle_event(
         cls,
         exploration_id: str,
         exploration_version: int,
@@ -159,12 +163,13 @@ class ExplorationActualStartEventHandler(BaseEventHandler):
 
     EVENT_TYPE: str = feconf.EVENT_TYPE_ACTUAL_START_EXPLORATION
 
-    # We have ignored [override] here because the signature of this method
-    # doesn't match with BaseEventHandler._handle_event().
     @classmethod
-    def _handle_event(  # type: ignore[override]
+    def _handle_event(
         cls, exp_id: str, exp_version: int, state_name: str, session_id: str
     ) -> None:
+        """Perform in-request processing of recording exploration actual start
+        events.
+        """
         stats_models.ExplorationActualStartEventLogEntryModel.create(
             exp_id, exp_version, state_name, session_id)
 
@@ -174,10 +179,8 @@ class SolutionHitEventHandler(BaseEventHandler):
 
     EVENT_TYPE: str = feconf.EVENT_TYPE_SOLUTION_HIT
 
-    # We have ignored [override] here because the signature of this method
-    # doesn't match with BaseEventHandler._handle_event().
     @classmethod
-    def _handle_event(  # type: ignore[override]
+    def _handle_event(
         cls,
         exp_id: str,
         exp_version: int,
@@ -185,6 +188,7 @@ class SolutionHitEventHandler(BaseEventHandler):
         session_id: str,
         time_spent_in_state_secs: float
     ) -> None:
+        """Perform in-request processing of recording solution hit events."""
         stats_models.SolutionHitEventLogEntryModel.create(
             exp_id, exp_version, state_name, session_id,
             time_spent_in_state_secs)
@@ -195,10 +199,8 @@ class StartExplorationEventHandler(BaseEventHandler):
 
     EVENT_TYPE: str = feconf.EVENT_TYPE_START_EXPLORATION
 
-    # We have ignored [override] here because the signature of this method
-    # doesn't match with BaseEventHandler._handle_event().
     @classmethod
-    def _handle_event(  # type: ignore[override]
+    def _handle_event(
         cls,
         exp_id: str,
         exp_version: int,
@@ -207,6 +209,9 @@ class StartExplorationEventHandler(BaseEventHandler):
         params: Dict[str, str],
         play_type: str
     ) -> None:
+        """Perform in-request processing of recording exploration start
+        events.
+        """
         stats_models.StartExplorationEventLogEntryModel.create(
             exp_id, exp_version, state_name, session_id, params,
             play_type)
@@ -218,10 +223,8 @@ class MaybeLeaveExplorationEventHandler(BaseEventHandler):
 
     EVENT_TYPE: str = feconf.EVENT_TYPE_MAYBE_LEAVE_EXPLORATION
 
-    # We have ignored [override] here because the signature of this method
-    # doesn't match with BaseEventHandler._handle_event().
     @classmethod
-    def _handle_event(  # type: ignore[override]
+    def _handle_event(
         cls,
         exp_id: str,
         exp_version: int,
@@ -231,6 +234,9 @@ class MaybeLeaveExplorationEventHandler(BaseEventHandler):
         params: Dict[str, str],
         play_type: str
     ) -> None:
+        """Perform in-request processing of recording exploration leave
+        events.
+        """
         stats_models.MaybeLeaveExplorationEventLogEntryModel.create(
             exp_id, exp_version, state_name, session_id, time_spent,
             params, play_type)
@@ -241,10 +247,8 @@ class CompleteExplorationEventHandler(BaseEventHandler):
 
     EVENT_TYPE: str = feconf.EVENT_TYPE_COMPLETE_EXPLORATION
 
-    # We have ignored [override] here because the signature of this method
-    # doesn't match with BaseEventHandler._handle_event().
     @classmethod
-    def _handle_event(  # type: ignore[override]
+    def _handle_event(
         cls,
         exp_id: str,
         exp_version: int,
@@ -254,6 +258,9 @@ class CompleteExplorationEventHandler(BaseEventHandler):
         params: Dict[str, str],
         play_type: str
     ) -> None:
+        """Perform in-request processing of recording exploration completion
+        events.
+        """
         stats_models.CompleteExplorationEventLogEntryModel.create(
             exp_id, exp_version, state_name, session_id, time_spent,
             params, play_type)
@@ -264,16 +271,17 @@ class RateExplorationEventHandler(BaseEventHandler):
 
     EVENT_TYPE: str = feconf.EVENT_TYPE_RATE_EXPLORATION
 
-    # We have ignored [override] here because the signature of this method
-    # doesn't match with BaseEventHandler._handle_event().
     @classmethod
-    def _handle_event(  # type: ignore[override]
+    def _handle_event(
         cls,
         exp_id: str,
         user_id: str,
         rating: int,
         old_rating: int
     ) -> None:
+        """Perform in-request processing of recording exploration rating
+        events.
+        """
         stats_models.RateExplorationEventLogEntryModel.create(
             exp_id, user_id, rating, old_rating)
         handle_exploration_rating(exp_id, rating, old_rating)
@@ -285,10 +293,8 @@ class StateHitEventHandler(BaseEventHandler):
     EVENT_TYPE: str = feconf.EVENT_TYPE_STATE_HIT
 
     # TODO(sll): Remove params before sending this event to the jobs taskqueue.
-    # We have ignored [override] here because the signature of this method
-    # doesn't match with BaseEventHandler._handle_event().
     @classmethod
-    def _handle_event(  # type: ignore[override]
+    def _handle_event(
         cls,
         exp_id: str,
         exp_version: int,
@@ -297,6 +303,7 @@ class StateHitEventHandler(BaseEventHandler):
         params: Dict[str, str],
         play_type: str
     ) -> None:
+        """Perform in-request processing of recording state hit events."""
         stats_models.StateHitEventLogEntryModel.create(
             exp_id, exp_version, state_name, session_id,
             params, play_type)
@@ -307,10 +314,8 @@ class StateCompleteEventHandler(BaseEventHandler):
 
     EVENT_TYPE: str = feconf.EVENT_TYPE_STATE_COMPLETED
 
-    # We have ignored [override] here because the signature of this method
-    # doesn't match with BaseEventHandler._handle_event().
     @classmethod
-    def _handle_event(  # type: ignore[override]
+    def _handle_event(
         cls,
         exp_id: str,
         exp_version: int,
@@ -318,6 +323,7 @@ class StateCompleteEventHandler(BaseEventHandler):
         session_id: str,
         time_spent_in_state_secs: float
     ) -> None:
+        """Perform in-request processing of recording state complete events."""
         stats_models.StateCompleteEventLogEntryModel.create(
             exp_id, exp_version, state_name, session_id,
             time_spent_in_state_secs)
@@ -328,10 +334,8 @@ class LeaveForRefresherExpEventHandler(BaseEventHandler):
 
     EVENT_TYPE: str = feconf.EVENT_TYPE_LEAVE_FOR_REFRESHER_EXP
 
-    # We have ignored [override] here because the signature of this method
-    # doesn't match with BaseEventHandler._handle_event().
     @classmethod
-    def _handle_event(  # type: ignore[override]
+    def _handle_event(
         cls,
         exp_id: str,
         refresher_exp_id: str,
@@ -340,6 +344,9 @@ class LeaveForRefresherExpEventHandler(BaseEventHandler):
         session_id: str,
         time_spent_in_state_secs: float
     ) -> None:
+        """Perform in-request processing of recording "leave for refresher
+        exploration" events.
+        """
         stats_models.LeaveForRefresherExplorationEventLogEntryModel.create(
             exp_id, refresher_exp_id, exp_version, state_name, session_id,
             time_spent_in_state_secs)
@@ -350,10 +357,11 @@ class FeedbackThreadCreatedEventHandler(BaseEventHandler):
 
     EVENT_TYPE: str = feconf.EVENT_TYPE_NEW_THREAD_CREATED
 
-    # We have ignored [override] here because the signature of this method
-    # doesn't match with BaseEventHandler._handle_event().
     @classmethod
-    def _handle_event(cls, exp_id: str) -> None:  # type: ignore[override]
+    def _handle_event(cls, exp_id: str) -> None:
+        """Perform in-request processing of recording new feedback thread
+        creation events.
+        """
         feedback_services.handle_new_thread_created(exp_id)  # type: ignore[no-untyped-call]
 
 
@@ -362,15 +370,16 @@ class FeedbackThreadStatusChangedEventHandler(BaseEventHandler):
 
     EVENT_TYPE: str = feconf.EVENT_TYPE_THREAD_STATUS_CHANGED
 
-    # We have ignored [override] here because the signature of this method
-    # doesn't match with BaseEventHandler._handle_event().
     @classmethod
-    def _handle_event(  # type: ignore[override]
+    def _handle_event(
         cls,
         exp_id: str,
         old_status: str,
         new_status: str
     ) -> None:
+        """Perform in-request processing of recording reopening feedback
+        thread events.
+        """
         feedback_services.handle_thread_status_changed(  # type: ignore[no-untyped-call]
             exp_id, old_status, new_status)
 

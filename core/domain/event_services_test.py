@@ -363,10 +363,9 @@ class TestEventHandler(event_services.BaseEventHandler):
 
     EVENT_TYPE = 'test_event'
 
-    # We have ignored [override] here because the signature of this method
-    # doesn't match with BaseEventHandler._handle_event().
     @classmethod
-    def _handle_event(cls, number: int) -> None:  # type: ignore[override]
+    def _handle_event(cls, number: int) -> None:
+        """Mock event handler method to process 'test_event' events."""
         MockNumbersModel(number=number).put()
 
 
