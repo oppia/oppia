@@ -1125,11 +1125,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
     # TODO(bhenning): The validation tests below should be split into separate
     # unit tests. Also, all validation errors should be covered in the tests.
-    # TODO(#13059): After we fully type the codebase we plan to get
-    # rid of the tests that intentionally test wrong inputs that we
-    # can normally catch by typing. In this test, only some cases should be
-    # removed, preferably those cases that include type ignores with either
-    # arg-type or assignment.
     def test_validation(self) -> None:
         """Test validation of explorations."""
         exploration = exp_domain.Exploration.create_default_exploration('eid')
@@ -1296,6 +1291,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(  # type: ignore[no-untyped-call]
             exploration, 'RuleSpec \'Contains\' is missing inputs')
 
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
         rule_spec.inputs = 'Inputs string'  # type: ignore[assignment]
         self._assert_validation_error(  # type: ignore[no-untyped-call]
             exploration, 'Expected inputs to be a dict')
@@ -1343,6 +1341,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         # Validate Outcome.
         outcome = init_state.interaction.answer_groups[0].outcome
         destination = exploration.init_state_name
+
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
         outcome.dest = None  # type: ignore[assignment]
         self._assert_validation_error(  # type: ignore[no-untyped-call]
             exploration, 'Every outcome should have a destination.')
@@ -1350,6 +1352,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         outcome.dest = destination
 
         default_outcome = init_state.interaction.default_outcome
+
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
         default_outcome.dest_if_really_stuck = 20  # type: ignore[assignment]
 
         self._assert_validation_error(  # type: ignore[no-untyped-call]
@@ -1358,6 +1364,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         default_outcome.dest_if_really_stuck = None
 
         # Try setting the outcome destination to something other than a string.
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
         outcome.dest = 15  # type: ignore[assignment]
         self._assert_validation_error(  # type: ignore[no-untyped-call]
             exploration, 'Expected outcome dest to be a string')
@@ -1367,6 +1376,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         outcome.feedback = state_domain.SubtitledHtml('feedback_1', '')
         exploration.validate()
 
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
         outcome.labelled_as_correct = 'hello'  # type: ignore[assignment]
         self._assert_validation_error(  # type: ignore[no-untyped-call]
             exploration, 'The "labelled_as_correct" field should be a boolean')
@@ -1386,6 +1398,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         # Try setting the outcome destination if stuck to something other
         # than a string.
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
         outcome.dest_if_really_stuck = 30  # type: ignore[assignment]
         self._assert_validation_error(  # type: ignore[no-untyped-call]
             exploration, 'Expected dest_if_really_stuck to be a string')
@@ -1409,6 +1424,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.validate()
 
         outcome.dest = destination
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
         outcome.param_changes = 'Changes'  # type: ignore[assignment]
         self._assert_validation_error(  # type: ignore[no-untyped-call]
             exploration, 'Expected outcome param_changes to be a list')
@@ -1425,6 +1443,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         outcome.param_changes = []
         exploration.validate()
 
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
         outcome.refresher_exploration_id = 12345  # type: ignore[assignment]
         self._assert_validation_error(  # type: ignore[no-untyped-call]
             exploration,
@@ -1436,6 +1457,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         outcome.refresher_exploration_id = 'valid_string'
         exploration.validate()
 
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
         outcome.missing_prerequisite_skill_id = 12345  # type: ignore[assignment]
         self._assert_validation_error(  # type: ignore[no-untyped-call]
             exploration,
@@ -1462,6 +1486,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.delete_state(new_state_name)
 
         # Validate InteractionInstance.
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
         interaction.id = 15  # type: ignore[assignment]
         self._assert_validation_error(  # type: ignore[no-untyped-call]
             exploration, 'Expected interaction id to be a string')
@@ -1484,6 +1511,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         rule_spec.rule_type = 'Contains'
         exploration.validate()
 
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
         interaction.customization_args = []  # type: ignore[assignment]
         self._assert_validation_error(  # type: ignore[no-untyped-call]
             exploration, 'Expected customization args to be a dict')
@@ -1500,6 +1530,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             )
         )
 
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
         interaction.customization_args = {
             15: state_domain.InteractionCustomizationArg('', {  # type: ignore[dict-item, no-untyped-call]
                 'type': 'unicode'
@@ -1512,6 +1545,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self.set_interaction_for_state(init_state, 'TextInput')  # type: ignore[no-untyped-call]
         exploration.validate()
 
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
         interaction.answer_groups = {}  # type: ignore[assignment]
         self._assert_validation_error(  # type: ignore[no-untyped-call]
             exploration, 'Expected answer groups to be a list')
@@ -1566,12 +1602,19 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             re.escape('Hint(s) must be specified if solution is specified'))
 
         init_state.update_interaction_solution(None)  # type: ignore[no-untyped-call]
+
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
         interaction.hints = {}  # type: ignore[assignment]
         self._assert_validation_error(  # type: ignore[no-untyped-call]
             exploration, 'Expected hints to be a list')
         interaction.hints = []
 
         # Validate AnswerGroup.
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name, None, state_domain.SubtitledHtml(
@@ -1623,6 +1666,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'to be <skill_id>-<misconception_id>, received '
             'invalid_tagged_skill_misconception_id')
 
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
         init_state.interaction.answer_groups[0].rule_specs = {}  # type: ignore[assignment]
         self._assert_validation_error(  # type: ignore[no-untyped-call]
             exploration, 'Expected answer group rules to be a list')
@@ -1651,6 +1697,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.language_code = 'en'
         exploration.validate()
 
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
         exploration.param_specs = 'A string'  # type: ignore[assignment]
         self._assert_validation_error(exploration, 'param_specs to be a dict')  # type: ignore[no-untyped-call]
 
