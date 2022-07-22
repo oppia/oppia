@@ -1068,6 +1068,19 @@ describe('Contributions and review component', () => {
         .toHaveBeenCalled();
     }));
 
+    it('should get Translation Suggestion Heading', () => {
+      spyOn(formatRtePreviewPipe, 'transform').and.stub();
+      let value = {
+        change: {
+          translation_html: 'string'
+        }
+      };
+
+      component.getTranslationSuggestionHeading(value as Suggestion);
+
+      expect(formatRtePreviewPipe.transform).toHaveBeenCalled();
+    });
+
     it('should load contributions correctly', () => {
       component.loadOpportunities().then(({opportunitiesDicts, more}) => {
         expect(Object.keys(component.contributions)).toContain('suggestion_1');
@@ -1123,16 +1136,23 @@ describe('Contributions and review component', () => {
 
     it('should set getQuestionContributionsSummary summary', () => {
       let suggestion = {
-        change: {
-          skill_id: 'skill1',
-          question_dict: null,
-          skill_difficulty: null,
-          translation_html: ['suggestion_1', 'suggestion_2']
-        },
-        target_id: 'string;,',
-        suggestion_id: 'suggestion_id',
-        author_name: 'string;',
-        status: 'ready'
+        key: {
+          suggestion: {
+            change: {
+              skill_id: 'string',
+              content_html: 'string',
+              translation_html: 'html',
+              question_dict: null,
+              skill_difficulty: null
+            },
+            target_id: 'string;,',
+            suggestion_id: 'suggestion_id',
+            author_name: 'string;',
+            status: 'ready',
+            suggestion_type: 'string'
+          } as Suggestion,
+          details: null,
+        }
       };
 
       component.SUGGESTION_LABELS = {
@@ -1143,15 +1163,9 @@ describe('Contributions and review component', () => {
       };
 
       spyOn(formatRtePreviewPipe, 'transform').and.returnValue('heading');
-      component.getQuestionContributionsSummary([{
-        suggestion: suggestion as Suggestion,
-        details: null,
-      }]);
+      component.getQuestionContributionsSummary(suggestion);
 
-      component.getTranslationContributionsSummary([{
-        suggestion: suggestion,
-        details: null,
-      }]);
+      component.getTranslationContributionsSummary(suggestion);
     });
 
     it('should open show translation suggestion modal when clicking on' +
@@ -1169,6 +1183,137 @@ describe('Contributions and review component', () => {
       component.switchToTab(
         component.TAB_TYPE_CONTRIBUTIONS, 'translate_content');
     });
+
+    it('should load new loadContributions', fakeAsync(() => {
+      spyOn(component, 'getContributionSummaries').and.returnValue(null);
+
+      component.activeTabType = 'activeTabType';
+      component.activeSuggestionType = 'activeSuggestionType';
+      component.contributions = {
+        1: null,
+        2: null,
+      };
+
+      component.tabNameToOpportunityFetchFunction = {
+        activeSuggestionType: {
+          activeTabType: (shouldResetOffset) => {
+            return Promise.resolve({
+              suggestionIdToDetails: {
+                1: {},
+                2: {}
+              },
+              more: false
+            });
+          }
+        }
+      };
+
+      component.loadContributions(true).then((value) => {
+        tick();
+        expect(value).toEqual({
+          opportunitiesDicts: null,
+          more: false
+        });
+      });
+    }));
+
+    it('should get Translation Contributions Summary', fakeAsync(() => {
+      spyOn(component, 'getTranslationSuggestionHeading')
+        .and.returnValue('heading');
+      let suggestionIdToSuggestions = {
+        suggestion: {
+          suggestion: {
+            suggestion_id: 'id',
+            status: 'status'
+          } as Suggestion,
+          details: {
+            skill_description: 'skill_description',
+            topic_name: 'topic_name',
+            story_title: 'story_title',
+            chapter_title: 'chapter_title'
+          }
+        }
+      };
+      component.SUGGESTION_LABELS = {
+        status: {
+          text: 'text',
+          color: 'color'
+        }
+      };
+      component.activeTabType = component.TAB_TYPE_REVIEWS;
+      tick();
+
+      expect(component.getTranslationContributionsSummary(
+        suggestionIdToSuggestions)).toEqual([{
+        id: 'id',
+        heading: 'heading',
+        subheading: 'topic_name / story_title / chapter_title',
+        labelText: 'text',
+        labelColor: 'color',
+        actionButtonTitle: 'Review'
+      }]);
+    }));
+
+    it('should get Question Contributions Summary', fakeAsync(() => {
+      spyOn(component, 'getTranslationSuggestionHeading')
+        .and.returnValue('heading');
+      spyOn(formatRtePreviewPipe, 'transform').and.returnValue('heading');
+      let suggestionIdToSuggestions = {
+        suggestion: {
+          suggestion: {
+            suggestion_type: null,
+            target_id: null,
+            suggestion_id: 'id',
+            status: 'status',
+            change: {
+              question_dict: null
+            }
+          } as Suggestion,
+          details: {
+            skill_description: 'skill_description',
+            topic_name: 'topic_name',
+            story_title: 'story_title',
+            chapter_title: 'chapter_title'
+          }
+        }
+      };
+      component.SUGGESTION_LABELS = {
+        status: {
+          text: 'text',
+          color: 'color'
+        }
+      };
+      component.activeTabType = component.TAB_TYPE_REVIEWS;
+      tick();
+
+      expect(component.getQuestionContributionsSummary(
+        suggestionIdToSuggestions)).toEqual([{
+        id: 'id',
+        heading: 'heading',
+        subheading: 'skill_description',
+        labelText: 'text',
+        labelColor: 'color',
+        actionButtonTitle: 'Review'
+      }]);
+    }));
+
+    it('should get Contribution Summaries', fakeAsync(() => {
+      spyOn(component, 'getTranslationContributionsSummary').and.stub();
+      spyOn(component, 'getQuestionContributionsSummary').and.stub();
+
+      component.activeSuggestionType = component.SUGGESTION_TYPE_TRANSLATE;
+      component.getContributionSummaries(null);
+      tick();
+
+      component.activeSuggestionType = component.SUGGESTION_TYPE_QUESTION;
+      component.getContributionSummaries(null);
+      tick();
+
+      expect(component.getTranslationContributionsSummary)
+        .toHaveBeenCalledWith(null);
+      expect(component.getTranslationContributionsSummary)
+        .toHaveBeenCalledWith(null);
+    }));
 
     it('should remove resolved suggestions when suggestion ' +
       'modal is opened and remove button is clicked', fakeAsync(() => {

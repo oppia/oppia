@@ -91,8 +91,15 @@ export interface ContributionTabs {
 }
 
 export interface SuggestionIdToSuggestions {
-  suggestion: Suggestion;
-  details: string;
+  [key: string]: {
+    suggestion: Suggestion;
+    details: {
+      skill_description: string;
+      topic_name: string;
+      chapter_title: string;
+      story_title: string;
+    };
+  };
 }
 
 export interface SUGGESTION_LABELS {
@@ -164,7 +171,7 @@ export class ContributionsAndReview
   ) {}
 
   getQuestionContributionsSummary(
-      suggestionIdToSuggestions: SuggestionIdToSuggestions[]):
+      suggestionIdToSuggestions: SuggestionIdToSuggestions):
       QuestionContributionsSummaryList[] {
     let questionContributionsSummaryList = [];
     Object.keys(suggestionIdToSuggestions).forEach((key) => {
@@ -195,7 +202,7 @@ export class ContributionsAndReview
   }
 
   getTranslationContributionsSummary(
-      suggestionIdToSuggestions: unknown[]
+      suggestionIdToSuggestions: SuggestionIdToSuggestions
   ): TranslationContributionsSummaryList[] {
     let translationContributionsSummaryList = [];
 
@@ -383,7 +390,7 @@ export class ContributionsAndReview
   }
 
   getContributionSummaries(
-      suggestionIdToSuggestions: SuggestionIdToSuggestions[]
+      suggestionIdToSuggestions: SuggestionIdToSuggestions
   ): TranslationContributionsSummaryList[] |
     QuestionContributionsSummaryList[] {
     if (this.activeSuggestionType === this.SUGGESTION_TYPE_TRANSLATE) {
