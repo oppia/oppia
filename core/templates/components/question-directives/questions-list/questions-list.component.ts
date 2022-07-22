@@ -19,7 +19,7 @@
 import { AlertsService } from 'services/alerts.service';
 import { AppConstants } from 'app.constants';
 import { CategorizedSkills, SelectSkillModalComponent } from 'components/skill-selector/select-skill-modal.component';
-import { ChangeDetectorRef, Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { ConfirmQuestionExitModalComponent } from '../modal-templates/confirm-question-exit-modal.component';
 import { ContextService } from 'services/context.service';
 import { downgradeComponent } from '@angular/upgrade/static';
@@ -58,7 +58,7 @@ interface GroupedSkillSummaries {
   selector: 'oppia-questions-list',
   templateUrl: './questions-list.component.html'
 })
-export class QuestionsListComponent implements OnInit, OnDestroy, OnChanges {
+export class QuestionsListComponent implements OnInit, OnDestroy {
   @Input() allSkillSummaries: ShortSkillSummary[];
   @Input() canEditQuestion: boolean;
   @Input() groupedSkillSummaries: GroupedSkillSummaries;
@@ -112,17 +112,6 @@ export class QuestionsListComponent implements OnInit, OnDestroy, OnChanges {
     private windowDimensionsService: WindowDimensionsService,
     private windowRef: WindowRef,
   ) { }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    // QuestionsListService takes time to
-    // update QuestionSummariesForOneSkill when new
-    // skill is selected from dropdown
-    // in topic quesiton tab component.
-    setTimeout(() => {
-      this.getQuestionSummariesForOneSkill();
-      this.changeDetectorRef.detectChanges();
-    }, 300);
-  }
 
   initializeNewQuestionCreation(skillIds: string[]): void {
     this.question =
@@ -665,6 +654,8 @@ export class QuestionsListComponent implements OnInit, OnDestroy, OnChanges {
         () => {
           this._initTab(false);
           this.focusManagerService.setFocus('newQuestionBtn');
+          this.getQuestionSummariesForOneSkill();
+          this.changeDetectorRef.detectChanges();
         }));
 
     this.showDifficultyChoices = false;

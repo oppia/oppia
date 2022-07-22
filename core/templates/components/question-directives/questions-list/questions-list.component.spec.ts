@@ -250,17 +250,6 @@ describe('Questions List Component', () => {
     component.selectedSkillId = 'skillId1';
   });
 
-  it('should set updated component properties on changes', fakeAsync(() => {
-    spyOn(component, 'getQuestionSummariesForOneSkill').and.stub();
-
-    component.ngOnChanges(null);
-    tick(400);
-
-    expect(component.getQuestionSummariesForOneSkill).toHaveBeenCalled();
-
-    component.ngOnDestroy();
-  }));
-
   it('should subscribe to question summaries init event on' +
     ' component initialization', () => {
     spyOn(questionsListService.onQuestionSummariesInitialized, 'subscribe');
