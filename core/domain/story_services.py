@@ -39,7 +39,7 @@ from core.domain import suggestion_services
 from core.domain import topic_fetchers
 from core.platform import models
 
-from typing import List, Optional
+from typing import List
 
 (exp_models, story_models, user_models,) = models.Registry.import_models(
     [models.NAMES.exploration, models.NAMES.story, models.NAMES.user])
