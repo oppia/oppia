@@ -237,8 +237,6 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
 
     this.interactionIsShown = false;
     this.stateEditorInitialized = false;
-    // The _init function is written separately since it is also called
-    // in $scope.$on when some external events are triggered.
     this._init();
   }
 
