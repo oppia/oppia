@@ -914,13 +914,6 @@ def _save_collection(
             collection_node.to_dict() for collection_node in collection.nodes
         ]
     }
-    # Here, collection_model is an instance of `CollectionModel` and
-    # `CollectionModel` does not contain any `node_count` attribute, but
-    # below we are defining a `node_count` attribute which causes MyPy to
-    # throw an error ("CollectionModel" has no attribute "node_count").
-    # Thus to avoid the error, we used an ignore here.
-    collection_model.node_count = len(  # type: ignore[attr-defined]
-        collection_model.collection_contents['nodes'])
     collection_model.commit(committer_id, commit_message, change_list)
     caching_services.delete_multi(
         caching_services.CACHE_NAMESPACE_COLLECTION, None, [collection.id])

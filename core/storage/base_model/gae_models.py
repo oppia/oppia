@@ -729,7 +729,8 @@ class BaseCommitLogEntryModel(BaseModel):
                 change.
             commit_type: str. The type of commit. Possible values are in
                 core.storage.base_models.COMMIT_TYPE_CHOICES.
-            commit_message: str|None. The commit description message.
+            commit_message: str|None. The commit description message, or None if
+                draft (or unpublished) model is provided.
             commit_cmds: list(dict). A list of commands, describing changes
                 made in this model, which should give sufficient information to
                 reconstruct the commit. Each dict always contains:
@@ -986,7 +987,8 @@ class VersionedModel(BaseModel):
             committer_id: str. The user_id of the user who committed the change.
             commit_type: str. Unique identifier of commit type. Possible values
                 are in COMMIT_TYPE_CHOICES.
-            commit_message: str|None. The commit description message.
+            commit_message: str|None. The commit description message, or None if
+                draft (or unpublished) model is provided.
             commit_cmds: list(dict). A list of commands, describing changes
                 made in this model, should give sufficient information to
                 reconstruct the commit. Dict always contains:
@@ -1251,7 +1253,8 @@ class VersionedModel(BaseModel):
 
         Args:
             committer_id: str. The user_id of the user who committed the change.
-            commit_message: str|None. The commit description message.
+            commit_message: str|None. The commit description message, or None if
+                draft (or unpublished) model is provided.
             commit_cmds: list(dict). A list of commands, describing changes
                 made in this model, should give sufficient information to
                 reconstruct the commit. Dict always contains:

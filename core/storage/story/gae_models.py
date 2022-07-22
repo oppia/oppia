@@ -141,11 +141,15 @@ class StoryModel(base_models.VersionedModel):
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
-    def compute_models_to_commit(
+    # We have ignored [override] here because the signature of this method
+    # doesn't match with VersionedModel.compute_models_to_commit(). Because
+    # argument `commit_message` of super class can accept Optional[str] but
+    # this method can only accept str.
+    def compute_models_to_commit(  # type: ignore[override]
         self,
         committer_id: str,
         commit_type: str,
-        commit_message: Optional[str],
+        commit_message: str,
         commit_cmds: base_models.AllowedCommitCmdTypes,
         # We expect Mapping because we want to allow models that inherit
         # from BaseModel as the values, if we used Dict this wouldn't
@@ -161,7 +165,7 @@ class StoryModel(base_models.VersionedModel):
                 change.
             commit_type: str. The type of commit. Possible values are in
                 core.storage.base_models.COMMIT_TYPE_CHOICES.
-            commit_message: str|None. The commit description message.
+            commit_message: str. The commit description message.
             commit_cmds: list(dict). A list of commands, describing changes
                 made in this model, which should give sufficient information to
                 reconstruct the commit. Each dict always contains:

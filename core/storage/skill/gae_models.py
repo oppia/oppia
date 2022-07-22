@@ -180,7 +180,7 @@ class SkillModel(base_models.VersionedModel):
             commit_type: str. The type of commit. Possible values are in
                 core.storage.base_models.COMMIT_TYPE_CHOICES.
             commit_message: str|None. The commit description message, for
-                unpublished skills, it may be equal to None..
+                unpublished skills, it may be equal to None.
             commit_cmds: list(dict). A list of commands, describing changes
                 made in this model, which should give sufficient information to
                 reconstruct the commit. Each dict always contains:
