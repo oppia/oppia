@@ -76,7 +76,7 @@ describe('End chapter check mark component', function() {
       classroom_url_fragment: 'classroom_url_fragment'
     });
 
-    expect(component.getPracticeTabUrl()).toBe('topic_page/revision');
+    expect(component.getRevisionTabUrl()).toBe('topic_page/revision');
     expect(urlInterpolationService.interpolateUrl).toHaveBeenCalledWith(
       '/learn/<classroom_url_fragment>/<topic_url_fragment>', {
         topic_url_fragment: 'topic_url_fragment',
