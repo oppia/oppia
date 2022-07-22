@@ -336,8 +336,8 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
             is_enclosed: bool. Returns True if both rule's ranges are enclosed.
         """
         if (
-            range_compare_with['lower_bound'] is None or 
-            range_compare_to['lower_bound'] is None or 
+            range_compare_with['lower_bound'] is None or
+            range_compare_to['lower_bound'] is None or
             range_compare_with['upper_bound'] is None or
             range_compare_to['upper_bound'] is None
         ):
@@ -349,7 +349,7 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
                 range_compare_with['lower_bound'] == range_compare_to[
                     'lower_bound'] and
                 (
-                    not range_compare_to['lb_inclusive'] or 
+                    not range_compare_to['lb_inclusive'] or
                     range_compare_with['lb_inclusive']
                 )
             )
@@ -361,7 +361,7 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
                 range_compare_with['upper_bound'] == range_compare_to[
                     'upper_bound'] and 
                 (
-                    not range_compare_to['ub_inclusive'] or 
+                    not range_compare_to['ub_inclusive'] or
                     range_compare_with['ub_inclusive']
                 )
             )
@@ -528,7 +528,7 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
         """Return rule values from the rule_spec
 
         Args:
-            rule_spec: state_domain.RuleSpec. rule spec of an answer group.
+            rule_spec: (state_domain.RuleSpec). Rule spec of an answer group.
 
         Returns:
             rule_value_f: float. The value of the rule spec.
