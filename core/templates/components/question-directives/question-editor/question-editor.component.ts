@@ -170,22 +170,6 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
     return 'Save Question';
   }
 
-  navigateToState(): void {
-    return;
-  }
-
-  addState(): void {
-    return;
-  }
-
-  recomputeGraph(): void {
-    return;
-  }
-
-  refreshWarnings(): void {
-    return;
-  }
-
   _updateQuestion(updateFunction: Function): void {
     this.questionChanged.emit();
     this.questionUpdateService.setQuestionStateData(

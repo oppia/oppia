@@ -299,14 +299,6 @@ describe('Question Editor Component', () => {
       .toBe('Type your question here.');
   });
 
-  it('should return undefined when calling functions which are not applicable' +
-    ' to question state', () => {
-    expect(component.navigateToState()).toBe(undefined);
-    expect(component.addState()).toBe(undefined);
-    expect(component.recomputeGraph()).toBe(undefined);
-    expect(component.refreshWarnings()).toBe(undefined);
-  });
-
   it('should save state content when user clicks on save', () => {
     expect(component.interactionIsShown).toBe(undefined);
     expect(component.questionStateData.content)
