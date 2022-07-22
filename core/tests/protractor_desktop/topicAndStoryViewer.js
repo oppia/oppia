@@ -88,6 +88,15 @@ describe('Topic and Story viewer functionality', function() {
     subTopicViewerPage = new SubTopicViewerPage.SubTopicViewerPage();
     await users.createAndLoginCurriculumAdminUser(
       'creator@storyViewer.com', 'creatorStoryViewer');
+
+    // The below lines enable the end_chapter_celebration flag in prod mode.
+    // They should be removed after the end_chapter_celebration flag is
+    // deprecated.
+    await adminPage.getFeaturesTab();
+    var endChapterFlag = (
+      await adminPage.getEndChapterCelebrationFeatureElement());
+    await adminPage.enableFeatureForProd(endChapterFlag);
+
     await createDummyExplorations();
     var handle = await browser.getWindowHandle();
     await topicsAndSkillsDashboardPage.get();

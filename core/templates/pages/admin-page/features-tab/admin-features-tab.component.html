@@ -97,7 +97,7 @@
                               </option>
                             </select>
                             <ng-container *ngIf="!!filterTypeToContext[filter.type].options">
-                              <select [(ngModel)]="filter.conditions[conditionIndex][1]">
+                              <select [(ngModel)]="filter.conditions[conditionIndex][1]" class="e2e-test-server-mode-selector">
                                 <ng-container *ngFor="let option of filterTypeToContext[filter.type].options">
                                   <option *ngIf="!filterTypeToContext[filter.type].optionFilter || filterTypeToContext[filter.type].optionFilter(featureFlag, option)"
                                           [value]="option">

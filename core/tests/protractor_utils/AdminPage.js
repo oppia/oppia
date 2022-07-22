@@ -70,6 +70,8 @@ var AdminPage = function() {
   var addFeatureRuleButtonLocator = by.css(
     '.e2e-test-feature-add-rule-button');
   var valueSelectorLocator = by.css('.e2e-test-value-selector');
+  var serverModeSelectorLocator = by.css(
+    '.e2e-test-server-mode-selector');
   var addConditionButtonLocator = by.css(
     '.e2e-test-add-condition-button');
   var rolesResultRowsElements = element.all(
@@ -187,6 +189,21 @@ var AdminPage = function() {
     return null;
   };
 
+  // Remove this method after the end_chapter_celebration feature flag
+  // is deprecated.
+  this.getEndChapterCelebrationFeatureElement = async function() {
+    var count = await featureFlagElements.count();
+    for (let i = 0; i < count; i++) {
+      var elem = featureFlagElements.get(i);
+      if ((await elem.element(featureNameLocator).getText()) ===
+          'end_chapter_celebration') {
+        return elem;
+      }
+    }
+
+    return null;
+  };
+
   this.removeAllRulesOfFeature = async function(featureElement) {
     while (!await featureElement.isElementPresent(noRuleIndicatorLocator)) {
       await action.click(
@@ -228,6 +245,37 @@ var AdminPage = function() {
       featureElement
         .element(addConditionButtonLocator)
     );
+
+    await this.saveChangeOfFeature(featureElement);
+  };
+
+  // Remove this method after the end_chapter_celebration feature flag
+  // is deprecated.
+  this.enableFeatureForProd = async function(featureElement) {
+    await this.removeAllRulesOfFeature(featureElement);
+
+    await action.click(
+      'Add feature rule button',
+      featureElement
+        .element(addFeatureRuleButtonLocator)
+    );
+
+    await action.sendKeys(
+      'Rule value selector',
+      featureElement
+        .element(valueSelectorLocator),
+      'Enabled');
+
+    await action.click(
+      'Add condition button',
+      featureElement
+        .element(addConditionButtonLocator)
+    );
+
+    await action.sendKeys(
+      'Server mode selector',
+      featureElement.element(serverModeSelectorLocator),
+      'prod');
 
     await this.saveChangeOfFeature(featureElement);
   };

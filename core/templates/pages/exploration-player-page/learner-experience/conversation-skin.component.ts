@@ -74,6 +74,7 @@ import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-su
 import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
 import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
+import { PlatformFeatureService } from 'services/platform-feature.service';
 import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 
 import './conversation-skin.component.css';
@@ -211,6 +212,7 @@ export class ConversationSkinComponent {
       EditableExplorationBackendApiService,
     private readOnlyExplorationBackendApiService:
       ReadOnlyExplorationBackendApiService,
+    private platformFeatureService: PlatformFeatureService,
     private learnerDashboardBackendApiService: LearnerDashboardBackendApiService
   ) {}
 
@@ -630,6 +632,10 @@ export class ConversationSkinComponent {
         return result;
       }
     }
+  }
+
+  isEndChapterCelebrationFeatureEnabled(): boolean {
+    return this.platformFeatureService.status.EndChapterCelebration.isEnabled;
   }
 
   reloadExploration(): void {
