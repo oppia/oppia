@@ -15,8 +15,10 @@ var chromeVersion = (args[0] == 'DEBUG=true') ? args[6] : args[5];
 var chromedriverPath =
 './node_modules/webdriver-manager/selenium/chromedriver_' + chromeVersion;
 
-var spw = null;
-var vidPath = '';
+// If video recorder is not running the ffmpeg process will be null.
+var ffmpegProcess = null;
+// The absolute path where the recorded video of test will be stored.
+var videoPath = '';
 // Enable ALL_VIDEOS if you want success videos to be saved.
 const ALL_VIDEOS = false;
 
@@ -127,7 +129,7 @@ exports.config = {
   // Define all options that are relevant for the WebdriverIO instance here
   //
   // Level of logging verbosity: trace | debug | info | warn | error | silent.
-  logLevel: 'info',
+  logLevel: 'warn',
 
   // Set a base URL in order to shorten url command calls. If your `url`
   // parameter starts with `/`, the base url gets prepended, not including
@@ -197,9 +199,6 @@ exports.config = {
    * @param {Object}         browser instance of created browser/device session
    */
   before: function() {
-    // Only running video recorder on Github Actions, since running it on
-    // CicleCI causes RAM issues (meaning very high flakiness).
-
     if (process.env.GITHUB_ACTIONS &&
       // eslint-disable-next-line eqeqeq
       process.env.VIDEO_RECORDING_IS_ENABLED == 1) {
@@ -219,17 +218,17 @@ exports.config = {
       try {
         fs.mkdirSync(dirPath, { recursive: true });
       } catch (err) {}
-      vidPath = path.resolve(dirPath, name);
-      ffmpegArgs.push(vidPath);
-      spw = childProcess.spawn('ffmpeg', ffmpegArgs);
-      spw.on('message', (message) => {
+      videoPath = path.resolve(dirPath, name);
+      ffmpegArgs.push(videoPath);
+      ffmpegProcess = childProcess.spawn('ffmpeg', ffmpegArgs);
+      ffmpegProcess.on('message', (message) => {
         // eslint-disable-next-line no-console
         console.log(`ffmpeg stdout: ${message}`);
       });
-      spw.on('error', (errorMessage) => {
+      ffmpegProcess.on('error', (errorMessage) => {
         console.error(`ffmpeg stderr: ${errorMessage}`);
       });
-      spw.on('close', (code) => {
+      ffmpegProcess.on('close', (code) => {
         // eslint-disable-next-line no-console
         console.log(`ffmpeg exited with code ${code}`);
       });
@@ -288,9 +287,9 @@ exports.config = {
     if (process.env.GITHUB_ACTIONS &&
       // eslint-disable-next-line eqeqeq
       process.env.VIDEO_RECORDING_IS_ENABLED == 1) {
-      spw.kill();
-      if (result === 0 && !ALL_VIDEOS && fs.existsSync(vidPath)) {
-        fs.unlinkSync(vidPath);
+      ffmpegProcess.kill();
+      if (result === 0 && !ALL_VIDEOS && fs.existsSync(videoPath)) {
+        fs.unlinkSync(videoPath);
         // eslint-disable-next-line no-console
         console.log(
           `Video for test: ${specs}` +

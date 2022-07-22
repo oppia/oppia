@@ -21,16 +21,16 @@ var action = require('./action');
 
 var ExplorationEditorStatsTab = function() {
   /**
-     * Interactive elements
-     */
+   * Interactive elements
+   */
   var numPassersby = $('.e2e-test-num-passersby');
   var issueElementStr = '.e2e-test-issue';
   var issueTitle = $('.e2e-test-issue-title');
   var resolveBtn = $('.e2e-test-issue-resolve');
 
   /**
-     * Workflows
-     */
+   * Workflows
+   */
   var _getNumPassersby = async function() {
     var numPasserByText = await action.getText(
       'Number Passer By', numPassersby);
