@@ -807,7 +807,12 @@ describe('Questions List Component', () => {
   });
 
   it('should not remove skill if it is the only one', () => {
-    component.associatedSkillSummaries = ['summary'];
+    component.associatedSkillSummaries = [
+      ShortSkillSummary.createFromBackendDict({
+        skill_id: '1',
+        skill_description: 'Skill Description'
+      })
+    ];
     spyOn(alertsService, 'addInfoMessage');
 
     component.removeSkill(null);

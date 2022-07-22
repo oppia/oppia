@@ -449,7 +449,7 @@ describe('Question Player Component', () => {
   it('should get color for score based on score per skill', () => {
     let scorePerSkill = {
       score: 5,
-      total: 7
+      total: 7,
     };
     component.questionPlayerConfig = {
       questionPlayerMode: {
