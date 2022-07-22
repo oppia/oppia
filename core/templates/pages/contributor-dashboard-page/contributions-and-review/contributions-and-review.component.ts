@@ -37,7 +37,6 @@ import { Subscription } from 'rxjs';
 import { TranslationTopicService } from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
 import { UserService } from 'services/user.service';
 
-
 export interface Suggestion {
   change: {
     skill_id?: string;

@@ -46,7 +46,7 @@ export class QuestionSuggestionEditorModalComponent
   @Input() questionStateData: State;
   @Input() questionId: string;
   @Input() skill: Skill;
-  @Input() skillDifficulty: SkillDifficulty | string | number;
+  @Input() skillDifficulty: SkillDifficulty | string;
   @Input() suggestionId: string;
 
   canEditQuestion: boolean;

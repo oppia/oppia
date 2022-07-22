@@ -26,7 +26,7 @@ import { PlayerPositionService } from 'pages/exploration-player-page/services/pl
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { PreventPageUnloadEventService } from 'services/prevent-page-unload-event.service';
 import { UserService } from 'services/user.service';
-import { QuestionPlayerComponent } from './question-player.component';
+import { QuestionPlayerComponent, QuestionPlayerConfig } from './question-player.component';
 import { QuestionPlayerStateService } from './services/question-player-state.service';
 import { Location } from '@angular/common';
 import { UserInfo } from 'domain/user/user-info.model';
@@ -299,13 +299,13 @@ describe('Question Player Component', () => {
   it('should check if action buttons footer is to be shown or not', () => {
     component.questionPlayerConfig = {
       resultActionButtons: ['first']
-    };
+    } as QuestionPlayerConfig;
 
     expect(component.showActionButtonsFooter()).toBe(true);
 
     component.questionPlayerConfig = {
       resultActionButtons: []
-    };
+    } as QuestionPlayerConfig;
     expect(component.showActionButtonsFooter()).toBe(false);
   });
 
@@ -315,7 +315,7 @@ describe('Question Player Component', () => {
         modeType: 'PASS_FAIL',
         passCutoff: 1.5
       }
-    };
+    } as QuestionPlayerConfig;
     component.scorePerSkillMapping = {
       skill1: {
         score: 5,
@@ -334,7 +334,7 @@ describe('Question Player Component', () => {
         modeType: 'PASS_FAIL',
         passCutoff: 0.5
       }
-    };
+    } as QuestionPlayerConfig;
 
     expect(component.hasUserPassedTest()).toBe(true);
   });
@@ -367,7 +367,7 @@ describe('Question Player Component', () => {
     component.questionPlayerConfig = {
       skillList: ['skillId1'],
       skillDescriptions: ['description1']
-    };
+    } as QuestionPlayerConfig;
     component.totalScore = 0.0;
 
     component.calculateScores(questionStateData as unknown as State);
@@ -381,7 +381,7 @@ describe('Question Player Component', () => {
     component.questionPlayerConfig = {
       skillList: ['skillId1'],
       skillDescriptions: ['description1']
-    };
+    } as QuestionPlayerConfig;
     let questionStateData = {
       ques1: {
         answers: [],
@@ -456,7 +456,7 @@ describe('Question Player Component', () => {
         modeType: 'NOT_PASS_FAIL',
         passCutoff: 1.5
       }
-    };
+    } as QuestionPlayerConfig;
 
     expect(component.getColorForScore(scorePerSkill)).toBe('rgb(0, 150, 136)');
 
@@ -465,7 +465,7 @@ describe('Question Player Component', () => {
         modeType: 'PASS_FAIL',
         passCutoff: 1.5
       }
-    };
+    } as QuestionPlayerConfig;
 
     expect(component.getColorForScore(scorePerSkill)).toBe('rgb(217, 92, 12)');
 
@@ -474,7 +474,7 @@ describe('Question Player Component', () => {
         modeType: 'PASS_FAIL',
         passCutoff: 0.5
       }
-    };
+    } as QuestionPlayerConfig;
 
     expect(component.getColorForScore(scorePerSkill)).toBe('rgb(0, 150, 136)');
   });
@@ -489,7 +489,7 @@ describe('Question Player Component', () => {
         modeType: 'NOT_PASS_FAIL',
         passCutoff: 1.5
       }
-    };
+    } as QuestionPlayerConfig;
 
     expect(
       component.getColorForScoreBar(scorePerSkill)).toBe('rgb(32, 93, 134)');
@@ -499,7 +499,7 @@ describe('Question Player Component', () => {
         modeType: 'PASS_FAIL',
         passCutoff: 1.5
       }
-    };
+    } as QuestionPlayerConfig;
 
     expect(
       component.getColorForScoreBar(scorePerSkill)).toBe('rgb(217, 92, 12)');
@@ -509,7 +509,7 @@ describe('Question Player Component', () => {
         modeType: 'PASS_FAIL',
         passCutoff: 0.5
       }
-    };
+    } as QuestionPlayerConfig;
 
     expect(
       component.getColorForScoreBar(scorePerSkill)).toBe('rgb(32, 93, 134)');

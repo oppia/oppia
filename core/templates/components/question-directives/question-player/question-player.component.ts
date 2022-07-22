@@ -67,12 +67,22 @@ interface MasteryPerSkillMapping {
   [key: string]: number;
 }
 
+export interface QuestionPlayerConfig {
+  resultActionButtons: string[];
+  questionPlayerMode: {
+    modeType: string;
+    passCutoff: number;
+  };
+  skillDescriptions: string[];
+  skillList: string[];
+}
+
 @Component({
   selector: 'oppia-question-player',
   templateUrl: './question-player.component.html'
 })
 export class QuestionPlayerComponent implements OnInit, OnDestroy {
-  @Input() questionPlayerConfig;
+  @Input() questionPlayerConfig: QuestionPlayerConfig;
 
   directiveSubscriptions = new Subscription();
   resultsLoaded: boolean;

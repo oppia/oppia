@@ -34,6 +34,7 @@ import { SuggestionBackendDict } from 'domain/suggestion/suggestion.model';
 import { SuggestionModalService } from 'services/suggestion-modal.service';
 import { ThreadDataBackendApiService } from 'pages/exploration-editor-page/feedback-tab/services/thread-data-backend-api.service';
 import { ThreadMessage } from 'domain/feedback_message/ThreadMessage.model';
+
 interface QuestionSuggestionModalValue {
   suggestionId: string;
   suggestion: SuggestionBackendDict;

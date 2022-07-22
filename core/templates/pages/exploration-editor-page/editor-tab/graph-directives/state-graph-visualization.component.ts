@@ -16,23 +16,23 @@
  * @fileoverview Component for the state graph visualization.
  */
 
+import * as d3 from 'd3';
+import cloneDeep from 'lodash/cloneDeep';
+import { AppConstants } from 'app.constants';
+import { AugmentedLink, NodeDataDict } from 'components/graph-services/graph-layout.service';
 import { ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { StateGraphLayoutService } from 'components/graph-services/graph-layout.service';
-import { StateCardIsCheckpointService } from 'components/state-editor/state-editor-properties-services/state-card-is-checkpoint.service';
 import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
 import { ExplorationWarningsService } from 'pages/exploration-editor-page/services/exploration-warnings.service';
-import { RouterService } from 'pages/exploration-editor-page/services/router.service';
-import { TranslationStatusService } from 'pages/exploration-editor-page/translation-tab/services/translation-status.service';
-import { Subscription } from 'rxjs';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import * as d3 from 'd3';
-import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
-import { AppConstants } from 'app.constants';
 import { GraphDataService } from 'pages/exploration-editor-page/services/graph-data.service';
 import { GraphNodes, GraphLink, GraphData } from 'services/compute-graph.service';
-import cloneDeep from 'lodash/cloneDeep';
-import { AugmentedLink, NodeDataDict } from 'components/graph-services/graph-layout.service';
+import { RouterService } from 'pages/exploration-editor-page/services/router.service';
+import { StateCardIsCheckpointService } from 'components/state-editor/state-editor-properties-services/state-card-is-checkpoint.service';
+import { StateGraphLayoutService } from 'components/graph-services/graph-layout.service';
+import { Subscription } from 'rxjs';
+import { TranslationStatusService } from 'pages/exploration-editor-page/translation-tab/services/translation-status.service';
+import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 
 interface ElementDimensions {
   h: number;

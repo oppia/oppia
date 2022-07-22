@@ -40,7 +40,7 @@ import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
 import { SkillDifficulty } from 'domain/skill/skill-difficulty.model';
 import { SkillEditorRoutingService } from 'pages/skill-editor-page/services/skill-editor-routing.service';
 import { SkillLinkageModificationsArray } from 'domain/question/editable-question-backend-api.service';
-import { SkillSummary } from 'domain/skill/skill-summary.model';
+import { SkillSummary, SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
 import { State } from 'domain/state/StateObjectFactory';
 import { Subscription } from 'rxjs';
 import { UtilsService } from 'services/utils.service';
@@ -50,8 +50,8 @@ import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { Rubric } from 'domain/skill/rubric.model';
 
 interface GroupedSkillSummaries {
-  current: unknown[];
-  others: unknown[];
+  current: SkillSummaryBackendDict[];
+  others: SkillSummaryBackendDict[];
 }
 
 @Component({
@@ -83,7 +83,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy, OnChanges {
   newQuestionSkillIds: string[];
   question: Question;
   questionEditorIsShown: boolean;
-  questionId: string | null;
+  questionId: string;
   questionIsBeingSaved: boolean;
   questionIsBeingUpdated: boolean;
   questionStateData: State;
