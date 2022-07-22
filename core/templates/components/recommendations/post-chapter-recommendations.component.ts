@@ -36,7 +36,10 @@ export class PostChapterRecommendationsComponent {
   @Input() nextStoryNodeThumbnailBgColor!: string;
   @Input() nextStoryNodeTitle!: string;
 
-  @Input() practiceQuestionsAreEnabled: boolean;
+  // The below property will not be null because the property that is being
+  // passed down as input from the parent component is initialized to
+  // be false.
+  @Input() practiceQuestionsAreEnabled!: boolean;
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
