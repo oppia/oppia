@@ -215,7 +215,13 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'message': 'Please use scripts.common.url_retrieve instead of '
                    'urllib.request.urlretrieve.',
         'excluded_files': (),
-        'excluded_dirs': ()
+        'excluded_dirs': (
+            'assets/',
+            'core/',
+            'data/',
+            'extensions/',
+            'jobs/',
+        ),
     },
 ]
 
