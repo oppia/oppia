@@ -42,7 +42,6 @@ import { LearnerDashboardSuggestionModalComponent } from './suggestion-modal/lea
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
 
-
 @NgModule({
   imports: [
     BrowserModule,

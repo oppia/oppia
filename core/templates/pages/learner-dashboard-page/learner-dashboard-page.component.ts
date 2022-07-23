@@ -174,9 +174,6 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    new Promise(() => {
-      throw new Error('exception!');
-    });
     let userProfileImagePromise =
       this.userService.getProfileImageDataUrlAsync();
     userProfileImagePromise.then(
