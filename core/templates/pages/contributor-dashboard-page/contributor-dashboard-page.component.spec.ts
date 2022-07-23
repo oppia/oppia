@@ -198,10 +198,10 @@ describe('Contributor dashboard page', function() {
     });
 
     it('should show default header if window pageYOffset is ' +
-      'less than 5', function() {
+      'less than 80', function() {
       const nativeWindowSpy = spyOnProperty(windowRef, 'nativeWindow');
       nativeWindowSpy.and.returnValue({
-        pageYOffset: 4
+        pageYOffset: 79
       });
 
       ctrl.scrollFunction();
@@ -210,10 +210,10 @@ describe('Contributor dashboard page', function() {
     });
 
     it('should show collapsed header if window pageYOffset is' +
-      ' scrolled greater than 5', function() {
+      ' scrolled greater than 80', function() {
       const nativeWindowSpy = spyOnProperty(windowRef, 'nativeWindow');
       nativeWindowSpy.and.returnValue({
-        pageYOffset: 6
+        pageYOffset: 81
       });
 
       ctrl.scrollFunction();

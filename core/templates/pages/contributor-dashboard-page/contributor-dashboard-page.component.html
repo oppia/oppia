@@ -62,8 +62,8 @@
                         <div class="oppia-review-item-detail-container e2e-test-translation-<[$ctrl.provideLanguageForProtractorClass(languageDescription)]>-reviewer">
                           <[languageDescription]>
                         </div>
-                      </span>   
-                    </div>                                    
+                      </span>
+                    </div>
                   </div>
                   <div ng-if="$ctrl.userCanReviewVoiceoverSuggestionsInLanguages.length > 0">
                     Voiceovers in languages:
@@ -73,7 +73,7 @@
                           <[languageDescription]>
                         </span>
                       </span>
-                    </div>                    
+                    </div>
                   </div>
                   <div ng-if="$ctrl.userCanReviewQuestions"
                        class="e2e-test-question-reviewer">
@@ -109,8 +109,10 @@
                 </a>
               </div>
               <div class="oppia-explanation-container">
-                <div class="oppia-opportunities-tabs-explanation"
-                     data-tab-name="<[$ctrl.tabsDetails[$ctrl.activeTabName].tabName]>">
+                <div class="oppia-opportunities-tabs-explanation">
+                  <div class="oppia-opportunities-tabs-explanation-before">
+                    <[$ctrl.tabsDetails[$ctrl.activeTabName].tabName]>
+                  </div>
                   <[$ctrl.tabsDetails[$ctrl.activeTabName].description]>
                 </div>
               </div>
@@ -171,7 +173,7 @@
                     <[languageDescription]>
                   </span>
                 </span>
-              </div>              
+              </div>
             </div>
             <div ng-if="$ctrl.userCanReviewVoiceoverSuggestionsInLanguages.length > 0">
               Voiceovers in languages:
@@ -181,7 +183,7 @@
                     <[languageDescription]>
                   </span>
                 </span>
-              </div>              
+              </div>
             </div>
             <div ng-if="$ctrl.userCanReviewQuestions"
                  class="e2e-test-question-reviewer">
@@ -329,17 +331,13 @@
     height: 35px;
   }
   .oppia-opportunities-tabs-explanation {
-    padding-top: 20px;
     position: relative;
   }
-  .oppia-opportunities-tabs-explanation::before {
-    bottom: 65%;
+  .oppia-opportunities-tabs-explanation-before {
     color: #009688;
-    content: attr(data-tab-name);
     font-family: "Capriola", "Roboto", Arial, sans-serif;
     font-size: 24px;
-    margin-bottom: 10px;
-    position: absolute;
+    z-index: 100;
   }
   .oppia-short-contributor-username-container,
   .oppia-long-contributor-username-container {
@@ -574,7 +572,8 @@
     .oppia-opportunities-tabs-explanation {
       font-size: 18px;
     }
-    .oppia-opportunities-tabs-explanation::before {
+    .oppia-opportunities-tabs-explanation-before {
+      /* bottom: 60%; */
       font-size: 20px;
     }
     .oppia-opportunities-tabs {
@@ -605,6 +604,7 @@
     }
     .oppia-outer-container {
       flex-direction: column;
+      margin-top: 0;
       width: 100%;
     }
     .oppia-mascot-container {
@@ -691,9 +691,6 @@
     .oppia-opportunities-tabs-text {
       font-size: 15px;
       padding: 10px 5px;
-    }
-    .oppia-opportunities-tabs-explanation::before {
-      margin-bottom: 20px;
     }
     .oppia-collapsed-opportunities-tab-header {
       align-items: center;
