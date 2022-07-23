@@ -386,6 +386,7 @@
 	"I18N_LEARNER_DASHBOARD_VIEW_SUGGESTION": "Ver sugerencia",
 	"I18N_LESSON_AUTHORS_DROPDOWN_TITLE": "Autores de la lección",
 	"I18N_LESSON_INFO_HEADER": "Información sobre la lección",
+	"I18N_LESSON_INFO_TOOLTIP_MESSAGE": "Has llegado a un punto de control. Buen trabajo! Vea su progreso y otra información de la lección aquí.",
 	"I18N_LIBRARY_ACTIVITY_COMPLETED_ICON": "Has completado esto",
 	"I18N_LIBRARY_ACTIVITY_IN_LEARNER_PLAYLIST": "Ya añadido a la lista de reproducción",
 	"I18N_LIBRARY_ADD_TO_LEARNER_PLAYLIST": "Añadir a la lista de «Jugar más tarde»",
