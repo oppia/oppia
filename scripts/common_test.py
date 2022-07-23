@@ -1018,7 +1018,7 @@ class CommonTests(test_utils.GenericTestBase):
                 getattr(default_context, method)()
             )
 
-    def test_url_retrieve_with_successfull_https_works(self) -> None:
+    def test_url_retrieve_with_successful_https_works(self) -> None:
         with tempfile.TemporaryDirectory() as tempdir:
             output_path = os.path.join(tempdir, 'buffer')
             attempts = []
@@ -1038,7 +1038,7 @@ class CommonTests(test_utils.GenericTestBase):
             with open(output_path, 'rb') as buffer:
                 self.assertEqual(buffer.read(), b'content')
 
-    def test_url_retrieve_with_successfull_https_works_on_retry(self) -> None:
+    def test_url_retrieve_with_successful_https_works_on_retry(self) -> None:
         with tempfile.TemporaryDirectory() as tempdir:
             output_path = os.path.join(tempdir, 'output')
             attempts = []
@@ -1095,7 +1095,7 @@ class CommonTests(test_utils.GenericTestBase):
             ):
                 common.url_retrieve('http://example.com', 'test_path')
 
-    def test_url_retrieve_with_successfull_http_works(self) -> None:
+    def test_url_retrieve_with_successful_http_works(self) -> None:
         with tempfile.TemporaryDirectory() as tempdir:
             output_path = os.path.join(tempdir, 'output')
             attempts = []
