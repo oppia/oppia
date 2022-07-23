@@ -39,7 +39,7 @@
                 <div class="oppia-short-contributor-username-container"
                      *ngIf="userIsLoggedIn || username?.length <= 8"
                      [attr.data-tab-name]="username">
-                  <lazy-loading [hidden]="userInfoIsLoading"></lazy-loading>
+                  <lazy-loading [hidden]="!userInfoIsLoading"></lazy-loading>
                   <span class="e2e-test-username"
                         [hidden]="userInfoIsLoading">
                     {{userIsLoggedIn ? username : 'Guest'}}
