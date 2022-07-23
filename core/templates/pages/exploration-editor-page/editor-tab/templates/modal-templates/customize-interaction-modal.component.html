@@ -113,8 +113,8 @@
 
 <style>
   .modal-footer {
-    align-items: center;
     display: flex;
+    justify-content: flex-end;
   }
   .interaction-editor-form .boolean-checkbox {
     float: left;
@@ -158,6 +158,11 @@
   }
 
   @media screen and (max-width: 768px) {
+    .modal-footer {
+      align-items: center;
+      display: flex;
+      justify-content: center;
+    }
     .customize-interaction-modal .modal-content {
       border: 0;
       border-radius: 0;
