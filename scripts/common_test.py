@@ -1024,7 +1024,7 @@ class CommonTests(test_utils.GenericTestBase):
             attempts = []
             def mock_urlopen(
                 url: str, context: ssl.SSLContext
-            ) -> io.BinaryIOBase:
+            ) -> io.BufferedIOBase:
                 attempts.append(url)
                 self.assertLessEqual(len(attempts), 1)
                 self.assertEqual(url, 'https://example.com')
@@ -1044,7 +1044,7 @@ class CommonTests(test_utils.GenericTestBase):
             attempts = []
             def mock_urlopen(
                 url: str, context: ssl.SSLContext
-            ) -> io.BinaryIOBase:
+            ) -> io.BufferedIOBase:
                 attempts.append(url)
                 self.assertLessEqual(len(attempts), 2)
                 self.assertEqual(url, 'https://example.com')
@@ -1064,7 +1064,7 @@ class CommonTests(test_utils.GenericTestBase):
         attempts = []
         def mock_open(_path: str, _options: str) -> NoReturn:
             raise AssertionError('open() should not be called')
-        def mock_urlopen(url: str, context: ssl.SSLContext) -> io.BinaryIOBase:
+        def mock_urlopen(url: str, context: ssl.SSLContext) -> io.BufferedIOBase:
             attempts.append(url)
             self.assertLessEqual(len(attempts), 2)
             self.assertEqual(url, 'https://example.com')
@@ -1075,7 +1075,7 @@ class CommonTests(test_utils.GenericTestBase):
         urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
 
         with open_swap, urlopen_swap:
-            with self.assertRaisesRegex(ssl.SSLError, 'test_error'):
+            with self.assertRaisesRegex(ssl.SSLError, 'test_error'):  # type: ignore[no-untyped-call]
                 common.url_retrieve('https://example.com', 'test_path')
 
     def test_url_retrieve_https_check_fails(self) -> None:
@@ -1088,7 +1088,7 @@ class CommonTests(test_utils.GenericTestBase):
         urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
 
         with open_swap, urlopen_swap:
-            with self.assertRaisesRegex(
+            with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
                 Exception, 'The URL http://example.com should use HTTPS.'
             ):
                 common.url_retrieve('http://example.com', 'test_path')
@@ -1099,7 +1099,7 @@ class CommonTests(test_utils.GenericTestBase):
             attempts = []
             def mock_urlopen(
                 url: str, context: ssl.SSLContext
-            ) -> io.BinaryIOBase:
+            ) -> io.BufferedIOBase:
                 attempts.append(url)
                 self.assertLessEqual(len(attempts), 1)
                 self.assertEqual(url, 'https://example.com')
