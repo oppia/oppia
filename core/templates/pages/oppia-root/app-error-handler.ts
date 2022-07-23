@@ -16,12 +16,12 @@
  * @fileoverview Error handler for frontend.
  */
 
-
 // eslint-disable-next-line oppia/disallow-httpclient
 import { HttpClient } from '@angular/common/http';
 import { ErrorHandler } from '@angular/core';
 import { LoggerService } from 'services/contextual/logger.service';
 import firebase from 'firebase/app';
+import { AppConstants } from 'app.constants';
 
 export class AppErrorHandler extends ErrorHandler {
   private readonly UNHANDLED_REJECTION_STATUS_CODE_REGEX = (
@@ -64,27 +64,31 @@ export class AppErrorHandler extends ErrorHandler {
       }
     }
 
-    let messageAndSourceAndStackTrace = [
-      '',
-      error.message,
-      '',
-      '    at URL: ' + window.location.href
-    ].join('\n');
-    let timeDifference = Date.now() - this.timeOfLastPostedError;
-    // To prevent an overdose of errors, throttle to at most 1 error
-    // every MIN_TIME_BETWEEN_ERRORS_MSEC.
-    if (timeDifference > this.MIN_TIME_BETWEEN_ERRORS_MSEC) {
-      // Catch all errors, to guard against infinite recursive loops.
-      // We use jQuery here instead of Angular's $http, since the
-      // latter creates a circular dependency.
-      this.http.post('/frontend_errors', {
-        error: messageAndSourceAndStackTrace
-      }).toPromise().then(() => {
-        this.timeOfLastPostedError = Date.now();
-      }, () => {
-        this.loggerService.warn('Error logging failed.');
-      });
+    if (!AppConstants.DEV_MODE) {
+      let messageAndSourceAndStackTrace = [
+        '',
+        error.message,
+        '',
+        '    at URL: ' + window.location.href
+      ].join('\n');
+      let timeDifference = Date.now() - this.timeOfLastPostedError;
+      // To prevent an overdose of errors, throttle to at most 1 error
+      // every MIN_TIME_BETWEEN_ERRORS_MSEC.
+      if (timeDifference > this.MIN_TIME_BETWEEN_ERRORS_MSEC) {
+        // Catch all errors, to guard against infinite recursive loops.
+        // We use jQuery here instead of Angular's $http, since the
+        // latter creates a circular dependency.
+        this.http.post('/frontend_errors', {
+          error: messageAndSourceAndStackTrace
+        }).toPromise().then(() => {
+          this.timeOfLastPostedError = Date.now();
+        }, () => {
+          this.loggerService.warn('Error logging failed.');
+        });
+      }
     }
+
+    this.loggerService.error(error.message);
   }
 }
 
