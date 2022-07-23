@@ -117,7 +117,7 @@ var ExplorationPlayerPage = function() {
     await waitFor.visibilityOf(
       radioButton, 'Radio Buttons takes too long to appear');
     var radioButtonOption = await radioButtonSelector();
-    await action.click('Radio Button', radioButtonOption);
+    await action.click('Radio Button', radioButtonOption)[0];
     await action.sendKeys(
       'Text Area',
       reportExplorationTextArea,
