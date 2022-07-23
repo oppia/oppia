@@ -23,7 +23,6 @@ import os
 import shutil
 import subprocess
 import tempfile
-import urllib.request as urlrequest
 import zipfile
 
 from core import utils
@@ -158,7 +157,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             return
 
         url_retrieve_swap = self.swap(
-            urlrequest, 'urlretrieve', mock_url_retrieve)
+            common, 'url_retrieve', mock_url_retrieve)
         recursive_chmod_swap = self.swap(
             common, 'recursive_chmod', mock_recursive_chmod)
         os_name_swap = self.swap(common, 'OS_NAME', 'Linux')
@@ -207,7 +206,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             return
 
         url_retrieve_swap = self.swap(
-            urlrequest, 'urlretrieve', mock_url_retrieve)
+            common, 'url_retrieve', mock_url_retrieve)
         recursive_chmod_swap = self.swap(
             common, 'recursive_chmod', mock_recursive_chmod)
         os_name_swap = self.swap(common, 'OS_NAME', 'Darwin')
@@ -241,7 +240,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             return True
 
         url_retrieve_swap = self.swap(
-            urlrequest, 'urlretrieve', mock_url_retrieve)
+            common, 'url_retrieve', mock_url_retrieve)
         recursive_chmod_swap = self.swap(
             common, 'recursive_chmod', mock_recursive_chmod)
         exists_swap = self.swap(os.path, 'exists', mock_exists)
@@ -276,7 +275,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             return False
 
         url_retrieve_swap = self.swap(
-            urlrequest, 'urlretrieve', mock_url_retrieve)
+            common, 'url_retrieve', mock_url_retrieve)
         os_name_swap = self.swap(common, 'OS_NAME', 'Linux')
         isfile_swap = self.swap(os.path, 'isfile', mock_isfile)
         zipfile_swap = self.swap(zipfile, 'ZipFile', MockZipFile)

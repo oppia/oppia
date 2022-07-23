@@ -26,11 +26,13 @@ import os
 import re
 import shutil
 import socketserver
+import ssl
 import stat
 import subprocess
 import sys
 import tempfile
 import time
+from urllib import request as urlrequest
 
 from core import constants
 from core import utils
@@ -982,3 +984,132 @@ class CommonTests(test_utils.GenericTestBase):
         with write_swap, stdout_write_swap:
             common.write_stdout_safe('test')
         self.assertEqual(mock_stdout.getvalue(), 'test')
+
+    def _assert_ssl_context_matches_default(
+        self, context: ssl.SSLContext
+    ) -> None:
+        """Assert that an SSL context matches the default one.
+
+        If we create two default SSL contexts, they will evaluate as unequal
+        even though they are the same for our purposes. Therefore, this function
+        checks that the provided context has the same important security
+        properties as the default.
+
+        Args:
+            context: SSLContext. The context to compare.
+
+        Raises:
+            AssertionError. Raised if the contexts differ in any of their
+                important attributes or behaviors.
+        """
+        default_context = ssl.create_default_context()
+        for attribute in (
+            'verify_flags', 'verify_mode', 'protocol',
+            'hostname_checks_common_name', 'options', 'minimum_version',
+            'maximum_version', 'check_hostname'
+        ):
+            self.assertEqual(
+                getattr(context, attribute),
+                getattr(default_context, attribute)
+            )
+        for method in ('get_ca_certs', 'get_ciphers'):
+            self.assertEqual(
+                getattr(context, method)(),
+                getattr(default_context, method)()
+            )
+
+    def test_url_retrieve_with_successfull_https_works(self) -> None:
+        with tempfile.TemporaryDirectory() as tempdir:
+            output_path = os.path.join(tempdir, 'buffer')
+            attempts = []
+            def mock_urlopen(
+                url: str, context: ssl.SSLContext
+            ) -> io.BinaryIOBase:
+                attempts.append(url)
+                self.assertLessEqual(len(attempts), 1)
+                self.assertEqual(url, 'https://example.com')
+                self._assert_ssl_context_matches_default(context)
+                return io.BytesIO(b'content')
+
+            urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
+
+            with urlopen_swap:
+                common.url_retrieve('https://example.com', output_path)
+            with open(output_path, 'rb') as buffer:
+                self.assertEqual(buffer.read(), b'content')
+
+    def test_url_retrieve_with_successfull_https_works_on_retry(self) -> None:
+        with tempfile.TemporaryDirectory() as tempdir:
+            output_path = os.path.join(tempdir, 'output')
+            attempts = []
+            def mock_urlopen(
+                url: str, context: ssl.SSLContext
+            ) -> io.BinaryIOBase:
+                attempts.append(url)
+                self.assertLessEqual(len(attempts), 2)
+                self.assertEqual(url, 'https://example.com')
+                self._assert_ssl_context_matches_default(context)
+                if len(attempts) == 1:
+                    raise ssl.SSLError()
+                return io.BytesIO(b'content')
+
+            urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
+
+            with urlopen_swap:
+                common.url_retrieve('https://example.com', output_path)
+            with open(output_path, 'rb') as buffer:
+                self.assertEqual(buffer.read(), b'content')
+
+    def test_url_retrieve_runs_out_of_attempts(self) -> None:
+        attempts = []
+        def mock_open(_path: str, _options: str) -> NoReturn:
+            raise AssertionError('open() should not be called')
+        def mock_urlopen(url: str, context: ssl.SSLContext) -> io.BinaryIOBase:
+            attempts.append(url)
+            self.assertLessEqual(len(attempts), 2)
+            self.assertEqual(url, 'https://example.com')
+            self._assert_ssl_context_matches_default(context)
+            raise ssl.SSLError('test_error')
+
+        open_swap = self.swap(builtins, 'open', mock_open)
+        urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
+
+        with open_swap, urlopen_swap:
+            with self.assertRaisesRegex(ssl.SSLError, 'test_error'):
+                common.url_retrieve('https://example.com', 'test_path')
+
+    def test_url_retrieve_https_check_fails(self) -> None:
+        def mock_open(_path: str, _options: str) -> NoReturn:
+            raise AssertionError('open() should not be called')
+        def mock_urlopen(url: str, context: ssl.SSLContext) -> NoReturn:  # pylint: disable=unused-argument
+            raise AssertionError('urlopen() should not be called')
+
+        open_swap = self.swap(builtins, 'open', mock_open)
+        urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
+
+        with open_swap, urlopen_swap:
+            with self.assertRaisesRegex(
+                Exception, 'The URL http://example.com should use HTTPS.'
+            ):
+                common.url_retrieve('http://example.com', 'test_path')
+
+    def test_url_retrieve_with_successfull_http_works(self) -> None:
+        with tempfile.TemporaryDirectory() as tempdir:
+            output_path = os.path.join(tempdir, 'output')
+            attempts = []
+            def mock_urlopen(
+                url: str, context: ssl.SSLContext
+            ) -> io.BinaryIOBase:
+                attempts.append(url)
+                self.assertLessEqual(len(attempts), 1)
+                self.assertEqual(url, 'https://example.com')
+                self._assert_ssl_context_matches_default(context)
+                return io.BytesIO(b'content')
+
+            urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
+
+            with urlopen_swap:
+                common.url_retrieve(
+                    'https://example.com', output_path, enforce_https=False)
+            with open(output_path, 'rb') as buffer:
+                self.assertEqual(buffer.read(), b'content')
