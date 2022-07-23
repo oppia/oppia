@@ -23,12 +23,11 @@ var workflow = require('./workflow.js');
 var general = require('../webdriverio_utils/general.js');
 
 var TopicsAndSkillsDashboardPage = function() {
+  var assignSkillToTopicButton = $('.e2e-test-assign-skill-to-topic-button');
   var assignSkillToTopicButtonsSelector = function() {
     return $$('.e2e-test-assign-skill-to-topic-button');
   };
-  var assignedTopicNamesInputSelector = function() {
-    return $$('.e2e-test-unassign-topic');
-  };
+  var assignedTopicNamesInput = $('.e2e-test-unassign-topic');
   var confirmMoveButton = $('.e2e-test-confirm-move-button');
   var confirmSkillCreationButton = $('.e2e-test-confirm-skill-creation-button');
   var confirmSkillsMergeButton = $('.e2e-test-confirm-skill-selection-button');
@@ -71,6 +70,7 @@ var TopicsAndSkillsDashboardPage = function() {
   };
   var topicFilterKeywordField = $('.e2e-test-select-keyword-dropdown');
   var topicFilterClassroomField = $('.e2e-test-select-classroom-dropdown');
+  var topicsListItem = $('.e2e-test-topics-list-item');
   var topicsListItemsSelector = function() {
     return $$('.e2e-test-topics-list-item');
   };
@@ -113,6 +113,8 @@ var TopicsAndSkillsDashboardPage = function() {
   this.waitForTopicsToLoad = async function() {
     await waitFor.visibilityOf(
       topicsTable, 'Topics table taking too long to appear');
+    await waitFor.visibilityOf(
+      topicsListItem, 'Topics list taking too long to appear');
     var topicsListItems = await topicsListItemsSelector();
     await waitFor.visibilityOf(
       topicsListItems[0], 'Topics list taking too long to appear');
@@ -169,9 +171,8 @@ var TopicsAndSkillsDashboardPage = function() {
   this.assignSkillToTopic = async function(skillName, topicName) {
     await this.waitForSkillsToLoad();
     await this.searchSkillByName(skillName);
-    var assignSkillToTopicButtons = await assignSkillToTopicButtonsSelector();
     await waitFor.visibilityOf(
-      assignSkillToTopicButtons[0],
+      assignSkillToTopicButton,
       'Assign skill to topic buttons taking too long to appear');
     var assignSkillToTopicButtons = await assignSkillToTopicButtonsSelector();
     expect(assignSkillToTopicButtons.length).toEqual(1);
@@ -358,9 +359,8 @@ var TopicsAndSkillsDashboardPage = function() {
     await action.click('Unassign Skill Button', unassignSkillButton);
 
     await waitFor.modalPopupToAppear();
-    var assignedTopicNamesInput = await assignedTopicNamesInputSelector();
     await waitFor.visibilityOf(
-      assignedTopicNamesInput[0],
+      assignedTopicNamesInput,
       'Topic names in unassign skill from topics modal taking' +
       ' too long to appear.');
     var topicListItem = $(

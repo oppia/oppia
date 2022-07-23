@@ -339,10 +339,10 @@ var TopicEditorPage = function() {
   };
 
   this.expectUncategorizedSkillsToBe = async function(skillDescriptions) {
-    var uncategorizedSkills = await uncategorizedSkillsSelector();
     await waitFor.visibilityOf(
       uncategorizedSkillCard,
       'Uncategorized skills taking too long to appear.');
+    var uncategorizedSkills = await uncategorizedSkillsSelector();
 
     for (var i = 0; i < uncategorizedSkills.length; i++) {
       var uncategorizedSkill = uncategorizedSkills[i];
