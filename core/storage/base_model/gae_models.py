@@ -62,7 +62,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import datastore_services
     from mypy_imports import transaction_services
 
-    AllowedCommitCmdTypes = Sequence[
+    AllowedCommitCmdsListType = Sequence[
         Mapping[str, change_domain.AcceptableChangeDictTypes]
     ]
 
@@ -713,7 +713,7 @@ class BaseCommitLogEntryModel(BaseModel):
             committer_id: str,
             commit_type: str,
             commit_message: Optional[str],
-            commit_cmds: AllowedCommitCmdTypes,
+            commit_cmds: AllowedCommitCmdsListType,
             status: str,
             community_owned: bool
     ) -> SELF_BASE_COMMIT_LOG_ENTRY_MODEL:
@@ -975,7 +975,7 @@ class VersionedModel(BaseModel):
         committer_id: str,
         commit_type: str,
         commit_message: Optional[str],
-        commit_cmds: AllowedCommitCmdTypes,
+        commit_cmds: AllowedCommitCmdsListType,
         # We expect Mapping because we want to allow models that inherit
         # from BaseModel as the values, if we used Dict this wouldn't
         # be allowed.
@@ -1247,7 +1247,7 @@ class VersionedModel(BaseModel):
         self,
         committer_id: str,
         commit_message: Optional[str],
-        commit_cmds: AllowedCommitCmdTypes
+        commit_cmds: AllowedCommitCmdsListType
     ) -> None:
         """Saves a version snapshot and updates the model.
 

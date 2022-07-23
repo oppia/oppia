@@ -286,7 +286,7 @@ class CollectionModel(base_models.VersionedModel):
         committer_id: str,
         commit_type: str,
         commit_message: Optional[str],
-        commit_cmds: base_models.AllowedCommitCmdTypes,
+        commit_cmds: base_models.AllowedCommitCmdsListType,
         # We expect Mapping because we want to allow models that inherit
         # from BaseModel as the values, if we used Dict this wouldn't
         # be allowed.
@@ -639,7 +639,7 @@ class CollectionRightsModel(base_models.VersionedModel):
         committer_id: str,
         commit_type: str,
         commit_message: Optional[str],
-        commit_cmds: base_models.AllowedCommitCmdTypes,
+        commit_cmds: base_models.AllowedCommitCmdsListType,
         # We expect Mapping because we want to allow models that inherit
         # from BaseModel as the values, if we used Dict this wouldn't
         # be allowed.

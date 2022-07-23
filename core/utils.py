@@ -167,8 +167,9 @@ def get_file_contents(
         mode: str. File opening mode, default is in read mode.
 
     Returns:
-        *. Either the raw_bytes stream if the flag is set or the
-        decoded stream in utf-8 format.
+        Union[str, bytes]. Either the raw_bytes stream ( bytes type ) if
+        the raw_bytes is True or the decoded stream ( string type ) in
+        utf-8 format if raw_bytes is False.
     """
     if raw_bytes:
         mode = 'rb'
