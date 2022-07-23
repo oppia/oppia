@@ -952,6 +952,8 @@ LEARNER_ANSWER_DETAILS_SUBMIT_URL = '/learneranswerdetailshandler'
 LEARNER_DASHBOARD_URL = '/learner-dashboard'
 LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL = (
     '/learnerdashboardtopicsandstoriesprogresshandler/data')
+LEARNER_COMPLETED_CHAPTERS_COUNT_DATA_URL = (
+    '/learnercompletedchapterscounthandler/data')
 LEARNER_DASHBOARD_COLLECTION_DATA_URL = (
     '/learnerdashboardcollectionsprogresshandler/data')
 LEARNER_DASHBOARD_EXPLORATION_DATA_URL = (

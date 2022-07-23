@@ -67,6 +67,13 @@
       </button>
     </div>
   </div>
+  <div *ngIf="inStoryMode && isEndChapterFeatureEnabled() && storyId">
+    <oppia-post-chapter-recommendations [nextStoryNodeLink]="nextLessonLink"
+                                        [nextStoryNodeThumbnailUrl]="nextStoryNodeIconUrl ? nextStoryNodeIconUrl : ''"
+                                        [nextStoryNodeThumbnailBgColor]="nextStoryNode ? nextStoryNode.thumbnailBgColor : ''"
+                                        [nextStoryNodeTitle]="nextStoryNode ? nextStoryNode.title : ''">
+    </oppia-post-chapter-recommendations>
+  </div>
 
   <div *ngIf="inStoryMode" class="conversation-skin-back-to-collection-container">
     <a [href]="storyViewerUrl" class="conversation-skin-back-to-collection" translate="I18N_PLAYER_RETURN_TO_STORY"></a>
