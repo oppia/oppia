@@ -1064,7 +1064,9 @@ class CommonTests(test_utils.GenericTestBase):
         attempts = []
         def mock_open(_path: str, _options: str) -> NoReturn:
             raise AssertionError('open() should not be called')
-        def mock_urlopen(url: str, context: ssl.SSLContext) -> io.BufferedIOBase:
+        def mock_urlopen(
+            url: str, context: ssl.SSLContext
+        ) -> io.BufferedIOBase:
             attempts.append(url)
             self.assertLessEqual(len(attempts), 2)
             self.assertEqual(url, 'https://example.com')
