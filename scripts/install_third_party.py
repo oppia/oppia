@@ -30,7 +30,7 @@ import zipfile
 from core import utils
 
 from . import common
-from . import install_backend_python_libs
+from . import install_python_prod_dependencies
 
 TOOLS_DIR = os.path.join('..', 'oppia_tools')
 THIRD_PARTY_DIR = os.path.join('.', 'third_party')
@@ -458,7 +458,7 @@ def main(args=None):
             'The redis command line interface will not be installed because '
             'your machine is on the Windows operating system.')
     unused_parsed_args = _PARSER.parse_args(args=args)
-    install_backend_python_libs.main()
+    install_python_prod_dependencies.main()
     download_all_dependencies(DEPENDENCIES_FILE_PATH)
     install_redis_cli()
     install_elasticsearch_dev_server()
