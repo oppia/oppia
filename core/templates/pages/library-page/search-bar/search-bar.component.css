@@ -225,13 +225,13 @@
   .oppia-search-bar-category-selector {
     margin-top: 95px;
     right: 9px;
-    transform: translate(-273px, 40px);
+    transform: translate(-284px, 40px);
     width: 0;
     z-index: 2;
   }
   .oppia-search-bar-language-selector {
     margin-top: 95px;
-    transform: translate(-114px, 40px);
+    transform: translate(-120px, 40px);
     width: 0;
     z-index: 2;
   }
