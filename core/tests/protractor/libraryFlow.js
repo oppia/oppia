@@ -136,6 +136,16 @@ describe('Rating', function() {
      'submitted', async function() {
     await users.createAndLoginSuperAdminUser(
       'user11@explorationRating.com', 'user11Rating');
+
+    // The below lines of code enable the user checkpoints feature on the
+    // config tab. This is required to enable the lesson-info modal button
+    // on the exploration footer, which in turn is required to view the ratings.
+    // This should be removed when the user checkpoints feature is no longer
+    // gated behind a config option.
+    await adminPage.editConfigProperty(
+      'Enable checkpoints feature.', 'Boolean',
+      async(elem) => await elem.setValue(true));
+
     // Create a test exploration.
 
     // We need a test exploration here.
