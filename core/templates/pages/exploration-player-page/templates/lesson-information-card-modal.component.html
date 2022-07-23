@@ -41,7 +41,7 @@
         <p *ngIf="explorationIsPrivate" class="private-card-info">{{ 'I18N_PLAYER_IS_PRIVATE' | translate }}</p>
 
         <ul *ngIf="!explorationIsPrivate" class="card-metrics row space-between center">
-          <li class="protractor-test-info-card-rating row-item">
+          <li class="e2e-test-info-card-rating row-item">
             <span class="fas fa-star fa-lg learn-info-card-star" [ngbTooltip]="'I18N_PLAYER_RATINGS_TOOLTIP' | translate" placement="top">
               <span class="oppia-icon-accessibility-label">{{ 'I18N_PLAYER_RATINGS_TOOLTIP' | translate }}</span>
             </span>
