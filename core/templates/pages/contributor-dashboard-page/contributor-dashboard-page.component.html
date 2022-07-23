@@ -57,21 +57,23 @@
                   <strong>Review rights:</strong>
                   <div ng-if="$ctrl.userCanReviewTranslationSuggestionsInLanguages.length > 0">
                     Translations in languages:
-                    <div class="oppia-review-rights-languages">
+                    <div class="oppia-language-container">
                       <span ng-repeat="languageDescription in $ctrl.userCanReviewTranslationSuggestionsInLanguages">
                         <div class="oppia-review-item-detail-container e2e-test-translation-<[$ctrl.provideLanguageForProtractorClass(languageDescription)]>-reviewer">
                           <[languageDescription]>
                         </div>
-                      </span>
-                    </div>                    
+                      </span>   
+                    </div>                                    
                   </div>
                   <div ng-if="$ctrl.userCanReviewVoiceoverSuggestionsInLanguages.length > 0">
                     Voiceovers in languages:
-                    <span ng-repeat="languageDescription in $ctrl.userCanReviewVoiceoverSuggestionsInLanguages">
-                      <span class="oppia-review-item-detail-container e2e-test-voiceover-<[$ctrl.provideLanguageForProtractorClass(languageDescription)]>-reviewer">
-                        <[languageDescription]>
+                    <div class="oppia-language-container">
+                      <span ng-repeat="languageDescription in $ctrl.userCanReviewVoiceoverSuggestionsInLanguages">
+                        <span class="oppia-review-item-detail-container e2e-test-voiceover-<[$ctrl.provideLanguageForProtractorClass(languageDescription)]>-reviewer">
+                          <[languageDescription]>
+                        </span>
                       </span>
-                    </span>
+                    </div>                    
                   </div>
                   <div ng-if="$ctrl.userCanReviewQuestions"
                        class="e2e-test-question-reviewer">
@@ -163,19 +165,23 @@
             <strong>Review rights:</strong>
             <div ng-if="$ctrl.userCanReviewTranslationSuggestionsInLanguages.length > 0">
               Translations in languages:
-              <span ng-repeat="languageDescription in $ctrl.userCanReviewTranslationSuggestionsInLanguages">
-                <span class="oppia-review-item-detail-container e2e-test-translation-<[languageDescription]>-reviewer">
-                  <[languageDescription]>
+              <div class="oppia-language-container">
+                <span ng-repeat="languageDescription in $ctrl.userCanReviewTranslationSuggestionsInLanguages">
+                  <span class="oppia-review-item-detail-container e2e-test-translation-<[languageDescription]>-reviewer">
+                    <[languageDescription]>
+                  </span>
                 </span>
-              </span>
+              </div>              
             </div>
             <div ng-if="$ctrl.userCanReviewVoiceoverSuggestionsInLanguages.length > 0">
               Voiceovers in languages:
-              <span ng-repeat="languageDescription in $ctrl.userCanReviewVoiceoverSuggestionsInLanguages">
-                <span class="oppia-review-item-detail-container e2e-test-voiceover-<[languageDescription]>-reviewer">
-                  <[languageDescription]>
+              <div class="oppia-language-container">
+                <span ng-repeat="languageDescription in $ctrl.userCanReviewVoiceoverSuggestionsInLanguages">
+                  <span class="oppia-review-item-detail-container e2e-test-voiceover-<[languageDescription]>-reviewer">
+                    <[languageDescription]>
+                  </span>
                 </span>
-              </span>
+              </div>              
             </div>
             <div ng-if="$ctrl.userCanReviewQuestions"
                  class="e2e-test-question-reviewer">
@@ -233,9 +239,10 @@
   </div>
 </div>
 <style>
-  .oppia-review-rights-languages {
+  .oppia-language-container {
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
   }
   .oppia-collapsed-user-info {
     display: flex;
@@ -301,8 +308,7 @@
     align-items: center;
     color: #4a4a4a;
     display: flex;
-    font-size: 20px;
-    margin: auto;
+    font-size: 18px;
   }
   .oppia-collapsed-dashboard-language-container-label {
     color: #4a4a4a;
@@ -479,8 +485,10 @@
     background-color: #00645d;
     border-radius: 10%;
     color: #fff;
-    margin: auto 2px;
+    height: 29px;
+    margin: 1px 2px;
     padding: 1px 5px;
+    width: fit-content;
   }
   .oppia-contributor-home {
     position: -webkit-sticky;
