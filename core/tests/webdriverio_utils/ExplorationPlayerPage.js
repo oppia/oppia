@@ -55,6 +55,7 @@ var ExplorationPlayerPage = function() {
     return $$('.e2e-test-rating-star');
   };
   var reportExplorationButton = $('.e2e-test-report-exploration-button');
+  var reportExplorationTextArea = $('.e2e-test-report-exploration-text-area');
   var returnToParentButton = $('.e2e-test-return-to-parent-button');
   let submitButton = $('.e2e-test-submit-report-button');
   var suggestionPopupLink = $('.e2e-test-exploration-suggestion-popup-link');
@@ -113,9 +114,11 @@ var ExplorationPlayerPage = function() {
     await waitFor.visibilityOf(
       radioButton, 'Radio Buttons takes too long to appear');
     await action.click('Radio Button', radioButton);
-    // eslint-disable-next-line oppia/e2e-practices
-    let textArea = $('<textarea>');
-    await action.sendKeys('Text Area', textArea, 'Reporting this exploration');
+    await action.sendKeys(
+      'Text Area',
+      reportExplorationTextArea,
+      'Reporting this exploration'
+    );
     await action.click('Submit Button', submitButton);
     let afterSubmitText = await action.getText(
       'Flagged Success Element', flaggedSuccessElement);

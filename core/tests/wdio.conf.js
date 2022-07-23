@@ -18,7 +18,7 @@ var chromedriverPath =
 // If video recorder is not running the ffmpeg process will be null.
 var ffmpegProcess = null;
 // The absolute path where the recorded video of test will be stored.
-var videoPath = '';
+var videoPath = null;
 // Enable ALL_VIDEOS if you want success videos to be saved.
 const ALL_VIDEOS = false;
 
