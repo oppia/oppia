@@ -210,6 +210,13 @@ BAD_PATTERNS_PYTHON_REGEXP = [
         'excluded_files': (),
         'excluded_dirs': ()
     },
+    {
+        'regexp': re.compile(r'urlretrieve\('),
+        'message': 'Please use scripts.common.url_retrieve instead of '
+                   'urllib.request.urlretrieve.',
+        'excluded_files': (),
+        'excluded_dirs': ()
+    },
 ]
 
 BAD_PATTERNS_MAP = {
