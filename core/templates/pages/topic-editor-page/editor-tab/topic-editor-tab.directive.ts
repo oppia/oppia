@@ -68,10 +68,10 @@ angular.module('oppia').directive('topicEditorTab', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topic-editor-page/editor-tab/topic-editor-tab.directive.html'),
       controller: [
-        '$rootScope', '$scope', '$uibModal', 'ContextService',
+        '$rootScope', '$scope', '$uibModal', 'AlertsService', 'ContextService',
         'EntityCreationService', 'FocusManagerService',
         'ImageUploadHelperService', 'NgbModal',
-        'PageTitleService', 'StoryCreationService',
+        'PageTitleService', 'QuestionBackendApiService', 'StoryCreationService',
         'TopicEditorRoutingService', 'TopicEditorStateService',
         'TopicUpdateService', 'TopicsAndSkillsDashboardBackendApiService',
         'UndoRedoService', 'UrlInterpolationService',
@@ -81,10 +81,10 @@ angular.module('oppia').directive('topicEditorTab', [
         'MAX_CHARS_IN_TOPIC_DESCRIPTION', 'MAX_CHARS_IN_TOPIC_NAME',
         'MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB',
         function(
-            $rootScope, $scope, $uibModal, ContextService,
+            $rootScope, $scope, $uibModal, AlertsService, ContextService,
             EntityCreationService, FocusManagerService,
             ImageUploadHelperService, NgbModal,
-            PageTitleService, StoryCreationService,
+            PageTitleService, QuestionBackendApiService, StoryCreationService,
             TopicEditorRoutingService, TopicEditorStateService,
             TopicUpdateService, TopicsAndSkillsDashboardBackendApiService,
             UndoRedoService, UrlInterpolationService,
@@ -137,23 +137,39 @@ angular.module('oppia').directive('topicEditorTab', [
               $scope.topic.getSkillSummariesThatAreNotInDiagnosticTest());
             $scope.selectedSkillsForDiagnosticTest = (
               $scope.topic.getDiagnosticTestSkillSummaries());
-            $scope.isDiagnosticTestSkillsDropdownPresent = false;
+            $scope.diagnosticTestSkillsDropdownIsShown = false;
             $scope.isSelectedSkillsForDiagnosticTestEmpty = true;
-            $scope.selectedSkillForDiagnosticTest;
 
             $scope.presentDiagnosticTestSkillDropdown = function() {
-              $scope.isDiagnosticTestSkillsDropdownPresent = true;
+              $scope.diagnosticTestSkillsDropdownIsShown = true;
             };
 
             $scope.removeSkillDropdownForDiagnosticTest = function() {
-              $scope.isDiagnosticTestSkillsDropdownPresent = false;
+              $scope.diagnosticTestSkillsDropdownIsShown = false;
             };
 
-            $scope.addSkillForDiagnosticTest = function(skillToAdd) {
+            $scope.addSkillForDiagnosticTest = async function() {
+              let skillToAdd = $scope.selectedSkillForDiagnosticTest;
               if (skillToAdd === null) {
                 return;
               }
+              let numberOfQuestions;
 
+              await QuestionBackendApiService
+                .fetchTotalQuestionCountForSkillIdsAsync(
+                  [skillToAdd.getId()]).then((questionCount) => {
+                  numberOfQuestions = questionCount;
+                });
+
+              if (numberOfQuestions < 2) {
+                AlertsService.addInfoMessage(
+                  'The skill should contain at least two questions for ' +
+                  'getting assigned to the diagnostic test.', 5000);
+                $scope.selectedSkillForDiagnosticTest = null;
+                $scope.diagnosticTestSkillsDropdownIsShown = false;
+                $scope.$applyAsync();
+                return;
+              }
               $scope.selectedSkillsForDiagnosticTest.push(skillToAdd);
               let j = -1;
               for (let skill of $scope.availableSkillsForDiagnosticTest) {
@@ -166,7 +182,7 @@ angular.module('oppia').directive('topicEditorTab', [
               TopicUpdateService.updateDiagnosticTestSkills(
                 $scope.topic,
                 cloneDeep($scope.selectedSkillsForDiagnosticTest));
-              $scope.isDiagnosticTestSkillsDropdownPresent = false;
+              $scope.diagnosticTestSkillsDropdownIsShown = false;
               $scope.$applyAsync();
             };
 

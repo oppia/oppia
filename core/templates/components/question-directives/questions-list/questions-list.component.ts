@@ -60,6 +60,7 @@ import { SkillDifficulty } from 'domain/skill/skill-difficulty.model';
 import { Subscription } from 'rxjs';
 import { ConfirmQuestionExitModalComponent } from '../modal-templates/confirm-question-exit-modal.component';
 import { QuestionEditorSaveModalComponent } from '../modal-templates/question-editor-save-modal.component';
+import { AssignedSkill } from 'domain/skill/assigned-skill.model';
 
 angular.module('oppia').component('questionsList', {
   bindings: {
@@ -83,8 +84,8 @@ angular.module('oppia').component('questionsList', {
     'QuestionObjectFactory', 'QuestionUndoRedoService',
     'QuestionValidationService', 'QuestionsListService',
     'SkillBackendApiService', 'SkillEditorRoutingService',
-    'UtilsService', 'WindowDimensionsService',
-    'DEFAULT_SKILL_DIFFICULTY', 'INTERACTION_SPECS',
+    'TopicsAndSkillsDashboardBackendApiService', 'UtilsService',
+    'WindowDimensionsService', 'DEFAULT_SKILL_DIFFICULTY', 'INTERACTION_SPECS',
     'NUM_QUESTIONS_PER_PAGE',
     function(
         $location, $rootScope, $timeout, AlertsService,
@@ -94,8 +95,8 @@ angular.module('oppia').component('questionsList', {
         QuestionObjectFactory, QuestionUndoRedoService,
         QuestionValidationService, QuestionsListService,
         SkillBackendApiService, SkillEditorRoutingService,
-        UtilsService, WindowDimensionsService,
-        DEFAULT_SKILL_DIFFICULTY, INTERACTION_SPECS,
+        TopicsAndSkillsDashboardBackendApiService, UtilsService,
+        WindowDimensionsService, DEFAULT_SKILL_DIFFICULTY, INTERACTION_SPECS,
         NUM_QUESTIONS_PER_PAGE) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
@@ -425,11 +426,31 @@ angular.module('oppia').component('questionsList', {
         }
         $location.hash(ctrl.questionId);
       };
-      ctrl.deleteQuestionFromSkill = function(
+
+      ctrl.deleteQuestionFromSkill = async function(
           questionId, skillDescription) {
         if (!ctrl.canEditQuestion()) {
           AlertsService.addWarning(
             'User does not have enough rights to delete the question');
+          return;
+        }
+
+        let skillIsAssgignedForDiagnosticTest = false;
+        await TopicsAndSkillsDashboardBackendApiService
+          .fetchTopicAssignmentsForSkillAsync(
+            ctrl.selectedSkillId).then((response: AssignedSkill[]) => {
+            response.map((topic) => {
+              if (topic.skillIdsForDiagnosticTest.includes(
+                ctrl.selectedSkillId)) {
+                skillIsAssgignedForDiagnosticTest = true;
+              }
+            });
+          });
+
+        if (skillIsAssgignedForDiagnosticTest &&
+            ctrl.getQuestionSummariesForOneSkill().length <= 2) {
+          AlertsService.addInfoMessage(
+            'The skill must be removed from the diagnostic test first.');
           return;
         }
         ctrl.deletedQuestionIds.push(questionId);

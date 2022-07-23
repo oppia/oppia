@@ -1798,7 +1798,8 @@ class TopicAssignment:
     """
 
     def __init__(
-            self, topic_id, topic_name, topic_version, subtopic_id):
+            self, topic_id, topic_name, topic_version, subtopic_id,
+            skill_ids_for_diagnostic_test):
         """Constructs a TopicAssignment domain object.
 
         Args:
@@ -1809,11 +1810,14 @@ class TopicAssignment:
             subtopic_id: str or None. The id of the subtopic to which the skill
                 is assigned, or None if the skill is not assigned to any
                 subtopic.
+            skill_ids_for_diagnostic_test: list(str). The list of skill_id that
+                will be used from a topic in the diagnostic test.
         """
         self.topic_id = topic_id
         self.topic_name = topic_name
         self.topic_version = topic_version
         self.subtopic_id = subtopic_id
+        self.skill_ids_for_diagnostic_test = skill_ids_for_diagnostic_test
 
     def to_dict(self):
         """Returns a dictionary representation of this domain object.
@@ -1826,6 +1830,7 @@ class TopicAssignment:
             'topic_name': self.topic_name,
             'topic_version': self.topic_version,
             'subtopic_id': self.subtopic_id,
+            'skill_ids_for_diagnostic_test': self.skill_ids_for_diagnostic_test
         }
 
 

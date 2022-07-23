@@ -597,11 +597,14 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic_assignments[0].topic_name, 'Topic1')
         self.assertEqual(topic_assignments[0].topic_id, topic_id)
         self.assertEqual(topic_assignments[0].topic_version, 1)
+        self.assertEqual(topic_assignments[0].skill_ids_for_diagnostic_test, [])
         self.assertIsNone(topic_assignments[0].subtopic_id)
 
         self.assertEqual(topic_assignments[1].topic_name, 'Topic2')
         self.assertEqual(topic_assignments[1].topic_id, topic_id_1)
         self.assertEqual(topic_assignments[1].topic_version, 1)
+        self.assertEqual(
+            topic_assignments[0].skill_ids_for_diagnostic_test, [self.SKILL_ID])
         self.assertEqual(topic_assignments[1].subtopic_id, 1)
 
     def test_remove_skill_from_all_topics(self):

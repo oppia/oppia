@@ -670,10 +670,10 @@ describe('Topic editor tab directive', function() {
   it('should be able to present diagnostic test dropdown selector correctly',
     function() {
       $scope.presentDiagnosticTestSkillDropdown();
-      expect($scope.isDiagnosticTestSkillsDropdownPresent).toBeTrue();
+      expect($scope.diagnosticTestSkillsDropdownIsShown).toBeTrue();
 
       $scope.removeSkillDropdownForDiagnosticTest();
-      expect($scope.isDiagnosticTestSkillsDropdownPresent).toBeFalse();
+      expect($scope.diagnosticTestSkillsDropdownIsShown).toBeFalse();
     });
 
   it('should not call the TopicUpdateService if null skill is added in the' +

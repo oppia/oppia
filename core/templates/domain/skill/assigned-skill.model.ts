@@ -21,6 +21,7 @@ export interface AssignedSkillBackendDict {
   'topic_name': string;
   'topic_version': number;
   'subtopic_id': number;
+  'skill_ids_for_diagnostic_test': string[];
 }
 
 export class AssignedSkill {
@@ -28,7 +29,8 @@ export class AssignedSkill {
     public topicId: string,
     public topicName: string,
     public topicVersion: number,
-    public subtopicId: number) {}
+    public subtopicId: number,
+    public skillIdsForDiagnosticTest: string[]) {}
 
   static createFromBackendDict(
       backendDict: AssignedSkillBackendDict): AssignedSkill {
@@ -36,6 +38,7 @@ export class AssignedSkill {
       backendDict.topic_id,
       backendDict.topic_name,
       backendDict.topic_version,
-      backendDict.subtopic_id);
+      backendDict.subtopic_id,
+      backendDict.skill_ids_for_diagnostic_test);
   }
 }

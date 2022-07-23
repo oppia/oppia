@@ -77,7 +77,7 @@ export class Topic {
   _practiceTabIsDisplayed: boolean;
   _metaTagContent: string;
   _pageTitleFragmentForWeb: string;
-  _skillsForDiagnosticTest: ShortSkillSummary[];
+  _skillSummariesForDiagnosticTest: ShortSkillSummary[];
   constructor(
       id: string | null,
       name: string,
@@ -120,7 +120,7 @@ export class Topic {
     this._practiceTabIsDisplayed = practiceTabIsDisplayed;
     this._metaTagContent = metaTagContent;
     this._pageTitleFragmentForWeb = pageTitleFragmentForWeb;
-    this._skillsForDiagnosticTest = skillIdsForDiagnosticTest.map(
+    this._skillSummariesForDiagnosticTest = skillIdsForDiagnosticTest.map(
       (skillId: string) => {
         return ShortSkillSummary.create(
           skillId, skillIdToDescriptionMap[skillId]);
@@ -236,14 +236,13 @@ export class Topic {
         'Topic url fragment should not be longer than ' +
         `${topicUrlFragmentCharLimit} characters.`);
     }
-    if (this._skillsForDiagnosticTest.length === 0) {
+    if (this._skillSummariesForDiagnosticTest.length === 0) {
       issues.push(
-        'Skill for the diagnostic test in the topic should not be empty.');
+        'The diagnostic test for the topic should test at least one skill.');
     }
-    if (this._skillsForDiagnosticTest.length > 3) {
+    if (this._skillSummariesForDiagnosticTest.length > 3) {
       issues.push(
-        'At most 3 skills should be added for the diagnostic test in ' +
-        'the topic.');
+        'The diagnostic test for the topic should test at most 3 skills.');
     }
 
     let subtopics = this._subtopics;
@@ -559,12 +558,12 @@ export class Topic {
   }
 
   getDiagnosticTestSkillSummaries(): ShortSkillSummary[] {
-    return this._skillsForDiagnosticTest.slice();
+    return this._skillSummariesForDiagnosticTest.slice();
   }
 
   setDiagnosticTestSkillSummaries(
-      skillsForDiagnosticTest: ShortSkillSummary[]): void {
-    this._skillsForDiagnosticTest = skillsForDiagnosticTest;
+      skillSummariesForDiagnosticTest: ShortSkillSummary[]): void {
+    this._skillSummariesForDiagnosticTest = skillSummariesForDiagnosticTest;
   }
 
   getSkillSummariesThatAreNotInDiagnosticTest(): ShortSkillSummary[] {
@@ -576,10 +575,13 @@ export class Topic {
     }
     let diagnosticTestSkillSummaries = this.getDiagnosticTestSkillSummaries();
 
+    const skillIdToDiagnosticTestMap = new Map();
+    for (let skillSummary of diagnosticTestSkillSummaries) {
+      skillIdToDiagnosticTestMap.set(skillSummary.getId(), true);
+    }
+
     return topicSkillSummaries.filter(object1 => {
-      return !diagnosticTestSkillSummaries.some(object2 => {
-        return object1.id === object2.id;
-      });
+      return !(skillIdToDiagnosticTestMap.get(object1.getId()) === true);
     });
   }
 

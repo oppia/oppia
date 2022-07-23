@@ -110,27 +110,27 @@ describe('Topic object factory', () => {
     ]);
   });
 
-  it('should warn user when no skill Ids were added for the diagnostic test',
+  it('should warn user when no skill were added for the diagnostic test',
     () => {
-      _sampleTopic._skillsForDiagnosticTest = [];
+      _sampleTopic._skillSummariesForDiagnosticTest = [];
       expect(_sampleTopic.validate()).toEqual([
-        'Skill for the diagnostic test in the topic should not be empty.'
+        'The diagnostic test for the topic should test at least one skill.'
       ]);
     });
 
-  it('should warn user when no skill Ids were added for the diagnostic test',
-    () => {
-      var shortSkillSummaries = [
-        ShortSkillSummary.create('skill 1', 'description 1'),
-        ShortSkillSummary.create('skill 2', 'description 2'),
-        ShortSkillSummary.create('skill 3', 'description 3'),
-        ShortSkillSummary.create('skill 4', 'description 4'),
-      ];
-      _sampleTopic._skillsForDiagnosticTest = shortSkillSummaries;
-      expect(_sampleTopic.validate()).toEqual([
-        'At most 3 skills should be added for the diagnostic test in the topic.'
-      ]);
-    });
+  it('should warn user when more than 3 skill were added for the ' +
+    'diagnostic test', () => {
+    var shortSkillSummaries = [
+      ShortSkillSummary.create('skill 1', 'description 1'),
+      ShortSkillSummary.create('skill 2', 'description 2'),
+      ShortSkillSummary.create('skill 3', 'description 3'),
+      ShortSkillSummary.create('skill 4', 'description 4'),
+    ];
+    _sampleTopic._skillSummariesForDiagnosticTest = shortSkillSummaries;
+    expect(_sampleTopic.validate()).toEqual([
+      'The diagnostic test for the topic should test at most 3 skills.'
+    ]);
+  });
 
   it('should warn user if duplicate stories are present', () => {
     _sampleTopic._canonicalStoryReferences = [
@@ -193,7 +193,7 @@ describe('Topic object factory', () => {
       'skill_2', 'Description 2');
     var shortSkillSummaries3 = ShortSkillSummary.create(
       'skill_3', 'Description 3');
-    _sampleTopic._skillsForDiagnosticTest = [shortSkillSummaries1];
+    _sampleTopic._skillSummariesForDiagnosticTest = [shortSkillSummaries1];
     expect(_sampleTopic.getSkillSummariesThatAreNotInDiagnosticTest()).toEqual(
       [shortSkillSummaries2, shortSkillSummaries3]);
   });

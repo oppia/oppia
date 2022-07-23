@@ -118,6 +118,10 @@ export class SkillsListComponent {
             'The skill is assigned to a subtopic in a published ' +
             'topic. Please unpublish the topic before deleting ' +
             'this skill.');
+        } else if (errorMessage.includes(
+          'The skill_ids_for_diagnostic_test field should not be empty.')) {
+          errorToast = (
+            'The skill must be removed from the diagnostic test first.');
         } else {
           errorToast = errorMessage;
         }
@@ -166,11 +170,18 @@ export class SkillsListComponent {
             setTimeout(() => {
               this.topicsAndSkillsDashboardBackendApiService.
                 onTopicsAndSkillsDashboardReinitialized.emit(true);
+              let successToast: string = (
+                'The skill has been unassigned to the topic.');
+              this.alertsService.addSuccessMessage(successToast, 1000);
             }, 100);
-          }).then(() => {
-            let successToast: string = (
-              'The skill has been unassigned to the topic.');
-            this.alertsService.addSuccessMessage(successToast, 1000);
+          }).catch((error) => {
+            let errorToast = error.error;
+            if (errorToast.includes(
+              'skill_ids_for_diagnostic_test field should not be empty.')) {
+              errorToast = (
+                'The skill must be removed from the diagnostic test first.');
+            }
+            this.alertsService.addInfoMessage(errorToast, 5000);
           });
         }
       }, () => {

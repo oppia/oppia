@@ -1232,7 +1232,7 @@ class TopicAssignmentTests(test_utils.GenericTestBase):
     def setUp(self):
         super(TopicAssignmentTests, self).setUp()
         self.topic_assignments = skill_domain.TopicAssignment(
-            'topic_id1', 'Topic1', 2, 1)
+            'topic_id1', 'Topic1', 2, 1, ['topic_1'])
 
     def test_topic_assignments_gets_created(self):
         topic_assignments_dict = {
@@ -1240,6 +1240,7 @@ class TopicAssignmentTests(test_utils.GenericTestBase):
             'topic_name': 'Topic1',
             'topic_version': 2,
             'subtopic_id': 1,
+            'skill_ids_for_diagnostic_test': ['topic_1']
         }
         self.assertEqual(
             self.topic_assignments.to_dict(),

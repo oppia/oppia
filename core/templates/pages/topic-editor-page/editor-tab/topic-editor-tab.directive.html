@@ -304,42 +304,37 @@
             <md-icon>close</md-icon>
           </button>
         </md-list-item>
-        <md-list-item>
-          <mat-form-field class="oppia-diagnostic-test-dropdown-div"
-                          ng-show="isDiagnosticTestSkillsDropdownPresent">
-            <select class="oppia-diagnostic-test-dropdown e2e-test-diagnostic-test-skill-selector"
+        <md-list-item ng-show="diagnosticTestSkillsDropdownIsShown">
+          <mat-form-field class="oppia-diagnostic-test-dropdown-div">
+            <select class="form-control oppia-diagnostic-test-dropdown e2e-test-diagnostic-test-skill-selector"
                     ng-model="selectedSkillForDiagnosticTest"
-                    ng-change="addSkillForDiagnosticTest(selectedSkillForDiagnosticTest)"
+                    ng-change="addSkillForDiagnosticTest()"
+                    ng-options="skillSummary.getDescription() for skillSummary in availableSkillsForDiagnosticTest"
                     aria-label="selection dropdown">
-              <option ng-repeat="skillSummary in availableSkillsForDiagnosticTest"
-                      ng-value="skillSummary">
-                {{skillSummary.getDescription()}}
-              </option>
             </select>
           </mat-form-field>
           <button class="oppia-remove-diagnostic-test-skill-button"
                   md-button  md-icon-button
                   aria-label="Clear"
-                  ng-show="isDiagnosticTestSkillsDropdownPresent"
                   ng-click="removeSkillDropdownForDiagnosticTest()">
             <md-icon>close</md-icon>
           </button>
-          <button class="oppia-add-diagnostic-test-skills-button e2e-test-add-diagnostic-test-skill"
-                  md-button
-                  ng-click="presentDiagnosticTestSkillDropdown()"
-                  ng-show="!isDiagnosticTestSkillsDropdownPresent"
-                  ng-disabled="availableSkillsForDiagnosticTest.length === 0 || selectedSkillsForDiagnosticTest.length === 3">
-            <div class="oppia-flex">
-              <md-icon aria-label="icon-button with a plus icon">add_circle</md-icon>
-              <h4 class="oppia-button-text">Add diagnostic test skills</h4>
-            </div>
-          </button>
         </md-list-item>
       </md-list>
+      <button class="oppia-add-diagnostic-test-skills-button e2e-test-add-diagnostic-test-skill"
+              md-button
+              ng-click="presentDiagnosticTestSkillDropdown()"
+              ng-show="!diagnosticTestSkillsDropdownIsShown"
+              ng-disabled="availableSkillsForDiagnosticTest.length === 0 || selectedSkillsForDiagnosticTest.length === 3">
+        <div class="oppia-flex">
+          <md-icon aria-label="icon-button with a plus icon">add_circle</md-icon>
+          <h4 class="oppia-button-text">Add diagnostic test skills</h4>
+        </div>
+      </button>
       <div class="oppia-diagnostic-test-card-note">
-        <span ng-if="!availableSkillsForDiagnosticTest.length"><em>(No more skills left for assignment.)</em></span>
+        <span ng-if="!availableSkillsForDiagnosticTest.length && selectedSkillsForDiagnosticTest.length < 3"><em>(No more skills left for assignment.)</em></span>
         <span ng-if="selectedSkillsForDiagnosticTest.length === 3"><em>(The maximum limit was reached for adding skills to the diagnostic test.)</em></span>
-        <span ng-if="selectedSkillsForDiagnosticTest.length === 0 && availableSkillsForDiagnosticTest.length > 0"><em>(Please add atleast 1 skill.)</em></span>
+        <span ng-if="selectedSkillsForDiagnosticTest.length === 0 && availableSkillsForDiagnosticTest.length > 0"><em>(Please add at least 1 skill.)</em></span>
       </div>
     </md-card>
   </div>
@@ -738,7 +733,7 @@
   }
 
   .oppia-diagnostic-test-dropdown-div {
-    width: 80%;
+    width: 85%;
   }
 
   .oppia-diagnostic-test-dropdown {
@@ -750,7 +745,7 @@
   }
 
   .oppia-diagnostic-test-skill-description {
-    width: 80%;
+    width: 85%;
   }
 
   .oppia-diagnostic-test-skill-list-header {
@@ -763,12 +758,13 @@
 
   .oppia-diagnostic-test-skill-items {
     align-items: center;
+    background-color: #e3e3e3;
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 20%), 0 1px 1px 0 rgb(0 0 0 / 14%), 0 2px 1px -1px rgb(0 0 0 / 12%);
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between;
-    padding: 8px 10px 8px 32px;
-    position: relative;
-    width: auto;
+    margin-bottom: 5px;
+    margin-top: 5px;
+    padding: 10px;
   }
 
   @media screen and (max-width: 1200px) {

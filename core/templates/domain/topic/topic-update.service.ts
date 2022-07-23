@@ -801,14 +801,16 @@ export class TopicUpdateService {
    * the change in the undo/redo service.
    */
   updateDiagnosticTestSkills(
-      topic: Topic, newSkillsForDiagnosticTest: ShortSkillSummary[]): void {
-    let oldSkillsForDiagnosticTest = cloneDeep(
+      topic: Topic,
+      newSkillSummariesForDiagnosticTest: ShortSkillSummary[]
+  ): void {
+    let oldSkillSummariesForDiagnosticTest = cloneDeep(
       topic.getDiagnosticTestSkillSummaries());
-    let oldSkillIdsForDiagnosticTest = oldSkillsForDiagnosticTest.map((
+    let oldSkillIdsForDiagnosticTest = oldSkillSummariesForDiagnosticTest.map((
         skillSummary: ShortSkillSummary) => {
       return skillSummary.getId();
     });
-    let newSkillIdsForDiagnosticTest = newSkillsForDiagnosticTest.map((
+    let newSkillIdsForDiagnosticTest = newSkillSummariesForDiagnosticTest.map((
         skillSummary: ShortSkillSummary) => {
       return skillSummary.getId();
     });
@@ -819,9 +821,11 @@ export class TopicUpdateService {
       newSkillIdsForDiagnosticTest,
       oldSkillIdsForDiagnosticTest,
       (changeDict, topic) => {
-        topic.setDiagnosticTestSkillSummaries(newSkillsForDiagnosticTest);
+        topic.setDiagnosticTestSkillSummaries(
+          newSkillSummariesForDiagnosticTest);
       }, (changeDict, topic) => {
-        topic.setDiagnosticTestSkillSummaries(oldSkillsForDiagnosticTest);
+        topic.setDiagnosticTestSkillSummaries(
+          oldSkillSummariesForDiagnosticTest);
       });
   }
 }

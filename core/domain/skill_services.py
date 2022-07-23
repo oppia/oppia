@@ -437,7 +437,8 @@ def get_all_topic_assignments_for_skill(skill_id):
                     break
 
             topic_assignments.append(skill_domain.TopicAssignment(
-                topic.id, topic.name, topic.version, subtopic_id))
+                topic.id, topic.name, topic.version, subtopic_id,
+                topic.skill_ids_for_diagnostic_test))
 
     return topic_assignments
 
