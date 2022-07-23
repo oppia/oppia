@@ -16,7 +16,8 @@
  * @fileoverview Module for the about page.
  */
 
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+// eslint-disable-next-line oppia/disallow-httpclient
+import { HttpClient, HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { APP_INITIALIZER, ErrorHandler, NgModule } from '@angular/core';
 
 
@@ -36,38 +37,10 @@ import { ToastrModule } from 'ngx-toastr';
 import { AngularFireAuth, AngularFireAuthModule, USE_EMULATOR } from '@angular/fire/auth';
 import { AngularFireModule } from '@angular/fire';
 import { AuthService } from 'services/auth.service';
-import firebase from 'firebase/app';
 import * as hammer from 'hammerjs';
+import { LoggerService } from 'services/contextual/logger.service';
+import { FirebaseErrorFilterHandler } from './app-error-handler';
 
-class FirebaseErrorFilterHandler extends ErrorHandler {
-  // AngularFire throws duplicate errors because it uses setTimeout() to manage
-  // promises internally. Errors thrown from those setTimeout() calls are not
-  // accessible to our code. Because of this, even though LoginPageComponent
-  // catches errors thrown by AngularFire, their duplicates are treated as
-  // "Unhandled Promise Rejections" and result in top-level error messages.
-  //
-  // To prevent these errors from interfering with end-to-end tests and from
-  // polluting the server, we ignore the following list of EXPECTED error codes.
-  private static readonly EXPECTED_ERROR_CODES = [
-    // Users pending deletion have their Firebase accounts disabled. When they
-    // try to sign in anyway, we redirect them to the /pending-account-deletion
-    // page.
-    'auth/user-disabled',
-    // In emulator mode we use signInWithEmailAndPassword() and, if that throws
-    // an 'auth/user-not-found' error, createUserWithEmailAndPassword() for
-    // convenience. In production mode we use signInWithRedirect(), which
-    // doesn't throw 'auth/user-not-found' because it handles both signing in
-    // and creating users in the same way.
-    'auth/user-not-found',
-  ];
-
-  handleError(error: firebase.auth.Error): void {
-    if (FirebaseErrorFilterHandler.EXPECTED_ERROR_CODES.includes(error.code)) {
-      return;
-    }
-    super.handleError(error);
-  }
-}
 
 // Config for ToastrModule (helps in flashing messages and alerts).
 export const toastrConfig = {
@@ -136,6 +109,7 @@ export class MyHammerConfig extends HammerGestureConfig {
     {
       provide: ErrorHandler,
       useClass: FirebaseErrorFilterHandler,
+      deps: [HttpClient, LoggerService]
     },
     {
       provide: HAMMER_GESTURE_CONFIG,

@@ -16,10 +16,11 @@
  * @fileoverview Module for the learner dashboard page.
  */
 
-import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
+import { APP_INITIALIZER, ErrorHandler, NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { HttpClientModule } from '@angular/common/http';
+// eslint-disable-next-line oppia/disallow-httpclient
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
@@ -40,6 +41,7 @@ import { RemoveActivityModalComponent } from 'pages/learner-dashboard-page/modal
 import { LearnerDashboardSuggestionModalComponent } from './suggestion-modal/learner-dashboard-suggestion-modal.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
+
 
 @NgModule({
   imports: [
@@ -94,6 +96,11 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
       useClass: MyHammerConfig
     },
     {
+      provide: ErrorHandler,
+      useClass: FirebaseErrorFilterHandler,
+      deps: [HttpClient, LoggerService]
+    },
+    {
       provide: APP_BASE_HREF,
       useValue: '/'
     }
@@ -108,6 +115,8 @@ import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
 import { ToastrModule } from 'ngx-toastr';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
+import { LoggerService } from 'services/contextual/logger.service';
+import { FirebaseErrorFilterHandler } from 'pages/oppia-root/app-error-handler';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

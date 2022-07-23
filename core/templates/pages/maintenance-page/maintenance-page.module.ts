@@ -16,8 +16,9 @@
  * @fileoverview Module for the maintenance page.
  */
 
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-import { APP_INITIALIZER, NgModule } from '@angular/core';
+// eslint-disable-next-line oppia/disallow-httpclient
+import { HttpClient, HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { APP_INITIALIZER, ErrorHandler, NgModule } from '@angular/core';
 import { APP_BASE_HREF } from '@angular/common';
 import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
 import { RouterModule } from '@angular/router';
@@ -32,6 +33,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ToastrModule } from 'ngx-toastr';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
+import { FirebaseErrorFilterHandler } from 'pages/oppia-root/app-error-handler';
+import { LoggerService } from 'services/contextual/logger.service';
 
 @NgModule({
   imports: [
@@ -66,6 +69,11 @@ import { SmartRouterModule } from 'hybrid-router-module-provider';
     {
       provide: HAMMER_GESTURE_CONFIG,
       useClass: MyHammerConfig
+    },
+    {
+      provide: ErrorHandler,
+      useClass: FirebaseErrorFilterHandler,
+      deps: [HttpClient, LoggerService]
     },
     {
       provide: APP_BASE_HREF,

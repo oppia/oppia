@@ -16,8 +16,9 @@
  * @fileoverview Module for the blog-admin page.
  */
 
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-import { APP_INITIALIZER, DoBootstrap, NgModule } from '@angular/core';
+// eslint-disable-next-line oppia/disallow-httpclient
+import { HttpClient, HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { APP_INITIALIZER, DoBootstrap, ErrorHandler, NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
@@ -36,6 +37,8 @@ import { RequestInterceptor } from 'services/request-interceptor.service';
 import { ToastrModule } from 'ngx-toastr';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
+import { FirebaseErrorFilterHandler } from 'pages/oppia-root/app-error-handler';
+import { LoggerService } from 'services/contextual/logger.service';
 
 declare var angular: ng.IAngularStatic;
 
@@ -78,6 +81,11 @@ declare var angular: ng.IAngularStatic;
     {
       provide: HAMMER_GESTURE_CONFIG,
       useClass: MyHammerConfig
+    },
+    {
+      provide: ErrorHandler,
+      useClass: FirebaseErrorFilterHandler,
+      deps: [HttpClient, LoggerService]
     },
     {
       provide: APP_BASE_HREF,

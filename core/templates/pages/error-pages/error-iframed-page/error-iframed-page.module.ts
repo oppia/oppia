@@ -16,9 +16,10 @@
  * @fileoverview Module for the error iframed page.
  */
 
-import { APP_INITIALIZER, NgModule } from '@angular/core';
+import { APP_INITIALIZER, ErrorHandler, NgModule } from '@angular/core';
 import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
-import { HttpClientModule } from '@angular/common/http';
+// eslint-disable-next-line oppia/disallow-httpclient
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 
 import { RequestInterceptor } from 'services/request-interceptor.service';
@@ -29,6 +30,8 @@ import { ErrorIframedPageRootComponent } from './error-iframed-root.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ToastrModule } from 'ngx-toastr';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
+import { FirebaseErrorFilterHandler } from 'pages/oppia-root/app-error-handler';
+import { LoggerService } from 'services/contextual/logger.service';
 
 
 @NgModule({
@@ -60,7 +63,12 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
     {
       provide: HAMMER_GESTURE_CONFIG,
       useClass: MyHammerConfig
-    }
+    },
+    {
+      provide: ErrorHandler,
+      useClass: FirebaseErrorFilterHandler,
+      deps: [HttpClient, LoggerService]
+    },
   ],
   bootstrap: [ErrorIframedPageRootComponent]
 })

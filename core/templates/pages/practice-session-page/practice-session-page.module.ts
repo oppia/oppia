@@ -17,9 +17,10 @@
  */
 
 import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
-import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
+import { APP_INITIALIZER, ErrorHandler, NgModule, StaticProvider } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
+// eslint-disable-next-line oppia/disallow-httpclient
+import { HTTP_INTERCEPTORS, HttpClientModule, HttpClient } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 import { APP_BASE_HREF } from '@angular/common';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -64,6 +65,11 @@ import { SmartRouterModule } from 'hybrid-router-module-provider';
       useClass: MyHammerConfig
     },
     {
+      provide: ErrorHandler,
+      useClass: FirebaseErrorFilterHandler,
+      deps: [HttpClient, LoggerService]
+    },
+    {
       provide: APP_BASE_HREF,
       useValue: '/'
     }
@@ -77,6 +83,8 @@ class PracticeSessionPageModule {
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
 import { ToastrModule } from 'ngx-toastr';
+import { FirebaseErrorFilterHandler } from 'pages/oppia-root/app-error-handler';
+import { LoggerService } from 'services/contextual/logger.service';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
