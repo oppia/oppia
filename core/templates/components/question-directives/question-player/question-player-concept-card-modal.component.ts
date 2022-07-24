@@ -17,9 +17,9 @@
  */
 
 import { Component, Input, OnInit } from '@angular/core';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
@@ -28,7 +28,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
   templateUrl: './question-player-concept-card-modal.component.html'
 })
 export class QuestionPlayerConceptCardModalComponent
-  extends ConfirmOrCancelModal implements OnInit {
+   extends ConfirmOrCancelModal implements OnInit {
   @Input() skillIds: string[] = [];
   @Input() skills: string[] = [];
 
@@ -66,6 +66,7 @@ export class QuestionPlayerConceptCardModalComponent
       selectedSubtopics);
   }
 }
+
 angular.module('oppia').directive('oppiaQuestionPlayerConceptCardModal',
   downgradeComponent({
     component: QuestionPlayerConceptCardModalComponent

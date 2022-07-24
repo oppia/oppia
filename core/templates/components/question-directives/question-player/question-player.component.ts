@@ -13,25 +13,25 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the questions player directive.
+ * @fileoverview Component for the questions player.
  */
 
 import { Component, Input, OnDestroy, OnInit, SecurityContext } from '@angular/core';
-import { DomSanitizer } from '@angular/platform-browser';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { ExplorationPlayerStateService } from 'pages/exploration-player-page/services/exploration-player-state.service';
 import { Location } from '@angular/common';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { DomSanitizer } from '@angular/platform-browser';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Subscription } from 'rxjs';
+import { State } from 'domain/state/StateObjectFactory';
+import { SkillMasteryBackendApiService } from 'domain/skill/skill-mastery-backend-api.service';
+import { ExplorationPlayerStateService } from 'pages/exploration-player-page/services/exploration-player-state.service';
 import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
 import { PreventPageUnloadEventService } from 'services/prevent-page-unload-event.service';
 import { QuestionPlayerConceptCardModalComponent } from './question-player-concept-card-modal.component';
 import { QuestionPlayerConstants } from 'components/question-directives/question-player/question-player.constants';
-import { QuestionPlayerStateService } from './services/question-player-state.service';
-import { SkillMasteryBackendApiService } from 'domain/skill/skill-mastery-backend-api.service';
 import { SkillMasteryModalComponent } from './skill-mastery-modal.component';
-import { State } from 'domain/state/StateObjectFactory';
-import { Subscription } from 'rxjs';
 import { UserService } from 'services/user.service';
+import { QuestionPlayerStateService } from './services/question-player-state.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
 interface QuestionData {
