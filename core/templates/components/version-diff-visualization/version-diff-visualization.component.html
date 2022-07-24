@@ -16,7 +16,7 @@
 
   <div>
     <div class="legend-graph" ng-show="$ctrl.diffGraphData">
-      <h4>Exploration Graph Legend</h4>
+      <h4 class="exploration-graph-legend-heading">Exploration Graph Legend</h4>
       <div state-graph-visualization graph-data="$ctrl.legendGraph"
            node-colors="$ctrl.LEGEND_GRAPH_COLORS"
            node-secondary-labels="$ctrl.LEGEND_GRAPH_SECONDARY_LABELS"
@@ -35,6 +35,9 @@
     margin-top: 30px;
     right: -100px;
     top: 10px;
+  }
+  .exploration-graph-legend-heading {
+    font-weight: normal;
   }
   version-diff-visualization .diff-graph, version-diff-visualization .legend-graph {
     border: 1px solid #707070;

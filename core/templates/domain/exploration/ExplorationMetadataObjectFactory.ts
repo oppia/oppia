@@ -34,7 +34,7 @@ export interface ExplorationMetadataBackendDict {
   'init_state_name': string;
   'param_specs': ParamSpecsBackendDict;
   'param_changes': ParamChangeBackendDict[];
-  'auto_tts_enabled'?: boolean;
+  'auto_tts_enabled': boolean;
   'correctness_feedback_enabled': boolean;
   'edits_allowed': boolean;
 }

@@ -47,6 +47,7 @@ let fixture: ComponentFixture<StoryViewerNavbarBreadcrumbComponent>;
 let readOnlyTopicObjectFactory: ReadOnlyTopicObjectFactory;
 let topicViewerBackendApiService: TopicViewerBackendApiService;
 let i18nLanguageCodeService: I18nLanguageCodeService;
+let urlService: UrlService;
 
 describe('Subtopic viewer navbar breadcrumb component', () => {
   beforeEach(waitForAsync(() => {
@@ -85,6 +86,7 @@ describe('Subtopic viewer navbar breadcrumb component', () => {
     readOnlyTopicObjectFactory = TestBed.inject(ReadOnlyTopicObjectFactory);
     topicViewerBackendApiService = TestBed.inject(TopicViewerBackendApiService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+    urlService = TestBed.inject(UrlService);
     fixture = TestBed.createComponent(StoryViewerNavbarBreadcrumbComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -100,7 +102,9 @@ describe('Subtopic viewer navbar breadcrumb component', () => {
         topic_name: 'Topic Name 1',
         topic_id: 'topic1',
         topic_description: 'Description',
-        practice_tab_is_displayed: false
+        practice_tab_is_displayed: false,
+        meta_tag_content: 'content',
+        page_title_fragment_for_web: 'title',
       } as ReadOnlyTopicBackendDict)
     );
   });
@@ -124,6 +128,15 @@ describe('Subtopic viewer navbar breadcrumb component', () => {
     component.ngOnInit();
     expect(component.getTopicUrl()).toBe(
       '/learn/classroom_1/topic_1/story');
+  });
+
+  it('should throw error if story url fragment is not present', () => {
+    spyOn(
+      urlService, 'getStoryUrlFragmentFromLearnerUrl').and.returnValue(null);
+
+    expect(() => {
+      component.ngOnInit();
+    }).toThrowError('Story url fragment is null');
   });
 
   it('should set topic name and story title translation key and ' +

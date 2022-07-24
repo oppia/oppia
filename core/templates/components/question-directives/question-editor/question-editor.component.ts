@@ -112,6 +112,8 @@ angular.module('oppia').component('questionEditor', {
         }
         QuestionUpdateService.setQuestionStateData(
           ctrl.question, updateFunction);
+
+        $rootScope.$applyAsync();
       };
 
       ctrl.saveStateContent = function(displayedValue) {
@@ -122,6 +124,8 @@ angular.module('oppia').component('questionEditor', {
           stateData.content = angular.copy(displayedValue);
           ctrl.interactionIsShown = true;
         });
+
+        $rootScope.$applyAsync();
       };
 
       ctrl.saveInteractionId = function(displayedValue) {

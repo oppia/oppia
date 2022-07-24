@@ -19,6 +19,8 @@
 import { Subscription } from 'rxjs';
 import cloneDeep from 'lodash/cloneDeep';
 import { RevertExplorationModalComponent } from './modal-templates/revert-exploration-modal.component';
+import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { ExplorationMetadataDiffModalComponent } from '../modal-templates/exploration-metadata-diff-modal.component';
 
 require(
   'components/version-diff-visualization/' +
@@ -284,6 +286,24 @@ angular.module('oppia').component('historyTab', {
 
       ctrl.reverseDateOrder = function() {
         ctrl.explorationVersionMetadata.reverse();
+      };
+
+      ctrl.showExplorationMetadataDiffModal = function() {
+        let modalRef: NgbModalRef = NgbModal.open(
+          ExplorationMetadataDiffModalComponent, {
+            backdrop: true,
+            windowClass: 'exploration-metadata-diff-modal',
+            size: 'xl'
+          });
+
+        modalRef.componentInstance.oldMetadata = ctrl.diffData.v1Metadata;
+        modalRef.componentInstance.newMetadata = ctrl.diffData.v2Metadata;
+        modalRef.componentInstance.headers = {
+          leftPane: ctrl.earlierVersionHeader,
+          rightPane: ctrl.laterVersionHeader
+        };
+
+        modalRef.result.then(function() {}, function() {});
       };
 
       ctrl.$onInit = function() {

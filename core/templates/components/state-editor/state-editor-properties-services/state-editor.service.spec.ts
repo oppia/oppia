@@ -76,6 +76,7 @@ describe('Editor state service', () => {
         {
           outcome: {
             dest: 'State',
+            dest_if_really_stuck: null,
             feedback: {
               html: '',
               content_id: 'This is a new feedback text',
@@ -92,6 +93,7 @@ describe('Editor state service', () => {
       ],
       default_outcome: {
         dest: 'Hola',
+        dest_if_really_stuck: null,
         feedback: {
           content_id: '',
           html: '',
@@ -462,7 +464,7 @@ describe('Editor state service', () => {
       },
       placeholder: {
         value: suof.createDefault('2', ''),
-      },
+      }
     };
     ecs.setInteraction(mockInteraction);
     expect(ecs.interaction.customizationArgs).toEqual({

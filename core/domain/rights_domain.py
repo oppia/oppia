@@ -179,13 +179,13 @@ class ActivityRights:
                 'cloned_from': self.cloned_from,
                 'status': self.status,
                 'community_owned': False,
-                'owner_names': user_services.get_human_readable_user_ids(# type: ignore[no-untyped-call]
+                'owner_names': user_services.get_human_readable_user_ids(
                     self.owner_ids),
-                'editor_names': user_services.get_human_readable_user_ids(# type: ignore[no-untyped-call]
+                'editor_names': user_services.get_human_readable_user_ids(
                     self.editor_ids),
-                'voice_artist_names': user_services.get_human_readable_user_ids(# type: ignore[no-untyped-call]
+                'voice_artist_names': user_services.get_human_readable_user_ids(
                     self.voice_artist_ids),
-                'viewer_names': user_services.get_human_readable_user_ids(# type: ignore[no-untyped-call]
+                'viewer_names': user_services.get_human_readable_user_ids(
                     self.viewer_ids),
                 'viewable_if_private': self.viewable_if_private,
             }

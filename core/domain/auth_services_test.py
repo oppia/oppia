@@ -56,9 +56,9 @@ class AuthServicesTests(test_utils.GenericTestBase):
                 None, None, None),
         ]
 
-        user_services.update_multiple_users_data(  # type: ignore[no-untyped-call]
+        user_services.update_multiple_users_data(
             [self.modifiable_full_user_data])
-        profile_users = user_services.create_new_profiles(  # type: ignore[no-untyped-call]
+        profile_users = user_services.create_new_profiles(
             self.auth_id, self.NEW_USER_EMAIL,
             self.modifiable_profile_user_data)
         self.profile_user_1_id = profile_users[0].user_id

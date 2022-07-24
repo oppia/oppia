@@ -24,12 +24,24 @@ import { FormsModule } from '@angular/forms';
 
 import { LimitToPipe } from './limit-to.pipe';
 import { StringUtilityPipesModule } from 'filters/string-utility-filters/string-utility-pipes.module';
+import { ParameterizeRuleDescriptionPipe } from './parameterize-rule-description.pipe';
+import { ConvertToPlainTextPipe } from './string-utility-filters/convert-to-plain-text.pipe';
+import { ReplaceInputsWithEllipsesPipe } from './string-utility-filters/replace-inputs-with-ellipses.pipe';
+import { TruncatePipe } from './string-utility-filters/truncate.pipe';
+import { WrapTextWithEllipsisPipe } from './string-utility-filters/wrap-text-with-ellipsis.pipe';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     StringUtilityPipesModule
+  ],
+  providers: [
+    ReplaceInputsWithEllipsesPipe,
+    ParameterizeRuleDescriptionPipe,
+    ConvertToPlainTextPipe,
+    TruncatePipe,
+    WrapTextWithEllipsisPipe,
   ],
   declarations: [
     LimitToPipe

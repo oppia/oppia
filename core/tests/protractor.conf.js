@@ -61,10 +61,6 @@ var suites = {
       'protractor_desktop/coreEditorAndPlayerFeatures.js'
     ],
 
-    creatorDashboard: [
-      'protractor_desktop/creatorDashboard.js'
-    ],
-
     embedding: [
       'protractor_desktop/embedding.js'
     ],
@@ -105,10 +101,6 @@ var suites = {
       'protractor_desktop/fileUploadExtensions.js'
     ],
 
-    learnerDashboard: [
-      'protractor_desktop/learnerDashboard.js'
-    ],
-
     library: [
       'protractor/libraryFlow.js'
     ],
@@ -121,20 +113,12 @@ var suites = {
       'protractor_desktop/playVoiceovers.js'
     ],
 
-    preferences: [
-      'protractor_desktop/preferences.js'
-    ],
-
     profileMenu: [
       'protractor/profileMenuFlow.js'
     ],
 
     publication: [
       'protractor_desktop/publicationAndLibrary.js'
-    ],
-
-    subscriptions: [
-      'protractor/subscriptionsFlow.js'
     ],
 
     topicAndStoryEditor: [

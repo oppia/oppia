@@ -200,6 +200,7 @@ describe('Exploration editor tab component', function() {
             rule_specs: [],
             outcome: {
               dest: 'unused',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'feedback_1',
                 html: ''
@@ -211,6 +212,7 @@ describe('Exploration editor tab component', function() {
           }],
           default_outcome: {
             dest: 'default',
+            dest_if_really_stuck: null,
             feedback: {
               content_id: 'default_outcome',
               html: ''
@@ -286,6 +288,7 @@ describe('Exploration editor tab component', function() {
             rule_specs: [],
             outcome: {
               dest: 'unused',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'feedback_1',
                 html: ''
@@ -297,6 +300,7 @@ describe('Exploration editor tab component', function() {
           }],
           default_outcome: {
             dest: 'default',
+            dest_if_really_stuck: null,
             feedback: {
               content_id: 'default_outcome',
               html: ''
@@ -471,6 +475,7 @@ describe('Exploration editor tab component', function() {
         rule_specs: [],
         outcome: {
           dest: 'unused',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'feedback_1',
             html: ''
@@ -485,6 +490,7 @@ describe('Exploration editor tab component', function() {
       rule_specs: [],
       outcome: {
         dest: 'Second State',
+        dest_if_really_stuck: null,
         feedback: {
           content_id: 'feedback_1',
           html: ''
@@ -509,6 +515,7 @@ describe('Exploration editor tab component', function() {
     expect(stateEditorService.interaction.defaultOutcome).toEqual(
       outcomeObjectFactory.createFromBackendDict({
         dest: 'default',
+        dest_if_really_stuck: null,
         feedback: {
           content_id: 'default_outcome',
           html: ''
@@ -520,6 +527,7 @@ describe('Exploration editor tab component', function() {
 
     var displayedValue = outcomeObjectFactory.createFromBackendDict({
       dest: 'Second State',
+      dest_if_really_stuck: null,
       feedback: {
         content_id: 'default_outcome_changed',
         html: 'This is the default outcome changed'

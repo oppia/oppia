@@ -55,6 +55,7 @@ var ExplorationEditorMainTab = function() {
   var interaction = $('.e2e-test-interaction');
   var interactionEditor = $('.e2e-test-interaction-editor');
   var interactionHtmlElement = $('.e2e-test-interaction-html');
+  var parameterElementButton = $('.e2e-test-main-html-select-selector');
   var interactionTab = function(tabId) {
     return $('.e2e-test-interaction-tab-' + tabId);
   };
@@ -67,8 +68,8 @@ var ExplorationEditorMainTab = function() {
       `.e2e-test-html-item-select-option=${optionNum}`);
   };
   var multipleChoiceAnswerOptions = function(optionNum) {
-    return $(
-      `.e2e-test-html-multiple-select-option=${optionNum}`);
+    return $$(
+      `.e2e-test-html-select-selector=${optionNum}`)[0];
   };
   var nodeLabelLocator = '.e2e-test-node-label';
   var openOutcomeDestEditor = $('.e2e-test-open-outcome-dest-editor');
@@ -525,7 +526,7 @@ var ExplorationEditorMainTab = function() {
     var explanationTextArea = await explanationTextAreaElement.$$('<p>')[0];
     await action.click('Explanation Text Area', explanationTextArea);
     var CKEditor = await ckEditorElement.$$(
-      'oppia-rte-resizer')[0];
+      '.oppia-rte-resizer')[0];
     await action.setValue(
       'Text CKEditor', CKEditor, solution.explanation);
     await action.click('Submit Solution Button', submitSolutionButton);
@@ -729,10 +730,12 @@ var ExplorationEditorMainTab = function() {
 
       if (interactionId === 'MultipleChoiceInput') {
         // This is a special case as it uses a dropdown to set a NonnegativeInt.
-        var parameterElementButton = parameterElement.$('<button>');
-        await action.click('Parameter Element Button', parameterElementButton);
+        await action.click(
+          'Parameter Element Button', parameterElementButton);
+
         var multipleChoiceAnswerOption =
-          multipleChoiceAnswerOptions(parameterValues[i]);
+          await multipleChoiceAnswerOptions(parameterValues[i]);
+
         await action.click(
           'Multiple Choice Answer Option: ' + i,
           multipleChoiceAnswerOption);
@@ -796,7 +799,7 @@ var ExplorationEditorMainTab = function() {
     var ruleDescriptionInDropdown = ruleDescription;
     await action.click('Answer Description', answerDescription);
     var ruleDropdownElement = await $$(
-      `.select2-results__option=${ruleDescriptionInDropdown}`)[0];
+      `.e2e-test-rule-type-selector=${ruleDescriptionInDropdown}`)[0];
     await action.click('Rule Dropdown Element', ruleDropdownElement);
   };
 

@@ -280,6 +280,7 @@ describe('ExplorationFooterComponent', () => {
                       html: '<p>Good Job</p>'
                     },
                     param_changes: [],
+                    dest_if_really_stuck: null,
                     dest: 'Mid'
                   },
                   training_data: [],
@@ -308,6 +309,7 @@ describe('ExplorationFooterComponent', () => {
                   html: '<p>Try again.</p>'
                 },
                 param_changes: [],
+                dest_if_really_stuck: null,
                 dest: 'Start'
               }
             },
@@ -403,6 +405,7 @@ describe('ExplorationFooterComponent', () => {
                       html: ' <p>Good Job</p>'
                     },
                     param_changes: [],
+                    dest_if_really_stuck: null,
                     dest: 'End'
                   },
                   training_data: [],
@@ -431,6 +434,7 @@ describe('ExplorationFooterComponent', () => {
                   html: '<p>try again.</p>'
                 },
                 param_changes: [],
+                dest_if_really_stuck: null,
                 dest: 'Mid'
               }
             },
@@ -444,6 +448,22 @@ describe('ExplorationFooterComponent', () => {
             }
           }
         }
+      },
+      exploration_metadata: {
+        title: 'Exploration',
+        category: 'Algebra',
+        objective: 'To learn',
+        language_code: 'en',
+        tags: [],
+        blurb: '',
+        author_notes: '',
+        states_schema_version: 50,
+        init_state_name: 'Introduction',
+        param_specs: {},
+        param_changes: [],
+        auto_tts_enabled: false,
+        correctness_feedback_enabled: true,
+        edits_allowed: true
       },
       version: 1,
       can_edit: true,
@@ -543,6 +563,7 @@ describe('ExplorationFooterComponent', () => {
             answer_groups: [],
             default_outcome: {
               dest: 'Introduction',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'default_outcome',
                 html: ''
@@ -633,6 +654,7 @@ describe('ExplorationFooterComponent', () => {
               hints: [],
               default_outcome: {
                 param_changes: [],
+                dest_if_really_stuck: null,
                 dest: 'Introduction',
                 feedback: {
                   html: '',
@@ -647,6 +669,22 @@ describe('ExplorationFooterComponent', () => {
             }
           }
         }
+      },
+      exploration_metadata: {
+        title: 'Exploration',
+        category: 'Algebra',
+        objective: 'To learn',
+        language_code: 'en',
+        tags: [],
+        blurb: '',
+        author_notes: '',
+        states_schema_version: 50,
+        init_state_name: 'Introduction',
+        param_specs: {},
+        param_changes: [],
+        auto_tts_enabled: false,
+        correctness_feedback_enabled: true,
+        edits_allowed: true
       },
       version: 1,
       can_edit: true,
@@ -711,6 +749,7 @@ describe('ExplorationFooterComponent', () => {
               default_outcome: {
                 param_changes: [],
                 dest: 'Introduction',
+                dest_if_really_stuck: null,
                 feedback: {
                   html: '',
                   content_id: 'content'
@@ -724,6 +763,22 @@ describe('ExplorationFooterComponent', () => {
             }
           }
         }
+      },
+      exploration_metadata: {
+        title: 'Exploration',
+        category: 'Algebra',
+        objective: 'To learn',
+        language_code: 'en',
+        tags: [],
+        blurb: '',
+        author_notes: '',
+        states_schema_version: 50,
+        init_state_name: 'Introduction',
+        param_specs: {},
+        param_changes: [],
+        auto_tts_enabled: false,
+        correctness_feedback_enabled: true,
+        edits_allowed: true
       },
       version: 1,
       can_edit: true,

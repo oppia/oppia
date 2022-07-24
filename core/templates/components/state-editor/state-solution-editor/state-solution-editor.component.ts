@@ -38,6 +38,7 @@ import { AppConstants } from 'app.constants';
 import { StateEditorConstants } from '../state-editor.constants';
 import { ConvertToPlainTextPipe } from 'filters/string-utility-filters/convert-to-plain-text.pipe';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
+import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
 
 interface DeleteValue {
   index: number;
@@ -49,17 +50,20 @@ interface DeleteValue {
   templateUrl: './state-solution-editor.component.html'
 })
 export class StateSolutionEditorComponent implements OnInit {
-  @Output() saveSolution: EventEmitter<Solution> = new EventEmitter();
+  // The state property is null until a solution is specified or removed.
+  @Output() saveSolution: EventEmitter<Solution | null> = new EventEmitter();
   @Output() refreshWarnings: EventEmitter<void> = new EventEmitter();
   @Output() getSolutionChange: EventEmitter<void> = new EventEmitter();
   @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired:
   EventEmitter<Solution> = (new EventEmitter());
 
-  correctAnswer: string;
-  inlineSolutionEditorIsActive: boolean;
-  solutionCardIsShown: boolean;
-  SOLUTION_EDITOR_FOCUS_LABEL: string;
-  correctAnswerEditorHtml: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  SOLUTION_EDITOR_FOCUS_LABEL!: string;
+  correctAnswerEditorHtml!: string;
+  inlineSolutionEditorIsActive: boolean = false;
+  solutionCardIsShown: boolean = false;
   INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_QUESTION: string = (
     StateEditorConstants.INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_QUESTION);
 
@@ -83,7 +87,6 @@ export class StateSolutionEditorComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.correctAnswer = null;
     this.solutionCardIsShown = true;
     this.inlineSolutionEditorIsActive = false;
     this.SOLUTION_EDITOR_FOCUS_LABEL = (
@@ -129,6 +132,9 @@ export class StateSolutionEditorComponent implements OnInit {
   getSolutionSummary(): string {
     const solution = this.stateSolutionService.savedMemento;
     const interactionId = this.stateInteractionIdService.savedMemento;
+    if (solution === null) {
+      throw new Error('Expected solution to be non-null.');
+    }
     const solutionSummary = (
       solution.getSummary(
         interactionId, this.stateCustomizationArgsService.savedMemento));
@@ -137,20 +143,19 @@ export class StateSolutionEditorComponent implements OnInit {
     return solutionAsPlainText;
   }
 
-  savedMemento(): Solution {
+  // Returns null if solution is not yet specified or removed.
+  savedMemento(): Solution | null {
     return this.stateSolutionService.savedMemento;
   }
 
   // This returns false if the current interaction ID is null.
   isCurrentInteractionLinear(): boolean {
-    return (
-      this.stateInteractionIdService.savedMemento &&
-      INTERACTION_SPECS[
-        this.stateInteractionIdService.savedMemento
-      ].is_linear);
+    let savedMemento = this.stateInteractionIdService.savedMemento;
+    return (Boolean(savedMemento) && INTERACTION_SPECS[
+      savedMemento as InteractionSpecsKey].is_linear);
   }
 
-  onSaveSolution(value: Solution): void {
+  onSaveSolution(value: Solution | null): void {
     this.saveSolution.emit(value);
   }
 
@@ -168,14 +173,18 @@ export class StateSolutionEditorComponent implements OnInit {
       this.stateSolutionService.displayed = result.solution;
       this.stateSolutionService.saveDisplayedValue();
       this.onSaveSolution(this.stateSolutionService.displayed);
+      let activeStateName = this.stateEditorService.getActiveStateName();
+      if (activeStateName === null) {
+        throw new Error('Expected active state name to be non-null.');
+      }
       let solutionIsValid = this.solutionVerificationService.verifySolution(
-        this.stateEditorService.getActiveStateName(),
+        activeStateName,
         this.stateEditorService.getInteraction(),
-        this.stateSolutionService.savedMemento.correctAnswer
+        result.solution.correctAnswer
       );
 
       this.solutionValidityService.updateValidity(
-        this.stateEditorService.getActiveStateName(), solutionIsValid);
+        activeStateName, solutionIsValid);
       this.refreshWarnings.emit();
       this.getSolutionChange.emit();
       if (!solutionIsValid) {

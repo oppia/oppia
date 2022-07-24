@@ -60,6 +60,7 @@ describe('LocalStorageService', () => {
         explorationIdOne, changeList, draftChangeListIdOne);
       localStorageService.saveExplorationDraft(
         explorationIdTwo, changeList, draftChangeListIdTwo);
+
       expect(localStorageService.getExplorationDraft(
         explorationIdOne)).toEqual(draftOne);
       expect(localStorageService.getExplorationDraft(
@@ -69,6 +70,7 @@ describe('LocalStorageService', () => {
     it('should correctly change and save a draft', () => {
       localStorageService.saveExplorationDraft(
         explorationIdOne, changeList, draftChangeListIdOne);
+
       expect(localStorageService.getExplorationDraft(
         explorationIdOne)).toEqual(draftOne);
 
@@ -80,6 +82,7 @@ describe('LocalStorageService', () => {
         });
       localStorageService.saveExplorationDraft(
         explorationIdOne, changeList, draftChangeListIdOneChanged);
+
       expect(localStorageService.getExplorationDraft(
         explorationIdOne)).toEqual(draftOneChanged);
     });
@@ -88,23 +91,28 @@ describe('LocalStorageService', () => {
       localStorageService.saveExplorationDraft(
         explorationIdTwo, changeList, draftChangeListIdTwo);
       localStorageService.removeExplorationDraft(explorationIdTwo);
+
       expect(localStorageService.getExplorationDraft(
         explorationIdTwo)).toBeNull();
     });
 
     it('should correctly save a language code', () => {
       localStorageService.updateLastSelectedTranslationLanguageCode('en');
+
       expect(localStorageService.getLastSelectedTranslationLanguageCode())
         .toBe('en');
 
       localStorageService.updateLastSelectedTranslationLanguageCode('hi');
+
       expect(localStorageService.getLastSelectedTranslationLanguageCode())
         .toBe('hi');
     });
 
     it('should not save a language code when storage is not available', () => {
       spyOn(localStorageService, 'isStorageAvailable').and.returnValue(false);
+
       localStorageService.updateLastSelectedTranslationLanguageCode('en');
+
       expect(localStorageService.getLastSelectedTranslationLanguageCode())
         .toBeNull();
     });
@@ -121,14 +129,37 @@ describe('LocalStorageService', () => {
 
     it('should not save a topic name when storage is not available', () => {
       spyOn(localStorageService, 'isStorageAvailable').and.returnValue(false);
+
       localStorageService.updateLastSelectedTranslationTopicName('Topic 1');
+
       expect(localStorageService.getLastSelectedTranslationTopicName())
+        .toBeNull();
+    });
+
+    it('should correctly save and retrieve sign up section preference', () => {
+      expect(localStorageService.getEndChapterSignUpSectionHiddenPreference())
+        .toBeNull();
+
+      localStorageService.updateEndChapterSignUpSectionHiddenPreference('true');
+
+      expect(localStorageService.getEndChapterSignUpSectionHiddenPreference())
+        .toBe('true');
+    });
+
+    it('should not save sign up section preference when local storage isn\'t ' +
+    'available', () => {
+      spyOn(localStorageService, 'isStorageAvailable').and.returnValue(false);
+
+      localStorageService.updateEndChapterSignUpSectionHiddenPreference('true');
+
+      expect(localStorageService.getEndChapterSignUpSectionHiddenPreference())
         .toBeNull();
     });
 
     it('should not get entity editor browser tabs info from local ' +
     'storage when storage is not available', () => {
       spyOn(localStorageService, 'isStorageAvailable').and.returnValue(false);
+
       expect(localStorageService.getEntityEditorBrowserTabsInfo(
         EntityEditorBrowserTabsInfoDomainConstants
           .OPENED_TOPIC_EDITOR_BROWSER_TABS, 'topic_1')).toBeNull();

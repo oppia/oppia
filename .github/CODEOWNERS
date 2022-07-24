@@ -39,6 +39,7 @@
 /core/templates/domain/ @oppia/lace-frontend-reviewers
 /core/templates/pages/ @srijanreddy98
 /core/templates/services/ @oppia/lace-frontend-reviewers
+/core/templates/utility/ @srijanreddy98
 /extensions/ @vojtechjelinek
 /scripts/ @oppia/dev-workflow-reviewers
 
@@ -68,6 +69,7 @@
 /core/templates/services/request-interceptor.service*.ts @srijanreddy98 @ashutoshc8101
 /core/templates/services/UpgradedServices.ts @srijanreddy98 @ashutoshc8101
 /core/templates/hybrid-router-module-provider*.ts @srijanreddy98 @ashutoshc8101
+/core/templates/utility/string-utility*.ts @srijanreddy98 @ashutoshc8101
 
 # TS typing
 /typings/ @vojtechjelinek
@@ -217,6 +219,7 @@
 /core/templates/components/state-directives/ @oppia/lace-frontend-reviewers
 /core/templates/components/graph-services/ @oppia/lace-frontend-reviewers
 /core/templates/components/on-screen-keyboard/ @oppia/interaction-and-rte-reviewers
+/core/templates/components/recommendations/ @oppia/lace-frontend-reviewers
 /core/templates/components/save-pending-changes/ @oppia/lace-frontend-reviewers
 /core/templates/components/stale-tab-info/ @oppia/lace-frontend-reviewers
 /core/templates/components/unsaved-changes-status-info/ @oppia/lace-frontend-reviewers
@@ -242,6 +245,7 @@
 /core/templates/services/image-upload-helper.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/staleness-detection.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/validators.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/services/yaml.service*.ts @oppia/lace-frontend-reviewers
 
 
 # Forms pages.
@@ -261,7 +265,7 @@
 
 
 # Global components and filters.
-/core/templates/components/angular-html-bind/ @srijanreddy98
+/core/templates/components/interaction-display/ @srijanreddy98
 /core/templates/components/button-directives/* @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/alert-message.component*.ts @srijanreddy98
 /core/templates/components/common-layout-directives/common-elements/attribution-guide.component.html @srijanreddy98
@@ -406,7 +410,7 @@
 /core/controllers/practice_sessions*.py @oppia/lace-backend-reviewers
 /core/controllers/question*.py @oppia/lace-backend-reviewers
 /core/controllers/review_tests*.py @oppia/lace-backend-reviewers
-/core/domain/classroom_domain.py @oppia/lace-backend-reviewers
+/core/domain/classroom_domain*.py @oppia/lace-backend-reviewers
 /core/domain/classroom_services*.py @oppia/lace-backend-reviewers
 /core/domain/question*.py @oppia/lace-backend-reviewers
 /core/domain/rights_domain*.py @oppia/lace-backend-reviewers
@@ -473,6 +477,7 @@
 /core/templates/pages/topics-and-skills-dashboard-page/ @oppia/lace-frontend-reviewers
 
 # Learner group project.
+/core/controllers/learner_group*.py @oppia/lace-backend-reviewers
 /core/domain/learner_group*.py @oppia/lace-backend-reviewers
 /core/templates/domain/learner_group/ @oppia/lace-frontend-reviewers
 
@@ -522,7 +527,7 @@
 /core/controllers/__init__.py @vojtechjelinek
 /core/domain/__init__.py @vojtechjelinek
 /core/domain/config*.py @oppia/lace-backend-reviewers
-/core/domain/change_domain.py @oppia/lace-backend-reviewers
+/core/domain/change_domain*.py @oppia/lace-backend-reviewers
 /core/templates/tests/ @nithusha21
 /core/templates/domain/utilities/ @nithusha21
 /core/templates/Polyfills.ts @srijanreddy98 @nithusha21
@@ -533,7 +538,7 @@
 
 # Python typing
 /mypy.ini @oppia/mypy-reviewers
-/mypy_imports.py @oppia/mypy-reviewers
+/mypy_imports*.py @oppia/mypy-reviewers
 /mypy_requirements.txt @oppia/mypy-reviewers
 /stubs/ @oppia/mypy-reviewers
 /scripts/run_mypy_checks*.py @oppia/mypy-reviewers
@@ -685,7 +690,7 @@
 # Data stability.
 /core/controllers/domain_objects_validator*.py @oppia/data-and-stability-reviewers
 /core/controllers/payload_validator*.py @oppia/data-and-stability-reviewers
-/core/handler_schema_constants.py @oppia/data-and-stability-reviewers
+/core/handler_schema_constants*.py @oppia/data-and-stability-reviewers
 
 
 # QA team.
@@ -737,6 +742,8 @@
 /core/domain/user*.py @seanlip
 /requirements.txt @vojtechjelinek
 /requirements.in @vojtechjelinek
+/requirements_dev.txt @vojtechjelinek
+/requirements_dev.in @vojtechjelinek
 /dependencies.json @vojtechjelinek
 /package.json @vojtechjelinek
 /yarn.lock @vojtechjelinek

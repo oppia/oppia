@@ -1,6 +1,3 @@
-<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/pages/exploration-player-page/learner-experience/tutor-card.component.css" as="style">
-<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/pages/exploration-player-page/learner-experience/tutor-card.component.rtl.css" as="style">
-
 <oppia-end-chapter-confetti #confetti
                             class="end-chapter-confetti">
 </oppia-end-chapter-confetti>
@@ -92,9 +89,9 @@
           This can lead to two conflicting copies of the interaction for
           non-inline interactions. -->
         <div *ngIf="isInteractionInline() && displayedCard.getInteractionHtml() && !displayedCard.isCompleted() && !conceptCardIsBeingShown">
-          <angular-html-bind-wrapper classStr="e2e-test-conversation-input"
+          <oppia-interaction-display classStr="e2e-test-conversation-input"
                                      [htmlData]="displayedCard.getInteractionHtml()">
-          </angular-html-bind-wrapper>
+          </oppia-interaction-display>
         </div>
       </div>
     </div>
@@ -118,6 +115,26 @@
         </div>
       </div>
     </div>
+    <div *ngIf="platformFeatureService.status.EndChapterCelebration.isEnabled && isOnTerminalCard() && milestoneMessageIsToBeDisplayed && generateMilestoneMessage()">
+      <div class="conversation-skin-milestone-message">
+        <div class="milestone-message-star-container">
+          <img [src]="getStaticImageUrl('/general/milestone-message-star-icon.svg')" class="star-icon">
+          <p class="completed-chapter-count">{{ completedChaptersCount }}</p>
+        </div>
+        <span class="milestone-message-text">{{ generateMilestoneMessage() }}</span>
+      </div>
+    </div>
+
+    <oppia-ratings-and-recommendations *ngIf="isOnTerminalCard() && isCurrentCardAtEndOfTranscript()"
+                                       [userIsLoggedIn]="userIsLoggedIn"
+                                       [explorationIsInPreviewMode]="explorationIsInPreviewMode"
+                                       [questionPlayerConfig]="questionPlayerConfig"
+                                       [collectionSummary]="collectionSummary"
+                                       [isRefresherExploration]="isRefresherExploration"
+                                       [recommendedExplorationSummaries]="recommendedExplorationSummaries"
+                                       [parentExplorationIds]="parentExplorationIds"
+                                       [nextLessonLink]="nextLessonLink">
+    </oppia-ratings-and-recommendations>
 
     <div *ngIf="displayedCardWasCompletedInPrevSession && !conceptCardIsBeingShown && (displayedCard.getInteractionId() != 'Continue')">
       <div class="conversation-skin-oppia-feedback-container conversation-skin-oppia-completed-state-card">
@@ -135,7 +152,3 @@
     </div>
   </div>
 </div>
-
-<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
-<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/exploration-player-page/learner-experience/tutor-card.component.css">
-<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/exploration-player-page/learner-experience/tutor-card.component.rtl.css">

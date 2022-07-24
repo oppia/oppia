@@ -31,7 +31,7 @@ from typing import Callable, Dict, List, Optional, Pattern, Union
 from typing_extensions import Final, TypedDict
 
 
-class ServerModes(enum.Enum):
+class ServerMode(enum.Enum):
     """Enum for server modes."""
 
     DEV = 'dev'
@@ -39,7 +39,7 @@ class ServerModes(enum.Enum):
     PROD = 'prod'
 
 
-FeatureStages = ServerModes
+FeatureStages = ServerMode
 
 # Union type defined from allowed types that a platform can contain
 # for it's data types.
@@ -55,9 +55,9 @@ class DataTypes(enum.Enum):
 
 
 ALLOWED_SERVER_MODES: Final = [
-    ServerModes.DEV.value,
-    ServerModes.TEST.value,
-    ServerModes.PROD.value
+    ServerMode.DEV.value,
+    ServerMode.TEST.value,
+    ServerMode.PROD.value
 ]
 ALLOWED_FEATURE_STAGES: Final = [
     FeatureStages.DEV.value,
@@ -111,7 +111,7 @@ class ClientSideContextDict(TypedDict):
 class ServerSideContextDict(TypedDict):
     """Dictionary representing the server's side Context object."""
 
-    server_mode: ServerModes
+    server_mode: ServerMode
 
 
 class EvaluationContext:
@@ -122,7 +122,7 @@ class EvaluationContext:
         platform_type: str,
         browser_type: Optional[str],
         app_version: Optional[str],
-        server_mode: ServerModes
+        server_mode: ServerMode
     ) -> None:
         self._platform_type = platform_type
         self._browser_type = browser_type
@@ -161,11 +161,11 @@ class EvaluationContext:
         return self._app_version
 
     @property
-    def server_mode(self) -> ServerModes:
+    def server_mode(self) -> ServerMode:
         """Returns the server mode of Oppia.
 
         Returns:
-            Enum(ServerModes). The the server mode of Oppia,
+            Enum(ServerMode). The the server mode of Oppia,
             must be one of the following: dev, test, prod.
         """
         return self._server_mode
@@ -911,14 +911,14 @@ class PlatformParameter:
                     value for _, value in server_mode_filter.conditions]
                 if self._feature_stage == FeatureStages.DEV.value:
                     if (
-                            ServerModes.TEST.value in server_modes or
-                            ServerModes.PROD.value in server_modes
+                            ServerMode.TEST.value in server_modes or
+                            ServerMode.PROD.value in server_modes
                     ):
                         raise utils.ValidationError(
                             'Feature in dev stage cannot be enabled in test or'
                             ' production environments.')
                 elif self._feature_stage == FeatureStages.TEST.value:
-                    if ServerModes.PROD.value in server_modes:
+                    if ServerMode.PROD.value in server_modes:
                         raise utils.ValidationError(
                             'Feature in test stage cannot be enabled in '
                             'production environment.')

@@ -20,7 +20,7 @@ import { GetAbbreviatedTextPipe } from
   'filters/string-utility-filters/get-abbreviated-text.pipe';
 
 describe('Testing filters', function() {
-  let pipe: GetAbbreviatedTextPipe = null;
+  let pipe: GetAbbreviatedTextPipe;
   beforeEach(() => {
     pipe = new GetAbbreviatedTextPipe();
   });

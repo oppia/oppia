@@ -12,39 +12,43 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
-
 /**
  * @fileoverview Unit tests for HTML Select Component.
  */
 
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { HtmlSelectComponent } from './html-select.component';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+
 describe('HTML Select Component', () => {
-  let $scope = null;
-  let $rootScope = null;
-  let ctrl = null;
+  let fixture: ComponentFixture<HtmlSelectComponent>;
+  let component: HtmlSelectComponent;
 
-  beforeEach(angular.mock.module('oppia'));
-  importAllAngularServices();
-
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
-
-    ctrl = $componentController('htmlSelect', {
-      $scope: $scope
-    });
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      declarations: [HtmlSelectComponent],
+      schemas: [NO_ERRORS_SCHEMA],
+    }).compileComponents();
   }));
 
-  it('should set selection ID', () => {
-    expect(ctrl.selection).toBe(undefined);
-    $scope.select('12');
-    expect(ctrl.selection).toBe('12');
+  beforeEach(() => {
+    fixture = TestBed.createComponent(
+      HtmlSelectComponent);
+    component = fixture.componentInstance;
+
+    component.options = [
+      { id: '12', val: 'string' },
+      { id: '21', val: 'string' }];
+
+    component.ngOnInit();
   });
 
-  it('should get selection index', () => {
-    ctrl.options = [{id: '12'}, {id: '21'}];
-    ctrl.selection = '21';
+  it('should update Selection', () => {
+    component.selection = 1;
+    component.selectionAsString = '2';
 
-    expect($scope.getSelectionIndex()).toBe(1);
+    component.updatedSelection();
+
+    expect(component.selection).toBe(2);
   });
 });

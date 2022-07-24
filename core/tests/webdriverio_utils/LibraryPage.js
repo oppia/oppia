@@ -23,8 +23,12 @@ var waitFor = require('./waitFor.js');
 var LibraryPage = function() {
   var LIBRARY_URL_SUFFIX = '/community-library';
 
+  var addToPlayLaterListButton = $('.e2e-test-add-to-playlist-btn');
+  var allCollectionSummaryTile = $('.e2e-test- collection-summary-tile');
   var allCollectionSummaryTile = $('.e2e-test-collection-summary-tile');
   var allExplorationSummaryTile = $('.e2e-test-exp-summary-tile');
+  var allExplorationSummaryTile = $('.e2e-test-exp-summary-tile');
+  var expHoverElement = $('.e2e-test-exploration-dashboard-card');
   var mainHeader = $('.e2e-test-library-main-header');
   var searchButton = $('.e2e-test-search-button');
   var allExplorationsTitled = function(explorationName) {
@@ -63,6 +67,20 @@ var LibraryPage = function() {
     await waitFor.pageToFullyLoad();
   };
 
+  this.addSelectedExplorationToPlaylist = async function() {
+    // We need to wait till the cards are loaded else it will
+    // throw element out of bond error.
+    // eslint-disable-next-line oppia/e2e-practices
+    await browser.pause(5000);
+    await expHoverElement.moveTo();
+
+    await waitFor.elementToBeClickable(
+      addToPlayLaterListButton,
+      'Add to \'Play Later\' list Icon taking too long to load');
+    await action.click(
+      'Add to play later list button', addToPlayLaterListButton);
+  };
+
   this.findExploration = async function(explorationTitle) {
     await waitFor.pageToFullyLoad();
     await _submitSearchQuery(explorationTitle);
@@ -74,9 +92,11 @@ var LibraryPage = function() {
       allExplorationSummaryTile,
       'Library Page does not have any explorations');
 
-    var explorationCard = await allExplorationsTitled(explorationName)[0];
+    var explorationCardElement = $(
+      `.e2e-test-exp-summary-tile-title=${explorationName}`);
     await waitFor.visibilityOf(
-      explorationCard, 'Unable to find exploration ' + explorationName);
+      explorationCardElement, 'Unable to find exploration ' + explorationName);
+    var explorationCard = await allExplorationsTitled(explorationName)[0];
     // The Exploration summary card is masked by a dummy element. Therefore, a
     // Javascript click is used.
     await action.click('Exploration Card', explorationCard, true);

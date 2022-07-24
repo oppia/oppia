@@ -30,8 +30,8 @@
                         tabindex="0"
                         [ngModelOptions]="{standalone: true}">
             <span dir="auto">
-              <angular-html-bind-wrapper classStr="e2e-test-item-selection-option" [htmlData]="choice">
-              </angular-html-bind-wrapper>
+              <oppia-rte-output-display class="e2e-test-item-selection-option" [rteString]="choice">
+              </oppia-rte-output-display>
             </span>
           </mat-checkbox>
         </label>
@@ -46,8 +46,8 @@
           </div>
           <div class="multiple-choice-content-container">
             <span>
-              <angular-html-bind-wrapper classStr="e2e-test-multiple-choice-option" [htmlData]="choice">
-              </angular-html-bind-wrapper>
+              <oppia-rte-output-display class="e2e-test-multiple-choice-option" [rteString]="choice">
+              </oppia-rte-output-display>
             </span>
           </div>
         </button>
