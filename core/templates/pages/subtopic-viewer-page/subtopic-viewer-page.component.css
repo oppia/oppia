@@ -85,13 +85,13 @@
   width: 200px;
 }
 
-@media(max-width: 600px) {
+@media screen and (max-width: 600px) {
   .oppia-subtopic-viewer-container {
     padding-top: 80px;
   }
 
   .oppia-subtopic-title {
-    font-size: 32px;
+    font-size: 2rem;
     margin-left: 25px;
     padding-right: 25px;
     padding-top: 20px;
