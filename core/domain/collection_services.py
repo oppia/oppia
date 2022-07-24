@@ -1086,14 +1086,14 @@ def publish_collection_and_update_user_profiles(
         collection_id: str. ID of the collection to be published.
 
     Raises:
-        Exception. If no collection summary model exists for the given id.
+        Exception. No collection summary model exists for the given id.
     """
     rights_manager.publish_collection(committer, collection_id)  # type: ignore[no-untyped-call]
     contribution_time_msec = utils.get_current_time_in_millisecs()
     collection_summary = get_collection_summary_by_id(collection_id)
     if collection_summary is None:
         raise Exception(
-            'No collection summary model exists for the give id: %s'
+            'No collection summary model exists for the given id: %s'
             % collection_id
         )
     contributor_ids = collection_summary.contributor_ids
