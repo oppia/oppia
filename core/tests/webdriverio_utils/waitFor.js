@@ -52,12 +52,10 @@ var urlToBe = async function(url) {
  * @param {string} errorMessage - Error message when element is not clickable.
  */
 var elementToBeClickable = async function(element, errorMessage) {
-  await browser.waitUntil(
-    await until.elementToBeClickable(element),
-    {
-      timeout: DEFAULT_WAIT_TIME_MSECS,
-      timeoutMsg: errorMessage
-    });
+  await element.waitForClickable({
+    timeout: DEFAULT_WAIT_TIME_MSECS,
+    timeoutMsg: errorMessage
+  });
 };
 
 /**
@@ -66,12 +64,11 @@ var elementToBeClickable = async function(element, errorMessage) {
  * @param {string} errorMessage - Error message when element is still visible.
  */
 var invisibilityOf = async function(element, errorMessage) {
-  await browser.waitUntil(
-    await until.invisibilityOf(element),
-    {
-      timeout: DEFAULT_WAIT_TIME_MSECS,
-      timeoutMsg: errorMessage
-    });
+  await element.waitForDisplayed({
+    timeout: DEFAULT_WAIT_TIME_MSECS,
+    reverse: true,
+    timeoutMsg: errorMessage
+  });
 };
 
 /**
@@ -79,12 +76,11 @@ var invisibilityOf = async function(element, errorMessage) {
  */
 var pageToFullyLoad = async function() {
   var loadingMessage = await $('.e2e-test-loading-fullpage');
-  await browser.waitUntil(
-    await until.invisibilityOf(loadingMessage),
-    {
-      timeout: 15000,
-      timeoutMsg: 'Page takes more than 15 secs to load'
-    });
+  await loadingMessage.waitForExist({
+    timeout: 15000,
+    reverse: true,
+    timeoutMsg: 'Pages takes more than 15 sec to load'
+  });
 };
 
 /**
@@ -108,12 +104,10 @@ var textToBePresentInElement = async function(element, text, errorMessage) {
  * @param {string} errorMessage - Error message when element is not present.
  */
 var presenceOf = async function(element, errorMessage) {
-  await browser.waitUntil(
-    await until.presenceOf(element),
-    {
-      timeout: DEFAULT_WAIT_TIME_MSECS,
-      timeoutMsg: errorMessage
-    });
+  await element.waitForExist({
+    timeout: DEFAULT_WAIT_TIME_MSECS,
+    timeoutMsg: errorMessage
+  });
 };
 
 /**
@@ -122,12 +116,10 @@ var presenceOf = async function(element, errorMessage) {
  * @param {string} errorMessage - Error message when element is invisible.
  */
 var visibilityOf = async function(element, errorMessage) {
-  await browser.waitUntil(
-    await until.visibilityOf(element),
-    {
-      timeout: DEFAULT_WAIT_TIME_MSECS,
-      timeoutMsg: errorMessage
-    });
+  await element.waitForDisplayed({
+    timeout: DEFAULT_WAIT_TIME_MSECS,
+    timeoutMsg: errorMessage
+  });
 };
 
 /**

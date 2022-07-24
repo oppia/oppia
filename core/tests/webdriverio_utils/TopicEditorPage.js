@@ -260,7 +260,10 @@ var TopicEditorPage = function() {
 
   this.addConceptCardToSubtopicExplanation = async function(skillName) {
     await action.click('RTE input', subtopicPageContentButton);
-    // Chaining selectors is selecting the non-interceptable element.
+    // The cke buttons classes are dynamically alloted and hence we cannot
+    // a class name to select a particular button. Also using chain selectors
+    // is returning a non interactable element hence we are explicitly using
+    // the dynamically alloted id of the button to select the button.
     // eslint-disable-next-line oppia/e2e-practices
     var conceptCardButton = $('#cke_124');
     await action.click('Concept card button', conceptCardButton);
@@ -336,10 +339,10 @@ var TopicEditorPage = function() {
   };
 
   this.expectUncategorizedSkillsToBe = async function(skillDescriptions) {
-    var uncategorizedSkills = await uncategorizedSkillsSelector();
     await waitFor.visibilityOf(
       uncategorizedSkillCard,
       'Uncategorized skills taking too long to appear.');
+    var uncategorizedSkills = await uncategorizedSkillsSelector();
 
     for (var i = 0; i < uncategorizedSkills.length; i++) {
       var uncategorizedSkill = uncategorizedSkills[i];

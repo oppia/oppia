@@ -144,7 +144,7 @@ var PreferencesPage = function() {
   this.expectDisplayedFirstSubscriptionToBe = async function(name) {
     await waitFor.visibilityOf(
       subscription,
-      'subscriptions taking too long to appear.');
+      'subscription taking too long to appear.');
     var subscriptions = await subscriptionsSelector();
     expect(await subscriptions[0].getText()).toMatch(name);
   };

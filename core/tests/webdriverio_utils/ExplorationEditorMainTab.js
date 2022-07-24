@@ -274,7 +274,8 @@ var ExplorationEditorMainTab = function() {
       if (responseNum === 'default') {
         headerElem = defaultResponseTab;
       } else {
-        await waitFor.visibilityOf(responseTabElement);
+        await waitFor.visibilityOf(
+          responseTabElement, 'Response tab is not visible');
         var responseTab = await $$('.e2e-test-response-tab');
         headerElem = responseTab[responseNum];
       }
@@ -815,16 +816,15 @@ var ExplorationEditorMainTab = function() {
   this.deleteState = async function(stateName) {
     await action.waitForAutosave();
     await general.scrollToTop();
-    var nodeElement = await explorationGraph.$(
+    var nodeStateElement = await explorationGraph.$(
       `.e2e-test-node=${stateName}`);
     await waitFor.visibilityOf(
-      nodeElement,
+      nodeStateElement,
       'State ' + stateName + ' takes too long to appear or does not exist');
     var nodeElement = await explorationGraph.$$(
       `.e2e-test-node=${stateName}`)[0];
     var deleteNode = nodeElement.$(deleteNodeLocator);
     await action.click('Delete Node', deleteNode);
-
     await action.click('Confirm Delete State Button', confirmDeleteStateButton);
     await waitFor.invisibilityOf(
       confirmDeleteStateButton, 'Deleting state takes too long');
