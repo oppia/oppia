@@ -75,7 +75,7 @@ import { CreatorDashboardPageComponent } from './creator-dashboard-page.componen
     },
     {
       provide: ErrorHandler,
-      useClass: FirebaseErrorFilterHandler,
+      useClass: AppErrorHandlerWithFirebaseErrorFilter,
       deps: [HttpClient, LoggerService]
     },
     {
@@ -92,7 +92,7 @@ class CreatorDashboardPageModule {
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
 import { ToastrModule } from 'ngx-toastr';
-import { FirebaseErrorFilterHandler } from 'pages/oppia-root/app-error-handler';
+import { AppErrorHandlerWithFirebaseErrorFilter } from 'pages/oppia-root/app-error-handler';
 import { LoggerService } from 'services/contextual/logger.service';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {

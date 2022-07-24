@@ -96,7 +96,7 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
     },
     {
       provide: ErrorHandler,
-      useClass: FirebaseErrorFilterHandler,
+      useClass: AppErrorHandlerWithFirebaseErrorFilter,
       deps: [HttpClient, LoggerService]
     },
     {
@@ -115,7 +115,7 @@ import { downgradeModule } from '@angular/upgrade/static';
 import { ToastrModule } from 'ngx-toastr';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
 import { LoggerService } from 'services/contextual/logger.service';
-import { FirebaseErrorFilterHandler } from 'pages/oppia-root/app-error-handler';
+import { AppErrorHandlerWithFirebaseErrorFilter } from 'pages/oppia-root/app-error-handler';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

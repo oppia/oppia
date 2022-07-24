@@ -21,7 +21,6 @@ import { HttpClient } from '@angular/common/http';
 import { ErrorHandler } from '@angular/core';
 import { LoggerService } from 'services/contextual/logger.service';
 import firebase from 'firebase/app';
-import { AppConstants } from 'app.constants';
 
 export class AppErrorHandler extends ErrorHandler {
   private readonly UNHANDLED_REJECTION_STATUS_CODE_REGEX = (
@@ -64,35 +63,33 @@ export class AppErrorHandler extends ErrorHandler {
       }
     }
 
-    if (!AppConstants.DEV_MODE) {
-      let messageAndSourceAndStackTrace = [
-        '',
-        error.message,
-        '',
-        '    at URL: ' + window.location.href
-      ].join('\n');
-      let timeDifference = Date.now() - this.timeOfLastPostedError;
-      // To prevent an overdose of errors, throttle to at most 1 error
-      // every MIN_TIME_BETWEEN_ERRORS_MSEC.
-      if (timeDifference > this.MIN_TIME_BETWEEN_ERRORS_MSEC) {
-        // Catch all errors, to guard against infinite recursive loops.
-        // We use jQuery here instead of Angular's $http, since the
-        // latter creates a circular dependency.
-        this.http.post('/frontend_errors', {
-          error: messageAndSourceAndStackTrace
-        }).toPromise().then(() => {
-          this.timeOfLastPostedError = Date.now();
-        }, () => {
-          this.loggerService.warn('Error logging failed.');
-        });
-      }
+    let messageAndSourceAndStackTrace = [
+      '',
+      error.message,
+      '',
+      '    at URL: ' + window.location.href
+    ].join('\n');
+    let timeDifference = Date.now() - this.timeOfLastPostedError;
+    // To prevent an overdose of errors, throttle to at most 1 error
+    // every MIN_TIME_BETWEEN_ERRORS_MSEC.
+    if (timeDifference > this.MIN_TIME_BETWEEN_ERRORS_MSEC) {
+      // Catch all errors, to guard against infinite recursive loops.
+      // We use jQuery here instead of Angular's $http, since the
+      // latter creates a circular dependency.
+      this.http.post('/frontend_errors', {
+        error: messageAndSourceAndStackTrace
+      }).toPromise().then(() => {
+        this.timeOfLastPostedError = Date.now();
+      }, () => {
+        this.loggerService.warn('Error logging failed.');
+      });
     }
 
     this.loggerService.error(error.message);
   }
 }
 
-export class FirebaseErrorFilterHandler extends AppErrorHandler {
+export class AppErrorHandlerWithFirebaseErrorFilter extends AppErrorHandler {
   // AngularFire throws duplicate errors because it uses setTimeout() to manage
   // promises internally. Errors thrown from those setTimeout() calls are not
   // accessible to our code. Because of this, even though LoginPageComponent
@@ -115,7 +112,7 @@ export class FirebaseErrorFilterHandler extends AppErrorHandler {
   ];
 
   handleError(error: Error): void {
-    if (FirebaseErrorFilterHandler.EXPECTED_ERROR_CODES.includes(
+    if (AppErrorHandlerWithFirebaseErrorFilter.EXPECTED_ERROR_CODES.includes(
       // The firebase.auth.Error is not comptabile with javascript's Error type.
       // That's why explicit type conversion is used as here.
       (error as unknown as firebase.auth.Error).code)) {

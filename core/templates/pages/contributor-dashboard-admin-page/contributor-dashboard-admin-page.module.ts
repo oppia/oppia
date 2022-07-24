@@ -72,7 +72,7 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
     },
     {
       provide: ErrorHandler,
-      useClass: FirebaseErrorFilterHandler,
+      useClass: AppErrorHandlerWithFirebaseErrorFilter,
       deps: [HttpClient, LoggerService]
     },
     {
@@ -88,7 +88,7 @@ class ContributorDashboardAdminPageModule {
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
-import { FirebaseErrorFilterHandler } from 'pages/oppia-root/app-error-handler';
+import { AppErrorHandlerWithFirebaseErrorFilter } from 'pages/oppia-root/app-error-handler';
 import { LoggerService } from 'services/contextual/logger.service';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {

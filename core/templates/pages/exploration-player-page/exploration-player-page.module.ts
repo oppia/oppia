@@ -107,7 +107,7 @@ import { SmartRouterModule } from 'hybrid-router-module-provider';
     },
     {
       provide: ErrorHandler,
-      useClass: FirebaseErrorFilterHandler,
+      useClass: AppErrorHandlerWithFirebaseErrorFilter,
       deps: [HttpClient, LoggerService]
     },
     {
@@ -125,7 +125,7 @@ import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
 import { ExplorationPlayerPageComponent } from './exploration-player-page.component';
 import { LessonInformationCardModalComponent } from './templates/lesson-information-card-modal.component';
-import { FirebaseErrorFilterHandler } from 'pages/oppia-root/app-error-handler';
+import { AppErrorHandlerWithFirebaseErrorFilter } from 'pages/oppia-root/app-error-handler';
 import { LoggerService } from 'services/contextual/logger.service';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
