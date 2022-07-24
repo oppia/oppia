@@ -759,7 +759,7 @@ class CollectionSummaryQueriesUnitTests(CollectionServicesUnitTests):
         system_user = user_services.get_system_user()
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception,
-            'No collection summary model exists for the give id:'
+            'No collection summary model exists for the given id:'
             ' Invalid_collection_id'
         ):
             with self.swap_to_always_return(
