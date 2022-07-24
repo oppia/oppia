@@ -258,6 +258,8 @@ var BlogDashboardPage = function() {
 
   this.deleteBlogPostWithTitle = async function(title) {
     var blogPostEditOptionButton = await this.getBlogPostTileEditOption(title);
+    await waitFor.visibilityOf(
+      blogPostEditOptionButton, 'Blog post button takes too long to appear');
     await action.click(
       'Blog post edit option', blogPostEditOptionButton);
     await action.click('Delete blog post button', deleteBlogPostButton);

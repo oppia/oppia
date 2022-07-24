@@ -50,11 +50,16 @@ var ExplorationPlayerPage = function() {
   var nextCardButton = $('.e2e-test-continue-to-next-card-button');
   var pauseButton = $('.e2e-test-pause-circle');
   var playButton = $('.e2e-test-play-circle');
+  var radioButton = $('.e2e-test-report-exploration-radio-button');
+  var radioButtonSelector = function() {
+    return $$('.e2e-test-report-exploration-radio-button');
+  };
   var ratingStar = $('.e2e-test-rating-star');
   var ratingStarsSelector = function() {
     return $$('.e2e-test-rating-star');
   };
   var reportExplorationButton = $('.e2e-test-report-exploration-button');
+  var reportExplorationTextArea = $('.e2e-test-report-exploration-text-area');
   var returnToParentButton = $('.e2e-test-return-to-parent-button');
   let submitButton = $('.e2e-test-submit-report-button');
   var suggestionPopupLink = $('.e2e-test-exploration-suggestion-popup-link');
@@ -109,13 +114,15 @@ var ExplorationPlayerPage = function() {
 
   this.reportExploration = async function() {
     await action.click('Report Exploration Button', reportExplorationButton);
-    let radioButton = await $$('<input>')[0];
     await waitFor.visibilityOf(
       radioButton, 'Radio Buttons takes too long to appear');
-    await action.click('Radio Button', radioButton);
-    // eslint-disable-next-line oppia/e2e-practices
-    let textArea = $('<textarea>');
-    await action.sendKeys('Text Area', textArea, 'Reporting this exploration');
+    var radioButtonOption = await radioButtonSelector();
+    await action.click('Radio Button', radioButtonOption)[0];
+    await action.sendKeys(
+      'Text Area',
+      reportExplorationTextArea,
+      'Reporting this exploration'
+    );
     await action.click('Submit Button', submitButton);
     let afterSubmitText = await action.getText(
       'Flagged Success Element', flaggedSuccessElement);

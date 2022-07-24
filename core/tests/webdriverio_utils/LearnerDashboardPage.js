@@ -40,12 +40,18 @@ var LearnerDashboardPage = function() {
   var progressSection = $('.e2e-test-progress-section');
   var subscriptionSection = $('.e2e-test-subscriptions-section');
   var skillProficiencyTopicTitle = $('.e2e-test-skill-proficiency-topic-title');
+  var stopicNamesInLearnerTopicSummaryTile = $(
+    '.e2e-test-learner-topic-summary-tile-title');
   var stopicNamesInLearnerTopicSummaryTilesSelector = function() {
     return $$('.e2e-test-learner-topic-summary-tile-title');
   };
+  var storyNamesInLearnerStorySummaryTile = $(
+    '.e2e-test-story-name-in-learner-story-summary-tile');
   var storyNamesInLearnerStorySummaryTilesSelector = function() {
     return $$('.e2e-test-story-name-in-learner-story-summary-tile');
   };
+  var topicNamesInLearnerStorySummaryTile = $(
+    '.e2e-test-topic-name-in-learner-story-summary-tile');
   var topicNamesInLearnerStorySummaryTilesSelector = function() {
     return $$('.e2e-test-topic-name-in-learner-story-summary-tile');
   };
@@ -76,6 +82,10 @@ var LearnerDashboardPage = function() {
   };
 
   this.navigateToCommunityLessonsSection = async function() {
+    await waitFor.visibilityOf(
+      communityLessonsSection,
+      'Commmunity lesson section takes too long to appear'
+    );
     await action.click('Community Lessons Section', communityLessonsSection);
   };
 
@@ -162,35 +172,35 @@ var LearnerDashboardPage = function() {
   };
 
   this.expectNumberOfTopicsInSuggestedForYou = async function(value) {
-    var topicNamesInLearnerTopicSummaryTiles = (
-      await stopicNamesInLearnerTopicSummaryTilesSelector());
     if (value > 0) {
       await waitFor.visibilityOf(
-        topicNamesInLearnerTopicSummaryTiles[0],
+        stopicNamesInLearnerTopicSummaryTile,
         'Learner Topic Name takes too long to appear');
     }
-    expect(topicNamesInLearnerTopicSummaryTiles.length).toEqual(value);
+    var stopicNamesInLearnerTopicSummaryTiles = (
+      await stopicNamesInLearnerTopicSummaryTilesSelector());
+    expect(stopicNamesInLearnerTopicSummaryTiles.length).toEqual(value);
   };
 
   this.expectNumberOfStoriesInCompletedStory = async function(value) {
-    var storyNamesInLearnerStorySummaryTiles = (
-      await storyNamesInLearnerStorySummaryTilesSelector());
     if (value > 0) {
       await waitFor.visibilityOf(
-        storyNamesInLearnerStorySummaryTiles[0],
+        storyNamesInLearnerStorySummaryTile,
         'Story Name Card takes too long to appear');
     }
+    var storyNamesInLearnerStorySummaryTiles = (
+      await storyNamesInLearnerStorySummaryTilesSelector());
     expect(storyNamesInLearnerStorySummaryTiles.length).toEqual(value);
   };
 
   this.expectNumberOfTopicsInContinueWhereYouLeftOff = async function(value) {
-    var topicNamesInLearnerStorySummaryTiles = (
-      await topicNamesInLearnerStorySummaryTilesSelector());
     if (value > 0) {
       await waitFor.visibilityOf(
-        topicNamesInLearnerStorySummaryTiles[0],
+        topicNamesInLearnerStorySummaryTile,
         'Topic Name Card takes too long to appear');
     }
+    var topicNamesInLearnerStorySummaryTiles = (
+      await topicNamesInLearnerStorySummaryTilesSelector());
     expect(topicNamesInLearnerStorySummaryTiles.length).toEqual(value);
   };
 
@@ -199,6 +209,8 @@ var LearnerDashboardPage = function() {
   };
 
   this.expectSubscriptionFirstNameToMatch = async function(name) {
+    await waitFor.visibilityOf(
+      subscriptionSection, 'Subscription section takes too long to appear');
     await subscriptionSection.scrollIntoView();
     await waitFor.visibilityOf(
       subscriptionNameElement,

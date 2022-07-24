@@ -25,7 +25,6 @@ var LibraryPage = function() {
   var LIBRARY_URL_SUFFIX = '/community-library';
 
   var addToPlayLaterListButton = $('.e2e-test-add-to-playlist-btn');
-  var allCollectionSummaryTile = $('.e2e-test- collection-summary-tile');
   var allCollectionSummaryTile = $('.e2e-test-collection-summary-tile');
   var allExplorationSummaryTile = $('.e2e-test-exp-summary-tile');
   var allExplorationSummaryTileSelector = function() {
