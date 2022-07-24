@@ -7,7 +7,7 @@
       <div class="recommendation-card">
         <svg width="192" height="150" class="recommendation-card-svg">
           <title>Next chapter card image</title>
-          <a [attr.href]="nextStoryNodeLink">
+          <a [attr.href]="nextStoryNodeLink" class="e2e-test-recommended-next-chapter-button">
             <rect width="192"
                   height="150"
                   [attr.fill]="nextStoryNodeThumbnailBgColor">
@@ -34,7 +34,7 @@
       <div class="recommendation-card">
         <svg width="192" height="150" class="recommendation-card-svg">
           <title>Practice session card image</title>
-          <a [attr.href]="getPracticeTabUrl()">
+          <a [attr.href]="getPracticeTabUrl()" class="e2e-test-start-practice-from-recommendations-button">
             <rect width="192"
                   height="150"
                   [attr.fill]="'#a6dacf'">
