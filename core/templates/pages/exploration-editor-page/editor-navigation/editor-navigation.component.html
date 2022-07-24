@@ -147,10 +147,10 @@
   }
 </style>
 <div class="navbar-mobile-container">
-  <i class="fa fa-book show-mobile-navbar-icon" ng-click="toggleMobileNavOptions()" aria-label="Mobile navbar options"></i>
+  <i class="fa fa-book show-mobile-navbar-icon e2e-test-mobile-options" ng-click="toggleMobileNavOptions()" aria-label="Mobile navbar options"></i>
   <div class="navbar-mobile-options" ng-if="mobileNavOptionsAreShown">
     <div class="exp-nav-dropdown-container">
-      <div class="exp-nav-dropdown-content" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      <div class="exp-nav-dropdown-content e2e-test-mobile-options-dropdown" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         <a>
           <i ng-if="!getTotalWarningsCount()" class="material-icons">&#xE254;</i>
           Options
@@ -197,7 +197,7 @@
               <span class="oppia-exploration-editor-tabs-dropdown-inner">Preview</span>
             </a>
           </li>
-          <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" ng-class="{'active': getActiveTabName() === 'settings'}">
+          <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item e2e-test-mobile-settings-button" ng-class="{'active': getActiveTabName() === 'settings'}">
             <a href="#" uib-tooltip="Settings" tooltip-placement="bottom" ng-click="selectSettingsTab()"
                class="oppia-exploration-editor-tabs-dropdown-element">
               <i class="material-icons oppia-mobile-exploration-editor-tabs-icon">&#xE8B8;</i>
@@ -274,7 +274,7 @@
           </div>
         </div>
 
-        <div class="exp-nav-dropdown-icon" ng-click="toggleNavigationOptions()" id="discardButtonPopup" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <div class="exp-nav-dropdown-icon e2e-test-mobile-changes-dropdown" ng-click="toggleNavigationOptions()" id="discardButtonPopup" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           <i class="fa fa-caret-down"></i>
         </div>
 
@@ -284,7 +284,7 @@
             Discard
           </div>
           <div ng-if="showPublishButton()" ng-class="{'disable-publish-button': !connectedToInternet || isExplorationLockedForEditing() || countWarnings()}">
-            <button type="button" class="btn btn-light"
+            <button type="button" class="btn btn-light e2e-test-mobile-publish-button"
                     ng-class="{'btn-success': connectedToInternet && !isExplorationLockedForEditing() && !countWarnings()}"
                     ng-click="showPublishExplorationModal()"
                     ng-disabled="!connectedToInternet || isExplorationLockedForEditing() || countWarnings()">

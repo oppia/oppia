@@ -365,6 +365,7 @@ def run_tests(args):
                 dev_mode=dev_mode,
                 debug_mode=args.debug_mode,
                 sharding_instances=args.sharding_instances,
+                mobile=args.mobile,
                 stdout=subprocess.PIPE))
 
             print(

@@ -99,6 +99,14 @@ var ExplorationEditorPage = function() {
     by.css('.e2e-test-preview-tab'));
   var navigateToSettingsTabButton = element(
     by.css('.e2e-test-settings-tab'));
+  var navigateToSettingsTabButtonMobile = element(
+    by.css('.e2e-test-mobile-options'));
+  var optionsDropdownMobile = element(
+    by.css('.e2e-test-mobile-options-dropdown'));
+  var settingsButtonMobile = element(
+    by.css('.e2e-test-mobile-settings-button'));
+  var saveButtonMobile = element(
+    by.css('.e2e-test-save-changes-for-small-screens'));
   var navigateToStatsTabButton = element(by.css('.e2e-test-stats-tab'));
   var navigateToTranslationTabButton = element(
     by.css('.e2e-test-translation-tab'));
@@ -243,7 +251,15 @@ var ExplorationEditorPage = function() {
 
   this.saveChanges = async function(commitMessage) {
     await action.waitForAutosave();
-    await action.click('Save changes button', saveChangesButton);
+    let width = (await browser.manage().window().getSize()).width;
+    if (width > 768) {
+      await action.click('Save changes button', saveChangesButton);
+    } else {
+      await action.click(
+        'Settings tab button', navigateToSettingsTabButtonMobile);
+      await action.click('Save draft', saveButtonMobile);
+    }
+
     if (commitMessage) {
       await action.sendKeys(
         'Commit message input', commitMessageInput, commitMessage);
@@ -376,7 +392,17 @@ var ExplorationEditorPage = function() {
   };
 
   this.navigateToSettingsTab = async function() {
-    await action.click('Settings tab button', navigateToSettingsTabButton);
+    let width = (await browser.manage().window().getSize()).width;
+    if (width > 768) {
+      await action.click('Settings tab button', navigateToSettingsTabButton);
+    } else {
+      await action.click(
+        'Settings tab button', navigateToSettingsTabButtonMobile);
+      await action.click(
+        'Options button dropdown', optionsDropdownMobile);
+      await action.click(
+        'Settings tab', settingsButtonMobile);
+    }
     await waitFor.pageToFullyLoad();
   };
 

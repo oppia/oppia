@@ -25,6 +25,7 @@ var CreatorDashboardPage = require('./CreatorDashboardPage.js');
 var ExplorationEditorPage = require('./ExplorationEditorPage.js');
 var TopicsAndSkillsDashboardPage = require('./TopicsAndSkillsDashboardPage.js');
 var SkillEditorPage = require('./SkillEditorPage');
+const { element } = require('angular');
 
 var imageUploadInput = element(
   by.css('.e2e-test-photo-upload-input'));
@@ -130,12 +131,26 @@ var createExplorationAsAdmin = async function() {
 // This will only work if all changes have been saved and there are no
 // outstanding warnings; run from the editor.
 var publishExploration = async function() {
-  await waitFor.elementToBeClickable(element(by.css(
-    '.e2e-test-publish-exploration')));
-  await element(by.css('.e2e-test-publish-exploration')).isDisplayed();
-  var testPublishExploration = element(
-    by.css('.e2e-test-publish-exploration'));
-  await action.click('Test Publish Exploration', testPublishExploration);
+  var changesOptions = element(by.css('.e2e-test-mobile-changes-dropdown'));
+  var navigateToSettingsTabButtonMobile = element(
+    by.css('.e2e-test-mobile-options'));
+  var publishButton = element(by.css(
+    '.e2e-test-publish-exploration'));
+  var publishButtonMobile = element(by.css('.e2e-test-mobile-publish-button'));
+
+  let width = (await browser.manage().window().getSize()).width;
+  if (width > 768) {
+    await waitFor.elementToBeClickable(publishButton);
+    await publishButton.isDisplayed();
+    await action.click('Test Publish Exploration', publishButton);
+  } else {
+    await action.click(
+      'Settings tab button', navigateToSettingsTabButtonMobile);
+    await action.click('Changes options', changesOptions);
+    await publishButtonMobile.isDisplayed();
+    await action.click('Publish button mobile', publishButtonMobile);
+  }
+
   var prePublicationButtonElem = element(by.css(
     '.e2e-test-confirm-pre-publication'));
   await action.click(
