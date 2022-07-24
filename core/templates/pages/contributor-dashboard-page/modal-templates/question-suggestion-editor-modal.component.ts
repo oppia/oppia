@@ -16,25 +16,25 @@
  * @fileoverview component for question suggestion editor modal.
  */
 
+import { Component, Input, OnInit } from '@angular/core';
+import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { AlertsService } from 'services/alerts.service';
 import { AppConstants } from 'app.constants';
-import { Component, Input, OnInit } from '@angular/core';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { ConfirmQuestionExitModalComponent } from 'components/question-directives/modal-templates/confirm-question-exit-modal.component';
-import { ContextService } from 'services/context.service';
-import { ContributionAndReviewService } from '../services/contribution-and-review.service';
-import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
-import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { Question } from 'domain/question/QuestionObjectFactory';
-import { QuestionsOpportunitiesSelectDifficultyModalComponent } from 'pages/topic-editor-page/modal-templates/questions-opportunities-select-difficulty-modal.component';
-import { QuestionSuggestionBackendApiService } from 'pages/contributor-dashboard-page/services/question-suggestion-backend-api.service';
 import { QuestionUndoRedoService } from 'domain/editor/undo_redo/question-undo-redo.service';
-import { QuestionValidationService } from 'services/question-validation.service';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { Skill } from 'domain/skill/SkillObjectFactory';
 import { SkillDifficulty } from 'domain/skill/skill-difficulty.model';
 import { State } from 'domain/state/StateObjectFactory';
+import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import { ConfirmQuestionExitModalComponent } from 'components/question-directives/modal-templates/confirm-question-exit-modal.component';
+import { QuestionsOpportunitiesSelectDifficultyModalComponent } from 'pages/topic-editor-page/modal-templates/questions-opportunities-select-difficulty-modal.component';
+import { ContextService } from 'services/context.service';
+import { ContributionAndReviewService } from '../services/contribution-and-review.service';
+import { ImageLocalStorageService } from 'services/image-local-storage.service';
+import { QuestionSuggestionBackendApiService } from 'pages/contributor-dashboard-page/services/question-suggestion-backend-api.service';
+import { QuestionValidationService } from 'services/question-validation.service';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
 
 @Component({
   selector: 'oppia-question-suggestion-editor-modal',

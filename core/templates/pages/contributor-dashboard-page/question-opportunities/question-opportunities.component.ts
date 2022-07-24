@@ -16,22 +16,22 @@
  * @fileoverview Component for question opportunities.
  */
 
-import constants from 'assets/constants';
-import { AlertsService } from 'services/alerts.service';
 import { Component, OnInit } from '@angular/core';
-import { ContextService } from 'services/context.service';
-import { ContributionOpportunitiesService } from '../services/contribution-opportunities.service';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import constants from 'assets/constants';
 import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
-import { QuestionsOpportunitiesSelectDifficultyModalComponent } from 'pages/topic-editor-page/modal-templates/questions-opportunities-select-difficulty-modal.component';
-import { QuestionSuggestionEditorModalComponent } from '../modal-templates/question-suggestion-editor-modal.component';
 import { QuestionUndoRedoService } from 'domain/editor/undo_redo/question-undo-redo.service';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { Skill } from 'domain/skill/SkillObjectFactory';
 import { SkillDifficulty } from 'domain/skill/skill-difficulty.model';
 import { SkillOpportunity } from 'domain/opportunity/skill-opportunity.model';
+import { QuestionsOpportunitiesSelectDifficultyModalComponent } from 'pages/topic-editor-page/modal-templates/questions-opportunities-select-difficulty-modal.component';
+import { QuestionSuggestionEditorModalComponent } from '../modal-templates/question-suggestion-editor-modal.component';
 import { TranslationOpportunity } from '../modal-templates/translation-modal.component';
+import { AlertsService } from 'services/alerts.service';
+import { ContextService } from 'services/context.service';
+import { ContributionOpportunitiesService } from '../services/contribution-opportunities.service';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { UserService } from 'services/user.service';
 
 interface Opportunities {

@@ -17,11 +17,13 @@
  */
 
 import * as d3 from 'd3';
-import cloneDeep from 'lodash/cloneDeep';
-import { AppConstants } from 'app.constants';
-import { AugmentedLink, NodeDataDict } from 'components/graph-services/graph-layout.service';
 import { ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { AppConstants } from 'app.constants';
+import cloneDeep from 'lodash/cloneDeep';
+import { Subscription } from 'rxjs';
+import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
+import { AugmentedLink, NodeDataDict } from 'components/graph-services/graph-layout.service';
 import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
 import { ExplorationWarningsService } from 'pages/exploration-editor-page/services/exploration-warnings.service';
 import { GraphDataService } from 'pages/exploration-editor-page/services/graph-data.service';
@@ -29,9 +31,7 @@ import { GraphNodes, GraphLink, GraphData } from 'services/compute-graph.service
 import { RouterService } from 'pages/exploration-editor-page/services/router.service';
 import { StateCardIsCheckpointService } from 'components/state-editor/state-editor-properties-services/state-card-is-checkpoint.service';
 import { StateGraphLayoutService } from 'components/graph-services/graph-layout.service';
-import { Subscription } from 'rxjs';
 import { TranslationStatusService } from 'pages/exploration-editor-page/translation-tab/services/translation-status.service';
-import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 
 interface ElementDimensions {

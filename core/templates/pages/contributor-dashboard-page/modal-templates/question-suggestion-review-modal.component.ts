@@ -16,24 +16,24 @@
  * @fileoverview Component for question suggestion review modal.
  */
 
-import { AppConstants } from 'app.constants';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { ContextService } from 'services/context.service';
-import { ContributionOpportunitiesService } from 'pages/contributor-dashboard-page/services/contribution-opportunities.service';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { ParamDict } from 'services/suggestion-modal.service';
+import { AppConstants } from 'app.constants';
+import { MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
 import { Question } from 'domain/question/QuestionObjectFactory';
-import { QuestionSuggestionEditorModalComponent } from './question-suggestion-editor-modal.component';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
 import { State } from 'domain/state/StateObjectFactory';
 import { SuggestionBackendDict } from 'domain/suggestion/suggestion.model';
+import { ThreadMessage } from 'domain/feedback_message/ThreadMessage.model';
+import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import { QuestionSuggestionEditorModalComponent } from './question-suggestion-editor-modal.component';
+import { ContextService } from 'services/context.service';
+import { ContributionOpportunitiesService } from 'pages/contributor-dashboard-page/services/contribution-opportunities.service';
+import { ParamDict } from 'services/suggestion-modal.service';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { SuggestionModalService } from 'services/suggestion-modal.service';
 import { ThreadDataBackendApiService } from 'pages/exploration-editor-page/feedback-tab/services/thread-data-backend-api.service';
-import { ThreadMessage } from 'domain/feedback_message/ThreadMessage.model';
 
 interface QuestionSuggestionModalValue {
   suggestionId: string;
