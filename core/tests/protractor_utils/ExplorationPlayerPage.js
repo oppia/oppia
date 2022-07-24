@@ -136,6 +136,8 @@ var ExplorationPlayerPage = function() {
     let textArea = element(by.tagName('textarea'));
     await action.sendKeys('Text Area', textArea, 'Reporting this exploration');
     await action.click('Submit Button', submitButton);
+    await waitFor.visibilityOf(
+      flaggedSuccessElement, 'Successfully-flagged modal not showing up.');
     let afterSubmitText = await flaggedSuccessElement.getText();
     expect(afterSubmitText).toMatch(
       'Your report has been forwarded to the moderators for review.');
