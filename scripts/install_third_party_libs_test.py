@@ -30,7 +30,6 @@ from core import utils
 from core.tests import test_utils
 
 from . import common
-from . import install_backend_python_libs
 from . import install_third_party
 from . import install_third_party_libs
 from . import pre_commit_hook
@@ -94,32 +93,6 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
 
         self.dir_exists_swap = self.swap(
             common, 'ensure_directory_exists', mock_ensure_directory_exists)
-
-    def test_install_prerequisite(self) -> None:
-        self.check_function_calls['check_call_is_called'] = False
-        prerequisite = install_third_party_libs.PREREQUISITES[0]
-        with self.Popen_swap:
-            install_third_party_libs.install_prerequisite(prerequisite)
-        self.assertTrue(self.check_function_calls['check_call_is_called'])
-
-    def test_install_prerequisite_with_prefix_fix(self) -> None:
-        self.check_function_calls['check_call_is_called'] = False
-        prerequisite = install_third_party_libs.PREREQUISITES[0]
-        with self.Popen_error_swap:
-            with self.check_call_swap:
-                install_third_party_libs.install_prerequisite(prerequisite)
-        self.assertTrue(self.check_function_calls['check_call_is_called'])
-
-    def test_install_prerequisite_raises_exception_if_prefix_fix_fails(
-            self) -> None:
-        self.check_function_calls['check_call_is_called'] = False
-        prerequisite = install_third_party_libs.PREREQUISITES[0]
-        with self.Popen_error_swap:
-            with self.check_call_error_swap:
-                with self.assertRaisesRegex(
-                        Exception, 'Error installing prerequisite'):
-                    install_third_party_libs.install_prerequisite(prerequisite)
-        self.assertTrue(self.check_function_calls['check_call_is_called'])
 
     def test_tweak_yarn_executable(self):
         def mock_is_file(unused_filename):
@@ -330,47 +303,8 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
                     Exception, 'Error compiling proto files at mock_path'):
                 install_third_party_libs.compile_protobuf_files(['mock_path'])
 
-    def test_ensure_pip_library_is_installed_with_regular_package(self):
-        exists_swap = self.swap_with_checks(
-            os.path,
-            'exists',
-            lambda _: False,
-            expected_args=[('path/package-1.1.0',)]
-        )
-        pip_install_swap = self.swap_with_checks(
-            install_backend_python_libs,
-            'pip_install',
-            lambda _, __: None,
-            expected_args=[('package==1.1.0', 'path/package-1.1.0')]
-        )
-
-        with exists_swap, pip_install_swap:
-            install_third_party_libs.ensure_pip_library_is_installed(
-                'package', '1.1.0', 'path')
-
-    def test_ensure_pip_library_is_installed_with_git_repo_package(self):
-        exists_swap = self.swap_with_checks(
-            os.path,
-            'exists',
-            lambda _: False,
-            expected_args=[('path/package-1.1.0',)]
-        )
-        pip_install_swap = self.swap_with_checks(
-            install_backend_python_libs,
-            'pip_install',
-            lambda _, __: None,
-            expected_args=[(
-                'git+https://aaa.com/package.git@1.1.0', 'path/package-1.1.0'
-            )]
-        )
-
-        with exists_swap, pip_install_swap:
-            install_third_party_libs.ensure_pip_library_is_installed(
-                'git+https://aaa.com/package.git', '1.1.0', 'path')
-
     def test_function_calls(self):
         check_function_calls = {
-            'ensure_pip_library_is_installed_is_called': False,
             'install_third_party_main_is_called': False,
             'setup_main_is_called': False,
             'setup_gae_main_is_called': False,
@@ -379,7 +313,6 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             'tweak_yarn_executable_is_called': False
         }
         expected_check_function_calls = {
-            'ensure_pip_library_is_installed_is_called': True,
             'install_third_party_main_is_called': True,
             'setup_main_is_called': True,
             'setup_gae_main_is_called': True,
@@ -387,10 +320,6 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             'pre_push_hook_main_is_called': True,
             'tweak_yarn_executable_is_called': False
         }
-        def mock_ensure_pip_library_is_installed(
-                unused_package, unused_version, unused_path):
-            check_function_calls[
-                'ensure_pip_library_is_installed_is_called'] = True
         def mock_check_call(unused_cmd_tokens):
             pass
         def mock_main_for_install_third_party(args):  # pylint: disable=unused-argument
@@ -441,9 +370,6 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
                 os.path.join(correct_google_path, 'pyglib'))
         ]
 
-        ensure_pip_install_swap = self.swap(
-            install_third_party_libs, 'ensure_pip_library_is_installed',
-            mock_ensure_pip_library_is_installed)
         swap_is_dir = self.swap(os.path, 'isdir', mock_is_dir)
         swap_mk_dir = self.swap(os, 'mkdir', mock_mk_dir)
         swap_copy_tree = self.swap(shutil, 'copytree', mock_copy_tree)
@@ -461,7 +387,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             install_third_party_libs, 'tweak_yarn_executable',
             mock_tweak_yarn_executable)
 
-        with ensure_pip_install_swap, check_call_swap, self.Popen_swap:
+        with check_call_swap, self.Popen_swap:
             with install_third_party_main_swap, setup_main_swap:
                 with setup_gae_main_swap, pre_commit_hook_main_swap:
                     with pre_push_hook_main_swap, tweak_yarn_executable_swap:
@@ -478,7 +404,6 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
 
     def test_function_calls_on_windows(self):
         check_function_calls = {
-            'ensure_pip_library_is_installed_is_called': False,
             'install_third_party_main_is_called': False,
             'setup_main_is_called': False,
             'setup_gae_main_is_called': False,
@@ -487,7 +412,6 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             'tweak_yarn_executable_is_called': False
         }
         expected_check_function_calls = {
-            'ensure_pip_library_is_installed_is_called': True,
             'install_third_party_main_is_called': True,
             'setup_main_is_called': True,
             'setup_gae_main_is_called': True,
@@ -495,10 +419,6 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             'pre_push_hook_main_is_called': False,
             'tweak_yarn_executable_is_called': True
         }
-        def mock_ensure_pip_library_is_installed(
-                unused_package, unused_version, unused_path):
-            check_function_calls[
-                'ensure_pip_library_is_installed_is_called'] = True
         def mock_check_call(unused_cmd_tokens):
             pass
         def mock_main_for_install_third_party(args):  # pylint: disable=unused-argument
@@ -514,9 +434,6 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         def mock_tweak_yarn_executable():
             check_function_calls['tweak_yarn_executable_is_called'] = True
 
-        ensure_pip_install_swap = self.swap(
-            install_third_party_libs, 'ensure_pip_library_is_installed',
-            mock_ensure_pip_library_is_installed)
         check_call_swap = self.swap(subprocess, 'check_call', mock_check_call)
         install_third_party_main_swap = self.swap(
             install_third_party, 'main', mock_main_for_install_third_party)
@@ -545,7 +462,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         with utils.open_file(temp_pq_config_file, 'w') as f:
             f.write(pq_actual_text)
 
-        with ensure_pip_install_swap, check_call_swap, self.Popen_swap:
+        with check_call_swap, self.Popen_swap:
             with install_third_party_main_swap, setup_main_swap:
                 with setup_gae_main_swap, pre_commit_hook_main_swap:
                     with pre_push_hook_main_swap, tweak_yarn_executable_swap:
