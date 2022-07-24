@@ -16,38 +16,38 @@
  * @fileoverview Component for the questions list.
  */
 
+import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { Subscription } from 'rxjs';
 import { AlertsService } from 'services/alerts.service';
 import { AppConstants } from 'app.constants';
-import { CategorizedSkills, SelectSkillModalComponent } from 'components/skill-selector/select-skill-modal.component';
-import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { ConfirmQuestionExitModalComponent } from '../modal-templates/confirm-question-exit-modal.component';
-import { ContextService } from 'services/context.service';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { EditableQuestionBackendApiService } from 'domain/question/editable-question-backend-api.service';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { ImageLocalStorageService } from 'services/image-local-storage.service';
-import { MisconceptionObjectFactory, MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { Question, QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
-import { QuestionEditorSaveModalComponent } from '../modal-templates/question-editor-save-modal.component';
-import { QuestionsListService } from 'services/questions-list.service';
 import { QuestionSummary } from 'domain/question/question-summary-object.model';
 import { QuestionSummaryForOneSkill } from 'domain/question/question-summary-for-one-skill-object.model';
 import { QuestionUndoRedoService } from 'domain/editor/undo_redo/question-undo-redo.service';
-import { QuestionValidationService } from 'services/question-validation.service';
 import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
 import { SkillDifficulty } from 'domain/skill/skill-difficulty.model';
-import { SkillEditorRoutingService } from 'pages/skill-editor-page/services/skill-editor-routing.service';
 import { SkillLinkageModificationsArray } from 'domain/question/editable-question-backend-api.service';
 import { SkillSummary, SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
+import { MisconceptionObjectFactory, MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
+import { Question, QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { State } from 'domain/state/StateObjectFactory';
-import { Subscription } from 'rxjs';
+import { Rubric } from 'domain/skill/rubric.model';
+import { EditableQuestionBackendApiService } from 'domain/question/editable-question-backend-api.service';
+import { CategorizedSkills, SelectSkillModalComponent } from 'components/skill-selector/select-skill-modal.component';
+import { ConfirmQuestionExitModalComponent } from '../modal-templates/confirm-question-exit-modal.component';
+import { QuestionEditorSaveModalComponent } from '../modal-templates/question-editor-save-modal.component';
+import { ContextService } from 'services/context.service';
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
+import { ImageLocalStorageService } from 'services/image-local-storage.service';
+import { QuestionsListService } from 'services/questions-list.service';
+import { QuestionValidationService } from 'services/question-validation.service';
+import { SkillEditorRoutingService } from 'pages/skill-editor-page/services/skill-editor-routing.service';
 import { UtilsService } from 'services/utils.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
-import { Rubric } from 'domain/skill/rubric.model';
 
 interface GroupedSkillSummaries {
   current: SkillSummaryBackendDict[];

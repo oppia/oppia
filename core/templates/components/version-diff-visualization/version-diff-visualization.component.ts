@@ -19,9 +19,9 @@
 
 import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { StateDiffModalComponent } from 'pages/exploration-editor-page/modal-templates/state-diff-modal.component';
 import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { StateDiffModalComponent } from 'pages/exploration-editor-page/modal-templates/state-diff-modal.component';
 
 interface NodesData {
   [key: string]: {
