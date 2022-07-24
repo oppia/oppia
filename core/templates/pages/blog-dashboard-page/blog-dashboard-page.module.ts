@@ -23,7 +23,6 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { downgradeComponent } from '@angular/upgrade/static';
-// eslint-disable-next-line oppia/disallow-httpclient
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RequestInterceptor } from 'services/request-interceptor.service';

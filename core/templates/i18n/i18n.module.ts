@@ -17,7 +17,6 @@
  */
 
 import { NgModule } from '@angular/core';
-// eslint-disable-next-line oppia/disallow-httpclient
 import { HttpClient } from '@angular/common/http';
 import { TranslateCacheModule, TranslateCacheService,
   TranslateCacheSettings } from 'ngx-translate-cache';

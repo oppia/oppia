@@ -16,7 +16,6 @@
  * @fileoverview Module for the blog-admin page.
  */
 
-// eslint-disable-next-line oppia/disallow-httpclient
 import { HttpClient, HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { APP_INITIALIZER, DoBootstrap, ErrorHandler, NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';

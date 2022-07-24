@@ -16,7 +16,6 @@
  * @fileoverview Module for the maintenance page.
  */
 
-// eslint-disable-next-line oppia/disallow-httpclient
 import { HttpClient, HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { APP_INITIALIZER, ErrorHandler, NgModule } from '@angular/core';
 import { APP_BASE_HREF } from '@angular/common';
