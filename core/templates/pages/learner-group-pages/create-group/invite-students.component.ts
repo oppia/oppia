@@ -58,7 +58,10 @@ export class InviteStudentsComponent {
 
   onSearchQueryChangeExec(username: string): void {
     if (username) {
-      if (this.invitedUsernames.includes(username.toLowerCase())) {
+      const isUserAlreadyInvited = this.invitedUsernames.some(
+        (name) => name.toLowerCase() === username.toLowerCase()
+      );
+      if (isUserAlreadyInvited) {
         this.alertsService.addInfoMessage(
           'User with username ' + username + ' has been already invited.'
         );

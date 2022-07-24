@@ -594,14 +594,14 @@ class VersionedSubtopicsDict(TypedDict):
     """Dictionary that represents versioned subtopics."""
 
     schema_version: int
-    subtopics: List[Subtopic]
+    subtopics: List[SubtopicDict]
 
 
-class VersionedStoryReferences(TypedDict):
+class VersionedStoryReferencesDict(TypedDict):
     """Dictionary that represents versioned story references."""
 
     schema_version: int
-    story_references: List[StoryReference]
+    story_references: List[StoryReferenceDict]
 
 
 class Topic:
@@ -1371,7 +1371,7 @@ class Topic:
     @classmethod
     def update_story_references_from_model(
         cls,
-        versioned_story_references: VersionedStoryReferences,
+        versioned_story_references: VersionedStoryReferencesDict,
         current_version: int
     ) -> None:
         """Converts the story_references blob contained in the given

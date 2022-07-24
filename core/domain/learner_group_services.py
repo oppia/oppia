@@ -28,7 +28,7 @@ from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.platform import models
 
-from typing import List, Optional, Tuple
+from typing import List, Optional, Sequence, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -248,7 +248,6 @@ def get_matching_learner_group_syllabus_to_add(
         group_subtopic_page_ids = learner_group_model.subtopic_page_ids
         group_story_ids = learner_group_model.story_ids
 
-    matching_topics: List[topic_domain.Topic] = []
     matching_topic_ids: List[str] = []
     all_classrooms_dict = config_domain.CLASSROOM_PAGES_DATA.value
 
@@ -261,12 +260,18 @@ def get_matching_learner_group_syllabus_to_add(
         for classroom in all_classrooms_dict:
             if category and classroom['name'] == category:
                 matching_topic_ids.extend(classroom['topic_ids'])
-        matching_topics = topic_fetchers.get_topics_by_ids(matching_topic_ids) # type: ignore[no-untyped-call]
+        matching_topics_with_none: Sequence[
+            Optional[topic_domain.Topic]
+        ] = (
+            topic_fetchers.get_topics_by_ids(matching_topic_ids)
+        )
     else:
-        matching_topics = topic_fetchers.get_all_topics() # type: ignore[no-untyped-call]
+        matching_topics_with_none = topic_fetchers.get_all_topics()
 
     keyword = keyword.lower()
-    for topic in matching_topics:
+    for topic in matching_topics_with_none:
+        # Ruling out the possibility of None for mypy type checking.
+        assert topic is not None
         if language_code not in (
             constants.DEFAULT_ADD_SYLLABUS_FILTER, topic.language_code
         ):
