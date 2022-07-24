@@ -40,7 +40,7 @@
 /core/templates/pages/ @oppia/lace-frontend-reviewers
 /core/templates/services/ @oppia/lace-frontend-reviewers
 /core/templates/utility/ @oppia/lace-frontend-reviewers
-/extensions/ @data-and-stability-reviewers
+/extensions/ @oppia/data-and-stability-reviewers
 /scripts/ @oppia/dev-workflow-reviewers
 
 
