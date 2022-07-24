@@ -180,7 +180,10 @@ describe('Static Pages Tour', function() {
   it('should visit the Home page', async function() {
     await browser.url('/');
     await waitFor.pageToFullyLoad();
-    expect(await $('.e2e-test-splash-page').isExisting()).toBe(true);
+    var splashPage = $('.e2e-test-splash-page');
+    await waitFor.visibilityOf(
+      splashPage, 'Splash page takes too long to appear');
+    expect(await splashPage.isExisting()).toBe(true);
   });
 
   it('should visit the About page', async function() {
