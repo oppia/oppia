@@ -182,7 +182,7 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
     this._updateQuestion(() => {
       const stateData = this.question?.getStateData();
       stateData.content = cloneDeep(displayedValue);
-      this.stateEditorIsInitialized = true;
+      this.interactionIsShown = true;
     });
   }
 
@@ -199,7 +199,7 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
       this.stateEditorService.onStateEditorInitialized.emit(stateData);
 
       if (stateData.content.html || stateData.interaction.id) {
-        this.stateEditorIsInitialized = true;
+        this.interactionIsShown = true;
       }
 
       this.loaderService.hideLoadingScreen();
@@ -235,7 +235,7 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
     this.oppiaBlackImgUrl = this.urlInterpolationService.getStaticImageUrl(
       '/avatar/oppia_avatar_100px.svg');
 
-    this.stateEditorIsInitialized = false;
+    this.interactionIsShown = false;
     this.stateEditorIsInitialized = false;
     this._init();
   }

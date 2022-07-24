@@ -254,7 +254,7 @@ describe('Question Editor Component', () => {
   });
 
   it('should initialize component properties when interaction editor' +
-    ' is initialized', () => {
+    ' is initialized', fakeAsync(() => {
     let onInteractionEditorInitializedEmitter = new EventEmitter();
     spyOnProperty(
       stateEditorService, 'onInteractionEditorInitialized')
@@ -266,10 +266,11 @@ describe('Question Editor Component', () => {
     component.stateEditorIsInitialized = false;
 
     onInteractionEditorInitializedEmitter.emit();
+    tick();
 
     expect(component.interactionIsShown).toBe(true);
     expect(component.stateEditorIsInitialized).toBe(true);
-  });
+  }));
 
   it('should initialize component properties when interaction id' +
     ' is changed', () => {
