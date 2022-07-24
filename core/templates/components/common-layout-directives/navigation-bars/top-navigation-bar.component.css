@@ -530,11 +530,4 @@
     white-space: nowrap;
     width: 100%;
   }
-  @media screen and (min-width: 769px) {
-    .oppia-logo {
-      left: 0;
-      margin-left: 60px;
-      position: absolute;
-    }
-  }
 }
