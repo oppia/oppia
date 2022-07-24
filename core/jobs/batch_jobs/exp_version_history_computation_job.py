@@ -90,9 +90,20 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
         )
         if model_group_is_valid:
             exp_model_vlatest = exp_models_vlatest[0]
+            commit_log_model_count = 0
+            for commit_log in commit_log_models:
+                # Version can be None if there is a commit which does not
+                # change the version of the exploration such as changing
+                # roles.
+                if (
+                    commit_log is not None and
+                    commit_log.version is not None
+                ):
+                    commit_log_model_count += 1
             model_group_is_valid = (
-                len(commit_log_models) == exp_model_vlatest.version
+                exp_model_vlatest.version == commit_log_model_count
             )
+
         return model_group_is_valid
 
     def _convert_to_formatted_model_group_dict(
@@ -121,7 +132,10 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
             [None] * exp_vlatest.version
         )
         for commit_log in model_group['commit_log_models']:
-            commit_log_models[commit_log.version - 1] = commit_log
+            # Version can be None if there is a commit which does not change
+            # the version of the exploration such as changing roles.
+            if commit_log.version is not None:
+                commit_log_models[commit_log.version - 1] = commit_log
 
         # Rearranging the already existing version history models for the
         # given exploration.
