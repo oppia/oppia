@@ -110,7 +110,7 @@ describe('Topic object factory', () => {
     ]);
   });
 
-  it('should warn user when no skill were added for the diagnostic test',
+  it('should warn user when no skills were added for the diagnostic test',
     () => {
       _sampleTopic._skillSummariesForDiagnosticTest = [];
       expect(_sampleTopic.validate()).toEqual([
@@ -118,7 +118,7 @@ describe('Topic object factory', () => {
       ]);
     });
 
-  it('should warn user when more than 3 skill were added for the ' +
+  it('should warn user when more than 3 skills were added for the ' +
     'diagnostic test', () => {
     var shortSkillSummaries = [
       ShortSkillSummary.create('skill 1', 'description 1'),

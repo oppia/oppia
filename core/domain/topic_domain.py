@@ -1205,8 +1205,7 @@ class Topic:
 
         if (
             strict and
-            len(self.skill_ids_for_diagnostic_test) == 0 and
-            len(all_skill_ids) > 0
+            len(self.skill_ids_for_diagnostic_test) == 0
         ):
             raise utils.ValidationError(
                 'The skill_ids_for_diagnostic_test field should not be empty.')
