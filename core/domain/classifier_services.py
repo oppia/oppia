@@ -571,7 +571,7 @@ def migrate_state_training_jobs(
             added or removed.
 
     Raises:
-        Exception. Interaction id does not exist for invalid state_name.
+        Exception. Interaction id does not exist for the state.
     """
     exp_id = state_training_jobs_mapping.exp_id
     exp_version = state_training_jobs_mapping.exp_version
@@ -583,7 +583,8 @@ def migrate_state_training_jobs(
 
     if interaction_id is None:
         raise Exception(
-            'Interaction id does not exist for state_name: %s' % state_name
+            'Interaction id does not exist for the state having state_name: %s'
+            % state_name
         )
     algorithm_id = feconf.INTERACTION_CLASSIFIER_MAPPING[
         interaction_id]['algorithm_id']
