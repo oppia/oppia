@@ -519,6 +519,7 @@
 /extensions/extensions.module.ts @oppia/angular-migration-reviewers
 /core/schema_utils*.py @oppia/data-and-stability-reviewers
 /core/utils*.py @oppia/lace-backend-reviewers
+/.rtlcssrc @oppia/lace-frontend-reviewers
 
 
 # Python typing
@@ -698,20 +699,6 @@
 /core/templates/services/auth-backend-api.service*.ts @oppia/data-and-stability-reviewers
 
 
-# Core Documentation.
-/AUTHORS @oppia/core-reviewers
-/CONTRIBUTORS @oppia/core-reviewers
-/LICENSE @oppia/core-reviewers
-/NOTICE @oppia/core-reviewers
-
-# Files with Legal Implications.
-/core/templates/pages/terms-page/terms-page.component.html @oppia/core-reviewers
-/core/templates/pages/privacy-page/privacy-page.component.html @oppia/core-reviewers
-/core/templates/pages/license-page/license-page.component.html @oppia/core-reviewers
-/core/domain/takeout_*.py @oppia/core-reviewers
-/core/domain/wipeout_*.py @oppia/core-reviewers
-
-
 # Critical files.
 #
 # IMPORTANT NOTE: Please ensure that these files are always located at the end
@@ -722,16 +709,6 @@
 #
 # On modifying this list make sure to keep the CODEOWNER_IMPORTANT_PATHS list
 # in scripts/linters/codeowner_linter.py in sync with the modifications.
-/core/templates/services/svg-sanitizer.service.ts @oppia/core-reviewers
-/scripts/linters/warranted_angular_security_bypasses.py @oppia/core-reviewers
-/core/controllers/access_validators*.py @oppia/core-reviewers
-/core/controllers/acl_decorators*.py @oppia/core-reviewers
-/core/controllers/base*.py @oppia/core-reviewers
-/core/domain/html*.py @oppia/core-reviewers
-/core/domain/rights_manager*.py @oppia/core-reviewers
-/core/domain/role_services*.py @oppia/core-reviewers
-/core/storage/ @oppia/core-reviewers
-/core/domain/user*.py @oppia/core-reviewers
 /requirements.txt @oppia/data-and-stability-reviewers
 /requirements.in @oppia/data-and-stability-reviewers
 /requirements_dev.txt @oppia/data-and-stability-reviewers
@@ -748,4 +725,23 @@
 /core/controllers/android_e2e_config*.py @oppia/web-android-compatibility-reviewers
 /core/android_validation_constants*.py @oppia/web-android-compatibility-reviewers
 /extensions/interactions/rule_templates.json @oppia/web-android-compatibility-reviewers
-/.rtlcssrc @oppia/lace-frontend-reviewers
+# Files owned by core reviewers.
+/core/templates/services/svg-sanitizer.service.ts @oppia/core-reviewers
+/scripts/linters/warranted_angular_security_bypasses.py @oppia/core-reviewers
+/core/controllers/access_validators*.py @oppia/core-reviewers
+/core/controllers/acl_decorators*.py @oppia/core-reviewers
+/core/controllers/base*.py @oppia/core-reviewers
+/core/domain/html*.py @oppia/core-reviewers
+/core/domain/rights_manager*.py @oppia/core-reviewers
+/core/domain/role_services*.py @oppia/core-reviewers
+/core/storage/ @oppia/core-reviewers
+/core/domain/user*.py @oppia/core-reviewers
+/AUTHORS @oppia/core-reviewers
+/CONTRIBUTORS @oppia/core-reviewers
+/LICENSE @oppia/core-reviewers
+/NOTICE @oppia/core-reviewers
+/core/templates/pages/terms-page/terms-page.component.html @oppia/core-reviewers
+/core/templates/pages/privacy-page/privacy-page.component.html @oppia/core-reviewers
+/core/templates/pages/license-page/license-page.component.html @oppia/core-reviewers
+/core/domain/takeout_*.py @oppia/core-reviewers
+/core/domain/wipeout_*.py @oppia/core-reviewers
