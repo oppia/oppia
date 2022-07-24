@@ -25,7 +25,6 @@ var CreatorDashboardPage = require('./CreatorDashboardPage.js');
 var ExplorationEditorPage = require('./ExplorationEditorPage.js');
 var TopicsAndSkillsDashboardPage = require('./TopicsAndSkillsDashboardPage.js');
 var SkillEditorPage = require('./SkillEditorPage');
-const { element } = require('angular');
 
 var imageUploadInput = element(
   by.css('.e2e-test-photo-upload-input'));

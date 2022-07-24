@@ -20,6 +20,7 @@
 var action = require('./action');
 var forms = require('./forms.js');
 var waitFor = require('./waitFor.js');
+const { browser } = require('protractor');
 
 var ExplorationEditorImprovementsTab = require(
   '../protractor_utils/ExplorationEditorImprovementsTab.js');
