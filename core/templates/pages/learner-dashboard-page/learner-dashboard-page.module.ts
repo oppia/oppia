@@ -109,7 +109,6 @@ import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
 import { ToastrModule } from 'ngx-toastr';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
-import { LoggerService } from 'services/contextual/logger.service';
 import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
