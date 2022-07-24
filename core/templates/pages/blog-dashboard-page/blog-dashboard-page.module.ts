@@ -16,7 +16,7 @@
  * @fileoverview Module for the blog-dashboard page.
  */
 
-import { APP_INITIALIZER, NgModule, StaticProvider, DoBootstrap, ErrorHandler} from '@angular/core';
+import { APP_INITIALIZER, NgModule, StaticProvider, DoBootstrap} from '@angular/core';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';

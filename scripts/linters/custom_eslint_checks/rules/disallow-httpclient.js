@@ -43,7 +43,7 @@ module.exports = {
     var filename = context.getFilename();
 
     var checkAndReportHttpClient = function(node) {
-      if (!filename.endsWith('backend-api.service.ts')){
+      if (!filename.endsWith('backend-api.service.ts')) {
         context.report({
           node: node,
           messageId: 'disallowHttpClient'

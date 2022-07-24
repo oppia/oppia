@@ -17,7 +17,7 @@
  */
 
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-import { APP_INITIALIZER, DoBootstrap, ErrorHandler, NgModule } from '@angular/core';
+import { APP_INITIALIZER, DoBootstrap, NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';

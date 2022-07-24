@@ -47,7 +47,7 @@ import { TopicEditorSendMailComponent } from './modal-templates/topic-editor-sen
 import { TopicEditorSaveModalComponent } from './modal-templates/topic-editor-save-modal.component';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
 import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
-s
+
 @NgModule({
   imports: [
     BrowserModule,

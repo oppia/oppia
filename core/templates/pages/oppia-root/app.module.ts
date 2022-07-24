@@ -16,8 +16,8 @@
  * @fileoverview Module for the about page.
  */
 
-import { HttpClient, HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-import { APP_INITIALIZER, ErrorHandler, NgModule } from '@angular/core';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { APP_INITIALIZER, NgModule } from '@angular/core';
 
 
 // Modules.
@@ -37,8 +37,7 @@ import { AngularFireAuth, AngularFireAuthModule, USE_EMULATOR } from '@angular/f
 import { AngularFireModule } from '@angular/fire';
 import { AuthService } from 'services/auth.service';
 import * as hammer from 'hammerjs';
-import { LoggerService } from 'services/contextual/logger.service';
-import { AppErrorHandlerProvider, AppErrorHandlerWithFirebaseErrorFilter } from './app-error-handler';
+import { AppErrorHandlerProvider } from './app-error-handler';
 
 
 // Config for ToastrModule (helps in flashing messages and alerts).

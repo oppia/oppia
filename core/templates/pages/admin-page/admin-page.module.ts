@@ -16,7 +16,7 @@
  * @fileoverview Module for the admin page.
  */
 
-import { APP_INITIALIZER, ErrorHandler, NgModule, StaticProvider } from '@angular/core';
+import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
