@@ -133,20 +133,13 @@
 
 
 # Core documentation
-/AUTHORS @oppia/core-reviewers
 /CHANGELOG @oppia/release-workflow-reviewers
-/CONTRIBUTORS @oppia/core-reviewers
-/LICENSE @oppia/core-reviewers
-/NOTICE @oppia/core-reviewers
 /core/templates/pages/about-page/ @oppia/lace-frontend-reviewers
 /core/templates/pages/about-page/about-page.constants.ts @oppia/angular-migration-reviewers
 /core/templates/pages/license-page/ @oppia/angular-migration-reviewers
-/core/templates/pages/license-page/license-page.component.html @oppia/core-reviewers
 /core/templates/pages/privacy-page/ @oppia/lace-frontend-reviewers
-/core/templates/pages/privacy-page/privacy-page.component.html @oppia/core-reviewers
 /core/templates/pages/privacy-page/privacy-page.component.ts @oppia/lace-frontend-reviewers
 /core/templates/pages/terms-page/ @oppia/lace-frontend-reviewers
-/core/templates/pages/terms-page/terms-page.component.html @oppia/core-reviewers
 
 
 # Dashboard pages.
@@ -639,11 +632,6 @@
 /webpack.*.ts @oppia/data-and-stability-reviewers
 
 
-# User Data Takeout.
-/core/domain/takeout_*.py @oppia/core-reviewers
-/core/domain/wipeout_*.py @oppia/core-reviewers
-
-
 # User’s profile page.
 /core/controllers/profile*.py @oppia/data-and-stability-reviewers
 /core/templates/domain/user/ @oppia/frontend-infrastructure-reviewers
@@ -708,6 +696,20 @@
 /core/domain/taskqueue*.py @oppia/data-and-stability-reviewers
 /core/templates/services/auth.service*.ts @oppia/data-and-stability-reviewers
 /core/templates/services/auth-backend-api.service*.ts @oppia/data-and-stability-reviewers
+
+
+# Core Documentation.
+/AUTHORS @oppia/core-reviewers
+/CONTRIBUTORS @oppia/core-reviewers
+/LICENSE @oppia/core-reviewers
+/NOTICE @oppia/core-reviewers
+
+# Files with Legal Implications.
+/core/templates/pages/terms-page/terms-page.component.html @oppia/core-reviewers
+/core/templates/pages/privacy-page/privacy-page.component.html @oppia/core-reviewers
+/core/templates/pages/license-page/license-page.component.html @oppia/core-reviewers
+/core/domain/takeout_*.py @oppia/core-reviewers
+/core/domain/wipeout_*.py @oppia/core-reviewers
 
 
 # Critical files.
