@@ -18,6 +18,8 @@
 
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { LearnerGroupSyllabusBackendApiService } from 'domain/learner_group/learner-group-syllabus-backend-api.service';
+import { LearnerGroupUserProgress } from 'domain/learner_group/learner-group-user-progress.model';
 import { LearnerGroupData } from 'domain/learner_group/learner-group.model';
 
 import './learner-group-overview.component.css';
@@ -29,11 +31,22 @@ import './learner-group-overview.component.css';
 })
 export class LearnerGroupOverviewComponent {
   @Input() learnerGroup: LearnerGroupData;
+  studentsProgress!: LearnerGroupUserProgress[];
 
-  constructor() {}
+  constructor(
+    private learnerGroupSyllabusBackendApiService:
+      LearnerGroupSyllabusBackendApiService
+  ) {}
 
   ngOnInit() {
-    
+    if (this.learnerGroup.studentUsernames.length > 0) {
+      this.learnerGroupSyllabusBackendApiService
+      .fetchStudentsProgressInAssignedSyllabus(
+        this.learnerGroup.id).then(studentsProgress => {
+          console.log('studentsProgress', studentsProgress);
+          this.studentsProgress = studentsProgress;
+        });
+    }
   }
 }
 

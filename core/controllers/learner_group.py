@@ -313,6 +313,51 @@ class LearnerGroupStudentProgressHandler(base.BaseHandler):
         })
 
 
+class LearnerGroupSyllabusHandler(base.BaseHandler):
+    """Handles fetching of the learner group syllabus."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'learner_group_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.LEARNER_GROUP_ID_REGEX
+                }]
+            },
+            'default_value': None
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
+    @acl_decorators.can_access_learner_groups
+    def get(self, learner_group_id):
+        """Handles GET requests for the learner group syllabus."""
+
+        learner_group = learner_group_fetchers.get_learner_group_by_id(
+            learner_group_id)
+        if learner_group is None:
+            raise self.InvalidInputException('No such learner group exists.')
+
+        story_summary_dicts = (
+            story_fetchers.get_learner_group_syllabus_story_summaries(
+                learner_group.story_ids))
+        subtopic_summary_dicts = (
+            subtopic_page_services
+                .get_learner_group_syllabus_subtopic_page_summaries(
+                    learner_group.subtopic_page_ids))
+
+        self.render_json({
+            'learner_group_id': learner_group_id,
+            'story_summary_dicts': story_summary_dicts,
+            'subtopic_summary_dicts': subtopic_summary_dicts
+        })
+
+
 class LearnerGroupSearchSyllabusHandler(base.BaseHandler):
     """Handles operations related to the learner group syllabus."""
 

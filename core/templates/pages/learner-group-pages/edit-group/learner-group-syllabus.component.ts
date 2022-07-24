@@ -18,7 +18,18 @@
 
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { AppConstants } from 'app.constants';
+import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-group-backend-api.service';
+import { LearnerGroupSubtopicSummary } from 'domain/learner_group/learner-group-subtopic-summary.model';
+import { LearnerGroupSyllabusBackendApiService } from 'domain/learner_group/learner-group-syllabus-backend-api.service';
+import { LearnerGroupSyllabus } from 'domain/learner_group/learner-group-syllabus.model';
 import { LearnerGroupData } from 'domain/learner_group/learner-group.model';
+import { StorySummary } from 'domain/story/story-summary.model';
+import { AssetsBackendApiService } from 'services/assets-backend-api.service';
+import { AddedSyllabusItemsSuccessfullyModalComponent } from '../templates/added-syllabus-items-successfully-modal.component';
+import { RemoveSyllabusItemModalComponent } from 
+  '../templates/remove-syllabus-item-modal.component';
 
 import './learner-group-syllabus.component.css';
 
@@ -29,11 +40,222 @@ import './learner-group-syllabus.component.css';
 })
 export class LearnerGroupSyllabusComponent {
   @Input() learnerGroup: LearnerGroupData;
+  subtopicSummaries!: LearnerGroupSubtopicSummary[];
+  storySummaries!: StorySummary[];
+  displayOrderOfSyllabusItems: string[] = [];
+  addNewSyllabusItemsModeIsActive = false;
+  newlyAddedStorySummaries: StorySummary[] = [];
+  newlyAddedSubtopicSummaries: LearnerGroupSubtopicSummary[] = [];
+  newlyAddedStoryIds: string[] = [];
+  newlyAddedSubtopicIds: string[] = [];
 
-  constructor() {}
+  constructor(
+    private assetsBackendApiService: AssetsBackendApiService,
+    private ngbModal: NgbModal,
+    private learnerGroupBackendApiService:
+      LearnerGroupBackendApiService,
+    private learnerGroupSyllabusBackendApiService:
+      LearnerGroupSyllabusBackendApiService
+  ) {}
 
   ngOnInit() {
-    
+    this.learnerGroupSyllabusBackendApiService.fetchLearnerGroupSyllabus(
+      this.learnerGroup.id).then(groupSyllabus => {
+        console.log('groupSyllabus', groupSyllabus);
+        this.subtopicSummaries = groupSyllabus.subtopicPageSummaries;
+        this.storySummaries = groupSyllabus.storySummaries;
+        this.setDisplayOrderOfSyllabusItems();
+      });
+  }
+
+  setDisplayOrderOfSyllabusItems(): void {
+    let topicNameToSyllabusMap = {};
+
+    this.storySummaries.map((summary, index) => {
+      let topicName = summary.getTopicName();
+      if (topicNameToSyllabusMap.hasOwnProperty(topicName)) {
+        topicNameToSyllabusMap[topicName].push(`story-${index}`);
+      } else {
+        topicNameToSyllabusMap[topicName] = [`story-${index}`];
+      }
+    });
+
+    this.subtopicSummaries.map((summary, index) => {
+      let topicName = summary.parentTopicName;
+      if (topicNameToSyllabusMap.hasOwnProperty(topicName)) {
+        topicNameToSyllabusMap[topicName].push(`subtopic-${index}`);
+      } else {
+        topicNameToSyllabusMap[topicName] = [`subtopic-${index}`];
+      }
+    });
+
+    this.displayOrderOfSyllabusItems = (
+      Object.keys(topicNameToSyllabusMap).reduce((arr, key) => {
+        return arr.concat(topicNameToSyllabusMap[key]);
+      }, [])
+    );
+  }
+
+  isDisplayedItemStory(item: string): boolean {
+    return item.startsWith('story');
+  }
+
+  isDisplayedItemSubtopic(item: string): boolean {
+    return item.startsWith('subtopic');
+  }
+
+  getIndexToDisplay(item: string): number {
+    return parseInt(item.split('-')[1]);
+  }
+
+  getSubtopicThumbnailUrl(
+    subtopicSummary: LearnerGroupSubtopicSummary
+  ): string {
+    let thumbnailUrl = '';
+    if (subtopicSummary.thumbnailFilename) {
+      thumbnailUrl = (
+        this.assetsBackendApiService.getThumbnailUrlForPreview(
+          AppConstants.ENTITY_TYPE.TOPIC, subtopicSummary.parentTopicId,
+          subtopicSummary.thumbnailFilename
+        )
+      );
+    }
+    return thumbnailUrl;
+  }
+
+  getStoryThumbnailUrl(storySummary: StorySummary): string {
+    let thumbnailUrl = '';
+    if (storySummary.getThumbnailFilename()) {
+      thumbnailUrl = (
+        this.assetsBackendApiService.getThumbnailUrlForPreview(
+          AppConstants.ENTITY_TYPE.STORY, storySummary.getId(),
+          storySummary.getThumbnailFilename()
+        )
+      );
+    }
+    return thumbnailUrl;
+  }
+
+  toggleAddNewSyllabusItemsMode(): void {
+    this.addNewSyllabusItemsModeIsActive = (
+      !this.addNewSyllabusItemsModeIsActive
+    );
+  }
+
+  isAddNewSyllabusItemsModeActive(): boolean {
+    return this.addNewSyllabusItemsModeIsActive;
+  }
+
+  isNewSyllabusAdded(): boolean {
+    return (
+      this.newlyAddedStoryIds.length > 0 ||
+      this.newlyAddedSubtopicIds.length > 0
+    );
+  }
+
+  updateNewlyAddedStoryIds(storyIds: string[]): void {
+    this.newlyAddedStoryIds = storyIds;
+  }
+
+  updateNewlyAddedSubtopicIds(subtopicIds: string[]): void {
+    this.newlyAddedSubtopicIds = subtopicIds;
+    console.log('subtopicIds', subtopicIds);
+  }
+
+  updateNewlyAddedStorySummaries(storySummaries: StorySummary[]): void {
+    this.newlyAddedStorySummaries = storySummaries;
+    console.log('newlyAddedStorySummaries', this.newlyAddedStorySummaries);
+  }
+
+  updateNewlyAddedSubtopicSummaries(
+      subtopicSummaries: LearnerGroupSubtopicSummary[]
+  ): void {
+    this.newlyAddedSubtopicSummaries = subtopicSummaries;
+    console.log('newlyAddedSubtopicSummaries', this.newlyAddedSubtopicSummaries);
+  }
+
+  saveNewSyllabusItems(): void {
+    this.learnerGroup.addStoryIds(this.newlyAddedStoryIds);
+      this.learnerGroup.addSubtopicPageIds(this.newlyAddedSubtopicIds);
+      this.learnerGroupBackendApiService.updateLearnerGroupAsync(
+        this.learnerGroup).then((learnerGroup) => {
+          this.subtopicSummaries.push(...this.newlyAddedSubtopicSummaries);
+          this.storySummaries.push(...this.newlyAddedStorySummaries);
+          this.newlyAddedStoryIds = [];
+          this.newlyAddedSubtopicIds = [];
+          this.newlyAddedStorySummaries = [];
+          this.newlyAddedSubtopicSummaries = [];
+          this.learnerGroup = learnerGroup;
+          this.setDisplayOrderOfSyllabusItems();
+        });
+
+    let modelRef = this.ngbModal.open(
+      AddedSyllabusItemsSuccessfullyModalComponent, {
+        backdrop: true,
+        windowClass: 'added-syllabus-items-successfully-modal'
+      });
+
+    modelRef.componentInstance.itemsAddedCount = (
+      this.newlyAddedStoryIds.length + this.newlyAddedSubtopicIds.length
+    );
+    modelRef.result.then(() => {
+      this.toggleAddNewSyllabusItemsMode();
+    }, () => {
+      this.ngOnInit();
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
+    });
+  }
+
+  removeSubtopicPageIdFromSyllabus(subtopicPageId: string): void {
+    let modelRef = this.ngbModal.open(
+      RemoveSyllabusItemModalComponent, {
+        backdrop: true,
+        windowClass: 'remove-syllabus-item-modal'
+      });
+
+    modelRef.componentInstance.syllabusItemType = 'skill';
+
+    modelRef.result.then(() => {
+      this.learnerGroup.removeSubtopicPageId(subtopicPageId);
+      this.learnerGroupBackendApiService.updateLearnerGroupAsync(
+        this.learnerGroup).then((learnerGroup) => {
+          this.subtopicSummaries = this.subtopicSummaries.filter(
+            subtopicSummary => subtopicSummary.subtopicPageId !== subtopicPageId
+          );
+          this.learnerGroup = learnerGroup;
+          this.setDisplayOrderOfSyllabusItems();
+        });
+    }, () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
+    });
+  }
+
+  removeStoryIdFromSyllabus(storyId: string): void {
+    let modelRef = this.ngbModal.open(
+      RemoveSyllabusItemModalComponent, {
+        backdrop: true,
+        windowClass: 'remove-syllabus-item-modal'
+      });
+    modelRef.componentInstance.syllabusItemType = 'story';
+
+    modelRef.result.then(() => {
+      this.learnerGroup.removeStoryId(storyId);
+      this.learnerGroupBackendApiService.updateLearnerGroupAsync(
+        this.learnerGroup).then((learnerGroup) => {
+          this.storySummaries = this.storySummaries.filter(
+            storySummary => storySummary.getId() !== storyId);
+          this.learnerGroup = learnerGroup;
+          this.setDisplayOrderOfSyllabusItems();
+        });
+    }, () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
+    });
   }
 }
 

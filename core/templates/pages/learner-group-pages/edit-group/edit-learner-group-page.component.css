@@ -26,6 +26,7 @@
 
 .oppia-dashboard-view-content-container {
   height: 100%;
+  overflow: auto;
   width: 80%;
 }
 

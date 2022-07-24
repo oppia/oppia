@@ -85,10 +85,10 @@ describe('Learner Group Object', () => {
     sampleLearnerGroupData.removeStudent('username2');
     sampleLearnerGroupData.inviteStudent('username4');
     sampleLearnerGroupData.revokeInvitation('sampleUsername');
-    sampleLearnerGroupData.addSubtopicPageId('subtopicPageId1');
+    sampleLearnerGroupData.addSubtopicPageIds(['subtopicPageId1']);
     sampleLearnerGroupData.removeSubtopicPageId('sampleSubtopicPageId');
-    sampleLearnerGroupData.addStoryId('storyId1');
-    sampleLearnerGroupData.addStoryId('storyId2');
+    sampleLearnerGroupData.addStoryIds(['storyId1']);
+    sampleLearnerGroupData.addStoryIds(['storyId2']);
     sampleLearnerGroupData.removeStoryId('storyId1');
 
     expect(sampleLearnerGroupData.title).toEqual('title1');

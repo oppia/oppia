@@ -952,6 +952,9 @@ URLS = [
         r'/learner_group_search_syllabus_handler',
         learner_group.LearnerGroupSearchSyllabusHandler),
     get_redirect_route(
+        r'/learner_group_syllabus_handler/<learner_group_id>',
+        learner_group.LearnerGroupSyllabusHandler),
+    get_redirect_route(
         r'/learner_group_user_progress_handler/<learner_group_id>',
         learner_group.LearnerGroupStudentProgressHandler),
     get_redirect_route(

@@ -31,7 +31,7 @@ import { LearnerGroupBackendApiService } from
 import { LearnerGroupSubtopicSummary } from
   'domain/learner_group/learner-group-subtopic-summary.model';
 import { StorySummary } from 'domain/story/story-summary.model';
-import { LearnerGroupInvitedUserInfo } from
+import { LearnerGroupInvitedUserInfo, LearnerGroupUserProgress } from
   'domain/learner_group/learner-group-user-progress.model';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
@@ -39,6 +39,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { ContextService } from 'services/context.service';
 
 import './edit-learner-group-page.component.css';
+import { LearnerGroupSyllabusBackendApiService } from 'domain/learner_group/learner-group-syllabus-backend-api.service';
 
 
 @Component({
@@ -62,22 +63,24 @@ export class EditLearnerGroupPageComponent implements OnInit, OnDestroy {
     private urlInterpolationService: UrlInterpolationService,
     private windowRef: WindowRef,
     private clipboard: Clipboard,
-    private contextService: ContextService
+    private contextService: ContextService,
+    private learnerGroupSyllabusBackendApiService:
+      LearnerGroupSyllabusBackendApiService
   ) {}
 
   ngOnInit(): void {
     this.learnerGroupId = this.contextService.getLearnerGroupId();
-    this.activeTab = this.EDIT_LEARNER_GROUP_TABS_I18N_IDS.OVERVIEW;
+    this.activeTab = this.EDIT_LEARNER_GROUP_TABS_I18N_IDS.SYLLABUS;
     if (this.learnerGroupId) {
       this.loaderService.showLoadingScreen('Loading');
       this.learnerGroupBackendApiService.fetchLearnerGroupInfoAsync(
         this.learnerGroupId).then(learnerGroup => {
-        this.learnerGroup = learnerGroup;
-        console.log('learnerGroup', learnerGroup);
-        this.loaderService.hideLoadingScreen();
-        }
-      );
+          this.learnerGroup = learnerGroup;
+          console.log('learnerGroup', learnerGroup);
+          this.loaderService.hideLoadingScreen();
+        });
     }
+
     this.subscribeToOnLangChange();
   }
 

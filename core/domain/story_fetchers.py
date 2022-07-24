@@ -321,6 +321,69 @@ def get_story_summaries_by_ids(
     return story_summaries
 
 
+def get_learner_group_syllabus_story_summaries(
+    story_ids: List[str]
+) -> List[story_domain.LearnerGroupSyllabusStorySummaryDict]:
+    """Returns the learner group syllabus story summary dicts
+    corresponding the given story ids.
+
+    Args:
+        story_ids: list(str). The list of story ids for which the story
+            summaries are to be returned.
+
+    Returns:
+        list(LearnerGroupSyllabusStorySummaryDict). The story summaries
+        corresponds to given story ids.
+    """
+    # If story check is applied only for mypy type checks. All story ids are
+    # supposed to be valid as a part of validation done for learner group
+    # syllabus before calling this function.
+    all_stories = [
+        story for story in get_stories_by_ids(story_ids) if story
+    ]
+
+    topic_ids = list(
+        {story.corresponding_topic_id for story in all_stories}
+    )
+    topics = topic_fetchers.get_topics_by_ids(topic_ids) # type: ignore[no-untyped-call]
+    topic_id_to_topic_map = {topic.id: topic for topic in topics}
+
+    story_summaries_dicts = [
+        story_summary.to_dict() for story_summary in
+        get_story_summaries_by_ids(story_ids)
+    ]
+
+    return [
+        {
+            'id': story.id,
+            'title': story.title,
+            'description': story.description,
+            'language_code': story.language_code,
+            'version': story.version,
+            'node_titles': summary_dict['node_titles'],
+            'thumbnail_filename': story.thumbnail_filename,
+            'thumbnail_bg_color': story.thumbnail_bg_color,
+            'url_fragment': story.url_fragment,
+            'story_model_created_on': summary_dict['story_model_created_on'],
+            'story_model_last_updated':
+                summary_dict['story_model_last_updated'],
+            'story_is_published': True,
+            'completed_node_titles': [],
+            'all_node_dicts': [
+                node.to_dict() for node in
+                story.story_contents.nodes
+            ],
+            'topic_name':
+                topic_id_to_topic_map[story.corresponding_topic_id].name,
+            'topic_url_fragment':
+                topic_id_to_topic_map[
+                    story.corresponding_topic_id].url_fragment
+        }
+        for (story, summary_dict) in
+        zip(all_stories, story_summaries_dicts)
+    ]
+
+
 def get_latest_completed_node_ids(user_id: str, story_id: str) -> List[str]:
     """Returns the ids of the completed nodes that come latest in the story.
 

@@ -1,0 +1,85 @@
+/*
+  NOTE to developers: We generate RTL CSS from this file in the webpack
+  compilation, here are sme additional rules that can be added to the CSS files:
+  https://rtlcss.com/learn/usage-guide/control-directives .
+*/
+
+.oppia-learner-group-preferences {
+  margin: 40px auto 0;
+  margin-bottom: 40px;
+  text-align: left;
+  width: 80%;
+}
+
+.oppia-learner-group-preferences .preferences-tab-title-section {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.oppia-learner-group-preferences .preferences-tab-title {
+  color: #00645c;
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 36px;
+}
+
+.oppia-learner-group-preferences .delete-group-button {
+  background: transparent;
+  border: solid 1.5px #a53417;
+  border-radius: 4px;
+  color: #a53417;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 700;
+  padding: 6px 26px;
+  text-align: center;
+}
+
+.oppia-learner-group-preferences .preferences-tab-sections {
+  background: #fff;
+  border-radius: 4px;
+  box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+}
+
+.oppia-learner-group-preferences .preferences-tab-sections-header {
+  border-bottom: 1px solid #e6e6e6;
+  display: flex;
+  justify-content: space-around;
+}
+
+.oppia-learner-group-preferences .preferences-tab-sections-header-title {
+  cursor: pointer;
+  font-weight: 500;
+  padding-bottom: 10px;
+}
+
+.oppia-learner-group-preferences .preferences-tab-sections-header-title.active {
+  border-bottom: 3px solid #33978f;
+  color: #015952;
+}
+
+.oppia-learner-group-preferences .preferences-tab-sections .btn-primary {  
+  background: #00609c;
+  font-size: 18px;
+  font-weight: 500;
+  justify-self: right;
+  margin-top: 40px;
+  padding: 7px 36px;
+}
+
+.oppia-learner-group-preferences .preferences-tab-sections .group-details-save-button {
+  background: #27635c;
+}
+
+.oppia-learner-group-preferences .edit-learner-group-details-section,
+.oppia-learner-group-preferences .edit-learner-group-students-section {
+  display: grid;
+  margin-top: 40px;
+}
+
+.oppia-learner-group-preferences .edit-learner-group-students-section .btn-primary {  
+  margin-top: unset;
+}

@@ -1,0 +1,32 @@
+<div class="modal-header">
+  <h3>
+    <span>Remove </span>
+    <span *ngIf="syllabusItemType === 'story'">Lesson</span>
+    <span *ngIf="syllabusItemType === 'skill'">Skill</span>
+  </h3>
+</div>
+
+<div class="modal-body">
+  <p>Are you sure you want to remove this item from the syllabus?</p>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-primary" (click)="cancel()">Cancel</button>
+  <button class="btn btn-danger" (click)="confirm()">Remove</button>
+</div>
+
+<style>
+  .btn-primary {
+    background-color: #00645c;
+    border: solid 1px #00645c;
+    margin-right: 20px;
+    padding: 6px 16px;
+  }
+
+  .btn-danger {
+    background: #fff;
+    border: solid 1px #a53417;
+    color: #a53417;
+    padding: 6px 16px;
+  }
+</style>

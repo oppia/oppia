@@ -179,7 +179,7 @@ export class CreateLearnerGroupPageComponent implements OnInit, OnDestroy {
       this.learnerGroupUrl = (
         this.windowRef.nativeWindow.location.protocol + '//' +
          this.windowRef.nativeWindow.location.host +
-          '/create-learner-group/' + this.learnerGroup.id
+          '/edit-group/' + this.learnerGroup.id
       );
       this.loaderService.hideLoadingScreen();
     });

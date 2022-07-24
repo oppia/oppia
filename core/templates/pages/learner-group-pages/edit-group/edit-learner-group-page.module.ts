@@ -35,6 +35,12 @@ import { LearnerGroupSyllabusComponent } from
   './learner-group-syllabus.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
+import { AddSyllabusItemsComponent } from
+  '../create-group/add-syllabus-items.component';
+import { RemoveSyllabusItemModalComponent } from
+  '../templates/remove-syllabus-item-modal.component';
+import { AddedSyllabusItemsSuccessfullyModalComponent } from
+  '../templates/added-syllabus-items-successfully-modal.component';
 
 @NgModule({
   imports: [
@@ -51,12 +57,22 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
   declarations: [
     EditLearnerGroupPageComponent,
     LearnerGroupOverviewComponent,
-    LearnerGroupSyllabusComponent
+    LearnerGroupSyllabusComponent,
+    LearnerGroupPreferencesComponent,
+    AddSyllabusItemsComponent,
+    LearnerGroupDetailsComponent,
+    RemoveSyllabusItemModalComponent,
+    AddedSyllabusItemsSuccessfullyModalComponent
   ],
   entryComponents: [
     EditLearnerGroupPageComponent,
     LearnerGroupOverviewComponent,
-    LearnerGroupSyllabusComponent
+    LearnerGroupSyllabusComponent,
+    LearnerGroupPreferencesComponent,
+    AddSyllabusItemsComponent,
+    LearnerGroupDetailsComponent,
+    RemoveSyllabusItemModalComponent,
+    AddedSyllabusItemsSuccessfullyModalComponent
   ],
   providers: [
     {
@@ -93,6 +109,8 @@ import { ToastrModule } from 'ngx-toastr';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
+import { LearnerGroupPreferencesComponent } from './learner-group-preferences.component';
+import { LearnerGroupDetailsComponent } from '../create-group/learner-group-details.component';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

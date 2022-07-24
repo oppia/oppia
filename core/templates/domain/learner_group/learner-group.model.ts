@@ -125,8 +125,8 @@ export class LearnerGroupData {
     this._invitedStudentUsernames.splice(index, 1);
   }
 
-  addSubtopicPageId(subtopicPageId: string): void {
-    this._subtopicPageIds.push(subtopicPageId);
+  addSubtopicPageIds(subtopicPageIds: string[]): void {
+    this._subtopicPageIds.push(...subtopicPageIds);
   }
 
   removeSubtopicPageId(subtopicPageId: string): void {
@@ -134,8 +134,8 @@ export class LearnerGroupData {
     this._subtopicPageIds.splice(index, 1);
   }
 
-  addStoryId(storyId: string): void {
-    this._storyIds.push(storyId);
+  addStoryIds(storyIds: string[]): void {
+    this._storyIds.push(...storyIds);
   }
 
   removeStoryId(storyId: string): void {

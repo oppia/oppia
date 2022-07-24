@@ -25,6 +25,7 @@ import { UrlInterpolationService }
   from 'domain/utilities/url-interpolation.service';
 import { LearnerGroupSyllabus, LearnerGroupSyllabusBackendDict }
   from './learner-group-syllabus.model';
+import { LearnerGroupUserProgress, LearnerGroupUserProgressBackendDict } from './learner-group-user-progress.model';
 
 interface SyllabusFilterDetails {
   description: string;
@@ -82,6 +83,53 @@ export class LearnerGroupSyllabusBackendApiService {
         }
       ).toPromise().then(matchingSyllabus => {
         resolve(LearnerGroupSyllabus.createFromBackendDict(matchingSyllabus));
+      });
+    });
+  }
+
+  async fetchStudentsProgressInAssignedSyllabus(
+      learnerGroupId: string
+  ): Promise<LearnerGroupUserProgress[]> {
+    return new Promise((resolve, reject) => {
+      const learnerGroupUrl = (
+        this.urlInterpolationService.interpolateUrl(
+          '/learner_group_user_progress_handler/<learner_group_id>', {
+            learner_group_id: learnerGroupId
+          }
+        )
+      );
+
+      this.http.get<LearnerGroupUserProgressBackendDict[]>(
+        learnerGroupUrl).toPromise().then(usersProgressInfo => {
+          resolve(
+            usersProgressInfo.map(
+              progressInfo => LearnerGroupUserProgress.createFromBackendDict(
+                progressInfo)
+            )
+          );
+      }, errorResponse => {
+        reject(errorResponse.error.error);
+      });
+    });
+  }
+
+  async fetchLearnerGroupSyllabus(
+      learnerGroupId: string
+  ): Promise<LearnerGroupSyllabus> {
+    return new Promise((resolve, reject) => {
+      const learnerGroupUrl = (
+        this.urlInterpolationService.interpolateUrl(
+          '/learner_group_syllabus_handler/<learner_group_id>', {
+            learner_group_id: learnerGroupId
+          }
+        )
+      );
+
+      this.http.get<LearnerGroupSyllabusBackendDict>(
+        learnerGroupUrl).toPromise().then(syllabusInfo => {
+          resolve(
+            LearnerGroupSyllabus.createFromBackendDict(syllabusInfo)
+          );
       });
     });
   }

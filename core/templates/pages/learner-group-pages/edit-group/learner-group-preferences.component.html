@@ -1,0 +1,56 @@
+<div class="oppia-learner-group-preferences">
+  <div class="preferences-tab-title-section">
+    <div class="preferences-tab-title">
+      <span translate="I18N_LEARNER_GROUP_PREFERENCE"></span>
+    </div>
+    <div>
+      <div class="btn btn-danger delete-group-button oppia-autofocus">
+        <span translate="I18N_DELETE_LEARNER_GROUP"></span>
+      </div>
+    </div>
+  </div>
+  <div class="preferences-tab-sections">
+    <div class="preferences-tab-sections-header">
+      <div class="preferences-tab-sections-header-title"
+           [ngClass]="{'active': isTabActive(EDIT_PREFERENCES_SECTIONS_I18N_IDS.GROUP_DETAILS)}"
+           (click)="setActiveTab(EDIT_PREFERENCES_SECTIONS_I18N_IDS.GROUP_DETAILS)">
+        <span translate="I18N_LEARNER_GROUP_GROUP_DETAILS_SECTION"></span>
+      </div>
+      <div class="preferences-tab-sections-header-title"
+           [ngClass]="{'active': isTabActive(EDIT_PREFERENCES_SECTIONS_I18N_IDS.GROUP_STUDENTS)}"
+           (click)="setActiveTab(EDIT_PREFERENCES_SECTIONS_I18N_IDS.GROUP_STUDENTS)">
+        <span translate="I18N_LEARNER_GROUP_GROUP_STUDENTS_SECTION"></span>
+      </div>
+    </div>
+    <div *ngIf="isTabActive(EDIT_PREFERENCES_SECTIONS_I18N_IDS.GROUP_DETAILS)" class="edit-learner-group-details-section">
+      <oppia-learner-group-details [learnerGroupTitle]="learnerGroup.title"
+                                   [learnerGroupDescription]="learnerGroup.description"
+                                   [readOnlyMode]="isReadOnlyModeActive()"
+                                   (updateLearnerGroupTitle)="updateLearnerGroupTitle($event)"
+                                   (updateLearnerGroupDesc)="updateLearnerGroupDesc($event)">
+      </oppia-learner-group-details>
+      <button class="btn btn-primary group-details-edit-button"
+              *ngIf="isReadOnlyModeActive()"
+              (click)="toggleReadOnlyMode()">
+        <span>Edit</span>
+      </button>
+      <button class="btn btn-primary group-details-save-button"
+              *ngIf="!isReadOnlyModeActive()"
+              (click)="saveLearnerGroupInfo()">
+        <span>Done</span>
+      </button>
+    </div>
+    <div *ngIf="isTabActive(EDIT_PREFERENCES_SECTIONS_I18N_IDS.GROUP_STUDENTS)" class="edit-learner-group-students-section">
+      <button class="btn btn-primary"
+              (click)="saveLearnerGroupInfo()">
+        + <span>New Learner</span>
+      </button>
+      <div class="current-group-students">
+        <span>Current group members({{learnerGroup.studentUsernames.length}})</span>
+        <div *ngFor="let student of learnerGroup.studentUsernames">
+          <span>{{student}}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
