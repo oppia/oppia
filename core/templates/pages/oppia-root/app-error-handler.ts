@@ -16,6 +16,10 @@
  * @fileoverview Error handler for frontend.
  */
 
+// This infrastructure file needs to use HttpClient. The general rule restricts
+// such imports to only be used in backend-api.service.ts files, but we cannot
+// use these here because we are explicitly specifying the dependencies of a
+// provider, which cannot be done using a injectable (service).
 // eslint-disable-next-line oppia/disallow-httpclient
 import { HttpClient } from '@angular/common/http';
 import { ErrorHandler } from '@angular/core';
