@@ -16,26 +16,26 @@
  * @fileoverview Component for showing and reviewing contributions.
  */
 
-import cloneDeep from 'lodash/cloneDeep';
-import { ActiveContributionDict, TranslationSuggestionReviewModalComponent } from '../modal-templates/translation-suggestion-review-modal.component';
-import { AlertsService } from 'services/alerts.service';
-import { AppConstants } from 'app.constants';
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { NgbModalRef, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { AppConstants } from 'app.constants';
+import cloneDeep from 'lodash/cloneDeep';
+import { Subscription } from 'rxjs';
+import { Rubric } from 'domain/skill/rubric.model';
+import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
+import { MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
+import { Question, QuestionBackendDict, QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
+import { ActiveContributionDict, TranslationSuggestionReviewModalComponent } from '../modal-templates/translation-suggestion-review-modal.component';
+import { ContributorDashboardConstants } from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
+import { QuestionSuggestionReviewModalComponent } from '../modal-templates/question-suggestion-review-modal.component';
+import { TranslationTopicService } from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
+import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe';
+import { UserService } from 'services/user.service';
+import { AlertsService } from 'services/alerts.service';
 import { ContextService } from 'services/context.service';
 import { ContributionAndReviewService } from '../services/contribution-and-review.service';
 import { ContributionOpportunitiesService } from '../services/contribution-opportunities.service';
-import { ContributorDashboardConstants } from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe';
-import { MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
-import { NgbModalRef, NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { Question, QuestionBackendDict, QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
-import { QuestionSuggestionReviewModalComponent } from '../modal-templates/question-suggestion-review-modal.component';
-import { Rubric } from 'domain/skill/rubric.model';
-import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
-import { Subscription } from 'rxjs';
-import { TranslationTopicService } from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
-import { UserService } from 'services/user.service';
 
 export interface Suggestion {
   change: {

@@ -13,12 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Converts unicode to HTML.
+ * @fileoverview Converts unicode to HTML Pipe.
  */
 
-import { HtmlEscaperService } from 'services/html-escaper.service';
-import { DomSanitizer } from '@angular/platform-browser';
 import { Pipe, PipeTransform, SecurityContext } from '@angular/core';
+import { DomSanitizer } from '@angular/platform-browser';
+import { HtmlEscaperService } from 'services/html-escaper.service';
 
 @Pipe({name: 'convertUnicodeToHtml'})
 export class ConvertUnicodeToHtml implements PipeTransform {
