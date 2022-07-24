@@ -284,34 +284,34 @@
 
 
 # Global frontend services
-/core/templates/services/alerts.service*.ts @oppia/angular-migration-reviewers
-/core/templates/services/date-time-format.service*.ts @oppia/angular-migration-reviewers
-/core/templates/services/debouncer.service*.ts @oppia/angular-migration-reviewers
-/core/templates/services/extension-tag-assembler.service*.ts @oppia/angular-migration-reviewers
-/core/templates/services/html-escaper.service*.ts @oppia/angular-migration-reviewers
-/core/templates/services/id-generation.service*.ts @oppia/angular-migration-reviewers
-/core/templates/services/keyboard-shortcut.service*.ts @oppia/angular-migration-reviewers
-/core/templates/services/local-storage.service*.ts @oppia/angular-migration-reviewers
-/core/templates/services/nested-directives*.ts @oppia/angular-migration-reviewers
-/core/templates/services/page-title.service*.ts @oppia/angular-migration-reviewers
-/core/templates/services/prevent-page-unload-event.service*.ts @oppia/angular-migration-reviewers
-/core/templates/services/promo-bar-backend-api.service*.ts @oppia/angular-migration-reviewers
-/core/templates/services/site-analytics.service*.ts @oppia/angular-migration-reviewers
-/core/templates/services/utils.service*.ts @oppia/angular-migration-reviewers
-/core/templates/services/stateful/background-mask.service*.ts @oppia/angular-migration-reviewers
-/core/templates/services/stateful/focus-manager.service*.ts @oppia/angular-migration-reviewers
-/core/templates/services/contextual/device-info.service*.ts @oppia/angular-migration-reviewers
-/core/templates/services/contextual/url.service*.ts @oppia/angular-migration-reviewers
-/core/templates/services/contextual/window-dimensions.service*.ts @oppia/angular-migration-reviewers
-/core/templates/services/contextual/window-ref.service*.ts @oppia/angular-migration-reviewers
-/core/templates/services/internet-connectivity.service*.ts @oppia/angular-migration-reviewers
-/core/templates/services/server-connection-backend-api.service*.ts @oppia/angular-migration-reviewers
-/core/templates/services/number-conversion.service*.ts @oppia/angular-migration-reviewers
+/core/templates/services/alerts.service*.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/services/date-time-format.service*.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/services/debouncer.service*.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/services/extension-tag-assembler.service*.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/services/html-escaper.service*.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/services/id-generation.service*.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/services/keyboard-shortcut.service*.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/services/local-storage.service*.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/services/nested-directives*.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/services/page-title.service*.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/services/prevent-page-unload-event.service*.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/services/promo-bar-backend-api.service*.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/services/site-analytics.service*.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/services/utils.service*.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/services/stateful/background-mask.service*.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/services/stateful/focus-manager.service*.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/services/contextual/device-info.service*.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/services/contextual/url.service*.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/services/contextual/window-dimensions.service*.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/services/contextual/window-ref.service*.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/services/internet-connectivity.service*.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/services/server-connection-backend-api.service*.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/services/number-conversion.service*.ts @oppia/frontend-infrastructure-reviewers
 
 
 # Global stylesheet.
-/core/templates/css/oppia.css @oppia/angular-migration-reviewers
-/core/templates/css/oppia-material.css @oppia/angular-migration-reviewers
+/core/templates/css/oppia.css @oppia/frontend-infrastructure-reviewers
+/core/templates/css/oppia-material.css @oppia/frontend-infrastructure-reviewers
 
 
 # Interaction project.
@@ -413,7 +413,7 @@
 
 # Readme
 /core/README.md @oppia/data-and-stability-reviewers
-/core/templates/css/README.md @oppia/angular-migration-reviewers
+/core/templates/css/README.md @oppia/frontend-infrastructure-reviewers
 /extensions/README.md @oppia/data-and-stability-reviewers
 /scripts/README.md @oppia/data-and-stability-reviewers
 
@@ -487,18 +487,18 @@
 /core/domain/email*.py @oppia/lace-backend-reviewers
 /core/domain/image_service*.py @oppia/lace-backend-reviewers
 /core/platform/ @oppia/data-and-stability-reviewers
-/core/templates/App*.ts @oppia/angular-migration-reviewers
-/core/templates/app.constants.ts @oppia/angular-migration-reviewers
-/core/templates/app.constants.ajs.ts @oppia/angular-migration-reviewers
-/core/templates/combined-tests.spec.ts @oppia/angular-migration-reviewers
-/core/templates/pages/interaction-specs.constants.ajs.ts @oppia/angular-migration-reviewers
-/core/templates/pages/interaction-specs.constants.ts @oppia/angular-migration-reviewers
-/core/templates/pages/login-page/ @oppia/angular-migration-reviewers
-/core/templates/pages/logout-page/ @oppia/angular-migration-reviewers
-/core/templates/app-events/ @oppia/angular-migration-reviewers
-/core/templates/services/app.service*.ts @oppia/angular-migration-reviewers
-/core/templates/services/contextual/document-attribute-customization.service*.ts @oppia/angular-migration-reviewers
-/core/templates/services/contextual/meta-tag-customization.service*.ts @oppia/angular-migration-reviewers
+/core/templates/App*.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/app.constants.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/app.constants.ajs.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/combined-tests.spec.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/pages/interaction-specs.constants.ajs.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/pages/interaction-specs.constants.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/pages/login-page/ @oppia/frontend-infrastructure-reviewers
+/core/templates/pages/logout-page/ @oppia/frontend-infrastructure-reviewers
+/core/templates/app-events/ @oppia/frontend-infrastructure-reviewers
+/core/templates/services/app.service*.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/services/contextual/document-attribute-customization.service*.ts @oppia/frontend-infrastructure-reviewers
+/core/templates/services/contextual/meta-tag-customization.service*.ts @oppia/frontend-infrastructure-reviewers
 /core/templates/services/interaction-rules-registry.service*.ts @oppia/interaction-and-rte-reviewers
 /core/templates/services/interaction-specs.service*.ts @oppia/interaction-and-rte-reviewers
 /core/templates/services/translation-file-hash-loader-backend-api.service.ts @oppia/angular-migration-reviewers
@@ -514,9 +514,9 @@
 /core/domain/config*.py @oppia/lace-backend-reviewers
 /core/domain/change_domain*.py @oppia/lace-backend-reviewers
 /core/templates/tests/ @oppia/angular-migration-reviewers
-/core/templates/domain/utilities/ @oppia/angular-migration-reviewers
-/core/templates/Polyfills.ts @oppia/angular-migration-reviewers
-/extensions/extensions.module.ts @oppia/angular-migration-reviewers
+/core/templates/domain/utilities/ @oppia/frontend-infrastructure-reviewers
+/core/templates/Polyfills.ts @oppia/frontend-infrastructure-reviewers
+/extensions/extensions.module.ts @oppia/frontend-infrastructure-reviewers
 /core/schema_utils*.py @oppia/data-and-stability-reviewers
 /core/utils*.py @oppia/lace-backend-reviewers
 /.rtlcssrc @oppia/lace-frontend-reviewers
