@@ -13,48 +13,48 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the questions editor component.
+ * @fileoverview Component for the questions editor tab.
  */
 
-import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
-import { ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, ChangeDetectorRef, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { EditabilityService } from 'services/editability.service';
-import { Hint } from 'domain/exploration/HintObjectFactory';
-import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
-import { LoaderService } from 'services/loader.service';
-import { MarkAllAudioAndTranslationsAsNeedingUpdateModalComponent } from 'components/forms/forms-templates/mark-all-audio-and-translations-as-needing-update-modal.component';
-import { MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import cloneDeep from 'lodash/cloneDeep';
+import { Subscription } from 'rxjs';
+import { MarkAllAudioAndTranslationsAsNeedingUpdateModalComponent } from 'components/forms/forms-templates/mark-all-audio-and-translations-as-needing-update-modal.component';
+import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
+import { MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 import { Question } from 'domain/question/QuestionObjectFactory';
 import { QuestionUpdateService } from 'domain/question/question-update.service';
 import { Solution } from 'domain/exploration/SolutionObjectFactory';
-import { SolutionValidityService } from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
+import { Hint } from 'domain/exploration/HintObjectFactory';
+import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
 import { State } from 'domain/state/StateObjectFactory';
-import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import { Subscription } from 'rxjs';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import cloneDeep from 'lodash/cloneDeep';
+import { SolutionValidityService } from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
+import { EditabilityService } from 'services/editability.service';
+import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
+import { LoaderService } from 'services/loader.service';
 
 @Component({
   selector: 'oppia-question-editor',
   templateUrl: './question-editor.component.html'
 })
 export class QuestionEditorComponent implements OnInit, OnDestroy {
-  @Input() canEditQuestion: boolean;
+  @Input() userCanEditQuestion: boolean;
   @Input() misconceptionsBySkill: MisconceptionSkillMap;
   @Input() question: Question;
   @Input() questionId: string;
   @Input() questionStateData: State;
-  @Output() questionChanged = new EventEmitter<void>();
+  @Output() questionChange = new EventEmitter<void>();
 
-  directiveSubscriptions = new Subscription();
+  componentSubscriptions = new Subscription();
   interactionIsShown: boolean;
   oppiaBlackImgUrl: string;
-  stateEditorInitialized: boolean;
+  stateEditorIsInitialized: boolean;
 
   constructor(
     private changeDetectionRef: ChangeDetectorRef,
@@ -69,9 +69,9 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
   ) { }
 
   showMarkAllAudioAsNeedingUpdateModalIfRequired(contentIds: string[]): void {
-    let state = this.question?.getStateData();
-    let recordedVoiceovers = state.recordedVoiceovers;
-    let writtenTranslations = state.writtenTranslations;
+    const state = this.question?.getStateData();
+    const recordedVoiceovers = state.recordedVoiceovers;
+    const writtenTranslations = state.writtenTranslations;
 
     const shouldPrompt = contentIds.some(
       (contentId) =>
@@ -133,7 +133,7 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
 
   saveNextContentIdIndex(displayedValue: number): void {
     this._updateQuestion(() => {
-      let stateData = this.question?.getStateData();
+      const stateData = this.question?.getStateData();
       stateData.nextContentIdIndex = cloneDeep(displayedValue);
     });
   }
@@ -171,7 +171,7 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
   }
 
   _updateQuestion(updateFunction: Function): void {
-    this.questionChanged.emit();
+    this.questionChange.emit();
     this.questionUpdateService.setQuestionStateData(
       this.question, updateFunction);
   }
@@ -180,9 +180,9 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
     // Show the interaction when the text content is saved, even if no
     // content is entered.
     this._updateQuestion(() => {
-      let stateData = this.question?.getStateData();
+      const stateData = this.question?.getStateData();
       stateData.content = cloneDeep(displayedValue);
-      this.interactionIsShown = true;
+      this.stateEditorIsInitialized = true;
     });
   }
 
@@ -193,38 +193,38 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
     this.stateEditorService.setInapplicableSkillMisconceptionIds(
       this.question?.getInapplicableSkillMisconceptionIds());
     this.solutionValidityService.init(['question']);
-    let stateData = this.questionStateData;
+    const stateData = this.questionStateData;
     stateData.interaction.defaultOutcome.setDestination(null);
     if (stateData) {
       this.stateEditorService.onStateEditorInitialized.emit(stateData);
 
       if (stateData.content.html || stateData.interaction.id) {
-        this.interactionIsShown = true;
+        this.stateEditorIsInitialized = true;
       }
 
       this.loaderService.hideLoadingScreen();
     }
-    this.stateEditorInitialized = true;
+    this.stateEditorIsInitialized = true;
   }
 
   ngOnInit(): void {
-    this.directiveSubscriptions.add(
+    this.componentSubscriptions.add(
       this.stateEditorService.onStateEditorDirectiveInitialized.subscribe(
         () => this._init()
       )
     );
-    this.directiveSubscriptions.add(
+    this.componentSubscriptions.add(
       this.stateEditorService.onInteractionEditorInitialized.subscribe(
         () => this._init()
       )
     );
-    this.directiveSubscriptions.add(
+    this.componentSubscriptions.add(
       this.stateInteractionIdService.onInteractionIdChanged.subscribe(
         () => this._init()
       )
     );
 
-    if (this.canEditQuestion) {
+    if (this.userCanEditQuestion) {
       this.editabilityService.markEditable();
     } else {
       this.editabilityService.markNotEditable();
@@ -235,13 +235,13 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
     this.oppiaBlackImgUrl = this.urlInterpolationService.getStaticImageUrl(
       '/avatar/oppia_avatar_100px.svg');
 
-    this.interactionIsShown = false;
-    this.stateEditorInitialized = false;
+    this.stateEditorIsInitialized = false;
+    this.stateEditorIsInitialized = false;
     this._init();
   }
 
   ngOnDestroy(): void {
-    this.directiveSubscriptions.unsubscribe();
+    this.componentSubscriptions.unsubscribe();
   }
 }
 

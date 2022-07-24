@@ -27,7 +27,7 @@
                              [misconceptionsBySkill]="misconceptionsBySkill"
                              [questionStateData]="questionStateData"
                              [question]="question"
-                             [canEditQuestion]="canEditQuestion">
+                             [userCanEditQuestion]="canEditQuestion">
       </oppia-question-editor>
     </div>
     <div class="alert alert-danger" *ngIf="question.getStateData().interaction.id && question.getValidationErrorMessage()">

@@ -194,7 +194,7 @@ describe('Question Editor Component', () => {
         update();
       });
 
-    component.canEditQuestion = true;
+    component.userCanEditQuestion = true;
     component.misconceptionsBySkill = {};
   });
 
@@ -206,18 +206,18 @@ describe('Question Editor Component', () => {
   it('should set component properties on initialization', () => {
     expect(component.oppiaBlackImgUrl).toBe(undefined);
     expect(component.interactionIsShown).toBe(undefined);
-    expect(component.stateEditorInitialized).toBe(undefined);
+    expect(component.stateEditorIsInitialized).toBe(undefined);
 
     component.ngOnInit();
 
     expect(component.oppiaBlackImgUrl)
       .toBe('/assets/images/avatar/oppia_avatar_100px.svg');
     expect(component.interactionIsShown).toBe(true);
-    expect(component.stateEditorInitialized).toBe(true);
+    expect(component.stateEditorIsInitialized).toBe(true);
   });
 
   it('should mark editability service as true if question is editable', () => {
-    component.canEditQuestion = true;
+    component.userCanEditQuestion = true;
     spyOn(editabilityService, 'markEditable');
 
     component.ngOnInit();
@@ -227,7 +227,7 @@ describe('Question Editor Component', () => {
 
   it('should mark editability service as false if question is not' +
     ' editable', () => {
-    component.canEditQuestion = false;
+    component.userCanEditQuestion = false;
     spyOn(editabilityService, 'markNotEditable');
 
     component.ngOnInit();
@@ -245,12 +245,12 @@ describe('Question Editor Component', () => {
     component.ngOnInit();
 
     component.interactionIsShown = false;
-    component.stateEditorInitialized = false;
+    component.stateEditorIsInitialized = false;
 
     onStateEditorDirectiveInitializedEmitter.emit();
 
     expect(component.interactionIsShown).toBe(true);
-    expect(component.stateEditorInitialized).toBe(true);
+    expect(component.stateEditorIsInitialized).toBe(true);
   });
 
   it('should initialize component properties when interaction editor' +
@@ -263,12 +263,12 @@ describe('Question Editor Component', () => {
     component.ngOnInit();
 
     component.interactionIsShown = false;
-    component.stateEditorInitialized = false;
+    component.stateEditorIsInitialized = false;
 
     onInteractionEditorInitializedEmitter.emit();
 
     expect(component.interactionIsShown).toBe(true);
-    expect(component.stateEditorInitialized).toBe(true);
+    expect(component.stateEditorIsInitialized).toBe(true);
   });
 
   it('should initialize component properties when interaction id' +
@@ -281,12 +281,12 @@ describe('Question Editor Component', () => {
     component.ngOnInit();
 
     component.interactionIsShown = false;
-    component.stateEditorInitialized = false;
+    component.stateEditorIsInitialized = false;
 
     onInteractionIdChangedEmitter.emit();
 
     expect(component.interactionIsShown).toBe(true);
-    expect(component.stateEditorInitialized).toBe(true);
+    expect(component.stateEditorIsInitialized).toBe(true);
   });
 
   it('should get state content save button placeholder', () => {
