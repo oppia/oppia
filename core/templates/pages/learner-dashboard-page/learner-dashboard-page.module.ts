@@ -19,7 +19,7 @@
 import { APP_INITIALIZER, ErrorHandler, NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
@@ -93,11 +93,7 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
       provide: HAMMER_GESTURE_CONFIG,
       useClass: MyHammerConfig
     },
-    {
-      provide: ErrorHandler,
-      useClass: AppErrorHandlerWithFirebaseErrorFilter,
-      deps: [HttpClient, LoggerService]
-    },
+    AppErrorHandlerProvider,
     {
       provide: APP_BASE_HREF,
       useValue: '/'
@@ -114,7 +110,7 @@ import { downgradeModule } from '@angular/upgrade/static';
 import { ToastrModule } from 'ngx-toastr';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
 import { LoggerService } from 'services/contextual/logger.service';
-import { AppErrorHandlerWithFirebaseErrorFilter } from 'pages/oppia-root/app-error-handler';
+import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

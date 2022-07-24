@@ -38,7 +38,7 @@ import { AngularFireModule } from '@angular/fire';
 import { AuthService } from 'services/auth.service';
 import * as hammer from 'hammerjs';
 import { LoggerService } from 'services/contextual/logger.service';
-import { AppErrorHandlerWithFirebaseErrorFilter } from './app-error-handler';
+import { AppErrorHandlerProvider, AppErrorHandlerWithFirebaseErrorFilter } from './app-error-handler';
 
 
 // Config for ToastrModule (helps in flashing messages and alerts).
@@ -105,11 +105,7 @@ export class MyHammerConfig extends HammerGestureConfig {
       provide: USE_EMULATOR,
       useValue: AuthService.firebaseEmulatorConfig
     },
-    {
-      provide: ErrorHandler,
-      useClass: AppErrorHandlerWithFirebaseErrorFilter,
-      deps: [HttpClient, LoggerService]
-    },
+    AppErrorHandlerProvider,
     {
       provide: HAMMER_GESTURE_CONFIG,
       useClass: MyHammerConfig

@@ -16,10 +16,10 @@
  * @fileoverview Module for the review tests page.
  */
 
-import { APP_INITIALIZER, ErrorHandler, NgModule, StaticProvider } from '@angular/core';
+import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -33,6 +33,7 @@ import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
+import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
 
 @NgModule({
   imports: [
@@ -63,11 +64,7 @@ import { SmartRouterModule } from 'hybrid-router-module-provider';
       provide: HAMMER_GESTURE_CONFIG,
       useClass: MyHammerConfig
     },
-    {
-      provide: ErrorHandler,
-      useClass: AppErrorHandlerWithFirebaseErrorFilter,
-      deps: [HttpClient, LoggerService]
-    },
+    AppErrorHandlerProvider,
   ]
 })
 class ReviewTestPageModule {
@@ -78,8 +75,6 @@ class ReviewTestPageModule {
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
 import { ToastrModule } from 'ngx-toastr';
-import { AppErrorHandlerWithFirebaseErrorFilter } from 'pages/oppia-root/app-error-handler';
-import { LoggerService } from 'services/contextual/logger.service';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

@@ -16,7 +16,7 @@
  * @fileoverview Module for the blog-admin page.
  */
 
-import { HttpClient, HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { APP_INITIALIZER, DoBootstrap, ErrorHandler, NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -36,8 +36,7 @@ import { RequestInterceptor } from 'services/request-interceptor.service';
 import { ToastrModule } from 'ngx-toastr';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
-import { AppErrorHandlerWithFirebaseErrorFilter } from 'pages/oppia-root/app-error-handler';
-import { LoggerService } from 'services/contextual/logger.service';
+import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
 
 declare var angular: ng.IAngularStatic;
 
@@ -81,11 +80,7 @@ declare var angular: ng.IAngularStatic;
       provide: HAMMER_GESTURE_CONFIG,
       useClass: MyHammerConfig
     },
-    {
-      provide: ErrorHandler,
-      useClass: AppErrorHandlerWithFirebaseErrorFilter,
-      deps: [HttpClient, LoggerService]
-    },
+    AppErrorHandlerProvider,
     {
       provide: APP_BASE_HREF,
       useValue: '/'
