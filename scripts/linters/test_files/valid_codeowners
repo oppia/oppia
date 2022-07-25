@@ -1,6 +1,6 @@
 # Per-directory ownership and automatic assignment for pull requests.
 
-/.circleci/ @kevinlee12
+/core @kevinlee12
 
 # Critical files.
 #

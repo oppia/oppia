@@ -163,7 +163,6 @@
 
 
 # Dev workflow team.
-/.circleci/ @oppia/automated-qa-reviewers
 /.eslintignore @oppia/dev-workflow-reviewers
 /.eslintrc @oppia/dev-workflow-reviewers
 /.htmllintrc @oppia/dev-workflow-reviewers

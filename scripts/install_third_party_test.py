@@ -25,7 +25,6 @@ import re
 import subprocess
 import tarfile
 import tempfile
-import urllib.request as urlrequest
 import zipfile
 
 from core import utils
@@ -75,7 +74,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         self.remove_swap = self.swap(os, 'remove', mock_remove)
         self.rename_swap = self.swap(os, 'rename', mock_rename)
         self.url_retrieve_swap = self.swap(
-            urlrequest, 'urlretrieve', mock_url_retrieve)
+            common, 'url_retrieve', mock_url_retrieve)
         self.extract_swap = self.swap(
             zipfile.ZipFile, 'extractall', mock_extractall)
 
@@ -105,7 +104,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
 
         exists_swap = self.swap(os.path, 'exists', mock_exists)
         url_retrieve_swap = self.swap(
-            urlrequest, 'urlretrieve', mock_url_retrieve)
+            common, 'url_retrieve', mock_url_retrieve)
         with self.dir_exists_swap, exists_swap, url_retrieve_swap:
             install_third_party.download_files(
                 'source_url', 'target_dir', ['file1', 'file2'])

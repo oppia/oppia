@@ -21,7 +21,6 @@ import os
 import pathlib
 import shutil
 import subprocess
-import urllib.request as urlrequest
 import zipfile
 
 
@@ -106,10 +105,10 @@ def install_buf_and_protoc():
 
     common.ensure_directory_exists(BUF_DIR)
     for bin_file in buf_files:
-        urlrequest.urlretrieve('%s/%s' % (
-            BUF_BASE_URL, bin_file), filename=os.path.join(BUF_DIR, bin_file))
-    urlrequest.urlretrieve('%s/%s' % (
-        PROTOC_URL, protoc_file), filename=os.path.join(BUF_DIR, protoc_file))
+        common.url_retrieve('%s/%s' % (
+            BUF_BASE_URL, bin_file), os.path.join(BUF_DIR, bin_file))
+    common.url_retrieve('%s/%s' % (
+        PROTOC_URL, protoc_file), os.path.join(BUF_DIR, protoc_file))
     try:
         with zipfile.ZipFile(os.path.join(BUF_DIR, protoc_file), 'r') as zfile:
             zfile.extractall(path=PROTOC_DIR)

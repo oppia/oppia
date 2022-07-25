@@ -21,7 +21,6 @@ import os
 import subprocess
 import sys
 import tarfile
-import urllib.request as urlrequest
 
 from . import clean
 from . import common
@@ -94,7 +93,7 @@ def download_and_install_package(url_to_retrieve, filename):
             downloaded.
         filename: string. The name of the tar file.
     """
-    urlrequest.urlretrieve(url_to_retrieve, filename=filename)
+    common.url_retrieve(url_to_retrieve, filename)
     tar = tarfile.open(name=filename)
     tar.extractall(path=common.OPPIA_TOOLS_DIR)
     tar.close()
@@ -130,7 +129,7 @@ def download_and_install_node():
             common.NODE_VERSION, architecture)
         url_to_retrieve = 'https://nodejs.org/dist/v%s/%s%s' % (
             common.NODE_VERSION, node_file_name, extension)
-        urlrequest.urlretrieve(url_to_retrieve, filename=outfile_name)
+        common.url_retrieve(url_to_retrieve, outfile_name)
         subprocess.check_call(
             ['powershell.exe', '-c', 'expand-archive',
              outfile_name, '-DestinationPath',

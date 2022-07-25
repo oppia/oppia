@@ -25,9 +25,12 @@ import platform
 import re
 import shutil
 import socket
+import ssl
 import subprocess
 import sys
 import time
+from urllib import error as urlerror
+from urllib import request as urlrequest
 
 from core import constants
 
@@ -834,3 +837,52 @@ def write_stdout_safe(string: Union[str, bytes]) -> None:
                 continue
 
             raise
+
+
+def url_retrieve(
+        url: str, output_path: str, max_attempts: int = 2,
+        enforce_https: bool = True
+) -> None:
+    """Retrieve a file from a URL and write the file to the file system.
+
+    Note that we use Python's recommended default settings for verifying SSL
+    connections, which are documented here:
+    https://docs.python.org/3/library/ssl.html#best-defaults.
+
+    Args:
+        url: str. The URL to retrieve the data from.
+        output_path: str. Path to the destination file where the data from the
+            URL will be written.
+        max_attempts: int. The maximum number of attempts that will be made to
+            download the data. For failures before the maximum number of
+            attempts, a message describing the error will be printed. Once the
+            maximum is hit, any errors will be raised.
+        enforce_https: bool. Whether to require that the provided URL starts
+            with 'https://' to ensure downloads are secure.
+
+    Raises:
+        Exception. Raised when the provided URL does not use HTTPS but
+            enforce_https is True.
+    """
+    failures = 0
+    success = False
+    if enforce_https and not url.startswith('https://'):
+        raise Exception(
+            'The URL %s should use HTTPS.' % url)
+    while not success and failures < max_attempts:
+        try:
+            with urlrequest.urlopen(
+                url, context=ssl.create_default_context()
+            ) as response:
+                with open(output_path, 'wb') as output_file:
+                    output_file.write(response.read())
+        except (urlerror.URLError, ssl.SSLError) as exception:
+            failures += 1
+            print('Attempt %d of %d failed when downloading %s.' % (
+                failures, max_attempts, url))
+            if failures >= max_attempts:
+                raise exception
+            print('Error: %s' % exception)
+            print('Retrying download.')
+        else:
+            success = True
