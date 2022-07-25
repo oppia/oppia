@@ -58,7 +58,7 @@ export class QuestionPlayerConceptCardModalComponent
   }
 
   retryTest(): void {
-    let selectedSubtopics = (
+    const selectedSubtopics = (
       this.urlService.getUrlParams().selected_subtopic_ids);
 
     this.windowRef.nativeWindow.location.replace(

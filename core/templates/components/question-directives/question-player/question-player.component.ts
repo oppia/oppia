@@ -84,7 +84,7 @@ export interface QuestionPlayerConfig {
 export class QuestionPlayerComponent implements OnInit, OnDestroy {
   @Input() questionPlayerConfig: QuestionPlayerConfig;
 
-  directiveSubscriptions = new Subscription();
+  componentSubscription = new Subscription();
   resultsLoaded: boolean;
   currentQuestion: number;
   totalQuestions: number;
@@ -510,19 +510,19 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     {
-      this.directiveSubscriptions.add(
+      this.componentSubscription.add(
         this.playerPositionService.onCurrentQuestionChange.subscribe(
           result => this.updateCurrentQuestion(result + 1)
         )
       );
 
-      this.directiveSubscriptions.add(
+      this.componentSubscription.add(
         this.explorationPlayerStateService.onTotalQuestionsReceived.subscribe(
           result => this.updateTotalQuestions(result)
         )
       );
 
-      this.directiveSubscriptions.add(
+      this.componentSubscription.add(
         this.questionPlayerStateService.onQuestionSessionCompleted.subscribe(
           (result) => {
             this.windowRef.nativeWindow.location.hash = (
@@ -575,7 +575,7 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.directiveSubscriptions.unsubscribe();
+    this.componentSubscription.unsubscribe();
   }
 }
 
