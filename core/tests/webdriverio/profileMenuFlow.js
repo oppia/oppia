@@ -1,4 +1,4 @@
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,12 +17,12 @@
  * and then logout.
  */
 
-var action = require('../protractor_utils/action.js');
+var action = require('../webdriverio_utils/action.js');
 var LearnerDashboardPage = require(
-  '../protractor_utils/LearnerDashboardPage.js');
-var general = require('../protractor_utils/general.js');
-var users = require('../protractor_utils/users.js');
-var waitFor = require('../protractor_utils/waitFor.js');
+  '../webdriverio_utils/LearnerDashboardPage.js');
+var general = require('../webdriverio_utils/general.js');
+var users = require('../webdriverio_utils/users.js');
+var waitFor = require('../webdriverio_utils/waitFor.js');
 
 describe('Profile menu flow', function() {
   var learnerDashboardPage = null;
@@ -41,7 +41,7 @@ describe('Profile menu flow', function() {
     await learnerDashboardPage.get();
     await general.navigateToTopicsAndSkillsDashboardPage();
     await waitFor.pageToFullyLoad();
-    expect(await browser.getCurrentUrl()).toEqual(
+    expect(await browser.getUrl()).toEqual(
       'http://localhost:9001/topics-and-skills-dashboard');
   });
 
@@ -54,54 +54,49 @@ describe('Profile menu flow', function() {
 
     it('should land on the learner dashboard after successful login',
       async function() {
-        expect(await browser.getCurrentUrl()).toEqual(
+        expect(await browser.getUrl()).toEqual(
           'http://localhost:9001/learner-dashboard');
       });
 
     it('should visit the profile page from the profile dropdown menu',
       async function() {
-        var profileLink = element(by.css(
-          '.e2e-test-profile-link'));
+        var profileLink = $('.e2e-test-profile-link');
         await action.click('Profile Link', profileLink);
         await waitFor.pageToFullyLoad();
-        expect(await browser.getCurrentUrl()).toEqual(
+        expect(await browser.getUrl()).toEqual(
           'http://localhost:9001/profile/desktopAndMobileVisitor');
       });
 
     it('should visit the creator dashboard from the profile dropdown menu',
       async function() {
-        var creatorDashboardLink = element(by.css(
-          '.e2e-test-creator-dashboard-link'));
+        var creatorDashboardLink = $('.e2e-test-creator-dashboard-link');
         await action.click('Creator Dashboard Link', creatorDashboardLink);
         await waitFor.pageToFullyLoad();
-        expect(await browser.getCurrentUrl()).toEqual(
+        expect(await browser.getUrl()).toEqual(
           'http://localhost:9001/creator-dashboard');
       });
 
     it('should visit the learner dashboard from the profile dropdown menu',
       async function() {
-        var learnerDashboardLink = element(by.css(
-          '.e2e-test-learner-dashboard-link'));
+        var learnerDashboardLink = $('.e2e-test-learner-dashboard-link');
         await action.click('Learner Dashboard Link', learnerDashboardLink);
         await waitFor.pageToFullyLoad();
-        expect(await browser.getCurrentUrl()).toEqual(
+        expect(await browser.getUrl()).toEqual(
           'http://localhost:9001/learner-dashboard');
       });
 
     it('should not show the topics and skills dashboard link in the profile ' +
       'dropdown menu when user is not admin', async function() {
-      var links = element.all(by.css(
-        '.e2e-test-topics-and-skills-dashboard-link'));
-      expect(await links.count()).toEqual(0);
+      var links = await $$('.e2e-test-topics-and-skills-dashboard-link');
+      expect(links.length).toEqual(0);
     });
 
     it('should visit the preferences page from the profile dropdown menu',
       async function() {
-        var preferencesLink = element(by.css(
-          '.e2e-test-preferences-link'));
+        var preferencesLink = $('.e2e-test-preferences-link');
         await action.click('Preferences Link', preferencesLink);
         await waitFor.pageToFullyLoad();
-        expect(await browser.getCurrentUrl()).toEqual(
+        expect(await browser.getUrl()).toEqual(
           'http://localhost:9001/preferences');
       });
   });
