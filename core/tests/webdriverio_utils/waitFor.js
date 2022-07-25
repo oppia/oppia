@@ -77,7 +77,7 @@ var invisibilityOf = async function(element, errorMessage) {
  */
 var pageToFullyLoad = async function() {
   var loadingMessage = await $('.e2e-test-loading-fullpage');
-  await loadingMessage.waitForExist({
+  await loadingMessage.waitForDisplayed({
     timeout: 15000,
     reverse: true,
     timeoutMsg: 'Pages takes more than 15 sec to load\n' +
