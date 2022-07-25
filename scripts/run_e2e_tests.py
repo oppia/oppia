@@ -164,16 +164,11 @@ SUITES_MIGRATED_TO_WEBDRIVERIO = [
     'preferences',
     'profileFeatures',
     'profileMenu',
-<<<<<<< HEAD
     'skillEditor',
     'subscriptions',
     'topicsAndSkillsDashboard',
     'topicAndStoryEditor',
     'topicAndStoryEditorFileUploadFeatures',
-=======
-    'subscriptions',
-    'topicAndStoryEditor',
->>>>>>> d11c54301d0ec478c1a37e8db183938cf9521e44
     'topicAndStoryViewer',
     'users',
     'wipeout',
@@ -200,13 +195,6 @@ SUITES_STILL_IN_PROTRACTOR = [
     'library',
     'playVoiceovers',
     'publication',
-<<<<<<< HEAD
-=======
-    'topicAndStoryEditorFileUploadFeatures',
-    'topicsAndSkillsDashboard',
-    'skillEditor',
-    'wipeout',
->>>>>>> d11c54301d0ec478c1a37e8db183938cf9521e44
 ]
 
 
