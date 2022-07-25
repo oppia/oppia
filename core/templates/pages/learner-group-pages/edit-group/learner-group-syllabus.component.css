@@ -55,9 +55,9 @@
 
 .oppia-learner-group-syllabus .assigned-syllabus-item-image {
   height: 160px;
-  position: relative;
   max-width: unset;
   object-fit: fill;
+  position: relative;
   width: 170px;
 }
 
@@ -69,9 +69,9 @@
 .oppia-learner-group-syllabus .same-row-container {
   color: #00645c;
   display: flex;
-  justify-content: space-between;
   font-size: 14px;
   font-weight: 500;
+  justify-content: space-between;
 }
 
 .oppia-learner-group-syllabus .assigned-syllabus-topic-title {
@@ -102,26 +102,20 @@
   top: 10px;
 }
 
-.oppia-learner-group-syllabus .type-tag-pill:after {
-  top: 10px;
-  border-color: transparent transparent transparent #fdd;
-  border-width: 10px;
-}
-
 .oppia-learner-group-syllabus .type-tag-pill:before {
-  top: 9px;
   border-color: transparent transparent transparent #a00;
   border-width: 11px;
+  top: 9px;
 }
 
 .oppia-learner-group-syllabus .type-tag-pill:after {
+  border-bottom: solid 15px #00645c;
   border-left: solid 15px #fff;
   border-top: solid 15px #00645c;
-  border-bottom: solid 15px #00645c;
   content: "";
   height: 0;
-  position: absolute;
   left: 0;
+  position: absolute;
   top: -1px;
   width: 0;
 }

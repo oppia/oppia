@@ -611,6 +611,7 @@ class LearnerGroupSearchStudentHandler(base.BaseHandler):
             'error': ''
         })
 
+
 class EditLearnerGroupPage(base.BaseHandler):
     """Page for editing a learner group."""
 
@@ -643,3 +644,63 @@ class EditLearnerGroupPage(base.BaseHandler):
             raise self.PageNotFoundException
 
         self.render_template('edit-learner-group-page.mainpage.html')
+
+
+class LearnerGroupStudentsInfoHandler(base.BaseHandler):
+    """Handles getting info of students of a learner group."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'learner_group_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.LEARNER_GROUP_ID_REGEX
+                }]
+            },
+            'default_value': None
+        }
+    }
+
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
+    @acl_decorators.can_access_learner_groups
+    def get(self, learner_group_id):
+        """Handles GET requests."""
+
+        is_valid_request = learner_group_services.is_user_facilitator(
+            self.user_id, learner_group_id)
+
+        if not is_valid_request:
+            raise self.PageNotFoundException
+
+        learner_group = learner_group_fetchers.get_learner_group_by_id(
+            learner_group_id)
+
+        students_user_settings = user_services.get_users_settings(
+            learner_group.student_user_ids, strict=True)
+        invited_user_settings = user_services.get_users_settings(
+            learner_group.invited_student_user_ids, strict=True)
+
+        self.render_json({
+            'students_info': [
+                {
+                    'username': user_settings.username,
+                    'profile_picture_data_url':
+                        user_settings.profile_picture_data_url
+                }
+                for user_settings in students_user_settings
+            ],
+            'invited_students_info': [
+                {
+                    'username': user_settings.username,
+                    'profile_picture_data_url':
+                        user_settings.profile_picture_data_url
+                }
+                for user_settings in invited_user_settings
+            ]
+        })

@@ -22,7 +22,12 @@ import { LearnerGroupSubtopicSummary, LearnerGroupSubtopicSummaryBackendDict }
  * user progress domain objects.
  */
 
-export interface LearnerGroupInvitedUserInfo {
+export interface LearnerGroupAllStudentsInfo {
+  students_info: LearnerGroupUserInfo[];
+  invited_students_info: LearnerGroupUserInfo[];
+}
+
+export interface LearnerGroupUserInfo {
   username: string;
   user_profile_picture_url: string;
   error: string;

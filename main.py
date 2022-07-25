@@ -967,7 +967,10 @@ URLS = [
         r'/learner_group_search_student_handler',
         learner_group.LearnerGroupSearchStudentHandler),
     get_redirect_route(
-        r'/edit-group/<group_id>', learner_group.EditLearnerGroupPage)
+        r'/learner_group_students_info_handler/<learner_group_id>',
+        learner_group.LearnerGroupStudentsInfoHandler),
+    get_redirect_route(
+        r'/edit-learner-group/<group_id>', learner_group.EditLearnerGroupPage)
 ]
 
 # Adding redirects for topic landing pages.

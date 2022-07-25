@@ -425,7 +425,7 @@ def get_learner_group_syllabus_subtopic_page_summaries(
     subtopic_page_ids: List[str]
 ) -> List[subtopic_page_domain.SubtopicPageSummaryDict]:
     """Returns summary dicts corresponding to the given subtopic page ids.
-    
+
     Args:
         subtopic_page_ids: list(str). The ids of the subtopic pages.
 

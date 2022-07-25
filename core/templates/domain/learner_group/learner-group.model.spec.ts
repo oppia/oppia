@@ -83,7 +83,7 @@ describe('Learner Group Object', () => {
     sampleLearnerGroupData.addStudent('username2');
     sampleLearnerGroupData.addStudent('username3');
     sampleLearnerGroupData.removeStudent('username2');
-    sampleLearnerGroupData.inviteStudent('username4');
+    sampleLearnerGroupData.inviteStudents(['username4']);
     sampleLearnerGroupData.revokeInvitation('sampleUsername');
     sampleLearnerGroupData.addSubtopicPageIds(['subtopicPageId1']);
     sampleLearnerGroupData.removeSubtopicPageId('sampleSubtopicPageId');

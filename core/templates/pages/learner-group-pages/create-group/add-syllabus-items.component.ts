@@ -177,9 +177,6 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
       }
     }
 
-    // TODO(milit): When the language changes, the translations won't
-    // change until the user changes the selection and this function is
-    // re-executed.
     if (selectedItemText.length > 0) {
       this.selectionDetails[itemsType].description = (
         this.translateService.instant(selectedItemText));

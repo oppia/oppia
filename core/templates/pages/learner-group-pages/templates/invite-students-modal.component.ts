@@ -13,24 +13,37 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for Added syllabus items successfully message modal.
+ * @fileoverview Component for Delete exploration modal.
  */
 
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 @Component({
-  selector: 'oppia-added-syllabus-items-successfully-modal',
-  templateUrl: './added-syllabus-items-successfully-modal.component.html'
+  selector: 'oppia-invite-students-modal',
+  templateUrl: './invite-students-modal.component.html'
 })
-export class AddedSyllabusItemsSuccessfullyModalComponent
-  extends ConfirmOrCancelModal {
-  itemsAddedCount!: number;
+export class InviteStudentsModalComponent extends ConfirmOrCancelModal {
+  syllabusItemType!: string;
+  invitedStudents: string[] = [];
+
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
   ) {
     super(ngbActiveModal);
+  }
+
+  confirm(): void {
+    this.ngbActiveModal.close({
+      invitedStudents: this.invitedStudents,
+    });
+  }
+
+  updateNewlyInvitedStudents(
+    invitedStudents: string[]
+  ): void {
+    this.invitedStudents = invitedStudents;
   }
 }

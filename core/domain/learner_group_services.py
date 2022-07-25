@@ -19,7 +19,7 @@
 from __future__ import annotations
 
 from core.constants import constants
-from core.domain import config_domain, subtopic_page_services
+from core.domain import config_domain
 from core.domain import learner_group_domain
 from core.domain import story_domain
 from core.domain import story_fetchers

@@ -16,19 +16,18 @@
  * @fileoverview Component for the learner group syllabus.
  */
 
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
 import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-group-backend-api.service';
 import { LearnerGroupSubtopicSummary } from 'domain/learner_group/learner-group-subtopic-summary.model';
 import { LearnerGroupSyllabusBackendApiService } from 'domain/learner_group/learner-group-syllabus-backend-api.service';
-import { LearnerGroupSyllabus } from 'domain/learner_group/learner-group-syllabus.model';
 import { LearnerGroupData } from 'domain/learner_group/learner-group.model';
 import { StorySummary } from 'domain/story/story-summary.model';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { AddedSyllabusItemsSuccessfullyModalComponent } from '../templates/added-syllabus-items-successfully-modal.component';
-import { RemoveSyllabusItemModalComponent } from 
+import { RemoveSyllabusItemModalComponent } from
   '../templates/remove-syllabus-item-modal.component';
 
 import './learner-group-syllabus.component.css';
@@ -61,11 +60,10 @@ export class LearnerGroupSyllabusComponent {
   ngOnInit() {
     this.learnerGroupSyllabusBackendApiService.fetchLearnerGroupSyllabus(
       this.learnerGroup.id).then(groupSyllabus => {
-        console.log('groupSyllabus', groupSyllabus);
-        this.subtopicSummaries = groupSyllabus.subtopicPageSummaries;
-        this.storySummaries = groupSyllabus.storySummaries;
-        this.setDisplayOrderOfSyllabusItems();
-      });
+      this.subtopicSummaries = groupSyllabus.subtopicPageSummaries;
+      this.storySummaries = groupSyllabus.storySummaries;
+      this.setDisplayOrderOfSyllabusItems();
+    });
   }
 
   setDisplayOrderOfSyllabusItems(): void {
@@ -109,7 +107,7 @@ export class LearnerGroupSyllabusComponent {
   }
 
   getSubtopicThumbnailUrl(
-    subtopicSummary: LearnerGroupSubtopicSummary
+      subtopicSummary: LearnerGroupSubtopicSummary
   ): string {
     let thumbnailUrl = '';
     if (subtopicSummary.thumbnailFilename) {
@@ -159,19 +157,16 @@ export class LearnerGroupSyllabusComponent {
 
   updateNewlyAddedSubtopicIds(subtopicIds: string[]): void {
     this.newlyAddedSubtopicIds = subtopicIds;
-    console.log('subtopicIds', subtopicIds);
   }
 
   updateNewlyAddedStorySummaries(storySummaries: StorySummary[]): void {
     this.newlyAddedStorySummaries = storySummaries;
-    console.log('newlyAddedStorySummaries', this.newlyAddedStorySummaries);
   }
 
   updateNewlyAddedSubtopicSummaries(
       subtopicSummaries: LearnerGroupSubtopicSummary[]
   ): void {
     this.newlyAddedSubtopicSummaries = subtopicSummaries;
-    console.log('newlyAddedSubtopicSummaries', this.newlyAddedSubtopicSummaries);
   }
 
   saveNewSyllabusItems(): void {
@@ -179,15 +174,15 @@ export class LearnerGroupSyllabusComponent {
       this.learnerGroup.addSubtopicPageIds(this.newlyAddedSubtopicIds);
       this.learnerGroupBackendApiService.updateLearnerGroupAsync(
         this.learnerGroup).then((learnerGroup) => {
-          this.subtopicSummaries.push(...this.newlyAddedSubtopicSummaries);
-          this.storySummaries.push(...this.newlyAddedStorySummaries);
-          this.newlyAddedStoryIds = [];
-          this.newlyAddedSubtopicIds = [];
-          this.newlyAddedStorySummaries = [];
-          this.newlyAddedSubtopicSummaries = [];
-          this.learnerGroup = learnerGroup;
-          this.setDisplayOrderOfSyllabusItems();
-        });
+        this.subtopicSummaries.push(...this.newlyAddedSubtopicSummaries);
+        this.storySummaries.push(...this.newlyAddedStorySummaries);
+        this.newlyAddedStoryIds = [];
+        this.newlyAddedSubtopicIds = [];
+        this.newlyAddedStorySummaries = [];
+        this.newlyAddedSubtopicSummaries = [];
+        this.learnerGroup = learnerGroup;
+        this.setDisplayOrderOfSyllabusItems();
+      });
 
     let modelRef = this.ngbModal.open(
       AddedSyllabusItemsSuccessfullyModalComponent, {
@@ -221,12 +216,12 @@ export class LearnerGroupSyllabusComponent {
       this.learnerGroup.removeSubtopicPageId(subtopicPageId);
       this.learnerGroupBackendApiService.updateLearnerGroupAsync(
         this.learnerGroup).then((learnerGroup) => {
-          this.subtopicSummaries = this.subtopicSummaries.filter(
-            subtopicSummary => subtopicSummary.subtopicPageId !== subtopicPageId
-          );
-          this.learnerGroup = learnerGroup;
-          this.setDisplayOrderOfSyllabusItems();
-        });
+        this.subtopicSummaries = this.subtopicSummaries.filter(
+          subtopicSummary => subtopicSummary.subtopicPageId !== subtopicPageId
+        );
+        this.learnerGroup = learnerGroup;
+        this.setDisplayOrderOfSyllabusItems();
+      });
     }, () => {
       // Note to developers:
       // This callback is triggered when the Cancel button is clicked.
@@ -246,11 +241,11 @@ export class LearnerGroupSyllabusComponent {
       this.learnerGroup.removeStoryId(storyId);
       this.learnerGroupBackendApiService.updateLearnerGroupAsync(
         this.learnerGroup).then((learnerGroup) => {
-          this.storySummaries = this.storySummaries.filter(
-            storySummary => storySummary.getId() !== storyId);
-          this.learnerGroup = learnerGroup;
-          this.setDisplayOrderOfSyllabusItems();
-        });
+        this.storySummaries = this.storySummaries.filter(
+          storySummary => storySummary.getId() !== storyId);
+        this.learnerGroup = learnerGroup;
+        this.setDisplayOrderOfSyllabusItems();
+      });
     }, () => {
       // Note to developers:
       // This callback is triggered when the Cancel button is clicked.

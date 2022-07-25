@@ -42,13 +42,19 @@
     </div>
     <div *ngIf="isTabActive(EDIT_PREFERENCES_SECTIONS_I18N_IDS.GROUP_STUDENTS)" class="edit-learner-group-students-section">
       <button class="btn btn-primary"
-              (click)="saveLearnerGroupInfo()">
+              (click)="openInviteStudentsModal()">
         + <span>New Learner</span>
       </button>
       <div class="current-group-students">
-        <span>Current group members({{learnerGroup.studentUsernames.length}})</span>
-        <div *ngFor="let student of learnerGroup.studentUsernames">
-          <span>{{student}}</span>
+        <span>Current group students({{learnerGroup.studentUsernames.length}})</span>
+        <div *ngFor="let studentInfo of invitedStudentsInfo">
+          <span>{{studentInfo.username}}</span>
+        </div>
+      </div>
+      <div class="invited-group-students">
+        <span>Invited group students({{learnerGroup.invitedStudentUsernames.length}})</span>
+        <div *ngFor="let studentInfo of currentStudentsInfo">
+          <span>{{studentInfo.username}}</span>
         </div>
       </div>
     </div>

@@ -101,12 +101,12 @@ export class LearnerGroupSyllabusBackendApiService {
 
       this.http.get<LearnerGroupUserProgressBackendDict[]>(
         learnerGroupUrl).toPromise().then(usersProgressInfo => {
-          resolve(
-            usersProgressInfo.map(
-              progressInfo => LearnerGroupUserProgress.createFromBackendDict(
-                progressInfo)
-            )
-          );
+        resolve(
+          usersProgressInfo.map(
+            progressInfo => LearnerGroupUserProgress.createFromBackendDict(
+              progressInfo)
+          )
+        );
       }, errorResponse => {
         reject(errorResponse.error.error);
       });
@@ -127,9 +127,9 @@ export class LearnerGroupSyllabusBackendApiService {
 
       this.http.get<LearnerGroupSyllabusBackendDict>(
         learnerGroupUrl).toPromise().then(syllabusInfo => {
-          resolve(
-            LearnerGroupSyllabus.createFromBackendDict(syllabusInfo)
-          );
+        resolve(
+          LearnerGroupSyllabus.createFromBackendDict(syllabusInfo)
+        );
       });
     });
   }

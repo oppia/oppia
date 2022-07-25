@@ -61,7 +61,7 @@
   color: #015952;
 }
 
-.oppia-learner-group-preferences .preferences-tab-sections .btn-primary {  
+.oppia-learner-group-preferences .preferences-tab-sections .btn-primary {
   background: #00609c;
   font-size: 18px;
   font-weight: 500;
@@ -80,6 +80,19 @@
   margin-top: 40px;
 }
 
-.oppia-learner-group-preferences .edit-learner-group-students-section .btn-primary {  
+.oppia-learner-group-preferences .edit-learner-group-students-section .btn-primary {
   margin-top: unset;
+}
+
+.invite-students-modal .modal-body {
+  padding: 30px;
+}
+
+.invite-students-modal .modal-footer {
+  border-top: unset;
+  padding: 0 30px 30px;
+}
+
+.invite-students-modal .modal-dialog {
+  margin: 200px auto;
 }

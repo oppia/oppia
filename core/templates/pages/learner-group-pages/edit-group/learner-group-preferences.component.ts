@@ -24,11 +24,13 @@ import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-grou
 import { LearnerGroupSubtopicSummary } from 'domain/learner_group/learner-group-subtopic-summary.model';
 import { LearnerGroupSyllabusBackendApiService } from 'domain/learner_group/learner-group-syllabus-backend-api.service';
 import { LearnerGroupSyllabus } from 'domain/learner_group/learner-group-syllabus.model';
+import { LearnerGroupAllStudentsInfo, LearnerGroupUserInfo } from 'domain/learner_group/learner-group-user-progress.model';
 import { LearnerGroupData } from 'domain/learner_group/learner-group.model';
 import { StorySummary } from 'domain/story/story-summary.model';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { LearnerGroupPagesConstants } from '../learner-group-pages.constants';
 import { AddedSyllabusItemsSuccessfullyModalComponent } from '../templates/added-syllabus-items-successfully-modal.component';
+import { InviteStudentsModalComponent } from '../templates/invite-students-modal.component';
 import { RemoveSyllabusItemModalComponent } from 
   '../templates/remove-syllabus-item-modal.component';
 
@@ -48,6 +50,9 @@ export class LearnerGroupPreferencesComponent {
   newLearnerGroupTitle!: string;
   newLearnerGroupDescription!: string;
   readOnlyMode = true;
+  invitedStudentsInfo!: LearnerGroupUserInfo[];
+  currentStudentsInfo: LearnerGroupUserInfo[];
+  invitedStudents: string[] = [];
 
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
@@ -60,6 +65,11 @@ export class LearnerGroupPreferencesComponent {
 
   ngOnInit() {
     this.activeTab = this.EDIT_PREFERENCES_SECTIONS_I18N_IDS.GROUP_DETAILS;
+    this.learnerGroupBackendApiService.fetchStudentsInfoAsync(
+      this.learnerGroup.id).then((studentsInfo) => {
+      this.currentStudentsInfo = studentsInfo.students_info;
+      this.invitedStudentsInfo = studentsInfo.invited_students_info;
+    });
   }
 
   isTabActive(tabName: string): boolean {
@@ -102,6 +112,33 @@ export class LearnerGroupPreferencesComponent {
       });
     }
     this.toggleReadOnlyMode();
+  }
+
+  openInviteStudentsModal(): void {
+    const modalRef = this.ngbModal.open(
+      InviteStudentsModalComponent,
+      { 
+        backdrop: 'static',
+        windowClass: 'invite-students-modal'
+      }
+    );
+
+    modalRef.result.then((data) => {
+      this.invitedStudents = data.invitedStudents;
+      this.learnerGroup.inviteStudents(this.invitedStudents);
+      this.learnerGroupBackendApiService.updateLearnerGroupAsync(
+        this.learnerGroup).then((learnerGroup) => {
+        this.learnerGroup = learnerGroup;
+      });
+    }, () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
+    });
+  }
+
+  updateInvitedStudents(invitedStudents: string[]): void {
+    this.invitedStudents = invitedStudents;
   }
 }
 

@@ -25,7 +25,7 @@ export const LearnerGroupPagesConstants = {
 
   CREATE_LEARNER_GROUP_PAGE_URL: '/create-learner-group',
 
-  EDIT_LEARNER_GROUP_PAGE_URL: '/edit-group',
+  EDIT_LEARNER_GROUP_PAGE_URL: '/edit-learner-group',
 
   EDIT_LEARNER_GROUP_TABS: {
     OVERVIEW: 'I18N_LEARNER_GROUP_OVERVIEW_TAB',

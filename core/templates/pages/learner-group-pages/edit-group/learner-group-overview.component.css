@@ -31,6 +31,6 @@
 .oppia-learner-group-overview .learner-group-summary-card .students-count,
 .oppia-learner-group-overview .learner-group-summary-card .assigned-skills-count,
 .oppia-learner-group-overview .learner-group-summary-card .assigned-stories-count {
-  font-family: 'Capriola';
+  font-family: 'Capriola', sans-serif;
   font-size: 26px;
 }

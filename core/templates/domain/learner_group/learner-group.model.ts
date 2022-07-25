@@ -116,8 +116,8 @@ export class LearnerGroupData {
     this._studentUsernames.splice(index, 1);
   }
 
-  inviteStudent(studentUsername: string): void {
-    this._invitedStudentUsernames.push(studentUsername);
+  inviteStudents(studentUsernames: string[]): void {
+    this._invitedStudentUsernames.push(...studentUsernames);
   }
 
   revokeInvitation(studentUsername: string): void {

@@ -60,9 +60,11 @@ import { AddedSyllabusItemsSuccessfullyModalComponent } from
     LearnerGroupSyllabusComponent,
     LearnerGroupPreferencesComponent,
     AddSyllabusItemsComponent,
+    InviteStudentsComponent,
     LearnerGroupDetailsComponent,
     RemoveSyllabusItemModalComponent,
-    AddedSyllabusItemsSuccessfullyModalComponent
+    AddedSyllabusItemsSuccessfullyModalComponent,
+    InviteStudentsModalComponent
   ],
   entryComponents: [
     EditLearnerGroupPageComponent,
@@ -70,9 +72,11 @@ import { AddedSyllabusItemsSuccessfullyModalComponent } from
     LearnerGroupSyllabusComponent,
     LearnerGroupPreferencesComponent,
     AddSyllabusItemsComponent,
+    InviteStudentsComponent,
     LearnerGroupDetailsComponent,
     RemoveSyllabusItemModalComponent,
-    AddedSyllabusItemsSuccessfullyModalComponent
+    AddedSyllabusItemsSuccessfullyModalComponent,
+    InviteStudentsModalComponent
   ],
   providers: [
     {
@@ -111,6 +115,8 @@ import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { LearnerGroupPreferencesComponent } from './learner-group-preferences.component';
 import { LearnerGroupDetailsComponent } from '../create-group/learner-group-details.component';
+import { InviteStudentsModalComponent } from '../templates/invite-students-modal.component';
+import { InviteStudentsComponent } from '../create-group/invite-students.component';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

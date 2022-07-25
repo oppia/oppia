@@ -31,7 +31,7 @@ import { LearnerGroupBackendApiService } from
 import { LearnerGroupSubtopicSummary } from
   'domain/learner_group/learner-group-subtopic-summary.model';
 import { StorySummary } from 'domain/story/story-summary.model';
-import { LearnerGroupInvitedUserInfo } from
+import { LearnerGroupUserInfo } from
   'domain/learner_group/learner-group-user-progress.model';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
@@ -58,7 +58,7 @@ export class CreateLearnerGroupPageComponent implements OnInit, OnDestroy {
   learnerGroupStoryIds: string[] = [];
   syllabusStorySummaries: StorySummary[] = [];
   learnerGroupInvitedStudents: string[] = [];
-  learnerGroupInvitedStudentsInfo: LearnerGroupInvitedUserInfo[] = [];
+  learnerGroupInvitedStudentsInfo: LearnerGroupUserInfo[] = [];
   learnerGroup!: LearnerGroupData;
   learnerGroupUrl: string = '';
 
@@ -138,7 +138,7 @@ export class CreateLearnerGroupPageComponent implements OnInit, OnDestroy {
   }
 
   updateLearnerGroupInvitedStudentsInfo(
-      invitedUsersInfo: LearnerGroupInvitedUserInfo[]
+      invitedUsersInfo: LearnerGroupUserInfo[]
   ): void {
     this.learnerGroupInvitedStudentsInfo = invitedUsersInfo;
   }
@@ -179,7 +179,7 @@ export class CreateLearnerGroupPageComponent implements OnInit, OnDestroy {
       this.learnerGroupUrl = (
         this.windowRef.nativeWindow.location.protocol + '//' +
          this.windowRef.nativeWindow.location.host +
-          '/edit-group/' + this.learnerGroup.id
+          '/edit-learner-group/' + this.learnerGroup.id
       );
       this.loaderService.hideLoadingScreen();
     });
