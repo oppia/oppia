@@ -305,14 +305,14 @@
           </button>
         </md-list-item>
         <md-list-item ng-show="diagnosticTestSkillsDropdownIsShown">
-          <mat-form-field class="oppia-diagnostic-test-dropdown-div">
+          <md-form-field class="oppia-diagnostic-test-dropdown-div">
             <select class="form-control oppia-diagnostic-test-dropdown e2e-test-diagnostic-test-skill-selector"
                     ng-model="selectedSkillForDiagnosticTest"
                     ng-change="addSkillForDiagnosticTest()"
                     ng-options="skillSummary.getDescription() for skillSummary in availableSkillsForDiagnosticTest"
                     aria-label="selection dropdown">
             </select>
-          </mat-form-field>
+          </md-form-field>
           <button class="oppia-remove-diagnostic-test-skill-button"
                   md-button  md-icon-button
                   aria-label="Clear"

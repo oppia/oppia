@@ -86,6 +86,7 @@ angular.module('oppia').component('questionsList', {
     'SkillBackendApiService', 'SkillEditorRoutingService',
     'TopicsAndSkillsDashboardBackendApiService', 'UtilsService',
     'WindowDimensionsService', 'DEFAULT_SKILL_DIFFICULTY', 'INTERACTION_SPECS',
+    'MINIMUM_QUESTION_COUNT_FOR_A_DIAGNOSTIC_TEST_SKILL',
     'NUM_QUESTIONS_PER_PAGE',
     function(
         $location, $rootScope, $timeout, AlertsService,
@@ -97,6 +98,7 @@ angular.module('oppia').component('questionsList', {
         SkillBackendApiService, SkillEditorRoutingService,
         TopicsAndSkillsDashboardBackendApiService, UtilsService,
         WindowDimensionsService, DEFAULT_SKILL_DIFFICULTY, INTERACTION_SPECS,
+        MINIMUM_QUESTION_COUNT_FOR_A_DIAGNOSTIC_TEST_SKILL,
         NUM_QUESTIONS_PER_PAGE) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
@@ -435,20 +437,24 @@ angular.module('oppia').component('questionsList', {
           return;
         }
 
-        let skillIsAssgignedForDiagnosticTest = false;
+        let skillIsAssginedForDiagnosticTest = false;
         await TopicsAndSkillsDashboardBackendApiService
           .fetchTopicAssignmentsForSkillAsync(
             ctrl.selectedSkillId).then((response: AssignedSkill[]) => {
             response.map((topic) => {
               if (topic.skillIdsForDiagnosticTest.includes(
                 ctrl.selectedSkillId)) {
-                skillIsAssgignedForDiagnosticTest = true;
+                skillIsAssginedForDiagnosticTest = true;
               }
             });
           });
 
-        if (skillIsAssgignedForDiagnosticTest &&
-            ctrl.getQuestionSummariesForOneSkill().length <= 2) {
+        // Should not allow question deletion if the current skill is attached
+        // to the diagnostic test, and has the minimum number of questions for
+        // the diagnostic test.
+        if (skillIsAssginedForDiagnosticTest &&
+            ctrl.getQuestionSummariesForOneSkill().length <=
+            MINIMUM_QUESTION_COUNT_FOR_A_DIAGNOSTIC_TEST_SKILL) {
           AlertsService.addInfoMessage(
             'The skill must be removed from the diagnostic test first.');
           return;

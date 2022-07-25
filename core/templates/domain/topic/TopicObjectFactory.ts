@@ -575,13 +575,14 @@ export class Topic {
     }
     let diagnosticTestSkillSummaries = this.getDiagnosticTestSkillSummaries();
 
-    const skillIdToDiagnosticTestMap = new Map();
+    const skillIdToDiagnosticTestMap = {};
     for (let skillSummary of diagnosticTestSkillSummaries) {
-      skillIdToDiagnosticTestMap.set(skillSummary.getId(), true);
+      skillIdToDiagnosticTestMap[skillSummary.getId()] = true;
     }
 
     return topicSkillSummaries.filter(object1 => {
-      return !(skillIdToDiagnosticTestMap.get(object1.getId()) === true);
+      return !(skillIdToDiagnosticTestMap.hasOwnProperty(
+        object1.getId()) === true);
     });
   }
 

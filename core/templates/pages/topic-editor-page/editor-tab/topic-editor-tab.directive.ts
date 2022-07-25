@@ -133,12 +133,11 @@ angular.module('oppia').directive('topicEditorTab', [
             $scope.topicNameExists = false;
             $scope.topicUrlFragmentExists = false;
             $scope.hostname = WindowRef.nativeWindow.location.hostname;
-            $scope.availableSkillsForDiagnosticTest = (
+            $scope.availableShortSkillsForDiagnosticTest = (
               $scope.topic.getSkillSummariesThatAreNotInDiagnosticTest());
-            $scope.selectedSkillsForDiagnosticTest = (
+            $scope.selectedShortSkillsForDiagnosticTest = (
               $scope.topic.getDiagnosticTestSkillSummaries());
             $scope.diagnosticTestSkillsDropdownIsShown = false;
-            $scope.isSelectedSkillsForDiagnosticTestEmpty = true;
 
             $scope.presentDiagnosticTestSkillDropdown = function() {
               $scope.diagnosticTestSkillsDropdownIsShown = true;
@@ -150,11 +149,9 @@ angular.module('oppia').directive('topicEditorTab', [
 
             $scope.addSkillForDiagnosticTest = async function() {
               let skillToAdd = $scope.selectedSkillForDiagnosticTest;
-              if (skillToAdd === null) {
-                return;
-              }
-              let numberOfQuestions;
+              $scope.selectedSkillForDiagnosticTest = null;
 
+              let numberOfQuestions;
               await QuestionBackendApiService
                 .fetchTotalQuestionCountForSkillIdsAsync(
                   [skillToAdd.getId()]).then((questionCount) => {
@@ -165,41 +162,40 @@ angular.module('oppia').directive('topicEditorTab', [
                 AlertsService.addInfoMessage(
                   'The skill should contain at least two questions for ' +
                   'getting assigned to the diagnostic test.', 5000);
-                $scope.selectedSkillForDiagnosticTest = null;
                 $scope.diagnosticTestSkillsDropdownIsShown = false;
                 $scope.$applyAsync();
                 return;
               }
-              $scope.selectedSkillsForDiagnosticTest.push(skillToAdd);
+              $scope.selectedShortSkillsForDiagnosticTest.push(skillToAdd);
               let j = -1;
-              for (let skill of $scope.availableSkillsForDiagnosticTest) {
+              for (let skill of $scope.availableShortSkillsForDiagnosticTest) {
                 j++;
                 if (skill.getId() === skillToAdd.getId()) {
-                  $scope.availableSkillsForDiagnosticTest.splice(j, 1);
+                  $scope.availableShortSkillsForDiagnosticTest.splice(j, 1);
                   break;
                 }
               }
               TopicUpdateService.updateDiagnosticTestSkills(
                 $scope.topic,
-                cloneDeep($scope.selectedSkillsForDiagnosticTest));
+                cloneDeep($scope.selectedShortSkillsForDiagnosticTest));
               $scope.diagnosticTestSkillsDropdownIsShown = false;
               $scope.$applyAsync();
             };
 
             $scope.removeSkillFromDiagnosticTest = function(skillToRemove) {
               let j = -1;
-              for (let skill of $scope.selectedSkillsForDiagnosticTest) {
+              for (let skill of $scope.selectedShortSkillsForDiagnosticTest) {
                 j++;
                 if (skill.getId() === skillToRemove.getId()) {
-                  $scope.selectedSkillsForDiagnosticTest.splice(j, 1);
+                  $scope.selectedShortSkillsForDiagnosticTest.splice(j, 1);
                   break;
                 }
               }
-              $scope.availableSkillsForDiagnosticTest.push(skillToRemove);
+              $scope.availableShortSkillsForDiagnosticTest.push(skillToRemove);
 
               TopicUpdateService.updateDiagnosticTestSkills(
                 $scope.topic,
-                cloneDeep($scope.selectedSkillsForDiagnosticTest));
+                cloneDeep($scope.selectedShortSkillsForDiagnosticTest));
               $scope.$applyAsync();
             };
 
