@@ -85,11 +85,10 @@ export class AppErrorHandler extends ErrorHandler {
       errorType !== '[object DOMException]' &&
       !(errorType instanceof Error)
     ) {
-      // The error passed to this handler in some cases doesnot provides a
-      // meaningful stacktrace of the exception. Different browsers set this
-      // value at different times. Modern browsers such as Chrome, Firefox,
-      // Edge set this value when an Error object is created. To ensure that
-      // the stack property is populated we use try/catch.
+      // The error passed to this handler in some cases does not provide
+      // a meaningful stack trace of the exception. Different browsers set 
+      // this value at different times. To ensure that the stack property is 
+      // populated we use try/catch.
       // see: https://web.archive.org/web/20140210004225/http://msdn.microsoft.com/en-us/library/windows/apps/hh699850.aspx
       try {
         throw new Error(`${error}`);
