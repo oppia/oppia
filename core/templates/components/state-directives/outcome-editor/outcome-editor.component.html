@@ -3,22 +3,28 @@
     color: rgb(200, 0, 0);
     font-style: italic;
   }
+
   .oppia-nothing-text {
     color: #888;
   }
+
   .oppia-non-empty-feedback-text {
     word-wrap: break-word;
   }
+
   .oppia-prerequisite-skill-text {
     margin-top: 1em;
   }
+
   .oppia-correct-text {
     color: rgb(20, 180, 15);
   }
+
   .oppia-incorrect-text {
     color: rgb(243, 13, 13);
   }
 </style>
+
 <div *ngIf="!feedbackEditorIsOpen && displayFeedback"
      title="{{ isEditable ? 'Edit feedback' : '' }}"
      class="h-100">
@@ -45,8 +51,8 @@
           <em>Nothing</em>
         </span>
         <span *ngIf="outcome && outcome.hasNonemptyFeedback()" class="oppia-non-empty-feedback-text">
-          <angular-html-bind-wrapper classStr="oppia-rte-editor" [htmlData]="outcome.feedback.html">
-          </angular-html-bind-wrapper>
+          <oppia-rte-output-display class="oppia-rte-editor" [rteString]="outcome.feedback.html">
+          </oppia-rte-output-display>
         </span>
       </div>
     </div>
@@ -169,10 +175,10 @@
         </div>
 
         <strong>The answers falling under this group are
-          <span *ngIf="outcome && outcome.labelledAsCorrect" class="oppia-correct-text">
+          <span *ngIf="outcome && outcome?.labelledAsCorrect" class="oppia-correct-text">
             correct
           </span>
-          <span *ngIf="outcome && !outcome.labelledAsCorrect" class="oppia-incorrect-text">
+          <span *ngIf="outcome && !outcome?.labelledAsCorrect" class="oppia-incorrect-text">
             incorrect
           </span>
         </strong>
@@ -182,6 +188,8 @@
 
   <div *ngIf="isEditable">
     <strong>The answers in this group are correct</strong>
-    <input class="ml-2 e2e-test-editor-correctness-toggle" type="checkbox" [(ngModel)]="outcome.labelledAsCorrect" (change)="onChangeCorrectnessLabel()">
+    <div *ngIf="outcome">
+      <input class="ml-2 e2e-test-editor-correctness-toggle" type="checkbox" [(ngModel)]="outcome.labelledAsCorrect" (change)="onChangeCorrectnessLabel()">
+    </div>
   </div>
 </div>

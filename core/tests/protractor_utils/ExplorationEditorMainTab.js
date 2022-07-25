@@ -36,11 +36,6 @@ var ExplorationEditorMainTab = function() {
     by.css('.e2e-test-add-response-details'));
   var addResponseHeader = element(
     by.css('.e2e-test-add-response-modal-header'));
-  var multipleChoiceAnswerOptions = function(optionNum) {
-    return element(
-      by.cssContainingText(
-        '.e2e-test-html-multiple-select-option', optionNum));
-  };
   var itemSelectionAnswerOptions = function(optionNum) {
     return element(
       by.cssContainingText(
@@ -55,7 +50,8 @@ var ExplorationEditorMainTab = function() {
   var editOutcomeDestAddExplorationId = element(
     by.css('.e2e-test-add-refresher-exploration-id'));
   var editOutcomeDestDropdownOptions = function(targetOption) {
-    return element.all(by.cssContainingText('option', targetOption)).first();
+    return element.all(by.cssContainingText(
+      '.e2e-test-afterward-dest-selector', targetOption)).first();
   };
   var feedbackBubble = element(by.css('.e2e-test-feedback-bubble'));
   var feedbackEditor = element(by.css('.e2e-test-open-feedback-editor'));
@@ -113,6 +109,8 @@ var ExplorationEditorMainTab = function() {
     by.css('.e2e-test-explanation-textarea'));
   var stateEditorTag = element(
     by.css('.e2e-test-state-content-editor'));
+  var parameterElementButton = element(
+    by.css('.e2e-test-main-html-select-selector'));
 
   /*
    * Buttons
@@ -777,14 +775,15 @@ var ExplorationEditorMainTab = function() {
 
       if (interactionId === 'MultipleChoiceInput') {
         // This is a special case as it uses a dropdown to set a NonnegativeInt.
-        var parameterElementButton = parameterElement.element(
-          by.tagName('button'));
-        await action.click('Parameter Element Button', parameterElementButton);
-        var multipleChoiceAnswerOption =
-          multipleChoiceAnswerOptions(parameterValues[i]);
+        await action.click(
+          'Parameter Element Button', parameterElementButton, true);
+
+        var multipleChoiceAnswerOption = element.all(by.cssContainingText(
+          '.e2e-test-html-select-selector', parameterValues[i])).first();
+
         await action.click(
           'Multiple Choice Answer Option: ' + i,
-          multipleChoiceAnswerOption);
+          multipleChoiceAnswerOption, true);
       } else if (interactionId === 'ItemSelectionInput') {
         var answerArray = Array.from(parameterValues[i]);
         for (var j = 0; j < answerArray.length; j++) {
@@ -843,8 +842,10 @@ var ExplorationEditorMainTab = function() {
     ruleDescription = _replaceRuleInputPlaceholders(ruleDescription, ['...']);
     var ruleDescriptionInDropdown = ruleDescription;
     await action.click('Answer Description', answerDescription);
+
     var ruleDropdownElement = element.all(by.cssContainingText(
-      '.select2-results__option', ruleDescriptionInDropdown)).first();
+      '.e2e-test-rule-type-selector',
+      ruleDescriptionInDropdown)).first();
     await action.click('Rule Dropdown Element', ruleDropdownElement);
   };
 

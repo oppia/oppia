@@ -23,6 +23,9 @@ var action = require('./action.js');
 var CreatorDashboardPage = function() {
   var CREATOR_DASHBOARD_URL = '/creator-dashboard';
 
+  var allExplorationCardsSelector = function() {
+    return $$('.e2e-test-exploration-dashboard-card');
+  };
   var activityCreationModal = $('.e2e-test-creation-modal');
   var averageRating = $('.e2e-test-oppia-average-rating');
   var collectionCard = $('.e2e-test-collection-card');
@@ -34,6 +37,40 @@ var CreatorDashboardPage = function() {
   var createNewExplorationButton = $('.e2e-test-create-new-exploration-button');
   var explorationDashboardCard = $('.e2e-test-exploration-dashboard-card');
   var explorationFeedbackCount = $('.e2e-test-exp-summary-tile-open-feedback');
+  var expSummaryRowFeedbackElement = $(
+    '.e2e-test-exp-summary-row-open-feedback');
+  var expSummaryRowFeedbackElementsSelector = function() {
+    return $$('.e2e-test-exp-summary-row-open-feedback');
+  };
+  var expSummaryRowRatingElement = $('.e2e-test-exp-summary-row-rating');
+  var expSummaryRowRatingElementsSelector = function() {
+    return $$('.e2e-test-exp-summary-row-rating');
+  };
+  var expSummaryRowTitleElement = $('.e2e-test-exp-summary-row-title');
+  var expSummaryRowTitleElementsSelector = function() {
+    return $$('.e2e-test-exp-summary-row-title');
+  };
+  var expSummaryRowViewsElement = $('.e2e-test-exp-summary-row-num-views');
+  var expSummaryRowViewsElementsSelector = function() {
+    return $$('.e2e-test-exp-summary-row-num-views');
+  };
+  var expSummaryTileFeedbackElement = $(
+    '.e2e-test-exp-summary-tile-open-feedback');
+  var expSummaryTileFeedbackElementsSelector = function() {
+    return $$('.e2e-test-exp-summary-tile-open-feedback');
+  };
+  var expSummaryTileRatingElement = $('.e2e-test-exp-summary-tile-rating');
+  var expSummaryTileRatingElementsSelector = function() {
+    return $$('.e2e-test-exp-summary-tile-rating');
+  };
+  var expSummaryTileTitleElement = $('.e2e-test-exp-summary-tile-title');
+  var expSummaryTileTitleElementsSelector = function() {
+    return $$('.e2e-test-exp-summary-tile-title');
+  };
+  var expSummaryTileViewsElement = $('.e2e-test-exp-summary-tile-num-views');
+  var expSummaryTileViewsElementsSelector = function() {
+    return $$('.e2e-test-exp-summary-tile-num-views');
+  };
   var listViewButton = $('.e2e-test-oppia-list-view-btn');
   // Dashboard stat elements.
   var openFeedbacks = $('.e2e-test-oppia-open-feedback');
@@ -44,7 +81,7 @@ var CreatorDashboardPage = function() {
   // Returns all exploration card elements with the given name.
   var _getExplorationElements = async function(explorationTitle) {
     await waitFor.visibilityOf(explorationDashboardCard);
-    var allExplorationCards = $$('.e2e-test-exploration-dashboard-card');
+    var allExplorationCards = allExplorationCardsSelector();
     return await allExplorationCards.filter(async function(tile) {
       var text = await tile.getText();
       // Tile text contains title, possibly followed by newline and text.
@@ -147,81 +184,80 @@ var CreatorDashboardPage = function() {
 
   // Returns titles of each explorations in grid view.
   this.getExpSummaryTileTitles = async function() {
-    var expSummaryTileTitleElements = await $$(
-      '.e2e-test-exp-summary-tile-title');
     await waitFor.visibilityOf(
-      expSummaryTileTitleElements[0],
+      expSummaryTileTitleElement,
       'Unable to find exploration titles');
+    var expSummaryTileTitleElements = (
+      await expSummaryTileTitleElementsSelector());
     return expSummaryTileTitleElements;
   };
 
   // Returns ratings of each explorations in grid view.
   this.getExpSummaryTileRatings = async function() {
-    var expSummaryTileRatingElements = await $$(
-      '.e2e-test-exp-summary-tile-rating');
     await waitFor.visibilityOf(
-      expSummaryTileRatingElements[0],
+      expSummaryTileRatingElement,
       'Unable to find exploration ratings');
+    var expSummaryTileRatingElements = (
+      await expSummaryTileRatingElementsSelector());
     return expSummaryTileRatingElements;
   };
 
   // Returns open feedback count of each exploration in grid view.
   this.getExpSummaryTileOpenFeedbackCount = async function() {
-    var expSummaryTileFeedbackElements = await $$(
-      '.e2e-test-exp-summary-tile-open-feedback');
     await waitFor.visibilityOf(
-      expSummaryTileFeedbackElements[0],
+      expSummaryTileFeedbackElement,
       'Unable to find exploration feedbacks');
+    var expSummaryTileFeedbackElements = (
+      await expSummaryTileFeedbackElementsSelector());
     return expSummaryTileFeedbackElements;
   };
 
   // Returns total views count of each exploration in grid view.
   this.getExpSummaryTileViewsCount = async function() {
-    var expSummaryTileViewsElements = await $$(
-      '.e2e-test-exp-summary-tile-num-views');
     await waitFor.visibilityOf(
-      expSummaryTileViewsElements[0],
+      expSummaryTileViewsElement,
       'Unable to find exploration views');
+    var expSummaryTileViewsElements = (
+      await expSummaryTileViewsElementsSelector());
     return expSummaryTileViewsElements;
   };
 
   // Returns titles of each explorations in list view.
   this.getExpSummaryRowTitles = async function() {
-    var expSummaryRowTitleElements = await $$(
-      '.e2e-test-exp-summary-row-title');
     await waitFor.visibilityOf(
-      expSummaryRowTitleElements[0],
+      expSummaryRowTitleElement,
       'Unable to find exploration titles');
+    var expSummaryRowTitleElements = (
+      await expSummaryRowTitleElementsSelector());
     return expSummaryRowTitleElements;
   };
 
   // Returns ratings of each explorations in list view.
   this.getExpSummaryRowRatings = async function() {
-    var expSummaryRowRatingElements = await $$(
-      '.e2e-test-exp-summary-row-rating');
     await waitFor.visibilityOf(
-      expSummaryRowRatingElements[0],
+      expSummaryRowRatingElement,
       'Unable to find exploration ratings');
+    var expSummaryRowRatingElements = (
+      await expSummaryRowRatingElementsSelector());
     return expSummaryRowRatingElements;
   };
 
   // Returns open feedback count of each exploration in list view.
   this.getExpSummaryRowOpenFeedbackCount = async function() {
-    var expSummaryRowFeedbackElements = await $$(
-      '.e2e-test-exp-summary-row-open-feedback');
     await waitFor.visibilityOf(
-      expSummaryRowFeedbackElements[0],
+      expSummaryRowFeedbackElement,
       'Unable to find exploration feedbacks');
+    var expSummaryRowFeedbackElements = (
+      await expSummaryRowFeedbackElementsSelector());
     return expSummaryRowFeedbackElements;
   };
 
   // Returns total views count of each exploration in list view.
   this.getExpSummaryRowViewsCount = async function() {
-    var expSummaryRowViewsElements = await $$(
-      '.e2e-test-exp-summary-row-num-views');
     await waitFor.visibilityOf(
-      expSummaryRowViewsElements[0],
+      expSummaryRowViewsElement,
       'Unable to find exploration views');
+    var expSummaryRowViewsElements = await expSummaryRowViewsElementsSelector();
     return expSummaryRowViewsElements;
   };
 

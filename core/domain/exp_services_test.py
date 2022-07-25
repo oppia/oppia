@@ -134,6 +134,7 @@ class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
             }],
             'outcome': {
                 'dest': feconf.DEFAULT_INIT_STATE_NAME,
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': '<p>Try again</p>'
@@ -1511,6 +1512,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                         'name': 'invalid_handler_name',
                         'rule_specs': [{
                             'dest': 'END',
+                            'dest_if_really_stuck': None,
                             'feedback': [],
                             'param_changes': [],
                             'definition': {'rule_type': 'default'}
@@ -1632,6 +1634,7 @@ states:
       answer_groups:
       - outcome:
           dest: New state
+          dest_if_really_stuck: null
           feedback:
             content_id: feedback_1
             html: <p>Correct!</p>
@@ -1658,6 +1661,7 @@ states:
           value: 1
       default_outcome:
         dest: Introduction
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -1735,6 +1739,7 @@ states:
       customization_args: {}
       default_outcome:
         dest: New state
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -1878,6 +1883,7 @@ title: Title
               answer_groups:
               - outcome:
                   dest: New state
+                  dest_if_really_stuck: null
                   feedback:
                     audio_translations:
                         en:
@@ -1897,6 +1903,7 @@ title: Title
               customization_args: {}
               default_outcome:
                 dest: Introduction
+                dest_if_really_stuck: null
                 feedback:
                   audio_translations:
                     en:
@@ -1939,6 +1946,7 @@ title: Title
               customization_args: {}
               default_outcome:
                 dest: New state
+                dest_if_really_stuck: null
                 feedback:
                   audio_translations: {}
                   html: ''
@@ -2078,7 +2086,7 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
         state3.update_interaction_customization_args(customization_args_dict3)
 
         default_outcome1 = state_domain.Outcome(
-            'state2', state_domain.SubtitledHtml(
+            'state2', None, state_domain.SubtitledHtml(
                 'default_outcome', '<p>Default outcome for state1</p>'),
             False, [], None, None
         )
@@ -2106,7 +2114,7 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
 
         state_answer_group_list2 = [state_domain.AnswerGroup(
             state_domain.Outcome(
-                'state1', state_domain.SubtitledHtml(
+                'state1', None, state_domain.SubtitledHtml(
                     'feedback_1', (
                         '<p>Outcome1 for state2</p><oppia-noninteractive-image'
                         ' filepath-with-value='
@@ -2120,7 +2128,7 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                     ], [], None
         ), state_domain.AnswerGroup(
             state_domain.Outcome(
-                'state3', state_domain.SubtitledHtml(
+                'state3', None, state_domain.SubtitledHtml(
                     'feedback_2', '<p>Outcome2 for state2</p>'),
                 False, [], None, None),
             [
@@ -2131,7 +2139,7 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
         )]
         state_answer_group_list3 = [state_domain.AnswerGroup(
             state_domain.Outcome(
-                'state1', state_domain.SubtitledHtml(
+                'state1', None, state_domain.SubtitledHtml(
                     'feedback_1', '<p>Outcome for state3</p>'),
                 False, [], None, None),
             [
@@ -2218,6 +2226,7 @@ states:
           value: 1
       default_outcome:
         dest: %s
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -2260,6 +2269,7 @@ states:
           value: 1
       default_outcome:
         dest: New state
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -2327,6 +2337,7 @@ states:
           value: 1
       default_outcome:
         dest: %s
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -2369,6 +2380,7 @@ states:
           value: 1
       default_outcome:
         dest: Renamed state
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -2709,6 +2721,7 @@ interaction:
       value: 1
   default_outcome:
     dest: %s
+    dest_if_really_stuck: null
     feedback:
       content_id: default_outcome
       html: ''
@@ -2755,6 +2768,7 @@ interaction:
       value: 1
   default_outcome:
     dest: New state
+    dest_if_really_stuck: null
     feedback:
       content_id: default_outcome
       html: ''
@@ -2802,6 +2816,7 @@ interaction:
       value: 1
   default_outcome:
     dest: Renamed state
+    dest_if_really_stuck: null
     feedback:
       content_id: default_outcome
       html: ''
@@ -2997,6 +3012,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             }],
             'outcome': {
                 'dest': self.init_state_name,
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': '<p>Try again</p>'
@@ -3012,6 +3028,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         # Default outcome specification for an interaction.
         self.interaction_default_outcome = {
             'dest': self.init_state_name,
+            'dest_if_really_stuck': None,
             'feedback': {
                 'content_id': 'default_outcome',
                 'html': '<p><strong>Incorrect</strong></p>'
@@ -3494,6 +3511,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                     }],
                     'outcome': {
                         'dest': 'State 2',
+                        'dest_if_really_stuck': None,
                         'feedback': {
                             'content_id': 'feedback_3',
                             'html': '<p>Try again</p>'
@@ -3511,6 +3529,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
                 {
                     'dest': 'State 2',
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'default_outcome',
                         'html': '<p><strong>Incorrect</strong></p>'
@@ -6150,6 +6169,7 @@ states:
             unicode_str: Continue
       default_outcome:
         dest: END
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -7507,7 +7527,7 @@ class ApplyDraftUnitTests(test_utils.GenericTestBase):
 
         migration_change_list = [exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
-            'from_version': 49,
+            'from_version': 50,
             'to_version': str(feconf.CURRENT_STATE_SCHEMA_VERSION)
         })]
         exp_services.update_exploration(

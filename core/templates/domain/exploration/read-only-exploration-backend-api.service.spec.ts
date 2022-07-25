@@ -63,6 +63,7 @@ describe('Read only exploration backend API service', () => {
             default_outcome: {
               param_changes: [],
               dest: 'Introduction',
+              dest_if_really_stuck: null,
               feedback: {
                 html: '',
                 content_id: 'content'

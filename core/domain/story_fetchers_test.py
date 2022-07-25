@@ -45,7 +45,7 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super(StoryFetchersUnitTests, self).setUp()
         self.story_id = story_services.get_new_story_id()
-        self.TOPIC_ID = topic_fetchers.get_new_topic_id()  # type: ignore[no-untyped-call]
+        self.TOPIC_ID = topic_fetchers.get_new_topic_id()
         self.save_new_topic(  # type: ignore[no-untyped-call]
             self.TOPIC_ID, self.USER_ID, name='Topic',
             description='A new topic', canonical_story_ids=[],
@@ -189,6 +189,48 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(stories), 2)
         self.assertEqual(stories[0].to_dict(), expected_story)
         self.assertEqual(stories[1], None)
+
+    def test_get_multi_users_progress_in_stories(self) -> None:
+        all_users_stories_progress = (
+            story_fetchers.get_multi_users_progress_in_stories(
+                [self.USER_ID], [self.story_id, 'invalid_story_id']
+            )
+        )
+        all_stories = story_fetchers.get_stories_by_ids(
+            [self.story_id, 'invalid_story_id'])
+
+        # Should return None for invalid story ID.
+        self.assertIsNone(all_stories[1])
+
+        user_stories_progress = all_users_stories_progress[self.USER_ID]
+
+        self.assertEqual(len(user_stories_progress), 1)
+        assert all_stories[0] is not None
+        self.assertEqual(user_stories_progress[0]['id'], self.story_id)
+        self.assertEqual(user_stories_progress[0]['completed_node_titles'], [])
+        self.assertEqual(
+            len(user_stories_progress[0]['all_node_dicts']),
+            len(all_stories[0].story_contents.nodes)
+        )
+        self.assertEqual(user_stories_progress[0]['topic_name'], 'Topic')
+
+        story_services.record_completed_node_in_story_context( # type: ignore[no-untyped-call]
+            self.USER_ID, self.story_id, self.NODE_ID_1)
+
+        all_users_stories_progress = (
+            story_fetchers.get_multi_users_progress_in_stories(
+                [self.USER_ID], [self.story_id, 'invalid_story_id']
+            )
+        )
+        user_stories_progress = all_users_stories_progress[self.USER_ID]
+
+        self.assertEqual(len(user_stories_progress), 1)
+        # Ruling out the possibility of None for mypy type checking.
+        assert user_stories_progress[0] is not None
+        self.assertEqual(user_stories_progress[0]['id'], self.story_id)
+        self.assertEqual(
+            user_stories_progress[0]['completed_node_titles'], ['Title 1'])
+        self.assertEqual(user_stories_progress[0]['topic_name'], 'Topic')
 
     def test_get_story_summary_by_id(self) -> None:
         story_summary = story_fetchers.get_story_summary_by_id(self.story_id)

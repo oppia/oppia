@@ -479,6 +479,7 @@ describe('Exploration save service ' +
           rule_specs: [],
           outcome: {
             dest: '',
+            dest_if_really_stuck: null,
             feedback: {
               content_id: 'feedback_1',
               html: '{{FeedbackValue}}'
@@ -487,6 +488,7 @@ describe('Exploration save service ' +
         }],
         default_outcome: {
           dest: 'Hola',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: '',
             html: '',
@@ -519,6 +521,7 @@ describe('Exploration save service ' +
           rule_specs: [],
           outcome: {
             dest: '',
+            dest_if_really_stuck: null,
             feedback: {
               content_id: 'feedback_1',
               html: '{{StateFeedbackValue}}'
@@ -527,6 +530,7 @@ describe('Exploration save service ' +
         }],
         default_outcome: {
           dest: 'State',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'default_outcome',
             html: ''
@@ -559,6 +563,7 @@ describe('Exploration save service ' +
           rule_specs: [],
           outcome: {
             dest: '',
+            dest_if_really_stuck: null,
             feedback: {
               content_id: '',
               html: ''
@@ -567,6 +572,7 @@ describe('Exploration save service ' +
         }],
         default_outcome: {
           dest: 'State2',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'default_outcome',
             html: ''
@@ -599,6 +605,7 @@ describe('Exploration save service ' +
           rule_specs: [],
           outcome: {
             dest: '',
+            dest_if_really_stuck: null,
             feedback: {
               content_id: '',
               html: ''
@@ -607,6 +614,7 @@ describe('Exploration save service ' +
         }],
         default_outcome: {
           dest: 'State2',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: '',
             html: ''

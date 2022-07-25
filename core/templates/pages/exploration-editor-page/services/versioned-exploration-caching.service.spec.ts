@@ -61,6 +61,7 @@ describe('Versioned exploration caching service', () => {
             default_outcome: {
               param_changes: [],
               dest: 'Introduction',
+              dest_if_really_stuck: null,
               feedback: {
                 html: '',
                 content_id: 'content'

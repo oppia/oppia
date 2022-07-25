@@ -433,6 +433,7 @@ describe('State Graph Visualization directive', function() {
             rule_specs: [],
             outcome: {
               dest: 'unused',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'feedback_1',
                 html: ''
@@ -444,6 +445,7 @@ describe('State Graph Visualization directive', function() {
           }],
           default_outcome: {
             dest: 'default',
+            dest_if_really_stuck: null,
             feedback: {
               content_id: 'default_outcome',
               html: ''

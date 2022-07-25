@@ -71,7 +71,7 @@ export class OutcomeEditorComponent implements OnInit {
 
   isCurrentInteractionLinear(): boolean {
     let interactionId = this.getCurrentInteractionId();
-    return interactionId !== null && INTERACTION_SPECS[
+    return Boolean(interactionId) && INTERACTION_SPECS[
       interactionId as InteractionSpecsKey].is_linear;
   }
 
