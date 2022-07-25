@@ -163,10 +163,7 @@ SUITES_MIGRATED_TO_WEBDRIVERIO = [
     'profileMenu',
     'subscriptions',
     'topicAndStoryEditor',
-<<<<<<< HEAD
     'topicAndStoryEditorFileUploadFeatures',
-=======
->>>>>>> d11c54301d0ec478c1a37e8db183938cf9521e44
     'topicAndStoryViewer',
     'users',
 ]
@@ -195,10 +192,6 @@ SUITES_STILL_IN_PROTRACTOR = [
     'navigation',
     'playVoiceovers',
     'publication',
-<<<<<<< HEAD
-=======
-    'topicAndStoryEditorFileUploadFeatures',
->>>>>>> d11c54301d0ec478c1a37e8db183938cf9521e44
     'topicsAndSkillsDashboard',
     'skillEditor',
     'wipeout',
