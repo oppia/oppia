@@ -1,4 +1,4 @@
-// Copyright 2021 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,28 +14,26 @@
 
 /**
  * @fileoverview Page object for the topic and story viewer page, for use
- * in Protractor tests.
+ * in WebdriverIO tests.
  */
 
 var waitFor = require('./waitFor.js');
 var action = require('./action.js');
 
 var TopicViewerPage = function() {
-  var topicDescription = element(by.css('.e2e-test-topic-description'));
-  var storySummaryTitleList =
-    element.all(by.css('.e2e-test-story-summary-title'));
-  var startPracticeButton =
-    element(by.css('.e2e-test-practice-start-button'));
-  var revisionTabLink = element(by.css('.e2e-test-revision-tab-link'));
-  var practiceTabLink = element(by.css('.e2e-test-practice-tab-link'));
-  var messageOnCompletion = element(
-    by.css('.e2e-test-practice-complete-message'));
+  var messageOnCompletion = $('.e2e-test-practice-complete-message');
+  var practiceTabLink = $('.e2e-test-practice-tab-link');
+  var revisionTabLink = $('.e2e-test-revision-tab-link');
+  var startPracticeButton = $('.e2e-test-practice-start-button');
+  var storySummaryTitleListElement = function() {
+    return $$('.e2e-test-story-summary-title');
+  };
+  var topicDescription = $('.e2e-test-topic-description');
 
   this.get = async function(classroomUrlFragment, topicName) {
-    await browser.get(`/learn/${classroomUrlFragment}`);
+    await browser.url(`/learn/${classroomUrlFragment}`);
     await waitFor.pageToFullyLoad();
-    var topicLink = element(by.cssContainingText(
-      '.e2e-test-topic-link', topicName));
+    var topicLink = $(`.e2e-test-topic-name=${topicName}`);
     await waitFor.presenceOf(
       topicLink, 'Topic ' +
       topicName + ' card is not present on /' + classroomUrlFragment);
@@ -51,13 +49,14 @@ var TopicViewerPage = function() {
   };
 
   this.expectStoryCountToBe = async function(count) {
+    var storySummaryTitleList = await storySummaryTitleListElement();
     if (count === 0) {
-      expect(await storySummaryTitleList.count()).toEqual(0);
+      expect(storySummaryTitleList.length).toEqual(0);
     } else {
       await waitFor.visibilityOf(
-        storySummaryTitleList.first(),
+        storySummaryTitleList[0],
         'Story summary tiles take too long to be visible.');
-      expect(await storySummaryTitleList.count()).toEqual(count);
+      expect(storySummaryTitleList.length).toEqual(count);
     }
   };
 
@@ -70,8 +69,7 @@ var TopicViewerPage = function() {
   };
 
   this.selectSkillForPractice = async function(subtopicTitle) {
-    var skillCheckbox = element(by.cssContainingText(
-      '.e2e-test-skill-checkbox', subtopicTitle));
+    var skillCheckbox = $(`.e2e-test-skill-checkbox-title=${subtopicTitle}`);
     await action.click('Select skill to practice', skillCheckbox);
   };
 

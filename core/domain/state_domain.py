@@ -45,6 +45,14 @@ from core.domain import translatable_object_registry  # pylint: disable=invalid-
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
 
+AllowedInputValueTypes = Union[
+    str,
+    int,
+    List[str],
+    List[List[str]],
+    Dict[str, Union[str, List[str]]]
+]
+
 
 class AnswerGroupDict(TypedDict):
     """Dictionary representing the AnswerGroup object."""
@@ -55,13 +63,12 @@ class AnswerGroupDict(TypedDict):
     tagged_skill_misconception_id: Optional[str]
 
 
-AllowedInputValueTypes = Union[
-    str,
-    int,
-    List[str],
-    List[List[str]],
-    Dict[str, Union[str, List[str]]]
-]
+class StateVersionHistoryDict(TypedDict):
+    """Dictionary representing the StateVersionHistory object."""
+
+    previously_edited_in_version: Optional[int]
+    state_name_in_previous_version: Optional[str]
+    committer_id: str
 
 
 class AnswerGroup(translation_domain.BaseTranslatableObject):
@@ -4017,9 +4024,11 @@ class StateVersionHistory:
     """
 
     def __init__(
-        self, previously_edited_in_version,
-        state_name_in_previous_version, committer_id
-    ):
+        self,
+        previously_edited_in_version: Optional[int],
+        state_name_in_previous_version: Optional[str],
+        committer_id: str
+    ) -> None:
         """Initializes the StateVersionHistory domain object.
 
         Args:
@@ -4035,7 +4044,7 @@ class StateVersionHistory:
         self.state_name_in_previous_version = state_name_in_previous_version
         self.committer_id = committer_id
 
-    def to_dict(self):
+    def to_dict(self) -> StateVersionHistoryDict:
         """Returns a dict representation of the StateVersionHistory domain
         object.
 
@@ -4051,7 +4060,10 @@ class StateVersionHistory:
         }
 
     @classmethod
-    def from_dict(cls, state_version_history_dict):
+    def from_dict(
+        cls,
+        state_version_history_dict: StateVersionHistoryDict
+    ) -> StateVersionHistory:
         """Return a StateVersionHistory domain object from a dict.
 
         Args:

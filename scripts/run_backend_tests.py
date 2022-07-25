@@ -191,6 +191,8 @@ class TestingTaskSpec:
             # see that.
             if 'ev_epollex_linux.cc' in str(e):
                 result = run_shell_cmd(exc_list, env=env)
+            else:
+                raise e
 
         messages = [result]
 
