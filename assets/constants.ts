@@ -6750,5 +6750,14 @@ export default {
   "ASSET_TYPE_IMAGE": "image",
   "ASSET_TYPE_THUMBNAIL": "thumbnail",
 
-  "FAVICON_ALERT_PATH": "/assets/images/favicon_alert/favicon_alert.ico"
+  "FAVICON_ALERT_PATH": "/assets/images/favicon_alert/favicon_alert.ico",
+
+  "CAN_FETCH_VERSION_HISTORY_DATA": false,
+  "METADATA_PROPERTIES": [
+    "title", "category", "objective", "language_code", "tags", "blurb",
+    "author_notes", "states_schema_version", "init_state_name", "param_specs",
+    "param_changes", "auto_tts_enabled", "correctness_feedback_enabled",
+    "edits_allowed"
+  ],
+  "NON_METADATA_PROPERTIES": ["id", "states"]
 } as const;

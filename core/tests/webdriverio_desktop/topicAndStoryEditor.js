@@ -1,4 +1,4 @@
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,22 +16,22 @@
  * @fileoverview End-to-end tests for the topic editor page.
  */
 
-var forms = require('../protractor_utils/forms.js');
-var general = require('../protractor_utils/general.js');
-var users = require('../protractor_utils/users.js');
-var waitFor = require('../protractor_utils/waitFor.js');
-var workflow = require('../protractor_utils/workflow.js');
+var forms = require('../webdriverio_utils/forms.js');
+var general = require('../webdriverio_utils/general.js');
+var users = require('../webdriverio_utils/users.js');
+var waitFor = require('../webdriverio_utils/waitFor.js');
+var workflow = require('../webdriverio_utils/workflow.js');
 
-var Constants = require('../protractor_utils/ProtractorConstants.js');
+var Constants = require('../webdriverio_utils/WebdriverioConstants.js');
 var TopicsAndSkillsDashboardPage =
-  require('../protractor_utils/TopicsAndSkillsDashboardPage.js');
-var TopicEditorPage = require('../protractor_utils/TopicEditorPage.js');
-var StoryEditorPage = require('../protractor_utils/StoryEditorPage.js');
-var SkillEditorPage = require('../protractor_utils/SkillEditorPage.js');
+  require('../webdriverio_utils/TopicsAndSkillsDashboardPage.js');
+var TopicEditorPage = require('../webdriverio_utils/TopicEditorPage.js');
+var StoryEditorPage = require('../webdriverio_utils/StoryEditorPage.js');
+var SkillEditorPage = require('../webdriverio_utils/SkillEditorPage.js');
 var ExplorationEditorPage =
-  require('../protractor_utils/ExplorationEditorPage.js');
+  require('../webdriverio_utils/ExplorationEditorPage.js');
 var ExplorationPlayerPage =
-  require('../protractor_utils/ExplorationPlayerPage.js');
+  require('../webdriverio_utils/ExplorationPlayerPage.js');
 
 describe('Topic editor functionality', function() {
   var topicsAndSkillsDashboardPage = null;
@@ -56,7 +56,7 @@ describe('Topic editor functionality', function() {
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createTopic(
       'Topic 1', 'unique-topic', 'Description', false);
-    var url = await browser.getCurrentUrl();
+    var url = await browser.getUrl();
     topicId = url.split('/')[4];
     await general.closeCurrentTabAndSwitchTo(handle);
     await users.logout();
@@ -72,7 +72,9 @@ describe('Topic editor functionality', function() {
       'Subtopic 1', 'subtopic-one', '../data/test2_svg.svg',
       'Subtopic content');
     await topicEditorPage.saveTopic('Added subtopic.');
+    await users.logout();
 
+    await users.login('creator@topicEditor.com');
     await topicEditorPage.get(topicId);
     await topicEditorPage.expectNumberOfSubtopicsToBe(1);
     await topicEditorPage.deleteSubtopicWithIndex(0);
@@ -87,7 +89,7 @@ describe('Topic editor functionality', function() {
     await topicsAndSkillsDashboardPage
       .createSkillWithDescriptionAndExplanation(
         'Skill 1', 'Concept card explanation', false);
-    var url = await browser.getCurrentUrl();
+    var url = await browser.getUrl();
     skillId = url.split('/')[4];
     await general.closeCurrentTabAndSwitchTo(handle);
     await topicsAndSkillsDashboardPage.get();
@@ -264,7 +266,7 @@ describe('Chapter editor functionality', function() {
         info.push(false);
         await workflow.createAndPublishExploration.apply(workflow, info);
       }
-      var url = await browser.getCurrentUrl();
+      var url = await browser.getUrl();
       var id = url.split('/')[4].replace('#', '');
       ids.push(id);
     }
@@ -333,7 +335,7 @@ describe('Chapter editor functionality', function() {
   it(
     'should check presence of skillreview RTE element in exploration ' +
     'linked to story', async function() {
-      await browser.get('/create/' + dummyExplorationIds[0]);
+      await browser.url('/create/' + dummyExplorationIds[0]);
       await waitFor.pageToFullyLoad();
       await explorationEditorMainTab.setContent(
         async function(richTextEditor) {
