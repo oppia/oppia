@@ -755,7 +755,9 @@ class CollectionSummaryQueriesUnitTests(CollectionServicesUnitTests):
         self.assertEqual(summaries[4].title, 'Learning basic verbs in Spanish')
         self.assertEqual(summaries[5].title, 'Private collection in Spanish')
 
-    def test_get_collection_summaries_with_no_query_dash_dash(self) -> None:
+    def test_publish_collection_raise_exception_for_invalid_collection_id(
+        self
+    ) -> None:
         system_user = user_services.get_system_user()
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception,

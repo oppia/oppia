@@ -74,7 +74,7 @@ SEARCH_INDEX_COLLECTIONS: Final = 'collections'
 MAX_ITERATIONS: Final = 10
 
 
-class SnapshotsMetaDataDict(TypedDict):
+class SnapshotsMetadataDict(TypedDict):
     """Dictionary representing the snapshot metadata for collection models."""
 
     committer_id: str
@@ -1051,7 +1051,7 @@ def delete_collections(
 
 def get_collection_snapshots_metadata(
     collection_id: str
-) -> List[SnapshotsMetaDataDict]:
+) -> List[SnapshotsMetadataDict]:
     """Returns the snapshots for this collection, as dicts.
 
     Args:

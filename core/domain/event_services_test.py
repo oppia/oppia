@@ -40,9 +40,7 @@ if MYPY:  # pragma: no cover
     from mypy_imports import stats_models
     from mypy_imports import user_models
 
-(
-    stats_models, feedback_models, user_models
-) = models.Registry.import_models([
+(stats_models, feedback_models, user_models) = models.Registry.import_models([
     models.NAMES.statistics, models.NAMES.feedback, models.NAMES.user
 ])
 

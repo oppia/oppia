@@ -39,9 +39,9 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import opportunity_models
 
-(opportunity_models,) = models.Registry.import_models(
-    [models.NAMES.opportunity]
-)
+(opportunity_models,) = models.Registry.import_models([
+    models.NAMES.opportunity
+])
 
 # NOTE TO DEVELOPERS: The functions:
 #   - delete_all_exploration_opportunity_summary_models()

@@ -84,7 +84,7 @@ RAND_RANGE = (1 << 30) - 1
 ID_LENGTH = 12
 
 
-class SnapshotsMetaDataDict(TypedDict):
+class SnapshotsMetadataDict(TypedDict):
     """Dictionary representing the snapshot metadata for versioned models."""
 
     committer_id: str
@@ -1563,7 +1563,7 @@ class VersionedModel(BaseModel):
             model_instance_id: str,
             version_numbers: List[int],
             allow_deleted: bool = False
-    ) -> List[SnapshotsMetaDataDict]:
+    ) -> List[SnapshotsMetadataDict]:
         """Gets a list of dicts, each representing a model snapshot.
 
         One dict is returned for each version number in the list of version
