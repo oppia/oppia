@@ -39,7 +39,7 @@ from core.domain import param_domain
 from core.domain import state_domain
 from core.domain import translation_domain
 
-from typing import Any, Callable, Dict, List, Optional, Set, Tuple, cast
+from typing import Any, Callable, Dict, List, Mapping, Optional, Sequence, Set, Tuple, cast
 from typing_extensions import Final, TypedDict
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
@@ -231,6 +231,23 @@ def clean_math_expression(math_expression: str) -> str:
     math_expression = re.sub(r'\\cdot', '*', math_expression)
 
     return math_expression
+
+
+class MetadataVersionHistoryDict(TypedDict):
+    """Dictionary representing MetadataVersionHistory object."""
+
+    last_edited_version_number: Optional[int]
+    last_edited_committer_id: str
+
+
+class ExplorationVersionHistoryDict(TypedDict):
+    """Dictionary representing ExplorationVersionHistory object."""
+
+    exploration_id: str
+    exploration_version: int
+    state_version_history: Dict[str, state_domain.StateVersionHistoryDict]
+    metadata_version_history: MetadataVersionHistoryDict
+    committer_ids: List[str]
 
 
 class ExplorationChange(change_domain.BaseChange):
@@ -535,7 +552,7 @@ class ExplorationCommitLogEntry:
         exploration_id: str,
         commit_type: str,
         commit_message: str,
-        commit_cmds: List[Dict[str, Any]],
+        commit_cmds: Sequence[Mapping[str, change_domain.AcceptableChangeDictTypes]],
         version: int,
         post_commit_status: str,
         post_commit_community_owned: bool,
@@ -3911,13 +3928,6 @@ class ExplorationMetadata:
         }
 
 
-class MetadataVersionHistoryDict(TypedDict):
-    """Dictionary representing the MetadataVersionHistory object."""
-
-    last_edited_version_number: int
-    last_edited_committer_id: str
-
-
 class MetadataVersionHistory:
     """Class to represent an element of the version history list of the
     exploration metadata.
@@ -3931,9 +3941,9 @@ class MetadataVersionHistory:
 
     def __init__(
         self,
-        last_edited_version_number: int,
+        last_edited_version_number: Optional[int],
         last_edited_committer_id: str
-    ) -> None:
+    ):
         """Initializes the MetadataVersionHistory domain object.
 
         Args:
@@ -3976,3 +3986,77 @@ class MetadataVersionHistory:
             metadata_version_history_dict['last_edited_version_number'],
             metadata_version_history_dict['last_edited_committer_id']
         )
+
+
+class ExplorationVersionHistory:
+    """Class to represent the version history of an exploration at a
+    particular version.
+
+    Attributes:
+        exploration_id: str. The id of the exploration.
+        exploration_version: int. The version number of the exploration.
+        state_version_history: Dict[str, StateVersionHistory].
+            The mapping of state names and StateVersionHistory domain objects.
+        metadata_version_history: MetadataVersionHistory. The details of the
+            last commit on the exploration metadata.
+        committer_ids: List[str]. A list of user ids who made the
+            'previous commit' on each state and the exploration metadata.
+    """
+
+    def __init__(
+        self,
+        exploration_id: str,
+        exploration_version: int,
+        state_version_history_dict: Dict[
+            str, state_domain.StateVersionHistoryDict
+        ],
+        metadata_last_edited_version_number: Optional[int],
+        metadata_last_edited_committer_id: str,
+        committer_ids: List[str]
+    ) -> None:
+        """Initializes the ExplorationVersionHistory domain object.
+
+        Args:
+            exploration_id: str. The id of the exploration.
+            exploration_version: int. The version number of the exploration.
+            state_version_history_dict: dict. The mapping of state names and
+                dicts of StateVersionHistory domain objects.
+            metadata_last_edited_version_number: int. The version number of the
+                exploration in which the metadata was last edited.
+            metadata_last_edited_committer_id: str. The user id of the user who
+                committed the latest changes to the exploration metadata.
+            committer_ids: List[str]. A list of user ids who made the
+                'previous commit' on each state and the exploration metadata.
+        """
+        self.exploration_id = exploration_id
+        self.exploration_version = exploration_version
+        self.state_version_history = {
+            state_name: state_domain.StateVersionHistory.from_dict(vh_dict)
+            for state_name, vh_dict in state_version_history_dict.items()
+        }
+        self.metadata_version_history = MetadataVersionHistory(
+            metadata_last_edited_version_number,
+            metadata_last_edited_committer_id
+        )
+        self.committer_ids = committer_ids
+
+    def to_dict(self) -> ExplorationVersionHistoryDict:
+        """Returns a dict representation of the ExplorationVersionHistory
+        domain object.
+
+        Returns:
+            dict. A dict representation of the ExplorationVersionHistory
+            domain object.
+        """
+        return {
+            'exploration_id': self.exploration_id,
+            'exploration_version': self.exploration_version,
+            'state_version_history': {
+                state_name: state_vh.to_dict()
+                for state_name, state_vh in self.state_version_history.items()
+            },
+            'metadata_version_history': (
+                self.metadata_version_history.to_dict()
+            ),
+            'committer_ids': self.committer_ids
+        }
