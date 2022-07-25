@@ -399,11 +399,11 @@ var TopicEditorPage = function() {
   };
 
   this.expectNumberOfStoriesToBe = async function(count) {
-    var storyListItems = await storyListItemsSelector();
     if (count) {
       await waitFor.visibilityOf(
         storyListTable, 'Story list table takes too long to appear.');
     }
+    var storyListItems = await storyListItemsSelector();
     expect(storyListItems.length).toEqual(count);
   };
 
