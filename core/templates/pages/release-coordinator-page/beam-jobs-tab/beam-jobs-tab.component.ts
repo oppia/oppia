@@ -46,14 +46,14 @@ export class BeamJobsTabComponent implements OnInit, OnDestroy {
   jobNameControl = new FormControl('');
 
   dataIsReady = false;
-  beamJobs: BeamJob[] = null;
-  selectedJob: BeamJob = null;
+  beamJobs!: BeamJob[];
+  selectedJob!: BeamJob | null;
 
   jobNames = new BehaviorSubject<string[]>([]);
   beamJobRuns = new BehaviorSubject<BeamJobRun[]>([]);
-  filteredJobNames: Observable<string[]>;
-  filteredBeamJobRuns: Observable<BeamJobRun[]>;
-  beamJobRunsRefreshIntervalSubscription: Subscription;
+  filteredJobNames!: Observable<string[]>;
+  filteredBeamJobRuns!: Observable<BeamJobRun[]>;
+  beamJobRunsRefreshIntervalSubscription!: Subscription;
 
   constructor(
       private backendApiService: ReleaseCoordinatorBackendApiService,
@@ -139,7 +139,12 @@ export class BeamJobsTabComponent implements OnInit, OnDestroy {
   }
 
   onJobNameSelect(jobName: string): void {
-    this.selectedJob = this.beamJobs.find(job => job.name === jobName);
+    let beamJob = this.beamJobs.find(job => job.name === jobName);
+    if (beamJob === undefined) {
+      this.selectedJob = null;
+    } else {
+      this.selectedJob = beamJob;
+    }
   }
 
   onStartNewClick(ev: Event): void {

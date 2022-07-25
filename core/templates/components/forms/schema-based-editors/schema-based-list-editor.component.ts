@@ -54,26 +54,32 @@ implements ControlValueAccessor, Validator {
   }
 
   directiveSubscriptions = new Subscription();
-  @Input() disabled: boolean;
+  @Input() disabled!: boolean;
   // Read-only property. The schema definition for each item in the list.
-  @Input() itemSchema: {
+  @Input() itemSchema!: {
     'ui_config': {'coding_mode': unknown; rows: number};
   } & Schema;
   // The length of the list. If not specified, the list is of arbitrary
   // length.
 
-  @Input() len: number;
+  @Input() len!: number;
   // UI configuration. May be undefined.
-  @Input() uiConfig: {'add_element_text': string};
-  @Input() validators: OppiaValidator[];
-  @Input() labelForFocusTarget: string;
-  onChange: (value: unknown) => void = (_: unknown) => {};
-  isAddItemButtonPresent: boolean;
-  addElementText: string;
-  isOneLineInput: boolean;
-  minListLength: number;
-  maxListLength: number;
-  showDuplicatesWarning: boolean;
+  @Input() uiConfig!: {'add_element_text': string};
+  @Input() validators!: OppiaValidator[];
+  @Input() labelForFocusTarget!: string;
+  addElementText!: string;
+  // Min list length is null when their is no validator set for the minimum
+  // length.
+  minListLength!: number | null;
+  // Max list length is null when their is no validator set for the maximum
+  // length.
+  maxListLength!: number | null;
+  onChange: (value: SchemaDefaultValue[]) => void = (
+    (_: SchemaDefaultValue[]) => {});
+
+  isAddItemButtonPresent: boolean = false;
+  isOneLineInput: boolean = false;
+  showDuplicatesWarning: boolean = false;
   constructor(
     private focusManagerService: FocusManagerService,
     private idGenerationService: IdGenerationService,
@@ -88,7 +94,7 @@ implements ControlValueAccessor, Validator {
     }
   }
 
-  registerOnChange(fn: (value: unknown) => void): void {
+  registerOnChange(fn: (value: SchemaDefaultValue[]) => void): void {
     this.onChange = fn;
   }
 
@@ -243,16 +249,22 @@ implements ControlValueAccessor, Validator {
     if (this.validators) {
       for (var i = 0; i < this.validators.length; i++) {
         if (this.validators[i].id === 'has_length_at_most') {
-          this.maxListLength = this.validators[i].max_value;
+          let maxValue = this.validators[i].max_value;
+          this.maxListLength = maxValue !== undefined ? maxValue : null;
         } else if (this.validators[i].id === 'has_length_at_least') {
-          this.minListLength = this.validators[i].min_value;
+          let minValue = this.validators[i].min_value;
+          this.minListLength = minValue !== undefined ? minValue : null;
         } else if (this.validators[i].id === 'is_uniquified') {
           this.showDuplicatesWarning = true;
         }
       }
     }
 
-    while (this.localValue && this.localValue.length < this.minListLength) {
+    while (
+      this.localValue &&
+      this.minListLength &&
+      this.localValue.length < this.minListLength
+    ) {
       this.localValue.push(
         this.schemaDefaultValueService.getDefaultValue(this.itemSchema));
     }

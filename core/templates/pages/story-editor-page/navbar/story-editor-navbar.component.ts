@@ -35,16 +35,16 @@ import { StoryEditorNavigationService } from '../services/story-editor-navigatio
   templateUrl: './story-editor-navbar.component.html'
 })
 export class StoryEditorNavbarComponent implements OnInit {
-  @Input() commitMessage;
-  validationIssues: string[];
-  prepublishValidationIssues: string | string[];
-  story: Story;
-  forceValidateExplorations: boolean;
-  storyIsPublished: boolean;
-  warningsAreShown: boolean;
-  showNavigationOptions: boolean;
-  showStoryEditOptions: boolean;
-  activeTab: string;
+  @Input() commitMessage!: string;
+  validationIssues!: string[];
+  prepublishValidationIssues!: string | string[];
+  story!: Story;
+  forceValidateExplorations: boolean = false;
+  storyIsPublished: boolean = false;
+  warningsAreShown: boolean = false;
+  showNavigationOptions: boolean = false;
+  showStoryEditOptions: boolean = false;
+  activeTab!: string;
   constructor(
     private storyEditorStateService: StoryEditorStateService,
     private undoRedoService: UndoRedoService,
@@ -58,7 +58,7 @@ export class StoryEditorNavbarComponent implements OnInit {
   EDITOR = 'Editor';
   PREVIEW = 'Preview';
   directiveSubscriptions = new Subscription();
-  explorationValidationIssues = [];
+  explorationValidationIssues: string[] = [];
 
   isStoryPublished(): boolean {
     return this.storyEditorStateService.isStoryPublished();
@@ -126,7 +126,7 @@ export class StoryEditorNavbarComponent implements OnInit {
     let storyPrepublishValidationIssues = (
       this.story.prepublishValidate());
     let nodePrepublishValidationIssues = (
-      [].concat.apply([], nodes.map(
+      Array.prototype.concat.apply([], nodes.map(
         (node) => node.prepublishValidate())));
     this.prepublishValidationIssues = (
       storyPrepublishValidationIssues.concat(
@@ -135,15 +135,16 @@ export class StoryEditorNavbarComponent implements OnInit {
 
   private _validateExplorations(): void {
     let nodes = this.story.getStoryContents().getNodes();
-    let explorationIds = [];
+    let explorationIds: string[] = [];
 
     if (
       this.storyEditorStateService.areAnyExpIdsChanged() ||
       this.forceValidateExplorations) {
       this.explorationValidationIssues = [];
       for (let i = 0; i < nodes.length; i++) {
-        if (nodes[i].getExplorationId() !== null) {
-          explorationIds.push(nodes[i].getExplorationId());
+        let explorationId = nodes[i].getExplorationId();
+        if (explorationId !== null) {
+          explorationIds.push(explorationId);
         } else {
           this.explorationValidationIssues.push(
             'Some chapters don\'t have exploration IDs provided.');
@@ -170,8 +171,8 @@ export class StoryEditorNavbarComponent implements OnInit {
     modalRef.result.then((commitMessage) => {
       this.storyEditorStateService.saveStory(
         commitMessage, () => {
-        }, (errorMessage: string) => {
-          this.alertsService.addInfoMessage(errorMessage, 5000);
+        }, (errorMessage: unknown) => {
+          this.alertsService.addInfoMessage(errorMessage as string, 5000);
         }
       );
     }, () => {

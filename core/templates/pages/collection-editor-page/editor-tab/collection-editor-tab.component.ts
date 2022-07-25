@@ -27,7 +27,7 @@ import { CollectionLinearizerService } from '../services/collection-linearizer.s
   templateUrl: './collection-editor-tab.component.html'
 })
 export class CollectionEditorTabComponent {
-  collection: Collection;
+  collection!: Collection;
 
   constructor(
     private collectionEditorStateService: CollectionEditorStateService,

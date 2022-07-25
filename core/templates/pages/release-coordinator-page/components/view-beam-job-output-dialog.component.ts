@@ -34,8 +34,8 @@ import { AlertsService } from 'services/alerts.service';
 })
 export class ViewBeamJobOutputDialogComponent implements OnInit, OnDestroy {
   selectedTab = new FormControl(0);
-  output: BeamJobRunResult = null;
-  subscription: Subscription = null;
+  output!: BeamJobRunResult;
+  subscription!: Subscription;
 
   constructor(
       @Inject(MAT_DIALOG_DATA) public beamJobRun: BeamJobRun,
@@ -52,7 +52,12 @@ export class ViewBeamJobOutputDialogComponent implements OnInit, OnDestroy {
           return of(null);
         }),
       )
-    ).subscribe(output => this.output = output);
+    ).subscribe(output => {
+      if (output === null) {
+        throw new Error('Beam job run output was not retrieved.');
+      }
+      this.output = output;
+    });
   }
 
   ngOnDestroy(): void {

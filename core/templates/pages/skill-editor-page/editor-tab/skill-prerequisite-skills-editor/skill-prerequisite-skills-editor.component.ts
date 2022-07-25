@@ -37,12 +37,12 @@ import { downgradeComponent } from '@angular/upgrade/static';
 })
 export class SkillPrerequisiteSkillsEditorComponent
 implements OnInit {
-  categorizedSkills: CategorizedSkills;
-  untriagedSkillSummaries: SkillSummary[];
-  groupedSkillSummaries: GroupedSkillSummaries;
-  skillIdToSummaryMap: object;
-  prerequisiteSkillsAreShown: boolean;
-  skill: Skill;
+  categorizedSkills!: CategorizedSkills;
+  untriagedSkillSummaries!: SkillSummary[];
+  groupedSkillSummaries!: GroupedSkillSummaries;
+  skillIdToSummaryMap!: Record<string, string>;
+  prerequisiteSkillsAreShown: boolean = false;
+  skill!: Skill;
   allAvailableSkills: SkillSummary[] = [];
 
   constructor(
@@ -88,7 +88,7 @@ implements OnInit {
     modalRef.componentInstance.untriagedSkillSummaries = (
       this.untriagedSkillSummaries);
 
-    const whenResolved = (summary): void => {
+    const whenResolved = (summary: SkillSummary): void => {
       let skillId = summary.id;
       if (skillId === this.skill.getId()) {
         this.alertsService.addInfoMessage(
@@ -121,12 +121,14 @@ implements OnInit {
     }
   }
 
-  getSkillDescription(skillIdUpdate: string): string {
+  // Return null if the skill is not found.
+  getSkillDescription(skillIdUpdate: string): string | null {
     for (let skill of this.allAvailableSkills) {
       if (skill.id === skillIdUpdate) {
         return skill.description;
       }
     }
+    return null;
   }
 
   ngOnInit(): void {
@@ -147,7 +149,8 @@ implements OnInit {
     this.skillIdToSummaryMap = {};
 
     for (let name in this.groupedSkillSummaries) {
-      let skillSummaries = this.groupedSkillSummaries[name];
+      let skillSummaries = (
+        this.groupedSkillSummaries[name as keyof GroupedSkillSummaries]);
       for (let idx in skillSummaries) {
         this.skillIdToSummaryMap[skillSummaries[idx].id] =
           skillSummaries[idx].description;

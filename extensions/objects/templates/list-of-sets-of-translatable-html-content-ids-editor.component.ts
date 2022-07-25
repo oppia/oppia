@@ -23,9 +23,9 @@ import { ObjectFormValidityChangeEvent } from 'app-events/app-events';
 import { EventBusGroup, EventBusService } from 'app-events/event-bus.service';
 
 interface Choice {
-  id: unknown;
+  id: string;
   selectedRank: string;
-  val: unknown;
+  val: string;
 }
 @Component({
   selector: 'list-of-sets-of-translatable-html-content-ids-editor',
@@ -34,21 +34,24 @@ interface Choice {
   styleUrls: []
 })
 export class ListOfSetsOfTranslatableHtmlContentIdsEditorComponent {
-  @Input() modalId: symbol;
-  @Input() initArgs;
-  @Input() value;
+  @Input() modalId!: symbol;
+  @Input() initArgs!: {
+    choices: Choice[];
+  };
+
+  @Input() value!: string[][];
   @Output() valueChanged = new EventEmitter;
-  errorMessage = '';
-  validOrdering = true;
-  choices: Choice[];
-  initValues: unknown[];
-  eventBusGroup: EventBusGroup;
+  errorMessage: string = '';
+  validOrdering: boolean = true;
+  choices!: Choice[];
+  initValues!: number[];
+  eventBusGroup!: EventBusGroup;
   constructor(private eventBusService: EventBusService) {
     this.eventBusGroup = new EventBusGroup(this.eventBusService);
   }
 
-  allowedChoices(): Choice[] {
-    const allowedList = [];
+  allowedChoices(): number[] {
+    const allowedList: number[] = [];
     for (var i = 1; i <= this.choices.length; i++) {
       allowedList.push(i);
     }

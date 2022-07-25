@@ -37,7 +37,7 @@ import constants from 'assets/constants';
 export class SkillEditorStalenessDetectionService {
   _staleTabEventEmitter = new EventEmitter<void>();
   _presenceOfUnsavedChangesEventEmitter = new EventEmitter<void>();
-  unsavedChangesWarningModalRef: NgbModalRef = null;
+  unsavedChangesWarningModalRef!: NgbModalRef;
 
   constructor(
     private ngbModal: NgbModal,
@@ -60,7 +60,7 @@ export class SkillEditorStalenessDetectionService {
 
   showStaleTabInfoModal(): void {
     const skill = this.skillEditorStateService.getSkill();
-    const skillEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
+    const skillEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo | null = (
       this.localStorageService.getEntityEditorBrowserTabsInfo(
         EntityEditorBrowserTabsInfoDomainConstants
           .OPENED_SKILL_EDITOR_BROWSER_TABS, skill.getId()));

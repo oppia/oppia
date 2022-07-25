@@ -29,6 +29,7 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
 import { Skill } from 'domain/skill/SkillObjectFactory';
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
 
 describe('Skill editor main tab Component', () => {
   let component: SkillPrerequisiteSkillsEditorComponent;
@@ -44,7 +45,7 @@ describe('Skill editor main tab Component', () => {
 
   let topicAndSkillsDashboardDataBackendDict: TopicsAndSkillDashboardData;
   let sampleSkill: Skill;
-  let skillSummaryDict = null;
+  let skillSummaryDict: SkillSummaryBackendDict;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -302,7 +303,7 @@ describe('Skill editor main tab Component', () => {
 
   it('should remove skill id when calling \'removeSkillId\'', () => {
     let deleteSpy = spyOn(skillUpdateService, 'deletePrerequisiteSkill')
-      .and.returnValue(null);
+      .and.returnValue();
 
     component.removeSkillId('xyz');
 
@@ -352,7 +353,7 @@ describe('Skill editor main tab Component', () => {
         }) as NgbModalRef;
       });
       let alertsSpy = spyOn(alertsService, 'addInfoMessage')
-        .and.returnValue(null);
+        .and.returnValue();
 
       component.skill = sampleSkill;
       component.addSkill();
@@ -374,7 +375,7 @@ describe('Skill editor main tab Component', () => {
       });
 
       let alertsSpy = spyOn(alertsService, 'addInfoMessage')
-        .and.returnValue(null);
+        .and.returnValue();
 
       component.skill = sampleSkill;
       component.addSkill();

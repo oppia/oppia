@@ -23,10 +23,66 @@ import { QuestionBackendApiService } from
   'domain/question/question-backend-api.service';
 
 describe('Question backend Api service', () => {
-  let questionBackendApiService = null;
-  let sampleDataResults = null;
-  let sampleResponse = null;
+  let questionBackendApiService: QuestionBackendApiService;
   let httpTestingController: HttpTestingController;
+  let sampleResponse = {
+    question_summary_dicts: [{
+      skill_descriptions: [],
+      summary: {
+        creator_id: '1',
+        created_on_msec: 0,
+        last_updated_msec: 0,
+        id: '0',
+        question_content: ''
+      }
+    }],
+    more: false
+  };
+  // Sample question object returnable from the backend.
+  let sampleDataResults = {
+    question_dicts: [{
+      id: '0',
+      question_state_data: {
+        content: {
+          html: 'Question 1'
+        },
+        recorded_voiceovers: {
+          voiceovers_mapping: {}
+        },
+        interaction: {
+          answer_groups: [],
+          confirmed_unclassified_answers: [],
+          customization_args: {},
+          default_outcome: {
+            dest: null,
+            dest_if_really_stuck: null,
+            feedback: {
+              html: 'Correct Answer'
+            },
+            param_changes: [],
+            labelled_as_correct: true
+          },
+          hints: [{
+            hint_content: {
+              html: 'Hint 1'
+            }
+          }],
+          solution: {
+            correct_answer: 'This is the correct answer',
+            answer_is_exclusive: false,
+            explanation: {
+              html: 'Solution explanation'
+            }
+          },
+          id: 'TextInput'
+        },
+        param_changes: [],
+        solicit_answer_details: false
+      },
+      language_code: 'en',
+      version: 1
+    }]
+  };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -35,66 +91,6 @@ describe('Question backend Api service', () => {
 
     questionBackendApiService = TestBed.get(QuestionBackendApiService);
     httpTestingController = TestBed.get(HttpTestingController);
-
-    // Sample question object returnable from the backend.
-    sampleDataResults = {
-      question_dicts: [{
-        id: '0',
-        question_state_data: {
-          content: {
-            html: 'Question 1'
-          },
-          recorded_voiceovers: {
-            voiceovers_mapping: {}
-          },
-          interaction: {
-            answer_groups: [],
-            confirmed_unclassified_answers: [],
-            customization_args: {},
-            default_outcome: {
-              dest: null,
-              dest_if_really_stuck: null,
-              feedback: {
-                html: 'Correct Answer'
-              },
-              param_changes: [],
-              labelled_as_correct: true
-            },
-            hints: [{
-              hint_content: {
-                html: 'Hint 1'
-              }
-            }],
-            solution: {
-              correct_answer: 'This is the correct answer',
-              answer_is_exclusive: false,
-              explanation: {
-                html: 'Solution explanation'
-              }
-            },
-            id: 'TextInput'
-          },
-          param_changes: [],
-          solicit_answer_details: false
-        },
-        language_code: 'en',
-        version: 1
-      }]
-    };
-
-    sampleResponse = {
-      question_summary_dicts: [{
-        skill_descriptions: [],
-        summary: {
-          creator_id: '1',
-          created_on_msec: 0,
-          last_updated_msec: 0,
-          id: '0',
-          question_content: ''
-        }
-      }],
-      more: false
-    };
   });
 
   afterEach(() => {
@@ -228,7 +224,8 @@ describe('Question backend Api service', () => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
       questionBackendApiService.fetchQuestionsAsync(
-        ['1'], 'abc', true).then(successHandler, failHandler);
+        ['1'], 'abc' as unknown as number, true
+      ).then(successHandler, failHandler);
       flushMicrotasks();
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith(
@@ -267,7 +264,7 @@ describe('Question backend Api service', () => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
       questionBackendApiService.fetchQuestionsAsync(
-        'x', 1, true).then(successHandler, failHandler);
+        'x' as unknown as string[], 1, true).then(successHandler, failHandler);
       flushMicrotasks();
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith(
@@ -280,7 +277,8 @@ describe('Question backend Api service', () => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
       questionBackendApiService.fetchQuestionsAsync(
-        [1, 2], 1, true).then(successHandler, failHandler);
+        [1, 2] as unknown as string[], 1, true
+      ).then(successHandler, failHandler);
       flushMicrotasks();
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith(
@@ -293,7 +291,7 @@ describe('Question backend Api service', () => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
       questionBackendApiService.fetchQuestionsAsync(
-        null, 1, true).then(successHandler, failHandler);
+        [], 1, true).then(successHandler, failHandler);
       flushMicrotasks();
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith(
@@ -306,7 +304,7 @@ describe('Question backend Api service', () => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
       questionBackendApiService.fetchQuestionsAsync(
-        ['1'], null, true).then(successHandler, failHandler);
+        ['1'], 0, true).then(successHandler, failHandler);
       flushMicrotasks();
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith(

@@ -49,23 +49,25 @@ interface OppiaValidator {
 })
 export class SchemaBasedFloatEditorComponent
 implements ControlValueAccessor, OnInit, Validator {
-  localValue: number | null;
-  @Input() disabled: boolean = false;
-  @Input() validators: OppiaValidator[];
-  @Input() labelForFocusTarget: string;
   @Output() inputBlur = new EventEmitter<void>();
   @Output() inputFocus = new EventEmitter<void>();
-  @ViewChild('floatform', {'static': true}) floatForm: NgForm;
-  userHasFocusedAtLeastOnce: boolean;
-  userIsCurrentlyTyping: boolean;
+  // If input is empty, the number value should be null.
+  localValue!: number | null;
+  @Input() disabled!: boolean;
+  @Input() validators!: OppiaValidator[];
+  @Input() labelForFocusTarget!: string;
+  @Input() uiConfig!: {checkRequireNonnegativeInput: boolean};
+  @ViewChild('floatform', {'static': true}) floatForm!: NgForm;
+  labelForErrorFocusTarget!: string;
+  minValue!: number;
+  localStringValue!: string;
+  userHasFocusedAtLeastOnce: boolean = false;
+  userIsCurrentlyTyping: boolean = false;
+  // Error message is null if there are no errors or input is empty.
   errorStringI18nKey: string | null = null;
-  labelForErrorFocusTarget: string;
-  hasLoaded: boolean;
-  onChange: (value: number) => void = () => {};
-  @Input() uiConfig: {checkRequireNonnegativeInput: boolean};
+  hasLoaded: boolean = false;
+  onChange: (value: number | null) => void = () => {};
   checkRequireNonnegativeInputValue: boolean = false;
-  minValue: number;
-  localStringValue: string;
 
   constructor(
     private focusManagerService: FocusManagerService,
@@ -80,7 +82,7 @@ implements ControlValueAccessor, OnInit, Validator {
   }
 
   // Implemented as a part of ControlValueAccessor interface.
-  registerOnChange(fn: (value: number) => void): void {
+  registerOnChange(fn: (value: number | null) => void): void {
     this.onChange = fn;
   }
 
@@ -140,7 +142,9 @@ implements ControlValueAccessor, OnInit, Validator {
       checkRequireNonnegativeInput);
     // If customization argument of numeric input interaction is true,
     // set Min value as 0 to not let down key go below 0.
-    this.minValue = checkRequireNonnegativeInput && 0;
+    if (checkRequireNonnegativeInput) {
+      this.minValue = 0;
+    }
     // So that focus is applied after all the functions in
     // main thread have executed.
     setTimeout(() => {
@@ -163,28 +167,36 @@ implements ControlValueAccessor, OnInit, Validator {
     this.inputBlur.emit();
   }
 
-  getMinValue(): number {
+  // Return null if their is no validator set for the least significant digit.
+  getMinValue(): number | null {
     for (var i = 0; i < this.validators.length; i++) {
       if (this.validators[i].id === 'is_at_least') {
         return this.validators[i].min_value;
       }
     }
+    return null;
   }
 
-  getMaxValue(): number {
+  // Return null if their is no validator set for the most significant digit.
+  getMaxValue(): number | null {
     for (var i = 0; i < this.validators.length; i++) {
       if (this.validators[i].id === 'is_at_most') {
         return this.validators[i].max_value;
       }
     }
+    return null;
   }
 
   generateErrors(): void {
-    this.errorStringI18nKey = (
-      this.numericInputValidationService.validateNumber(
-        this.localValue,
-        this.checkRequireNonnegativeInputValue,
-        this.getCurrentDecimalSeparator())) || null;
+    if (this.localValue !== null) {
+      this.errorStringI18nKey = (
+        this.numericInputValidationService.validateNumber(
+          this.localValue,
+          this.checkRequireNonnegativeInputValue,
+          this.getCurrentDecimalSeparator())) || null;
+    } else {
+      this.errorStringI18nKey = null;
+    }
   }
 
   onKeypress(evt: KeyboardEvent): void {

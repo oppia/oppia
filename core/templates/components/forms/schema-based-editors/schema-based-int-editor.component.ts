@@ -22,6 +22,12 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 
+interface OppiaValidator {
+  id: string;
+  'min_value': number;
+  'max_value': number;
+}
+
 @Component({
   selector: 'schema-based-int-editor',
   templateUrl: './schema-based-int-editor.component.html',
@@ -41,11 +47,11 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
 })
 export class SchemaBasedIntEditorComponent
 implements ControlValueAccessor, OnInit, Validator {
-  localValue;
-  @Input() disabled;
-  @Input() notRequired;
-  @Input() validators;
-  @Input() labelForFocusTarget;
+  localValue!: number;
+  @Input() disabled!: boolean;
+  @Input() notRequired!: boolean;
+  @Input() validators!: OppiaValidator[];
+  @Input() labelForFocusTarget!: string;
   @Output() inputBlur = new EventEmitter<void>();
   @Output() inputFocus = new EventEmitter<void>();
   onChange: (val: number) => void = () => {};

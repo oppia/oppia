@@ -19,6 +19,7 @@
 import { Component, forwardRef, Input, OnInit } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, ControlValueAccessor, Validator, AbstractControl, ValidationErrors } from '@angular/forms';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { Schema } from 'services/schema-default-value.service';
 
 @Component({
   selector: 'schema-based-choices-editor',
@@ -38,12 +39,12 @@ import { downgradeComponent } from '@angular/upgrade/static';
 })
 export class SchemaBasedChoicesEditorComponent
 implements ControlValueAccessor, OnInit, Validator {
-  localValue: string;
-  @Input() disabled: boolean;
+  localValue!: string;
+  @Input() disabled!: boolean;
   // The choices for the object's value.
-  @Input() choices: string[];
+  @Input() choices!: string[];
   // The schema for this object.
-  @Input() schema: unknown;
+  @Input() schema!: Schema;
   onChange: (val: string) => void = () => {};
 
   // Implemented as a part of ControlValueAccessor interface.

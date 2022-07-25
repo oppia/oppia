@@ -27,7 +27,7 @@ import { ConfirmOrCancelModal } from 'components/common-layout-directives/common
 })
 
 export class PreviewSetParametersModalComponent extends ConfirmOrCancelModal {
-  @Input() manualParamChanges: string[];
+  @Input() manualParamChanges!: string[];
 
   constructor(
     private ngbActiveModal: NgbActiveModal,

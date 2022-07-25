@@ -40,8 +40,8 @@ export class StoryEditorNavbarBreadcrumbComponent {
      private urlInterpolationService: UrlInterpolationService
   ) {}
 
-  topicName: string;
-  story: Story;
+  topicName!: string;
+  story!: Story;
   directiveSubscriptions = new Subscription();
   TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topicId>';
 

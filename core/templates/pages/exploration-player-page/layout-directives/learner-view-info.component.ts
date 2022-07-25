@@ -45,15 +45,15 @@ import './learner-view-info.component.css';
   templateUrl: './learner-view-info.component.html'
 })
 export class LearnerViewInfoComponent {
-  explorationId: string;
+  explorationId!: string;
   directiveSubscriptions: Subscription = new Subscription();
-  explorationTitle: string;
-  explorationTitleTranslationKey: string;
-  isLinkedToTopic: boolean;
-  storyPlaythroughObject: StoryPlaythrough;
-  topicName: string;
-  topicNameTranslationKey: string;
-  expInfo: LearnerExplorationSummaryBackendDict;
+  explorationTitle!: string;
+  explorationTitleTranslationKey!: string;
+  isLinkedToTopic: boolean = false;
+  storyPlaythroughObject!: StoryPlaythrough;
+  topicName!: string;
+  topicNameTranslationKey!: string;
+  expInfo!: LearnerExplorationSummaryBackendDict;
 
   constructor(
     private ngbModal: NgbModal,
@@ -131,12 +131,10 @@ export class LearnerViewInfoComponent {
     let topicUrlFragment: string;
     let classroomUrlFragment: string;
 
-    try {
-      topicUrlFragment = (
-        this.urlService.getTopicUrlFragmentFromLearnerUrl());
-      classroomUrlFragment = (
-        this.urlService.getClassroomUrlFragmentFromLearnerUrl());
-    } catch (e) {}
+    topicUrlFragment = (
+      this.urlService.getTopicUrlFragmentFromLearnerUrl());
+    classroomUrlFragment = (
+      this.urlService.getClassroomUrlFragmentFromLearnerUrl());
 
     return topicUrlFragment &&
       classroomUrlFragment &&

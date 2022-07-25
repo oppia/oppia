@@ -16,7 +16,7 @@
  * @fileoverview Component for add answer group modal.
  */
 
-import { EventBusGroup, EventBusService } from 'app-events/event-bus.service';
+import { EventBusGroup, EventBusService, Newable } from 'app-events/event-bus.service';
 import { ObjectFormValidityChangeEvent } from 'app-events/app-events';
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
@@ -35,6 +35,7 @@ import { Outcome, OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectF
 import { AppConstants } from 'app.constants';
 import { EditabilityService } from 'services/editability.service';
 import cloneDeep from 'lodash/cloneDeep';
+import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
 
  interface TaggedMisconception {
    skillId: string;
@@ -53,18 +54,18 @@ import cloneDeep from 'lodash/cloneDeep';
 export class AddAnswerGroupModalComponent
    extends ConfirmOrCancelModal implements OnInit, OnDestroy {
    @Output() addState = new EventEmitter();
-   @Input() currentInteractionId: string;
-   @Input() stateName: string | null;
+   @Input() currentInteractionId!: string;
+   @Input() stateName!: string;
 
-   isEditable: boolean;
-   eventBusGroup: EventBusGroup;
-   feedbackEditorIsOpen: boolean;
-   tmpRule: Rule;
-   tmpOutcome: Outcome;
-   tmpTaggedSkillMisconceptionId: string | null;
-   addAnswerGroupForm: object;
-   questionModeEnabled: boolean;
-   isInvalid: boolean;
+   isEditable: boolean = false;
+   eventBusGroup!: EventBusGroup;
+   feedbackEditorIsOpen: boolean = false;
+   tmpRule!: Rule;
+   tmpOutcome!: Outcome;
+   tmpTaggedSkillMisconceptionId!: string | null;
+   addAnswerGroupForm!: object;
+   questionModeEnabled: boolean = false;
+   isInvalid: boolean = false;
    modalId = Symbol();
    validation: boolean = false;
 
@@ -114,8 +115,9 @@ export class AddAnswerGroupModalComponent
    // This returns false if the current interaction ID is null.
    isCurrentInteractionLinear(): boolean {
      return (
-       this.currentInteractionId &&
-       INTERACTION_SPECS[this.currentInteractionId].is_linear);
+       Boolean(this.currentInteractionId) &&
+       INTERACTION_SPECS[
+         this.currentInteractionId as InteractionSpecsKey].is_linear);
    }
 
    isFeedbackLengthExceeded(tmpOutcome: Outcome): boolean {
@@ -155,7 +157,7 @@ export class AddAnswerGroupModalComponent
 
    ngOnInit(): void {
      this.eventBusGroup.on(
-       ObjectFormValidityChangeEvent,
+       ObjectFormValidityChangeEvent as Newable<ObjectFormValidityChangeEvent>,
        event => {
          if (event.message.modalId === this.modalId) {
            this.isInvalid = event.message.value;
@@ -171,11 +173,11 @@ export class AddAnswerGroupModalComponent
      this.questionModeEnabled = (
        this.stateEditorService.isInQuestionMode());
 
-     this.tmpRule = this.ruleObjectFactory.createNew(null, {}, {});
+     this.tmpRule = this.ruleObjectFactory.createNew('', {}, {});
      var feedbackContentId = this.generateContentIdService.getNextStateId(
        AppConstants.COMPONENT_NAME_FEEDBACK);
      this.tmpOutcome = this.outcomeObjectFactory.createNew(
-       this.questionModeEnabled ? null : this.stateName,
+       this.questionModeEnabled ? '' : this.stateName,
        feedbackContentId, '', []);
    }
 

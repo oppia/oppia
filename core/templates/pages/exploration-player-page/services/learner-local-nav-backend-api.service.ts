@@ -26,7 +26,7 @@ import { FlagExplorationModalResult } from '../modals/flag-exploration-modal.com
   providedIn: 'root'
 })
 export class LearnerLocalNavBackendApiService {
-  flagExplorationUrl: string;
+  flagExplorationUrl!: string;
 
   constructor(
     private httpClient: HttpClient,

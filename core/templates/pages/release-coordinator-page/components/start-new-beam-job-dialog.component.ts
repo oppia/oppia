@@ -52,6 +52,11 @@ export class StartNewBeamJobDialogComponent {
         this.alertsService.addWarning(error.message);
         return of(null);
       })
-    ).subscribe(newJobRun => this.matDialogRef.close(newJobRun));
+    ).subscribe(newJobRun => {
+      if (newJobRun === null) {
+        throw new Error('Beam job run was not created.');
+      }
+      this.matDialogRef.close(newJobRun);
+    });
   }
 }

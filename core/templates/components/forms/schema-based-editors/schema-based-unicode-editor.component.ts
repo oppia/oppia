@@ -53,19 +53,20 @@ interface OppiaValidator {
 })
 export class SchemaBasedUnicodeEditor
 implements ControlValueAccessor, OnInit, Validator {
-  @Input() disabled: boolean;
-  @Input() uiConfig: {
-    rows: string[]; placeholder: string; 'coding_mode': unknown;
-  };
-
-  @Input() validators: OppiaValidator[];
-  @Input() labelForFocusTarget: string;
   @Output() inputBlur: EventEmitter<void> = new EventEmitter();
   @Output() inputFocus: EventEmitter<void> = new EventEmitter();
-  localValue: string;
+  @Input() disabled!: boolean;
+  // UI configuration. May be undefined if the schema does not specify it.
+  @Input() uiConfig!: {
+    rows: string[]; placeholder: string; 'coding_mode': unknown;
+  } | undefined;
+
+  @Input() validators!: OppiaValidator[];
+  @Input() labelForFocusTarget!: string;
+  localValue!: string;
   onChange: (value: string) => void = () => {};
   directiveSubscriptions = new Subscription();
-  codemirrorStatus: boolean;
+  codemirrorStatus: boolean = false;
   codemirrorOptions: {
     extraKeys: { Tab: (cm: CodeMirror.Editor) => void };
     indentWithTabs: boolean;
@@ -76,6 +77,10 @@ implements ControlValueAccessor, OnInit, Validator {
       extraKeys: {
         Tab: (cm) => {
           var spaces = Array(
+            // This throws "Object is possibly undefined." The type undefined
+            // comes here from code mirror dependency. We need to suppress this
+            // error because of strict type checking.
+            // @ts-ignore
             cm.getOption('indentUnit') + 1).join(' ');
           cm.replaceSelection(spaces);
           // Move the cursor to the end of the selection.

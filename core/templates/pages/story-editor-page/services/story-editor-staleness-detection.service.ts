@@ -36,7 +36,7 @@ import { UnsavedChangesStatusInfoModalComponent } from 'components/unsaved-chang
 export class StoryEditorStalenessDetectionService {
   _staleTabEventEmitter = new EventEmitter<void>();
   _presenceOfUnsavedChangesEventEmitter = new EventEmitter<void>();
-  unsavedChangesWarningModalRef: NgbModalRef = null;
+  unsavedChangesWarningModalRef!: NgbModalRef;
 
   constructor(
     private ngbModal: NgbModal,
@@ -64,7 +64,7 @@ export class StoryEditorStalenessDetectionService {
   showStaleTabInfoModal(): void {
     const story = this.storyEditorStateService.getStory();
     if (story) {
-      const storyEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
+      const storyEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo | null = (
         this.localStorageService.getEntityEditorBrowserTabsInfo(
           EntityEditorBrowserTabsInfoDomainConstants
             .OPENED_STORY_EDITOR_BROWSER_TABS, story.getId()));

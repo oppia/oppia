@@ -36,10 +36,10 @@ export class SkillDescriptionEditorComponent implements OnInit, OnDestroy {
   MAX_CHARS_IN_SKILL_DESCRIPTION = (
     AppConstants.MAX_CHARS_IN_SKILL_DESCRIPTION);
 
-  skillRights: SkillRights = null;
-  skill: Skill = null;
-  skillDescriptionEditorIsShown: boolean = null;
-  tmpSkillDescription: string = null;
+  skillRights!: SkillRights;
+  skill!: Skill;
+  skillDescriptionEditorIsShown: boolean = false;
+  tmpSkillDescription!: string;
   constructor(
     private skillUpdateService: SkillUpdateService,
     private skillEditorStateService: SkillEditorStateService,

@@ -48,12 +48,12 @@ interface BindableFieldDict {
 export class SkillConceptCardEditorComponent implements OnInit {
   @Output() getConceptCardChange: EventEmitter<void> = new EventEmitter();
   directiveSubscriptions: Subscription = new Subscription();
-  isEditable: boolean;
-  skill: Skill;
-  skillEditorCardIsShown: boolean;
-  workedExamplesListIsShown: boolean;
-  bindableFieldsDict: BindableFieldDict;
-  activeWorkedExampleIndex: number;
+  isEditable: boolean = false;
+  skill!: Skill;
+  skillEditorCardIsShown: boolean = false;
+  workedExamplesListIsShown: boolean = false;
+  bindableFieldsDict!: BindableFieldDict;
+  activeWorkedExampleIndex!: number | null;
   COMPONENT_NAME_WORKED_EXAMPLE = (
     AppConstants.COMPONENT_NAME_WORKED_EXAMPLE);
 

@@ -40,9 +40,9 @@ describe('Skill Misconceptions Editor Component', () => {
   let windowDimensionsService: WindowDimensionsService;
 
   let mockOnSkillChangeEmitter = new EventEmitter();
-  let sampleMisconception: Misconception = null;
+  let sampleMisconception: Misconception;
   let sampleSkill: Skill;
-  let testSubscriptions: Subscription = null;
+  let testSubscriptions: Subscription;
   const skillChangeSpy = jasmine.createSpy('saveOutcomeDestDetails');
 
   beforeEach(waitForAsync(() => {
@@ -97,7 +97,7 @@ describe('Skill Misconceptions Editor Component', () => {
       mockOnSkillChangeEmitter);
 
     expect(component.skill).toBe(undefined);
-    expect(component.misconceptions).toBe(undefined);
+    expect(component.misconceptions).toBeUndefined();
     expect(component.misconceptionsListIsShown).toBe(undefined);
 
     component.ngOnInit();
@@ -137,7 +137,7 @@ describe('Skill Misconceptions Editor Component', () => {
         misconception: sampleMisconception
       })
     } as NgbModalRef);
-    spyOn(skillUpdateService, 'addMisconception').and.returnValue(null);
+    spyOn(skillUpdateService, 'addMisconception').and.returnValue();
 
     component.openAddMisconceptionModal();
     tick();
@@ -152,7 +152,7 @@ describe('Skill Misconceptions Editor Component', () => {
     spyOn(ngbModal, 'open').and.returnValue({
       result: Promise.reject()
     } as NgbModalRef);
-    spyOn(skillUpdateService, 'addMisconception').and.returnValue(null);
+    spyOn(skillUpdateService, 'addMisconception').and.returnValue();
 
     component.openAddMisconceptionModal();
 
@@ -172,7 +172,7 @@ describe('Skill Misconceptions Editor Component', () => {
         }
       })
     } as NgbModalRef);
-    spyOn(skillUpdateService, 'deleteMisconception').and.returnValue(null);
+    spyOn(skillUpdateService, 'deleteMisconception').and.returnValue();
 
     component.ngOnInit();
     component.openDeleteMisconceptionModal(1, '1');
@@ -191,7 +191,7 @@ describe('Skill Misconceptions Editor Component', () => {
       },
       result: Promise.reject()
     } as NgbModalRef);
-    spyOn(skillUpdateService, 'deleteMisconception').and.returnValue(null);
+    spyOn(skillUpdateService, 'deleteMisconception').and.returnValue();
 
     component.ngOnInit();
     component.openDeleteMisconceptionModal(1, '1');

@@ -38,18 +38,18 @@ import { downgradeComponent } from '@angular/upgrade/static';
 })
 export class SchemaBasedBoolEditorComponent
 implements ControlValueAccessor, Validator {
-  localValue;
-  @Input() disabled: boolean;
-  @Input() labelForFocusTarget: string;
+  localValue!: boolean;
+  @Input() disabled!: boolean;
+  @Input() labelForFocusTarget!: string;
   onChange: (val: boolean) => void = () => {};
 
   // Implemented as a part of ControlValueAccessor interface.
-  writeValue(value: unknown): void {
+  writeValue(value: boolean): void {
     this.localValue = value;
   }
 
   // Implemented as a part of ControlValueAccessor interface.
-  registerOnChange(fn: (val: unknown) => void): void {
+  registerOnChange(fn: (val: boolean) => void): void {
     this.onChange = fn;
   }
 

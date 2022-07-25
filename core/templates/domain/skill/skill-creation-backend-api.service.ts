@@ -37,7 +37,7 @@ export interface SkillCreationBackendDict {
 
 export interface ImageData {
   filename: string;
-  imageBlob: Blob;
+  imageBlob: Blob | null;
 }
 
 interface SkillCreationBackendResponse {

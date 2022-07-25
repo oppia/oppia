@@ -36,6 +36,7 @@ import { ReadOnlyStoryNode } from 'domain/story_viewer/read-only-story-node.mode
 import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
 
 import './story-viewer-page.component.css';
+import { StoryNode } from 'domain/story/story-node.model';
 
 
 interface IconParametersArray {
@@ -149,9 +150,7 @@ export class StoryViewerPageComponent implements OnInit, OnDestroy {
       });
   }
 
-  getExplorationUrl(
-      node: { getExplorationId: () => string;
-              getId: () => string; }): string {
+  getExplorationUrl(node: StoryNode): string {
     let result = '/explore/' + node.getExplorationId();
     result = this.urlService.addField(
       result, 'topic_url_fragment',

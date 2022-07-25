@@ -31,13 +31,13 @@ import { CollectionEditorStateService } from '../services/collection-editor-stat
 })
 export class CollectionEditorPrePublishModalComponent
   extends ConfirmOrCancelModal {
-  private _collection: Collection;
-  requireTitleToBeSpecified: boolean;
-  requireObjectiveToBeSpecified: boolean;
-  requireCategoryToBeSpecified: boolean;
-  newTitle: string;
-  newObjective: string;
-  newCategory: string;
+  private _collection!: Collection;
+  requireTitleToBeSpecified: boolean = false;
+  requireObjectiveToBeSpecified: boolean = false;
+  requireCategoryToBeSpecified: boolean = false;
+  newTitle!: string | null;
+  newObjective!: string | null;
+  newCategory!: string | null;
   CATEGORY_LIST = AppConstants.ALL_CATEGORIES;
 
   constructor(

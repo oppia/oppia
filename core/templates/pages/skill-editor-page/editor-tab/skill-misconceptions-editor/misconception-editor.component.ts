@@ -23,6 +23,7 @@ import { AppConstants } from 'app.constants';
 import { SkillUpdateService } from 'domain/skill/skill-update.service';
 import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
 import { Skill } from 'domain/skill/SkillObjectFactory';
+import { Misconception } from 'domain/skill/MisconceptionObjectFactory';
 
 interface MisconceptionFormSchema {
   type: 'html';
@@ -42,18 +43,18 @@ interface Container {
 })
 export class MisconceptionEditorComponent implements OnInit {
   @Output() onMisconceptionChange = new EventEmitter<void>();
-  @Input() getIndex: string;
-  @Input() isEditable: boolean;
-  @Input() misconception;
-  nameMemento: string;
-  notesMemento: string;
-  feedbackMemento: string;
-  container: Container;
-  skill: Skill;
-  MAX_CHARS_IN_MISCONCEPTION_NAME: number;
-  nameEditorIsOpen: boolean;
-  notesEditorIsOpen: boolean;
-  feedbackEditorIsOpen: boolean;
+  @Input() getIndex!: string;
+  @Input() isEditable!: boolean;
+  @Input() misconception!: Misconception;
+  nameMemento!: string;
+  notesMemento!: string;
+  feedbackMemento!: string;
+  container!: Container;
+  skill!: Skill;
+  MAX_CHARS_IN_MISCONCEPTION_NAME!: number;
+  nameEditorIsOpen: boolean = false;
+  notesEditorIsOpen: boolean = false;
+  feedbackEditorIsOpen: boolean = false;
   NOTES_FORM_SCHEMA: MisconceptionFormSchema = {
     type: 'html',
     ui_config: {}
@@ -124,7 +125,6 @@ export class MisconceptionEditorComponent implements OnInit {
         this.misconception.getId(),
         this.nameMemento,
         this.container.misconceptionName);
-      this.nameMemento = null;
     }
   }
 
@@ -140,7 +140,6 @@ export class MisconceptionEditorComponent implements OnInit {
         this.misconception.getId(),
         this.notesMemento,
         this.container.misconceptionNotes);
-      this.notesMemento = null;
     }
   }
 
@@ -165,25 +164,21 @@ export class MisconceptionEditorComponent implements OnInit {
         this.misconception.getId(),
         this.feedbackMemento,
         this.container.misconceptionFeedback);
-      this.feedbackMemento = null;
     }
   }
 
   cancelEditName(): void {
     this.container.misconceptionName = this.nameMemento;
-    this.nameMemento = null;
     this.nameEditorIsOpen = false;
   }
 
   cancelEditNotes(): void {
     this.container.misconceptionNotes = this.notesMemento;
-    this.notesMemento = null;
     this.notesEditorIsOpen = false;
   }
 
   cancelEditFeedback(): void {
     this.container.misconceptionFeedback = this.feedbackMemento;
-    this.feedbackMemento = null;
     this.feedbackEditorIsOpen = false;
   }
 }

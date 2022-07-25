@@ -101,7 +101,7 @@ describe('Schema based float editor component', function() {
     expect(component.labelForErrorFocusTarget).toBe('FocusLabel');
 
     tick();
-    let mockFunction = function(value: number) {};
+    let mockFunction = function(value: number | null) {};
     component.registerOnChange(mockFunction);
     component.writeValue(2);
     component.registerOnTouched(null);
@@ -190,7 +190,7 @@ describe('Schema based float editor component', function() {
   }));
 
   it('should validate value', () => {
-    component.uiConfig = null;
+    component.uiConfig = {checkRequireNonnegativeInput: false};
 
     expect(component.validate(new FormControl(null)))
       .toEqual({error: 'invalid'});

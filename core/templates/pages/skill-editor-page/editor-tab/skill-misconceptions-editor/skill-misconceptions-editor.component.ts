@@ -35,10 +35,13 @@ import { Skill } from 'domain/skill/SkillObjectFactory';
 export class SkillMisconceptionsEditorComponent implements OnInit {
   @Output() getMisconceptionsChange = new EventEmitter();
   directiveSubscriptions = new Subscription();
-  skill: Skill;
-  misconceptionsListIsShown: boolean;
-  misconceptions: Misconception[];
-  activeMisconceptionIndex: number;
+  skill!: Skill;
+  misconceptionsListIsShown: boolean = false;
+  misconceptions!: Misconception[];
+  // Active Miscellaneous Index is null if no misconception is active. It is
+  // used to close the active misconception when the user again clicks on a
+  // misconception.
+  activeMisconceptionIndex!: number | null;
   isEditable: boolean = true;
 
   constructor(

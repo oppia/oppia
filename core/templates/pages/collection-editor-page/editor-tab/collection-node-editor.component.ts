@@ -31,11 +31,11 @@ import { CollectionLinearizerService } from '../services/collection-linearizer.s
   templateUrl: './collection-node-editor.component.html'
 })
 export class CollectionNodeEditorComponent implements OnInit {
-  @Input() collectionNode: CollectionNode;
-  @Input() linearIndex: number;
-  explorationId: string;
-  collection: Collection;
-  hrefUrl: string;
+  @Input() collectionNode!: CollectionNode;
+  @Input() linearIndex!: number;
+  explorationId!: string;
+  collection!: Collection;
+  hrefUrl!: string;
 
   constructor(
     private collectionLinearizerService: CollectionLinearizerService,

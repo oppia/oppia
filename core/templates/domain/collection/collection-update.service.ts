@@ -26,14 +26,19 @@ import { CollectionDomainConstants } from
   'domain/collection/collection-domain.constants';
 import { Collection } from 'domain/collection/collection.model';
 import { CollectionNode } from './collection-node.model';
-import { Change, CollectionChange } from 'domain/editor/undo_redo/change.model';
+import { BackendChangeObject, Change, CollectionChange, DomainObject } from 'domain/editor/undo_redo/change.model';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exploration-summary.model';
+import { Params } from '@angular/router';
 
 type CollectionUpdateApply = (
   collectionChange: CollectionChange, collection: Collection) => void;
 type CollectionUpdateReverse = (
   collectionChange: CollectionChange, collection: Collection) => void;
+type ChangeBackendDict = (
+  backendChangeObject: BackendChangeObject,
+  domainObject: DomainObject
+) => void;
 
 @Injectable({
   providedIn: 'root'
@@ -43,16 +48,18 @@ export class CollectionUpdateService {
 
   private _applyChange(
       collection: Collection,
-      command: string, params,
+      command: string, params: Params | BackendChangeObject,
       apply: CollectionUpdateApply,
       reverse: CollectionUpdateReverse): void {
     let changeDict = cloneDeep(params);
     changeDict.cmd = command;
-    let changeObj = new Change(changeDict, apply, reverse);
+    let changeObj = new Change(
+      changeDict as BackendChangeObject, apply as ChangeBackendDict,
+      reverse as ChangeBackendDict);
     this.undoRedoService.applyChange(changeObj, collection);
   }
 
-  private _getParameterFromChangeDict(changeDict, paramName) {
+  private _getParameterFromChangeDict(changeDict: Params, paramName: string) {
     return changeDict[paramName];
   }
 
@@ -61,9 +68,12 @@ export class CollectionUpdateService {
   private _applyPropertyChange(
       collection: Collection,
       propertyName: string,
-      newValue: string|string[],
-      oldValue: string|string[],
-      apply, reverse) {
+      // New value can be set to null.
+      newValue: string|string[] | null,
+      // Old value is null until the user provides it.
+      oldValue: string|string[] | null,
+      apply: CollectionUpdateApply,
+      reverse: CollectionUpdateReverse) {
     this._applyChange(
       collection,
       CollectionDomainConstants.CMD_EDIT_COLLECTION_PROPERTY, {
@@ -73,19 +83,19 @@ export class CollectionUpdateService {
       }, apply, reverse);
   }
 
-  private _getNewPropertyValueFromChangeDict(changeDict) {
+  private _getNewPropertyValueFromChangeDict(changeDict: Params) {
     return this._getParameterFromChangeDict(changeDict, 'new_value');
   }
 
-  private _getExplorationIdFromChangeDict(changeDict): string {
+  private _getExplorationIdFromChangeDict(changeDict: Params): string {
     return this._getParameterFromChangeDict(changeDict, 'exploration_id');
   }
 
-  private _getFirstIndexFromChangeDict(changeDict): number {
+  private _getFirstIndexFromChangeDict(changeDict: Params): number {
     return this._getParameterFromChangeDict(changeDict, 'first_index');
   }
 
-  private _getSecondIndexFromChangeDict(changeDict): number {
+  private _getSecondIndexFromChangeDict(changeDict: Params): number {
     return this._getParameterFromChangeDict(changeDict, 'second_index');
   }
 
@@ -167,7 +177,7 @@ export class CollectionUpdateService {
    */
   setCollectionTitle(
       collection: Collection,
-      title: string): void {
+      title: string | null): void {
     const oldTitle = collection.getTitle();
     this._applyPropertyChange(
       collection,
@@ -188,7 +198,7 @@ export class CollectionUpdateService {
    */
   setCollectionCategory(
       collection: Collection,
-      category: string): void {
+      category: string | null): void {
     let oldCategory = collection.getCategory();
     this._applyPropertyChange(
       collection,
@@ -207,7 +217,10 @@ export class CollectionUpdateService {
    * Changes the objective of a collection and records the change in the
    * undo/redo service.
    */
-  setCollectionObjective(collection: Collection, objective: string): void {
+  setCollectionObjective(
+      collection: Collection,
+      objective: string | null
+  ): void {
     let oldObjective = collection.getObjective();
     this._applyPropertyChange(
       collection, CollectionDomainConstants.COLLECTION_PROPERTY_OBJECTIVE,
@@ -227,7 +240,7 @@ export class CollectionUpdateService {
    */
   setCollectionLanguageCode(
       collection: Collection,
-      languageCode: string): void {
+      languageCode: string | null): void {
     let oldLanguageCode = collection.getLanguageCode();
     this._applyPropertyChange(
       collection, CollectionDomainConstants.COLLECTION_PROPERTY_LANGUAGE_CODE,

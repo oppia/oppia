@@ -37,10 +37,10 @@ import { CollectionEditorSaveModalComponent } from '../modals/collection-editor-
 })
 export class CollectionEditorNavbarComponent {
   directiveSubscriptions = new Subscription();
-  collectionRights: CollectionRights;
-  validationIssues: string[];
-  collection: Collection;
-  collectionId: string;
+  collectionRights!: CollectionRights;
+  validationIssues!: string[];
+  collection!: Collection;
+  collectionId!: string;
   editButtonHovering: boolean = false;
   playerButtonHovering: boolean = false;
 
@@ -128,7 +128,7 @@ export class CollectionEditorNavbarComponent {
 
   isCollectionPublishable(): boolean {
     return (
-      this.collectionRights.isPrivate() &&
+      this.collectionRights.isPrivate() === true &&
       this.getChangeListCount() === 0 &&
       this.validationIssues.length === 0);
   }

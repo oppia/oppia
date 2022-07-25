@@ -30,9 +30,9 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
   templateUrl: './skill-rubrics-editor.component.html'
 })
 export class SkillRubricsEditorComponent implements OnInit, OnDestroy {
-  skill: Skill;
-  rubrics: Rubric[];
-  rubricsListIsShown: boolean;
+  skill!: Skill;
+  rubrics!: Rubric[];
+  rubricsListIsShown: boolean = false;
   directiveSubscriptions = new Subscription();
 
   constructor(

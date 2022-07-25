@@ -25,8 +25,8 @@ import { PlaythroughIssue } from 'domain/statistics/PlaythroughIssueObjectFactor
   providedIn: 'root'
 })
 export class PlaythroughIssuesService {
-  explorationId: string = null;
-  explorationVersion: number = null;
+  explorationId!: string;
+  explorationVersion!: number;
 
   constructor(
     private playthroughIssuesBackendApiService:

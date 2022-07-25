@@ -31,6 +31,10 @@ import { CurrentInteractionService } from '../services/current-interaction.servi
 import { HelpCardEventResponse, PlayerPositionService } from '../services/player-position.service';
 import { SupplementalCardComponent } from './supplemental-card.component';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { Interaction } from 'domain/exploration/InteractionObjectFactory';
+import { WrittenTranslations } from 'domain/exploration/WrittenTranslationsObjectFactory';
+import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
+import { AudioTranslationLanguageService } from '../services/audio-translation-language.service';
 
 describe('Supplemental card component', () => {
   let fixture: ComponentFixture<SupplementalCardComponent>;
@@ -43,9 +47,10 @@ describe('Supplemental card component', () => {
   let urlInterpolationService: UrlInterpolationService;
   let windowRef: WindowRef;
   let i18nLanguageCodeService: I18nLanguageCodeService;
+  let recordedVoiceovers = new RecordedVoiceovers({});
   let mockStateCard = new StateCard(
-    'state_name', 'html', 'html', null, [], null,
-    null, '', null);
+    'state_name', 'html', 'html', {} as Interaction, [], recordedVoiceovers,
+    {} as WrittenTranslations, '', {} as AudioTranslationLanguageService);
 
   class MockChangeDetectorRef {
     detectChanges(): void {}
@@ -200,8 +205,9 @@ describe('Supplemental card component', () => {
 
   it('should update the displayedCard when changes are detected', () => {
     let updatedStateCard = new StateCard(
-      'state_name', 'new content', 'html', null, [], null,
-      null, '', null);
+      'state_name', 'new content', 'html', {} as Interaction, [],
+      recordedVoiceovers, {} as WrittenTranslations, '',
+      {} as AudioTranslationLanguageService);
     const changes: SimpleChanges = {
       displayedCard: {
         previousValue: mockStateCard,

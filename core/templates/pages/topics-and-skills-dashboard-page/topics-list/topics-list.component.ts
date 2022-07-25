@@ -32,16 +32,19 @@ import { DeleteTopicModalComponent } from '../modals/delete-topic-modal.componen
   templateUrl: './topics-list.component.html'
 })
 export class TopicsListComponent {
-  @Input() topicSummaries: CreatorTopicSummary[];
-  @Input() pageNumber: number;
-  @Input() itemsPerPage: number;
-  @Input() userCanDeleteTopic: boolean;
-  @Input() selectedTopicIds: string;
+  @Input() topicSummaries!: CreatorTopicSummary[];
+  @Input() pageNumber!: number;
+  @Input() itemsPerPage!: number;
+  @Input() userCanDeleteTopic: boolean = false;
+  @Input() selectedTopicIds!: string;
   @Output() selectedTopicIdsChange: EventEmitter<string> = (
     new EventEmitter());
 
   directiveSubscriptions: Subscription = new Subscription();
-  selectedIndex: string = null;
+  // Selected topic index is set to null when the delete topic modal is closed.
+  // This is to ensure that the edit options are not shown for the topic that
+  // is being deleted.
+  selectedIndex: string | null = null;
   TOPIC_HEADINGS: string[] = [
     'index', 'name', 'canonical_story_count', 'subtopic_count',
     'skill_count', 'topic_status'

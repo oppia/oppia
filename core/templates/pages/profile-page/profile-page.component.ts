@@ -57,27 +57,27 @@ export class ProfilePageComponent {
     helpText: ''
   };
 
-  usernameIsLong: boolean;
+  usernameIsLong: boolean = false;
   userBio: string = '';
   userDisplayedStatistics: UserDisplayedStatistic[] = [];
   userEditedExplorations: LearnerExplorationSummary[] = [];
-  userNotLoggedIn: boolean;
-  isAlreadySubscribed: boolean;
-  isUserVisitingOwnProfile: boolean;
+  userNotLoggedIn: boolean = false;
+  isAlreadySubscribed: boolean = false;
+  isUserVisitingOwnProfile: boolean = false;
   subscriptionButtonPopoverText: string = '';
   currentPageNumber: number = 0;
   PAGE_SIZE: number = 6;
   startingExplorationNumber: number = 1;
   endingExplorationNumber: number = 6;
-  profileIsOfCurrentUser: boolean;
-  data: UserProfile;
-  numUserPortfolioExplorations: number;
+  profileIsOfCurrentUser: boolean = false;
+  data!: UserProfile;
+  numUserPortfolioExplorations!: number;
   explorationsOnPage: LearnerExplorationSummary[] = [];
-  explorationIndexEnd: number;
-  explorationIndexStart: number;
+  explorationIndexEnd!: number;
+  explorationIndexStart!: number;
   subjectInterests: string[] = [];
   profilePictureDataUrl: string = '';
-  firstContributionMsec: number;
+  firstContributionMsec!: number | null;
   preferencesUrl = (
     '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PREFERENCES.ROUTE);
 
@@ -132,6 +132,15 @@ export class ProfilePageComponent {
               this.ratingComputationService.computeAverageRating(
                 exploration2.ratings));
 
+            if (avgRating1 === null) {
+              return -1;
+            }
+            if (avgRating2 === null) {
+              return 1;
+            }
+            if (avgRating1 === null && avgRating2 === null) {
+              return -1;
+            }
             if (avgRating1 > avgRating2) {
               return 1;
             } else if (avgRating1 === avgRating2) {

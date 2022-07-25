@@ -23,9 +23,9 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
   templateUrl: './html-select.component.html'
 })
 export class HtmlSelectComponent implements OnInit {
-  @Input() options: { id: string; val: string }[];
-  @Input() selection: number;
-  selectionAsString: string;
+  @Input() options!: { id: string; val: string }[];
+  @Input() selection!: number;
+  selectionAsString!: string;
   @Output() onSelectionChange = new EventEmitter();
 
   ngOnInit(): void {

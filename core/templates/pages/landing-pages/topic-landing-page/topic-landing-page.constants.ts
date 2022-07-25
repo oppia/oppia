@@ -44,3 +44,9 @@ export const TopicLandingPageConstants = {
     }
   }
 } as const;
+
+export type TopicLandingPageDataKey = (
+  keyof typeof TopicLandingPageConstants.TOPIC_LANDING_PAGE_DATA);
+
+export type TopicLandingPageMathDataKey = (
+    keyof typeof TopicLandingPageConstants.TOPIC_LANDING_PAGE_DATA.math);

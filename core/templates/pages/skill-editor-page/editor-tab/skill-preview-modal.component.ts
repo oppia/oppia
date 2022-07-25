@@ -26,9 +26,9 @@ import { WorkedExample } from 'domain/skill/WorkedExampleObjectFactory';
   templateUrl: './skill-preview-modal.component.html'
 })
 export class SkillPreviewModalComponent extends ConfirmOrCancelModal {
-  @Input() skillDescription: string;
-  @Input() skillExplanation: string;
-  @Input() skillWorkedExamples: WorkedExample[];
+  @Input() skillDescription!: string;
+  @Input() skillExplanation!: string;
+  @Input() skillWorkedExamples!: WorkedExample[];
 
   constructor(
     private ngbActiveModal: NgbActiveModal

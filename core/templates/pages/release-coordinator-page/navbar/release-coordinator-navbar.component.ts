@@ -31,20 +31,20 @@ import { UserService } from 'services/user.service';
   templateUrl: './release-coordinator-navbar.component.html',
 })
 export class ReleaseCoordinatorNavbarComponent implements OnInit {
-  @Input() activeTab: string;
+  @Input() activeTab!: string;
   @Output() activeTabChange = new EventEmitter();
 
   TAB_ID_BEAM_JOBS: string = ReleaseCoordinatorPageConstants.TAB_ID_BEAM_JOBS;
   TAB_ID_MISC: string = ReleaseCoordinatorPageConstants.TAB_ID_MISC;
-  profilePictureDataUrl: string;
-  username: string;
-  profileUrl: string;
+  profilePictureDataUrl!: string;
+  username!: string | null;
+  profileUrl!: string;
   logoutUrl: string = (
     '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LOGOUT.ROUTE);
 
   profileDropdownIsActive: boolean = false;
-  logoWebpImageSrc: string;
-  logoPngImageSrc: string;
+  logoWebpImageSrc!: string;
+  logoPngImageSrc!: string;
   PAGES_REGISTERED_WITH_FRONTEND = (
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
 
@@ -77,6 +77,9 @@ export class ReleaseCoordinatorNavbarComponent implements OnInit {
     const userInfo = await this.userService.getUserInfoAsync();
 
     this.username = userInfo.getUsername();
+    if (this.username === null) {
+      throw new Error('User is not logged in.');
+    }
     this.profileUrl = (
       this.urlInterpolationService.interpolateUrl(
         '/profile/<username>', {

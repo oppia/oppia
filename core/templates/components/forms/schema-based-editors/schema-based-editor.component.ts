@@ -19,7 +19,7 @@
 import { Input, Output, EventEmitter, Component, forwardRef, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, ControlValueAccessor, Validator, AbstractControl, ValidationErrors, NgForm } from '@angular/forms';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { Schema } from 'services/schema-default-value.service';
+import { Schema, SchemaDefaultValue } from 'services/schema-default-value.service';
 
 const VALIDATION_STATUS_INVALID = 'INVALID';
 
@@ -41,21 +41,21 @@ const VALIDATION_STATUS_INVALID = 'INVALID';
 })
 export class SchemaBasedEditorComponent
 implements AfterViewInit, ControlValueAccessor, Validator {
-  @ViewChild('hybridForm') form: NgForm;
-  _localValue;
-  @Input() schema: Schema;
-  @Input() disabled: boolean;
-  @Input() labelForFocusTarget: string;
+  @ViewChild('hybridForm') form!: NgForm;
+  _localValue!: SchemaDefaultValue;
+  @Input() schema!: Schema;
+  @Input() disabled!: boolean;
+  @Input() labelForFocusTarget!: string;
   @Output() inputBlur = new EventEmitter();
   @Output() inputFocus = new EventEmitter();
-  @Input() headersEnabled;
-  @Input() notRequired: boolean;
-  onChange: (val: unknown) => void = () => {};
-  get localValue(): unknown {
+  @Input() headersEnabled!: boolean;
+  @Input() notRequired!: boolean;
+  onChange: (val: SchemaDefaultValue) => void = () => {};
+  get localValue(): SchemaDefaultValue {
     return this._localValue;
   }
 
-  @Input() set localValue(val: unknown) {
+  @Input() set localValue(val: SchemaDefaultValue) {
     this._localValue = val;
     this.onChange(val);
     this.localValueChange.emit(val);
@@ -65,7 +65,7 @@ implements AfterViewInit, ControlValueAccessor, Validator {
   constructor(private elementRef: ElementRef) { }
 
   // Implemented as a part of ControlValueAccessor interface.
-  writeValue(value: unknown): void {
+  writeValue(value: SchemaDefaultValue): void {
     if (value === null) {
       return;
     }
@@ -73,7 +73,7 @@ implements AfterViewInit, ControlValueAccessor, Validator {
   }
 
   // Implemented as a part of ControlValueAccessor interface.
-  registerOnChange(fn: (val: unknown) => void): void {
+  registerOnChange(fn: (val: SchemaDefaultValue) => void): void {
     this.onChange = fn;
   }
 
@@ -89,6 +89,10 @@ implements AfterViewInit, ControlValueAccessor, Validator {
   ngAfterViewInit(): void {
     let angularJsFormController: angular.IFormController = angular.element(
       this.elementRef.nativeElement).controller('form');
+    // This throws "Object is possibly undefined." The type undefined
+    // comes here from NgForm dependency. We need to suppress this
+    // error because of strict type checking.
+    // @ts-ignore
     this.form.statusChanges.subscribe((validationStatus) => {
       if (angularJsFormController === null ||
         angularJsFormController === undefined) {

@@ -26,7 +26,7 @@ import { CollectionEditorStateService } from '../services/collection-editor-stat
   templateUrl: './collection-permissions-card.component.html'
 })
 export class CollectionPermissionsCardComponent {
-  collectionRights: CollectionRights;
+  collectionRights!: CollectionRights;
 
   constructor(
     private collectionEditorStateService: CollectionEditorStateService

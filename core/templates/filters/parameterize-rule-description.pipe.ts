@@ -27,6 +27,7 @@ import { TranslatableSetOfNormalizedString, TranslatableSetOfUnicodeString } fro
 import { AnswerChoice } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { AppConstants } from 'app.constants';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
+import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
 
 @Pipe({
   name: 'parameterizeRuleDescriptionPipe'
@@ -48,7 +49,8 @@ export class ParameterizeRuleDescriptionPipe implements PipeTransform {
       console.error('Cannot find interaction with id ' + interactionId);
       return '';
     }
-    var description = INTERACTION_SPECS[interactionId].rule_descriptions[
+    var description = INTERACTION_SPECS[
+      interactionId as InteractionSpecsKey].rule_descriptions[
       rule.type];
     if (!description) {
       console.error(

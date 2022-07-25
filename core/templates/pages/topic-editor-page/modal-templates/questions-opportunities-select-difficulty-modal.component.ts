@@ -24,6 +24,7 @@ import { Rubric } from 'domain/skill/rubric.model';
 import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
 import { SkillDifficulty } from 'domain/skill/skill-difficulty.model';
 import { Skill } from 'domain/skill/SkillObjectFactory';
+import { ImageFile } from 'domain/utilities/image-file.model';
 import { ExtractImageFilenamesFromModelService } from 'pages/exploration-player-page/services/extract-image-filenames-from-model.service';
 import { AlertsService } from 'services/alerts.service';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
@@ -36,10 +37,10 @@ import { ImageLocalStorageService } from 'services/image-local-storage.service';
 })
 export class QuestionsOpportunitiesSelectDifficultyModalComponent
   extends ConfirmOrCancelModal implements OnInit {
-  @Input() skillId: string;
-  instructionMessage: string;
-  skillIdToRubricsObject: Record<string, Rubric[]>;
-  skill: Skill;
+  @Input() skillId!: string;
+  instructionMessage!: string;
+  skillIdToRubricsObject!: Record<string, Rubric[]>;
+  skill!: Skill;
   linkedSkillsWithDifficulty: SkillDifficulty[] = [];
 
   constructor(
@@ -66,7 +67,7 @@ export class QuestionsOpportunitiesSelectDifficultyModalComponent
         // these images and store their corresponding base64 URLs in the local
         // storage. The image components will use the data from the local
         // storage to render the image.
-        let imageFileFetchPromises = [];
+        let imageFileFetchPromises: Promise<ImageFile>[] = [];
         let imageFilenames = (
           this.extractImageFilenamesFromModelService.getImageFilenamesInSkill(
             this.skill));

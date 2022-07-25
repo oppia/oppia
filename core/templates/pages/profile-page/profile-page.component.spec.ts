@@ -235,7 +235,7 @@ describe('Profile page', () => {
     ' page is not provided', fakeAsync(() => {
     spyOn(mockWindowRef.nativeWindow.location, 'reload');
     spyOn(userService, 'getLoginUrlAsync').and.returnValue(
-      Promise.resolve(null));
+      Promise.resolve(''));
 
     componentInstance.ngOnInit();
     tick();
@@ -261,8 +261,13 @@ describe('Profile page', () => {
       user_impact_score: 100,
       created_exp_summary_dicts: [],
       edited_exp_summary_dicts: [],
-      is_already_subscribed: false
-    } as UserProfileBackendDict);
+      is_already_subscribed: false,
+      profile_is_of_current_user: false,
+      is_user_visiting_own_profile: false,
+      first_contribution_msec: null,
+      subject_interests: [],
+      profile_picture_data_url: '',
+    });
     spyOn(profilePageBackendApiService, 'fetchProfileDataAsync')
       .and.returnValue(Promise.resolve(profileDataLocal));
     componentInstance.ngOnInit();

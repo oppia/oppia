@@ -28,7 +28,7 @@ import { ExplorationDataService } from 'pages/exploration-editor-page/services/e
 })
 
 export class RevertExplorationModalComponent extends ConfirmOrCancelModal {
-  @Input() version: string;
+  @Input() version!: string;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,

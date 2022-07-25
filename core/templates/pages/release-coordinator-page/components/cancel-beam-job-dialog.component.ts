@@ -49,6 +49,11 @@ export class CancelBeamJobDialogComponent {
         this.alertsService.addWarning(error.message);
         return of(null);
       })
-    ).subscribe(cancelledJobRun => this.matDialogRef.close(cancelledJobRun));
+    ).subscribe(cancelledJobRun => {
+      if (cancelledJobRun === null) {
+        throw new Error('Cancellation failed.');
+      }
+      this.matDialogRef.close(cancelledJobRun);
+    });
   }
 }

@@ -95,23 +95,21 @@ describe('Learner view info component', () => {
     topicViewerBackendApiService = TestBed.inject(
       TopicViewerBackendApiService);
 
-    let topicDataDict = {
-      subtopics: [],
-      skill_descriptions: {},
-      uncategorized_skill_ids: [],
-      degrees_of_mastery: {},
-      canonical_story_dicts: [],
-      additional_story_dicts: [],
-      topic_name: 'Topic Name 1',
-      topic_id: 'topic1',
-      topic_description: 'Description',
-      practice_tab_is_displayed: false
-    };
-
     spyOn(topicViewerBackendApiService, 'fetchTopicDataAsync').and.resolveTo(
-      readOnlyTopicObjectFactory.createFromBackendDict(
-        topicDataDict as ReadOnlyTopicBackendDict
-      )
+      readOnlyTopicObjectFactory.createFromBackendDict({
+        subtopics: [],
+        skill_descriptions: {},
+        uncategorized_skill_ids: [],
+        degrees_of_mastery: {},
+        canonical_story_dicts: [],
+        additional_story_dicts: [],
+        topic_name: 'Topic Name 1',
+        topic_id: 'topic1',
+        topic_description: 'Description',
+        practice_tab_is_displayed: false,
+        meta_tag_content: 'content',
+        page_title_fragment_for_web: 'title',
+      } as ReadOnlyTopicBackendDict)
     );
 
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
@@ -205,7 +203,7 @@ describe('Learner view info component', () => {
       }));
 
     expect(componentInstance.openInformationCardModal).toHaveBeenCalled();
-    componentInstance.expInfo = null;
+    componentInstance.expInfo = {} as LearnerExplorationSummaryBackendDict;
 
     componentInstance.showInformationCard();
     tick();
@@ -217,7 +215,7 @@ describe('Learner view info component', () => {
   it('should handle error if backend call fails', fakeAsync(() => {
     let explorationId = 'expId';
     componentInstance.explorationId = explorationId;
-    componentInstance.expInfo = null;
+    componentInstance.expInfo = {} as LearnerExplorationSummaryBackendDict;
 
     spyOn(learnerViewInfoBackendApiService, 'fetchLearnerInfoAsync')
       .and.returnValue(Promise.reject());

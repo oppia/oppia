@@ -95,7 +95,7 @@ describe('Topic creation backend api service', () => {
 
       expect(req.request.body.get('payload')).toEqual(JSON.stringify(postData));
       let sampleFormData = new FormData();
-      sampleFormData.append('image', imagesData[0].imageBlob);
+      sampleFormData.append('image', imagesData[0].imageBlob as Blob);
       expect(
         req.request.body.get('image')).toEqual(sampleFormData.get('image'));
       req.flush(postData);
@@ -122,7 +122,7 @@ describe('Topic creation backend api service', () => {
       expect(req.request.method).toEqual('POST');
       expect(req.request.body.get('payload')).toEqual(JSON.stringify(postData));
       let sampleFormData = new FormData();
-      sampleFormData.append('image', imagesData[0].imageBlob);
+      sampleFormData.append('image', imagesData[0].imageBlob as Blob);
       expect(
         req.request.body.get('image')).toEqual(sampleFormData.get('image'));
       flushMicrotasks();

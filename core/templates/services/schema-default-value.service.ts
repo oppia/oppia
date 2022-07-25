@@ -87,6 +87,7 @@ interface DictSchemaDefaultValue {
 }
 
 export type SchemaDefaultValue = (
+  null |
   string |
   number |
   boolean |

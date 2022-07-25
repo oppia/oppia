@@ -81,7 +81,6 @@ describe('ListOfSetsOfTranslatableHtmlContentIdsEditorComponent', () => {
 
   it('should initialise component when user adds response', () => {
     spyOn(component.valueChanged, 'emit');
-    component.value = [undefined];
 
     component.ngOnInit();
 
@@ -161,8 +160,6 @@ describe('ListOfSetsOfTranslatableHtmlContentIdsEditorComponent', () => {
   });
 
   it('should rearrage choices when user changes position of choices', () => {
-    component.value = undefined;
-
     component.ngOnInit();
 
     component.choices = [
@@ -237,7 +234,6 @@ describe('ListOfSetsOfTranslatableHtmlContentIdsEditorComponent', () => {
       'ca_choices_3',
       'ca_choices_4'
     ];
-    component.value[3] = undefined;
 
     component.selectItem(3);
 

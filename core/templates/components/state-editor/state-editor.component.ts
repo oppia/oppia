@@ -40,17 +40,18 @@ import { Solution } from 'domain/exploration/SolutionObjectFactory';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
 import { Hint } from 'domain/exploration/HintObjectFactory';
+import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
 
 @Component({
   selector: 'oppia-state-editor',
   templateUrl: './state-editor.component.html'
 })
 export class StateEditorComponent implements OnInit, OnDestroy {
-  @Input() addState: (value: string) => void;
-  @Input() explorationIsLinkedToStory: boolean;
+  @Input() addState!: (value: string) => void;
+  @Input() explorationIsLinkedToStory: boolean = false;
   @Input() interactionIsShown: boolean = true;
-  @Input() stateContentSaveButtonPlaceholder: string;
-  @Input() stateContentPlaceholder: string;
+  @Input() stateContentSaveButtonPlaceholder!: string;
+  @Input() stateContentPlaceholder!: string;
 
   @Output() onSaveHints = new EventEmitter<Hint[]>();
   @Output() onSaveInapplicableSkillMisconceptionIds = (
@@ -74,15 +75,15 @@ export class StateEditorComponent implements OnInit, OnDestroy {
     new EventEmitter<string[]>());
 
   directiveSubscriptions = new Subscription();
-  oppiaBlackImgUrl: string;
-  currentStateIsTerminal: boolean;
-  conceptCardIsShown: boolean;
-  windowIsNarrow: boolean;
-  interactionIdIsSet: boolean;
-  servicesInitialized: boolean;
-  stateName: string | null;
-  stateData: State;
-  currentInteractionCanHaveSolution: boolean;
+  oppiaBlackImgUrl!: string;
+  currentStateIsTerminal: boolean = false;
+  conceptCardIsShown: boolean = false;
+  windowIsNarrow: boolean = false;
+  interactionIdIsSet: boolean = false;
+  servicesInitialized: boolean = false;
+  stateName!: string | null;
+  stateData!: State;
+  currentInteractionCanHaveSolution: boolean = false;
 
   constructor(
     private stateCardIsCheckpointService: StateCardIsCheckpointService,
@@ -165,10 +166,11 @@ export class StateEditorComponent implements OnInit, OnDestroy {
     this.interactionIdIsSet = Boolean(newInteractionId);
     this.currentInteractionCanHaveSolution = Boolean(
       this.interactionIdIsSet &&
-      INTERACTION_SPECS[newInteractionId].can_have_solution);
+      INTERACTION_SPECS[
+        newInteractionId as InteractionSpecsKey].can_have_solution);
     this.currentStateIsTerminal = Boolean(
       this.interactionIdIsSet && INTERACTION_SPECS[
-        newInteractionId].is_terminal);
+        newInteractionId as InteractionSpecsKey].is_terminal);
   }
 
   reinitializeEditor(): void {
@@ -206,13 +208,28 @@ export class StateEditorComponent implements OnInit, OnDestroy {
           }
           this.stateData = stateData;
           this.stateName = this.stateEditorService.getActiveStateName();
+          if (this.stateName === null) {
+            throw new Error(
+              'Expected stateName to be defined but received ' +
+              this.stateName);
+          }
           this.stateEditorService.setInteraction(stateData.interaction);
           this.stateContentService.init(
             this.stateName, stateData.content);
+          if (stateData.linkedSkillId === null) {
+            throw new Error(
+              'Expected linked skill id to be defined but received ' +
+              stateData.interaction.id);
+          }
           this.stateLinkedSkillIdService.init(
             this.stateName, stateData.linkedSkillId);
           this.stateHintsService.init(
             this.stateName, stateData.interaction.hints);
+          if (stateData.interaction.id === null) {
+            throw new Error(
+              'Expected interaction.id to be defined but received ' +
+              stateData.interaction.id);
+          }
           this.stateInteractionIdService.init(
             this.stateName, stateData.interaction.id);
           this.stateCustomizationArgsService.init(
