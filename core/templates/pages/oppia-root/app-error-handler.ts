@@ -88,10 +88,8 @@ export class AppErrorHandler extends ErrorHandler {
       // The Error.stack property provides a meaningful stacktrace of the
       // exception. Different browsers set this value at different times.
       // Modern browsers such as Chrome, Firefox, Edge set this value when
-      // an Error object is created. Older browsers like IE 10 & 11 set this
-      // value only when the Error is thrown. To ensure that the stack
-      // property is populated we use try/catch.
-      // eslint-disable-next-line max-len
+      // an Error object is created. To ensure that the stack property is
+      // populated we use try/catch.
       // see: https://web.archive.org/web/20140210004225/http://msdn.microsoft.com/en-us/library/windows/apps/hh699850.aspx
       try {
         throw new Error(`${error}`);
@@ -100,7 +98,7 @@ export class AppErrorHandler extends ErrorHandler {
       }
     }
 
-    let messageAndSourceAndStackTrace = [
+    let messageAndStackTrace = [
       '',
       error.message,
       '',
@@ -111,7 +109,7 @@ export class AppErrorHandler extends ErrorHandler {
     // every MIN_TIME_BETWEEN_ERRORS_MSEC.
     if (timeDifference > this.MIN_TIME_BETWEEN_ERRORS_MSEC) {
       this.http.post('/frontend_errors', {
-        error: messageAndSourceAndStackTrace
+        error: messageAndStackTrace
       }).toPromise().then(() => {
         this.timeOfLastPostedError = Date.now();
       }, () => {
