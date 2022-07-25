@@ -39,7 +39,7 @@ jobs:
       - name: Run frontend tests
         run: PYTHONIOENCODING=utf-8 python -m scripts.run_frontend_tests --run_minified_tests --skip_install --check_coverage
       - name: Uploading fronted coverage reports as an artifact
-        if: ${{ failure() }}
+        if: ${{ always() }}
         uses: actions/upload-artifact@v2
         with:
           name: frontend-coverage
