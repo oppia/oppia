@@ -70,7 +70,7 @@ export class FacilitatorDashboardPageComponent implements OnInit, OnDestroy {
   getLearnerGroupPageUrl(learnerGroupId: string): string {
     return (
       this.urlInterpolationService.interpolateUrl(
-        '/create-learner-group/<groupId>', {
+        '/edit-learner-group/<groupId>', {
           groupId: learnerGroupId
         }
       )

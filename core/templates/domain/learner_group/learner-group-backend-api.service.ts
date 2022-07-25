@@ -23,7 +23,8 @@ import { Injectable } from '@angular/core';
 
 import { LearnerGroupBackendDict, LearnerGroupData } from './learner-group.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { LearnerGroupInvitedUserInfo } from './learner-group-user-progress.model';
+import { LearnerGroupUserInfo, LearnerGroupUserInfoBackendDict } from
+  './learner-group-user-info.model';
 
 
 interface DeleteLearnerGroupBackendResponse {
@@ -145,19 +146,19 @@ export class LearnerGroupBackendApiService {
   async searchNewStudentToAddAsync(
       learnerGroupId: string,
       username: string
-  ): Promise<LearnerGroupInvitedUserInfo> {
+  ): Promise<LearnerGroupUserInfo> {
     return new Promise((resolve, reject) => {
       const learnerGroupUrl = '/learner_group_search_student_handler';
       const filterData = {
         username: username,
         learner_group_id: learnerGroupId
       };
-      this.http.get<LearnerGroupInvitedUserInfo>(
+      this.http.get<LearnerGroupUserInfoBackendDict>(
         learnerGroupUrl, {
           params: filterData
         }
       ).toPromise().then(response => {
-        resolve(response);
+        resolve(LearnerGroupUserInfo.createFromBackendDict(response));
       });
     });
   }

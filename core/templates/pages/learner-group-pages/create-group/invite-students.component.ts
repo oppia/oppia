@@ -21,8 +21,8 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { AlertsService } from 'services/alerts.service';
 import { LearnerGroupBackendApiService } from
   'domain/learner_group/learner-group-backend-api.service';
-import { LearnerGroupInvitedUserInfo } from
-  'domain/learner_group/learner-group-user-progress.model';
+import { LearnerGroupUserInfo } from
+  'domain/learner_group/learner-group-user-info.model';
 
 import './invite-students.component.css';
 
@@ -33,13 +33,13 @@ import './invite-students.component.css';
 })
 export class InviteStudentsComponent {
   @Input() learnerGroupID: string = '';
-  @Input() invitedUsersInfo: LearnerGroupInvitedUserInfo[] = [];
+  @Input() invitedUsersInfo: LearnerGroupUserInfo[] = [];
   @Input() invitedUsernames: string[] = [];
   @Output() updateLearnerGroupInvitedStudents:
     EventEmitter<string[]> = new EventEmitter();
 
   @Output() updateLearnerGroupInvitedStudentsInfo:
-    EventEmitter<LearnerGroupInvitedUserInfo[]> = new EventEmitter();
+    EventEmitter<LearnerGroupUserInfo[]> = new EventEmitter();
 
   searchedUsername: string = '';
   alertTimeout = 6000;
