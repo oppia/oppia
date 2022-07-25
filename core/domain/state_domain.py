@@ -22,6 +22,7 @@ import collections
 import copy
 import itertools
 import logging
+import math
 import re
 
 from core import android_validation_constants
@@ -899,6 +900,351 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         if self.solution and not self.hints:
             raise utils.ValidationError(
                 'Hint(s) must be specified if solution is specified')
+
+        # Validation for NumericInput interaction.
+        if self.id == 'NumericInput':
+            for ans_group_index, answer_group in enumerate(self.answer_groups):
+                for rule_spec_index, rule_spec in enumerate(
+                    answer_group.rule_specs):
+                    # Validates x in [a-b, a+b], b must be a positive value.
+                    if rule_spec.rule_type == 'IsWithinTolerance':
+                        if rule_spec.inputs['tol'] <= 0:
+                            raise utils.ValidationError(
+                                f'The rule {rule_spec_index} of answer '
+                                f'group {ans_group_index} having '
+                                f'rule type IsWithinTolerance '
+                                f'have tol value less than zero '
+                                f'in NumericInput interaction.'
+                            )
+
+                    # Validates x in [a, b], a must not be greater than b.
+                    if rule_spec.rule_type == 'IsInclusivelyBetween':
+                        if rule_spec.inputs['a'] > rule_spec.inputs['b']:
+                            raise utils.ValidationError(
+                                f'The rule {rule_spec_index} of answer '
+                                f'group {ans_group_index} having '
+                                f'rule type IsInclusivelyBetween '
+                                f'have a value greater than b value '
+                                f'in NumericInput interaction.'
+                            )
+
+        # Validation for FractionInput interaction.
+        if self.id == 'FractionInput':
+            for ans_group_index, answer_group in enumerate(self.answer_groups):
+                inputs_with_whole_nums = [
+                    'HasDenominatorEqualTo',
+                    'HasNumeratorEqualTo',
+                    'HasIntegerPartEqualTo',
+                    'HasNoFractionalPart'
+                ]
+                allow_non_zero_integ_part = (
+                    self.customization_args[
+                        'allowNonzeroIntegerPart'].value)
+                allow_imp_frac = (
+                    self.customization_args[
+                        'allowImproperFraction'].value)
+                require_simple_form = (
+                    self.customization_args[
+                        'requireSimplestForm'].value)
+
+                for rule_spec_index, rule_spec in enumerate(
+                    answer_group.rule_specs):
+
+                    if rule_spec.rule_type not in inputs_with_whole_nums:
+                        num = rule_spec.inputs['f']['numerator']
+                        den = rule_spec.inputs['f']['denominator']
+                        whole = rule_spec.inputs['f']['wholeNumber']
+
+                        # Validates if the denominator is greater than zero.
+                        if whole == 0:
+                            if den <= 0:
+                                raise utils.ValidationError(
+                                    f'The rule {rule_spec_index} of answer '
+                                    f'group {ans_group_index} has '
+                                    f'denominator less than or equal to zero '
+                                    f'in FractionInput interaction.'
+                                )
+
+                        # Validates if the solution in simplest form.
+                        if require_simple_form:
+                            if whole == 0:
+                                d = math.gcd(num, den)
+                                val_num = num // d
+                                val_den = den // d
+                                if val_num != num and val_den != den:
+                                    raise utils.ValidationError(
+                                        f'The rule {rule_spec_index} of '
+                                        f'answer group {ans_group_index} do '
+                                        f'not have value in simple form '
+                                        f'in FractionInput interaction.'
+                                    )
+
+                        # Validates if the solution in proper frac form.
+                        if not allow_imp_frac:
+                            if whole == 0:
+                                if den <= num:
+                                    raise utils.ValidationError(
+                                        f'The rule {rule_spec_index} of '
+                                        f'answer group {ans_group_index} do '
+                                        f'not have value in proper fraction '
+                                        f'in FractionInput interaction.'
+                                    )
+
+                        # Validates rule exactly equal is without integ part.
+                        if rule_spec.rule_type == 'IsExactlyEqualTo':
+                            if not allow_non_zero_integ_part:
+                                if whole != 0:
+                                    raise utils.ValidationError(
+                                        f'The rule {rule_spec_index} of '
+                                        f'answer group {ans_group_index} has '
+                                        f'non zero integer part '
+                                        f'in FractionInput interaction.'
+                                    )
+
+                    # Validates if the frac den is > 0.
+                    if rule_spec.rule_type == 'HasDenominatorEqualTo':
+                        if rule_spec.inputs['x'] <= 0:
+                            raise utils.ValidationError(
+                                f'The rule {rule_spec_index} of answer '
+                                f'group {ans_group_index} has '
+                                f'denominator less than or equal to zero '
+                                f'having rule type HasDenominatorEqualTo '
+                                f'in FractionInput interaction.'
+                            )
+
+                    # Validates if the solution is without integ part.
+                    if rule_spec.rule_type == 'HasIntegerPartEqualTo':
+                        if (
+                                not allow_non_zero_integ_part and
+                                rule_spec.inputs['x'] != 0
+                        ):
+                            raise utils.ValidationError(
+                                f'The rule {rule_spec_index} of answer '
+                                f'group {ans_group_index} has '
+                                f'non zero integer part having '
+                                f'rule type HasIntegerPartEqualTo '
+                                f'in FractionInput interaction.'
+                            )
+
+        # Validates for NumberWithUnits interaction.
+        if self.id == 'NumberWithUnits':
+            number_with_units_rules = []
+            for ans_group_index, answer_group in enumerate(self.answer_groups):
+                # Validates equal to should not come after equivalent to.
+                for rule_spec_index, rule_spec in enumerate(
+                    answer_group.rule_specs):
+                    if rule_spec.rule_type == 'IsEquivalentTo':
+                        number_with_units_rules.append(
+                            rule_spec.inputs['f'])
+                    if rule_spec.rule_type == 'IsEqualTo':
+                        if (rule_spec.inputs['f'] in
+                            number_with_units_rules):
+                            raise utils.ValidationError(
+                                f'The rule {rule_spec_index} of answer '
+                                f'group {ans_group_index} has '
+                                f'rule type equal is coming after '
+                                f'rule type equivalent having same value '
+                                f'in FractionInput interaction.'
+                            )
+
+        # Validates for MultipleChoiceInput interaction.
+        if self.id == 'MultipleChoiceInput':
+            selected_equals_choices = []
+            rule_spec_list = []
+            for ans_group_index, answer_group in enumerate(self.answer_groups):
+                # Validates no ans choice should appear more than one.
+                for rule_spec_index, rule_spec in enumerate(
+                    answer_group.rule_specs):
+                    if rule_spec.rule_type == 'Equals':
+                        if rule_spec.inputs['x'] in selected_equals_choices:
+                            raise utils.ValidationError(
+                                f'rule - {rule_spec_index}, answer group '
+                                f'- {ans_group_index} is '
+                                f'already present in MultipleChoiceInput '
+                                f'interaction.'
+                            )
+                        else:
+                            selected_equals_choices.append(
+                                rule_spec.inputs['x'])
+
+                    rule_spec_list.append(rule_spec.inputs['x'])
+            choices = (
+                self.customization_args['choices'].value)
+            # Validates answer choices should be non-empty and unique.
+            seen_choices = []
+            choice_empty = False
+            choice_duplicate = False
+            for choice in choices:
+                if choice.html in ('<p></p>', ''):
+                    choice_empty = True
+                if choice.html in seen_choices:
+                    choice_duplicate = True
+                seen_choices.append(choice.html)
+            if choice_empty:
+                raise utils.ValidationError(
+                    'There should not be any empty ' +
+                    'choices in MultipleChoiceInput interaction.'
+                )
+            if choice_duplicate:
+                raise utils.ValidationError(
+                    'There should not be any duplicate ' +
+                    'choices in MultipleChoiceInput interaction.'
+                )
+            # Validates if all MC have feedbacks do not ask for def feedback.
+            if (
+                    len(choices) == len(set(rule_spec_list))
+                    and self.default_outcome is not None
+            ):
+                raise utils.ValidationError(
+                    'All choices have feedback ' +
+                    'and still has default outcome '
+                    'in MultipleChoiceInput interaction.'
+                )
+
+        # Validates for ItemSelectionInput interaction.
+        if self.id == 'ItemSelectionInput':
+            min_value = (
+                self.customization_args
+                ['minAllowableSelectionCount'].value)
+            max_value = (
+                self.customization_args
+                ['maxAllowableSelectionCount'].value)
+            for ans_group_index, answer_group in enumerate(self.answer_groups):
+                # Validates no ans choice should appear more than one.
+                for rule_spec_index, rule_spec in enumerate(
+                    answer_group.rule_specs):
+                    if rule_spec.rule_type == 'Equals':
+                        if (
+                                len(rule_spec.inputs['x']) < min_value or
+                                len(rule_spec.inputs['x']) > max_value
+                            ):
+                            raise utils.ValidationError(
+                                f'Selected choices of rule {rule_spec_index} '
+                                f'of answer group {ans_group_index} '
+                                f'either less than min_selection_value '
+                                f'or greter than max_selection_value '
+                                f'in ItemSelectionInput interaction.'
+                            )
+
+            # Validates min no of selec should be no greater than max num.
+            if min_value > max_value:
+                raise utils.ValidationError(
+                    f'Min value which is {str(min_value)} '
+                    f'is greater than max value '
+                    f'which is {str(max_value)} '
+                    f'in ItemSelectionInput interaction.'
+                )
+            # Validates there should be enough choice to have min num of selec.
+            if len(choices) < min_value:
+                raise utils.ValidationError(
+                    f'Number of choices which is {str(len(choices))} '
+                    f'is lesser than the '
+                    f'min value selection which is {str(min_value)} '
+                    f'in ItemSelectionInput interaction.'
+                )
+            # Validates all items should be unique and non-empty.
+            seen_choices = []
+            choice_empty = False
+            choice_duplicate = False
+            for choice in choices:
+                if choice.html in ('<p></p>', ''):
+                    choice_empty = True
+                if choice.html in seen_choices:
+                    choice_duplicate = True
+                seen_choices.append(choice.html)
+            if choice_empty:
+                raise utils.ValidationError(
+                    'There should not be any empty ' +
+                    'choices in ItemSelectionInput interaction.'
+                )
+            if choice_duplicate:
+                raise utils.ValidationError(
+                    'There should not be any duplicate ' +
+                    'choices in ItemSelectionInput interaction.'
+                )
+
+        # Validates for DragAndDropSortInput interaction.
+        if self.id == 'DragAndDropSortInput':
+            multi_item_value = (
+                self.customization_args
+                ['allowMultipleItemsInSamePosition'].value)
+            for ans_group_index, answer_group in enumerate(self.answer_groups):
+                for rule_spec_index, rule_spec in enumerate(
+                    answer_group.rule_specs):
+                    # Validates multi items in same place iff setting on.
+                    if not multi_item_value:
+                        for ele in rule_spec.inputs['x']:
+                            if len(ele) > 1:
+                                raise utils.ValidationError(
+                                    f'The rule {rule_spec_index} of '
+                                    f'answer group {ans_group_index} '
+                                    f'have multiple items at same place '
+                                    f'when multiple items in same '
+                                    f'position settings is turned off '
+                                    f'in DragAndDropSortInput interaction.'
+                                )
+
+                    # Validates == +/- 1 no option if multi item set off.
+                    if not multi_item_value:
+                        if (
+                            rule_spec.rule_type ==
+                            'IsEqualToOrderingWithOneItemAtIncorrectPosition'
+                        ):
+                            raise utils.ValidationError(
+                                f'The rule {rule_spec_index} '
+                                f'of answer group {ans_group_index} '
+                                f'having rule type - IsEqualToOrderingWith'
+                                f'OneItemAtIncorrectPosition should not '
+                                f'be there when the '
+                                f'multiple items in same position '
+                                f'setting is turned off '
+                                f'in DragAndDropSortInput interaction.'
+                            )
+
+                    # Validates for a < b, a should not be the same as b.
+                    if (
+                        rule_spec.rule_type ==
+                        'HasElementXBeforeElementY'
+                    ):
+                        if (
+                            rule_spec.inputs['x'] == rule_spec.inputs['y']
+                        ):
+                            raise utils.ValidationError(
+                                f'The rule {rule_spec_index} of '
+                                f'answer group {ans_group_index} '
+                                f'the value 1 and value 2 cannot be '
+                                f'same when rule type is '
+                                f'HasElementXBeforeElementY '
+                                f'of DragAndDropSortInput interaction.'
+                            )
+            choices = (
+                self.customization_args['choices'].value)
+            # Validates there should be at least 2 items.
+            if len(choices) < 2:
+                raise utils.ValidationError(
+                    'Atleast 2 choices should be there '
+                    'in DragAndDropSortInput interaction.'
+                )
+            # Validates all inputs should be non-empty, unique.
+            seen_choices = []
+            choice_empty = False
+            choice_duplicate = False
+            for choice in choices:
+                if choice.html in ('<p></p>', ''):
+                    choice_empty = True
+                if choice.html in seen_choices:
+                    choice_duplicate = True
+                seen_choices.append(choice.html)
+            if choice_empty:
+                raise utils.ValidationError(
+                    'There should not be any empty ' +
+                    'choices in DragAndDropSortInput interaction.'
+                )
+            if choice_duplicate:
+                raise utils.ValidationError(
+                    'There should not be any duplicate ' +
+                    'choices in DragAndDropSortInput interaction.'
+                )
 
     def _validate_customization_args(self):
         """Validates the customization arguments keys and values using
