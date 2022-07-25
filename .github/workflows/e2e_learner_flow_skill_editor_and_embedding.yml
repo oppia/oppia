@@ -45,7 +45,7 @@ jobs:
         run: sudo apt install ffmpeg
       - name: Run Learner Flow E2E Test
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
-        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --suite="learner" --prod_env
+        run:  for run in {1..5}; do xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --suite="learner" --prod_env; done
         env: 
           VIDEO_RECORDING_IS_ENABLED: 0
       - name: Run Skill Editor E2E Test
