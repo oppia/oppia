@@ -32,7 +32,8 @@ var alertToBePresent = async() => {
     await until.alertIsPresent(),
     {
       timeout: DEFAULT_WAIT_TIME_MSECS,
-      timeoutMsg: 'Alert box took too long to appear.'
+      timeoutMsg: 'Alert box took too long to appear.\n' +
+      new Error().stack + '\n'
     });
 };
 
@@ -54,7 +55,7 @@ var urlToBe = async function(url) {
 var elementToBeClickable = async function(element, errorMessage) {
   await element.waitForClickable({
     timeout: DEFAULT_WAIT_TIME_MSECS,
-    timeoutMsg: errorMessage
+    timeoutMsg: errorMessage + '\n' + new Error().stack + '\n'
   });
 };
 
@@ -67,7 +68,7 @@ var invisibilityOf = async function(element, errorMessage) {
   await element.waitForDisplayed({
     timeout: DEFAULT_WAIT_TIME_MSECS,
     reverse: true,
-    timeoutMsg: errorMessage
+    timeoutMsg: errorMessage + '\n' + new Error().stack + '\n'
   });
 };
 
@@ -76,10 +77,11 @@ var invisibilityOf = async function(element, errorMessage) {
  */
 var pageToFullyLoad = async function() {
   var loadingMessage = await $('.e2e-test-loading-fullpage');
-  await loadingMessage.waitForExist({
+  await loadingMessage.waitForDisplayed({
     timeout: 15000,
     reverse: true,
-    timeoutMsg: 'Pages takes more than 15 sec to load'
+    timeoutMsg: 'Pages takes more than 15 sec to load\n' +
+    new Error().stack + '\n'
   });
 };
 
@@ -94,7 +96,7 @@ var textToBePresentInElement = async function(element, text, errorMessage) {
     await until.textToBePresentInElement(element, text),
     {
       timeout: DEFAULT_WAIT_TIME_MSECS,
-      timeoutMsg: errorMessage
+      timeoutMsg: errorMessage + '\n' + new Error().stack + '\n'
     });
 };
 
@@ -106,7 +108,7 @@ var textToBePresentInElement = async function(element, text, errorMessage) {
 var presenceOf = async function(element, errorMessage) {
   await element.waitForExist({
     timeout: DEFAULT_WAIT_TIME_MSECS,
-    timeoutMsg: errorMessage
+    timeoutMsg: errorMessage + '\n' + new Error().stack + '\n'
   });
 };
 
@@ -118,7 +120,7 @@ var presenceOf = async function(element, errorMessage) {
 var visibilityOf = async function(element, errorMessage) {
   await element.waitForDisplayed({
     timeout: DEFAULT_WAIT_TIME_MSECS,
-    timeoutMsg: errorMessage
+    timeoutMsg: errorMessage + '\n' + new Error().stack + '\n'
   });
 };
 
@@ -137,7 +139,7 @@ var elementAttributeToBe = async function(
   },
   {
     timeout: DEFAULT_WAIT_TIME_MSECS,
-    timeoutMsg: errorMessage
+    timeoutMsg: errorMessage + '\n' + new Error().stack + '\n'
   });
 };
 
@@ -153,7 +155,7 @@ var newTabToBeCreated = async function(errorMessage, urlToMatch) {
   },
   {
     timeout: DEFAULT_WAIT_TIME_MSECS_FOR_NEW_TAB,
-    timeoutMsg: errorMessage
+    timeoutMsg: errorMessage + '\n' + new Error().stack + '\n'
   });
 };
 
@@ -166,7 +168,7 @@ var urlRedirection = async function(url) {
     await until.urlIs(url),
     {
       timeout: DEFAULT_WAIT_TIME_MSECS,
-      timeoutMsg: 'URL redirection took too long'
+      timeoutMsg: 'URL redirection took too long\n' + new Error().stack + '\n'
     });
 };
 
@@ -216,7 +218,7 @@ var fileToBeDownloaded = async function(filename) {
   },
   {
     timeout: DEFAULT_WAIT_TIME_MSECS,
-    timeoutMsg: 'File was not downloaded!'
+    timeoutMsg: 'File was not downloaded!\n' + new Error().stack + '\n'
   });
 };
 
