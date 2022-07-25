@@ -35,6 +35,8 @@ import { UrlInterpolationService } from
 import { LearnerGroupData } from 'domain/learner_group/learner-group.model';
 import { TranslateService } from '@ngx-translate/core';
 import { PageTitleService } from 'services/page-title.service';
+import { LearnerGroupUserInfo } from
+  'domain/learner_group/learner-group-user-info.model';
 
 class MockTranslateService {
   onLangChange: EventEmitter<string> = new EventEmitter();
@@ -53,11 +55,11 @@ describe('CreateLearnerGroupPageComponent', () => {
   let clipboard: Clipboard;
   let pageTitleService: PageTitleService;
 
-  const userInfo = {
+  const userInfo = LearnerGroupUserInfo.createFromBackendDict({
     username: 'username1',
-    user_profile_picture_url: 'profile_picture_url1',
+    profile_picture_data_url: 'profile_picture_url1',
     error: ''
-  };
+  });
 
   const sampleSubtopicSummaryDict = {
     subtopic_id: 1,

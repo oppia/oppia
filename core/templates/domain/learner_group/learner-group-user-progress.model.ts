@@ -22,17 +22,6 @@ import { LearnerGroupSubtopicSummary, LearnerGroupSubtopicSummaryBackendDict }
  * user progress domain objects.
  */
 
-export interface LearnerGroupAllStudentsInfo {
-  students_info: LearnerGroupUserInfo[];
-  invited_students_info: LearnerGroupUserInfo[];
-}
-
-export interface LearnerGroupUserInfo {
-  username: string;
-  user_profile_picture_url: string;
-  error: string;
-}
-
 export interface LearnerGroupUserProgressBackendDict {
   username: string ;
   progress_sharing_is_turned_on: boolean;

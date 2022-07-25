@@ -107,6 +107,10 @@
   position: absolute;
   right: 0;
   top: 40%;
+  -moz-transform: scaleX(1) /*rtl:scaleX(-1)*/;
+  -o-transform: scaleX(1) /*rtl:scaleX(-1)*/;
+  -webkit-transform: scaleX(1) /*rtl:scaleX(-1)*/;
+  transform: scaleX(1) /*rtl:scaleX(-1)*/;
 }
 
 @media screen and (max-width: 575px) {

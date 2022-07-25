@@ -69,6 +69,7 @@
     "I18N_ADD_NEW_SYLLABUS_CANCEL_BUTTON_TEXT": "Cancel",
     "I18N_ADD_NEW_SYLLABUS_ITEMS": "New Syllabus Items",
     "I18N_ADD_NEW_SYLLABUS_DONE_BUTTON_TEXT": "Done",
+    "I18N_ADD_SYLLABUS_DESCRIPTION_TEXT": "Add skills or stories to your syllabus to automatically send them to your students.",
     "I18N_ADD_SYLLABUS_SEARCH_PLACEHOLDER": "Search eg. Story,  Physics, English",
     "I18N_ASSIGNED_STORIES_AND_SKILLS": "Assigned Stories and Skills",
     "I18N_ATTRIBUTION_HTML_STEP_ONE": "Copy and paste the HTML",

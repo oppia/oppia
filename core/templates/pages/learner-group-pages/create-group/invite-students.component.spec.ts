@@ -24,6 +24,8 @@ import { InviteStudentsComponent } from './invite-students.component';
 import { LearnerGroupBackendApiService } from
   'domain/learner_group/learner-group-backend-api.service';
 import { AlertsService } from 'services/alerts.service';
+import { LearnerGroupUserInfo } from
+  'domain/learner_group/learner-group-user-info.model';
 
 describe('InviteStudentsComponent', () => {
   let component: InviteStudentsComponent;
@@ -31,11 +33,11 @@ describe('InviteStudentsComponent', () => {
   let alertsService: AlertsService;
   let learnerGroupBackendApiService: LearnerGroupBackendApiService;
 
-  const userInfo = {
+  const userInfo = LearnerGroupUserInfo.createFromBackendDict({
     username: 'username1',
-    user_profile_picture_url: 'profile_picture_url1',
+    profile_picture_data_url: 'profile_picture_url1',
     error: ''
-  };
+  });
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -77,11 +79,11 @@ describe('InviteStudentsComponent', () => {
 
   it('should show alert message when trying to add an invalid students to ' +
   'the learner group', fakeAsync(() => {
-    const userInfo2 = {
+    const userInfo2 = LearnerGroupUserInfo.createFromBackendDict({
       username: 'username2',
-      user_profile_picture_url: '',
+      profile_picture_data_url: '',
       error: 'You cannot invite yourself to the learner group.'
-    };
+    });
     const alertServiceSpy = spyOn(alertsService, 'addInfoMessage');
 
     spyOn(learnerGroupBackendApiService, 'searchNewStudentToAddAsync')

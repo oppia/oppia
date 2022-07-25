@@ -32,7 +32,7 @@ import { LearnerGroupSubtopicSummary } from
   'domain/learner_group/learner-group-subtopic-summary.model';
 import { StorySummary } from 'domain/story/story-summary.model';
 import { LearnerGroupUserInfo } from
-  'domain/learner_group/learner-group-user-progress.model';
+  'domain/learner_group/learner-group-user-info.model';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { WindowRef } from 'services/contextual/window-ref.service';

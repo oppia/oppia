@@ -88,6 +88,9 @@
   content: none;
 }
 
+/* Following change is required to avoid checkmark getting flipped in RTL mode. */
+
+/*rtl:begin:ignore*/
 .oppia-create-learner-group .checkmark:after {
   border-bottom: 3px solid #fff;
   border-right: 3px solid #fff;
@@ -100,6 +103,7 @@
   transform: rotate(45deg);
   width: 8px;
 }
+/*rtl:end:ignore*/
 
 .oppia-create-learner-group .oppia-learner-group-progressbar li .indicator {
   align-items: center;

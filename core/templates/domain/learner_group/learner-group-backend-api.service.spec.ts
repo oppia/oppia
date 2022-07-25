@@ -22,6 +22,7 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { LearnerGroupBackendApiService } from
   './learner-group-backend-api.service';
+import { LearnerGroupUserInfo } from './learner-group-user-info.model';
 import { LearnerGroupData } from './learner-group.model';
 
 describe('Learner Group Backend API Service', () => {
@@ -260,7 +261,7 @@ describe('Learner Group Backend API Service', () => {
     );
     const sampleUserInfo = {
       username: 'username1',
-      user_profile_picture_url: 'profile_picture_url1',
+      profile_picture_data_url: 'profile_picture_url1',
       error: ''
     };
 
@@ -273,7 +274,9 @@ describe('Learner Group Backend API Service', () => {
 
     flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalledWith(sampleUserInfo);
+    expect(successHandler).toHaveBeenCalledWith(
+      LearnerGroupUserInfo.createFromBackendDict(
+        sampleUserInfo));
     expect(failHandler).not.toHaveBeenCalled();
   }));
 });

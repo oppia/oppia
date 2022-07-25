@@ -22,7 +22,7 @@ import { AlertsService } from 'services/alerts.service';
 import { LearnerGroupBackendApiService } from
   'domain/learner_group/learner-group-backend-api.service';
 import { LearnerGroupUserInfo } from
-  'domain/learner_group/learner-group-user-progress.model';
+  'domain/learner_group/learner-group-user-info.model';
 
 import './invite-students.component.css';
 
@@ -58,7 +58,10 @@ export class InviteStudentsComponent {
 
   onSearchQueryChangeExec(username: string): void {
     if (username) {
-      if (this.invitedUsernames.includes(username.toLowerCase())) {
+      const isUserAlreadyInvited = this.invitedUsernames.some(
+        (name) => name.toLowerCase() === username.toLowerCase()
+      );
+      if (isUserAlreadyInvited) {
         this.alertsService.addInfoMessage(
           'User with username ' + username + ' has been already invited.'
         );

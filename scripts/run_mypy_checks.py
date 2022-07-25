@@ -82,8 +82,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/suggestion_services_test.py',
     'core/domain/summary_services.py',
     'core/domain/summary_services_test.py',
-    'core/domain/topic_fetchers.py',
-    'core/domain/topic_fetchers_test.py',
     'core/domain/topic_services.py',
     'core/domain/topic_services_test.py',
     'core/domain/voiceover_services.py',

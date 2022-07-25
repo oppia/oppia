@@ -21,12 +21,12 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { LearnerGroupBackendDict, LearnerGroupData } from
-  './learner-group.model';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
-import { LearnerGroupAllStudentsInfo, LearnerGroupUserInfo } from
-  './learner-group-user-progress.model';
+import { LearnerGroupBackendDict, LearnerGroupData } from './learner-group.model';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import {
+  LearnerGroupAllStudentsInfoBackendDict,
+  LearnerGroupUserInfo, LearnerGroupUserInfoBackendDict
+} from './learner-group-user-info.model';
 
 
 interface DeleteLearnerGroupBackendResponse {
@@ -155,19 +155,19 @@ export class LearnerGroupBackendApiService {
         username: username,
         learner_group_id: learnerGroupId
       };
-      this.http.get<LearnerGroupUserInfo>(
+      this.http.get<LearnerGroupUserInfoBackendDict>(
         learnerGroupUrl, {
           params: filterData
         }
       ).toPromise().then(response => {
-        resolve(response);
+        resolve(LearnerGroupUserInfo.createFromBackendDict(response));
       });
     });
   }
 
   async fetchStudentsInfoAsync(
       learnerGroupId: string
-  ): Promise<LearnerGroupAllStudentsInfo> {
+  ): Promise<LearnerGroupAllStudentsInfoBackendDict> {
     return new Promise((resolve, reject) => {
       const learnerGroupUrl = (
         this.urlInterpolationService.interpolateUrl(
@@ -176,7 +176,7 @@ export class LearnerGroupBackendApiService {
           }
         )
       );
-      this.http.get<LearnerGroupAllStudentsInfo>(
+      this.http.get<LearnerGroupAllStudentsInfoBackendDict>(
         learnerGroupUrl).toPromise().then(response => {
         resolve(response);
       });
