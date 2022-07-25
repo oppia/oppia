@@ -642,7 +642,7 @@ def update_story(
     if story_is_published:
         opportunity_services.update_exploration_opportunities(  # type: ignore[no-untyped-call]
             old_story, new_story)
-    suggestion_services.auto_reject_translation_suggestions_for_exp_ids(  # type: ignore[no-untyped-call]
+    suggestion_services.auto_reject_translation_suggestions_for_exp_ids(
         exp_ids_removed_from_story)
 
     exp_models.ExplorationContextModel.delete_multi(
@@ -683,7 +683,7 @@ def delete_story(
         )
         # Reject the suggestions related to the exploration used in
         # the story.
-        suggestion_services.auto_reject_translation_suggestions_for_exp_ids(  # type: ignore[no-untyped-call]
+        suggestion_services.auto_reject_translation_suggestions_for_exp_ids(
             exp_ids)
 
     exploration_context_models: Sequence[

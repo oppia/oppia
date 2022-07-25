@@ -510,7 +510,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
     @classmethod
     def get_in_review_translation_suggestions_with_exp_ids_by_offset(
         cls,
-        limit: int,
+        limit: Optional[int],
         offset: int,
         user_id: str,
         language_codes: List[str],
@@ -521,7 +521,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
         given exploration IDs.
 
         Args:
-            limit: int. Maximum number of entities to be returned.
+            limit: int|None. Maximum number of entities to be returned. If None,
+                returns all matching entities.
             offset: int. Number of results to skip from the beginning of all
                 results matching the query.
             user_id: str. The id of the user trying to make this query.
@@ -550,6 +551,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
         results: Sequence[GeneralSuggestionModel] = (
             suggestion_query.fetch(limit, offset=offset)
+            if limit is not None
+            else suggestion_query.fetch(offset=offset)
         )
         next_offset = offset + len(results)
 

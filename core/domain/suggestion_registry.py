@@ -24,6 +24,7 @@ import datetime
 from core import feconf
 from core import utils
 from core.constants import constants
+from core.domain import change_domain
 from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_fetchers
@@ -37,6 +38,8 @@ from core.domain import skill_fetchers
 from core.domain import state_domain
 from core.domain import user_services
 from core.platform import models
+
+from typing import Dict, Type, Union
 
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 
@@ -66,6 +69,19 @@ class BaseSuggestion:
         edited_by_reviewer: bool. Whether the suggestion is edited by the
             reviewer.
     """
+
+    suggestion_id: str
+    suggestion_type: str
+    target_type: str
+    target_version_at_submission: int
+    target_id: str
+    final_reviewer_id: str
+    change: change_domain.BaseChange
+    score_category: str
+    last_updated: datetime.datetime
+    edited_by_reviewer: bool
+    language_code: str
+    author_id: str
 
     def __init__(self, status, final_reviewer_id):
         """Initializes a Suggestion object."""
@@ -235,7 +251,7 @@ class BaseSuggestion:
                 'Expected the first part of score_category to be among allowed'
                 ' choices, received %s' % self.get_score_type())
 
-    def accept(self):
+    def accept(self, *args):
         """Accepts the suggestion. Each subclass must implement this
         function.
         """
@@ -355,7 +371,9 @@ class SuggestionEditStateContent(BaseSuggestion):
         self.target_id = target_id
         self.target_version_at_submission = target_version_at_submission
         self.author_id = author_id
-        self.change = exp_domain.ExplorationChange(change)
+        self.change: exp_domain.ExplorationChange = (
+            exp_domain.ExplorationChange(change)
+        )
         self.score_category = score_category
         self.language_code = language_code
         self.last_updated = last_updated
@@ -543,7 +561,9 @@ class SuggestionTranslateContent(BaseSuggestion):
         self.target_id = target_id
         self.target_version_at_submission = target_version_at_submission
         self.author_id = author_id
-        self.change = exp_domain.ExplorationChange(change)
+        self.change: exp_domain.ExplorationChange = (
+            exp_domain.ExplorationChange(change)
+        )
         self.score_category = score_category
         self.language_code = language_code
         self.last_updated = last_updated
@@ -742,7 +762,9 @@ class SuggestionAddQuestion(BaseSuggestion):
         self.target_id = target_id
         self.target_version_at_submission = target_version_at_submission
         self.author_id = author_id
-        self.change = question_domain.QuestionSuggestionChange(change)
+        self.change: question_domain.QuestionSuggestionChange = (
+            question_domain.QuestionSuggestionChange(change)
+        )
         self.score_category = score_category
         self.language_code = language_code
         self.last_updated = last_updated
@@ -1197,7 +1219,14 @@ VOICEOVER_APPLICATION_TARGET_TYPE_TO_DOMAIN_CLASSES = {
         ExplorationVoiceoverApplication)
 }
 
-SUGGESTION_TYPES_TO_DOMAIN_CLASSES = {
+SUGGESTION_TYPES_TO_DOMAIN_CLASSES: Dict[
+    str,
+    Union[
+        Type[SuggestionEditStateContent],
+        Type[SuggestionTranslateContent],
+        Type[SuggestionAddQuestion]
+    ]
+] = {
     feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT: (
         SuggestionEditStateContent),
     feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT: (
