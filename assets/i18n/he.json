@@ -77,6 +77,7 @@
 	"I18N_DELETE_ACCOUNT_PAGE_LIST_2_1": "תהליכים והצעות",
 	"I18N_DELETE_ACCOUNT_PAGE_LIST_2_2": "סטטיסטיקות משתמש",
 	"I18N_DELETE_ACCOUNT_PAGE_LIST_2_3": "חקירות, אוספים, נושאים, סיפורים, כישורים ושאלות ציבוריות",
+	"I18N_DELETE_ACCOUNT_PAGE_MODAL_TEXT": "האם באמת למחוק את החשבון שלך? <strong>פעולה זו בלתי הפיכה</strong>",
 	"I18N_DELETE_ACCOUNT_PAGE_PARAGRAPH_1": "הפעולה הזאת תמחק את חשבון המשתמש וגם את כל המידע הפרטי המקושר לחשבון. מידע ציבורי יהפוך לאנונימי, ולא יהיה מקושר לחשבון. הבעלות על חלק מהמידע עשויה לעבור לקהילה. הנה סיכום של המידע שיימחק:",
 	"I18N_DELETE_ACCOUNT_PAGE_PARAGRAPH_1_HEADING": "סקירה כללית",
 	"I18N_DELETE_ACCOUNT_PAGE_PARAGRAPH_2": "סיכום המידע שיהפוך לאנונימי:",
