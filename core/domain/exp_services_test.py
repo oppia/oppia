@@ -26,6 +26,7 @@ import zipfile
 
 from core import feconf
 from core import utils
+from core.constants import constants
 from core.domain import classifier_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
@@ -112,6 +113,61 @@ class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
     """Test that classifier models are correctly mapped when an exploration
     is reverted.
     """
+
+    def test_raises_key_error_for_invalid_id(self):
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'tes_exp_id', title='some title', category='Algebra',
+            language_code=constants.DEFAULT_LANGUAGE_CODE
+        )
+        exploration.objective = 'An objective'
+        exploration.correctness_feedback_enabled = False
+        self.set_interaction_for_state(
+            exploration.states[exploration.init_state_name], 'NumericInput'
+        )
+        exp_services.save_new_exploration(self.owner_id, exploration)
+
+        interaction_answer_groups = [{
+            'rule_specs': [{
+                    'inputs': {
+                        'x': 60
+                    },
+                    'rule_type': 'IsLessThanOrEqualTo'
+            }],
+            'outcome': {
+                'dest': feconf.DEFAULT_INIT_STATE_NAME,
+                'dest_if_really_stuck': None,
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': '<p>Try again</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': ['answer1', 'answer2', 'answer3'],
+            'tagged_skill_misconception_id': None
+        }]
+
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
+            'new_value': interaction_answer_groups
+        }), exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX),
+            'new_value': 4
+        })]
+        with self.assertRaisesRegex(KeyError, 'NumericInput'):
+            with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
+                with self.swap(feconf, 'MIN_TOTAL_TRAINING_EXAMPLES', 2):
+                    with self.swap(feconf, 'MIN_ASSIGNED_LABELS', 1):
+                        exp_services.update_exploration(
+                            self.owner_id, 'tes_exp_id', change_list, '')
 
     def test_reverting_an_exploration_maintains_classifier_models(self):
         """Test that when exploration is reverted to previous version
