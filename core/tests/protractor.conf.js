@@ -112,16 +112,8 @@ var suites = {
       'protractor_desktop/playVoiceovers.js'
     ],
 
-    profileMenu: [
-      'protractor/profileMenuFlow.js'
-    ],
-
     publication: [
       'protractor_desktop/publicationAndLibrary.js'
-    ],
-
-    topicAndStoryEditor: [
-      'protractor_desktop/topicAndStoryEditor.js'
     ],
 
     topicAndStoryEditorFileUploadFeatures: [
@@ -134,10 +126,6 @@ var suites = {
 
     skillEditor: [
       'protractor_desktop/skillEditor.js'
-    ],
-
-    topicAndStoryViewer: [
-      'protractor_desktop/topicAndStoryViewer.js'
     ],
 
     wipeout: [

@@ -23,6 +23,8 @@ var waitFor = require('./waitFor.js');
 var action = require('./action.js');
 var CreatorDashboardPage = require('./CreatorDashboardPage.js');
 var ExplorationEditorPage = require('./ExplorationEditorPage.js');
+var TopicsAndSkillsDashboardPage = require('./TopicsAndSkillsDashboardPage.js');
+var SkillEditorPage = require('./SkillEditorPage');
 
 // Check if the save roles button is clickable.
 var canAddRolesToUsers = async function() {
@@ -257,7 +259,6 @@ var createSkillAndAssignTopic = async function(
   await topicsAndSkillsDashboardPage.get();
   await topicsAndSkillsDashboardPage.navigateToSkillsTab();
   await topicsAndSkillsDashboardPage.filterSkillsByStatus('Unassigned');
-  await topicsAndSkillsDashboardPage.searchSkillByName(skillDescription);
   await topicsAndSkillsDashboardPage.assignSkillToTopic(
     skillDescription, topicName);
 };

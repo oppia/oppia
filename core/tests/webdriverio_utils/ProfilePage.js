@@ -101,7 +101,7 @@ var ProfilePage = function() {
     var allExplorationCardElements = allExplorationCardSelector();
     var explorationsCardByName = await allExplorationCardElements.filter(
       async function(card) {
-        var cardTitle = await card.$('.e2e-test-exp-summary-tile-title');
+        var cardTitle = card.$('.e2e-test-exp-summary-tile-title');
         await waitFor.visibilityOf(
           cardTitle,
           'CardTitle is not present or taking too long to display');

@@ -182,7 +182,9 @@ var RealEditor = function(elem) {
 
 var RichTextEditor = async function(elem) {
   var rteElements = await elem.$$('.e2e-test-rte');
-  var modalDialogElements = await $$('.modal-dialog');
+  var modalDialogElementsSelector = function() {
+    return $$('.modal-dialog');
+  };
 
   var closeRteComponentButtonLocator = (
     '.e2e-test-close-rich-text-component-editor');
@@ -250,6 +252,7 @@ var RichTextEditor = async function(elem) {
       await _clickToolbarButton(
         'cke_button__oppia' + componentName.toLowerCase());
 
+      var modalDialogElements = await modalDialogElementsSelector();
       var modalDialogLength = modalDialogElements.length;
       // The currently active modal is the last in the DOM.
       var modal = modalDialogElements[modalDialogLength - 1];
@@ -515,7 +518,7 @@ var expectRichText = function(elem) {
 //   area (including both element and text nodes, so more than just the
 //   concatenation of arrayOfTexts), e.g. 'textBold'.
 var RichTextChecker = async function(arrayOfElems, arrayOfTexts, fullText) {
-  expect(await arrayOfElems.length).toEqual(arrayOfTexts.length);
+  expect(arrayOfElems.length).toEqual(arrayOfTexts.length);
   // These are shared by the returned functions, and records how far through
   // the child elements and text of the rich text area checking has gone. The
   // arrayPointer traverses both arrays simultaneously.
@@ -528,12 +531,12 @@ var RichTextChecker = async function(arrayOfElems, arrayOfTexts, fullText) {
 
   var _readFormattedText = async function(text, tagName) {
     expect(
-      await (await arrayOfElems[arrayPointer]).getTagName()
+      await arrayOfElems[arrayPointer].getTagName()
     ).toBe(tagName);
     // Remove comments introduced by angular for bindings using replace.
     expect(
       (
-        await (await arrayOfElems[arrayPointer]).getAttribute('innerHTML')
+        await arrayOfElems[arrayPointer].getAttribute('innerHTML')
       ).replace(/<!--[^>]*-->/g, '').trim()
     ).toBe(text);
     expect(arrayOfTexts[arrayPointer]).toEqual(text);

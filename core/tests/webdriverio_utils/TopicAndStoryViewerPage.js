@@ -73,16 +73,16 @@ var TopicAndStoryViewerPage = function() {
   };
 
   this.expectCompletedLessonCountToBe = async function(count) {
-    var lessonCompletedIcons = await lessonCompletedIconsSelector();
     await waitFor.visibilityOf(
       lessonTrack, 'Lesson track takes too long to be visible.');
+    var lessonCompletedIcons = await lessonCompletedIconsSelector();
     expect(lessonCompletedIcons.length).toEqual(count);
   };
 
   this.expectUncompletedLessonCountToBe = async function(count) {
-    var lessonUncompletedIcons = await lessonUncompletedIconsSelector();
     await waitFor.visibilityOf(
       lessonTrack, 'Lesson track takes too long to be visible.');
+    var lessonUncompletedIcons = await lessonUncompletedIconsSelector();
     expect(lessonUncompletedIcons.length).toEqual(count);
   };
 

@@ -22,6 +22,7 @@ var waitFor = require('./waitFor.js');
 var SubscriptionDashboardPage = function() {
   var subscriptionButton = $('.e2e-test-subscription-button');
   var subscribeLabel = $('.e2e-test-subscribe-label');
+  var subscriptionNameElement = $('.e2e-test-subscription-name');
   var subscriptionNameSelector = function() {
     return $$('.e2e-test-subscription-name');
   };
@@ -33,10 +34,10 @@ var SubscriptionDashboardPage = function() {
   };
 
   this.expectSubscriptionFirstNameToMatch = async function(name) {
+    await waitFor.visibilityOf(
+      subscriptionNameElement, 'First Subscriber Name is not visible');
     var subscriptionName = await subscriptionNameSelector();
     var firstSubscriberNameElem = subscriptionName[0];
-    await waitFor.visibilityOf(
-      firstSubscriberNameElem, 'First Subscriber Name is not visible');
     expect(await firstSubscriberNameElem.getText()).toMatch(name);
   };
 
@@ -50,10 +51,10 @@ var SubscriptionDashboardPage = function() {
   };
 
   this.expectSubscriptionCountToEqual = async function(value) {
-    var subscriptionName = await subscriptionNameSelector();
     await waitFor.visibilityOf(
-      subscriptionName[0],
+      subscriptionNameElement,
       'Subscriber Name Card takes too long to appear');
+    var subscriptionName = await subscriptionNameSelector();
     expect(await subscriptionName.length).toEqual(value);
   };
 
