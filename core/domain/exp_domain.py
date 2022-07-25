@@ -555,7 +555,9 @@ class ExplorationCommitLogEntry:
         exploration_id: str,
         commit_type: str,
         commit_message: str,
-        commit_cmds: Sequence[Mapping[str, change_domain.AcceptableChangeDictTypes]],
+        commit_cmds: Sequence[
+            Mapping[str, change_domain.AcceptableChangeDictTypes]
+        ],
         version: int,
         post_commit_status: str,
         post_commit_community_owned: bool,
