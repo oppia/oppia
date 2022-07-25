@@ -39,7 +39,10 @@ from core.domain import param_domain
 from core.domain import state_domain
 from core.domain import translation_domain
 
-from typing import Any, Callable, Dict, List, Mapping, Optional, Sequence, Set, Tuple, cast
+from typing import (
+    Any, Callable, Dict, List, Mapping, Optional, Sequence,
+    Set, Tuple, cast
+)
 from typing_extensions import Final, TypedDict
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
