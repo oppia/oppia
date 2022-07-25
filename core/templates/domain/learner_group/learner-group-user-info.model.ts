@@ -19,7 +19,7 @@
 
 export interface LearnerGroupUserInfoBackendDict {
   username: string;
-  user_profile_picture_url: string;
+  profile_picture_data_url: string;
   error: string;
 }
 
@@ -55,7 +55,7 @@ export class LearnerGroupUserInfo {
   ): LearnerGroupUserInfo {
     return new LearnerGroupUserInfo(
       infoBackendDict.username,
-      infoBackendDict.user_profile_picture_url,
+      infoBackendDict.profile_picture_data_url,
       infoBackendDict.error
     );
   }

@@ -15,7 +15,7 @@
     </div>
     <div class="invited-students-inner-container">
       <div class="invited-student-card" *ngFor="let userInfo of invitedUsersInfo; trackBy: index">
-        <img [src]="getProfileImageDataUrl(userInfo.profile_picture_data_url)">
+        <img [src]="getProfileImageDataUrl(userInfo.userProfilePictureUrl)">
         <div>{{userInfo.username}}</div>
         <i class="fa fa-times close-button" (click)="removeInvitedStudent(userInfo.username)"></i>
       </div>

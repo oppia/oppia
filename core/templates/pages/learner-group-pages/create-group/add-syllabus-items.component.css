@@ -145,8 +145,11 @@
 }
 
 .oppia-add-learner-group-syllabus .syllabus-item-title-info {
+  align-items: center;
   color: #999;
+  display: flex;
   font-size: 14px;
+  gap: 5px;
   text-transform: uppercase;
 }
 
@@ -163,7 +166,7 @@
   align-items: center;
   display: flex;
   gap: 10px;
-  justify-content: right;
+  justify-content: right /*rtl:left*/;
   padding: 6px;
   width: 30%;
 }

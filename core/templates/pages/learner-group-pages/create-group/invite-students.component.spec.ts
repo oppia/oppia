@@ -35,7 +35,7 @@ describe('InviteStudentsComponent', () => {
 
   const userInfo = LearnerGroupUserInfo.createFromBackendDict({
     username: 'username1',
-    user_profile_picture_url: 'profile_picture_url1',
+    profile_picture_data_url: 'profile_picture_url1',
     error: ''
   });
 
@@ -81,7 +81,7 @@ describe('InviteStudentsComponent', () => {
   'the learner group', fakeAsync(() => {
     const userInfo2 = LearnerGroupUserInfo.createFromBackendDict({
       username: 'username2',
-      user_profile_picture_url: '',
+      profile_picture_data_url: '',
       error: 'You cannot invite yourself to the learner group.'
     });
     const alertServiceSpy = spyOn(alertsService, 'addInfoMessage');

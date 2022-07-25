@@ -261,7 +261,7 @@ describe('Learner Group Backend API Service', () => {
     );
     const sampleUserInfo = {
       username: 'username1',
-      user_profile_picture_url: 'profile_picture_url1',
+      profile_picture_data_url: 'profile_picture_url1',
       error: ''
     };
 

@@ -22,7 +22,7 @@ describe('Learner Group User Info', () => {
   it('should correctly convert backend dict to object', () => {
     const sampleLearnerGroupUserInfoDict = {
       username: 'user1',
-      user_profile_picture_url: 'profile_picture',
+      profile_picture_data_url: 'profile_picture',
       error: 'some error message'
     };
 
