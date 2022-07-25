@@ -64,22 +64,27 @@ export class AppErrorHandler extends ErrorHandler {
 
   handleError(error: Error): void {
     if (AppErrorHandler.EXPECTED_ERROR_CODES.includes(
-      // The firebase.auth.Error is not comptabile with javascript's Error type.
-      // That's why explicit type conversion is used as here.
-      (error as unknown as firebase.auth.Error).code)) {
+      // The firebase.auth.Error is not compatible with javascript's Error type.
+      // That's why explicit type conversion is used here.
+      (error as unknown as firebase.auth.Error).code)
+    ) {
       return;
     }
 
     // Suppress unhandled rejection errors status code -1, because -1 is the
     // status code for aborted requests.
     if (this.UNHANDLED_REJECTION_STATUS_CODE_REGEX.test(
-      error.message)) {
+      error.message
+    )) {
       return;
     }
 
     let errorType = Object.prototype.toString.call(error);
-    if (errorType !== '[object Error]' &&
-      errorType !== '[object DOMException]' && !(errorType instanceof Error)) {
+    if (
+      errorType !== '[object Error]' &&
+      errorType !== '[object DOMException]' &&
+      !(errorType instanceof Error)
+    ) {
       // The Error.stack property provides a meaningful stacktrace of the
       // exception. Different browsers set this value at different times.
       // Modern browsers such as Chrome, Firefox, Edge set this value when
@@ -105,9 +110,6 @@ export class AppErrorHandler extends ErrorHandler {
     // To prevent an overdose of errors, throttle to at most 1 error
     // every MIN_TIME_BETWEEN_ERRORS_MSEC.
     if (timeDifference > this.MIN_TIME_BETWEEN_ERRORS_MSEC) {
-      // Catch all errors, to guard against infinite recursive loops.
-      // We use jQuery here instead of Angular's $http, since the
-      // latter creates a circular dependency.
       this.http.post('/frontend_errors', {
         error: messageAndSourceAndStackTrace
       }).toPromise().then(() => {
