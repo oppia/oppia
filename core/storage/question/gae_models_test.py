@@ -125,7 +125,7 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
             inapplicable_skill_misconception_ids)
 
     def test_put_multi_questions(self) -> None:
-        question_state_data = self._create_valid_question_data('ABC') # type: ignore[no-untyped-call]
+        question_state_data = self._create_valid_question_data('ABC')
         linked_skill_ids = ['skill_id1', 'skill_id2']
         self.save_new_question( # type: ignore[no-untyped-call]
             'question_id1', 'owner_id',

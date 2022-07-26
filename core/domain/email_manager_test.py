@@ -2069,7 +2069,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 'question_dict': {
                     'id': 'test_id',
                     'version': 12,
-                    'question_state_data': self._create_valid_question_data(  # type: ignore[no-untyped-call]
+                    'question_state_data': self._create_valid_question_data(
                         'default_state').to_dict(),
                     'language_code': constants.DEFAULT_LANGUAGE_CODE,
                     'question_state_data_schema_version': (
@@ -3675,7 +3675,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                 'question_dict': {
                     'id': 'test_id',
                     'version': 12,
-                    'question_state_data': self._create_valid_question_data(  # type: ignore[no-untyped-call]
+                    'question_state_data': self._create_valid_question_data(
                         'default_state').to_dict(),
                     'language_code': constants.DEFAULT_LANGUAGE_CODE,
                     'question_state_data_schema_version': (
@@ -4475,7 +4475,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             'question_dict': {
                 'id': 'test_id',
                 'version': 12,
-                'question_state_data': self._create_valid_question_data(   # type: ignore[no-untyped-call]
+                'question_state_data': self._create_valid_question_data(
                     'default_state').to_dict(),
                 'language_code': constants.DEFAULT_LANGUAGE_CODE,
                 'question_state_data_schema_version': (

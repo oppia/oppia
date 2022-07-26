@@ -4002,7 +4002,7 @@ class State(translation_domain.BaseTranslatableObject):
 
         return state_dict
 
-    def get_all_html_content_strings(self):
+    def get_all_html_content_strings(self) -> List[str]:
         """Get all html content strings in the state.
 
         Returns:

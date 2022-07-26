@@ -212,10 +212,14 @@ def create_suggestion(
     suggestion_domain_class = (
         suggestion_registry.SUGGESTION_TYPES_TO_DOMAIN_CLASSES[
             suggestion_type])
+    # Here, argument `final_reviewer_id` of suggestion_domain_class method
+    # can only accept string values but here we are providing None value
+    # which causes MyPy to throw `incompatible argument type` error. Thus
+    # to avoid the error, we used ignore here.
     suggestion = suggestion_domain_class(
         thread_id, target_id, target_version_at_submission, status, author_id,
-        None, change, score_category, language_code, False)
-    suggestion.validate()  # type: ignore[no-untyped-call]
+        None, change, score_category, language_code, False)  # type: ignore[arg-type]
+    suggestion.validate()
 
     # Here, argument `final_reviewer_id` of create method can only accept
     # string values but here we are providing None value which causes MyPy
@@ -410,7 +414,7 @@ def _update_suggestions(
     suggestion_ids = []
 
     for suggestion in suggestions:
-        suggestion.validate()  # type: ignore[no-untyped-call]
+        suggestion.validate()
         suggestion_ids.append(suggestion.suggestion_id)
 
     suggestion_models_to_update_with_none = (
@@ -493,8 +497,8 @@ def accept_suggestion(
             'The suggestion with id %s has already been accepted/'
             'rejected.' % (suggestion_id)
         )
-    suggestion.pre_accept_validate()  # type: ignore[no-untyped-call]
-    html_string = ''.join(suggestion.get_all_html_content_strings())  # type: ignore[no-untyped-call]
+    suggestion.pre_accept_validate()
+    html_string = ''.join(suggestion.get_all_html_content_strings())
     error_list = (
         html_validation_service.  # type: ignore[no-untyped-call]
         validate_math_tags_in_html_with_attribute_math_content(
@@ -508,13 +512,13 @@ def accept_suggestion(
     if suggestion.edited_by_reviewer:
         commit_message = '%s (with edits)' % commit_message
 
-    suggestion.set_suggestion_status_to_accepted()  # type: ignore[no-untyped-call]
-    suggestion.set_final_reviewer_id(reviewer_id)  # type: ignore[no-untyped-call]
+    suggestion.set_suggestion_status_to_accepted()
+    suggestion.set_final_reviewer_id(reviewer_id)
 
     author_name = user_services.get_username(suggestion.author_id)
     commit_message = get_commit_message_for_suggestion(
         author_name, commit_message)
-    suggestion.accept(commit_message)  # type: ignore[no-untyped-call]
+    suggestion.accept(commit_message)
 
     _update_suggestion(suggestion)
 
@@ -609,8 +613,8 @@ def reject_suggestions(
         raise Exception('Review message cannot be empty.')
 
     for suggestion in suggestions:
-        suggestion.set_suggestion_status_to_rejected()  # type: ignore[no-untyped-call]
-        suggestion.set_final_reviewer_id(reviewer_id)  # type: ignore[no-untyped-call]
+        suggestion.set_suggestion_status_to_rejected()
+        suggestion.set_final_reviewer_id(reviewer_id)
 
     _update_suggestions(suggestions)
 
@@ -707,9 +711,9 @@ def resubmit_rejected_suggestion(
             'Only rejected suggestions can be resubmitted.' % (suggestion_id)
         )
 
-    suggestion.pre_update_validate(change)  # type: ignore[no-untyped-call]
+    suggestion.pre_update_validate(change)
     suggestion.change = change
-    suggestion.set_suggestion_status_to_in_review()  # type: ignore[no-untyped-call]
+    suggestion.set_suggestion_status_to_in_review()
     _update_suggestion(suggestion)
 
     # Update the community contribution stats so that the number of suggestions
@@ -1579,7 +1583,7 @@ def create_community_contribution_stats_from_model(
         CommunityContributionStats. The corresponding
         CommunityContributionStats domain object.
     """
-    return suggestion_registry.CommunityContributionStats(  # type: ignore[no-untyped-call]
+    return suggestion_registry.CommunityContributionStats(
         (
             community_contribution_stats_model
             .translation_reviewer_counts_by_lang_code
@@ -1628,7 +1632,7 @@ def create_translation_contribution_stats_from_model(
         TranslationContributionStats. The corresponding
         TranslationContributionStats domain object.
     """
-    return suggestion_registry.TranslationContributionStats(  # type: ignore[no-untyped-call]
+    return suggestion_registry.TranslationContributionStats(
         translation_contribution_stats_model.language_code,
         translation_contribution_stats_model.contributor_user_id,
         translation_contribution_stats_model.topic_id,
@@ -1687,11 +1691,11 @@ def get_suggestion_types_that_need_reviewers() -> Dict[str, Set[str]]:
             language codes of the translation suggestions that need more
             reviewers.
     """
-    suggestion_types_needing_reviewers = {}
+    suggestion_types_needing_reviewers: Dict[str, Set[str]] = {}
     stats = get_community_contribution_stats()
 
     language_codes_that_need_reviewers = (
-        stats.get_translation_language_codes_that_need_reviewers()  # type: ignore[no-untyped-call]
+        stats.get_translation_language_codes_that_need_reviewers()
     )
     if len(language_codes_that_need_reviewers) != 0:
         suggestion_types_needing_reviewers[
@@ -1699,9 +1703,11 @@ def get_suggestion_types_that_need_reviewers() -> Dict[str, Set[str]]:
                 language_codes_that_need_reviewers
             )
 
-    if stats.are_question_reviewers_needed():  # type: ignore[no-untyped-call]
+    if stats.are_question_reviewers_needed():
+        # Here we used cast because the MyPy considering an empty set `{}`
+        # as an empty dictionary.
         suggestion_types_needing_reviewers[
-            feconf.SUGGESTION_TYPE_ADD_QUESTION] = {}
+            feconf.SUGGESTION_TYPE_ADD_QUESTION] = cast(Set[str], {})
 
     return suggestion_types_needing_reviewers
 
@@ -1744,7 +1750,7 @@ def _update_suggestion_counts_in_community_contribution_stats_transactional(
 
     # Create a community contribution stats object to validate the updates.
     stats = create_community_contribution_stats_from_model(stats_model)
-    stats.validate()  # type: ignore[no-untyped-call]
+    stats.validate()
 
     stats_model.update_timestamps()
     stats_model.put()
@@ -1795,7 +1801,7 @@ def update_translation_suggestion(
         else translation_html
     )
     suggestion.edited_by_reviewer = True
-    suggestion.pre_update_validate(suggestion.change)  # type: ignore[no-untyped-call]
+    suggestion.pre_update_validate(suggestion.change)
     _update_suggestion(suggestion)
 
 

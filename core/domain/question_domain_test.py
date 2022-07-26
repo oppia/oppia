@@ -293,7 +293,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
     def setUp(self) -> None:
         """Before each individual test, create a question."""
         super(QuestionDomainTest, self).setUp()
-        question_state_data = self._create_valid_question_data('ABC')  # type: ignore[no-untyped-call]
+        question_state_data = self._create_valid_question_data('ABC')
         self.question = question_domain.Question(
             'question_id', question_state_data,
             feconf.CURRENT_STATE_SCHEMA_VERSION, 'en', 1, ['skill1'],
@@ -628,7 +628,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         """Test to verify update_question_state_data method of the Question
         domain object.
         """
-        question_state_data = self._create_valid_question_data('Test')  # type: ignore[no-untyped-call]
+        question_state_data = self._create_valid_question_data('Test')
 
         self.question.update_question_state_data(question_state_data)
 

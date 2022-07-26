@@ -193,7 +193,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
     ) -> None:
         """Edits suggestion immediately before pre-accept validation."""
         suggestion.score_category = 'invalid_score_category'
-        suggestion.pre_accept_validate()  # type: ignore[no-untyped-call]
+        suggestion.pre_accept_validate()
 
     def test_create_new_suggestion_successfully(self) -> None:
         expected_suggestion_dict = {
@@ -223,7 +223,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         observed_suggestion = suggestion_services.get_suggestion_by_id(
             self.suggestion_id)
         self.assertDictContainsSubset(
-            expected_suggestion_dict, observed_suggestion.to_dict())  # type: ignore[no-untyped-call]
+            expected_suggestion_dict, observed_suggestion.to_dict())
 
     # TODO(#13059): After we fully type the codebase we plan to get
     # rid of the tests that intentionally test wrong inputs that we
@@ -922,7 +922,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'question_dict': {
                 'id': 'test_id',
                 'version': 12,
-                'question_state_data': self._create_valid_question_data(  # type: ignore[no-untyped-call]
+                'question_state_data': self._create_valid_question_data(
                     'default_state').to_dict(),
                 'language_code': 'en',
                 'question_state_data_schema_version': (
@@ -999,7 +999,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'question_dict': {
                 'id': 'test_id',
                 'version': 12,
-                'question_state_data': self._create_valid_question_data(  # type: ignore[no-untyped-call]
+                'question_state_data': self._create_valid_question_data(
                     'default_state').to_dict(),
                 'language_code': 'en',
                 'question_state_data_schema_version': (
@@ -1160,7 +1160,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             'question_dict': {
                 'id': 'test_id',
                 'version': 12,
-                'question_state_data': self._create_valid_question_data(  # type: ignore[no-untyped-call]
+                'question_state_data': self._create_valid_question_data(
                     'default_state').to_dict(),
                 'language_code': 'en',
                 'question_state_data_schema_version': (
@@ -2153,7 +2153,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             'question_dict': {
                 'id': 'test_id',
                 'version': 12,
-                'question_state_data': self._create_valid_question_data(  # type: ignore[no-untyped-call]
+                'question_state_data': self._create_valid_question_data(
                     'default_state').to_dict(),
                 'language_code': 'en',
                 'question_state_data_schema_version': (
@@ -2444,7 +2444,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
                 'question_dict': {
                     'id': 'test_id',
                     'version': 12,
-                    'question_state_data': self._create_valid_question_data(  # type: ignore[no-untyped-call]
+                    'question_state_data': self._create_valid_question_data(
                         'default_state').to_dict(),
                     'language_code': self.language_code,
                     'question_state_data_schema_version': (
@@ -3118,7 +3118,7 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
             'question_dict': {
                 'id': 'test_id',
                 'version': 12,
-                'question_state_data': self._create_valid_question_data(  # type: ignore[no-untyped-call]
+                'question_state_data': self._create_valid_question_data(
                     'default_state').to_dict(),
                 'language_code': self.language_code,
                 'question_state_data_schema_version': (
@@ -3749,7 +3749,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             'question_dict': {
                 'id': 'test_id',
                 'version': 12,
-                'question_state_data': self._create_valid_question_data(  # type: ignore[no-untyped-call]
+                'question_state_data': self._create_valid_question_data(
                     'default_state').to_dict(),
                 'language_code': self.language_code,
                 'question_state_data_schema_version': (
@@ -4301,7 +4301,7 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
             'question_dict': {
                 'id': 'test_id',
                 'version': 12,
-                'question_state_data': self._create_valid_question_data(  # type: ignore[no-untyped-call]
+                'question_state_data': self._create_valid_question_data(
                     'default_state').to_dict(),
                 'language_code': self.language_code,
                 'question_state_data_schema_version': (
@@ -4598,7 +4598,7 @@ class GetSuggestionTypesThatNeedReviewersUnitTests(test_utils.GenericTestBase):
             'question_dict': {
                 'id': 'test_id',
                 'version': 12,
-                'question_state_data': self._create_valid_question_data(  # type: ignore[no-untyped-call]
+                'question_state_data': self._create_valid_question_data(
                     'default_state').to_dict(),
                 'language_code': constants.DEFAULT_LANGUAGE_CODE,
                 'question_state_data_schema_version': (

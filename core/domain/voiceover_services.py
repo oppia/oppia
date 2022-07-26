@@ -128,7 +128,7 @@ def _save_voiceover_applications(
     """
     voiceover_application_models = []
     for voiceover_application in voiceover_applications:
-        voiceover_application.validate()  # type: ignore[no-untyped-call]
+        voiceover_application.validate()
         voiceover_application_model = _get_voiceover_application_model(
             voiceover_application)
         voiceover_application_models.append(voiceover_application_model)
@@ -223,7 +223,7 @@ def accept_voiceover_application(
 
     reviewer = user_services.get_user_actions_info(reviewer_id)
 
-    voiceover_application.accept(reviewer_id)  # type: ignore[no-untyped-call]
+    voiceover_application.accept(reviewer_id)
 
     _save_voiceover_applications([voiceover_application])
 
@@ -254,7 +254,7 @@ def accept_voiceover_application(
         voiceover_application = _get_voiceover_application_from_model(
             model)
         if not voiceover_application.is_handled:
-            voiceover_application.reject(  # type: ignore[no-untyped-call]
+            voiceover_application.reject(
                 reviewer_id, 'We have to reject your application as another '
                 'application for the same opportunity got accepted.')
             rejected_voiceover_applications.append(voiceover_application)
@@ -288,7 +288,7 @@ def reject_voiceover_application(
 
     reviewer = user_services.get_user_actions_info(reviewer_id)
 
-    voiceover_application.reject(reviewer.user_id, rejection_message)  # type: ignore[no-untyped-call]
+    voiceover_application.reject(reviewer.user_id, rejection_message)
     _save_voiceover_applications([voiceover_application])
 
     if voiceover_application.target_type == feconf.ENTITY_TYPE_EXPLORATION:

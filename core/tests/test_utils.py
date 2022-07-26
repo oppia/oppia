@@ -3471,7 +3471,9 @@ title: Title
             owner_id, 'New skill created.',
             [{'cmd': skill_domain.CMD_CREATE_NEW}])
 
-    def _create_valid_question_data(self, default_dest_state_name):
+    def _create_valid_question_data(
+        self, default_dest_state_name: str
+    ) -> state_domain.State:
         """Creates a valid question_data dict.
 
         Args:
