@@ -38,7 +38,7 @@ var StoryEditorPage = function() {
     by.css('.e2e-test-save-story-notes-button'));
   var returnToTopicButton = element(
     by.css('.e2e-test-return-to-topic-button'));
-  var saveStoryButton = element(
+  var saveStoryButton = element.all(
     by.css('.e2e-test-save-story-button'));
   var commitMessageField = element(
     by.css('.e2e-test-commit-message-input'));
@@ -350,13 +350,9 @@ var StoryEditorPage = function() {
   this.saveStory = async function(commitMessage) {
     let width = (await browser.manage().window().getSize()).width;
     if (width < 831) {
-      if (await changesOptions.count() === 0) {
-        await action.click(
-          'Settings tab button', navigateToOptionsMobile);
-      }
-      await waitFor.visibilityOf(
-        saveButtonMobile, 'Save draft button takes too long to appear.');
-      await action.click('Save draft', saveButtonMobile);
+      await action.click(
+        'Settings tab button', navigateToOptionsMobile);
+      await action.click('Save draft', saveButtonMobile.first());
     } else {
       await action.click('Save Story Button', saveStoryButton);
     }

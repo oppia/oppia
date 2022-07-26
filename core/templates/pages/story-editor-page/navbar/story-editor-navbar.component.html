@@ -112,7 +112,7 @@
         </div>
         <div class="story-nav-dropdown-icon"
              (click)="toggleNavigationOptions()">
-          <i class="fa fa-caret-down e2e-test-mobile-changes-dropdown"></i>
+          <i class="fa fa-caret-down"></i>
         </div>
       </div>
     </div>
@@ -140,13 +140,13 @@
         </div>
       </div>
       <div class="story-nav-dropdown-content right-container">
-        <div class="story-nav-dropdown-text e2e-test-save-changes-for-small-screens"
+        <div class="story-nav-dropdown-text"
              [attr.disabled]="!isStorySaveable()"
              (click)="saveChanges()">
           <span *ngIf="isSaveInProgress()">
             <span>Saving</span>
           </span>
-          <span *ngIf="!isSaveInProgress()">
+          <span *ngIf="!isSaveInProgress()" class="e2e-test-mobile-save-changes">
             Save Changes
           </span>
           <span *ngIf="getChangeListLength() > 0">
