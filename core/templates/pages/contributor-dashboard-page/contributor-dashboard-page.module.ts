@@ -51,6 +51,7 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
 import { ContributionsAndReview } from './contributions-and-review/contributions-and-review.component';
 import { QuestionOpportunitiesComponent } from './question-opportunities/question-opportunities.component';
 import { ContributorDashboardPageComponent } from './contributor-dashboard-page.component';
+import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
 
 @NgModule({
   imports: [
@@ -113,6 +114,7 @@ import { ContributorDashboardPageComponent } from './contributor-dashboard-page.
       provide: HAMMER_GESTURE_CONFIG,
       useClass: MyHammerConfig
     },
+    AppErrorHandlerProvider,
     {
       provide: APP_BASE_HREF,
       useValue: '/'
