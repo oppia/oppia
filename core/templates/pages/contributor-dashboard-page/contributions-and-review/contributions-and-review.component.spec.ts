@@ -1148,17 +1148,10 @@ describe('Contributions and review component', () => {
             target_id: 'string;,',
             suggestion_id: 'suggestion_id',
             author_name: 'string;',
-            status: 'ready',
+            status: 'review',
             suggestion_type: 'string'
           } as Suggestion,
           details: null,
-        }
-      };
-
-      component.SUGGESTION_LABELS = {
-        ready: {
-          text: 'ready',
-          color: 'red',
         }
       };
 
@@ -1224,7 +1217,7 @@ describe('Contributions and review component', () => {
         suggestion: {
           suggestion: {
             suggestion_id: 'id',
-            status: 'status'
+            status: 'review'
           } as Suggestion,
           details: {
             skill_description: 'skill_description',
@@ -1234,12 +1227,6 @@ describe('Contributions and review component', () => {
           }
         }
       } as unknown as SuggestionDetails;
-      component.SUGGESTION_LABELS = {
-        status: {
-          text: 'text',
-          color: 'color'
-        }
-      };
       component.activeTabType = component.TAB_TYPE_REVIEWS;
       tick();
 
@@ -1248,8 +1235,8 @@ describe('Contributions and review component', () => {
         id: 'id',
         heading: 'heading',
         subheading: 'topic_name / story_title / chapter_title',
-        labelText: 'text',
-        labelColor: 'color',
+        labelText: 'Awaiting review',
+        labelColor: '#eeeeee',
         actionButtonTitle: 'Review'
       }]);
     }));
@@ -1264,7 +1251,7 @@ describe('Contributions and review component', () => {
             suggestion_type: null,
             target_id: null,
             suggestion_id: 'id',
-            status: 'status',
+            status: 'review',
             change: {
               question_dict: null
             }
@@ -1277,12 +1264,7 @@ describe('Contributions and review component', () => {
           }
         }
       };
-      component.SUGGESTION_LABELS = {
-        status: {
-          text: 'text',
-          color: 'color'
-        }
-      };
+
       component.activeTabType = component.TAB_TYPE_REVIEWS;
       tick();
 
@@ -1291,8 +1273,8 @@ describe('Contributions and review component', () => {
         id: 'id',
         heading: 'heading',
         subheading: 'skill_description',
-        labelText: 'text',
-        labelColor: 'color',
+        labelText: 'Awaiting review',
+        labelColor: '#eeeeee',
         actionButtonTitle: 'Review'
       }]);
     }));

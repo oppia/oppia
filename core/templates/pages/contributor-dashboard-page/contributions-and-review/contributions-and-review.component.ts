@@ -96,13 +96,6 @@ export interface SuggestionDetails {
   };
 }
 
-export interface SUGGESTION_LABELS {
-  [key: string]: {
-    text: string;
-    color: string;
-  };
-}
-
 export interface ReviewTabs {
   suggestionType: string;
   text: string;
@@ -121,7 +114,6 @@ export class ContributionsAndReview
   TAB_TYPE_CONTRIBUTIONS: string;
   TAB_TYPE_REVIEWS: string;
   activeExplorationId: string;
-  SUGGESTION_LABELS: SUGGESTION_LABELS;
   contributions: SuggestionDetails;
   userDetailsLoading: boolean;
   userIsLoggedIn: boolean;
@@ -132,6 +124,20 @@ export class ContributionsAndReview
   reviewTabs: ReviewTabs[] = [];
   contributionTabs: ContributionTab[];
   tabNameToOpportunityFetchFunction: unknown;
+  SUGGESTION_LABELS = {
+    review: {
+      text: 'Awaiting review',
+      color: '#eeeeee'
+    },
+    accepted: {
+      text: 'Accepted',
+      color: '#8ed274'
+    },
+    rejected: {
+      text: 'Revisions Requested',
+      color: '#e76c8c'
+    }
+  };
 
   constructor(
     private alertsService: AlertsService,
@@ -487,20 +493,6 @@ export class ContributionsAndReview
   }
 
   ngOnInit(): void {
-    this.SUGGESTION_LABELS = {
-      review: {
-        text: 'Awaiting review',
-        color: '#eeeeee'
-      },
-      accepted: {
-        text: 'Accepted',
-        color: '#8ed274'
-      },
-      rejected: {
-        text: 'Revisions Requested',
-        color: '#e76c8c'
-      }
-    };
     this.SUGGESTION_TYPE_QUESTION = 'add_question';
     this.SUGGESTION_TYPE_TRANSLATE = 'translate_content';
     this.TAB_TYPE_CONTRIBUTIONS = 'contributions';
