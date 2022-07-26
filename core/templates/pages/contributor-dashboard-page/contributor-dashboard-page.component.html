@@ -34,7 +34,17 @@
                 </span>
               </div>
               <div class="oppia-contributor-username-and-review-rights-container">
-                <div class="oppia-contributor-username-container"
+                <div class="oppia-short-contributor-username-container"
+                     ng-if="!$ctrl.userIsLoggedIn || $ctrl.username.length <= 8"
+                     data-tab-name="username">
+                  <lazy-loading ng-show="$ctrl.userInfoIsLoading"></lazy-loading>
+                  <span class="e2e-test-username"
+                        ng-show="!$ctrl.userInfoIsLoading">
+                    <[$ctrl.userIsLoggedIn ? $ctrl.username : 'Guest']>
+                  </span>
+                </div>
+                <div class="oppia-long-contributor-username-container"
+                     ng-if="$ctrl.userIsLoggedIn && $ctrl.username.length > 8"
                      data-tab-name="username">
                   <lazy-loading ng-show="$ctrl.userInfoIsLoading"></lazy-loading>
                   <span class="e2e-test-username"
@@ -211,10 +221,12 @@
   <div ng-if="$ctrl.activeTabName === 'myContributionTab' || !$ctrl.activeTabName">
     <contributions-and-review></contributions-and-review>
   </div>
-  <div ng-if="$ctrl.activeTabName === 'submitQuestionTab'" class="oppia-opportunities">
+  <div ng-if="$ctrl.activeTabName === 'submitQuestionTab'"
+       class="oppia-opportunities">
     <question-opportunities></question-opportunities>
   </div>
-  <div ng-if="$ctrl.activeTabName === 'translateTextTab'" class="oppia-opportunities">
+  <div ng-if="$ctrl.activeTabName === 'translateTextTab'"
+       class="oppia-opportunities">
     <oppia-translation-opportunities></oppia-translation-opportunities>
   </div>
 </div>
@@ -249,7 +261,7 @@
     margin-right: 10px;
   }
   .oppia-opportunities {
-    margin-top: 20px;
+    margin: 20px 10px 0 10px;
   }
   .oppia-user-and-rights {
     display: flex;
@@ -316,14 +328,17 @@
     margin-bottom: 10px;
     position: absolute;
   }
-  .oppia-contributor-username-container {
+  .oppia-short-contributor-username-container,
+  .oppia-long-contributor-username-container {
     color: #009688;
     font-family: "Capriola", "Roboto", Arial, sans-serif;
     font-size: 24px;
     height: 30%;
     padding-top: 10px;
     position: relative;
-    width: 100px;
+  }
+  .oppia-short-contributor-username-container {
+    min-width: 100px;
   }
   .oppia-review-right-details-container {
     font-size: 18px;
@@ -342,7 +357,8 @@
     position: relative;
     width: 40%;
   }
-  .oppia-contributor-username-container::before {
+  .oppia-short-contributor-username-container::before,
+  .oppia-long-contributor-username-container::before {
     bottom: 65%;
     color: #4a4a4a;
     content: attr(data-tab-name);
@@ -533,6 +549,11 @@
   @keyframes translate-y {
       from { transform: translateY(-100%); }
       to { transform: translateY(0); }
+  }
+  @media only screen and (max-width: 800px) {
+    .oppia-contributor-username-container {
+      font-size: 20px;
+    }
   }
   @media only screen and (max-width: 700px) {
     .oppia-opportunities-tabs {
