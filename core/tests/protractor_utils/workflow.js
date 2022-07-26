@@ -130,7 +130,7 @@ var createExplorationAsAdmin = async function() {
 // This will only work if all changes have been saved and there are no
 // outstanding warnings; run from the editor.
 var publishExploration = async function() {
-  var changesOptions = element(by.css('.e2e-test-mobile-changes-dropdown'));
+  var changesOptions = element.all(by.css('.e2e-test-mobile-changes-dropdown'));
   var navigateToSettingsTabButtonMobile = element(
     by.css('.e2e-test-mobile-options'));
   var publishButton = element(by.css(
@@ -143,11 +143,13 @@ var publishExploration = async function() {
     await publishButton.isDisplayed();
     await action.click('Test Publish Exploration', publishButton);
   } else {
-    await action.click(
-      'Settings tab button', navigateToSettingsTabButtonMobile);
-    await action.click('Changes options', changesOptions);
+    if (changesOptions.count() === 0) {
+      await action.click(
+        'Settings tab button', navigateToSettingsTabButtonMobile, true);
+    }
+    await action.click('Changes options', changesOptions.first(), true);
     await publishButtonMobile.isDisplayed();
-    await action.click('Publish button mobile', publishButtonMobile);
+    await action.click('Publish button mobile', publishButtonMobile, true);
   }
 
   var prePublicationButtonElem = element(by.css(

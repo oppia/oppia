@@ -124,7 +124,7 @@
           <i class="material-icons">&#xE254;</i>
           <span>Discard Changes</span>
         </div>
-        <div class="story-nav-dropdown-option">
+        <div class="story-nav-dropdown-option e2e-test-mobile-publish-button">
           <div *ngIf="!isStoryPublished()"
                (click)="publishStory()"
                [attr.disabled]="isStorySaveable() || getWarningsCount() > 0 || prepublishValidationIssues.length > 0">
@@ -140,7 +140,7 @@
         </div>
       </div>
       <div class="story-nav-dropdown-content right-container">
-        <div class="story-nav-dropdown-text"
+        <div class="story-nav-dropdown-text e2e-test-save-changes-for-small-screens"
              [attr.disabled]="!isStorySaveable()"
              (click)="saveChanges()">
           <span *ngIf="isSaveInProgress()">

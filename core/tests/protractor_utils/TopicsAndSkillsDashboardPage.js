@@ -37,6 +37,7 @@ var TopicsAndSkillsDashboardPage = function() {
   var deleteSkillButton = element(
     by.css('.e2e-test-delete-skill-button'));
   var topicsTable = element(by.css('.e2e-test-topics-table'));
+  var topicsTableMobile = element(by.css('.e2e-test-mobile-topic-table'));
   var skillsTable = element(by.css('.e2e-test-skills-table'));
   var skillsTableMobile = element(
     by.css('.e2e-test-mobile-skills-table'));
@@ -60,6 +61,8 @@ var TopicsAndSkillsDashboardPage = function() {
     '.e2e-test-select-classroom-dropdown'));
   var topicEditOptions = element.all(
     by.css('.e2e-test-topic-edit-box'));
+  var topicEditOptionsMobile = element.all(
+    by.css('.e2e-test-mobile-topic-name'));
   var skillEditOptions = element.all(
     by.css('.e2e-test-skill-edit-box'));
   var topicResetFilters = element(by.css(
@@ -165,10 +168,16 @@ var TopicsAndSkillsDashboardPage = function() {
   // Only use this if the topics count is not zero. This is supposed to be used
   // for actions being performed on the topics like editing, deleting etc.
   this.waitForTopicsToLoad = async function() {
-    await waitFor.visibilityOf(
-      topicsTable, 'Topics table taking too long to appear');
-    await waitFor.visibilityOf(
-      topicsListItems.first(), 'Topics list taking too long to appear');
+    let width = (await browser.manage().window().getSize()).width;
+    if (width < 831) {
+      await waitFor.visibilityOf(
+        topicsTableMobile, 'Topics table taking too long to appear');
+    } else {
+      await waitFor.visibilityOf(
+        topicsTable, 'Topics table taking too long to appear');
+      await waitFor.visibilityOf(
+        topicsListItems.first(), 'Topics list taking too long to appear');
+    }
   };
 
   this.isTopicTablePresent = async function() {
@@ -196,10 +205,15 @@ var TopicsAndSkillsDashboardPage = function() {
 
   this.navigateToTopicWithIndex = async function(index) {
     await this.waitForTopicsToLoad();
-    await action.click(
-      'Topic edit option', topicEditOptions.get(index));
-    await action.click(
-      'Edit topic button', editTopicButton);
+    let width = (await browser.manage().window().getSize()).width;
+    if (width < 831) {
+      await action.click('Topic name', topicEditOptionsMobile.get(index));
+    } else {
+      await action.click(
+        'Topic edit option', topicEditOptions.get(index));
+      await action.click(
+        'Edit topic button', editTopicButton);
+    }
     await waitFor.pageToFullyLoad();
   };
 

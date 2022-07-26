@@ -70,7 +70,16 @@ var StoryEditorPage = function() {
     by.css('.e2e-test-story-meta-tag-content-field'));
   var storyMetaTagContentLabel = element(
     by.css('.e2e-test-story-meta-tag-content-label'));
-
+  var addChapterDropdown = element(
+    by.css('.e2e-test-mobile-add-chapter'));
+  var navigateToOptionsMobile = element(
+    by.css('.e2e-test-mobile-options-base'));
+  var saveButtonMobile = element.all(
+    by.css('.e2e-test-save-changes-for-small-screens'));
+  var changesOptions = element.all(
+    by.css('.e2e-test-mobile-changes-dropdown'));
+  var publishButtonMobile = element(
+    by.css('.e2e-test-mobile-publish-button'));
   /*
    * CHAPTER
    */
@@ -151,7 +160,18 @@ var StoryEditorPage = function() {
   };
 
   this.publishStory = async function() {
-    await action.click('Publish Story Button', publishStoryButton);
+    let width = (await browser.manage().window().getSize()).width;
+    if (width < 831) {
+      if (changesOptions.count() === 0) {
+        await action.click(
+          'Settings tab button', navigateToSettingsTabButtonMobile, true);
+      }
+      await action.click('Changes options', changesOptions.first(), true);
+      await publishButtonMobile.isDisplayed();
+      await action.click('Publish button mobile', publishButtonMobile, true);
+    } else {
+      await action.click('Publish Story Button', publishStoryButton);
+    }
   };
 
   this.unpublishStory = async function() {
@@ -172,10 +192,18 @@ var StoryEditorPage = function() {
   };
 
   this.createNewChapter = async function(title, explorationId, imgPath) {
-    await general.scrollToTop();
-    await action.click(
-      'Create chapter button takes too long to be clickable.',
-      createChapterButton);
+    let width = (await browser.manage().window().getSize()).width;
+    if (width < 831) {
+      await action.click('Chapter dropdown', addChapterDropdown, true);
+      await action.click(
+        'Create chapter button takes too long to be clickable.',
+        createChapterButton, true);
+    } else {
+      await general.scrollToTop();
+      await action.click(
+        'Create chapter button takes too long to be clickable.',
+        createChapterButton);
+    }
     await action.sendKeys(
       'New chapter title field', newChapterTitleField, title);
     await action.sendKeys(
@@ -320,7 +348,19 @@ var StoryEditorPage = function() {
   };
 
   this.saveStory = async function(commitMessage) {
-    await action.click('Save Story Button', saveStoryButton);
+    let width = (await browser.manage().window().getSize()).width;
+    if (width < 831) {
+      if (await saveButtonMobile.count() === 0) {
+        await action.click(
+          'Settings tab button', navigateToOptionsMobile);
+      }
+      await waitFor.visibilityOf(
+        saveButtonMobile, 'Save draft button takes too long to appear.');
+      await action.click('Save draft', saveButtonMobile.first());
+    } else {
+      await action.click('Save Story Button', saveStoryButton);
+    }
+
     await waitFor.visibilityOf(
       commitMessageField, 'Commit message modal takes too long to appear.');
     await commitMessageField.sendKeys(commitMessage);
