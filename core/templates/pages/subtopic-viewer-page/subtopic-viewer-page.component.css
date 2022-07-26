@@ -89,13 +89,13 @@
   width: 200px;
 }
 
-@media(max-width: 600px) {
+@media screen and (max-width: 600px) {
   .oppia-subtopic-viewer-container {
     padding-top: 80px;
   }
 
   .oppia-subtopic-title {
-    font-size: 2em;
+    font-size: 2rem;
     margin-left: 25px;
     padding-right: 25px;
     padding-top: 20px;
@@ -103,9 +103,14 @@
 
   .oppia-page-contents-viewer {
     font-size: 1.2em;
-    margin-left: 25px;
-    margin-right: 25px;
+    margin-left: 10px;
+    margin-right: 10px;
     padding: 30px 20px;
     width: calc(100% - 50px);
+  }
+
+  .oppia-subtopic-viewer-container-card {
+    padding-left: 18px;
+    padding-right: 18px;
   }
 }

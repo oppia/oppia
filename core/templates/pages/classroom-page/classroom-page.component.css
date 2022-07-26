@@ -72,12 +72,15 @@
 
 .oppia-classroom-viewer-container .oppia-topic-summary-tiles {
   display: grid;
-  gap: 24px;
   grid-template-columns: 210px 210px 210px;
   justify-content: center;
   margin-top: 40px;
   overflow-y: auto;
   padding-bottom: 18vh;
+}
+
+.oppia-topic-summary-tile {
+  margin: 0 12px;
 }
 
 .oppia-classroom-viewer-container .classroom-name {
