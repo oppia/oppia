@@ -1121,7 +1121,10 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             subtopic_page_services.get_subtopic_page_by_id(
                 self.TOPIC_ID, 1, strict=False))
         self.assertIsNone(
-            suggestion_services.get_suggestion_by_id(suggestion.suggestion_id))
+            suggestion_services.get_suggestion_by_id(
+                suggestion.suggestion_id, strict=False
+            )
+        )
 
     def test_delete_subtopic_with_skill_ids(self):
         changelist = [topic_domain.TopicChange({
