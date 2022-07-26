@@ -29,7 +29,7 @@ from typing import Any, Dict, List, Mapping, Sequence
 MYPY = False
 if MYPY: # pragma: no cover
     # Here, we are importing state domain only for type-checking purpose.
-    from core.domain import state_domain
+    from core.domain import state_domain  # pylint: disable=invalid-import # isort:skip
     from mypy_imports import base_models
     from mypy_imports import datastore_services
 
