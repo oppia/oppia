@@ -143,7 +143,7 @@ exports.config = {
   // Define all options that are relevant for the WebdriverIO instance here
   //
   // Level of logging verbosity: trace | debug | info | warn | error | silent.
-  logLevel: 'warn',
+  logLevel: 'info',
 
   // Set a base URL in order to shorten url command calls. If your `url`
   // parameter starts with `/`, the base url gets prepended, not including
@@ -212,7 +212,7 @@ exports.config = {
    * @param {Array.<String>} specs   List of spec file paths that are to be run
    * @param {Object}         browser instance of created browser/device session
    */
-  before: function() {
+  before: async function() {
     if (process.env.GITHUB_ACTIONS &&
       // eslint-disable-next-line eqeqeq
       process.env.VIDEO_RECORDING_IS_ENABLED == 1) {
@@ -249,7 +249,7 @@ exports.config = {
     }
     // Set a wide enough window size for the navbar in the library pages to
     // display fully.
-    browser.setWindowSize(1285, 1000);
+    await browser.setWindowSize(1285, 1000);
 
 
     // Configure the Firebase Admin SDK to communicate with the emulator.
@@ -257,7 +257,7 @@ exports.config = {
     FirebaseAdmin.initializeApp({projectId: 'dev-project-id'});
 
     // Navigate to the splash page so that tests can begin on an Angular page.
-    browser.url('http://localhost:9001');
+    await browser.url('http://localhost:9001');
   },
   /**
    * Function to be executed after a test
