@@ -140,9 +140,9 @@
         </div>
       </div>
       <div class="story-nav-dropdown-content right-container">
-        <div class="story-nav-dropdown-text e2e-test-mobile-save-changes"
-             [disabled]="!isStorySaveable()"
-             (click)="saveChanges()">
+        <button class="story-nav-dropdown-text e2e-test-mobile-save-changes"
+                [disabled]="!isStorySaveable()"
+                (click)="saveChanges()">
           <span *ngIf="isSaveInProgress()">
             <span>Saving</span>
           </span>
