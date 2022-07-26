@@ -76,6 +76,10 @@ var invisibilityOf = async function(element, errorMessage) {
  * Consider adding this method after each browser.url() call.
  */
 var pageToFullyLoad = async function() {
+  await browser.setTimeout({
+    // eslint-disable-next-line quote-props
+    'implicit': 5000,
+  });
   var loadingMessage = await $('.e2e-test-loading-fullpage');
   await loadingMessage.waitForDisplayed({
     timeout: 15000,
