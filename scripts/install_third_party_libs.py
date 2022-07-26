@@ -21,55 +21,13 @@ import os
 import pathlib
 import shutil
 import subprocess
-import sys
-import urllib.request as urlrequest
 import zipfile
 
-from typing import Tuple
 
-TOOLS_DIR = os.path.join(os.pardir, 'oppia_tools')
-
-# These libraries need to be installed before running or importing any script.
-
-PREREQUISITES = (
-    ('pyyaml', '6.0', os.path.join(TOOLS_DIR, 'pyyaml-6.0')),
-    ('future', '0.18.2', os.path.join('third_party', 'python_libs')),
-    ('six', '1.16.0', os.path.join('third_party', 'python_libs')),
-    ('certifi', '2021.10.8', os.path.join(TOOLS_DIR, 'certifi-2021.10.8')),
-    ('typing-extensions', '4.0.1', os.path.join('third_party', 'python_libs'))
-)
-
-
-def install_prerequisite(package: Tuple[str]) -> None:
-    """Install prerequisite Python package.
-
-    Args:
-        package: tuple. The args to provide to pip install.
-
-    Raises:
-        Exception. If the package fails to install due to issues with --prefix.
-    """
-    package_name, version_number, target_path = package
-    command_text = [
-        sys.executable, '-m', 'pip', 'install', '%s==%s'
-        % (package_name, version_number), '--target', target_path]
-    uextention_text = ['--user', '--prefix=', '--system']
-    current_process = subprocess.Popen(
-        command_text, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    output_stderr = current_process.communicate()[1]  # pylint: disable=invalid-name
-    if b'can\'t combine user with prefix' in output_stderr:
-        try:
-            subprocess.check_call(command_text + uextention_text)
-        except subprocess.CalledProcessError as e:
-            raise Exception(
-                'Error installing prerequisite %s' % package_name) from e
-
-
-for prerequisite in PREREQUISITES:
-    install_prerequisite(prerequisite)
+from scripts import install_python_dev_dependencies
+install_python_dev_dependencies.main(['--assert_compiled'])
 
 from . import common  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-from . import install_backend_python_libs  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import install_third_party  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import pre_commit_hook  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import pre_push_hook  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
@@ -147,10 +105,10 @@ def install_buf_and_protoc():
 
     common.ensure_directory_exists(BUF_DIR)
     for bin_file in buf_files:
-        urlrequest.urlretrieve('%s/%s' % (
-            BUF_BASE_URL, bin_file), filename=os.path.join(BUF_DIR, bin_file))
-    urlrequest.urlretrieve('%s/%s' % (
-        PROTOC_URL, protoc_file), filename=os.path.join(BUF_DIR, protoc_file))
+        common.url_retrieve('%s/%s' % (
+            BUF_BASE_URL, bin_file), os.path.join(BUF_DIR, bin_file))
+    common.url_retrieve('%s/%s' % (
+        PROTOC_URL, protoc_file), os.path.join(BUF_DIR, protoc_file))
     try:
         with zipfile.ZipFile(os.path.join(BUF_DIR, protoc_file), 'r') as zfile:
             zfile.extractall(path=PROTOC_DIR)
@@ -198,87 +156,10 @@ def compile_protobuf_files(proto_files_paths):
                 r'^import (\w*_pb2 as)', r'from proto_files import \1')
 
 
-def ensure_pip_library_is_installed(package, version, path):
-    """Installs the pip library after ensuring its not already installed.
-
-    Args:
-        package: str. The package name.
-        version: str. The package version.
-        path: str. The installation path for the package.
-    """
-    print('Checking if %s is installed in %s' % (package, path))
-
-    if package.startswith('git+'):
-        exact_lib_path = os.path.join(
-            path,
-            '%s-%s' % (
-                package[package.rindex('/') + 1:package.index('.git')],
-                version
-            )
-        )
-    else:
-        exact_lib_path = os.path.join(path, '%s-%s' % (package, version))
-
-    if not os.path.exists(exact_lib_path):
-        print('Installing %s' % package)
-        if package.startswith('git+'):
-            install_backend_python_libs.pip_install(
-                '%s@%s' % (package, version), exact_lib_path)
-        else:
-            install_backend_python_libs.pip_install(
-                '%s==%s' % (package, version), exact_lib_path)
-
-
-def ensure_system_python_libraries_are_installed(package, version):
-    """Installs the pip library with the corresponding version to the system
-    globally. This is necessary because the development application server
-    requires certain libraries on the host machine.
-
-    Args:
-        package: str. The package name.
-        version: str. The package version.
-    """
-    print('Checking if %s is installed.' % (package))
-    install_backend_python_libs.pip_install_to_system(package, version)
-
-
 def main() -> None:
     """Install third-party libraries for Oppia."""
     setup.main(args=[])
     setup_gae.main(args=[])
-    # These system python libraries are REQUIRED to start the development server
-    # and cannot be added to oppia_tools because the dev_appserver python script
-    # looks for them in the default system paths when it is run. Therefore, we
-    # must install these libraries to the developer's computer.
-    system_pip_dependencies = [
-        ('protobuf', common.PROTOBUF_VERSION),
-        ('grpcio', common.GRPCIO_VERSION),
-    ]
-    local_pip_dependencies = [
-        ('coverage', common.COVERAGE_VERSION, common.OPPIA_TOOLS_DIR),
-        ('pylint', common.PYLINT_VERSION, common.OPPIA_TOOLS_DIR),
-        ('Pillow', common.PILLOW_VERSION, common.OPPIA_TOOLS_DIR),
-        (
-            'git+https://github.com/oppia/pylint-quotes.git',
-            common.PYLINT_QUOTES_VERSION,
-            common.OPPIA_TOOLS_DIR
-        ),
-        ('webtest', common.WEBTEST_VERSION, common.OPPIA_TOOLS_DIR),
-        ('isort', common.ISORT_VERSION, common.OPPIA_TOOLS_DIR),
-        ('pycodestyle', common.PYCODESTYLE_VERSION, common.OPPIA_TOOLS_DIR),
-        ('esprima', common.ESPRIMA_VERSION, common.OPPIA_TOOLS_DIR),
-        ('PyGithub', common.PYGITHUB_VERSION, common.OPPIA_TOOLS_DIR),
-        ('protobuf', common.PROTOBUF_VERSION, common.OPPIA_TOOLS_DIR),
-        ('psutil', common.PSUTIL_VERSION, common.OPPIA_TOOLS_DIR),
-        ('pip-tools', common.PIP_TOOLS_VERSION, common.OPPIA_TOOLS_DIR),
-        ('setuptools', common.SETUPTOOLS_VERSION, common.OPPIA_TOOLS_DIR),
-    ]
-
-    for package, version, path in local_pip_dependencies:
-        ensure_pip_library_is_installed(package, version, path)
-
-    for package, version in system_pip_dependencies:
-        ensure_system_python_libraries_are_installed(package, version)
 
     # Download and install required JS and zip files.
     print('Installing third-party JS libraries and zip files.')
