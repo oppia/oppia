@@ -167,7 +167,8 @@ class ActivityRights:
             list(str). List of usernames corresponding to given user_ids. If
             username does not exist, the corresponding entry in the returned
             list is the user's truncated email address. If the user is scheduled
-            to be deleted USER_IDENTIFICATION_FOR_USER_BEING_DELETED is returned.
+            to be deleted USER_IDENTIFICATION_FOR_USER_BEING_DELETED is 
+            returned.
         """
 
         user_settings_models = user_models.UserSettingsModel.get_multi(
@@ -191,7 +192,6 @@ class ActivityRights:
                     if model is not None else None
                 )
 
-
         usernames = []
         for ind, user_settings in enumerate(users_settings):
             if user_settings.deleted:
@@ -203,8 +203,6 @@ class ActivityRights:
                     '[Awaiting user registration: %s]' %
                     user_settings.truncated_email)
         return usernames
-
-
 
     def to_dict(self) -> ActivityRightsDict:
         """Returns a dict suitable for use by the frontend.
