@@ -7,9 +7,9 @@
     <div class="form-group">
       <div class="input-group oppia-input-group" [ngClass]="{'classroom-page-input-group': isSearchButtonActive()}">
         <div class="input-group-addon oppia-search-bar-icon">
-          <i class="material-icons oppia-translate-icon-down md-18" *ngIf="!isSearchInProgress()">&#xE8B6;</i>
+          <i class="fas fa-search material-icons oppia-translate-icon-down md-18" *ngIf="!isSearchInProgress()"></i>
           <span *ngIf="isSearchInProgress()">
-            <i class="material-icons md-18 oppia-animate-spin">&#xE863;</i>
+            <i class="fas fa-sync material-icons md-18 oppia-animate-spin"></i>
           </span>
         </div>
         <input type="text"
@@ -34,8 +34,10 @@
             type="button"
             class="btn e2e-test-search-bar-dropdown-toggle oppia-search-bar-dropdown-toggle oppia-search-bar-input oppia-search-bar-category-input dropdown-toggle"
             title="{{ selectionDetails.categories.description | translate }}">
-      <i *ngIf="isMobileViewActive()" class="material-icons md-18 category-selector-icon">&#xE574;</i>
-      {{ categoryButtonText | truncate:14 }}
+      <i *ngIf="isMobileViewActive()" class="fas fa-shapes material-icons md-18 category-selector-icon"></i>
+      <span class="btn-text">
+        {{ categoryButtonText | truncate:14 }}
+      </span>
     </button>
     <ul ngbDropdownMenu
         class="e2e-test-search-bar-dropdown-menu oppia-search-bar-dropdown-menu oppia-search-bar-dropdown-menu-section dropdown-menu"
@@ -44,18 +46,18 @@
         <li ngbDropdownItem *ngIf="selectionDetails.categories.selections[item.id]">
           <a (click)="toggleSelection('categories', item.id)" *ngIf="!first && !last" class="dropdown-item">
             <span class="e2e-test-selected">{{ item.text | translate }}</span>
-            <i *ngIf="selectionDetails.categories.selections[item.id]" class="material-icons md-18 float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+            <i *ngIf="selectionDetails.categories.selections[item.id]" class="fas fa-check material-icons md-18 float-right oppia-search-bar-category-selection-symbol"></i>
           </a>
           <a (click)="toggleSelection('categories', item.id)" *ngIf="first" (keydown)="onMenuKeypress($event, 'category', {shiftTab: ACTION_CLOSE})" class="dropdown-item">
             <span class="e2e-test-selected">{{ item.text | translate }}</span>
-            <i *ngIf="selectionDetails.categories.selections[item.id]" class="material-icons md-18 float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+            <i *ngIf="selectionDetails.categories.selections[item.id]" class="fas fa-check material-icons md-18 float-right oppia-search-bar-category-selection-symbol"></i>
           </a>
           <a (click)="toggleSelection('categories', item.id)"
              *ngIf="last"
              (keydown)="onMenuKeypress($event, 'category', {tab: ACTION_CLOSE})"
              class="dropdown-item">
             <span class="e2e-test-selected">{{ item.text | translate }}</span>
-            <i *ngIf="selectionDetails.categories.selections[item.id]" class="material-icons md-18 float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+            <i *ngIf="selectionDetails.categories.selections[item.id]" class="fas fa-check material-icons md-18 float-right oppia-search-bar-category-selection-symbol"></i>
           </a>
         </li>
       </ng-container>
@@ -67,16 +69,16 @@
         <li ngbDropdownItem *ngIf="!selectionDetails.categories.selections[item.id]">
           <a (click)="toggleSelection('categories', item.id)" *ngIf="!first && !last" class="dropdown-item">
             <span class="e2e-test-deselected">{{ item.text | translate }}</span>
-            <i *ngIf="selectionDetails.categories.selections[item.id]" class="material-icons md-18 float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+            <i *ngIf="selectionDetails.categories.selections[item.id]" class="fas fa-check material-icons md-18 float-right oppia-search-bar-category-selection-symbol"></i>
           </a>
           <a (click)="toggleSelection('categories', item.id)" *ngIf="first" (keydown)="onMenuKeypress($event, 'category', {shiftTab: ACTION_CLOSE})" class="dropdown-item">
             <span class="e2e-test-deselected">{{ item.text | translate }}</span>
-            <i *ngIf="selectionDetails.categories.selections[item.id]" class="material-icons md-18 float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+            <i *ngIf="selectionDetails.categories.selections[item.id]" class="fas fa-check material-icons md-18 float-right oppia-search-bar-category-selection-symbol"></i>
           </a>
           <a (click)="toggleSelection('categories', item.id)" *ngIf="last" (keydown)="onMenuKeypress($event, 'category', {tab: ACTION_CLOSE})"
              class="dropdown-item">
             <span class="e2e-test-deselected">{{ item.text | translate }}</span>
-            <i *ngIf="selectionDetails.categories.selections[item.id]" class="material-icons md-18 float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+            <i *ngIf="selectionDetails.categories.selections[item.id]" class="fas fa-check material-icons md-18 float-right oppia-search-bar-category-selection-symbol"></i>
           </a>
         </li>
       </ng-container>
@@ -92,8 +94,10 @@
             type="button"
             class="btn e2e-test-search-bar-dropdown-toggle oppia-search-bar-input oppia-search-bar-language-input dropdown-toggle language-dropdown-toggle oppia-search-bar-dropdown-toggle-button"
             title="{{selectionDetails.languageCodes.description | translate}}">
-      <i *ngIf="isMobileViewActive()" class="material-icons md-18 language-selector-icon">&#xe8e2;</i>
-      {{ languageButtonText | truncate:14 }}
+      <i *ngIf="isMobileViewActive()" class="fas fa-globe material-icons md-18 language-selector-icon"></i>
+      <span class="btn-text">
+        {{ languageButtonText | truncate:14 }}
+      </span>
     </button>
     <ul ngbDropdownMenu class="e2e-test-search-bar-dropdown-menu oppia-search-bar-dropdown-menu-section dropdown-menu"
         role="menu">
@@ -101,16 +105,16 @@
         <li ngbDropdownItem *ngIf="selectionDetails.languageCodes.selections[item.id]">
           <a (click)="toggleSelection('languageCodes', item.id)" *ngIf="!first && !last" class="dropdown-item">
             <span class="e2e-test-selected">{{ item.text | translate }}</span>
-            <i *ngIf="selectionDetails.languageCodes.selections[item.id]" class="material-icons md-18 float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+            <i *ngIf="selectionDetails.languageCodes.selections[item.id]" class="fas fa-check material-icons md-18 float-right oppia-search-bar-category-selection-symbol"></i>
           </a>
           <a (click)="toggleSelection('languageCodes', item.id)" *ngIf="first" (keydown)="onMenuKeypress($event, 'language', {shiftTab: ACTION_CLOSE})" class="dropdown-item">
             <span class="e2e-test-selected">{{ item.text | translate }}</span>
-            <i *ngIf="selectionDetails.languageCodes.selections[item.id]" class="material-icons md-18 float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+            <i *ngIf="selectionDetails.languageCodes.selections[item.id]" class="fas fa-check material-icons md-18 float-right oppia-search-bar-category-selection-symbol"></i>
           </a>
           <a (click)="toggleSelection('languageCodes', item.id)" *ngIf="last" (keydown)="onMenuKeypress($event, 'language', {tab: ACTION_CLOSE})"
              class="dropdown-item">
             <span class="e2e-test-selected">{{ item.text | translate }}</span>
-            <i *ngIf="selectionDetails.languageCodes.selections[item.id]" class="material-icons md-18 float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+            <i *ngIf="selectionDetails.languageCodes.selections[item.id]" class="fas fa-check material-icons md-18 float-right oppia-search-bar-category-selection-symbol"></i>
           </a>
         </li>
       </ng-container>
@@ -122,16 +126,16 @@
         <li ngbDropdownItem *ngIf="!selectionDetails.languageCodes.selections[item.id]">
           <a (click)="toggleSelection('languageCodes', item.id)" *ngIf="!first && !last" class="dropdown-item">
             <span class="e2e-test-deselected">{{ item.text | translate }}</span>
-            <i *ngIf="selectionDetails.languageCodes.selections[item.id]" class="material-icons md-18  float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+            <i *ngIf="selectionDetails.languageCodes.selections[item.id]" class="fas fa-check material-icons md-18  float-right oppia-search-bar-category-selection-symbol"></i>
           </a>
           <a (click)="toggleSelection('languageCodes', item.id)" *ngIf="first" (keydown)="onMenuKeypress($event, 'language', {shiftTab: ACTION_CLOSE})" class="dropdown-item">
             <span class="e2e-test-deselected">{{ item.text | translate }}</span>
-            <i *ngIf="selectionDetails.languageCodes.selections[item.id]" class="material-icons md-18  float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+            <i *ngIf="selectionDetails.languageCodes.selections[item.id]" class="fas fa-check material-icons md-18  float-right oppia-search-bar-category-selection-symbol"></i>
           </a>
           <a (click)="toggleSelection('languageCodes', item.id)" *ngIf="last" (keydown)="onMenuKeypress($event, 'language', {tab: ACTION_CLOSE})"
              class="dropdown-item">
             <span class="e2e-test-deselected">{{ item.text | translate }}</span>
-            <i *ngIf="selectionDetails.languageCodes.selections[item.id]" class="material-icons md-18  float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+            <i *ngIf="selectionDetails.languageCodes.selections[item.id]" class="fas fa-check material-icons md-18  float-right oppia-search-bar-category-selection-symbol"></i>
           </a>
         </li>
       </ng-container>
@@ -143,7 +147,7 @@
            class="oppia-search-button e2e-test-search-button"
            (click)="onSearchQueryChangeExec()"
            title="Click here to search">
-        <i class="material-icons md-18 search-button-icon">&#xe8b6;</i>
+        <i class="fas fa-search material-icons md-18 search-button-icon"></i>
       </div>
     </div>
   </div>
