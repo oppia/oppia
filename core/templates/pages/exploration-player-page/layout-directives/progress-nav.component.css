@@ -80,6 +80,12 @@
   text-align: left;
 }
 
+/*
+  The comment in the section below is an rtlcss value directive mentioned here:
+  https://rtlcss.com/learn/usage-guide/value-directives/, which tells rtlcss
+  to replace the value of the input style to whatever is specified in the
+  comment.
+*/
 .progress-nav-bar .material-icons {
   -moz-transform: scaleX(1) /*rtl:scaleX(-1)*/;
   -o-transform: scaleX(1) /*rtl:scaleX(-1)*/;
