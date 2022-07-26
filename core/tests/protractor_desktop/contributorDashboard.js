@@ -154,7 +154,8 @@ describe('Contributor dashboard page', function() {
       await users.logout();
     });
 
-  it('should allow the users to use the copy tool', async function() {
+  //eslint-disable-next-line oppia/no-test-blockers
+  fit('should allow the users to use the copy tool', async function() {
     storyEditorPage = new StoryEditorPage.StoryEditorPage();
     topicEditorPage = new TopicEditorPage.TopicEditorPage();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
@@ -177,6 +178,11 @@ describe('Contributor dashboard page', function() {
     await explorationEditorMainTab.setInteraction('EndExploration');
     var explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     await explorationEditorPage.navigateToSettingsTab();
+    let width = (await browser.manage().window().getSize()).width;
+    if (width < 769) {
+      var basicSettings = element(by.css('.e2e-test-basic-settings'));
+      await action.click('Basic Settings', basicSettings);
+    }
     await explorationEditorSettingsTab.setTitle('exp1');
     await explorationEditorSettingsTab.setLanguage('English');
     await explorationEditorSettingsTab.setObjective(

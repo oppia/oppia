@@ -106,7 +106,7 @@ var ExplorationEditorPage = function() {
     by.css('.e2e-test-mobile-options-dropdown'));
   var settingsButtonMobile = element(
     by.css('.e2e-test-mobile-settings-button'));
-  var saveButtonMobile = element(
+  var saveButtonMobile = element.all(
     by.css('.e2e-test-save-changes-for-small-screens'));
   var navigateToStatsTabButton = element(by.css('.e2e-test-stats-tab'));
   var navigateToTranslationTabButton = element(
@@ -255,23 +255,30 @@ var ExplorationEditorPage = function() {
     let width = (await browser.manage().window().getSize()).width;
     if (width > 768) {
       await action.click('Save changes button', saveChangesButton);
-    } else {
-      await action.click(
-        'Settings tab button', navigateToSettingsTabButtonMobile);
-      await action.click('Save draft', saveButtonMobile);
-    }
+      if (commitMessage) {
+        await action.sendKeys(
+          'Commit message input', commitMessageInput, commitMessage);
+      }
 
-    if (commitMessage) {
-      await action.sendKeys(
-        'Commit message input', commitMessageInput, commitMessage);
+      await action.click('Save draft button', commitChangesButton);
+      // TODO(#13096): Remove browser.sleep from e2e files.
+      /* eslint-disable-next-line oppia/e2e-practices */
+      await browser.sleep(2500);
+      await waitFor.textToBePresentInElement(
+        saveDraftButtonTextContainer, 'Save Draft',
+        'Changes could not be saved');
+    } else {
+      if (await saveButtonMobile.count() === 0) {
+        await action.click(
+          'Settings tab button', navigateToSettingsTabButtonMobile);
+      }
+      await action.click('Save draft', saveButtonMobile.first());
+      if (commitMessage) {
+        await action.sendKeys(
+          'Commit message input', commitMessageInput, commitMessage);
+      }
+      await action.click('Save draft button', commitChangesButton);
     }
-    await action.click('Save draft button', commitChangesButton);
-    // TODO(#13096): Remove browser.sleep from e2e files.
-    /* eslint-disable-next-line oppia/e2e-practices */
-    await browser.sleep(2500);
-    await waitFor.textToBePresentInElement(
-      saveDraftButtonTextContainer, 'Save Draft',
-      'Changes could not be saved');
   };
 
   this.publishChanges = async function(commitMessage) {
@@ -397,8 +404,10 @@ var ExplorationEditorPage = function() {
     if (width > 768) {
       await action.click('Settings tab button', navigateToSettingsTabButton);
     } else {
-      await action.click(
-        'Settings tab button', navigateToSettingsTabButtonMobile);
+      if (await saveButtonMobile.count() === 0) {
+        await action.click(
+          'Settings tab button', navigateToSettingsTabButtonMobile);
+      }
       await action.click(
         'Options button dropdown', optionsDropdownMobile);
       await action.click(
