@@ -22,9 +22,10 @@ from core.constants import constants
 from core.domain import change_domain
 from core.domain import user_domain
 
+from mypy_imports import user_models
+
 from typing import List, Optional
 from typing_extensions import TypedDict
-from mypy_imports import user_models
 
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
