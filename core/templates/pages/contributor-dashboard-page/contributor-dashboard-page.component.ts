@@ -100,7 +100,7 @@ export class ContributorDashboardPageComponent
   }
 
   showLanguageSelector(): boolean {
-    var activeTabDetail = this.tabsDetails[this.activeTabName];
+    const activeTabDetail = this.tabsDetails[this.activeTabName];
     return activeTabDetail.customizationOptions.includes('language');
   }
 
@@ -112,10 +112,10 @@ export class ContributorDashboardPageComponent
   }
 
   showTopicSelector(): boolean {
-    var activeTabDetail = this.tabsDetails[this.activeTabName];
-    var activeSuggestionType =
+    const activeTabDetail = this.tabsDetails[this.activeTabName];
+    const activeSuggestionType =
       this.contributionAndReviewService.getActiveSuggestionType();
-    var activeTabType = this.contributionAndReviewService.getActiveTabType();
+    const activeTabType = this.contributionAndReviewService.getActiveTabType();
     return activeTabDetail.customizationOptions.includes('topic') ||
       (
         activeTabType === 'reviews' &&
@@ -133,7 +133,7 @@ export class ContributorDashboardPageComponent
   }
 
   getLanguageDescriptions(languageCodes: string[]): string[] {
-    var languageDescriptions = [];
+    let languageDescriptions = [];
     languageCodes.forEach((languageCode) => {
       languageDescriptions.push(
         this.languageUtilService.getAudioLanguageDescription(

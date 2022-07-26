@@ -34,12 +34,7 @@ import { ContributionOpportunitiesService } from '../services/contribution-oppor
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { UserService } from 'services/user.service';
 
-interface Opportunities {
-  opportunities: SkillOpportunity[];
-  more: boolean;
-}
-
-interface OpportunitiesData {
+interface Opportunity {
   id: string;
   heading: string;
   subheading: string;
@@ -47,10 +42,16 @@ interface OpportunitiesData {
   actionButtonTitle: string;
 }
 
-interface PresentableOpportunitiesData {
-  opportunitiesDicts: OpportunitiesData[];
+interface GetSkillOpportunitiesResponse {
+  opportunities: SkillOpportunity[];
   more: boolean;
 }
+
+interface GetPresentableOpportunitiesResponse {
+  opportunitiesDicts: Opportunity[];
+  more: boolean;
+}
+
 @Component({
   selector: 'oppia-question-opportunities',
   templateUrl: './question-opportunities.component.html'
@@ -71,9 +72,10 @@ export class QuestionOpportunitiesComponent implements OnInit {
   ) {}
 
   getPresentableOpportunitiesData(
-      opportunitiesObject: Opportunities): PresentableOpportunitiesData {
+      opportunitiesObject: GetSkillOpportunitiesResponse
+  ): GetPresentableOpportunitiesResponse {
     let opportunitiesDicts = [];
-    let more = opportunitiesObject.more;
+    const more = opportunitiesObject.more;
 
     for (let index in opportunitiesObject.opportunities) {
       const opportunity = opportunitiesObject.opportunities[index];
@@ -82,7 +84,7 @@ export class QuestionOpportunitiesComponent implements OnInit {
       const progressPercentage = (
         (opportunity.getQuestionCount() / constants.MAX_QUESTIONS_PER_SKILL) *
         100).toFixed(2);
-      var opportunityDict = {
+      const opportunityDict = {
         id: opportunity.id,
         heading: heading,
         subheading: subheading,
@@ -100,18 +102,19 @@ export class QuestionOpportunitiesComponent implements OnInit {
   createQuestion(
       skill: Skill, skillDifficulty: SkillDifficulty | string): void {
     const skillId = skill.getId();
-    const question =
-      this.questionObjectFactory.createDefaultQuestion([skillId]);
+    const question = (
+      this.questionObjectFactory.createDefaultQuestion([skillId]));
     const questionId = question.getId();
     const questionStateData = question.getStateData();
     this.questionUndoRedoService.clearChanges();
 
 
-    let modalRef = this.ngbModal.open(QuestionSuggestionEditorModalComponent, {
-      size: 'lg',
-      backdrop: 'static',
-      keyboard: false,
-    });
+    const modalRef = this.ngbModal.open(
+      QuestionSuggestionEditorModalComponent, {
+        size: 'lg',
+        backdrop: 'static',
+        keyboard: false,
+      });
 
     modalRef.componentInstance.suggestionId = '';
     modalRef.componentInstance.question = question;

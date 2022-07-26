@@ -20,7 +20,7 @@ import { ComponentFixture, fakeAsync, flush, TestBed, tick, waitForAsync } from 
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ExplorationOpportunitySummary } from 'domain/opportunity/exploration-opportunity-summary.model';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { ContributionDetails, ContributionsAndReview, Suggestion } from './contributions-and-review.component';
+import { ContributionDetails, ContributionsAndReview, Suggestion, SuggestionDetails } from './contributions-and-review.component';
 import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
 import { TranslationTopicService } from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
 import { MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFactory';
@@ -1233,7 +1233,7 @@ describe('Contributions and review component', () => {
             chapter_title: 'chapter_title'
           }
         }
-      };
+      } as unknown as SuggestionDetails;
       component.SUGGESTION_LABELS = {
         status: {
           text: 'text',
@@ -1287,7 +1287,7 @@ describe('Contributions and review component', () => {
       tick();
 
       expect(component.getQuestionContributionsSummary(
-        suggestionIdToSuggestions)).toEqual([{
+        suggestionIdToSuggestions as unknown as SuggestionDetails)).toEqual([{
         id: 'id',
         heading: 'heading',
         subheading: 'skill_description',
@@ -1338,7 +1338,13 @@ describe('Contributions and review component', () => {
             },
             status: 'review'
           },
-          details: 'skill_1'
+          details: {
+            skill_description: 'skill_description',
+            skill_rubrics: [],
+            chapter_title: 'skill_1',
+            story_title: 'skill_1',
+            topic_name: 'skill_1',
+          }
         }
       };
 
