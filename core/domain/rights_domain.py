@@ -20,11 +20,12 @@ from core import feconf
 from core import utils
 from core.constants import constants
 from core.domain import change_domain
+from core.domain import user_domain
 
 from typing import List, Optional
 from typing_extensions import TypedDict
 
-from core.domain import user_services  # pylint: disable=invalid-import-from # isort:skip
+from mypy_imports import user_models
 
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
@@ -156,6 +157,55 @@ class ActivityRights:
             raise utils.ValidationError(
                 'Activity should have atleast one owner.')
 
+    def get_username_email_from_user_ids(user_ids):
+        """Converts the given ids to usernames, or truncated email addresses.
+
+        Args:
+            user_ids: list(str). The list of user_ids.
+
+        Returns:
+            list(str). List of usernames corresponding to given user_ids. If
+            username does not exist, the corresponding entry in the returned
+            list is the user's truncated email address. If the user is scheduled to
+            be deleted USER_IDENTIFICATION_FOR_USER_BEING_DELETED is returned.
+        """
+
+        user_settings_models = user_models.UserSettingsModel.get_multi(
+            user_ids, include_deleted=True)
+        users_settings: List[Optional[user_domain.UserSettings]] = []
+        for i, model in enumerate(user_settings_models):
+            if user_ids[i] == feconf.SYSTEM_COMMITTER_ID:
+                users_settings.append(user_domain.UserSettings(
+                    user_id=feconf.SYSTEM_COMMITTER_ID,
+                    email=feconf.SYSTEM_EMAIL_ADDRESS,
+                    username='admin',
+                ))
+            else:
+                if model is not None and model.deleted:
+                    model.username = 'UserBeingDeleted'
+                users_settings.append(
+                    user_domain.UserSettings(
+                    user_id=model.id,
+                    email=model.email,
+                    username=model.username)
+                    if model is not None else None
+                )
+
+
+        usernames = []
+        for ind, user_settings in enumerate(users_settings):
+            if user_settings.deleted:
+                usernames.append('[User being deleted]')
+            elif user_settings.username:
+                usernames.append(user_settings.username)
+            else:
+                usernames.append(
+                    '[Awaiting user registration: %s]' %
+                    user_settings.truncated_email)
+        return usernames
+
+
+
     def to_dict(self) -> ActivityRightsDict:
         """Returns a dict suitable for use by the frontend.
 
@@ -179,13 +229,13 @@ class ActivityRights:
                 'cloned_from': self.cloned_from,
                 'status': self.status,
                 'community_owned': False,
-                'owner_names': user_services.get_human_readable_user_ids(
+                'owner_names': self.get_username_email_from_user_ids(
                     self.owner_ids),
-                'editor_names': user_services.get_human_readable_user_ids(
+                'editor_names': self.get_username_email_from_user_ids(
                     self.editor_ids),
-                'voice_artist_names': user_services.get_human_readable_user_ids(
+                'voice_artist_names': self.get_username_email_from_user_ids(
                     self.voice_artist_ids),
-                'viewer_names': user_services.get_human_readable_user_ids(
+                'viewer_names': self.get_username_email_from_user_ids(
                     self.viewer_ids),
                 'viewable_if_private': self.viewable_if_private,
             }
