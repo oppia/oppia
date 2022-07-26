@@ -167,7 +167,7 @@ class ActivityRights:
             list(str). List of usernames corresponding to given user_ids. If
             username does not exist, the corresponding entry in the returned
             list is the user's truncated email address. If the user is scheduled
-            to be deleted USER_IDENTIFICATION_FOR_USER_BEING_DELETED is 
+            to be deleted USER_IDENTIFICATION_FOR_USER_BEING_DELETED is
             returned.
         """
 
@@ -193,7 +193,7 @@ class ActivityRights:
                 )
 
         usernames = []
-        for ind, user_settings in enumerate(users_settings):
+        for user_settings in enumerate(users_settings):
             if user_settings.deleted:
                 usernames.append('[User being deleted]')
             elif user_settings.username:
