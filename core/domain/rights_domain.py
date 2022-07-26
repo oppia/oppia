@@ -179,7 +179,15 @@ class ActivityRights:
                 users_settings.append(user_domain.UserSettings(
                     user_id=feconf.SYSTEM_COMMITTER_ID,
                     email=feconf.SYSTEM_EMAIL_ADDRESS,
+                    roles=[
+                    feconf.ROLE_ID_FULL_USER,
+                    feconf.ROLE_ID_CURRICULUM_ADMIN,
+                    feconf.ROLE_ID_MODERATOR,
+                    feconf.ROLE_ID_VOICEOVER_ADMIN
+                    ],
+                    banned=False,
                     username='admin',
+                    has_viewed_lesson_info_modal_once=False,
                 ))
             else:
                 if model is not None and model.deleted:
