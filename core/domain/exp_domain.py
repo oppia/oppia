@@ -1199,7 +1199,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         'The default outcome for state %s has a refresher '
                         'exploration ID, but is not a self-loop.' % state_name)
 
-            for group in interaction.answer_groups:
+            for group_idx, group in enumerate(interaction.answer_groups):
                 # Check group destinations.
                 if group.outcome.dest not in all_state_names:
                     raise utils.ValidationError(
@@ -1241,6 +1241,22 @@ class Exploration(translation_domain.BaseTranslatableObject):
                             'The parameter %s was used in an answer group, '
                             'but it does not exist in this exploration'
                             % param_change.name)
+
+                # Check if tagged_skill_misconception_id is None or not.
+                if group.tagged_skill_misconception_id is not None:
+                    raise utils.ValidationError(
+                        'The outcome for answer group %s in state %s has '
+                        'tagged skill misconception id, which '
+                        'should be None' % (str(group_idx+1), state_name)
+                    )
+
+                # Check if the answergroup has atleast one rulespec.
+                if len(group.rule_specs) == 0:
+                    raise utils.ValidationError(
+                        'The outcome for answer group %s in state %s has '
+                        'no rule specs, atleast one is required ' % (
+                            str(group_idx+1), state_name)
+                    )
 
         if strict:
             warnings_list = []
@@ -1366,7 +1382,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                             'The default outcome for state %s is labelled '
                             'correct but is a self-loop.' % state_name)
 
-                for group_idx, group in enumerate(interaction.answer_groups):
+                for group in interaction.answer_groups:
                     # Check that, if the outcome is a self-loop, then the
                     # outcome is not labelled as correct.
                     if (
@@ -1385,22 +1401,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
                             'The outcome for the state is labelled '
                             'correct but a destination for the stuck learner '
                             'is specified.')
-
-                    # Check if tagged_skill_misconception_id is None or not.
-                    if group.tagged_skill_misconception_id is not None:
-                        raise utils.ValidationError(
-                            'The outcome for answer group %s in state %s has '
-                            'tagged skill misconception id, which '
-                            'should be None' % (str(group_idx+1), state_name)
-                        )
-
-                    # Check if the answergroup has atleast one rulespec.
-                    if len(group.rule_specs) == 0:
-                        raise utils.ValidationError(
-                            'The outcome for answer group %s in state %s has '
-                            'no rule specs, atleast one is required ' % (
-                                str(group_idx+1), state_name)
-                        )
 
             if len(warnings_list) > 0:
                 warning_str = ''
