@@ -32,6 +32,7 @@ import { LightweightOppiaRootComponent } from './lightweight-oppia-root.componen
 import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { CookieModule } from 'ngx-cookie';
+import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
 
 @NgModule({
   imports: [
@@ -53,6 +54,7 @@ import { CookieModule } from 'ngx-cookie';
       useClass: RequestInterceptor,
       multi: true
     },
+    AppErrorHandlerProvider,
     {
       provide: APP_INITIALIZER,
       useFactory: platformFeatureInitFactory,

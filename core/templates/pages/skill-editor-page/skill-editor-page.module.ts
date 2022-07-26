@@ -48,6 +48,7 @@ import { SkillMisconceptionsEditorComponent } from './editor-tab/skill-misconcep
 import { SkillPreviewModalComponent } from './editor-tab/skill-preview-modal.component';
 import { SkillConceptCardEditorComponent } from './editor-tab/skill-concept-card-editor/skill-concept-card-editor.component';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
+import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
 
 @NgModule({
   imports: [
@@ -111,6 +112,7 @@ import { SmartRouterModule } from 'hybrid-router-module-provider';
       provide: HAMMER_GESTURE_CONFIG,
       useClass: MyHammerConfig
     },
+    AppErrorHandlerProvider,
     {
       provide: APP_BASE_HREF,
       useValue: '/'
