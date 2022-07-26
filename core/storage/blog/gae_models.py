@@ -14,10 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Models for storing data related to blog posts. The author can edit both
-published and draft blog post at any time. Hence, functionality for reverting
-back to earlier versions is not being built in. All models are therefore not
-versioned."""
+"""Models for storing data related to blog posts."""
 
 from __future__ import annotations
 
@@ -50,7 +47,9 @@ class BlogPostModelDataDict(TypedDict):
 
 
 class BlogPostModel(base_models.BaseModel):
-    """Model to store blog post data.
+    """Model to store blog post data.Functionality to allow authors to revert
+    back to earlier versions is not being built in. All models are therefore not
+    versioned.
 
     The id of instances of this class is in the form of random hash of
     12 chars.
