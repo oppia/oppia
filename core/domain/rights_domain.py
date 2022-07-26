@@ -24,7 +24,6 @@ from core.domain import user_domain
 
 from typing import List, Optional
 from typing_extensions import TypedDict
-
 from mypy_imports import user_models
 
 # TODO(#14537): Refactor this file and remove imports marked
