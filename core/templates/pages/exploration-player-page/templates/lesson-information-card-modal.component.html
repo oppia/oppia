@@ -65,7 +65,9 @@
         <div class="oppia-lesson-info-card-authors">
           <div (click)="toggleLessonAuthorsSubmenu()" class="authors-title">{{ 'I18N_LESSON_AUTHORS_DROPDOWN_TITLE' | translate }}</div>
           <div [hidden]="!lessonAuthorsSubmenuIsShown" class="authors-dropdown-menu">
-            <div *ngFor="let name of contributorNames" ngbDropdownItem>{{ name }}</div>
+            <div *ngFor="let name of contributorNames" ngbDropdownItem>
+              <a [attr.href]="'/profile/' + name" target="_blank" rel="noopener noreferrer">{{ name }}</a>
+            </div>
           </div>
         </div>
       </div>
@@ -129,7 +131,9 @@
         <div class="oppia-lesson-info-card-authors">
           <div (click)="toggleLessonAuthorsSubmenu()" class="authors-title">{{ 'I18N_LESSON_AUTHORS_DROPDOWN_TITLE' | translate }}</div>
           <div [hidden]="!lessonAuthorsSubmenuIsShown" class="authors-dropdown-menu">
-            <div *ngFor="let name of contributorNames" ngbDropdownItem>{{ name }}</div>
+            <div *ngFor="let name of contributorNames" ngbDropdownItem>
+              <a [attr.href]="'/profile/' + name" target="_blank" rel="noopener noreferrer">{{ name }}</a>
+            </div>
           </div>
         </div>
       </div>
