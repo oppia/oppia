@@ -157,7 +157,7 @@ class ActivityRights:
             raise utils.ValidationError(
                 'Activity should have atleast one owner.')
 
-    def get_username_email_from_user_ids(user_ids):
+    def get_username_email_from_user_ids(self, user_ids):
         """Converts the given ids to usernames, or truncated email addresses.
 
         Args:
@@ -166,8 +166,8 @@ class ActivityRights:
         Returns:
             list(str). List of usernames corresponding to given user_ids. If
             username does not exist, the corresponding entry in the returned
-            list is the user's truncated email address. If the user is scheduled to
-            be deleted USER_IDENTIFICATION_FOR_USER_BEING_DELETED is returned.
+            list is the user's truncated email address. If the user is scheduled
+            to be deleted USER_IDENTIFICATION_FOR_USER_BEING_DELETED is returned.
         """
 
         user_settings_models = user_models.UserSettingsModel.get_multi(
