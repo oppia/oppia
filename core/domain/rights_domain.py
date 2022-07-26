@@ -196,7 +196,11 @@ class ActivityRights:
                     user_domain.UserSettings(
                     user_id=model.id,
                     email=model.email,
-                    username=model.username)
+                    roles=model.roles,
+                    banned=model.banned,
+                    username=model.username,
+                    has_viewed_lesson_info_modal_once=(
+                    model.has_viewed_lesson_info_modal_once))
                     if model is not None else None
                 )
 
