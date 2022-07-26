@@ -143,7 +143,7 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
     };
 
     $scope.refreshActiveContributionState = function() {
-      let nextContribution = $scope.allContributions[
+      const nextContribution = $scope.allContributions[
         $scope.currentSuggestionId];
       $scope.suggestion = nextContribution.suggestion;
 
@@ -157,8 +157,8 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
       SkillBackendApiService.fetchSkillAsync(
         $scope.suggestion.change.skill_id
       ).then((skillDict) => {
-        var misconceptionsBySkill = {};
-        var skill = skillDict.skill;
+        let misconceptionsBySkill = {};
+        const skill = skillDict.skill;
         misconceptionsBySkill[skill.getId()] = skill.getMisconceptions();
         $scope.misconceptionsBySkill = misconceptionsBySkill;
         $scope.refreshContributionState();
