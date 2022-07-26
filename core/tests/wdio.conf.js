@@ -187,6 +187,8 @@ exports.config = {
     }]
   ],
 
+  waitforTimeout: 10000,
+
   isMobile: false,
 
   // Options to be passed to Jasmine.
