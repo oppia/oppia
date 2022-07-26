@@ -177,22 +177,22 @@ var urlRedirection = async function(url) {
 };
 
 var visibilityOfInfoToast = async function(errorMessage) {
-  var toastInfoElement = $('.toast-info');
+  var toastInfoElement = await $('.toast-info');
   await visibilityOf(toastInfoElement, errorMessage);
 };
 
 var invisibilityOfInfoToast = async function(errorMessage) {
-  var toastInfoElement = $('.toast-info');
+  var toastInfoElement = await $('.toast-info');
   await invisibilityOf(toastInfoElement, errorMessage);
 };
 
 var invisibilityOfLoadingMessage = async function(errorMessage) {
-  var loadingMessage = $('.e2e-test-loading-message');
+  var loadingMessage = await $('.e2e-test-loading-message');
   await invisibilityOf(loadingMessage, errorMessage);
 };
 
 var visibilityOfSuccessToast = async function(errorMessage) {
-  var toastSuccessElement = $('.toast-success');
+  var toastSuccessElement = await $('.toast-success');
   await visibilityOf(toastSuccessElement, errorMessage);
 };
 
