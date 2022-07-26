@@ -39,6 +39,9 @@ export class CsrfTokenService {
       return response.text();
     }).then((responseText: string) => {
       return JSON.parse(responseText.substring(5)).token;
+    }).catch((error: Error) => {
+      throw new Error(
+        'There has been a problem with the fetch operation: ' + error.message);
     });
   }
 
