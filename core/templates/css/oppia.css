@@ -2299,7 +2299,7 @@ oppia-parameter {
   .modal-dialog {
     margin-left: auto;
     margin-right: auto;
-    width: 320px;
+    width: 90vw;
   }
 }
 @media(min-width: 1024px) {
