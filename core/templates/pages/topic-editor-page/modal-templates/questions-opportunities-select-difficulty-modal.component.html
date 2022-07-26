@@ -7,7 +7,10 @@
     <h3 class="oppia-modal-header" *ngIf="linkedSkillsWithDifficulty.length > 0">
       {{ skillWithDifficulty.getDescription() }}
     </h3>
-    <button type="button" class="close oppia-close-button-position" (click)="cancel()" aria-label="Close">
+    <button type="button" 
+            class="close oppia-close-button-position" 
+            (click)="cancel()" 
+            aria-label="Close">
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
@@ -17,7 +20,9 @@
     </div>
     <div class="list-group">
       <div class="list-group-item">
-        <label class="list-group-item-heading skill-description">Select the difficulty per skill according to the specified rubrics</label>
+        <label class="list-group-item-heading skill-description">
+          Select the difficulty per skill according to the specified rubrics
+        </label>
         <oppia-question-difficulty-selector [skillIdToRubricsObject]="skillIdToRubricsObject"
                                             [(skillWithDifficulty)]="skillWithDifficulty">
         </oppia-question-difficulty-selector>
