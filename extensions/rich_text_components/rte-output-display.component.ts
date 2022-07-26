@@ -57,7 +57,7 @@ export class RteOutputDisplayComponent implements AfterViewInit {
   constructor(
     private _viewContainerRef: ViewContainerRef,
     private cdRef: ChangeDetectorRef,
-    private elementRef: ElementRef,
+    public elementRef: ElementRef,
     private oppiaHtmlParserService: OppiaRteParserService
   ) {}
 
