@@ -66,7 +66,7 @@ describe('Csrf Token Service', function() {
         csrfTokenService.initializeToken();
       } catch (e) {
         expect(e).toEqual(new Error(
-          'THere has been a problem with the fetch operation: Test Error'));
+          'There has been a problem with the fetch operation: Test Error'));
       }
     });
   });
