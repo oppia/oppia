@@ -176,7 +176,7 @@ describe('GraphVizComponent', () => {
     spyOn(Element.prototype, 'querySelectorAll').and.callFake(
       jasmine.createSpy('querySelectorAll').and
         .returnValue([{
-          width: 120,
+          width: 527,
           getAttribute: (attr) => {
             if (attr === 'height') {
               return 250;
@@ -195,7 +195,7 @@ describe('GraphVizComponent', () => {
 
     component.ngAfterViewInit();
 
-    expect(component.vizWidth).toBe(120);
+    expect(component.vizWidth).toBe(527);
     expect(component.graphOptions).toEqual([{
       text: 'Labeled',
       option: 'isLabeled'
@@ -209,7 +209,7 @@ describe('GraphVizComponent', () => {
       option: 'isWeighted'
     }]);
     expect(component.helpText).toBeNull();
-    expect(component.svgViewBox).toBe('0 0 671 250');
+    expect(component.svgViewBox).toBe('0 0 527 250');
     // Function init() is only called when the interaction is active.
     // Therefore, we verify that the value of interactionIsActive is true
     // before calling the function init().

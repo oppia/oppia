@@ -187,11 +187,9 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
     const viewBoxHeight = Math.max(
       boundingBox.height + boundingBox.y,
       svgContainer.getAttribute('height'));
-    this.svgViewBox = (
-      0 + ' ' + 0 + ' ' + (boundingBox.width + boundingBox.x) +
-        ' ' + (viewBoxHeight));
-    // Initial value of SVG view box.
+    this.svgViewBox = `0 0 ${svgContainer.width} ${viewBoxHeight}`;
 
+    // Initial value of SVG view box.
     if (this.interactionIsActive) {
       this.init();
     }
