@@ -553,6 +553,12 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         self.assert_suggestion_status(
             self.suggestion_id, suggestion_models.STATUS_IN_REVIEW)
 
+    def test_raises_exception_for_invalid_suggestion_id_with_strict_true(
+        self
+    ) -> None:
+        with self.assertRaisesRegex(Exception, 'No suggestion model exists'):  # type: ignore[no-untyped-call]
+            suggestion_services.get_suggestion_by_id('invalid_id')
+
     def test_accept_suggestion_raises_exception_if_suggestion_already_accepted(
         self
     ) -> None:
@@ -2490,7 +2496,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
             feconf.ENTITY_TYPE_EXPLORATION,
             self.target_id, feconf.CURRENT_STATE_SCHEMA_VERSION,
             self.author_id, edit_state_content_change_dict,
-            'test description')
+            None)
 
     def _assert_reviewable_suggestion_email_infos_are_equal(
         self,

@@ -100,7 +100,7 @@ def create_suggestion(
     target_version_at_submission: int,
     author_id: str,
     change: Mapping[str, change_domain.AcceptableChangeDictTypes],
-    description: str
+    description: Optional[str]
 ) -> suggestion_registry.SuggestionAddQuestion: ...
 
 
@@ -112,7 +112,7 @@ def create_suggestion(
     target_version_at_submission: int,
     author_id: str,
     change: Mapping[str, change_domain.AcceptableChangeDictTypes],
-    description: str
+    description: Optional[str]
 ) -> suggestion_registry.SuggestionTranslateContent: ...
 
 
@@ -124,7 +124,7 @@ def create_suggestion(
     target_version_at_submission: int,
     author_id: str,
     change: Mapping[str, change_domain.AcceptableChangeDictTypes],
-    description: str
+    description: Optional[str]
 ) -> suggestion_registry.SuggestionEditStateContent: ...
 
 
@@ -135,7 +135,7 @@ def create_suggestion(
     target_version_at_submission: int,
     author_id: str,
     change: Mapping[str, change_domain.AcceptableChangeDictTypes],
-    description: str
+    description: Optional[str]
 ) -> suggestion_registry.BaseSuggestion:
     """Creates a new SuggestionModel and the corresponding FeedbackThread.
 
@@ -149,7 +149,8 @@ def create_suggestion(
             entity at the time of creation of the suggestion.
         author_id: str. The ID of the user who submitted the suggestion.
         change: dict. The details of the suggestion.
-        description: str. The description of the changes provided by the author.
+        description: str|None. The description of the changes provided by the
+            author or None, if no description is provided.
 
     Returns:
         Suggestion. The newly created suggestion domain object.
@@ -921,7 +922,7 @@ def get_translation_suggestions_waiting_longest_for_review(
 
 def get_translation_suggestions_in_review_by_exploration(
     exp_id: str, language_code: str
-) -> List[Optional[suggestion_registry.SuggestionTranslateContent]]:
+) -> List[Optional[suggestion_registry.BaseSuggestion]]:
     """Returns translation suggestions in review by exploration ID.
 
     Args:
@@ -937,26 +938,15 @@ def get_translation_suggestions_in_review_by_exploration(
         .get_translation_suggestions_in_review_with_exp_id(
             exp_id, language_code)
     )
-    translation_suggestions: List[
-        Optional[suggestion_registry.SuggestionTranslateContent]
-    ] = []
-    for model in suggestion_models_in_review:
-        if model is not None:
-            suggestion = get_suggestion_from_model(model)
-            # Here, we are narrowing down the type from BaseSuggestion
-            # to SuggestionTranslateContent.
-            assert isinstance(
-                suggestion, suggestion_registry.SuggestionTranslateContent
-            )
-            translation_suggestions.append(suggestion)
-        else:
-            translation_suggestions.append(None)
-    return translation_suggestions
+    return [
+        get_suggestion_from_model(model) if model else None
+        for model in suggestion_models_in_review
+    ]
 
 
 def get_translation_suggestions_in_review_by_exp_ids(
     exp_ids: List[str], language_code: str
-) -> List[Optional[suggestion_registry.SuggestionTranslateContent]]:
+) -> List[Optional[suggestion_registry.BaseSuggestion]]:
     """Returns translation suggestions in review by exploration ID and language
     code.
 
@@ -976,22 +966,10 @@ def get_translation_suggestions_in_review_by_exp_ids(
         .get_in_review_translation_suggestions_by_exp_ids(
             exp_ids, language_code)
     )
-    translation_suggestions: List[
-        Optional[suggestion_registry.SuggestionTranslateContent]
-    ] = []
-    for model in suggestion_models_in_review:
-        if model is not None:
-            suggestion = get_suggestion_from_model(model)
-            # Here, we are narrowing down the type from BaseSuggestion to
-            # SuggestionTranslateContent.
-            assert isinstance(
-                suggestion, suggestion_registry.SuggestionTranslateContent
-            )
-            translation_suggestions.append(suggestion)
-        else:
-            translation_suggestions.append(None)
-
-    return translation_suggestions
+    return [
+        get_suggestion_from_model(model) if model else None
+        for model in suggestion_models_in_review
+    ]
 
 
 def get_suggestions_with_translatable_explorations(
