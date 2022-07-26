@@ -113,7 +113,6 @@ exports.config = {
     browserName: 'chrome',
     'goog:chromeOptions': {
       args: [
-        'headless',
         '--lang=en-EN',
         '--window-size=1285x1000',
         // These arguments let us simulate recording from a microphone.
@@ -154,7 +153,7 @@ exports.config = {
 
   // Default timeout in milliseconds for request
   // if browser driver or grid doesn't send response.
-  connectionRetryTimeout: 120000,
+  connectionRetryTimeout: 150000,
 
   // Default request retries count.
   connectionRetryCount: 3,
@@ -187,7 +186,7 @@ exports.config = {
     }]
   ],
 
-  waitforTimeout: 10000,
+  waitforTimeout: 20000,
 
   isMobile: false,
 
