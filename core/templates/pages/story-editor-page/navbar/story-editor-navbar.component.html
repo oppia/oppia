@@ -140,19 +140,19 @@
         </div>
       </div>
       <div class="story-nav-dropdown-content right-container">
-        <div class="story-nav-dropdown-text"
-             [attr.disabled]="!isStorySaveable()"
+        <div class="story-nav-dropdown-text e2e-test-mobile-save-changes"
+             [disabled]="!isStorySaveable()"
              (click)="saveChanges()">
           <span *ngIf="isSaveInProgress()">
             <span>Saving</span>
           </span>
-          <span *ngIf="!isSaveInProgress()" class="e2e-test-mobile-save-changes">
+          <span *ngIf="!isSaveInProgress()">
             Save Changes
           </span>
           <span *ngIf="getChangeListLength() > 0">
             ({{ getChangeListLength() }})
           </span>
-        </div>
+        </button>
         <div class="story-nav-dropdown-icon"
              (click)="toggleStoryEditOptions()">
           <i class="fa fa-caret-down e2e-test-mobile-changes-dropdown"></i>
@@ -162,6 +162,9 @@
   </div>
 </div>
 <style>
+  .hide {
+    /* display: none; */
+  }
   .oppia-editor-warnings-text {
     width: 100%;
     word-wrap: break-word;

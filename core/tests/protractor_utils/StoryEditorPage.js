@@ -75,7 +75,7 @@ var StoryEditorPage = function() {
   var navigateToOptionsMobile = element(
     by.css('.e2e-test-mobile-options-base'));
   var saveButtonMobile = element(
-    by.css('.e2e-test-save-changes-for-small-screens'));
+    by.css('.e2e-test-mobile-save-changes'));
   var changesOptions = element.all(
     by.css('.e2e-test-mobile-changes-dropdown'));
   var publishButtonMobile = element(
@@ -352,7 +352,7 @@ var StoryEditorPage = function() {
     if (width < 831) {
       await action.click(
         'Settings tab button', navigateToOptionsMobile);
-      await action.click('Save draft', saveButtonMobile.first());
+      await action.click('Save draft', saveButtonMobile);
     } else {
       await action.click('Save Story Button', saveStoryButton);
     }
