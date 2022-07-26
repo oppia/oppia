@@ -78,7 +78,7 @@ var invisibilityOf = async function(element, errorMessage) {
 var pageToFullyLoad = async function() {
   await browser.setTimeout({
     // eslint-disable-next-line quote-props
-    'implicit': 5000,
+    'implicit': 1000,
   });
   var loadingMessage = await $('.e2e-test-loading-fullpage');
   await loadingMessage.waitForDisplayed({
