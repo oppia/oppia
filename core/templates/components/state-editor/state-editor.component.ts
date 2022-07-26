@@ -208,28 +208,13 @@ export class StateEditorComponent implements OnInit, OnDestroy {
           }
           this.stateData = stateData;
           this.stateName = this.stateEditorService.getActiveStateName();
-          if (this.stateName === null) {
-            throw new Error(
-              'Expected stateName to be defined but received ' +
-              this.stateName);
-          }
           this.stateEditorService.setInteraction(stateData.interaction);
           this.stateContentService.init(
             this.stateName, stateData.content);
-          if (stateData.linkedSkillId === null) {
-            throw new Error(
-              'Expected linked skill id to be defined but received ' +
-              stateData.interaction.id);
-          }
           this.stateLinkedSkillIdService.init(
             this.stateName, stateData.linkedSkillId);
           this.stateHintsService.init(
             this.stateName, stateData.interaction.hints);
-          if (stateData.interaction.id === null) {
-            throw new Error(
-              'Expected interaction.id to be defined but received ' +
-              stateData.interaction.id);
-          }
           this.stateInteractionIdService.init(
             this.stateName, stateData.interaction.id);
           this.stateCustomizationArgsService.init(
