@@ -356,7 +356,6 @@ var ExplorationEditorPage = function() {
   this.navigateToMainTab = async function() {
     await action.waitForAutosave();
     await action.click('Main tab button', navigateToMainTabButton);
-    await waitFor.pageToFullyLoad();
   };
 
   this.navigateToPreviewTab = async function() {
