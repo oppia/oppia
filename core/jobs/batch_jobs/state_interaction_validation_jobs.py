@@ -533,26 +533,16 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
         Returns:
             rule_value_f: float. The value of the rule spec.
         """
-        rule_value_f = rule_spec.inputs['f'].strip()
-        if '/' in rule_value_f:
-            rule_value_f = rule_value_f.split('/')
-            # For values like '1 3/2'.
-            if len(rule_value_f[0].strip().split()) > 1:
-                value_1 = rule_value_f[0].strip().split()
-                value_2 = rule_value_f[1]
-
-                rule_value_f = (
-                    float(value_1[0]) +
-                    float(value_1[1]) / float(value_2)
-                )
-            # For values like '1/2'.
-            else:
-                rule_value_f = (
-                    float(rule_value_f[0]) / float(
-                        rule_value_f[1])
-                )
+        rule_value_f = rule_spec.inputs['f']
+        if rule_value_f['wholeNumber'] == 0:
+            rule_value_f = float(
+                rule_value_f['numerator']/rule_value_f['denominator']
+            )
         else:
-            rule_value_f = float(rule_value_f)
+            rule_value_f = float(
+                rule_value_f['wholeNumber'] +
+                rule_value_f['numerator']/rule_value_f['denominator']
+            )
 
         return rule_value_f
 
@@ -638,26 +628,10 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
                         )
 
                     if rule_spec.rule_type == 'IsLessThan':
-                        rule_value_f = rule_spec.inputs['f'].strip()
-                        if '/' in rule_value_f:
-                            rule_value_f = rule_value_f.split('/')
-                            # For values like '1 3/2'.
-                            if len(rule_value_f[0].strip().split()) > 1:
-                                value_1 = rule_value_f[0].strip().split()
-                                value_2 = rule_value_f[1]
-
-                                rule_value_f = (
-                                    float(value_1[0]) +
-                                    float(value_1[1]) / float(value_2)
-                                )
-                            # For values like '1/2'.
-                            else:
-                                rule_value_f = (
-                                    float(rule_value_f[0]) / float(
-                                        rule_value_f[1])
-                                )
-                        else:
-                            rule_value_f = float(rule_value_f)
+                        rule_value_f = (
+                            ExpStateInteractionValidationJob.
+                            _get_rule_value_f(rule_spec)
+                        )
 
                         (
                             ExpStateInteractionValidationJob.
