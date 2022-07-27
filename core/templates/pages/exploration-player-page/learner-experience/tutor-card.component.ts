@@ -128,6 +128,7 @@ export class TutorCardComponent {
   OPPIA_AVATAR_IMAGE_URL: string;
   OPPIA_AVATAR_LINK_URL: string;
   profilePicture: string;
+  nextMilestoneChapterCount: number | null = null;
   checkMarkHidden: boolean = true;
   animationHasPlayedOnce: boolean = false;
   checkMarkSkipped: boolean = false;
@@ -269,6 +270,37 @@ export class TutorCardComponent {
     let milestoneMessageTranslationKey = (
       'I18N_END_CHAPTER_MILESTONE_MESSAGE_' + chapterCountMessageIndex);
     return this.translateService.instant(milestoneMessageTranslationKey);
+  }
+
+  shouldShowMilestoneProgressBar(): boolean {
+    if (
+      !this.inStoryMode ||
+      this.completedChaptersCount > 50 ||
+      (this.milestoneMessageIsToBeDisplayed &&
+        MILESTONE_SPECIFIC_COMPLETED_CHAPTER_COUNTS.includes(
+          this.completedChaptersCount))
+    ) {
+      this.nextMilestoneChapterCount = null;
+      return false;
+    }
+
+    if (!this.milestoneMessageIsToBeDisplayed &&
+        MILESTONE_SPECIFIC_COMPLETED_CHAPTER_COUNTS.includes(
+          this.completedChaptersCount)) {
+      let chapterCountIndex = (
+        MILESTONE_SPECIFIC_COMPLETED_CHAPTER_COUNTS.indexOf(
+          this.completedChaptersCount));
+      this.nextMilestoneChapterCount = (
+        MILESTONE_SPECIFIC_COMPLETED_CHAPTER_COUNTS[chapterCountIndex + 1]);
+      return true;
+    }
+
+    for (let milestoneCount of MILESTONE_SPECIFIC_COMPLETED_CHAPTER_COUNTS) {
+      if (milestoneCount > this.completedChaptersCount) {
+        this.nextMilestoneChapterCount = milestoneCount;
+        return true;
+      }
+    }
   }
 
   getStaticImageUrl(imagePath: string): string {

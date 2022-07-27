@@ -176,6 +176,10 @@
   padding: 0 20px;
 }
 
+.conversation-skin-milestone-message.milestone-progress-message {
+  flex-direction: column;
+}
+
 .conversation-skin-milestone-message .milestone-message-star-container {
   align-items: center;
   display: flex;
@@ -197,11 +201,42 @@
   position: relative;
 }
 
+.conversation-skin-milestone-message .chapters-left-count {
+  font-weight: 500;
+  margin-top: 9px;
+  position: relative;
+}
+
 .conversation-skin-milestone-message .milestone-message-text {
   font-size: 1.1em;
   font-weight: 800;
   margin-top: 9px;
   text-align: center;
+}
+
+.conversation-skin-milestone-message .milestone-message-progress-bar-container {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  margin-top: -25px;
+  width: 100%;
+}
+
+.milestone-message-progress-bar-container .milestone-progress-bar-outer {
+  border: 2px solid #00645c;
+  height: 20px;
+  margin-right: 30px;
+  width: 300px;
+}
+
+.milestone-message-progress-bar-container .milestone-progress-bar-inner {
+  background: #a6dacf;
+  height: 100%;
+}
+
+.milestone-message-progress-bar-container .milestone-message-star-container {
+  margin-bottom: 9px;
+  margin-left: -57px;
 }
 
 .oppia-conversation-skin-inline-interaction {
