@@ -178,7 +178,7 @@ def get_languages_with_complete_translation(exploration):
         list(str). A list of language code in which the translation for the
         exploration is complete i.e, 100%.
     """
-    content_count = get_content_count(exploration)
+    content_count = exploration.get_content_count()
     language_code_list = []
     for language_code, count in get_translation_counts(
         feconf.TranslatableEntityType.EXPLORATION,
@@ -236,30 +236,6 @@ def get_translation_counts(entity_type, entity_id, entity_version):
             translation_count_in_a_lang_code)
 
     return dict(exploration_translation_counts)
-
-
-def get_content_count(base_translatable_object):
-    """Returns the total number of distinct content fields available in the
-    exploration which are user facing and can be translated into
-    different languages.
-
-    (The content field includes state content, feedback, hints, solutions.)
-
-    Returns:
-        int. The total number of distinct content fields available inside
-        the exploration.
-    """
-    content_count = (
-        len(
-            base_translatable_object.get_all_contents_which_need_translations(
-                translation_domain.EntityTranslation.create_empty(
-                    entity_type=feconf.TranslatableEntityType.EXPLORATION,
-                    entity_id='',
-                    language_code='')
-                )
-        )
-    )
-    return content_count
 
 
 def get_translatable_text(exploration, language_code):

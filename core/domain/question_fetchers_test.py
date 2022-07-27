@@ -188,7 +188,8 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
             language_code='en',
             version=0,
             next_content_id_index=content_id_generator.next_content_id_index,
-            question_state_data_schema_version=48)
+            question_state_data_schema_version=(
+                feconf.CURRENT_STATE_SCHEMA_VERSION))
 
         question_model.commit(
             self.editor_id, 'question model created',

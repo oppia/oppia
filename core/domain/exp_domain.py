@@ -2232,11 +2232,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 versioned_exploration_states['states'], init_state_name)
         elif current_states_schema_version == 50:
             versioned_exploration_states['states'], next_content_id_index = (
-                conversion_fn(
-                    versioned_exploration_states['states'],
-                    init_state_name
-                )
-            )
+                conversion_fn(versioned_exploration_states['states']))
             return next_content_id_index
         else:
             versioned_exploration_states['states'] = conversion_fn(

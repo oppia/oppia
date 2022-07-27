@@ -1612,7 +1612,7 @@ class GenericTestBase(AppEngineTestBase):
     }
 
     VERSION_27_STATE_DICT = {
-        'content': {'content_id': 'content_0', 'html': ''},
+        'content': {'content_id': 'content', 'html': ''},
         'param_changes': [],
         'content_ids_to_audio_translations': {
             'content': {},
@@ -1799,7 +1799,7 @@ correctness_feedback_enabled: true
 edits_allowed: true
 init_state_name: %s
 language_code: en
-next_content_id_index: 0
+next_content_id_index: 4
 objective: ''
 param_changes: []
 param_specs: {}
@@ -1809,7 +1809,7 @@ states:
     card_is_checkpoint: true
     classifier_model_id: null
     content:
-      content_id: content
+      content_id: content_0
       html: ''
     interaction:
       answer_groups: []
@@ -1818,7 +1818,7 @@ states:
       default_outcome:
         dest: %s
         feedback:
-          content_id: default_outcome
+          content_id: default_outcome_1
           html: ''
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
@@ -1831,14 +1831,14 @@ states:
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        content: {}
-        default_outcome: {}
+        content_0: {}
+        default_outcome_1: {}
     solicit_answer_details: false
   New state:
     card_is_checkpoint: false
     classifier_model_id: null
     content:
-      content_id: content
+      content_id: content_2
       html: ''
     interaction:
       answer_groups: []
@@ -1847,7 +1847,7 @@ states:
       default_outcome:
         dest: New state
         feedback:
-          content_id: default_outcome
+          content_id: default_outcome_3
           html: ''
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
@@ -1860,8 +1860,8 @@ states:
     param_changes: []
     recorded_voiceovers:
       voiceovers_mapping:
-        content: {}
-        default_outcome: {}
+        content_2: {}
+        default_outcome_3: {}
     solicit_answer_details: false
 states_schema_version: %d
 tags: []
@@ -1931,6 +1931,7 @@ title: Title
 
     def setUp(self) -> None:
         super(GenericTestBase, self).setUp()
+        self.maxDiff = None
         if self.AUTO_CREATE_DEFAULT_SUPERADMIN_USER:
             self.signup_superadmin_user()
 

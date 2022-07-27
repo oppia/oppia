@@ -169,7 +169,7 @@ def create_exp_opportunity_summary(topic, story, exploration):
         # exploration can be voiceovered in its own language.
         language_codes_needing_voice_artists.add(exploration.language_code)
 
-    content_count = translation_services.get_content_count(exploration)
+    content_count = exploration.get_content_count()
     translation_counts = translation_services.get_translation_counts(
         feconf.TranslatableEntityType.EXPLORATION,
         exploration.id,
@@ -259,7 +259,7 @@ def update_opportunity_with_updated_exploration(exp_id):
             model.
     """
     updated_exploration = exp_fetchers.get_exploration_by_id(exp_id)
-    content_count = translation_services.get_content_count(updated_exploration)
+    content_count = updated_exploration.get_content_count()
     translation_counts = translation_services.get_translation_counts(
         feconf.TranslatableEntityType.EXPLORATION,
         updated_exploration.id,

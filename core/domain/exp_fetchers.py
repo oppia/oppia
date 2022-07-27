@@ -209,10 +209,8 @@ def get_exploration_from_model(
     # is necessary.
     if (run_conversion and exploration_model.states_schema_version !=
             feconf.CURRENT_STATE_SCHEMA_VERSION):
-        next_content_id_index = (
-            _migrate_states_schema(
-                versioned_exploration_states, init_state_name)
-        )
+        next_content_id_index = _migrate_states_schema(
+            versioned_exploration_states, init_state_name)
     if next_content_id_index is not None:
         exploration_model.next_content_id_index = next_content_id_index
 

@@ -20,6 +20,7 @@ from __future__ import annotations
 
 from core import feconf
 from core import utils
+from core.domain import exp_domain
 from core.domain import translation_domain
 from core.tests import test_utils
 
@@ -45,8 +46,9 @@ class DummyTranslatableObjectWithTwoParams(
             translation_domain.TranslatableContentsCollection())
 
         translatable_contents_collection.add_translatable_field(
-            translation_domain.TranslatableContentFormat.UNICODE_STRING,
             'content_id_1',
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
+            translation_domain.ContentType.CONTENT,
             self.param1)
         translatable_contents_collection.add_fields_from_translatable_object(
             self.param2)
@@ -72,8 +74,9 @@ class DummyTranslatableObjectWithSingleParam(
             translation_domain.TranslatableContentsCollection())
 
         translatable_contents_collection.add_translatable_field(
-            translation_domain.TranslatableContentFormat.UNICODE_STRING,
             'content_id_2',
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
+            translation_domain.ContentType.CONTENT,
             self.param3)
         return translatable_contents_collection
 
@@ -99,12 +102,14 @@ class DummyTranslatableObjectWithDuplicateContentIdForParams(
             translation_domain.TranslatableContentsCollection())
 
         translatable_contents_collection.add_translatable_field(
-            translation_domain.TranslatableContentFormat.UNICODE_STRING,
             'content_id_2',
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
+            translation_domain.ContentType.CONTENT,
             self.param1)
         translatable_contents_collection.add_translatable_field(
-            translation_domain.TranslatableContentFormat.UNICODE_STRING,
             'content_id_2',
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
+            translation_domain.ContentType.CONTENT,
             self.param2)
         return translatable_contents_collection
 
@@ -149,20 +154,24 @@ class DummyTranslatableObjectWithFourParams(
             translation_domain.TranslatableContentsCollection())
 
         translatable_contents_collection.add_translatable_field(
-            translation_domain.TranslatableContentFormat.UNICODE_STRING,
             'content_id_1',
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
+            translation_domain.ContentType.HINT,
             self.param1)
         translatable_contents_collection.add_translatable_field(
-            translation_domain.TranslatableContentFormat.UNICODE_STRING,
             'content_id_2',
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
+            translation_domain.ContentType.DEFAULT_OUTCOME,
             self.param2)
         translatable_contents_collection.add_translatable_field(
-            translation_domain.TranslatableContentFormat.UNICODE_STRING,
             'content_id_3',
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
+            translation_domain.ContentType.CONTENT,
             self.param3)
         translatable_contents_collection.add_translatable_field(
-            translation_domain.TranslatableContentFormat.UNICODE_STRING,
             'content_id_4',
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
+            translation_domain.ContentType.CONTENT,
             self.param4)
         return translatable_contents_collection
 
@@ -210,10 +219,10 @@ class BaseTranslatableObjectUnitTest(test_utils.GenericTestBase):
             'TranslatableContentsCollection.'):
             translatable_object.get_translatable_contents_collection()
 
-    def test_get_all_contents_which_need_translations_method(self) -> None:
+    def test_get_all_contents_which_need_translations(self) -> None:
         translation_dict = {
             'content_id_3': translation_domain.TranslatedContent(
-                'My name is Nikhil.', True)
+                'My name is Nikhil.', 'html', True)
         }
         entity_translations = translation_domain.EntityTranslation(
             'exp_id', feconf.TranslatableEntityType.EXPLORATION, 1, 'en',
@@ -223,7 +232,7 @@ class BaseTranslatableObjectUnitTest(test_utils.GenericTestBase):
             'My name is jack.', 'My name is jhon.', 'My name is Nikhil.', '')
         contents_which_need_translation = (
             translatable_object.get_all_contents_which_need_translations(
-                entity_translations))
+                entity_translations).values())
 
         expected_list_of_contents_which_need_translataion = [
             'My name is jack.',
@@ -245,7 +254,7 @@ class EntityTranslationsUnitTests(test_utils.GenericTestBase):
     def test_creation_of_object(self) -> None:
         translation_dict = {
             'content_id_1': translation_domain.TranslatedContent(
-                'My name is Nikhil.', False)
+                'My name is Nikhil.', 'html', False)
         }
         entity_translations = translation_domain.EntityTranslation(
             'exp_id', feconf.TranslatableEntityType.EXPLORATION, 1, 'en',
@@ -269,42 +278,36 @@ class TranslatableContentUnitTests(test_utils.GenericTestBase):
     def test_creation_of_object(self) -> None:
         translatable_content = translation_domain.TranslatableContent(
             'content_id_1',
+            translation_domain.ContentType.CONTENT,
+            translation_domain.TranslatableContentFormat.HTML,
             'My name is Jhon.',
-            translation_domain.TranslatableContentFormat.HTML
         )
 
         self.assertEqual(translatable_content.content_id, 'content_id_1')
         self.assertEqual(translatable_content.content_value, 'My name is Jhon.')
+
+        self.assertEqual(
+            translatable_content.content_format,
+            translation_domain.TranslatableContentFormat.HTML)
         self.assertEqual(
             translatable_content.content_type,
-            translation_domain.TranslatableContentFormat.HTML)
+            translation_domain.ContentType.CONTENT)
 
-    def test_from_dict_method_of_translatable_content_class(self) -> None:
-        translatable_content = (
-                translation_domain.TranslatableContent.from_dict({
-                'content_id': 'content_id_1',
-                'content_value': 'My name is Jhon.',
-                'content_type': translation_domain
-                .TranslatableContentFormat.HTML
-            })
-        )
-
-        self.assertEqual(translatable_content.content_id, 'content_id_1')
-        self.assertEqual(translatable_content.content_value, 'My name is Jhon.')
-        self.assertEqual(
-            translatable_content.content_type,
-            translation_domain.TranslatableContentFormat.HTML)
 
     def test_to_dict_method_of_translatable_content_class(self) -> None:
         translatable_content_dict = {
             'content_id': 'content_id_1',
             'content_value': 'My name is Jhon.',
-            'content_type': translation_domain.TranslatableContentFormat.HTML
+            'content_type': 'content',
+            'content_format': 'html',
+            'interaction_id': None,
+            'rule_type': None
         }
         translatable_content = translation_domain.TranslatableContent(
             'content_id_1',
-            'My name is Jhon.',
-            translation_domain.TranslatableContentFormat.HTML
+            translation_domain.ContentType.CONTENT,
+            translation_domain.TranslatableContentFormat.HTML,
+            'My name is Jhon.'
         )
 
         self.assertEqual(
@@ -318,25 +321,21 @@ class TranslatedContentUnitTests(test_utils.GenericTestBase):
 
     def test_creation_of_object(self) -> None:
         translated_content = translation_domain.TranslatedContent(
-            'My name is Nikhil.', False)
-
-        self.assertEqual(translated_content.content_value, 'My name is Nikhil.')
-        self.assertEqual(translated_content.needs_update, False)
-
-    def test_from_dict_method_of_translated_content_class(self) -> None:
-        translated_content = translation_domain.TranslatedContent.from_dict({
-            'content_value': 'My name is Nikhil.',
-            'needs_update': False
-        })
+            'My name is Nikhil.',
+            translation_domain.TranslatableContentFormat.HTML,
+            False)
 
         self.assertEqual(translated_content.content_value, 'My name is Nikhil.')
         self.assertEqual(translated_content.needs_update, False)
 
     def test_to_dict_method_of_translated_content_class(self) -> None:
         translated_content = translation_domain.TranslatedContent(
-            'My name is Nikhil.', False)
+            'My name is Nikhil.',
+            translation_domain.TranslatableContentFormat.HTML,
+            False)
         translated_content_dict = {
             'content_value': 'My name is Nikhil.',
+            'content_format': 'html',
             'needs_update': False
         }
 
@@ -397,252 +396,3 @@ class MachineTranslationTests(test_utils.GenericTestBase):
                 'translated_text': 'hola mundo'
             }
         )
-
-
-# def test_get_languages_with_complete_translation(self):
-#         exploration = exp_domain.Exploration.create_default_exploration('0')
-#         self.assertEqual(
-#             exploration.get_languages_with_complete_translation(), [])
-#         written_translations = state_domain.WrittenTranslations.from_dict({
-#             'translations_mapping': {
-#                 'content': {
-#                     'hi': {
-#                         'data_format': 'html',
-#                         'translation': '<p>Translation in Hindi.</p>',
-#                         'needs_update': False
-#                     }
-#                 }
-#             }
-#         })
-#         exploration.states[
-#             feconf.DEFAULT_INIT_STATE_NAME].update_written_translations(
-#                 written_translations)
-
-#         self.assertEqual(
-#             exploration.get_languages_with_complete_translation(), ['hi'])
-
-#     def test_get_translation_counts_with_no_needs_update(self):
-#         exploration = exp_domain.Exploration.create_default_exploration('0')
-#         self.assertEqual(
-#             exploration.get_translation_counts(), {})
-
-#         init_state = exploration.states[exploration.init_state_name]
-#         init_state.update_content(
-#             state_domain.SubtitledHtml.from_dict({
-#                 'content_id': 'content_0',
-#                 'html': '<p>This is content</p>'
-#             }))
-#         init_state.update_interaction_id('TextInput')
-#         default_outcome = state_domain.Outcome(
-#             'Introduction', state_domain.SubtitledHtml(
-#                 'default_outcome', '<p>The default outcome.</p>'),
-#             False, [], None, None
-#         )
-
-#         init_state.update_interaction_default_outcome(default_outcome)
-
-#         written_translations = state_domain.WrittenTranslations.from_dict({
-#             'translations_mapping': {
-#                 'content': {
-#                     'hi': {
-#                         'data_format': 'html',
-#                         'translation': '<p>Translation in Hindi.</p>',
-#                         'needs_update': False
-#                     }
-#                 },
-#                 'default_outcome': {
-#                     'hi': {
-#                         'data_format': 'html',
-#                         'translation': '<p>Translation in Hindi.</p>',
-#                         'needs_update': False
-#                     }
-#                 }
-#             }
-#         })
-#         init_state.update_written_translations(written_translations)
-
-#         exploration.add_states(['New state'])
-#         new_state = exploration.states['New state']
-#         new_state.update_content(
-#             state_domain.SubtitledHtml.from_dict({
-#                 'content_id': 'content_0',
-#                 'html': '<p>This is content</p>'
-#             }))
-#         new_state.update_interaction_id('TextInput')
-#         default_outcome = state_domain.Outcome(
-#             'Introduction', state_domain.SubtitledHtml(
-#                 'default_outcome', '<p>The default outcome.</p>'),
-#             False, [], None, None)
-#         new_state.update_interaction_default_outcome(default_outcome)
-
-#         written_translations = state_domain.WrittenTranslations.from_dict({
-#             'translations_mapping': {
-#                 'content': {
-#                     'hi': {
-#                         'data_format': 'html',
-#                         'translation': '<p>New state translation in Hindi.</p>',
-#                         'needs_update': False
-#                     }
-#                 },
-#                 'default_outcome': {
-#                     'hi': {
-#                         'data_format': 'html',
-#                         'translation': '<p>New State translation in Hindi.</p>',
-#                         'needs_update': False
-#                     }
-#                 }
-#             }
-#         })
-#         new_state.update_written_translations(written_translations)
-
-#         self.assertEqual(
-#             exploration.get_translation_counts(), {'hi': 4})
-
-#     def test_get_translation_counts_with_needs_update(self):
-#         exploration = exp_domain.Exploration.create_default_exploration('0')
-#         self.assertEqual(
-#             exploration.get_translation_counts(), {})
-
-#         init_state = exploration.states[feconf.DEFAULT_INIT_STATE_NAME]
-#         init_state.update_content(
-#             state_domain.SubtitledHtml.from_dict({
-#                 'content_id': 'content_0',
-#                 'html': '<p>This is content</p>'
-#             }))
-#         init_state.update_interaction_id('TextInput')
-#         default_outcome = state_domain.Outcome(
-#             'Introduction', state_domain.SubtitledHtml(
-#                 'default_outcome', '<p>The default outcome.</p>'),
-#             False, [], None, None
-#         )
-#         init_state.update_interaction_default_outcome(default_outcome)
-
-#         written_translations = state_domain.WrittenTranslations.from_dict({
-#             'translations_mapping': {
-#                 'content': {
-#                     'hi': {
-#                         'data_format': 'html',
-#                         'translation': '<p>Translation in Hindi.</p>',
-#                         'needs_update': True
-#                     }
-#                 },
-#                 'default_outcome': {
-#                     'hi': {
-#                         'data_format': 'html',
-#                         'translation': '<p>Translation in Hindi.</p>',
-#                         'needs_update': False
-#                     }
-#                 }
-#             }
-#         })
-#         init_state.update_written_translations(written_translations)
-
-#         self.assertEqual(
-#             exploration.get_translation_counts(), {'hi': 1})
-
-#     def test_get_translation_counts_with_translation_in_multiple_lang(self):
-#         exploration = exp_domain.Exploration.create_default_exploration('0')
-#         self.assertEqual(
-#             exploration.get_translation_counts(), {})
-#         init_state = exploration.states[feconf.DEFAULT_INIT_STATE_NAME]
-#         init_state.update_content(
-#             state_domain.SubtitledHtml.from_dict({
-#                 'content_id': 'content_0',
-#                 'html': '<p>This is content</p>'
-#             }))
-#         init_state.update_interaction_id('TextInput')
-#         default_outcome = state_domain.Outcome(
-#             'Introduction', state_domain.SubtitledHtml(
-#                 'default_outcome', '<p>The default outcome.</p>'),
-#             False, [], None, None
-#         )
-
-#         init_state.update_interaction_default_outcome(default_outcome)
-
-#         written_translations = state_domain.WrittenTranslations.from_dict({
-#             'translations_mapping': {
-#                 'content': {
-#                     'hi-en': {
-#                         'data_format': 'html',
-#                         'translation': '<p>Translation in Hindi.</p>',
-#                         'needs_update': False
-#                     },
-#                     'hi': {
-#                         'data_format': 'html',
-#                         'translation': '<p>Translation in Hindi.</p>',
-#                         'needs_update': False
-#                     }
-#                 },
-#                 'default_outcome': {
-#                     'hi': {
-#                         'data_format': 'html',
-#                         'translation': '<p>Translation in Hindi.</p>',
-#                         'needs_update': False
-#                     }
-#                 }
-#             }
-#         })
-#         init_state.update_written_translations(written_translations)
-
-#         self.assertEqual(
-#             exploration.get_translation_counts(), {
-#                 'hi': 2,
-#                 'hi-en': 1
-#             })
-
-#     def test_get_content_count(self):
-#         # Adds 1 to content count to exploration (content, default_outcome).
-#         exploration = exp_domain.Exploration.create_default_exploration('0')
-#         self.assertEqual(exploration.get_content_count(), 1)
-
-#         # Adds 2 to content count to exploration (content default_outcome).
-#         exploration.add_states(['New state'])
-#         init_state = exploration.states[exploration.init_state_name]
-
-#         # Adds 1 to content count to exploration (ca_placeholder_0)
-#         self.set_interaction_for_state(init_state, 'TextInput')
-
-#         state_answer_group = state_domain.AnswerGroup(
-#             state_domain.Outcome(
-#                 exploration.init_state_name, state_domain.SubtitledHtml(
-#                     'feedback_1', 'Feedback'),
-#                 False, [], None, None),
-#             [
-#                 state_domain.RuleSpec(
-#                     'Contains',
-#                     {
-#                         'x':
-#                         {
-#                             'contentId': 'rule_input_5',
-#                             'normalizedStrSet': ['Test']
-#                         }
-#                     })
-#             ],
-#             [],
-#             None
-#         )
-#         # Adds 1 to content count to exploration (feedback_1).
-#         init_state.update_interaction_answer_groups([state_answer_group])
-
-#         hints_list = [
-#             state_domain.Hint(
-#                 state_domain.SubtitledHtml('hint_1', '<p>hint one</p>')
-#             )
-#         ]
-#         # Adds 1 to content count to exploration (hint_1).
-#         init_state.update_interaction_hints(hints_list)
-
-#         solution_dict = {
-#             'answer_is_exclusive': False,
-#             'correct_answer': 'helloworld!',
-#             'explanation': {
-#                 'content_id': 'solution',
-#                 'html': '<p>hello_world is a string</p>'
-#             },
-#         }
-#         solution = state_domain.Solution.from_dict(
-#             init_state.interaction.id, solution_dict)
-#         # Adds 1 to content count to exploration (solution).
-#         init_state.update_interaction_solution(solution)
-
-#         self.assertEqual(exploration.get_content_count(), 6)

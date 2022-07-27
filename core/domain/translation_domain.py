@@ -99,28 +99,6 @@ class TranslatableContent:
         self.interaction_id = interaction_id
         self.rule_type = rule_type
 
-    @classmethod
-    def from_dict(
-        cls,
-        translatable_content_dict: TranslatableContentDict
-    ) -> TranslatableContent:
-        """Returns a TranslatableContent object from its dict representation.
-
-        Args:
-            translatable_content_dict: dict. The dict representation of
-                TranslatableContent object.
-
-        Returns:
-            TranslatableContent. An instance of TranslatableContent class.
-        """
-        return cls(
-            translatable_content_dict['content_id'],
-            translatable_content_dict['content_type'],
-            translatable_content_dict['content_format'],
-            translatable_content_dict['content_value'],
-            translatable_content_dict['interaction_id'],
-            translatable_content_dict['rule_type'])
-
     def to_dict(self) -> TranslatableContentDict:
         """Returns the dict representation of TranslatableContent object.
 
@@ -161,25 +139,6 @@ class TranslatedContent:
         self.content_format = content_format
         self.needs_update = needs_update
 
-    @classmethod
-    def from_dict(
-        cls,
-        translated_content_dict: feconf.TranslatedContentDict
-    ) -> TranslatedContent:
-        """Returns a TranslatedContent object from its dict representation.
-
-        Args:
-            translated_content_dict: TranslatedContentDict. Dict representation
-                of TranslatedContent object.
-
-        Returns:
-            TranslatedContent. An instance of TranslatedContent class.
-        """
-        return cls(
-            translated_content_dict['content_value'],
-            translated_content_dict['content_format'],
-            translated_content_dict['needs_update'])
-
     def to_dict(self) -> feconf.TranslatedContentDict:
         """Returns the dict representation of TranslatedContent object.
 
@@ -190,7 +149,7 @@ class TranslatedContent:
         """
         return {
             'content_value': self.content_value,
-            'content_format': self.content_format,
+            'content_format': self.content_format.value,
             'needs_update': self.needs_update
         }
 
@@ -289,7 +248,7 @@ class BaseTranslatableObject:
 
     def get_all_contents_which_need_translations(
         self,
-        entity_translation: EntityTranslation
+        entity_translation: EntityTranslation = None
     ) -> List[TranslatableContent]:
         """Returns a list of TranslatableContent instances which need new or
         updated translations.
@@ -301,15 +260,24 @@ class BaseTranslatableObject:
         Returns:
             list(TranslatableContent). Returns a list of TranslatableContent.
         """
+        if entity_translation is None:
+            entity_translation = EntityTranslation.create_empty(
+                entity_type=feconf.TranslatableEntityType.EXPLORATION,
+                entity_id='',
+                language_code='')
+
         translatable_content_list = (
             self.get_translatable_contents_collection()
             .content_id_to_translatable_content.values())
+
         content_ids_for_translated_contents = (
             entity_translation.translations.keys())
 
         content_id_to_translatable_content = {}
 
         for translatable_content in translatable_content_list:
+            # TODO(#6178): Remove empty html checks once we add a validation
+            # check that ensures each content should be non-empty html.
             if translatable_content.content_value == '':
                 continue
 
@@ -380,6 +348,20 @@ class BaseTranslatableObject:
             return False
 
         return True
+
+
+    def get_content_count(self):
+        """Returns the total number of distinct content fields available in the
+        exploration which are user facing and can be translated into
+        different languages.
+
+        (The content field includes state content, feedback, hints, solutions.)
+
+        Returns:
+            int. The total number of distinct content fields available inside
+            the exploration.
+        """
+        return len(self.get_all_contents_which_need_translations())
 
 
 class EntityTranslation:
@@ -482,10 +464,11 @@ class EntityTranslation:
                         content_value)
 
     def add_translation(
+        self,
         content_id: str,
         content_value: feconf.ContentValueType,
         content_format: TranslatableContentFormat,
-        needs_update: boolean):
+        needs_update: bool):
         """Adds new TranslatedContent in the object."""
         self.translations[content_id] = TranslatedContent(
             content_value, content_format, needs_update)
@@ -497,7 +480,7 @@ class EntityTranslation:
         return cls(
             entity_id=entity_id,
             entity_type=entity_type,
-            entity_version=0,
+            entity_version=entity_version,
             language_code=language_code,
             translations={}
         )
@@ -1024,7 +1007,7 @@ class ContentIdGenerator:
         """Constructs an ContentIdGenerator object."""
         self.next_content_id_index = start_index
 
-    def generate(self, content_type: ContentType, extra_prefix='') -> str:
+    def generate(self, content_type: ContentType, extra_prefix=None) -> str:
         """Generates the new content-id from the next content id."""
         content_id = content_type.value + '_'
         if extra_prefix:

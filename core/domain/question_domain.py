@@ -1297,11 +1297,8 @@ class Question(translation_domain.BaseTranslatableObject):
             current_state_schema_version, current_state_schema_version + 1))
 
         if current_state_schema_version == 50:
-            versioned_exploration_states['states'], next_content_id_index = (
-                conversion_fn(
-                    versioned_exploration_states['states'],
-                    init_state_name
-                )
+            versioned_question_state['state'], next_content_id_index = (
+                conversion_fn(versioned_question_state['state'])
             )
             return next_content_id_index
 

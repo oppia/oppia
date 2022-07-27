@@ -797,7 +797,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             'subtopic_id': 1,
             'new_value': {
                 'html': '<p>New Value</p>',
-                'content_id': 'content_0'
+                'content_id': 'content'
             }
         })]
         topic_services.update_topic_and_subtopic_pages(
@@ -828,12 +828,12 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                     .SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML),
                 'old_value': {
                     'html': '',
-                    'content_id': 'content_0'
+                    'content_id': 'content'
                 },
                 'subtopic_id': 2,
                 'new_value': {
                     'html': '<p>New Value</p>',
-                    'content_id': 'content_0'
+                    'content_id': 'content'
                 }
             }),
             subtopic_page_domain.SubtopicPageChange({
@@ -930,7 +930,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 'subtopic_id': 2,
                 'new_value': {
                     'html': '<p>New Value</p>',
-                    'content_id': 'content_0'
+                    'content_id': 'content'
                 }
             }),
         ]

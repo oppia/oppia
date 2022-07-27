@@ -1460,8 +1460,8 @@ def update_exploration(
         updated_exploration.version,
         content_ids_corresponding_translations_to_remove,
         content_ids_corresponding_translations_to_mark_needs_update,
-        translation_services.get_content_count(updated_exploration)
-        )
+        updated_exploration.get_content_count()
+    )
 
     # Update summary of changed exploration in a deferred task.
     taskqueue_services.defer(

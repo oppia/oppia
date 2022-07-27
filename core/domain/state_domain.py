@@ -3250,7 +3250,10 @@ class State(translation_domain.BaseTranslatableObject):
         Yields:
             (str|list(str), str). A tuple containing content and content-id.
         """
-        yield state_dict['content'], translation_domain.ContentType.CONTENT
+        yield (
+            state_dict['content'],
+            translation_domain.ContentType.CONTENT,
+            None)
 
         interaction = state_dict['interaction']
 
@@ -3258,12 +3261,16 @@ class State(translation_domain.BaseTranslatableObject):
         if default_outcome is not None:
             yield (
                 default_outcome['feedback'],
-                translation_domain.ContentType.FEEDBACK)
+                translation_domain.ContentType.FEEDBACK,
+                None)
 
         answer_groups = interaction['answer_groups']
         for answer_group in answer_groups:
             outcome = answer_group['outcome']
-            yield outcome['feedback'], translation_domain.ContentType.FEEDBACK
+            yield (
+                outcome['feedback'],
+                translation_domain.ContentType.FEEDBACK,
+                None),
 
             if interaction['id'] not in ['TextInput', 'SetInput']:
                 continue
@@ -3276,13 +3283,15 @@ class State(translation_domain.BaseTranslatableObject):
                         yield input_value, translation_domain.ContentType.RULE
 
         for hint in interaction['hints']:
-            yield hint['hint_content'], translation_domain.ContentType.HINT
+            yield (
+                hint['hint_content'], translation_domain.ContentType.HINT, None)
 
         solution = interaction['solution']
         if solution is not None:
             yield (
                 solution['explanation'],
-                translation_domain.ContentType.SOLUTION)
+                translation_domain.ContentType.SOLUTION,
+                None)
 
         interaction_id = interaction['id']
         customisation_args = interaction['customization_args']
@@ -3309,7 +3318,8 @@ class State(translation_domain.BaseTranslatableObject):
                 for content in contents:
                     yield (
                         content,
-                        translation_domain.ContentType.CUSTOMIZATION_ARG
+                        translation_domain.ContentType.CUSTOMIZATION_ARG,
+                        spec["name"]
                     )
 
     @classmethod
@@ -3332,14 +3342,15 @@ class State(translation_domain.BaseTranslatableObject):
         for state_name in sorted(states_dict.keys()):
             state = states_dict[state_name]
             voiceovers = []
-            for content, content_type in (
+            for content, content_type, extra_prefix in (
                 cls.traverse_v49_state_dict_for_contents(state)
             ):
                 content_id_key = 'content_id'
                 if content_type == translation_domain.ContentType.RULE:
                     content_id_key = 'contentId'
                 old_content_id = content[content_id_key]
-                new_content_id = content_id_generator.generate(content_type)
+                new_content_id = content_id_generator.generate(
+                    content_type, extra_prefix=extra_prefix)
 
                 voiceovers_mapping = (
                     state['recorded_voiceovers'][
@@ -3381,19 +3392,17 @@ class State(translation_domain.BaseTranslatableObject):
         for state_name in sorted(states_dict.keys()):
             old_id_to_new_id = {}
 
-            for content, content_type in (
+            for content, content_type, extra_prefix in (
                 cls.traverse_v49_state_dict_for_contents(
                     states_dict[state_name])
             ):
-                if content_type == translation_domain.ContentType.INTERACTION:
-                    old_id_to_new_id[content.content_id] = (
-                        content_id_generator.generate(content_type))
-                elif content_type == translation_domain.ContentType.RULE:
+                if content_type == translation_domain.ContentType.RULE:
                     old_id_to_new_id[content['contentId']] = (
                         content_id_generator.generate(content_type))
                 else:
                     old_id_to_new_id[content['content_id']] = (
-                        content_id_generator.generate(content_type))
+                        content_id_generator.generate(
+                            content_type, extra_prefix=extra_prefix))
 
             states_to_content_id[state_name] = old_id_to_new_id
 

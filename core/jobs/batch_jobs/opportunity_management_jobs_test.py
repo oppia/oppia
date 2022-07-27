@@ -453,7 +453,7 @@ class GenerateExplorationOpportunitySummariesJobTests(
             objective='objective',
             language_code='cs',
             init_state_name='state',
-            states_schema_version=48,
+            states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
             states={
                 'state': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
                     'state',  'content_0', 'default_outcome_1',
@@ -462,6 +462,7 @@ class GenerateExplorationOpportunitySummariesJobTests(
             },
             next_content_id_index=2
         )
+        exp_model.states['state']['content']['html'] = 'A text for translation'
         exp_model.update_timestamps()
         datastore_services.put_multi([
             exp_model, story_model, self.topic_model, topic_rights_model
@@ -541,18 +542,20 @@ class GenerateExplorationOpportunitySummariesJobTests(
             objective='objective',
             language_code='en',
             init_state_name='state1',
-            states_schema_version=48,
+            states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
             states={
                 'state1': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
                     'state1',  'content_0', 'default_outcome_1',
                     is_initial_state=True
                 ).to_dict(),
                 'state2': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
-                    'state2',  'content_2', 'default_outcome_3',
+                    'state2', 'content_2', 'default_outcome_3',
                 ).to_dict()
             },
             next_content_id_index=4
         )
+        exp_model.states['state1']['content']['html'] = 'A text for translation'
+        exp_model.states['state2']['content']['html'] = 'A text for translation'
         exp_model.update_timestamps()
         datastore_services.put_multi([self.topic_model, exp_model, story_model])
 
@@ -799,7 +802,7 @@ class GenerateExplorationOpportunitySummariesJobTests(
             objective='objective',
             language_code='en',
             init_state_name='state1',
-            states_schema_version=48,
+            states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
             states={
                 'state1': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
                     'state1',  'content_0', 'default_outcome_1',
@@ -811,6 +814,8 @@ class GenerateExplorationOpportunitySummariesJobTests(
             },
             next_content_id_index=4
         )
+        exp_model.states['state1']['content']['html'] = 'A text for translation'
+        exp_model.states['state2']['content']['html'] = 'A text for translation'
         exp_model.update_timestamps()
         datastore_services.put_multi([
             exp_model, story_model, topic_model, topic_rights_model

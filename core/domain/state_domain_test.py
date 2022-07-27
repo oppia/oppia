@@ -3334,7 +3334,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             translatable_content.content_value
             for translatable_content in
             state.get_all_contents_which_need_translations(
-                self.dummy_entity_translations)
+                self.dummy_entity_translations).values()
         ]
 
         self.assertItemsEqual(
@@ -3369,7 +3369,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             translatable_content.content_value
             for translatable_content in
             state.get_all_contents_which_need_translations(
-                self.dummy_entity_translations)
+                self.dummy_entity_translations).values()
         ]
 
         self.assertItemsEqual(

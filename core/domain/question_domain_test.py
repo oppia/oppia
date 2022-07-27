@@ -290,16 +290,23 @@ class QuestionDomainTest(test_utils.GenericTestBase):
     def setUp(self):
         """Before each individual test, create a question."""
         super(QuestionDomainTest, self).setUp()
-        self.content_id_generator = translation_domain.ContentIdGenerator()
+        content_id_generator = translation_domain.ContentIdGenerator()
         question_state_data = self._create_valid_question_data(
-            'ABC', self.content_id_generator)
+            'ABC', content_id_generator)
         self.question = question_domain.Question(
             'question_id', question_state_data,
             feconf.CURRENT_STATE_SCHEMA_VERSION, 'en', 1, ['skill1'],
-            ['skillId12345-123'], content_id_generator.next_content_id_index)
+            ['skillId12345-123'],
+            content_id_generator.next_content_id_index)
+
+        self.content_id_generator = translation_domain.ContentIdGenerator()
+        self.question_state_dict = (
+            question_domain.Question.create_default_question_state(
+                self.content_id_generator
+            ).to_dict())
         translation_dict = {
             'content_id_3': translation_domain.TranslatedContent(
-                'My name is Nikhil.', True)
+                'My name is Nikhil.', 'html', True)
         }
         self.dummy_entity_translations = translation_domain.EntityTranslation(
             'question_id', feconf.TranslatableEntityType.QUESTION, 1, 'hi',
@@ -309,17 +316,17 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         """Test to verify to_dict and from_dict methods
         of Question domain object.
         """
-        default_question_state_data = (
-            question_domain.Question.create_default_question_state())
         question_dict = {
             'id': 'col1.random',
-            'question_state_data': default_question_state_data.to_dict(),
+            'question_state_data': self.question_state_dict,
             'question_state_data_schema_version': (
                 feconf.CURRENT_STATE_SCHEMA_VERSION),
             'language_code': 'en',
             'version': 1,
             'linked_skill_ids': ['skill1'],
-            'inapplicable_skill_misconception_ids': ['skill1-123']
+            'inapplicable_skill_misconception_ids': ['skill1-123'],
+            'next_content_id_index': (
+                self.content_id_generator.next_content_id_index)
         }
 
         observed_object = question_domain.Question.from_dict(question_dict)
@@ -495,8 +502,11 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         skill_ids = ['test_skill1', 'test_skill2']
         question = question_domain.Question.create_default_question(
             question_id, skill_ids)
+        content_id_generator = translation_domain.ContentIdGenerator()
         default_question_data = (
-            question_domain.Question.create_default_question_state().to_dict())
+            question_domain.Question.create_default_question_state(
+                content_id_generator
+            ).to_dict())
 
         self.assertEqual(question.id, question_id)
         self.assertEqual(
@@ -538,8 +548,9 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         """Test to verify update_question_state_data method of the Question
         domain object.
         """
+        content_id_generator = translation_domain.ContentIdGenerator()
         question_state_data = self._create_valid_question_data(
-            'Test', self.content_id_generator)
+            'Test', content_id_generator)
 
         self.question.update_question_state_data(question_state_data)
         self.question.update_next_content_id_index(
@@ -551,18 +562,16 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
     def test_question_state_dict_conversion_from_v27_to_v28(self):
-        question_data = (
-            question_domain.Question.create_default_question_state().to_dict())
 
-        test_data = question_data['recorded_voiceovers']
-        question_data['content_ids_to_audio_translations'] = (
+        test_data = self.question_state_dict['recorded_voiceovers']
+        self.question_state_dict['content_ids_to_audio_translations'] = (
             test_data['voiceovers_mapping'])
 
-        # Removing 'recorded_voiceovers' from question_data.
-        del question_data['recorded_voiceovers']
+        # Removing 'recorded_voiceovers' from self.question_state_dict.
+        del self.question_state_dict['recorded_voiceovers']
 
         test_value = {
-            'state': question_data,
+            'state': self.question_state_dict,
             'state_schema_version': 27
         }
 
@@ -577,14 +586,12 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             test_value['state']['recorded_voiceovers'], test_data)
 
     def test_question_state_dict_conversion_from_v28_to_v29(self):
-        question_data = (
-            question_domain.Question.create_default_question_state().to_dict())
 
-        # Removing 'solicit_answer_details' from question_data.
-        del question_data['solicit_answer_details']
+        # Removing 'solicit_answer_details' from self.question_state_dict.
+        del self.question_state_dict['solicit_answer_details']
 
         test_value = {
-            'state': question_data,
+            'state': self.question_state_dict,
             'state_schema_version': 28
         }
 
@@ -599,17 +606,15 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             test_value['state']['solicit_answer_details'], False)
 
     def test_question_state_dict_conversion_from_v29_to_v30(self):
-        question_data = (
-            question_domain.Question.create_default_question_state().to_dict())
 
-        question_data['interaction']['answer_groups'] = [
+        self.question_state_dict['interaction']['answer_groups'] = [
             {
                 'tagged_misconception_id': 1
             }
         ]
 
         test_value = {
-            'state': question_data,
+            'state': self.question_state_dict,
             'state_schema_version': 29
         }
 
@@ -634,17 +639,15 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             'answer_groups'][0]['tagged_skill_misconception_id'])
 
     def test_question_state_dict_conversion_from_v30_to_v31(self):
-        question_data = (
-            question_domain.Question.create_default_question_state().to_dict())
 
-        question_data['recorded_voiceovers']['voiceovers_mapping'] = {
+        self.question_state_dict['recorded_voiceovers']['voiceovers_mapping'] = {
             'content': {
                 'audio_metadata': {}
             }
         }
 
         test_value = {
-            'state': question_data,
+            'state': self.question_state_dict,
             'state_schema_version': 30
         }
 
@@ -670,25 +673,23 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
     def test_question_state_dict_conversion_from_v31_to_v32(self):
-        question_data = (
-            question_domain.Question.create_default_question_state().to_dict())
 
-        question_data['interaction']['id'] = 'SetInput'
+        self.question_state_dict['interaction']['id'] = 'SetInput'
 
         test_value = {
-            'state': question_data,
+            'state': self.question_state_dict,
             'state_schema_version': 31
         }
 
         self.assertEqual(
-            question_data['interaction']['customization_args'], {})
+            self.question_state_dict['interaction']['customization_args'], {})
 
         question_domain.Question.update_state_from_model(
             test_value, test_value['state_schema_version'])
 
         self.assertEqual(test_value['state_schema_version'], 32)
         self.assertEqual(
-            question_data['interaction']['customization_args'],
+            self.question_state_dict['interaction']['customization_args'],
             {
                 'buttonText': {
                     'value': 'Add item'
@@ -697,25 +698,23 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
     def test_question_state_dict_conversion_from_v32_to_v33(self):
-        question_data = (
-            question_domain.Question.create_default_question_state().to_dict())
 
-        question_data['interaction']['id'] = 'MultipleChoiceInput'
+        self.question_state_dict['interaction']['id'] = 'MultipleChoiceInput'
 
         test_value = {
-            'state': question_data,
+            'state': self.question_state_dict,
             'state_schema_version': 32
         }
 
         self.assertEqual(
-            question_data['interaction']['customization_args'], {})
+            self.question_state_dict['interaction']['customization_args'], {})
 
         question_domain.Question.update_state_from_model(
             test_value, test_value['state_schema_version'])
 
         self.assertEqual(test_value['state_schema_version'], 33)
         self.assertEqual(
-            question_data['interaction']['customization_args'],
+            self.question_state_dict['interaction']['customization_args'],
             {
                 'showChoicesInShuffledOrder': {
                     'value': True
@@ -724,15 +723,13 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
     def test_question_state_dict_conversion_from_v33_to_v34(self):
-        question_data = (
-            question_domain.Question.create_default_question_state().to_dict())
 
-        question_data['content']['html'] = '<br/>'
-        question_data['interaction']['default_outcome'][
+        self.question_state_dict['content']['html'] = '<br/>'
+        self.question_state_dict['interaction']['default_outcome'][
             'feedback']['html'] = '<br/>'
 
         test_value = {
-            'state': question_data,
+            'state': self.question_state_dict,
             'state_schema_version': 33
         }
 
@@ -757,11 +754,9 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
     def test_question_state_dict_conversion_from_v34_to_v35(self):
-        question_data = (
-            question_domain.Question.create_default_question_state().to_dict())
 
-        question_data['interaction']['id'] = 'MathExpressionInput'
-        question_data['interaction']['solution'] = {
+        self.question_state_dict['interaction']['id'] = 'MathExpressionInput'
+        self.question_state_dict['interaction']['solution'] = {
             'answer_is_exclusive': False,
             'correct_answer': {
                 'ascii': '1'
@@ -771,7 +766,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                 'html': '<p>This is a solution.</p>'
             }
         }
-        question_data['interaction']['answer_groups'] = [
+        self.question_state_dict['interaction']['answer_groups'] = [
             {
                 'rule_specs': [{
                     'inputs': {
@@ -823,15 +818,12 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                 },
             }
         ]
-        question_data['recorded_voiceovers']['voiceovers_mapping'] = {
-            'temp_id': {}, 'temp_id_2': {}, 'temp_id_3': {}, 'temp_id_4': {}
-        }
-        question_data['written_translations']['translations_mapping'] = {
+        self.question_state_dict['recorded_voiceovers']['voiceovers_mapping'] = {
             'temp_id': {}, 'temp_id_2': {}, 'temp_id_3': {}, 'temp_id_4': {}
         }
 
         test_value = {
-            'state': question_data,
+            'state': self.question_state_dict,
             'state_schema_version': 34
         }
 
@@ -846,11 +838,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self.assertEqual(
             test_value['state']['recorded_voiceovers'][
                 'voiceovers_mapping'],
-            {'temp_id_3': {}}
-        )
-        self.assertEqual(
-           test_value['state']['written_translations'][
-               'translations_mapping'],
             {'temp_id_3': {}}
         )
         self.assertEqual(
@@ -904,9 +891,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         test_value['state']['recorded_voiceovers']['voiceovers_mapping'] = {
             'temp_id': {}
         }
-        test_value['state']['written_translations']['translations_mapping'] = {
-            'temp_id': {}
-        }
         test_value['state_schema_version'] = 34
 
         question_domain.Question.update_state_from_model(
@@ -958,9 +942,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         test_value['state']['recorded_voiceovers']['voiceovers_mapping'] = {
             'temp_id': {}
         }
-        test_value['state']['written_translations']['translations_mapping'] = {
-            'temp_id': {}
-        }
         test_value['state_schema_version'] = 34
 
         question_domain.Question.update_state_from_model(
@@ -982,10 +963,8 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
     def test_question_state_dict_conversion_from_v35_to_v36(self):
-        question_data = (
-            question_domain.Question.create_default_question_state().to_dict())
 
-        question_data['written_translations']['translations_mapping'] = {
+        self.question_state_dict['written_translations']['translations_mapping'] = {
             'temp_id_1': {
                 'en': {
                     'html': 'html_body_1'
@@ -999,7 +978,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         }
 
         test_value = {
-            'state': question_data,
+            'state': self.question_state_dict,
             'state_schema_version': 35
         }
 
@@ -1216,18 +1195,16 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
     def test_question_state_dict_conversion_from_v36_to_v37(self):
-        question_data = (
-            question_domain.Question.create_default_question_state().to_dict())
 
-        question_data['interaction']['id'] = 'TextInput'
-        question_data['interaction']['answer_groups'] = [{
+        self.question_state_dict['interaction']['id'] = 'TextInput'
+        self.question_state_dict['interaction']['answer_groups'] = [{
             'rule_specs': [{
                 'rule_type': 'CaseSensitiveEquals'
             }]
         }]
 
         test_value = {
-            'state': question_data,
+            'state': self.question_state_dict,
             'state_schema_version': 36
         }
 
@@ -1242,21 +1219,19 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
     def test_question_state_dict_conversion_from_v37_to_v38(self):
-        question_data = (
-            question_domain.Question.create_default_question_state().to_dict())
 
-        question_data['interaction']['id'] = 'MathEquationInput'
-        question_data['interaction']['answer_groups'] = [{
+        self.question_state_dict['interaction']['id'] = 'MathEquationInput'
+        self.question_state_dict['interaction']['answer_groups'] = [{
             'rule_specs': [{
                 'inputs': {
                     'x': 'variable=pi'
                 }
             }]
         }]
-        question_data['interaction']['customization_args'] = {}
+        self.question_state_dict['interaction']['customization_args'] = {}
 
         test_value = {
-            'state': question_data,
+            'state': self.question_state_dict,
             'state_schema_version': 37
         }
 
@@ -1265,7 +1240,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
         self.assertEqual(test_value['state_schema_version'], 38)
         self.assertEqual(
-            question_data['interaction']['customization_args'],
+            self.question_state_dict['interaction']['customization_args'],
             {
                 'customOskLetters': {
                     'value': ['a', 'b', 'e', 'i', 'l', 'r', 'v', 'π']
@@ -1274,16 +1249,14 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
     def test_question_state_dict_conversion_from_v38_to_v39(self):
-        question_data = (
-            question_domain.Question.create_default_question_state().to_dict())
 
-        question_data['interaction']['id'] = 'NumericExpressionInput'
-        question_data['interaction']['customization_args'] = {}
-        question_data['recorded_voiceovers']['voiceovers_mapping'] = {}
-        question_data['written_translations']['translations_mapping'] = {}
+        self.question_state_dict['interaction']['id'] = 'NumericExpressionInput'
+        self.question_state_dict['interaction']['customization_args'] = {}
+        self.question_state_dict['recorded_voiceovers']['voiceovers_mapping'] = {}
+        self.question_state_dict['written_translations']['translations_mapping'] = {}
 
         test_value = {
-            'state': question_data,
+            'state': self.question_state_dict,
             'state_schema_version': 38
         }
 
@@ -1313,11 +1286,9 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
     def test_question_state_dict_conversion_from_v39_to_v40(self):
-        question_data = (
-            question_domain.Question.create_default_question_state().to_dict())
 
-        question_data['interaction']['id'] = 'TextInput'
-        question_data['interaction']['answer_groups'] = [{
+        self.question_state_dict['interaction']['id'] = 'TextInput'
+        self.question_state_dict['interaction']['answer_groups'] = [{
             'rule_specs': [{
                 'inputs': {
                     'x': 'variable=pi'
@@ -1327,7 +1298,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         }]
 
         test_value = {
-            'state': question_data,
+            'state': self.question_state_dict,
             'state_schema_version': 39
         }
 
@@ -1345,11 +1316,11 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
     def test_question_state_dict_conversion_from_v40_to_v41(self):
-        question_data = (
-            question_domain.Question.create_default_question_state().to_dict())
-
-        question_data['interaction']['id'] = 'TextInput'
-        question_data['interaction']['answer_groups'] = [{
+        self.question_state_dict['written_translations'] = {
+            'translation_mapping': {}
+        }
+        self.question_state_dict['interaction']['id'] = 'TextInput'
+        self.question_state_dict['interaction']['answer_groups'] = [{
             'rule_specs': [{
                 'rule_type': 'standard',
                 'inputs': {
@@ -1357,12 +1328,11 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                 },
             }]
         }]
-        question_data['next_content_id_index'] = 0
-        question_data['recorded_voiceovers']['voiceovers_mapping'] = {}
-        question_data['written_translations']['translations_mapping'] = {}
+        self.question_state_dict['next_content_id_index'] = 0
+        self.question_state_dict['recorded_voiceovers']['voiceovers_mapping'] = {}
 
         test_value = {
-            'state': question_data,
+            'state': self.question_state_dict,
             'state_schema_version': 40
         }
 
@@ -1383,10 +1353,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             test_value['state']['recorded_voiceovers']['voiceovers_mapping'],
             {'rule_input_0': {}}
         )
-        self.assertEqual(
-            test_value['state']['written_translations']['translations_mapping'],
-            {'rule_input_0': {}}
-        )
 
         # Testing with interaction id 'SetInput'.
         test_value['state']['interaction']['id'] = 'SetInput'
@@ -1400,7 +1366,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         }]
         test_value['state']['next_content_id_index'] = 0
         test_value['state']['recorded_voiceovers']['voiceovers_mapping'] = {}
-        test_value['state']['written_translations']['translations_mapping'] = {}
         test_value['state_schema_version'] = 40
 
         question_domain.Question.update_state_from_model(
@@ -1420,20 +1385,14 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             test_value['state']['recorded_voiceovers']['voiceovers_mapping'],
             {'rule_input_0': {}}
         )
-        self.assertEqual(
-            test_value['state']['written_translations']['translations_mapping'],
-            {'rule_input_0': {}}
-        )
 
     def test_question_state_dict_conversion_from_v41_to_v42(self):
-        question_data = (
-            question_domain.Question.create_default_question_state().to_dict())
 
-        question_data['interaction']['id'] = 'ItemSelectionInput'
-        question_data['interaction']['solution'] = {
+        self.question_state_dict['interaction']['id'] = 'ItemSelectionInput'
+        self.question_state_dict['interaction']['solution'] = {
             'correct_answer': ['correct_value']
         }
-        question_data['interaction']['customization_args'] = {
+        self.question_state_dict['interaction']['customization_args'] = {
             'choices': {
                 'value': [
                     {'html': 'correct_value', 'content_id': 'content_id_1'},
@@ -1442,7 +1401,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                 ]
             }
         }
-        question_data['interaction']['answer_groups'] = [{
+        self.question_state_dict['interaction']['answer_groups'] = [{
             'rule_specs': [{
                 'inputs': {
                     'x': ['correct_value'],
@@ -1452,7 +1411,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         }]
 
         test_value = {
-            'state': question_data,
+            'state': self.question_state_dict,
             'state_schema_version': 41
         }
 
@@ -1579,13 +1538,11 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
     def test_question_state_dict_conversion_from_v42_to_v43(self):
-        question_data = (
-            question_domain.Question.create_default_question_state().to_dict())
 
-        question_data['interaction']['id'] = 'NumericExpressionInput'
+        self.question_state_dict['interaction']['id'] = 'NumericExpressionInput'
 
         test_value = {
-            'state': question_data,
+            'state': self.question_state_dict,
             'state_schema_version': 42
         }
 
@@ -1608,12 +1565,10 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
     def test_question_state_dict_conversion_from_v43_to_v44(self):
-        question_data = (
-            question_domain.Question.create_default_question_state().to_dict())
-        del question_data['card_is_checkpoint']
+        del self.question_state_dict['card_is_checkpoint']
 
         test_value = {
-            'state': question_data,
+            'state': self.question_state_dict,
             'state_schema_version': 43
         }
 
@@ -1624,14 +1579,11 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
         self.assertEqual(test_value['state_schema_version'], 44)
         self.assertEqual(test_value['state']['card_is_checkpoint'], False)
-
     def test_question_state_dict_conversion_from_v44_to_v45(self):
-        question_data = (
-            question_domain.Question.create_default_question_state().to_dict())
-        del question_data['linked_skill_id']
+        del self.question_state_dict['linked_skill_id']
 
         test_value = {
-            'state': question_data,
+            'state': self.question_state_dict,
             'state_schema_version': 44
         }
 
@@ -1644,11 +1596,9 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self.assertIsNone(test_value['state']['linked_skill_id'])
 
     def test_question_state_dict_conversion_from_v45_to_v46(self):
-        question_data = (
-            question_domain.Question.create_default_question_state().to_dict())
 
         test_value = {
-            'state': question_data,
+            'state': self.question_state_dict,
             'state_schema_version': 45
         }
 
@@ -1661,17 +1611,15 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self.assertEqual(test_value['state'], initial_json)
 
     def test_question_state_dict_conversion_from_v46_to_v47(self):
-        question_data = (
-            question_domain.Question.create_default_question_state().to_dict())
 
-        question_data['content']['html'] = (
+        self.question_state_dict['content']['html'] = (
             '<oppia-noninteractive-svgdiagram '
             'svg_filename-with-value="filename.svg">'
             '</oppia-noninteractive-svgdiagram>'
         )
 
         test_value = {
-            'state': question_data,
+            'state': self.question_state_dict,
             'state_schema_version': 46
         }
 
@@ -1688,13 +1636,11 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
     def test_question_state_dict_conversion_from_v47_to_v48(self):
-        question_data = (
-            question_domain.Question.create_default_question_state().to_dict())
 
-        question_data['content']['html'] = '&nbsp;'
+        self.question_state_dict['content']['html'] = '&nbsp;'
 
         test_value = {
-            'state': question_data,
+            'state': self.question_state_dict,
             'state_schema_version': 47
         }
 
@@ -1705,13 +1651,11 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self.assertEqual(test_value['state']['content']['html'], ' ')
 
     def test_question_state_dict_conversion_from_v48_to_v49(self):
-        question_data = (
-            question_domain.Question.create_default_question_state().to_dict())
 
-        question_data['interaction']['id'] = 'NumericInput'
+        self.question_state_dict['interaction']['id'] = 'NumericInput'
 
         test_value = {
-            'state': question_data,
+            'state': self.question_state_dict,
             'state_schema_version': 48
         }
 
@@ -1734,14 +1678,12 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
 
     def test_question_state_dict_conversion_from_v49_to_v50(self):
-        question_data = (
-            question_domain.Question.create_default_question_state().to_dict())
 
-        question_data['interaction']['id'] = 'AlgebraicExpressionInput'
-        question_data['interaction']['customization_args'] = {
+        self.question_state_dict['interaction']['id'] = 'AlgebraicExpressionInput'
+        self.question_state_dict['interaction']['customization_args'] = {
             'customOskLetters': ['a', 'b', 'c']
         }
-        question_data['interaction']['answer_groups'] = [{
+        self.question_state_dict['interaction']['answer_groups'] = [{
             'outcome': {
                 'dest': 'abc',
                 'feedback': {
@@ -1770,7 +1712,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         }]
 
         test_value = {
-            'state': question_data,
+            'state': self.question_state_dict,
             'state_schema_version': 49
         }
 
@@ -1795,7 +1737,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             translatable_content.content_value
             for translatable_content in
             self.question.get_all_contents_which_need_translations(
-                self.dummy_entity_translations)
+                self.dummy_entity_translations).values()
         ]
 
         self.assertItemsEqual(
