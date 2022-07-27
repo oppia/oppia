@@ -1,4 +1,4 @@
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,28 +16,28 @@
  * @fileoverview End-to-end tests for the story viewer.
  */
 
-var action = require('../protractor_utils/action.js');
-var forms = require('../protractor_utils/forms.js');
-var general = require('../protractor_utils/general.js');
-var users = require('../protractor_utils/users.js');
-var waitFor = require('../protractor_utils/waitFor.js');
-var workflow = require('../protractor_utils/workflow.js');
+var action = require('../webdriverio_utils/action.js');
+var forms = require('../webdriverio_utils/forms.js');
+var general = require('../webdriverio_utils/general.js');
+var users = require('../webdriverio_utils/users.js');
+var waitFor = require('../webdriverio_utils/waitFor.js');
+var workflow = require('../webdriverio_utils/workflow.js');
 
-var AdminPage = require('../protractor_utils/AdminPage.js');
-var Constants = require('../protractor_utils/ProtractorConstants.js');
+var AdminPage = require('../webdriverio_utils/AdminPage.js');
+var Constants = require('../webdriverio_utils/WebdriverioConstants.js');
 var TopicsAndSkillsDashboardPage =
-  require('../protractor_utils/TopicsAndSkillsDashboardPage.js');
+  require('../webdriverio_utils/TopicsAndSkillsDashboardPage.js');
 var TopicAndStoryViewerPage = require(
-  '../protractor_utils/TopicAndStoryViewerPage.js');
-var TopicViewerPage = require('../protractor_utils/TopicViewerPage.js');
-var TopicEditorPage = require('../protractor_utils/TopicEditorPage.js');
-var StoryEditorPage = require('../protractor_utils/StoryEditorPage.js');
-var SubTopicViewerPage = require('../protractor_utils/SubTopicViewerPage.js');
+  '../webdriverio_utils/TopicAndStoryViewerPage.js');
+var TopicViewerPage = require('../webdriverio_utils/TopicViewerPage.js');
+var TopicEditorPage = require('../webdriverio_utils/TopicEditorPage.js');
+var StoryEditorPage = require('../webdriverio_utils/StoryEditorPage.js');
+var SubTopicViewerPage = require('../webdriverio_utils/SubTopicViewerPage.js');
 var ExplorationEditorPage =
-  require('../protractor_utils/ExplorationEditorPage.js');
+  require('../webdriverio_utils/ExplorationEditorPage.js');
 var ExplorationPlayerPage =
-  require('../protractor_utils/ExplorationPlayerPage.js');
-var SkillEditorPage = require('../protractor_utils/SkillEditorPage.js');
+  require('../webdriverio_utils/ExplorationPlayerPage.js');
+var SkillEditorPage = require('../webdriverio_utils/SkillEditorPage.js');
 
 describe('Topic and Story viewer functionality', function() {
   var adminPage = null;
@@ -88,6 +88,15 @@ describe('Topic and Story viewer functionality', function() {
     subTopicViewerPage = new SubTopicViewerPage.SubTopicViewerPage();
     await users.createAndLoginCurriculumAdminUser(
       'creator@storyViewer.com', 'creatorStoryViewer');
+
+    // The below lines enable the end_chapter_celebration flag in prod mode.
+    // They should be removed after the end_chapter_celebration flag is
+    // deprecated.
+    await adminPage.getFeaturesTab();
+    var endChapterFlag = (
+      await adminPage.getEndChapterCelebrationFeatureElement());
+    await adminPage.enableFeatureForProd(endChapterFlag);
+
     await createDummyExplorations();
     var handle = await browser.getWindowHandle();
     await topicsAndSkillsDashboardPage.get();
@@ -97,7 +106,7 @@ describe('Topic and Story viewer functionality', function() {
     await topicEditorPage.updateMetaTagContent('topic meta tag');
     await topicEditorPage.updatePageTitleFragment('topic page title');
     await topicEditorPage.saveTopic('Added thumbnail.');
-    var url = await browser.getCurrentUrl();
+    var url = await browser.getUrl();
     var topicId = url.split('/')[4].slice(0, -1);
     await general.closeCurrentTabAndSwitchTo(handle);
     await adminPage.editConfigProperty(
@@ -116,7 +125,7 @@ describe('Topic and Story viewer functionality', function() {
     await skillEditorPage.addRubricExplanationForDifficulty(
       'Easy', 'Second explanation for easy difficulty.');
     await skillEditorPage.saveOrPublishSkill('Edited rubrics');
-    var url = await browser.getCurrentUrl();
+    var url = await browser.getUrl();
     skillId = url.split('/')[4];
     await skillEditorPage.get(skillId);
 
@@ -193,7 +202,7 @@ describe('Topic and Story viewer functionality', function() {
 
     // Signing up with the login button should redirect the user back to the
     // exploration.
-    var loginButton = element(by.css('.e2e-test-login-button'));
+    var loginButton = $('.e2e-test-login-button');
     await action.click('Login button', loginButton);
     await users.createAndLoginUser(
       'newStoryViewer@storyviewer.com', 'newStoryViewer', false);
@@ -204,6 +213,51 @@ describe('Topic and Story viewer functionality', function() {
     await topicAndStoryViewerPage.expectCompletedLessonCountToBe(2);
     await topicAndStoryViewerPage.expectUncompletedLessonCountToBe(1);
     await users.logout();
+  });
+
+  it('should dismiss sign-up section and load practice session page upon' +
+  'clicking the practice session card on the last state.', async function() {
+    await topicAndStoryViewerPage.get(
+      'math', 'topic-tasv-one', 'storyplayertasvone');
+
+    await topicAndStoryViewerPage.goToChapterIndex(0);
+    await explorationPlayerPage.submitAnswer('Continue', null);
+
+    await topicAndStoryViewerPage.waitForSignUpSection();
+    await topicAndStoryViewerPage.dismissSignUpSection();
+    await topicAndStoryViewerPage.waitForSignUpSectionToDisappear();
+
+    await waitFor.clientSideRedirection(async() => {
+      // Click the practice session card to trigger redirection.
+      await topicAndStoryViewerPage.goToPracticeSessionFromRecommendations();
+    }, (url) => {
+      // Wait until the URL has changed to that of the practice tab.
+      return (/practice/.test(url));
+    }, async() => {
+      // Wait until the practice tab is loaded.
+      await topicAndStoryViewerPage.waitForPracticeTabContainer();
+    });
+  });
+
+  it('should load the next chapter upon clicking the next chapter ' +
+    'card on the last state.',
+  async function() {
+    await topicAndStoryViewerPage.get(
+      'math', 'topic-tasv-one', 'storyplayertasvone');
+
+    await topicAndStoryViewerPage.goToChapterIndex(0);
+    await explorationPlayerPage.submitAnswer('Continue', null);
+
+    await waitFor.clientSideRedirection(async() => {
+      // Click the next chapter card to trigger redirection.
+      await topicAndStoryViewerPage.goToNextChapterFromRecommendations();
+    }, (url) => {
+      // Wait until the URL has changed to that of the next chapter.
+      return (/node_id=node_2/.test(url));
+    }, async() => {
+      // Wait until the conversation-skin of the next chapter is loaded.
+      await topicAndStoryViewerPage.waitForConversationSkinCardsContainer();
+    });
   });
 
   it(
