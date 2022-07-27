@@ -43,7 +43,7 @@
         </oppia-progress-nav>
       </div>
       <div *ngIf="recommendedExplorationSummaries && recommendedExplorationSummaries.length > 0 && ((!isEndChapterCelebrationFeatureEnabled() && inStoryMode) || (collectionSummary && isOnTerminalCard() && isCurrentCardAtEndOfTranscript()))" class="conversation-skin-next-lesson-wrapper">
-        <div class="oppia-conversation-skin-next-lession-text-container">
+        <div class="oppia-conversation-skin-next-lesson-text-container">
           <span class="conversation-skin-next-lesson-text" translate="I18N_NEXT_LESSON"></span>
           <span *ngIf="!isHackyExpTitleTranslationDisplayed(recommendedExplorationSummaries[0].id)">
             {{ recommendedExplorationSummaries[0].title }}
