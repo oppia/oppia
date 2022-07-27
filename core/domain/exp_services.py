@@ -1723,6 +1723,36 @@ def revert_version_history(
         new_version_history_model.put()
 
 
+def get_exploration_version_valid_info(exploration_id, revert_to_version):
+    """Tests whether an exploration can be reverted to the given version
+    number. Does not commit any changes.
+
+    Args:
+        exploration_id: str. The id of the exploration to be reverted to the
+            current version.
+        revert_to_version: int. The version to which the given exploration
+            is to be reverted.
+
+    Returns:
+        dict{'valid': bool, 'details': Optional[str]}. If the revert_to_version
+        passes all backend validation checks, then 'details' is None.
+        Otherwise, 'details' stores the validation error as a string.
+    """
+    # Validate the previous version of the exploration.
+    exploration = exp_fetchers.get_exploration_by_id(
+        exploration_id, version=revert_to_version)
+    exploration_rights = rights_manager.get_exploration_rights(exploration.id)
+    try:
+        if exploration_rights.status != rights_domain.ACTIVITY_STATUS_PRIVATE:
+            exploration.validate(strict=True)
+        else:
+            exploration.validate()
+    except Exception as ex:
+        return {'valid': False, 'details': str(ex)}
+
+    return {'valid': True, 'details': None}
+
+
 def revert_exploration(
         committer_id, exploration_id, current_version, revert_to_version):
     """Reverts an exploration to the given version number. Commits changes.
@@ -1754,15 +1784,9 @@ def revert_exploration(
             'which is too old. Please reload the page and try again.'
             % (exploration_model.version, current_version))
 
-    # Validate the previous version of the exploration before committing the
-    # change.
+    # Assume revert_to_version passes all backend validation checks.
     exploration = exp_fetchers.get_exploration_by_id(
         exploration_id, version=revert_to_version)
-    exploration_rights = rights_manager.get_exploration_rights(exploration.id)
-    if exploration_rights.status != rights_domain.ACTIVITY_STATUS_PRIVATE:
-        exploration.validate(strict=True)
-    else:
-        exploration.validate()
 
     exp_models.ExplorationModel.revert(
         exploration_model, committer_id,

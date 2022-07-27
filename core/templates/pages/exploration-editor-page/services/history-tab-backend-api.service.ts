@@ -24,11 +24,21 @@ interface HistoryTabBackendDict {
   'summaries': string[];
 }
 
-interface HistoryTabResposne {
+interface HistoryTabResponse {
   summaries: string[];
 }
 
-interface HistoryTabPostData{
+interface HistoryTabCheckRevertValidBackendDict {
+  'valid': boolean;
+  'details': string | null;
+}
+
+interface HistoryTabCheckRevertValidResponse {
+  valid: boolean;
+  details: string | null;
+}
+
+interface HistoryTabData{
   revertExplorationUrl: string;
   currentVersion: number;
   revertToVersion: number;
@@ -42,13 +52,19 @@ export class HistoryTabBackendApiService {
         private http: HttpClient
   ) {}
 
-  getData(explorationAllSnapshotsUrl: string): Promise<HistoryTabResposne> {
+  getData(explorationAllSnapshotsUrl: string): Promise<HistoryTabResponse> {
     return this.http.get<HistoryTabBackendDict>(
       explorationAllSnapshotsUrl
     ).toPromise();
   }
 
-  postData(data: HistoryTabPostData): Promise<HistoryTabResposne> {
+  getCheckRevertValidData(revertExplorationUrl: string):
+      Promise<HistoryTabCheckRevertValidResponse> {
+    return this.http.get<HistoryTabCheckRevertValidBackendDict>(
+      revertExplorationUrl).toPromise();
+  }
+
+  postData(data: HistoryTabData): Promise<HistoryTabResponse> {
     return this.http.post<HistoryTabBackendDict>(
       data.revertExplorationUrl,
       {

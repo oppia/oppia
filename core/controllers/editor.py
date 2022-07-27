@@ -710,6 +710,26 @@ class ExplorationSnapshotsHandler(EditorHandler):
         })
 
 
+class ExplorationCheckRevertValidHandler(EditorHandler):
+    """Checks if an older version of an exploration is valid."""
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': SCHEMA_FOR_EXPLORATION_ID
+        },
+        'version': {
+            'schema': SCHEMA_FOR_VERSION
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+    @acl_decorators.can_edit_exploration
+    def get(self, exploration_id, version):
+        """Handles GET requests."""
+        self.render_json(exp_services.get_exploration_version_valid_info(
+            exploration_id, version))
+
+
 class ExplorationRevertHandler(EditorHandler):
     """Reverts an exploration to an older version."""
 
