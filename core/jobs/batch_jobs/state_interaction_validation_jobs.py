@@ -536,12 +536,12 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
         rule_value_f = rule_spec.inputs['f']
         if rule_value_f['wholeNumber'] == 0:
             rule_value_f = float(
-                rule_value_f['numerator']/rule_value_f['denominator']
+                rule_value_f['numerator'] / rule_value_f['denominator']
             )
         else:
             rule_value_f = float(
                 rule_value_f['wholeNumber'] +
-                rule_value_f['numerator']/rule_value_f['denominator']
+                rule_value_f['numerator'] / rule_value_f['denominator']
             )
 
         return rule_value_f
@@ -1115,7 +1115,7 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
         """
         try:
             exp_model = exp_fetchers.get_exploration_from_model(exp)
-        except:
+        except Exception:
             return None
         return exp_model
 
