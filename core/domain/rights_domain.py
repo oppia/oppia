@@ -14,9 +14,9 @@
 
 """Domain objects for rights for various user actions."""
 
-import logging
-
 from __future__ import annotations
+
+import logging
 
 from core import feconf
 from core import utils
@@ -124,7 +124,6 @@ def get_username_email_from_user_ids(user_ids: list[str]) -> List[str]:
         if user_settings is None:
             logging.error('User id %s not known in list of user_ids %s' % (
                     user_ids[ind], user_ids))
-            raise Exception('User not found.')
         elif user_settings.deleted:
             usernames.append('[User being deleted]')
         elif user_settings.username:
