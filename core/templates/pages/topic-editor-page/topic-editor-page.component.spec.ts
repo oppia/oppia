@@ -70,7 +70,7 @@ describe('Topic editor page', function() {
     topic.setName('New Name');
     topic.setUrlFragment('topic-url-fragment');
     topic.setPageTitleFragmentForWeb('topic page title');
-    topic.setDiagnosticTestSkillSummaries([skillSummary]);
+    topic.setSkillSummariesForDiagnosticTest([skillSummary]);
     TopicEditorStateService.setTopic(topic);
     spyOn(TopicEditorStateService, 'getTopic').and.returnValue(topic);
     $scope = $rootScope.$new();

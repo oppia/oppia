@@ -213,10 +213,10 @@ describe('Topic update service', function() {
 
   it('should create a proper backend change dict for updating the skill Ids ' +
      'for diagnostic test', function() {
-    _sampleTopic.setDiagnosticTestSkillSummaries([_secondSkillSummary]);
+    _sampleTopic.setSkillSummariesForDiagnosticTest([_secondSkillSummary]);
     topicUpdateService.updateDiagnosticTestSkills(
       _sampleTopic, [_firstSkillSummary]);
-    expect(_sampleTopic.getDiagnosticTestSkillSummaries()).toEqual(
+    expect(_sampleTopic.getSkillSummariesForDiagnosticTest()).toEqual(
       [_firstSkillSummary]);
     expect(undoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'update_topic_property',
@@ -225,7 +225,7 @@ describe('Topic update service', function() {
       old_value: ['skill_2']
     }]);
     undoRedoService.undoChange(_sampleTopic);
-    expect(_sampleTopic.getDiagnosticTestSkillSummaries()).toEqual(
+    expect(_sampleTopic.getSkillSummariesForDiagnosticTest()).toEqual(
       [_secondSkillSummary]);
   });
 

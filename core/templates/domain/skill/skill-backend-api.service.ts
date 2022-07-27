@@ -62,6 +62,10 @@ interface DoesSkillWithDescriptionExistBackendResponse {
   'skill_description_exists': boolean;
 }
 
+interface CheckSkillAssignmnetForDiagnosticTestBackendResponse {
+  'skill_is_assigned_for_diagnostic_test': boolean;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -181,6 +185,33 @@ export class SkillBackendApiService {
       Promise<boolean> {
     return new Promise((resolve, reject) => {
       this._doesSkillWithDescriptionExist(description, resolve, reject);
+    });
+  }
+
+  private _checkSkillAssignmentForDiagnosticTest(
+      skillId: string,
+      successCallback: (value: boolean | PromiseLike<boolean>) => void,
+      errorCallback: (reason?: string) => void): void {
+    let skillAssignmentForDiagnosticTestUrl = (
+      this.urlInterpolationService.interpolateUrl(
+        SkillDomainConstants
+          .SKILL_ASSIGNMENT_FOR_DIAGNOSTIC_TEST_URL_TEMPLATE, {
+          skill_id: skillId
+        }));
+    this.http.get<CheckSkillAssignmnetForDiagnosticTestBackendResponse>(
+      skillAssignmentForDiagnosticTestUrl).toPromise().then((response) => {
+      if (successCallback) {
+        successCallback(response.skill_is_assigned_for_diagnostic_test);
+      }
+    }, (errorResponse) => {
+      errorCallback(errorResponse.error.error);
+    });
+  }
+
+  async checkSkillAssignmentForDiagnosticTest(skillId: string):
+      Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this._checkSkillAssignmentForDiagnosticTest(skillId, resolve, reject);
     });
   }
 }

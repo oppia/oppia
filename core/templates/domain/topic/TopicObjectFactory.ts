@@ -557,23 +557,24 @@ export class Topic {
     return this._uncategorizedSkillSummaries.slice();
   }
 
-  getDiagnosticTestSkillSummaries(): ShortSkillSummary[] {
+  getSkillSummariesForDiagnosticTest(): ShortSkillSummary[] {
     return this._skillSummariesForDiagnosticTest.slice();
   }
 
-  setDiagnosticTestSkillSummaries(
+  setSkillSummariesForDiagnosticTest(
       skillSummariesForDiagnosticTest: ShortSkillSummary[]): void {
     this._skillSummariesForDiagnosticTest = skillSummariesForDiagnosticTest;
   }
 
-  getSkillSummariesThatAreNotInDiagnosticTest(): ShortSkillSummary[] {
+  getAvailableSkillSummariesForDiagnosticTest(): ShortSkillSummary[] {
     let topicSkillSummaries = cloneDeep(this._uncategorizedSkillSummaries);
     let subtopics = this._subtopics;
     for (let i = 0; i < subtopics.length; i++) {
       topicSkillSummaries = topicSkillSummaries.concat(
         subtopics[i].getSkillSummaries());
     }
-    let diagnosticTestSkillSummaries = this.getDiagnosticTestSkillSummaries();
+    let diagnosticTestSkillSummaries = (
+      this.getSkillSummariesForDiagnosticTest());
 
     const skillIdToDiagnosticTestMap = {};
     for (let skillSummary of diagnosticTestSkillSummaries) {
@@ -601,8 +602,8 @@ export class Topic {
     this.setPracticeTabIsDisplayed(otherTopic.getPracticeTabIsDisplayed());
     this.setMetaTagContent(otherTopic.getMetaTagContent());
     this.setPageTitleFragmentForWeb(otherTopic.getPageTitleFragmentForWeb());
-    this.setDiagnosticTestSkillSummaries(
-      otherTopic.getDiagnosticTestSkillSummaries());
+    this.setSkillSummariesForDiagnosticTest(
+      otherTopic.getSkillSummariesForDiagnosticTest());
     this._version = otherTopic.getVersion();
     this._nextSubtopicId = otherTopic.getNextSubtopicId();
     this.clearAdditionalStoryReferences();

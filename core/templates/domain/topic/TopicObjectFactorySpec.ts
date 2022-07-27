@@ -171,17 +171,17 @@ describe('Topic object factory', () => {
     expect(topic.getAdditionalStoryReferences()).toEqual([]);
     expect(topic.getCanonicalStoryReferences()).toEqual([]);
     expect(topic.getUncategorizedSkillSummaries()).toEqual([]);
-    expect(topic.getDiagnosticTestSkillSummaries()).toEqual([]);
+    expect(topic.getSkillSummariesForDiagnosticTest()).toEqual([]);
   });
 
   it('should be able to correctly update skill Ids for the diagnostic test',
     () => {
       var skillSummary1 = ShortSkillSummary.create('skill_1', 'Description 1');
       var skillSummary2 = ShortSkillSummary.create('skill_1', 'Description 1');
-      expect(_sampleTopic.getDiagnosticTestSkillSummaries()).toEqual(
+      expect(_sampleTopic.getSkillSummariesForDiagnosticTest()).toEqual(
         [skillSummary1]);
-      _sampleTopic.setDiagnosticTestSkillSummaries([skillSummary2]);
-      expect(_sampleTopic.getDiagnosticTestSkillSummaries()).toEqual(
+      _sampleTopic.setSkillSummariesForDiagnosticTest([skillSummary2]);
+      expect(_sampleTopic.getSkillSummariesForDiagnosticTest()).toEqual(
         [skillSummary2]);
     });
 
@@ -194,7 +194,7 @@ describe('Topic object factory', () => {
     var shortSkillSummaries3 = ShortSkillSummary.create(
       'skill_3', 'Description 3');
     _sampleTopic._skillSummariesForDiagnosticTest = [shortSkillSummaries1];
-    expect(_sampleTopic.getSkillSummariesThatAreNotInDiagnosticTest()).toEqual(
+    expect(_sampleTopic.getAvailableSkillSummariesForDiagnosticTest()).toEqual(
       [shortSkillSummaries2, shortSkillSummaries3]);
   });
 

@@ -351,3 +351,35 @@ class SkillDescriptionHandler(base.BaseHandler):
                     skill_description))
         })
         self.render_json(self.values)
+
+
+class DiagnosticTestSkillAssignmentHandler(base.BaseHandler):
+    """A handler for checking if a skill is assigned for the diagnostic test
+    in any of the existing topics.
+    """
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'skill_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_edit_skill
+    def get(self, skill_id) -> None:
+        """Returns a boolean value that represents whether the skill is assigned
+        for the diagnostic test.
+        """
+        self.values.update({
+            'skill_is_assigned_for_diagnostic_test': (
+                skill_services.check_skill_assignment_for_diagnostic_test(
+                    skill_id))
+        })
+        self.render_json(self.values)

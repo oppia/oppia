@@ -25,8 +25,7 @@ describe('Assigned Skill Model', () => {
         topic_id: 'topicId',
         topic_name: 'topic',
         topic_version: 1,
-        subtopic_id: 2,
-        skill_ids_for_diagnostic_test: ['topicID1']
+        subtopic_id: 2
       };
 
       let assignedSkill = AssignedSkill.createFromBackendDict(backendDict);
@@ -35,6 +34,5 @@ describe('Assigned Skill Model', () => {
       expect(assignedSkill.topicName).toEqual('topic');
       expect(assignedSkill.topicVersion).toEqual(1);
       expect(assignedSkill.subtopicId).toEqual(2);
-      expect(assignedSkill.skillIdsForDiagnosticTest).toEqual(['topicID1']);
     });
 });

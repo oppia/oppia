@@ -805,7 +805,7 @@ export class TopicUpdateService {
       newSkillSummariesForDiagnosticTest: ShortSkillSummary[]
   ): void {
     let oldSkillSummariesForDiagnosticTest = cloneDeep(
-      topic.getDiagnosticTestSkillSummaries());
+      topic.getSkillSummariesForDiagnosticTest());
     let oldSkillIdsForDiagnosticTest = oldSkillSummariesForDiagnosticTest.map((
         skillSummary: ShortSkillSummary) => {
       return skillSummary.getId();
@@ -821,10 +821,10 @@ export class TopicUpdateService {
       newSkillIdsForDiagnosticTest,
       oldSkillIdsForDiagnosticTest,
       (changeDict, topic) => {
-        topic.setDiagnosticTestSkillSummaries(
+        topic.setSkillSummariesForDiagnosticTest(
           newSkillSummariesForDiagnosticTest);
       }, (changeDict, topic) => {
-        topic.setDiagnosticTestSkillSummaries(
+        topic.setSkillSummariesForDiagnosticTest(
           oldSkillSummariesForDiagnosticTest);
       });
   }

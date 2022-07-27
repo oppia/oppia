@@ -255,6 +255,55 @@ describe('Skill backend API service', () => {
     }));
 
   it(
+    'should make a request to check if skill assigned for diagnostic test.',
+    fakeAsync(() => {
+      const backendResponse = {
+        skill_is_assigned_for_diagnostic_test: false,
+      };
+      const skillId = 'skill1';
+
+      skillBackendApiService.checkSkillAssignmentForDiagnosticTest(
+        skillId).then(response => {
+        expect(response).toEqual(false);
+      });
+
+      let req = httpTestingController.expectOne(
+        '/diagnostic_test_skill_assignment_handler/skill1'
+      );
+      expect(req.request.method).toEqual('GET');
+      req.flush(backendResponse);
+
+      flushMicrotasks();
+    }));
+
+  it(
+    'should use the rejection handler if skill assigned for diagnostic test' +
+    ' request failed.', fakeAsync(() => {
+      const successHandler = jasmine.createSpy('success');
+      const failHandler = jasmine.createSpy('fail');
+
+      const skillId = 'skill1';
+
+      skillBackendApiService.checkSkillAssignmentForDiagnosticTest(
+        skillId).then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/diagnostic_test_skill_assignment_handler/skill1'
+      );
+      expect(req.request.method).toEqual('GET');
+      req.flush({
+        error: 'Some error in the backend.'
+      }, {
+        status: 500, statusText: 'Internal Server Error'
+      });
+
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith('Some error in the backend.');
+    }));
+
+  it(
     'should use the rejection handler if the skill update in the backend' +
     'failed.', fakeAsync(() => {
       const successHandler = jasmine.createSpy('success');

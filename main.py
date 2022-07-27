@@ -348,6 +348,9 @@ URLS = [
         r'%s/<skill_description>' % feconf.SKILL_DESCRIPTION_HANDLER,
         skill_editor.SkillDescriptionHandler),
     get_redirect_route(
+        r'%s/<skill_id>' % feconf.DIAGNOSTIC_TEST_SKILL_ASSIGNMENT_HANDLER,
+        skill_editor.DiagnosticTestSkillAssignmentHandler),
+    get_redirect_route(
         r'%s/story' % feconf.TOPIC_VIEWER_URL_PREFIX,
         topic_viewer.TopicViewerPage),
 

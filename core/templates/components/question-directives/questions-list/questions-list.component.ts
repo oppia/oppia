@@ -60,7 +60,6 @@ import { SkillDifficulty } from 'domain/skill/skill-difficulty.model';
 import { Subscription } from 'rxjs';
 import { ConfirmQuestionExitModalComponent } from '../modal-templates/confirm-question-exit-modal.component';
 import { QuestionEditorSaveModalComponent } from '../modal-templates/question-editor-save-modal.component';
-import { AssignedSkill } from 'domain/skill/assigned-skill.model';
 
 angular.module('oppia').component('questionsList', {
   bindings: {
@@ -84,9 +83,8 @@ angular.module('oppia').component('questionsList', {
     'QuestionObjectFactory', 'QuestionUndoRedoService',
     'QuestionValidationService', 'QuestionsListService',
     'SkillBackendApiService', 'SkillEditorRoutingService',
-    'TopicsAndSkillsDashboardBackendApiService', 'UtilsService',
-    'WindowDimensionsService', 'DEFAULT_SKILL_DIFFICULTY', 'INTERACTION_SPECS',
-    'MINIMUM_QUESTION_COUNT_FOR_A_DIAGNOSTIC_TEST_SKILL',
+    'UtilsService', 'WindowDimensionsService', 'DEFAULT_SKILL_DIFFICULTY',
+    'INTERACTION_SPECS', 'MINIMUM_QUESTION_COUNT_FOR_A_DIAGNOSTIC_TEST_SKILL',
     'NUM_QUESTIONS_PER_PAGE',
     function(
         $location, $rootScope, $timeout, AlertsService,
@@ -96,9 +94,8 @@ angular.module('oppia').component('questionsList', {
         QuestionObjectFactory, QuestionUndoRedoService,
         QuestionValidationService, QuestionsListService,
         SkillBackendApiService, SkillEditorRoutingService,
-        TopicsAndSkillsDashboardBackendApiService, UtilsService,
-        WindowDimensionsService, DEFAULT_SKILL_DIFFICULTY, INTERACTION_SPECS,
-        MINIMUM_QUESTION_COUNT_FOR_A_DIAGNOSTIC_TEST_SKILL,
+        UtilsService, WindowDimensionsService, DEFAULT_SKILL_DIFFICULTY,
+        INTERACTION_SPECS, MINIMUM_QUESTION_COUNT_FOR_A_DIAGNOSTIC_TEST_SKILL,
         NUM_QUESTIONS_PER_PAGE) {
       var ctrl = this;
       ctrl.directiveSubscriptions = new Subscription();
@@ -438,16 +435,10 @@ angular.module('oppia').component('questionsList', {
         }
 
         let skillIsAssginedForDiagnosticTest = false;
-        await TopicsAndSkillsDashboardBackendApiService
-          .fetchTopicAssignmentsForSkillAsync(
-            ctrl.selectedSkillId).then((response: AssignedSkill[]) => {
-            response.map((topic) => {
-              if (topic.skillIdsForDiagnosticTest.includes(
-                ctrl.selectedSkillId)) {
-                skillIsAssginedForDiagnosticTest = true;
-              }
-            });
-          });
+        await SkillBackendApiService.checkSkillAssignmentForDiagnosticTest(
+          ctrl.selectedSkillId).then((response: boolean) => {
+          skillIsAssginedForDiagnosticTest = response;
+        });
 
         // Should not allow question deletion if the current skill is attached
         // to the diagnostic test, and has the minimum number of questions for
@@ -456,7 +447,8 @@ angular.module('oppia').component('questionsList', {
             ctrl.getQuestionSummariesForOneSkill().length <=
             MINIMUM_QUESTION_COUNT_FOR_A_DIAGNOSTIC_TEST_SKILL) {
           AlertsService.addInfoMessage(
-            'The skill must be removed from the diagnostic test first.');
+            'The skill must be removed from the diagnostic test first.', 5000);
+          $rootScope.$applyAsync();
           return;
         }
         ctrl.deletedQuestionIds.push(questionId);

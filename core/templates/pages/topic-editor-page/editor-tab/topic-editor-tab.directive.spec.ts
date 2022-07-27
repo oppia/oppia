@@ -19,6 +19,7 @@
 
 import { EventEmitter } from '@angular/core';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { fakeAsync, tick } from '@angular/core/testing';
 import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
 import { Subtopic } from 'domain/topic/subtopic.model';
 import { StoryReference } from 'domain/topic/story-reference-object.model';
@@ -51,6 +52,8 @@ describe('Topic editor tab directive', function() {
   var StoryCreationService = null;
   var UndoRedoService = null;
   var TopicEditorRoutingService = null;
+  var QuestionBackendApiService = null;
+  var AlertsService = null;
   var mockStorySummariesInitializedEventEmitter = new EventEmitter();
 
   var mockTasdReinitializedEventEmitter = null;
@@ -85,6 +88,7 @@ describe('Topic editor tab directive', function() {
     ngbModal = $injector.get('NgbModal');
     TopicEditorStateService = $injector.get('TopicEditorStateService');
     TopicObjectFactory = $injector.get('TopicObjectFactory');
+    AlertsService = $injector.get('AlertsService');
     var MockContextSerivce = {
       getEntityType: () => 'topic',
       getEntityId: () => 'dkfn32sxssasd'
@@ -100,6 +104,7 @@ describe('Topic editor tab directive', function() {
     UndoRedoService = $injector.get('UndoRedoService');
     EntityCreationService = $injector.get('EntityCreationService');
     TopicEditorRoutingService = $injector.get('TopicEditorRoutingService');
+    QuestionBackendApiService = $injector.get('QuestionBackendApiService');
     mockTasdReinitializedEventEmitter = new EventEmitter();
 
     topicInitializedEventEmitter = new EventEmitter();
@@ -129,7 +134,8 @@ describe('Topic editor tab directive', function() {
       TopicEditorStateService: TopicEditorStateService,
       EntityCreationService: EntityCreationService,
       TopicsAndSkillsDashboardBackendApiService:
-        MockTopicsAndSkillsDashboardBackendApiService
+        MockTopicsAndSkillsDashboardBackendApiService,
+      QuestionBackendApiService: QuestionBackendApiService
     });
     var subtopic = Subtopic.createFromTitle(1, 'subtopic1');
     topic = TopicObjectFactory.createInterstitialTopic();
@@ -650,12 +656,19 @@ describe('Topic editor tab directive', function() {
   });
 
   it('should call the TopicUpdateService if skillId is added in the ' +
-     'diagnostic test', function() {
+     'diagnostic test', fakeAsync(function() {
     var updateSkillIdForDiagosticTestSpy = spyOn(
       TopicUpdateService, 'updateDiagnosticTestSkills');
-    $scope.addSkillForDiagnosticTest(skillSummary);
+    spyOn(
+      QuestionBackendApiService,
+      'fetchTotalQuestionCountForSkillIdsAsync').and.returnValue(
+      Promise.resolve(2));
+    $scope.selectedSkillForDiagnosticTest = skillSummary;
+    $scope.addSkillForDiagnosticTest();
+    $rootScope.$apply();
+    tick();
     expect(updateSkillIdForDiagosticTestSpy).toHaveBeenCalled();
-  });
+  }));
 
   it('should call the TopicUpdateService if any skillId is removed from the ' +
      'diagnostic test', function() {
@@ -669,18 +682,28 @@ describe('Topic editor tab directive', function() {
 
   it('should be able to present diagnostic test dropdown selector correctly',
     function() {
+      expect($scope.diagnosticTestSkillsDropdownIsShown).toBeFalse();
       $scope.presentDiagnosticTestSkillDropdown();
       expect($scope.diagnosticTestSkillsDropdownIsShown).toBeTrue();
 
-      $scope.removeSkillDropdownForDiagnosticTest();
+      $scope.removeDiagnosticTestSkillDropdown();
       expect($scope.diagnosticTestSkillsDropdownIsShown).toBeFalse();
     });
 
-  it('should not call the TopicUpdateService if null skill is added in the' +
-     ' diagnostic test', function() {
-    var updateSkillIdForDiagosticTestSpy = spyOn(
-      TopicUpdateService, 'updateDiagnosticTestSkills');
-    $scope.addSkillForDiagnosticTest(null);
-    expect(updateSkillIdForDiagosticTestSpy).not.toHaveBeenCalled();
-  });
+  it('should warning message when a skill with less than 2 questions is added' +
+     ' for diagnostic test.', fakeAsync(function() {
+    let alert = spyOn(AlertsService, 'addInfoMessage');
+    spyOn(
+      QuestionBackendApiService,
+      'fetchTotalQuestionCountForSkillIdsAsync').and.returnValue(
+      Promise.resolve(1));
+    $scope.selectedSkillForDiagnosticTest = skillSummary;
+    $scope.addSkillForDiagnosticTest();
+    $rootScope.$apply();
+    tick();
+
+    expect(alert).toHaveBeenCalledWith(
+      'The skill should contain at least two questions for getting assigned' +
+      ' to the diagnostic test.', 5000);
+  }));
 });

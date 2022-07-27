@@ -745,44 +745,98 @@ describe('QuestionsListComponent', () => {
         'User does not have enough rights to delete the question');
     });
 
-    it('should delete question when user is in the skill editor', () => {
-      ctrl.selectedSkillId = 'skillId1';
-      ctrl.deletedQuestionIds = [];
+    it('should delete question when user is in the skill editor',
+      fakeAsync(() => {
+        ctrl.selectedSkillId = 'skillId1';
+        ctrl.deletedQuestionIds = [];
+
+        spyOn(
+          SkillBackendApiService,
+          'checkSkillAssignmentForDiagnosticTest').and.returnValue(
+          Promise.resolve(false));
+        spyOn(ctrl, 'canEditQuestion').and.returnValue(true);
+        spyOn(AlertsService, 'addSuccessMessage');
+        spyOn(ctrl, 'getAllSkillSummaries').and.returnValue([]);
+        spyOn(EditableQuestionBackendApiService, 'editQuestionSkillLinksAsync')
+          .and.returnValue($q.resolve());
+
+        ctrl.deleteQuestionFromSkill(questionId, skillDescription);
+        $scope.$apply();
+        // We need multiple '$rootScope.$apply()' here since, the source code
+        // consists of nested promises.
+        $rootScope.$apply();
+        tick();
+        $rootScope.$apply();
+        tick();
+        $rootScope.$apply();
+        tick();
+
+        expect(AlertsService.addSuccessMessage).toHaveBeenCalledWith(
+          'Deleted Question'
+        );
+      }));
+
+    it('should not be able to delete question when the skill is assigned to ' +
+    'diagnostic test and the skill has less than equal to the minimum ' +
+    'questions for the diagnostic test.',
+    fakeAsync(() => {
+      spyOn(
+        SkillBackendApiService,
+        'checkSkillAssignmentForDiagnosticTest').and.returnValue(
+        Promise.resolve(true));
+      spyOn(AlertsService, 'addInfoMessage');
       spyOn(ctrl, 'canEditQuestion').and.returnValue(true);
       spyOn(AlertsService, 'addSuccessMessage');
       spyOn(ctrl, 'getAllSkillSummaries').and.returnValue([]);
-      spyOn(EditableQuestionBackendApiService, 'editQuestionSkillLinksAsync')
-        .and.returnValue($q.resolve());
-
       ctrl.deleteQuestionFromSkill(questionId, skillDescription);
       $scope.$apply();
+      // We need multiple '$rootScope.$apply()' here since, the source code
+      // consists of nested promises.
+      $rootScope.$apply();
+      tick();
+      $rootScope.$apply();
+      tick();
+      $rootScope.$apply();
+      tick();
 
-      expect(AlertsService.addSuccessMessage).toHaveBeenCalledWith(
-        'Deleted Question'
-      );
-    });
+      expect(AlertsService.addInfoMessage).toHaveBeenCalledOnceWith(
+        'The skill must be removed from the diagnostic test first.', 5000);
+    }));
 
-    it('should delete question when user is not in the skill editor', () => {
-      ctrl.selectedSkillId = 'skillId1';
-      ctrl.deletedQuestionIds = [];
-      spyOn(ctrl, 'canEditQuestion').and.returnValue(true);
-      spyOn(AlertsService, 'addSuccessMessage');
-      spyOn(ctrl, 'getAllSkillSummaries').and.returnValue([
-        ShortSkillSummary.createFromBackendDict({
-          skill_id: '1',
-          skill_description: 'Skill Description'
-        })
-      ]);
-      spyOn(EditableQuestionBackendApiService, 'editQuestionSkillLinksAsync')
-        .and.returnValue($q.resolve());
+    it('should delete question when user is not in the skill editor',
+      fakeAsync(() => {
+        ctrl.selectedSkillId = 'skillId1';
+        ctrl.deletedQuestionIds = [];
+        spyOn(
+          SkillBackendApiService,
+          'checkSkillAssignmentForDiagnosticTest').and.returnValue(
+          Promise.resolve(false));
+        spyOn(ctrl, 'canEditQuestion').and.returnValue(true);
+        spyOn(AlertsService, 'addSuccessMessage');
+        spyOn(ctrl, 'getAllSkillSummaries').and.returnValue([
+          ShortSkillSummary.createFromBackendDict({
+            skill_id: '1',
+            skill_description: 'Skill Description'
+          })
+        ]);
+        spyOn(EditableQuestionBackendApiService, 'editQuestionSkillLinksAsync')
+          .and.returnValue($q.resolve());
 
-      ctrl.deleteQuestionFromSkill(questionId, skillDescription);
-      $scope.$apply();
+        ctrl.deleteQuestionFromSkill(questionId, skillDescription);
+        $scope.$apply();
+        // We need multiple '$rootScope.$apply()' here since, the source code
+        // consists of nested promises.
+        $rootScope.$apply();
+        tick();
+        $rootScope.$apply();
+        tick();
+        $rootScope.$apply();
+        tick();
 
-      expect(AlertsService.addSuccessMessage).toHaveBeenCalledWith(
-        'Deleted Question'
-      );
-    });
+        expect(AlertsService.addSuccessMessage).toHaveBeenCalledWith(
+          'Deleted Question'
+        );
+      }));
   });
 
   it('should not remove skill if it is the only one', () => {

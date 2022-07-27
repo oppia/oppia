@@ -287,12 +287,12 @@
         </em>
       </div>
       <div class="oppia-diagnostic-test-skill-list-header"
-           ng-if="selectedSkillsForDiagnosticTest.length">
+           ng-if="selectedSkillSummariesForDiagnosticTest.length">
         <strong>Diagnostic test skills</strong>
       </div>
       <md-list>
         <md-list-item class="oppia-diagnostic-test-skill-items"
-                      ng-repeat="skill in selectedSkillsForDiagnosticTest">
+                      ng-repeat="skill in selectedSkillSummariesForDiagnosticTest">
           <span class="oppia-diagnostic-test-skill-description">
             {{skill.getDescription()}}
           </span>
@@ -309,14 +309,14 @@
             <select class="form-control oppia-diagnostic-test-dropdown e2e-test-diagnostic-test-skill-selector"
                     ng-model="selectedSkillForDiagnosticTest"
                     ng-change="addSkillForDiagnosticTest()"
-                    ng-options="skillSummary.getDescription() for skillSummary in availableSkillsForDiagnosticTest"
+                    ng-options="skillSummary.getDescription() for skillSummary in availableSkillSummariesForDiagnosticTest"
                     aria-label="selection dropdown">
             </select>
           </md-form-field>
           <button class="oppia-remove-diagnostic-test-skill-button"
                   md-button  md-icon-button
                   aria-label="Clear"
-                  ng-click="removeSkillDropdownForDiagnosticTest()">
+                  ng-click="removeDiagnosticTestSkillDropdown()">
             <md-icon>close</md-icon>
           </button>
         </md-list-item>
@@ -325,16 +325,16 @@
               md-button
               ng-click="presentDiagnosticTestSkillDropdown()"
               ng-show="!diagnosticTestSkillsDropdownIsShown"
-              ng-disabled="availableSkillsForDiagnosticTest.length === 0 || selectedSkillsForDiagnosticTest.length === 3">
+              ng-disabled="availableSkillSummariesForDiagnosticTest.length === 0 || selectedSkillSummariesForDiagnosticTest.length === 3">
         <div class="oppia-flex">
           <md-icon aria-label="icon-button with a plus icon">add_circle</md-icon>
           <h4 class="oppia-button-text">Add diagnostic test skills</h4>
         </div>
       </button>
       <div class="oppia-diagnostic-test-card-note">
-        <span ng-if="!availableSkillsForDiagnosticTest.length && selectedSkillsForDiagnosticTest.length < 3"><em>(No more skills left for assignment.)</em></span>
-        <span ng-if="selectedSkillsForDiagnosticTest.length === 3"><em>(The maximum limit was reached for adding skills to the diagnostic test.)</em></span>
-        <span ng-if="selectedSkillsForDiagnosticTest.length === 0 && availableSkillsForDiagnosticTest.length > 0"><em>(Please add at least 1 skill.)</em></span>
+        <span ng-if="!availableSkillSummariesForDiagnosticTest.length && selectedSkillSummariesForDiagnosticTest.length < 3"><em>(No more skills left for assignment.)</em></span>
+        <span ng-if="selectedSkillSummariesForDiagnosticTest.length === 3"><em>(The maximum limit was reached for adding skills to the diagnostic test.)</em></span>
+        <span ng-if="selectedSkillSummariesForDiagnosticTest.length === 0 && availableSkillSummariesForDiagnosticTest.length > 0"><em>(Please add at least 1 skill.)</em></span>
       </div>
     </md-card>
   </div>
