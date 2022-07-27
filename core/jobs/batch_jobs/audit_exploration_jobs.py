@@ -93,21 +93,31 @@ class ExpStateAuditChecksJob(base_jobs.JobBase):
 
     def get_exploration_from_models(
         self,
-        model_pair: Tuple[
+        model: Tuple[
             exp_models.ExplorationModel,
-            opportunity_models.ExplorationOpportunitySummaryModel
+            opportunity_models.ExplorationOpportunitySummaryModel |
+            exp_models.ExplorationModel
         ]
     ) -> exp_domain.Exploration:
-        """Returns the exploration domain object from the curated
-        exploration model.
+        """Returns the exploration domain object.
 
         Args:
-            model_pair: tuple. The pair of exp and opportunity models.
+            model: tuple|exp_models.ExplorationModel. The pair of exp and
+                opportunity models or just exp model.
 
         Returns:
-            bool. Returns whether the exp model is curated or not.
+            exp_models.ExplorationModel. Returns the exp domain object.
         """
-        return exp_fetchers.get_exploration_from_model(model_pair[0])
+        if isinstance(model, tuple):
+            try:
+                return exp_fetchers.get_exploration_from_model(model[0])
+            except:
+                return None
+        else:
+            try:
+                return exp_fetchers.get_exploration_from_model(model)
+            except:
+                return None
 
     def convert_into_model_pair(
       self,
@@ -536,13 +546,29 @@ class ExpStateAuditChecksJob(base_jobs.JobBase):
                 )
         return states_with_values
 
+    def get_exp_summary_from_model(self, exp_summ):
+        """Get exploration summary domain object.
+
+        Args:
+            exp_summ: exp_models.ExpSummaryModel. The exp summary model.
+
+        Returns:
+            exp_domain.ExplorationSummary | None. The exp summary or None.
+        """
+        try:
+            return exp_fetchers.get_exploration_summary_from_model(exp_summ)
+        except:
+            return None
+
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         all_explorations = (
             self.pipeline
             | 'Get all ExplorationModels' >> ndb_io.GetModels(
                 exp_models.ExplorationModel.get_all(include_deleted=False))
             | 'Get exploration from model' >> beam.Map(
-                exp_fetchers.get_exploration_from_model)
+                self.get_exploration_from_models)
+            | 'Filter valid explorations' >> beam.Filter(
+                lambda exp: exp is not None)
         )
 
         all_explorations_summaries = (
@@ -551,6 +577,8 @@ class ExpStateAuditChecksJob(base_jobs.JobBase):
             exp_models.ExpSummaryModel.get_all(include_deleted=False))
             | 'Get exp summary from model' >> beam.Map(
             exp_fetchers.get_exploration_summary_from_model)
+            | 'Filter valid exploration summaries' >> beam.Filter(
+                lambda exp_summ: exp_summ is not None)
         )
 
         exp_private_summ_models = (
@@ -630,6 +658,8 @@ class ExpStateAuditChecksJob(base_jobs.JobBase):
                 self.filter_curated_explorations)
             | 'Get exploration from the model' >> beam.Map(
                 self.get_exploration_from_models)
+            | 'Filter valid curated explorations' >> beam.Filter(
+                lambda exp: exp is not None)
             | 'Combine curated exp id and states' >> beam.Map(
                 lambda exp: (exp.id, exp.states, exp.created_on))
         )
