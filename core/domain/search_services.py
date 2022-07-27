@@ -62,7 +62,7 @@ def index_exploration_summaries(
     """Adds the explorations to the search index.
 
     Args:
-        exp_summaries: list(ExpSummaryModel). List of Exp Summary domain
+        exp_summaries: list(ExplorationSummary). List of Exp Summary domain
             objects to be indexed.
     """
     # The argument `documents` of add_documents_to_index() is annotated
@@ -85,7 +85,7 @@ def _exp_summary_to_search_dict(
     be indexed for further queries or not.
 
     Args:
-        exp_summary: ExpSummaryModel. ExplorationSummary domain object.
+        exp_summary: ExplorationSummary. ExplorationSummary domain object.
 
     Returns:
         dict. The representation of the given exploration, in a form that can
@@ -110,7 +110,7 @@ def _should_index_exploration(
     search queries.
 
     Args:
-        exp_summary: ExpSummaryModel. ExplorationSummary domain object.
+        exp_summary: ExplorationSummary. ExplorationSummary domain object.
 
     Returns:
         bool. Whether the given exploration should be indexed for future
@@ -158,8 +158,8 @@ def index_collection_summaries(
     """Adds the collections to the search index.
 
     Args:
-        collection_summaries: list(CollectionSummaryModel). List of
-            Collection Summary domain objects to be indexed.
+        collection_summaries: list(CollectionSummary). List of collection
+            summary domain objects to be indexed.
     """
     # The argument `documents` of add_documents_to_index() is annotated
     # with List[Dict[str, Any]] because this method can accept any kind
@@ -180,7 +180,7 @@ def _collection_summary_to_search_dict(
     """Converts a collection domain object to a search dict.
 
     Args:
-        collection_summary: CollectionSummaryModel. The collection
+        collection_summary: CollectionSummary. The collection
             summary object to be converted.
 
     Returns:
@@ -204,7 +204,7 @@ def _should_index_collection(
     """Checks if a particular collection should be indexed.
 
     Args:
-        collection: CollectionSummaryModel. The collection summary model object.
+        collection: CollectionSummary. CollectionSummary domain object.
 
     Returns:
         bool. Whether a particular collection should be indexed.
