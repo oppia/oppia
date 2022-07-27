@@ -82,7 +82,7 @@ export class ContributorDashboardPageComponent
   }
 
   provideLanguageForProtractorClass(languageDescription: string): string {
-    let lang = languageDescription.split(' ').join('-').toLowerCase();
+    const lang = languageDescription.split(' ').join('-').toLowerCase();
     return lang.replace(/\(?\)?/g, '');
   }
 
@@ -127,7 +127,7 @@ export class ContributorDashboardPageComponent
   }
 
   getLanguageDescriptions(languageCodes: string[]): string[] {
-    let languageDescriptions = [];
+    const languageDescriptions = [];
     languageCodes.forEach((languageCode) => {
       languageDescriptions.push(
         this.languageUtilService.getAudioLanguageDescription(
