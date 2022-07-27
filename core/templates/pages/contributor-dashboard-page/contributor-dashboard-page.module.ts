@@ -48,6 +48,7 @@ import { TranslationModalComponent } from './modal-templates/translation-modal.c
 import { TranslationOpportunitiesComponent } from './translation-opportunities/translation-opportunities.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
+import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
 
 @NgModule({
   imports: [
@@ -104,6 +105,7 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
       provide: HAMMER_GESTURE_CONFIG,
       useClass: MyHammerConfig
     },
+    AppErrorHandlerProvider,
     {
       provide: APP_BASE_HREF,
       useValue: '/'

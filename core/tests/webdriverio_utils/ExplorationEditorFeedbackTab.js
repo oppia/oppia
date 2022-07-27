@@ -34,7 +34,6 @@ var ExplorationEditorFeedbackTab = function() {
     '.e2e-test-exploration-feedback-subject');
   var suggestionCommitMessageInput = $('.e2e-test-suggestion-commit-message');
   var suggestionReviewMessageInput = $('.e2e-test-suggestion-review-message');
-  var suggestionRowClassNameElement = $('.e2e-test-oppia-feedback-tab-row');
   var feedbackStatusDropdown = $('.e2e-test-oppia-feedback-status-menu');
   var feedbackMessage = $('.e2e-test-exploration-feedback');
   var feedbackMessagesSelector = function() {
