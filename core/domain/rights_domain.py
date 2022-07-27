@@ -69,6 +69,7 @@ class ActivityRightsDict(TypedDict):
     viewer_names: List[str]
     viewable_if_private: bool
 
+
 def get_username_email_from_user_ids(user_ids: list(str)) -> List[str]:
     """Converts the given ids to usernames, or truncated email addresses.
 
