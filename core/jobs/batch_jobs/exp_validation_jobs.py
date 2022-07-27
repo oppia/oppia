@@ -1221,23 +1221,30 @@ class ExpStateValidationJob(base_jobs.JobBase):
         """
         return (model_pair[0] is not None) and (model_pair[1] is not None)
 
-    def get_exploration_from_models(self, model_pair: Tuple[
+    def get_exploration_from_models(self, model: Tuple[
         exp_models.ExplorationModel,
-        opportunity_models.ExplorationOpportunitySummaryModel
+        opportunity_models.ExplorationOpportunitySummaryModel |
+        exp_models.ExplorationModel
     ]) -> exp_domain.Exploration:
-        """Returns the exploration domain object from the curated
-        exploration model.
+        """Returns the exploration domain object.
 
         Args:
-            model_pair: tuple. The pair of exp and opportunity models.
+            model: tuple|exp_models.ExplorationModel. The pair of exp and
+                opportunity models.
 
         Returns:
-            bool. Returns whether the exp model is curated or not.
+            exp_models.ExplorationModel. Returns the exp domain object.
         """
-        try:
-            return exp_fetchers.get_exploration_from_model(model_pair[0])
-        except:
-            return None
+        if isinstance(model, tuple):
+            try:
+                return exp_fetchers.get_exploration_from_model(model[0])
+            except:
+                return None
+        else:
+            try:
+                return exp_fetchers.get_exploration_from_model(model)
+            except:
+                return None
 
     def convert_into_model_pair(
       self, models_list_pair: Tuple[
