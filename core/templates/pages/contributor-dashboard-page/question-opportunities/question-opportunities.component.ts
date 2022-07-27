@@ -108,7 +108,6 @@ export class QuestionOpportunitiesComponent implements OnInit {
     const questionStateData = question.getStateData();
     this.questionUndoRedoService.clearChanges();
 
-
     const modalRef = this.ngbModal.open(
       QuestionSuggestionEditorModalComponent, {
         size: 'lg',

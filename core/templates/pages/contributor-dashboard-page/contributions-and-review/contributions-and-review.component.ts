@@ -52,16 +52,7 @@ export interface Suggestion {
   author_name?: string;
 }
 
-export interface QuestionContributionsSummary {
-  id: string;
-  heading: string;
-  subheading: string;
-  labelText: string;
-  labelColor: string;
-  actionButtonTitle: string;
-}
-
-export interface TranslationContributionsSummary {
+export interface ContributionsSummary {
   id: string;
   heading: string;
   subheading: string;
@@ -83,12 +74,6 @@ export interface ContributionDetails {
   topic_name: string;
 }
 
-export interface ContributionTab {
-  suggestionType: string;
-  text: string;
-  enabled: boolean;
-}
-
 export interface SuggestionDetails {
   [key: string]: {
     suggestion: Suggestion;
@@ -96,9 +81,10 @@ export interface SuggestionDetails {
   };
 }
 
-export interface ReviewTabs {
+export interface TabDetails {
   suggestionType: string;
   text: string;
+  enabled?: boolean;
 }
 
 @Component({
@@ -121,8 +107,8 @@ export class ContributionsAndReview
   activeSuggestionType: string;
   dropdownShown: boolean;
   activeDropdownTabChoice: string;
-  reviewTabs: ReviewTabs[] = [];
-  contributionTabs: ContributionTab[];
+  reviewTabs: TabDetails[] = [];
+  contributionTabs: TabDetails[] = [];
   tabNameToOpportunityFetchFunction: unknown;
   SUGGESTION_LABELS = {
     review: {
@@ -154,11 +140,11 @@ export class ContributionsAndReview
 
   getQuestionContributionsSummary(
       suggestionIdToSuggestions: SuggestionDetails):
-      QuestionContributionsSummary[] {
+      ContributionsSummary[] {
     const questionContributionsSummaryList = [];
     Object.keys(suggestionIdToSuggestions).forEach((key) => {
-      let suggestion = suggestionIdToSuggestions[key].suggestion;
-      let details = suggestionIdToSuggestions[key].details;
+      const suggestion = suggestionIdToSuggestions[key].suggestion;
+      const details = suggestionIdToSuggestions[key].details;
       let subheading = '';
       if (details === null) {
         subheading = (
@@ -167,30 +153,31 @@ export class ContributionsAndReview
         subheading = details.skill_description;
       }
 
-      let change = suggestion.change;
-      let requiredData = {
+      const requiredData = {
         id: suggestion.suggestion_id,
         heading: this.formatRtePreviewPipe.transform(
-          change.question_dict?.question_state_data.content.html),
+          suggestion.change.question_dict?.question_state_data.content.html),
         subheading: subheading,
         labelText: this.SUGGESTION_LABELS[suggestion.status].text,
         labelColor: this.SUGGESTION_LABELS[suggestion.status].color,
         actionButtonTitle: (
           this.activeTabType === this.TAB_TYPE_REVIEWS ? 'Review' : 'View')
       };
+
       questionContributionsSummaryList.push(requiredData);
     });
+
     return questionContributionsSummaryList;
   }
 
   getTranslationContributionsSummary(
       suggestionIdToSuggestions: SuggestionDetails
-  ): TranslationContributionsSummary[] {
+  ): ContributionsSummary[] {
     const translationContributionsSummaryList = [];
 
     Object.keys(suggestionIdToSuggestions).forEach((key) => {
-      let suggestion = suggestionIdToSuggestions[key].suggestion;
-      let details = suggestionIdToSuggestions[key].details;
+      const suggestion = suggestionIdToSuggestions[key].suggestion;
+      const details = suggestionIdToSuggestions[key].details;
       let subheading = '';
       if (details === null) {
         subheading = (
@@ -201,7 +188,7 @@ export class ContributionsAndReview
           ' / ' + details.chapter_title);
       }
 
-      let requiredData = {
+      const requiredData = {
         id: suggestion.suggestion_id,
         heading: this.getTranslationSuggestionHeading(suggestion),
         subheading: subheading,
@@ -360,7 +347,7 @@ export class ContributionsAndReview
     if (suggestion.suggestion_type === this.SUGGESTION_TYPE_TRANSLATE) {
       const suggestionIdToContribution = {};
       for (let suggestionId in this.contributions) {
-        let contribution = this.contributions[suggestionId];
+        const contribution = this.contributions[suggestionId];
         suggestionIdToContribution[suggestionId] = contribution;
       }
       this.contextService.setCustomEntityContext(
@@ -373,8 +360,7 @@ export class ContributionsAndReview
 
   getContributionSummaries(
       suggestionIdToSuggestions: SuggestionDetails
-  ): TranslationContributionsSummary[] |
-    QuestionContributionsSummary[] {
+  ): ContributionsSummary[] {
     if (this.activeSuggestionType === this.SUGGESTION_TYPE_TRANSLATE) {
       return this.getTranslationContributionsSummary(suggestionIdToSuggestions);
     } else if (this.activeSuggestionType === this.SUGGESTION_TYPE_QUESTION) {

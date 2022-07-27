@@ -22,7 +22,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import AppConstants from 'assets/constants';
-import { ContributorDashboardConstants } from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
+import { ContributorDashboardConstants, ContributorDashboardTabsDetails } from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
 import { ContributionAndReviewService } from './services/contribution-and-review.service';
 import { ContributionOpportunitiesService } from './services/contribution-opportunities.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
@@ -32,12 +32,6 @@ import { TranslationLanguageService } from 'pages/exploration-editor-page/transl
 import { TranslationTopicService } from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
 import { UserService } from 'services/user.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-
-interface TabsDetails {
-  submitQuestionTab: {
-    enabled: boolean;
-  };
-}
 
 @Component({
   selector: 'contributor-dashboard-page',
@@ -55,7 +49,7 @@ export class ContributorDashboardPageComponent
   userCanReviewVoiceoverSuggestionsInLanguages: unknown[];
   userCanReviewQuestions: boolean;
   OPPIA_AVATAR_LINK_URL: string;
-  tabsDetails: TabsDetails;
+  tabsDetails: ContributorDashboardTabsDetails;
   OPPIA_AVATAR_IMAGE_URL: string;
   languageCode: string;
   topicName: string;
@@ -217,8 +211,9 @@ export class ContributorDashboardPageComponent
 
     this.activeTabName = 'myContributionTab';
 
-    this.tabsDetails = (
-      ContributorDashboardConstants.CONTRIBUTOR_DASHBOARD_TABS_DETAILS);
+    this.tabsDetails = {
+      ...ContributorDashboardConstants.CONTRIBUTOR_DASHBOARD_TABS_DETAILS
+    } as unknown as ContributorDashboardTabsDetails;
     this.OPPIA_AVATAR_LINK_URL = (
       AppConstants.OPPIA_AVATAR_LINK_URL);
     this.OPPIA_AVATAR_IMAGE_URL = (
