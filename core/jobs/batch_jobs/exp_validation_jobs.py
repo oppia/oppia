@@ -1277,7 +1277,9 @@ class ExpStateValidationJob(base_jobs.JobBase):
             | 'Get all ExplorationModels' >> ndb_io.GetModels(
                 exp_models.ExplorationModel.get_all(include_deleted=False))
             | 'Get exploration from model' >> beam.Map(
-                exp_fetchers.get_exploration_from_model)
+                self.get_exploration_from_models)
+            | 'Filter valid explorations' >> beam.Filter(
+                lambda exp: exp is not None)
         )
 
         exps_with_id_and_models = (
