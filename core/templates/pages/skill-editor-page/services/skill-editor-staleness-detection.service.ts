@@ -37,6 +37,9 @@ import constants from 'assets/constants';
 export class SkillEditorStalenessDetectionService {
   _staleTabEventEmitter = new EventEmitter<void>();
   _presenceOfUnsavedChangesEventEmitter = new EventEmitter<void>();
+  // This property is initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   unsavedChangesWarningModalRef!: NgbModalRef;
 
   constructor(
@@ -60,6 +63,7 @@ export class SkillEditorStalenessDetectionService {
 
   showStaleTabInfoModal(): void {
     const skill = this.skillEditorStateService.getSkill();
+    // Return null if skill id is not present in the local storage.
     const skillEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo | null = (
       this.localStorageService.getEntityEditorBrowserTabsInfo(
         EntityEditorBrowserTabsInfoDomainConstants

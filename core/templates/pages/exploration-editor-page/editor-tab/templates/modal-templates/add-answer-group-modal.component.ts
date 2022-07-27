@@ -54,19 +54,26 @@ import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
 export class AddAnswerGroupModalComponent
    extends ConfirmOrCancelModal implements OnInit, OnDestroy {
    @Output() addState = new EventEmitter();
+   // These properties are initialized using Angular lifecycle hooks
+   // and we need to do non-null assertion. For more information, see
+   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
    @Input() currentInteractionId!: string;
    @Input() stateName!: string;
 
-   isEditable: boolean = false;
    eventBusGroup!: EventBusGroup;
-   feedbackEditorIsOpen: boolean = false;
    tmpRule!: Rule;
    tmpOutcome!: Outcome;
+   // Below property(temporary value) is null until the user clicks on the 'Add'
+   // button in the answer group modal to add a new answer group. This is to
+   // prevent the user from adding an answer group without having selected an
+   // answer group type.
    tmpTaggedSkillMisconceptionId!: string | null;
    addAnswerGroupForm!: object;
+   modalId = Symbol();
+   isEditable: boolean = false;
+   feedbackEditorIsOpen: boolean = false;
    questionModeEnabled: boolean = false;
    isInvalid: boolean = false;
-   modalId = Symbol();
    validation: boolean = false;
 
    constructor(

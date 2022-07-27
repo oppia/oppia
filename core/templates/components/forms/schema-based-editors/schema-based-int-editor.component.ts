@@ -47,13 +47,16 @@ interface OppiaValidator {
 })
 export class SchemaBasedIntEditorComponent
 implements ControlValueAccessor, OnInit, Validator {
-  localValue!: number;
+  @Output() inputBlur = new EventEmitter<void>();
+  @Output() inputFocus = new EventEmitter<void>();
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() disabled!: boolean;
   @Input() notRequired!: boolean;
   @Input() validators!: OppiaValidator[];
   @Input() labelForFocusTarget!: string;
-  @Output() inputBlur = new EventEmitter<void>();
-  @Output() inputFocus = new EventEmitter<void>();
+  localValue!: number;
   onChange: (val: number) => void = () => {};
   constructor(
     private focusManagerService: FocusManagerService,

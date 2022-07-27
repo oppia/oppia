@@ -51,13 +51,16 @@ export class SchemaBasedFloatEditorComponent
 implements ControlValueAccessor, OnInit, Validator {
   @Output() inputBlur = new EventEmitter<void>();
   @Output() inputFocus = new EventEmitter<void>();
-  // If input is empty, the number value should be null.
-  localValue!: number | null;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() disabled!: boolean;
   @Input() validators!: OppiaValidator[];
   @Input() labelForFocusTarget!: string;
   @Input() uiConfig!: {checkRequireNonnegativeInput: boolean};
   @ViewChild('floatform', {'static': true}) floatForm!: NgForm;
+  // If input is empty, the number value should be null.
+  localValue!: number | null;
   labelForErrorFocusTarget!: string;
   minValue!: number;
   localStringValue!: string;

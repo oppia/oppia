@@ -55,13 +55,16 @@ interface TopicData {
   styleUrls: []
 })
 export class TopicLandingPageComponent implements OnInit, OnDestroy {
-  directiveSubscriptions = new Subscription();
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   backgroundBannerUrl!: string;
   lessonInDevicesPngImageSrc!: string;
   lessonInDevicesWebpImageSrc!: string;
   lessonsQualities!: LessonsQuality[];
   topicData!: TopicData;
   topicTitle!: string;
+  directiveSubscriptions = new Subscription();
 
   constructor(
     private pageTitleService: PageTitleService,

@@ -54,6 +54,9 @@ implements ControlValueAccessor, Validator {
   }
 
   directiveSubscriptions = new Subscription();
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() disabled!: boolean;
   // Read-only property. The schema definition for each item in the list.
   @Input() itemSchema!: {

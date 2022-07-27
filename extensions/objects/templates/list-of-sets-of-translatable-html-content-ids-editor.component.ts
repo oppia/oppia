@@ -34,18 +34,21 @@ interface Choice {
   styleUrls: []
 })
 export class ListOfSetsOfTranslatableHtmlContentIdsEditorComponent {
+  @Output() valueChanged = new EventEmitter;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() modalId!: symbol;
   @Input() initArgs!: {
     choices: Choice[];
   };
 
   @Input() value!: string[][];
-  @Output() valueChanged = new EventEmitter;
-  errorMessage: string = '';
-  validOrdering: boolean = true;
   choices!: Choice[];
   initValues!: number[];
   eventBusGroup!: EventBusGroup;
+  errorMessage: string = '';
+  validOrdering: boolean = true;
   constructor(private eventBusService: EventBusService) {
     this.eventBusGroup = new EventBusGroup(this.eventBusService);
   }

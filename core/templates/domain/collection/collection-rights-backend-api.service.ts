@@ -67,6 +67,7 @@ export class CollectionRightsBackendApiService {
 
   private _setCollectionStatus(
       collectionId: string,
+      // Collection version is null for the default collection.
       collectionVersion: number | null,
       isPublic: boolean,
       successCallback: (value: CollectionRights) => void,

@@ -40,20 +40,23 @@ import './supplemental-card.component.css';
 })
 export class SupplementalCardComponent implements OnInit, OnDestroy {
   @Output() clickContinueButton: EventEmitter<void> = new EventEmitter();
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() isLearnAgainButton!: boolean;
   @Input() displayedCard!: StateCard;
   @ViewChild('helpCard') helpCard!: ElementRef;
   @ViewChild('interactionContainer') interactionContainer!: ElementRef;
   currentDisplayedCard!: StateCard;
+  // Help card html is set to null when the help card is tall. This is to
+  // prevent the help card from being displayed when the help card is tall.
+  helpCardHtml!: string | null;
+  OPPIA_AVATAR_IMAGE_URL!: string;
   directiveSubscriptions = new Subscription();
   // Last answer is null if their is no answer.
   lastAnswer: string | null = null;
   maxHelpCardHeightSeen: number = 0;
-  // Help card html is set to null when the help card is tall. This is to
-  // prevent the help card from being displayed when the help card is tall.
-  helpCardHtml!: string | null;
   helpCardHasContinueButton: boolean = false;
-  OPPIA_AVATAR_IMAGE_URL!: string;
   OPPIA_AVATAR_LINK_URL = AppConstants.OPPIA_AVATAR_LINK_URL;
   CONTINUE_BUTTON_FOCUS_LABEL: string = (
     ExplorationPlayerConstants.CONTINUE_BUTTON_FOCUS_LABEL);

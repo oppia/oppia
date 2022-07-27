@@ -32,10 +32,13 @@ import { DeleteTopicModalComponent } from '../modals/delete-topic-modal.componen
   templateUrl: './topics-list.component.html'
 })
 export class TopicsListComponent {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() topicSummaries!: CreatorTopicSummary[];
   @Input() pageNumber!: number;
   @Input() itemsPerPage!: number;
-  @Input() userCanDeleteTopic: boolean = false;
+  @Input() userCanDeleteTopic!: boolean;
   @Input() selectedTopicIds!: string;
   @Output() selectedTopicIdsChange: EventEmitter<string> = (
     new EventEmitter());

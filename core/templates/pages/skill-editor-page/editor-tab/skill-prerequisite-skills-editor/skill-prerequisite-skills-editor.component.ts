@@ -37,12 +37,15 @@ import { downgradeComponent } from '@angular/upgrade/static';
 })
 export class SkillPrerequisiteSkillsEditorComponent
 implements OnInit {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   categorizedSkills!: CategorizedSkills;
   untriagedSkillSummaries!: SkillSummary[];
   groupedSkillSummaries!: GroupedSkillSummaries;
   skillIdToSummaryMap!: Record<string, string>;
-  prerequisiteSkillsAreShown: boolean = false;
   skill!: Skill;
+  prerequisiteSkillsAreShown: boolean = false;
   allAvailableSkills: SkillSummary[] = [];
 
   constructor(

@@ -35,16 +35,19 @@ import { StoryEditorNavigationService } from '../services/story-editor-navigatio
   templateUrl: './story-editor-navbar.component.html'
 })
 export class StoryEditorNavbarComponent implements OnInit {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() commitMessage!: string;
   validationIssues!: string[];
   prepublishValidationIssues!: string | string[];
   story!: Story;
+  activeTab!: string;
   forceValidateExplorations: boolean = false;
   storyIsPublished: boolean = false;
   warningsAreShown: boolean = false;
   showNavigationOptions: boolean = false;
   showStoryEditOptions: boolean = false;
-  activeTab!: string;
   constructor(
     private storyEditorStateService: StoryEditorStateService,
     private undoRedoService: UndoRedoService,
@@ -171,6 +174,8 @@ export class StoryEditorNavbarComponent implements OnInit {
     modalRef.result.then((commitMessage) => {
       this.storyEditorStateService.saveStory(
         commitMessage, () => {
+        // The type of error 'e' is unknown because anything can be throw
+        // in TypeScript. We need to make sure to check the type of 'e'.
         }, (errorMessage: unknown) => {
           this.alertsService.addInfoMessage(errorMessage as string, 5000);
         }

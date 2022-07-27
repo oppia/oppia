@@ -38,9 +38,12 @@ import { downgradeComponent } from '@angular/upgrade/static';
 })
 export class SchemaBasedBoolEditorComponent
 implements ControlValueAccessor, Validator {
-  localValue!: boolean;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() disabled!: boolean;
   @Input() labelForFocusTarget!: string;
+  localValue: boolean = false;
   onChange: (val: boolean) => void = () => {};
 
   // Implemented as a part of ControlValueAccessor interface.

@@ -45,15 +45,18 @@ import './learner-view-info.component.css';
   templateUrl: './learner-view-info.component.html'
 })
 export class LearnerViewInfoComponent {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   explorationId!: string;
-  directiveSubscriptions: Subscription = new Subscription();
   explorationTitle!: string;
   explorationTitleTranslationKey!: string;
-  isLinkedToTopic: boolean = false;
   storyPlaythroughObject!: StoryPlaythrough;
   topicName!: string;
   topicNameTranslationKey!: string;
   expInfo!: LearnerExplorationSummaryBackendDict;
+  directiveSubscriptions: Subscription = new Subscription();
+  isLinkedToTopic: boolean = false;
 
   constructor(
     private ngbModal: NgbModal,
@@ -131,10 +134,12 @@ export class LearnerViewInfoComponent {
     let topicUrlFragment: string;
     let classroomUrlFragment: string;
 
-    topicUrlFragment = (
-      this.urlService.getTopicUrlFragmentFromLearnerUrl());
-    classroomUrlFragment = (
-      this.urlService.getClassroomUrlFragmentFromLearnerUrl());
+    try {
+      topicUrlFragment = (
+        this.urlService.getTopicUrlFragmentFromLearnerUrl());
+      classroomUrlFragment = (
+        this.urlService.getClassroomUrlFragmentFromLearnerUrl());
+    } catch (e) {}
 
     return topicUrlFragment &&
       classroomUrlFragment &&

@@ -41,6 +41,9 @@ const VALIDATION_STATUS_INVALID = 'INVALID';
 })
 export class SchemaBasedEditorComponent
 implements AfterViewInit, ControlValueAccessor, Validator {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @ViewChild('hybridForm') form!: NgForm;
   _localValue!: SchemaDefaultValue;
   @Input() schema!: Schema;

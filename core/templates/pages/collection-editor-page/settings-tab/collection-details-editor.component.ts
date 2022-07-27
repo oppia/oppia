@@ -34,19 +34,22 @@ import { CollectionEditorStateService } from '../services/collection-editor-stat
 })
 export class CollectionDetailsEditorComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   collection!: Collection;
-  COLLECTION_TITLE_INPUT_FOCUS_LABEL = (
-    CollectionEditorPageConstants.COLLECTION_TITLE_INPUT_FOCUS_LABEL);
-
-  CATEGORY_LIST: string[] = [...AppConstants.ALL_CATEGORIES];
-  languageListForSelect = AppConstants.SUPPORTED_CONTENT_LANGUAGES;
-  TAG_REGEX = AppConstants.TAG_REGEX;
   // The following properties are used to display the collection settings.
   // These are null until collection data is entered by the user.
   displayedCollectionTitle!: string | null;
   displayedCollectionObjective!: string | null;
   displayedCollectionCategory!: string | null;
   displayedCollectionLanguage!: string | null;
+  COLLECTION_TITLE_INPUT_FOCUS_LABEL = (
+    CollectionEditorPageConstants.COLLECTION_TITLE_INPUT_FOCUS_LABEL);
+
+  CATEGORY_LIST: string[] = [...AppConstants.ALL_CATEGORIES];
+  languageListForSelect = AppConstants.SUPPORTED_CONTENT_LANGUAGES;
+  TAG_REGEX = AppConstants.TAG_REGEX;
   displayedCollectionTags: string[] | null = [];
 
   constructor(

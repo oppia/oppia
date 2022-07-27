@@ -38,17 +38,20 @@ interface Container {
   templateUrl: './worked-example-editor.component.html'
 })
 export class WorkedExampleEditorComponent implements OnInit {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() index!: number;
   @Input() isEditable!: boolean;
   @Input() workedExample!: WorkedExample;
   container!: Container;
-  explanationEditorIsOpen: boolean = false;
-  questionEditorIsOpen: boolean = false;
   tmpWorkedExampleQuestionHtml!: string;
   tmpWorkedExampleExplanationHtml!: string;
   // Below properties are null when the editor is closed.
   workedExampleQuestionMemento!: string | null;
   workedExampleExplanationMemento!: string | null;
+  explanationEditorIsOpen: boolean = false;
+  questionEditorIsOpen: boolean = false;
   WORKED_EXAMPLE_FORM_SCHEMA: HtmlFormSchema = {
     type: 'html',
     ui_config: {}

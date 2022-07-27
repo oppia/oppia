@@ -47,12 +47,6 @@ import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
   templateUrl: './state-editor.component.html'
 })
 export class StateEditorComponent implements OnInit, OnDestroy {
-  @Input() addState!: (value: string) => void;
-  @Input() explorationIsLinkedToStory: boolean = false;
-  @Input() interactionIsShown: boolean = true;
-  @Input() stateContentSaveButtonPlaceholder!: string;
-  @Input() stateContentPlaceholder!: string;
-
   @Output() onSaveHints = new EventEmitter<Hint[]>();
   @Output() onSaveInapplicableSkillMisconceptionIds = (
     new EventEmitter<string[]>());
@@ -74,15 +68,27 @@ export class StateEditorComponent implements OnInit, OnDestroy {
   @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired = (
     new EventEmitter<string[]>());
 
-  directiveSubscriptions = new Subscription();
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() addState!: (value: string) => void;
+  @Input() explorationIsLinkedToStory!: boolean;
+  @Input() interactionIsShown!: boolean;
+  @Input() stateContentSaveButtonPlaceholder!: string;
+  @Input() stateContentPlaceholder!: string;
+
+
   oppiaBlackImgUrl!: string;
+  // State name is null if their is no state selected or have no active state.
+  // This is the case when the user is creating a new state.
+  stateName!: string | null;
+  stateData!: State;
+  directiveSubscriptions = new Subscription();
   currentStateIsTerminal: boolean = false;
   conceptCardIsShown: boolean = false;
   windowIsNarrow: boolean = false;
   interactionIdIsSet: boolean = false;
   servicesInitialized: boolean = false;
-  stateName!: string | null;
-  stateData!: State;
   currentInteractionCanHaveSolution: boolean = false;
 
   constructor(

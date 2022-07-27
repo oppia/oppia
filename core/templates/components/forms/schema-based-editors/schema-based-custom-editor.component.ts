@@ -39,10 +39,13 @@ import { CustomSchema, SchemaDefaultValue } from 'services/schema-default-value.
 })
 export class SchemaBasedCustomEditorComponent
 implements ControlValueAccessor, Validator {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() localValue!: SchemaDefaultValue;
-  @Output() localValueChange = new EventEmitter();
   @Input() schema!: CustomSchema;
   @Input() form!: AbstractControl;
+  @Output() localValueChange = new EventEmitter();
   onChange: (_: SchemaDefaultValue) => void = () => {};
   onTouch: () => void = () => {};
   onValidatorChange: () => void = () => {};

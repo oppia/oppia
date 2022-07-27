@@ -27,6 +27,9 @@ import { UrlService } from 'services/contextual/url.service';
 import { StoryEditorStateService } from '../services/story-editor-state.service';
 
 interface IconsArray {
+    // Thumbnails for the story nodes are null if they are not yet uploaded.
+    // Means when we are making a new story with no nodes, the thumbnails are
+    // null.
     'thumbnailIconUrl': string | null;
     'thumbnailBgColor': string | null;
 }
@@ -36,6 +39,9 @@ interface IconsArray {
   templateUrl: './story-preview-tab.component.html'
 })
 export class StoryPreviewTabComponent implements OnInit, OnDestroy {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   story!: Story;
   storyId!: string;
   storyContents!: StoryContents;

@@ -175,6 +175,7 @@ export class CollectionUpdateService {
    * Changes the title of a collection and records the change in the
    * undo/redo service.
    */
+  // Collection title is null for the default collection.
   setCollectionTitle(
       collection: Collection,
       title: string | null): void {
@@ -196,6 +197,7 @@ export class CollectionUpdateService {
    * Changes the category of a collection and records the change in the
    * undo/redo service.
    */
+  // Collection category is null for the default collection.
   setCollectionCategory(
       collection: Collection,
       category: string | null): void {
@@ -217,6 +219,7 @@ export class CollectionUpdateService {
    * Changes the objective of a collection and records the change in the
    * undo/redo service.
    */
+  // Collection objective is null for the default collection.
   setCollectionObjective(
       collection: Collection,
       objective: string | null
@@ -238,6 +241,7 @@ export class CollectionUpdateService {
    * Changes the language code of a collection and records the change in
    * the undo/redo service.
    */
+  // Collection language code is null for the default collection.
   setCollectionLanguageCode(
       collection: Collection,
       languageCode: string | null): void {

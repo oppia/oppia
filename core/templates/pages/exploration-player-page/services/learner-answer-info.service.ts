@@ -36,6 +36,9 @@ export class LearnerAnswerInfoService {
     private learnerAnswerDetailsBackendApiService:
       LearnerAnswerDetailsBackendApiService) {}
 
+  // These properties are initialized using init method and we need to do
+  // non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   private submittedAnswerInfoCount: number = 0;
   private currentEntityId!: string;
   private stateName!: string;

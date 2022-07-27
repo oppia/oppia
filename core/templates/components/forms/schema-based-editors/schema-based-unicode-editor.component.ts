@@ -55,6 +55,9 @@ export class SchemaBasedUnicodeEditor
 implements ControlValueAccessor, OnInit, Validator {
   @Output() inputBlur: EventEmitter<void> = new EventEmitter();
   @Output() inputFocus: EventEmitter<void> = new EventEmitter();
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() disabled!: boolean;
   // UI configuration. May be undefined if the schema does not specify it.
   @Input() uiConfig!: {

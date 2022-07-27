@@ -20,7 +20,7 @@ import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { ExplorationCreationBackendApiService } from 'components/entity-creation-services/exploration-creation-backend-api.service';
 import { Collection } from 'domain/collection/collection.model';
-import { ExplorationSummaryBackendApiService, ExplorationSummaryDict } from 'domain/summary/exploration-summary-backend-api.service';
+import { ExplorationSummaryBackendApiService } from 'domain/summary/exploration-summary-backend-api.service';
 import { LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exploration-summary.model';
 import { NormalizeWhitespacePipe } from 'filters/string-utility-filters/normalize-whitespace.pipe';
 import { AlertsService } from 'services/alerts.service';
@@ -34,6 +34,9 @@ import { CollectionLinearizerService } from '../services/collection-linearizer.s
   templateUrl: './collection-node-creator.component.html'
 })
 export class CollectionNodeCreatorComponent {
+  // This property is initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   collection!: Collection;
   newExplorationId: string = '';
   newExplorationTitle: string = '';

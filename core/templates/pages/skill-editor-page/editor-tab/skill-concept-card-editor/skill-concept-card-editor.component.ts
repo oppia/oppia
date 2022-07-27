@@ -48,12 +48,17 @@ interface BindableFieldDict {
 export class SkillConceptCardEditorComponent implements OnInit {
   @Output() getConceptCardChange: EventEmitter<void> = new EventEmitter();
   directiveSubscriptions: Subscription = new Subscription();
-  isEditable: boolean = false;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   skill!: Skill;
+  bindableFieldsDict!: BindableFieldDict;
+  // Index can be null. It means that no worked example is active.
+  // This also help in closing the worked example editor.
+  activeWorkedExampleIndex!: number | null;
+  isEditable: boolean = false;
   skillEditorCardIsShown: boolean = false;
   workedExamplesListIsShown: boolean = false;
-  bindableFieldsDict!: BindableFieldDict;
-  activeWorkedExampleIndex!: number | null;
   COMPONENT_NAME_WORKED_EXAMPLE = (
     AppConstants.COMPONENT_NAME_WORKED_EXAMPLE);
 

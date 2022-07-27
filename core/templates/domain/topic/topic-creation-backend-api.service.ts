@@ -51,9 +51,9 @@ export class TopicCreationBackendApiService {
 
     let body = new FormData();
     body.append('payload', JSON.stringify(postData));
-    if (imagesData[0].imageBlob === null) {
-      throw new Error('Image blob is null');
-    }
+    // if (imagesData[0].imageBlob === null) {
+    //   throw new Error('Image blob is null');
+    // }
     body.append('image', imagesData[0].imageBlob);
 
     this.http.post<TopicCreationResponse>(

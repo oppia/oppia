@@ -30,6 +30,9 @@ import { WindowDimensionsService } from 'services/contextual/window-dimensions.s
   templateUrl: './skill-rubrics-editor.component.html'
 })
 export class SkillRubricsEditorComponent implements OnInit, OnDestroy {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   skill!: Skill;
   rubrics!: Rubric[];
   rubricsListIsShown: boolean = false;

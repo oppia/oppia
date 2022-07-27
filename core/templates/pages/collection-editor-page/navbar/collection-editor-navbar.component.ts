@@ -37,6 +37,9 @@ import { CollectionEditorSaveModalComponent } from '../modals/collection-editor-
 })
 export class CollectionEditorNavbarComponent {
   directiveSubscriptions = new Subscription();
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   collectionRights!: CollectionRights;
   validationIssues!: string[];
   collection!: Collection;

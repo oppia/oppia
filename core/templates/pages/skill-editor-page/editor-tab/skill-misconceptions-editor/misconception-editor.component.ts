@@ -43,6 +43,9 @@ interface Container {
 })
 export class MisconceptionEditorComponent implements OnInit {
   @Output() onMisconceptionChange = new EventEmitter<void>();
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() getIndex!: string;
   @Input() isEditable!: boolean;
   @Input() misconception!: Misconception;

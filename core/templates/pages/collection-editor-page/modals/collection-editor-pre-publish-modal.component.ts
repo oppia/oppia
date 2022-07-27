@@ -31,13 +31,17 @@ import { CollectionEditorStateService } from '../services/collection-editor-stat
 })
 export class CollectionEditorPrePublishModalComponent
   extends ConfirmOrCancelModal {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   private _collection!: Collection;
-  requireTitleToBeSpecified: boolean = false;
-  requireObjectiveToBeSpecified: boolean = false;
-  requireCategoryToBeSpecified: boolean = false;
+  // Below properties are null for default collection.
   newTitle!: string | null;
   newObjective!: string | null;
   newCategory!: string | null;
+  requireTitleToBeSpecified: boolean = false;
+  requireObjectiveToBeSpecified: boolean = false;
+  requireCategoryToBeSpecified: boolean = false;
   CATEGORY_LIST = AppConstants.ALL_CATEGORIES;
 
   constructor(

@@ -37,6 +37,8 @@ export interface SkillCreationBackendDict {
 
 export interface ImageData {
   filename: string;
+  // 'imageBlob' will be null when filenames
+  // are not present in localStorage.
   imageBlob: Blob | null;
 }
 

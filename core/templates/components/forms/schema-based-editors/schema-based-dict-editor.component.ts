@@ -41,6 +41,9 @@ import { Schema, SchemaDefaultValue } from 'services/schema-default-value.servic
 
 export class SchemaBasedDictEditorComponent
 implements ControlValueAccessor, OnInit, Validator {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   localValue!: Record<string, SchemaDefaultValue>;
   @Input() disabled!: boolean;
   @Input() propertySchemas!: {name: string; schema: Schema}[];
@@ -94,7 +97,7 @@ implements ControlValueAccessor, OnInit, Validator {
     this.onChange(this.localValue);
   }
 
-  getSchema(index: number): unknown {
+  getSchema(index: number): Schema {
     return this.propertySchemas[index].schema;
   }
 

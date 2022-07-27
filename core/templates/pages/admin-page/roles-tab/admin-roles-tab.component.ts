@@ -31,14 +31,16 @@ import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
 })
 export class AdminRolesTabComponent implements OnInit {
   @Output() setStatusMessage: EventEmitter<string> = new EventEmitter();
-
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   UPDATABLE_ROLES!: string[];
   VIEWABLE_ROLES!: string[];
   HUMAN_READABLE_ROLES!: HumanReadableRolesBackendResponse;
   topicSummaries!: CreatorTopicSummary[];
   roleToActions!: RoleToActionsBackendResponse;
+  errorMessage!: string;
   rolesFetched: boolean = false;
-
   roleSelectorIsShown: boolean = false;
   username: string = '';
   userRoles: string[] = [];
@@ -48,11 +50,7 @@ export class AdminRolesTabComponent implements OnInit {
   // removed or added to user roles. This value is used to present a progress
   // spinner next to the role which is currently being updated in the backend.
   // RoleCurrentlyBeingUpdatedInBackend is null when no role is being updated.
-  // Also note that this value is not used to determine whether the role is
-  // currently being removed or added. This is because the role is removed from
-  // the user roles array when the backend call is successful.
   roleCurrentlyBeingUpdatedInBackend: string | null = null;
-  errorMessage!: string;
   bannedStatusChangeInProgress = false;
   userIsBanned = false;
   roleIsCurrentlyBeingEdited = false;
