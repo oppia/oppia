@@ -809,7 +809,10 @@ class Question(translation_domain.BaseTranslatableObject):
                     'interaction']['answer_groups']:
                 for rule_spec in group['rule_specs']:
                     rule_input = rule_spec['inputs']['x']
-                    for variable in expression_parser.get_variables(  # type: ignore[no-untyped-call]
+                    # Ruling out the possibility of any other type for mypy
+                    # type checking.
+                    assert isinstance(rule_input, str)
+                    for variable in expression_parser.get_variables(
                             rule_input):
                         # Replacing greek letter names with greek symbols.
                         if len(variable) > 1:
