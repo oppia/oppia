@@ -1662,7 +1662,7 @@ class TranslationContributionStatsDict(TypedDict):
     accepted_translation_word_count: int
     rejected_translations_count: int
     rejected_translation_word_count: int
-    contribution_dates: Set[datetime.datetime]
+    contribution_dates: Set[datetime.date]
 
 
 class TranslationContributionStats:
@@ -1680,7 +1680,7 @@ class TranslationContributionStats:
         accepted_translation_word_count: int,
         rejected_translations_count: int,
         rejected_translation_word_count: int,
-        contribution_dates: Set[datetime.datetime]
+        contribution_dates: Set[datetime.date]
     ) -> None:
         self.language_code = language_code
         self.contributor_user_id = contributor_user_id
