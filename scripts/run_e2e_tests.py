@@ -195,12 +195,6 @@ SUITES_STILL_IN_PROTRACTOR = [
     'library',
     'playVoiceovers',
     'publication',
-<<<<<<< HEAD
-=======
-    'topicsAndSkillsDashboard',
-    'skillEditor',
-    'wipeout',
->>>>>>> 8a1792391e4076e8f619fdb7297c6dd1078d7952
 ]
 
 
