@@ -72,8 +72,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/state_domain_test.py',
     'core/domain/stats_services.py',
     'core/domain/stats_services_test.py',
-    'core/domain/summary_services.py',
-    'core/domain/summary_services_test.py',
     'core/domain/topic_services.py',
     'core/domain/topic_services_test.py',
     'core/domain/wipeout_service.py',
