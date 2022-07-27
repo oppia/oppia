@@ -18,7 +18,6 @@
 
 from __future__ import annotations
 
-
 import argparse
 import os
 import site
@@ -43,8 +42,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/collection_services_test.py',
     'core/domain/draft_upgrade_services.py',
     'core/domain/draft_upgrade_services_test.py',
-    'core/domain/email_manager.py',
-    'core/domain/email_manager_test.py',
     'core/domain/event_services.py',
     'core/domain/event_services_test.py',
     'core/domain/exp_domain.py',
@@ -63,8 +60,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/object_registry_test.py',
     'core/domain/opportunity_services.py',
     'core/domain/opportunity_services_test.py',
-    'core/domain/platform_feature_services.py',
-    'core/domain/platform_feature_services_test.py',
     'core/domain/question_domain.py',
     'core/domain/question_domain_test.py',
     'core/domain/question_services.py',
@@ -77,8 +72,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/skill_services_test.py',
     'core/domain/state_domain.py',
     'core/domain/state_domain_test.py',
-    'core/domain/stats_domain.py',
-    'core/domain/stats_domain_test.py',
     'core/domain/stats_services.py',
     'core/domain/stats_services_test.py',
     'core/domain/story_services.py',
@@ -89,12 +82,8 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/suggestion_services_test.py',
     'core/domain/summary_services.py',
     'core/domain/summary_services_test.py',
-    'core/domain/topic_fetchers.py',
-    'core/domain/topic_fetchers_test.py',
     'core/domain/topic_services.py',
     'core/domain/topic_services_test.py',
-    'core/domain/user_services.py',
-    'core/domain/user_services_test.py',
     'core/domain/voiceover_services.py',
     'core/domain/voiceover_services_test.py',
     'core/domain/wipeout_service.py',
@@ -115,7 +104,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/tests/load_tests/feedback_thread_summaries_test.py',
     'core/tests/test_utils.py',
     'core/tests/test_utils_test.py',
-    'core/jobs/batch_jobs',
     'extensions/',
     'scripts/check_if_pr_is_low_risk.py',
     'scripts/check_if_pr_is_low_risk_test.py',
@@ -127,8 +115,8 @@ NOT_FULLY_COVERED_FILES = [
     'scripts/extend_index_yaml_test.py',
     'scripts/flake_checker.py',
     'scripts/flake_checker_test.py',
-    'scripts/install_backend_python_libs.py',
-    'scripts/install_backend_python_libs_test.py',
+    'scripts/install_python_prod_dependencies.py',
+    'scripts/install_python_prod_dependencies_test.py',
     'scripts/install_third_party_libs.py',
     'scripts/install_third_party_libs_test.py',
     'scripts/install_third_party.py',

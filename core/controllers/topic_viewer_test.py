@@ -79,6 +79,7 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
                 self.story_id_2))
         self.topic.meta_tag_content = 'topic meta content'
         self.topic.page_title_fragment_for_web = 'topic page title'
+        self.topic.skill_ids_for_diagnostic_test = [self.skill_id_2]
 
         topic_services.save_new_topic(self.admin_id, self.topic)
         story_services.save_new_story(self.admin_id, self.story_1)
@@ -312,6 +313,7 @@ class TopicPageDataHandlerTests(
         subtopic_1.url_fragment = 'sub-one-frag'
         self.topic.subtopics = [subtopic_1]
         self.topic.next_subtopic_id = 2
+        self.topic.skill_ids_for_diagnostic_test = [self.skill_id_2]
         topic_services.save_new_topic(self.admin_id, self.topic)
         topic_services.publish_topic(self.topic_id, self.admin_id)
         self.save_new_skill(
@@ -367,6 +369,7 @@ class TopicPageDataHandlerTests(
         subtopic_1.url_fragment = 'sub-one-frag'
         self.topic.subtopics = [subtopic_1]
         self.topic.next_subtopic_id = 2
+        self.topic.skill_ids_for_diagnostic_test = [self.skill_id_2]
         topic_services.save_new_topic(self.admin_id, self.topic)
         topic_services.publish_topic(self.topic_id, self.admin_id)
         self.save_new_skill(
@@ -424,6 +427,7 @@ class TopicPageDataHandlerTests(
         subtopic_1.url_fragment = 'sub-one-frag'
         self.topic.subtopics = [subtopic_1]
         self.topic.next_subtopic_id = 2
+        self.topic.skill_ids_for_diagnostic_test = ['skill_id_1']
         topic_services.save_new_topic(self.admin_id, self.topic)
         topic_services.publish_topic(self.topic_id, self.admin_id)
         for i in range(number_of_skills):
@@ -476,6 +480,7 @@ class TopicPageDataHandlerTests(
         subtopic_1.url_fragment = 'sub-one-frag'
         self.topic.subtopics = [subtopic_1]
         self.topic.next_subtopic_id = 2
+        self.topic.skill_ids_for_diagnostic_test = ['skill_id_1']
         topic_services.save_new_topic(self.admin_id, self.topic)
         topic_services.publish_topic(self.topic_id, self.admin_id)
         for i in range(number_of_skills):
@@ -530,6 +535,7 @@ class TopicPageDataHandlerTests(
         subtopic_1.url_fragment = 'sub-one-frag'
         self.topic.subtopics = [subtopic_1]
         self.topic.next_subtopic_id = 2
+        self.topic.skill_ids_for_diagnostic_test = ['skill_id_1']
         topic_services.save_new_topic(self.admin_id, self.topic)
         topic_services.publish_topic(self.topic_id, self.admin_id)
         for i in range(number_of_skills):

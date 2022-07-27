@@ -86,6 +86,7 @@ describe('Extracting Image file names in the state service', () => {
                 html: ''
               },
               dest: 'State 3',
+              dest_if_really_stuck: null,
               param_changes: [],
               labelled_as_correct: false,
               refresher_exploration_id: null,
@@ -173,6 +174,7 @@ describe('Extracting Image file names in the state service', () => {
             id: 'MultipleChoiceInput',
             default_outcome: {
               dest: 'Introduction',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'default_outcome',
                 html: 'Try Again!'
@@ -203,6 +205,7 @@ describe('Extracting Image file names in the state service', () => {
               {
                 outcome: {
                   dest: 'State 4',
+                  dest_if_really_stuck: null,
                   feedback: {
                     content_id: 'feedback_1',
                     html: '<p>We are going to ItemSelection' +
@@ -225,6 +228,7 @@ describe('Extracting Image file names in the state service', () => {
               {
                 outcome: {
                   dest: 'State 5',
+                  dest_if_really_stuck: null,
                   feedback: {
                     content_id: 'feedback_2',
                     html: "Let's go to state 5 ImageAndRegion"
@@ -287,6 +291,7 @@ describe('Extracting Image file names in the state service', () => {
                       '</oppia-noninteractive-image></p>'
               },
               dest: 'State 4',
+              dest_if_really_stuck: null,
               param_changes: [],
               labelled_as_correct: false,
               refresher_exploration_id: null,
@@ -320,6 +325,7 @@ describe('Extracting Image file names in the state service', () => {
               {
                 outcome: {
                   dest: 'State 6',
+                  dest_if_really_stuck: null,
                   feedback: {
                     content_id: 'feedback_1',
                     html: "It is choice number 1. Let's go to the Text Input"
@@ -345,6 +351,7 @@ describe('Extracting Image file names in the state service', () => {
               {
                 outcome: {
                   dest: 'State 1',
+                  dest_if_really_stuck: null,
                   feedback: {
                     content_id: 'feedback_2',
                     html: 'It is choice number 2'
@@ -408,6 +415,7 @@ describe('Extracting Image file names in the state service', () => {
             confirmed_unclassified_answers: [],
             default_outcome: {
               dest: 'State 5',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'content',
                 html: 'Try Again!'
@@ -421,6 +429,7 @@ describe('Extracting Image file names in the state service', () => {
               {
                 outcome: {
                   dest: 'State 5',
+                  dest_if_really_stuck: null,
                   feedback: {
                     content_id: 'feeedback_1',
                     html: '<p>That is the class definition. Try again.</p>'
@@ -440,6 +449,7 @@ describe('Extracting Image file names in the state service', () => {
               {
                 outcome: {
                   dest: 'State 5',
+                  dest_if_really_stuck: null,
                   feedback: {
                     content_id: 'feeedback_2',
                     html: '<p>That is a function, which is close to what you' +
@@ -460,6 +470,7 @@ describe('Extracting Image file names in the state service', () => {
               {
                 outcome: {
                   dest: 'State 5',
+                  dest_if_really_stuck: null,
                   feedback: {
                     content_id: 'feeedback_3',
                     html: '<p>That is the class docstring. Try again.</p>'
@@ -479,6 +490,7 @@ describe('Extracting Image file names in the state service', () => {
               {
                 outcome: {
                   dest: 'State 5',
+                  dest_if_really_stuck: null,
                   feedback: {
                     content_id: 'feeedback_4',
                     html: "<p>That's a classmethod. It does execute code," +
@@ -499,6 +511,7 @@ describe('Extracting Image file names in the state service', () => {
               {
                 outcome: {
                   dest: 'State 1',
+                  dest_if_really_stuck: null,
                   feedback: {
                     content_id: 'feeedback_5',
                     html: '<p>You found it! This is the code responsible for' +
@@ -616,6 +629,7 @@ describe('Extracting Image file names in the state service', () => {
             id: 'TextInput',
             default_outcome: {
               dest: 'State 6',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'default_outcome',
                 html: '<p>Try again.</p>'
@@ -647,6 +661,7 @@ describe('Extracting Image file names in the state service', () => {
               }],
               outcome: {
                 dest: 'State 1',
+                dest_if_really_stuck: null,
                 feedback: {
                   content_id: 'feedback_1',
                   html: "<p>Let's go to State 1</p>"
@@ -668,6 +683,7 @@ describe('Extracting Image file names in the state service', () => {
               }],
               outcome: {
                 dest: 'State 1',
+                dest_if_really_stuck: null,
                 feedback: {
                   content_id: 'feedback_2',
                   html: '<p>Let\'s go to State 1</p><oppia-noninteractive-mat' +
@@ -764,6 +780,7 @@ describe('Extracting Image file names in the state service', () => {
                 html: '<p>Try again!</p>'
               },
               dest: 'State 4',
+              dest_if_really_stuck: null,
               param_changes: [],
               labelled_as_correct: false,
               refresher_exploration_id: null,
@@ -793,6 +810,7 @@ describe('Extracting Image file names in the state service', () => {
               {
                 outcome: {
                   dest: 'State 7',
+                  dest_if_really_stuck: null,
                   feedback: {
                     content_id: 'feedback_1',
                     html: 'It is choice number 1.'
@@ -816,6 +834,7 @@ describe('Extracting Image file names in the state service', () => {
               {
                 outcome: {
                   dest: 'State 1',
+                  dest_if_really_stuck: null,
                   feedback: {
                     content_id: 'feedback_2',
                     html: 'It is choice number 2'

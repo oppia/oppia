@@ -25,7 +25,7 @@ from core.domain import change_domain
 from core.domain import state_domain
 from core.domain import translation_domain
 
-from typing import Callable, List
+from typing import Callable, List, Optional
 from typing_extensions import Final, TypedDict
 
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
@@ -468,3 +468,66 @@ class SubtopicPage:
         ):
             raise utils.ValidationError(
                 'Invalid language code: %s' % self.language_code)
+
+
+class SubtopicPageSummaryDict(TypedDict):
+    """Dictionary representation of SubtopicPageSummary domain object."""
+
+    subtopic_id: int
+    subtopic_title: str
+    parent_topic_id: str
+    parent_topic_name: str
+    thumbnail_filename: Optional[str]
+    thumbnail_bg_color: Optional[str]
+    subtopic_mastery: Optional[float]
+
+
+class SubtopicPageSummary:
+    """Domain object for Subtopic Page Summary."""
+
+    def __init__(
+        self,
+        subtopic_id: int,
+        subtopic_title: str,
+        parent_topic_id: str,
+        parent_topic_name: str,
+        thumbnail_filename: Optional[str],
+        thumbnail_bg_color: Optional[str],
+        subtopic_mastery: Optional[float]
+    ):
+        """Initialize a SubtopicPageSummary object.
+
+        Args:
+            subtopic_id: str. The id of the subtopic.
+            subtopic_title: str. The title of the subtopic.
+            parent_topic_id: str. The id of the parent topic.
+            parent_topic_name: str. The name of the parent topic.
+            thumbnail_filename: str. The filename of the thumbnail image.
+            thumbnail_bg_color: str. The background color of the thumbnail
+                image.
+            subtopic_mastery: float. The mastery score of a user in the
+                subtopic.
+        """
+        self.subtopic_id = subtopic_id
+        self.subtopic_title = subtopic_title
+        self.parent_topic_id = parent_topic_id
+        self.parent_topic_name = parent_topic_name
+        self.thumbnail_filename = thumbnail_filename
+        self.thumbnail_bg_color = thumbnail_bg_color
+        self.subtopic_mastery = subtopic_mastery
+
+    def to_dict(self) -> SubtopicPageSummaryDict:
+        """Returns a dict representing this SubtopicPageSummary domain object.
+
+        Returns:
+            dict. A dict, mapping all fields of SubtopicPageSummary instance.
+        """
+        return {
+            'subtopic_id': self.subtopic_id,
+            'subtopic_title': self.subtopic_title,
+            'parent_topic_id': self.parent_topic_id,
+            'parent_topic_name': self.parent_topic_name,
+            'thumbnail_filename': self.thumbnail_filename,
+            'thumbnail_bg_color': self.thumbnail_bg_color,
+            'subtopic_mastery': self.subtopic_mastery
+        }

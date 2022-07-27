@@ -89,9 +89,9 @@
           This can lead to two conflicting copies of the interaction for
           non-inline interactions. -->
         <div *ngIf="isInteractionInline() && displayedCard.getInteractionHtml() && !displayedCard.isCompleted() && !conceptCardIsBeingShown">
-          <angular-html-bind-wrapper classStr="e2e-test-conversation-input"
+          <oppia-interaction-display classStr="e2e-test-conversation-input"
                                      [htmlData]="displayedCard.getInteractionHtml()">
-          </angular-html-bind-wrapper>
+          </oppia-interaction-display>
         </div>
       </div>
     </div>
@@ -115,6 +115,15 @@
         </div>
       </div>
     </div>
+    <div *ngIf="platformFeatureService.status.EndChapterCelebration.isEnabled && isOnTerminalCard() && milestoneMessageIsToBeDisplayed && generateMilestoneMessage()">
+      <div class="conversation-skin-milestone-message">
+        <div class="milestone-message-star-container">
+          <img [src]="getStaticImageUrl('/general/milestone-message-star-icon.svg')" class="star-icon">
+          <p class="completed-chapter-count">{{ completedChaptersCount }}</p>
+        </div>
+        <span class="milestone-message-text">{{ generateMilestoneMessage() }}</span>
+      </div>
+    </div>
 
     <oppia-ratings-and-recommendations *ngIf="isOnTerminalCard() && isCurrentCardAtEndOfTranscript()"
                                        [userIsLoggedIn]="userIsLoggedIn"
@@ -123,7 +132,8 @@
                                        [collectionSummary]="collectionSummary"
                                        [isRefresherExploration]="isRefresherExploration"
                                        [recommendedExplorationSummaries]="recommendedExplorationSummaries"
-                                       [parentExplorationIds]="parentExplorationIds">
+                                       [parentExplorationIds]="parentExplorationIds"
+                                       [nextLessonLink]="nextLessonLink">
     </oppia-ratings-and-recommendations>
 
     <div *ngIf="displayedCardWasCompletedInPrevSession && !conceptCardIsBeingShown && (displayedCard.getInteractionId() != 'Continue')">

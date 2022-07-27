@@ -99,9 +99,9 @@
       <div class="d-block flex-grow-1">
         <div tabindex="0" *ngIf="!contentEditorIsActive" (click)="contentEditorIsActive=true" class="e2e-test-content-button blog-post-content-button">
           <div class="oppia-editable-section-mask">
-            <angular-html-bind-wrapper [htmlData]="this.blogPostData.content"
-                                       classStr="e2e-test-content-display">
-            </angular-html-bind-wrapper>
+            <oppia-rte-output-display [rteString]="this.blogPostData.content"
+                                      class="e2e-test-content-display">
+            </oppia-rte-output-display>
           </div>
         </div>
         <div *ngIf="contentEditorIsActive"  class="e2e-test-content-editor">

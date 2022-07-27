@@ -53,6 +53,7 @@ describe('Question backend Api service', () => {
             customization_args: {},
             default_outcome: {
               dest: null,
+              dest_if_really_stuck: null,
               feedback: {
                 html: 'Correct Answer'
               },

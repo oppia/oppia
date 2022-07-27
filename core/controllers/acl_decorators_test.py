@@ -4051,6 +4051,55 @@ class AccessLearnerDashboardDecoratorTests(test_utils.GenericTestBase):
         self.assertEqual(response['error'], error_msg)
 
 
+class AccessLearnerGroupsDecoratorTests(test_utils.GenericTestBase):
+    """Tests the decorator can_access_learner_groups."""
+
+    user = 'user'
+    user_email = 'user@example.com'
+    banned_user = 'banneduser'
+    banned_user_email = 'banned@example.com'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+        @acl_decorators.can_access_learner_groups
+        def get(self):
+            return self.render_json({'success': True})
+
+    def setUp(self):
+        super(AccessLearnerGroupsDecoratorTests, self).setUp()
+        self.signup(self.user_email, self.user)
+        self.signup(self.banned_user_email, self.banned_user)
+        self.mark_user_banned(self.banned_user)
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock/', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_banned_user_cannot_access_teacher_dashboard(self):
+        self.login(self.banned_user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/', expected_status_int=401)
+        error_msg = 'You do not have the credentials to access this page.'
+        self.assertEqual(response['error'], error_msg)
+        self.logout()
+
+    def test_exploration_editor_can_access_learner_groups(self):
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/')
+        self.assertTrue(response['success'])
+        self.logout()
+
+    def test_guest_user_cannot_access_teacher_dashboard(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/', expected_status_int=401)
+        error_msg = 'You must be logged in to access this resource.'
+        self.assertEqual(response['error'], error_msg)
+
+
 class EditTopicDecoratorTests(test_utils.GenericTestBase):
     """Tests the decorator can_edit_topic."""
 

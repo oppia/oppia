@@ -208,6 +208,8 @@ angular.module('oppia').component('explorationEditorTab', {
         // Show the interaction when the text content is saved, even if no
         // content is entered.
         ctrl.interactionIsShown = true;
+
+        $rootScope.$applyAsync();
       };
 
       ctrl.saveLinkedSkillId = function(displayedValue) {

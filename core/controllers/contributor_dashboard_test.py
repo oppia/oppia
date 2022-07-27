@@ -874,6 +874,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic')]
         topic.next_subtopic_id = 2
+        topic.skill_ids_for_diagnostic_test = [subtopic_skill_id]
         subtopic_page = (
             subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
                 subtopic_id, topic.id))
@@ -931,6 +932,7 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-three')]
         topic.next_subtopic_id = 2
+        topic.skill_ids_for_diagnostic_test = ['skill_id_1']
         topic_services.save_new_topic(self.owner_id, topic)
         topic_services.publish_topic(topic.id, self.admin_id)
 
@@ -1384,6 +1386,7 @@ class TranslatableTopicNamesHandlerTest(test_utils.GenericTestBase):
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-three')]
         topic.next_subtopic_id = 2
+        topic.skill_ids_for_diagnostic_test = ['skill_id_3']
         topic_services.save_new_topic(self.owner_id, topic)
 
         # Unpublished topics should not be returned.

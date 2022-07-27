@@ -24,6 +24,8 @@ from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import translation_domain
+from core.domain import state_domain
+from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
@@ -168,7 +170,7 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
                 'does not match the latest schema version %s' % (
                     self.EXP_1_ID,
                     '1',
-                    '50',
+                    '51',
                     '60'
                 )
         )
@@ -344,7 +346,7 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
     ) -> None:
         auth_id = 'test_id'
         user_email = 'test@email.com'
-        user_id = user_services.create_new_user(auth_id, user_email).user_id  # type: ignore[no-untyped-call]
+        user_id = user_services.create_new_user(auth_id, user_email).user_id
         self.assertIsNone(exp_fetchers.get_exploration_user_data(
             user_id, self.EXP_1_ID))
 
@@ -352,10 +354,10 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
         auth_id = 'test_id'
         username = 'testname'
         user_email = 'test@email.com'
-        user_id = user_services.create_new_user(auth_id, user_email).user_id  # type: ignore[no-untyped-call]
-        user_services.set_username(user_id, username)  # type: ignore[no-untyped-call]
+        user_id = user_services.create_new_user(auth_id, user_email).user_id
+        user_services.set_username(user_id, username)
 
-        user_services.update_learner_checkpoint_progress(  # type: ignore[no-untyped-call]
+        user_services.update_learner_checkpoint_progress(
             user_id, self.EXP_1_ID, 'Introduction', 1)
         expected_user_data_dict = {
             'rating': None,
@@ -378,6 +380,35 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
         # Ruling out the possibility of None for mypy type checking.
         assert exp_user_data is not None
         self.assertEqual(expected_user_data_dict, exp_user_data.to_dict())
+
+    def test_get_exploration_version_history(self) -> None:
+        version_history = exp_fetchers.get_exploration_version_history(
+            self.EXP_1_ID, 2
+        )
+
+        self.assertIsNone(version_history)
+
+        exp_services.update_exploration( # type: ignore[no-untyped-call]
+            self.owner_id, self.EXP_1_ID, [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'New state'
+                })
+            ], 'A commit message.'
+        )
+        version_history = exp_fetchers.get_exploration_version_history(
+            self.EXP_1_ID, 2
+        )
+
+        self.assertIsNotNone(version_history)
+        if version_history is not None:
+            self.assertEqual(version_history.committer_ids, [self.owner_id])
+            self.assertEqual(
+                version_history.state_version_history['New state'].to_dict(),
+                state_domain.StateVersionHistory(
+                    None, None, self.owner_id
+                ).to_dict()
+            )
 
 
 class LoggedOutUserProgressTests(test_utils.GenericTestBase):
@@ -495,6 +526,7 @@ states:
           value: 1
       default_outcome:
         dest: End
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''

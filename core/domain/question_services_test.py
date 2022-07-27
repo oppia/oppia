@@ -790,6 +790,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             state_domain.AnswerGroup.from_dict({
                 'outcome': {
                     'dest': None,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': feedback_content_ids[0],
                         'html': '<p>Feedback</p>'
@@ -814,6 +815,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             state_domain.AnswerGroup.from_dict({
                 'outcome': {
                     'dest': None,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': feedback_content_ids[1],
                         'html': '<p>Feedback</p>'
@@ -838,6 +840,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             state_domain.AnswerGroup.from_dict({
                 'outcome': {
                     'dest': None,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': feedback_content_ids[2],
                         'html': '<p>Feedback</p>'
@@ -943,6 +946,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             state_domain.AnswerGroup.from_dict({
                 'outcome': {
                     'dest': None,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': feedback_content_ids[0],
                         'html': '<p>Feedback</p>'
@@ -967,6 +971,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             state_domain.AnswerGroup.from_dict({
                 'outcome': {
                     'dest': None,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': feedback_content_ids[1],
                         'html': '<p>Feedback</p>'
@@ -991,6 +996,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             state_domain.AnswerGroup.from_dict({
                 'outcome': {
                     'dest': None,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': feedback_content_ids[2],
                         'html': '<p>Feedback</p>'
@@ -1088,6 +1094,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         answer_group = {
             'outcome': {
                 'dest': 'abc',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': '<p>Feedback</p>'
@@ -1125,6 +1132,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'customization_args': {},
                 'default_outcome': {
                     'dest': None,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'feedback_1',
                         'html': 'Correct Answer'
@@ -1180,6 +1188,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         answer_group = {
             'outcome': {
                 'dest': 'abc',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': '<p>Feedback</p>'
@@ -1225,6 +1234,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'customization_args': {},
                 'default_outcome': {
                     'dest': None,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'feedback_1',
                         'html': 'Correct Answer'
@@ -1290,6 +1300,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         answer_group = {
             'outcome': {
                 'dest': 'abc',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': '<p>Feedback</p>'
@@ -1327,6 +1338,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'customization_args': {},
                 'default_outcome': {
                     'dest': None,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'feedback_1',
                         'html': 'Correct Answer'
@@ -1377,6 +1389,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         answer_group = {
             'outcome': {
                 'dest': 'abc',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': '<p>Feedback</p>'
@@ -1418,6 +1431,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 },
                 'default_outcome': {
                     'dest': None,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'feedback_1',
                         'html': 'Correct Answer'
@@ -1470,6 +1484,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         answer_group = {
             'outcome': {
                 'dest': 'abc',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': feedback_html_content
@@ -1514,6 +1529,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 },
                 'default_outcome': {
                     'dest': None,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'feedback_1',
                         'html': 'Correct Answer'
@@ -1572,6 +1588,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         answer_group = {
             'outcome': {
                 'dest': 'abc',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': '<p>Feedback</p>'
@@ -1614,6 +1631,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'customization_args': {},
                 'default_outcome': {
                     'dest': None,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'feedback_1',
                         'html': 'Correct Answer'
@@ -1678,6 +1696,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         answer_group = {
             'outcome': {
                 'dest': 'abc',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': '<p>Feedback</p>'
@@ -1720,6 +1739,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'customization_args': {},
                 'default_outcome': {
                     'dest': None,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'feedback_1',
                         'html': 'Correct Answer'
@@ -1786,6 +1806,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         answer_group = {
             'outcome': {
                 'dest': 'abc',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': '<p>Feedback</p>'
@@ -1823,6 +1844,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'customization_args': {},
                 'default_outcome': {
                     'dest': None,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'feedback_1',
                         'html': 'Correct Answer'
@@ -1889,6 +1911,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         answer_groups_list = [{
             'outcome': {
                 'dest': 'Introduction',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': '<p>Feedback</p>'
@@ -1909,6 +1932,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         }, {
             'outcome': {
                 'dest': 'Introduction',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_2',
                     'html': '<p>Feedback</p>'
@@ -1954,6 +1978,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'customization_args': {},
                 'default_outcome': {
                     'dest': 'Introduction',
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'feedback_3',
                         'html': 'Correct Answer'
@@ -2035,6 +2060,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'customization_args': {},
                 'default_outcome': {
                     'dest': None,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'feedback_1',
                         'html': 'Correct Answer'
@@ -2116,6 +2142,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 },
                 'default_outcome': {
                     'dest': None,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'feedback_1',
                         'html': 'Correct Answer'
@@ -2184,6 +2211,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'customization_args': {},
                 'default_outcome': {
                     'dest': None,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'feedback_1',
                         'html': 'Correct Answer'
@@ -2255,6 +2283,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 },
                 'default_outcome': {
                     'dest': None,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'feedback_1',
                         'html': 'Correct Answer'
@@ -2330,6 +2359,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'answer_groups': [{
                     'outcome': {
                         'dest': None,
+                        'dest_if_really_stuck': None,
                         'feedback': {
                             'content_id': 'feedback_1',
                             'html': 'Correct Answer'
@@ -2358,6 +2388,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 },
                 'default_outcome': {
                     'dest': None,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'feedback_1',
                         'html': 'Correct Answer'
@@ -2417,6 +2448,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         answer_group = {
             'outcome': {
                 'dest': 'abc',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': '<p>Feedback</p>'
@@ -2454,6 +2486,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'customization_args': {},
                 'default_outcome': {
                     'dest': None,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'feedback_1',
                         'html': 'Correct Answer'
@@ -2504,6 +2537,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         answer_group = {
             'outcome': {
                 'dest': 'abc',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': '<p>Feedback</p>'
@@ -2541,6 +2575,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'customization_args': {},
                 'default_outcome': {
                     'dest': None,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'feedback_1',
                         'html': 'Correct Answer'
@@ -2592,6 +2627,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         answer_group = {
             'outcome': {
                 'dest': 'abc',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': '<p>Feedback</p>'
@@ -2637,6 +2673,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 },
                 'default_outcome': {
                     'dest': None,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'feedback_1',
                         'html': 'Correct Answer'
@@ -2688,6 +2725,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         answer_group = {
             'outcome': {
                 'dest': 'abc',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': '<p>Feedback</p>'
@@ -2732,6 +2770,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 },
                 'default_outcome': {
                     'dest': None,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'feedback_1',
                         'html': 'Correct Answer'
@@ -2783,6 +2822,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         answer_group = {
             'outcome': {
                 'dest': 'abc',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': '<p>Feedback</p>'
@@ -2832,6 +2872,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 },
                 'default_outcome': {
                     'dest': None,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'feedback_1',
                         'html': 'Correct Answer'
@@ -2889,6 +2930,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         answer_group = {
             'outcome': {
                 'dest': 'abc',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': '<p>Feedback</p>'
@@ -2954,6 +2996,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 },
                 'default_outcome': {
                     'dest': None,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'feedback_1',
                         'html': 'Correct Answer'
@@ -3019,6 +3062,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         answer_group = {
             'outcome': {
                 'dest': 'abc',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': '<p>Feedback</p>'
@@ -3064,6 +3108,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 },
                 'default_outcome': {
                     'dest': None,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'feedback_1',
                         'html': 'Correct Answer'
@@ -3114,6 +3159,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         answer_group = {
             'outcome': {
                 'dest': 'abc',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': '<p>Feedback</p>'
@@ -3159,6 +3205,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 },
                 'default_outcome': {
                     'dest': None,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'feedback_1',
                         'html': 'Correct Answer'
@@ -3204,6 +3251,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         answer_group = {
             'outcome': {
                 'dest': 'abc',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': '<p>Feedback</p>'
@@ -3246,6 +3294,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 },
                 'default_outcome': {
                     'dest': None,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'feedback_1',
                         'html': 'Correct Answer'
@@ -3293,6 +3342,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         answer_group1 = {
             'outcome': {
                 'dest': 'abc',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': '<p>Feedback</p>'
@@ -3330,6 +3380,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
         answer_group2 = {
             'outcome': {
                 'dest': 'abc',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_2',
                     'html': '<p>Feedback</p>'
@@ -3380,6 +3431,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 },
                 'default_outcome': {
                     'dest': None,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'feedback_1',
                         'html': 'Correct Answer'

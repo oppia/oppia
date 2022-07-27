@@ -160,7 +160,7 @@ import { HelpModalComponent } from './modal-templates/help-modal.component';
 angular.module('oppia').component('explorationEditorPage', {
   template: require('./exploration-editor-page.component.html'),
   controller: [
-    '$q', '$rootScope', '$scope', 'AlertsService',
+    '$location', '$q', '$rootScope', '$scope', 'AlertsService',
     'AutosaveInfoModalsService', 'BottomNavbarStatusService',
     'ChangeListService', 'ContextService',
     'EditabilityService', 'EntityTranslationsService',
@@ -187,7 +187,7 @@ angular.module('oppia').component('explorationEditorPage', {
     'UserEmailPreferencesService', 'UserExplorationPermissionsService',
     'UserService', 'WindowDimensionsService',
     function(
-        $q, $rootScope, $scope, AlertsService,
+        $location, $q, $rootScope, $scope, AlertsService,
         AutosaveInfoModalsService, BottomNavbarStatusService,
         ChangeListService, ContextService,
         EditabilityService, EntityTranslationsService,
@@ -219,6 +219,15 @@ angular.module('oppia').component('explorationEditorPage', {
       ctrl.autosaveIsInProgress = false;
       ctrl.connectedToInternet = true;
       ctrl.explorationEditorPageHasInitialized = false;
+
+      // When the URL path changes, reroute to the appropriate tab in the
+      // Exploration editor page if back and forward button pressed in browser.
+      $rootScope.$watch(() => $location.path(), (newPath, oldPath) => {
+        if (newPath !== '') {
+          RouterService._changeTab(newPath);
+          $rootScope.$applyAsync();
+        }
+      });
 
       var setDocumentTitle = function() {
         if (ExplorationTitleService.savedMemento) {
@@ -577,6 +586,11 @@ angular.module('oppia').component('explorationEditorPage', {
             () => {
               ctrl.startEditorTutorial();
             })
+        );
+        ctrl.directiveSubscriptions.add(
+          RouterService.onRefreshTranslationTab.subscribe(() => {
+            $scope.$applyAsync();
+          })
         );
         ctrl.directiveSubscriptions.add(
           StateTutorialFirstTimeService.onOpenTranslationTutorial.subscribe(

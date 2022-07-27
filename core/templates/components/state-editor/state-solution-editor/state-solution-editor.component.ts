@@ -156,7 +156,7 @@ export class StateSolutionEditorComponent implements OnInit {
   // This returns false if the current interaction ID is null.
   isCurrentInteractionLinear(): boolean {
     let savedMemento = this.stateInteractionIdService.savedMemento;
-    return (savedMemento !== null && INTERACTION_SPECS[
+    return (Boolean(savedMemento) && INTERACTION_SPECS[
       savedMemento as InteractionSpecsKey].is_linear);
   }
 

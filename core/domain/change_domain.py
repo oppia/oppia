@@ -24,15 +24,19 @@ from core import feconf
 from core import utils
 from core.domain import state_domain
 
-from typing import Dict, List, Mapping, Union, cast
+from typing import Any, Dict, List, Mapping, Union, cast
 
 # Union type defined from allowed types that a Dict can contain for its values.
 AcceptableChangeDictTypes = Union[
     str,
+    bool,
     int,
+    None,
     List[str],
     List[state_domain.AnswerGroupDict],
-    state_domain.RecordedVoiceoversDict
+    state_domain.RecordedVoiceoversDict,
+    # This Dict type is added to allow BaseChange to accept customization_args.
+    Dict[str, Dict[str, Any]]
 ]
 
 

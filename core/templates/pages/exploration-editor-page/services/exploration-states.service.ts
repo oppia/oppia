@@ -19,7 +19,6 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { Location } from '@angular/common';
 import { EventEmitter, Injectable } from '@angular/core';
 
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -55,6 +54,7 @@ import { InteractionRulesRegistryService } from 'services/interaction-rules-regi
 import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { ExplorationNextContentIdIndexService } from 'pages/exploration-editor-page/services/exploration-next-content-id-index.service';
 import { MarkTranslationsAsNeedingUpdateModalComponent } from 'components/forms/forms-templates/mark-translations-as-needing-update-modal.component';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 interface ContentsMapping {
   [contentId: string]: SubtitledHtml;
@@ -85,7 +85,7 @@ export class ExplorationStatesService {
     private contextService: ContextService,
     private explorationInitStateNameService: ExplorationInitStateNameService,
     private interactionRulesRegistryService: InteractionRulesRegistryService,
-    private location: Location,
+    private windowRef: WindowRef,
     private ngbModal: NgbModal,
     private normalizeWhitespacePipe: NormalizeWhitespacePipe,
     private solutionValidityService: SolutionValidityService,
@@ -705,7 +705,7 @@ export class ExplorationStatesService {
       this.stateDeletedCallbacks.forEach((callback) => {
         callback(deleteStateName);
       });
-      this.location.prepareExternalUrl(
+      this.windowRef.nativeWindow.location.hash = (
         '/gui/' + this.stateEditorService.getActiveStateName());
       this._refreshGraphEventEmitter.emit();
       // This ensures that if the deletion changes rules in the current

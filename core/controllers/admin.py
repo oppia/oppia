@@ -384,7 +384,7 @@ class AdminHandler(base.BaseHandler):
         state.update_interaction_hints(hints_list)
         state.update_interaction_default_outcome(
             state_domain.Outcome(
-                None,
+                None, None,
                 state_domain.SubtitledHtml(
                     contentIdGenerator.generate(
                         translation_domain.ContentType.DEFAULT_OUTCOME),

@@ -292,6 +292,11 @@ export default {
 
   "TASK_TARGET_TYPE_STATE": "state",
 
+  // Filters for adding new syllabus items to learner groups.
+  "DEFAULT_ADD_SYLLABUS_FILTER": "All",
+  "LEARNER_GROUP_ADD_STORY_FILTER": "Story",
+  "LEARNER_GROUP_ADD_SKILL_FILTER": "Skill",
+
   // Roles in exploration.
   "ROLE_OWNER": "owner",
   "ROLE_EDITOR": "editor",
@@ -5898,6 +5903,11 @@ export default {
   // page.
   "OPPORTUNITIES_PAGE_SIZE": 10,
 
+  // The breakpoint for mobile view for contributor dashboard in px.
+  // This value must be the same as the one specified in
+  // opportunities-list-item.component.html.
+  "OPPORTUNITIES_LIST_ITEM_MOBILE_BREAKPOINT": 700,
+
   // Represents the string value indicating "All topics" in the Contributor
   // Dashboard topic selector.
   "TOPIC_SENTINEL_NAME_ALL": "All",
@@ -5959,6 +5969,7 @@ export default {
       "answer_groups": [],
       "default_outcome": {
         "dest": "Introduction",
+        "dest_if_really_stuck": null,
         "feedback": {
           "content_id": "<placholder2>",
           "html": ""
@@ -6024,6 +6035,9 @@ export default {
 
   // A regular expression for allowed entity id's.
   "ENTITY_ID_REGEX": "^[a-zA-Z0-9-_]{1,12}$",
+
+  // A regular expression for allowed learner group IDs.
+  "LEARNER_GROUP_ID_REGEX": "^[a-zA-Z]{1,12}$",
 
   // A regular expression for allowed characters in Title field for Blog Post.
   "VALID_BLOG_POST_TITLE_REGEX": "^[a-zA-Z0-9][a-zA-Z0-9 ]+(-[a-zA-Z0-9]+)*$",
@@ -6732,5 +6746,14 @@ export default {
   "ASSET_TYPE_IMAGE": "image",
   "ASSET_TYPE_THUMBNAIL": "thumbnail",
 
-  "FAVICON_ALERT_PATH": "/assets/images/favicon_alert/favicon_alert.ico"
+  "FAVICON_ALERT_PATH": "/assets/images/favicon_alert/favicon_alert.ico",
+
+  "CAN_FETCH_VERSION_HISTORY_DATA": false,
+  "METADATA_PROPERTIES": [
+    "title", "category", "objective", "language_code", "tags", "blurb",
+    "author_notes", "states_schema_version", "init_state_name", "param_specs",
+    "param_changes", "auto_tts_enabled", "correctness_feedback_enabled",
+    "edits_allowed"
+  ],
+  "NON_METADATA_PROPERTIES": ["id", "states"]
 } as const;

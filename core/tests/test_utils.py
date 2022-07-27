@@ -1645,13 +1645,14 @@ class GenericTestBase(AppEngineTestBase):
                     'html': '',
                 },
                 'dest': None,
+                'dest_if_really_stuck': None,
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None,
                 'labelled_as_correct': True,
             },
             'customization_args': {
                 'rows': {'value': 1},
-                'placeholder': {'value': 'Enter text here'},
+                'placeholder': {'value': 'Enter text here'}
             },
             'confirmed_unclassified_answers': [],
             'id': 'TextInput',
@@ -1817,6 +1818,7 @@ states:
       customization_args: {}
       default_outcome:
         dest: %s
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome_1
           html: ''
@@ -1846,6 +1848,7 @@ states:
       customization_args: {}
       default_outcome:
         dest: New state
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome_3
           html: ''
@@ -3118,6 +3121,10 @@ title: Title
         ]
         uncategorized_skill_ids = uncategorized_skill_ids or []
         subtopics = subtopics or []
+        skill_ids_for_diagnostic_test = []
+        for subtopic in subtopics:
+            skill_ids_for_diagnostic_test.extend(subtopic.skill_ids)
+
         topic = topic_domain.Topic(
             topic_id, name, abbreviated_name, url_fragment, thumbnail_filename,
             thumbnail_bg_color, thumbnail_size_in_bytes, description,
@@ -3126,7 +3133,7 @@ title: Title
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, next_subtopic_id,
             language_code, 0, feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION,
             meta_tag_content, practice_tab_is_displayed,
-            page_title_fragment_for_web)
+            page_title_fragment_for_web, skill_ids_for_diagnostic_test)
         topic_services.save_new_topic(owner_id, topic)
         return topic
 
@@ -3470,7 +3477,7 @@ title: Title
                     'unicode_str': 'Enter text here',
                 },
             },
-            'rows': {'value': 1},
+            'rows': {'value': 1}
         })
         state.interaction.default_outcome.labelled_as_correct = True
         state.interaction.default_outcome.dest = None
@@ -3528,8 +3535,16 @@ class EmailMessageMock:
     """Mock for core.platform.models email services messages."""
 
     def __init__(
-            self, sender_email, recipient_email, subject, plaintext_body,
-            html_body, bcc=None, reply_to=None, recipient_variables=None):
+        self,
+        sender_email: str,
+        recipient_email: str,
+        subject: str,
+        plaintext_body: str,
+        html_body: str,
+        bcc: Optional[List[str]] = None,
+        reply_to: Optional[str] = None,
+        recipient_variables: Optional[Dict[str, Dict[str, str]]] = None
+    ) -> None:
         """Inits a mock email message with all the necessary data.
 
         Args:

@@ -16,472 +16,315 @@
  * @fileoverview Unit tests for RouterService.
  */
 
-import { fakeAsync, flush, flushMicrotasks } from '@angular/core/testing';
-import $ from 'jquery';
+import { RouterService } from './router.service';
 import { Subscription } from 'rxjs';
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { discardPeriodicTasks, fakeAsync, flush, TestBed, tick } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import $ from 'jquery';
+import { ContextService } from 'services/context.service';
+import { ExplorationImprovementsService } from 'services/exploration-improvements.service';
+import { ExplorationStatesService } from './exploration-states.service';
+import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import { ExplorationInitStateNameService } from './exploration-init-state-name.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
+
+class MockContextService {
+  getExplorationId() {
+    return 'expID';
+  }
+}
+
+class MockExplorationInitStateNameService {
+  savedMemento = 'main';
+}
+
+class MockActiveModal {
+  dismiss(): void {
+    return;
+  }
+}
 
 describe('Router Service', () => {
-  var RouterService = null;
-  var ExplorationStatesService = null;
-  var ExplorationImprovementsService = null;
-  var ExplorationInitStateNameService = null;
-  var ExternalSaveService = null;
-  var StateEditorRefreshService = null;
-  var $rootScope = null;
-  var $location = null;
-  var $timeout = null, $interval = null;
-  const centerGraphSpy = jasmine.createSpy('centerGraphSpy');
-  var testSubscriptions = null;
-  var refreshStatisticsTabSpy = null;
-  var refreshSettingsTabSpy = null;
-  var refreshTranslationTabSpy = null;
-  var externalSaveSpy = null;
-  var refreshVersionHistorySpy = null;
-  var refreshStateEditorSpy = null;
+  let routerService: RouterService;
+  let testSubscriptions: Subscription;
+  let explorationImprovementsService: ExplorationImprovementsService;
+  let explorationStatesService: ExplorationStatesService;
+  let stateEditorService: StateEditorService;
+  let windowRef: WindowRef;
+  let hasStateSpy;
+  let isInitializedSpy;
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('NgbModal', {
-      open: () => {
-        return {
-          result: Promise.resolve()
-        };
-      }
+  beforeEach((() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [
+        RouterService,
+        WindowRef,
+        {
+          provide: NgbActiveModal,
+          useClass: MockActiveModal
+        },
+        ExplorationImprovementsService,
+        ExplorationStatesService,
+        StateEditorService,
+        {
+          provide: ContextService,
+          useClass: MockContextService
+        },
+        {
+          provide: ExplorationInitStateNameService,
+          useClass: MockExplorationInitStateNameService
+        }
+      ]
     });
-  }));
-  importAllAngularServices();
-  beforeEach(angular.mock.inject($injector => {
-    RouterService = $injector.get('RouterService');
-    ExplorationStatesService = $injector.get('ExplorationStatesService');
-    ExplorationImprovementsService = $injector.get(
-      'ExplorationImprovementsService');
-    ExplorationInitStateNameService = $injector.get(
-      'ExplorationInitStateNameService');
-    ExternalSaveService = $injector.get('ExternalSaveService');
-    StateEditorRefreshService = $injector.get('StateEditorRefreshService');
-    $rootScope = $injector.get('$rootScope');
-    $location = $injector.get('$location');
-    $timeout = $injector.get('$timeout');
-    $interval = $injector.get('$interval');
 
-    ExplorationInitStateNameService.init('initState');
-    ExplorationStatesService.init({
-      newState: {
-        content: {
-          content_id: 'content',
-          html: ''
-        },
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content: {},
-            default_outcome: {},
-          },
-        },
-        param_changes: [],
-        interaction: {
-          answer_groups: [{
-            rule_specs: [],
-            outcome: {
-              dest: 'Me Llamo',
-              feedback: {
-                content_id: 'feedback_1',
-                html: 'buen trabajo!',
-              },
-            },
-          }],
-          customization_args: {
-            placeholder: {
-              value: {
-                content_id: 'ca_placeholder_0',
-                unicode_str: ''
-              }
-            },
-            rows: { value: 1 }
-          },
-          default_outcome: {
-            dest: 'Hola',
-            feedback: {
-              content_id: 'default_outcome',
-              html: 'try again!',
-            },
-            labelled_as_correct: false,
-          },
-          hints: [],
-          id: 'TextInput',
-          solution: null,
-        },
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {},
-          },
-        }
-      },
-      initState: {
-        content: {
-          content_id: 'content',
-          html: ''
-        },
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content: {},
-            default_outcome: {},
-          },
-        },
-        param_changes: [],
-        interaction: {
-          answer_groups: [{
-            rule_specs: [],
-            outcome: {
-              dest: 'Me Llamo',
-              feedback: {
-                content_id: 'feedback_1',
-                html: 'buen trabajo!',
-              },
-            },
-          }],
-          customization_args: {
-            placeholder: {
-              value: {
-                content_id: 'ca_placeholder_0',
-                unicode_str: ''
-              }
-            },
-            rows: { value: 1 }
-          },
-          default_outcome: {
-            dest: 'Hola',
-            feedback: {
-              content_id: 'default_outcome',
-              html: 'try again!',
-            },
-            labelled_as_correct: false,
-          },
-          hints: [],
-          id: 'TextInput',
-          solution: null,
-        },
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {},
-          },
-        }
-      }
-    });
+    routerService = TestBed.inject(RouterService);
+    explorationImprovementsService = TestBed.inject(
+      ExplorationImprovementsService);
+    explorationStatesService = TestBed.inject(
+      ExplorationStatesService);
+    windowRef = TestBed.inject(WindowRef);
+    stateEditorService = TestBed.inject(StateEditorService);
   }));
 
   beforeEach(() => {
-    refreshStatisticsTabSpy = jasmine.createSpy('refreshStatisticsTab');
-    refreshSettingsTabSpy = jasmine.createSpy('refreshSettingsTab');
-    refreshTranslationTabSpy = jasmine.createSpy('refreshTranslationTab');
-    refreshStateEditorSpy = jasmine.createSpy('RefreshStateEditor');
-    externalSaveSpy = jasmine.createSpy('externalSpy');
-    refreshVersionHistorySpy = jasmine.createSpy('refreshVersionHistory');
-    testSubscriptions = new Subscription();
-    testSubscriptions.add(RouterService.onCenterGraph.subscribe(
-      centerGraphSpy));
-    testSubscriptions.add(
-      RouterService.onRefreshStatisticsTab.subscribe(refreshStatisticsTabSpy));
-    testSubscriptions.add(
-      RouterService.onRefreshSettingsTab.subscribe(refreshSettingsTabSpy));
-    testSubscriptions.add(
-      RouterService.onRefreshTranslationTab.subscribe(
-        refreshTranslationTabSpy));
-    testSubscriptions.add(
-      ExternalSaveService.onExternalSave.subscribe(externalSaveSpy));
-    testSubscriptions.add(
-      RouterService.onRefreshVersionHistory.subscribe(
-        refreshVersionHistorySpy));
-    testSubscriptions.add(
-      StateEditorRefreshService.onRefreshStateEditor.subscribe(
-        refreshStateEditorSpy));
-  });
+    isInitializedSpy = spyOn(explorationStatesService, 'isInitialized');
+    isInitializedSpy.and.returnValue(true);
+    hasStateSpy = spyOn(explorationStatesService, 'hasState');
+    hasStateSpy.and.returnValue(true);
+    spyOn(stateEditorService, 'getActiveStateName')
+      .and.returnValue(null);
 
+    testSubscriptions = new Subscription();
+    routerService.navigateToMainTab('first card');
+  });
   afterEach(() => {
     testSubscriptions.unsubscribe();
   });
 
   it('should not navigate to main tab when already there', fakeAsync(() => {
-    var jQuerySpy = spyOn(window, '$');
+    let jQuerySpy = spyOn(window, '$');
     jQuerySpy.withArgs('.oppia-editor-cards-container').and.returnValue(
       $(document.createElement('div')));
     jQuerySpy.and.callThrough();
-    let fadeOutSpy = spyOn($.fn, 'fadeOut').and.callFake(cb => {
+
+    spyOn($.fn, 'fadeOut').and.callFake(cb => {
       cb();
-      $timeout.flush(200);
+      setTimeout(() => {},);
       return null;
     });
 
-    expect(RouterService.getActiveTabName()).toBe('main');
-    RouterService.navigateToMainTab('newState');
+    expect(routerService.getActiveTabName()).toBe('main');
+    routerService.navigateToPreviewTab();
+    tick(300);
 
-    $rootScope.$apply();
+    routerService.navigateToMainTab('first card');
+
+    tick(300);
+
+
+    expect(routerService.getActiveTabName()).toBe('main');
+
+    routerService.navigateToMainTab('first card');
+
+    tick(300);
+
+
+    expect(routerService.getActiveTabName()).toBe('main');
+
     flush();
+    discardPeriodicTasks();
+  }));
 
-    expect(externalSaveSpy).toHaveBeenCalled();
-    expect(RouterService.getActiveTabName()).toBe('main');
+  it('should navigate to main tab if path is ""', fakeAsync(() => {
+    window.location.hash = '';
+    routerService._changeTab(undefined);
 
-    RouterService.navigateToMainTab('newState');
+    tick(300);
 
-    $rootScope.$apply();
+    routerService.onCenterGraph.emit();
+    expect(routerService.getActiveTabName()).toBe('main');
+
     flush();
-
-    expect(RouterService.getActiveTabName()).toBe('main');
-    expect(fadeOutSpy).toHaveBeenCalled();
+    discardPeriodicTasks();
   }));
 
-  it('should navigate to main tab when current location is not main', () => {
-    // Go to stats tab.
-    RouterService.navigateToStatsTab();
-    $timeout.flush();
-    $rootScope.$apply();
+  it('should navigate to setting tab', fakeAsync(() => {
+    expect(routerService.getActiveTabName()).toBe('main');
+    routerService.navigateToSettingsTab();
 
-    expect(externalSaveSpy).toHaveBeenCalled();
-    expect(RouterService.getActiveTabName()).toBe('stats');
-    expect(refreshStatisticsTabSpy).toHaveBeenCalled();
+    tick(300);
 
-    expect(RouterService.isLocationSetToNonStateEditorTab()).toBe(true);
-    $rootScope.$apply();
+    routerService.onRefreshSettingsTab.emit();
+    expect(routerService.getActiveTabName()).toBe('settings');
 
-    // Now go to main tab.
-    RouterService.navigateToMainTab('newState');
-    $rootScope.$apply();
-    $rootScope.$apply();
-
-    expect(externalSaveSpy).toHaveBeenCalled();
-    expect(RouterService.getActiveTabName()).toBe('main');
-    expect(RouterService.isLocationSetToNonStateEditorTab()).toBe(false);
-    $rootScope.$apply();
-
-    $interval.flush(300);
-
-    expect(refreshStateEditorSpy).toHaveBeenCalled();
-    expect(centerGraphSpy).toHaveBeenCalled();
-  });
-
-  it('should navigate to translation tab', () => {
-    RouterService.navigateToTranslationTab();
-    $rootScope.$apply();
-
-    expect(externalSaveSpy).toHaveBeenCalled();
-    expect(RouterService.getActiveTabName()).toBe('translation');
-    $interval.flush(300);
-
-    expect(refreshTranslationTabSpy).toHaveBeenCalled();
-
-    expect(RouterService.isLocationSetToNonStateEditorTab()).toBe(true);
-    $rootScope.$apply();
-  });
-
-  it('should navigate to preview tab', () => {
-    expect(RouterService.getActiveTabName()).toBe('main');
-    RouterService.navigateToPreviewTab();
-    $timeout.flush(200);
-    $rootScope.$apply();
-
-    expect(externalSaveSpy).toHaveBeenCalled();
-    expect(RouterService.getActiveTabName()).toBe('preview');
-
-    $interval.flush(300);
-    $rootScope.$apply();
-
-    expect(externalSaveSpy).toHaveBeenCalled();
-    expect(RouterService.getActiveTabName()).toBe('preview');
-
-    $interval.flush(300);
-
-    expect(RouterService.isLocationSetToNonStateEditorTab()).toBe(false);
-    $rootScope.$apply();
-  });
-
-  it('should navigate to stats tab', () => {
-    RouterService.navigateToStatsTab();
-    $rootScope.$apply();
-
-    expect(externalSaveSpy).toHaveBeenCalled();
-    expect(RouterService.getActiveTabName()).toBe('stats');
-    expect(refreshStatisticsTabSpy).toHaveBeenCalled();
-
-    expect(RouterService.isLocationSetToNonStateEditorTab()).toBe(true);
-    $rootScope.$apply();
-  });
-
-  it('should navigate to improvements tab', fakeAsync(() => {
-    spyOn(ExplorationImprovementsService, 'isImprovementsTabEnabledAsync')
-      .and.returnValue(Promise.resolve(true));
-
-    RouterService.navigateToImprovementsTab();
-    $rootScope.$apply(); // Apply the change of active tab.
-    flushMicrotasks(); // Flush pending promise chains.
-    $rootScope.$apply(); // Apply any new changes made to the active tab.
-
-    expect(externalSaveSpy).toHaveBeenCalled();
-    expect(RouterService.getActiveTabName()).toEqual('improvements');
-
-    expect(RouterService.isLocationSetToNonStateEditorTab()).toBe(true);
-    $rootScope.$apply();
+    flush();
+    discardPeriodicTasks();
   }));
 
-  it(
-    'should reroute to main tab after confirming improvements tab is disabled',
-    fakeAsync(() => {
-      let resolveIsImprovementsTabEnabledPromise: (_: boolean) => void;
-      let isImprovementsTabEnabledPromise = new Promise(resolve => {
-        resolveIsImprovementsTabEnabledPromise = resolve;
-      });
-      spyOn(ExplorationImprovementsService, 'isImprovementsTabEnabledAsync')
-        .and.returnValue(isImprovementsTabEnabledPromise);
+  it('should navigate to translation tab', fakeAsync(() => {
+    expect(routerService.getActiveTabName()).toBe('main');
+    routerService.navigateToTranslationTab();
 
-      RouterService.navigateToImprovementsTab();
-      $rootScope.$apply(); // Apply the change of active tab.
+    routerService.onRefreshTranslationTab.emit();
+    tick(300);
 
-      // Promise hasn't been fulfilled yet, should still be on improvements tab.
-      expect(RouterService.getActiveTabName()).toEqual('improvements');
-      expect(RouterService.isLocationSetToNonStateEditorTab()).toBe(true);
+    expect(routerService.getActiveTabName()).toBe('translation');
 
-      resolveIsImprovementsTabEnabledPromise(false);
-      flushMicrotasks(); // Flush pending promise chains.
-      $rootScope.$apply(); // Apply any new changes made to the active tab.
-
-      // Promise has been fulfilled, should be redirected to main tab since
-      // we've confirmed the improvements tab is not enabled.
-      expect(RouterService.getActiveTabName()).toEqual('main');
-      expect(RouterService.isLocationSetToNonStateEditorTab()).toBe(false);
-    }));
-
-  it('should reroute to the main tab immediately when improvements tab is ' +
-    'disabled', fakeAsync(() => {
-    spyOn(ExplorationImprovementsService, 'isImprovementsTabEnabledAsync')
-      .and.returnValue(Promise.resolve(false));
-
-    RouterService.navigateToImprovementsTab();
-    $rootScope.$apply(); // Apply the change of active tab.
-    flushMicrotasks(); // Flush pending promise chains.
-    $rootScope.$apply(); // Apply any new changes made to the active tab.
-
-    expect(RouterService.getActiveTabName()).toEqual('main');
-    expect(RouterService.isLocationSetToNonStateEditorTab()).toBe(false);
+    flush();
+    discardPeriodicTasks();
   }));
 
-  it(
-    'should remain on the improvements tab after confirming it is enabled',
+  it('should navigate to preview tab', fakeAsync(() => {
+    expect(routerService.getActiveTabName()).toBe('main');
+    routerService.navigateToPreviewTab();
+
+    tick(300);
+
+    expect(routerService.getActiveTabName()).toBe('preview');
+
+    flush();
+    discardPeriodicTasks();
+  }));
+
+  it('should navigate to preview tab', fakeAsync(() => {
+    hasStateSpy.and.returnValue(false);
+    isInitializedSpy.and.returnValue(true);
+    tick();
+    expect(routerService.getActiveTabName()).toBe('main');
+    routerService.navigateToPreviewTab();
+
+    tick(3000);
+
+    expect(routerService.getActiveTabName()).toBe('preview');
+
+    flush();
+    discardPeriodicTasks();
+  }));
+
+  it('should navigate to stats tab', fakeAsync(() => {
+    expect(routerService.getActiveTabName()).toBe('main');
+    routerService.navigateToStatsTab();
+
+    tick(300);
+
+    routerService.onRefreshStatisticsTab.emit();
+    expect(routerService.getActiveTabName()).toBe('stats');
+
+    flush();
+    discardPeriodicTasks();
+  }));
+
+  it('should navigate to main tab if improvements tab is not enabled',
     fakeAsync(() => {
-      let resolveIsImprovementsTabEnabledPromise: (_: boolean) => void;
-      let isImprovementsTabEnabledPromise = new Promise(resolve => {
-        resolveIsImprovementsTabEnabledPromise = resolve;
-      });
-      spyOn(ExplorationImprovementsService, 'isImprovementsTabEnabledAsync')
-        .and.returnValue(isImprovementsTabEnabledPromise);
+      spyOn(explorationImprovementsService, 'isImprovementsTabEnabledAsync')
+        .and.returnValue(Promise.resolve(false));
 
-      RouterService.navigateToImprovementsTab();
-      $rootScope.$apply(); // Apply the change of active tab.
-      flushMicrotasks(); // Flush pending promise chains.
-      $rootScope.$apply(); // Apply any new changes made to the active tab.
+      expect(routerService.getActiveTabName()).toBe('main');
 
-      expect(RouterService.getActiveTabName()).toEqual('improvements');
-      expect(RouterService.isLocationSetToNonStateEditorTab()).toBe(true);
+      routerService.navigateToImprovementsTab();
+      tick(300);
 
-      resolveIsImprovementsTabEnabledPromise(true);
-      flushMicrotasks(); // Flush pending promise chains.
-      $rootScope.$apply(); // Apply any new changes made to the active tab.
+      expect(routerService.getActiveTabName()).toBe('main');
 
-      expect(RouterService.getActiveTabName()).toEqual('improvements');
-      expect(RouterService.isLocationSetToNonStateEditorTab()).toBe(true);
+      flush();
+      discardPeriodicTasks();
     }));
 
-  it(
-    'should not reroute to the main tab after leaving improvements tab',
+  it('should navigate to improvements tab is not enabled',
     fakeAsync(() => {
-      let resolveIsImprovementsTabEnabledPromise: (_: boolean) => void;
-      let isImprovementsTabEnabledPromise = new Promise(resolve => {
-        resolveIsImprovementsTabEnabledPromise = resolve;
-      });
-      spyOn(ExplorationImprovementsService, 'isImprovementsTabEnabledAsync')
-        .and.returnValue(isImprovementsTabEnabledPromise);
+      spyOn(explorationImprovementsService, 'isImprovementsTabEnabledAsync')
+        .and.returnValue(Promise.resolve(true));
 
-      RouterService.navigateToImprovementsTab();
-      $rootScope.$apply(); // Apply the change of active tab.
+      expect(routerService.getActiveTabName()).toBe('main');
+      routerService.navigateToImprovementsTab();
 
-      // Promise hasn't been fulfilled yet, should still be on improvements tab.
-      expect(RouterService.getActiveTabName()).toEqual('improvements');
+      tick(300);
 
-      RouterService.navigateToStatsTab();
-      $rootScope.$apply(); // Apply the change of active tab.
+      expect(routerService.getActiveTabName()).toBe('improvements');
 
-      // Have navigated to stats tab before promise was fulfilled.
-      expect(RouterService.getActiveTabName()).toEqual('stats');
-
-      resolveIsImprovementsTabEnabledPromise(false);
-      flushMicrotasks(); // Flush pending promise chains.
-      $rootScope.$apply(); // Apply any new changes made to the active tab.
-
-      // Promise has been fulfilled, but user has navigated away from the
-      // improvements tab. They should *not* have been redirected to main tab.
-      expect(RouterService.getActiveTabName()).toEqual('stats');
+      flush();
+      discardPeriodicTasks();
     }));
 
-  it('should navigate to settings tab', () => {
-    RouterService.navigateToSettingsTab();
-    $rootScope.$apply();
+  it('should navigate to history tab', fakeAsync(() => {
+    expect(routerService.getActiveTabName()).toBe('main');
+    routerService.navigateToHistoryTab();
 
-    expect(externalSaveSpy).toHaveBeenCalled();
-    expect(RouterService.getActiveTabName()).toBe('settings');
-    expect(refreshSettingsTabSpy).toHaveBeenCalled();
+    tick(300);
 
-    expect(RouterService.isLocationSetToNonStateEditorTab()).toBe(true);
-    $rootScope.$apply();
-  });
+    routerService.onRefreshVersionHistory.emit();
+    expect(routerService.getActiveTabName()).toBe('history');
 
-  it('should navigate to history tab', () => {
-    RouterService.navigateToHistoryTab();
-    $rootScope.$apply();
+    flush();
+    discardPeriodicTasks();
+  }));
 
-    expect(externalSaveSpy).toHaveBeenCalled();
-    expect(refreshVersionHistorySpy).toHaveBeenCalled();
-    expect(RouterService.getActiveTabName()).toBe('history');
+  it('should navigate to feedback tab', fakeAsync(() => {
+    expect(routerService.getActiveTabName()).toBe('main');
+    routerService.navigateToFeedbackTab();
 
-    expect(RouterService.isLocationSetToNonStateEditorTab()).toBe(true);
-    $rootScope.$apply();
-  });
+    tick(300);
 
-  it('should navigate to feedback tab', () => {
-    RouterService.navigateToFeedbackTab();
-    $rootScope.$apply();
+    expect(routerService.getActiveTabName()).toBe('feedback');
 
-    // $watch is called.
-    expect(externalSaveSpy).toHaveBeenCalled();
-    expect(RouterService.getActiveTabName()).toBe('feedback');
+    flush();
+    discardPeriodicTasks();
+  }));
 
-    expect(RouterService.isLocationSetToNonStateEditorTab()).toBe(true);
-    $rootScope.$apply();
-  });
+  it('should navigate to main tab when newpath is unknow', fakeAsync(() => {
+    expect(routerService.getActiveTabName()).toBe('main');
 
-  it('should handle when location redirects to an invalid path', () => {
-    var locationPathSpy = spyOn($location, 'path');
-    locationPathSpy.and.returnValue('/invalid');
+    routerService._changeTab('error-page');
+    tick(300);
 
-    RouterService.navigateToMainTab(null);
-    $rootScope.$apply();
-    expect(externalSaveSpy).toHaveBeenCalled();
+    expect(routerService.getActiveTabName()).toBe('main');
 
-    // Change to a valid path during the call.
-    locationPathSpy.and.returnValue('/gui/initState');
+    flush();
+    discardPeriodicTasks();
+  }));
 
-    $rootScope.$apply();
-    expect(externalSaveSpy).toHaveBeenCalled();
-    expect(RouterService.getActiveTabName()).toBe('main');
-    expect(RouterService.getCurrentStateFromLocationPath())
-      .toEqual('initState');
+  it('should tell isLocationSetToNonStateEditorTab', fakeAsync(() => {
+    spyOnProperty(windowRef, 'nativeWindow')
+      .and.returnValue({
+        location: {
+          hash: '#/settings'
+        }
+      });
 
-    $interval.flush(300);
+    expect(routerService.isLocationSetToNonStateEditorTab())
+      .toBeTrue();
 
-    expect(refreshStateEditorSpy).toHaveBeenCalled();
-    expect(centerGraphSpy).toHaveBeenCalled();
-  });
+    flush();
+    discardPeriodicTasks();
+  }));
 
-  it('should save pending changes', () => {
-    RouterService.savePendingChanges();
-    expect(externalSaveSpy).toHaveBeenCalled();
+  it('should tell current State From Location Path to be null',
+    fakeAsync(() => {
+      spyOnProperty(windowRef, 'nativeWindow')
+        .and.returnValue({
+          location: {
+            hash: '#/gui/Introduction'
+          }
+        });
+
+      routerService.savePendingChanges();
+      expect(routerService.getCurrentStateFromLocationPath())
+        .toBe('/Introduction');
+
+      routerService.navigateToMainTab('/Introduction');
+      flush();
+      discardPeriodicTasks();
+    }));
+
+  it('should not navigate to main tab', () => {
+    spyOn(routerService, '_getCurrentStateFromLocationPath')
+      .and.returnValue('/main');
+
+    routerService.navigateToMainTab('main');
+
+    expect(routerService._getCurrentStateFromLocationPath)
+      .toHaveBeenCalled();
   });
 });

@@ -11,8 +11,8 @@
     </div>
     <div class="oppia-page-contents-viewer">
       <div>
-        <angular-html-bind-wrapper *ngIf="pageContents" [htmlData]="pageContents.getHtml()">
-        </angular-html-bind-wrapper>
+        <oppia-rte-output-display *ngIf="pageContents" [rteString]="pageContents.getHtml()">
+        </oppia-rte-output-display>
       </div>
     </div>
   </div>

@@ -1257,7 +1257,32 @@ class Question(translation_domain.BaseTranslatableObject):
 
     @classmethod
     def _convert_state_v50_dict_to_v51_dict(cls, question_state_dict):
-        """Converts from v50 to v51. Version 51 removes next_content_id_index
+        """Converts from version 50 to 51. Version 51 adds a new
+        dest_if_really_stuck field to Outcome class to redirect learners
+        to a state for strengthening concepts when they get really stuck.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+
+        answer_groups = question_state_dict['interaction']['answer_groups']
+        for answer_group in answer_groups:
+            answer_group['outcome']['dest_if_really_stuck'] = None
+
+        if question_state_dict['interaction']['default_outcome'] is not None:
+            question_state_dict[
+                'interaction']['default_outcome']['dest_if_really_stuck'] = None
+
+        return question_state_dict
+
+    @classmethod
+    def _convert_state_v51_dict_to_v52_dict(cls, question_state_dict):
+        """Converts from v51 to v52. Version 52 removes next_content_id_index
         and WrittenTranslation from State. This version also updates the
         content-ids for each translatable field in the state with its new
         content-id.
@@ -1296,7 +1321,7 @@ class Question(translation_domain.BaseTranslatableObject):
         conversion_fn = getattr(cls, '_convert_state_v%s_dict_to_v%s_dict' % (
             current_state_schema_version, current_state_schema_version + 1))
 
-        if current_state_schema_version == 50:
+        if current_state_schema_version == 51:
             versioned_question_state['state'], next_content_id_index = (
                 conversion_fn(versioned_question_state['state'])
             )
@@ -1379,18 +1404,24 @@ class Question(translation_domain.BaseTranslatableObject):
         interaction_specs = interaction_registry.Registry.get_all_specs()
         at_least_one_correct_answer = False
         dest_is_specified = False
+        dest_if_stuck_is_specified = False
         interaction = self.question_state_data.interaction
         for answer_group in interaction.answer_groups:
             if answer_group.outcome.labelled_as_correct:
                 at_least_one_correct_answer = True
             if answer_group.outcome.dest is not None:
                 dest_is_specified = True
+            if answer_group.outcome.dest_if_really_stuck is not None:
+                dest_if_stuck_is_specified = True
 
         if interaction.default_outcome.labelled_as_correct:
             at_least_one_correct_answer = True
 
         if interaction.default_outcome.dest is not None:
             dest_is_specified = True
+
+        if interaction.default_outcome.dest_if_really_stuck is not None:
+            dest_if_stuck_is_specified = True
 
         if not at_least_one_correct_answer:
             raise utils.ValidationError(
@@ -1401,6 +1432,12 @@ class Question(translation_domain.BaseTranslatableObject):
         if dest_is_specified:
             raise utils.ValidationError(
                 'Expected all answer groups to have destination as None.'
+            )
+
+        if dest_if_stuck_is_specified:
+            raise utils.ValidationError(
+                'Expected all answer groups to have destination for the '
+                'stuck learner as None.'
             )
 
         if not interaction.hints:

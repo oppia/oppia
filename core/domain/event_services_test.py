@@ -452,7 +452,9 @@ class AnswerSubmissionEventHandlerTests(test_utils.GenericTestBase):
             'classification_categorization': category,
             'session_id': session_id,
             'interaction_id': 'TextInput',
-            'params': {}
+            'params': {},
+            'rule_spec_str': None,
+            'answer_str': None,
         }])
 
         all_models = (

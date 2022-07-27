@@ -2272,6 +2272,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         answer_group = {
             'outcome': {
                 'dest': None,
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': ''
@@ -2330,6 +2331,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
                 },
                 'default_outcome': {
                     'dest': None,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'feedback_2',
                         'html': 'Correct Answer'
@@ -2481,6 +2483,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
                         ],
                         'outcome': {
                             'dest': None,
+                            'dest_if_really_stuck': None,
                             'feedback': {
                                 'html': '<p>assas</p>',
                                 'content_id': 'feedback_0'
@@ -2525,6 +2528,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
                 },
                 'default_outcome': {
                     'dest': None,
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'html': '<p>wer</p>',
                         'content_id': 'default_outcome'
