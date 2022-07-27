@@ -70,7 +70,7 @@ class ActivityRightsDict(TypedDict):
     viewable_if_private: bool
 
 
-def get_username_email_from_user_ids(user_ids: list(str)) -> List[str]:
+def get_username_email_from_user_ids(user_ids: list[str]) -> List[str]:
     """Converts the given ids to usernames, or truncated email addresses.
 
     Args:
@@ -119,7 +119,11 @@ def get_username_email_from_user_ids(user_ids: list(str)) -> List[str]:
 
     usernames = []
     for user_settings in enumerate(users_settings):
-        if user_settings.username:
+        if user_settings is None:
+            raise Exception('User not found.')
+        elif user_settings.deleted:
+            usernames.append('[User being deleted]')
+        elif user_settings.username:
             usernames.append(user_settings.username)
         else:
             usernames.append(
