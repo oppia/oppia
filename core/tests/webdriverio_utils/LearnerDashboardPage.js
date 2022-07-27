@@ -126,7 +126,7 @@ var LearnerDashboardPage = function() {
       editGoalsTopicName,
       'Topic in Edit Goals takes too long to appear');
     await waitFor.textToBePresentInElement(
-      editGoalsTopicName, name,
+      '.e2e-test-topic-name-in-edit-goals', name,
       `Text "${name}" taking too long to be present in editGoalsTopic`);
     var topicName = $(
       `.e2e-test-topic-name-in-edit-goals=${name}`);
@@ -138,7 +138,7 @@ var LearnerDashboardPage = function() {
       currentGoalsTopicName,
       'Topic in Current Goals takes too long to appear');
     await waitFor.textToBePresentInElement(
-      currentGoalsTopicName, name,
+      '.e2e-test-topic-name-in-current-goals', name,
       `Text "${name}" taking too long to be present in currentGoalsTopic`);
     var topicName = $(
       `.e2e-test-topic-name-in-current-goals=${name}`);
@@ -151,7 +151,7 @@ var LearnerDashboardPage = function() {
       'Topic in Skill Proficiency takes too long to appear'
     );
     await waitFor.textToBePresentInElement(
-      skillProficiencyTopicTitle, name,
+      '.e2e-test-skill-proficiency-topic-title', name,
       `Text "${name}" taking too long to be present in skillProficiencyTopic`);
     var topicName = $(
       `.e2e-test-skill-proficiency-topic-title=${name}`);
@@ -164,7 +164,7 @@ var LearnerDashboardPage = function() {
       'Topic in completed goals takes too long to appear'
     );
     await waitFor.textToBePresentInElement(
-      completedGoalsTopicName, name,
+      '.e2e-test-completed-goals-topic-name', name,
       `Text "${name}" taking too long to be present in completedGoalsTopic`);
     var topicName = $(
       `.e2e-test-completed-goals-topic-name*=${name}`);

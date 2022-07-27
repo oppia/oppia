@@ -71,7 +71,7 @@ var AdminPage = function() {
       await general.acceptAlert();
       // Waiting for success message.
       await waitFor.textToBePresentInElement(
-        statusMessage, 'saved successfully',
+        '.e2e-test-status-message', 'saved successfully',
         'New config could not be saved');
       return true;
     }

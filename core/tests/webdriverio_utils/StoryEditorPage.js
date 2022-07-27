@@ -324,7 +324,7 @@ var StoryEditorPage = function() {
     await waitFor.visibilityOf(
       saveStoryButton, 'Save Story Button taking too long to appear.');
     await waitFor.textToBePresentInElement(
-      saveStoryButton, 'Save Draft', 'Story could not be saved.');
+      '.e2e-test-save-story-button', 'Save Draft', 'Story could not be saved.');
   };
 
   this.expectSaveStoryDisabled = async function() {

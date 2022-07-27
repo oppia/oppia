@@ -242,7 +242,7 @@ var ExplorationEditorPage = function() {
     // eslint-disable-next-line oppia/e2e-practices
     await browser.pause(2500);
     await waitFor.textToBePresentInElement(
-      saveDraftButtonTextContainer, 'Save Draft',
+      '.e2e-test-save-draft-message', 'Save Draft',
       'Changes could not be saved');
   };
 
@@ -256,7 +256,7 @@ var ExplorationEditorPage = function() {
     /* eslint-disable-next-line oppia/e2e-practices */
     await browser.pause(2500);
     await waitFor.textToBePresentInElement(
-      publishChangesButtonTextContainer, 'Publish Changes',
+      '.e2e-test-publish-changes-message', 'Publish Changes',
       'Changes could not be saved');
   };
 

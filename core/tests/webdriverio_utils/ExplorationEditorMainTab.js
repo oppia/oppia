@@ -870,7 +870,7 @@ var ExplorationEditorMainTab = function() {
       await stateNameContainer.getAttribute('textContent') +
       'instead of expected ' + targetName);
     await waitFor.textToBePresentInElement(
-      stateNameContainer, targetName, errorMessage);
+      '.e2e-test-state-name-container', targetName, errorMessage);
   };
 
   this.setStateName = async function(name) {
@@ -890,7 +890,7 @@ var ExplorationEditorMainTab = function() {
     await waitFor.visibilityOf(
       stateNameContainer, 'State Name Container takes too long to appear');
     await waitFor.textToBePresentInElement(
-      stateNameContainer, name,
+      '.e2e-test-state-name-container', name,
       'Current state name is:' + await stateNameContainer.getAttribute(
         'textContent') + 'instead of expected ' + name);
   };
@@ -899,7 +899,7 @@ var ExplorationEditorMainTab = function() {
     await waitFor.visibilityOf(
       stateNameContainer, 'State Name Container taking too long to show up');
     await waitFor.textToBePresentInElement(
-      stateNameContainer, name,
+      '.e2e-test-state-name-container', name,
       'Expecting current state ' + await stateNameContainer.getAttribute(
         'textContent') + ' to be ' + name);
     await waitFor.visibilityOf(
