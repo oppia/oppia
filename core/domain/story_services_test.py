@@ -580,7 +580,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(new_story_dict['version'], 2)
 
         # Instead of Deleting the version key, we are making them equal to
-        # check that the other contents of the two dicts are the same or not.
+        # check if the other contents of the two dicts are same or not.
         orig_story_dict['version'] = new_story_dict['version']
         self.assertEqual(orig_story_dict, new_story_dict)
 
@@ -1579,7 +1579,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 'property_name': exp_domain.STATE_PROPERTY_PARAM_CHANGES,
                 'state_name': feconf.DEFAULT_INIT_STATE_NAME,
                 'new_value': [
-                    # Here, the expected type of 3rd argument of paramChange is
+                    # Here, the expected type for 3rd argument of paramChange is
                     # CustomizationArgsDict, but for testing purposes here we
                     # are providing a empty dict which causes MyPy to throw
                     # missing keys error. Thus to avoid error, we used ignore.

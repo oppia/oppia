@@ -309,7 +309,7 @@ def get_exp_metadata_dicts_matching_query(
     query_string: str,
     search_offset: Optional[int],
     user: user_domain.UserActionsInfo
-) -> Tuple[List[exp_domain.ExplorationSummaryMetaDataDict], Optional[int]]:
+) -> Tuple[List[exp_domain.ExplorationSummaryMetadataDict], Optional[int]]:
     """Given a query string and a search offset, returns a list of exploration
     metadata dicts that satisfy the search query.
 
@@ -340,7 +340,7 @@ def get_exp_metadata_dicts_matching_query(
 
 def get_exploration_metadata_dicts(
     exploration_ids: List[str], user: user_domain.UserActionsInfo
-) -> List[exp_domain.ExplorationSummaryMetaDataDict]:
+) -> List[exp_domain.ExplorationSummaryMetadataDict]:
     """Given a list of exploration ids, optionally filters the list for
     explorations that are currently non-private and not deleted, and returns a
     list of dicts of the corresponding exploration summaries for collection

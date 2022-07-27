@@ -278,7 +278,7 @@ class Question(translation_domain.BaseTranslatableObject):
         """
         # Here, question_state_dict is of type StateDict and StateDict does
         # not 'content_ids_to_audio_translations' key, but for implementation
-        # purpose we are accessing that key which causes MyPy to throw error.
+        # purpose we are accessing that key which causes MyPy to throw an error.
         # Thus to avoid the error, we used ignore here.
         question_state_dict['recorded_voiceovers'] = {
             'voiceovers_mapping': (
@@ -325,9 +325,10 @@ class Question(translation_domain.BaseTranslatableObject):
         for answer_group in answer_groups:
             answer_group['tagged_skill_misconception_id'] = None
             # Here, answer_group is of type AnswerGroupDict and AnswerGroupDict
-            # does not contain 'tagged_misconception_id' key, but here for
-            # implementation purpose we accessing that key which causes MyPy to
-            # throw error. Thus to avoid the error, we used ignore here.
+            # does not contain 'tagged_misconception_id' key, but for
+            # implementation purposes here we are accessing that key
+            # which causes MyPy to throw an error. Thus to avoid the
+            # error, we used ignore here.
             del answer_group['tagged_misconception_id']  # type: ignore[misc]
 
         return question_state_dict
@@ -611,7 +612,7 @@ class Question(translation_domain.BaseTranslatableObject):
                 # Here, `translations_mapping[content_id][lang_code]` is of type
                 # WrittenTranslationDict and WrittenTranslationDict do not have
                 # any `html` key, but for implementation purposes here we are
-                # accessing that `html` key which causes MyPy to throw error.
+                # accessing that `html` key which causes MyPy to throw an error.
                 # Thus to avoid the error, we used ignore here.
                 translations_mapping[
                     content_id][lang_code]['translation'] = (
@@ -966,10 +967,10 @@ class Question(translation_domain.BaseTranslatableObject):
                     content_id = content_id_counter.generate_content_id(
                         'rule_input_')
                     # The expected type for `rule_spec_dict['inputs']['x']`
-                    # is Dict[str, AllowedRuleSpecInputTypes] but here we
-                    # giving Dict[str, Dit[str, AllowedRuleSpecInputTypes]]
-                    # values which causes MyPy to throw `incompatible type`
-                    # error. Thus to avoid the error, we used ignore here.
+                    # is AllowedRuleSpecInputTypes but here we are providing
+                    # Dict[str, AllowedRuleSpecInputTypes] values which causes
+                    # MyPy to throw `incompatible type` error. Thus to avoid
+                    # the error, we used ignore here.
                     # Convert to TranslatableSetOfNormalizedString.
                     if interaction_id == 'TextInput':
                         rule_spec_dict['inputs']['x'] = {

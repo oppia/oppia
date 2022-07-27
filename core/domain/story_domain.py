@@ -302,7 +302,7 @@ class StoryNode:
         return incremented_node_id
 
     @classmethod
-    def require_valid_node_id(cls, node_id: Optional[str]) -> None:
+    def require_valid_node_id(cls, node_id: str) -> None:
         """Validates the node id for a StoryNode object.
 
         Args:
@@ -568,6 +568,8 @@ class StoryContents:
                 'Expected nodes field to be a list, received %s' % self.nodes)
 
         if len(self.nodes) > 0:
+            # Ruling out the possibility of None for mypy type checking.
+            assert self.initial_node_id is not None
             StoryNode.require_valid_node_id(self.initial_node_id)
         StoryNode.require_valid_node_id(self.next_node_id)
 
