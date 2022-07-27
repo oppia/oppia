@@ -397,6 +397,9 @@ URLS = [
         r'%s' % feconf.LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL,
         learner_dashboard.LearnerDashboardTopicsAndStoriesProgressHandler),
     get_redirect_route(
+        r'%s' % feconf.LEARNER_COMPLETED_CHAPTERS_COUNT_DATA_URL,
+        learner_dashboard.LearnerCompletedChaptersCountHandler),
+    get_redirect_route(
         r'%s' % feconf.LEARNER_DASHBOARD_COLLECTION_DATA_URL,
         learner_dashboard.LearnerDashboardCollectionsProgressHandler),
     get_redirect_route(
@@ -591,6 +594,14 @@ URLS = [
         r'%s/<entity_type>/<entity_id>' % (
             feconf.LEARNER_ANSWER_DETAILS_SUBMIT_URL),
         reader.LearnerAnswerDetailsSubmissionHandler),
+    get_redirect_route(
+        r'%s/<exploration_id>/<state_name>/<version>' % (
+            feconf.STATE_VERSION_HISTORY_URL_PREFIX
+        ), reader.StateVersionHistoryHandler),
+    get_redirect_route(
+        r'%s/<exploration_id>/<version>' % (
+            feconf.METADATA_VERSION_HISTORY_URL_PREFIX
+        ), reader.MetadataVersionHistoryHandler),
 
     get_redirect_route(
         r'%s/<question_id>' % feconf.QUESTION_EDITOR_DATA_URL_PREFIX,
