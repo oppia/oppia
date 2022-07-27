@@ -69,7 +69,7 @@ class FormattedModelGroupDict(TypedDict):
 class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
     """Computes and populates the version history data for an exploration."""
 
-    def _filter_valid_model_group(
+    def filter_valid_model_group(
         self, model_group: UnformattedModelGroupDict
     ) -> bool:
         """Returns True if the given model group is valid.
@@ -106,7 +106,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
 
         return model_group_is_valid
 
-    def _convert_to_formatted_model_group_dict(
+    def convert_to_formatted_model_group_dict(
         self, model_group: UnformattedModelGroupDict
     ) -> FormattedModelGroupDict:
         """Returns a formatted version of the given valid model group.
@@ -154,7 +154,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
             'version_history_models': version_history_models
         }
 
-    def _get_updated_version_history_model(
+    def get_updated_version_history_model(
         self,
         vh_model: Optional[exp_models.ExplorationVersionHistoryModel],
         exp_id: str,
@@ -215,7 +215,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
         vh_model.committer_ids = updated_committer_ids
         return vh_model
 
-    def _get_reverted_version_history_model(
+    def get_reverted_version_history_model(
         self,
         revert_to_vh_model: exp_models.ExplorationVersionHistoryModel,
         current_vh_model: Optional[exp_models.ExplorationVersionHistoryModel],
@@ -272,7 +272,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
 
         return current_vh_model
 
-    def _check_for_revert_commit(
+    def check_for_revert_commit(
         self, change_list: List[exp_domain.ExplorationChange]
     ) -> Optional[int]:
         """Checks if revert commit is present in the change list and returns
@@ -289,7 +289,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                 return change.version_number
         return None
 
-    def _compare_version_histories(
+    def compare_version_histories(
         self,
         expected_state_vh: Dict[str, state_domain.StateVersionHistory],
         expected_metadata_vh: exp_domain.MetadataVersionHistory,
@@ -327,7 +327,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
             return False
         return True
 
-    def _verify_version_history_models(
+    def verify_version_history_models(
         self,
         vh_models: List[exp_models.ExplorationVersionHistoryModel],
         commit_log_models: List[exp_models.ExplorationCommitLogEntryModel],
@@ -386,7 +386,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
         )
         verified_state_vh.append(expected_state_vh)
         verified_metadata_vh.append(expected_metadata_vh)
-        if not self._compare_version_histories(
+        if not self.compare_version_histories(
             expected_state_vh, expected_metadata_vh,
             actual_state_vh, actual_metadata_vh
         ):
@@ -404,7 +404,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                     change_list.append(exp_domain.ExplorationChange(
                         change_dict
                     ))
-                revert_to_version = self._check_for_revert_commit(
+                revert_to_version = self.check_for_revert_commit(
                     change_list
                 )
                 if revert_to_version is not None:
@@ -426,7 +426,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                         vh_model.metadata_last_edited_version_number,
                         vh_model.metadata_last_edited_committer_id
                     )
-                    if not self._compare_version_histories(
+                    if not self.compare_version_histories(
                         expected_state_vh, expected_metadata_vh,
                         actual_state_vh, actual_metadata_vh
                     ):
@@ -459,7 +459,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                         vh_model.metadata_last_edited_version_number,
                         vh_model.metadata_last_edited_committer_id
                     )
-                    if not self._compare_version_histories(
+                    if not self.compare_version_histories(
                         expected_state_vh, expected_metadata_vh,
                         actual_state_vh, actual_metadata_vh
                     ):
@@ -470,7 +470,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
 
         return verified
 
-    def _create_version_history_models(
+    def create_version_history_models(
         self, model_group: FormattedModelGroupDict
     ) -> Tuple[str, List[exp_models.ExplorationVersionHistoryModel]]:
         """Creates the version history models for a particular exploration.
@@ -509,7 +509,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                 None, committer_id_v1
             )
             committer_ids_at_v1 = [committer_id_v1]
-            vh_model_at_v1 = self._get_updated_version_history_model(
+            vh_model_at_v1 = self.get_updated_version_history_model(
                 version_history_models[0],
                 exp_v1.id, 1, committer_id_v1,
                 states_vh_at_v1, metadata_vh_at_v1, committer_ids_at_v1
@@ -528,7 +528,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                 old_exploration = versioned_explorations[version - 2]
                 # If the change list contains evert commit, we have to
                 # handle it separately.
-                revert_to_version = self._check_for_revert_commit(
+                revert_to_version = self.check_for_revert_commit(
                     change_list
                 )
                 if revert_to_version is not None:
@@ -549,7 +549,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                     revert_to_vh_model = (
                         version_history_models[revert_to_version - 1]
                     )
-                    new_vh_model = self._get_reverted_version_history_model(
+                    new_vh_model = self.get_reverted_version_history_model(
                         revert_to_vh_model,
                         version_history_models[version - 1],
                         exp_id, version
@@ -617,7 +617,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                         )
                     )
 
-                    new_vh_model = self._get_updated_version_history_model(
+                    new_vh_model = self.get_updated_version_history_model(
                         version_history_models[version - 1],
                         exp_id, version, committer_id,
                         new_states_vh, new_metadata_vh, new_committer_ids
@@ -626,7 +626,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                     version_history_models[version - 1] = new_vh_model
                     versioned_explorations[version - 1] = new_exploration
 
-            if not self._verify_version_history_models(
+            if not self.verify_version_history_models(
                 version_history_models,
                 commit_log_models,
                 versioned_explorations
@@ -635,27 +635,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
 
             return (exp_id, version_history_models)
 
-    def _get_exploration_snapshot_models(
-        self, snapshot_ids: List[str]
-    ) -> List[Optional[exp_models.ExplorationSnapshotContentModel]]:
-        """Gets the exploration snapshot models from given ids
-
-        Args:
-            snapshot_ids: List[str]. The snapshot ids.
-
-        Returns:
-            ExplorationSnapshotContentModel. The exploration snapshot content
-            model.
-        """
-        with datastore_services.get_ndb_context():
-            snapshot_models = (
-                exp_models.ExplorationSnapshotContentModel.get_multi(
-                    snapshot_ids
-                )
-            )
-            return snapshot_models
-
-    def _get_exploration_at_v1(
+    def generate_exploration_from_snapshot(
         self, snapshot_model: exp_models.ExplorationSnapshotContentModel
     ) -> exp_models.ExplorationModel:
         """Returns the exploration model with given id at version 1.
@@ -676,6 +656,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
             )
             reconstituted_model.created_on = snapshot_model.created_on
             reconstituted_model.last_updated = snapshot_model.last_updated
+            print(reconstituted_model)
             return reconstituted_model
 
     def filter_valid_exploration_models(
@@ -724,19 +705,18 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
 
         explorations_at_v1 = (
             valid_explorations_vlatest
-            | 'Get the exploration ids' >>
-                beam.Map(lambda model: model[0])
-            | 'Get the snapshot ids at v1' >> beam.Map(lambda exp_id: (
-                exp_models.ExplorationModel.get_snapshot_id(exp_id, 1)
-            ))
-            | 'Combine the snapshot ids into a list' >> beam.combiners.ToList()
-            | 'Get the snapshot models at v1' >>
-                beam.Map(self._get_exploration_snapshot_models)
-            | 'Flatten the snapshot models' >> beam.FlatMap(lambda x: x)
+            | 'Get all the snapshot models' >> ndb_io.GetModels(
+                exp_models.ExplorationSnapshotContentModel.get_all(
+                    include_deleted=False
+                )
+            )
             | 'Filter the snapshot models without None' >>
                 beam.Filter(lambda model: model is not None)
+            | 'Get the snapshot models at version 1' >> beam.Filter(
+                lambda model: model.get_version_string() == '1'
+            )
             | 'Get reconstituted explorations at v1' >>
-                beam.Map(self._get_exploration_at_v1)
+                beam.Map(self.generate_exploration_from_snapshot)
         )
 
         valid_explorations_v1 = (
@@ -791,17 +771,17 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
             | 'Get rid of exploration id' >>
                 beam.Values() # pylint: disable=no-value-for-parameter
             | 'Filter valid model groups' >> beam.Filter(
-                self._filter_valid_model_group
+                self.filter_valid_model_group
             )
             | 'Format valid model groups' >> beam.Map(
-                self._convert_to_formatted_model_group_dict
+                self.convert_to_formatted_model_group_dict
             )
         )
 
         version_history_models = (
             model_groups
             | 'Create the version history models for each valid exploration' >>
-                beam.Map(self._create_version_history_models)
+                beam.Map(self.create_version_history_models)
         )
 
         exps_having_invalid_change_list = (
