@@ -1234,7 +1234,10 @@ class ExpStateValidationJob(base_jobs.JobBase):
         Returns:
             bool. Returns whether the exp model is curated or not.
         """
-        return exp_fetchers.get_exploration_from_model(model_pair[0])
+        try:
+            return exp_fetchers.get_exploration_from_model(model_pair[0])
+        except:
+            return None
 
     def convert_into_model_pair(
       self, models_list_pair: Tuple[
@@ -1302,6 +1305,8 @@ class ExpStateValidationJob(base_jobs.JobBase):
                 self.filter_curated_explorations)
             | 'Get exploration from the model' >> beam.Map(
                 self.get_exploration_from_models)
+            | 'Filter valid explorations' >> beam.Filter(
+                lambda exp: exp is not None)
             | 'Combine curated exp id and states' >> beam.Map(
                 lambda exp: (exp.id, exp.states, exp.created_on))
         )
