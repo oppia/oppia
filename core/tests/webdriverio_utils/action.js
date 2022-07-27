@@ -20,7 +20,7 @@ var waitFor = require('./waitFor.js');
 
 // Waits for the invisibility of the autosave message.
 var waitForAutosave = async function() {
-  var autoSaveIndicatorElement = await $('.e2e-test-autosave-indicator');
+  var autoSaveIndicatorElement = $('.e2e-test-autosave-indicator');
   await waitFor.invisibilityOf(
     autoSaveIndicatorElement, 'Auto save indicator didn\'t disappear');
 };
@@ -64,7 +64,7 @@ var getAttribute = async function(elementName, element, attribute) {
 var select = async function(selectorName, selectorElement, optionToSelect) {
   await waitFor.visibilityOf(
     selectorElement,
-    `${selectorName} is not present to select ${optionToSelect}`
+    `${selectorName} is not visible to select ${optionToSelect}`
   );
   await selectorElement.selectByVisibleText(optionToSelect);
 };

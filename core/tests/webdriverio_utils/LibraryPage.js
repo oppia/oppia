@@ -170,9 +170,9 @@ var LibraryPage = function() {
       `.e2e-test-exp-summary-tile-title=${explorationName}`);
     await waitFor.visibilityOf(
       explorationCardElement, 'Unable to find exploration ' + explorationName);
+    var explorationCard = await allExplorationsTitled(explorationName)[0];
     // The Exploration summary card is masked by a dummy element. Therefore, a
     // Javascript click is used.
-    var explorationCard = await allExplorationsTitled(explorationName)[0];
     await action.click('Exploration Card', explorationCard, true);
     await waitFor.pageToFullyLoad();
   };
