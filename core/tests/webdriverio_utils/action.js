@@ -50,7 +50,7 @@ var click = async function(elementName, clickableElement, elementIsMasked) {
 };
 
 var getText = async function(elementName, element) {
-  await waitFor.elementToBeClickable(
+  await waitFor.visibilityOf(
     element, `${elementName} is not visible for getText()`);
   return await element.getText();
 };
