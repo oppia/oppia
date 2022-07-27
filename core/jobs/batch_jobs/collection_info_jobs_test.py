@@ -25,27 +25,31 @@ from core.jobs.batch_jobs import collection_info_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
 
+from typing import Type
+from typing_extensions import Final
+
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import collection_models
     from mypy_imports import feedback_models
     from mypy_imports import user_models
 
-(
-    collection_models, feedback_models, user_models
-) = models.Registry.import_models([
-    models.NAMES.collection, models.NAMES.feedback, models.NAMES.user])
-
-datastore_services = models.Registry.import_datastore_services()
+(collection_models, feedback_models, user_models) = (
+    models.Registry.import_models([
+        models.NAMES.collection, models.NAMES.feedback, models.NAMES.user
+    ])
+)
 
 
 class GetCollectionOwnersEmailsJobTests(job_test_utils.JobTestBase):
 
-    JOB_CLASS = collection_info_jobs.GetCollectionOwnersEmailsJob
+    JOB_CLASS: Type[
+        collection_info_jobs.GetCollectionOwnersEmailsJob
+    ] = collection_info_jobs.GetCollectionOwnersEmailsJob
 
-    USER_ID_1 = 'id_1'
-    USER_ID_2 = 'id_2'
-    USER_ID_3 = 'id_3'
+    USER_ID_1: Final = 'id_1'
+    USER_ID_2: Final = 'id_2'
+    USER_ID_3: Final = 'id_3'
 
     def test_empty_storage(self) -> None:
         self.assert_job_output_is_empty()
@@ -142,22 +146,24 @@ class GetCollectionOwnersEmailsJobTests(job_test_utils.JobTestBase):
 
 class MatchEntityTypeCollectionJobTests(job_test_utils.JobTestBase):
 
-    JOB_CLASS = collection_info_jobs.MatchEntityTypeCollectionJob
+    JOB_CLASS: Type[
+        collection_info_jobs.MatchEntityTypeCollectionJob
+    ] = collection_info_jobs.MatchEntityTypeCollectionJob
 
-    USER_ID = 'user_1'
-    ENTITY_ID = 'col_id_1'
-    ENTITY_ID_1 = 'exp_id_1'
-    ENTITY_ID_2 = 'top_id_1'
+    USER_ID: Final = 'user_1'
+    ENTITY_ID: Final = 'col_id_1'
+    ENTITY_ID_1: Final = 'exp_id_1'
+    ENTITY_ID_2: Final = 'top_id_1'
 
-    ENTITY_TYPE = 'collection'
-    ENTITY_TYPE_1 = feconf.ENTITY_TYPE_EXPLORATION
-    ENTITY_TYPE_2 = feconf.ENTITY_TYPE_TOPIC
+    ENTITY_TYPE: Final = 'collection'
+    ENTITY_TYPE_1: Final = feconf.ENTITY_TYPE_EXPLORATION
+    ENTITY_TYPE_2: Final = feconf.ENTITY_TYPE_TOPIC
 
-    STATUS = 'open'
-    SUBJECT = 'dummy subject'
-    HAS_SUGGESTION = True
-    SUMMARY = 'This is a great summary.'
-    MESSAGE_COUNT = 0
+    STATUS: Final = 'open'
+    SUBJECT: Final = 'dummy subject'
+    HAS_SUGGESTION: Final = True
+    SUMMARY: Final = 'This is a great summary.'
+    MESSAGE_COUNT: Final = 0
 
     def test_empty_storage(self) -> None:
         self.assert_job_output_is_empty()

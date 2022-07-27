@@ -26,6 +26,9 @@ from core.jobs.batch_jobs import email_deletion_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
 
+from typing import Type
+from typing_extensions import Final
+
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import email_models
@@ -39,10 +42,12 @@ if MYPY: # pragma: no cover
 
 class DeleteUnneededEmailRelatedModelsJobTests(job_test_utils.JobTestBase):
 
-    JOB_CLASS = email_deletion_jobs.DeleteUnneededEmailRelatedModelsJob
+    JOB_CLASS: Type[
+        email_deletion_jobs.DeleteUnneededEmailRelatedModelsJob
+    ] = email_deletion_jobs.DeleteUnneededEmailRelatedModelsJob
 
-    USER_ID = 'user_id'
-    DATETIME = datetime.datetime.strptime('2016-02-16', '%Y-%m-%d')
+    USER_ID: Final = 'user_id'
+    DATETIME: Final = datetime.datetime.strptime('2016-02-16', '%Y-%m-%d')
 
     def setUp(self) -> None:
         super().setUp()

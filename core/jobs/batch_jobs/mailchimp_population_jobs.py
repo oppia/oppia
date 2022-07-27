@@ -30,6 +30,7 @@ import apache_beam as beam
 import mailchimp3
 from mailchimp3 import mailchimpclient
 import result
+
 from typing import Iterable, List
 
 MYPY = False
@@ -37,10 +38,15 @@ if MYPY: # pragma: no cover
     from mypy_imports import config_models
     from mypy_imports import user_models
 
-(config_models, user_models) = models.Registry.import_models(
-    [models.NAMES.config, models.NAMES.user])
+(config_models, user_models) = models.Registry.import_models([
+    models.NAMES.config, models.NAMES.user
+])
 
 
+# TODO(#15613): Due to incomplete typing of apache_beam library and absences
+# of stubs in Typeshed, MyPy assuming CombineFn class is of type Any. Thus to
+# avoid MyPy's error (Class cannot subclass 'CombineFn' (has type 'Any')) , we
+# added an ignore here.
 class CombineItems(beam.CombineFn):  # type: ignore[misc]
     """CombineFn for combining all user email, status tuples."""
 
@@ -86,7 +92,11 @@ def _get_mailchimp_class() -> mailchimp3.MailChimp:
         mc_api=feconf.MAILCHIMP_API_KEY, mc_user=feconf.MAILCHIMP_USERNAME)
 
 
-class SendBatchMailchimpRequest(beam.DoFn):
+# TODO(#15613): Due to incomplete typing of apache_beam library and absences
+# of stubs in Typeshed, MyPy assuming DoFn class is of type Any. Thus to avoid
+# MyPy's error (Class cannot subclass 'DoFn' (has type 'Any')) , we added an
+# ignore here.
+class SendBatchMailchimpRequest(beam.DoFn):  # type: ignore[misc]
     """DoFn to send batch mailchimp request for 500 users at a time."""
 
     def process(

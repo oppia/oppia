@@ -187,7 +187,7 @@ class ModelRelationshipError(BaseAuditError):
     def __init__(
         self,
         id_property: model_property.ModelProperty,
-        model_id: str,
+        model_id: Optional[str],
         target_kind: str,
         target_id: str
     ) -> None:
@@ -196,7 +196,8 @@ class ModelRelationshipError(BaseAuditError):
         Args:
             id_property: ModelProperty. The property referring to the ID of the
                 target model.
-            model_id: str. The ID of the model with problematic ID property.
+            model_id: str|None. The ID of the model with problematic ID
+                property.
             target_kind: str. The kind of model the property refers to.
             target_id: str. The ID of the specific model that the property
                 refers to. NOTE: This is the value of the ID property.
