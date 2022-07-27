@@ -17,6 +17,9 @@
  * wdio-wait-for.
  */
 
+var loadingPageSelector = function() {
+    return $('.e2e-test-loading-fullpage');
+};
 var until = require('wdio-wait-for');
 var fs = require('fs');
 var Constants = require('./WebdriverioConstants');
@@ -76,8 +79,7 @@ var invisibilityOf = async function(element, errorMessage) {
  * Consider adding this method after each browser.url() call.
  */
 var pageToFullyLoad = async function() {
-  var loadingMessage = await $('.e2e-test-loading-fullpage');
-  await loadingMessage.waitForDisplayed({
+  await loadingPageSelector().waitForDisplayed({
     timeout: 15000,
     reverse: true,
     timeoutMsg: 'Pages takes more than 15 sec to load\n' +
