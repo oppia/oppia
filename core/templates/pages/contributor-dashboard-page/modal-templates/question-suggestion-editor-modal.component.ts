@@ -129,7 +129,7 @@ export class QuestionSuggestionEditorModalComponent
     }
     this.siteAnalyticsService.registerContributorDashboardSubmitSuggestionEvent(
       'Question');
-    var imagesData = this.imageLocalStorageService.getStoredImagesData();
+    const imagesData = this.imageLocalStorageService.getStoredImagesData();
     this.imageLocalStorageService.flushStoredImagesData();
     this.contextService.resetImageSaveDestination();
     if (this.isEditing) {

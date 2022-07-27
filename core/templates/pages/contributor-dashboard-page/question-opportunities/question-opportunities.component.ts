@@ -74,7 +74,7 @@ export class QuestionOpportunitiesComponent implements OnInit {
   getPresentableOpportunitiesData(
       opportunitiesObject: GetSkillOpportunitiesResponse
   ): GetPresentableOpportunitiesResponse {
-    let opportunitiesDicts = [];
+    const opportunitiesDicts = [];
     const more = opportunitiesObject.more;
 
     for (let index in opportunitiesObject.opportunities) {

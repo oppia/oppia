@@ -97,7 +97,7 @@ export class QuestionSuggestionReviewModalComponent
     this.ngbActiveModal.dismiss();
     this.skillBackendApiService.fetchSkillAsync(
       this.suggestion.change.skill_id).then((skillDict) => {
-      let modalRef = this.ngbModal.open(
+      const modalRef = this.ngbModal.open(
         QuestionSuggestionEditorModalComponent, {
           size: 'lg',
           backdrop: 'static',
