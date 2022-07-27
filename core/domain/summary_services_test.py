@@ -485,7 +485,10 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
             self.COLLECTION_ID, self.owner_id, exploration_id=self.EXP_ID)
         rights_manager.publish_exploration(self.owner, self.EXP_ID)  # type: ignore[no-untyped-call]
         rights_manager.publish_collection(self.owner, self.COLLECTION_ID)  # type: ignore[no-untyped-call]
-        mock_user = user_services.get_user_actions_info('mock_user')
+        # Here, get_user_actions_info method can only accept string values but
+        # for testing purposes here we are providing None which causes MyPy to
+        # throw an error. Thus to avoid the error, we used ignore here.
+        mock_user = user_services.get_user_actions_info(None)  # type: ignore[arg-type]
         collection_dict = (
             summary_services.get_learner_collection_dict_by_id(
                 self.COLLECTION_ID, mock_user)
@@ -1134,7 +1137,10 @@ class CollectionNodeMetadataDictsTest(
     def test_guest_cannot_fetch_private_exploration_metadata_dicts(
         self
     ) -> None:
-        new_guest_user = user_services.get_user_actions_info('mock_user')
+        # Here, get_user_actions_info method can only accept string values but
+        # for testing purposes here we are providing None which causes MyPy to
+        # throw an error. Thus to avoid the error, we used ignore here.
+        new_guest_user = user_services.get_user_actions_info(None)  # type: ignore[arg-type]
         self.save_new_valid_exploration('exp_id', self.albert_id)
         metadata_dicts = summary_services.get_exploration_metadata_dicts(
             ['exp_id'], new_guest_user)
