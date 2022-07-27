@@ -1103,13 +1103,31 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
                 )
         return states_with_values
 
+    def get_exploration_from_model(self, exp):
+        """Fetching exploration domain object from model
+
+        Args:
+            exp: ExplorationModel. The ExplorationModel from storage layer.
+
+        Returns:
+            exp_model|None: exp_domain.Exploration. The exploration domain
+            object.
+        """
+        try:
+            exp_model = exp_fetchers.get_exploration_from_model(exp)
+        except:
+            return None
+        return exp_model
+
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         all_explorations = (
             self.pipeline
             | 'Get all ExplorationModels' >> ndb_io.GetModels(
                 exp_models.ExplorationModel.get_all(include_deleted=False))
             | 'Get exploration from model' >> beam.Map(
-                exp_fetchers.get_exploration_from_model)
+                self.get_exploration_from_model)
+            | 'Filter valid explorations' >> beam.Filter(
+                lambda exp: exp is not None)
         )
 
         exp_ids_pcoll = (
