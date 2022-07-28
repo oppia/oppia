@@ -258,8 +258,8 @@
 }
 
 .oppia-lesson-info-h1 {
-  cursor: pointer;
   color: #fff;
+  cursor: pointer;
   display: inline;
   font-family: "Roboto", Arial, sans-serif;
   font-size: 17px;
