@@ -1896,7 +1896,7 @@ def can_resubmit_suggestion(handler):
         suggestion = suggestion_services.get_suggestion_by_id(
             suggestion_id, strict=False
         )
-        if not suggestion:
+        if suggestion is None:
             raise self.InvalidInputException(
                 'No suggestion found with given suggestion id')
 
