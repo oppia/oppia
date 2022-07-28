@@ -515,7 +515,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
         )
 
         explorations_at_v1 = (
-            valid_explorations_vlatest
+            self.pipeline
             | 'Get all the snapshot models' >> ndb_io.GetModels(
                 exp_models.ExplorationSnapshotContentModel.get_all(
                     include_deleted=False
@@ -549,7 +549,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
         )
 
         all_commit_logs = (
-            valid_explorations_vlatest
+            self.pipeline
             | 'Get all ExplorationCommitLogEntryModels' >> ndb_io.GetModels(
                 exp_models.ExplorationCommitLogEntryModel.get_all(
                     include_deleted=False
@@ -560,7 +560,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
         )
 
         all_version_history_models = (
-            all_commit_logs
+            self.pipeline
             | 'Get already existing ExplorationVersionHistoryModels' >>
                 ndb_io.GetModels(
                     exp_models.ExplorationVersionHistoryModel.get_all(
@@ -581,6 +581,17 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
             | 'Group by key' >> beam.CoGroupByKey()
             | 'Get rid of exploration id' >>
                 beam.Values() # pylint: disable=no-value-for-parameter
+        )
+
+        invalid_model_groups = (
+            model_groups
+            | 'Filter invalid model groups' >> beam.Filter(
+                lambda mg: not self.filter_valid_model_group(mg)
+            )
+        )
+
+        valid_model_groups = (
+            model_groups
             | 'Filter valid model groups' >> beam.Filter(
                 self.filter_valid_model_group
             )
@@ -590,7 +601,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
         )
 
         version_history_models = (
-            model_groups
+            valid_model_groups
             | 'Create the version history models for each valid exploration' >>
                 beam.Map(self.create_version_history_models)
         )
@@ -667,12 +678,20 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
             )
         )
 
+        report_number_of_invalid_model_groups = (
+            invalid_model_groups
+            | 'Count number of explorations having incomplete commit logs' >>
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'INVALID MODEL GROUPS'
+                )
+        )
+
         # The below count gives the number of explorations which have complete
         # commit logs of all versions and have supported states schema version.
         # However, it also includes the explorations having invalid change
         # list.
         report_exps_count_for_which_version_history_can_be_computed = (
-            model_groups
+            valid_model_groups
             | 'Count exps for which version history can be computed' >>
                 job_result_transforms.CountObjectsToJobRunResult(
                     'EXPS FOR WHICH VERSION HISTORY CAN BE COMPUTED'
@@ -722,6 +741,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
         return (
             (
                 report_number_of_exps_queried,
+                report_number_of_invalid_model_groups,
                 report_number_of_invalid_exps_vlatest,
                 report_details_of_invalid_exps_vlatest,
                 report_number_of_invalid_exps_v1,
@@ -942,9 +962,7 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
         }
         if expected_state_vh_dict != actual_state_vh_dict:
             return False
-        if expected_metadata_vh.to_dict() != actual_metadata_vh.to_dict():
-            return False
-        return True
+        return expected_metadata_vh.to_dict() == actual_metadata_vh.to_dict()
 
     def check_for_revert_commit(
         self, change_list: List[exp_domain.ExplorationChange]
@@ -1113,7 +1131,7 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
         )
 
         all_explorations_v1 = (
-            all_explorations_vlatest
+            self.pipeline
             | 'Get all the snapshot models' >> ndb_io.GetModels(
                 exp_models.ExplorationSnapshotContentModel.get_all(
                     include_deleted=False
@@ -1131,7 +1149,7 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
         )
 
         all_commit_logs = (
-            all_explorations_v1
+            self.pipeline
             | 'Get all ExplorationCommitLogEntryModels' >> ndb_io.GetModels(
                 exp_models.ExplorationCommitLogEntryModel.get_all(
                     include_deleted=False
@@ -1142,7 +1160,7 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
         )
 
         all_version_history_models = (
-            all_commit_logs
+            self.pipeline
             | 'Get all ExplorationVersionHistoryModels' >>
                 ndb_io.GetModels(
                     exp_models.ExplorationVersionHistoryModel.get_all(
@@ -1176,13 +1194,13 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
         verification_success = (
             verification_results
             | 'Filter the verified explorations' >>
-                beam.Filter(lambda x: x[1] is True)
+                beam.Filter(lambda x: x[1])
         )
 
         verification_failed = (
             verification_results
             | 'Filter the unverified explorations' >>
-                beam.Filter(lambda x: x[1] is False)
+                beam.Filter(lambda x: not x[1])
         )
 
         report_number_of_explorations_queried = (
