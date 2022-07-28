@@ -251,7 +251,6 @@
 }
 
 .oppia-lesson-info {
-  cursor: pointer;
   display: flex;
   list-style-type: none;
   padding-left: 0;
@@ -259,6 +258,7 @@
 }
 
 .oppia-lesson-info-h1 {
+  cursor: pointer;
   color: #fff;
   display: inline;
   font-family: "Roboto", Arial, sans-serif;
@@ -295,6 +295,10 @@
   font-size: 15px;
   font-weight: normal;
   padding-bottom: 10px;
+}
+
+.oppia-lesson-info .oppia-exploration-info-icon {
+  cursor: pointer;
 }
 
 .oppia-close-popover-button {
