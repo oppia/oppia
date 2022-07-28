@@ -126,7 +126,7 @@ export class CollectionNodeCreatorComponent {
   // editor page.
   isIdMalformed(typedExplorationId: string): boolean {
     return (
-      Boolean(typedExplorationId) &&
+      typedExplorationId !== '' &&
       typedExplorationId.lastIndexOf('#') ===
       typedExplorationId.length - 1);
   }

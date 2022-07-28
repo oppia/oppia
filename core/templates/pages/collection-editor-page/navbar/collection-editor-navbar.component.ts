@@ -131,7 +131,7 @@ export class CollectionEditorNavbarComponent {
 
   isCollectionPublishable(): boolean {
     return (
-      Boolean(this.collectionRights.isPrivate()) &&
+      this.collectionRights.isPrivate() === true &&
       this.getChangeListCount() === 0 &&
       this.validationIssues.length === 0);
   }

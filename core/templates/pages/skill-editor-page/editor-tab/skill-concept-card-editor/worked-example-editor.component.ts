@@ -135,6 +135,9 @@ export class WorkedExampleEditorComponent implements OnInit {
   }
 
   cancelEditQuestion(): void {
+    if (this.workedExampleQuestionMemento === null) {
+      return;
+    }
     this.container.workedExampleQuestionHtml = cloneDeep(
       this.workedExampleQuestionMemento);
     this.workedExampleQuestionMemento = null;
@@ -142,6 +145,9 @@ export class WorkedExampleEditorComponent implements OnInit {
   }
 
   cancelEditExplanation(): void {
+    if (this.workedExampleExplanationMemento === null) {
+      return;
+    }
     this.container.workedExampleExplanationHtml = cloneDeep(
       this.workedExampleExplanationMemento);
     this.workedExampleExplanationMemento = null;

@@ -25,7 +25,7 @@ import { Subscription } from 'rxjs';
 
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
-import { TopicLandingPageConstants } from
+import { TopicLandingPageConstants, TopicLandingPageDataKey, TopicLandingPageMathDataKey } from
   'pages/landing-pages/topic-landing-page/topic-landing-page.constants';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -46,7 +46,7 @@ interface TopicData {
   topicTitle: string;
   topicTagline: string;
   collectionId: string;
-  chapters: string[];
+  chapters: readonly string[];
 }
 
 @Component({
@@ -55,13 +55,16 @@ interface TopicData {
   styleUrls: []
 })
 export class TopicLandingPageComponent implements OnInit, OnDestroy {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  backgroundBannerUrl!: string;
+  lessonInDevicesPngImageSrc!: string;
+  lessonInDevicesWebpImageSrc!: string;
+  lessonsQualities!: LessonsQuality[];
+  topicData!: TopicData;
+  topicTitle!: string;
   directiveSubscriptions = new Subscription();
-  backgroundBannerUrl: string = null;
-  lessonInDevicesPngImageSrc: string = null;
-  lessonInDevicesWebpImageSrc: string = null;
-  lessonsQualities: LessonsQuality[] = null;
-  topicData: TopicData = null;
-  topicTitle: string = null;
 
   constructor(
     private pageTitleService: PageTitleService,
@@ -111,7 +114,9 @@ export class TopicLandingPageComponent implements OnInit, OnDestroy {
     let topicName = pathArray[2];
 
     this.topicData =
-      TopicLandingPageConstants.TOPIC_LANDING_PAGE_DATA[subjectName][topicName];
+      TopicLandingPageConstants.TOPIC_LANDING_PAGE_DATA[
+        subjectName as TopicLandingPageDataKey][
+          topicName as TopicLandingPageMathDataKey];
     this.topicTitle = this.topicData.topicTitle;
 
     this.lessonsQualities = this.getLessonQualities();
