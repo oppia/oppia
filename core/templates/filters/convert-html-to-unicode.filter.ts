@@ -17,10 +17,10 @@
  */
 
 export const convertHtmlToUnicode = (html: string): string => {
-  let domparser = new DOMParser();
-  let dom = domparser.parseFromString(html, 'text/html');
+  const domparser = new DOMParser();
+  const dom = domparser.parseFromString(html, 'text/html');
 
-  return dom.querySelector('body').innerText;
+  return (dom.querySelector('body')?.innerText) as string;
 };
 
 angular.module('oppia').filter('convertHtmlToUnicode', [function() {
