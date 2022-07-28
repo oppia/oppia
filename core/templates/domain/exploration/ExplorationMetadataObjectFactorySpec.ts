@@ -17,6 +17,7 @@
  */
 
 import { TestBed } from '@angular/core/testing';
+import constants from 'assets/constants';
 import { ExplorationMetadata, ExplorationMetadataBackendDict, ExplorationMetadataObjectFactory } from './ExplorationMetadataObjectFactory';
 
 describe('Exploration metadata object factory', () => {
@@ -65,5 +66,23 @@ describe('Exploration metadata object factory', () => {
 
     expect(explorationMetadata.toBackendDict()).toEqual(
       explorationMetadataBackendDict);
+  });
+
+  it('should contain all the latest exploration metadata properties', () => {
+    // This test is meant to fail when the properties mentioned in
+    // constants.METADATA_PROPERTIES are not present in the model class.
+    // If you modify anything in constants.METADATA_PROPERTIES, then make
+    // sure to include the changes in properties in the attributes of the
+    // model class too.
+    explorationMetadata = explorationMetadataObjectFactory
+      .createFromBackendDict(explorationMetadataBackendDict);
+    const backendDict = explorationMetadata.toBackendDict();
+
+    for (let property of constants.METADATA_PROPERTIES) {
+      expect(backendDict.hasOwnProperty(property)).toBeTrue();
+    }
+    for (let property of constants.NON_METADATA_PROPERTIES) {
+      expect(backendDict.hasOwnProperty(property)).toBeFalse();
+    }
   });
 });

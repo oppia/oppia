@@ -25,13 +25,13 @@ import subprocess
 import sys
 
 from core import utils
+from scripts import install_python_dev_dependencies
 
 import pkg_resources
 
 from . import common
 
 # This is the version that is set in install_prerequisites.sh.
-OPPIA_REQUIRED_PIP_VERSION = '21.2.3'
 GIT_DIRECT_URL_REQUIREMENT_PATTERN = (
     # NOTE: Direct URLs to GitHub must specify a specific commit hash in their
     # definition. This helps stabilize the implementation we depend upon.
@@ -89,7 +89,7 @@ def normalize_python_library_name(library_name):
     # the suffix. We have also implemented the backend tests,
     # test_uniqueness_of_lib_names_in_requirements_file and
     # test_uniqueness_of_lib_names_in_compiled_requirements_file, in
-    # scripts/install_backend_python_libs_test.py to ensure that all
+    # scripts/install_python_prod_dependencies_test.py to ensure that all
     # library names in the requirements files are distinct when normalized.
     library_name = re.sub(r'\[[^\[^\]]+\]', '', library_name)
     return library_name.lower()
@@ -414,7 +414,9 @@ def verify_pip_is_installed():
     """
     print('Checking if pip is installed on the local machine')
     try:
-        import pip
+        # We are just checking that pip is available for import, so it's
+        # okay that we don't use it.
+        import pip  # pylint: disable=unused-import
     except ImportError as e:
         common.print_each_string_after_two_new_lines([
             'Pip is required to install Oppia dependencies, but pip wasn\'t '
@@ -435,16 +437,6 @@ def verify_pip_is_installed():
                 'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28'
                 'Windows%29')
         raise ImportError('Error importing pip: %s' % e) from e
-    else:
-        if pip.__version__ != OPPIA_REQUIRED_PIP_VERSION:
-            common.print_each_string_after_two_new_lines([
-                'Oppia requires pip==%s, but you have pip==%s installed.' % (
-                    OPPIA_REQUIRED_PIP_VERSION, pip.__version__),
-                'Upgrading pip to %s on your behalf...' % (
-                    OPPIA_REQUIRED_PIP_VERSION),
-            ])
-            _run_pip_command(
-                ['install', 'pip==%s' % OPPIA_REQUIRED_PIP_VERSION])
 
 
 def _run_pip_command(cmd_parts):
@@ -474,30 +466,6 @@ def _run_pip_command(cmd_parts):
         print(stderr)
         print('Refer to https://github.com/oppia/oppia/wiki/Troubleshooting')
         raise Exception('Error installing package')
-
-
-def pip_install_to_system(package, version):
-    """Installs third party libraries with pip to the user's system.
-
-    Note: These libraries are installed to the user's default system-wide
-    'site-packages' folder, not to a local Oppia third-party directory. This is
-    ONLY required in very specific cases where the development server scripts
-    require default libraries. (When running another python script using
-    the shell, the call stack that is instantiated for that python script cannot
-    be edited by us; therefore, we have no control over which system paths, the
-    script visits when it looks for libraries and can only install those
-    necessary libraries to the default system path.)
-
-    In general, please DO NOT use this method when installing packages required
-    for oppia. Use pip_install instead.
-
-    Args:
-        package: str. The package name.
-        version: str. The package version.
-    """
-    verify_pip_is_installed()
-    _run_pip_command(
-        ['install', _get_pip_versioned_package_string(package, version)])
 
 
 def pip_install(
@@ -639,7 +607,7 @@ def validate_metadata_directories():
                 'The python library %s was installed without the correct '
                 'metadata folders which may indicate that the convention for '
                 'naming the metadata folders have changed. Please go to '
-                '`scripts/install_backend_python_libs` and modify our '
+                '`scripts/install_python_prod_dependencies` and modify our '
                 'assumptions in the '
                 '_get_possible_normalized_metadata_directory_names'
                 ' function for what metadata directory names can be.' %
@@ -654,25 +622,8 @@ def main():
     """
     verify_pip_is_installed()
     print('Regenerating "requirements.txt" file...')
-    # Calls the script to regenerate requirements. The reason we cannot call the
-    # regenerate requirements functionality inline is because the python script
-    # that regenerates the file is a command-line interface (CLI). Once the CLI
-    # finishes execution, it forces itself and any python scripts in the current
-    # callstack to exit.
-    # Therefore, in order to allow continued execution after the requirements
-    # file is generated, we must call it as a separate process.
-    # The option --no-emit-index-url is specified to prevent pip compile from
-    # generating an index configuration line(s) in requirements.txt when the
-    # local pip configuration uses one or more custom index servers.
-    subprocess.check_call(
-        [
-            'python',
-            '-m',
-            'scripts.regenerate_requirements',
-            '--no-emit-index-url',
-        ],
-        stdin=subprocess.PIPE,
-        stdout=subprocess.PIPE)
+    install_python_dev_dependencies.compile_pip_requirements(
+        'requirements.in', 'requirements.txt')
     # Adds a note to the beginning of the 'requirements.txt' file to make sure
     # developers understand that they should not append or change this
     # autogenerated file.

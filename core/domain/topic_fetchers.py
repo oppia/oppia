@@ -24,15 +24,24 @@ from core import feconf
 from core import utils
 from core.domain import caching_services
 from core.domain import classroom_services
+from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import topic_domain
 from core.platform import models
 
-(skill_models, topic_models,) = models.Registry.import_models([
-    models.NAMES.skill, models.NAMES.topic])
+from typing import Dict, List, Optional, Sequence, Set, overload
+from typing_extensions import Literal, TypedDict
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import topic_models
+
+(topic_models,) = models.Registry.import_models([models.NAMES.topic])
 
 
-def _migrate_subtopics_to_latest_schema(versioned_subtopics, topic_id):
+def _migrate_subtopics_to_latest_schema(
+    versioned_subtopics: topic_domain.VersionedSubtopicsDict, topic_id: str
+) -> None:
     """Holds the responsibility of performing a step-by-step, sequential update
     of the subtopics structure based on the schema version of the input
     subtopics dictionary. If the current subtopics schema changes, a
@@ -64,7 +73,9 @@ def _migrate_subtopics_to_latest_schema(versioned_subtopics, topic_id):
         subtopic_schema_version += 1
 
 
-def _migrate_story_references_to_latest_schema(versioned_story_references):
+def _migrate_story_references_to_latest_schema(
+    versioned_story_references: topic_domain.VersionedStoryReferencesDict
+) -> None:
     """Holds the responsibility of performing a step-by-step, sequential update
     of the story reference structure based on the schema version of the input
     story reference dictionary. If the current story reference schema changes, a
@@ -97,7 +108,9 @@ def _migrate_story_references_to_latest_schema(versioned_story_references):
         story_reference_schema_version += 1
 
 
-def get_topic_from_model(topic_model):
+def get_topic_from_model(
+    topic_model: topic_models.TopicModel
+) -> topic_domain.Topic:
     """Returns a topic domain object given a topic model loaded
     from the datastore.
 
@@ -109,15 +122,19 @@ def get_topic_from_model(topic_model):
         topic. A Topic domain object corresponding to the given
         topic model.
     """
-    versioned_subtopics = {
+    versioned_subtopics: topic_domain.VersionedSubtopicsDict = {
         'schema_version': topic_model.subtopic_schema_version,
         'subtopics': copy.deepcopy(topic_model.subtopics)
     }
-    versioned_canonical_story_references = {
+    versioned_canonical_story_references: (
+        topic_domain.VersionedStoryReferencesDict
+    ) = {
         'schema_version': topic_model.story_reference_schema_version,
         'story_references': topic_model.canonical_story_references
     }
-    versioned_additional_story_references = {
+    versioned_additional_story_references: (
+        topic_domain.VersionedStoryReferencesDict
+    ) = {
         'schema_version': topic_model.story_reference_schema_version,
         'story_references': topic_model.additional_story_references
     }
@@ -161,7 +178,41 @@ def get_topic_from_model(topic_model):
         topic_model.last_updated)
 
 
-def get_topic_by_id(topic_id, strict=True, version=None):
+@overload
+def get_topic_by_id(
+    topic_id: str
+) -> topic_domain.Topic: ...
+
+
+@overload
+def get_topic_by_id(
+    topic_id: str,
+    *,
+    version: Optional[int] = None
+) -> topic_domain.Topic: ...
+
+
+@overload
+def get_topic_by_id(
+    topic_id: str,
+    *,
+    strict: Literal[True],
+    version: Optional[int] = None
+) -> topic_domain.Topic: ...
+
+
+@overload
+def get_topic_by_id(
+    topic_id: str,
+    *,
+    strict: Literal[False],
+    version: Optional[int] = None
+) -> Optional[topic_domain.Topic]: ...
+
+
+def get_topic_by_id(
+    topic_id: str, strict: bool = True, version: Optional[int] = None
+) -> Optional[topic_domain.Topic]:
     """Returns a domain object representing a topic.
 
     Args:
@@ -175,7 +226,7 @@ def get_topic_by_id(topic_id, strict=True, version=None):
         Topic or None. The domain object representing a topic with the
         given id, or None if it does not exist.
     """
-    sub_namespace = str(version) if version else None
+    sub_namespace: Optional[str] = str(version) if version else None
     cached_topic = caching_services.get_multi(
         caching_services.CACHE_NAMESPACE_TOPIC,
         sub_namespace,
@@ -197,7 +248,9 @@ def get_topic_by_id(topic_id, strict=True, version=None):
             return None
 
 
-def get_topics_by_ids(topic_ids):
+def get_topics_by_ids(
+    topic_ids: List[str]
+) -> List[Optional[topic_domain.Topic]]:
     """Returns a list of topics matching the IDs provided.
 
     Args:
@@ -207,14 +260,15 @@ def get_topics_by_ids(topic_ids):
         list(Topic|None). The list of topics corresponding to given ids
         (with None in place of topic ids corresponding to deleted topics).
     """
-    all_topic_models = topic_models.TopicModel.get_multi(topic_ids)
-    topics = [
+    all_topic_models: List[Optional[topic_models.TopicModel]] = (
+        topic_models.TopicModel.get_multi(topic_ids))
+    topics: List[Optional[topic_domain.Topic]] = [
         get_topic_from_model(topic_model) if topic_model is not None else None
         for topic_model in all_topic_models]
     return topics
 
 
-def get_topic_by_name(topic_name):
+def get_topic_by_name(topic_name: str) -> Optional[topic_domain.Topic]:
     """Returns a domain object representing a topic.
 
     Args:
@@ -224,15 +278,17 @@ def get_topic_by_name(topic_name):
         Topic or None. The domain object representing a topic with the
         given id, or None if it does not exist.
     """
-    topic_model = topic_models.TopicModel.get_by_name(topic_name)
+    topic_model: Optional[topic_models.TopicModel] = (
+        topic_models.TopicModel.get_by_name(topic_name))
     if topic_model is None:
         return None
 
-    topic = get_topic_from_model(topic_model)
-    return topic
+    return get_topic_from_model(topic_model)
 
 
-def get_topic_by_url_fragment(url_fragment):
+def get_topic_by_url_fragment(
+    url_fragment: str
+) -> Optional[topic_domain.Topic]:
     """Returns a domain object representing a topic.
 
     Args:
@@ -242,28 +298,47 @@ def get_topic_by_url_fragment(url_fragment):
         Topic or None. The domain object representing a topic with the
         given id, or None if it does not exist.
     """
-    topic_model = (
+    topic_model: Optional[topic_models.TopicModel] = (
         topic_models.TopicModel.get_by_url_fragment(url_fragment))
     if topic_model is None:
         return None
 
-    topic = get_topic_from_model(topic_model)
-    return topic
+    return get_topic_from_model(topic_model)
 
 
-def get_all_topics():
+def get_all_topics() -> List[topic_domain.Topic]:
     """Returns all the topics present in the datastore.
 
     Returns:
         list(Topic). The list of topics present in the datastore.
     """
     backend_topic_models = topic_models.TopicModel.get_all()
-    topics = [
+    topics: List[topic_domain.Topic] = [
         get_topic_from_model(topic) for topic in backend_topic_models]
     return topics
 
 
-def get_topic_rights(topic_id, strict=True):
+@overload
+def get_topic_rights(
+    topic_id: str
+) -> topic_domain.TopicRights: ...
+
+
+@overload
+def get_topic_rights(
+    topic_id: str, *, strict: Literal[True]
+) -> topic_domain.TopicRights: ...
+
+
+@overload
+def get_topic_rights(
+    topic_id: str, *, strict: Literal[False]
+) -> Optional[topic_domain.TopicRights]: ...
+
+
+def get_topic_rights(
+    topic_id: str, strict: bool = True
+) -> Optional[topic_domain.TopicRights]:
     """Retrieves the rights object for the given topic.
 
     Args:
@@ -272,14 +347,16 @@ def get_topic_rights(topic_id, strict=True):
             exists in the datastore.
 
     Returns:
-        TopicRights. The rights object associated with the given topic.
+        TopicRights or None. The rights object associated with the given topic,
+        or None if it does not exist.
 
     Raises:
         EntityNotFoundError. The topic with ID topic_id was not
             found in the datastore.
     """
 
-    model = topic_models.TopicRightsModel.get(topic_id, strict=strict)
+    model: Optional[topic_models.TopicRightsModel] = (
+        topic_models.TopicRightsModel.get(topic_id, strict=strict))
 
     if model is None:
         return None
@@ -287,7 +364,9 @@ def get_topic_rights(topic_id, strict=True):
     return get_topic_rights_from_model(model)
 
 
-def get_topic_rights_from_model(topic_rights_model):
+def get_topic_rights_from_model(
+    topic_rights_model: topic_models.TopicRightsModel
+) -> topic_domain.TopicRights:
     """Constructs a TopicRights object from the given topic rights model.
 
     Args:
@@ -305,7 +384,7 @@ def get_topic_rights_from_model(topic_rights_model):
     )
 
 
-def get_all_topic_summaries():
+def get_all_topic_summaries() -> List[topic_domain.TopicSummary]:
     """Returns the summaries of all topics present in the datastore.
 
     Returns:
@@ -313,13 +392,15 @@ def get_all_topic_summaries():
         datastore.
     """
     topic_summaries_models = topic_models.TopicSummaryModel.get_all()
-    topic_summaries = [
+    topic_summaries: List[topic_domain.TopicSummary] = [
         get_topic_summary_from_model(summary)
         for summary in topic_summaries_models]
     return topic_summaries
 
 
-def get_multi_topic_summaries(topic_ids):
+def get_multi_topic_summaries(
+    topic_ids: List[str]
+) -> List[Optional[topic_domain.TopicSummary]]:
     """Returns the summaries of all topics whose topic ids are passed in.
 
     Args:
@@ -327,8 +408,8 @@ def get_multi_topic_summaries(topic_ids):
             returned.
 
     Returns:
-        list(TopicSummary). The list of summaries of all given topics present in
-        the datastore.
+        list(TopicSummary) or None. The list of summaries of all given topics
+        present in the datastore, or None if it does not exist.
     """
     topic_summaries_models = topic_models.TopicSummaryModel.get_multi(topic_ids)
     topic_summaries = [
@@ -337,7 +418,7 @@ def get_multi_topic_summaries(topic_ids):
     return topic_summaries
 
 
-def get_published_topic_summaries():
+def get_published_topic_summaries() -> List[topic_domain.TopicSummary]:
     """Returns the summaries of all published topics present in the datastore.
 
     Returns:
@@ -349,24 +430,32 @@ def get_published_topic_summaries():
         topic_id
         for topic_id, topic_rights in topic_id_to_topic_rights.items()
         if topic_rights.topic_is_published]
-    return get_multi_topic_summaries(published_topic_ids)
+    topic_summaries_list = [
+        topic_summary for topic_summary in get_multi_topic_summaries(
+            published_topic_ids
+        ) if topic_summary is not None
+    ]
+    return topic_summaries_list
 
 
-def get_all_skill_ids_assigned_to_some_topic():
+def get_all_skill_ids_assigned_to_some_topic() -> Set[str]:
     """Returns the ids of all the skills that are linked to some topics.
 
     Returns:
         set([str]). The ids of all the skills linked to some topic.
     """
-    skill_ids = set([])
+    skill_ids: Set[str] = set()
     all_topic_models = topic_models.TopicModel.get_all()
-    all_topics = [get_topic_from_model(topic) for topic in all_topic_models]
+    all_topics: List[topic_domain.Topic] = [
+        get_topic_from_model(topic) for topic in all_topic_models]
     for topic in all_topics:
         skill_ids.update(topic.get_all_skill_ids())
     return skill_ids
 
 
-def get_topic_summary_from_model(topic_summary_model):
+def get_topic_summary_from_model(
+    topic_summary_model: topic_models.TopicSummaryModel
+) -> topic_domain.TopicSummary:
     """Returns a domain object for an Oppia topic summary given a
     topic summary model.
 
@@ -397,7 +486,9 @@ def get_topic_summary_from_model(topic_summary_model):
     )
 
 
-def get_topic_summary_by_id(topic_id, strict=True):
+def get_topic_summary_by_id(
+    topic_id: str, strict: bool = True
+) -> Optional[topic_domain.TopicSummary]:
     """Returns a domain object representing a topic summary.
 
     Args:
@@ -409,16 +500,18 @@ def get_topic_summary_by_id(topic_id, strict=True):
         TopicSummary or None. The topic summary domain object corresponding to
         a topic with the given topic_id, if it exists, or else None.
     """
-    topic_summary_model = topic_models.TopicSummaryModel.get(
-        topic_id, strict=strict)
+    topic_summary_model: Optional[topic_models.TopicSummaryModel] = (
+        topic_models.TopicSummaryModel.get(
+            topic_id, strict=strict))
     if topic_summary_model:
-        topic_summary = get_topic_summary_from_model(topic_summary_model)
+        topic_summary: topic_domain.TopicSummary = (
+            get_topic_summary_from_model(topic_summary_model))
         return topic_summary
     else:
         return None
 
 
-def get_new_topic_id():
+def get_new_topic_id() -> str:
     """Returns a new topic id.
 
     Returns:
@@ -427,7 +520,9 @@ def get_new_topic_id():
     return topic_models.TopicModel.get_new_id('')
 
 
-def get_multi_topic_rights(topic_ids):
+def get_multi_topic_rights(
+    topic_ids: List[str]
+) -> List[Optional[topic_domain.TopicRights]]:
     """Returns the rights of all topics whose topic ids are passed in.
 
     Args:
@@ -438,14 +533,15 @@ def get_multi_topic_rights(topic_ids):
         list(TopicRights). The list of rights of all given topics present in
         the datastore.
     """
-    topic_rights_models = topic_models.TopicRightsModel.get_multi(topic_ids)
-    topic_rights = [
+    topic_rights_models: List[Optional[topic_models.TopicRightsModel]] = (
+        topic_models.TopicRightsModel.get_multi(topic_ids))
+    topic_rights: List[Optional[topic_domain.TopicRights]] = [
         get_topic_rights_from_model(rights) if rights else None
         for rights in topic_rights_models]
     return topic_rights
 
 
-def get_topic_rights_with_user(user_id):
+def get_topic_rights_with_user(user_id: str) -> List[topic_domain.TopicRights]:
     """Retrieves the rights object for all topics assigned to given user.
 
     Args:
@@ -455,14 +551,15 @@ def get_topic_rights_with_user(user_id):
         list(TopicRights). The rights objects associated with the topics
         assigned to given user.
     """
-    topic_rights_models = topic_models.TopicRightsModel.get_by_user(user_id)
+    topic_rights_models: Sequence[topic_models.TopicRightsModel] = (
+        topic_models.TopicRightsModel.get_by_user(user_id))
     return [
         get_topic_rights_from_model(model)
         for model in topic_rights_models
         if model is not None]
 
 
-def get_all_topic_rights():
+def get_all_topic_rights() -> Dict[str, topic_domain.TopicRights]:
     """Returns the rights object of all topics present in the datastore.
 
     Returns:
@@ -470,14 +567,33 @@ def get_all_topic_rights():
         keyed by topic id.
     """
     topic_rights_models = topic_models.TopicRightsModel.get_all()
-    topic_rights = {}
+    topic_rights: Dict[str, topic_domain.TopicRights] = {}
     for model in topic_rights_models:
-        rights = get_topic_rights_from_model(model)
+        rights: topic_domain.TopicRights = get_topic_rights_from_model(model)
         topic_rights[rights.id] = rights
     return topic_rights
 
 
-def get_canonical_story_dicts(user_id, topic):
+class CannonicalStoryDict(TypedDict):
+    """Dictionary that represents cannonical stories."""
+
+    id: str
+    title: str
+    description: str
+    node_titles: List[str]
+    thumbnail_bg_color: Optional[str]
+    thumbnail_filename: Optional[str]
+    url_fragment: str
+    topic_url_fragment: str
+    classroom_url_fragment: str
+    story_is_published: bool
+    completed_node_titles: List[str]
+    all_node_dicts: List[story_domain.StoryNodeDict]
+
+
+def get_canonical_story_dicts(
+    user_id: str, topic: topic_domain.Topic
+) -> List[CannonicalStoryDict]:
     """Returns a list of canonical story dicts in the topic.
 
     Args:
@@ -487,14 +603,17 @@ def get_canonical_story_dicts(user_id, topic):
     Returns:
         list(dict). A list of canonical story dicts in the given topic.
     """
-    canonical_story_ids = topic.get_canonical_story_ids(
+    canonical_story_ids: List[str] = topic.get_canonical_story_ids(
         include_only_published=True)
-    canonical_story_summaries = [
+    canonical_story_summaries: List[Optional[story_domain.StorySummary]] = [
         story_fetchers.get_story_summary_by_id(
             canonical_story_id) for canonical_story_id
         in canonical_story_ids]
     canonical_story_dicts = []
     for story_summary in canonical_story_summaries:
+        # Ruling out the possibility of None for mypy type checking.
+        assert story_summary is not None
+
         pending_and_all_nodes_in_story = (
             story_fetchers.get_pending_and_all_nodes_in_story(
                 user_id, story_summary.id))
@@ -503,7 +622,16 @@ def get_canonical_story_dicts(user_id, topic):
         pending_node_titles = [node.title for node in pending_nodes]
         completed_node_titles = utils.compute_list_difference(
             story_summary.node_titles, pending_node_titles)
-        story_summary_dict = story_summary.to_human_readable_dict()
+        # Here, the return type of 'to_human_readable_dict()' method is
+        # HumanReadableStorySummaryDict which does not have topic_url_fragment,
+        # story_is_published and other keys. To overcome this missing keys
+        # issues, we defined a CannonicalStoryDict and assigned it to the
+        # `story_summary_dict`. Due this a conflict in type assignment is
+        # raised which cause MyPy to throw `Incompatible types in assignment`
+        # error. Thus to avoid error, we used ignore here.
+        story_summary_dict: CannonicalStoryDict = (
+            story_summary.to_human_readable_dict()  # type: ignore[assignment]
+        )
         story_summary_dict['topic_url_fragment'] = topic.url_fragment
         story_summary_dict['classroom_url_fragment'] = (
             classroom_services.get_classroom_url_fragment_for_topic_id(
