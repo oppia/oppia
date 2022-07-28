@@ -35,19 +35,16 @@ import { StoryEditorNavigationService } from '../services/story-editor-navigatio
   templateUrl: './story-editor-navbar.component.html'
 })
 export class StoryEditorNavbarComponent implements OnInit {
-  // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion. For more information, see
-  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  @Input() commitMessage!: string;
-  validationIssues!: string[];
-  prepublishValidationIssues!: string | string[];
-  story!: Story;
-  activeTab!: string;
-  forceValidateExplorations: boolean = false;
-  storyIsPublished: boolean = false;
-  warningsAreShown: boolean = false;
-  showNavigationOptions: boolean = false;
-  showStoryEditOptions: boolean = false;
+  @Input() commitMessage;
+  validationIssues: string[];
+  prepublishValidationIssues: string | string[];
+  story: Story;
+  forceValidateExplorations: boolean;
+  storyIsPublished: boolean;
+  warningsAreShown: boolean;
+  showNavigationOptions: boolean;
+  showStoryEditOptions: boolean;
+  activeTab: string;
   constructor(
     private storyEditorStateService: StoryEditorStateService,
     private undoRedoService: UndoRedoService,
@@ -61,7 +58,7 @@ export class StoryEditorNavbarComponent implements OnInit {
   EDITOR = 'Editor';
   PREVIEW = 'Preview';
   directiveSubscriptions = new Subscription();
-  explorationValidationIssues: string[] = [];
+  explorationValidationIssues = [];
 
   isStoryPublished(): boolean {
     return this.storyEditorStateService.isStoryPublished();
@@ -129,7 +126,7 @@ export class StoryEditorNavbarComponent implements OnInit {
     let storyPrepublishValidationIssues = (
       this.story.prepublishValidate());
     let nodePrepublishValidationIssues = (
-      Array.prototype.concat.apply([], nodes.map(
+      [].concat.apply([], nodes.map(
         (node) => node.prepublishValidate())));
     this.prepublishValidationIssues = (
       storyPrepublishValidationIssues.concat(
@@ -138,16 +135,15 @@ export class StoryEditorNavbarComponent implements OnInit {
 
   private _validateExplorations(): void {
     let nodes = this.story.getStoryContents().getNodes();
-    let explorationIds: string[] = [];
+    let explorationIds = [];
 
     if (
       this.storyEditorStateService.areAnyExpIdsChanged() ||
       this.forceValidateExplorations) {
       this.explorationValidationIssues = [];
       for (let i = 0; i < nodes.length; i++) {
-        let explorationId = nodes[i].getExplorationId();
-        if (explorationId !== null) {
-          explorationIds.push(explorationId);
+        if (nodes[i].getExplorationId() !== null) {
+          explorationIds.push(nodes[i].getExplorationId());
         } else {
           this.explorationValidationIssues.push(
             'Some chapters don\'t have exploration IDs provided.');
@@ -174,10 +170,8 @@ export class StoryEditorNavbarComponent implements OnInit {
     modalRef.result.then((commitMessage) => {
       this.storyEditorStateService.saveStory(
         commitMessage, () => {
-        // The type of error 'e' is unknown because anything can be throw
-        // in TypeScript. We need to make sure to check the type of 'e'.
-        }, (errorMessage: unknown) => {
-          this.alertsService.addInfoMessage(errorMessage as string, 5000);
+        }, (errorMessage: string) => {
+          this.alertsService.addInfoMessage(errorMessage, 5000);
         }
       );
     }, () => {

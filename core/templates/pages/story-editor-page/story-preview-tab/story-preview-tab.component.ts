@@ -27,11 +27,8 @@ import { UrlService } from 'services/contextual/url.service';
 import { StoryEditorStateService } from '../services/story-editor-state.service';
 
 interface IconsArray {
-    // Thumbnails for the story nodes are null if they are not yet uploaded.
-    // Means when we are making a new story with no nodes, the thumbnails are
-    // null.
-    'thumbnailIconUrl': string | null;
-    'thumbnailBgColor': string | null;
+    'thumbnailIconUrl': string;
+    'thumbnailBgColor': string;
 }
 
 @Component({
@@ -39,14 +36,11 @@ interface IconsArray {
   templateUrl: './story-preview-tab.component.html'
 })
 export class StoryPreviewTabComponent implements OnInit, OnDestroy {
-  // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion. For more information, see
-  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  story!: Story;
-  storyId!: string;
-  storyContents!: StoryContents;
-  nodes!: StoryNode[];
-  pathIconParameters!: IconsArray[];
+  story: Story;
+  storyId: string;
+  storyContents: StoryContents;
+  nodes: StoryNode[];
+  pathIconParameters: IconsArray[];
   constructor(
     private storyEditorStateService: StoryEditorStateService,
     private assetsBackendApiService: AssetsBackendApiService,
@@ -68,10 +62,10 @@ export class StoryPreviewTabComponent implements OnInit, OnDestroy {
   generatePathIconParameters(): IconsArray[] {
     var storyNodes = this.nodes;
     var iconParametersArray = [];
-    let thumbnailFilename = storyNodes[0].getThumbnailFilename();
-    let thumbnailIconUrl = thumbnailFilename ? (
+    let thumbnailIconUrl = storyNodes[0].getThumbnailFilename() ? (
             this.assetsBackendApiService.getThumbnailUrlForPreview(
-              'story', this.storyId, thumbnailFilename)) : null;
+              'story', this.storyId,
+              storyNodes[0].getThumbnailFilename())) : null;
     iconParametersArray.push({
       thumbnailIconUrl: thumbnailIconUrl,
       thumbnailBgColor: storyNodes[0].getThumbnailBgColor()
@@ -79,10 +73,10 @@ export class StoryPreviewTabComponent implements OnInit, OnDestroy {
 
     for (
       var i = 1; i < this.nodes.length; i++) {
-      let thumbnailFilename = storyNodes[i].getThumbnailFilename();
-      thumbnailIconUrl = thumbnailFilename ? (
+      thumbnailIconUrl = storyNodes[i].getThumbnailFilename() ? (
           this.assetsBackendApiService.getThumbnailUrlForPreview(
-            'story', this.storyId, thumbnailFilename)) : null;
+            'story', this.storyId,
+            storyNodes[i].getThumbnailFilename())) : null;
       iconParametersArray.push({
         thumbnailIconUrl: thumbnailIconUrl,
         thumbnailBgColor: storyNodes[i].getThumbnailBgColor()
@@ -91,7 +85,9 @@ export class StoryPreviewTabComponent implements OnInit, OnDestroy {
     return iconParametersArray;
   }
 
-  getExplorationUrl(node: StoryNode): string {
+  getExplorationUrl(node: {
+     getExplorationId: () => string;
+     getId: () => string; }): string {
     var result = '/explore/' + node.getExplorationId();
     result = this.urlService.addField(
       result, 'story_id', this.storyId);

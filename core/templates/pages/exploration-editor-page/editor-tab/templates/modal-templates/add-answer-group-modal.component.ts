@@ -180,11 +180,11 @@ export class AddAnswerGroupModalComponent
      this.questionModeEnabled = (
        this.stateEditorService.isInQuestionMode());
 
-     this.tmpRule = this.ruleObjectFactory.createNew('', {}, {});
+     this.tmpRule = this.ruleObjectFactory.createNew(null, {}, {});
      var feedbackContentId = this.generateContentIdService.getNextStateId(
        AppConstants.COMPONENT_NAME_FEEDBACK);
      this.tmpOutcome = this.outcomeObjectFactory.createNew(
-       this.questionModeEnabled ? '' : this.stateName,
+       this.questionModeEnabled ? null : this.stateName,
        feedbackContentId, '', []);
    }
 

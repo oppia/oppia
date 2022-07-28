@@ -57,32 +57,27 @@ export class ProfilePageComponent {
     helpText: ''
   };
 
-  // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion. For more information, see
-  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  data!: UserProfile;
-  numUserPortfolioExplorations!: number;
-  explorationIndexEnd!: number;
-  explorationIndexStart!: number;
-  // The time in milliseconds when the user first contributed to Oppia.
-  // This property is initially set as null for a new user .
-  firstContributionMsec!: number | null;
-  usernameIsLong: boolean = false;
+  usernameIsLong: boolean;
   userBio: string = '';
   userDisplayedStatistics: UserDisplayedStatistic[] = [];
   userEditedExplorations: LearnerExplorationSummary[] = [];
-  userNotLoggedIn: boolean = false;
-  isAlreadySubscribed: boolean = false;
-  isUserVisitingOwnProfile: boolean = false;
+  userNotLoggedIn: boolean;
+  isAlreadySubscribed: boolean;
+  isUserVisitingOwnProfile: boolean;
   subscriptionButtonPopoverText: string = '';
   currentPageNumber: number = 0;
   PAGE_SIZE: number = 6;
   startingExplorationNumber: number = 1;
   endingExplorationNumber: number = 6;
-  profileIsOfCurrentUser: boolean = false;
+  profileIsOfCurrentUser: boolean;
+  data: UserProfile;
+  numUserPortfolioExplorations: number;
   explorationsOnPage: LearnerExplorationSummary[] = [];
+  explorationIndexEnd: number;
+  explorationIndexStart: number;
   subjectInterests: string[] = [];
   profilePictureDataUrl: string = '';
+  firstContributionMsec: number;
   preferencesUrl = (
     '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PREFERENCES.ROUTE);
 
@@ -137,15 +132,6 @@ export class ProfilePageComponent {
               this.ratingComputationService.computeAverageRating(
                 exploration2.ratings));
 
-            if (avgRating1 === null) {
-              return -1;
-            }
-            if (avgRating2 === null) {
-              return 1;
-            }
-            if (avgRating1 === null && avgRating2 === null) {
-              return -1;
-            }
             if (avgRating1 > avgRating2) {
               return 1;
             } else if (avgRating1 === avgRating2) {

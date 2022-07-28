@@ -34,23 +34,18 @@ import { CollectionEditorStateService } from '../services/collection-editor-stat
 })
 export class CollectionDetailsEditorComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
-  // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion. For more information, see
-  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  collection!: Collection;
-  // The following properties are used to display the collection settings.
-  // These are null until collection data is entered by the user.
-  displayedCollectionTitle!: string | null;
-  displayedCollectionObjective!: string | null;
-  displayedCollectionCategory!: string | null;
-  displayedCollectionLanguage!: string | null;
+  collection: Collection;
   COLLECTION_TITLE_INPUT_FOCUS_LABEL = (
     CollectionEditorPageConstants.COLLECTION_TITLE_INPUT_FOCUS_LABEL);
 
   CATEGORY_LIST: string[] = [...AppConstants.ALL_CATEGORIES];
   languageListForSelect = AppConstants.SUPPORTED_CONTENT_LANGUAGES;
   TAG_REGEX = AppConstants.TAG_REGEX;
-  displayedCollectionTags: string[] | null = [];
+  displayedCollectionTitle: string;
+  displayedCollectionObjective: string;
+  displayedCollectionCategory: string;
+  displayedCollectionLanguage: string;
+  displayedCollectionTags: string[] = [];
 
   constructor(
     private alertsService: AlertsService,
@@ -80,9 +75,8 @@ export class CollectionDetailsEditorComponent implements OnInit, OnDestroy {
 
     // If the current category is not in the dropdown, add it
     // as the first option.
-    let category = this.collection.getCategory();
-    if (!categoryIsInList && category) {
-      this.CATEGORY_LIST.unshift(category);
+    if (!categoryIsInList && this.collection.getCategory()) {
+      this.CATEGORY_LIST.unshift(this.collection.getCategory());
     }
   }
 
@@ -91,10 +85,7 @@ export class CollectionDetailsEditorComponent implements OnInit, OnDestroy {
   }
 
   // Normalize the tags for the collection.
-  normalizeTags(tags: string[] | null): string[] {
-    if (tags === null) {
-      return [];
-    }
+  normalizeTags(tags: string[]): string[] {
     for (let i = 0; i < tags.length; i++) {
       tags[i] = tags[i].trim().replace(/\s+/g, ' ');
     }

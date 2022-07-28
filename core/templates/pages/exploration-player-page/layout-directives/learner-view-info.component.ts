@@ -56,7 +56,7 @@ export class LearnerViewInfoComponent {
   topicNameTranslationKey!: string;
   expInfo!: LearnerExplorationSummaryBackendDict;
   directiveSubscriptions: Subscription = new Subscription();
-  isLinkedToTopic: boolean = false;
+  isLinkedToTopic: boolean;
 
   constructor(
     private ngbModal: NgbModal,

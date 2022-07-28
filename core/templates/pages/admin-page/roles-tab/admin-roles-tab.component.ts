@@ -20,10 +20,9 @@ import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { AdminDataService } from '../services/admin-data.service';
-import { AdminBackendApiService, HumanReadableRolesBackendResponse, RoleToActionsBackendResponse } from 'domain/admin/admin-backend-api.service';
+import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
 import { TopicManagerRoleEditorModalComponent } from './topic-manager-role-editor-modal.component';
 import { AlertsService } from 'services/alerts.service';
-import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
 
 @Component({
   selector: 'oppia-admin-roles-tab',
@@ -31,26 +30,24 @@ import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
 })
 export class AdminRolesTabComponent implements OnInit {
   @Output() setStatusMessage: EventEmitter<string> = new EventEmitter();
-  // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion. For more information, see
-  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  UPDATABLE_ROLES!: string[];
-  VIEWABLE_ROLES!: string[];
-  HUMAN_READABLE_ROLES!: HumanReadableRolesBackendResponse;
-  topicSummaries!: CreatorTopicSummary[];
-  roleToActions!: RoleToActionsBackendResponse;
-  errorMessage!: string;
-  rolesFetched: boolean = false;
-  roleSelectorIsShown: boolean = false;
-  username: string = '';
-  userRoles: string[] = [];
-  possibleRolesToAdd: string[] = [];
-  managedTopicIds: string[] = [];
+
+  UPDATABLE_ROLES = null;
+  VIEWABLE_ROLES = null;
+  HUMAN_READABLE_ROLES = null;
+  topicSummaries = null;
+  roleToActions = null;
+  rolesFetched = false;
+
+  roleSelectorIsShown = false;
+  username = '';
+  userRoles = [];
+  possibleRolesToAdd = [];
+  managedTopicIds = [];
   // The roleCurrentlyBeingUpdatedInBackend holds the role which is either being
   // removed or added to user roles. This value is used to present a progress
   // spinner next to the role which is currently being updated in the backend.
-  // RoleCurrentlyBeingUpdatedInBackend is null when no role is being updated.
-  roleCurrentlyBeingUpdatedInBackend: string | null = null;
+  roleCurrentlyBeingUpdatedInBackend = null;
+  errorMessage = null;
   bannedStatusChangeInProgress = false;
   userIsBanned = false;
   roleIsCurrentlyBeingEdited = false;
@@ -109,7 +106,7 @@ export class AdminRolesTabComponent implements OnInit {
     modalRef.componentInstance.managedTopicIds = (
       this.managedTopicIds);
     modalRef.componentInstance.username = this.username;
-    let topicIdToName: Record<string, string> = {};
+    let topicIdToName = {};
     this.topicSummaries.forEach(
       topicSummary => topicIdToName[topicSummary.id] = topicSummary.name);
     modalRef.componentInstance.topicIdToName = topicIdToName;
