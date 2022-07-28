@@ -46,7 +46,9 @@ if MYPY: # pragma: no cover
     from mypy_imports import topic_models
 
 (base_models, story_models, topic_models) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.story, models.NAMES.topic])
+    models.NAMES.base_model, models.NAMES.story, models.NAMES.topic
+])
+
 datastore_services = models.Registry.import_datastore_services()
 
 
@@ -164,9 +166,14 @@ class MigrateStoryJob(base_jobs.JobBase):
                     feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION),
                 change_dicts,
                 additional_models={}
-            ).values()
-        datastore_services.update_timestamps_multi(list(models_to_put))
-        return models_to_put
+            )
+        models_to_put_values = []
+        for _, value in models_to_put.items():
+            # Here, we are narrowing down the type from object to BaseModel.
+            assert isinstance(value, base_models.BaseModel)
+            models_to_put_values.append(value)
+        datastore_services.update_timestamps_multi(models_to_put_values)
+        return models_to_put_values
 
     @staticmethod
     def _update_story_summary(
