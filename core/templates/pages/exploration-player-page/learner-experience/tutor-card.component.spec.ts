@@ -485,6 +485,17 @@ describe('Tutor card component', () => {
     expect(componentInstance.setNextMilestoneAndCheckIfProgressBarIsShown())
       .toBe(true);
     expect(componentInstance.nextMilestoneChapterCount).toBe(5);
+
+    spyOn(componentInstance, 'isCompletedChaptersCountGreaterThanLastMilestone')
+      .and.returnValue(false);
+    spyOn(
+      componentInstance, 'isMilestoneReachedAndMilestoneMessageToBeDisplayed')
+      .and.returnValue(false);
+    componentInstance.completedChaptersCount = 55;
+    componentInstance.milestoneMessageIsToBeDisplayed = true;
+
+    expect(componentInstance.setNextMilestoneAndCheckIfProgressBarIsShown())
+      .toBe(false);
   });
 
   it('should not show milestone progress bar if completed chapters count ' +
@@ -559,6 +570,19 @@ describe('Tutor card component', () => {
     expect(
       componentInstance.isMilestoneReachedAndMilestoneMessageToBeDisplayed())
       .toBe(false);
+  });
+
+  it('should correctly determine if completed chapters count is greater than ' +
+  'last milestone', () => {
+    componentInstance.completedChaptersCount = 1;
+
+    expect(componentInstance.isCompletedChaptersCountGreaterThanLastMilestone())
+      .toBe(false);
+
+    componentInstance.completedChaptersCount = 51;
+
+    expect(componentInstance.isCompletedChaptersCountGreaterThanLastMilestone())
+      .toBe(true);
   });
 
   it('should update displayed card', fakeAsync(() => {

@@ -275,7 +275,7 @@ export class TutorCardComponent {
   setNextMilestoneAndCheckIfProgressBarIsShown(): boolean {
     if (
       !this.inStoryMode ||
-      this.completedChaptersCount > 50 ||
+      this.isCompletedChaptersCountGreaterThanLastMilestone() ||
       this.isMilestoneReachedAndMilestoneMessageToBeDisplayed()
     ) {
       this.nextMilestoneChapterCount = null;
@@ -301,13 +301,21 @@ export class TutorCardComponent {
         return true;
       }
     }
+
+    return false;
   }
 
   isMilestoneReachedAndMilestoneMessageToBeDisplayed(): boolean {
     return (
       this.milestoneMessageIsToBeDisplayed &&
       MILESTONE_SPECIFIC_COMPLETED_CHAPTER_COUNTS.includes(
-        this.completedChaptersCount));
+        this.completedChaptersCount
+      )
+    );
+  }
+
+  isCompletedChaptersCountGreaterThanLastMilestone(): boolean {
+    return this.completedChaptersCount > 50;
   }
 
   getStaticImageUrl(imagePath: string): string {
