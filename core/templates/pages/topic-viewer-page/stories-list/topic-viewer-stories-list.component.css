@@ -7,17 +7,17 @@
   Some additional rules that can be added to the CSS files can be found here:
   https://rtlcss.com/learn/usage-guide/control-directives .
 */
-.tab-title {
+stories-list .tab-title {
   color: #017a70;
   font-weight: lighter;
   margin: .83em 0 0.3em 0;
 }
 
-.story-info-container {
+stories-list .story-info-container {
   padding-top: 4vh;
 }
 
-.stories-can-play {
+stories-list .stories-can-play {
   display: inline-block;
   font-size: 1.4em;
   font-weight: 500;
@@ -25,45 +25,45 @@
   padding-bottom: 15px;
 }
 
-.topic-description {
+stories-list .topic-description {
   border-bottom: 1px solid #7b7b7b;
   font-size: 1.1em;
   padding-bottom: 2vh;
 }
 
-.oppia-stories-list-container .oppia-page-card {
+stories-list .oppia-stories-list-container .oppia-page-card {
   border-radius: 0.25em;
   padding-bottom: 7.5vh;
   width: 704px;
 }
 
-.mat-card-margin-desktop {
+stories-list .mat-card-margin-desktop {
   margin-top: 10em;
 }
 
 @media(max-width: 1024px) {
-  .oppia-stories-list-container .oppia-page-card {
+  stories-list .oppia-stories-list-container .oppia-page-card {
     width: 80vw;
   }
 }
 
 @media(max-width: 768px) {
-  .oppia-stories-list-container .oppia-page-card {
+  stories-list .oppia-stories-list-container .oppia-page-card {
     width: 100%;
   }
 
-  .story-info-container {
+  stories-list .story-info-container {
     padding-top: 0;
   }
 }
 
 @media(max-width: 500px) {
-  .oppia-stories-list-container .oppia-page-card {
+  stories-list .oppia-stories-list-container .oppia-page-card {
     padding: 12em 24px 64px 24px;
     width: 100%;
   }
 
-  .story-info-container {
+  stories-list .story-info-container {
     padding-top: 0;
   }
 }

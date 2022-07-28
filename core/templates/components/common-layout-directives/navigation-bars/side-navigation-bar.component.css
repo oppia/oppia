@@ -133,16 +133,16 @@
 .oppia-sidebar-menu li {
   border-bottom: 1px solid #e3e3e3;
 }
-.oppia-submenu-image-position {
+oppia-side-navigation-bar.oppia-submenu-image-position {
   float: right;
   margin-right: 5%;
   margin-top: 2.5%;
 }
-.oppia-submenu-image {
+oppia-side-navigation-bar.oppia-submenu-image {
   height: 80px;
   width: 64.54px;
 }
-.oppia-community-library-section {
+oppia-side-navigation-bar.oppia-community-library-section {
   background: #ededed;
   border-radius: 0 0 8px 8px;
   -webkit-box-shadow: 0 8px 6px -6px black;
@@ -202,7 +202,7 @@
   Note that adding "overflow-y: scroll;" will break infinite scrolling in the
   search results page.
 */
-.oppia-content-container {
+oppia-side-navigation-bar.oppia-content-container {
   height: 100%;
   left: 0;
   position: relative;

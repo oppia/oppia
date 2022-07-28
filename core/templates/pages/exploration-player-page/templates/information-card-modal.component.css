@@ -21,32 +21,32 @@
   line-height: 1.5;
   margin-top: 20px
 }
-.fas.fa-tags.oppia-info-card-modal-tooltip {
+oppia-information-card-modal .fas.fa-tags.oppia-info-card-modal-tooltip {
   margin-left: 0.0625rem;
   margin-right: 0.1875rem;
 }
-.mat-padding {
+oppia-information-card-modal .mat-padding {
   padding: 0;
 }
-.row.center {
+oppia-information-card-modal .row.center {
   display: flex;
   flex-direction: row;
 }
-.space-between {
+oppia-information-card-modal .space-between {
   justify-content: space-between;
 }
-.center {
+oppia-information-card-modal .center {
   align-content: center;
   align-items: center;
 }
-.row-item {
+oppia-information-card-modal .row-item {
   flex-grow: 1;
 }
-.card-metrics {
+oppia-information-card-modal .card-metrics {
   box-sizing: border-box  ;
   max-width: 100%;
 }
-.exploration-tags {
+oppia-information-card-modal .exploration-tags {
   max-width: 90%;
 }
 .oppia-info-card-logo-thumbnail {
@@ -60,7 +60,7 @@
   position: relative;
 }
 
-.oppia-contributors-more-circle {
+oppia-information-card-modal .oppia-contributors-more-circle {
   background: #888;
   border-radius: 10%;
   color: #fff;
@@ -165,6 +165,6 @@
   color: #009688;
 }
 
-.learn-info-card-star {
+oppia-information-card-modal .learn-info-card-star {
   margin-right: 5px
 }

@@ -8,7 +8,7 @@
   https://rtlcss.com/learn/usage-guide/control-directives .
 */
 
-.conversation-skin-help-card {
+oppia-supplemental-card .conversation-skin-help-card {
   background: #fff;
   border-radius: 2px;
   /* We move the help card lower so that it does not block
@@ -27,24 +27,24 @@
   z-index: 1001;
 }
 
-.conversation-skin-help-card.ng-enter,
-.conversation-skin-help-card.ng-leave-active {
+oppia-supplemental-card .conversation-skin-help-card.ng-enter,
+oppia-supplemental-card .conversation-skin-help-card.ng-leave-active {
   opacity: 0;
   transform: translateX(200px);
 }
 
-.help-card-standard {
+oppia-supplemental-card .help-card-standard {
   /* Use margin-bottom to make sure the help card doesn't get hidden behind the footer. */
   margin-bottom: 80px;
   position: absolute;
 }
 
-.conversation-skin-help-card .conversation-skin-oppia-avatar {
+oppia-supplemental-card .conversation-skin-help-card .conversation-skin-oppia-avatar {
   left: -15px;
   top: 12px;
 }
 
-.conversation-skin-close-help-card-button {
+oppia-supplemental-card .conversation-skin-close-help-card-button {
   background: none;
   border: 0;
   color: #000;
@@ -58,6 +58,6 @@
   z-index: 200;
 }
 
-.conversation-skin-supplemental-card {
+oppia-supplemental-card .conversation-skin-supplemental-card {
   background-color: #fff;
 }

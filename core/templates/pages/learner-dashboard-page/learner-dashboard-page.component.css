@@ -44,8 +44,8 @@
   padding: 0.1px;
 }
 
-.home-button,
-.goals-button {
+oppia-learner-dashboard-page .home-button,
+oppia-learner-dashboard-page.goals-button {
   left: 10px;
   position: relative;
 }
@@ -71,18 +71,18 @@
   text-align: center;
 }
 
-.empty-feedback-threads {
+oppia-learner-dashboard-page .empty-feedback-threads {
   color: #333;
   font-family: "Roboto", Arial, sans-serif;
   font-size: 18px;
 }
 
-.oppia-buttons {
+oppia-learner-dashboard-page .oppia-buttons {
   cursor: pointer;
   display: inline-block;
 }
 
-.oppia-svg-image {
+oppia-learner-dashboard-page .oppia-svg-image {
   display: block;
   height: 48px;
   width: 64px;
@@ -180,7 +180,7 @@
   margin-left: 6px;
 }
 
-.oppia-feedback-section-top-margin {
+oppia-learner-dashboard-page .oppia-feedback-section-top-margin {
   margin-top: 64px;
 }
 
@@ -209,35 +209,35 @@
   margin: 6px 0 0 14px;
 }
 
-.oppia-row {
+oppia-learner-dashboard-page .oppia-row {
   display: flex;
 }
-.oppia-sort-options {
+oppia-learner-dashboard-page .oppia-sort-options {
   width: auto;
 }
 .oppia-learner-dashboard-intro-button-link {
   margin-top: 13px;
   width: 230px;
 }
-.oppia-btn-secondary {
+oppia-learner-dashboard-page .oppia-btn-secondary {
   padding: 0 3px;
 }
-.oppia-exploration-title {
+oppia-learner-dashboard-page .oppia-exploration-title {
   font-size: 105%;
   margin-left: 7px;
 }
-.oppia-message-summaries {
+oppia-learner-dashboard-page .oppia-message-summaries {
   padding: 13px 8px 7px 8px;
 }
-.oppia-profile-picture {
+oppia-learner-dashboard-page .oppia-profile-picture {
   margin-top: 4px;
   min-width: 32px;
 }
-.oppia-updated-status {
+oppia-learner-dashboard-page .oppia-updated-status {
   float: right;
   margin-right: 15px;
 }
-.oppia-feedback-message-spacing {
+oppia-learner-dashboard-page .oppia-feedback-message-spacing {
   width: 8%;
 }
 
@@ -271,7 +271,7 @@
   .oppia-learner-dashboard-buttons {
     height: 0.1rem;
   }
-  .oppia-buttons {
+  oppia-learner-dashboard-page .oppia-buttons {
     margin-left: 135px;
   }
   .oppia-learner-dashboard-progress-button-menu-options {
@@ -286,7 +286,7 @@
 }
 
 @media screen and (min-width: 1001px) and (max-width: 1200px) {
-  .oppia-buttons {
+  oppia-learner-dashboard-page .oppia-buttons {
     margin-left: 205px;
   }
   .oppia-learner-dashboard-progress-button-menu-options {
@@ -398,7 +398,7 @@
   margin: 20px 0;
   width: 100%;
 }
-.oppia-pagination-button {
+oppia-learner-dashboard-page .oppia-pagination-button {
   background-color: transparent;
   border: none;
   box-sizing: border-box;

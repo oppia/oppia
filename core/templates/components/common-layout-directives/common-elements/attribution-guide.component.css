@@ -8,21 +8,21 @@
   https://rtlcss.com/learn/usage-guide/control-directives .
 */
 
-.oppia-cc-icon {
+attribution-guide .oppia-cc-icon {
   right: 25px;
 }
 
-.oppia-cc-icon a.oppia-attribution-image-link {
+attribution-guide .oppia-cc-icon a.oppia-attribution-image-link {
   text-decoration: none;
 }
 
-.oppia-cc-icon a.oppia-attribution-image-link:focus > img {
+attribution-guide .oppia-cc-icon a.oppia-attribution-image-link:focus > img {
   outline: 1px dotted #212121;
   outline: auto 5px -webkit-focus-ring-color;
 }
 
-.oppia-cc-icon a.oppia-attribution-link:hover,
-.oppia-cc-icon a.oppia-attribution-link:focus {
+attribution-guide .oppia-cc-icon a.oppia-attribution-link:hover,
+attribution-guide .oppia-cc-icon a.oppia-attribution-link:focus {
   text-decoration: underline;
 }
 
