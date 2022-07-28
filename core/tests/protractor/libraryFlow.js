@@ -144,7 +144,7 @@ describe('Rating', function() {
     // gated behind a config option.
     await adminPage.editConfigProperty(
       'Enable checkpoints feature.', 'Boolean',
-      async(elem) => await elem.setValue(true));
+      async(elem) => await (await elem).setValue(true));
 
     // Create a test exploration.
 
