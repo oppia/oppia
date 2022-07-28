@@ -890,11 +890,21 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
                     change_dict
                 ))
             old_exploration = versioned_explorations[version - 2]
-            new_exploration = exp_services.apply_change_list_to_exploration(
-                old_exploration, version - 1, change_list
-            )
-            new_exploration.version = version
-            versioned_explorations.append(new_exploration)
+            revert_to_version = self.check_for_revert_commit(
+                    change_list
+                )
+            if revert_to_version is not None:
+                new_exploration = copy.deepcopy(
+                    versioned_explorations[revert_to_version - 1]
+                )
+                new_exploration.version = version
+                versioned_explorations.append(new_exploration)
+            else:
+                new_exploration = exp_services.apply_change_list_to_exploration(
+                    old_exploration, version - 1, change_list
+                )
+                new_exploration.version = version
+                versioned_explorations.append(new_exploration)
 
         return versioned_explorations
 
@@ -969,11 +979,6 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
         commit_log_models = model_group['commit_log_models']
         vh_models = model_group['version_history_models']
         exp_id = exp_v1.id
-
-        # Check if any of the models is still None.
-        for vh_model in vh_models:
-            if vh_model is None:
-                return (exp_id, False)
 
         # Get the exploration domain objects.
         versioned_explorations = self.get_all_versioned_explorations(
@@ -1062,14 +1067,14 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
                 else:
                     expected_state_vh = (
                         exp_services.update_states_version_history(
-                            copy.deepcopy(verified_state_vh[version - 2]),
+                            copy.deepcopy(verified_state_vh[-1]),
                             change_list, prev_exp.states,
                             curr_exp.states, version, committer_id
                         )
                     )
                     expected_metadata_vh = (
                         exp_services.update_metadata_version_history(
-                            copy.deepcopy(verified_metadata_vh[version - 2]),
+                            copy.deepcopy(verified_metadata_vh[-1]),
                             change_list, prev_exp.get_metadata(),
                             curr_exp.get_metadata(), version, committer_id
                         )
@@ -1095,7 +1100,7 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
                 verified_state_vh.append(expected_state_vh)
                 verified_metadata_vh.append(expected_metadata_vh)
 
-        return (exp_id, True)
+        return (exp_id, verified)
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         all_explorations_vlatest = (
@@ -1180,6 +1185,14 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
                 beam.Filter(lambda x: x[1] is False)
         )
 
+        report_number_of_explorations_queried = (
+            all_explorations_vlatest
+            | 'Count the number of explorations' >>
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'ALL EXPLORATIONS'
+                )
+        )
+
         report_number_of_verified_explorations = (
             verification_success
             | 'Count the number of verified explorations' >>
@@ -1208,6 +1221,7 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
 
         return (
             (
+                report_number_of_explorations_queried,
                 report_number_of_verified_explorations,
                 report_number_of_unverified_explorations,
                 report_details_of_unverified_explorations
