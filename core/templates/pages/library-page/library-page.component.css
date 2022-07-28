@@ -3,7 +3,7 @@
   compilation, here are sme additional rules that can be added to the CSS files:
   https://rtlcss.com/learn/usage-guide/control-directives .
 */
-.oppia-classroom-div {
+oppia-library-page .oppia-classroom-div {
   background-color: whitesmoke;
   border: 4px solid #04857c;
   border-radius: 10px;
@@ -12,39 +12,39 @@
   overflow: hidden;
   padding: 30px 45px 45px 45px;
 }
-.oppia-classroom-text {
+oppia-library-page .oppia-classroom-text {
   float: left;
   width: 62%;
 }
-.oppia-classroom-h1 {
+oppia-library-page .oppia-classroom-h1 {
   color: #033e39;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
 }
-.oppia-classroom-h2 {
+oppia-library-page .oppia-classroom-h2 {
   color: #033e39;
   font-family: "Roboto", Arial, sans-serif;
   font-weight: 700;
 }
-.oppia-classroom-p {
+oppia-library-page .oppia-classroom-p {
   color: #383838;
   font-family: "Rubik, regular", "Roboto", Arial, sans-serif;
   line-height: 1.5;
   margin-top: 25px;
 }
-.oppia-classroom-div > img {
+oppia-library-page .oppia-classroom-div > img {
   bottom: 0;
   height: 100%;
   position: absolute;
   transform: translateY(50px);
 }
-.oppia-classroom-text > a {
+oppia-library-page .oppia-classroom-text > a {
   width: 180px;
 }
-.classroom-promo-image {
+oppia-library-page .classroom-promo-image {
   display: flex;
   padding-top: 40px;
 }
-.oppia-group-page-header {
+oppia-library-page .oppia-group-page-header {
   color: #2c4841;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 2em;
@@ -78,7 +78,7 @@
   .oppia-library-group-header-container {
     width: 80%;
   }
-  .classroom-promo-image {
+  oppia-library-page .classroom-promo-image {
     padding-top: 0;
   }
 }
@@ -111,7 +111,7 @@
     margin-left: 11.25%;
   }
 }
-.oppia-library-group-header a,
+oppia-library-page .oppia-library-group-header a,
 .oppia-library-group-header span {
   color: inherit;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
@@ -157,13 +157,13 @@
   top: 0;
   white-space: nowrap;
 }
-.oppia-mobile-activity-cards-container {
+oppia-library-page .oppia-mobile-activity-cards-container {
   overflow-y: hidden;
 }
-.limit-cards-shown {
+oppia-library-page .limit-cards-shown {
   max-height: 293px;
 }
-.card-container-height-toggle-btn {
+oppia-library-page .card-container-height-toggle-btn {
   background: #04857c;
   border: none;
   border-radius: 8px;
@@ -171,12 +171,12 @@
   font-size: 18px;
   padding: 6px 20px 3px 20px;
 }
-.height-toggle-btn-container {
+oppia-library-page .height-toggle-btn-container {
   display: flex;
   justify-content: center;
   margin-top: 12px;
 }
-.button-alignment-div {
+oppia-library-page .button-alignment-div {
   width: 350px;
 }
 .oppia-library-carousel {
@@ -194,7 +194,7 @@
   position: relative;
   z-index: 3;
 }
-.oppia-exp-summary-tiles-container-extra-info {
+oppia-library-page .oppia-exp-summary-tiles-container-extra-info {
   margin-bottom: 20px;
 }
 .oppia-library-no-explorations-text-container {
@@ -202,12 +202,12 @@
   padding-bottom: 40px;
   padding-top: 40px;
 }
-.oppia-exploration-summary-header {
+oppia-library-page .oppia-exploration-summary-header {
   margin-left: auto;
   margin-right: auto;
   max-width: 856px;
 }
-.oppia-search-bar-container {
+oppia-library-page .oppia-search-bar-container {
   margin: 0 auto 5vh auto;
   padding-bottom: 60px;
   width: max-content;
@@ -222,52 +222,52 @@
   .oppia-library-h2 {
     font-size: 1.75em;
   }
-  .oppia-classroom-h1 {
+  oppia-library-page .oppia-classroom-h1 {
     font-size: 2em;
   }
-  .oppia-classroom-h2 {
+  oppia-library-page .oppia-classroom-h2 {
     font-size: 1.0em;
   }
-  .oppia-classroom-p {
+  oppia-library-page .oppia-classroom-p {
     font-size: 1.05em;
   }
 }
 @media (max-width: 1126px) {
-  .oppia-classroom-div {
+  oppia-library-page .oppia-classroom-div {
     margin-top: 100px;
   }
 }
 @media (max-width: 900px) {
-  .oppia-classroom-h1 {
+  oppia-library-page .oppia-classroom-h1 {
     font-size: 1.45em;
   }
-  .oppia-classroom-h2 {
+  oppia-library-page .oppia-classroom-h2 {
     font-size: 0.9em;
   }
-  .oppia-classroom-p {
+  oppia-library-page .oppia-classroom-p {
     font-size: 0.95em;
     margin-top: 20px;
   }
-  .oppia-classroom-div > img {
+  oppia-library-page .oppia-classroom-div > img {
     height: 80%;
     transform: translateY(35px);
   }
 }
 @media (max-width: 727px) {
-  .oppia-classroom-div {
+  oppia-library-page .oppia-classroom-div {
     height: 400px;
     padding: 20px;
   }
-  .oppia-classroom-text {
+  oppia-library-page .oppia-classroom-text {
     float: none;
     width: 100%;
   }
-  .oppia-classroom-text > a {
+  oppia-library-page .oppia-classroom-text > a {
     float: left;
     margin-top: 50px;
     width: 140px;
   }
-  .oppia-classroom-div > img {
+  oppia-library-page .oppia-classroom-div > img {
     height: 60%;
     right: 10px;
     transform: translateY(45px);
@@ -279,7 +279,7 @@
     margin-left: 7%;
     width: 80%;
   }
-  .oppia-search-bar-container {
+  oppia-library-page .oppia-search-bar-container {
     margin-bottom: 90px;
   }
   .oppia-library-group {
@@ -293,35 +293,35 @@
   }
 }
 @media (max-width: 450px) {
-  .oppia-classroom-text > a {
+  oppia-library-page .oppia-classroom-text > a {
     font-size: 0.75em;
     margin-top: 40px;
     width: fit-content;
   }
-  .oppia-classroom-div > img {
+  oppia-library-page .oppia-classroom-div > img {
     height: 45%;
     transform: translateY(25px);
   }
-  .oppia-classroom-h1 {
+  oppia-library-page .oppia-classroom-h1 {
     font-size: 1.3em;
   }
-  .oppia-classroom-h2 {
+  oppia-library-page .oppia-classroom-h2 {
     font-size: 0.75em;
   }
-  .oppia-classroom-p {
+  oppia-library-page .oppia-classroom-p {
     font-size: 0.85em;
   }
 }
 @media (max-width: 344px) {
-  .oppia-classroom-div > img {
+  oppia-library-page .oppia-classroom-div > img {
     height: 35%;
     transform: translateY(25px);
   }
-  .oppia-classroom-text > a {
+  oppia-library-page .oppia-classroom-text > a {
     margin-top: 40px;
   }
 }
-.oppia-exp-summary-tiles-container {
+oppia-library-page .oppia-exp-summary-tiles-container {
   display: block;
   height: 100%;
   margin-left: auto;
@@ -336,7 +336,7 @@
 /* Ensure that the summary tiles tiles remain centered. Note that these values
   would need to be updated if the summary tiles are changed. */
 @media (max-width: 844px) {
-  .oppia-exp-summary-tiles-container {
+  oppia-library-page .oppia-exp-summary-tiles-container {
     margin-left: 5vw;
     margin-right: 5vw;
     max-width: 89vw;
@@ -344,7 +344,7 @@
   }
 }
 @media (max-width: 632px) {
-  .oppia-exp-summary-tiles-container {
+  oppia-library-page .oppia-exp-summary-tiles-container {
     margin-left: 2vw;
     margin-right: 2vw;
     max-width: 96vw;
