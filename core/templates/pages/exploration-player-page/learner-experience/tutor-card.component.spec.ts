@@ -473,15 +473,17 @@ describe('Tutor card component', () => {
     componentInstance.inStoryMode = true;
     componentInstance.milestoneMessageIsToBeDisplayed = false;
     componentInstance.completedChaptersCount = 2;
-    spyOn(componentInstance, 'shouldShowMilestoneProgressBar')
+    spyOn(componentInstance, 'setNextMilestoneAndCheckIfProgressBarIsShown')
       .and.callThrough();
 
-    expect(componentInstance.shouldShowMilestoneProgressBar()).toBe(true);
+    expect(componentInstance.setNextMilestoneAndCheckIfProgressBarIsShown())
+      .toBe(true);
     expect(componentInstance.nextMilestoneChapterCount).toBe(5);
 
     componentInstance.completedChaptersCount = 4;
 
-    expect(componentInstance.shouldShowMilestoneProgressBar()).toBe(true);
+    expect(componentInstance.setNextMilestoneAndCheckIfProgressBarIsShown())
+      .toBe(true);
     expect(componentInstance.nextMilestoneChapterCount).toBe(5);
   });
 
@@ -490,10 +492,11 @@ describe('Tutor card component', () => {
     componentInstance.inStoryMode = true;
     componentInstance.milestoneMessageIsToBeDisplayed = false;
     componentInstance.completedChaptersCount = 51;
-    spyOn(componentInstance, 'shouldShowMilestoneProgressBar')
+    spyOn(componentInstance, 'setNextMilestoneAndCheckIfProgressBarIsShown')
       .and.callThrough();
 
-    expect(componentInstance.shouldShowMilestoneProgressBar()).toBe(false);
+    expect(componentInstance.setNextMilestoneAndCheckIfProgressBarIsShown())
+      .toBe(false);
     expect(componentInstance.nextMilestoneChapterCount).toBeNull();
   });
 
@@ -501,10 +504,11 @@ describe('Tutor card component', () => {
     componentInstance.inStoryMode = false;
     componentInstance.milestoneMessageIsToBeDisplayed = false;
     componentInstance.completedChaptersCount = 1;
-    spyOn(componentInstance, 'shouldShowMilestoneProgressBar')
+    spyOn(componentInstance, 'setNextMilestoneAndCheckIfProgressBarIsShown')
       .and.callThrough();
 
-    expect(componentInstance.shouldShowMilestoneProgressBar()).toBe(false);
+    expect(componentInstance.setNextMilestoneAndCheckIfProgressBarIsShown())
+      .toBe(false);
     expect(componentInstance.nextMilestoneChapterCount).toBeNull();
   });
 
@@ -513,10 +517,11 @@ describe('Tutor card component', () => {
     componentInstance.inStoryMode = true;
     componentInstance.milestoneMessageIsToBeDisplayed = true;
     componentInstance.completedChaptersCount = 1;
-    spyOn(componentInstance, 'shouldShowMilestoneProgressBar')
+    spyOn(componentInstance, 'setNextMilestoneAndCheckIfProgressBarIsShown')
       .and.callThrough();
 
-    expect(componentInstance.shouldShowMilestoneProgressBar()).toBe(false);
+    expect(componentInstance.setNextMilestoneAndCheckIfProgressBarIsShown())
+      .toBe(false);
     expect(componentInstance.nextMilestoneChapterCount).toBeNull();
   });
 
@@ -525,10 +530,11 @@ describe('Tutor card component', () => {
     componentInstance.inStoryMode = true;
     componentInstance.milestoneMessageIsToBeDisplayed = false;
     componentInstance.completedChaptersCount = 10;
-    spyOn(componentInstance, 'shouldShowMilestoneProgressBar')
+    spyOn(componentInstance, 'setNextMilestoneAndCheckIfProgressBarIsShown')
       .and.callThrough();
 
-    expect(componentInstance.shouldShowMilestoneProgressBar()).toBe(true);
+    expect(componentInstance.setNextMilestoneAndCheckIfProgressBarIsShown())
+      .toBe(true);
     expect(componentInstance.nextMilestoneChapterCount).toBe(25);
   });
 

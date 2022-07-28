@@ -272,7 +272,7 @@ export class TutorCardComponent {
     return this.translateService.instant(milestoneMessageTranslationKey);
   }
 
-  shouldShowMilestoneProgressBar(): boolean {
+  setNextMilestoneAndCheckIfProgressBarIsShown(): boolean {
     if (
       !this.inStoryMode ||
       this.completedChaptersCount > 50 ||
@@ -284,9 +284,11 @@ export class TutorCardComponent {
       return false;
     }
 
-    if (!this.milestoneMessageIsToBeDisplayed &&
-        MILESTONE_SPECIFIC_COMPLETED_CHAPTER_COUNTS.includes(
-          this.completedChaptersCount)) {
+    if (
+      !this.milestoneMessageIsToBeDisplayed &&
+      MILESTONE_SPECIFIC_COMPLETED_CHAPTER_COUNTS.includes(
+        this.completedChaptersCount)
+    ) {
       let chapterCountIndex = (
         MILESTONE_SPECIFIC_COMPLETED_CHAPTER_COUNTS.indexOf(
           this.completedChaptersCount));

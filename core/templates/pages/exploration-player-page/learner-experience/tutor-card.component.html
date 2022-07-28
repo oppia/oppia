@@ -115,7 +115,7 @@
         </div>
       </div>
     </div>
-    <div *ngIf="platformFeatureService.status.EndChapterCelebration.isEnabled && isOnTerminalCard() && milestoneMessageIsToBeDisplayed && generateMilestoneMessage() && !shouldShowMilestoneProgressBar()">
+    <div *ngIf="platformFeatureService.status.EndChapterCelebration.isEnabled && isOnTerminalCard() && milestoneMessageIsToBeDisplayed && generateMilestoneMessage() && !setNextMilestoneAndCheckIfProgressBarIsShown()">
       <div class="conversation-skin-milestone-message">
         <div class="milestone-message-star-container">
           <img [src]="getStaticImageUrl('/general/milestone-message-star-icon.svg')" class="star-icon">
@@ -124,7 +124,7 @@
         <span class="milestone-message-text">{{ generateMilestoneMessage() }}</span>
       </div>
     </div>
-    <div *ngIf="platformFeatureService.status.EndChapterCelebration.isEnabled && isOnTerminalCard() && shouldShowMilestoneProgressBar()">
+    <div *ngIf="platformFeatureService.status.EndChapterCelebration.isEnabled && isOnTerminalCard() && setNextMilestoneAndCheckIfProgressBarIsShown()">
       <div class="conversation-skin-milestone-message milestone-progress-message">
         <div class="milestone-message-progress-bar-container">
           <div class="milestone-progress-bar-outer">
