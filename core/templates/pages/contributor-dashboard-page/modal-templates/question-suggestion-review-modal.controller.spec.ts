@@ -471,7 +471,7 @@ describe('Question Suggestion Review Modal Controller', function() {
 
       expect($scope.currentSuggestionId).toEqual('1');
       expect($scope.skippedContributionIds.length).toEqual(0);
-      expect($scope.remainingContributionIds.length).toEqual(1);
+      expect($scope.remainingContributionIdStack.length).toEqual(1);
       expect($scope.isLastItem).toBeFalse();
       expect($scope.isFirstItem).toBeTrue();
 
@@ -481,7 +481,7 @@ describe('Question Suggestion Review Modal Controller', function() {
       expect($scope.refreshActiveContributionState).toHaveBeenCalled();
       expect($scope.currentSuggestionId).toEqual('2');
       expect($scope.skippedContributionIds.length).toEqual(1);
-      expect($scope.remainingContributionIds.length).toEqual(0);
+      expect($scope.remainingContributionIdStack.length).toEqual(0);
       expect($scope.isLastItem).toBeTrue();
       expect($scope.isFirstItem).toBeFalse();
 
@@ -490,7 +490,7 @@ describe('Question Suggestion Review Modal Controller', function() {
 
       expect($scope.currentSuggestionId).toEqual('2');
       expect($scope.skippedContributionIds.length).toEqual(1);
-      expect($scope.remainingContributionIds.length).toEqual(0);
+      expect($scope.remainingContributionIdStack.length).toEqual(0);
       expect($scope.isLastItem).toBeTrue();
       expect($scope.isFirstItem).toBeFalse();
 
@@ -500,7 +500,7 @@ describe('Question Suggestion Review Modal Controller', function() {
       expect($scope.refreshActiveContributionState).toHaveBeenCalled();
       expect($scope.currentSuggestionId).toEqual('1');
       expect($scope.skippedContributionIds.length).toEqual(0);
-      expect($scope.remainingContributionIds.length).toEqual(1);
+      expect($scope.remainingContributionIdStack.length).toEqual(1);
       expect($scope.isLastItem).toBeFalse();
       expect($scope.isFirstItem).toBeTrue();
 
@@ -509,7 +509,7 @@ describe('Question Suggestion Review Modal Controller', function() {
 
       expect($scope.currentSuggestionId).toEqual('1');
       expect($scope.skippedContributionIds.length).toEqual(0);
-      expect($scope.remainingContributionIds.length).toEqual(1);
+      expect($scope.remainingContributionIdStack.length).toEqual(1);
       expect($scope.isLastItem).toBeFalse();
       expect($scope.isFirstItem).toBeTrue();
     });

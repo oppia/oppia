@@ -92,15 +92,14 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
 
     $scope.currentSuggestion = suggestionIdToContribution[suggestionId];
     delete suggestionIdToContribution[suggestionId];
-    $scope.remainingContributionIds = Object.keys(
+    $scope.remainingContributionIdStack = Object.keys(
       suggestionIdToContribution
-    );
-    $scope.remainingContributionIds.reverse();
+    ).reverse();
     $scope.skippedContributionIds = [];
     $scope.allContributions = suggestionIdToContribution;
     $scope.allContributions[suggestionId] = $scope.currentSuggestion;
 
-    $scope.isLastItem = $scope.remainingContributionIds.length === 0;
+    $scope.isLastItem = $scope.remainingContributionIdStack.length === 0;
     $scope.isFirstItem = $scope.skippedContributionIds.length === 0;
 
     $scope.refreshContributionState = function() {
@@ -147,7 +146,7 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
         $scope.currentSuggestionId];
       $scope.suggestion = nextContribution.suggestion;
 
-      $scope.isLastItem = $scope.remainingContributionIds.length === 0;
+      $scope.isLastItem = $scope.remainingContributionIdStack.length === 0;
       $scope.isFirstItem = $scope.skippedContributionIds.length === 0;
 
       if (!nextContribution.details) {
@@ -172,7 +171,7 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
       $scope.showQuestion = false;
       $scope.skippedContributionIds.push($scope.currentSuggestionId);
 
-      $scope.currentSuggestionId = $scope.remainingContributionIds.pop();
+      $scope.currentSuggestionId = $scope.remainingContributionIdStack.pop();
 
       $scope.refreshActiveContributionState();
     };
@@ -182,7 +181,7 @@ angular.module('oppia').controller('QuestionSuggestionReviewModalController', [
         return;
       }
       $scope.showQuestion = false;
-      $scope.remainingContributionIds.push($scope.currentSuggestionId);
+      $scope.remainingContributionIdStack.push($scope.currentSuggestionId);
 
       $scope.currentSuggestionId = $scope.skippedContributionIds.pop();
 
