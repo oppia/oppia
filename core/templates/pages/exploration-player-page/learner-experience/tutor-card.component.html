@@ -128,10 +128,13 @@
       <div class="conversation-skin-milestone-message milestone-progress-message">
         <div class="milestone-message-progress-bar-container">
           <div class="milestone-progress-bar-outer">
-            <div class="milestone-progress-bar-inner" [style.width.%]="(completedChaptersCount / nextMilestoneChapterCount) * 100"></div>
+            <div class="milestone-progress-bar-inner"
+                 [style.width.%]="(completedChaptersCount / nextMilestoneChapterCount) * 100">
+            </div>
           </div>
           <div class="milestone-message-star-container">
-            <img [src]="getStaticImageUrl('/general/milestone-message-star-icon.svg')" class="star-icon">
+            <img [src]="getStaticImageUrl('/general/milestone-message-star-icon.svg')"
+                 class="star-icon">
             <p class="chapters-left-count">{{ nextMilestoneChapterCount }}</p>
           </div>
         </div>

@@ -75,8 +75,6 @@ export class RatingsAndRecommendationsComponent {
   @Input() nextLessonLink: string | undefined;
   inStoryMode: boolean;
   nextStoryNode: ReadOnlyStoryNode | null = null;
-  // The below property is fetched via a HTTP call.
-  // It will remain undefined until a response is received.
   practiceQuestionsAreEnabled: boolean = false;
   // The below properties will be undefined if the exploration is not being
   // played in story mode, i.e. inStoryMode is false.

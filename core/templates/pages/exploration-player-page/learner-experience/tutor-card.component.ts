@@ -276,9 +276,7 @@ export class TutorCardComponent {
     if (
       !this.inStoryMode ||
       this.completedChaptersCount > 50 ||
-      (this.milestoneMessageIsToBeDisplayed &&
-        MILESTONE_SPECIFIC_COMPLETED_CHAPTER_COUNTS.includes(
-          this.completedChaptersCount))
+      this.isMilestoneReachedAndMilestoneMessageToBeDisplayed()
     ) {
       this.nextMilestoneChapterCount = null;
       return false;
@@ -303,6 +301,14 @@ export class TutorCardComponent {
         return true;
       }
     }
+    return false;
+  }
+
+  isMilestoneReachedAndMilestoneMessageToBeDisplayed(): boolean {
+    return (
+      this.milestoneMessageIsToBeDisplayed &&
+      MILESTONE_SPECIFIC_COMPLETED_CHAPTER_COUNTS.includes(
+        this.completedChaptersCount));
   }
 
   getStaticImageUrl(imagePath: string): string {

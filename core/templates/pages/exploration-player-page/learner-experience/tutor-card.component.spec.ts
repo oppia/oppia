@@ -538,6 +538,29 @@ describe('Tutor card component', () => {
     expect(componentInstance.nextMilestoneChapterCount).toBe(25);
   });
 
+  it('should correctly determine if new milestone is reached and message is ' +
+  'to be displayed', () => {
+    componentInstance.milestoneMessageIsToBeDisplayed = true;
+    componentInstance.completedChaptersCount = 1;
+
+    expect(
+      componentInstance.isMilestoneReachedAndMilestoneMessageToBeDisplayed())
+      .toBe(true);
+
+    componentInstance.completedChaptersCount = 2;
+
+    expect(
+      componentInstance.isMilestoneReachedAndMilestoneMessageToBeDisplayed())
+      .toBe(false);
+
+    componentInstance.milestoneMessageIsToBeDisplayed = false;
+    componentInstance.completedChaptersCount = 1;
+
+    expect(
+      componentInstance.isMilestoneReachedAndMilestoneMessageToBeDisplayed())
+      .toBe(false);
+  });
+
   it('should update displayed card', fakeAsync(() => {
     mockDisplayedCard.markAsCompleted();
     componentInstance.displayedCard = mockDisplayedCard;
