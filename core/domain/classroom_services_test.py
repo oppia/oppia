@@ -34,7 +34,7 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])  # type: ignore[no-untyped-call]
 
     def test_can_get_classroom_by_url_fragment(self) -> None:
-        topic_id = topic_fetchers.get_new_topic_id()  # type: ignore[no-untyped-call]
+        topic_id = topic_fetchers.get_new_topic_id()
         config_services.set_property(
             self.user_id_admin, 'classroom_pages_data', [{
                 'name': 'math',
@@ -54,7 +54,7 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
         self.assertIsNone(classroom)
 
     def test_get_classroom_url_fragment_for_topic_id(self) -> None:
-        topic_id = topic_fetchers.get_new_topic_id()  # type: ignore[no-untyped-call]
+        topic_id = topic_fetchers.get_new_topic_id()
         config_services.set_property(
             self.user_id_admin, 'classroom_pages_data', [{
                 'name': 'math',
@@ -69,7 +69,7 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
         self.assertEqual(classroom_url_fragment, 'math-one')
 
     def test_return_default_if_associated_classroom_is_not_found(self) -> None:
-        topic_id = topic_fetchers.get_new_topic_id()  # type: ignore[no-untyped-call]
+        topic_id = topic_fetchers.get_new_topic_id()
         config_services.set_property(
             self.user_id_admin, 'classroom_pages_data', [{
                 'name': 'math',

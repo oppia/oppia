@@ -1,4 +1,4 @@
-// Copyright 2021 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,23 +14,24 @@
 
 /**
  * @fileoverview Page object for the topic and story viewer page, for use
- * in Protractor tests.
+ * in WebdriverIO tests.
  */
 
 var waitFor = require('./waitFor.js');
 var action = require('./action.js');
 
 var SubTopicViewerPage = function() {
-  var subTopicTileList = element.all(by.css('.e2e-test-subtopic-tile'));
-  var conceptCardList = element.all(
-    by.css('.e2e-test-concept-card-link'));
-  var conceptCardExplanation = element(
-    by.css('.e2e-test-concept-card-explanation'));
+  var conceptCardExplanation = $('.e2e-test-concept-card-explanation');
+  var conceptCardListSelector = function() {
+    return $$('.e2e-test-concept-card-link');
+  };
+  var subTopicTileListSelector = function() {
+    return $$('.e2e-test-subtopic-tile');
+  };
 
   this.get = async function(subTopicName) {
     await waitFor.pageToFullyLoad();
-    var subTopicTile = element(by.cssContainingText(
-      '.e2e-test-subtopic-tile', subTopicName));
+    var subTopicTile = $(`.e2e-test-subtopic-tile=${subTopicName}`);
     await waitFor.presenceOf(
       subTopicTile, 'Sub topic ' + subTopicName + ' card is not present,');
     await action.click(subTopicName, subTopicTile);
@@ -38,29 +39,32 @@ var SubTopicViewerPage = function() {
   };
 
   this.expectRevisionCardCountToBe = async function(count) {
+    var subTopicTileList = await subTopicTileListSelector();
     if (count === 0) {
-      expect(await subTopicTileList.count()).toEqual(0);
+      expect(subTopicTileList.length).toEqual(0);
     } else {
       await waitFor.visibilityOf(
-        subTopicTileList.first(),
+        subTopicTileList[0],
         'Revisions cards take too long to be visible.');
-      expect(await subTopicTileList.count()).toEqual(count);
+      expect(subTopicTileList.length).toEqual(count);
     }
   };
 
   this.expectConceptCardCountToBe = async function(count) {
+    var conceptCardList = await conceptCardListSelector();
     if (count === 0) {
-      expect(await conceptCardList.count()).toEqual(0);
+      expect(conceptCardList.length).toEqual(0);
     } else {
       await waitFor.visibilityOf(
-        conceptCardList.first(),
+        conceptCardList[0],
         'Concept cards take too long to be visible.');
-      expect(await conceptCardList.count()).toEqual(count);
+      expect(conceptCardList.length).toEqual(count);
     }
   };
 
   this.getConceptCard = async function() {
-    var conceptCardElement = conceptCardList.first();
+    var conceptCardList = await conceptCardListSelector();
+    var conceptCardElement = conceptCardList[0];
     await action.click('Concept card link', conceptCardElement);
     await waitFor.pageToFullyLoad();
   };
@@ -69,7 +73,8 @@ var SubTopicViewerPage = function() {
     await waitFor.visibilityOf(
       conceptCardExplanation,
       'Concept card explanation takes too long to be visible.');
-    var text = await conceptCardExplanation.getText();
+    var text = await action.getText(
+      'Concept Card Explanation', conceptCardExplanation);
     expect(text).toEqual(description);
   };
 };
