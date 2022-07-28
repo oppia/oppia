@@ -66,6 +66,12 @@ class ExpStateInteractionValidationJobTests(
                 'a': 3,
                 'b': 5
               }
+            },
+            {
+              'rule_type': 'Equals',
+              'inputs': {
+                'x': 'Not a number'
+              }
             }
           ],
           'outcome': {
@@ -846,7 +852,8 @@ class ExpStateInteractionValidationJobTests(
             f'[{{\'state_name\': \'EXP_1_STATE_1\', '
             f'\'numeric_input_interaction_values\': [\'Rule 1 from answer '
             f'group 0 will never be matched because it is made '
-            f'redundant by the above rules\']}}]'
+            f'redundant by the above rules\', \'Rule 2 from answer group 0 '
+            f'having rule type equals contains string values.\']}}]'
           ),
           job_run_result.JobRunResult.as_stderr(
             f'The id of exp is 1, created on {str(self.YEAR_AGO_DATE)}, '

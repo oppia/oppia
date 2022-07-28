@@ -423,8 +423,8 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
                         range_var = {
                             'ans_group_index': int(ans_group_index),
                             'rule_spec_index': int(rule_spec_index),
-                            'lower_bound': 0,
-                            'upper_bound': 0,
+                            'lower_bound': None,
+                            'upper_bound': None,
                             'lb_inclusive': False,
                             'ub_inclusive': False
                         }
@@ -449,14 +449,21 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
                             )
 
                         if rule_spec.rule_type == 'Equals':
-                            rule_value = float(rule_spec.inputs['x'])
-                            (
-                                ExpStateInteractionValidationJob.
-                                _set_lower_and_upper_bounds(
-                                    range_var, rule_value,
-                                    rule_value, True, True
+                            try:
+                                rule_value = float(rule_spec.inputs['x'])
+                                (
+                                    ExpStateInteractionValidationJob.
+                                    _set_lower_and_upper_bounds(
+                                        range_var, rule_value,
+                                        rule_value, True, True
+                                    )
                                 )
-                            )
+                            except Exception:
+                                numeric_input_interaction_values.append(
+                                    f'Rule {rule_spec_index} from answer '
+                                    f'group {ans_group_index} having rule '
+                                    f'type equals contains string values.'
+                                )
 
                         if rule_spec.rule_type == 'IsLessThan':
                             rule_value = float(rule_spec.inputs['x'])
