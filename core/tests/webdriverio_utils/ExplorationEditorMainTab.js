@@ -80,7 +80,6 @@ var ExplorationEditorMainTab = function() {
   };
   var ruleDetails = $('.e2e-test-rule-details');
   var stateContentDisplay = $('.e2e-test-state-content-display');
-  var stateContentEditorLocator = '.e2e-test-state-content-editor';
   var stateEditButton = $('.e2e-test-edit-content-pencil-button');
   var stateEditorTag = $('.e2e-test-state-content-editor');
   var stateNameContainer = $('.e2e-test-state-name-container');
@@ -468,11 +467,7 @@ var ExplorationEditorMainTab = function() {
     await action.click('stateEditButton', stateEditButton);
     await waitFor.visibilityOf(
       stateEditorTag, 'State editor tag not showing up');
-    var stateContentEditor = stateEditorTag.$(stateContentEditorLocator);
-    await waitFor.visibilityOf(
-      stateContentEditor,
-      'stateContentEditor taking too long to appear to set content');
-    var richTextEditor = await forms.RichTextEditor(stateContentEditor);
+    var richTextEditor = await forms.RichTextEditor(stateEditorTag);
     await richTextEditor.clear();
     await richTextInstructions(richTextEditor);
     await action.click('Save State Content Button', saveStateContentButton);
