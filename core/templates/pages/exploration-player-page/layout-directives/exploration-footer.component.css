@@ -169,7 +169,7 @@
 .lesson-info-tooltip::before {
   border: solid transparent;
   content: " ";
-  left: 5%;
+  left: 49.5%;
   position: absolute;
   top: 100%;
 }
@@ -177,7 +177,6 @@
 .lesson-info-tooltip::after {
   border-left: 2px solid transparent;
   border-right: 15px solid transparent;
-  border-top: 20px solid #f5701b;
 }
 
 .lesson-info-tooltip::before {
