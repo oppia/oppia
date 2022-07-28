@@ -1226,7 +1226,7 @@ describe('Contributions and review component', () => {
             chapter_title: 'chapter_title'
           }
         }
-      } as unknown as SuggestionDetails;
+      } as unknown as Record<string, SuggestionDetails>;
       component.activeTabType = component.TAB_TYPE_REVIEWS;
       tick();
 
@@ -1269,7 +1269,8 @@ describe('Contributions and review component', () => {
       tick();
 
       expect(component.getQuestionContributionsSummary(
-        suggestionIdToSuggestions as unknown as SuggestionDetails)).toEqual([{
+        suggestionIdToSuggestions as
+        unknown as Record<string, SuggestionDetails>)).toEqual([{
         id: 'id',
         heading: 'heading',
         subheading: 'skill_description',

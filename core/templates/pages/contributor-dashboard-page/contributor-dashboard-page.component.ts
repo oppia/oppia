@@ -39,16 +39,16 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 })
 export class ContributorDashboardPageComponent
   implements OnInit {
+  OPPIA_AVATAR_LINK_URL: string = AppConstants.OPPIA_AVATAR_LINK_URL;
   defaultHeaderVisible: boolean;
   profilePictureDataUrl: SafeUrl | string;
   username: string;
   userInfoIsLoading: boolean;
   userIsLoggedIn: boolean;
   userIsReviewer: boolean;
-  userCanReviewTranslationSuggestionsInLanguages: unknown[];
-  userCanReviewVoiceoverSuggestionsInLanguages: unknown[];
+  userCanReviewTranslationSuggestionsInLanguages: string[];
+  userCanReviewVoiceoverSuggestionsInLanguages: string[];
   userCanReviewQuestions: boolean;
-  OPPIA_AVATAR_LINK_URL: string;
   tabsDetails: ContributorDashboardTabsDetails;
   OPPIA_AVATAR_IMAGE_URL: string;
   languageCode: string;
@@ -214,8 +214,6 @@ export class ContributorDashboardPageComponent
     this.tabsDetails = {
       ...ContributorDashboardConstants.CONTRIBUTOR_DASHBOARD_TABS_DETAILS
     } as unknown as ContributorDashboardTabsDetails;
-    this.OPPIA_AVATAR_LINK_URL = (
-      AppConstants.OPPIA_AVATAR_LINK_URL);
     this.OPPIA_AVATAR_IMAGE_URL = (
       this.urlInterpolationService.getStaticImageUrl(
         '/avatar/oppia_avatar_100px.svg'));

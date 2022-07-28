@@ -75,10 +75,8 @@ export interface ContributionDetails {
 }
 
 export interface SuggestionDetails {
-  [key: string]: {
-    suggestion: Suggestion;
-    details: ContributionDetails;
-  };
+  suggestion: Suggestion;
+  details: ContributionDetails;
 }
 
 export interface TabDetails {
@@ -100,7 +98,7 @@ export class ContributionsAndReview
   TAB_TYPE_CONTRIBUTIONS: string;
   TAB_TYPE_REVIEWS: string;
   activeExplorationId: string;
-  contributions: SuggestionDetails;
+  contributions: Record<string, SuggestionDetails> | object;
   userDetailsLoading: boolean;
   userIsLoggedIn: boolean;
   activeTabType: string;
@@ -139,7 +137,7 @@ export class ContributionsAndReview
   ) {}
 
   getQuestionContributionsSummary(
-      suggestionIdToSuggestions: SuggestionDetails):
+      suggestionIdToSuggestions: Record<string, SuggestionDetails>):
       ContributionsSummary[] {
     const questionContributionsSummaryList = [];
     Object.keys(suggestionIdToSuggestions).forEach((key) => {
@@ -171,7 +169,7 @@ export class ContributionsAndReview
   }
 
   getTranslationContributionsSummary(
-      suggestionIdToSuggestions: SuggestionDetails
+      suggestionIdToSuggestions: Record<string, SuggestionDetails>
   ): ContributionsSummary[] {
     const translationContributionsSummaryList = [];
 
@@ -359,7 +357,7 @@ export class ContributionsAndReview
   }
 
   getContributionSummaries(
-      suggestionIdToSuggestions: SuggestionDetails
+      suggestionIdToSuggestions: Record<string, SuggestionDetails>
   ): ContributionsSummary[] {
     if (this.activeSuggestionType === this.SUGGESTION_TYPE_TRANSLATE) {
       return this.getTranslationContributionsSummary(suggestionIdToSuggestions);
@@ -484,7 +482,6 @@ export class ContributionsAndReview
     this.TAB_TYPE_CONTRIBUTIONS = 'contributions';
     this.TAB_TYPE_REVIEWS = 'reviews';
     this.activeExplorationId = null;
-
     this.userDetailsLoading = true;
     this.userIsLoggedIn = false;
     this.activeTabType = '';
