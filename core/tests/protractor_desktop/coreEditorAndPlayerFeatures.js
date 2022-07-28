@@ -133,7 +133,7 @@ describe('Enable correctness feedback and set correctness', function() {
     await explorationEditorPage.navigateToMainTab();
     await explorationEditorMainTab.setStateName('First');
     await explorationEditorMainTab.setContent(await forms.toRichText(
-      'Select the right option.'), true);
+      'Select the right option.'));
 
     // Create interaction without closing the add response modal. Set
     // correctness in the modal.
@@ -222,7 +222,7 @@ describe('Enable correctness feedback and set correctness', function() {
 
     await explorationEditorMainTab.moveToState('Second');
     await explorationEditorMainTab.setContent(await forms.toRichText(
-      'Select the right option.'), true);
+      'Select the right option.'));
 
     await explorationEditorMainTab.setInteraction('MultipleChoiceInput', [
       await forms.toRichText('Correct!'),
@@ -572,7 +572,7 @@ describe('Core exploration functionality', function() {
   it('should change the first card of the exploration', async function() {
     await explorationEditorMainTab.setStateName('card 1');
     await explorationEditorMainTab.setContent(
-      await forms.toRichText('this is card 1'), true);
+      await forms.toRichText('this is card 1'));
     await explorationEditorMainTab.setInteraction('Continue');
     var responseEditor = await explorationEditorMainTab.getResponseEditor(
       'default');
