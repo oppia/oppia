@@ -80,6 +80,7 @@ angular.module('oppia').directive('topicEditorTab', [
         'MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB',
         'MAX_CHARS_IN_TOPIC_DESCRIPTION', 'MAX_CHARS_IN_TOPIC_NAME',
         'MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB',
+        'MINIMUM_QUESTION_COUNT_FOR_A_DIAGNOSTIC_TEST_SKILL',
         function(
             $rootScope, $scope, $uibModal, AlertsService, ContextService,
             EntityCreationService, FocusManagerService,
@@ -92,7 +93,8 @@ angular.module('oppia').directive('topicEditorTab', [
             MAX_CHARS_IN_META_TAG_CONTENT,
             MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB,
             MAX_CHARS_IN_TOPIC_DESCRIPTION, MAX_CHARS_IN_TOPIC_NAME,
-            MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB) {
+            MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB,
+            MINIMUM_QUESTION_COUNT_FOR_A_DIAGNOSTIC_TEST_SKILL) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           $scope.MAX_CHARS_IN_TOPIC_URL_FRAGMENT = (
@@ -134,8 +136,22 @@ angular.module('oppia').directive('topicEditorTab', [
             $scope.topicUrlFragmentExists = false;
             $scope.hostname = WindowRef.nativeWindow.location.hostname;
 
+            $scope.getEligibleSkillSummariesForDiagnosticTest = function() {
+              let availableSkillSummaries = (
+                $scope.topic.getAvailableSkillSummariesForDiagnosticTest());
+
+              return availableSkillSummaries.filter(skillSummary => {
+                if (
+                    $scope.skillQuestionCountDict[skillSummary.getId()] >=
+                    MINIMUM_QUESTION_COUNT_FOR_A_DIAGNOSTIC_TEST_SKILL) {
+                  return true;
+                } else {
+                  return false;
+                }
+              })
+            };
             $scope.availableSkillSummariesForDiagnosticTest = (
-              $scope.topic.getAvailableSkillSummariesForDiagnosticTest());
+              $scope.getEligibleSkillSummariesForDiagnosticTest());
             $scope.selectedSkillSummariesForDiagnosticTest = (
               $scope.topic.getSkillSummariesForDiagnosticTest());
             $scope.diagnosticTestSkillsDropdownIsShown = false;
