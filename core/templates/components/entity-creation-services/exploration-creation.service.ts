@@ -60,12 +60,13 @@ export class ExplorationCreationService {
         this.siteAnalyticsService.registerCreateNewExplorationEvent(
           response.explorationId);
         setTimeout(() => {
-          this.windowRef.nativeWindow.location.href =
-        this.urlInterpolationService.interpolateUrl(
-          this.CREATE_NEW_EXPLORATION_URL_TEMPLATE, {
-            exploration_id: response.explorationId
-          }
-        );
+          this.windowRef.nativeWindow.location.href = (
+            this.urlInterpolationService.interpolateUrl(
+              this.CREATE_NEW_EXPLORATION_URL_TEMPLATE, {
+                exploration_id: response.explorationId
+              }
+            )
+          );
         }, 150);
         return false;
       }, () => {
