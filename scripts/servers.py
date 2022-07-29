@@ -64,7 +64,7 @@ def managed_process(
 
     Raises:
         Exception. The process exited unexpectedly (only raised if
-        raise_on_nonzero_exit is True).
+            raise_on_nonzero_exit is True).
     """
     get_proc_info = lambda p: (
         '%s(name="%s", pid=%d)' % (human_readable_name, p.name(), p.pid)

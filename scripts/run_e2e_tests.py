@@ -358,7 +358,7 @@ def main(args=None):
 
             # Check whether we should rerun based on the instructions from the
             # flake checker server.
-            test_is_flaky, rerun_override = flake_checker.is_test_output_flaky(
+            _, rerun_override = flake_checker.is_test_output_flaky(
                 output, parsed_args.suite)
             if rerun_override == flake_checker.RERUN_YES:
                 print(
