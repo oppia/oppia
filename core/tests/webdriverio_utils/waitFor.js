@@ -205,7 +205,7 @@ var fadeInToComplete = async function(element, errorMessage) {
 
 var modalPopupToAppear = async function() {
   await visibilityOf(
-    $('.modal-body'), 'Modal taking too long to appear.');
+    await $('.modal-body'), 'Modal taking too long to appear.');
 };
 
 /**
