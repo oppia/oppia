@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Backend services related to fetch learner groups to display
- * on the teacher dashboard.
+ * on the facilitator dashboard.
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
@@ -24,21 +24,21 @@ import { Injectable } from '@angular/core';
 import { ShortLearnerGroupSummary, ShortLearnerGroupSummaryBackendDict }
   from './short-learner-group-summary.model';
 
-interface TeacherDashboardBackendResponse {
+interface FacilitatorDashboardBackendResponse {
   learner_groups_list: ShortLearnerGroupSummaryBackendDict[];
 }
 
 @Injectable({
   providedIn: 'root'
 })
-export class TeacherDashboardBackendApiService {
+export class FacilitatorDashboardBackendApiService {
   constructor(private http: HttpClient) {}
 
   async _fetchTeacherDashboardLearnerGroupsAsync():
   Promise<ShortLearnerGroupSummary[]> {
     return new Promise((resolve, reject) => {
-      this.http.get<TeacherDashboardBackendResponse>(
-        '/teacher_dashboard_handler').toPromise().then(dashboardData => {
+      this.http.get<FacilitatorDashboardBackendResponse>(
+        '/facilitator_dashboard_handler').toPromise().then(dashboardData => {
         resolve(
           dashboardData.learner_groups_list.map(
             shortLearnerGroupSummary => ShortLearnerGroupSummary
@@ -54,5 +54,5 @@ export class TeacherDashboardBackendApiService {
 }
 
 angular.module('oppia').factory(
-  'TeacherDashboardBackendApiService',
-  downgradeInjectable(TeacherDashboardBackendApiService));
+  'FacilitatorDashboardBackendApiService',
+  downgradeInjectable(FacilitatorDashboardBackendApiService));
