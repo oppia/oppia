@@ -406,6 +406,14 @@ describe('Tutor card component', () => {
     flush();
   }));
 
+  it('should not skip animation if it hasn\'t been triggered yet',
+    fakeAsync(() => {
+      let fakeClickEvent = new MouseEvent('click');
+      document.dispatchEvent(fakeClickEvent);
+
+      expect(componentInstance.checkMarkSkipped).toBe(false);
+    }));
+
   it('should correctly generate the milestone message', () => {
     componentInstance.inStoryMode = true;
     componentInstance.milestoneMessageIsToBeDisplayed = true;
@@ -461,13 +469,121 @@ describe('Tutor card component', () => {
     expect(translateService.instant).not.toHaveBeenCalled();
   });
 
-  it('should not skip animation if it hasn\'t been triggered yet',
-    fakeAsync(() => {
-      let fakeClickEvent = new MouseEvent('click');
-      document.dispatchEvent(fakeClickEvent);
+  it('should correctly show milestone progress bar', () => {
+    componentInstance.inStoryMode = true;
+    componentInstance.milestoneMessageIsToBeDisplayed = false;
+    componentInstance.completedChaptersCount = 2;
+    spyOn(componentInstance, 'setNextMilestoneAndCheckIfProgressBarIsShown')
+      .and.callThrough();
 
-      expect(componentInstance.checkMarkSkipped).toBe(false);
-    }));
+    expect(componentInstance.setNextMilestoneAndCheckIfProgressBarIsShown())
+      .toBe(true);
+    expect(componentInstance.nextMilestoneChapterCount).toBe(5);
+
+    componentInstance.completedChaptersCount = 4;
+
+    expect(componentInstance.setNextMilestoneAndCheckIfProgressBarIsShown())
+      .toBe(true);
+    expect(componentInstance.nextMilestoneChapterCount).toBe(5);
+
+    spyOn(componentInstance, 'isCompletedChaptersCountGreaterThanLastMilestone')
+      .and.returnValue(false);
+    spyOn(
+      componentInstance, 'isMilestoneReachedAndMilestoneMessageToBeDisplayed')
+      .and.returnValue(false);
+    componentInstance.completedChaptersCount = 55;
+    componentInstance.milestoneMessageIsToBeDisplayed = true;
+
+    expect(componentInstance.setNextMilestoneAndCheckIfProgressBarIsShown())
+      .toBe(false);
+  });
+
+  it('should not show milestone progress bar if completed chapters count ' +
+    'is greater than 50', () => {
+    componentInstance.inStoryMode = true;
+    componentInstance.milestoneMessageIsToBeDisplayed = false;
+    componentInstance.completedChaptersCount = 51;
+    spyOn(componentInstance, 'setNextMilestoneAndCheckIfProgressBarIsShown')
+      .and.callThrough();
+
+    expect(componentInstance.setNextMilestoneAndCheckIfProgressBarIsShown())
+      .toBe(false);
+    expect(componentInstance.nextMilestoneChapterCount).toBeNull();
+  });
+
+  it('should not show milestone progress bar if not in story mode', () => {
+    componentInstance.inStoryMode = false;
+    componentInstance.milestoneMessageIsToBeDisplayed = false;
+    componentInstance.completedChaptersCount = 1;
+    spyOn(componentInstance, 'setNextMilestoneAndCheckIfProgressBarIsShown')
+      .and.callThrough();
+
+    expect(componentInstance.setNextMilestoneAndCheckIfProgressBarIsShown())
+      .toBe(false);
+    expect(componentInstance.nextMilestoneChapterCount).toBeNull();
+  });
+
+  it('should not show milestone progress bar if milestone message is to be ' +
+    'displayed, and completed chapters count is a milestone', () => {
+    componentInstance.inStoryMode = true;
+    componentInstance.milestoneMessageIsToBeDisplayed = true;
+    componentInstance.completedChaptersCount = 1;
+    spyOn(componentInstance, 'setNextMilestoneAndCheckIfProgressBarIsShown')
+      .and.callThrough();
+
+    expect(componentInstance.setNextMilestoneAndCheckIfProgressBarIsShown())
+      .toBe(false);
+    expect(componentInstance.nextMilestoneChapterCount).toBeNull();
+  });
+
+  it('should show milestone progress bar even if the completed chapters count' +
+    ' is a milestone, if the milestone message is not to be displayed', () => {
+    componentInstance.inStoryMode = true;
+    componentInstance.milestoneMessageIsToBeDisplayed = false;
+    componentInstance.completedChaptersCount = 10;
+    spyOn(componentInstance, 'setNextMilestoneAndCheckIfProgressBarIsShown')
+      .and.callThrough();
+
+    expect(componentInstance.setNextMilestoneAndCheckIfProgressBarIsShown())
+      .toBe(true);
+    expect(componentInstance.nextMilestoneChapterCount).toBe(25);
+  });
+
+  it('should correctly determine if new milestone is reached and message is ' +
+  'to be displayed', () => {
+    componentInstance.milestoneMessageIsToBeDisplayed = true;
+    componentInstance.completedChaptersCount = 1;
+
+    expect(
+      componentInstance.isMilestoneReachedAndMilestoneMessageToBeDisplayed())
+      .toBe(true);
+
+    componentInstance.completedChaptersCount = 2;
+
+    expect(
+      componentInstance.isMilestoneReachedAndMilestoneMessageToBeDisplayed())
+      .toBe(false);
+
+    componentInstance.milestoneMessageIsToBeDisplayed = false;
+    componentInstance.completedChaptersCount = 1;
+
+    expect(
+      componentInstance.isMilestoneReachedAndMilestoneMessageToBeDisplayed())
+      .toBe(false);
+  });
+
+  it('should correctly determine if completed chapters count is greater than ' +
+  'last milestone', () => {
+    componentInstance.completedChaptersCount = 1;
+
+    expect(componentInstance.isCompletedChaptersCountGreaterThanLastMilestone())
+      .toBe(false);
+
+    componentInstance.completedChaptersCount = 51;
+
+    expect(componentInstance.isCompletedChaptersCountGreaterThanLastMilestone())
+      .toBe(true);
+  });
 
   it('should update displayed card', fakeAsync(() => {
     mockDisplayedCard.markAsCompleted();

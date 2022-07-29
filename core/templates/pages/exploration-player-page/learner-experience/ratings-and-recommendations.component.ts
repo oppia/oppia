@@ -34,6 +34,8 @@ import { TopicViewerDomainConstants } from 'domain/topic_viewer/topic-viewer-dom
 import { PlatformFeatureService } from 'services/platform-feature.service';
 import { LocalStorageService } from 'services/local-storage.service';
 import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
+import { TopicViewerBackendApiService } from 'domain/topic_viewer/topic-viewer-backend-api.service';
+import { ReadOnlyTopic } from 'domain/topic_viewer/read-only-topic-object.factory';
 import { ReadOnlyStoryNode } from 'domain/story_viewer/read-only-story-node.model';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { AppConstants } from 'app.constants';
@@ -73,6 +75,7 @@ export class RatingsAndRecommendationsComponent {
   @Input() nextLessonLink: string | undefined;
   inStoryMode: boolean;
   nextStoryNode: ReadOnlyStoryNode | null = null;
+  practiceQuestionsAreEnabled: boolean = false;
   // The below properties will be undefined if the exploration is not being
   // played in story mode, i.e. inStoryMode is false.
   storyViewerUrl: string | undefined;
@@ -94,6 +97,7 @@ export class RatingsAndRecommendationsComponent {
     private platformFeatureService: PlatformFeatureService,
     private localStorageService: LocalStorageService,
     private storyViewerBackendApiService: StoryViewerBackendApiService,
+    private topicViewerBackendApiService: TopicViewerBackendApiService,
     private assetsBackendApiService: AssetsBackendApiService
   ) {}
 
@@ -128,6 +132,13 @@ export class RatingsAndRecommendationsComponent {
           classroom_url_fragment: classroomUrlFragment,
           story_url_fragment: storyUrlFragment
         });
+
+      this.topicViewerBackendApiService.fetchTopicDataAsync(
+        topicUrlFragment, classroomUrlFragment
+      ).then((topicData: ReadOnlyTopic) => {
+        this.practiceQuestionsAreEnabled = (
+          topicData.getPracticeTabIsDisplayed());
+      });
     }
     this.collectionId = this.urlService.getCollectionIdFromExplorationUrl();
 

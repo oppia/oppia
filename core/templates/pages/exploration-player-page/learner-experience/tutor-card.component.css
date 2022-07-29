@@ -176,6 +176,10 @@ oppia-tutor-card .conversation-skin-milestone-message {
   padding: 0 20px;
 }
 
+oppia-tutor-card .conversation-skin-milestone-message.milestone-progress-message {
+  flex-direction: column;
+}
+
 oppia-tutor-card .conversation-skin-milestone-message .milestone-message-star-container {
   align-items: center;
   display: flex;
@@ -191,7 +195,13 @@ oppia-tutor-card .conversation-skin-milestone-message .milestone-message-star-co
   transform: scale(1.5);
 }
 
-.conversation-skin-milestone-message .completed-chapter-count {
+oppia-tutor-card .conversation-skin-milestone-message .completed-chapter-count {
+  font-weight: 500;
+  margin-top: 9px;
+  position: relative;
+}
+
+oppia-tutor-card .conversation-skin-milestone-message .chapters-left-count {
   font-weight: 500;
   margin-top: 9px;
   position: relative;
@@ -202,6 +212,31 @@ oppia-tutor-card .conversation-skin-milestone-message .milestone-message-text {
   font-weight: 800;
   margin-top: 9px;
   text-align: center;
+}
+
+oppia-tutor-card .conversation-skin-milestone-message .milestone-message-progress-bar-container {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  margin-top: -25px;
+  width: 100%;
+}
+
+oppia-tutor-card .milestone-message-progress-bar-container .milestone-progress-bar-outer {
+  border: 2px solid #00645c;
+  height: 20px;
+  margin-right: 30px;
+  width: 300px;
+}
+
+oppia-tutor-card .milestone-message-progress-bar-container .milestone-progress-bar-inner {
+  background: #a6dacf;
+  height: 100%;
+}
+
+oppia-tutor-card .milestone-message-progress-bar-container .milestone-message-star-container {
+  margin-bottom: 9px;
+  margin-left: -57px;
 }
 
 oppia-tutor-card .oppia-conversation-skin-inline-interaction {

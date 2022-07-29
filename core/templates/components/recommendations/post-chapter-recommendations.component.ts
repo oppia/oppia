@@ -31,10 +31,16 @@ export class PostChapterRecommendationsComponent {
 
   // The properties below will not be null because when being passed down as
   // input from the parent component, a null/undefined check is performed and
-  // if the check fails, an empty string is passed down instead.
+  // if the check fails, an empty string/false is passed down instead.
   @Input() nextStoryNodeThumbnailUrl!: string;
   @Input() nextStoryNodeThumbnailBgColor!: string;
   @Input() nextStoryNodeTitle!: string;
+
+  // The below property will not be null because the property that is being
+  // passed down as input from the parent component is initialized to
+  // be false.
+  @Input() practiceQuestionsAreEnabled!: boolean;
+
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService
@@ -51,5 +57,14 @@ export class PostChapterRecommendationsComponent {
         classroom_url_fragment: (
           this.urlService.getUrlParams().classroom_url_fragment)
       }) + '/practice';
+  }
+
+  getRevisionTabUrl(): string {
+    return this.urlInterpolationService.interpolateUrl(
+      PracticeSessionPageConstants.TOPIC_VIEWER_PAGE, {
+        topic_url_fragment: this.urlService.getUrlParams().topic_url_fragment,
+        classroom_url_fragment: (
+          this.urlService.getUrlParams().classroom_url_fragment)
+      }) + '/revision';
   }
 }
