@@ -55,7 +55,7 @@ datastore_services = models.Registry.import_datastore_services()
 
 
 class TranslationContributionsStatsDict(TypedDict):
-    """Dict representation of translation contributions stats dictionary."""
+    """Type for the translation contributions stats dictionary."""
 
     suggestion_status: str
     edited_by_reviewer: bool

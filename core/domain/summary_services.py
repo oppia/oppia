@@ -39,7 +39,7 @@ from typing_extensions import TypedDict
 
 
 class DisplayableCollectionSummaryDict(TypedDict):
-    """Dict representing the displayable collection summary dictionary."""
+    """Type for the displayable collection summary dictionary."""
 
     id: str
     title: str
@@ -55,7 +55,7 @@ class DisplayableCollectionSummaryDict(TypedDict):
 
 
 class DisplayableExplorationSummaryDict(TypedDict):
-    """Dict representing the displayable exploration summary dictionary."""
+    """Type for the displayable exploration summary dictionary."""
 
     id: str
     title: str
@@ -76,20 +76,20 @@ class DisplayableExplorationSummaryDict(TypedDict):
 
 
 class PlayThroughDict(TypedDict):
-    """Dict representing the user-specific playthrough information."""
+    """Type for the user-specific playthrough information dictionary."""
 
     next_exploration_id: Optional[str]
     completed_exploration_ids: List[str]
 
 
 class LearnerCollectionNodeDict(collection_domain.CollectionNodeDict):
-    """Dict representing the learner collection node dictionary."""
+    """Type for the learner collection node dictionary."""
 
     exploration_summary: Optional[DisplayableExplorationSummaryDict]
 
 
 class LearnerCollectionDict(TypedDict):
-    """Dict representing the learner collection dictionary."""
+    """Type for the learner collection dictionary."""
 
     id: str
     title: str
@@ -108,20 +108,22 @@ class LibraryGroupDict(TypedDict):
 
     header_i18n_id: str
     categories: List[str]
-    activity_summary_dicts: Sequence[Union[
-        DisplayableCollectionSummaryDict,
-        DisplayableExplorationSummaryDict
-    ]]
+    activity_summary_dicts: Sequence[DisplayableSummaryDictsType]
     has_full_results_page: bool
     full_results_url: Optional[str]
 
 
 class LibraryIndexGroupDict(TypedDict):
-    """Dict representing the _LIBRARY_INDEX_GROUPS's dictionaries."""
+    """Type for the _LIBRARY_INDEX_GROUPS's dictionaries."""
 
     header_i18n_id: str
     search_categories: List[str]
 
+
+DisplayableSummaryDictsType = Union[
+    DisplayableCollectionSummaryDict,
+    DisplayableExplorationSummaryDict
+]
 
 _LIBRARY_INDEX_GROUPS: List[LibraryIndexGroupDict] = [{
     'header_i18n_id': 'I18N_LIBRARY_GROUPS_MATHEMATICS_&_STATISTICS',
@@ -639,12 +641,7 @@ def get_library_groups(language_codes: List[str]) -> List[LibraryGroupDict]:
 
     results: List[LibraryGroupDict] = []
     for group in _LIBRARY_INDEX_GROUPS:
-        summary_dicts: Sequence[
-            Union[
-                DisplayableCollectionSummaryDict,
-                DisplayableExplorationSummaryDict
-            ]
-        ] = []
+        summary_dicts: Sequence[DisplayableSummaryDictsType] = []
         collection_ids_to_display = (
             header_id_to_collection_ids[group['header_i18n_id']])
         summary_dicts = [
@@ -714,9 +711,7 @@ def require_activities_to_be_public(
 
 def get_featured_activity_summary_dicts(
     language_codes: List[str]
-) -> List[
-    Union[DisplayableCollectionSummaryDict, DisplayableExplorationSummaryDict]
-]:
+) -> List[DisplayableSummaryDictsType]:
     """Returns a list of featured activities with the given language codes.
     The return value is sorted according to the list stored in the datastore.
 
@@ -754,14 +749,7 @@ def get_featured_activity_summary_dicts(
         collection_ids)
 
     summary_dicts_by_id: Dict[
-        str,
-        Dict[
-            str,
-            Union[
-                DisplayableCollectionSummaryDict,
-                DisplayableExplorationSummaryDict
-            ]
-        ]
+        str, Dict[str, DisplayableSummaryDictsType]
     ] = {
         constants.ACTIVITY_TYPE_EXPLORATION: {
             summary_dict['id']: summary_dict

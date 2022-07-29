@@ -255,12 +255,8 @@ class Question(translation_domain.BaseTranslatableObject):
         Returns:
             State. The corresponding State domain object.
         """
-        # The argument `default_dest_state_name` of create_default_state method
-        # can only accept string values but here we are providing None which
-        # causes MyPy to throw `Incompatible argument type` error. Thus to avoid
-        # the error, we used ignore here.
         return state_domain.State.create_default_state(
-            None, is_initial_state=True)  # type: ignore[arg-type]
+            None, is_initial_state=True)
 
     @classmethod
     def _convert_state_v27_dict_to_v28_dict(

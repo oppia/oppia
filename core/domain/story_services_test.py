@@ -416,17 +416,6 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_services.validate_prerequisite_skills_in_story_contents(
                 self.topic.get_all_skill_ids(), self.story.story_contents)
 
-    def test_prerequisite_skills_validation_with_none_initial_node_id(
-        self
-    ) -> None:
-        self.story.story_contents.initial_node_id = None
-        expected_error_string = (
-            'Initial_node_id of story contents should not be None.')
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
-            Exception, expected_error_string):
-            story_services.validate_prerequisite_skills_in_story_contents(
-                self.topic.get_all_skill_ids(), self.story.story_contents)
-
     def test_story_with_loop(self) -> None:
         self.story.story_contents.next_node_id = 'node_4'
         node_1: story_domain.StoryNodeDict = {

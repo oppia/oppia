@@ -290,10 +290,8 @@ def validate_prerequisite_skills_in_story_contents(
     # structure.
     nodes_queue = []
     is_node_visited = [False] * len(story_contents.nodes)
-    if story_contents.initial_node_id is None:
-        raise Exception(
-            'Initial_node_id of story contents should not be None.'
-        )
+    # Ruling out the possibility of None for mypy type checking.
+    assert story_contents.initial_node_id is not None
     starting_node_index = story_contents.get_node_index(
         story_contents.initial_node_id)
     nodes_queue.append(story_contents.nodes[starting_node_index].id)

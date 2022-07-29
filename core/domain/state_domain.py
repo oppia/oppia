@@ -45,7 +45,8 @@ from core.domain import translatable_object_registry  # pylint: disable=invalid-
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
 
-
+# The `AllowedRuleSpecInputTypes` is union of allowed types that a
+# RuleSpec's inputs dictionary can accept for it's values.
 AllowedRuleSpecInputTypes = Union[
     str,
     int,
@@ -2396,7 +2397,7 @@ class RuleSpec(translation_domain.BaseTranslatableObject):
     def __init__(
         self,
         rule_type: str,
-        inputs: Mapping[str, Union[str, int, List[str], List[List[str]]]]
+        inputs: Mapping[str, AllowedRuleSpecInputTypes]
     ) -> None:
         """Initializes a RuleSpec domain object.
 
@@ -3831,13 +3832,14 @@ class State(translation_domain.BaseTranslatableObject):
     @classmethod
     def create_default_state(
         cls,
-        default_dest_state_name: str,
+        default_dest_state_name: Optional[str],
         is_initial_state: bool = False
     ) -> State:
         """Return a State domain object with default value.
 
         Args:
-            default_dest_state_name: str. The default destination state.
+            default_dest_state_name: str. The default destination state, or None
+                if no default destination state is defined.
             is_initial_state: bool. Whether this state represents the initial
                 state of an exploration.
 

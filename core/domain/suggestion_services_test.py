@@ -4764,7 +4764,7 @@ class GetSuggestionTypesThatNeedReviewersUnitTests(test_utils.GenericTestBase):
 
         self.assertDictEqual(
             suggestion_types_needing_reviewers,
-            {feconf.SUGGESTION_TYPE_ADD_QUESTION: {}})
+            {feconf.SUGGESTION_TYPE_ADD_QUESTION: set()})
 
     def test_get_returns_reviewers_needed_if_translation_for_a_lang_no_reviewer(
         self
@@ -4832,5 +4832,5 @@ class GetSuggestionTypesThatNeedReviewersUnitTests(test_utils.GenericTestBase):
             {
                 feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT: {
                     'en', 'fr'},
-                feconf.SUGGESTION_TYPE_ADD_QUESTION: {}
+                feconf.SUGGESTION_TYPE_ADD_QUESTION: set()
             })

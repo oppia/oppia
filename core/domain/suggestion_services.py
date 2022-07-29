@@ -1682,10 +1682,8 @@ def get_suggestion_types_that_need_reviewers() -> Dict[str, Set[str]]:
             )
 
     if stats.are_question_reviewers_needed():
-        # Here we used cast because the MyPy considering an empty set `{}`
-        # as an empty dictionary.
         suggestion_types_needing_reviewers[
-            feconf.SUGGESTION_TYPE_ADD_QUESTION] = cast(Set[str], {})
+            feconf.SUGGESTION_TYPE_ADD_QUESTION] = set()
 
     return suggestion_types_needing_reviewers
 

@@ -102,21 +102,20 @@ class BaseSuggestion:
     # are not available which causes MyPy to throw undefined attribute
     # error for all attributes that are used in BaseSuggestion. Thus to
     # provide type-info to MyPy about these attributes, we defined them
-    # in `if` clause so that they don get executed at runtime.
-    if MYPY:  # pragma: no cover
-        suggestion_id: str
-        suggestion_type: str
-        target_type: str
-        target_id: str
-        target_version_at_submission: int
-        author_id: str
-        final_reviewer_id: str
-        change: change_domain.BaseChange
-        score_category: str
-        last_updated: datetime.datetime
-        language_code: str
-        edited_by_reviewer: bool
-        image_context: str
+    # as class variables.
+    suggestion_id: str
+    suggestion_type: str
+    target_type: str
+    target_id: str
+    target_version_at_submission: int
+    author_id: str
+    final_reviewer_id: str
+    change: change_domain.BaseChange
+    score_category: str
+    last_updated: datetime.datetime
+    language_code: str
+    edited_by_reviewer: bool
+    image_context: str
 
     def __init__(self, status: str, final_reviewer_id: str) -> None:
         """Initializes a Suggestion object."""
@@ -997,8 +996,10 @@ class SuggestionAddQuestion(BaseSuggestion):
                 % (skill_difficulties, self._get_skill_difficulty()))
 
         question = question_domain.Question(
-            None, state_domain.State.from_dict(
-                question_dict['question_state_data']),
+            None,
+            state_domain.State.from_dict(
+                question_dict['question_state_data']
+            ),
             question_dict['question_state_data_schema_version'],
             question_dict['language_code'], None,
             question_dict['linked_skill_ids'],
@@ -1195,19 +1196,17 @@ class BaseVoiceoverApplication:
     # these attributes are not available which causes MyPy to throw
     # undefined attribute error for all attributes that are used in
     # BaseVoiceoverApplication. Thus to provide the type-info to MyPy
-    # about these attributes, we defined them in `if` clause so that
-    # they don get executed at runtime.
-    if MYPY:  # pragma: no cover
-        voiceover_application_id: str
-        target_type: str
-        target_id: str
-        status: str
-        author_id: str
-        final_reviewer_id: Optional[str]
-        language_code: str
-        filename: str
-        content: str
-        rejection_message: Optional[str]
+    # about these attributes, we defined them as class variables.
+    voiceover_application_id: str
+    target_type: str
+    target_id: str
+    status: str
+    author_id: str
+    final_reviewer_id: Optional[str]
+    language_code: str
+    filename: str
+    content: str
+    rejection_message: Optional[str]
 
     def __init__(self) -> None:
         """Initializes a GeneralVoiceoverApplication object."""
