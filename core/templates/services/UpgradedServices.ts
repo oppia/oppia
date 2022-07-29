@@ -543,7 +543,6 @@ export class UpgradedServices {
       new ConstructTranslationIdsService();
     upgradedServices['ContinueRulesService'] = new ContinueRulesService();
     upgradedServices['CountVectorizerService'] = new CountVectorizerService();
-    upgradedServices['CsrfTokenService'] = new CsrfTokenService();
     upgradedServices['DateTimeFormatService'] = new DateTimeFormatService();
     upgradedServices['DebouncerService'] = new DebouncerService();
     upgradedServices['DragAndDropSortInputRulesService'] =
@@ -656,6 +655,8 @@ export class UpgradedServices {
     upgradedServices['ContinueValidationService'] =
       new ContinueValidationService(
         upgradedServices['baseInteractionValidationService']);
+    upgradedServices['CsrfTokenService'] = new CsrfTokenService(
+      upgradedServices['HttpXhrBackend']);
     upgradedServices['DeviceInfoService'] = new DeviceInfoService(
       upgradedServices['WindowRef']);
     upgradedServices['DocumentAttributeCustomizationService'] =

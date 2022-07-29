@@ -16,16 +16,22 @@
  * @fileoverview Unit tests for the csrf service
  */
 import { CsrfTokenService } from 'services/csrf-token.service';
+import { TestBed } from '@angular/core/testing';
+import { HttpBackend } from '@angular/common/http';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
 describe('Csrf Token Service', function() {
   let csrfTokenService: CsrfTokenService;
+  let httpBackend: HttpBackend;
+  let httpTestingController: HttpTestingController;
+
   beforeEach(() => {
-    csrfTokenService = new CsrfTokenService();
-    spyOn(window, 'fetch').and.callFake((reqInfo: RequestInfo) => {
-      return Promise.resolve(
-        new Response('12345{"token": "sample-csrf-token"}')
-      );
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
     });
+    httpTestingController = TestBed.get(HttpTestingController);
+    httpBackend = TestBed.get(HttpBackend);
+    csrfTokenService = new CsrfTokenService(httpBackend);
   });
 
   it('should correctly set the csrf token', (done) => {
@@ -34,6 +40,12 @@ describe('Csrf Token Service', function() {
     csrfTokenService.getTokenAsync().then(function(token) {
       expect(token).toEqual('sample-csrf-token');
     }).then(done, done.fail);
+
+    let req = httpTestingController.expectOne('/csrfhandler');
+    expect(req.request.method).toEqual('GET');
+    req.flush('12345{"token": "sample-csrf-token"}');
+
+    httpTestingController.verify();
   });
 
   it('should error if initialize is called more than once', () => {
