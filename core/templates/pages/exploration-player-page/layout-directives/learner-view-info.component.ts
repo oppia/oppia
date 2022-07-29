@@ -131,8 +131,8 @@ export class LearnerViewInfoComponent {
   }
 
   getTopicUrl(): string {
-    let topicUrlFragment: string;
-    let classroomUrlFragment: string;
+    let topicUrlFragment!: string;
+    let classroomUrlFragment!: string;
 
     try {
       topicUrlFragment = (

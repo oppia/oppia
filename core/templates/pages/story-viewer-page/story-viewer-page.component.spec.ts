@@ -22,7 +22,7 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { TranslateService } from '@ngx-translate/core';
 
 import { StoryNode } from 'domain/story/story-node.model';
-import { StoryPlaythrough, StoryPlaythroughBackendDict } from 'domain/story_viewer/story-playthrough.model';
+import { StoryPlaythrough } from 'domain/story_viewer/story-playthrough.model';
 import { StoryViewerPageComponent } from './story-viewer-page.component';
 import { UserService } from 'services/user.service';
 import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';

@@ -62,6 +62,9 @@ export class LearnerAnswerInfoService {
     typeC: 0.05
   };
 
+  INTERACTION_IDS_WITHOUT_ANSWER_DETAILS: readonly string[] = (
+    AppConstants.INTERACTION_IDS_WITHOUT_ANSWER_DETAILS);
+
   getRandomProbabilityIndex(): number {
     const min = 0;
     const max = 100;
@@ -87,7 +90,7 @@ export class LearnerAnswerInfoService {
       return;
     }
 
-    if (AppConstants.INTERACTION_IDS_WITHOUT_ANSWER_DETAILS.indexOf(
+    if (this.INTERACTION_IDS_WITHOUT_ANSWER_DETAILS.indexOf(
       this.interactionId) !== -1) {
       return;
     }

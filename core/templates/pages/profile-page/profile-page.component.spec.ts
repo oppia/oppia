@@ -27,7 +27,7 @@ import { UserService } from 'services/user.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { LoggerService } from 'services/contextual/logger.service';
-import { UserProfile, UserProfileBackendDict } from 'domain/user/user-profile.model';
+import { UserProfile } from 'domain/user/user-profile.model';
 import { MatCardModule } from '@angular/material/card';
 import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
 import { LoaderService } from 'services/loader.service';
