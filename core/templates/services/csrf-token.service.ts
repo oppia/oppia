@@ -47,6 +47,7 @@ export class CsrfTokenService {
       }, (err) => {
         console.error(
           'The following error is thrown while trying to get csrf token.');
+        console.error(err);
         throw err;
       });
   }
