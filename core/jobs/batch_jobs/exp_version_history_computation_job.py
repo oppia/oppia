@@ -340,10 +340,14 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                 commit_log_model = commit_log_models[version - 1]
                 committer_id: str = commit_log_model.user_id
                 change_list: List[exp_domain.ExplorationChange] = []
-                for change_dict in commit_log_model.commit_cmds:
-                    change_list.append(exp_domain.ExplorationChange(
-                        change_dict
-                    ))
+                try:
+                    for change_dict in commit_log_model.commit_cmds:
+                        change_list.append(exp_domain.ExplorationChange(
+                            change_dict
+                        ))
+                except Exception:
+                    return (exp_id, [])
+
                 old_exploration = versioned_explorations[version - 2]
                 # If the change list contains evert commit, we have to
                 # handle it separately.
