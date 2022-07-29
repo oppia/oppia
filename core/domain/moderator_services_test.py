@@ -82,7 +82,7 @@ class FlagExplorationEmailEnqueueTaskTests(test_utils.EmailTestBase):
             moderator_services.enqueue_flag_exploration_email_task(
                 self.exploration.id, self.report_text, self.new_user_id)
 
-            self.process_and_flush_pending_tasks()  # type: ignore[no-untyped-call]
+            self.process_and_flush_pending_tasks()
 
             # Make sure correct email is sent.
             messages = self._get_sent_email_messages(self.MODERATOR_EMAIL)

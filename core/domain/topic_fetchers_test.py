@@ -66,7 +66,7 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
             'subtopic_id': 1,
             'url_fragment': 'sample-fragment'
         })]
-        self.save_new_topic(  # type: ignore[no-untyped-call]
+        self.save_new_topic(
             self.TOPIC_ID, self.user_id, name='Name',
             abbreviated_name='name', url_fragment='name-one',
             description='Description',
@@ -316,7 +316,7 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
 
     def test_get_topic_by_version(self) -> None:
         topic_id = topic_fetchers.get_new_topic_id()
-        self.save_new_topic(  # type: ignore[no-untyped-call]
+        self.save_new_topic(
             topic_id, self.user_id, name='topic name',
             abbreviated_name='topic-name', url_fragment='topic-name',
             description='Description', canonical_story_ids=[],
@@ -465,7 +465,7 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
             self.user_id_admin, self.TOPIC_ID, change_list,
             'Moved skill to subtopic.')
         topic_id = topic_fetchers.get_new_topic_id()
-        self.save_new_topic(  # type: ignore[no-untyped-call]
+        self.save_new_topic(
             topic_id, self.user_id, name='Name 2', description='Description',
             abbreviated_name='random', url_fragment='name-three',
             canonical_story_ids=[], additional_story_ids=[],

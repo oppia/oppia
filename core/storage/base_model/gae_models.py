@@ -203,6 +203,18 @@ class BaseModel(datastore_services.Model):
             'derived class. It should be implemented in the derived class.')
 
     @classmethod
+    def apply_deletion_policy(cls, user_id: str) -> None:
+        """This method should be implemented by subclasses.
+
+        Raises:
+            NotImplementedError. The method is not overwritten in a derived
+                class.
+        """
+        raise NotImplementedError(
+            'The apply_deletion_policy() method is missing from the '
+            'derived class. It should be implemented in the derived class.')
+
+    @classmethod
     def has_reference_to_user_id(cls, user_id: str) -> bool:
         """This method should be implemented by subclasses.
 

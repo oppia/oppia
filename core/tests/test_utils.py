@@ -1511,7 +1511,9 @@ class AppEngineTestBase(TestBase):
         return self._platform_taskqueue_services_stub.count_jobs_in_taskqueue(
             queue_name=queue_name)
 
-    def process_and_flush_pending_tasks(self, queue_name=None):
+    def process_and_flush_pending_tasks(
+        self, queue_name: Optional[str] = None
+    ) -> None:
         """Executes all of the tasks in a single queue if a queue name is
         specified or all of the tasks in the taskqueue if no queue name is
         specified.
@@ -2855,7 +2857,7 @@ title: Title
         collection_services.save_new_collection(owner_id, collection)
         return collection
 
-    def publish_collection(self, owner_id, collection_id):
+    def publish_collection(self, owner_id: str, collection_id: str) -> None:
         """Publish the collection with the given collection_id.
 
         Args:
@@ -3097,19 +3099,27 @@ title: Title
         return subtopic_page
 
     def save_new_topic(
-            self, topic_id, owner_id, name='topic', abbreviated_name='topic',
-            url_fragment='topic',
-            thumbnail_filename='topic.svg',
-            thumbnail_bg_color=(
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0]),
-            thumbnail_size_in_bytes=21131,
-            description='description', canonical_story_ids=None,
-            additional_story_ids=None, uncategorized_skill_ids=None,
-            subtopics=None, next_subtopic_id=0,
-            language_code=constants.DEFAULT_LANGUAGE_CODE,
-            meta_tag_content='topic meta tag content',
-            practice_tab_is_displayed=False,
-            page_title_fragment_for_web='topic page title'):
+        self,
+        topic_id: str,
+        owner_id: str,
+        name: str = 'topic',
+        abbreviated_name: str = 'topic',
+        url_fragment: str = 'topic',
+        thumbnail_filename: Optional[str] = 'topic.svg',
+        thumbnail_bg_color: Optional[str] = (
+            constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0]),
+        thumbnail_size_in_bytes: int = 21131,
+        description: str = 'description',
+        canonical_story_ids: List[str] = None,
+        additional_story_ids: List[str] = None,
+        uncategorized_skill_ids: List[str] = None,
+        subtopics: List[topic_domain.Subtopic] = None,
+        next_subtopic_id: int = 0,
+        language_code: str = constants.DEFAULT_LANGUAGE_CODE,
+        meta_tag_content: str = 'topic meta tag content',
+        practice_tab_is_displayed: bool = False,
+        page_title_fragment_for_web: str = 'topic page title'
+    ) -> topic_domain.Topic:
         """Creates an Oppia Topic and saves it.
 
         Args:

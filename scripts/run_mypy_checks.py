@@ -86,8 +86,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/topic_services_test.py',
     'core/domain/voiceover_services.py',
     'core/domain/voiceover_services_test.py',
-    'core/domain/wipeout_service.py',
-    'core/domain/wipeout_service_test.py',
     'core/platform_feature_list.py',
     'core/platform_feature_list_test.py',
     'core/storage/storage_models_test.py',

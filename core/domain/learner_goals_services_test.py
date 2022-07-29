@@ -85,28 +85,28 @@ class LearnerGoalsTests(test_utils.GenericTestBase):
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])  # type: ignore[no-untyped-call]
 
         # Save the topics.
-        self.save_new_topic(  # type: ignore[no-untyped-call]
+        self.save_new_topic(
             self.TOPIC_ID_1, self.owner_id, name=self.TOPIC_NAME_1,
             url_fragment='topic-one',
             description='A new topic', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[self.subtopic_1], next_subtopic_id=1)
         topic_services.publish_topic(self.TOPIC_ID_1, self.curriculum_admin_id)  # type: ignore[no-untyped-call]
-        self.save_new_topic(  # type: ignore[no-untyped-call]
+        self.save_new_topic(
             self.TOPIC_ID_2, self.owner_id, name=self.TOPIC_NAME_2,
             url_fragment='topic-two',
             description='A new topic', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[self.subtopic_2], next_subtopic_id=1)
         topic_services.publish_topic(self.TOPIC_ID_2, self.curriculum_admin_id)  # type: ignore[no-untyped-call]
-        self.save_new_topic(  # type: ignore[no-untyped-call]
+        self.save_new_topic(
             self.TOPIC_ID_3, self.owner_id, name=self.TOPIC_NAME_3,
             url_fragment='topic-three',
             description='A new topic', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[self.subtopic_3], next_subtopic_id=1)
         topic_services.publish_topic(self.TOPIC_ID_3, self.curriculum_admin_id)  # type: ignore[no-untyped-call]
-        self.save_new_topic(  # type: ignore[no-untyped-call]
+        self.save_new_topic(
             self.TOPIC_ID_4, self.owner_id, name=self.TOPIC_NAME_4,
             url_fragment='topic-four',
             description='A new topic', canonical_story_ids=[],

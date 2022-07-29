@@ -2899,7 +2899,7 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
         self.assertEqual(
             user_services.get_last_week_dashboard_stats(self.owner_id), None)
 
-        self.process_and_flush_pending_tasks()  # type: ignore[no-untyped-call]
+        self.process_and_flush_pending_tasks()
 
         self.assertEqual(
             user_services.get_weekly_dashboard_stats(self.owner_id), [])
@@ -3596,7 +3596,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
 
         user_services.remove_translation_review_rights_in_language(
             self.reviewer_1_id, 'hi')
-        self.process_and_flush_pending_tasks()  # type: ignore[no-untyped-call]
+        self.process_and_flush_pending_tasks()
 
         stats = suggestion_services.get_community_contribution_stats()  # type: ignore[no-untyped-call]
         self.assertEqual(stats.question_reviewer_count, 1)
