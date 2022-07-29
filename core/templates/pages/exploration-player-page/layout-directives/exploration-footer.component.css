@@ -182,7 +182,7 @@
 .oppia-exploration-footer .lesson-info-tooltip::before {
   border-left: 7px solid transparent;
   border-right: 7px solid transparent;
-  border-top: 10px solid #f5701b;
+  border-top: 20px solid #f5701b;
 }
 
 @keyframes bounce {
