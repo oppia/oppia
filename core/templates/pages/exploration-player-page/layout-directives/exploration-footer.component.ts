@@ -39,6 +39,8 @@ import { PlayerPositionService } from '../services/player-position.service';
 import { PlayerTranscriptService } from '../services/player-transcript.service';
 import { LessonInformationCardModalComponent } from '../templates/lesson-information-card-modal.component';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { ProgressReminderModalComponent } from '../templates/progress-reminder-modal.component';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 import './exploration-footer.component.css';
 
@@ -92,7 +94,8 @@ export class ExplorationFooterComponent {
     private userService: UserService,
     private editableExplorationBackendApiService:
       EditableExplorationBackendApiService,
-    private urlInterpolationService: UrlInterpolationService
+    private urlInterpolationService: UrlInterpolationService,
+    private windowRef: WindowRef
   ) {}
 
   ngOnInit(): void {
@@ -158,6 +161,85 @@ export class ExplorationFooterComponent {
           }
         );
     }
+    this.playerPositionService.onLoadedMostRecentCheckpoint.subscribe(
+      () => {
+        if (this.CHECKPOINTS_FEATURE_IS_ENABLED) {
+          if (this.checkpointCount) {
+            this.showProgressReminderModal();
+          } else {
+            this.getCheckpointCount().then(() => {
+              this.showProgressReminderModal();
+            });
+          }
+        }
+      });
+  }
+
+  showProgressReminderModal(): void {
+    let mostRecentlyReachedCheckpointIndex = (
+      this.getMostRecentlyReachedCheckpointIndex()
+    );
+
+    this.completedCheckpointsCount = mostRecentlyReachedCheckpointIndex - 1;
+
+    if (this.completedCheckpointsCount === 0) {
+      return;
+    }
+
+    if (this.expInfo) {
+      this.openProgressReminderModal();
+    } else {
+      let stringifiedExpIds = JSON.stringify(
+        [this.explorationId]);
+      let includePrivateExplorations = JSON.stringify(true);
+
+      this.learnerViewInfoBackendApiService.fetchLearnerInfoAsync(
+        stringifiedExpIds,
+        includePrivateExplorations
+      ).then((response) => {
+        this.expInfo = response.summaries[0];
+        this.openProgressReminderModal();
+      }, () => {
+        this.loggerService.error(
+          'Information card failed to load for exploration ' +
+          this.explorationId);
+      });
+    }
+  }
+
+  openProgressReminderModal(): void {
+    let modalRef = this.ngbModal.open(ProgressReminderModalComponent, {
+      windowClass: 'oppia-progress-reminder-modal'
+    });
+
+    let displayedCardIndex = (
+      this.playerPositionService.getDisplayedCardIndex()
+    );
+    if (displayedCardIndex > 0) {
+      let state = this.explorationEngineService.getState();
+      let stateCard = this.explorationEngineService.getStateCardByName(
+        state.name);
+      if (stateCard.isTerminal()) {
+        this.completedCheckpointsCount += 1;
+      }
+    }
+
+    modalRef.componentInstance.checkpointCount = this.checkpointCount;
+    modalRef.componentInstance.completedCheckpointsCount = (
+      this.completedCheckpointsCount);
+    modalRef.componentInstance.explorationTitle = this.expInfo.title;
+
+    modalRef.result.then(() => {
+      // This callback is used for when the learner chooses to restart
+      // the exploration.
+      this.editableExplorationBackendApiService.resetExplorationProgressAsync(
+        this.explorationId).then(() => {
+        this.windowRef.nativeWindow.location.reload();
+      });
+    }, () => {
+      // This callback is used for when the learner chooses to resume
+      // the exploration.
+    });
   }
 
   openInformationCardModal(): void {

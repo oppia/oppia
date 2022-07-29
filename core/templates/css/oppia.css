@@ -2245,6 +2245,12 @@ oppia-parameter {
   min-width: 320px;
 }
 
+.oppia-progress-reminder-modal .modal-dialog {
+  margin: 100px auto;
+  max-width: 400px;
+  min-width: 320px;
+}
+
 .skill-select-modal .modal-xl {
   width: 1000px;
 }
@@ -2823,6 +2829,11 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .oppia-modal-lesson-information-card .modal-dialog .modal-content {
   border-radius: 4px;
+  min-width: 270px;
+}
+
+.oppia-progress-reminder-modal .modal-dialog .modal-content {
+  border-radius: 0;
   min-width: 270px;
 }
 

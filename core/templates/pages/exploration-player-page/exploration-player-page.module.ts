@@ -71,6 +71,7 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
     ExplorationPlayerPageComponent,
     ExplorationSuccessfullyFlaggedModalComponent,
     LessonInformationCardModalComponent,
+    ProgressReminderModalComponent,
     FlagExplorationModalComponent,
     LearnerLocalNavComponent,
     LearnerViewInfoComponent,
@@ -81,6 +82,7 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
     ExplorationPlayerPageComponent,
     ExplorationSuccessfullyFlaggedModalComponent,
     LessonInformationCardModalComponent,
+    ProgressReminderModalComponent,
     FlagExplorationModalComponent,
     LearnerLocalNavComponent,
     LearnerViewInfoComponent,
@@ -118,6 +120,7 @@ import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
 import { ExplorationPlayerPageComponent } from './exploration-player-page.component';
 import { LessonInformationCardModalComponent } from './templates/lesson-information-card-modal.component';
+import { ProgressReminderModalComponent } from './templates/progress-reminder-modal.component';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
