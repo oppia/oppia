@@ -98,6 +98,12 @@ module.exports = {
     learner_dashboard:
       commonPrefix + '/pages/learner-dashboard-page/' +
       'learner-dashboard-page.import.ts',
+    facilitator_dashboard:
+      commonPrefix + '/pages/facilitator-dashboard-page/' +
+      'facilitator-dashboard-page.import.ts',
+    learner_group_creator:
+      commonPrefix + '/pages/learner-group-pages/create-group/' +
+      'create-learner-group-page.import.ts',
     maintenance:
       commonPrefix + '/pages/maintenance-page/maintenance-page.import.ts',
     moderator:
@@ -473,6 +479,28 @@ module.exports = {
       template:
         commonPrefix + '/pages/topic-viewer-page/' +
         'topic-viewer-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['facilitator_dashboard'],
+      filename: 'facilitator-dashboard-page.mainpage.html',
+      hybrid: true,
+      meta: defaultMeta,
+      template:
+        commonPrefix + '/pages/facilitator-dashboard-page/' +
+        'facilitator-dashboard-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['learner_group_creator'],
+      filename: 'create-learner-group-page.mainpage.html',
+      hybrid: true,
+      meta: defaultMeta,
+      template:
+        commonPrefix + '/pages/learner-group-pages/create-group/' +
+        'create-learner-group-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

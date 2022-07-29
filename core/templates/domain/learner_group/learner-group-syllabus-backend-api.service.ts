@@ -26,12 +26,31 @@ import { UrlInterpolationService }
 import { LearnerGroupSyllabus, LearnerGroupSyllabusBackendDict }
   from './learner-group-syllabus.model';
 
+interface SyllabusFilterDetails {
+  description: string;
+  itemsName: string;
+  masterList: {
+    id: string;
+    text: string;
+  }[];
+  selection: string;
+  defaultValue: string;
+  summary: string;
+}
 
-interface LearnerGroupSyllabusFilter {
+export interface SyllabusSelectionDetails {
+  [key: string]: SyllabusFilterDetails;
+  types: SyllabusFilterDetails;
+  categories: SyllabusFilterDetails;
+  languageCodes: SyllabusFilterDetails;
+}
+
+export interface LearnerGroupSyllabusFilter {
   keyword: string;
   type: string;
   category: string;
   languageCode: string;
+  learnerGroupId: string;
 }
 
 @Injectable({
@@ -44,23 +63,17 @@ export class LearnerGroupSyllabusBackendApiService {
   ) {}
 
   async searchNewSyllabusItemsAsync(
-      learnerGroupId: string,
       syllabusFilter: LearnerGroupSyllabusFilter
   ): Promise<LearnerGroupSyllabus> {
     return new Promise((resolve, reject) => {
-      const learnerGroupUrl = (
-        this.urlInterpolationService.interpolateUrl(
-          '/learner_group_search_syllabus_handler/<learner_group_id>', {
-            learner_group_id: learnerGroupId
-          }
-        )
-      );
+      const learnerGroupUrl = '/learner_group_search_syllabus_handler';
 
       const filterData = {
         search_keyword: syllabusFilter.keyword,
         search_type: syllabusFilter.type,
         search_category: syllabusFilter.category,
-        search_language_code: syllabusFilter.languageCode
+        search_language_code: syllabusFilter.languageCode,
+        learner_group_id: syllabusFilter.learnerGroupId
       };
 
       this.http.get<LearnerGroupSyllabusBackendDict>(

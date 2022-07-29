@@ -30,6 +30,17 @@ export class ConstructTranslationIdsService {
       'I18N_LIBRARY_' + prefix.toUpperCase() + '_' +
         name.toUpperCase().split(' ').join('_'));
   }
+
+  // Construct a translation id for a classroom title from name.
+  getClassroomTitleId(name: string): string {
+    return (
+      'I18N_CLASSROOM_' + name.toUpperCase() + '_TITLE');
+  }
+
+  getSyllabusTypeTitleId(name: string): string {
+    return (
+      'I18N_SYLLABUS_' + name.toUpperCase() + '_TITLE');
+  }
 }
 
 angular.module('oppia').factory(

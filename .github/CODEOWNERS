@@ -464,6 +464,8 @@
 /core/controllers/learner_group*.py @oppia/lace-backend-reviewers
 /core/domain/learner_group*.py @oppia/lace-backend-reviewers
 /core/templates/domain/learner_group/ @oppia/lace-frontend-reviewers
+/core/templates/pages/facilitator-dashboard-page/ @oppia/lace-frontend-reviewers
+/core/templates/pages/learner-group-pages/ @oppia/lace-frontend-reviewers
 
 # Beam jobs
 /setup.py @oppia/data-and-stability-reviewers
