@@ -22,6 +22,7 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { LearnerGroupBackendApiService } from
   './learner-group-backend-api.service';
+import { LearnerGroupUserInfo } from './learner-group-user-info.model';
 import { LearnerGroupData } from './learner-group.model';
 
 describe('Learner Group Backend API Service', () => {
@@ -249,4 +250,33 @@ describe('Learner Group Backend API Service', () => {
       expect(failHandler).toHaveBeenCalledWith(401);
     })
   );
+
+  it('should successfully search new student to add', fakeAsync(() => {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+
+    const SEARCH_STUDENT_URL = (
+      '/learner_group_search_student_handler?username=username1&' +
+      'learner_group_id=groupId'
+    );
+    const sampleUserInfo = {
+      username: 'username1',
+      profile_picture_data_url: 'profile_picture_url1',
+      error: ''
+    };
+
+    learnerGroupBackendApiService.searchNewStudentToAddAsync(
+      'groupId', 'username1').then(successHandler, failHandler);
+
+    var req = httpTestingController.expectOne(SEARCH_STUDENT_URL);
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleUserInfo);
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(
+      LearnerGroupUserInfo.createFromBackendDict(
+        sampleUserInfo));
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
 });
