@@ -101,15 +101,19 @@ var ExplorationEditorPage = function() {
     return (
       new ExplorationEditorImprovementsTab.ExplorationEditorImprovementsTab());
   };
+
   this.getFeedbackTab = function() {
     return new ExplorationEditorFeedbackTab.ExplorationEditorFeedbackTab();
   };
+
   this.getHistoryTab = function() {
     return new ExplorationEditorHistoryTab.ExplorationEditorHistoryTab();
   };
+
   this.getMainTab = function() {
     return new ExplorationEditorMainTab.ExplorationEditorMainTab();
   };
+
   this.getSettingsTab = function() {
     return new ExplorationEditorSettingsTab.ExplorationEditorSettingsTab();
   };
@@ -120,6 +124,19 @@ var ExplorationEditorPage = function() {
     return new ExplorationEditorTranslationTab
       .ExplorationEditorTranslationTab();
   };
+  this.getPreviewTab = function() {
+    return new ExplorationPlayerPage.ExplorationPlayerPage();
+  };
+
+  this.getStatsTab = function() {
+    return new ExplorationEditorStatsTab.ExplorationEditorStatsTab();
+  };
+
+  this.getTranslationTab = function() {
+    return new ExplorationEditorTranslationTab
+      .ExplorationEditorTranslationTab();
+  };
+
   this.getPreviewTab = function() {
     return new ExplorationPlayerPage.ExplorationPlayerPage();
   };
@@ -349,7 +366,6 @@ var ExplorationEditorPage = function() {
   this.navigateToMainTab = async function() {
     await action.waitForAutosave();
     await action.click('Main tab button', navigateToMainTabButton);
-    await waitFor.pageToFullyLoad();
   };
 
   this.navigateToPreviewTab = async function() {

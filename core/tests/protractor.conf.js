@@ -279,8 +279,7 @@ exports.config = {
           }
         },
       });
-    }
-    else {
+    } else {
       console.log(
         'Videos will not be recorded for this suite either because videos' +
         ' have been disabled for it (using environment variables) or' +

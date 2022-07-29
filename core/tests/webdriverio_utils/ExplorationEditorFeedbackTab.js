@@ -29,11 +29,11 @@ var ExplorationEditorFeedbackTab = function() {
   var feedbackBackButton = $('.e2e-test-oppia-feedback-back-button');
   var feedbackResponseTextArea = $('.e2e-test-feedback-response-textarea');
   var suggestionRowClassName = '.e2e-test-oppia-feedback-tab-row';
+  var suggestionRowClassNameElement = $('.e2e-test-oppia-feedback-tab-row');
   var feedbackSubjectClassName = (
     '.e2e-test-exploration-feedback-subject');
   var suggestionCommitMessageInput = $('.e2e-test-suggestion-commit-message');
   var suggestionReviewMessageInput = $('.e2e-test-suggestion-review-message');
-  var suggestionRowClassNameElement = $('.e2e-test-oppia-feedback-tab-row');
   var feedbackStatusDropdown = $('.e2e-test-oppia-feedback-status-menu');
   var feedbackMessage = $('.e2e-test-exploration-feedback');
   var feedbackMessagesSelector = function() {

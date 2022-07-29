@@ -32,7 +32,8 @@ var alertToBePresent = async() => {
     await until.alertIsPresent(),
     {
       timeout: DEFAULT_WAIT_TIME_MSECS,
-      timeoutMsg: 'Alert box took too long to appear.'
+      timeoutMsg: 'Alert box took too long to appear.\n' +
+      new Error().stack + '\n'
     });
 };
 
@@ -52,12 +53,10 @@ var urlToBe = async function(url) {
  * @param {string} errorMessage - Error message when element is not clickable.
  */
 var elementToBeClickable = async function(element, errorMessage) {
-  await browser.waitUntil(
-    await until.elementToBeClickable(element),
-    {
-      timeout: DEFAULT_WAIT_TIME_MSECS,
-      timeoutMsg: errorMessage
-    });
+  await element.waitForClickable({
+    timeout: DEFAULT_WAIT_TIME_MSECS,
+    timeoutMsg: errorMessage + '\n' + new Error().stack + '\n'
+  });
 };
 
 /**
@@ -66,12 +65,11 @@ var elementToBeClickable = async function(element, errorMessage) {
  * @param {string} errorMessage - Error message when element is still visible.
  */
 var invisibilityOf = async function(element, errorMessage) {
-  await browser.waitUntil(
-    await until.invisibilityOf(element),
-    {
-      timeout: DEFAULT_WAIT_TIME_MSECS,
-      timeoutMsg: errorMessage
-    });
+  await element.waitForDisplayed({
+    timeout: DEFAULT_WAIT_TIME_MSECS,
+    reverse: true,
+    timeoutMsg: errorMessage + '\n' + new Error().stack + '\n'
+  });
 };
 
 /**
@@ -79,12 +77,12 @@ var invisibilityOf = async function(element, errorMessage) {
  */
 var pageToFullyLoad = async function() {
   var loadingMessage = await $('.e2e-test-loading-fullpage');
-  await browser.waitUntil(
-    await until.invisibilityOf(loadingMessage),
-    {
-      timeout: 15000,
-      timeoutMsg: 'Page takes more than 15 secs to load'
-    });
+  await loadingMessage.waitForDisplayed({
+    timeout: 15000,
+    reverse: true,
+    timeoutMsg: 'Pages takes more than 15 sec to load\n' +
+    new Error().stack + '\n'
+  });
 };
 
 /**
@@ -98,7 +96,7 @@ var textToBePresentInElement = async function(element, text, errorMessage) {
     await until.textToBePresentInElement(element, text),
     {
       timeout: DEFAULT_WAIT_TIME_MSECS,
-      timeoutMsg: errorMessage
+      timeoutMsg: errorMessage + '\n' + new Error().stack + '\n'
     });
 };
 
@@ -108,12 +106,10 @@ var textToBePresentInElement = async function(element, text, errorMessage) {
  * @param {string} errorMessage - Error message when element is not present.
  */
 var presenceOf = async function(element, errorMessage) {
-  await browser.waitUntil(
-    await until.presenceOf(element),
-    {
-      timeout: DEFAULT_WAIT_TIME_MSECS,
-      timeoutMsg: errorMessage
-    });
+  await element.waitForExist({
+    timeout: DEFAULT_WAIT_TIME_MSECS,
+    timeoutMsg: errorMessage + '\n' + new Error().stack + '\n'
+  });
 };
 
 /**
@@ -122,12 +118,10 @@ var presenceOf = async function(element, errorMessage) {
  * @param {string} errorMessage - Error message when element is invisible.
  */
 var visibilityOf = async function(element, errorMessage) {
-  await browser.waitUntil(
-    await until.visibilityOf(element),
-    {
-      timeout: DEFAULT_WAIT_TIME_MSECS,
-      timeoutMsg: errorMessage
-    });
+  await element.waitForDisplayed({
+    timeout: DEFAULT_WAIT_TIME_MSECS,
+    timeoutMsg: errorMessage + '\n' + new Error().stack + '\n'
+  });
 };
 
 /**
@@ -145,7 +139,7 @@ var elementAttributeToBe = async function(
   },
   {
     timeout: DEFAULT_WAIT_TIME_MSECS,
-    timeoutMsg: errorMessage
+    timeoutMsg: errorMessage + '\n' + new Error().stack + '\n'
   });
 };
 
@@ -161,7 +155,7 @@ var newTabToBeCreated = async function(errorMessage, urlToMatch) {
   },
   {
     timeout: DEFAULT_WAIT_TIME_MSECS_FOR_NEW_TAB,
-    timeoutMsg: errorMessage
+    timeoutMsg: errorMessage + '\n' + new Error().stack + '\n'
   });
 };
 
@@ -174,7 +168,7 @@ var urlRedirection = async function(url) {
     await until.urlIs(url),
     {
       timeout: DEFAULT_WAIT_TIME_MSECS,
-      timeoutMsg: 'URL redirection took too long'
+      timeoutMsg: 'URL redirection took too long\n' + new Error().stack + '\n'
     });
 };
 
@@ -224,7 +218,7 @@ var fileToBeDownloaded = async function(filename) {
   },
   {
     timeout: DEFAULT_WAIT_TIME_MSECS,
-    timeoutMsg: 'File was not downloaded!'
+    timeoutMsg: 'File was not downloaded!\n' + new Error().stack + '\n'
   });
 };
 

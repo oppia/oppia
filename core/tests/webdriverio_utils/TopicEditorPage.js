@@ -42,10 +42,6 @@ var TopicEditorPage = function() {
   var newStoryUrlFragmentField = $('.e2e-test-new-story-url-fragment-field');
   var newSubtopicEditorElement = $('.e2e-test-new-subtopic-editor');
   var pageEditor = $('.e2e-test-edit-subtopic-page-contents');
-  var questionItem = $('.e2e-test-question-list-item');
-  var questionItemsSelector = function() {
-    return $$('.e2e-test-question-list-item');
-  };
   var questionsTabButton = $('.e2e-test-questions-tab-button');
   var saveQuestionButton = $('.e2e-test-save-question-button');
   var subtopicColumnsSelector = function() {
@@ -161,10 +157,10 @@ var TopicEditorPage = function() {
 
   this.expectNumberOfQuestionsForSkillWithDescriptionToBe = async function(
       count, skillDescription) {
-    await selectSkillDropdown.selectByVisibleText(skillDescription);
     await waitFor.visibilityOf(
-      questionItem, 'Question takes too long to appear');
-    var questionItems = await questionItemsSelector();
+      selectSkillDropdown, 'Select Skill dropdown takes too long to appear');
+    await selectSkillDropdown.selectByVisibleText(skillDescription);
+    var questionItems = await $$('.e2e-test-question-list-item');
     await waitFor.visibilityOf(
       questionItems[0], 'Question takes too long to appear');
     expect(questionItems.length).toEqual(count);
@@ -264,7 +260,10 @@ var TopicEditorPage = function() {
 
   this.addConceptCardToSubtopicExplanation = async function(skillName) {
     await action.click('RTE input', subtopicPageContentButton);
-    // Chaining selectors is selecting the non-interceptable element.
+    // The cke buttons classes are dynamically alloted and hence we cannot
+    // a class name to select a particular button. Also using chain selectors
+    // is returning a non interactable element hence we are explicitly using
+    // the dynamically alloted id of the button to select the button.
     // eslint-disable-next-line oppia/e2e-practices
     var conceptCardButton = $('#cke_124');
     await action.click('Concept card button', conceptCardButton);
@@ -340,10 +339,10 @@ var TopicEditorPage = function() {
   };
 
   this.expectUncategorizedSkillsToBe = async function(skillDescriptions) {
-    var uncategorizedSkills = await uncategorizedSkillsSelector();
     await waitFor.visibilityOf(
       uncategorizedSkillCard,
       'Uncategorized skills taking too long to appear.');
+    var uncategorizedSkills = await uncategorizedSkillsSelector();
 
     for (var i = 0; i < uncategorizedSkills.length; i++) {
       var uncategorizedSkill = uncategorizedSkills[i];
