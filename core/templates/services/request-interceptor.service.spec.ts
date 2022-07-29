@@ -21,10 +21,49 @@ import {
   HttpTestingController
 } from '@angular/common/http/testing';
 // eslint-disable-next-line oppia/disallow-httpclient
-import { HTTP_INTERCEPTORS, HttpClient, HttpHandler, HttpRequest, HttpParams } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClient, HttpHandler, HttpRequest, HttpParams, HttpBackend } from '@angular/common/http';
 
-import { MockCsrfTokenService, RequestInterceptor } from 'services/request-interceptor.service';
+import { RequestInterceptor } from 'services/request-interceptor.service';
 import { CsrfTokenService } from './csrf-token.service';
+import { Injectable } from '@angular/core';
+
+
+@Injectable({
+  providedIn: 'root'
+})
+export class MockCsrfTokenService {
+  // 'tokenPromise' will be null when token is not initialized.
+  tokenPromise: PromiseLike<string> | null = null;
+  http: HttpClient;
+
+  constructor(httpBackend: HttpBackend) {
+    this.http = new HttpClient(httpBackend);
+  }
+
+  initializeToken(): void {
+    if (this.tokenPromise !== null) {
+      throw new Error('Token request has already been made');
+    }
+    this.tokenPromise = this.http.get(
+      '/csrfhandler', { responseType: 'text' }
+    ).toPromise().then((responseText: string) => {
+      // Remove the protective XSSI (cross-site scripting inclusion) prefix.
+      return JSON.parse(responseText.substring(5)).token;
+    }, (err) => {
+      console.error(
+        'The following error is thrown while trying to get CSRF token.');
+      console.error(err);
+      throw err;
+    });
+  }
+
+  getTokenAsync(): PromiseLike<string> {
+    if (this.tokenPromise === null) {
+      throw new Error('Token needs to be initialized');
+    }
+    return this.tokenPromise;
+  }
+}
 
 
 describe('Request Interceptor Service', () => {

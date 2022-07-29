@@ -18,48 +18,10 @@
 
 import { from, Observable } from 'rxjs';
 // eslint-disable-next-line oppia/disallow-httpclient
-import { HttpBackend, HttpClient, HttpRequest, HttpInterceptor, HttpEvent, HttpHandler } from '@angular/common/http';
+import { HttpRequest, HttpInterceptor, HttpEvent, HttpHandler } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { switchMap } from 'rxjs/operators';
 import { CsrfTokenService } from './csrf-token.service';
-
-
-@Injectable({
-  providedIn: 'root'
-})
-export class MockCsrfTokenService {
-  // 'tokenPromise' will be null when token is not initialized.
-  tokenPromise: PromiseLike<string> | null = null;
-  http: HttpClient;
-
-  constructor(httpBackend: HttpBackend) {
-    this.http = new HttpClient(httpBackend);
-  }
-
-  initializeToken(): void {
-    if (this.tokenPromise !== null) {
-      throw new Error('Token request has already been made');
-    }
-    this.tokenPromise = this.http.get(
-      '/csrfhandler', { responseType: 'text' }
-    ).toPromise().then((responseText: string) => {
-      // Remove the protective XSSI (cross-site scripting inclusion) prefix.
-      return JSON.parse(responseText.substring(5)).token;
-    }, (err) => {
-      console.error(
-        'The following error is thrown while trying to get CSRF token.');
-      console.error(err);
-      throw err;
-    });
-  }
-
-  getTokenAsync(): PromiseLike<string> {
-    if (this.tokenPromise === null) {
-      throw new Error('Token needs to be initialized');
-    }
-    return this.tokenPromise;
-  }
-}
 
 
 @Injectable({
