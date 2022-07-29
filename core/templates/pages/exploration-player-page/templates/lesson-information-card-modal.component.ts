@@ -39,6 +39,11 @@ interface ExplorationTagSummary {
   tagsInTooltip: string[];
 }
 
+const CHECKPOINT_STATUS_INCOMPLETE = 'incomplete';
+const CHECKPOINT_STATUS_COMPLETED = 'completed';
+const CHECKPOINT_STATUS_IN_PROGRESS = 'in-progress';
+const EXPLORATION_STATUS_PRIVATE = 'private';
+
 import './lesson-information-card-modal.component.css';
 
 
@@ -96,7 +101,8 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
     this.numViews = this.expInfo.num_views;
     this.lastUpdatedString = this.getLastUpdatedString(
       this.expInfo.last_updated_msec);
-    this.explorationIsPrivate = (this.expInfo.status === 'private');
+    this.explorationIsPrivate = (
+      this.expInfo.status === EXPLORATION_STATUS_PRIVATE);
     this.explorationTags = this.getExplorationTagsSummary(this.expInfo.tags);
     this.explorationId = this.expInfo.id;
     this.expTitle = this.expInfo.title;
@@ -123,19 +129,20 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
     // in the lesson info card.
     this.checkpointStatusArray = new Array(this.checkpointCount);
     for (let i = 0; i < this.completedCheckpointsCount; i++) {
-      this.checkpointStatusArray[i] = 'completed';
+      this.checkpointStatusArray[i] = CHECKPOINT_STATUS_COMPLETED;
     }
     // If not all checkpoints are completed, then the checkpoint immediately
     // following the last completed checkpoint is labeled 'in-progress'.
     if (this.checkpointCount > this.completedCheckpointsCount) {
       this.checkpointStatusArray[this.completedCheckpointsCount] = (
-        'in-progress');
+        CHECKPOINT_STATUS_IN_PROGRESS);
     }
     for (
       let i = this.completedCheckpointsCount + 1;
       i < this.checkpointCount;
-      i++) {
-      this.checkpointStatusArray[i] = 'incomplete';
+      i++
+    ) {
+      this.checkpointStatusArray[i] = CHECKPOINT_STATUS_INCOMPLETE;
     }
     this.loggedOutProgressUniqueUrlId = (
       this.explorationPlayerStateService.getUniqueProgressUrlId());
@@ -150,7 +157,7 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
     if (this.completedCheckpointsCount === 0) {
       return 0;
     }
-    let spaceBetweenEachNode = 100 / (this.checkpointCount - 1);
+    const spaceBetweenEachNode = 100 / (this.checkpointCount - 1);
     return (
       ((this.completedCheckpointsCount - 1) * spaceBetweenEachNode) +
       (spaceBetweenEachNode / 2));
@@ -184,16 +191,6 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
 
   getStaticImageUrl(imageUrl: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imageUrl);
-  }
-
-  titleWrapper(): object {
-    let titleHeight = document.querySelectorAll(
-      '.oppia-info-card-logo-thumbnail')[0].clientWidth - 20;
-    let titleCss = {
-      'word-wrap': 'break-word',
-      width: titleHeight.toString()
-    };
-    return titleCss;
   }
 
   isHackyExpTitleTranslationDisplayed(): boolean {

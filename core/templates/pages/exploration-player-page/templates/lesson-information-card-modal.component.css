@@ -4,7 +4,7 @@
   https://rtlcss.com/learn/usage-guide/control-directives .
 */
 
-mat-card.oppia-lesson-info-card {
+.oppia-lesson-info-card {
   border-bottom-left-radius: 4px;
   border-bottom-right-radius: 4px;
   padding: 0 0 6px 0;
@@ -28,7 +28,7 @@ mat-card.oppia-lesson-info-card {
 }
 
 .oppia-info-card-exploration-contributors-profile img {
-  border: 3px solid white;
+  border: 3px solid #fff;
   height: 22px;
   margin-right: 2px;
   width: 22px;
@@ -78,7 +78,7 @@ mat-card.oppia-lesson-info-card {
 
 .oppia-info-card-title {
   bottom: 0;
-  color: white;
+  color: #fff;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   margin: 12px 0 0 0;
   padding: 0;
@@ -95,7 +95,7 @@ mat-card.oppia-lesson-info-card {
 }
 
 .oppia-info-card-tooltip-more {
-  color: blue;
+  color: #00f;
 }
 
 .oppia-info-card-bottom-row .sharing-links-container {
@@ -160,14 +160,6 @@ mat-card.oppia-lesson-info-card {
   text-align: center;
 }
 
-.oppia-info-card-bottom-row md-chips md-chip {
-  cursor: default;
-  font-size: 12px;
-  line-height: 1em;
-  margin: 0;
-  padding: 0;
-}
-
 .oppia-lesson-exploration-progress-info .private-card-info {
   color: red;
 }
@@ -181,32 +173,36 @@ mat-card.oppia-lesson-info-card {
   margin-right: 0.3125rem;
 }
 
-.row.center {
+.oppia-lesson-info-card .row.center {
   display: flex;
   flex-direction: row;
 }
 
-.space-between {
+.oppia-lesson-info-card .space-between {
   justify-content: space-between;
 }
 
-.center {
+.oppia-lesson-info-card .center {
   align-content: center;
   align-items: center;
 }
 
-.row-item {
+.oppia-lesson-info-card .break-word {
+  word-wrap: break-word;
+}
+
+.oppia-lesson-info-card .row-item {
   flex-grow: 1;
 }
 
-.named-contributors-container {
+.oppia-lesson-info-card .named-contributors-container {
   align-items: center;
   display: flex;
   flex-direction: row;
   width: 36px;
 }
 
-.progress-bar-container {
+.oppia-lesson-info-card .progress-bar-container {
   align-items: center;
   display: flex;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
@@ -214,15 +210,15 @@ mat-card.oppia-lesson-info-card {
   width: 100%;
 }
 
-.single-checkpoint-bar {
+.oppia-lesson-info-card .single-checkpoint-bar {
   justify-content: center;
 }
 
-.multiple-checkpoints-bar {
+.oppia-lesson-info-card .multiple-checkpoints-bar {
   justify-content: space-between;
 }
 
-.reverse-checkpoint-order {
+.oppia-lesson-info-card .reverse-checkpoint-order {
   flex-direction: row-reverse;
 }
 

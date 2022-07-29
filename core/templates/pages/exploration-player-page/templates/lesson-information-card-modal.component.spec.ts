@@ -337,18 +337,6 @@ describe('Lesson Information card modal component', () => {
     expect(componentInstance.getLastUpdatedString(12)).toEqual(dateTimeString);
   });
 
-  it('should provide title wrapper', () => {
-    let titleHeight = 20;
-    spyOn(document, 'querySelectorAll').and.returnValue([{
-      clientWidth: titleHeight + 20
-    }] as unknown as NodeListOf<Element>);
-
-    expect(componentInstance.titleWrapper()).toEqual({
-      'word-wrap': 'break-word',
-      width: titleHeight.toString()
-    });
-  });
-
   it('should save logged-out learner progress correctly', fakeAsync(() => {
     spyOn(explorationPlayerStateService, 'setUniqueProgressUrlId')
       .and.returnValue(Promise.resolve());

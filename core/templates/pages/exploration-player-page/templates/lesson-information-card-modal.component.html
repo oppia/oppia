@@ -1,10 +1,10 @@
 <mat-card class="oppia-lesson-info-card">
   <div [ngStyle]="infoCardBackgroundCss" class="oppia-info-card-logo-thumbnail">
     <img [src]="getStaticImageUrl(infoCardBackgroundImageUrl)" class="oppia-info-card-bg-image">
-    <h2 [ngStyle]="titleWrapper()" class="oppia-info-card-title" *ngIf="isHackyExpTitleTranslationDisplayed()">
+    <h2 class="oppia-info-card-title break-word" *ngIf="isHackyExpTitleTranslationDisplayed()">
       {{ expTitleTranslationKey | translate }}
     </h2>
-    <h2 [ngStyle]="titleWrapper()" class="oppia-info-card-title" *ngIf="!isHackyExpTitleTranslationDisplayed()">
+    <h2 class="oppia-info-card-title break-word" *ngIf="!isHackyExpTitleTranslationDisplayed()">
       {{ expTitle }}
     </h2>
   </div>
@@ -100,8 +100,7 @@
               <span *ngIf="explorationTags.tagsToShow.length > 0">
                 {{ explorationTags.tagsToShow.join(", ") }}
               </span>
-              <span *ngIf="explorationTags.tagsToShow.length === 0 &&
-                explorationTags.tagsInTooltip.length === 0">
+              <span *ngIf="explorationTags.tagsToShow.length === 0 && explorationTags.tagsInTooltip.length === 0">
                 <span><em>{{ 'I18N_PLAYER_NO_TAGS' | translate }}</em></span>
               </span>
             </div>

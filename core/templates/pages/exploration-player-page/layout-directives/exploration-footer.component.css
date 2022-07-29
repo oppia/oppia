@@ -256,10 +256,10 @@
   padding-top: 10px;
 }
 
-.oppia-lesson-info-h1 {
+.oppia-lesson-info-header {
   color: #fff;
   cursor: pointer;
-  display: inline;
+  display: block;
   font-family: "Roboto", Arial, sans-serif;
   font-size: 17px;
   font-weight: normal;
