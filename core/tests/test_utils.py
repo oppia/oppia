@@ -2780,7 +2780,7 @@ title: Title
         exp_summary_model.update_timestamps()
         exp_summary_model.put()
 
-    def publish_exploration(self, owner_id, exploration_id):
+    def publish_exploration(self, owner_id: str, exploration_id: str) -> None:
         """Publish the exploration with the given exploration_id.
 
         Args:
@@ -2791,9 +2791,14 @@ title: Title
         rights_manager.publish_exploration(committer, exploration_id)
 
     def save_new_default_collection(
-            self, collection_id, owner_id, title='A title',
-            category='A category', objective='An objective',
-            language_code=constants.DEFAULT_LANGUAGE_CODE):
+        self,
+        collection_id: str,
+        owner_id: str,
+        title: str = 'A title',
+        category: str = 'A category',
+        objective: str = 'An objective',
+        language_code: str = constants.DEFAULT_LANGUAGE_CODE
+    ) -> collection_domain.Collection:
         """Saves a new default collection written by owner_id.
 
         Args:

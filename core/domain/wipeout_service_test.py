@@ -464,7 +464,7 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
 
     def test_pre_delete_user_exploration_ownership_is_released(self) -> None:
         self.save_new_valid_exploration('exp_id', self.user_1_id)
-        self.publish_exploration(self.user_1_id, 'exp_id')  # type: ignore[no-untyped-call]
+        self.publish_exploration(self.user_1_id, 'exp_id')
         rights_manager.assign_role_for_exploration(  # type: ignore[no-untyped-call]
             user_services.get_system_user(),
             'exp_id',
@@ -484,7 +484,7 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
         self
     ) -> None:
         self.save_new_valid_exploration('exp_id', self.user_1_id)
-        self.publish_exploration(self.user_1_id, 'exp_id')  # type: ignore[no-untyped-call]
+        self.publish_exploration(self.user_1_id, 'exp_id')
         rights_manager.assign_role_for_exploration(  # type: ignore[no-untyped-call]
             self.user_1_actions,
             'exp_id',
@@ -540,7 +540,7 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
         self
     ) -> None:
         self.save_new_valid_exploration('exp_id', self.user_1_id)
-        self.publish_exploration(self.user_1_id, 'exp_id')  # type: ignore[no-untyped-call]
+        self.publish_exploration(self.user_1_id, 'exp_id')
         rights_manager.assign_role_for_exploration(  # type: ignore[no-untyped-call]
             user_services.get_system_user(),
             'exp_id',
@@ -561,7 +561,7 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
         self
     ) -> None:
         self.save_new_valid_exploration('exp_id', self.user_1_id)
-        self.publish_exploration(self.user_1_id, 'exp_id')  # type: ignore[no-untyped-call]
+        self.publish_exploration(self.user_1_id, 'exp_id')
         rights_manager.assign_role_for_exploration(  # type: ignore[no-untyped-call]
             user_services.get_system_user(),
             'exp_id',
@@ -1789,7 +1789,7 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)  # type: ignore[no-untyped-call]
         self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)  # type: ignore[no-untyped-call]
         self.save_new_valid_exploration(self.EXP_1_ID, self.user_1_id)
-        self.publish_exploration(self.user_1_id, self.EXP_1_ID)  # type: ignore[no-untyped-call]
+        self.publish_exploration(self.user_1_id, self.EXP_1_ID)
         rights_manager.assign_role_for_exploration(  # type: ignore[no-untyped-call]
             user_services.get_user_actions_info(self.user_1_id),
             self.EXP_1_ID,
@@ -2071,7 +2071,7 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
 
     def test_multiple_explorations_are_pseudonymized(self) -> None:
         self.save_new_valid_exploration(self.EXP_2_ID, self.user_1_id)
-        self.publish_exploration(self.user_1_id, self.EXP_2_ID)  # type: ignore[no-untyped-call]
+        self.publish_exploration(self.user_1_id, self.EXP_2_ID)
 
         wipeout_service.pre_delete_user(self.user_1_id)
         self.process_and_flush_pending_tasks()
@@ -2127,9 +2127,9 @@ class WipeoutServiceVerifyDeleteExplorationModelsTests(
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)  # type: ignore[no-untyped-call]
         self.save_new_valid_exploration(self.EXP_1_ID, self.user_1_id)
-        self.publish_exploration(self.user_1_id, self.EXP_1_ID)  # type: ignore[no-untyped-call]
+        self.publish_exploration(self.user_1_id, self.EXP_1_ID)
         self.save_new_valid_exploration(self.EXP_2_ID, self.user_1_id)
-        self.publish_exploration(self.user_1_id, self.EXP_2_ID)  # type: ignore[no-untyped-call]
+        self.publish_exploration(self.user_1_id, self.EXP_2_ID)
         wipeout_service.pre_delete_user(self.user_1_id)
         self.process_and_flush_pending_tasks()
 
@@ -5600,11 +5600,11 @@ class WipeoutServiceDeleteVersionHistoryModelsTests(test_utils.GenericTestBase):
         self.version_history_model_class = (
             exp_models.ExplorationVersionHistoryModel)
         self.save_new_valid_exploration(self.EXPLORATION_ID_0, self.user_1_id)
-        self.publish_exploration(self.user_1_id, self.EXPLORATION_ID_0)  # type: ignore[no-untyped-call]
+        self.publish_exploration(self.user_1_id, self.EXPLORATION_ID_0)
         self.save_new_valid_exploration(self.EXPLORATION_ID_1, self.user_1_id)
-        self.publish_exploration(self.user_1_id, self.EXPLORATION_ID_1)  # type: ignore[no-untyped-call]
+        self.publish_exploration(self.user_1_id, self.EXPLORATION_ID_1)
         self.save_new_valid_exploration(self.EXPLORATION_ID_2, self.user_2_id)
-        self.publish_exploration(self.user_2_id, self.EXPLORATION_ID_2)  # type: ignore[no-untyped-call]
+        self.publish_exploration(self.user_2_id, self.EXPLORATION_ID_2)
 
     def test_one_version_history_model_is_pseudonymized(self) -> None:
         wipeout_service.pre_delete_user(self.user_2_id)

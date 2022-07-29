@@ -54,8 +54,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/feedback_services_test.py',
     'core/domain/html_validation_service.py',
     'core/domain/html_validation_service_test.py',
-    'core/domain/learner_progress_services.py',
-    'core/domain/learner_progress_services_test.py',
     'core/domain/object_registry.py',
     'core/domain/object_registry_test.py',
     'core/domain/opportunity_services.py',

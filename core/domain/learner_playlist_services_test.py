@@ -76,16 +76,16 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
             category='Welcome', language_code='en')
 
         # Save a few collections.
-        self.save_new_default_collection(  # type: ignore[no-untyped-call]
+        self.save_new_default_collection(
             self.COL_ID_0, self.owner_id, title='Bridges',
             category='Architecture')
-        self.save_new_default_collection(  # type: ignore[no-untyped-call]
+        self.save_new_default_collection(
             self.COL_ID_1, self.owner_id, title='Introduce Oppia',
             category='Welcome')
-        self.save_new_default_collection(  # type: ignore[no-untyped-call]
+        self.save_new_default_collection(
             self.COL_ID_2, self.user_id,
             title='Introduce Interactions in Oppia', category='Welcome')
-        self.save_new_default_collection(  # type: ignore[no-untyped-call]
+        self.save_new_default_collection(
             self.COL_ID_3, self.owner_id, title='Welcome Oppia Collection',
             category='Welcome')
 
@@ -131,7 +131,7 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
         self.assertEqual(
             self._get_all_learner_playlist_exp_ids(self.user_id), [])
         # Now if we try to add the same exploration, it shouldn't be added.
-        learner_progress_services.add_exp_to_learner_playlist(  # type: ignore[no-untyped-call]
+        learner_progress_services.add_exp_to_learner_playlist(
             self.user_id, self.EXP_ID_0)
         self.assertEqual(
             self._get_all_learner_playlist_exp_ids(self.user_id), [])
@@ -140,7 +140,7 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
         # Test adding a single exploration_id to learner playlist.
         self.assertEqual(
             self._get_all_learner_playlist_exp_ids(self.user_id), [])
-        learner_progress_services.add_exp_to_learner_playlist(  # type: ignore[no-untyped-call]
+        learner_progress_services.add_exp_to_learner_playlist(
             self.user_id, self.EXP_ID_0)
         self.assertEqual(
             self._get_all_learner_playlist_exp_ids(
@@ -148,7 +148,7 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
 
         # Test adding a single exploration_id to learner playlist at
         # a specific position.
-        learner_progress_services.add_exp_to_learner_playlist(  # type: ignore[no-untyped-call]
+        learner_progress_services.add_exp_to_learner_playlist(
             self.user_id, self.EXP_ID_1, position_to_be_inserted=0)
         self.assertEqual(
             self._get_all_learner_playlist_exp_ids(
@@ -162,13 +162,13 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
             self._get_all_learner_playlist_exp_ids(
                 self.user_id), [])
 
-        learner_progress_services.add_exp_to_learner_playlist(  # type: ignore[no-untyped-call]
+        learner_progress_services.add_exp_to_learner_playlist(
             self.user_id, self.EXP_ID_0)
         self.assertEqual(
             self._get_all_learner_playlist_exp_ids(
                 self.user_id), [self.EXP_ID_0])
 
-        learner_progress_services.add_exp_to_learner_playlist(  # type: ignore[no-untyped-call]
+        learner_progress_services.add_exp_to_learner_playlist(
             self.user_id, self.EXP_ID_1)
         self.assertEqual(
             self._get_all_learner_playlist_exp_ids(
@@ -180,15 +180,15 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
         # Test adding the exploration_id if it is already in
         # learner_playlist.exploration_ids.
         # Add the first exploration to the second position.
-        learner_progress_services.add_exp_to_learner_playlist(  # type: ignore[no-untyped-call]
+        learner_progress_services.add_exp_to_learner_playlist(
             self.user_id, self.EXP_ID_0)
-        learner_progress_services.add_exp_to_learner_playlist(  # type: ignore[no-untyped-call]
+        learner_progress_services.add_exp_to_learner_playlist(
             self.user_id, self.EXP_ID_1)
         self.assertEqual(
             self._get_all_learner_playlist_exp_ids(
                 self.user_id), [self.EXP_ID_0, self.EXP_ID_1])
 
-        learner_progress_services.add_exp_to_learner_playlist(  # type: ignore[no-untyped-call]
+        learner_progress_services.add_exp_to_learner_playlist(
             self.user_id, self.EXP_ID_0,
             position_to_be_inserted=1)
         self.assertEqual(
@@ -198,7 +198,7 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
     def test_incomplete_exploration_is_not_added_to_learner_playlist(
         self
     ) -> None:
-        learner_progress_services.add_exp_to_learner_playlist(  # type: ignore[no-untyped-call]
+        learner_progress_services.add_exp_to_learner_playlist(
             self.user_id, self.EXP_ID_0)
         self.assertEqual(
             self._get_all_learner_playlist_exp_ids(
@@ -206,7 +206,7 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
 
         state_name = 'state_name'
         version = 1
-        learner_progress_services.mark_exploration_as_incomplete(  # type: ignore[no-untyped-call]
+        learner_progress_services.mark_exploration_as_incomplete(
             self.user_id, self.EXP_ID_1, state_name, version)
 
         # Test that the exploration added to the in progress list doesn't get
@@ -220,7 +220,7 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
         exp_ids = ['SAMPLE_EXP_ID_%s' % index for index in range(
             0, MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT)]
         for exp_id in exp_ids:
-            learner_progress_services.add_exp_to_learner_playlist(  # type: ignore[no-untyped-call]
+            learner_progress_services.add_exp_to_learner_playlist(
                 self.user_id, exp_id)
         self.assertEqual(
             self._get_all_learner_playlist_exp_ids(self.user_id), exp_ids)
@@ -251,7 +251,7 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
                 self.user_id), [])
 
         # Now if we try to add the same collection, it shouldn't be added.
-        learner_progress_services.add_collection_to_learner_playlist(  # type: ignore[no-untyped-call]
+        learner_progress_services.add_collection_to_learner_playlist(
             self.user_id, self.COL_ID_0)
         self.assertEqual(
             self._get_all_learner_playlist_collection_ids(self.user_id), [])
@@ -260,7 +260,7 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
         # Test adding a single collection_id to learner playlist.
         self.assertEqual(
             self._get_all_learner_playlist_collection_ids(self.user_id), [])
-        learner_progress_services.add_collection_to_learner_playlist(  # type: ignore[no-untyped-call]
+        learner_progress_services.add_collection_to_learner_playlist(
             self.user_id, self.COL_ID_0)
         self.assertEqual(
             self._get_all_learner_playlist_collection_ids(
@@ -268,7 +268,7 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
 
         # Test adding a single collection_id to learner playlist at
         # a specific position.
-        learner_progress_services.add_collection_to_learner_playlist(  # type: ignore[no-untyped-call]
+        learner_progress_services.add_collection_to_learner_playlist(
             self.user_id, self.COL_ID_1, position_to_be_inserted=0)
         self.assertEqual(
             self._get_all_learner_playlist_collection_ids(
@@ -280,13 +280,13 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
             self._get_all_learner_playlist_collection_ids(
                 self.user_id), [])
 
-        learner_progress_services.add_collection_to_learner_playlist(  # type: ignore[no-untyped-call]
+        learner_progress_services.add_collection_to_learner_playlist(
             self.user_id, self.COL_ID_0)
         self.assertEqual(
             self._get_all_learner_playlist_collection_ids(
                 self.user_id), [self.COL_ID_0])
 
-        learner_progress_services.add_collection_to_learner_playlist(  # type: ignore[no-untyped-call]
+        learner_progress_services.add_collection_to_learner_playlist(
             self.user_id, self.COL_ID_1)
         self.assertEqual(
             self._get_all_learner_playlist_collection_ids(
@@ -298,15 +298,15 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
         # Test adding the collection_id if it is already in
         # learner_playlist.collection_ids.
         # Add the first collection to the second position.
-        learner_progress_services.add_collection_to_learner_playlist(  # type: ignore[no-untyped-call]
+        learner_progress_services.add_collection_to_learner_playlist(
             self.user_id, self.COL_ID_0)
-        learner_progress_services.add_collection_to_learner_playlist(  # type: ignore[no-untyped-call]
+        learner_progress_services.add_collection_to_learner_playlist(
             self.user_id, self.COL_ID_1)
         self.assertEqual(
             self._get_all_learner_playlist_collection_ids(
                 self.user_id), [self.COL_ID_0, self.COL_ID_1])
 
-        learner_progress_services.add_collection_to_learner_playlist(  # type: ignore[no-untyped-call]
+        learner_progress_services.add_collection_to_learner_playlist(
             self.user_id, self.COL_ID_0,
             position_to_be_inserted=1)
         self.assertEqual(
@@ -318,7 +318,7 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
         col_ids = ['SAMPLE_COL_ID_%s' % index for index in range(
             0, MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT)]
         for col_id in col_ids:
-            learner_progress_services.add_collection_to_learner_playlist(  # type: ignore[no-untyped-call]
+            learner_progress_services.add_collection_to_learner_playlist(
                 self.user_id, col_id)
         self.assertEqual(
             self._get_all_learner_playlist_collection_ids(
