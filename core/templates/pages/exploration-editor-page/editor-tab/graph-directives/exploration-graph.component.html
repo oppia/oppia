@@ -27,8 +27,19 @@
     </div>
     <md-card class="oppia-state-graph-card">
       <div class="oppia-state-graph-container e2e-test-exploration-graph">
-        <div state-graph-visualization graph-data="$ctrl.getGraphData()" current-state-id="$ctrl.getActiveStateName()" on-click-function="$ctrl.onClickStateInMinimap" on-delete-function="$ctrl.deleteState" on-maximize-function="$ctrl.openStateGraphModal" allow-panning="true" center-at-current-state="true" class="h-100" is-editable="$ctrl.isEditable()" show-warning-sign="true">
-        </div>
+        <state-graph-visualization [current-state-id]="$ctrl.getActiveStateName()"
+                                   (on-click-function)="$ctrl.onClickStateInMinimap($event)"
+                                   (on-delete-function)="$ctrl.deleteState($event)"
+                                   (on-maximize-function)="$ctrl.openStateGraphModal()"
+                                   [version-graph-data]="null"
+                                   [maximize]="true"
+                                   [allow-panning]="true"
+                                   [center-at-current-state]="true"
+                                   class="h-100"
+                                   [is-editable]="$ctrl.isEditable()"
+                                   [graph-data]="$ctrl.getGraphData()"
+                                   [show-warning-sign]="true">
+        </state-graph-visualization>
       </div>
     </md-card>
   </div>

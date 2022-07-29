@@ -1,0 +1,101 @@
+<div class="modal-header e2e-test-question-suggestion-review-modal-header">
+  <div>
+    <h3>{{questionHeader}}</h3>
+    <h4 class="author-header">Submitted by {{authorName}}</h4>
+  </div>
+  <button type="button" class="close oppia-close-button-position" (click)="cancel()" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+
+<div class="modal-body">
+  <section class="oppia-suggestion-review-container">
+    <div class="oppia-question-suggestion">
+      <div>
+        <strong>Selected Difficulty: {{skillDifficultyLabel}}</strong>
+        <div *ngIf="skillRubricExplanations.length > 0">
+          <strong title="Use these notes to make sure your question is at the right difficulty.">
+            Notes from Skill Rubric
+          </strong>
+          <ul>
+            <li *ngFor="let explanation of skillRubricExplanations">
+              <span [innerHTML]="explanation"></span>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <oppia-question-editor [questionId]="questionId"
+                             [misconceptionsBySkill]="misconceptionsBySkill"
+                             [questionStateData]="questionStateData"
+                             [question]="question"
+                             [userCanEditQuestion]="canEditQuestion"
+                             (questionChange)="questionChanged()">
+      </oppia-question-editor>
+    </div>
+  </section>
+  <section [hidden]="!reviewable" class="oppia-reviewer-actions">
+    <div class="oppia-suggestion-review-message">
+      Review message (required if rejecting):
+      <textarea class="e2e-test-suggestion-review-message w-100" rows="3" [(ngModel)]="reviewMessage"></textarea>
+    </div>
+  </section>
+  <div [hidden]="!(!reviewable && suggestionIsRejected)"
+       class="oppia-suggestion-review-message">
+    <strong>Review message: </strong>{{reviewMessage}}
+  </div>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-secondary" *ngIf="!reviewable" (click)="cancel()">Cancel</button>
+  <span ngbTooltip="Enter review message before rejecting" placement="bottom" disableTooltip="!(reviewMessage.length == 0)">
+    <button class="btn btn-danger e2e-test-question-suggestion-review-reject-button"
+            *ngIf="reviewable"
+            [disabled]="reviewMessage.length == 0"
+            (click)="reject()">Reject
+    </button>
+  </span>
+  <span placement="bottom">
+    <button class="btn btn-secondary e2e-test-question-suggestion-review-edit-button"
+            *ngIf="reviewable"
+            (click)="edit()">Edit
+    </button>
+  </span>
+  <span placement="bottom">
+    <button class="btn btn-success e2e-test-question-suggestion-review-accept-button"
+            *ngIf="reviewable"
+            (click)="accept()">Accept
+    </button>
+  </span>
+</div>
+
+<style>
+  .author-header {
+    margin-top: -12px;
+  }
+
+  .oppia-question-suggestion-rubric {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .oppia-question-suggestion {
+    height: 100%;
+    overflow: scroll;
+  }
+
+  .oppia-reviewer-actions {
+    border-top: 1px solid #e5e5e5;
+    margin-left: -15px;
+    margin-right: -15px;
+    padding: 0 15px;
+  }
+
+  .oppia-difficulty-message {
+    margin-bottom: 0.5em;
+  }
+
+  .oppia-suggestion-review-message {
+    margin-left: 10px;
+    margin-top: 20px;
+  }
+</style>

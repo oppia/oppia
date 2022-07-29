@@ -29,14 +29,16 @@ angular.module('oppia').component('stateTranslationEditor', {
   template: require('./state-translation-editor.component.html'),
   controller: [
     '$scope', 'EditabilityService',
-    'ExplorationStatesService', 'ExternalSaveService', 'NgbModal',
+    'ExplorationStatesService', 'ExternalSaveService',
+    'GraphDataService', 'NgbModal',
     'StateEditorService', 'StateWrittenTranslationsService',
     'TranslationLanguageService', 'TranslationStatusService',
     'TranslationTabActiveContentIdService',
     'WrittenTranslationObjectFactory',
     function(
         $scope, EditabilityService,
-        ExplorationStatesService, ExternalSaveService, NgbModal,
+        ExplorationStatesService, ExternalSaveService,
+        GraphDataService, NgbModal,
         StateEditorService, StateWrittenTranslationsService,
         TranslationLanguageService, TranslationStatusService,
         TranslationTabActiveContentIdService,
@@ -134,6 +136,10 @@ angular.module('oppia').component('stateTranslationEditor', {
           TranslationStatusService.refresh();
         }
         $scope.translationEditorIsOpen = false;
+
+        setTimeout(() => {
+          GraphDataService.recompute();
+        });
       };
 
       $scope.openTranslationEditor = function() {

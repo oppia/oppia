@@ -428,6 +428,9 @@ describe('Exploration editor page component', function() {
         mockOpenTranslationTutorialEmitter.emit();
         expect(ctrl.startTranslationTutorial).toHaveBeenCalled();
         expect(rs.navigateToTranslationTab).toHaveBeenCalled();
+
+        flush();
+        discardPeriodicTasks();
       }));
 
     it('should mark exploration as editable and translatable',

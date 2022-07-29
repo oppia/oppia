@@ -39,13 +39,13 @@ angular.module('oppia').component('translatorOverview', {
   template: require('./translator-overview.component.html'),
   controller: [
     '$scope', '$window', 'ExplorationLanguageCodeService',
-    'FocusManagerService', 'LanguageUtilService',
+    'FocusManagerService', 'GraphDataService', 'LanguageUtilService',
     'RouterService', 'StateEditorService', 'TranslationLanguageService',
     'TranslationStatusService', 'TranslationTabActiveModeService',
     'DEFAULT_AUDIO_LANGUAGE',
     function(
         $scope, $window, ExplorationLanguageCodeService,
-        FocusManagerService, LanguageUtilService,
+        FocusManagerService, GraphDataService, LanguageUtilService,
         RouterService, StateEditorService, TranslationLanguageService,
         TranslationStatusService, TranslationTabActiveModeService,
         DEFAULT_AUDIO_LANGUAGE) {
@@ -95,6 +95,10 @@ angular.module('oppia').component('translatorOverview', {
         }
         refreshDirectiveScope();
         TranslationStatusService.refresh();
+
+        setTimeout(() => {
+          GraphDataService.recompute();
+        });
       };
 
       $scope.getTranslationProgressStyle = function() {

@@ -1,12 +1,12 @@
 <div class="oppia-opportunities-list">
   <div [hidden]="loadingOpportunityData" *ngFor="let opportunity of visibleOpportunities">
     <oppia-opportunities-list-item [opportunity]="opportunity"
-                             (clickActionButton)="clickActionButton.emit($event)"
-                             [progressBarRequired]="progressBarRequired"
-                             [labelRequired]="labelRequired"
-                             [opportunityHeadingTruncationLength]="opportunityHeadingTruncationLength"
-                             [opportunityType]="opportunityType"
-                             [showOpportunityButton]="showOpportunityButton">
+                                   (clickActionButton)="clickActionButton.emit($event)"
+                                   [progressBarRequired]="progressBarRequired"
+                                   [labelRequired]="labelRequired"
+                                   [opportunityHeadingTruncationLength]="opportunityHeadingTruncationLength"
+                                   [opportunityType]="opportunityType"
+                                   [showOpportunityButton]="showOpportunityButton">
     </oppia-opportunities-list-item>
   </div>
   <div [hidden]="!loadingOpportunityData" class="e2e-test-opportunity-loading-placeholder">

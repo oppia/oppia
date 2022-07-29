@@ -22,9 +22,10 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 export interface ParamDict {
   action: string;
-  audioUpdateRequired: boolean;
-  commitMessage: string;
+  audioUpdateRequired?: boolean;
+  commitMessage?: string;
   reviewMessage: string;
+  skillDifficulty?: number;
 }
 
 @Injectable({

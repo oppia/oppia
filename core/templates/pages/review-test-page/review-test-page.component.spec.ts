@@ -24,28 +24,31 @@ import { PageTitleService } from 'services/page-title.service';
 import { ReviewTestEngineService } from
   'pages/review-test-page/review-test-engine.service';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { QuestionPlayerConstants } from 'components/question-directives/question-player/question-player.constants';
 
 describe('Review test page component', function() {
   var ctrl = null;
   var $q = null;
   var $scope = null;
-  var pageTitleService = null;
-  var reviewTestBackendApiService = null;
-  var reviewTestEngineService = null;
+  var pageTitleService: PageTitleService = null;
+  var reviewTestBackendApiService: ReviewTestBackendApiService = null;
+  var reviewTestEngineService: ReviewTestEngineService = null;
   var urlService = null;
   var $translate = null;
   var I18nLanguageCodeService = null;
 
   importAllAngularServices();
 
-  beforeEach(function() {
-    pageTitleService = TestBed.get(PageTitleService);
-    reviewTestBackendApiService = TestBed.get(ReviewTestBackendApiService);
-    reviewTestEngineService = TestBed.get(ReviewTestEngineService);
+  beforeEach(() => {
+    pageTitleService = TestBed.inject(PageTitleService);
+    reviewTestBackendApiService = TestBed.inject(ReviewTestBackendApiService);
+    reviewTestEngineService = TestBed.inject(ReviewTestEngineService);
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('ReviewTestBackendApiService', reviewTestBackendApiService);
+    $provide.value(
+      'QUESTION_PLAYER_MODE', QuestionPlayerConstants.QUESTION_PLAYER_MODE);
   }));
 
   beforeEach(angular.mock.inject(function($injector, $componentController) {

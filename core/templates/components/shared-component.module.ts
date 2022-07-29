@@ -139,6 +139,15 @@ import { AddAnswerGroupModalComponent } from 'pages/exploration-editor-page/edit
 import { AnswerGroupEditor } from './state-directives/answer-group-editor/answer-group-editor.component';
 import { StateResponsesComponent } from './state-editor/state-responses-editor/state-responses.component';
 import { StateEditorComponent } from './state-editor/state-editor.component';
+import { QuestionEditorComponent } from './question-directives/question-editor/question-editor.component';
+import { QuestionPlayerConceptCardModalComponent } from './question-directives/question-player/question-player-concept-card-modal.component';
+import { QuestionPlayerComponent } from './question-directives/question-player/question-player.component';
+import { QuestionsListComponent } from './question-directives/questions-list/questions-list.component';
+import { SkillMasteryModalComponent } from './question-directives/question-player/skill-mastery-modal.component';
+import { StateGraphVisualization } from 'pages/exploration-editor-page/editor-tab/graph-directives/state-graph-visualization.component';
+import { VersionDiffVisualizationComponent } from './version-diff-visualization/version-diff-visualization.component';
+import { QuestionSuggestionEditorModalComponent } from 'pages/contributor-dashboard-page/modal-templates/question-suggestion-editor-modal.component';
+import { QuestionSuggestionReviewModalComponent } from 'pages/contributor-dashboard-page/modal-templates/question-suggestion-review-modal.component';
 
 // Pipes.
 import { StringUtilityPipesModule } from 'filters/string-utility-filters/string-utility-pipes.module';
@@ -295,7 +304,16 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     AddAnswerGroupModalComponent,
     AnswerGroupEditor,
     StateResponsesComponent,
-    StateEditorComponent
+    StateEditorComponent,
+    QuestionEditorComponent,
+    QuestionPlayerConceptCardModalComponent,
+    QuestionPlayerComponent,
+    QuestionsListComponent,
+    SkillMasteryModalComponent,
+    StateGraphVisualization,
+    VersionDiffVisualizationComponent,
+    QuestionSuggestionEditorModalComponent,
+    QuestionSuggestionReviewModalComponent
   ],
 
   entryComponents: [
@@ -383,9 +401,6 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     DeleteLastHintModalComponent,
     DeleteSolutionModalComponent,
     SavePendingChangesModalComponent,
-    AddHintModalComponent,
-    ReviewMaterialEditorComponent,
-    TagMisconceptionModalComponent,
     QuestionMisconceptionEditorComponent,
     SolutionEditor,
     SolutionExplanationEditor,
@@ -403,7 +418,16 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     AddAnswerGroupModalComponent,
     AnswerGroupEditor,
     StateResponsesComponent,
-    StateEditorComponent
+    StateEditorComponent,
+    QuestionEditorComponent,
+    QuestionPlayerConceptCardModalComponent,
+    QuestionPlayerComponent,
+    QuestionsListComponent,
+    SkillMasteryModalComponent,
+    StateGraphVisualization,
+    VersionDiffVisualizationComponent,
+    QuestionSuggestionEditorModalComponent,
+    QuestionSuggestionReviewModalComponent
   ],
 
   exports: [
@@ -520,7 +544,16 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     AddAnswerGroupModalComponent,
     AnswerGroupEditor,
     StateResponsesComponent,
-    StateEditorComponent
+    StateEditorComponent,
+    QuestionEditorComponent,
+    QuestionPlayerConceptCardModalComponent,
+    QuestionPlayerComponent,
+    QuestionsListComponent,
+    SkillMasteryModalComponent,
+    StateGraphVisualization,
+    VersionDiffVisualizationComponent,
+    QuestionSuggestionEditorModalComponent,
+    QuestionSuggestionReviewModalComponent
   ],
 })
 

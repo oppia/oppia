@@ -187,4 +187,8 @@ describe('Question Validation Service', () => {
       mockQuestionDict);
     expect(qvs.isQuestionValid(question, mockMisconceptionObject)).toBeTrue();
   });
+
+  it('should return false if question is not valid', () => {
+    expect(qvs.isQuestionValid(undefined, mockMisconceptionObject)).toBeFalse();
+  });
 });

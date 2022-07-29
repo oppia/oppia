@@ -1,9 +1,9 @@
 <background-banner></background-banner>
 <div class="oppia-practice-session-container position-relative e2e-test-practice-session-container">
-  <question-player ng-if="$ctrl.questionPlayerConfig.skillList &&
-                          $ctrl.questionPlayerConfig.skillList.length > 0"
-                   player-config="$ctrl.questionPlayerConfig">
-  </question-player>
+  <oppia-question-player ng-if="$ctrl.questionPlayerConfig.skillList &&
+                           $ctrl.questionPlayerConfig.skillList.length > 0"
+                         [question-player-config]="$ctrl.questionPlayerConfig">
+  </oppia-question-player>
 </div>
 <style>
   .oppia-practice-session-container .oppia-practice-session {
