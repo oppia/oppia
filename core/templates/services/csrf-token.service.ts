@@ -29,6 +29,7 @@ import { HttpClient, HttpBackend } from '@angular/common/http';
   providedIn: 'root'
 })
 export class CsrfTokenService {
+  // 'tokenPromise' will be null when token is not initialized.
   tokenPromise: PromiseLike<string> | null = null;
   http: HttpClient;
 
@@ -43,6 +44,7 @@ export class CsrfTokenService {
     this.tokenPromise = this.http.get(
       '/csrfhandler', { responseType: 'text' }
     ).toPromise().then((responseText: string) => {
+      // Remove the protective XSSI (cross-site scripting inclusion) prefix.
       return JSON.parse(responseText.substring(5)).token;
     }, (err) => {
       console.error(

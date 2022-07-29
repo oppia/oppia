@@ -655,8 +655,6 @@ export class UpgradedServices {
     upgradedServices['ContinueValidationService'] =
       new ContinueValidationService(
         upgradedServices['baseInteractionValidationService']);
-    upgradedServices['CsrfTokenService'] = new CsrfTokenService(
-      upgradedServices['HttpXhrBackend']);
     upgradedServices['DeviceInfoService'] = new DeviceInfoService(
       upgradedServices['WindowRef']);
     upgradedServices['DocumentAttributeCustomizationService'] =
@@ -799,6 +797,8 @@ export class UpgradedServices {
         upgradedServices['WrittenTranslationObjectFactory']);
 
     // Topological level: 2.
+    upgradedServices['CsrfTokenService'] = new CsrfTokenService(
+      upgradedServices['HttpXhrBackend']);
     upgradedServices['AnswerGroupObjectFactory'] = new AnswerGroupObjectFactory(
       upgradedServices['OutcomeObjectFactory'],
       upgradedServices['RuleObjectFactory']);
