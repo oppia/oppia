@@ -291,21 +291,20 @@
         <strong>Diagnostic test skills</strong>
       </div>
       <md-list>
-        <md-list-item class="oppia-diagnostic-test-skill-items"
-                      ng-repeat="skill in selectedSkillSummariesForDiagnosticTest">
-          <span class="oppia-diagnostic-test-skill-description">
-            {{skill.getDescription()}}
-          </span>
-          <button class="oppia-remove-diagnostic-test-skill-button e2e-test-remove-skill-from-diagnostic-test"
-                  ng-click="removeSkillFromDiagnosticTest(skill)"
-                  md-button
-                  md-icon-button
-                  aria-label="Clear">
-            <md-icon>close</md-icon>
-          </button>
+        <md-list-item class="oppia-diagnostic-test-skill_items-container" ng-repeat="skill in selectedSkillSummariesForDiagnosticTest">
+          <div class="oppia-diagnostic-test-skill-items">
+            <span>{{skill.getDescription()}}</span>
+            <button class="oppia-remove-diagnostic-test-skill-button e2e-test-remove-skill-from-diagnostic-test"
+                    ng-click="removeSkillFromDiagnosticTest(skill)"
+                    md-button
+                    md-icon-button
+                    aria-label="Clear">
+              <md-icon>close</md-icon>
+            </button>
+          </div>
         </md-list-item>
         <md-list-item ng-show="diagnosticTestSkillsDropdownIsShown">
-          <md-form-field class="oppia-diagnostic-test-dropdown-div">
+          <md-form-field class="oppia-diagnostic-test-skill-items">
             <select class="form-control oppia-diagnostic-test-dropdown e2e-test-diagnostic-test-skill-selector"
                     ng-model="selectedSkillForDiagnosticTest"
                     ng-change="addSkillForDiagnosticTest()"
@@ -732,16 +731,13 @@
     padding: 10px;
   }
 
-  .oppia-diagnostic-test-dropdown-div {
-    width: 85%;
-  }
-
   .oppia-diagnostic-test-dropdown {
     width: 50%;
   }
 
   .oppia-remove-diagnostic-test-skill-button {
     border-radius: 25px;
+    position: relative;
   }
 
   .oppia-diagnostic-test-skill-description {
@@ -756,15 +752,17 @@
     display: block;
   }
 
-  .oppia-diagnostic-test-skill-items {
-    align-items: center;
+  .oppia-diagnostic-test-skill_items-container {
     background-color: #e3e3e3;
-    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 20%), 0 1px 1px 0 rgb(0 0 0 / 14%), 0 2px 1px -1px rgb(0 0 0 / 12%);
-    display: flex;
-    flex-wrap: wrap;
     margin-bottom: 5px;
     margin-top: 5px;
-    padding: 10px;
+  }
+  .oppia-diagnostic-test-skill-items {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    width: -webkit-fill-available;
   }
 
   @media screen and (max-width: 1200px) {
