@@ -516,7 +516,18 @@ class DiagnosticTestSkillAssignmentHandlerTest(BaseSkillEditorControllerTests):
         self.assertEqual(
             json_response['skill_is_assigned_for_diagnostic_test'], False)
 
-        self.topic.skill_ids_for_diagnostic_test = ['skill_id_1']
+        changelist = [
+            topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+                'property_name': (
+                    topic_domain.TOPIC_PROPERTY_SKILL_IDS_FOR_DIAGNOSTIC_TEST),
+                'old_value': [],
+                'new_value': ['skill_id_1']
+            })]
+        topic_services.update_topic_and_subtopic_pages(
+            self.admin_id, self.topic.id, changelist,
+            'Updated diagnostic test.')
+
         json_response = self.get_json(self.url)
         self.assertEqual(
             json_response['skill_is_assigned_for_diagnostic_test'], True)
