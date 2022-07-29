@@ -24,10 +24,6 @@ var suites = {
       'protractor/accessibility.js'
     ],
 
-    additionalEditorFeaturesModals: [
-      'protractor_desktop/additionalEditorFeaturesModals.js'
-    ],
-
     adminPage: [
       'protractor_desktop/adminTabFeatures.js'
     ],

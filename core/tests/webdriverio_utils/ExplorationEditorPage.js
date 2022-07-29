@@ -228,7 +228,7 @@ var ExplorationEditorPage = function() {
     var expObjectiveValue = await action.getValue(
       'Exploration Objective', expObjective);
     expect(expObjectiveValue).toMatch(objective);
-    expect(explorationLanguage).toMatch(language);
+    expect(explorationLanguage).toBe(language);
     var expTagsSelectionChoiceElements = (
       await expTagsSelectionChoiceElementsSelector());
     for (var i = 0; i < expTagsSelectionChoiceElements.length; i++) {

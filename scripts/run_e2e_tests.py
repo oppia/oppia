@@ -153,6 +153,7 @@ RERUN_POLICIES = {
 
 SUITES_MIGRATED_TO_WEBDRIVERIO = [
     'additionalEditorFeatures',
+    'additionalEditorFeaturesModals',
     'additionalPlayerFeatures',
     'blogDashboard',
     'classroomPage',
@@ -178,7 +179,6 @@ SUITES_MIGRATED_TO_WEBDRIVERIO = [
 
 SUITES_STILL_IN_PROTRACTOR = [
     'accessibility',
-    'additionalEditorFeaturesModals',
     'adminPage',
     'coreEditorAndPlayerFeatures',
     'embedding',

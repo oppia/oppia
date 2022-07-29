@@ -32,6 +32,10 @@ var suites = {
     './core/tests/webdriverio_desktop/additionalEditorFeatures.js'
   ],
 
+  additionalEditorFeaturesModals: [
+    './core/tests/webdriverio_desktop/additionalEditorFeaturesModals.js'
+  ],
+
   additionalPlayerFeatures: [
     './core/tests/webdriverio_desktop/additionalPlayerFeatures.js'
   ],
