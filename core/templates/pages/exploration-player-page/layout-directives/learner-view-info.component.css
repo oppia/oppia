@@ -3,27 +3,27 @@
   compilation, here are sme additional rules that can be added to the CSS files:
   https://rtlcss.com/learn/usage-guide/control-directives .
 */
-.oppia-navbar-breadcrumb {
+oppia-learner-view-info .oppia-navbar-breadcrumb {
   padding-top: 10px;
 }
-.oppia-learner-navbar-container {
+oppia-learner-view-info .oppia-learner-navbar-container {
   display: flex;
 }
-.lesson-info-section {
+oppia-learner-view-info .lesson-info-section {
   display: contents;
 }
-.oppia-navbar-title-container {
+oppia-learner-view-info .oppia-navbar-title-container {
   display: flex;
   flex-direction: column;
 }
-.oppia-exploration-h1 {
+oppia-learner-view-info .oppia-exploration-h1 {
   color: #fff;
   display: inline;
   font-size: 18px;
   font-weight: normal;
   margin-bottom: 1px;
 }
-.oppia-topic-title {
+oppia-learner-view-info .oppia-topic-title {
   color: #fff;
   display: flex;
   font-size: 12px;

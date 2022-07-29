@@ -124,7 +124,7 @@
   padding-right: 20px;
 }
 
-.close-tooltip {
+.oppia-exploration-footer .close-tooltip {
   background-color: black;
   height: 100vh;
   left: 0;
@@ -134,19 +134,19 @@
   width: 100vw;
 }
 
-.lesson-info-tooltip-add-ons {
+.oppia-exploration-footer .lesson-info-tooltip-add-ons {
   left: 5px;
 }
 
-.lesson-info-tooltip-add-ons::after {
+.oppia-exploration-footer .lesson-info-tooltip-add-ons::after {
   margin-right: 163px;
 }
 
-.lesson-info-tooltip-add-ons::before {
+.oppia-exploration-footer .lesson-info-tooltip-add-ons::before {
   margin-right: 161px;
 }
 
-.lesson-info-tooltip {
+.oppia-exploration-footer .lesson-info-tooltip {
   -webkit-animation: bounce 4s infinite;
   animation: bounce 4s infinite;
   background-color: #f5701b;
@@ -165,8 +165,8 @@
   z-index: 2;
 }
 
-.lesson-info-tooltip::after,
-.lesson-info-tooltip::before {
+.oppia-exploration-footer .lesson-info-tooltip::after,
+.oppia-exploration-footer .lesson-info-tooltip::before {
   border: solid transparent;
   content: " ";
   left: 49.5%;
@@ -174,12 +174,12 @@
   top: 100%;
 }
 
-.lesson-info-tooltip::after {
+.oppia-exploration-footer .lesson-info-tooltip::after {
   border-left: 2px solid transparent;
   border-right: 15px solid transparent;
 }
 
-.lesson-info-tooltip::before {
+.oppia-exploration-footer .lesson-info-tooltip::before {
   border-left: 7px solid transparent;
   border-right: 7px solid transparent;
   border-top: 10px solid #f5701b;
@@ -300,7 +300,7 @@
   cursor: pointer;
 }
 
-.oppia-close-popover-button {
+.oppia-exploration-footer .oppia-close-popover-button {
   outline: none;
   padding: 0;
   right: 0;
@@ -312,7 +312,7 @@
     display: none;
   }
 
-  .lesson-info-tooltip {
+  .oppia-exploration-footer .lesson-info-tooltip {
     font-size: 14px;
     height: auto;
     margin-right: 10px;
