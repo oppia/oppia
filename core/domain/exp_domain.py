@@ -2316,6 +2316,77 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return states_dict
 
     @classmethod
+    def _convert_states_v51_dict_to_v52_dict(cls, states_dict):
+        """Converts from version 50 to 51. Version 51 adds a new
+        dest_if_really_stuck field to Outcome class to redirect learners
+        to a state for strengthening concepts when they get really stuck.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        for state_dict in states_dict.values():
+            content_id_list = []
+            for answer_group in state_dict['interaction']['answer_groups']:
+                content_id_list.append(
+                    answer_group['outcome']['feedback']['content_id']
+                )
+
+                for rule_spec in answer_group.rule_specs:
+                    for param_name, value in rule_spec.inputs.items():
+                        param_type = (
+                            interaction_registry.Registry.get_interaction_by_id(
+                                self.interaction.id
+                            ).get_rule_param_type(rule_spec.rule_type, param_name))
+
+                        if issubclass(param_type, objects.BaseTranslatableObject):
+                            if value['contentId'] in content_id_list:
+                                raise utils.ValidationError(
+                                    'Found a duplicate content '
+                                    'id %s' % value['contentId'])
+                            content_id_list.append(value['contentId'])
+
+            if state_dict['interaction']['default_outcome']:
+                default_outcome_content_id = (
+                    self.interaction.default_outcome.feedback.content_id)
+                if default_outcome_content_id in content_id_list:
+                    raise utils.ValidationError(
+                        'Found a duplicate content id %s'
+                        % default_outcome_content_id)
+                content_id_list.append(default_outcome_content_id)
+            for hint in self.interaction.hints:
+                hint_content_id = hint.hint_content.content_id
+                if hint_content_id in content_id_list:
+                    raise utils.ValidationError(
+                        'Found a duplicate content id %s' % hint_content_id)
+                content_id_list.append(hint_content_id)
+            if self.interaction.solution:
+                solution_content_id = (
+                    self.interaction.solution.explanation.content_id)
+                if solution_content_id in content_id_list:
+                    raise utils.ValidationError(
+                        'Found a duplicate content id %s' % solution_content_id)
+                content_id_list.append(solution_content_id)
+
+            if self.interaction.id is not None:
+                for ca_name in self.interaction.customization_args:
+                    content_id_list.extend(
+                        self.interaction.customization_args[ca_name]
+                        .get_content_ids()
+                    )
+
+            if len(set(content_id_list)) != len(content_id_list):
+                raise utils.ValidationError(
+                    'Expected all content_ids to be unique, '
+                    'received %s' % content_id_list)
+
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states,
             current_states_schema_version, init_state_name):
