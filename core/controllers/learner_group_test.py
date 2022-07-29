@@ -41,7 +41,7 @@ class CreateLearnerGroupHandlerTests(test_utils.GenericTestBase):
     USER2_USERNAME = 'user2'
 
     def setUp(self):
-        super(CreateLearnerGroupHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.signup(self.USER1_EMAIL, self.USER1_USERNAME)
         self.signup(self.USER2_EMAIL, self.USER2_USERNAME)
@@ -88,7 +88,7 @@ class LearnerGroupHandlerTests(test_utils.GenericTestBase):
     LEARNER_GROUP_ID = None
 
     def setUp(self):
-        super(LearnerGroupHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.signup(self.USER1_EMAIL, self.USER1_USERNAME)
         self.signup(self.USER2_EMAIL, self.USER2_USERNAME)
@@ -195,7 +195,7 @@ class LearnerGroupHandlerTests(test_utils.GenericTestBase):
 class FacilitatorDashboardHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(FacilitatorDashboardHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
 
         self.facilitator_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
@@ -236,7 +236,7 @@ class LearnerGroupSearchSyllabusHandlerTests(test_utils.GenericTestBase):
     STORY_ID_1 = 'story_id_1'
 
     def setUp(self):
-        super(LearnerGroupSearchSyllabusHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.signup(
             self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
@@ -347,7 +347,7 @@ class FacilitatorLearnerGroupViewHandlerTests(test_utils.GenericTestBase):
     LEARNER_GROUP_ID = None
 
     def setUp(self):
-        super(FacilitatorLearnerGroupViewHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.signup(self.USER1_EMAIL, self.USER1_USERNAME)
         self.signup(self.USER2_EMAIL, self.USER2_USERNAME)
@@ -422,7 +422,7 @@ class LearnerGroupStudentProgressHandlerTests(test_utils.GenericTestBase):
     DEGREE_OF_MASTERY_2 = 0.0
 
     def setUp(self):
-        super(LearnerGroupStudentProgressHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.signup(
             self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)

@@ -176,7 +176,7 @@ class ApplyAuditDoFns(beam.PTransform):
         Args:
             kind: str. The kind of models this PTransform will receive.
         """
-        super(ApplyAuditDoFns, self).__init__(
+        super().__init__(
             label='Apply every Audit DoFn targeting %s' % kind)
         self._kind = kind
         self._do_fn_types = tuple(AUDIT_DO_FN_TYPES_BY_KIND[kind])
@@ -211,7 +211,7 @@ class GetExistingModelKeyCounts(beam.PTransform):
         Args:
             kind: str. The kind of model this PTransform will receive.
         """
-        super(GetExistingModelKeyCounts, self).__init__(
+        super().__init__(
             label='Generate (key, count)s for all existing %ss' % kind)
         self._kind = kind
 
@@ -241,7 +241,7 @@ class GetMissingModelKeyErrors(beam.PTransform):
         Args:
             kind: str. The kind of model this PTransform will receive.
         """
-        super(GetMissingModelKeyErrors, self).__init__(
+        super().__init__(
             label='Generate (key, error)s from the ID properties in %s' % kind)
         self._id_referencing_properties = (
             ID_REFERENCING_PROPERTIES_BY_KIND_OF_POSSESSOR[kind])

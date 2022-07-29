@@ -289,7 +289,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
     def setUp(self):
         """Before each individual test, create a question."""
-        super(QuestionDomainTest, self).setUp()
+        super().setUp()
         question_state_data = self._create_valid_question_data('ABC')
         self.question = question_domain.Question(
             'question_id', question_state_data,
@@ -1877,7 +1877,7 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
     """Test for Question Summary object."""
 
     def setUp(self):
-        super(QuestionSummaryTest, self).setUp()
+        super().setUp()
         self.fake_date_created = datetime.datetime(
             2018, 11, 17, 20, 2, 45, 0)
         self.fake_date_updated = datetime.datetime(

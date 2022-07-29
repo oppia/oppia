@@ -113,7 +113,7 @@ class GetModelsWithDuplicatePropertyValues(beam.PTransform):
     """Helper class to retrive models with duplicate properties."""
 
     def __init__(self, property_name: str) -> None:
-        super(GetModelsWithDuplicatePropertyValues, self).__init__()
+        super().__init__()
         self.property_name = property_name
 
     def expand(self, blog_model_pcoll):
