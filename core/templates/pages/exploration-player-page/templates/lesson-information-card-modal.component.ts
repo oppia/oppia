@@ -169,7 +169,7 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
     let MAX_CHARS_TO_SHOW = 45;
 
     for (let i = 0; i < arrayOfTags.length; i++) {
-      let newLength = (tagsToShow.toString() + arrayOfTags[i]).length;
+      const newLength = (tagsToShow.toString() + arrayOfTags[i]).length;
 
       if (newLength < MAX_CHARS_TO_SHOW) {
         tagsToShow.push(arrayOfTags[i]);
