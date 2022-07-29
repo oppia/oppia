@@ -18,14 +18,9 @@
 
 from __future__ import annotations
 
-import copy
-import datetime
 
-from core import feconf
 from core.platform import models
 from core.tests import test_utils
-
-from typing import Dict, List
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -68,7 +63,7 @@ class ClassroomModelUnitTest(test_utils.GenericTestBase):
             'Start from the basic physics.')
 
     def test_get_export_policy_not_applicable(self) -> None:
-         self.assertEqual(
+        self.assertEqual(
             classroom_models.ClassroomModel.get_export_policy(),
             {
                 'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -109,4 +104,3 @@ class ClassroomModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(
             classroom_models.ClassroomModel.get_by_id('id'),
             self.classroom_model)
-

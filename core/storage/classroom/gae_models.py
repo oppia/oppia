@@ -25,7 +25,7 @@ import core.storage.base_model.gae_models as base_models
 from typing import Dict, List, Optional
 
 MYPY = False
-if MYPY: # pragms: no cover
+if MYPY: # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import datastore_services
 
@@ -38,6 +38,7 @@ class ClassroomModel(base_models.BaseModel):
     The id of instances of this class is in the form of random hash of
     12 chars.
     """
+
     # The name of the classroom.
     name = datastore_services.StringProperty(required=True, indexed=True)
     # The url fragment of the classroom.
@@ -112,6 +113,12 @@ class ClassroomModel(base_models.BaseModel):
             classroom_id: str. Classroom ID of the newly-created classroom.
             name: str. The name of the classroom.
             url_fragment: str. The url fragment of the classroom.
+            course_details: str. A text to provide course details present in
+                the classroom.
+            topic_list_intro: str. A text to provide an introduction for all
+                the topics in the classroom.
+            topic_id_to_prerequisite_topic_ids: dict(str, list(str)). A dict
+                with topic ID as key and list of topic IDs as value.
 
         Returns:
             ClassroomModel. The newly created ClassroomModel instance.
@@ -159,7 +166,7 @@ class ClassroomModel(base_models.BaseModel):
         with the given name doesn't exist.
 
         Args:
-            name: str. The name of the classroom.
+            classroom_name: str. The name of the classroom.
 
         Returns:
             ClassroomModel | None. The Classroom model or None if not found.
