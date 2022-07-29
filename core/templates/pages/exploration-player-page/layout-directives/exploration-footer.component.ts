@@ -57,6 +57,7 @@ export class ExplorationFooterComponent {
   iframed!: boolean;
   windowIsNarrow!: boolean;
   resizeSubscription!: Subscription;
+  checkpointSubscription!: Subscription;
   contributorNames: string[] = [];
   hintsAndSolutionsAreSupported: boolean = true;
 
@@ -161,8 +162,8 @@ export class ExplorationFooterComponent {
           }
         );
     }
-    this.playerPositionService.onLoadedMostRecentCheckpoint.subscribe(
-      () => {
+    this.checkpointSubscription = this.playerPositionService
+      .onLoadedMostRecentCheckpoint.subscribe(() => {
         if (this.CHECKPOINTS_FEATURE_IS_ENABLED) {
           if (this.checkpointCount) {
             this.showProgressReminderModal();
@@ -176,7 +177,7 @@ export class ExplorationFooterComponent {
   }
 
   showProgressReminderModal(): void {
-    let mostRecentlyReachedCheckpointIndex = (
+    const mostRecentlyReachedCheckpointIndex = (
       this.getMostRecentlyReachedCheckpointIndex()
     );
 
@@ -322,6 +323,9 @@ export class ExplorationFooterComponent {
   ngOnDestroy(): void {
     if (this.resizeSubscription) {
       this.resizeSubscription.unsubscribe();
+    }
+    if (this.checkpointSubscription) {
+      this.checkpointSubscription.unsubscribe();
     }
   }
 
