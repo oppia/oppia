@@ -328,8 +328,8 @@ class ExpStateInteractionValidationJobTests(
             {
               'rule_type': 'HasElementXAtPositionY',
               'inputs': {
-                'x': 'ca_choices_18',
-                'y': 2
+                'x': 'ca_choices_17',
+                'y': 1
               }
             }
           ],
@@ -355,10 +355,7 @@ class ExpStateInteractionValidationJobTests(
               'inputs': {
                 'x': [
                   [
-                    'ca_choices_17'
-                  ],
-                  [
-                    'ca_choices_18'
+                    'ca_choices_17', 'ca_choices_18'
                   ],
                   [
                     'ca_choices_19'
@@ -366,6 +363,20 @@ class ExpStateInteractionValidationJobTests(
                   [
                     'ca_choices_20'
                   ]
+                ]
+              }
+            },
+            {
+              'rule_type': 'IsEqualToOrdering',
+              'inputs': {
+                'x': []
+              }
+            },
+            {
+              'rule_type': 'IsEqualToOrdering',
+              'inputs': {
+                'x': [
+                  []
                 ]
               }
             }
@@ -825,7 +836,10 @@ class ExpStateInteractionValidationJobTests(
             f'data are [{{\'state_name\': \'EXP_1_STATE_4\', '
             f'\'drag_drop_interaction_values\': [\'Rule - 0 of answer group '
             f'1 will never be match because it is made redundant by the '
-            f'HasElementXAtPositionY rule above.\', \'Rule - 0 of answer '
+            f'HasElementXAtPositionY rule above.\', \'Rule - 1 of answer '
+            f'group 1 of rule type IsEqualToOrdering have empty values.\', '
+            f'\'Rule - 2 of answer group 1 of rule type IsEqualToOrdering '
+            f'have empty values inside choices.\', \'Rule - 0 of answer '
             f'group 3 will never be match because it is made redundant by '
             f'the IsEqualToOrderingWithOneItemAtIncorrectPosition '
             f'rule above.\']}}]'

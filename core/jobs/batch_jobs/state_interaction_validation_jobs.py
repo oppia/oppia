@@ -793,6 +793,14 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
                     )
 
                 if rule_spec.rule_type == 'IsEqualToOrdering':
+                    if len(rule_spec.inputs['x']) <= 0:
+                        drag_drop_interaction_values.append(
+                            f'Rule - {rule_spec_index} of '
+                            f'answer group {ans_group_index} '
+                            f'of rule type IsEqualToOrdering '
+                            f'have empty values.'
+                        )
+                        continue
                     for ele in ele_x_at_y_rules:
                         ele_position = ele['position']
                         ele_element = ele['element']
@@ -809,6 +817,14 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
                                         f'HasElementXAtPositionY rule above.'
                                     )
                         else:
+                            if len(rule_choice) <= 0:
+                                drag_drop_interaction_values.append(
+                                    f'Rule - {rule_spec_index} of '
+                                    f'answer group {ans_group_index} '
+                                    f'of rule type IsEqualToOrdering '
+                                    f'have empty values inside choices.'
+                                )
+                                continue
                             if rule_choice[0] == ele_element:
                                 drag_drop_interaction_values.append(
                                     f'Rule - {rule_spec_index} of answer group '
