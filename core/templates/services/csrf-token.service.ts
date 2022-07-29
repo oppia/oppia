@@ -33,7 +33,9 @@ export class CsrfTokenService {
   http: HttpClient;
 
   constructor(httpBackend: HttpBackend) {
-    this.http = new HttpClient(httpBackend);
+    if (httpBackend) {
+      this.http = new HttpClient(httpBackend);
+    }
   }
 
   initializeToken(): void {
@@ -41,15 +43,17 @@ export class CsrfTokenService {
       throw new Error('Token request has already been made');
     }
 
-    this.tokenPromise = this.http.get('/csrfhandler').toPromise()
-      .then((response: {token: string}) => {
-        return response.token;
-      }, (err) => {
-        console.error(
-          'The following error is thrown while trying to get csrf token.');
-        console.error(err);
-        throw err;
-      });
+    if (this.http) {
+      this.tokenPromise = this.http.get('/csrfhandler').toPromise()
+        .then((response: {token: string}) => {
+          return response.token;
+        }, (err) => {
+          console.error(
+            'The following error is thrown while trying to get csrf token.');
+          console.error(err);
+          throw err;
+        });
+    }
   }
 
   getTokenAsync(): PromiseLike<string> {
