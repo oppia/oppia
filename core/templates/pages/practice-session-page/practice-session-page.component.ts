@@ -16,127 +16,136 @@
  * @fileoverview Component for the practice session.
  */
 
-require('base-components/base-content.component.ts');
-require(
-  'components/common-layout-directives/common-elements/' +
-  'background-banner.component.ts');
-require(
-  'components/question-directives/question-player/' +
-  'question-player.component.ts');
-
-require('interactions/interactionsQuestionsRequires.ts');
-require('objects/objectComponentsRequiresForPlayers.ts');
-
-require('services/alerts.service.ts');
-require('services/contextual/url.service.ts');
-require('services/page-title.service.ts');
-require('pages/practice-session-page/practice-session-page.constants.ajs.ts');
-require('pages/interaction-specs.constants.ajs.ts');
-
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { Subscription } from 'rxjs';
+import { UrlService } from 'services/contextual/url.service';
+import { PracticeSessionPageConstants } from 'pages/practice-session-page/practice-session-page.constants';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { QuestionPlayerConfig } from 'pages/exploration-player-page/learner-experience/ratings-and-recommendations.component';
+import { LoaderService } from 'services/loader.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { PageTitleService } from 'services/page-title.service';
+import { TranslateService } from '@ngx-translate/core';
+import { PracticeSessionsBackendApiService } from './practice-session-backend-api.service';
 
-angular.module('oppia').component('practiceSessionPage', {
-  template: require('./practice-session-page.component.html'),
-  controller: [
-    '$http', '$translate', 'I18nLanguageCodeService', 'LoaderService',
-    'PageTitleService', 'UrlInterpolationService', 'UrlService',
-    'PRACTICE_SESSIONS_DATA_URL', 'PRACTICE_SESSIONS_URL', 'TOPIC_VIEWER_PAGE',
-    'TOTAL_QUESTIONS',
-    function(
-        $http, $translate, I18nLanguageCodeService, LoaderService,
-        PageTitleService, UrlInterpolationService, UrlService,
-        PRACTICE_SESSIONS_DATA_URL, PRACTICE_SESSIONS_URL, TOPIC_VIEWER_PAGE,
-        TOTAL_QUESTIONS) {
-      var ctrl = this;
-      ctrl.directiveSubscriptions = new Subscription();
-      ctrl.setPageTitle = function() {
-        $translate.use(I18nLanguageCodeService.getCurrentI18nLanguageCode())
-          .then(() => {
-            const translatedTitle = $translate.instant(
-              'I18N_PRACTICE_SESSION_PAGE_TITLE', {
-                topicName: ctrl.topicName
-              }
-            );
-            PageTitleService.setDocumentTitle(translatedTitle);
-          });
-      };
-      ctrl.subscribeToOnLanguageCodeChange = function() {
-        ctrl.directiveSubscriptions.add(
-          I18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(() => {
-            ctrl.setPageTitle();
-          })
-        );
-      };
-      var _fetchSkillDetails = function() {
-        var topicUrlFragment = (
-          UrlService.getTopicUrlFragmentFromLearnerUrl());
-        var practiceSessionsDataUrl = UrlInterpolationService
-          .interpolateUrl(
-            PRACTICE_SESSIONS_DATA_URL, {
-              topic_url_fragment: topicUrlFragment,
-              classroom_url_fragment: (
-                UrlService.getClassroomUrlFragmentFromLearnerUrl()),
-              stringified_subtopic_ids: ctrl.stringifiedSubtopicIds
-            });
-        var practiceSessionsUrl = UrlInterpolationService.interpolateUrl(
-          PRACTICE_SESSIONS_URL, {
-            topic_url_fragment: topicUrlFragment,
-            classroom_url_fragment: (
-              UrlService.getClassroomUrlFragmentFromLearnerUrl()),
-            stringified_subtopic_ids: ctrl.stringifiedSubtopicIds
-          });
-        var topicViewerUrl = UrlInterpolationService.interpolateUrl(
-          TOPIC_VIEWER_PAGE, {
-            topic_url_fragment: topicUrlFragment,
-            classroom_url_fragment: (
-              UrlService.getClassroomUrlFragmentFromLearnerUrl()),
-          });
-        $http.get(practiceSessionsDataUrl).then(function(result) {
-          var skillList = [];
-          var skillDescriptions = [];
-          for (var skillId in result.data.skill_ids_to_descriptions_map) {
-            skillList.push(skillId);
-            skillDescriptions.push(
-              result.data.skill_ids_to_descriptions_map[skillId]);
-          }
-          var questionPlayerConfig = {
-            resultActionButtons: [
-              {
-                type: 'REVIEW_LOWEST_SCORED_SKILL',
-                i18nId: 'I18N_QUESTION_PLAYER_REVIEW_LOWEST_SCORED_SKILL'
-              },
-              {
-                type: 'DASHBOARD',
-                i18nId: 'I18N_QUESTION_PLAYER_MY_DASHBOARD',
-                url: topicViewerUrl
-              },
-              {
-                type: 'RETRY_SESSION',
-                i18nId: 'I18N_QUESTION_PLAYER_NEW_SESSION',
-                url: practiceSessionsUrl
-              },
-            ],
-            skillList: skillList,
-            skillDescriptions: skillDescriptions,
-            questionCount: TOTAL_QUESTIONS,
-            questionsSortedByDifficulty: false
-          };
-          ctrl.questionPlayerConfig = questionPlayerConfig;
-          ctrl.topicName = result.data.topic_name;
-          ctrl.setPageTitle();
-          ctrl.subscribeToOnLanguageCodeChange();
-          LoaderService.hideLoadingScreen();
+@Component({
+  selector: 'practice-session-page',
+  templateUrl: './practice-session-page.component.html'
+})
+export class PracticeSessionPageComponent implements OnInit, OnDestroy {
+  directiveSubscriptions = new Subscription();
+  topicName: string;
+  stringifiedSubtopicIds: string;
+  questionPlayerConfig: QuestionPlayerConfig;
+
+  constructor(
+    private urlService: UrlService,
+    private urlInterpolationService: UrlInterpolationService,
+    private loaderService: LoaderService,
+    private i18nLanguageCodeService: I18nLanguageCodeService,
+    private pageTitleService: PageTitleService,
+    private translateService: TranslateService,
+    private practiceSessionsBackendApiService: PracticeSessionsBackendApiService
+  ) {}
+
+  setPageTitle(): void {
+    this.translateService.use(
+      this.i18nLanguageCodeService.getCurrentI18nLanguageCode());
+
+    const translatedTitle = this.translateService.instant(
+      'I18N_PRACTICE_SESSION_PAGE_TITLE', {
+        topicName: this.topicName
+      }
+    );
+
+    this.pageTitleService.setDocumentTitle(translatedTitle);
+  }
+
+  subscribeToOnLanguageCodeChange(): void {
+    this.directiveSubscriptions.add(
+      this.i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(() => {
+        this.setPageTitle();
+      })
+    );
+  }
+
+  _fetchSkillDetails(): void {
+    var topicUrlFragment = (
+      this.urlService.getTopicUrlFragmentFromLearnerUrl());
+    var practiceSessionsDataUrl = this.urlInterpolationService
+      .interpolateUrl(
+        PracticeSessionPageConstants.PRACTICE_SESSIONS_DATA_URL, {
+          topic_url_fragment: topicUrlFragment,
+          classroom_url_fragment: (
+            this.urlService.getClassroomUrlFragmentFromLearnerUrl()),
+          stringified_subtopic_ids: this.stringifiedSubtopicIds
         });
+    var practiceSessionsUrl = this.urlInterpolationService.interpolateUrl(
+      PracticeSessionPageConstants.PRACTICE_SESSIONS_URL, {
+        topic_url_fragment: topicUrlFragment,
+        classroom_url_fragment: (
+          this.urlService.getClassroomUrlFragmentFromLearnerUrl()),
+        stringified_subtopic_ids: this.stringifiedSubtopicIds
+      });
+    var topicViewerUrl = this.urlInterpolationService.interpolateUrl(
+      PracticeSessionPageConstants.TOPIC_VIEWER_PAGE, {
+        topic_url_fragment: topicUrlFragment,
+        classroom_url_fragment: (
+          this.urlService.getClassroomUrlFragmentFromLearnerUrl()),
+      });
+
+    this.practiceSessionsBackendApiService.fetchPracticeSessionsData(
+      practiceSessionsDataUrl).then((result) => {
+      var skillList = [];
+      var skillDescriptions = [];
+      for (var skillId in result.data.skill_ids_to_descriptions_map) {
+        skillList.push(skillId);
+        skillDescriptions.push(
+          result.data.skill_ids_to_descriptions_map[skillId]);
+      }
+      this.questionPlayerConfig = {
+        resultActionButtons: [
+          {
+            type: 'REVIEW_LOWEST_SCORED_SKILL',
+            i18nId: 'I18N_QUESTION_PLAYER_REVIEW_LOWEST_SCORED_SKILL'
+          },
+          {
+            type: 'DASHBOARD',
+            i18nId: 'I18N_QUESTION_PLAYER_MY_DASHBOARD',
+            url: topicViewerUrl
+          },
+          {
+            type: 'RETRY_SESSION',
+            i18nId: 'I18N_QUESTION_PLAYER_NEW_SESSION',
+            url: practiceSessionsUrl
+          },
+        ],
+        skillList: skillList,
+        skillDescriptions: skillDescriptions,
+        questionCount: PracticeSessionPageConstants.TOTAL_QUESTIONS,
+        questionsSortedByDifficulty: false
       };
-      ctrl.$onInit = function() {
-        ctrl.topicName = UrlService.getTopicUrlFragmentFromLearnerUrl();
-        ctrl.stringifiedSubtopicIds = (
-          UrlService.getSelectedSubtopicsFromUrl());
-        _fetchSkillDetails();
-      };
-      ctrl.$onDestroy = function() {
-        ctrl.directiveSubscriptions.unsubscribe();
-      };
-    }
-  ]
-});
+      this.topicName = result.data.topic_name;
+      this.setPageTitle();
+      this.subscribeToOnLanguageCodeChange();
+      this.loaderService.hideLoadingScreen();
+    });
+  }
+
+  ngOnInit(): void {
+    this.topicName = this.urlService.getTopicUrlFragmentFromLearnerUrl();
+    this.stringifiedSubtopicIds = (
+      this.urlService.getSelectedSubtopicsFromUrl());
+    this._fetchSkillDetails();
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
+  }
+}
+
+angular.module('oppia').directive('practiceSessionPage',
+  downgradeComponent({
+    component: PracticeSessionPageComponent
+  }) as angular.IDirectiveFactory);
