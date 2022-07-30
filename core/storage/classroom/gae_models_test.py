@@ -94,13 +94,22 @@ class ClassroomModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(
             classroom_models.ClassroomModel.get_by_url_fragment('math'),
             self.classroom_model)
+        self.assertEqual(
+            classroom_models.ClassroomModel.get_by_url_fragment(
+                'incorrect_url_fragment'), None)
 
     def test_get_model_by_name(self) -> None:
         self.assertEqual(
             classroom_models.ClassroomModel.get_by_name('math'),
             self.classroom_model)
+        self.assertEqual(
+            classroom_models.ClassroomModel.get_by_name('incorrect_name'),
+            None)
 
     def test_get_model_by_id(self) -> None:
         self.assertEqual(
             classroom_models.ClassroomModel.get_by_id('id'),
             self.classroom_model)
+        self.assertEqual(
+            classroom_models.ClassroomModel.get_by_id('incorrect_id'),
+            None)

@@ -46,10 +46,10 @@ class ClassroomModel(base_models.BaseModel):
         required=True, indexed=True)
     # A text to provide course details present in the classroom.
     course_details = datastore_services.StringProperty(
-        default='', indexed=True, required=False)
+        indexed=True, required=True)
     # A text to provide an introduction for all the topics in the classroom.
     topic_list_intro = datastore_services.StringProperty(
-        default='', indexed=True, required=False)
+        indexed=True, required=True)
     # The property is used to establish dependencies among the topics in the
     # classroom. This field contains a dict with topic ID as key and a list of
     # prerequisite topic IDs as value.
