@@ -4673,7 +4673,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             suggestion_services.get_suggestion_types_that_need_reviewers())
         self.assertDictEqual(
             suggestion_types_needing_reviewers,
-            {feconf.SUGGESTION_TYPE_ADD_QUESTION: {}})
+            {feconf.SUGGESTION_TYPE_ADD_QUESTION: set()})
         expected_email_html_body = (
             'Hi user1,'
             '<br><br>'
@@ -4719,7 +4719,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             suggestion_services.get_suggestion_types_that_need_reviewers())
         self.assertDictEqual(
             suggestion_types_needing_reviewers,
-            {feconf.SUGGESTION_TYPE_ADD_QUESTION: {}})
+            {feconf.SUGGESTION_TYPE_ADD_QUESTION: set()})
         expected_email_html_body_for_admin_1 = (
             'Hi user1,'
             '<br><br>'
@@ -5039,7 +5039,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
             {
                 feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT: {
                     'fr', 'hi'},
-                feconf.SUGGESTION_TYPE_ADD_QUESTION: {}
+                feconf.SUGGESTION_TYPE_ADD_QUESTION: set()
             })
         expected_email_html_body_for_admin_1 = (
             'Hi user1,'

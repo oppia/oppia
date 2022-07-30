@@ -306,7 +306,7 @@ class StoryNode:
         """Validates the node id for a StoryNode object.
 
         Args:
-            node_id: str|None. The node id to be validated.
+            node_id: str. The node id to be validated.
         """
         if not isinstance(node_id, str):
             raise utils.ValidationError(
