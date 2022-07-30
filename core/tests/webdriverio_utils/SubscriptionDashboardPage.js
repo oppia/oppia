@@ -59,6 +59,8 @@ var SubscriptionDashboardPage = function() {
   };
 
   this.navigateToSubscriptionButton = async function() {
+    await waitFor.visibilityOf(
+      subscriptionButton, 'Subscription button not visible');
     await waitFor.elementToBeClickable(
       subscriptionButton, 'Subscription button is not clickable');
     var subscribeButtonStatusBeforeClick = await subscriptionButton.getText();

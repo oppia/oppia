@@ -268,7 +268,7 @@ var ExplorationPlayerPage = function() {
     await waitFor.visibilityOf(
       explorationHeader, 'Exploration Header taking too long to appear.');
     await waitFor.textToBePresentInElement(
-      explorationHeader, name, 'No Header Text');
+      '.e2e-test-exploration-header', name, 'No Header Text');
     var ExplorationHeaderText = await action.getText(
       'Exploration Header', explorationHeader);
     expect(
@@ -291,6 +291,8 @@ var ExplorationPlayerPage = function() {
     await action.click('Submit Button', ratingStars[ratingValue - 1]);
     await waitFor.visibilityOfSuccessToast(
       'Success toast for rating takes too long to appear.');
+    await waitFor.visibilityOf(
+      feedbackCloseButton, 'Feedback close button not visible');
     await waitFor.elementToBeClickable(feedbackCloseButton);
     await action.click('Feedback Close Button', feedbackCloseButton);
     await waitFor.invisibilityOf(
@@ -313,9 +315,13 @@ var ExplorationPlayerPage = function() {
   };
 
   this.submitFeedback = async function(feedback) {
+    await waitFor.visibilityOf(
+      feedbackPopupLink, 'Feedback popup link not visible');
     await waitFor.elementToBeClickable(feedbackPopupLink);
     await action.click('Feedback Popup Link', feedbackPopupLink);
     await action.setValue('Feedback Text Area', feedbackTextArea, feedback);
+    await waitFor.visibilityOf(
+      feedbackSubmitButton, 'Feeback submit button is not visible');
     await waitFor.elementToBeClickable(feedbackSubmitButton);
     await action.click('Feedback Submit Button', feedbackSubmitButton);
     await waitFor.invisibilityOf(
