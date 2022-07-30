@@ -272,10 +272,12 @@ class Question(translation_domain.BaseTranslatableObject):
         Returns:
             dict. The converted question_state_dict.
         """
-        # Here, question_state_dict is of type StateDict and StateDict does
-        # not 'content_ids_to_audio_translations' key, but for implementation
-        # purpose we are accessing that key which causes MyPy to throw an error.
-        # Thus to avoid the error, we used ignore here.
+        # In _convert_* functions, we allow less strict typing because here
+        # we are working with previous versions of the domain object and in
+        # previous versions of the domain object there are some fields that are
+        # discontinued in the latest domain object. So, while accessing these
+        # discontinued fields MyPy throws an error. Thus to avoid the error,
+        # we used ignore here.
         question_state_dict['recorded_voiceovers'] = {
             'voiceovers_mapping': (
                 question_state_dict.pop('content_ids_to_audio_translations'))  # type: ignore[misc]
@@ -320,10 +322,11 @@ class Question(translation_domain.BaseTranslatableObject):
         answer_groups = question_state_dict['interaction']['answer_groups']
         for answer_group in answer_groups:
             answer_group['tagged_skill_misconception_id'] = None
-            # Here, answer_group is of type AnswerGroupDict and AnswerGroupDict
-            # does not contain 'tagged_misconception_id' key, but for
-            # implementation purposes here we are accessing that key
-            # which causes MyPy to throw an error. Thus to avoid the
+            # In _convert_* functions, we allow less strict typing because here
+            # we are working with previous versions of the domain object and in
+            # previous versions of the domain object there are some fields that
+            # are discontinued in the latest domain object. So, while accessing
+            # these discontinued fields MyPy throws an error. Thus to avoid the
             # error, we used ignore here.
             del answer_group['tagged_misconception_id']  # type: ignore[misc]
 
@@ -605,11 +608,13 @@ class Question(translation_domain.BaseTranslatableObject):
             for lang_code in translations_mapping[content_id]:
                 translations_mapping[
                     content_id][lang_code]['data_format'] = 'html'
-                # Here, `translations_mapping[content_id][lang_code]` is of type
-                # WrittenTranslationDict and WrittenTranslationDict do not have
-                # any `html` key, but for implementation purposes here we are
-                # accessing that `html` key which causes MyPy to throw an error.
-                # Thus to avoid the error, we used ignore here.
+                # In _convert_* functions, we allow less strict typing
+                # because here we are working with previous versions of
+                # the domain object and in previous versions of the domain
+                # object there are some fields (eg. html) that are discontinued
+                # in the latest domain object. So, while accessing these
+                # discontinued fields MyPy throws an error. Thus to avoid
+                # the error, we used ignore here.
                 translations_mapping[
                     content_id][lang_code]['translation'] = (
                         translations_mapping[content_id][lang_code]['html'])  # type: ignore[misc]
@@ -889,11 +894,13 @@ class Question(translation_domain.BaseTranslatableObject):
                     rule_type = rule_spec_dict['rule_type']
                     rule_inputs = rule_spec_dict['inputs']['x']
                     rule_type_to_inputs[rule_type].add(rule_inputs)
-                # The expected type for 'inputs' key is
-                # Dict[str, AllowedRuleSpecInputTypes] but here we are
-                # assigning Dict[str, List[AllowedRuleSpecInputTypes]]
-                # which causes MyPy to throw `incompatible type` error.
-                # Thus to avoid the error, we used ignore here.
+                # In _convert_* functions, we allow less strict typing because
+                # here we are working with previous versions of the domain
+                # object and in previous versions of the domain object there are
+                # some fields whose type does not match with the latest domain
+                # object's types. So, while assigning these fields according to
+                # the previous version MyPy throws an error. Thus to avoid the
+                # error, we used ignore here.
                 answer_group_dict['rule_specs'] = [{
                     'rule_type': rule_type,
                     'inputs': {'x': list(rule_type_to_inputs[rule_type])}  # type: ignore[dict-item]

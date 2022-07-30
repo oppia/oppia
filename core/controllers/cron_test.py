@@ -537,7 +537,7 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         self.expected_suggestion_types_needing_reviewers = {
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT: {
                 'en', 'fr'},
-            feconf.SUGGESTION_TYPE_ADD_QUESTION: {}
+            feconf.SUGGESTION_TYPE_ADD_QUESTION: set()
         }
 
         self.can_send_emails = self.swap(feconf, 'CAN_SEND_EMAILS', True)
