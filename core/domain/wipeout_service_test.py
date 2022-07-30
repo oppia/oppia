@@ -3194,7 +3194,7 @@ class WipeoutServiceDeleteSkillModelsTests(test_utils.GenericTestBase):
             commit_log_model.user_id, skill_mappings_2[self.SKILL_2_ID])
 
     def test_one_skill_with_multiple_users_is_pseudonymized(self) -> None:
-        skill_services.update_skill(  # type: ignore[no-untyped-call]
+        skill_services.update_skill(
             self.user_2_id,
             self.SKILL_1_ID,
             [skill_domain.SkillChange({
@@ -3284,7 +3284,7 @@ class WipeoutServiceVerifyDeleteSkillModelsTests(test_utils.GenericTestBase):
             wipeout_service.get_pending_deletion_request(self.user_2_id))
         self.assertTrue(wipeout_service.verify_user_deleted(self.user_2_id))
 
-        skill_services.update_skill(  # type: ignore[no-untyped-call]
+        skill_services.update_skill(
             self.user_2_id,
             self.SKILL_2_ID,
             [skill_domain.SkillChange({

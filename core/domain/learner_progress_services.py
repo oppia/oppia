@@ -93,7 +93,7 @@ class DisplayableTopicSummaryDict(TypedDict):
     classroom: str
     practice_tab_is_displayed: bool
     degrees_of_mastery: Dict[str, Optional[float]]
-    skill_descriptions: Tuple[Dict[str, List[str]], List[str]]
+    skill_descriptions: Tuple[Dict[str, Optional[str]], List[str]]
     subtopics: List[topic_domain.SubtopicDict]
 
 
@@ -1731,9 +1731,9 @@ def get_displayable_untracked_topic_summary_dicts(
         assert topic is not None
         all_skill_ids = topic.get_all_skill_ids()
         skill_descriptions = (
-            skill_services.get_descriptions_of_skills(  # type: ignore[no-untyped-call]
+            skill_services.get_descriptions_of_skills(
                 all_skill_ids))
-        degrees_of_mastery = skill_services.get_multi_user_skill_mastery(  # type: ignore[no-untyped-call]
+        degrees_of_mastery = skill_services.get_multi_user_skill_mastery(
             user_id, all_skill_ids)
         summary_dict[classroom_services.get_classroom_url_fragment_for_topic_id(
             topic.id)].append({
@@ -1786,9 +1786,9 @@ def get_displayable_topic_summary_dicts(
         assert topic is not None
         all_skill_ids = topic.get_all_skill_ids()
         skill_descriptions = (
-            skill_services.get_descriptions_of_skills(  # type: ignore[no-untyped-call]
+            skill_services.get_descriptions_of_skills(
                 all_skill_ids))
-        degrees_of_mastery = skill_services.get_multi_user_skill_mastery(  # type: ignore[no-untyped-call]
+        degrees_of_mastery = skill_services.get_multi_user_skill_mastery(
             user_id, all_skill_ids)
         summary_dicts.append({
             'id': topic.id,

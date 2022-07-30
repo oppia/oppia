@@ -176,7 +176,7 @@ def get_skill_from_model(
             feconf.CURRENT_RUBRIC_SCHEMA_VERSION):
         _migrate_rubrics_to_latest_schema(versioned_rubrics)
 
-    return skill_domain.Skill(  # type: ignore[no-untyped-call]
+    return skill_domain.Skill(
         skill_model.id, skill_model.description,
         [
             skill_domain.Misconception.from_dict(misconception)

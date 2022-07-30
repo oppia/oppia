@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import copy
+import datetime
 import json
 
 from core import android_validation_constants
@@ -26,7 +27,7 @@ from core.constants import constants
 from core.domain import change_domain
 from core.domain import state_domain
 
-from typing import List
+from typing import List, Optional
 from typing_extensions import TypedDict
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
@@ -629,12 +630,24 @@ class Skill:
     """Domain object for an Oppia Skill."""
 
     def __init__(
-            self, skill_id, description, misconceptions, rubrics,
-            skill_contents, misconceptions_schema_version,
-            rubric_schema_version, skill_contents_schema_version,
-            language_code, version, next_misconception_id, superseding_skill_id,
-            all_questions_merged, prerequisite_skill_ids,
-            created_on=None, last_updated=None):
+        self,
+        skill_id: str,
+        description: str,
+        misconceptions: List[Misconception],
+        rubrics: List[Rubric],
+        skill_contents: SkillContents,
+        misconceptions_schema_version: int,
+        rubric_schema_version: int,
+        skill_contents_schema_version: int,
+        language_code: str,
+        version: int,
+        next_misconception_id: int,
+        superseding_skill_id: Optional[str],
+        all_questions_merged: bool,
+        prerequisite_skill_ids: List[str],
+        created_on: Optional[datetime.datetime] = None,
+        last_updated: Optional[datetime.datetime] = None
+    ) -> None:
         """Constructs a Skill domain object.
 
         Args:
@@ -1798,7 +1811,12 @@ class TopicAssignment:
     """
 
     def __init__(
-            self, topic_id, topic_name, topic_version, subtopic_id):
+        self,
+        topic_id: str,
+        topic_name: str,
+        topic_version: int,
+        subtopic_id: Optional[int]
+    ) -> None:
         """Constructs a TopicAssignment domain object.
 
         Args:
@@ -1806,7 +1824,7 @@ class TopicAssignment:
             topic_name: str. The name of the topic.
             topic_version: int. The current version of the topic to which the
                 skill is assigned.
-            subtopic_id: str or None. The id of the subtopic to which the skill
+            subtopic_id: int or None. The id of the subtopic to which the skill
                 is assigned, or None if the skill is not assigned to any
                 subtopic.
         """

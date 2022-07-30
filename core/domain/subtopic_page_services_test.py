@@ -649,7 +649,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
         student_id_2 = 'student_2'
 
         # Add some subtopic progress for the student.
-        skill_services.create_user_skill_mastery( # type: ignore[no-untyped-call]
+        skill_services.create_user_skill_mastery(
             student_id_1, 'skill_id_1', degree_of_mastery
         )
 
