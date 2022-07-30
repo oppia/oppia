@@ -96,7 +96,19 @@ describe('Beam Jobs Tab Component', () => {
         ViewBeamJobOutputDialogComponent,
       ],
       providers: [
-        ReleaseCoordinatorBackendApiService,
+        {
+          provide: ReleaseCoordinatorBackendApiService,
+          useValue: jasmine.createSpyObj<ReleaseCoordinatorBackendApiService>(
+            'ReleaseCoordinatorBackendApiService', {}, {
+              getBeamJobs: () => of(beamJobs),
+              getBeamJobRuns: () => of(beamJobRuns),
+              startNewBeamJob: () => (
+                of(new BeamJobRun('123', 'FooJob', 'RUNNING', 0, 0, false))),
+              cancelBeamJobRun: () => (
+                of(new BeamJobRun('123', 'FooJob', 'CANCELLED', 0, 0, false))),
+              getBeamJobRunOutput: () => of(new BeamJobRunResult('abc', '123')),
+            } as Partial<ReleaseCoordinatorBackendApiService>),
+        },
       ],
     });
     // NOTE: This allows tests to compile the DOM of each dialog component.

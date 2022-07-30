@@ -98,7 +98,7 @@ describe('Skill Misconceptions Editor Component', () => {
 
     expect(component.skill).toBe(undefined);
     expect(component.misconceptions).toBeUndefined();
-    expect(component.misconceptionsListIsShown).toBe(undefined);
+    expect(component.misconceptionsListIsShown).toBeFalse();
 
     component.ngOnInit();
     mockOnSkillChangeEmitter.emit();

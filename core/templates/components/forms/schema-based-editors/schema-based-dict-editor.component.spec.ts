@@ -59,7 +59,7 @@ describe('Schema Based Dict Editor Component', () => {
     expect(component).toBeDefined();
     expect(component.validate(new FormControl(1))).toEqual({});
     expect(component.onChange).toEqual(mockFunction);
-    expect(component.onChange({first: 'true'})).toEqual(true);
+    expect(component.onChange({first: 'true'})).toEqual({first: 'true'});
   }));
 
   it('should set directive properties on initialization', () => {

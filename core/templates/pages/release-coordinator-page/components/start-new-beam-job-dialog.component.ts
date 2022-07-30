@@ -38,7 +38,8 @@ export class StartNewBeamJobDialogComponent {
   constructor(
       @Inject(MAT_DIALOG_DATA) public beamJob: BeamJob,
       private matDialogRef:
-        MatDialogRef<StartNewBeamJobDialogComponent, BeamJobRun>,
+        // JobRun may be null if the job failed to start.
+        MatDialogRef<StartNewBeamJobDialogComponent, BeamJobRun | null>,
       private alertsService: AlertsService,
       private backendApiService: ReleaseCoordinatorBackendApiService) {}
 
@@ -52,11 +53,6 @@ export class StartNewBeamJobDialogComponent {
         this.alertsService.addWarning(error.message);
         return of(null);
       })
-    ).subscribe(newJobRun => {
-      if (newJobRun === null) {
-        throw new Error('Beam job run was not created.');
-      }
-      this.matDialogRef.close(newJobRun);
-    });
+    ).subscribe(newJobRun => this.matDialogRef.close(newJobRun));
   }
 }

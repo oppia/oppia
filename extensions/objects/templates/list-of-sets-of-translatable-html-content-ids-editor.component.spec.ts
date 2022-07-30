@@ -81,6 +81,8 @@ describe('ListOfSetsOfTranslatableHtmlContentIdsEditorComponent', () => {
 
   it('should initialise component when user adds response', () => {
     spyOn(component.valueChanged, 'emit');
+    // Use unknown type conversion to check input invalidity.
+    component.value = [undefined as unknown as string[]];
 
     component.ngOnInit();
 
@@ -234,6 +236,8 @@ describe('ListOfSetsOfTranslatableHtmlContentIdsEditorComponent', () => {
       'ca_choices_3',
       'ca_choices_4'
     ];
+    // Use unknown type conversion to check input invalidity.
+    component.value[3] = undefined as unknown as string[];
 
     component.selectItem(3);
 

@@ -142,10 +142,10 @@ describe('State Editor Component', () => {
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
 
     expect(component.oppiaBlackImgUrl).toBeUndefined();
-    expect(component.currentStateIsTerminal).toBe(undefined);
-    expect(component.conceptCardIsShown).toBe(undefined);
-    expect(component.windowIsNarrow).toBe(undefined);
-    expect(component.interactionIdIsSet).toBe(undefined);
+    expect(component.currentStateIsTerminal).toBeFalse();
+    expect(component.conceptCardIsShown).toBeFalse();
+    expect(component.windowIsNarrow).toBeFalse();
+    expect(component.interactionIdIsSet).toBeFalse();
     expect(component.stateName).toBe(undefined);
 
     component.ngOnInit();
@@ -164,9 +164,9 @@ describe('State Editor Component', () => {
     spyOnProperty(stateInteractionIdService, 'onInteractionIdChanged')
       .and.returnValue(onInteractionIdChangedEmitter);
 
-    expect(component.interactionIdIsSet).toBe(undefined);
-    expect(component.currentInteractionCanHaveSolution).toBe(undefined);
-    expect(component.currentStateIsTerminal).toBe(undefined);
+    expect(component.interactionIdIsSet).toBeFalse();
+    expect(component.currentInteractionCanHaveSolution).toBeFalse();
+    expect(component.currentStateIsTerminal).toBeFalse();
 
     component.ngOnInit();
 
@@ -178,7 +178,7 @@ describe('State Editor Component', () => {
   });
 
   it('should toggle concept card', () => {
-    expect(component.conceptCardIsShown).toBe(undefined);
+    expect(component.conceptCardIsShown).toBeFalse();
 
     component.conceptCardIsShown = true;
     component.toggleConceptCard();
@@ -249,7 +249,7 @@ describe('State Editor Component', () => {
     expect(() => {
       onStateEditorInitializedEmitter.emit(stateData as State);
       tick();
-    }).toThrowError('Expected stateData to be defined but received undefined');
+    }).toThrowError('Expected stateData to be defined but received null');
   }));
 
   it('should reinitialize editor when responses change', () => {

@@ -359,8 +359,32 @@ describe('Read only exploration backend API service', () => {
 
     expect(successHandler).toHaveBeenCalledWith({
       can_edit: true,
-      exploration: null,
-      exploration_metadata: null,
+      exploration: {
+        init_state_name: 'state_name',
+        param_changes: [],
+        param_specs: {},
+        states: {},
+        title: '',
+        language_code: '',
+        objective: '',
+        correctness_feedback_enabled: false
+      },
+      exploration_metadata: {
+        title: '',
+        category: '',
+        objective: '',
+        language_code: 'en',
+        tags: [],
+        blurb: '',
+        author_notes: '',
+        states_schema_version: 50,
+        init_state_name: '',
+        param_specs: {},
+        param_changes: [],
+        auto_tts_enabled: false,
+        correctness_feedback_enabled: false,
+        edits_allowed: true
+      },
       exploration_id: '0',
       is_logged_in: true,
       session_id: 'sessionId',

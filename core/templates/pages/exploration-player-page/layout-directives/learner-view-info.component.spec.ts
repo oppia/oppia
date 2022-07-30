@@ -203,7 +203,7 @@ describe('Learner view info component', () => {
       }));
 
     expect(componentInstance.openInformationCardModal).toHaveBeenCalled();
-    componentInstance.expInfo = {} as LearnerExplorationSummaryBackendDict;
+    componentInstance.expInfo = undefined;
 
     componentInstance.showInformationCard();
     tick();
@@ -215,7 +215,7 @@ describe('Learner view info component', () => {
   it('should handle error if backend call fails', fakeAsync(() => {
     let explorationId = 'expId';
     componentInstance.explorationId = explorationId;
-    componentInstance.expInfo = {} as LearnerExplorationSummaryBackendDict;
+    componentInstance.expInfo = undefined;
 
     spyOn(learnerViewInfoBackendApiService, 'fetchLearnerInfoAsync')
       .and.returnValue(Promise.reject());

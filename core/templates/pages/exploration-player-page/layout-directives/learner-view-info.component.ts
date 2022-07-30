@@ -54,7 +54,7 @@ export class LearnerViewInfoComponent {
   storyPlaythroughObject!: StoryPlaythrough;
   topicName!: string;
   topicNameTranslationKey!: string;
-  expInfo!: LearnerExplorationSummaryBackendDict;
+  expInfo?: LearnerExplorationSummaryBackendDict;
   directiveSubscriptions: Subscription = new Subscription();
   isLinkedToTopic: boolean = false;
 

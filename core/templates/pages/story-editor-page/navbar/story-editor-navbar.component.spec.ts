@@ -327,7 +327,7 @@ describe('Story editor navbar component', () => {
     mockStoryInitializedEventEmitter.emit();
     fixture.detectChanges();
 
-    expect(component.storyIsPublished).toBe(undefined);
+    expect(component.storyIsPublished).toBeFalse();
 
     storyEditorStateService.setStory(story);
     fixture.detectChanges();

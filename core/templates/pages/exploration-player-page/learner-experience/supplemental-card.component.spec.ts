@@ -164,9 +164,13 @@ describe('Supplemental card component', () => {
 
   it('should tell if help card is tall', () => {
     let height = 400;
-    spyOn(window, '$').and.returnValue({
-      height: () => height
-    } as JQLite);
+    spyOn(
+      fixture.elementRef.nativeElement, 'getElementsByClassName'
+    ).withArgs('conversation-skin-help-card').and.returnValue([
+      {
+        offsetHeight: 400
+      }
+    ]);
     spyOn(componentInstance, 'updateHelpCardBottomPosition');
     componentInstance.maxHelpCardHeightSeen = height - 100;
     expect(componentInstance.isHelpCardTall()).toBeFalse();

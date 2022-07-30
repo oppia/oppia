@@ -115,7 +115,9 @@ describe('Schema Based List Editor Component', () => {
 
   it('should delete last element if user clicks outside the text input box' +
     ' without entering any text', () => {
-    component.localValue = ['item1', null];
+    component.localValue = [
+      // Use unknown type conversion to check input invalidity.
+      'item1', undefined as unknown as SchemaDefaultValue];
 
     component.lastElementOnBlur();
 

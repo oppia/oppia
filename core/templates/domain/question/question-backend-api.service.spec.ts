@@ -264,6 +264,7 @@ describe('Question backend Api service', () => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
       questionBackendApiService.fetchQuestionsAsync(
+        // Use unknown type conversion to check input invalidity.
         'x' as unknown as string[], 1, true).then(successHandler, failHandler);
       flushMicrotasks();
       expect(successHandler).not.toHaveBeenCalled();
@@ -277,6 +278,7 @@ describe('Question backend Api service', () => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
       questionBackendApiService.fetchQuestionsAsync(
+        // Use unknown type conversion to check input invalidity.
         [1, 2] as unknown as string[], 1, true
       ).then(successHandler, failHandler);
       flushMicrotasks();
@@ -291,7 +293,8 @@ describe('Question backend Api service', () => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
       questionBackendApiService.fetchQuestionsAsync(
-        [], 1, true).then(successHandler, failHandler);
+        // Use unknown type conversion to check input invalidity.
+        null as unknown as string[], 1, true).then(successHandler, failHandler);
       flushMicrotasks();
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith(

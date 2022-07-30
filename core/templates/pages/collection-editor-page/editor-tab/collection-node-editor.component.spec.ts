@@ -139,7 +139,7 @@ describe('Collection node editor component ', () => {
     spyOn(collectionLinearizerService, 'removeCollectionNode')
       .and.returnValue(false);
     let alertsSpy = spyOn(alertsService, 'fatalWarning')
-      .and.callThrough();
+      .and.returnValue();
 
     component.deleteNode();
 
@@ -162,7 +162,7 @@ describe('Collection node editor component ', () => {
     spyOn(collectionLinearizerService, 'shiftNodeLeft')
       .and.returnValue(false);
     let alertsSpy = spyOn(alertsService, 'fatalWarning')
-      .and.callThrough();
+      .and.returnValue();
 
     component.shiftNodeLeft();
 
@@ -185,7 +185,7 @@ describe('Collection node editor component ', () => {
     spyOn(collectionLinearizerService, 'shiftNodeRight')
       .and.returnValue(false);
     let alertsSpy = spyOn(alertsService, 'fatalWarning')
-      .and.callThrough();
+      .and.returnValue();
 
     component.shiftNodeRight();
 

@@ -191,15 +191,11 @@ implements ControlValueAccessor, OnInit, Validator {
   }
 
   generateErrors(): void {
-    if (this.localValue !== null) {
-      this.errorStringI18nKey = (
-        this.numericInputValidationService.validateNumber(
-          this.localValue,
-          this.checkRequireNonnegativeInputValue,
-          this.getCurrentDecimalSeparator())) || null;
-    } else {
-      this.errorStringI18nKey = null;
-    }
+    this.errorStringI18nKey = (
+      this.numericInputValidationService.validateNumber(
+        this.localValue as number,
+        this.checkRequireNonnegativeInputValue,
+        this.getCurrentDecimalSeparator())) || null;
   }
 
   onKeypress(evt: KeyboardEvent): void {

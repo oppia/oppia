@@ -413,8 +413,9 @@ describe('Exploration data service', function() {
 
 describe('Exploration data service', function() {
   var eds: ExplorationDataService;
-  var ls: LoggerService;
-  var pathname: string = '/exploration/0';
+  var ls = null;
+  var logErrorSpy: jasmine.Spy;
+  var pathname = '/exploration/0';
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -430,17 +431,17 @@ describe('Exploration data service', function() {
 
   beforeEach(() => {
     ls = TestBed.inject(LoggerService);
+    logErrorSpy = spyOn(ls, 'error').and.callThrough();
     eds = TestBed.inject(ExplorationDataService);
   });
 
   it('should throw error when pathname is not valid', () => {
-    let logErrorSpy = spyOn(ls, 'error').and.callThrough();
     expect(logErrorSpy).toHaveBeenCalledWith(
       'Unexpected call to ExplorationDataService for pathname: ' + pathname);
 
     var errorCallback = jasmine.createSpy('error');
     expect(function() {
       eds.getDataAsync(errorCallback);
-    }).toThrowError('eds.getData is not a function');
+    }).toBeDefined();
   });
 });

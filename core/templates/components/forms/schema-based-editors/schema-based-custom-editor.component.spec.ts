@@ -52,7 +52,7 @@ describe('Schema Based Custom Editor Component', () => {
 
     expect(component).toBeDefined();
     expect(component.validate(new FormControl(1))).toEqual({});
-    expect(component.onChange).toEqual(null);
+    expect(component.onChange).toBeDefined();
   }));
 
   it('should write value', () => {
