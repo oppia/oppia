@@ -464,6 +464,8 @@
 /core/controllers/learner_group*.py @oppia/lace-backend-reviewers
 /core/domain/learner_group*.py @oppia/lace-backend-reviewers
 /core/templates/domain/learner_group/ @oppia/lace-frontend-reviewers
+/core/templates/pages/facilitator-dashboard-page/ @oppia/lace-frontend-reviewers
+/core/templates/pages/learner-group-pages/ @oppia/lace-frontend-reviewers
 
 # Beam jobs
 /setup.py @oppia/data-and-stability-reviewers
@@ -680,11 +682,20 @@
 /core/tests/protractor_desktop/ @oppia/automated-qa-reviewers
 /core/tests/protractor/ @oppia/automated-qa-reviewers
 /core/tests/protractor.conf.js @oppia/automated-qa-reviewers
+/core/tests/webdriverio_utils/ @oppia/automated-qa-reviewers
+/core/tests/webdriverio_desktop/ @oppia/automated-qa-reviewers
+/core/tests/webdriverio/ @oppia/automated-qa-reviewers
+/core/tests/wdio.conf.js @oppia/automated-qa-reviewers
 /extensions/interactions/*/protractor.js @oppia/automated-qa-reviewers
 /extensions/interactions/protractor.js @oppia/automated-qa-reviewers
 /extensions/rich_text_components/*/protractor.js @oppia/automated-qa-reviewers
 /extensions/rich_text_components/protractor.js @oppia/automated-qa-reviewers
 /extensions/objects/protractor.js @oppia/automated-qa-reviewers
+/extensions/interactions/*/webdriverio.js @oppia/automated-qa-reviewers
+/extensions/interactions/webdriverio.js @oppia/automated-qa-reviewers
+/extensions/rich_text_components/*/webdriverio.js @oppia/automated-qa-reviewers
+/extensions/rich_text_components/webdriverio.js @oppia/automated-qa-reviewers
+/extensions/objects/webdriverio.js @oppia/automated-qa-reviewers
 /scripts/backend_test_shards.json @oppia/automated-qa-reviewers
 /scripts/backend_tests_incomplete_coverage.txt @oppia/automated-qa-reviewers
 /.github/actions @oppia/automated-qa-reviewers
