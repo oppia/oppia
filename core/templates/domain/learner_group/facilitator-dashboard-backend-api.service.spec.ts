@@ -13,18 +13,19 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for TeacherDashboardBackendApiService.
+ * @fileoverview Unit tests for FacilitatorDashboardBackendApiService.
  */
 
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { TeacherDashboardBackendApiService } from
-  './teacher-dashboard-backend-api.service';
+import { FacilitatorDashboardBackendApiService } from
+  './facilitator-dashboard-backend-api.service';
 
 describe('Teacher Dashboard Backend API Service', () => {
-  var teacherDashboardBackendApiService: TeacherDashboardBackendApiService;
+  var facilitatorDashboardBackendApiService:
+    FacilitatorDashboardBackendApiService;
   let httpTestingController: HttpTestingController;
 
   var sampleShortLearnerGroupData = {
@@ -35,15 +36,15 @@ describe('Teacher Dashboard Backend API Service', () => {
     students_count: 5
   };
 
-  const TEACHER_DASHBOARD_URL = '/teacher_dashboard_handler';
+  const FACILITATOR_DASHBOARD_URL = '/facilitator_dashboard_handler';
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [TeacherDashboardBackendApiService]
+      providers: [FacilitatorDashboardBackendApiService]
     });
-    teacherDashboardBackendApiService = TestBed.inject(
-      TeacherDashboardBackendApiService);
+    facilitatorDashboardBackendApiService = TestBed.inject(
+      FacilitatorDashboardBackendApiService);
 
     httpTestingController = TestBed.inject(HttpTestingController);
   });
@@ -57,11 +58,11 @@ describe('Teacher Dashboard Backend API Service', () => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      teacherDashboardBackendApiService
+      facilitatorDashboardBackendApiService
         .fetchTeacherDashboardLearnerGroupsAsync()
         .then(successHandler, failHandler);
 
-      var req = httpTestingController.expectOne(TEACHER_DASHBOARD_URL);
+      var req = httpTestingController.expectOne(FACILITATOR_DASHBOARD_URL);
       expect(req.request.method).toEqual('GET');
       req.flush({
         learner_groups_list: [sampleShortLearnerGroupData]
