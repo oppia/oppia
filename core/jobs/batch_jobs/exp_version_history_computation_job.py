@@ -769,25 +769,6 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
     successfully.
     """
 
-    def filter_valid_exploration_models(
-        self, exp_model: exp_models.ExplorationModel
-    ) -> bool:
-        """Returns true if the exploration model at is valid for calculation
-        of version history.
-
-        Args:
-            exp_model: exp_models.ExplorationModel. The exploration model.
-
-        Returns:
-            bool. Whether the exploration model at can be used for
-            calculation of version history.
-        """
-        try:
-            exp_fetchers.get_exploration_from_model(exp_model)
-            return True
-        except Exception:
-            return False
-
     def generate_exploration_from_snapshot(
         self, snapshot_model: exp_models.ExplorationSnapshotContentModel
     ) -> exp_models.ExplorationModel:

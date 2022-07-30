@@ -130,6 +130,12 @@ class ComputeExplorationVersionHistoryJobTests(
                 'state_name': 'A new state'
             })
         ], 'A commit message.')
+        exp_services.update_exploration(self.user_1_id, self.EXP_ID_2, [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'A new state'
+            })
+        ], 'A commit message.')
         version_history_keys = [
             datastore_services.Key(
                 exp_models.ExplorationVersionHistoryModel,
@@ -158,19 +164,31 @@ class ComputeExplorationVersionHistoryJobTests(
         # Having invalid change list is not possible if the exploration is
         # updated using exp_services. Hence, we have to simulate the scenario
         # manually by changing the commit logs.
-        commit_log_model = exp_models.ExplorationCommitLogEntryModel.get(
+        clm_1 = exp_models.ExplorationCommitLogEntryModel.get(
             exp_models.ExplorationCommitLogEntryModel.get_instance_id(
                 self.EXP_ID_1, 2
             )
         )
-        commit_log_model.commit_cmds = [
+        clm_2 = exp_models.ExplorationCommitLogEntryModel.get(
+            exp_models.ExplorationCommitLogEntryModel.get_instance_id(
+                self.EXP_ID_2, 2
+            )
+        )
+        clm_1.commit_cmds = [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
                 'state_name': feconf.DEFAULT_INIT_STATE_NAME
             }).to_dict()
         ]
-        commit_log_model.update_timestamps()
-        commit_log_model.put()
+        clm_2.commit_cmds.append({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'A new state',
+                'property_name': 'fallbacks'
+        })
+        exp_models.ExplorationCommitLogEntryModel.update_timestamps_multi([
+            clm_1, clm_2
+        ])
+        exp_models.ExplorationCommitLogEntryModel.put_multi([clm_1, clm_2])
 
         self.assert_job_output_is([
             job_run_result.JobRunResult.as_stdout('ALL EXPS SUCCESS: 2'),
@@ -178,16 +196,13 @@ class ComputeExplorationVersionHistoryJobTests(
                 'EXPS FOR WHICH VERSION HISTORY CAN BE COMPUTED SUCCESS: 2'
             ),
             job_run_result.JobRunResult.as_stdout(
-                'EXPS HAVING INVALID CHANGE LIST SUCCESS: 1'
-            ),
-            job_run_result.JobRunResult.as_stdout(
-                'EXPS FOR WHICH VERSION HISTORY CAN WAS COMPUTED SUCCESS: 1'
-            ),
-            job_run_result.JobRunResult.as_stdout(
-                'CREATED OR MODIFIED VERSION HISTORY MODELS SUCCESS: 1'
+                'EXPS HAVING INVALID CHANGE LIST SUCCESS: 2'
             ),
             job_run_result.JobRunResult.as_stderr(
                 'Exploration %s has invalid change list' % (self.EXP_ID_1)
+            ),
+            job_run_result.JobRunResult.as_stderr(
+                'Exploration %s has invalid change list' % (self.EXP_ID_2)
             )
         ])
 
@@ -575,21 +590,97 @@ class VerifyVersionHistoryModelsJobTests(
         ], 'A commit messages.')
 
         # Manually corrupting the version history model.
-        vh_model = exp_models.ExplorationVersionHistoryModel.get(
+        vh_model_1 = exp_models.ExplorationVersionHistoryModel.get(
             exp_models.ExplorationVersionHistoryModel.get_instance_id(
                 self.EXP_ID_1, 2
             )
         )
-        vh_model.metadata_last_edited_version_number = 1
-        vh_model.update_timestamps()
-        vh_model.put()
+        vh_model_1.state_version_history['A new state'][
+            'state_name_in_previous_version'] = 'Previous state'
+        vh_model_1.metadata_last_edited_version_number = 1
+        vh_model_2 = exp_models.ExplorationVersionHistoryModel.get(
+            exp_models.ExplorationVersionHistoryModel.get_instance_id(
+                self.EXP_ID_2, 1
+            )
+        )
+        vh_model_2.metadata_last_edited_version_number = 0
+        exp_models.ExplorationVersionHistoryModel.update_timestamps_multi([
+            vh_model_1, vh_model_2
+        ])
+        exp_models.ExplorationVersionHistoryModel.put_multi([
+            vh_model_1, vh_model_2
+        ])
 
         self.assert_job_output_is([
             job_run_result.JobRunResult.as_stdout(
                 'ALL EXPLORATIONS SUCCESS: 2'
             ),
             job_run_result.JobRunResult.as_stdout(
+                'UNVERIFIED EXPLORATIONS SUCCESS: 2'
+            ),
+            job_run_result.JobRunResult.as_stderr(
+                'Version history for exploration with ID %s was not '
+                'created correctly' % (self.EXP_ID_1)
+            ),
+            job_run_result.JobRunResult.as_stderr(
+                'Version history for exploration with ID %s was not '
+                'created correctly' % (self.EXP_ID_2)
+            )
+        ])
+
+    def test_with_valid_version_history_models_having_revert_commit(self):
+        self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
+        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'A new state'
+            })
+        ], 'A commit message.')
+        exp_services.revert_exploration(self.user_1_id, self.EXP_ID_1, 2, 1)
+        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'Another new state'
+            })
+        ], 'A commit message.')
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult.as_stdout(
+                'ALL EXPLORATIONS SUCCESS: 1'
+            ),
+            job_run_result.JobRunResult.as_stdout(
                 'VERIFIED EXPLORATIONS SUCCESS: 1'
+            )
+        ])
+
+    def test_with_invalid_version_history_models_having_revert_commit(self):
+        self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
+        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'A new state'
+            })
+        ], 'A commit message.')
+        exp_services.revert_exploration(self.user_1_id, self.EXP_ID_1, 2, 1)
+        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'Another new state'
+            })
+        ], 'A commit message.')
+
+        vh_model = exp_models.ExplorationVersionHistoryModel.get(
+            exp_models.ExplorationVersionHistoryModel.get_instance_id(
+                self.EXP_ID_1, 3
+            )
+        )
+        vh_model.metadata_last_edited_version_number = 0
+        vh_model.update_timestamps()
+        vh_model.put()
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult.as_stdout(
+                'ALL EXPLORATIONS SUCCESS: 1'
             ),
             job_run_result.JobRunResult.as_stdout(
                 'UNVERIFIED EXPLORATIONS SUCCESS: 1'
