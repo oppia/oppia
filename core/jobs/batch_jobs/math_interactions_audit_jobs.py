@@ -25,10 +25,13 @@ from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
+
 from typing import List, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
+    # Here, state_domain is imported only for type checking.
+    from core.domain import state_domain
     from mypy_imports import exp_models
 
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
@@ -90,7 +93,8 @@ class FindMathExplorationsWithRulesJob(base_jobs.JobBase):
         )
 
     def contains_math_interactions(
-            self, model: exp_models.ExplorationModel) -> bool:
+        self, model: exp_models.ExplorationModel
+    ) -> bool:
         """Checks if the exploration contains any state with any of the
         math interactions.
 
@@ -105,8 +109,8 @@ class FindMathExplorationsWithRulesJob(base_jobs.JobBase):
             for state_dict in model.states.values())
 
     def flat_map_exp_with_states(
-            self,
-            model: exp_models.ExplorationModel) -> List[Tuple[str, str, dict]]:
+        self, model: exp_models.ExplorationModel
+    ) -> List[Tuple[str, str, state_domain.StateDict]]:
         """Maps exploration model with it's states data.
 
         Args:
@@ -122,7 +126,8 @@ class FindMathExplorationsWithRulesJob(base_jobs.JobBase):
         ]
 
     def map_with_rule_types(
-            self, tup: Tuple[str, str, dict]) -> Tuple[str, str, List[str]]:
+        self, tup: Tuple[str, str, state_domain.StateDict]
+    ) -> Tuple[str, str, List[str]]:
         """Maps state tuple with it's rule types.
 
         Args:
