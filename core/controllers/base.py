@@ -565,7 +565,7 @@ class BaseHandler(webapp2.RequestHandler):
         # We use this super in order to bypass the write method
         # in webapp2.Response, since webapp2.Response doesn't support writing
         # bytes.
-        super().write(file.getvalue())  # pylint: disable=bad-super-call
+        super(webapp2.Response, self.response).write(file.getvalue())  # pylint: disable=bad-super-call
 
     def render_template(self, filepath, iframe_restriction='DENY'):
         """Prepares an HTML response to be sent to the client.
