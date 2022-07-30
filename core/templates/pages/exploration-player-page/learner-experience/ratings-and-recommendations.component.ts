@@ -43,7 +43,7 @@ import { AppConstants } from 'app.constants';
 interface ResultActionButton {
   type: string;
   i18nId: string;
-  url: string;
+  url?: string;
 }
 
 export interface QuestionPlayerConfig {

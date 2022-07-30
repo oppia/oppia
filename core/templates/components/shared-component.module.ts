@@ -148,6 +148,7 @@ import { StateGraphVisualization } from 'pages/exploration-editor-page/editor-ta
 import { VersionDiffVisualizationComponent } from './version-diff-visualization/version-diff-visualization.component';
 import { QuestionSuggestionEditorModalComponent } from 'pages/contributor-dashboard-page/modal-templates/question-suggestion-editor-modal.component';
 import { QuestionSuggestionReviewModalComponent } from 'pages/contributor-dashboard-page/modal-templates/question-suggestion-review-modal.component';
+import { ReviewTestPageComponent } from 'pages/review-test-page/review-test-page.component';
 
 // Pipes.
 import { StringUtilityPipesModule } from 'filters/string-utility-filters/string-utility-pipes.module';
@@ -313,7 +314,8 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     StateGraphVisualization,
     VersionDiffVisualizationComponent,
     QuestionSuggestionEditorModalComponent,
-    QuestionSuggestionReviewModalComponent
+    QuestionSuggestionReviewModalComponent,
+    ReviewTestPageComponent
   ],
 
   entryComponents: [
@@ -427,7 +429,8 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     StateGraphVisualization,
     VersionDiffVisualizationComponent,
     QuestionSuggestionEditorModalComponent,
-    QuestionSuggestionReviewModalComponent
+    QuestionSuggestionReviewModalComponent,
+    ReviewTestPageComponent
   ],
 
   exports: [
@@ -553,7 +556,8 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     StateGraphVisualization,
     VersionDiffVisualizationComponent,
     QuestionSuggestionEditorModalComponent,
-    QuestionSuggestionReviewModalComponent
+    QuestionSuggestionReviewModalComponent,
+    ReviewTestPageComponent
   ],
 })
 
