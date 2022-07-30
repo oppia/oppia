@@ -244,6 +244,9 @@ var BlogDashboardPage = function() {
       var blogPostTile = blogPostTiles[i];
       var blogPostTitleContainer = await blogPostTile.$(
         '.e2e-test-blog-post-title');
+      // The element is not interactable when we call getText(), so it returns
+      // null. To avoid that we are waiting till the element becomes clicakble
+      // as we do not have any alternative for checking interactibility.
       await waitFor.elementToBeClickable(
         blogPostTitleContainer, 'Blog Post title is not interactable');
       var blogPostTitle = await action.getText(
@@ -275,6 +278,9 @@ var BlogDashboardPage = function() {
       var blogPostRow = blogPostListItems[i];
       var blogPostTitleContainer = await blogPostRow.$(
         '.e2e-test-blog-post-title');
+      // The element is not interactable when we call getText(), so it returns
+      // null. To avoid that we are waiting till the element becomes clicakble
+      // as we do not have any alternative for checking interactibility.
       await waitFor.elementToBeClickable(
         blogPostTitleContainer, 'Blog Post title is not interactable');
       var blogPostTitle = await action.getText(
