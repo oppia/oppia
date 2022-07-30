@@ -11,7 +11,7 @@
           (click)="showInformationCard()"
           *ngIf="CHECKPOINTS_FEATURE_IS_ENABLED && !footerIsInQuestionPlayerMode">
         <img [src]="getStaticImageUrl('/general/apple.svg')" class="exploration-footer-img" alt="">
-        <h1>
+        <h1 tabindex="0">
           <span class="oppia-lesson-info-header">
               {{ 'I18N_LESSON_INFO_HEADER' | translate }}
           </span>
