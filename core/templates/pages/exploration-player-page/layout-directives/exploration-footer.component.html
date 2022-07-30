@@ -8,8 +8,8 @@
   <div class="row">
     <div [ngClass]="{'col-sm-5': isLanguageRTL(), 'col-sm-3': !isLanguageRTL()}">
       <button class="oppia-lesson-info"
-          (click)="showInformationCard()"
-          *ngIf="CHECKPOINTS_FEATURE_IS_ENABLED && !footerIsInQuestionPlayerMode">
+              (click)="showInformationCard()"
+              *ngIf="CHECKPOINTS_FEATURE_IS_ENABLED && !footerIsInQuestionPlayerMode">
         <img [src]="getStaticImageUrl('/general/apple.svg')" class="exploration-footer-img" alt="">
         <h1>
           <span class="oppia-lesson-info-header">
