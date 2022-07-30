@@ -104,6 +104,7 @@ angular.module('oppia').component('stateNameEditor', {
           RouterService.navigateToMainTab(normalizedStateName);
         }
       };
+
       ctrl.$onInit = function() {
         ctrl.directiveSubscriptions.add(
           ExternalSaveService.onExternalSave.subscribe(

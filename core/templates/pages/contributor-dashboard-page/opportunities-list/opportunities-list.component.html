@@ -5,7 +5,8 @@
                              [progressBarRequired]="progressBarRequired"
                              [labelRequired]="labelRequired"
                              [opportunityHeadingTruncationLength]="opportunityHeadingTruncationLength"
-                             [opportunityType]="opportunityType">
+                             [opportunityType]="opportunityType"
+                             [showOpportunityButton]="showOpportunityButton">
     </oppia-opportunities-list-item>
   </div>
   <div [hidden]="!loadingOpportunityData" class="e2e-test-opportunity-loading-placeholder">
@@ -73,7 +74,6 @@
     min-width: 100px;
     text-align: center;
   }
-
   .oppia-pagination-button:hover {
     border: 2px solid #009688;
     border-radius: 5px;
@@ -83,5 +83,11 @@
   }
   .oppia-pagination-button[disabled]:hover {
     border: none;
+  }
+  @media only screen and (max-width: 700px) {
+    .oppia-opportunities-list {
+      margin: auto 0;
+      width: 100%;
+    }
   }
 </style>

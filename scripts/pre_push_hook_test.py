@@ -29,7 +29,7 @@ from core import utils
 from core.tests import test_utils
 
 from . import common
-from . import install_backend_python_libs
+from . import install_python_prod_dependencies
 from . import pre_push_hook
 
 
@@ -140,7 +140,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
 
     def test_get_remote_name_with_error_in_obtaining_remote(self):
         def mock_communicate():
-            return (b'test', b'Error')
+            return (b'test', b'test_oppia_error')
         process = subprocess.Popen(
             [b'echo', b'test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         process.communicate = mock_communicate
@@ -148,12 +148,12 @@ class PrePushHookTests(test_utils.GenericTestBase):
             return process
 
         popen_swap = self.swap(subprocess, 'Popen', mock_popen)
-        with popen_swap, self.assertRaisesRegex(ValueError, 'Error'):
+        with popen_swap, self.assertRaisesRegex(ValueError, 'test_oppia_error'):
             pre_push_hook.get_remote_name()
 
     def test_get_remote_name_with_error_in_obtaining_remote_url(self):
         def mock_communicate():
-            return ('test', 'Error')
+            return ('test', 'test_oppia_error')
         process_for_remote = subprocess.Popen(
             [b'echo', b'origin\nupstream'], stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)
@@ -167,7 +167,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
                 return process_for_remote
 
         popen_swap = self.swap(subprocess, 'Popen', mock_popen)
-        with popen_swap, self.assertRaisesRegex(ValueError, 'Error'):
+        with popen_swap, self.assertRaisesRegex(ValueError, 'test_oppia_error'):
             pre_push_hook.get_remote_name()
 
     def test_get_remote_name_with_no_remote_set(self):
@@ -242,12 +242,14 @@ class PrePushHookTests(test_utils.GenericTestBase):
 
     def test_git_diff_name_status_with_error(self):
         def mock_start_subprocess_for_result(unused_cmd_tokens):
-            return ('M\tfile1\nA\tfile2', 'Error')
+            return ('M\tfile1\nA\tfile2', 'test_oppia_error')
         subprocess_swap = self.swap(
             pre_push_hook, 'start_subprocess_for_result',
             mock_start_subprocess_for_result)
 
-        with subprocess_swap, self.assertRaisesRegex(ValueError, 'Error'):
+        with subprocess_swap, self.assertRaisesRegex(
+            ValueError, 'test_oppia_error'
+        ):
             pre_push_hook.git_diff_name_status(
                 'left', 'right', diff_filter='filter')
 
@@ -451,7 +453,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
         def mock_exists(unused_file):
             return True
         def mock_start_subprocess_for_result(unused_cmd_tokens):
-            return ('Output', 'Error')
+            return ('Output', 'test_oppia_error')
 
         islink_swap = self.swap(os.path, 'islink', mock_islink)
         exists_swap = self.swap(os.path, 'exists', mock_exists)
@@ -460,7 +462,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
             mock_start_subprocess_for_result)
 
         with islink_swap, exists_swap, subprocess_swap, self.print_swap:
-            with self.assertRaisesRegex(ValueError, 'Error'):
+            with self.assertRaisesRegex(ValueError, 'test_oppia_error'):
                 pre_push_hook.install_hook()
         self.assertTrue('Symlink already exists' in self.print_arr)
         self.assertFalse(
@@ -804,7 +806,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
             self.assertEqual(error_code, 1)
 
         swap_get_mismatches = self.swap(
-            install_backend_python_libs, 'get_mismatches',
+            install_python_prod_dependencies, 'get_mismatches',
             mock_get_mismatches)
         swap_sys_exit = self.swap(sys, 'exit', mock_exit_error)
         with self.print_swap, swap_sys_exit, swap_get_mismatches:
@@ -841,7 +843,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
             self.assertEqual(error_code, 1)
 
         swap_get_mismatches = self.swap(
-            install_backend_python_libs, 'get_mismatches',
+            install_python_prod_dependencies, 'get_mismatches',
             mock_get_mismatches)
         swap_sys_exit = self.swap(sys, 'exit', mock_exit_error)
         with self.print_swap, swap_sys_exit, swap_get_mismatches:
@@ -868,7 +870,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
         def mock_get_mismatches():
             return {}
         swap_get_mismatches = self.swap(
-            install_backend_python_libs,
+            install_python_prod_dependencies,
             'get_mismatches',
             mock_get_mismatches)
 

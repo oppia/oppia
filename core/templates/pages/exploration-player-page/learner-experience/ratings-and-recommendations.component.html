@@ -49,7 +49,7 @@
     </div>
   </div>
 
-  <div *ngIf="inStoryMode && !userIsLoggedIn && !isSignUpSectionHidden()" class="conversation-skin-login-container">
+  <div *ngIf="inStoryMode && !userIsLoggedIn && !isSignUpSectionHidden()" class="conversation-skin-login-container e2e-test-end-chapter-sign-up-section">
     <div class="conversation-skin-congratulations-text" translate="I18N_CHAPTER_COMPLETION"></div>
     <span class="conversation-skin-login-text text-secondary" translate="I18N_SAVE_PROGRESS"></span>
     <div class="mt-2">
@@ -62,10 +62,17 @@
         Already have an account?
         <span class="conversation-skin-login-button-text" translate="" (click)="signIn()">Sign In</span>
       </button>
-      <button class="conversation-skin-hide-sign-up-section-button" *ngIf="isEndChapterFeatureEnabled()">
+      <button class="conversation-skin-hide-sign-up-section-button e2e-test-dismiss-sign-up-section-button" *ngIf="isEndChapterFeatureEnabled()">
         <span class="conversation-skin-hide-sign-up-section-text" translate="I18N_SIGNUP_SECTION_DONT_ASK_ME_AGAIN" (click)="hideSignUpSection()"></span>
       </button>
     </div>
+  </div>
+  <div *ngIf="inStoryMode && isEndChapterFeatureEnabled() && storyId">
+    <oppia-post-chapter-recommendations [nextStoryNodeLink]="nextLessonLink"
+                                        [nextStoryNodeThumbnailUrl]="nextStoryNodeIconUrl ? nextStoryNodeIconUrl : ''"
+                                        [nextStoryNodeThumbnailBgColor]="nextStoryNode ? nextStoryNode.thumbnailBgColor : ''"
+                                        [nextStoryNodeTitle]="nextStoryNode ? nextStoryNode.title : ''">
+    </oppia-post-chapter-recommendations>
   </div>
 
   <div *ngIf="inStoryMode" class="conversation-skin-back-to-collection-container">
