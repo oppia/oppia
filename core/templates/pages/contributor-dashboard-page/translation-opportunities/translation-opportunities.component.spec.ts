@@ -177,11 +177,16 @@ describe('Translation opportunities component', () => {
     'of opportunity list', () => {
     spyOn(translationLanguageService, 'getActiveLanguageCode').and.returnValue(
       'en');
+
+    expect(component.allOpportunities).toEqual({});
+
     const {opportunitiesDicts, } = (
       component.getPresentableOpportunitiesData({
         opportunities: opportunitiesArray,
         more: false
       }));
+
+    expect(Object.keys(component.allOpportunities).length).toEqual(2);
     expect(
       opportunitiesDicts[opportunitiesDicts.length - 1].translationsCount +
       opportunitiesDicts[opportunitiesDicts.length - 1].inReviewCount ===
@@ -192,11 +197,16 @@ describe('Translation opportunities component', () => {
     'opportunities', () => {
     spyOn(translationLanguageService, 'getActiveLanguageCode').and.returnValue(
       'en');
+
+    expect(component.allOpportunities).toEqual({});
+
     const {opportunitiesDicts, } = (
       component.getPresentableOpportunitiesData({
         opportunities: opportunitiesArray,
         more: false
       }));
+
+    expect(Object.keys(component.allOpportunities).length).toEqual(2);
     expect(opportunitiesDicts.length).toBe(2);
     expect(opportunitiesDicts.sort((a, b) => {
       return parseInt(a.id) - parseInt(b.id);
