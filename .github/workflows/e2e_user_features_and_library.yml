@@ -47,7 +47,7 @@ jobs:
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --suite="library" --prod_env
         env:
-          VIDEO_RECORDING_IS_ENABLED: 1
+          VIDEO_RECORDING_IS_ENABLED: 0
       - name: Run e2e preferences test
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-install --skip-build --suite="preferences" --prod_env
