@@ -45,7 +45,7 @@ if MYPY:  # pragma: no cover
 
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 
-changeType = Dict[
+ChangeType = Dict[
     str, Union[str, float, Dict[str, Union[str, int, state_domain.StateDict]]]
 ]
 
@@ -2125,7 +2125,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['score_category'],
             expected_suggestion_dict['language_code'], False, self.fake_date)
 
-        change: changeType = {
+        change: ChangeType = {
             'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
                 'question_state_data': self._create_valid_question_data(
@@ -2145,7 +2145,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
                 question_domain.QuestionChange(change))
 
     def test_pre_update_validate_complains_if_nothing_changed(self) -> None:
-        change: changeType = {
+        change: ChangeType = {
             'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
                 'question_state_data': self._create_valid_question_data(
@@ -2164,7 +2164,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             self.reviewer_id, change,
             'question.topic_1', 'en', False, self.fake_date)
 
-        new_change: changeType = {
+        new_change: ChangeType = {
             'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
                 'question_state_data': self._create_valid_question_data(
@@ -2187,7 +2187,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
     def test_pre_update_validate_accepts_a_change_in_skill_difficulty_only(
         self
     ) -> None:
-        change: changeType = {
+        change: ChangeType = {
             'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
                 'question_state_data': self._create_valid_question_data(
@@ -2206,7 +2206,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             self.reviewer_id, change,
             'question.topic_1', 'en', False, self.fake_date)
 
-        new_change: changeType = {
+        new_change: ChangeType = {
             'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
                 'question_state_data': self._create_valid_question_data(
@@ -2230,7 +2230,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
     def test_pre_update_validate_accepts_a_change_in_state_data_only(
         self
     ) -> None:
-        change: changeType = {
+        change: ChangeType = {
             'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
                 'question_state_data': self._create_valid_question_data(
@@ -2249,7 +2249,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             self.reviewer_id, change,
             'question.topic_1', 'en', False, self.fake_date)
 
-        new_change: changeType = {
+        new_change: ChangeType = {
             'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
                 'question_state_data': self._create_valid_question_data(
