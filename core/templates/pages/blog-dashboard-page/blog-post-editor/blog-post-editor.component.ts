@@ -64,7 +64,7 @@ export class BlogPostEditorComponent implements OnInit {
   dateTimeLastSaved: string = '';
   authorUsername: string = '';
   windowIsNarrow: boolean = false;
-  contentEditorIsActive: boolean = true;
+  contentEditorIsActive: boolean = false;
   invalidImageWarningIsShown: boolean = false;
   newChangesAreMade: boolean = false;
   lastChangesWerePublished: boolean = false;
@@ -131,9 +131,8 @@ export class BlogPostEditorComponent implements OnInit {
           this.title = this.blogPostData.title;
           this.dateTimeLastSaved = this.getDateStringInWords(
             this.blogPostData.lastUpdated);
-          if (this.blogPostData.content.length > 0) {
-            this.contentEditorIsActive = false;
-          }
+          this.contentEditorIsActive = Boolean(
+            this.blogPostData.content.length === 0);
           if (this.blogPostData.thumbnailFilename) {
             this.thumbnailDataUrl = this.assetsBackendApiService
               .getThumbnailUrlForPreview(
