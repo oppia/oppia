@@ -181,7 +181,10 @@ var RealEditor = function(elem) {
 };
 
 var RichTextEditor = async function(elem) {
-  var rteElements = await elem.$$('.e2e-test-rte');
+  var rteElement = await elem.$$('.e2e-test-rte');
+  var rteElementsSelector = function() {
+    return elem.$$('.e2e-test-rte');
+  };
   var modalDialogElementsSelector = function() {
     return $$('.modal-dialog');
   };
@@ -189,10 +192,13 @@ var RichTextEditor = async function(elem) {
   var closeRteComponentButtonLocator = (
     '.e2e-test-close-rich-text-component-editor');
   // Set focus in the RTE.
+  await waitFor.visibilityOf(rteElement);
+  var rteElements = await rteElementsSelector();
   await waitFor.elementToBeClickable(rteElements[0]);
   await rteElements[0].click();
 
   var _appendContentText = async function(text) {
+    var rteElements = await rteElementsSelector();
     await rteElements[0].setValue(text);
   };
   var _clickToolbarButton = async function(buttonName) {
@@ -202,6 +208,7 @@ var RichTextEditor = async function(elem) {
     await elem.$('.' + buttonName).click();
   };
   var _clearContent = async function() {
+    var rteElements = await rteElementsSelector();
     expect(
       await rteElements[0].isExisting()
     ).toBe(true);
@@ -271,6 +278,7 @@ var RichTextEditor = async function(elem) {
         modal, 'Customization modal taking too long to disappear.');
       // Ensure that focus is not on added component once it is added so that
       // the component is not overwritten by some other element.
+      var rteElements = await rteElementsSelector();
       if (
         [
           'Video', 'Image', 'Collapsible', 'Tabs'
