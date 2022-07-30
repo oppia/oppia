@@ -3,43 +3,43 @@
   compilation, here are sme additional rules that can be added to the CSS files:
   https://rtlcss.com/learn/usage-guide/control-directives .
 */
-.oppia-topic-viewer-container {
+topic-viewer-page .oppia-topic-viewer-container {
   color: black;
   margin: 0 auto;
   text-align: left;
   text-decoration: none;
 }
 
-.navbar-light .navbar-container {
+topic-viewer-page .navbar-light .navbar-container {
   background: #00645c;
   border-bottom: 1px solid rgba(255, 255, 255, 0.5);
 }
 
-.coming-soon-title {
+topic-viewer-page .coming-soon-title {
   font-family: 'Capriola', 'Roboto', Arial, sans-serif;
   font-size: 1.5em;
   margin: 1em;
   padding-top: 1em;
 }
 
-.topic-viewer-tabs-list {
+topic-viewer-page .topic-viewer-tabs-list {
   margin: 0 auto;
   width: 704px;
 }
 
-.topic-viewer-page-content {
+topic-viewer-page .topic-viewer-page-content {
   margin-top: -100px;
 }
 
-.oppia-navbar {
+topic-viewer-page .oppia-navbar {
   box-shadow: none;
 }
 
-.oppia-topic-viewer-container .background-banner-position {
+topic-viewer-page .oppia-topic-viewer-container .background-banner-position {
   position: inherit;
 }
 
-.oppia-topic-viewer-tabs-container {
+topic-viewer-page .oppia-topic-viewer-tabs-container {
   background-color: #00645c;
   box-shadow: 3px 3px 6px rgba(0,0,0, 0.5);
   font-family: 'Capriola', 'Roboto', Arial, sans-serif;
@@ -48,20 +48,20 @@
   z-index: 1000;
 }
 
-.oppia-topic-viewer-container /deep/ .oppia-background-banner {
+topic-viewer-page .oppia-topic-viewer-container /deep/ .oppia-background-banner {
   margin-top: -50px;
 }
 
-.oppia-topic-viewer-container .headroom--unpinned {
+topic-viewer-page .oppia-topic-viewer-container .headroom--unpinned {
   transform: translateY(-150%);
 }
 
-.oppia-topic-viewer-container .headroom {
+topic-viewer-page .oppia-topic-viewer-container .headroom {
   transition: transform 200ms linear;
   will-change: transform;
 }
 
-.oppia-topic-viewer-tabs-container .topic-viewer-tabs .tab-icon {
+topic-viewer-page .oppia-topic-viewer-tabs-container .topic-viewer-tabs .tab-icon {
   display: block;
   font-size: 2em;
   height: 45px;
@@ -71,7 +71,7 @@
   width: 50%;
 }
 
-.oppia-topic-viewer-tabs-container .topic-viewer-tabs {
+topic-viewer-page .oppia-topic-viewer-tabs-container .topic-viewer-tabs {
   display: -webkit-inline-flex;
   display: inline-flex;
   justify-content: space-evenly;
@@ -81,20 +81,20 @@
   width: 100%;
 }
 
-.oppia-topic-viewer-tabs-container .pad-top-mobile {
+topic-viewer-page .oppia-topic-viewer-tabs-container .pad-top-mobile {
   padding-top: 10px;
 }
 
-.oppia-topic-viewer-tabs-container .pad-top-desktop {
+topic-viewer-page .oppia-topic-viewer-tabs-container .pad-top-desktop {
   padding-top: 20px;
 }
 
-.oppia-topic-viewer-tabs-container .topic-viewer-tabs li {
+topic-viewer-page .oppia-topic-viewer-tabs-container .topic-viewer-tabs li {
   list-style: none;
   margin-bottom: 0;
 }
 
-.oppia-topic-viewer-tabs-container .topic-viewer-tabs .topic-viewer-tabs-text {
+topic-viewer-page .oppia-topic-viewer-tabs-container .topic-viewer-tabs .topic-viewer-tabs-text {
   color: #fff;
   cursor: pointer;
   font-size: 1.1em;
@@ -105,100 +105,100 @@
   width: 152px;
 }
 
-.topic-viewer-page-content .tab-title {
+topic-viewer-page .topic-viewer-page-content .tab-title {
   color: #017a70;
   font-size: 2em;
   word-break: break-word;
 }
 
-.oppia-topic-viewer-tabs-container .topic-viewer-tabs .topic-viewer-tabs-text .tab-title {
+topic-viewer-page .oppia-topic-viewer-tabs-container .topic-viewer-tabs .topic-viewer-tabs-text .tab-title {
   font-size: 1em;
   text-decoration: none;
   text-transform: uppercase;
 }
 
-.oppia-topic-viewer-tabs-container .topic-viewer-tabs-active .topic-viewer-tabs-text,
-.oppia-topic-viewer-tabs-container .topic-viewer-tabs-active .topic-viewer-tabs-text:hover {
+topic-viewer-page .oppia-topic-viewer-tabs-container .topic-viewer-tabs-active .topic-viewer-tabs-text,
+topic-viewer-page .oppia-topic-viewer-tabs-container .topic-viewer-tabs-active .topic-viewer-tabs-text:hover {
   border-bottom: 4px solid #fff;
   color: #fff;
 }
 
-.oppia-topic-viewer-tabs-container .topic-viewer-tabs .topic-viewer-tabs-text:hover,
-.oppia-topic-viewer-tabs-container .topic-viewer-tabs .topic-viewer-tabs-text:focus {
+topic-viewer-page .oppia-topic-viewer-tabs-container .topic-viewer-tabs .topic-viewer-tabs-text:hover,
+topic-viewer-page .oppia-topic-viewer-tabs-container .topic-viewer-tabs .topic-viewer-tabs-text:focus {
   outline: 0;
   text-decoration: none;
 }
 
-.topic-viewer-page-content .oppia-page-card {
+topic-viewer-page .topic-viewer-page-content .oppia-page-card {
   border-radius: 0.25em;
   margin-top: 10em;
   padding-bottom: 7.5vh;
   width: 704px;
 }
 
-.topic-viewer-page-content .practice-tab-not-available-card {
+topic-viewer-page .topic-viewer-page-content .practice-tab-not-available-card {
   margin-top: 20vh;
   width: 40vw;
 }
 
-.topic-viewer-page-content .coming-soon-text {
+topic-viewer-page .topic-viewer-page-content .coming-soon-text {
   font-family: Roboto, Arial, sans-serif;
   font-size: 1.1em;
   margin-left: 1.4em;
 }
 
 @media(max-width: 1024px) {
-  .topic-viewer-tabs-list {
+  topic-viewer-page .topic-viewer-tabs-list {
     width: 80vw;
   }
 
-  .oppia-topic-viewer-tabs-container .topic-viewer-tabs .topic-viewer-tabs-text {
+  topic-viewer-page .oppia-topic-viewer-tabs-container .topic-viewer-tabs .topic-viewer-tabs-text {
     width: 100%;
   }
 
-  .topic-viewer-page-content .oppia-page-card {
+  topic-viewer-page .topic-viewer-page-content .oppia-page-card {
     margin-top: 10em;
     width: 80vw;
   }
 
-  .oppia-topic-viewer-tabs-container .topic-viewer-tabs li {
+  topic-viewer-page .oppia-topic-viewer-tabs-container .topic-viewer-tabs li {
     flex: 1;
     width: auto;
   }
 }
 
 @media(max-width: 500px) {
-  .topic-viewer-tabs-list {
+  topic-viewer-page .topic-viewer-tabs-list {
     width: 90vw;
   }
 
-  .oppia-topic-viewer-tabs-container .topic-viewer-tabs {
+  topic-viewer-page .oppia-topic-viewer-tabs-container .topic-viewer-tabs {
     padding-top: 5px;
   }
 
-  .oppia-topic-viewer-tabs-container .topic-viewer-tabs .topic-viewer-tabs-text {
+  topic-viewer-page .oppia-topic-viewer-tabs-container .topic-viewer-tabs .topic-viewer-tabs-text {
     width: 100%;
   }
 
-  .topic-viewer-page-content {
+  topic-viewer-page .topic-viewer-page-content {
     margin-top: -160px;
   }
 
-  .topic-viewer-page-content .oppia-page-card {
+  topic-viewer-page .topic-viewer-page-content .oppia-page-card {
     margin-top: 7em;
     padding: 70px 24px 64px 24px;
     width: 100%;
   }
 
-  .oppia-topic-viewer-tabs-container .topic-viewer-tabs .tab-icon {
+  topic-viewer-page .oppia-topic-viewer-tabs-container .topic-viewer-tabs .tab-icon {
     display: none;
   }
 
-  .oppia-topic-viewer-tabs-container .topic-viewer-tabs .topic-viewer-tabs-text .tab-title {
+  topic-viewer-page .oppia-topic-viewer-tabs-container .topic-viewer-tabs .topic-viewer-tabs-text .tab-title {
     font-size: 0.8em;
   }
 
-  .oppia-topic-viewer-tabs-container .topic-viewer-tabs li {
+  topic-viewer-page .oppia-topic-viewer-tabs-container .topic-viewer-tabs li {
     flex: 1;
     width: auto;
   }
