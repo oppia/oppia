@@ -181,7 +181,9 @@ var RealEditor = function(elem) {
 };
 
 var RichTextEditor = async function(elem) {
-  var rteElements = await elem.$$('.e2e-test-rte');
+  var rteElementsSelector = function() {
+    return elem.$$('.e2e-test-rte');
+  };
   var modalDialogElementsSelector = function() {
     return $$('.modal-dialog');
   };
@@ -189,19 +191,21 @@ var RichTextEditor = async function(elem) {
   var closeRteComponentButtonLocator = (
     '.e2e-test-close-rich-text-component-editor');
   // Set focus in the RTE.
-  await waitFor.elementToBeClickable(rteElements[0]);
-  await rteElements[0].click();
+  var rteElements = await rteElementsSelector();
+  await action.click('RTE Element', rteElements[0]);
 
   var _appendContentText = async function(text) {
-    await rteElements[0].setValue(text);
+    var rteElements = await rteElementsSelector();
+    await rteElements[0].addValue(text);
   };
   var _clickToolbarButton = async function(buttonName) {
     await waitFor.elementToBeClickable(
-      elem.$('.' + buttonName),
+      elem.$(`'.${buttonName}'`),
       'Toolbar button takes too long to be clickable.');
-    await elem.$('.' + buttonName).click();
+    await elem.$(`'.${buttonName}'`).click();
   };
   var _clearContent = async function() {
+    var rteElements = await rteElementsSelector();
     expect(
       await rteElements[0].isExisting()
     ).toBe(true);
@@ -276,6 +280,7 @@ var RichTextEditor = async function(elem) {
           'Video', 'Image', 'Collapsible', 'Tabs'
         ].includes(componentName)) {
         // RteElementFirst can be found in beginning of RichTextEditor function.
+        var rteElements = await rteElementsSelector();
         await action.setValue(
           'First RTE Element',
           rteElements[0],

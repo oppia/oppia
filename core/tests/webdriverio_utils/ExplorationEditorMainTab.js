@@ -86,6 +86,7 @@ var ExplorationEditorMainTab = function() {
   var stateEditorTag = $('.e2e-test-state-content-editor');
   var stateNameContainer = $('.e2e-test-state-name-container');
   var stateNameInput = $('.e2e-test-state-name-input');
+  var stateNameText = $('.e2e-test-state-name-text');
   var stateNodeLabel = function(nodeElement) {
     return nodeElement.$(nodeLabelLocator);
   };
@@ -894,11 +895,11 @@ var ExplorationEditorMainTab = function() {
       stateNameContainer, 'State Name Container taking too long to show up');
     await waitFor.textToBePresentInElement(
       stateNameContainer, name,
-      'Expecting current state ' + await stateNameContainer.getAttribute(
-        'textContent') + ' to be ' + name);
+      'Expecting current state ' + await stateNameText.getText() +
+      ' to be ' + name);
     await waitFor.visibilityOf(
-      stateNameContainer, 'State name container taking too long to appear');
-    expect(await stateNameContainer.getAttribute('textContent')).toMatch(name);
+      stateNameText, 'State name container taking too long to appear');
+    expect(await stateNameText.getText()).toMatch(name);
   };
 };
 
