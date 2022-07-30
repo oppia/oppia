@@ -250,6 +250,8 @@
 }
 
 .oppia-lesson-info {
+  background: none;
+  border: none;
   display: flex;
   list-style-type: none;
   padding-left: 0;

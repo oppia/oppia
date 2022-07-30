@@ -7,11 +7,11 @@
   </div>
   <div class="row">
     <div [ngClass]="{'col-sm-5': isLanguageRTL(), 'col-sm-3': !isLanguageRTL()}">
-      <ul class="oppia-lesson-info"
+      <button class="oppia-lesson-info"
           (click)="showInformationCard()"
           *ngIf="CHECKPOINTS_FEATURE_IS_ENABLED && !footerIsInQuestionPlayerMode">
         <img [src]="getStaticImageUrl('/general/apple.svg')" class="exploration-footer-img" alt="">
-        <h1 tabindex="0">
+        <h1>
           <span class="oppia-lesson-info-header">
               {{ 'I18N_LESSON_INFO_HEADER' | translate }}
           </span>
@@ -20,7 +20,7 @@
           <i class="material-icons oppia-navbar-breadcrumb-icon oppia-footer-info-icon">&#xE88E;</i>
           <span class="oppia-icon-accessibility-label">{{ 'I18N_PLAYER_INFO_TOOLTIP' | translate }}</span>
         </li>
-      </ul>
+      </button>
       <oppia-hint-and-solution-buttons *ngIf="windowIsNarrow && hintsAndSolutionsAreSupported">
       </oppia-hint-and-solution-buttons>
     </div>
