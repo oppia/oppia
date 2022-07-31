@@ -1949,6 +1949,7 @@ class TranslationContributionStatsModelUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(expected_data, user_data)
 
+
 class TranslationReviewStatsModelUnitTests(test_utils.GenericTestBase):
     """Tests the TranslationContributionStatsModel class."""
 
@@ -1959,7 +1960,7 @@ class TranslationReviewStatsModelUnitTests(test_utils.GenericTestBase):
     REVIEWED_TRANSLATION_WORD_COUNT = 100
     ACCEPTED_TRANSLATIONS_COUNT = 1
     ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT = 0
-    ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_WORD_COUNT=0
+    ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_WORD_COUNT = 0
     ACCEPTED_TRANSLATION_WORD_COUNT = 50
     # Timestamp dates in sec since epoch for Mar 19 2021 UTC.
     # CONTRIBUTION_DATES = [
@@ -2039,7 +2040,8 @@ class TranslationReviewStatsModelUnitTests(test_utils.GenericTestBase):
             self.ACCEPTED_TRANSLATION_WORD_COUNT
         )
         self.assertEqual(
-            translation_review_stats_model.accepted_translations_with_reviewer_edits_word_count,
+            translation_review_stats_model
+            .accepted_translations_with_reviewer_edits_word_count,
             self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_WORD_COUNT
         )
         self.assertEqual(
@@ -2311,7 +2313,7 @@ class QuestionContributionStatsModelUnitTests(test_utils.GenericTestBase):
     def test_export_data_nontrivial(self) -> None:
         topic_id_2 = 'topic ID 2'
         # Seed question stats data for two different topics.
-        model_1_id = suggestion_models.QuestionContributionStatsModel.create(
+        suggestion_models.QuestionContributionStatsModel.create(
             contributor_user_id=self.CONTRIBUTOR_USER_ID,
             topic_id=self.TOPIC_ID,
             submitted_questions_count=self.SUBMITTED_QUESTION_COUNT,
@@ -2322,7 +2324,7 @@ class QuestionContributionStatsModelUnitTests(test_utils.GenericTestBase):
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=self.LAST_CONTRIBUTION_DATE
         )
-        model_2_id = suggestion_models.QuestionContributionStatsModel.create(
+        suggestion_models.QuestionContributionStatsModel.create(
             contributor_user_id=self.CONTRIBUTOR_USER_ID,
             topic_id=topic_id_2,
             submitted_questions_count=self.SUBMITTED_QUESTION_COUNT,

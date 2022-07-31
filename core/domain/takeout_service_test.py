@@ -423,15 +423,15 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
     ACCEPTED_TRANSLATION_WORD_COUNT: Final = 50
     REJECTED_TRANSLATIONS_COUNT: Final = 0
     REJECTED_TRANSLATION_WORD_COUNT: Final = 0
-    REVIEWED_TRANSLATIONS_COUNT: Final  = 0
-    REVIEWED_TRANSLATION_WORD_COUNT: Final  = 0
-    ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT: Final  = 0
-    SUBMITTED_QUESTION_COUNT: Final  = 20
-    ACCEPTED_QUESTIONS_COUNT: Final  = 2
-    ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT: Final  = 0
-    REVIEWED_QUESTIONS_COUNT: Final  = 2
-    ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT: Final  = 0
-    ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_WORD_COUNT: Final  = 0
+    REVIEWED_TRANSLATIONS_COUNT: Final = 0
+    REVIEWED_TRANSLATION_WORD_COUNT: Final = 0
+    ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT: Final = 0
+    SUBMITTED_QUESTION_COUNT: Final = 20
+    ACCEPTED_QUESTIONS_COUNT: Final = 2
+    ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT: Final = 0
+    REVIEWED_QUESTIONS_COUNT: Final = 2
+    ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT: Final = 0
+    ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_WORD_COUNT: Final = 0
     # Timestamp dates in sec since epoch for Mar 19 2021 UTC.
     CONTRIBUTION_DATES: Final = [
         datetime.date.fromtimestamp(1616173836),
@@ -1858,7 +1858,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                     'accepted_translation_word_count': (
                         self.ACCEPTED_TRANSLATION_WORD_COUNT),
                     'accepted_translations_with_reviewer_edits_word_count': (
-                        self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_WORD_COUNT),
+                        self
+                        .ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_WORD_COUNT),
                     'review_months': self.CONTRIBUTION_MONTHS,
                     'first_contribution_date': (
                         self.FIRST_CONTRIBUTION_DATE.isoformat()),

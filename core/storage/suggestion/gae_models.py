@@ -19,7 +19,6 @@ from __future__ import annotations
 import datetime
 
 from core import feconf
-from core import utils
 from core.platform import models
 
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
@@ -1299,7 +1298,6 @@ class TranslationReviewStatsModel(base_models.BaseModel):
     """Records the contributor dashboard translation review stats. There
     is one instance of this model per (language_code, reviewer_user_id,
     topic_id) tuple. See related design doc for more details:
-    
     """
 
     # We use the model id as a key in the Takeout dict.
@@ -1338,12 +1336,10 @@ class TranslationReviewStatsModel(base_models.BaseModel):
     # The unique last_updated dates of the translation reviews.
     review_months = datastore_services.StringProperty(
         repeated=True, indexed=True)
-    # The first date that the reviewer made a translation review
-    first_contribution_date = datastore_services.DateProperty(
-        indexed=True)
-    # The last date that the reviewer made a translation review
-    last_contribution_date = datastore_services.DateProperty(
-        indexed=True)
+    # The first date that the reviewer made a translation review.
+    first_contribution_date = datastore_services.DateProperty(indexed=True)
+    # The last date that the reviewer made a translation review.
+    last_contribution_date = datastore_services.DateProperty(indexed=True)
 
     @classmethod
     def create(
@@ -1542,8 +1538,7 @@ class TranslationReviewStatsModel(base_models.BaseModel):
                     model.accepted_translation_word_count),
                 'accepted_translations_with_reviewer_edits_word_count': (
                     model.accepted_translations_with_reviewer_edits_word_count),
-                'review_months': [
-                    month for month in model.review_months],
+                'review_months': list(model.review_months),
                 'first_contribution_date': (
                     model.first_contribution_date.isoformat()),
                 'last_contribution_date': (
@@ -1578,12 +1573,10 @@ class QuestionContributionStatsModel(base_models.BaseModel):
     # The unique last_updated dates of the question suggestions.
     contribution_months = datastore_services.StringProperty(
         repeated=True, indexed=True)
-    # The first date that the submitter made a question submission
-    first_contribution_date = datastore_services.DateProperty(
-        indexed=True)
-    # The last date that the submitter made a question submission
-    last_contribution_date = datastore_services.DateProperty(
-        indexed=True)
+    # The first date that the submitter made a question submission.
+    first_contribution_date = datastore_services.DateProperty(indexed=True)
+    # The last date that the submitter made a question submission.
+    last_contribution_date = datastore_services.DateProperty(indexed=True)
 
     @classmethod
     def create(
@@ -1756,14 +1749,14 @@ class QuestionContributionStatsModel(base_models.BaseModel):
                     model.accepted_questions_count),
                 'accepted_questions_without_reviewer_edits_count': (
                     model.accepted_questions_without_reviewer_edits_count),
-                'contribution_months': [
-                    month for month in model.contribution_months],
+                'contribution_months': list(model.contribution_months),
                 'first_contribution_date': (
                     model.first_contribution_date.isoformat()),
                 'last_contribution_date': (
                     model.last_contribution_date.isoformat())
             }
         return user_data
+
 
 class QuestionReviewStatsModel(base_models.BaseModel):
     """Records the contributor dashboard question review stats. There
@@ -1791,12 +1784,10 @@ class QuestionReviewStatsModel(base_models.BaseModel):
     # The unique last_updated dates of the question suggestions.
     review_months = datastore_services.StringProperty(
         repeated=True, indexed=True)
-    # The first date that the reviewer made a question review
-    first_contribution_date = datastore_services.DateProperty(
-        indexed=True)
-    # The last date that the reviewer made a question review
-    last_contribution_date = datastore_services.DateProperty(
-        indexed=True)
+    # The first date that the reviewer made a question review.
+    first_contribution_date = datastore_services.DateProperty(indexed=True)
+    # The last date that the reviewer made a question review.
+    last_contribution_date = datastore_services.DateProperty(indexed=True)
 
     @classmethod
     def create(
@@ -1969,8 +1960,7 @@ class QuestionReviewStatsModel(base_models.BaseModel):
                     model.accepted_questions_count),
                 'accepted_questions_with_reviewer_edits_count': (
                     model.accepted_questions_with_reviewer_edits_count),
-                'review_months': [
-                    month for month in model.review_months],
+                'review_months': list(model.review_months),
                 'first_contribution_date': (
                     model.first_contribution_date.isoformat()),
                 'last_contribution_date': (
