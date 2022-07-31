@@ -504,7 +504,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
             | 'Get reconstituted exploration models' >>
                 beam.Map(self.generate_exploration_from_snapshot)
             | 'Filter exploration models without None' >>
-                beam.Map(lambda x: x is not None)
+                beam.Filter(lambda x: x is not None)
             | 'Filter valid exploration models' >> beam.Filter(
                 self.filter_valid_exploration_models
             )
@@ -1081,7 +1081,7 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
             | 'Get reconstituted exploration models' >>
                 beam.Map(self.generate_exploration_from_snapshot)
             | 'Filter exploration models without None' >>
-                beam.Map(lambda x: x is not None)
+                beam.Filter(lambda x: x is not None)
             | 'Filter valid exploration models' >> beam.Filter(
                 self.filter_valid_exploration_models
             )
