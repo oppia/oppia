@@ -791,7 +791,7 @@ describe('Contributions and review component', () => {
               content_html: null,
               content_id: null,
               data_format: null,
-              language_code: null,
+              language_code: 'en',
               translation_html: null,
               state_name: null,
               new_value: null,
