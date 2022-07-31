@@ -43,11 +43,7 @@ var expectInteractionDetailsToMatch = async function(
   expect(optionsCount).toEqual(richTextInstructionsArray.length);
   var results = [];
   for (var i = 0; i < optionsCount; i++) {
-<<<<<<< HEAD
-    promises.push(await optionElements[i].$(
-=======
     results.push(await optionElements[i].$(
->>>>>>> 989056a001a8410e22480d040ed59912ef280c03
       '.e2e-test-multiple-choice-option').getText());
   }
   var rteInstructionArrayCopy = [...richTextInstructionsArray];
