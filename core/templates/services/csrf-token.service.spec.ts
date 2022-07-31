@@ -48,6 +48,21 @@ describe('Csrf Token Service', function() {
     httpTestingController.verify();
   });
 
+  it('should throw error when the request failed', (done) => {
+    csrfTokenService.initializeToken();
+
+    csrfTokenService.getTokenAsync().then(done.fail, done);
+
+    let req = httpTestingController.expectOne('/csrfhandler');
+    expect(req.request.method).toEqual('GET');
+    req.error(
+      new ErrorEvent('network error'), {status: 500, statusText: 'error'}
+    );
+
+    httpTestingController.verify();
+  });
+
+
   it('should error if initialize is called more than once', () => {
     csrfTokenService.initializeToken();
 

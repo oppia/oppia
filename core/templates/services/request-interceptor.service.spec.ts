@@ -25,52 +25,12 @@ import { HTTP_INTERCEPTORS, HttpClient, HttpHandler, HttpRequest, HttpParams, Ht
 
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { CsrfTokenService } from './csrf-token.service';
-import { Injectable } from '@angular/core';
-
-
-@Injectable({
-  providedIn: 'root'
-})
-export class MockCsrfTokenService {
-  // 'tokenPromise' will be null when token is not initialized.
-  tokenPromise: PromiseLike<string> | null = null;
-  http: HttpClient;
-
-  constructor(httpBackend: HttpBackend) {
-    this.http = new HttpClient(httpBackend);
-  }
-
-  initializeToken(): void {
-    if (this.tokenPromise !== null) {
-      throw new Error('Token request has already been made');
-    }
-    this.tokenPromise = this.http.get(
-      '/csrfhandler', { responseType: 'text' }
-    ).toPromise().then((responseText: string) => {
-      // Remove the protective XSSI (cross-site scripting inclusion) prefix.
-      return JSON.parse(responseText.substring(5)).token;
-    }, (err) => {
-      console.error(
-        'The following error is thrown while trying to get CSRF token.');
-      console.error(err);
-      throw err;
-    });
-  }
-
-  getTokenAsync(): PromiseLike<string> {
-    if (this.tokenPromise === null) {
-      throw new Error('Token needs to be initialized');
-    }
-    return this.tokenPromise;
-  }
-}
 
 
 describe('Request Interceptor Service', () => {
-  let cts: CsrfTokenService;
+  let csrfTokenService: CsrfTokenService;
   let httpClient: HttpClient;
   let httpTestingController: HttpTestingController;
-  let mockCsrfTokenService: MockCsrfTokenService;
   let requestInterceptor: RequestInterceptor;
 
   beforeEach(() => {
@@ -83,16 +43,10 @@ describe('Request Interceptor Service', () => {
       }]
     });
 
-    mockCsrfTokenService = TestBed.get(MockCsrfTokenService);
     requestInterceptor = TestBed.get(RequestInterceptor);
-    cts = TestBed.get(CsrfTokenService);
+    csrfTokenService = TestBed.get(CsrfTokenService);
     httpClient = TestBed.get(HttpClient);
     httpTestingController = TestBed.get(HttpTestingController);
-    // This throws "Argument of type 'string[]' is not assignable to parameter
-    // of type 'PromiseLike<string>'.". We need to suppress this error because
-    // we need to mock the `getTokenAsync` function for testing purposes.
-    // @ts-expect-error
-    spyOn(cts, 'getTokenAsync').and.returnValue(['sample-csrf-token']);
   });
 
   afterEach(() => {
@@ -100,6 +54,14 @@ describe('Request Interceptor Service', () => {
   });
 
   it('should expect request body to be a FormData constructor', () => {
+    spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(
+      // This throws "Argument of type 'string[]' is not assignable to parameter
+      // of type 'PromiseLike<string>'.". We need to suppress this error because
+      // we need to mock the `getTokenAsync` function for testing purposes.
+      // @ts-expect-error
+      ['sample-csrf-token']
+    );
+
     httpClient.post('/api', {data: 'test'}).subscribe(
       async(response) => expect(response).toBeTruthy());
 
@@ -113,6 +75,14 @@ describe('Request Interceptor Service', () => {
   });
 
   it('should modify http requests body when they are intercepted', () => {
+    spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(
+      // This throws "Argument of type 'string[]' is not assignable to parameter
+      // of type 'PromiseLike<string>'.". We need to suppress this error because
+      // we need to mock the `getTokenAsync` function for testing purposes.
+      // @ts-expect-error
+      ['sample-csrf-token']
+    );
+
     httpClient.patch('/api', {data: 'test'}).subscribe(
       async(response) => expect(response).toBeTruthy());
 
@@ -131,6 +101,14 @@ describe('Request Interceptor Service', () => {
   });
 
   it('should not handle http requests when the body is null', () => {
+    spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(
+      // This throws "Argument of type 'string[]' is not assignable to parameter
+      // of type 'PromiseLike<string>'.". We need to suppress this error because
+      // we need to mock the `getTokenAsync` function for testing purposes.
+      // @ts-expect-error
+      ['sample-csrf-token']
+    );
+
     httpClient.get('/api').subscribe(
       async(response) => expect(response).toBeTruthy());
     httpClient.patch('/api2', {data: 'test'}).subscribe(
@@ -146,7 +124,7 @@ describe('Request Interceptor Service', () => {
     req2.flush({data: 'test'});
     reqCSRF.flush('12345{"token": "sample-csrf-token"}');
 
-    expect(cts.getTokenAsync).toHaveBeenCalledTimes(1);
+    expect(csrfTokenService.getTokenAsync).toHaveBeenCalledTimes(1);
     expect(req.request.body).toBeNull();
     expect(req2.request.body).toEqual({
       csrf_token: 'sample-csrf-token',
@@ -156,7 +134,7 @@ describe('Request Interceptor Service', () => {
   });
 
   it('should throw error if csrf Token is not initialised', () => {
-    spyOn(cts, 'initializeToken').and.callFake(() => {
+    spyOn(csrfTokenService, 'initializeToken').and.callFake(() => {
       throw new Error('Error');
     });
 
@@ -167,9 +145,9 @@ describe('Request Interceptor Service', () => {
   });
 
   it('should correctly set the csrf token', (done) => {
-    mockCsrfTokenService.initializeToken();
+    csrfTokenService.initializeToken();
 
-    mockCsrfTokenService.getTokenAsync().then(function(token) {
+    csrfTokenService.getTokenAsync().then(function(token) {
       expect(token).toEqual('sample-csrf-token');
     }).then(done, done.fail);
 
@@ -178,18 +156,18 @@ describe('Request Interceptor Service', () => {
   });
 
   it('should error if initialize is called more than once', () => {
-    mockCsrfTokenService.initializeToken();
+    csrfTokenService.initializeToken();
 
     let reqCSFR = httpTestingController.expectOne('/csrfhandler');
     reqCSFR.flush('12345{"token": "sample-csrf-token"}');
 
-    expect(() => mockCsrfTokenService.initializeToken())
+    expect(() => csrfTokenService.initializeToken())
       .toThrowError('Token request has already been made');
   });
 
   it('should error if getTokenAsync is called before initialize', () => {
     try {
-      mockCsrfTokenService.getTokenAsync();
+      csrfTokenService.getTokenAsync();
     } catch (e) {
       expect(e).toEqual(new Error('Token needs to be initialized'));
     }
@@ -259,6 +237,14 @@ describe('Request Interceptor Service', () => {
   });
 
   it('should not throw error if null param in POST request', () => {
+    spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(
+      // This throws "Argument of type 'string[]' is not assignable to parameter
+      // of type 'PromiseLike<string>'.". We need to suppress this error because
+      // we need to mock the `getTokenAsync` function for testing purposes.
+      // @ts-expect-error
+      ['sample-csrf-token']
+    );
+
     httpClient.post(
       '/api',
       {data: 'test'},
@@ -272,6 +258,14 @@ describe('Request Interceptor Service', () => {
   });
 
   it('should not throw error if null param in PUT request', () => {
+    spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(
+      // This throws "Argument of type 'string[]' is not assignable to parameter
+      // of type 'PromiseLike<string>'.". We need to suppress this error because
+      // we need to mock the `getTokenAsync` function for testing purposes.
+      // @ts-expect-error
+      ['sample-csrf-token']
+    );
+
     httpClient.put(
       '/api',
       {data: 'test'},
@@ -285,6 +279,14 @@ describe('Request Interceptor Service', () => {
   });
 
   it('should not throw error if null param in PATCH request', () => {
+    spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(
+      // This throws "Argument of type 'string[]' is not assignable to parameter
+      // of type 'PromiseLike<string>'.". We need to suppress this error because
+      // we need to mock the `getTokenAsync` function for testing purposes.
+      // @ts-expect-error
+      ['sample-csrf-token']
+    );
+
     httpClient.patch(
       '/api',
       {data: 'test'},
