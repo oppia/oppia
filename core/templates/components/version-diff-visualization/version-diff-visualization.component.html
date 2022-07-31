@@ -1,45 +1,58 @@
-<div ng-hide="$ctrl.diffGraphData" class="oppia-align-center">
+<div [hidden]="diffGraphData" class="oppia-align-center">
   Loading
   <loading-dots></loading-dots>
 </div>
 
 <div class="version-diff-container">
-  <div>
-    <div state-graph-visualization class="e2e-test-history-graph diff-graph"
-         graph-data="$ctrl.diffGraphData" node-colors="$ctrl.diffGraphNodeColors"
-         node-secondary-labels="$ctrl.diffGraphSecondaryLabels"
-         init-state-id2="$ctrl.v1InitStateId"
-         link-property-mapping="$ctrl.DIFF_GRAPH_LINK_PROPERTY_MAPPING"
-         on-click-function="$ctrl.onClickStateInDiffGraph">
-    </div>
-  </div>
+  <mat-card class="diff-graph version-diff-graph e2e-test-history-graph">
+    <state-graph-visualization [versionGraphData]="diffGraphData"
+                               [nodeColors]="diffGraphNodeColors"
+                               [nodeSecondaryLabels]="diffGraphSecondaryLabels"
+                               [initStateId2]="v1InitStateId"
+                               class="version-diff-container-graph"
+                               [linkPropertyMapping]="DIFF_GRAPH_LINK_PROPERTY_MAPPING"
+                               (onClickFunction)="onClickStateInDiffGraph($event)">
+    </state-graph-visualization>
+  </mat-card>
 
-  <div>
-    <div class="legend-graph" ng-show="$ctrl.diffGraphData">
-      <h4 class="exploration-graph-legend-heading">Exploration Graph Legend</h4>
-      <div state-graph-visualization graph-data="$ctrl.legendGraph"
-           node-colors="$ctrl.LEGEND_GRAPH_COLORS"
-           node-secondary-labels="$ctrl.LEGEND_GRAPH_SECONDARY_LABELS"
-           link-property-mapping="$ctrl.LEGEND_GRAPH_LINK_PROPERTY_MAPPING"
-           id="legend-graph">
-      </div>
-    </div>
+  <h4 class="exploration-graph-legend-heading">Exploration Graph Legend:</h4>
+  <div class="version-diff-graph">
+    <mat-card class="legend-graph version-diff-graph" [hidden]="!diffGraphData">
+      <state-graph-visualization [versionGraphData]="legendGraph"
+                                 [nodeColors]="LEGEND_GRAPH_COLORS"
+                                 [nodeSecondaryLabels]="LEGEND_GRAPH_SECONDARY_LABELS"
+                                 [linkPropertyMapping]="LEGEND_GRAPH_LINK_PROPERTY_MAPPING"
+                                 id="legend-graph">
+      </state-graph-visualization>
+    </mat-card>
   </div>
 </div>
 
 <style>
+  .version-diff-graph {
+    height: 100%;
+    margin-bottom: 0;
+    padding-bottom: 0;
+    position: relative;
+    width: 100%;
+  }
+
   .legend-graph .node rect {
     pointer-events: none;
   }
+
   .legend-graph {
-    margin-top: 30px;
+    position: initial;
     right: -100px;
     top: 10px;
   }
+
   .exploration-graph-legend-heading {
     font-weight: normal;
+    margin-top: 10px;
   }
-  version-diff-visualization .diff-graph, version-diff-visualization .legend-graph {
+
+  .diff-graph, .legend-graph {
     border: 1px solid #707070;
   }
 </style>

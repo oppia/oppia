@@ -1,28 +1,25 @@
-<div class="oppia-editor-cards-container" ng-if="$ctrl.stateEditorInitialized">
-  <oppia-state-editor (on-save-state-content)="$ctrl.saveStateContent($event)"
-                      (on-save-interaction-customization-args)="$ctrl.saveInteractionCustomizationArgs($event)"
-                      (on-save-next-content-id-index)="$ctrl.saveNextContentIdIndex($event)"
-                      (on-save-interaction-id)="$ctrl.saveInteractionId($event)"
-                      (on-save-interaction-default-outcome)="$ctrl.saveInteractionDefaultOutcome($event)"
-                      (on-save-interaction-answer-groups)="$ctrl.saveInteractionAnswerGroups($event)"
-                      (on-save-solution)="$ctrl.saveSolution($event)"
-                      (on-save-hints)="$ctrl.saveHints($event)"
-                      (on-save-inapplicable-skill-misconception-ids)="$ctrl.saveInapplicableSkillMisconceptionIds($event)"
-                      [state-content-placeholder]="$ctrl.getStateContentPlaceholder()"
-                      [state-content-save-button-placeholder]="$ctrl.getStateContentSaveButtonPlaceholder()"
-                      (show-mark-all-audio-as-needing-update-modal-if-required)="$ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired($event)"
-                      [interaction-is-shown]="$ctrl.interactionIsShown"
-                      (recompute-graph)="$ctrl.recomputeGraph($event)"
-                      (navigate-to-state)="$ctrl.navigateToState($event)"
-                      [add-state]="$ctrl.addState"
-                      (refresh-warnings)="$ctrl.refreshWarnings($event)">
+<div class="oppia-editor-cards-container" *ngIf="stateEditorIsInitialized">
+  <oppia-state-editor (onSaveStateContent)="saveStateContent($event)"
+                      (onSaveInteractionCustomizationArgs)="saveInteractionCustomizationArgs($event)"
+                      (onSaveNextContentIdIndex)="saveNextContentIdIndex($event)"
+                      (onSaveInteractionId)="saveInteractionId($event)"
+                      (onSaveInteractionDefaultOutcome)="saveInteractionDefaultOutcome($event)"
+                      (onSaveInteractionAnswerGroups)="saveInteractionAnswerGroups($event)"
+                      (onSaveSolution)="saveSolution($event)"
+                      (onSaveHints)="saveHints($event)"
+                      (onSaveInapplicableSkillMisconceptionIds)="saveInapplicableSkillMisconceptionIds($event)"
+                      (showMarkAllAudioAsNeedingUpdateModalIfRequired)="showMarkAllAudioAsNeedingUpdateModalIfRequired($event)"
+                      [interactionIsShown]="interactionIsShown"
+                      [stateContentPlaceholder]="getStateContentPlaceholder()"
+                      [stateContentSaveButtonPlaceholder]="getStateContentSaveButtonPlaceholder()">
   </oppia-state-editor>
 </div>
 
 <style>
-  question-editor .oppia-editor-cards-container {
+  .oppia-editor-cards-container {
     padding-bottom: 5vh;
   }
+
   question-editor oppia-outcome-feedback-editor {
     min-width: 100%;
   }

@@ -82,7 +82,6 @@ var ExplorationEditorMainTab = function() {
   var responseTabElement = $('.e2e-test-response-tab');
   var ruleDetails = $('.e2e-test-rule-details');
   var stateContentDisplay = $('.e2e-test-state-content-display');
-  var stateContentEditorLocator = '.e2e-test-state-content-editor';
   var stateEditButton = $('.e2e-test-edit-content-pencil-button');
   var stateEditorTag = $('.e2e-test-state-content-editor');
   var stateNameContainer = $('.e2e-test-state-name-container');
@@ -440,8 +439,11 @@ var ExplorationEditorMainTab = function() {
 
     await editOutcomeDestDropdownOptions.selectByVisibleText(targetOption);
 
-    // 'End' is one of the keys name for setValue function, so to insert
-    // 'End' as a string we need to pass it as an array of string.
+    // 'End' is one of the key names present in Webdriver protocol,
+    // and so if we try to pass 'End' in setValue, webdriverio will
+    // press the 'End' key present in keyboard instead of typing 'End'
+    // as a string. Hence, to type 'End' as a string, we need to pass it
+    // as an array of string.
     if (destName === 'End') {
       destName = ['E', 'n', 'd'];
     }
@@ -474,11 +476,7 @@ var ExplorationEditorMainTab = function() {
     await action.click('stateEditButton', stateEditButton);
     await waitFor.visibilityOf(
       stateEditorTag, 'State editor tag not showing up');
-    var stateContentEditor = stateEditorTag.$(stateContentEditorLocator);
-    await waitFor.visibilityOf(
-      stateContentEditor,
-      'stateContentEditor taking too long to appear to set content');
-    var richTextEditor = await forms.RichTextEditor(stateContentEditor);
+    var richTextEditor = await forms.RichTextEditor(stateEditorTag);
     await richTextEditor.clear();
     await richTextInstructions(richTextEditor);
     await action.click('Save State Content Button', saveStateContentButton);
