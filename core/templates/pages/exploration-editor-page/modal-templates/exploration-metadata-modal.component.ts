@@ -19,6 +19,9 @@
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { FormControl } from '@angular/forms';
+import { MatChipInputEvent } from '@angular/material/chips';
+import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { AppConstants } from 'app.constants';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { ExplorationCategoryService } from '../services/exploration-category.service';
@@ -28,7 +31,7 @@ import { ExplorationTagsService } from '../services/exploration-tags.service';
 import { ExplorationTitleService } from '../services/exploration-title.service';
 import { AlertsService } from 'services/alerts.service';
 import { ExplorationStatesService } from '../services/exploration-states.service';
-import { FormControl } from '@angular/forms';
+
 
 @Component({
   selector: 'oppia-exploration-metadata-modal',
@@ -47,6 +50,13 @@ export class ExplorationMetadataModalComponent
 
   myControl = new FormControl('');
   options: string[] = ['One', 'Two', 'Three'];
+  addOnBlur = true;
+  readonly separatorKeysCodes = [ENTER, COMMA] as const;
+
+  explorationTags: string[] = [];
+
+  filteredChoices;
+  newCategory;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -59,6 +69,52 @@ export class ExplorationMetadataModalComponent
     private explorationStatesService: ExplorationStatesService,
   ) {
     super(ngbActiveModal);
+  }
+
+  updateCategoryListWithUserData(): void {
+    if (this.newCategory) {
+      this.CATEGORY_LIST_FOR_SELECT2.push(this.newCategory);
+    }
+  }
+
+  filterChoices(searchTerm: string): void {
+    this.newCategory = {
+      id: searchTerm,
+      text: searchTerm
+    };
+
+    this.filteredChoices = this.CATEGORY_LIST_FOR_SELECT2.filter(
+      value => value.text.toLowerCase().indexOf(searchTerm.toLowerCase()) > -1);
+
+    this.filteredChoices.push(this.newCategory);
+
+    if (searchTerm === '') {
+      this.filteredChoices = this.CATEGORY_LIST_FOR_SELECT2;
+    }
+  }
+
+  add(event: MatChipInputEvent): void {
+    const value = (event.value || '').trim();
+
+    // Add our fruit.
+    if (value) {
+      this.explorationTags.push(value);
+    }
+
+    // Clear the input value.
+    event.input.value = '';
+
+    this.explorationTagsService.displayed = this.explorationTags;
+  }
+
+  remove(fruit: string): void {
+    const index = this.explorationTags.indexOf(fruit);
+
+    if (index >= 0) {
+      this.explorationTags.splice(index, 1);
+    }
+
+    this.explorationTagsService.displayed = this.explorationTags;
   }
 
   save(): void {
@@ -172,14 +228,14 @@ export class ExplorationMetadataModalComponent
       }
     }
 
-
-    console.error(this.explorationTagsService.displayed);
+    this.filteredChoices = this.CATEGORY_LIST_FOR_SELECT2;
+    this.explorationTags = (this.explorationTagsService.displayed) as string[];
   }
 
   shivam(): void {
     console.error('thisis erro');
+    console.error(this.explorationTagsService.displayed);
     console.error(this.explorationCategoryService.displayed);
-    console.error(this.explorationCategoryService.savedMemento);
   }
 }
 

@@ -16,21 +16,21 @@
                                       [formStyle]="{'font-weight': 'normal'}">
   </oppia-exploration-objective-editor>
   <p *ngIf="requireCategoryToBeSpecified">
-      <mat-form-field class="example-full-width" appearance="fill">
-        <mat-label>Add a category: How would you categorize your exploration?</mat-label>
-        <input type="text"
-               placeholder="Type new category here"
-               aria-label="Number"
-               matInput
-               [formControl]="myControl"
-               [matAutocomplete]="auto"
-               [(ngModel)]="explorationCategoryService.displayed">
-        <mat-autocomplete #auto="matAutocomplete">
-          <mat-option *ngFor="let option of CATEGORY_LIST_FOR_SELECT2" [value]="option.id">
-            {{option.text}}
-          </mat-option>
-        </mat-autocomplete>
-      </mat-form-field>
+    <mat-form-field appearance="fill">
+      <mat-label>Add a category: How would you categorize your exploration?</mat-label>
+      <mat-select [(ngModel)]="explorationCategoryService.displayed">
+        <mat-option>
+          <ngx-mat-select-search ngModel
+                                 (ngModelChange)="filterChoices($event)"
+                                 (keydown.enter)="updateCategoryListWithUserData()"
+                                 placeholderLabel="Type new category here...">
+          </ngx-mat-select-search>
+        </mat-option>
+        <mat-option (click)="updateCategoryListWithUserData()" *ngFor="let option of filteredChoices" [value]="option.id">
+          {{ option.text }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
 
       <!-- <select2-dropdown item="explorationCategoryService.displayed"
                         choices="CATEGORY_LIST_FOR_SELECT2"
@@ -56,44 +56,22 @@
               width="100%">
       </select> -->
   </p>
-  <p *ngIf="askForTags">
-    <label class="font-weight-normal"> Add tags to help learners discover your exploration.
-
-
-      <mat-form-field class="example-full-width" appearance="fill">
-        <mat-label>Add a category: How would you categorize your exploration?</mat-label>
-        <input type="text"
-               placeholder="Type new category here"
-               aria-label="Number"
-               matInput
-               [formControl]="myControl"
-               [matAutocomplete]="auto"
-               [(ngModel)]="explorationCategoryService.displayed">
-        <mat-autocomplete #auto="matAutocomplete">
-          <!-- <mat-option *ngFor="let option of CATEGORY_LIST_FOR_SELECT2" [value]="option.id">
-            {{option.text}}
-          </mat-option> -->
-          <mat-select multiple>
-            <mat-option *ngFor="let option of CATEGORY_LIST_FOR_SELECT2" [value]="option.id">{{option.id}}</mat-option>
-          </mat-select>
-        </mat-autocomplete>
+  <p *ngIf="askForTags"> 
+      <mat-form-field class="example-chip-list" appearance="fill">
+        <mat-label>Add tags to help learners discover your exploration.</mat-label>
+        <mat-chip-list #chipList aria-label="Fruit selection">
+          <mat-chip *ngFor="let tags of explorationTags" (removed)="remove(tags)">
+            {{ tags }}
+              <mat-icon matChipRemove class="update-cross-icon">cancel</mat-icon>
+          </mat-chip>
+          <input placeholder="Add a new tag (using lowercase letters and spaces)..."
+                 pattern="[a-z]"
+                 [matChipInputFor]="chipList"
+                 [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                 [matChipInputAddOnBlur]="addOnBlur"
+                 (matChipInputTokenEnd)="add($event)">
+        </mat-chip-list>
       </mat-form-field>
-
-      <mat-form-field appearance="fill">
-        <mat-label>Toppings</mat-label>
-        <mat-select multiple>
-          <mat-option *ngFor="let topping of explorationTagsService.displayed" [value]="topping">{{topping}}</mat-option>
-        </mat-select>
-      </mat-form-field>
-
-
-      <!-- <select2-dropdown item="explorationTagsService.displayed"
-                        choices="explorationTagsService.displayed"
-                        allow-multiple-choices="true"
-                        invalid-search-term-message="Add a new tag (using lowercase letters and spaces)..."
-                        new-choice-regex="<[::TAG_REGEX]>">
-      </select2-dropdown> -->
-    </label>
   </p>
 </div>
 
@@ -104,6 +82,10 @@
 
 <style>
   .mat-form-field {
+    width: 100%;
+  }
+
+  .example-chip-list {
     width: 100%;
   }
 </style>
