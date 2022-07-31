@@ -414,7 +414,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         'automatically_update_topics': False,
         'is_curriculum_admin': False
     }
-<<<<<<< Updated upstream
     ANDROID_REPORT_INFO_SCHEMA_VERSION: Final = 1
     SUGGESTION_LANGUAGE_CODE: Final = 'en'
     SUBMITTED_TRANSLATIONS_COUNT: Final = 2
@@ -424,7 +423,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
     ACCEPTED_TRANSLATION_WORD_COUNT: Final = 50
     REJECTED_TRANSLATIONS_COUNT: Final = 0
     REJECTED_TRANSLATION_WORD_COUNT: Final = 0
-=======
     ANDROID_REPORT_INFO_SCHEMA_VERSION = 1
     SUGGESTION_LANGUAGE_CODE = 'en'
     SUBMITTED_TRANSLATIONS_COUNT = 2
@@ -443,7 +441,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
     REVIEWED_QUESTIONS_COUNT = 2
     ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT = 0
     ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_WORD_COUNT = 0
->>>>>>> Stashed changes
     # Timestamp dates in sec since epoch for Mar 19 2021 UTC.
     CONTRIBUTION_DATES: Final = [
         datetime.date.fromtimestamp(1616173836),
@@ -1121,40 +1118,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'managed_topic_ids': []
         }
 
-<<<<<<< Updated upstream
-        expected_voiceover_application_data: Dict[
-            str, Dict[str, Optional[str]]
-        ] = {}
-        expected_contrib_proficiency_data: Dict[
-            str, Dict[str, Union[int, bool]]
-        ] = {}
-        expected_contribution_rights_data: Dict[
-            str, Union[bool, List[str]]
-        ] = {}
-        expected_collection_rights_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
-        expected_collection_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
-        expected_skill_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
-        expected_subtopic_page_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
-        expected_topic_rights_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
-        expected_topic_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
-        expected_translation_contribution_stats: Dict[
-            str, Dict[str, Dict[str, str]]
-        ] = {}
-        expected_story_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
-        expected_question_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
-        expected_config_property_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
-        expected_exploration_rights_sm: Dict[
-            str, Dict[str, Dict[str, str]]
-        ] = {}
-        expected_exploration_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
-        expected_platform_parameter_sm: Dict[
-            str, Dict[str, Dict[str, str]]
-        ] = {}
-        expected_user_auth_details: Dict[str, str] = {}
-        expected_user_email_preferences: Dict[str, str] = {}
-        expected_blog_post_data: Dict[str, Union[str, float, List[str]]] = {}
-        expected_blog_post_rights: Dict[str, List[str]] = {
-=======
         expected_voiceover_application_data = {}
         expected_contrib_proficiency_data = {}
         expected_contribution_rights_data = {}
@@ -1178,7 +1141,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_user_email_preferences = {}
         expected_blog_post_data = {}
         expected_blog_post_rights = {
->>>>>>> Stashed changes
             'editable_blog_post_ids': []
         }
         expected_learner_group_model_data: Dict[str, str] = {}
