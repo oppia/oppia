@@ -66,7 +66,226 @@ describe('Question Suggestion Review Modal component', () => {
   const reviewable = true;
   const skillDifficulty = 0.3;
   const suggestionId = '123';
-  let suggestion = null;
+  let misconceptionsBySkill = null;
+  let suggestionIdToContribution = {
+    1: {
+      details: {
+        id: '1',
+        chapter_title: null,
+        story_title: null,
+        topic_name: null,
+        question_count: 1,
+        skill_description: questionHeader,
+        skill_rubrics: [{
+          explanations: ['explanation'],
+          difficulty: 'Easy'
+        }]
+      },
+      suggestion: {
+        suggestion_type: null,
+        target_id: null,
+        target_type: null,
+        exploration_content_html: null,
+        language_code: null,
+        last_updated_msecs: null,
+        suggestion_id: null,
+        status: '',
+        author_name: authorName,
+        change: {
+          data_format: null,
+          language_code: null,
+          state_name: null,
+          translation_html: null,
+          new_value: null,
+          old_value: null,
+          content_html: null,
+          content_id: null,
+          cmd: 'create_new_fully_specified_question',
+          question_dict: {
+            id: '1',
+            question_state_data_schema_version: null,
+            language_code: null,
+            version: null,
+            linked_skill_ids: null,
+            inapplicable_skill_misconception_ids: null,
+            question_state_data: {
+              content: {
+                html: 'Question 1',
+                content_id: 'content_1'
+              },
+              interaction: {
+                answer_groups: [{
+                  outcome: {
+                    dest: 'outcome 1',
+                    dest_if_really_stuck: null,
+                    feedback: {
+                      content_id: 'content_5',
+                      html: ''
+                    },
+                    labelled_as_correct: true,
+                    param_changes: [],
+                    refresher_exploration_id: null
+                  },
+                  rule_specs: [],
+                }],
+                confirmed_unclassified_answers: [],
+                customization_args: {
+                  placeholder: {
+                    value: {
+                      content_id: 'ca_placeholder_0',
+                      unicode_str: ''
+                    }
+                  },
+                  rows: { value: 1 }
+                },
+                default_outcome: {
+                  dest: null,
+                  dest_if_really_stuck: null,
+                  feedback: {
+                    html: 'Correct Answer',
+                    content_id: 'content_2'
+                  },
+                  param_changes: [],
+                  labelled_as_correct: true
+                },
+                hints: [{
+                  hint_content: {
+                    html: 'Hint 1',
+                    content_id: 'content_3'
+                  }
+                }],
+                solution: {
+                  correct_answer: 'This is the correct answer',
+                  answer_is_exclusive: false,
+                  explanation: {
+                    html: 'Solution explanation',
+                    content_id: 'content_4'
+                  }
+                },
+                id: 'TextInput'
+              },
+              param_changes: [],
+              recorded_voiceovers: {
+                voiceovers_mapping: {}
+              },
+              written_translations: {
+                translations_mapping: {}
+              },
+            },
+          },
+          skill_difficulty: skillDifficulty,
+          skill_id: 'skill_1'
+        }
+      }
+    },
+    2: {
+      details: {
+        id: '2',
+        topic_name: null,
+        chapter_title: null,
+        story_title: null,
+        question_count: 1,
+        skill_description: questionHeader,
+        skill_rubrics: []
+      },
+      suggestion: {
+        suggestion_id: null,
+        suggestion_type: null,
+        target_id: null,
+        target_type: null,
+        exploration_content_html: null,
+        language_code: null,
+        last_updated_msecs: null,
+        status: '',
+        author_name: authorName,
+        change: {
+          data_format: null,
+          language_code: null,
+          state_name: null,
+          translation_html: null,
+          new_value: null,
+          old_value: null,
+          content_html: null,
+          content_id: null,
+          cmd: 'create_new_fully_specified_question',
+          question_dict: {
+            id: '2',
+            question_state_data_schema_version: null,
+            language_code: null,
+            version: null,
+            linked_skill_ids: null,
+            inapplicable_skill_misconception_ids: null,
+            question_state_data: {
+              content: {
+                html: 'Question 1',
+                content_id: 'content_1'
+              },
+              interaction: {
+                answer_groups: [{
+                  outcome: {
+                    dest: 'outcome 1',
+                    dest_if_really_stuck: null,
+                    feedback: {
+                      content_id: 'content_5',
+                      html: ''
+                    },
+                    labelled_as_correct: true,
+                    param_changes: [],
+                    refresher_exploration_id: null
+                  },
+                  rule_specs: [],
+                }],
+                confirmed_unclassified_answers: [],
+                customization_args: {
+                  placeholder: {
+                    value: {
+                      content_id: 'ca_placeholder_0',
+                      unicode_str: ''
+                    }
+                  },
+                  rows: { value: 1 }
+                },
+                default_outcome: {
+                  dest: null,
+                  dest_if_really_stuck: null,
+                  feedback: {
+                    html: 'Correct Answer',
+                    content_id: 'content_2'
+                  },
+                  param_changes: [],
+                  labelled_as_correct: true
+                },
+                hints: [{
+                  hint_content: {
+                    html: 'Hint 1',
+                    content_id: 'content_3'
+                  }
+                }],
+                solution: {
+                  correct_answer: 'This is the correct answer',
+                  answer_is_exclusive: false,
+                  explanation: {
+                    html: 'Solution explanation',
+                    content_id: 'content_4'
+                  }
+                },
+                id: 'TextInput'
+              },
+              param_changes: [],
+              recorded_voiceovers: {
+                voiceovers_mapping: {}
+              },
+              written_translations: {
+                translations_mapping: {}
+              },
+            },
+          },
+          skill_difficulty: skillDifficulty,
+          skill_id: 'skill_1'
+        }
+      }
+    },
+  };
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -98,17 +317,13 @@ describe('Question Suggestion Review Modal component', () => {
     suggestionModalService = TestBed.inject(SuggestionModalService);
     cancelSuggestionSpy = spyOn(suggestionModalService, 'cancelSuggestion');
 
-    component.authorName = 'Username 1';
-    component.contentHtml = 'Content html';
-    component.question = null;
-    component.questionHeader = 'Question header';
     component.reviewable = true;
-    component.skillDifficulty = 0.3;
-    component.suggestionId = '123';
-    component.suggestion = null;
-    component.skillDifficulty = skillDifficulty;
     component.suggestionId = suggestionId;
-    component.suggestion = suggestion;
+    component.misconceptionsBySkill = misconceptionsBySkill;
+    // This throws "TS2322". We need to suppress this error because
+    // not all of the data is needed to run these tests.
+    // @ts-ignore
+    component.suggestionIdToContribution = suggestionIdToContribution;
 
     ngbModal = TestBed.inject(NgbModal);
     skillBackendApiService = TestBed.inject(SkillBackendApiService);
