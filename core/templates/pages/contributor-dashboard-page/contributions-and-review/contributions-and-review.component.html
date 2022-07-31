@@ -25,10 +25,10 @@
           Contributions
         </div>
         <div class="oppia-contributions-dropdown-list-option"
-             *ngIf="tab?.enabled">
-          <div *ngFor="let tab of contributionTabs"
-               (click)="switchToTab(TAB_TYPE_CONTRIBUTIONS, tab.suggestionType)"
-               [ngClass]="isActiveTab(TAB_TYPE_CONTRIBUTIONS, tab.suggestionType) ? 'oppia-contributions-dropdown-list-option-selected' : ''">
+             *ngFor="let tab of contributionTabs"
+             (click)="switchToTab(TAB_TYPE_CONTRIBUTIONS, tab.suggestionType)"
+             [ngClass]="isActiveTab(TAB_TYPE_CONTRIBUTIONS, tab.suggestionType) ? 'oppia-contributions-dropdown-list-option-selected' : ''">
+          <div *ngIf="tab?.enabled">
             {{ tab.text }}
           </div>
         </div>
