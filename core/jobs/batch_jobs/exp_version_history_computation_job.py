@@ -86,38 +86,39 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
         commit_log_models = model_group['commit_log_models']
 
         model_group_is_valid = len(exp_models_vlatest) == 1
-        exp_model_vlatest = exp_models_vlatest[0]
-
-        commit_log_flags: List[bool] = [False] * exp_model_vlatest.version
-        exp_flags: List[bool] = [False] * exp_model_vlatest.version
-
         if model_group_is_valid:
-            for commit_log in commit_log_models:
-                # Version can be None if there is a commit which does not
-                # change the version of the exploration such as changing
-                # roles.
-                if (
-                    commit_log is not None and
-                    commit_log.version is not None and
-                    commit_log.version >= 1 and
-                    commit_log.version <= exp_model_vlatest.version
-                ):
-                    commit_log_flags[commit_log.version - 1] = True
-            model_group_is_valid = (
-                exp_model_vlatest.version == commit_log_flags.count(True)
-            )
+            exp_model_vlatest = exp_models_vlatest[0]
 
-        if model_group_is_valid:
-            for exp_model in all_exp_models:
-                if (
-                    exp_model is not None and
-                    exp_model.version >= 1 and
-                    exp_model.version <= exp_model_vlatest.version
-                ):
-                    exp_flags[exp_model.version - 1] = True
-            model_group_is_valid = (
-                exp_model_vlatest.version == exp_flags.count(True)
-            )
+            commit_log_flags: List[bool] = [False] * exp_model_vlatest.version
+            exp_flags: List[bool] = [False] * exp_model_vlatest.version
+
+            if model_group_is_valid:
+                for commit_log in commit_log_models:
+                    # Version can be None if there is a commit which does not
+                    # change the version of the exploration such as changing
+                    # roles.
+                    if (
+                        commit_log is not None and
+                        commit_log.version is not None and
+                        commit_log.version >= 1 and
+                        commit_log.version <= exp_model_vlatest.version
+                    ):
+                        commit_log_flags[commit_log.version - 1] = True
+                model_group_is_valid = (
+                    exp_model_vlatest.version == commit_log_flags.count(True)
+                )
+
+            if model_group_is_valid:
+                for exp_model in all_exp_models:
+                    if (
+                        exp_model is not None and
+                        exp_model.version >= 1 and
+                        exp_model.version <= exp_model_vlatest.version
+                    ):
+                        exp_flags[exp_model.version - 1] = True
+                model_group_is_valid = (
+                    exp_model_vlatest.version == exp_flags.count(True)
+                )
 
         return model_group_is_valid
 
@@ -550,7 +551,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
 
         model_groups = (
             ({
-                'exp_models': all_explorations,
+                'all_exp_models': all_explorations,
                 'exp_models_vlatest': all_explorations_vlatest,
                 'commit_log_models': all_commit_logs,
                 'version_history_models': all_version_history_models
@@ -631,7 +632,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
             invalid_model_groups
             | 'Save info on invalid model groups' >> beam.Map(
                 lambda exp_id: job_run_result.JobRunResult.as_stderr(
-                    'Version history cannot be computed for exploration'
+                    'Version history cannot be computed for exploration '
                     'with ID %s' % (exp_id)
                 )
             )
@@ -745,52 +746,59 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
         version_history_models = model_group['version_history_models']
 
         model_group_is_valid = len(exp_models_vlatest) == 1
-        exp_model_vlatest = exp_models_vlatest[0]
-
-        commit_log_flags: List[bool] = [False] * exp_model_vlatest.version
-        version_history_flags: List[bool] = [False] * exp_model_vlatest.version
-        exp_flags: List[bool] = [False] * exp_model_vlatest.version
-
         if model_group_is_valid:
-            for commit_log in commit_log_models:
-                # Version can be None if there is a commit which does not
-                # change the version of the exploration such as changing
-                # roles.
-                if (
-                    commit_log is not None and
-                    commit_log.version is not None and
-                    commit_log.version >= 1 and
-                    commit_log.version <= exp_model_vlatest.version
-                ):
-                    commit_log_flags[commit_log.version - 1] = True
-            model_group_is_valid = (
-                exp_model_vlatest.version == commit_log_flags.count(True)
-            )
+            exp_model_vlatest = exp_models_vlatest[0]
 
-        if model_group_is_valid:
-            for exp_model in all_exp_models:
-                if (
-                    exp_model is not None and
-                    exp_model.version >= 1 and
-                    exp_model.version <= exp_model_vlatest.version
-                ):
-                    exp_flags[exp_model.version - 1] = True
-            model_group_is_valid = (
-                exp_model_vlatest.version == exp_flags.count(True)
+            commit_log_flags: List[bool] = [False] * exp_model_vlatest.version
+            version_history_flags: List[bool] = (
+                [False] * exp_model_vlatest.version
             )
+            exp_flags: List[bool] = [False] * exp_model_vlatest.version
 
-        if model_group_is_valid:
-            for vh_model in version_history_models:
-                if (
-                    vh_model is not None and
-                    vh_model.exploration_version >= 1 and
-                    vh_model.exploration_version <= exp_model_vlatest.version
-                ):
-                    version_history_flags[
-                        vh_model.exploration_version - 1] = True
-            model_group_is_valid = (
-                exp_model_vlatest.version == version_history_flags.count(True)
-            )
+            if model_group_is_valid:
+                for commit_log in commit_log_models:
+                    # Version can be None if there is a commit which does not
+                    # change the version of the exploration such as changing
+                    # roles.
+                    if (
+                        commit_log is not None and
+                        commit_log.version is not None and
+                        commit_log.version >= 1 and
+                        commit_log.version <= exp_model_vlatest.version
+                    ):
+                        commit_log_flags[commit_log.version - 1] = True
+                model_group_is_valid = (
+                    exp_model_vlatest.version == commit_log_flags.count(True)
+                )
+
+            if model_group_is_valid:
+                for exp_model in all_exp_models:
+                    if (
+                        exp_model is not None and
+                        exp_model.version >= 1 and
+                        exp_model.version <= exp_model_vlatest.version
+                    ):
+                        exp_flags[exp_model.version - 1] = True
+                model_group_is_valid = (
+                    exp_model_vlatest.version == exp_flags.count(True)
+                )
+
+            if model_group_is_valid:
+                for vh_model in version_history_models:
+                    if (
+                        vh_model is not None and
+                        vh_model.exploration_version >= 1 and
+                        vh_model.exploration_version <= (
+                            exp_model_vlatest.version
+                        )
+                    ):
+                        version_history_flags[
+                            vh_model.exploration_version - 1] = True
+                model_group_is_valid = (
+                    exp_model_vlatest.version == version_history_flags.count(
+                        True
+                    )
+                )
 
         return model_group_is_valid
 
@@ -1113,7 +1121,7 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
 
         verification_results = (
             ({
-                'exp_models': all_explorations,
+                'all_exp_models': all_explorations,
                 'exp_models_vlatest': all_explorations_vlatest,
                 'commit_log_models': all_commit_logs,
                 'version_history_models': all_version_history_models
