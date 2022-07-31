@@ -43,9 +43,12 @@ jobs:
       - name: Install ffmpeg
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: sudo apt install ffmpeg
+      - name: Build Webpack
+        if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
+        run: python -m scripts.build --prod_env
       - name: Run Topics and Skills Dashboard E2E Test
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
-        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --suite="topicsAndSkillsDashboard" --prod_env
+        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-build --skip-install --suite="topicsAndSkillsDashboard" --prod_env
         env:
           VIDEO_RECORDING_IS_ENABLED: 0
       - name: Run Topic and Story Editor E2E Test

@@ -98,58 +98,6 @@ _PARSER.add_argument(
     help='Build webpack with source maps.',
     action='store_true')
 
-# Never rerun failing tests, even when they match a known flake.
-RERUN_POLICY_NEVER = 'never'
-# Only rerun failing tests when they match a known flake.
-RERUN_POLICY_KNOWN_FLAKES = 'known flakes'
-# Always rerun failing tests, even when they don't match a known flake.
-RERUN_POLICY_ALWAYS = 'always'
-
-RERUN_POLICIES = {
-    'accessibility': RERUN_POLICY_NEVER,
-    'additionaleditorfeatures': RERUN_POLICY_KNOWN_FLAKES,
-    'additionaleditorfeaturesmodals': RERUN_POLICY_ALWAYS,
-    'additionalplayerfeatures': RERUN_POLICY_NEVER,
-    'adminpage': RERUN_POLICY_NEVER,
-    'blogdashboard': RERUN_POLICY_NEVER,
-    'classroompage': RERUN_POLICY_NEVER,
-    'classroompagefileuploadfeatures': RERUN_POLICY_NEVER,
-    'collections': RERUN_POLICY_NEVER,
-    'contributordashboard': RERUN_POLICY_KNOWN_FLAKES,
-    'coreeditorandplayerfeatures': RERUN_POLICY_KNOWN_FLAKES,
-    'creatordashboard': RERUN_POLICY_KNOWN_FLAKES,
-    'embedding': RERUN_POLICY_KNOWN_FLAKES,
-    'explorationfeedbacktab': RERUN_POLICY_NEVER,
-    'explorationhistorytab': RERUN_POLICY_KNOWN_FLAKES,
-    'explorationimprovementstab': RERUN_POLICY_ALWAYS,
-    'explorationstatisticstab': RERUN_POLICY_KNOWN_FLAKES,
-    'explorationtranslationtab': RERUN_POLICY_KNOWN_FLAKES,
-    'extensions': RERUN_POLICY_NEVER,
-    'featuregating': RERUN_POLICY_ALWAYS,
-    'fileuploadextensions': RERUN_POLICY_NEVER,
-    'fileuploadfeatures': RERUN_POLICY_KNOWN_FLAKES,
-    'learner': RERUN_POLICY_NEVER,
-    'learnerdashboard': RERUN_POLICY_NEVER,
-    'library': RERUN_POLICY_NEVER,
-    'navigation': RERUN_POLICY_KNOWN_FLAKES,
-    'playvoiceovers': RERUN_POLICY_NEVER,
-    'preferences': RERUN_POLICY_NEVER,
-    'profilefeatures': RERUN_POLICY_NEVER,
-    'profilemenu': RERUN_POLICY_NEVER,
-    'publication': RERUN_POLICY_NEVER,
-    'releasecoordinatorpagefeatures': RERUN_POLICY_NEVER,
-    'skilleditor': RERUN_POLICY_KNOWN_FLAKES,
-    'subscriptions': RERUN_POLICY_NEVER,
-    'topicandstoryeditor': RERUN_POLICY_NEVER,
-    'topicandstoryeditorfileuploadfeatures': RERUN_POLICY_NEVER,
-    'topicandstoryviewer': RERUN_POLICY_NEVER,
-    'topicsandskillsdashboard': RERUN_POLICY_NEVER,
-    'users': RERUN_POLICY_NEVER,
-    'wipeout': RERUN_POLICY_NEVER,
-    # The suite name is `full` when no --suite argument is passed. This
-    # indicates that all the tests should be run.
-    'full': RERUN_POLICY_NEVER,
-}
 
 SUITES_MIGRATED_TO_WEBDRIVERIO = [
     'blogDashboard',
@@ -392,7 +340,6 @@ def run_tests(args):
 def main(args=None):
     """Run tests, rerunning at most MAX_RETRY_COUNT times if they flake."""
     parsed_args = _PARSER.parse_args(args=args)
-    policy = RERUN_POLICIES[parsed_args.suite.lower()]
 
     with servers.managed_portserver():
         for attempt_num in range(1, MAX_RETRY_COUNT + 1):
@@ -409,34 +356,15 @@ def main(args=None):
                 flake_checker.report_pass(parsed_args.suite)
                 break
 
-            # Check whether we should rerun based on this suite's policy
-            # and override instructions from the flake checker server.
-            test_is_flaky, rerun_override = flake_checker.is_test_output_flaky(
+            # Check whether we should rerun based on the instructions from the
+            # flake checker server.
+            rerun = flake_checker.check_test_flakiness(
                 output, parsed_args.suite)
-            if rerun_override == flake_checker.RERUN_YES:
-                print(
-                    'Rerunning as per instructions from logging '
-                    'server.')
-            elif rerun_override == flake_checker.RERUN_NO:
-                print(
-                    'Not rerunning as per instructions from '
-                    'logging server.')
+            if rerun:
+                print('Rerunning.')
+            else:
+                print('Not rerunning.')
                 break
-            # No rerun override, so follow rerun policies.
-            elif policy == RERUN_POLICY_NEVER:
-                print(
-                    'Not rerunning because the policy is to never '
-                    'rerun the {} suite'.format(parsed_args.suite))
-                break
-            elif policy == RERUN_POLICY_KNOWN_FLAKES and not test_is_flaky:
-                print((
-                    'Not rerunning because the policy is to only '
-                    'rerun the %s suite on known flakes, and this '
-                    'failure did not match any known flakes')
-                    % parsed_args.suite)
-                break
-            # Else rerun policy is either always or we had a known flake
-            # with a known flakes rerun policy, so rerun.
 
     sys.exit(return_code)
 
