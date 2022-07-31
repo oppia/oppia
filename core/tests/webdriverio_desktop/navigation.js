@@ -148,10 +148,7 @@ describe('Static Pages Tour', function() {
           var url = await browser.getUrl();
           // Wait until the URL has changed to something that is not /login.
           return !(/login/.test(url));
-        },
-        {
-          timeout: 10000,
-        });
+        }, { timeout: 10000 });
       },
       (url) => {
         // Wait for second redirection (splash page to preferred dashboard

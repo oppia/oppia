@@ -188,9 +188,9 @@ var LibraryPage = function() {
     var elems = await _getExplorationElements(name);
     await waitFor.visibilityOf(
       elems[0], 'Rating card takes too long to appear');
-    var value = await action.getText(
+    var explorationRatingValue = await action.getText(
       'Exp Summary Tile', elems[0].$(expSummaryTileRatingLocator));
-    expect(value).toBe(ratingValue);
+    expect(explorationRatingValue).toBe(ratingValue);
   };
 
   this.clickCreateActivity = async function() {
