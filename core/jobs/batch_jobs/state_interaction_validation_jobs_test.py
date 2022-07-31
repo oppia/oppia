@@ -72,7 +72,25 @@ class ExpStateInteractionValidationJobTests(
               'inputs': {
                 'x': 'Not a number'
               }
-            }
+            },
+            {
+              'rule_type': 'IsLessThanOrEqualTo',
+              'inputs': {
+                'x': 'Not a number'
+              }
+            },
+            {
+              'rule_type': 'IsLessThan',
+              'inputs': {
+                'x': 'Not a number'
+              }
+            },
+            {
+              'rule_type': 'IsGreaterThan',
+              'inputs': {
+                'x': 'Not a number'
+              }
+            },
           ],
           'outcome': {
             'dest': 'EXP_1_STATE_1',
@@ -154,6 +172,12 @@ class ExpStateInteractionValidationJobTests(
                   'numerator': 2,
                   'denominator': 1
                 }
+              }
+            },
+            {
+              'rule_type': 'HasDenominatorEqualTo',
+              'inputs': {
+                'x': 'Not a number'
               }
             }
           ],
@@ -858,7 +882,9 @@ class ExpStateInteractionValidationJobTests(
             f'\'fraction_input_interaction_values\': [\'Rule 1 from answer '
             f'group 0 of FractionInput interaction having rule type '
             f'HasFractionalPartExactlyEqualTo will never be matched because '
-            f'it is made redundant by the above rules\']}}]'
+            f'it is made redundant by the above rules\', \'Rule 2 from '
+            f'answer group 0 having rule type HasDenominatorEqualTo '
+            f'contains string value - Not a number\']}}]'
           ),
           job_run_result.JobRunResult.as_stderr(
             f'The id of exp is 1, created on {str(self.YEAR_AGO_DATE)}, '
@@ -867,7 +893,13 @@ class ExpStateInteractionValidationJobTests(
             f'\'numeric_input_interaction_values\': [\'Rule 1 from answer '
             f'group 0 will never be matched because it is made '
             f'redundant by the above rules\', \'Rule 2 from answer group 0 '
-            f'having rule type equals contains string values.\']}}]'
+            f'having rule type equals contains string value - Not a '
+            f'number\', \'Rule 3 from answer group 0 having rule type '
+            f'IsLessThanOrEqualTo contains string value - Not a '
+            f'number\', \'Rule 4 from answer group 0 having rule type '
+            f'IsLessThan contains string value - Not a number\', \'Rule 5 '
+            f'from answer group 0 having rule type IsGreaterThan contains '
+            f'string value - Not a number\']}}]'
           ),
           job_run_result.JobRunResult.as_stderr(
             f'The id of exp is 1, created on {str(self.YEAR_AGO_DATE)}, '

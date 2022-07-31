@@ -429,24 +429,42 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
                             'ub_inclusive': False
                         }
                         if rule_spec.rule_type == 'IsLessThanOrEqualTo':
-                            rule_value = float(rule_spec.inputs['x'])
-                            (
-                                ExpStateInteractionValidationJob.
-                                _set_lower_and_upper_bounds(
-                                    range_var, lower_infinity,
-                                    rule_value, False, True
+                            try:
+                                rule_value = float(rule_spec.inputs['x'])
+                                (
+                                    ExpStateInteractionValidationJob.
+                                    _set_lower_and_upper_bounds(
+                                        range_var, lower_infinity,
+                                        rule_value, False, True
+                                    )
                                 )
-                            )
+                            except Exception:
+                                rule_value = rule_spec.inputs['x']
+                                numeric_input_interaction_values.append(
+                                    f'Rule {rule_spec_index} from answer '
+                                    f'group {ans_group_index} having rule '
+                                    f'type IsLessThanOrEqualTo contains '
+                                    f'string value - {rule_value}'
+                                )
 
                         if rule_spec.rule_type == 'IsGreaterThanOrEqualTo':
-                            rule_value = float(rule_spec.inputs['x'])
-                            (
-                                ExpStateInteractionValidationJob.
-                                _set_lower_and_upper_bounds(
-                                    range_var, rule_value,
-                                    upper_infinity, True, False
+                            try:
+                                rule_value = float(rule_spec.inputs['x'])
+                                (
+                                    ExpStateInteractionValidationJob.
+                                    _set_lower_and_upper_bounds(
+                                        range_var, rule_value,
+                                        upper_infinity, True, False
+                                    )
                                 )
-                            )
+                            except Exception:
+                                rule_value = rule_spec.inputs['x']
+                                numeric_input_interaction_values.append(
+                                    f'Rule {rule_spec_index} from answer '
+                                    f'group {ans_group_index} having rule '
+                                    f'type IsGreaterThanOrEqualTo contains '
+                                    f'string value - {rule_value}'
+                                )
 
                         if rule_spec.rule_type == 'Equals':
                             try:
@@ -459,53 +477,79 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
                                     )
                                 )
                             except Exception:
+                                rule_value = rule_spec.inputs['x']
                                 numeric_input_interaction_values.append(
                                     f'Rule {rule_spec_index} from answer '
                                     f'group {ans_group_index} having rule '
-                                    f'type equals contains string values.'
+                                    f'type equals contains string '
+                                    f'value - {rule_value}'
                                 )
 
                         if rule_spec.rule_type == 'IsLessThan':
-                            rule_value = float(rule_spec.inputs['x'])
-                            (
-                                ExpStateInteractionValidationJob.
-                                _set_lower_and_upper_bounds(
-                                    range_var, lower_infinity,
-                                    rule_value, False, False
+                            try:
+                                rule_value = float(rule_spec.inputs['x'])
+                                (
+                                    ExpStateInteractionValidationJob.
+                                    _set_lower_and_upper_bounds(
+                                        range_var, lower_infinity,
+                                        rule_value, False, False
+                                    )
                                 )
-                            )
+                            except Exception:
+                                rule_value = rule_spec.inputs['x']
+                                numeric_input_interaction_values.append(
+                                    f'Rule {rule_spec_index} from answer '
+                                    f'group {ans_group_index} having rule '
+                                    f'type IsLessThan contains string '
+                                    f'value - {rule_value}'
+                                )
 
                         if rule_spec.rule_type == 'IsWithinTolerance':
-                            rule_value_x = float(rule_spec.inputs['x'])
-                            rule_value_tol = float(rule_spec.inputs['tol'])
-                            (
-                                ExpStateInteractionValidationJob.
-                                _set_lower_and_upper_bounds(
-                                    range_var, rule_value_x - rule_value_tol,
-                                    rule_value_x + rule_value_tol, True, True
+                            try:
+                                rule_value_x = float(rule_spec.inputs['x'])
+                                rule_value_tol = float(rule_spec.inputs['tol'])
+                                (
+                                    ExpStateInteractionValidationJob.
+                                    _set_lower_and_upper_bounds(
+                                        range_var, rule_value_x - rule_value_tol,
+                                        rule_value_x + rule_value_tol, True, True
+                                    )
                                 )
-                            )
+                            except Exception:
+                                pass
 
                         if rule_spec.rule_type == 'IsGreaterThan':
-                            rule_value = float(rule_spec.inputs['x'])
-                            (
-                                ExpStateInteractionValidationJob.
-                                _set_lower_and_upper_bounds(
-                                    range_var, rule_value,
-                                    upper_infinity, False, False
+                            try:
+                                rule_value = float(rule_spec.inputs['x'])
+                                (
+                                    ExpStateInteractionValidationJob.
+                                    _set_lower_and_upper_bounds(
+                                        range_var, rule_value,
+                                        upper_infinity, False, False
+                                    )
                                 )
-                            )
+                            except Exception:
+                                rule_value = rule_spec.inputs['x']
+                                numeric_input_interaction_values.append(
+                                    f'Rule {rule_spec_index} from answer '
+                                    f'group {ans_group_index} having rule '
+                                    f'type IsGreaterThan contains string '
+                                    f'value - {rule_value}'
+                                )
 
                         if rule_spec.rule_type == 'IsInclusivelyBetween':
-                            rule_value_a = float(rule_spec.inputs['a'])
-                            rule_value_b = float(rule_spec.inputs['b'])
-                            (
-                                ExpStateInteractionValidationJob.
-                                _set_lower_and_upper_bounds(
-                                    range_var, rule_value_a,
-                                    rule_value_b, True, True
+                            try:
+                                rule_value_a = float(rule_spec.inputs['a'])
+                                rule_value_b = float(rule_spec.inputs['b'])
+                                (
+                                    ExpStateInteractionValidationJob.
+                                    _set_lower_and_upper_bounds(
+                                        range_var, rule_value_a,
+                                        rule_value_b, True, True
+                                    )
                                 )
-                            )
+                            except Exception:
+                                pass
                         for range_ele in ranges:
                             if (
                                 ExpStateInteractionValidationJob.
@@ -649,8 +693,17 @@ class ExpStateInteractionValidationJob(base_jobs.JobBase):
                         )
 
                     if rule_spec.rule_type == 'HasDenominatorEqualTo':
-                        rule_value_x = int(rule_spec.inputs['x'])
-                        matched_denominator['denominator'] = rule_value_x
+                        try:
+                            rule_value_x = int(rule_spec.inputs['x'])
+                            matched_denominator['denominator'] = rule_value_x
+                        except Exception:
+                            rule_value_x = rule_spec.inputs['x']
+                            fraction_input_interaction_values.append(
+                                f'Rule {rule_spec_index} from answer '
+                                f'group {ans_group_index} having rule '
+                                f'type HasDenominatorEqualTo contains '
+                                f'string value - {rule_value_x}'
+                            )
 
                     for range_ele in ranges:
                         if (
