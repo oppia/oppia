@@ -16,18 +16,15 @@
 
 from __future__ import annotations
 
-import logging
-
 from core import feconf
 from core import utils
 from core.constants import constants
 from core.domain import change_domain
-from core.domain import user_domain
-
-from mypy_imports import user_models
 
 from typing import List, Optional
 from typing_extensions import TypedDict
+
+from core.domain import user_services  # pylint: disable=invalid-import-from # isort:skip
 
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
@@ -70,69 +67,6 @@ class ActivityRightsDict(TypedDict):
     voice_artist_names: List[str]
     viewer_names: List[str]
     viewable_if_private: bool
-
-
-def get_username_email_from_user_ids(user_ids: list[str]) -> List[str]:
-    """Converts the given ids to usernames, or truncated email addresses.
-
-    Args:
-        user_ids: list(str). The list of user_ids.
-
-    Returns:
-        list(str). List of usernames corresponding to given user_ids. If
-        username does not exist, the corresponding entry in the returned
-        list is the user's truncated email address. If the user is scheduled
-        to be deleted USER_IDENTIFICATION_FOR_USER_BEING_DELETED is
-        returned.
-    """
-
-    user_settings_models = user_models.UserSettingsModel.get_multi(
-        user_ids, include_deleted=True)
-    users_settings: List[Optional[user_domain.UserSettings]] = []
-    for i, model in enumerate(user_settings_models):
-        if user_ids[i] == feconf.SYSTEM_COMMITTER_ID:
-            users_settings.append(user_domain.UserSettings(
-                user_id=feconf.SYSTEM_COMMITTER_ID,
-                email=feconf.SYSTEM_EMAIL_ADDRESS,
-                roles=[
-                    feconf.ROLE_ID_FULL_USER,
-                    feconf.ROLE_ID_CURRICULUM_ADMIN,
-                    feconf.ROLE_ID_MODERATOR,
-                    feconf.ROLE_ID_VOICEOVER_ADMIN
-                ],
-                banned=False,
-                username='admin',
-                has_viewed_lesson_info_modal_once=False,
-            ))
-        else:
-            if model is not None and model.deleted:
-                model.username = 'UserBeingDeleted'
-            users_settings.append(
-                user_domain.UserSettings(
-                user_id=model.id,
-                email=model.email,
-                roles=model.roles,
-                banned=model.banned,
-                username=model.username,
-                has_viewed_lesson_info_modal_once=(
-                    model.has_viewed_lesson_info_modal_once))
-                if model is not None else None
-            )
-
-    usernames = []
-    for ind, user_settings in enumerate(users_settings):
-        if user_settings is None:
-            logging.error('User id %s not known in list of user_ids %s' % (
-                    user_ids[ind], user_ids))
-        elif user_settings.deleted:
-            usernames.append('[User being deleted]')
-        elif user_settings.username:
-            usernames.append(user_settings.username)
-        else:
-            usernames.append(
-                '[Awaiting user registration: %s]' %
-                user_settings.truncated_email)
-    return usernames
 
 
 class ActivityRights:
@@ -245,13 +179,13 @@ class ActivityRights:
                 'cloned_from': self.cloned_from,
                 'status': self.status,
                 'community_owned': False,
-                'owner_names': get_username_email_from_user_ids(
+                'owner_names': user_services.get_human_readable_user_ids(
                     self.owner_ids),
-                'editor_names': get_username_email_from_user_ids(
+                'editor_names': user_services.get_human_readable_user_ids(
                     self.editor_ids),
-                'voice_artist_names': get_username_email_from_user_ids(
+                'voice_artist_names': user_services.get_human_readable_user_ids(
                     self.voice_artist_ids),
-                'viewer_names': get_username_email_from_user_ids(
+                'viewer_names': user_services.get_human_readable_user_ids(
                     self.viewer_ids),
                 'viewable_if_private': self.viewable_if_private,
             }
