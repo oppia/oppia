@@ -21,6 +21,7 @@ import { PostPublishModalComponent } from 'pages/exploration-editor-page/modal-t
 import { ExplorationPublishModalComponent } from 'pages/exploration-editor-page/modal-templates/exploration-publish-modal.component';
 import { EditorReloadingModalComponent } from 'pages/exploration-editor-page/modal-templates/editor-reloading-modal.component';
 import { ConfirmDiscardChangesModalComponent } from 'pages/exploration-editor-page/modal-templates/confirm-discard-changes-modal.component';
+import { ExplorationMetadataModalComponent } from '../modal-templates/exploration-metadata-modal.component';
 
 require(
   'components/common-layout-directives/common-elements/' +
@@ -31,9 +32,6 @@ require(
 require(
   'components/common-layout-directives/common-elements/' +
   'sharing-links.component.ts');
-require(
-  'pages/exploration-editor-page/modal-templates/' +
-  'exploration-metadata-modal.controller');
 require(
   'pages/exploration-editor-page/modal-templates/' +
   'exploration-save-modal.controller');
@@ -279,22 +277,11 @@ angular.module('oppia').factory('ExplorationSaveService', [
         // If the metadata has not yet been specified, open the pre-publication
         // 'add exploration metadata' modal.
         if (isAdditionalMetadataNeeded()) {
-          var modalInstance = $uibModal.open({
-            template: require(
-              'pages/exploration-editor-page/modal-templates/' +
-              'exploration-metadata-modal.template.html'),
+          var modalInstance = NgbModal.open(ExplorationMetadataModalComponent, {
             backdrop: 'static',
-            controller: 'ExplorationMetadataModalController'
           });
 
-          modalInstance.opened.then(function() {
-            // Toggle loading dots off after modal is opened.
-            if (onEndLoadingCallback) {
-              onEndLoadingCallback();
-            }
-          });
-
-          modalInstance.result.then(function(metadataList) {
+          modalInstance.result.then((metadataList) => {
             if (metadataList.length > 0) {
               var commitMessage = (
                 'Add metadata: ' + metadataList.join(', ') + '.');
@@ -303,24 +290,24 @@ angular.module('oppia').factory('ExplorationSaveService', [
                 onStartLoadingCallback();
               }
 
-              saveDraftToBackend(commitMessage).then(function() {
+              saveDraftToBackend(commitMessage).then(() => {
                 if (onEndLoadingCallback) {
                   onEndLoadingCallback();
                 }
                 openPublishExplorationModal(
                   onStartLoadingCallback, onEndLoadingCallback)
-                  .then(function() {
+                  .then(() => {
                     whenModalsClosed.resolve();
                   });
               });
             } else {
               openPublishExplorationModal(
                 onStartLoadingCallback, onEndLoadingCallback)
-                .then(function() {
+                .then(() => {
                   whenModalsClosed.resolve();
                 });
             }
-          }, function() {
+          }, () => {
             whenModalsClosed.resolve();
             ExplorationTitleService.restoreFromMemento();
             ExplorationObjectiveService.restoreFromMemento();
@@ -333,7 +320,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
           // No further metadata is needed. Open the publish modal immediately.
           openPublishExplorationModal(
             onStartLoadingCallback, onEndLoadingCallback)
-            .then(function() {
+            .then(() => {
               whenModalsClosed.resolve();
             });
         }

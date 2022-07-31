@@ -1,3 +1,4 @@
+<button (click)="shivam()">SHivam</button>
 <div class="modal-header e2e-test-metadata-modal-header">
   <h3>Add Some Details</h3>
 </div>
@@ -6,53 +7,103 @@
   <p>
     Just a few more things before you publish:
   </p>
-  <oppia-exploration-title-editor ng-if="requireTitleToBeSpecified"
-                                  [label-text]="'Add a title: what should your exploration be called?'"
-                                  [form-style]="{'font-weight':'normal'}">
+  <oppia-exploration-title-editor *ngIf="requireTitleToBeSpecified"
+                                  [labelText]="'Add a title: what should your exploration be called?'"
+                                  [formStyle]="{'font-weight':'normal'}">
   </oppia-exploration-title-editor>
-  <oppia-exploration-objective-editor ng-if="requireObjectiveToBeSpecified"
-                                      [label-text]="'Add a goal: what does the exploration help people to do?'"
-                                      [form-style]="{'font-weight': 'normal'}">
+  <oppia-exploration-objective-editor *ngIf="requireObjectiveToBeSpecified"
+                                      [labelText]="'Add a goal: what does the exploration help people to do?'"
+                                      [formStyle]="{'font-weight': 'normal'}">
   </oppia-exploration-objective-editor>
-  <p ng-if="requireCategoryToBeSpecified">
-    <label class="font-weight-normal"> Add a category: How would you categorize your exploration?
-      <select2-dropdown class="e2e-test-exploration-category-dropdown"
-                        item="explorationCategoryService.displayed"
+  <p *ngIf="requireCategoryToBeSpecified">
+      <mat-form-field class="example-full-width" appearance="fill">
+        <mat-label>Add a category: How would you categorize your exploration?</mat-label>
+        <input type="text"
+               placeholder="Type new category here"
+               aria-label="Number"
+               matInput
+               [formControl]="myControl"
+               [matAutocomplete]="auto"
+               [(ngModel)]="explorationCategoryService.displayed">
+        <mat-autocomplete #auto="matAutocomplete">
+          <mat-option *ngFor="let option of CATEGORY_LIST_FOR_SELECT2" [value]="option.id">
+            {{option.text}}
+          </mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+
+      <!-- <select2-dropdown item="explorationCategoryService.displayed"
                         choices="CATEGORY_LIST_FOR_SELECT2"
-                        placeholder="Choose or type a new category"
                         new-choice-regex="^[A-Z a-z]+$"
                         width="100%"
                         invalid-search-term-message="Invalid category name">
-      </select2-dropdown>
-    </label>
+      </select2-dropdown> -->
   </p>
-  <p ng-if="askForLanguageCheck">
-    <label class="font-weight-normal"> Verify the language: Is your exploration written in this language
-      <select class="form-control e2e-test-exploration-language-select"
+  <p *ngIf="askForLanguageCheck">
+    <mat-form-field appearance="fill">
+      <mat-label>Verify the language: Is your exploration written in this language</mat-label>
+      <mat-select [(ngModel)]="explorationLanguageCodeService.displayed" name="language">
+        <mat-option *ngFor="let value of explorationLanguageCodeService.getSupportedContentLanguages()" [value]="value.code">
+          {{value.description}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+      <!-- <select class="form-control e2e-test-exploration-language-select"
               ng-model="explorationLanguageCodeService.displayed"
               ng-change="saveExplorationLanguageCode()"
               ng-options="lc.code as lc.description for lc in explorationLanguageCodeService.getSupportedContentLanguages()"
               width="100%">
-      </select>
-    </label>
+      </select> -->
   </p>
-  <p ng-if="askForTags">
+  <p *ngIf="askForTags">
     <label class="font-weight-normal"> Add tags to help learners discover your exploration.
-      <select2-dropdown item="explorationTagsService.displayed"
+
+
+      <mat-form-field class="example-full-width" appearance="fill">
+        <mat-label>Add a category: How would you categorize your exploration?</mat-label>
+        <input type="text"
+               placeholder="Type new category here"
+               aria-label="Number"
+               matInput
+               [formControl]="myControl"
+               [matAutocomplete]="auto"
+               [(ngModel)]="explorationCategoryService.displayed">
+        <mat-autocomplete #auto="matAutocomplete">
+          <!-- <mat-option *ngFor="let option of CATEGORY_LIST_FOR_SELECT2" [value]="option.id">
+            {{option.text}}
+          </mat-option> -->
+          <mat-select multiple>
+            <mat-option *ngFor="let option of CATEGORY_LIST_FOR_SELECT2" [value]="option.id">{{option.id}}</mat-option>
+          </mat-select>
+        </mat-autocomplete>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Toppings</mat-label>
+        <mat-select multiple>
+          <mat-option *ngFor="let topping of explorationTagsService.displayed" [value]="topping">{{topping}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+
+      <!-- <select2-dropdown item="explorationTagsService.displayed"
                         choices="explorationTagsService.displayed"
                         allow-multiple-choices="true"
                         invalid-search-term-message="Add a new tag (using lowercase letters and spaces)..."
-                        new-choice-regex="<[::TAG_REGEX]>"
-                        width="100%"
-                        placeholder="Skills, concepts, topics..."
-                        class="e2e-test-tags"
-                        on-selection-change="saveExplorationTags()">
-      </select2-dropdown>
+                        new-choice-regex="<[::TAG_REGEX]>">
+      </select2-dropdown> -->
     </label>
   </p>
 </div>
 
 <div class="modal-footer">
-  <button class="btn btn-secondary" ng-click="cancel()">Cancel</button>
-  <button class="btn btn-success e2e-test-confirm-pre-publication" ng-click="save()" ng-disabled="!isSavingAllowed()">Save Changes</button>
+  <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
+  <button class="btn btn-success e2e-test-confirm-pre-publication" (click)="save()" [disabled]="!isSavingAllowed()">Save Changes</button>
 </div>
+
+<style>
+  .mat-form-field {
+    width: 100%;
+  }
+</style>

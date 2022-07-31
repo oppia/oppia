@@ -66,6 +66,8 @@ import { SmartRouterModule } from 'hybrid-router-module-provider';
 import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
 import { ExplorationTitleEditorComponent } from './exploration-title-editor/exploration-title-editor.component';
 import { ExplorationObjectiveEditorComponent } from './exploration-objective-editor/exploration-objective-editor.component';
+import { ExplorationMetadataModalComponent } from 'pages/exploration-editor-page/modal-templates/exploration-metadata-modal.component';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 
 @NgModule({
   imports: [
@@ -76,6 +78,9 @@ import { ExplorationObjectiveEditorComponent } from './exploration-objective-edi
     // TODO(#13443): Remove smart router module provider once all pages are
     // migrated to angular router.
     SmartRouterModule,
+    MatAutocompleteModule,
+    ReactiveFormsModule,
+    FormsModule,
     RouterModule.forRoot([]),
     SharedComponentsModule,
     ToastrModule.forRoot(toastrConfig)
@@ -112,7 +117,8 @@ import { ExplorationObjectiveEditorComponent } from './exploration-objective-edi
     TranslationTabBusyModalComponent,
     ExplorationMetadataDiffModalComponent,
     ExplorationTitleEditorComponent,
-    ExplorationObjectiveEditorComponent
+    ExplorationObjectiveEditorComponent,
+    ExplorationMetadataModalComponent
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
@@ -145,7 +151,8 @@ import { ExplorationObjectiveEditorComponent } from './exploration-objective-edi
     TranslationTabBusyModalComponent,
     ExplorationMetadataDiffModalComponent,
     ExplorationTitleEditorComponent,
-    ExplorationObjectiveEditorComponent
+    ExplorationObjectiveEditorComponent,
+    ExplorationMetadataModalComponent
   ],
   providers: [
     {
@@ -179,6 +186,7 @@ import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
 import { ToastrModule } from 'ngx-toastr';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

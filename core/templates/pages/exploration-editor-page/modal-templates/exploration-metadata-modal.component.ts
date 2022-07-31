@@ -28,6 +28,7 @@ import { ExplorationTagsService } from '../services/exploration-tags.service';
 import { ExplorationTitleService } from '../services/exploration-title.service';
 import { AlertsService } from 'services/alerts.service';
 import { ExplorationStatesService } from '../services/exploration-states.service';
+import { FormControl } from '@angular/forms';
 
 @Component({
   selector: 'oppia-exploration-metadata-modal',
@@ -35,6 +36,7 @@ import { ExplorationStatesService } from '../services/exploration-states.service
 })
 export class ExplorationMetadataModalComponent
   extends ConfirmOrCancelModal implements OnInit {
+  categoryLocalValue: string;
   objectiveHasBeenPreviouslyEdited: boolean;
   requireTitleToBeSpecified: boolean;
   requireObjectiveToBeSpecified: boolean;
@@ -42,6 +44,9 @@ export class ExplorationMetadataModalComponent
   askForLanguageCheck: boolean;
   askForTags: boolean;
   CATEGORY_LIST_FOR_SELECT2;
+
+  myControl = new FormControl('');
+  options: string[] = ['One', 'Two', 'Three'];
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -62,7 +67,7 @@ export class ExplorationMetadataModalComponent
     }
 
     // Record any fields that have changed.
-    var metadataList = [];
+    let metadataList = [];
     if (this.explorationTitleService.hasChanged()) {
       metadataList.push('title');
     }
@@ -140,7 +145,7 @@ export class ExplorationMetadataModalComponent
     this.askForTags = (
       (this.explorationTagsService.savedMemento as unknown[]).length === 0);
 
-    for (var i = 0; i < AppConstants.ALL_CATEGORIES.length; i++) {
+    for (let i = 0; i < AppConstants.ALL_CATEGORIES.length; i++) {
       this.CATEGORY_LIST_FOR_SELECT2.push({
         id: AppConstants.ALL_CATEGORIES[i],
         text: AppConstants.ALL_CATEGORIES[i]
@@ -148,9 +153,9 @@ export class ExplorationMetadataModalComponent
     }
 
     if (this.explorationStatesService.isInitialized()) {
-      var categoryIsInSelect2 = this.CATEGORY_LIST_FOR_SELECT2
+      let categoryIsInSelect2 = this.CATEGORY_LIST_FOR_SELECT2
         .some(
-          function(categoryItem) {
+          (categoryItem) => {
             return categoryItem.id ===
             this.explorationCategoryService.savedMemento;
           }
@@ -166,8 +171,18 @@ export class ExplorationMetadataModalComponent
         });
       }
     }
+
+
+    console.error(this.explorationTagsService.displayed);
+  }
+
+  shivam(): void {
+    console.error('thisis erro');
+    console.error(this.explorationCategoryService.displayed);
+    console.error(this.explorationCategoryService.savedMemento);
   }
 }
+
 angular.module('oppia').directive('oppiaExplorationMetadataModal',
   downgradeComponent({
     component: ExplorationMetadataModalComponent
