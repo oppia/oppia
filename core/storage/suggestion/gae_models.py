@@ -1766,7 +1766,7 @@ class QuestionContributionStatsModel(base_models.BaseModel):
         return user_data
 
 class QuestionReviewStatsModel(base_models.BaseModel):
-    """Records the contributor dashboard question contribution stats. There
+    """Records the contributor dashboard question review stats. There
     is one instance of this model per (contributor_user_id,
     topic_id) tuple. See related design doc for more details:
     """
@@ -1774,10 +1774,10 @@ class QuestionReviewStatsModel(base_models.BaseModel):
     # We use the model id as a key in the Takeout dict.
     ID_IS_USED_AS_TAKEOUT_KEY = True
 
-    # The user ID of the question contributor.
+    # The user ID of the question reviewer.
     contributor_user_id = datastore_services.StringProperty(
         required=True, indexed=True)
-    # The topic ID of the question contribution.
+    # The topic ID of the question.
     topic_id = datastore_services.StringProperty(required=True, indexed=True)
     # The number of reviewed questions.
     reviewed_questions_count = datastore_services.IntegerProperty(
@@ -1785,7 +1785,7 @@ class QuestionReviewStatsModel(base_models.BaseModel):
     # The number of accepted questions.
     accepted_questions_count = datastore_services.IntegerProperty(
         required=True, indexed=True)
-    # The number of accepted questions without reviewer edits.
+    # The number of accepted questions with reviewer edits.
     accepted_questions_with_reviewer_edits_count = (
         datastore_services.IntegerProperty(required=True, indexed=True))
     # The unique last_updated dates of the question suggestions.

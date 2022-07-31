@@ -423,24 +423,15 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
     ACCEPTED_TRANSLATION_WORD_COUNT: Final = 50
     REJECTED_TRANSLATIONS_COUNT: Final = 0
     REJECTED_TRANSLATION_WORD_COUNT: Final = 0
-    ANDROID_REPORT_INFO_SCHEMA_VERSION = 1
-    SUGGESTION_LANGUAGE_CODE = 'en'
-    SUBMITTED_TRANSLATIONS_COUNT = 2
-    SUBMITTED_TRANSLATION_WORD_COUNT = 100
-    ACCEPTED_TRANSLATIONS_COUNT = 1
-    ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT = 0
-    ACCEPTED_TRANSLATION_WORD_COUNT = 50
-    REJECTED_TRANSLATIONS_COUNT = 0
-    REJECTED_TRANSLATION_WORD_COUNT = 0
-    REVIEWED_TRANSLATIONS_COUNT = 0
-    REVIEWED_TRANSLATION_WORD_COUNT = 0
-    ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT = 0
-    SUBMITTED_QUESTION_COUNT = 20
-    ACCEPTED_QUESTIONS_COUNT = 2
-    ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT = 0
-    REVIEWED_QUESTIONS_COUNT = 2
-    ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT = 0
-    ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_WORD_COUNT = 0
+    REVIEWED_TRANSLATIONS_COUNT: Final  = 0
+    REVIEWED_TRANSLATION_WORD_COUNT: Final  = 0
+    ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT: Final  = 0
+    SUBMITTED_QUESTION_COUNT: Final  = 20
+    ACCEPTED_QUESTIONS_COUNT: Final  = 2
+    ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT: Final  = 0
+    REVIEWED_QUESTIONS_COUNT: Final  = 2
+    ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT: Final  = 0
+    ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_WORD_COUNT: Final  = 0
     # Timestamp dates in sec since epoch for Mar 19 2021 UTC.
     CONTRIBUTION_DATES: Final = [
         datetime.date.fromtimestamp(1616173836),
@@ -451,10 +442,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
     ]
     FIRST_CONTRIBUTION_DATE = datetime.datetime(2021, 5, 20)
     LAST_CONTRIBUTION_DATE = datetime.datetime(2022, 5, 20)
-    FIRST_CONTRIBUTION_EPOCH = utils.get_time_in_millisecs(
-        FIRST_CONTRIBUTION_DATE)
-    LAST_CONTRIBUTION_EPOCH = utils.get_time_in_millisecs(
-        LAST_CONTRIBUTION_DATE)
 
     def set_up_non_trivial(self) -> None:
         """Set up all models for use in testing.
@@ -1118,29 +1105,47 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'managed_topic_ids': []
         }
 
-        expected_voiceover_application_data = {}
-        expected_contrib_proficiency_data = {}
-        expected_contribution_rights_data = {}
-        expected_collection_rights_sm = {}
-        expected_collection_sm = {}
-        expected_skill_sm = {}
-        expected_subtopic_page_sm = {}
-        expected_topic_rights_sm = {}
-        expected_topic_sm = {}
-        expected_translation_contribution_stats = {}
-        expected_translation_review_stats = {}
-        expected_question_contribution_stats = {}
-        expected_question_review_stats = {}
-        expected_story_sm = {}
-        expected_question_sm = {}
-        expected_config_property_sm = {}
-        expected_exploration_rights_sm = {}
-        expected_exploration_sm = {}
-        expected_platform_parameter_sm = {}
-        expected_user_auth_details = {}
-        expected_user_email_preferences = {}
-        expected_blog_post_data = {}
-        expected_blog_post_rights = {
+        expected_voiceover_application_data: Dict[
+            str, Dict[str, Optional[str]]
+        ] = {}
+        expected_contrib_proficiency_data: Dict[
+            str, Dict[str, Union[int, bool]]
+        ] = {}
+        expected_contribution_rights_data: Dict[
+            str, Union[bool, List[str]]
+        ] = {}
+        expected_collection_rights_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
+        expected_collection_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
+        expected_skill_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
+        expected_subtopic_page_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
+        expected_topic_rights_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
+        expected_topic_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
+        expected_translation_contribution_stats: Dict[
+            str, Dict[str, Dict[str, str]]
+        ] = {}
+        expected_translation_review_stats: Dict[
+            str, Dict[str, Dict[str, str]]
+        ] = {}
+        expected_question_contribution_stats: Dict[
+            str, Dict[str, Dict[str, str]]
+        ] = {}
+        expected_question_review_stats: Dict[
+            str, Dict[str, Dict[str, str]]
+        ] = {}
+        expected_story_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
+        expected_question_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
+        expected_config_property_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
+        expected_exploration_rights_sm: Dict[
+            str, Dict[str, Dict[str, str]]
+        ] = {}
+        expected_exploration_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
+        expected_platform_parameter_sm: Dict[
+            str, Dict[str, Dict[str, str]]
+        ] = {}
+        expected_user_auth_details: Dict[str, str] = {}
+        expected_user_email_preferences: Dict[str, str] = {}
+        expected_blog_post_data: Dict[str, Union[str, float, List[str]]] = {}
+        expected_blog_post_rights: Dict[str, List[str]] = {
             'editable_blog_post_ids': []
         }
         expected_learner_group_model_data: Dict[str, str] = {}

@@ -1970,7 +1970,7 @@ class TranslationReviewStatsModelUnitTests(test_utils.GenericTestBase):
         'Jan 2021', 'Feb 2021'
     ]
     FIRST_CONTRIBUTION_DATE = datetime.date.fromtimestamp(1616173836)
-    LAST_CONTRIBUTION_DATE = datetime.date.fromtimestamp(1616173837)
+    LAST_CONTRIBUTION_DATE = datetime.date.fromtimestamp(1616173836)
 
     def test_get_returns_model_when_it_exists(self) -> None:
         suggestion_models.TranslationReviewStatsModel.create(
@@ -2166,8 +2166,10 @@ class TranslationReviewStatsModelUnitTests(test_utils.GenericTestBase):
                 'accepted_translations_with_reviewer_edits_word_count': (
                     self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_WORD_COUNT),
                 'review_months': self.REVIEW_MONTHS,
-                'first_contribution_date': self.FIRST_CONTRIBUTION_DATE,
-                'last_contribution_date': self.LAST_CONTRIBUTION_DATE
+                'first_contribution_date': (
+                    self.FIRST_CONTRIBUTION_DATE.isoformat()),
+                'last_contribution_date': (
+                    self.LAST_CONTRIBUTION_DATE.isoformat())
             },
             model_2_id_without_user_id: {
                 'language_code': self.LANGUAGE_CODE,
@@ -2185,8 +2187,10 @@ class TranslationReviewStatsModelUnitTests(test_utils.GenericTestBase):
                 'accepted_translations_with_reviewer_edits_word_count': (
                     self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_WORD_COUNT),
                 'review_months': self.REVIEW_MONTHS,
-                'first_contribution_date': self.FIRST_CONTRIBUTION_DATE,
-                'last_contribution_date': self.LAST_CONTRIBUTION_DATE
+                'first_contribution_date': (
+                    self.FIRST_CONTRIBUTION_DATE.isoformat()),
+                'last_contribution_date': (
+                    self.LAST_CONTRIBUTION_DATE.isoformat())
             }
         }
 
@@ -2210,7 +2214,7 @@ class QuestionContributionStatsModelUnitTests(test_utils.GenericTestBase):
         'Jan 2021', 'Feb 2021'
     ]
     FIRST_CONTRIBUTION_DATE = datetime.date.fromtimestamp(1616173836)
-    LAST_CONTRIBUTION_DATE = datetime.date.fromtimestamp(1616173837)
+    LAST_CONTRIBUTION_DATE = datetime.date.fromtimestamp(1616173836)
 
     def test_get_returns_model_when_it_exists(self) -> None:
         suggestion_models.QuestionContributionStatsModel.create(
@@ -2341,8 +2345,10 @@ class QuestionContributionStatsModelUnitTests(test_utils.GenericTestBase):
                 'accepted_questions_without_reviewer_edits_count': (
                     self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
                 'contribution_months': self.CONTRIBUTION_MONTHS,
-                'first_contribution_date': self.FIRST_CONTRIBUTION_DATE,
-                'last_contribution_date': self.LAST_CONTRIBUTION_DATE
+                'first_contribution_date': (
+                    self.FIRST_CONTRIBUTION_DATE.isoformat()),
+                'last_contribution_date': (
+                    self.LAST_CONTRIBUTION_DATE.isoformat())
             },
             model_2_id_without_user_id: {
                 'topic_id': topic_id_2,
@@ -2353,8 +2359,10 @@ class QuestionContributionStatsModelUnitTests(test_utils.GenericTestBase):
                 'accepted_questions_without_reviewer_edits_count': (
                     self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
                 'contribution_months': self.CONTRIBUTION_MONTHS,
-                'first_contribution_date': self.FIRST_CONTRIBUTION_DATE,
-                'last_contribution_date': self.LAST_CONTRIBUTION_DATE
+                'first_contribution_date': (
+                    self.FIRST_CONTRIBUTION_DATE.isoformat()),
+                'last_contribution_date': (
+                    self.LAST_CONTRIBUTION_DATE.isoformat())
             }
         }
 
@@ -2378,7 +2386,7 @@ class QuestionReviewStatsModelUnitTests(test_utils.GenericTestBase):
         'Jan 2021', 'Feb 2021'
     ]
     FIRST_CONTRIBUTION_DATE = datetime.date.fromtimestamp(1616173836)
-    LAST_CONTRIBUTION_DATE = datetime.date.fromtimestamp(1616173837)
+    LAST_CONTRIBUTION_DATE = datetime.date.fromtimestamp(1616173836)
 
     def test_get_returns_model_when_it_exists(self) -> None:
         suggestion_models.QuestionReviewStatsModel.create(
@@ -2509,8 +2517,10 @@ class QuestionReviewStatsModelUnitTests(test_utils.GenericTestBase):
                 'accepted_questions_with_reviewer_edits_count': (
                     self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
                 'review_months': self.REVIEW_MONTHS,
-                'first_contribution_date': self.FIRST_CONTRIBUTION_DATE,
-                'last_contribution_date': self.LAST_CONTRIBUTION_DATE
+                'first_contribution_date': (
+                    self.FIRST_CONTRIBUTION_DATE.isoformat()),
+                'last_contribution_date': (
+                    self.LAST_CONTRIBUTION_DATE.isoformat())
             },
             model_2_id_without_user_id: {
                 'topic_id': topic_id_2,
@@ -2521,8 +2531,10 @@ class QuestionReviewStatsModelUnitTests(test_utils.GenericTestBase):
                 'accepted_questions_with_reviewer_edits_count': (
                     self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
                 'review_months': self.REVIEW_MONTHS,
-                'first_contribution_date': self.FIRST_CONTRIBUTION_DATE,
-                'last_contribution_date': self.LAST_CONTRIBUTION_DATE
+                'first_contribution_date': (
+                    self.FIRST_CONTRIBUTION_DATE.isoformat()),
+                'last_contribution_date': (
+                    self.LAST_CONTRIBUTION_DATE.isoformat())
             }
         }
 
