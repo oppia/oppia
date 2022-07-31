@@ -139,7 +139,7 @@ describe('Router Service', () => {
 
   it('should navigate to main tab if path is ""', fakeAsync(() => {
     window.location.hash = '';
-    routerService._changeTab('');
+    routerService._changeTab(undefined);
 
     tick(300);
 

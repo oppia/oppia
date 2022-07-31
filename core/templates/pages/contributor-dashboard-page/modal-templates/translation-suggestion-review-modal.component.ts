@@ -17,7 +17,7 @@
  * @fileoverview Component for translation suggestion review modal.
  */
 
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewChild, ElementRef } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AlertsService } from 'services/alerts.service';
 import { ContextService } from 'services/context.service';
@@ -33,6 +33,10 @@ import { AppConstants } from 'app.constants';
 import constants from 'assets/constants';
 import { ListSchema, UnicodeSchema } from 'services/schema-default-value.service';
 import { UserContributionRightsDataBackendDict } from 'services/user-backend-api.service';
+// This throws "TS2307". We need to
+// suppress this error because rte-output-display is not strictly typed yet.
+// @ts-ignore
+import { RteOutputDisplayComponent } from 'rich_text_components/rte-output-display.component';
 
 interface HTMLSchema {
   'type': string;
@@ -73,9 +77,14 @@ interface ActiveSuggestionDict {
 
 // Details are null if suggestion's corresponding opportunity is deleted.
 // See issue #14234.
-interface ActiveContributionDict {
+export interface ActiveContributionDict {
   'details': ActiveContributionDetailsDict | null;
   'suggestion': ActiveSuggestionDict;
+}
+
+enum ExpansionTabType {
+  CONTENT,
+  TRANSLATION
 }
 
 
@@ -89,7 +98,6 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   activeContribution!: ActiveContributionDict;
-  activeContributionDetails!: ActiveContributionDetailsDict;
   authorName!: string;
   activeSuggestion!: ActiveSuggestionDict;
   activeSuggestionId!: string;
@@ -102,7 +110,11 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   languageCode!: string;
   languageDescription!: string;
   preEditTranslationHtml!: string;
-  remainingContributions!: Record<string, ActiveContributionDict>;
+  remainingContributionIds!: string[];
+  skippedContributionIds: string[] = [];
+  allContributions!: Record<string, ActiveContributionDict>;
+  isLastItem!: boolean;
+  isFirstItem: boolean = true;
   reviewMessage!: string;
   status!: string;
   subheading!: string;
@@ -116,10 +128,28 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   contentTypeIsSetOfStrings: boolean = false;
   contentTypeIsUnicode: boolean = false;
   lastSuggestionToReview: boolean = false;
+  firstSuggestionToReview: boolean = true;
   resolvingSuggestion: boolean = false;
   reviewable: boolean = false;
   canEditTranslation: boolean = false;
   userIsCurriculumAdmin: boolean = false;
+  isContentExpanded: boolean = false;
+  isContentOverflowing: boolean = false;
+  isTranslationExpanded: boolean = false;
+  isTranslationOverflowing: boolean = false;
+
+  @ViewChild('contentPanel')
+    contentPanel!: RteOutputDisplayComponent;
+
+  @ViewChild('translationPanel')
+    translationPanel!: RteOutputDisplayComponent;
+
+  @ViewChild('contentContainer')
+    contentContainer!: ElementRef;
+
+  @ViewChild('translationContainer')
+    translationContainer!: ElementRef;
+
   HTML_SCHEMA: HTMLSchema = { type: 'html' };
   MAX_REVIEW_MESSAGE_LENGTH = constants.MAX_REVIEW_MESSAGE_LENGTH;
   SET_OF_STRINGS_SCHEMA: ListSchema = {
@@ -156,16 +186,21 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     this.languageDescription = (
       this.languageUtilService.getAudioLanguageDescription(
         this.activeSuggestion.language_code));
-    this.activeContributionDetails = (
-      this.activeContribution.details as ActiveContributionDetailsDict);
     this.status = this.activeSuggestion.status;
     if (this.reviewable) {
       this.siteAnalyticsService
         .registerContributorDashboardViewSuggestionForReview('Translation');
     }
     delete this.suggestionIdToContribution[this.initialSuggestionId];
-    this.remainingContributions = this.suggestionIdToContribution;
-    this.init();
+    this.remainingContributionIds = Object.keys(
+      this.suggestionIdToContribution);
+    this.remainingContributionIds.reverse();
+    this.isLastItem = this.remainingContributionIds.length === 0;
+    this.allContributions = this.suggestionIdToContribution;
+    this.allContributions[this.activeSuggestionId] = (
+      this.activeContribution);
+
+    this.refreshActiveContributionState();
     // The 'html' value is passed as an object as it is required for
     // schema-based-editor. Otherwise the corrrectly updated value for
     // the translation is not received from the editor when the translation
@@ -175,7 +210,28 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     };
   }
 
-  init(): void {
+  refreshActiveContributionState(): void {
+    this.activeContribution = this.allContributions[
+      this.activeSuggestionId];
+
+    // Close modal instance if the suggestion's corresponding opportunity
+    // is deleted. See issue #14234.
+    if (this.activeContribution.details === null) {
+      this.activeModal.close(this.resolvedSuggestionIds);
+      return;
+    }
+    this.activeSuggestion = this.activeContribution.suggestion;
+    this.contextService.setCustomEntityContext(
+      AppConstants.IMAGE_CONTEXT.EXPLORATION_SUGGESTIONS,
+      this.activeSuggestion.target_id);
+    this.subheading = (
+      `${this.activeContribution.details.topic_name} / ` +
+        `${this.activeContribution.details.story_title} / ` +
+        `${this.activeContribution.details.chapter_title}`
+    );
+
+    this.isLastItem = this.remainingContributionIds.length === 0;
+    this.isFirstItem = this.skippedContributionIds.length === 0;
     this.userCanReviewTranslationSuggestionsInLanguages = [];
     this.languageCode = this.activeSuggestion.change.
       language_code;
@@ -201,12 +257,18 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
             author_name
         );
       });
+    this.reviewMessage = '';
+    if (!this.reviewable) {
+      this._getThreadMessagesAsync(this.activeSuggestionId);
+    }
+    this.isContentExpanded = false;
+    this.isTranslationExpanded = false;
     this.errorMessage = '';
     this.errorFound = false;
     this.startedEditing = false;
     this.resolvingSuggestion = false;
     this.lastSuggestionToReview = (
-      Object.keys(this.remainingContributions).length <= 0);
+      Object.keys(this.allContributions).length <= 1);
     this.translationHtml = (
       this.activeSuggestion.change.translation_html);
     this.status = this.activeSuggestion.status;
@@ -226,9 +288,31 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       this.activeSuggestion.change.data_format ===
         'set_of_unicode_string'
     );
-    this.reviewMessage = '';
-    if (!this.reviewable) {
-      this._getThreadMessagesAsync(this.activeSuggestionId);
+    setTimeout(() => {
+      this.computePanelOverflowState();
+    }, 0);
+  }
+
+  computePanelOverflowState(): void {
+    setTimeout(() => {
+      this.isContentOverflowing = (
+        this.contentPanel.elementRef.nativeElement.offsetHeight >
+        this.contentContainer.nativeElement.offsetHeight);
+      this.isTranslationOverflowing = (
+        this.translationPanel.elementRef.nativeElement.offsetHeight >
+        this.translationContainer.nativeElement.offsetHeight);
+    }, 0);
+  }
+
+  ngAfterViewInit(): void {
+    this.computePanelOverflowState();
+  }
+
+  toggleExpansionState(tab: ExpansionTabType): void {
+    if (tab === ExpansionTabType.CONTENT) {
+      this.isContentExpanded = !this.isContentExpanded;
+    } else if (tab === ExpansionTabType.TRANSLATION) {
+      this.isTranslationExpanded = !this.isTranslationExpanded;
     }
   }
 
@@ -264,41 +348,63 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     const response = await this.threadDataBackendApiService.fetchMessagesAsync(
       threadId);
     const threadMessageBackendDicts = response.messages;
-    this.reviewMessage = threadMessageBackendDicts.map(
-      m => ThreadMessage.createFromBackendDict(m))[1].text;
+    let threadMessages = threadMessageBackendDicts.map(
+      m => ThreadMessage.createFromBackendDict(m));
+    // This is to prevent a console error when a contribution
+    // doesn't have a review message. When a contribution has
+    // a review message the second element of the threadMessages
+    // array contains the actual review message.
+    if (threadMessages[1] !== undefined) {
+      this.reviewMessage = threadMessages[1].text;
+    }
   }
 
-  showNextItemToReview(suggestionId: string): void {
+  goToNextItem(): void {
+    const lastContributionId = this.remainingContributionIds.pop();
+    // If the current item is the last item, do not navigate.
+    if (lastContributionId === undefined) {
+      return;
+    }
+    // Don't add resolved contributions to the skippedContributionIds beacuse
+    // we don't want to show resolved suggestions when navigating back.
+    if (!this.resolvedSuggestionIds.includes(this.activeSuggestionId)) {
+      this.skippedContributionIds.push(this.activeSuggestionId);
+    }
+
+    this.activeSuggestionId = lastContributionId;
+
+    this.refreshActiveContributionState();
+  }
+
+  goToPreviousItem(): void {
+    const lastContributionId = this.skippedContributionIds.pop();
+    // If the current item is the first item, do not navigate.
+    if (lastContributionId === undefined) {
+      return;
+    }
+    // Don't add resolved contributions to the remainingContributionIds beacuse
+    // we don't want to show resolved suggestions when navigating forward.
+    if (!this.resolvedSuggestionIds.includes(this.activeSuggestionId)) {
+      this.remainingContributionIds.push(this.activeSuggestionId);
+    }
+
+    this.activeSuggestionId = lastContributionId;
+
+    this.refreshActiveContributionState();
+  }
+
+  resolveSuggestionAndUpdateModal(): void {
     this.resolvedSuggestionIds.push(this.activeSuggestionId);
-    if (this.lastSuggestionToReview) {
+
+    // Resolved contributions don't need to be displayed in the modal.
+    delete this.allContributions[this.activeSuggestionId];
+
+    // If the reviewed item was the last item, close the modal.
+    if (this.lastSuggestionToReview || this.isLastItem) {
       this.activeModal.close(this.resolvedSuggestionIds);
       return;
     }
-
-    let lastContribution = (
-      Object.keys(this.remainingContributions)[
-        Object.keys(this.remainingContributions).length - 1]);
-    this.activeSuggestionId = lastContribution;
-    this.activeContribution = this.remainingContributions[
-      lastContribution];
-    delete this.remainingContributions[this.activeSuggestionId];
-    // Close modal instance if the suggestion's corresponding opportunity
-    // is deleted. See issue #14234.
-    if (!this.activeContribution.details) {
-      this.activeModal.close(this.resolvedSuggestionIds);
-      return;
-    }
-
-    this.activeSuggestion = this.activeContribution.suggestion;
-    this.activeContributionDetails = this.activeContribution.details;
-    this.contextService.setCustomEntityContext(
-      AppConstants.IMAGE_CONTEXT.EXPLORATION_SUGGESTIONS,
-      this.activeSuggestion.target_id);
-    this.subheading = (
-      this.activeContributionDetails.topic_name + ' / ' +
-      this.activeContributionDetails.story_title +
-      ' / ' + this.activeContributionDetails.chapter_title);
-    this.init();
+    this.goToNextItem();
   }
 
   acceptAndReviewNext(): void {
@@ -315,7 +421,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       this.activeSuggestion.target_id, this.activeSuggestionId,
       AppConstants.ACTION_ACCEPT_SUGGESTION,
       this.reviewMessage, this.finalCommitMessage,
-      this.showNextItemToReview.bind(this),
+      this.resolveSuggestionAndUpdateModal.bind(this),
       (error) => {
         this.rejectAndReviewNext('Invalid Suggestion');
         this.alertsService.clearWarnings();
@@ -337,7 +443,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
         this.activeSuggestion.target_id, this.activeSuggestionId,
         AppConstants.ACTION_REJECT_SUGGESTION,
         reviewMessage || this.reviewMessage, null,
-        this.showNextItemToReview.bind(this),
+        this.resolveSuggestionAndUpdateModal.bind(this),
         (error) => {
           this.alertsService.clearWarnings();
           this.alertsService.addWarning(

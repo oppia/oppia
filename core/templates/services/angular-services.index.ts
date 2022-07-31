@@ -100,7 +100,7 @@ import { LearnerDashboardIdsBackendApiService } from 'domain/learner_dashboard/l
 import { SuggestionModalForLearnerDashboardService } from 'pages/learner-dashboard-page/suggestion-modal/suggestion-modal-for-learner-dashboard.service';
 import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-group-backend-api.service';
 import { LearnerGroupSyllabusBackendApiService } from 'domain/learner_group/learner-group-syllabus-backend-api.service';
-import { TeacherDashboardBackendApiService } from 'domain/learner_group/teacher-dashboard-backend-api.service';
+import { FacilitatorDashboardBackendApiService } from 'domain/learner_group/facilitator-dashboard-backend-api.service';
 import { NumberWithUnitsObjectFactory } from 'domain/objects/NumberWithUnitsObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { PlatformFeatureAdminBackendApiService } from 'domain/platform_feature/platform-feature-admin-backend-api.service';
@@ -418,6 +418,7 @@ import { QuestionUpdateService } from 'domain/question/question-update.service';
 import { SkillEditorRoutingService } from 'pages/skill-editor-page/services/skill-editor-routing.service';
 import { QuestionUndoRedoService } from 'domain/editor/undo_redo/question-undo-redo.service';
 import { ExplorationMetadataObjectFactory } from 'domain/exploration/ExplorationMetadataObjectFactory';
+import { VersionHistoryBackendApiService } from 'pages/exploration-editor-page/services/version-history-backend-api.service';
 import { TranslationStatusService } from 'pages/exploration-editor-page/translation-tab/services/translation-status.service';
 import { YamlService } from './yaml.service';
 import { HistoryTabYamlConversionService } from 'pages/exploration-editor-page/services/history-tab-yaml-conversion.service';
@@ -815,7 +816,8 @@ export const angularServices: [string, Type<{}>][] = [
   ['SuggestionsService', SuggestionsService],
   ['SvgFileFetcherBackendApiService', SvgFileFetcherBackendApiService],
   ['SvgSanitizerService', SvgSanitizerService],
-  ['TeacherDashboardBackendApiService', TeacherDashboardBackendApiService],
+  ['FacilitatorDashboardBackendApiService',
+    FacilitatorDashboardBackendApiService],
   ['TextInputPredictionService', TextInputPredictionService],
   ['TextInputRulesService', TextInputRulesService],
   ['TextInputTokenizer', TextInputTokenizer],
@@ -860,6 +862,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['UtilsService', UtilsService],
   ['ValidatorsService', ValidatorsService],
   ['VersionedExplorationCachingService', VersionedExplorationCachingService],
+  ['VersionHistoryBackendApiService', VersionHistoryBackendApiService],
   ['VersionTreeService', VersionTreeService],
   ['WindowDimensionsService', WindowDimensionsService],
   ['WindowRef', WindowRef],
