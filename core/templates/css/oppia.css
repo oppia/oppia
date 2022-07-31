@@ -159,26 +159,26 @@ why they need to be overriden.  */
   transform: translate3d(0,-1px,0);
 }
 
-.oppia-learner-confirm-button.protractor-test-submit-answer-button.md-button[disabled],
-.oppia-learner-confirm-button.protractor-test-submit-answer-button.mat-button[disabled] {
+.oppia-learner-confirm-button.e2e-test-submit-answer-button.md-button[disabled],
+.oppia-learner-confirm-button.e2e-test-submit-answer-button.mat-button[disabled] {
   background-color: transparent;
   color: rgba(0,0,0,0.38);
   cursor: default;
 }
 
-.oppia-learner-confirm-button.protractor-test-submit-answer-button.md-button[disabled]:hover,
-.oppia-learner-confirm-button.protractor-test-submit-answer-button.mat-button[disabled]:hover {
+.oppia-learner-confirm-button.e2e-test-submit-answer-button.md-button[disabled]:hover,
+.oppia-learner-confirm-button.e2e-test-submit-answer-button.mat-button[disabled]:hover {
   text-decoration: none;
 }
 
-.oppia-learner-confirm-button.protractor-test-submit-answer-button.md-button,
-.oppia-learner-confirm-button.protractor-test-submit-answer-button.mat-button {
+.oppia-learner-confirm-button.e2e-test-submit-answer-button.md-button,
+.oppia-learner-confirm-button.e2e-test-submit-answer-button.mat-button {
   font: 16px;
   margin: 0;
   min-width: 55px;
 }
 
-.oppia-learner-confirm-button.protractor-test-submit-answer-button.mat-button {
+.oppia-learner-confirm-button.e2e-test-submit-answer-button.mat-button {
   border-radius: 2px;
   font-size: 16px;
   line-height: 22px;
@@ -2300,7 +2300,7 @@ oppia-parameter {
   .modal-dialog {
     margin-left: auto;
     margin-right: auto;
-    width: 320px;
+    width: 90vw;
   }
 }
 @media(min-width: 1024px) {
@@ -3915,11 +3915,11 @@ div.oppia-issues-learner-action {
   are used for correctly stacking AngularJS modals on top of Angular modals.
 */
 .forced-modal-stack-over {
-  z-index: 1060 !important;
+  z-index: 1080 !important;
 }
 
 .forced-modal-backdrop-stack-over {
-  z-index: 1055 !important;
+  z-index: 1075 !important;
 }
 
 .oppia-profile-picture {

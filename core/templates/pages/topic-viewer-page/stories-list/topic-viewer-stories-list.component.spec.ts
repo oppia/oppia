@@ -95,8 +95,4 @@ describe('Topic Viewer Stories List Component', () => {
     widthSpy.and.returnValue(800);
     expect(component.checkTabletView()).toBe(false);
   });
-
-  it('should get RTL language status correctly', () => {
-    expect(component.isLanguageRTL()).toBeTrue();
-  });
 });

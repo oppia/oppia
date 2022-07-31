@@ -41,7 +41,7 @@ class GcsFileSystemUnitTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_EXPLORATION, 'eid')
 
     def test_get_and_save(self) -> None:
-        self.fs.commit('abc.png', 'file_contents')
+        self.fs.commit('abc.png', b'file_contents')
         self.assertEqual(self.fs.get('abc.png'), b'file_contents')
 
     def test_validate_entity_parameters(self) -> None:
@@ -68,7 +68,7 @@ class GcsFileSystemUnitTests(test_utils.GenericTestBase):
 
     def test_delete(self) -> None:
         self.assertFalse(self.fs.isfile('abc.png'))
-        self.fs.commit('abc.png', 'file_contents')
+        self.fs.commit('abc.png', b'file_contents')
         self.assertTrue(self.fs.isfile('abc.png'))
 
         self.fs.delete('abc.png')
@@ -87,10 +87,10 @@ class GcsFileSystemUnitTests(test_utils.GenericTestBase):
     def test_listdir(self) -> None:
         self.assertItemsEqual(self.fs.listdir(''), [])  # type: ignore[no-untyped-call]
 
-        self.fs.commit('abc.png', 'file_contents')
-        self.fs.commit('abcd.png', 'file_contents_2')
-        self.fs.commit('abc/abcd.png', 'file_contents_3')
-        self.fs.commit('bcd/bcde.png', 'file_contents_4')
+        self.fs.commit('abc.png', b'file_contents')
+        self.fs.commit('abcd.png', b'file_contents_2')
+        self.fs.commit('abc/abcd.png', b'file_contents_3')
+        self.fs.commit('bcd/bcde.png', b'file_contents_4')
 
         file_names = ['abc.png', 'abc/abcd.png', 'abcd.png', 'bcd/bcde.png']
 
@@ -117,7 +117,7 @@ class GcsFileSystemUnitTests(test_utils.GenericTestBase):
         self.assertEqual(new_fs.listdir('assets'), [])
 
     def test_copy(self) -> None:
-        self.fs.commit('abc2.png', 'file_contents')
+        self.fs.commit('abc2.png', b'file_contents')
         self.assertEqual(self.fs.listdir(''), ['abc2.png'])
         destination_fs = fs_services.GcsFileSystem(
             feconf.ENTITY_TYPE_QUESTION, 'question_id1')
@@ -147,7 +147,7 @@ class DirectoryTraversalTests(test_utils.GenericTestBase):
             with self.assertRaisesRegex(IOError, 'Invalid filepath'):  # type: ignore[no-untyped-call]
                 fs.get(filepath)
             with self.assertRaisesRegex(IOError, 'Invalid filepath'):  # type: ignore[no-untyped-call]
-                fs.commit(filepath, 'raw_file')
+                fs.commit(filepath, b'raw_file')
             with self.assertRaisesRegex(IOError, 'Invalid filepath'):  # type: ignore[no-untyped-call]
                 fs.delete(filepath)
             with self.assertRaisesRegex(IOError, 'Invalid filepath'):  # type: ignore[no-untyped-call]
@@ -169,7 +169,7 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])  # type: ignore[no-untyped-call]
         self.user_id_admin = (
             self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))  # type: ignore[no-untyped-call]
-        self.admin = user_services.get_user_actions_info(self.user_id_admin)  # type: ignore[no-untyped-call]
+        self.admin = user_services.get_user_actions_info(self.user_id_admin)
 
     def test_save_original_and_compressed_versions_of_image(self) -> None:
         with utils.open_file(

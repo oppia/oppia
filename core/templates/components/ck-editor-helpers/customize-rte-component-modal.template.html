@@ -18,9 +18,9 @@
   </div>
 
   <div class="modal-footer">
-    <input type="submit" class="btn btn-secondary" value="Cancel" ng-click="cancel()">
-    <input ng-if="!currentRteIsMathExpressionEditor" type="submit" class="btn btn-success protractor-test-close-rich-text-component-editor" value="Done" ng-click="save()" ng-disabled="form.schemaForm.$invalid">
-    <input ng-if="currentRteIsMathExpressionEditor" type="submit" class="btn btn-success protractor-test-close-rich-text-component-editor" value="Done" ng-click="save()" ng-disabled="form.schemaForm.$invalid || disableSaveButtonForMathRte()">
+    <input type="submit" class="btn btn-secondary e2e-test-cancel-rich-text-editor" value="Cancel" ng-click="cancel()">
+    <input ng-if="!currentRteIsMathExpressionEditor" type="submit" class="btn btn-success e2e-test-close-rich-text-component-editor" value="Done" ng-click="save()" ng-disabled="form.schemaForm.$invalid">
+    <input ng-if="currentRteIsMathExpressionEditor" type="submit" class="btn btn-success e2e-test-close-rich-text-component-editor" value="Done" ng-click="save()" ng-disabled="form.schemaForm.$invalid || disableSaveButtonForMathRte()">
   </div>
 </div>
 <style>

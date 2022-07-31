@@ -26,30 +26,34 @@ import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 import { Subscription } from 'rxjs';
 import { ExternalSaveService } from 'services/external-save.service';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
+import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
 
 @Component({
   selector: 'oppia-outcome-editor',
   templateUrl: './outcome-editor.component.html'
 })
 export class OutcomeEditorComponent implements OnInit {
-  @Input() areWarningsSuppressed: boolean;
-  @Input() displayFeedback: boolean;
-  @Input() isEditable: boolean;
-  @Input() outcome: Outcome;
-  @Input() addState: (value: string) => void;
   @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired:
   EventEmitter<string[]> = new EventEmitter();
 
   @Output() saveDest: EventEmitter<Outcome> = new EventEmitter();
   @Output() saveFeedback: EventEmitter<Outcome> = new EventEmitter();
   @Output() saveCorrectnessLabel: EventEmitter<Outcome> = new EventEmitter();
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() areWarningsSuppressed!: boolean;
+  @Input() displayFeedback!: boolean;
+  @Input() isEditable!: boolean;
+  @Input() outcome!: Outcome;
+  @Input() addState!: (value: string) => void;
+  savedOutcome!: Outcome;
   directiveSubscriptions = new Subscription();
   ENABLE_PREREQUISITE_SKILLS = AppConstants.ENABLE_PREREQUISITE_SKILLS;
-  canAddPrerequisiteSkill: boolean;
-  correctnessLabelEditorIsOpen: boolean;
-  destinationEditorIsOpen: boolean;
-  feedbackEditorIsOpen: boolean;
-  savedOutcome: Outcome;
+  canAddPrerequisiteSkill: boolean = false;
+  correctnessLabelEditorIsOpen: boolean = false;
+  destinationEditorIsOpen: boolean = false;
+  feedbackEditorIsOpen: boolean = false;
 
   constructor(
     private externalSaveService: ExternalSaveService,
@@ -65,10 +69,10 @@ export class OutcomeEditorComponent implements OnInit {
     return this.stateEditorService.getCorrectnessFeedbackEnabled();
   }
 
-  // This returns false if the current interaction ID is null.
   isCurrentInteractionLinear(): boolean {
     let interactionId = this.getCurrentInteractionId();
-    return interactionId && INTERACTION_SPECS[interactionId].is_linear;
+    return Boolean(interactionId) && INTERACTION_SPECS[
+      interactionId as InteractionSpecsKey].is_linear;
   }
 
   onExternalSave(): void {
@@ -151,19 +155,27 @@ export class OutcomeEditorComponent implements OnInit {
     this.savedOutcome.feedback = cloneDeep(
       this.outcome.feedback);
 
-    if (this.stateEditorService.isInQuestionMode()) {
-      this.savedOutcome.dest = null;
-    } else if (
+    if (
+      !this.stateEditorService.isInQuestionMode() &&
       this.savedOutcome.dest === this.outcome.dest &&
         !this.stateEditorService.getStateNames().includes(
           this.outcome.dest)) {
       // If the stateName has changed and previously saved
       // destination points to the older name, update it to
       // the active state name.
-      this.savedOutcome.dest = this.stateEditorService.getActiveStateName();
+      let activeStateName = this.stateEditorService.getActiveStateName();
+      if (activeStateName === null) {
+        throw new Error(
+          'The active state name is null in the outcome editor.');
+      }
+      this.savedOutcome.dest = activeStateName;
     }
     if (fromClickSaveFeedbackButton && contentHasChanged) {
       let contentId = this.savedOutcome.feedback.contentId;
+      if (contentId === null) {
+        throw new Error(
+          'The content ID is null in the outcome editor.');
+      }
       this.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit([contentId]);
     }
     this.saveFeedback.emit(this.savedOutcome);

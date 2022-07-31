@@ -25,64 +25,64 @@ from core.tests import test_utils
 
 class GetAuditsByKindTests(test_utils.TestBase):
 
-    def test_returns_value_from_decorator(self):
-        unique_obj = object()
+    unique_obj = object()
 
-        @classmethod
-        def get_audit_do_fn_types_by_kind_mock(unused_cls):
-            """Returns the unique_obj."""
-            return unique_obj
+    @classmethod
+    def get_audit_do_fn_types_by_kind_mock(cls) -> object:
+        """Returns the unique_obj."""
+        return cls.unique_obj
 
+    def test_returns_value_from_decorator(self) -> None:
         get_audit_do_fn_types_by_kind_swap = self.swap(
             validation_decorators.AuditsExisting,
             'get_audit_do_fn_types_by_kind',
-            get_audit_do_fn_types_by_kind_mock)
+            self.get_audit_do_fn_types_by_kind_mock)
 
         with get_audit_do_fn_types_by_kind_swap:
             self.assertIs(
                 base_validation_registry.get_audit_do_fn_types_by_kind(),
-                unique_obj)
+                self.unique_obj)
 
 
 class GetIdReferencingPropertiesByKindOfPossessorTests(test_utils.TestBase):
 
-    def test_returns_value_from_decorator(self):
-        unique_obj = object()
+    unique_obj = object()
 
-        @classmethod
-        def get_id_referencing_properties_by_kind_of_possessor_mock(unused_cls):
-            """Returns the unique_obj."""
-            return unique_obj
+    @classmethod
+    def get_id_referencing_properties_by_kind_of_possessor_mock(cls) -> object:
+        """Returns the unique_obj."""
+        return cls.unique_obj
 
+    def test_returns_value_from_decorator(self) -> None:
         get_id_referencing_properties_by_kind_of_possessor_swap = self.swap(
             validation_decorators.RelationshipsOf,
             'get_id_referencing_properties_by_kind_of_possessor',
-            get_id_referencing_properties_by_kind_of_possessor_mock)
+            self.get_id_referencing_properties_by_kind_of_possessor_mock)
 
         with get_id_referencing_properties_by_kind_of_possessor_swap:
             self.assertIs(
                 base_validation_registry
                 .get_id_referencing_properties_by_kind_of_possessor(),
-                unique_obj)
+                self.unique_obj)
 
 
 class GetAllModelKindsReferencedByPropertiesTests(test_utils.TestBase):
 
-    def test_returns_value_from_decorator(self):
-        unique_obj = object()
+    unique_obj = object()
 
-        @classmethod
-        def get_all_model_kinds_referenced_by_properties_mock(unused_cls):
-            """Returns the unique_obj."""
-            return unique_obj
+    @classmethod
+    def get_all_model_kinds_referenced_by_properties_mock(cls) -> object:
+        """Returns the unique_obj."""
+        return cls.unique_obj
 
+    def test_returns_value_from_decorator(self) -> None:
         get_all_model_kinds_referenced_by_properties_swap = self.swap(
             validation_decorators.RelationshipsOf,
             'get_all_model_kinds_referenced_by_properties',
-            get_all_model_kinds_referenced_by_properties_mock)
+            self.get_all_model_kinds_referenced_by_properties_mock)
 
         with get_all_model_kinds_referenced_by_properties_swap:
             self.assertIs(
                 base_validation_registry
                 .get_all_model_kinds_referenced_by_properties(),
-                unique_obj)
+                self.unique_obj)

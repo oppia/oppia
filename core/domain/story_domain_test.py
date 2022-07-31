@@ -230,7 +230,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super(StoryDomainUnitTests, self).setUp()
-        self.story_id = story_services.get_new_story_id()  # type: ignore[no-untyped-call]
+        self.story_id = story_services.get_new_story_id()
         self.TOPIC_ID = utils.generate_random_string(12)
         self.story = self.save_new_story(  # type: ignore[no-untyped-call]
             self.story_id, self.USER_ID, self.TOPIC_ID,
@@ -403,7 +403,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             1000, 1001))
 
     def test_to_human_readable_dict(self) -> None:
-        story_summary = story_fetchers.get_story_summary_by_id(self.story_id)  # type: ignore[no-untyped-call]
+        story_summary = story_fetchers.get_story_summary_by_id(self.story_id)
         expected_dict: story_domain.HumanReadableStorySummaryDict = {
             'id': self.story_id,
             'title': 'Title',

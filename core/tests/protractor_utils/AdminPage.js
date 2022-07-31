@@ -26,54 +26,56 @@ var waitFor = require('./waitFor.js');
 var AdminPage = function() {
   var ADMIN_URL_SUFFIX = '/admin';
 
-  var configTab = element(by.css('.protractor-test-admin-config-tab'));
-  var saveAllConfigs = element(by.css('.protractor-test-save-all-configs'));
+  var configTab = element(by.css('.e2e-test-admin-config-tab'));
+  var saveAllConfigs = element(by.css('.e2e-test-save-all-configs'));
   var configProperties = element.all(by.css(
-    '.protractor-test-config-property'
+    '.e2e-test-config-property'
   ));
-  var adminRolesTab = element(by.css('.protractor-test-admin-roles-tab'));
+  var adminRolesTab = element(by.css('.e2e-test-admin-roles-tab'));
   var adminRolesTabContainer = element(
-    by.css('.protractor-test-roles-tab-container'));
+    by.css('.e2e-test-roles-tab-container'));
   var usernameInputFieldForRolesEditing = element(
-    by.css('.protractor-test-username-for-role-editor'));
-  var editUserRoleButton = element(by.css('.protractor-test-role-edit-button'));
+    by.css('.e2e-test-username-for-role-editor'));
+  var editUserRoleButton = element(by.css('.e2e-test-role-edit-button'));
   var addNewRoleButton = element(
-    by.css('.protractor-test-add-new-role-button'));
-  var progressSpinner = element(by.css('.protractor-test-progress-spinner'));
-  var roleSelector = element(by.css('.protractor-test-new-role-selector'));
+    by.css('.e2e-test-add-new-role-button'));
+  var progressSpinner = element(by.css('.e2e-test-progress-spinner'));
+  var roleSelector = element(by.css('.e2e-test-new-role-selector'));
   var roleEditorContainer = element(
-    by.css('.protractor-test-roles-editor-card-container'));
+    by.css('.e2e-test-roles-editor-card-container'));
   var userRoleItems = element.all(
-    by.css('.protractor-test-user-role-description'));
-  var statusMessage = element(by.css('.protractor-test-status-message'));
+    by.css('.e2e-test-user-role-description'));
+  var statusMessage = element(by.css('.e2e-test-status-message'));
 
-  var roleDropdown = element(by.css('.protractor-test-role-method'));
-  var roleValueOption = element(by.css('.protractor-test-role-value'));
-  var viewRoleButton = element(by.css('.protractor-test-role-success'));
+  var roleDropdown = element(by.css('.e2e-test-role-method'));
+  var roleValueOption = element(by.css('.e2e-test-role-value'));
+  var viewRoleButton = element(by.css('.e2e-test-role-success'));
   var explorationElements = element.all(by.css(
-    '.protractor-test-reload-exploration-row'));
+    '.e2e-test-reload-exploration-row'));
   var reloadCollectionButtons = element.all(by.css(
-    '.protractor-test-reload-collection-button'));
+    '.e2e-test-reload-collection-button'));
   var explorationTitleLocator = by.css(
-    '.protractor-test-reload-exploration-title');
+    '.e2e-test-reload-exploration-title');
   var explorationButtonLocator = by.css(
-    '.protractor-test-reload-exploration-button');
-  var configTitleLocator = by.css('.protractor-test-config-title');
-  var featuresTab = element(by.css('.protractor-test-admin-features-tab'));
+    '.e2e-test-reload-exploration-button');
+  var configTitleLocator = by.css('.e2e-test-config-title');
+  var featuresTab = element(by.css('.e2e-test-admin-features-tab'));
   var featureFlagElements = element.all(by.css(
-    '.protractor-test-feature-flag'));
-  var featureNameLocator = by.css('.protractor-test-feature-name');
-  var noRuleIndicatorLocator = by.css('.protractor-test-no-rule-indicator');
+    '.e2e-test-feature-flag'));
+  var featureNameLocator = by.css('.e2e-test-feature-name');
+  var noRuleIndicatorLocator = by.css('.e2e-test-no-rule-indicator');
   var removeRuleButtonLocator = by.css(
-    '.protractor-test-remove-rule-button');
-  var saveButtonLocator = by.css('.protractor-test-save-button');
+    '.e2e-test-remove-rule-button');
+  var saveButtonLocator = by.css('.e2e-test-save-button');
   var addFeatureRuleButtonLocator = by.css(
-    '.protractor-test-feature-add-rule-button');
-  var valueSelectorLocator = by.css('.protractor-test-value-selector');
+    '.e2e-test-feature-add-rule-button');
+  var valueSelectorLocator = by.css('.e2e-test-value-selector');
+  var serverModeSelectorLocator = by.css(
+    '.e2e-test-server-mode-selector');
   var addConditionButtonLocator = by.css(
-    '.protractor-test-add-condition-button');
+    '.e2e-test-add-condition-button');
   var rolesResultRowsElements = element.all(
-    by.css('.protractor-test-roles-result-rows'));
+    by.css('.e2e-test-roles-result-rows'));
 
 
   // The reload functions are used for mobile testing
@@ -187,6 +189,21 @@ var AdminPage = function() {
     return null;
   };
 
+  // Remove this method after the end_chapter_celebration feature flag
+  // is deprecated.
+  this.getEndChapterCelebrationFeatureElement = async function() {
+    var count = await featureFlagElements.count();
+    for (let i = 0; i < count; i++) {
+      var elem = featureFlagElements.get(i);
+      if ((await elem.element(featureNameLocator).getText()) ===
+          'end_chapter_celebration') {
+        return elem;
+      }
+    }
+
+    return null;
+  };
+
   this.removeAllRulesOfFeature = async function(featureElement) {
     while (!await featureElement.isElementPresent(noRuleIndicatorLocator)) {
       await action.click(
@@ -232,6 +249,37 @@ var AdminPage = function() {
     await this.saveChangeOfFeature(featureElement);
   };
 
+  // Remove this method after the end_chapter_celebration feature flag
+  // is deprecated.
+  this.enableFeatureForProd = async function(featureElement) {
+    await this.removeAllRulesOfFeature(featureElement);
+
+    await action.click(
+      'Add feature rule button',
+      featureElement
+        .element(addFeatureRuleButtonLocator)
+    );
+
+    await action.sendKeys(
+      'Rule value selector',
+      featureElement
+        .element(valueSelectorLocator),
+      'Enabled');
+
+    await action.click(
+      'Add condition button',
+      featureElement
+        .element(addConditionButtonLocator)
+    );
+
+    await action.sendKeys(
+      'Server mode selector',
+      featureElement.element(serverModeSelectorLocator),
+      'prod');
+
+    await this.saveChangeOfFeature(featureElement);
+  };
+
   this.editConfigProperty = async function(
       propertyName, objectType, editingInstructions) {
     await this.get();
@@ -273,7 +321,7 @@ var AdminPage = function() {
     await waitFor.invisibilityOf(
       progressSpinner, 'Progress spinner is taking too long to disappear.');
     var removeButtonElement = element(by.css(
-      '.protractor-test-' + newRole.split(' ').join('-') +
+      '.e2e-test-' + newRole.split(' ').join('-') +
       '-remove-button-container'));
     await waitFor.visibilityOf(
       removeButtonElement, 'Role removal button takes too long to appear.');

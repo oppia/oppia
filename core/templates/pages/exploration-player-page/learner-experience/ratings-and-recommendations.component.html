@@ -23,9 +23,11 @@
   <div *ngIf="!collectionSummary && !inStoryMode && recommendedExplorationSummaries && recommendedExplorationSummaries.length > 0"
        class="conversation-skin-final-recommendations">
     <div *ngIf="recommendedExplorationSummaries.length > 0">
-      <span *ngIf="!collectionSummary && !isRefresherExploration" class="conversation-skin-final-recommendations-header"
-            translate="I18N_PLAYER_RECOMMEND_EXPLORATIONS">
-      </span>
+      <div class="conversation-skin-final-recommendations-header-container">
+        <span *ngIf="!collectionSummary && !isRefresherExploration" class="conversation-skin-final-recommendations-header"
+              translate="I18N_END_EXPLORATION_RECOMMENDATION_MESSAGE">
+        </span>
+      </div>
       <div class="ratings-and-recommendations-exp-summary-tiles-container conversation-skin-recommended-activities-container">
         <oppia-exploration-summary-tile *ngFor="let exp of (recommendedExplorationSummaries|limitTo:3)"
                                         [collectionId]="collectionId"
@@ -40,23 +42,38 @@
                                         [thumbnailBgColor]="exp.thumbnailBgColor"
                                         [numViews]="exp.numViews"
                                         [isCommunityOwned]="exp.communityOwned"
-                                        class="oppia-exploration-summary-tile">
+                                        [mobileCutoffPx]="5000"
+                                        class="ratings-component-oppia-exploration-summary-tile">
         </oppia-exploration-summary-tile>
       </div>
     </div>
   </div>
 
-  <div *ngIf="inStoryMode && !userIsLoggedIn" class="conversation-skin-login-container">
+  <div *ngIf="inStoryMode && !userIsLoggedIn && !isSignUpSectionHidden()" class="conversation-skin-login-container e2e-test-end-chapter-sign-up-section">
     <div class="conversation-skin-congratulations-text" translate="I18N_CHAPTER_COMPLETION"></div>
     <span class="conversation-skin-login-text text-secondary" translate="I18N_SAVE_PROGRESS"></span>
     <div class="mt-2">
-      <button mat-button class="md-raised oppia-login-button text-light protractor-test-login-button m-2" (click)="signIn()">
-        LOGIN
-      </button>
-      <button mat-button class="md-raised oppia-sign-up-button text-light m-2" (click)="signIn()">
+      <button mat-button class="md-raised oppia-sign-up-button e2e-test-login-button text-light" (click)="signIn()">
         SIGN UP
       </button>
     </div>
+    <div class="conversation-skin-login-secondary-options">
+      <button class="conversation-skin-login-button">
+        Already have an account?
+        <span class="conversation-skin-login-button-text" translate="" (click)="signIn()">Sign In</span>
+      </button>
+      <button class="conversation-skin-hide-sign-up-section-button e2e-test-dismiss-sign-up-section-button" *ngIf="isEndChapterFeatureEnabled()">
+        <span class="conversation-skin-hide-sign-up-section-text" translate="I18N_SIGNUP_SECTION_DONT_ASK_ME_AGAIN" (click)="hideSignUpSection()"></span>
+      </button>
+    </div>
+  </div>
+  <div *ngIf="inStoryMode && isEndChapterFeatureEnabled() && storyId">
+    <oppia-post-chapter-recommendations [nextStoryNodeLink]="nextLessonLink"
+                                        [nextStoryNodeThumbnailUrl]="nextStoryNodeIconUrl ? nextStoryNodeIconUrl : ''"
+                                        [nextStoryNodeThumbnailBgColor]="nextStoryNode ? nextStoryNode.thumbnailBgColor : ''"
+                                        [nextStoryNodeTitle]="nextStoryNode ? nextStoryNode.title : ''"
+                                        [practiceQuestionsAreEnabled]="practiceQuestionsAreEnabled">
+    </oppia-post-chapter-recommendations>
   </div>
 
   <div *ngIf="inStoryMode" class="conversation-skin-back-to-collection-container">
@@ -71,16 +88,11 @@
 </div>
 
 <style>
-  .oppia-login-button {
-    background-color: #00645c;
-    font-size: 1em;
-    min-width: max-content;
-    width: 154px;
-  }
-
   .oppia-sign-up-button {
-    background-color: #00609c;
+    background-color: #00645c;
+    border-radius: 15px;
     font-size: 1em;
+    margin-bottom: 25px;
     min-width: max-content;
     width: 154px;
   }
@@ -96,10 +108,11 @@
 
   .conversation-skin-final-ratings {
     background-color: white;
+    border-bottom: 2px solid #bbb;
+    border-top: 2px solid #bbb;
     margin: 0 auto 60px;
-    padding: 11px;
+    padding: 0 0 20px 0;
     text-align: center;
-    width: 38%;
   }
 
   .conversation-skin-final-ratings-display {
@@ -107,14 +120,13 @@
     letter-spacing: 10px;
   }
 
-  .conversation-skin-final-recommendations {
-    margin-top: 50px;
-    text-align: center;
-  }
-
   .conversation-skin-final-recommendations-header {
     color: #064b46;
     font-size: 150%;
+  }
+
+  .conversation-skin-final-recommendations-header-container {
+    text-align: center;
   }
 
   .conversation-skin-recommended-activities-container {
@@ -122,21 +134,26 @@
   }
 
   .conversation-skin-back-to-collection-container {
-    margin-bottom: 92px;
-    margin-top: 24px;
+    border: 1px solid #00645c;
+    border-radius: 40px;
+    margin: auto;
+    padding: 5px;
     text-align: center;
+    width: 35%;
   }
 
   .conversation-skin-back-to-collection {
     color: #064b46;
-    text-decoration: underline;
   }
 
   .conversation-skin-login-container {
     background-color: #fff;
+    border-bottom: 2px solid #bbb;
+    border-top: 2px solid #bbb;
     margin-bottom: 24px;
     margin-top: 24px;
     padding: 1.5em 2em;
+    padding-bottom: 0.5em;
     text-align: center;
     width: 100%;
   }
@@ -150,28 +167,45 @@
     font-weight: 500;
   }
 
+  .conversation-skin-login-container .conversation-skin-hide-sign-up-section-text {
+    color: #00645c;
+    cursor: pointer;
+    text-decoration: underline;
+  }
+
+  .conversation-skin-login-container .conversation-skin-login-button-text {
+    color: #00645c;
+    cursor: pointer;
+    text-decoration: underline;
+  }
+
+  .conversation-skin-login-container .conversation-skin-login-secondary-options {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .conversation-skin-login-secondary-options button {
+    background: none;
+    border: none;
+    cursor: default;
+    font-size: 0.8em;
+  }
+
   .ratings-and-recommendations-exp-summary-tiles-container {
       align-items: center;
       display: flex;
+      flex-direction: column;
       height: 100%;
-      justify-content: center;
       margin-left: auto;
       margin-right: auto;
-      max-width: 928px;
-      min-height: 300px;
       padding-bottom: 24px;
       padding-top: 24px;
-      width: 100vw;
   }
 
   @media screen and (max-width: 959px) {
     .conversation-skin-final-summary {
       margin: 0 auto;
       max-width: 650px;
-      width: 100%;
-    }
-    .conversation-skin-final-ratings {
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14), 0 2px 4px rgba(0, 0, 0, 0.23);
       width: 100%;
     }
   }

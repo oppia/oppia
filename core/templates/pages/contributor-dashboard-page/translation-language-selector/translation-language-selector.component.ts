@@ -87,19 +87,34 @@ export class TranslationLanguageSelectorComponent implements OnInit {
     this.languageSelection = (
       this.activeLanguageCode ?
       this.languageIdToDescription[this.activeLanguageCode] :
-      'Select a language...'
+      'Language'
     );
+
+    this.contributionOpportunitiesBackendApiService
+      .getPreferredTranslationLanguageAsync()
+      .then((preferredLanguageCode: string|null) => {
+        if (preferredLanguageCode) {
+          this.populateLanguageSelection(
+            preferredLanguageCode);
+        }
+      });
   }
 
   toggleDropdown(): void {
     this.dropdownShown = !this.dropdownShown;
   }
 
+  populateLanguageSelection(languageCode: string): void {
+    this.setActiveLanguageCode.emit(languageCode);
+    this.languageSelection = (
+      this.languageIdToDescription[languageCode]);
+  }
+
   selectOption(activeLanguageCode: string): void {
-    this.setActiveLanguageCode.emit(activeLanguageCode);
-    this.languageSelection = this.languageIdToDescription[
-      activeLanguageCode];
+    this.populateLanguageSelection(activeLanguageCode);
     this.dropdownShown = false;
+    this.contributionOpportunitiesBackendApiService
+      .savePreferredTranslationLanguageAsync(activeLanguageCode);
   }
 
   showExplanationPopup(index: number): void {

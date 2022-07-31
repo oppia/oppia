@@ -61,6 +61,9 @@ export class ExplorationPlayerStateService {
   explorationId: string;
   version: number;
   storyUrlFragment: string;
+  lastCompletedCheckpoint: string;
+  isLoggedOutProgressTracked: boolean = false;
+  uniqueProgressUrlId: string | null = null;
   private _playerStateChangeEventEmitter: EventEmitter<string> = (
     new EventEmitter<string>());
 
@@ -344,6 +347,36 @@ export class ExplorationPlayerStateService {
       this.setExplorationMode();
     }
     this.explorationEngineService.moveToExploration(callback);
+  }
+
+  setLastCompletedCheckpoint(checkpointStateName: string): void {
+    this.lastCompletedCheckpoint = checkpointStateName;
+  }
+
+  trackLoggedOutLearnerProgress(): void {
+    this.isLoggedOutProgressTracked = true;
+  }
+
+  isLoggedOutLearnerProgressTracked(): boolean {
+    return this.isLoggedOutProgressTracked;
+  }
+
+  async setUniqueProgressUrlId(): Promise<void> {
+    await this.editableExplorationBackendApiService.
+      recordProgressAndFetchUniqueProgressIdOfLoggedOutLearner(
+        this.explorationId,
+        this.version,
+        this.lastCompletedCheckpoint
+      )
+      .then((response) => {
+        this.uniqueProgressUrlId = (
+          response.unique_progress_url_id);
+        this.trackLoggedOutLearnerProgress();
+      });
+  }
+
+  getUniqueProgressUrlId(): string {
+    return this.uniqueProgressUrlId;
   }
 
   getLanguageCode(): string {

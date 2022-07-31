@@ -1,8 +1,5 @@
-<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/pages/exploration-player-page/learner-experience/conversation-skin.component.css" as="style">
-<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/pages/exploration-player-page/learner-experience/conversation-skin.component.rtl.css" as="style">
-
 <div role="main" class="oppia-conversation-skin-animate-cards-container position-relative" *ngIf="hasFullyLoaded">
-  <div class="conversation-skin-cards-container conversation-skin-animate-cards protractor-test-conversation-skin-cards-container"
+  <div class="conversation-skin-cards-container conversation-skin-animate-cards e2e-test-conversation-skin-cards-container"
        [ngClass]="{'animate-to-two-cards': isAnimatingToTwoCards, 'animate-to-one-card': isAnimatingToOneCard}">
 
     <div class="conversation-skin-tutor-card-container"
@@ -13,7 +10,18 @@
       <oppia-tutor-card [displayedCard]="displayedCard"
                         [displayedCardWasCompletedInPrevSession]="isDisplayedCardCompletedInPrevSession()"
                         [avatarImageIsShown]="true"
-                        [startCardChangeAnimation]="startCardChangeAnimation">
+                        [startCardChangeAnimation]="startCardChangeAnimation"
+                        [userIsLoggedIn]="isLoggedIn"
+                        [collectionSummary]="collectionSummary"
+                        [questionPlayerConfig]="questionPlayerConfig"
+                        [explorationIsInPreviewMode]="isInPreviewMode"
+                        [isRefresherExploration]="isRefresherExploration"
+                        [recommendedExplorationSummaries]="recommendedExplorationSummaries"
+                        [parentExplorationIds]="parentExplorationIds"
+                        [inStoryMode]="inStoryMode"
+                        [nextLessonLink]="getExplorationLink()"
+                        [completedChaptersCount]="completedChaptersCount"
+                        [milestoneMessageIsToBeDisplayed]="chapterIsCompletedForTheFirstTime">
       </oppia-tutor-card>
       <div *ngIf="isCurrentSupplementalCardNonempty() && !canWindowShowTwoCards()">
         <oppia-supplemental-card (clickContinueButton)="showUpcomingCard()"
@@ -34,8 +42,8 @@
                             (changeCard)="changeCard($event)">
         </oppia-progress-nav>
       </div>
-      <div *ngIf="recommendedExplorationSummaries && recommendedExplorationSummaries.length > 0 && (inStoryMode  || (collectionSummary && isOnTerminalCard() && isCurrentCardAtEndOfTranscript()))" class="conversation-skin-next-lesson-wrapper">
-        <div class="oppia-conversation-skin-next-lession-text-container">
+      <div *ngIf="recommendedExplorationSummaries && recommendedExplorationSummaries.length > 0 && ((!isEndChapterCelebrationFeatureEnabled() && inStoryMode) || (collectionSummary && isOnTerminalCard() && isCurrentCardAtEndOfTranscript()))" class="conversation-skin-next-lesson-wrapper">
+        <div class="oppia-conversation-skin-next-lesson-text-container">
           <span class="conversation-skin-next-lesson-text" translate="I18N_NEXT_LESSON"></span>
           <span *ngIf="!isHackyExpTitleTranslationDisplayed(recommendedExplorationSummaries[0].id)">
             {{ recommendedExplorationSummaries[0].title }}
@@ -64,7 +72,7 @@
         <div class="conversation-skin-supplemental-nav" *ngIf="isSupplementalNavShown() && !getCanAskLearnerForAnswerInfo()">
           <button mat-button
                   type="submit"
-                  class="oppia-learner-confirm-button protractor-test-submit-answer-button conversation-skin-supplemental-nav-submit-button"
+                  class="oppia-learner-confirm-button e2e-test-submit-answer-button conversation-skin-supplemental-nav-submit-button"
                   (click)="submitAnswerFromProgressNav()"
                   [disabled]="isSubmitButtonDisabled()">
             {{ 'I18N_INTERACTIONS_SUBMIT' | translate }}
@@ -78,19 +86,7 @@
   </div>
 </div>
 
-<oppia-ratings-and-recommendations *ngIf="isOnTerminalCard() && isCurrentCardAtEndOfTranscript()"
-                                   [userIsLoggedIn]="isLoggedIn"
-                                   [explorationIsInPreviewMode]="isInPreviewMode"
-                                   [questionPlayerConfig]="questionPlayerConfig"
-                                   [inStoryMode]="inStoryMode"
-                                   [storyViewerUrl]="storyViewerUrl"
-                                   [collectionSummary]="collectionSummary"
-                                   [isRefresherExploration]="isRefresherExploration"
-                                   [recommendedExplorationSummaries]="recommendedExplorationSummaries"
-                                   [parentExplorationIds]="parentExplorationIds">
-</oppia-ratings-and-recommendations>
-
-<div *ngIf="prevSessionStatesProgress.length != 0" class="oppia-exploration-checkpoints-message">
+<div *ngIf="CHECKPOINTS_FEATURE_IS_ENABLED && prevSessionStatesProgress.length != 0" class="oppia-exploration-checkpoints-message">
   <div id="toast-container" class="toast-top-center toast-container">
     <div class="toast-info checkpoints-toast-info ngx-toastr ng-trigger ng-trigger-flyInOut">
       <div aria-live="polite" role="alertdialog" class="toast-message" attr.aria-label="{{'I18N_EXPLORATION_STARTING_FROM_CHECKPOINT' | translate}}">
@@ -100,6 +96,12 @@
   </div>
 </div>
 
-<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
-<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/exploration-player-page/learner-experience/conversation-skin.component.css">
-<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/exploration-player-page/learner-experience/conversation-skin.component.rtl.css">
+<div *ngIf="CHECKPOINTS_FEATURE_IS_ENABLED && isProgressClearanceMessageShown()" class="oppia-exploration-checkpoints-message">
+  <div id="toast-container" class="toast-top-center toast-container">
+    <div class="toast-info checkpoints-toast-info ngx-toastr ng-trigger ng-trigger-flyInOut">
+      <div aria-live="polite" role="alertdialog" class="toast-message" attr.aria-label="{{'I18N_EXPLORATION_STARTING_FROM_BEGINNING' | translate}}">
+        {{ 'I18N_EXPLORATION_STARTING_FROM_BEGINNING' | translate }}
+      </div>
+    </div>
+  </div>
+</div>

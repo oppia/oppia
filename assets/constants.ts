@@ -74,10 +74,14 @@ export default {
     "History", "Mathematics", "Medicine", "Music", "Physics", "Programming",
     "Reading", "Statistics"],
 
+  // These classrooms are shown in the add learner group syllabus filters.
+  "SEARCH_DROPDOWN_CLASSROOMS": ["math"],
+
+  // These types are shown in the add learner group syllabus filters.
+  "SEARCH_DROPDOWN_TYPES": ["Skill", "Story"],
+
   // The default language code for an exploration.
   "DEFAULT_LANGUAGE_CODE": "en",
-
-  "RTL_LANGUAGE_CODES": ["ar"],
 
   // Hacky translation keys for classroom, topic, skill, exploration
   // and subtopic names and descriptions. Needs to be updated whenever
@@ -293,6 +297,11 @@ export default {
   "TASK_ENTITY_TYPE_EXPLORATION": "exploration",
 
   "TASK_TARGET_TYPE_STATE": "state",
+
+  // Filters for adding new syllabus items to learner groups.
+  "DEFAULT_ADD_SYLLABUS_FILTER": "All",
+  "LEARNER_GROUP_ADD_STORY_FILTER": "Story",
+  "LEARNER_GROUP_ADD_SKILL_FILTER": "Skill",
 
   // Roles in exploration.
   "ROLE_OWNER": "owner",
@@ -5899,6 +5908,11 @@ export default {
   // page.
   "OPPORTUNITIES_PAGE_SIZE": 10,
 
+  // The breakpoint for mobile view for contributor dashboard in px.
+  // This value must be the same as the one specified in
+  // opportunities-list-item.component.html.
+  "OPPORTUNITIES_LIST_ITEM_MOBILE_BREAKPOINT": 700,
+
   // Represents the string value indicating "All topics" in the Contributor
   // Dashboard topic selector.
   "TOPIC_SENTINEL_NAME_ALL": "All",
@@ -5960,6 +5974,7 @@ export default {
       "answer_groups": [],
       "default_outcome": {
         "dest": "Introduction",
+        "dest_if_really_stuck": null,
         "feedback": {
           "content_id": "default_outcome",
           "html": ""
@@ -6028,6 +6043,9 @@ export default {
 
   // A regular expression for allowed entity id's.
   "ENTITY_ID_REGEX": "^[a-zA-Z0-9-_]{1,12}$",
+
+  // A regular expression for allowed learner group IDs.
+  "LEARNER_GROUP_ID_REGEX": "^[a-zA-Z]{1,12}$",
 
   // A regular expression for allowed characters in Title field for Blog Post.
   "VALID_BLOG_POST_TITLE_REGEX": "^[a-zA-Z0-9][a-zA-Z0-9 ]+(-[a-zA-Z0-9]+)*$",
@@ -6173,6 +6191,9 @@ export default {
   // Maximum allowed length of a state name.
   "MAX_STATE_NAME_LENGTH": 50,
 
+  // Maximum allowed length of unique progress url ID.
+  "MAX_PROGRESS_URL_ID_LENGTH": 6,
+
   "PLATFORM_PARAMETER_ALLOWED_BROWSER_TYPES": [
     "Chrome", "Edge", "Safari", "Firefox", "Others"],
   "PLATFORM_PARAMETER_ALLOWED_PLATFORM_TYPES": ["Web", "Android", "Backend"],
@@ -6312,28 +6333,6 @@ export default {
       "ROUTE": "about-foundation",
       "TITLE": "About the Oppia Foundation | Oppia",
       "META": []
-    },
-    "CLASSROOM": {
-      "ROUTE": "learn/:classroom_url_fragment",
-      "TITLE": "Oppia",
-      // Some routes contain url fragments, as syntax for url fragments are
-      // different for angular router and backend. They have to be registered
-      // manually in the backend. Please use angular router syntax here.
-      "MANUALLY_REGISTERED_WITH_BACKEND": true,
-      "META": [
-        {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "description",
-          // eslint-disable-next-line max-len
-          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it"
-        },
-        {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "og:description",
-          // eslint-disable-next-line max-len
-          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it"
-        }
-      ]
     },
     "CONTACT": {
       "ROUTE": "contact",
@@ -6635,24 +6634,6 @@ export default {
         }
       ]
     },
-    "SPLASH": {
-      "ROUTE": "",
-      "TITLE": "I18N_SPLASH_PAGE_TITLE",
-      "META": [
-        {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "description",
-          // eslint-disable-next-line max-len
-          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
-        },
-        {
-          "PROPERTY_TYPE": "itemprop",
-          "PROPERTY_VALUE": "og:description",
-          // eslint-disable-next-line max-len
-          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
-        }
-      ]
-    },
     "STORY_VIEWER": {
       // eslint-disable-next-line max-len
       "ROUTE": "learn/:classroom_url_fragment/:topic_url_fragment/story/:story_url_fragment",
@@ -6667,6 +6648,48 @@ export default {
       "ROUTE": "volunteer",
       "TITLE": "Volunteer | Oppia",
       "META": []
+    },
+    "CLASSROOM": {
+      "ROUTE": "learn/:classroom_url_fragment",
+      "TITLE": "Oppia",
+      "LIGHTWEIGHT": true,
+      // Some routes contain url fragments, as syntax for url fragments are
+      // different for angular router and backend. They have to be registered
+      // manually in the backend. Please use angular router syntax here.
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it"
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it"
+        }
+      ]
+    },
+    "SPLASH": {
+      "ROUTE": "",
+      "TITLE": "Oppia | Free, Online and Interactive Lessons for Anyone",
+      "LIGHTWEIGHT": true,
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        }
+      ]
     }
   },
 
@@ -6731,5 +6754,14 @@ export default {
   "ASSET_TYPE_IMAGE": "image",
   "ASSET_TYPE_THUMBNAIL": "thumbnail",
 
-  "FAVICON_ALERT_PATH": "/assets/images/favicon_alert/favicon_alert.ico"
+  "FAVICON_ALERT_PATH": "/assets/images/favicon_alert/favicon_alert.ico",
+
+  "CAN_FETCH_VERSION_HISTORY_DATA": false,
+  "METADATA_PROPERTIES": [
+    "title", "category", "objective", "language_code", "tags", "blurb",
+    "author_notes", "states_schema_version", "init_state_name", "param_specs",
+    "param_changes", "auto_tts_enabled", "correctness_feedback_enabled",
+    "edits_allowed"
+  ],
+  "NON_METADATA_PROPERTIES": ["id", "states"]
 } as const;

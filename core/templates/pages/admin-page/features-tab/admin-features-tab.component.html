@@ -1,5 +1,5 @@
-<div *ngFor="let featureFlag of featureFlags;" class="container oppia-page-card oppia-long-text oppia-admin-features protractor-test-feature-flag">
-  <h2 class="oppia-feature-name protractor-test-feature-name">{{featureFlag.name}}</h2>
+<div *ngFor="let featureFlag of featureFlags;" class="container oppia-page-card oppia-long-text oppia-admin-features e2e-test-feature-flag">
+  <h2 class="oppia-feature-name e2e-test-feature-name">{{featureFlag.name}}</h2>
   <div class="row oppia-feature-top-margin">
     <div class="col-2"><b>Description:</b></div>
     <div class="col-10 oppia-description-content">{{featureFlag.description}}</div>
@@ -27,7 +27,7 @@
   </div>
   <div class="row oppia-feature-top-margin">
     <div class="col-12">
-      <div *ngIf="featureFlag.rules.length === 0" class="oppia-flex-center oppia-feature-bottom-margin protractor-test-no-rule-indicator">
+      <div *ngIf="featureFlag.rules.length === 0" class="oppia-flex-center oppia-feature-bottom-margin e2e-test-no-rule-indicator">
         No rule.
       </div>
       <!-- Rules -->
@@ -38,7 +38,7 @@
             <div class="row">
               <div class="col-2"><b>If Matched:</b></div>
               <div class="col-10">
-                <select [(ngModel)]="rule.valueWhenMatched" class="protractor-test-value-selector">
+                <select [(ngModel)]="rule.valueWhenMatched" class="e2e-test-value-selector">
                   <option [ngValue]="true">Enabled</option>
                   <option [ngValue]="false">Disabled</option>
                 </select>
@@ -97,7 +97,7 @@
                               </option>
                             </select>
                             <ng-container *ngIf="!!filterTypeToContext[filter.type].options">
-                              <select [(ngModel)]="filter.conditions[conditionIndex][1]">
+                              <select [(ngModel)]="filter.conditions[conditionIndex][1]" class="e2e-test-server-mode-selector">
                                 <ng-container *ngFor="let option of filterTypeToContext[filter.type].options">
                                   <option *ngIf="!filterTypeToContext[filter.type].optionFilter || filterTypeToContext[filter.type].optionFilter(featureFlag, option)"
                                           [value]="option">
@@ -130,7 +130,7 @@
                         No condition specified.
                       </div>
                       <div class="oppia-flex-center oppia-feature-top-margin">
-                        <button class="btn btn-secondary oppia-feature-top-margin protractor-test-add-condition-button" (click)="addNewCondition(filter)">
+                        <button class="btn btn-secondary oppia-feature-top-margin e2e-test-add-condition-button" (click)="addNewCondition(filter)">
                           Add New Condition To Bottom
                         </button>
                       </div>
@@ -162,7 +162,7 @@
                 </button>
               </div>
               <div class="col-6 oppia-flex-vertical-center">
-                <button class="btn btn-secondary protractor-test-remove-rule-button" (click)="removeRule(featureFlag, ruleIndex)">x</button>
+                <button class="btn btn-secondary e2e-test-remove-rule-button" (click)="removeRule(featureFlag, ruleIndex)">x</button>
               </div>
             </div>
           </div>
@@ -171,14 +171,14 @@
     </div>
   </div>
   <div class="oppia-flex-center oppia-feature-bottom-margin">
-    <button class="btn btn-secondary protractor-test-feature-add-rule-button" (click)="addNewRuleToBottom(featureFlag)">
+    <button class="btn btn-secondary e2e-test-feature-add-rule-button" (click)="addNewRuleToBottom(featureFlag)">
       Add Rule To Bottom
     </button>
   </div>
   <div class="row oppia-control-buttons-container oppia-feature-top-margin">
     <!-- Control Buttons -->
     <button
-            class="btn btn-primary protractor-test-save-button"
+            class="btn btn-primary e2e-test-save-button"
             (click)="updateFeatureRulesAsync(featureFlag)"
             [disabled]="!isFeatureFlagRulesChanged(featureFlag)">
       Save
@@ -192,13 +192,13 @@
   </div>
 </div>
 
-<div *ngIf="featureFlags.length === 0" class="oppia-page-card oppia-long-text oppia-admin-features oppia-empty-indicator protractor-test-no-feature">
+<div *ngIf="featureFlags.length === 0" class="oppia-page-card oppia-long-text oppia-admin-features oppia-empty-indicator e2e-test-no-feature">
   No platform features are available.
 </div>
 
-<div *ngIf="isDummyFeatureEnabled" class="oppia-dev-mode protractor-test-angular-dummy-feature-indicator">
+<div *ngIf="isDummyFeatureEnabled" class="oppia-dev-mode e2e-test-angular-dummy-feature-indicator">
   Angular: Dummy Feature Enabled
-  <span *ngIf="isDummyApiEnabled" class="protractor-test-angular-dummy-handler-indicator">, Dummy Handler Enabled.</span>
+  <span *ngIf="isDummyApiEnabled" class="e2e-test-angular-dummy-handler-indicator">, Dummy Handler Enabled.</span>
 </div>
 
 
@@ -332,7 +332,7 @@
     width: 100%;
   }
 
-  .protractor-test-angular-dummy-feature-indicator {
+  .e2e-test-angular-dummy-feature-indicator {
     bottom: 10px;
   }
 </style>

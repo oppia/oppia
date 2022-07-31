@@ -1,6 +1,3 @@
-<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/components/button-directives/social-buttons.component.css" as="style">
-<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/components/button-directives/social-buttons.component.rtl.css" as="style">
-
 <div class="oppia-footer-social">
   <div class="oppia-follow-us">
     <h3>
@@ -30,9 +27,4 @@
       </a>
     </div>
   </div>
-
 </div>
-
-<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
-<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/components/button-directives/social-buttons.component.css">
-<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/components/button-directives/social-buttons.component.rtl.css">

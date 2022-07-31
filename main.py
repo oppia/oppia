@@ -48,6 +48,7 @@ from core.controllers import improvements
 from core.controllers import incoming_app_feedback_report
 from core.controllers import learner_dashboard
 from core.controllers import learner_goals
+from core.controllers import learner_group
 from core.controllers import learner_playlist
 from core.controllers import library
 from core.controllers import moderator
@@ -283,6 +284,9 @@ URLS = [
         r'%s/<opportunity_type>' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
         contributor_dashboard.ContributionOpportunitiesHandler),
     get_redirect_route(
+        r'/preferredtranslationlanguage',
+        contributor_dashboard.TranslationPreferenceHandler),
+    get_redirect_route(
         r'%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,
         contributor_dashboard.ReviewableOpportunitiesHandler),
     get_redirect_route(
@@ -392,6 +396,9 @@ URLS = [
     get_redirect_route(
         r'%s' % feconf.LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL,
         learner_dashboard.LearnerDashboardTopicsAndStoriesProgressHandler),
+    get_redirect_route(
+        r'%s' % feconf.LEARNER_COMPLETED_CHAPTERS_COUNT_DATA_URL,
+        learner_dashboard.LearnerCompletedChaptersCountHandler),
     get_redirect_route(
         r'%s' % feconf.LEARNER_DASHBOARD_COLLECTION_DATA_URL,
         learner_dashboard.LearnerDashboardCollectionsProgressHandler),
@@ -510,6 +517,9 @@ URLS = [
         r'/memorycachehandler', release_coordinator.MemoryCacheHandler),
 
     get_redirect_route(
+        '/checkpoints_feature_status_handler',
+        reader.CheckpointsFeatureStatusHandler),
+    get_redirect_route(
         r'%s/<exploration_id>' % feconf.EXPLORATION_URL_PREFIX,
         reader.ExplorationPage),
     get_redirect_route(
@@ -534,11 +544,20 @@ URLS = [
         '/explorehandler/solution_hit_event/<exploration_id>',
         reader.SolutionHitEventHandler),
     get_redirect_route(
+        '/sync_logged_out_and_logged_in_progress/<exploration_id>',
+        reader.SyncLoggedOutLearnerProgressHandler),
+    get_redirect_route(
         r'/explorehandler/state_hit_event/<exploration_id>',
         reader.StateHitEventHandler),
     get_redirect_route(
         r'/explorehandler/state_complete_event/<exploration_id>',
         reader.StateCompleteEventHandler),
+    get_redirect_route(
+        r'/explorehandler/checkpoint_reached_by_logged_out_user/<exploration_id>', # pylint: disable=line-too-long
+        reader.SaveTransientCheckpointProgressHandler),
+    get_redirect_route(
+        '/progress/<unique_progress_url_id>',
+        reader.TransientCheckpointUrlPage),
     get_redirect_route(
         r'/explorehandler/leave_for_refresher_exp_event/<exploration_id>',
         reader.LeaveForRefresherExpEventHandler),
@@ -575,6 +594,14 @@ URLS = [
         r'%s/<entity_type>/<entity_id>' % (
             feconf.LEARNER_ANSWER_DETAILS_SUBMIT_URL),
         reader.LearnerAnswerDetailsSubmissionHandler),
+    get_redirect_route(
+        r'%s/<exploration_id>/<state_name>/<version>' % (
+            feconf.STATE_VERSION_HISTORY_URL_PREFIX
+        ), reader.StateVersionHistoryHandler),
+    get_redirect_route(
+        r'%s/<exploration_id>/<version>' % (
+            feconf.METADATA_VERSION_HISTORY_URL_PREFIX
+        ), reader.MetadataVersionHistoryHandler),
 
     get_redirect_route(
         r'%s/<question_id>' % feconf.QUESTION_EDITOR_DATA_URL_PREFIX,
@@ -912,7 +939,38 @@ URLS = [
     get_redirect_route(
         r'/topics_and_skills_dashboard/categorized_and_untriaged_skills_data',
         topics_and_skills_dashboard
-            .CategorizedAndUntriagedSkillsDataHandler)
+            .CategorizedAndUntriagedSkillsDataHandler),
+
+    get_redirect_route(
+        r'/create_learner_group_handler',
+        learner_group.CreateLearnerGroupHandler),
+    get_redirect_route(
+        r'/update_learner_group_handler/<learner_group_id>',
+        learner_group.LearnerGroupHandler),
+    get_redirect_route(
+        r'/delete_learner_group_handler/<learner_group_id>',
+        learner_group.LearnerGroupHandler),
+    get_redirect_route(
+        r'%s' % feconf.FACILITATOR_DASHBOARD_HANDLER,
+        learner_group.FacilitatorDashboardHandler),
+    get_redirect_route(
+        r'/facilitator_view_of_learner_group_handler/<learner_group_id>',
+        learner_group.FacilitatorLearnerGroupViewHandler),
+    get_redirect_route(
+        r'/learner_group_search_syllabus_handler',
+        learner_group.LearnerGroupSearchSyllabusHandler),
+    get_redirect_route(
+        r'/learner_group_user_progress_handler/<learner_group_id>',
+        learner_group.LearnerGroupStudentProgressHandler),
+    get_redirect_route(
+        r'%s' % feconf.FACILITATOR_DASHBOARD_PAGE_URL,
+        learner_group.FacilitatorDashboardPage),
+    get_redirect_route(
+        r'%s' % feconf.CREATE_LEARNER_GROUP_PAGE_URL,
+        learner_group.CreateLearnerGroupPage),
+    get_redirect_route(
+        r'/learner_group_search_student_handler',
+        learner_group.LearnerGroupSearchStudentHandler)
 ]
 
 # Adding redirects for topic landing pages.
@@ -938,9 +996,17 @@ for stewards_route in constants.STEWARDS_LANDING_PAGE['ROUTES']:
 # Redirect all routes handled using angular router to the oppia root page.
 for page in constants.PAGES_REGISTERED_WITH_FRONTEND.values():
     if not 'MANUALLY_REGISTERED_WITH_BACKEND' in page:
-        URLS.append(
-            get_redirect_route(
-                r'/%s' % page['ROUTE'], oppia_root.OppiaRootPage))
+        if 'LIGHTWEIGHT' in page:
+            URLS.append(
+                get_redirect_route(
+                    r'/%s' % page['ROUTE'],
+                    oppia_root.OppiaLightweightRootPage
+                )
+            )
+        else:
+            URLS.append(
+                get_redirect_route(
+                    r'/%s' % page['ROUTE'], oppia_root.OppiaRootPage))
 
 # Manually redirect routes with url fragments to the oppia root page.
 URLS.extend((
@@ -949,7 +1015,9 @@ URLS.extend((
         r'%s/story/<story_url_fragment>' % feconf.TOPIC_VIEWER_URL_PREFIX,
         oppia_root.OppiaRootPage),
     get_redirect_route(
-        r'/learn/<classroom_url_fragment>', oppia_root.OppiaRootPage),
+        r'/learn/<classroom_url_fragment>',
+        oppia_root.OppiaLightweightRootPage
+    ),
 ))
 
 # Add cron urls. Note that cron URLs MUST start with /cron for them to work

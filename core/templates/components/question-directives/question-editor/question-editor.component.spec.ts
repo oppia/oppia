@@ -16,62 +16,72 @@
  * @fileoverview Unit tests for Question Editor Component.
  */
 
-import { EventEmitter } from '@angular/core';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
+import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
+import { Solution } from 'domain/exploration/SolutionObjectFactory';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import { QuestionUpdateService } from 'domain/question/question-update.service';
 import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { EditabilityService } from 'services/editability.service';
+import { QuestionEditorComponent } from './question-editor.component';
 
-describe('QuestionEditorComponent', () => {
-  let ctrl = null;
-  let $rootScope = null;
-  let $scope = null;
-  var ngbModal: NgbModal;
-  let $q = null;
+class MockNgbModal {
+  open() {
+    return {
+      result: Promise.resolve()
+    };
+  }
+}
 
-  let QuestionObjectFactory: QuestionObjectFactory;
-  let EditabilityService = null;
-  let StateEditorService = null;
-  let StateInteractionIdService = null;
-  let QuestionUpdateService = null;
-
+describe('Question Editor Component', () => {
+  let component: QuestionEditorComponent;
+  let fixture: ComponentFixture<QuestionEditorComponent>;
+  let ngbModal: NgbModal;
+  let questionObjectFactory: QuestionObjectFactory;
+  let editabilityService: EditabilityService;
+  let stateEditorService: StateEditorService;
+  let stateInteractionIdService: StateInteractionIdService;
+  let questionUpdateService: QuestionUpdateService;
   let question = null;
 
-  beforeEach(angular.mock.module('oppia'));
-
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('NgbModal', {
-      open: () => {
-        return {
-          result: Promise.resolve()
-        };
-      }
-    });
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      declarations: [
+        QuestionEditorComponent
+      ],
+      providers: [
+        QuestionObjectFactory,
+        EditabilityService,
+        StateEditorService,
+        StateInteractionIdService,
+        QuestionUpdateService,
+        {
+          provide: NgbModal,
+          useClass: MockNgbModal
+        }
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   }));
 
-  importAllAngularServices();
+  beforeEach(() => {
+    fixture = TestBed.createComponent(QuestionEditorComponent);
+    component = fixture.componentInstance;
 
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
-    ngbModal = $injector.get('NgbModal');
-    $q = $injector.get('$q');
+    questionObjectFactory = TestBed.inject(QuestionObjectFactory);
+    stateEditorService = TestBed.inject(StateEditorService);
+    stateInteractionIdService = TestBed.inject(StateInteractionIdService);
+    editabilityService = TestBed.inject(EditabilityService);
+    questionUpdateService = TestBed.inject(QuestionUpdateService);
+    ngbModal = TestBed.inject(NgbModal);
 
-    QuestionObjectFactory = $injector.get('QuestionObjectFactory');
-    EditabilityService = $injector.get('EditabilityService');
-    StateEditorService = $injector.get('StateEditorService');
-    StateInteractionIdService = $injector.get('StateInteractionIdService');
-    QuestionUpdateService = $injector.get('QuestionUpdateService');
-
-    ctrl = $componentController('questionEditor', {
-      $scope: $scope
-    }, {
-      canEditQuestion: () => {},
-      getMisconceptionsBySkill: () => {},
-      questionChanged: () => {}
-    });
-
-    question = QuestionObjectFactory.createFromBackendDict({
+    question = questionObjectFactory.createFromBackendDict({
       id: '1',
       question_state_data: {
         content: {
@@ -82,6 +92,7 @@ describe('QuestionEditorComponent', () => {
           answer_groups: [{
             outcome: {
               dest: 'outcome 1',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'content_5',
                 html: ''
@@ -107,6 +118,7 @@ describe('QuestionEditorComponent', () => {
           },
           default_outcome: {
             dest: null,
+            dest_if_really_stuck: null,
             feedback: {
               html: 'Correct Answer',
               content_id: 'content_2'
@@ -174,234 +186,219 @@ describe('QuestionEditorComponent', () => {
       question_state_data_schema_version: 44,
       version: 45
     });
-    ctrl.question = question;
-    ctrl.questionStateData = question.getStateData();
+    component.question = question;
+    component.questionStateData = question.getStateData();
 
-    spyOn(QuestionUpdateService, 'setQuestionStateData')
+    spyOn(questionUpdateService, 'setQuestionStateData')
       .and.callFake((question, update) => {
         update();
       });
-  }));
+
+    component.userCanEditQuestion = true;
+    component.misconceptionsBySkill = {};
+  });
+
 
   afterEach(() => {
-    ctrl.$onDestroy();
+    component.ngOnDestroy();
   });
 
   it('should set component properties on initialization', () => {
-    expect(ctrl.oppiaBlackImgUrl).toBe(undefined);
-    expect(ctrl.interactionIsShown).toBe(undefined);
-    expect(ctrl.stateEditorInitialized).toBe(undefined);
+    expect(component.oppiaBlackImgUrl).toBe(undefined);
+    expect(component.interactionIsShown).toBe(undefined);
+    expect(component.stateEditorIsInitialized).toBe(undefined);
 
-    ctrl.$onInit();
+    component.ngOnInit();
 
-    expect(ctrl.oppiaBlackImgUrl)
+    expect(component.oppiaBlackImgUrl)
       .toBe('/assets/images/avatar/oppia_avatar_100px.svg');
-    expect(ctrl.interactionIsShown).toBe(true);
-    expect(ctrl.stateEditorInitialized).toBe(true);
+    expect(component.interactionIsShown).toBe(true);
+    expect(component.stateEditorIsInitialized).toBe(true);
   });
 
   it('should mark editability service as true if question is editable', () => {
-    spyOn(ctrl, 'canEditQuestion').and.returnValue(true);
-    spyOn(EditabilityService, 'markEditable');
+    component.userCanEditQuestion = true;
+    spyOn(editabilityService, 'markEditable');
 
-    ctrl.$onInit();
+    component.ngOnInit();
 
-    expect(EditabilityService.markEditable).toHaveBeenCalled();
+    expect(editabilityService.markEditable).toHaveBeenCalled();
   });
 
   it('should mark editability service as false if question is not' +
     ' editable', () => {
-    spyOn(ctrl, 'canEditQuestion').and.returnValue(false);
-    spyOn(EditabilityService, 'markNotEditable');
+    component.userCanEditQuestion = false;
+    spyOn(editabilityService, 'markNotEditable');
 
-    ctrl.$onInit();
+    component.ngOnInit();
 
-    expect(EditabilityService.markNotEditable).toHaveBeenCalled();
+    expect(editabilityService.markNotEditable).toHaveBeenCalled();
   });
 
   it('should initialize component properties when state editor directive' +
     ' is initialized', () => {
     let onStateEditorDirectiveInitializedEmitter = new EventEmitter();
     spyOnProperty(
-      StateEditorService, 'onStateEditorDirectiveInitialized')
+      stateEditorService, 'onStateEditorDirectiveInitialized')
       .and.returnValue(onStateEditorDirectiveInitializedEmitter);
 
-    ctrl.$onInit();
+    component.ngOnInit();
 
-    ctrl.interactionIsShown = false;
-    ctrl.stateEditorInitialized = false;
+    component.interactionIsShown = false;
+    component.stateEditorIsInitialized = false;
 
     onStateEditorDirectiveInitializedEmitter.emit();
-    $scope.$apply();
 
-    expect(ctrl.interactionIsShown).toBe(true);
-    expect(ctrl.stateEditorInitialized).toBe(true);
+    expect(component.interactionIsShown).toBe(true);
+    expect(component.stateEditorIsInitialized).toBe(true);
   });
 
   it('should initialize component properties when interaction editor' +
-    ' is initialized', () => {
+    ' is initialized', fakeAsync(() => {
     let onInteractionEditorInitializedEmitter = new EventEmitter();
     spyOnProperty(
-      StateEditorService, 'onInteractionEditorInitialized')
+      stateEditorService, 'onInteractionEditorInitialized')
       .and.returnValue(onInteractionEditorInitializedEmitter);
 
-    ctrl.$onInit();
+    component.ngOnInit();
 
-    ctrl.interactionIsShown = false;
-    ctrl.stateEditorInitialized = false;
+    component.interactionIsShown = false;
+    component.stateEditorIsInitialized = false;
 
     onInteractionEditorInitializedEmitter.emit();
-    $scope.$apply();
+    tick();
 
-    expect(ctrl.interactionIsShown).toBe(true);
-    expect(ctrl.stateEditorInitialized).toBe(true);
-  });
+    expect(component.interactionIsShown).toBe(true);
+    expect(component.stateEditorIsInitialized).toBe(true);
+  }));
 
   it('should initialize component properties when interaction id' +
     ' is changed', () => {
     let onInteractionIdChangedEmitter = new EventEmitter();
     spyOnProperty(
-      StateInteractionIdService, 'onInteractionIdChanged')
+      stateInteractionIdService, 'onInteractionIdChanged')
       .and.returnValue(onInteractionIdChangedEmitter);
 
-    ctrl.$onInit();
+    component.ngOnInit();
 
-    ctrl.interactionIsShown = false;
-    ctrl.stateEditorInitialized = false;
+    component.interactionIsShown = false;
+    component.stateEditorIsInitialized = false;
 
     onInteractionIdChangedEmitter.emit();
-    $scope.$apply();
 
-    expect(ctrl.interactionIsShown).toBe(true);
-    expect(ctrl.stateEditorInitialized).toBe(true);
+    expect(component.interactionIsShown).toBe(true);
+    expect(component.stateEditorIsInitialized).toBe(true);
   });
 
   it('should get state content save button placeholder', () => {
-    expect(ctrl.getStateContentSaveButtonPlaceholder()).toBe('Save Question');
+    expect(component.getStateContentSaveButtonPlaceholder())
+      .toBe('Save Question');
   });
 
   it('should get state content placeholder', () => {
-    expect(ctrl.getStateContentPlaceholder()).toBe('Type your question here.');
-  });
-
-  it('should return undefined when calling functions which are not applicable' +
-    ' to question state', () => {
-    expect(ctrl.navigateToState()).toBe(undefined);
-    expect(ctrl.addState()).toBe(undefined);
-    expect(ctrl.recomputeGraph()).toBe(undefined);
-    expect(ctrl.refreshWarnings()).toBe(undefined);
+    expect(component.getStateContentPlaceholder())
+      .toBe('Type your question here.');
   });
 
   it('should save state content when user clicks on save', () => {
-    expect(ctrl.interactionIsShown).toBe(undefined);
-    expect(ctrl.questionStateData.content)
+    expect(component.interactionIsShown).toBe(undefined);
+    expect(component.questionStateData.content)
       .toEqual(SubtitledHtml.createFromBackendDict({
         html: 'Question 1',
         content_id: 'content_1'
       }));
 
-    ctrl.saveStateContent('New content');
+    component.saveStateContent('New content' as unknown as SubtitledHtml);
 
-    expect(ctrl.interactionIsShown).toBe(true);
-    expect(ctrl.questionStateData.content).toBe('New content');
+    expect(component.interactionIsShown).toBe(true);
+    expect(component.questionStateData.content).toBe('New content');
   });
 
   it('should save interaction ID when interaction is saved', () => {
-    spyOn(StateEditorService, 'setInteractionId');
+    spyOn(stateEditorService, 'setInteractionId');
 
-    ctrl.saveInteractionId('TextInput');
+    component.saveInteractionId('TextInput');
 
-    expect(StateEditorService.setInteractionId).toHaveBeenCalledWith(
+    expect(stateEditorService.setInteractionId).toHaveBeenCalledWith(
       'TextInput'
     );
   });
 
   it('should save interaction answer groups when interaction is saved', () => {
-    spyOn(StateEditorService, 'setInteractionAnswerGroups');
+    spyOn(stateEditorService, 'setInteractionAnswerGroups');
 
-    ctrl.saveInteractionAnswerGroups('New Answer Group');
+    component.saveInteractionAnswerGroups(null);
 
-    expect(StateEditorService.setInteractionAnswerGroups).toHaveBeenCalledWith(
-      'New Answer Group'
+    expect(stateEditorService.setInteractionAnswerGroups).toHaveBeenCalledWith(
+      null
     );
   });
 
   it('should save interaction default outcome when' +
     ' interaction is saved', () => {
-    spyOn(StateEditorService, 'setInteractionDefaultOutcome');
+    spyOn(stateEditorService, 'setInteractionDefaultOutcome');
 
-    ctrl.saveInteractionDefaultOutcome('New outcome');
+    component.saveInteractionDefaultOutcome({dest: 'New outcome'} as Outcome);
 
-    expect(StateEditorService.setInteractionDefaultOutcome)
-      .toHaveBeenCalledWith('New outcome');
+    expect(stateEditorService.setInteractionDefaultOutcome)
+      .toHaveBeenCalledWith({dest: 'New outcome'} as Outcome);
   });
 
   it('should save customization args when interaction is saved', () => {
-    spyOn(StateEditorService, 'setInteractionCustomizationArgs');
+    spyOn(stateEditorService, 'setInteractionCustomizationArgs');
 
-    ctrl.saveInteractionCustomizationArgs('Customization Args');
+    component.saveInteractionCustomizationArgs('Customization Args');
 
-    expect(StateEditorService.setInteractionCustomizationArgs)
+    expect(stateEditorService.setInteractionCustomizationArgs)
       .toHaveBeenCalledWith('Customization Args');
   });
 
   it('should set interaction solution when interaction is saved', () => {
-    spyOn(StateEditorService, 'setInteractionSolution');
+    spyOn(stateEditorService, 'setInteractionSolution');
 
-    ctrl.saveSolution('Solution');
+    component.saveSolution('Solution' as unknown as Solution);
 
-    expect(StateEditorService.setInteractionSolution)
+    expect(stateEditorService.setInteractionSolution)
       .toHaveBeenCalledWith('Solution');
   });
 
   it('should save hints when interaction is saved', () => {
-    spyOn(StateEditorService, 'setInteractionHints');
+    spyOn(stateEditorService, 'setInteractionHints');
 
-    ctrl.saveHints('Hints');
+    component.saveHints([]);
 
-    expect(StateEditorService.setInteractionHints)
-      .toHaveBeenCalledWith('Hints');
+    expect(stateEditorService.setInteractionHints)
+      .toHaveBeenCalledWith([]);
   });
 
   it('should save inapplicable skill misconception ID when interaction' +
     ' is saved', () => {
-    spyOn(StateEditorService, 'setInapplicableSkillMisconceptionIds');
+    spyOn(stateEditorService, 'setInapplicableSkillMisconceptionIds');
 
-    ctrl.saveInapplicableSkillMisconceptionIds('InapplicableID');
+    component.saveInapplicableSkillMisconceptionIds(['InapplicableID']);
 
-    expect(StateEditorService.setInapplicableSkillMisconceptionIds)
-      .toHaveBeenCalledWith('InapplicableID');
+    expect(stateEditorService.setInapplicableSkillMisconceptionIds)
+      .toHaveBeenCalledWith(['InapplicableID']);
   });
 
   it('should save next content ID index when interaction is saved', () => {
-    expect(ctrl.questionStateData.nextContentIdIndex).toBe(null);
+    expect(component.questionStateData.nextContentIdIndex).toBe(null);
 
-    ctrl.saveNextContentIdIndex('Next ID');
+    component.saveNextContentIdIndex(2);
 
-    expect(ctrl.questionStateData.nextContentIdIndex).toBe('Next ID');
+    expect(component.questionStateData.nextContentIdIndex).toBe(2);
   });
 
   it('should show mark all audio needing update modal and mark all unflagged' +
-    ' voiceovers and translations as needing update', () => {
+    ' voiceovers and translations as needing update', fakeAsync(() => {
     spyOn(ngbModal, 'open').and.returnValue({
-      result: $q.resolve()
+      result: Promise.resolve()
     } as NgbModalRef);
 
-    expect(
-      ctrl.questionStateData.recordedVoiceovers
-        .voiceoversMapping.content.en.needsUpdate).toEqual(false);
-    expect(
-      ctrl.questionStateData.writtenTranslations
-        .translationsMapping.content.en.needsUpdate).toEqual(false);
+    component.showMarkAllAudioAsNeedingUpdateModalIfRequired(['content']);
+    tick();
 
-    ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired(['content']);
-    $scope.$apply();
-
-    expect(
-      ctrl.questionStateData.recordedVoiceovers
-        .voiceoversMapping.content.en.needsUpdate).toEqual(true);
-    expect(
-      ctrl.questionStateData.writtenTranslations
-        .translationsMapping.content.en.needsUpdate).toEqual(true);
-  });
+    expect(ngbModal.open).toHaveBeenCalled();
+    expect(questionUpdateService.setQuestionStateData).toHaveBeenCalled();
+  }));
 });

@@ -1,7 +1,7 @@
 <div class="topic-card"
      [ngStyle]="{background: topicSummary.getThumbnailBgColor(), 'pointer-events': !isPublished ? 'none' : 'auto'}"
      [ngClass]="{'faded-topic-card': !isPublished}">
-  <a [href]="getTopicPageUrl()" class="protractor-test-topic-link">
+  <a [href]="getTopicPageUrl()" class="e2e-test-topic-link">
     <div class="topic-thumbnail">
       <span class="topic-coming-soon" *ngIf="!isPublished">
         {{ 'I18N_CLASSROOM_PAGE_COMING_SOON' | translate }}
@@ -11,10 +11,10 @@
       </picture>
     </div>
     <div class="topic-details" [ngStyle]="{'background-color': getDarkerThumbnailBgColor()}" ng-class="{'mask-effect': !isPublished}">
-      <span class="topic-name" *ngIf="!isHackyTopicNameTranslationDisplayed()">
+      <span class="topic-name e2e-test-topic-name" *ngIf="!isHackyTopicNameTranslationDisplayed()">
         {{ topicSummary.getName() }}
       </span>
-      <span class="topic-name" *ngIf="isHackyTopicNameTranslationDisplayed()">
+      <span class="topic-name e2e-test-topic-name" *ngIf="isHackyTopicNameTranslationDisplayed()">
         {{ topicNameTranslationKey | translate }}
       </span>
       {{ topicSummary.getTotalPublishedNodeCount() }}

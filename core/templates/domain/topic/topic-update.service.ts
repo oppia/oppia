@@ -330,11 +330,12 @@ export class TopicUpdateService {
    * the undo/redo service.
    */
   addSubtopic(
-      topic: Topic, title: string): void {
+      topic: Topic, title: string, urlFragment: string): void {
     let nextSubtopicId = topic.getNextSubtopicId();
     this._applyChange(topic, TopicDomainConstants.CMD_ADD_SUBTOPIC, {
       subtopic_id: nextSubtopicId,
-      title: title
+      title: title,
+      url_fragment: urlFragment
     }, (changeDict, topic) => {
       // ---- Apply ----
       topic.addSubtopic(title);

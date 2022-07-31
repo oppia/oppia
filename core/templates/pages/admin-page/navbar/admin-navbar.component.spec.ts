@@ -18,8 +18,10 @@
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { async, ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { APP_BASE_HREF } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { UserInfo } from 'domain/user/user-info.model';
-import { MockRouterModule } from 'hybrid-router-module-provider';
+import { SmartRouterModule } from 'hybrid-router-module-provider';
 
 import { UserService } from 'services/user.service';
 import { AdminRouterService } from '../services/admin-router.service';
@@ -43,9 +45,16 @@ describe('Admin Navbar component', () => {
     TestBed.configureTestingModule({
       imports: [
         HttpClientTestingModule,
-        MockRouterModule
+        // TODO(#13443): Remove hybrid router module provider once all pages are
+        // migrated to angular router.
+        SmartRouterModule,
+        RouterModule.forRoot([])
       ],
-      declarations: [AdminNavbarComponent]
+      declarations: [AdminNavbarComponent],
+      providers: [{
+        provide: APP_BASE_HREF,
+        useValue: '/'
+      }]
     }).compileComponents();
 
     fixture = TestBed.createComponent(AdminNavbarComponent);

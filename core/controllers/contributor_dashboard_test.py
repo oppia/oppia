@@ -888,6 +888,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic')]
         topic.next_subtopic_id = 2
+        topic.skill_ids_for_diagnostic_test = [subtopic_skill_id]
         subtopic_page = (
             subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
                 subtopic_id, topic.id))
@@ -896,7 +897,8 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             [topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_ADD_SUBTOPIC,
                 'subtopic_id': 1,
-                'title': 'Sample'
+                'title': 'Sample',
+                'url_fragment': 'sample-fragment'
             })]
         )
         topic_services.save_new_topic(self.owner_id, topic)
@@ -944,6 +946,7 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-three')]
         topic.next_subtopic_id = 2
+        topic.skill_ids_for_diagnostic_test = ['skill_id_1']
         topic_services.save_new_topic(self.owner_id, topic)
         topic_services.publish_topic(topic.id, self.admin_id)
 
@@ -1397,6 +1400,7 @@ class TranslatableTopicNamesHandlerTest(test_utils.GenericTestBase):
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-three')]
         topic.next_subtopic_id = 2
+        topic.skill_ids_for_diagnostic_test = ['skill_id_3']
         topic_services.save_new_topic(self.owner_id, topic)
 
         # Unpublished topics should not be returned.
@@ -1410,3 +1414,33 @@ class TranslatableTopicNamesHandlerTest(test_utils.GenericTestBase):
             response,
             {'topic_names': ['topic']}
         )
+
+
+class TranslationPreferenceHandlerTest(test_utils.GenericTestBase):
+    """Test for the TranslationPreferenceHandler."""
+
+    def test_get_preferred_translation_language_when_user_is_logged_in(self):
+        user_email = 'user@example.com'
+        self.signup(user_email, 'user')
+        self.login(user_email)
+
+        response = self.get_json('/preferredtranslationlanguage')
+        self.assertIsNone(response['preferred_translation_language_code'])
+
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/preferredtranslationlanguage',
+            {'language_code': 'en'},
+            csrf_token=csrf_token
+        )
+
+        response = self.get_json('/preferredtranslationlanguage')
+        self.assertEqual(response['preferred_translation_language_code'], 'en')
+        self.logout()
+
+    def test_handler_with_guest_user_raises_exception(self):
+        response = self.get_json(
+            '/preferredtranslationlanguage', expected_status_int=401)
+
+        error_msg = 'You must be logged in to access this resource.'
+        self.assertEqual(response['error'], error_msg)

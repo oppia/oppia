@@ -98,7 +98,7 @@ class UserAuthDetailsTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL) # type: ignore[no-untyped-call]
         self.user_auth_details_model = (
             auth_models.UserAuthDetailsModel.get(self.owner_id))
-        self.user_auth_details = auth_services.get_user_auth_details_from_model( # type: ignore[no-untyped-call]
+        self.user_auth_details = auth_services.get_user_auth_details_from_model(
             self.user_auth_details_model)
         self.auth_id = self.get_auth_id_from_email(self.OWNER_EMAIL) # type: ignore[no-untyped-call]
         self.user_auth_details.validate()
@@ -122,8 +122,11 @@ class UserAuthDetailsTests(test_utils.GenericTestBase):
                 'deleted': True,
             })
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_validate_non_str_user_id(self) -> None:
-        self.user_auth_details.user_id = 123
+        self.user_auth_details.user_id = 123  # type: ignore[assignment]
         self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, 'user_id must be a string',
             self.user_auth_details.validate)
@@ -173,14 +176,20 @@ class UserAuthDetailsTests(test_utils.GenericTestBase):
             utils.ValidationError, 'wrong format',
             self.user_auth_details.validate)
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_validate_non_str_gae_id(self) -> None:
-        self.user_auth_details.gae_id = 123
+        self.user_auth_details.gae_id = 123  # type: ignore[assignment]
         self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, 'gae_id must be a string',
             self.user_auth_details.validate)
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_validate_non_str_firebase_auth_id(self) -> None:
-        self.user_auth_details.firebase_auth_id = 123
+        self.user_auth_details.firebase_auth_id = 123  # type: ignore[assignment]
         self.assertRaisesRegex( # type: ignore[no-untyped-call]
             utils.ValidationError, 'firebase_auth_id must be a string',
             self.user_auth_details.validate)

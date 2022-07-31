@@ -1,6 +1,3 @@
-<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/pages/story-viewer-page/story-viewer-page.component.css" as="style">
-<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/pages/story-viewer-page/story-viewer-page.component.rtl.css" as="style">
-
 <div class="oppia-story-viewer-container" (click)="focusSkipButton($event.target, isLoggedIn)">
   <div *ngIf="storyIsLoaded">
     <div class="oppia-story-viewer-inner-container">
@@ -28,7 +25,7 @@
 
             <div>
               <div class="fx-row">
-                <div class="oppia-lesson-track protractor-test-lesson-track">
+                <div class="oppia-lesson-track e2e-test-lesson-track">
                   <svg *ngIf="!last"
                        width="9px"
                        height="530px"
@@ -42,19 +39,19 @@
                     </path>
                   </svg>
 
-                  <img class="oppia-lesson-icon-completed protractor-test-lesson-icon-completed"
+                  <img class="oppia-lesson-icon-completed e2e-test-lesson-icon-completed"
                        [src]="getStaticImageUrl('/general/collection_paw.svg')"
                        *ngIf="node.isCompleted()">
                   <div *ngIf="!node.isCompleted() && (node.getId() === storyPlaythroughObject.getNextPendingNodeId())"
-                       class="oppia-lesson-icon-uncompleted protractor-test-lesson-icon-uncompleted">
+                       class="oppia-lesson-icon-uncompleted e2e-test-lesson-icon-uncompleted">
                   </div>
                   <div *ngIf="!node.isCompleted() && (node.getId() !== storyPlaythroughObject.getNextPendingNodeId())"
-                       class="oppia-lesson-icon-uncompleted oppia-lesson-icon-unavailable protractor-test-lesson-icon-uncompleted">
+                       class="oppia-lesson-icon-uncompleted oppia-lesson-icon-unavailable e2e-test-lesson-icon-uncompleted">
                   </div>
                 </div>
 
                 <div class="oppia-story-viewer-card">
-                  <span class="oppia-chapter-title protractor-test-chapter-title" aria-live="assertive">
+                  <span class="oppia-chapter-title e2e-test-chapter-title" aria-live="assertive">
                     <span [innerHTML]="'I18N_TOPIC_VIEWER_CHAPTER' | translate"></span>
                     <span *ngIf="!isHackyStoryNodeTitleTranslationDisplayed(index)">
                       {{index + 1}}: {{ node.getTitle() }}
@@ -159,7 +156,7 @@
     <div *ngIf="!isLoggedIn && showLoginOverlay" class="story-viewer-login-container" #overlay>
       <h2 class="login-text">Save your progress</h2>
       <div class="login-buttons">
-        <button class="btn mat-raised-button oppia-login-button text-light protractor-test-login-button" (click)="signIn()">
+        <button class="btn mat-raised-button oppia-login-button text-light e2e-test-login-button" (click)="signIn()">
           LOG IN
         </button>
         <span class="m-3 oppia-login-or-signup-text">or</span>
@@ -173,6 +170,3 @@
     </div>
   </div>
 </div>
-<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
-<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/story-viewer-page/story-viewer-page.component.css">
-<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/story-viewer-page/story-viewer-page.component.rtl.css">

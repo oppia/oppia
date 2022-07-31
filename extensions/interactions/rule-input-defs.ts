@@ -224,7 +224,7 @@ export interface TranslatableSetOfNormalizedString
   normalizedStrSet: string[];
 }
 
-export interface TextInputRuleInputs {
+export interface TextInputRuleInputs extends BaseTranslatableObject {
   x: TranslatableSetOfNormalizedString;
 }
 

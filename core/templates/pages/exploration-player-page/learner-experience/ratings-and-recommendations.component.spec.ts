@@ -27,6 +27,26 @@ import { UserService } from 'services/user.service';
 import { LearnerViewRatingService } from '../services/learner-view-rating.service';
 import { MockLimitToPipe } from '../templates/information-card-modal.component.spec';
 import { RatingsAndRecommendationsComponent } from './ratings-and-recommendations.component';
+import { ExplorationPlayerStateService } from './../services/exploration-player-state.service';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { PlatformFeatureService } from 'services/platform-feature.service';
+import { LocalStorageService } from 'services/local-storage.service';
+import { AssetsBackendApiService } from 'services/assets-backend-api.service';
+import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
+import { TopicViewerBackendApiService } from 'domain/topic_viewer/topic-viewer-backend-api.service';
+import { StoryPlaythrough } from 'domain/story_viewer/story-playthrough.model';
+import { ReadOnlyStoryNode } from 'domain/story_viewer/read-only-story-node.model';
+import { ReadOnlyTopic } from 'domain/topic_viewer/read-only-topic-object.factory';
+
+class MockPlatformFeatureService {
+  get status(): object {
+    return {
+      EndChapterCelebration: {
+        isEnabled: true
+      }
+    };
+  }
+}
 
 describe('Ratings and recommendations component', () => {
   let fixture: ComponentFixture<RatingsAndRecommendationsComponent>;
@@ -35,6 +55,13 @@ describe('Ratings and recommendations component', () => {
   let learnerViewRatingService: LearnerViewRatingService;
   let urlService: UrlService;
   let userService: UserService;
+  let explorationPlayerStateService: ExplorationPlayerStateService;
+  let urlInterpolationService: UrlInterpolationService;
+  let platformFeatureService: PlatformFeatureService;
+  let localStorageService: LocalStorageService;
+  let assetsBackendApiService: AssetsBackendApiService;
+  let storyViewerBackendApiService: StoryViewerBackendApiService;
+  let topicViewerBackendApiService: TopicViewerBackendApiService;
 
   const mockNgbPopover = jasmine.createSpyObj(
     'NgbPopover', ['close', 'toggle']);
@@ -65,6 +92,16 @@ describe('Ratings and recommendations component', () => {
         LearnerViewRatingService,
         UrlService,
         UserService,
+        ExplorationPlayerStateService,
+        UrlInterpolationService,
+        AssetsBackendApiService,
+        StoryViewerBackendApiService,
+        TopicViewerBackendApiService,
+        LocalStorageService,
+        {
+          provide: PlatformFeatureService,
+          useClass: MockPlatformFeatureService
+        },
         {
           provide: WindowRef,
           useClass: MockWindowRef
@@ -81,13 +118,33 @@ describe('Ratings and recommendations component', () => {
     learnerViewRatingService = TestBed.inject(LearnerViewRatingService);
     urlService = TestBed.inject(UrlService);
     userService = TestBed.inject(UserService);
+    explorationPlayerStateService = TestBed.inject(
+      ExplorationPlayerStateService);
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
+    platformFeatureService = TestBed.inject(PlatformFeatureService);
+    localStorageService = TestBed.inject(LocalStorageService);
+    assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
+    storyViewerBackendApiService = TestBed.inject(
+      StoryViewerBackendApiService);
+    topicViewerBackendApiService = TestBed.inject(
+      TopicViewerBackendApiService);
   });
 
   it('should populate internal properties and subscribe to event' +
     ' listeners on initialize', fakeAsync(() => {
-    let collectionId = 'collection_id';
-    let userRating = 5;
-    let mockOnRatingUpdated = new EventEmitter<void>();
+    const collectionId = 'collection_id';
+    const userRating = 5;
+    const mockOnRatingUpdated = new EventEmitter<void>();
+    const readOnlyStoryNode1 = new ReadOnlyStoryNode(
+      'node_1', '', '', [], [], [], '', false, '',
+      null, false, 'bg_color_1', 'filename_1');
+    const readOnlyStoryNode2 = new ReadOnlyStoryNode(
+      'node_2', '', '', [], [], [], '', false, '',
+      null, false, 'bg_color_2', 'filename_2');
+
+    expect(componentInstance.inStoryMode).toBe(undefined);
+    expect(componentInstance.storyViewerUrl).toBe(undefined);
+    expect(componentInstance.practiceQuestionsAreEnabled).toBe(false);
 
     spyOn(urlService, 'getCollectionIdFromExplorationUrl').and.returnValue(
       collectionId);
@@ -98,20 +155,80 @@ describe('Ratings and recommendations component', () => {
       (callb: (rating: number) => void) => {
         callb(userRating);
       });
+    spyOn(explorationPlayerStateService, 'isInStoryChapterMode')
+      .and.returnValue(true);
+    spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
+      'dummy_story_viewer_page_url');
     spyOnProperty(learnerViewRatingService, 'onRatingUpdated').and.returnValue(
       mockOnRatingUpdated);
+    spyOn(componentInstance, 'getIconUrl').and.returnValue('thumbnail_url');
+    spyOn(urlService, 'getUrlParams').and.returnValue({
+      story_url_fragment: 'story_url_fragment',
+      topic_url_fragment: 'topic_url_fragment',
+      classroom_url_fragment: 'classroom_url_fragment',
+      node_id: 'node_1'
+    });
+    spyOn(storyViewerBackendApiService, 'fetchStoryDataAsync').and.returnValue(
+      Promise.resolve(new StoryPlaythrough(
+        'story_id', [readOnlyStoryNode1, readOnlyStoryNode2], '', '', '', '')));
+    spyOn(topicViewerBackendApiService, 'fetchTopicDataAsync').and.returnValue(
+      Promise.resolve(new ReadOnlyTopic(
+        'topic_name', 'topic_Id', 'description',
+        [], [], [], [], {}, {}, true, 'metatag', 'page_title_fragment')));
 
     componentInstance.questionPlayerConfig = null;
 
     componentInstance.ngOnInit();
     mockOnRatingUpdated.emit();
-    tick();
+    tick(1000);
 
+    expect(explorationPlayerStateService.isInStoryChapterMode)
+      .toHaveBeenCalled();
+    expect(componentInstance.inStoryMode).toBe(true);
+    expect(componentInstance.storyId).toBe('story_id');
+    expect(componentInstance.nextStoryNode).toBe(readOnlyStoryNode2);
+    expect(componentInstance.getIconUrl).toHaveBeenCalledWith(
+      'story_id', 'filename_2');
+    expect(componentInstance.nextStoryNodeIconUrl).toBe('thumbnail_url');
+    expect(urlInterpolationService.interpolateUrl).toHaveBeenCalled();
+    expect(componentInstance.storyViewerUrl).toBe(
+      'dummy_story_viewer_page_url');
+    expect(componentInstance.practiceQuestionsAreEnabled).toBe(true);
     expect(componentInstance.userRating).toEqual(userRating);
     expect(alertsService.addSuccessMessage).toHaveBeenCalled();
     expect(learnerViewRatingService.getUserRating).toHaveBeenCalled();
     expect(componentInstance.collectionId).toEqual(collectionId);
   }));
+
+  it('should not generate story page url and determine the next story node' +
+  'if not in story mode', fakeAsync(() => {
+    expect(componentInstance.inStoryMode).toBe(undefined);
+    expect(componentInstance.storyViewerUrl).toBe(undefined);
+
+    spyOn(explorationPlayerStateService, 'isInStoryChapterMode')
+      .and.returnValue(false);
+    spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
+      'dummy_story_viewer_page_url');
+
+    componentInstance.ngOnInit();
+    tick();
+
+    expect(explorationPlayerStateService.isInStoryChapterMode)
+      .toHaveBeenCalled();
+    expect(componentInstance.inStoryMode).toBe(false);
+    expect(urlInterpolationService.interpolateUrl).not.toHaveBeenCalled();
+    expect(componentInstance.storyViewerUrl).toBe(undefined);
+  }));
+
+  it('should obtain next chapter thumbnail url', () => {
+    spyOn(assetsBackendApiService, 'getThumbnailUrlForPreview')
+      .and.returnValue('dummy_thumbnail_url');
+
+    expect(componentInstance.getIconUrl('story_id', 'thumbnail_filename'))
+      .toBe('dummy_thumbnail_url');
+    expect(assetsBackendApiService.getThumbnailUrlForPreview)
+      .toHaveBeenCalledWith('story', 'story_id', 'thumbnail_filename');
+  });
 
   it('should toggle popover when user clicks on rating stars', () => {
     componentInstance.feedbackPopOver = mockNgbPopover;
@@ -168,4 +285,44 @@ describe('Ratings and recommendations component', () => {
 
     expect(userService.getLoginUrlAsync).toHaveBeenCalled();
   }));
+
+  it('should save user\'s sign up section preference to localStorage', () => {
+    spyOn(localStorageService, 'updateEndChapterSignUpSectionHiddenPreference');
+
+    componentInstance.hideSignUpSection();
+
+    expect(localStorageService.updateEndChapterSignUpSectionHiddenPreference)
+      .toHaveBeenCalledWith('true');
+  });
+
+  it('should get user\'s sign up section preference from localStorage', () => {
+    const getPreferenceSpy = (
+      spyOn(localStorageService, 'getEndChapterSignUpSectionHiddenPreference')
+        .and.returnValue('true'));
+
+    expect(componentInstance.isSignUpSectionHidden()).toBe(true);
+    expect(localStorageService.getEndChapterSignUpSectionHiddenPreference)
+      .toHaveBeenCalled();
+
+    getPreferenceSpy.and.returnValue(null);
+
+    expect(componentInstance.isSignUpSectionHidden()).toBe(false);
+  });
+
+  it('should correctly determine if the feature is enabled or not', () => {
+    const featureSpy = (
+      spyOnProperty(platformFeatureService, 'status', 'get').and.callThrough());
+
+    expect(componentInstance.isEndChapterFeatureEnabled()).toBe(true);
+
+    featureSpy.and.returnValue(
+      {
+        EndChapterCelebration: {
+          isEnabled: false
+        }
+      }
+    );
+
+    expect(componentInstance.isEndChapterFeatureEnabled()).toBe(false);
+  });
 });

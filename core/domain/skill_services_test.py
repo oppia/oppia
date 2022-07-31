@@ -1359,7 +1359,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             description='Subtopic Skill')
 
         subtopic = topic_domain.Subtopic.create_default_subtopic(
-            1, 'Subtopic Title')
+            1, 'Subtopic Title', 'url-frag')
         subtopic.skill_ids = [subtopic_skill_id]
 
         self.save_new_topic(
@@ -1474,6 +1474,23 @@ class SkillMasteryServicesUnitTests(test_utils.GenericTestBase):
                 skill_services.filter_skills_by_mastery(
                     self.USER_ID, self.SKILL_IDS))
         self.assertEqual(arranged_filtered_skill_ids, self.SKILL_IDS)
+
+    def test_get_multi_users_skills_mastery(self) -> None:
+        user_ids = [self.USER_ID, 'user_2']
+        skill_ids = [self.SKILL_ID_1, self.SKILL_ID_2]
+        degrees_of_mastery = {
+            self.USER_ID: {
+                self.SKILL_ID_1: self.DEGREE_OF_MASTERY_1,
+                self.SKILL_ID_2: self.DEGREE_OF_MASTERY_2
+            },
+            'user_2': {
+                self.SKILL_ID_1: None,
+                self.SKILL_ID_2: None
+            }
+        }
+        user_skill_mastery = skill_services.get_multi_users_skills_mastery(
+            user_ids, skill_ids)
+        self.assertEqual(user_skill_mastery, degrees_of_mastery)
 
 
 class SkillMigrationTests(test_utils.GenericTestBase):

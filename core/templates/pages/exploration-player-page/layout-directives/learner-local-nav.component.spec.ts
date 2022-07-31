@@ -61,6 +61,22 @@ describe('Learner Local Nav Component ', () => {
       objective: '',
       correctness_feedback_enabled: false
     },
+    exploration_metadata: {
+      title: '',
+      category: '',
+      objective: '',
+      language_code: 'en',
+      tags: [],
+      blurb: '',
+      author_notes: '',
+      states_schema_version: 50,
+      init_state_name: '',
+      param_specs: {},
+      param_changes: [],
+      auto_tts_enabled: false,
+      correctness_feedback_enabled: false,
+      edits_allowed: true
+    },
     exploration_id: 'test_id',
     is_logged_in: true,
     session_id: 'test_session',
@@ -71,8 +87,8 @@ describe('Learner Local Nav Component ', () => {
     correctness_feedback_enabled: true,
     record_playthrough_probability: 1,
     has_viewed_lesson_info_modal_once: false,
-    furthest_completed_checkpoint_exp_version: 1,
-    furthest_completed_checkpoint_state_name: 'State B',
+    furthest_reached_checkpoint_exp_version: 1,
+    furthest_reached_checkpoint_state_name: 'State B',
     most_recently_reached_checkpoint_state_name: 'State A',
     most_recently_reached_checkpoint_exp_version: 1
   };

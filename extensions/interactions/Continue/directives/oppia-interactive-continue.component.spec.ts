@@ -22,6 +22,7 @@ import { InteractionAttributesExtractorService } from 'interactions/interaction-
 import { ContextService } from 'services/context.service';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { ContinueRulesService } from './continue-rules.service';
+import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
 
 describe('OppiaInteractiveContinue', () => {
   let component: OppiaInteractiveContinue;
@@ -29,7 +30,9 @@ describe('OppiaInteractiveContinue', () => {
   let contextService: ContextService;
 
   class mockInteractionAttributesExtractorService {
-    getValuesFromAttributes(interactionId, attributes) {
+    getValuesFromAttributes(
+        interactionId: InteractionSpecsKey, attributes: Record<string, string>
+    ) {
       return {
         buttonText: {
           value: {
@@ -50,7 +53,7 @@ describe('OppiaInteractiveContinue', () => {
         expect(answer).toBe('Please continue.');
       },
       registerCurrentInteraction: (
-          submitAnswerFn: Function, validateExpressionFn) => {
+          submitAnswerFn: Function, validateExpressionFn: Function) => {
         submitAnswerFn();
         expect(validateExpressionFn).toBeNull();
       }
@@ -100,7 +103,7 @@ describe('OppiaInteractiveContinue', () => {
         expect(answer).toBe('Continue button');
       },
       registerCurrentInteraction: (
-          submitAnswerFn: Function, validateExpressionFn) => {
+          submitAnswerFn: Function, validateExpressionFn: Function) => {
         submitAnswerFn();
       }
     };

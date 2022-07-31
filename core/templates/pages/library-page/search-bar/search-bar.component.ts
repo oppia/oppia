@@ -33,6 +33,9 @@ import { ConstructTranslationIdsService } from 'services/construct-translation-i
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
 import { TranslateService } from '@ngx-translate/core';
 
+import './search-bar.component.css';
+
+
 interface SearchDropDownCategories {
   id: string;
   text: string;
@@ -135,10 +138,6 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     this.activeMenuName = this.navigationService.activeMenuName;
   }
 
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
-  }
-
   // Update the description, numSelections and summary fields of the
   // relevant entry of selectionDetails.
   updateSelectionDetails(itemsType: string): void {
@@ -161,9 +160,6 @@ export class SearchBarComponent implements OnInit, OnDestroy {
       'I18N_LIBRARY_N_' + itemsName.toUpperCase());
     this.translationData[itemsName + 'Count'] = totalCount;
 
-    // TODO(milit): When the language changes, the translations won't
-    // change until the user changes the selection and this function is
-    // re-executed.
     if (selectedItems.length > 0) {
       let translatedItems = [];
       for (let i = 0; i < selectedItems.length; i++) {

@@ -22,6 +22,7 @@ import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angul
 import { of } from 'rxjs';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { LoaderService } from 'services/loader.service';
+import { SearchResponseBackendDict } from 'services/search-backend-api.service';
 import { SearchService } from 'services/search.service';
 import { ActivityTilesInfinityGridComponent } from './activity-tiles-infinity-grid.component';
 
@@ -89,9 +90,11 @@ describe('Activity Tiles Infinity Grid Component', () => {
     componentInstance.endOfPageIsReached = false;
     componentInstance.allActivitiesInOrder = [];
     spyOn(searchService, 'loadMoreData').and.callFake((
-        successCallback: (SearchResponseData, boolean) => void,
-        failureCallback?: (boolean) => void) => {
-      successCallback({ activity_list: [] }, true);
+        successCallback: (
+          SearchResponseData: SearchResponseBackendDict, boolean: boolean
+        ) => void,
+        failureCallback: (boolean: boolean) => void) => {
+      successCallback({ search_cursor: null, activity_list: [] }, true);
       failureCallback(true);
     });
 

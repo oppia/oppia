@@ -1,11 +1,11 @@
-<div class="modal-header protractor-test-add-or-update-solution-modal">
+<div class="modal-header e2e-test-add-or-update-solution-modal">
   <h3>{{ solutionType !== null ? 'Update Solution' : 'Add Solution' }}</h3>
 </div>
 
 <div class="modal-body">
   <div class="form-inline">
     <div class="oppia-rule-details-header">
-      <select class="protractor-test-answer-is-exclusive-select"
+      <select class="e2e-test-answer-is-exclusive-select"
               [(ngModel)]="tempAnsOption"
               (ngModelChange)="onAnswerChange()">
         <option *ngFor="let item of ansOptions">
@@ -15,12 +15,12 @@
       <br>
       <br>
       <div>
-        <angular-html-bind-wrapper classStr="protractor-test-interaction-html"
+        <oppia-interaction-display classStr="e2e-test-interaction-html"
                                    [htmlData]="correctAnswerEditorHtml">
-        </angular-html-bind-wrapper>
+        </oppia-interaction-display>
       </div>
       <br>
-      <button class="md-button oppia-learner-confirm-button protractor-test-submit-answer-button"
+      <button class="md-button oppia-learner-confirm-button e2e-test-submit-answer-button"
               (click)="onSubmitFromSubmitButton()"
               *ngIf="data.correctAnswer === undefined && shouldAdditionalSubmitButtonBeShown()"
               [disabled]="isSubmitButtonDisabled()">
@@ -29,7 +29,7 @@
       <br>
       <div [hidden]="data.correctAnswer === undefined">
         <strong>Explanation:</strong>
-        <schema-based-editor class="protractor-test-explanation-textarea"
+        <schema-based-editor class="e2e-test-explanation-textarea"
                              [schema]="EXPLANATION_FORM_SCHEMA"
                              [(localValue)]="data.explanationHtml">
         </schema-based-editor>
@@ -43,7 +43,7 @@
 
 <div class="modal-footer">
   <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
-  <button class="btn btn-success protractor-test-submit-solution-button"
+  <button class="btn btn-success e2e-test-submit-solution-button"
           (click)="saveSolution()"
           [disabled]="data.correctAnswer === undefined || isSubmitButtonDisabled() || !data.explanationHtml || isSolutionExplanationLengthExceeded(data.explanationHtml)"
           title="Check if the solution corresponds to a correct answer and save it.">

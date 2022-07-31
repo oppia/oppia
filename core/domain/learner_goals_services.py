@@ -22,10 +22,18 @@ from core import feconf
 from core.domain import user_domain
 from core.platform import models
 
+from typing import List
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import user_models
+
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
 
-def get_learner_goals_from_model(learner_goals_model):
+def get_learner_goals_from_model(
+    learner_goals_model: user_models.LearnerGoalsModel
+) -> user_domain.LearnerGoals:
     """Returns the learner goals domain object given the learner goals
     model loaded from the datastore.
 
@@ -43,7 +51,7 @@ def get_learner_goals_from_model(learner_goals_model):
         learner_goals_model.topic_ids_to_master)
 
 
-def save_learner_goals(learner_goals):
+def save_learner_goals(learner_goals: user_domain.LearnerGoals) -> None:
     """Save a learner goals domain object as an LearnerGoalsModel entity
     in the datastore.
 
@@ -60,11 +68,13 @@ def save_learner_goals(learner_goals):
         learner_goals_model.update_timestamps()
         learner_goals_model.put()
     else:
-        learner_goals_dict['id'] = learner_goals.id
-        user_models.LearnerGoalsModel(**learner_goals_dict).put()
+        user_models.LearnerGoalsModel(
+            id=learner_goals.id,
+            **learner_goals_dict
+        ).put()
 
 
-def mark_topic_to_learn(user_id, topic_id):
+def mark_topic_to_learn(user_id: str, topic_id: str) -> bool:
     """Adds the topic id to the learner goals of the user. If the count exceeds
     feconf.MAX_CURRENT_GOALS_COUNT, the topic is not added.
 
@@ -102,7 +112,10 @@ def mark_topic_to_learn(user_id, topic_id):
                 topic_id))
 
 
-def remove_topics_from_learn_goal(user_id, topic_ids_to_remove):
+def remove_topics_from_learn_goal(
+    user_id: str,
+    topic_ids_to_remove: List[str]
+) -> None:
     """Removes topics from the learner goals of the user (if present).
 
     Args:
@@ -128,7 +141,7 @@ def remove_topics_from_learn_goal(user_id, topic_ids_to_remove):
         save_learner_goals(learner_goals)
 
 
-def get_all_topic_ids_to_learn(user_id):
+def get_all_topic_ids_to_learn(user_id: str) -> List[str]:
     """Returns a list with the ids of all the topics that are in the
     goals of the user.
 

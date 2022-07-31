@@ -4045,6 +4045,55 @@ class AccessLearnerDashboardDecoratorTests(test_utils.GenericTestBase):
         self.assertEqual(response['error'], error_msg)
 
 
+class AccessLearnerGroupsDecoratorTests(test_utils.GenericTestBase):
+    """Tests the decorator can_access_learner_groups."""
+
+    user = 'user'
+    user_email = 'user@example.com'
+    banned_user = 'banneduser'
+    banned_user_email = 'banned@example.com'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {}
+        HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+        @acl_decorators.can_access_learner_groups
+        def get(self):
+            return self.render_json({'success': True})
+
+    def setUp(self):
+        super(AccessLearnerGroupsDecoratorTests, self).setUp()
+        self.signup(self.user_email, self.user)
+        self.signup(self.banned_user_email, self.banned_user)
+        self.mark_user_banned(self.banned_user)
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock/', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_banned_user_cannot_access_teacher_dashboard(self):
+        self.login(self.banned_user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/', expected_status_int=401)
+        error_msg = 'You do not have the credentials to access this page.'
+        self.assertEqual(response['error'], error_msg)
+        self.logout()
+
+    def test_exploration_editor_can_access_learner_groups(self):
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/')
+        self.assertTrue(response['success'])
+        self.logout()
+
+    def test_guest_user_cannot_access_teacher_dashboard(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/', expected_status_int=401)
+        error_msg = 'You must be logged in to access this resource.'
+        self.assertEqual(response['error'], error_msg)
+
+
 class EditTopicDecoratorTests(test_utils.GenericTestBase):
     """Tests the decorator can_edit_topic."""
 
@@ -4735,7 +4784,7 @@ class StoryViewerTests(test_utils.GenericTestBase):
             self.story_id, self.admin_id, self.topic_id,
             url_fragment=self.story_url_fragment)
         subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
-            1, 'Subtopic Title 1')
+            1, 'Subtopic Title 1', 'url-frag-one')
         subtopic_1.skill_ids = ['skill_id_1']
         subtopic_1.url_fragment = 'sub-one-frag'
         self.save_new_topic(
@@ -4918,11 +4967,11 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
 
         self.topic_id = topic_fetchers.get_new_topic_id()
         subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
-            1, 'Subtopic Title 1')
+            1, 'Subtopic Title 1', 'url-frag-one')
         subtopic_1.skill_ids = ['skill_id_1']
         subtopic_1.url_fragment = 'sub-one-frag'
         subtopic_2 = topic_domain.Subtopic.create_default_subtopic(
-            2, 'Subtopic Title 2')
+            2, 'Subtopic Title 2', 'url-frag-two')
         subtopic_2.skill_ids = ['skill_id_2']
         subtopic_2.url_fragment = 'sub-two-frag'
         self.subtopic_page_1 = (
@@ -4933,7 +4982,8 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
             [topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_ADD_SUBTOPIC,
                 'subtopic_id': 1,
-                'title': 'Sample'
+                'title': 'Sample',
+                'url_fragment': 'sample-fragment'
             })]
         )
         self.save_new_topic(
@@ -5103,7 +5153,7 @@ class TopicViewerTests(test_utils.GenericTestBase):
 
         self.topic_id = topic_fetchers.get_new_topic_id()
         subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
-            1, 'Subtopic Title 1')
+            1, 'Subtopic Title 1', 'url-frag-one')
         subtopic_1.skill_ids = ['skill_id_1']
         subtopic_1.url_fragment = 'sub-one-frag'
         self.save_new_topic(

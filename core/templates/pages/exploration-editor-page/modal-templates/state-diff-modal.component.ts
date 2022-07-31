@@ -21,9 +21,7 @@ import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { State } from 'domain/state/StateObjectFactory';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { ContextService } from 'services/context.service';
-import { StateDiffModalBackendApiService } from '../services/state-diff-modal-backend-api.service';
+import { HistoryTabYamlConversionService } from '../services/history-tab-yaml-conversion.service';
 
 export interface headersAndYamlStrs {
   leftPane: string;
@@ -68,47 +66,22 @@ export class StateDiffModalComponent
 
   constructor(
       private ngbActiveModal: NgbActiveModal,
-      private contextService: ContextService,
-      private urlInterpolationService: UrlInterpolationService,
-      private stateDiffModalBackendApiService:
-      StateDiffModalBackendApiService,
+      private historyTabYamlConversionService: HistoryTabYamlConversionService
   ) {
     super(ngbActiveModal);
   }
 
   ngOnInit(): void {
-    const url = this.urlInterpolationService.interpolateUrl(
-      '/createhandler/state_yaml/<exploration_id>', {
-        exploration_id: (
-          this.contextService.getExplorationId())
+    this.historyTabYamlConversionService
+      .getYamlStringFromStateOrMetadata(this.oldState)
+      .then((result) => {
+        this.yamlStrs.leftPane = result;
       });
 
-    if (this.oldState) {
-      this.stateDiffModalBackendApiService.fetchYaml(
-        this.oldState.toBackendDict(), 50, url).then(response => {
-        this.yamlStrs.leftPane = response.yaml;
+    this.historyTabYamlConversionService
+      .getYamlStringFromStateOrMetadata(this.newState)
+      .then((result) => {
+        this.yamlStrs.rightPane = result;
       });
-    } else {
-      // Note: the timeout is needed or the string will be sent
-      // before codemirror has fully loaded and will not be
-      // displayed. This causes issues with the e2e tests.
-      setTimeout(() => {
-        this.yamlStrs.leftPane = '';
-      }, 200);
-    }
-
-    if (this.newState) {
-      this.stateDiffModalBackendApiService.fetchYaml(
-        this.newState.toBackendDict(), 50, url).then(response => {
-        this.yamlStrs.rightPane = response.yaml;
-      });
-    } else {
-      // Note: the timeout is needed or the string will be sent
-      // before codemirror has fully loaded and will not be
-      // displayed. This causes issues with the e2e tests.
-      setTimeout(() => {
-        this.yamlStrs.rightPane = '';
-      }, 200);
-    }
   }
 }

@@ -32,6 +32,26 @@ import { UserService } from 'services/user.service';
 import { of } from 'rxjs';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 
+class MockWindowRef {
+  _window = {
+    location: {
+      _href: '',
+      get href() {
+        return this._href;
+      },
+      set href(val) {
+        this._href = val;
+      },
+      replace: (val: string) => {}
+    },
+    gtag: () => {}
+  };
+
+  get nativeWindow() {
+    return this._window;
+  }
+}
+
 class MockI18nLanguageCodeService {
   codeChangeEventEmiiter = new EventEmitter<string>();
   getCurrentI18nLanguageCode() {
@@ -45,17 +65,23 @@ class MockI18nLanguageCodeService {
 
 describe('Teach Page', () => {
   let siteAnalyticsService: SiteAnalyticsService;
-  let loaderService: LoaderService = null;
+  let loaderService: LoaderService;
   let userService: UserService;
   let windowDimensionsService: WindowDimensionsService;
+  let windowRef: MockWindowRef;
   var resizeEvent = new Event('resize');
   beforeEach(async() => {
+    windowRef = new MockWindowRef();
     TestBed.configureTestingModule({
       declarations: [TeachPageComponent, MockTranslatePipe],
       providers: [
         {
           provide: I18nLanguageCodeService,
           useClass: MockI18nLanguageCodeService
+        },
+        {
+          provide: WindowRef,
+          useValue: windowRef
         },
         {
           provide: WindowDimensionsService,
@@ -66,17 +92,6 @@ describe('Teach Page', () => {
         },
         SiteAnalyticsService,
         UrlInterpolationService,
-        {
-          provide: WindowRef,
-          useValue: {
-            nativeWindow: {
-              location: {
-                href: ''
-              },
-              gtag: () => {}
-            }
-          }
-        }
       ]
     }).compileComponents();
   });
@@ -92,10 +107,9 @@ describe('Teach Page', () => {
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
   });
 
-  let component;
-  let teachPageComponent;
+  let component: TeachPageComponent;
   beforeEach(() => {
-    teachPageComponent = TestBed.createComponent(TeachPageComponent);
+    let teachPageComponent = TestBed.createComponent(TeachPageComponent);
     component = teachPageComponent.componentInstance;
   });
 
@@ -168,9 +182,7 @@ describe('Teach Page', () => {
   it('should redirect to library page when Browse Library is clicked',
     () => {
       component.onClickBrowseLibraryButton();
-      expect(
-        component.windowRef.nativeWindow.location.href
-      ).toBe('/community-library');
+      expect(windowRef.nativeWindow.location.href).toBe('/community-library');
     }
   );
 
@@ -186,9 +198,7 @@ describe('Teach Page', () => {
   it('should redirect to teach page when Guide For Parents is clicked',
     () => {
       component.onClickGuideParentsButton();
-      expect(
-        component.windowRef.nativeWindow.location.href
-      ).toBe('/teach');
+      expect(windowRef.nativeWindow.location.href).toBe('/teach');
     }
   );
 
@@ -204,9 +214,7 @@ describe('Teach Page', () => {
   it('should redirect to teach page when Tips For Parents is clicked',
     () => {
       component.onClickTipforParentsButton();
-      expect(
-        component.windowRef.nativeWindow.location.href
-      ).toBe('/teach');
+      expect(windowRef.nativeWindow.location.href).toBe('/teach');
     }
   );
 

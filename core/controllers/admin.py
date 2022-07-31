@@ -379,7 +379,7 @@ class AdminHandler(base.BaseHandler):
         state.update_interaction_hints(hints_list)
         state.update_interaction_default_outcome(
             state_domain.Outcome(
-                None, state_domain.SubtitledHtml(
+                None, None, state_domain.SubtitledHtml(
                     'feedback_id', '<p>Dummy Feedback</p>'),
                 True, [], None, None
             )
@@ -471,7 +471,7 @@ class AdminHandler(base.BaseHandler):
             topic_1.add_uncategorized_skill_id(skill_id_1)
             topic_1.add_uncategorized_skill_id(skill_id_2)
             topic_1.add_uncategorized_skill_id(skill_id_3)
-            topic_1.add_subtopic(1, 'Dummy Subtopic Title')
+            topic_1.add_subtopic(1, 'Dummy Subtopic Title', 'dummysubtopic')
             topic_1.move_skill_id_to_subtopic(None, 1, skill_id_2)
             topic_1.move_skill_id_to_subtopic(None, 1, skill_id_3)
 
@@ -568,7 +568,8 @@ class AdminHandler(base.BaseHandler):
                 [topic_domain.TopicChange({
                     'cmd': topic_domain.CMD_ADD_SUBTOPIC,
                     'subtopic_id': 1,
-                    'title': 'Dummy Subtopic Title'
+                    'title': 'Dummy Subtopic Title',
+                    'url_fragment': 'dummy-fragment'
                 })]
             )
 

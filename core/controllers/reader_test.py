@@ -22,6 +22,7 @@ from core import feconf
 from core.constants import constants
 from core.domain import collection_domain
 from core.domain import collection_services
+from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -44,8 +45,9 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-(classifier_models, stats_models) = models.Registry.import_models(
-    [models.NAMES.classifier, models.NAMES.statistics])
+(classifier_models, exp_models, stats_models) = models.Registry.import_models([
+    models.NAMES.classifier, models.NAMES.exploration, models.NAMES.statistics
+])
 
 
 def _get_change_list(state_name, property_name, new_value):
@@ -577,7 +579,7 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
             if include_system_recommendations is not None else '')
         recommendations_url = (
             '/explorehandler/recommendations/%s?'
-            'stringified_author_recommended_ids=%s%s%s' % (
+            'author_recommended_ids=%s%s%s' % (
                 exploration_id, author_recommended_ids_str, collection_id_param,
                 include_recommendations_param))
 
@@ -973,10 +975,10 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
     def test_get_recommendation_ids_with_invalid_author_recommended_ids(self):
         self.get_json(
             '/explorehandler/recommendations/%s' % self.EXP_ID_1, params={
-                'collection_id': 'collection_id',
+                'collection_id': self.COL_ID,
                 'include_system_recommendations': True,
-                'stringified_author_recommended_ids': 'invalid_type'
-            }, expected_status_int=404
+                'author_recommended_ids': 'invalid_type'
+            }, expected_status_int=400
         )
 
 
@@ -2951,3 +2953,478 @@ class ExplorationRestartEventHandlerTests(test_utils.GenericTestBase):
             exploration_dict['most_recently_reached_checkpoint_state_name'])
 
         self.logout()
+
+
+class SaveTransientCheckpointProgressHandlerTests(test_utils.GenericTestBase):
+    """Tests for save transient checkpoint progress handler."""
+
+    def test_logged_out_user_checkpoint_progress_is_saved_correctly(self):
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        # Load demo exploration.
+        exp_id = '0'
+        exp_services.delete_demo('0')
+        exp_services.load_demo('0')
+
+        # Logged out user opens exploration.
+        exploration_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
+        self.assertIsNone(
+            exploration_dict['furthest_reached_checkpoint_exp_version'])
+        self.assertIsNone(
+            exploration_dict['furthest_reached_checkpoint_state_name'])
+        self.assertIsNone(
+            exploration_dict['most_recently_reached_checkpoint_exp_version'])
+        self.assertIsNone(
+            exploration_dict['most_recently_reached_checkpoint_state_name'])
+
+        # First checkpoint reached.
+        csrf_token = self.get_new_csrf_token()
+        response = self.post_json(
+            '/explorehandler/checkpoint_reached_by_logged_out_user/%s' % exp_id,
+            {
+                'most_recently_reached_checkpoint_exp_version': 1,
+                'most_recently_reached_checkpoint_state_name': 'Welcome!'
+            },
+            csrf_token=csrf_token
+        )
+
+        unique_progress_url_id = response['unique_progress_url_id']
+
+        exp_user_data = exp_fetchers.get_logged_out_user_progress(
+            unique_progress_url_id
+        )
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_exp_version, 1)
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_state_name, 'Welcome!')
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_exp_version, 1)
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_state_name,
+            'Welcome!')
+
+        # Update exploration.
+        # Now version of the exploration becomes 2.
+        change_list = _get_change_list(
+            'What language',
+            exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
+            True
+        )
+        exp_services.update_exploration(
+            owner_id,
+            exp_id,
+            change_list,
+            'Made What language state a checkpoint'
+        )
+
+        # Second checkpoint reached.
+        csrf_token = self.get_new_csrf_token()
+        self.put_json(
+            '/explorehandler/checkpoint_reached_by_logged_out_user/%s' % exp_id,
+            {
+                'unique_progress_url_id': unique_progress_url_id,
+                'most_recently_reached_checkpoint_exp_version': 2,
+                'most_recently_reached_checkpoint_state_name': 'What language'
+            },
+            csrf_token=csrf_token
+        )
+        exp_user_data = exp_fetchers.get_logged_out_user_progress(
+            unique_progress_url_id
+        )
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_exp_version, 2)
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_state_name,
+            'What language')
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_exp_version, 2)
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_state_name,
+            'What language')
+
+
+class TransientCheckpointUrlPageTests(test_utils.GenericTestBase):
+    """Tests for transient checkpoint url handler."""
+
+    def test_exploration_page_raises_error_with_invalid_pid(self):
+        unique_progress_url_id = 'pid123'
+
+        self.get_html_response(
+            '/progress/%s' % (unique_progress_url_id),
+            expected_status_int=404
+        )
+
+    def test_logged_out_progress_is_displayed_correctly_when_exp_version_is_same(self): # pylint: disable=line-too-long
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+
+        # Load demo exploration.
+        exp_id = '0'
+        exp_services.delete_demo('0')
+        exp_services.load_demo('0')
+
+        # Logged out user opens exploration.
+        exploration_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
+        self.assertIsNone(
+            exploration_dict['furthest_reached_checkpoint_exp_version'])
+        self.assertIsNone(
+            exploration_dict['furthest_reached_checkpoint_state_name'])
+        self.assertIsNone(
+            exploration_dict['most_recently_reached_checkpoint_exp_version'])
+        self.assertIsNone(
+            exploration_dict['most_recently_reached_checkpoint_state_name'])
+
+        # First checkpoint reached.
+        csrf_token = self.get_new_csrf_token()
+        response = self.post_json(
+            '/explorehandler/checkpoint_reached_by_logged_out_user/%s' % exp_id,
+            {
+                'most_recently_reached_checkpoint_exp_version': 1,
+                'most_recently_reached_checkpoint_state_name': 'Welcome!'
+            },
+            csrf_token=csrf_token
+        )
+
+        unique_progress_url_id = response['unique_progress_url_id']
+
+        response = self.get_html_response(
+            '/progress/%s' % (unique_progress_url_id),
+            expected_status_int=302
+        )
+
+        exp_user_data = exp_fetchers.get_logged_out_user_progress(
+            unique_progress_url_id
+        )
+
+        self.assertTrue(
+            response.headers['Location'].endswith(
+                '%s/%s?pid=%s' % (
+            feconf.EXPLORATION_URL_PREFIX,
+            exp_user_data.exploration_id,
+            unique_progress_url_id)))
+
+        exploration_dict = self.get_json(
+            '%s/%s?pid=%s' % (
+                feconf.EXPLORATION_INIT_URL_PREFIX,
+                exp_user_data.exploration_id,
+                unique_progress_url_id
+                ))
+        self.assertEqual(
+            exploration_dict['furthest_reached_checkpoint_exp_version'], 1)
+        self.assertEqual(
+            exploration_dict['furthest_reached_checkpoint_state_name'],
+            'Welcome!')
+        self.assertEqual(
+            exploration_dict['most_recently_reached_checkpoint_exp_version'], 1)
+        self.assertEqual(
+            exploration_dict['most_recently_reached_checkpoint_state_name'],
+            'Welcome!')
+
+    def test_logged_out_progress_is_displayed_correctly_when_exp_version_different(self): # pylint: disable=line-too-long
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        # Load demo exploration.
+        exp_id = '0'
+        exp_services.delete_demo('0')
+        exp_services.load_demo('0')
+
+        # Logged out user opens exploration.
+        exploration_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
+        self.assertIsNone(
+            exploration_dict['furthest_reached_checkpoint_exp_version'])
+        self.assertIsNone(
+            exploration_dict['furthest_reached_checkpoint_state_name'])
+        self.assertIsNone(
+            exploration_dict['most_recently_reached_checkpoint_exp_version'])
+        self.assertIsNone(
+            exploration_dict['most_recently_reached_checkpoint_state_name'])
+
+        # Update exploration.
+        # Now version of the exploration becomes 2.
+        change_list = _get_change_list(
+            'What language',
+            exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
+            True
+        )
+        exp_services.update_exploration(
+            owner_id,
+            exp_id,
+            change_list,
+            'Made What language state a checkpoint'
+        )
+
+        # First checkpoint reached.
+        csrf_token = self.get_new_csrf_token()
+        response = self.post_json(
+            '/explorehandler/checkpoint_reached_by_logged_out_user/%s' % exp_id,
+            {
+                'most_recently_reached_checkpoint_exp_version': 1,
+                'most_recently_reached_checkpoint_state_name': 'Welcome!'
+            },
+            csrf_token=csrf_token
+        )
+
+        unique_progress_url_id = response['unique_progress_url_id']
+
+        response = self.get_html_response(
+            '/progress/%s' % (unique_progress_url_id),
+            expected_status_int=302
+        )
+
+        exp_user_data = exp_fetchers.get_logged_out_user_progress(
+            unique_progress_url_id
+        )
+
+        self.assertTrue(
+            response.headers['Location'].endswith(
+                '%s/%s?pid=%s' % (
+            feconf.EXPLORATION_URL_PREFIX,
+            exp_user_data.exploration_id,
+            unique_progress_url_id)))
+
+        exploration_dict = self.get_json(
+            '%s/%s?pid=%s' % (
+                feconf.EXPLORATION_INIT_URL_PREFIX,
+                exp_user_data.exploration_id,
+                unique_progress_url_id
+                ))
+        self.assertEqual(
+            exploration_dict['furthest_reached_checkpoint_exp_version'], 1)
+        self.assertEqual(
+            exploration_dict['furthest_reached_checkpoint_state_name'],
+            'Welcome!')
+        self.assertEqual(
+            exploration_dict['most_recently_reached_checkpoint_exp_version'], 1)
+        self.assertEqual(
+            exploration_dict['most_recently_reached_checkpoint_state_name'],
+            'Welcome!')
+
+
+class SyncLoggedOutLearnerProgressHandlerTests(test_utils.GenericTestBase):
+    """Tests for sync logged out learner progress handler."""
+
+    def test_logged_in_checkpoint_progress_is_synced_correctly(self):
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+
+        # Load demo exploration.
+        exp_id = '0'
+        exp_services.delete_demo('0')
+        exp_services.load_demo('0')
+
+        # Use a dummy unique_progress_url_id.
+        pid = 'pidABC'
+
+        # Update progress for logged out user.
+        exp_services.update_logged_out_user_progress(
+            exp_id,
+            pid,
+            'Welcome!',
+            1
+        )
+
+        self.login(self.VIEWER_EMAIL)
+        viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
+
+        # Hit the handler for syncing logged out progress with
+        # logged in progress when the user signs-in.
+
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/sync_logged_out_and_logged_in_progress/%s' % exp_id, # pylint: disable=line-too-long
+            {
+                'unique_progress_url_id': pid,
+            },
+            csrf_token=csrf_token
+        )
+
+        exp_user_data = exp_fetchers.get_exploration_user_data(
+            viewer_id, exp_id)
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_exp_version, 1)
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_state_name, 'Welcome!')
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_exp_version, 1)
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_state_name,
+            'Welcome!')
+
+        self.logout()
+
+
+class StateVersionHistoryHandlerUnitTests(test_utils.GenericTestBase):
+    """Tests for fetching the version history of a particular state of an
+    exploration.
+    """
+
+    EXP_ID = '0'
+
+    def setUp(self):
+        super(StateVersionHistoryHandlerUnitTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
+        self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
+        exp_services.update_exploration(self.owner_id, self.EXP_ID, [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'b'
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
+                'new_state_name': 'a'
+            })
+        ], 'A commit message.')
+
+    def test_raises_error_when_version_history_does_not_exist(self):
+        self.login(self.OWNER_EMAIL)
+        # Deleting the version history model produced by exp_services.
+        vh_model = exp_models.ExplorationVersionHistoryModel.get(
+            exp_models.ExplorationVersionHistoryModel.get_instance_id(
+                self.EXP_ID, 2
+            )
+        )
+        vh_model.delete()
+
+        self.get_json(
+            '%s/%s/%s/%s' % (
+                feconf.STATE_VERSION_HISTORY_URL_PREFIX,
+                self.EXP_ID, 'a', 2
+            ), expected_status_int=404
+        )
+
+        self.logout()
+
+    def test_version_history_for_a_state_is_fetched_correctly(self):
+        self.login(self.OWNER_EMAIL)
+        exploration_v1 = exp_fetchers.get_exploration_by_id(
+            self.EXP_ID, version=1
+        )
+        response_for_state_a = self.get_json(
+            '%s/%s/%s/%s' % (
+                feconf.STATE_VERSION_HISTORY_URL_PREFIX,
+                self.EXP_ID, 'a', 2
+            )
+        )
+        response_for_state_b = self.get_json(
+            '%s/%s/%s/%s' % (
+                feconf.STATE_VERSION_HISTORY_URL_PREFIX,
+                self.EXP_ID, 'b', 2
+            )
+        )
+
+        self.assertEqual(
+            response_for_state_a, {
+                'last_edited_version_number': 1,
+                'state_name_in_previous_version': (
+                    feconf.DEFAULT_INIT_STATE_NAME
+                ),
+                'state_dict_in_previous_version': exploration_v1.states[
+                    feconf.DEFAULT_INIT_STATE_NAME
+                ].to_dict(),
+                'last_edited_committer_username': self.OWNER_USERNAME
+            }
+        )
+        self.assertEqual(
+            response_for_state_b, {
+                'last_edited_version_number': None,
+                'state_name_in_previous_version': None,
+                'state_dict_in_previous_version': None,
+                'last_edited_committer_username': self.OWNER_USERNAME
+            }
+        )
+
+        self.logout()
+
+
+class MetadataVersionHistoryHandlerUnitTests(test_utils.GenericTestBase):
+    """Tests for fetching the version history of the exploration metadata."""
+
+    EXP_ID = '0'
+
+    def setUp(self):
+        super(MetadataVersionHistoryHandlerUnitTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
+        self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
+        exp_services.update_exploration(self.owner_id, self.EXP_ID, [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'New title'
+            })
+        ], 'A commit message.')
+
+    def test_raises_error_when_version_history_does_not_exist(self):
+        self.login(self.OWNER_EMAIL)
+        # Deleting the version history model produced by exp_services.
+        vh_model = exp_models.ExplorationVersionHistoryModel.get(
+            exp_models.ExplorationVersionHistoryModel.get_instance_id(
+                self.EXP_ID, 2
+            )
+        )
+        vh_model.delete()
+
+        self.get_json(
+            '%s/%s/%s' % (
+                feconf.METADATA_VERSION_HISTORY_URL_PREFIX, self.EXP_ID, 2
+            ), expected_status_int=404)
+
+        self.logout()
+
+    def test_version_history_for_exploration_metadata_is_fetched_correctly(
+        self
+    ):
+        self.login(self.OWNER_EMAIL)
+        exploration_v1 = exp_fetchers.get_exploration_by_id(
+            self.EXP_ID, version=1
+        )
+        response = self.get_json(
+            '%s/%s/%s' % (
+                feconf.METADATA_VERSION_HISTORY_URL_PREFIX, self.EXP_ID, 2
+            )
+        )
+
+        self.assertEqual(
+            response, {
+                'last_edited_version_number': 1,
+                'last_edited_committer_username': self.OWNER_USERNAME,
+                'metadata_dict_in_previous_version': (
+                    exploration_v1.get_metadata().to_dict()
+                )
+            }
+        )
+
+        self.logout()
+
+
+class CheckpointsFeatureStatusHandlerTests(test_utils.GenericTestBase):
+    """Unit test for CheckpointsFeatureStatusHandler."""
+
+    def test_get_request_returns_correct_status(self):
+        self.set_config_property(
+            config_domain.CHECKPOINTS_FEATURE_IS_ENABLED, False)
+
+        response = self.get_json('/checkpoints_feature_status_handler')
+        self.assertEqual(
+            response, {
+                'checkpoints_feature_is_enabled': False
+            })
+
+        self.set_config_property(
+            config_domain.CHECKPOINTS_FEATURE_IS_ENABLED, True)
+        response = self.get_json('/checkpoints_feature_status_handler')
+        self.assertEqual(
+            response, {
+                'checkpoints_feature_is_enabled': True,
+            })

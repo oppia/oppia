@@ -67,7 +67,7 @@ describe('Response Header Component', () => {
     stateEditorService = TestBed.inject(StateEditorService);
     outcomeObjectFactory = TestBed.inject(OutcomeObjectFactory);
 
-    component.outcome = outcomeObjectFactory.createNew('/', null, null, null);
+    component.outcome = outcomeObjectFactory.createNew('/', '0', '0', []);
     component.index = 0;
 
     fixture.detectChanges();

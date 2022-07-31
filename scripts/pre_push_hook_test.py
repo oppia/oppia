@@ -29,7 +29,7 @@ from core import utils
 from core.tests import test_utils
 
 from . import common
-from . import install_backend_python_libs
+from . import install_python_prod_dependencies
 from . import pre_push_hook
 
 
@@ -140,7 +140,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
 
     def test_get_remote_name_with_error_in_obtaining_remote(self):
         def mock_communicate():
-            return (b'test', b'Error')
+            return (b'test', b'test_oppia_error')
         process = subprocess.Popen(
             [b'echo', b'test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         process.communicate = mock_communicate
@@ -148,12 +148,12 @@ class PrePushHookTests(test_utils.GenericTestBase):
             return process
 
         popen_swap = self.swap(subprocess, 'Popen', mock_popen)
-        with popen_swap, self.assertRaisesRegex(ValueError, 'Error'):
+        with popen_swap, self.assertRaisesRegex(ValueError, 'test_oppia_error'):
             pre_push_hook.get_remote_name()
 
     def test_get_remote_name_with_error_in_obtaining_remote_url(self):
         def mock_communicate():
-            return ('test', 'Error')
+            return ('test', 'test_oppia_error')
         process_for_remote = subprocess.Popen(
             [b'echo', b'origin\nupstream'], stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)
@@ -167,7 +167,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
                 return process_for_remote
 
         popen_swap = self.swap(subprocess, 'Popen', mock_popen)
-        with popen_swap, self.assertRaisesRegex(ValueError, 'Error'):
+        with popen_swap, self.assertRaisesRegex(ValueError, 'test_oppia_error'):
             pre_push_hook.get_remote_name()
 
     def test_get_remote_name_with_no_remote_set(self):
@@ -242,12 +242,14 @@ class PrePushHookTests(test_utils.GenericTestBase):
 
     def test_git_diff_name_status_with_error(self):
         def mock_start_subprocess_for_result(unused_cmd_tokens):
-            return ('M\tfile1\nA\tfile2', 'Error')
+            return ('M\tfile1\nA\tfile2', 'test_oppia_error')
         subprocess_swap = self.swap(
             pre_push_hook, 'start_subprocess_for_result',
             mock_start_subprocess_for_result)
 
-        with subprocess_swap, self.assertRaisesRegex(ValueError, 'Error'):
+        with subprocess_swap, self.assertRaisesRegex(
+            ValueError, 'test_oppia_error'
+        ):
             pre_push_hook.git_diff_name_status(
                 'left', 'right', diff_filter='filter')
 
@@ -451,7 +453,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
         def mock_exists(unused_file):
             return True
         def mock_start_subprocess_for_result(unused_cmd_tokens):
-            return ('Output', 'Error')
+            return ('Output', 'test_oppia_error')
 
         islink_swap = self.swap(os.path, 'islink', mock_islink)
         exists_swap = self.swap(os.path, 'exists', mock_exists)
@@ -460,7 +462,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
             mock_start_subprocess_for_result)
 
         with islink_swap, exists_swap, subprocess_swap, self.print_swap:
-            with self.assertRaisesRegex(ValueError, 'Error'):
+            with self.assertRaisesRegex(ValueError, 'test_oppia_error'):
                 pre_push_hook.install_hook()
         self.assertTrue('Symlink already exists' in self.print_arr)
         self.assertFalse(
@@ -660,8 +662,10 @@ class PrePushHookTests(test_utils.GenericTestBase):
 
     def test_typescript_check_failiure(self):
         self.does_diff_include_ts_files = True
-        def mock_run_script_and_get_returncode(unused_script):
-            return 1
+        def mock_run_script_and_get_returncode(script):
+            if script == pre_push_hook.TYPESCRIPT_CHECKS_CMDS:
+                return 1
+            return 0
         run_script_and_get_returncode_swap = self.swap(
             pre_push_hook, 'run_script_and_get_returncode',
             mock_run_script_and_get_returncode)
@@ -698,10 +702,33 @@ class PrePushHookTests(test_utils.GenericTestBase):
             'Push aborted due to failing typescript checks in '
             'strict mode.' in self.print_arr)
 
+    def test_backend_associated_test_file_check_failure(self):
+        def mock_run_script_and_get_returncode(script):
+            if script == pre_push_hook.BACKEND_ASSOCIATED_TEST_FILE_CHECK_CMD:
+                return 1
+            return 0
+        run_script_and_get_returncode_swap = self.swap(
+            pre_push_hook, 'run_script_and_get_returncode',
+            mock_run_script_and_get_returncode)
+
+        with self.get_remote_name_swap, self.get_refs_swap, self.print_swap:
+            with self.collect_files_swap, self.uncommitted_files_swap:
+                with self.check_output_swap, self.start_linter_swap:
+                    with self.ts_swap, run_script_and_get_returncode_swap:
+                        with self.execute_mypy_checks_swap:
+                            with self.assertRaisesRegex(SystemExit, '1'):
+                                with self.swap_check_backend_python_libs:
+                                    pre_push_hook.main(args=[])
+        self.assertTrue(
+            'Push failed due to some backend files lacking an '
+            'associated test file.' in self.print_arr)
+
     def test_frontend_test_failure(self):
         self.does_diff_include_js_or_ts_files = True
-        def mock_run_script_and_get_returncode(unused_script):
-            return 1
+        def mock_run_script_and_get_returncode(script):
+            if script == pre_push_hook.FRONTEND_TEST_CMDS:
+                return 1
+            return 0
         run_script_and_get_returncode_swap = self.swap(
             pre_push_hook, 'run_script_and_get_returncode',
             mock_run_script_and_get_returncode)
@@ -719,8 +746,10 @@ class PrePushHookTests(test_utils.GenericTestBase):
     def test_invalid_ci_e2e_test_suites_failure(self):
         self.does_diff_include_ci_config_or_js_files = True
 
-        def mock_run_script_and_get_returncode(unused_script):
-            return 1
+        def mock_run_script_and_get_returncode(script):
+            if script == pre_push_hook.CI_PROTRACTOR_CHECK_CMDS:
+                return 1
+            return 0
         run_script_and_get_returncode_swap = self.swap(
             pre_push_hook, 'run_script_and_get_returncode',
             mock_run_script_and_get_returncode)
@@ -749,13 +778,19 @@ class PrePushHookTests(test_utils.GenericTestBase):
             pre_push_hook.main(args=['--install'])
 
     def test_main_without_install_arg_and_errors(self):
+        def mock_run_script_and_get_returncode(unused_script):
+            return 0
+        run_script_and_get_returncode_swap = self.swap(
+            pre_push_hook, 'run_script_and_get_returncode',
+            mock_run_script_and_get_returncode)
         with self.get_remote_name_swap, self.get_refs_swap, self.print_swap:
             with self.collect_files_swap, self.uncommitted_files_swap:
                 with self.check_output_swap, self.start_linter_swap:
-                    with self.js_or_ts_swap:
-                        with self.execute_mypy_checks_swap:
-                            with self.swap_check_backend_python_libs:
-                                pre_push_hook.main(args=[])
+                    with run_script_and_get_returncode_swap:
+                        with self.js_or_ts_swap:
+                            with self.execute_mypy_checks_swap:
+                                with self.swap_check_backend_python_libs:
+                                    pre_push_hook.main(args=[])
 
     def test_main_exits_when_mismatches_exist_in_backend_python_libs(self):
         """Test that main exits with correct error message when mismatches are
@@ -771,7 +806,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
             self.assertEqual(error_code, 1)
 
         swap_get_mismatches = self.swap(
-            install_backend_python_libs, 'get_mismatches',
+            install_python_prod_dependencies, 'get_mismatches',
             mock_get_mismatches)
         swap_sys_exit = self.swap(sys, 'exit', mock_exit_error)
         with self.print_swap, swap_sys_exit, swap_get_mismatches:
@@ -808,7 +843,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
             self.assertEqual(error_code, 1)
 
         swap_get_mismatches = self.swap(
-            install_backend_python_libs, 'get_mismatches',
+            install_python_prod_dependencies, 'get_mismatches',
             mock_get_mismatches)
         swap_sys_exit = self.swap(sys, 'exit', mock_exit_error)
         with self.print_swap, swap_sys_exit, swap_get_mismatches:
@@ -835,7 +870,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
         def mock_get_mismatches():
             return {}
         swap_get_mismatches = self.swap(
-            install_backend_python_libs,
+            install_python_prod_dependencies,
             'get_mismatches',
             mock_get_mismatches)
 

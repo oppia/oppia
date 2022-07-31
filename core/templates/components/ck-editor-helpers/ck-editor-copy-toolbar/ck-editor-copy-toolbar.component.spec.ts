@@ -28,8 +28,8 @@ import { CkEditorCopyContentService } from
 describe('CkEditor copy toolbar', () => {
   let component: CkEditorCopyToolbarComponent;
   let fixture: ComponentFixture<CkEditorCopyToolbarComponent>;
-  let ckCopyService;
-  let dummyRichTextEditor;
+  let ckCopyService: CkEditorCopyContentService;
+  let dummyRichTextEditor: HTMLElement;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({

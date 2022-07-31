@@ -197,7 +197,7 @@ def send_email_to_qualified_users(
     if max_recipients:
         recipient_ids = recipient_ids[:max_recipients]
 
-    bulk_email_model_id = email_manager.send_user_query_email(  # type: ignore[no-untyped-call]
+    bulk_email_model_id = email_manager.send_user_query_email(
         user_query.submitter_id, recipient_ids, email_subject,
         email_body, email_intent
     )

@@ -42,6 +42,9 @@ import { PageTitleService } from 'services/page-title.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
+import './topic-viewer-page.component.css';
+
+
 @Component({
   selector: 'topic-viewer-page',
   templateUrl: './topic-viewer-page.component.html',
@@ -153,10 +156,6 @@ export class TopicViewerPageComponent implements OnInit, OnDestroy {
       }
     );
     this.pageTitleService.setDocumentTitle(translatedTitle);
-  }
-
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   checkMobileView(): boolean {

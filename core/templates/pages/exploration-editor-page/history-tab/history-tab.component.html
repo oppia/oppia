@@ -52,7 +52,7 @@
       <div class="display-container">
         <span>Displaying <[$ctrl.startingIndex]>-<[$ctrl.endIndex]> of <[$ctrl.totalExplorationVersionMetadata.length]></span>
       </div>
-      <div ng-repeat="metadata in $ctrl.explorationVersionMetadata track by $index" class="history-list-item protractor-test-history-list-item">
+      <div ng-repeat="metadata in $ctrl.explorationVersionMetadata track by $index" class="history-list-item e2e-test-history-list-item">
         <div class="history-table-index">
           <[metadata.versionNumber]>.
         </div>
@@ -63,15 +63,15 @@
           <strong><profile-link-text [username]="metadata.committerId"></profile-link-text></strong>
         </div>
         <div class="history-table-version" title="<[metadata.tooltipText]>">
-          <em class="protractor-test-history-tab-commit-date"><[metadata.createdOnMsecsStr]></em>
+          <em class="e2e-test-history-tab-commit-date"><[metadata.createdOnMsecsStr]></em>
         </div>
-        <div class="history-table-options protractor-test-history-list-options">
+        <div class="history-table-options e2e-test-history-list-options">
           <div class="dropdown">
             <div type="button" id="<['dropdownMenuButton-' + $index]>" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               <i class="fa fa-ellipsis-v"></i>
             </div>
             <div class="dropdown-menu dropdown-menu-left" aria-labelledby="<['dropdownMenuButton-' + $index]>">
-              <a class="dropdown-item protractor-test-revert-version" href="#" ng-if="metadata.versionNumber !== $ctrl.currentVersion && $ctrl.isEditable()" ng-click="$ctrl.showRevertExplorationModal(metadata.versionNumber)">
+              <a class="dropdown-item e2e-test-revert-version" href="#" ng-if="metadata.versionNumber !== $ctrl.currentVersion && $ctrl.isEditable()" ng-click="$ctrl.showRevertExplorationModal(metadata.versionNumber)">
                 Revert
               </a>
               <a class="dropdown-item" href="#" ng-click="$ctrl.downloadExplorationWithVersion(metadata.versionNumber)"
@@ -115,23 +115,32 @@
       <div class="revision-container">
         <div class="revision-select-container">
           <span>Revision #1</span>
-          <select class="form-control protractor-test-history-version-dropdown-first" ng-model="$ctrl.firstVersion" ng-change="$ctrl.changeSelectedVersions($ctrl.firstVersion, 1)" ng-options="choice as choice.versionNumber for choice in $ctrl.totalExplorationVersionMetadata"></select>
+          <select class="form-control e2e-test-history-version-dropdown-first" ng-model="$ctrl.firstVersion" ng-change="$ctrl.changeSelectedVersions($ctrl.firstVersion, 1)" ng-options="choice as choice.versionNumber for choice in $ctrl.totalExplorationVersionMetadata"></select>
         </div>
         <div class="revision-select-container">
           <span>Revision #2</span>
-          <select class="form-control protractor-test-history-version-dropdown-second" ng-model="$ctrl.secondVersion" ng-change="$ctrl.changeSelectedVersions($ctrl.secondVersion, 2)" ng-options="choice as choice.versionNumber for choice in $ctrl.totalExplorationVersionMetadata"></select>
+          <select class="form-control e2e-test-history-version-dropdown-second" ng-model="$ctrl.secondVersion" ng-change="$ctrl.changeSelectedVersions($ctrl.secondVersion, 2)" ng-options="choice as choice.versionNumber for choice in $ctrl.totalExplorationVersionMetadata"></select>
         </div>
-        <button ng-click="$ctrl.resetGraph()" class="btn btn-outline-secondary oppia-reset-button protractor-test-reset-graph">Reset</button>
+        <button ng-click="$ctrl.resetGraph()" class="btn btn-outline-secondary oppia-reset-button e2e-test-reset-graph">Reset</button>
       </div>
       <div ng-if="$ctrl.diffData && !$ctrl.hideHistoryGraph && $ctrl.explorationVersionMetadata" class="graph-diff-container">
         <h3>
           Changes from version <[$ctrl.compareVersionMetadata.earlierVersion.versionNumber]>
           to version <[$ctrl.compareVersionMetadata.laterVersion.versionNumber]>
         </h3>
-        <version-diff-visualization diff-data="$ctrl.diffData"
-                                    earlier-version-header="$ctrl.earlierVersionHeader"
-                                    later-version-header="$ctrl.laterVersionHeader">
-        </version-diff-visualization>
+        <div class="exploration-metadata-changes-container">
+          Changes in exploration metadata (title, category etc.):
+          <a class="text-primary view-metadata-changes-button e2e-test-view-metadata-history" ng-click="$ctrl.showExplorationMetadataDiffModal()">
+            View metadata changes
+          </a>
+        </div>
+        <div class="state-changes-container">
+          <div>Changes in exploration states:</div>
+          <oppia-version-diff-visualization [diff-data]="$ctrl.diffData"
+                                            [earlier-version-header]="$ctrl.earlierVersionHeader"
+                                            [later-version-header]="$ctrl.laterVersionHeader">
+          </oppia-version-diff-visualization>
+        </div>
       </div>
     </div>
   </md-card>
@@ -279,6 +288,12 @@
   }
   history-tab .oppia-reset-button {
     height: 35px;
+  }
+  history-tab .exploration-metadata-changes-container {
+    margin-bottom: 10px;
+  }
+  history-tab .view-metadata-changes-button {
+    white-space: nowrap;
   }
   @media screen and (max-width: 768px) {
     history-tab .revision-container .revision-select-container {

@@ -3,29 +3,35 @@
     color: rgb(200, 0, 0);
     font-style: italic;
   }
+
   .oppia-nothing-text {
     color: #888;
   }
+
   .oppia-non-empty-feedback-text {
     word-wrap: break-word;
   }
+
   .oppia-prerequisite-skill-text {
     margin-top: 1em;
   }
+
   .oppia-correct-text {
     color: rgb(20, 180, 15);
   }
+
   .oppia-incorrect-text {
     color: rgb(243, 13, 13);
   }
 </style>
+
 <div *ngIf="!feedbackEditorIsOpen && displayFeedback"
      title="{{ isEditable ? 'Edit feedback' : '' }}"
      class="h-100">
-  <div class="oppia-readonly-rule-tile protractor-test-edit-outcome-feedback-button"
+  <div class="oppia-readonly-rule-tile e2e-test-edit-outcome-feedback-button"
        [ngClass]="{'oppia-editable-section': isEditable}">
     <div class="oppia-rule-preview oppia-transition-200">
-      <div class="oppia-click-to-start-editing protractor-test-open-outcome-feedback-editor"
+      <div class="oppia-click-to-start-editing e2e-test-open-outcome-feedback-editor"
            *ngIf="isEditable" (click)="openFeedbackEditor()">
         <i *ngIf="isEditable" class="material-icons oppia-editor-edit-icon float-right"
            title="Edit Feedback">&#xE254;
@@ -45,8 +51,8 @@
           <em>Nothing</em>
         </span>
         <span *ngIf="outcome && outcome.hasNonemptyFeedback()" class="oppia-non-empty-feedback-text">
-          <angular-html-bind-wrapper classStr="oppia-rte-editor" [htmlData]="outcome.feedback.html">
-          </angular-html-bind-wrapper>
+          <oppia-rte-output-display class="oppia-rte-editor" [rteString]="outcome.feedback.html">
+          </oppia-rte-output-display>
         </span>
       </div>
     </div>
@@ -57,7 +63,7 @@
 
 <div *ngIf="isEditable && feedbackEditorIsOpen">
   <form role="form"
-        class="form-inline protractor-test-edit-outcome-feedback"
+        class="form-inline e2e-test-edit-outcome-feedback"
         name="editOutcomeForm.editFeedbackForm">
     <oppia-outcome-feedback-editor [outcome]="outcome">
     </oppia-outcome-feedback-editor>
@@ -75,7 +81,7 @@
         Cancel
       </button>
       <button type="button"
-              class="btn btn-success protractor-test-save-outcome-feedback"
+              class="btn btn-success e2e-test-save-outcome-feedback"
               [disabled]="invalidStateAfterFeedbackSave() || isFeedbackLengthExceeded()"
               (click)="saveThisFeedback(true)">
         Save Feedback
@@ -91,10 +97,10 @@
 <div *ngIf="!destinationEditorIsOpen && !isInQuestionMode()"
      class="h-100"
      title="{{ isEditable ? 'Change the destination card' : '' }}">
-  <div class="oppia-readonly-rule-tile protractor-test-edit-outcome-dest-button"
+  <div class="oppia-readonly-rule-tile e2e-test-edit-outcome-dest-button"
        [ngClass]="{'oppia-editable-section': isEditable}">
     <div class="oppia-rule-preview oppia-transition-200">
-      <div class="oppia-click-to-start-editing protractor-test-open-outcome-dest-editor"
+      <div class="oppia-click-to-start-editing e2e-test-open-outcome-dest-editor"
            *ngIf="isEditable" (click)="openDestinationEditor()">
         <i *ngIf="isEditable" class="material-icons oppia-editor-edit-icon float-right"
            title="Edit Destination">&#xE254;
@@ -125,7 +131,7 @@
 
 <div *ngIf="isEditable && destinationEditorIsOpen && !isInQuestionMode()">
   <form role="form"
-        class="form-inline protractor-test-edit-outcome-dest"
+        class="form-inline e2e-test-edit-outcome-dest"
         name="editOutcomeForm.editDestForm"
         (submit)="saveThisDestination()">
     <oppia-outcome-destination-editor [outcome]="outcome"
@@ -137,12 +143,12 @@
   <div class="oppia-rule-save-cancel-buttons">
     <div class="float-right">
       <button type="button"
-              class="btn btn-secondary mr-2 protractor-test-cancel-outcome-dest"
+              class="btn btn-secondary mr-2 e2e-test-cancel-outcome-dest"
               (click)="cancelThisDestinationEdit()">
         Cancel
       </button>
       <button type="button"
-              class="btn btn-success protractor-test-save-outcome-dest"
+              class="btn btn-success e2e-test-save-outcome-dest"
               [disabled]="invalidStateAfterDestinationSave()"
               (click)="saveThisDestination()">
         Save Destination
@@ -169,10 +175,10 @@
         </div>
 
         <strong>The answers falling under this group are
-          <span *ngIf="outcome && outcome.labelledAsCorrect" class="oppia-correct-text">
+          <span *ngIf="outcome && outcome?.labelledAsCorrect" class="oppia-correct-text">
             correct
           </span>
-          <span *ngIf="outcome && !outcome.labelledAsCorrect" class="oppia-incorrect-text">
+          <span *ngIf="outcome && !outcome?.labelledAsCorrect" class="oppia-incorrect-text">
             incorrect
           </span>
         </strong>
@@ -182,6 +188,8 @@
 
   <div *ngIf="isEditable">
     <strong>The answers in this group are correct</strong>
-    <input class="ml-2 protractor-test-editor-correctness-toggle" type="checkbox" [(ngModel)]="outcome.labelledAsCorrect" (change)="onChangeCorrectnessLabel()">
+    <div *ngIf="outcome">
+      <input class="ml-2 e2e-test-editor-correctness-toggle" type="checkbox" [(ngModel)]="outcome.labelledAsCorrect" (change)="onChangeCorrectnessLabel()">
+    </div>
   </div>
 </div>

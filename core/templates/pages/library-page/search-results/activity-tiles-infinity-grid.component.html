@@ -14,7 +14,7 @@
                                    [getThumbnailBgColor]="activity.thumbnail_bg_color"
                                    [showLearnerDashboardIconsIfPossible]="true"
                                    [isContainerNarrow]="libraryWindowIsNarrow"
-                                   class="protractor-test-collection-summary-tile">
+                                   class="e2e-test-collection-summary-tile">
     </oppia-collection-summary-tile>
     <oppia-exploration-summary-tile *ngIf="activity.activity_type === 'exploration'"
                                     [explorationId]="activity.id"
@@ -30,7 +30,7 @@
                                     [isCommunityOwned]="activity.community_owned"
                                     [showLearnerDashboardIconsIfPossible]="true"
                                     [isContainerNarrow]="libraryWindowIsNarrow"
-                                    class="protractor-test-exp-summary-tile">
+                                    class="e2e-test-exp-summary-tile">
     </oppia-exploration-summary-tile>
   </div>
 </div>

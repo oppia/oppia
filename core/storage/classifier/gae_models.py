@@ -26,6 +26,8 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
+    # Here, we are importing 'classifier_domain' only for type checking.
+    from core.domain import classifier_domain  # pylint: disable=invalid-import # isort:skip
     from mypy_imports import base_models
     from mypy_imports import datastore_services
 
@@ -412,7 +414,9 @@ class StateTrainingJobsMappingModel(base_models.BaseModel):
     @classmethod
     def create_multi(
             cls,
-            state_training_jobs_mappings: List[StateTrainingJobsMappingModel]
+            state_training_jobs_mappings: List[
+                classifier_domain.StateTrainingJobsMapping
+            ]
     ) -> List[str]:
         """Creates multiple new StateTrainingJobsMappingModel entries.
 

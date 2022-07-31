@@ -109,11 +109,10 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
         }
         observed_training_job = self._get_training_job_from_dict(
             expected_training_job_dict)
-        # The 'assertDictEqual' expects 'Dict[Any, Any]' but we
-        # provide 'TypedDict' and thus we add an ignore.
         self.assertDictEqual(
-            expected_training_job_dict, # type: ignore[arg-type]
-            observed_training_job.to_dict()) # type: ignore[arg-type]
+            expected_training_job_dict,
+            observed_training_job.to_dict()
+        )
 
     def test_validation_status(self) -> None:
         self.training_job_dict['status'] = 'invalid_status'
@@ -287,11 +286,10 @@ class StateTrainingJobsMappingDomainTests(test_utils.GenericTestBase):
         }
         observed_mapping = self._get_mapping_from_dict(
             expected_mapping_dict)
-        # The 'assertDictEqual' expects 'Dict[Any, Any]' but we
-        # provide 'TypedDict' and thus we add an ignore.
         self.assertDictEqual(
-            expected_mapping_dict, # type: ignore[arg-type]
-            observed_mapping.to_dict()) # type: ignore[arg-type]
+            expected_mapping_dict,
+            observed_mapping.to_dict()
+        )
 
     def test_validation_for_mapping_with_correct_data(self) -> None:
         mapping = self._get_mapping_from_dict(self.mapping_dict)
@@ -331,9 +329,9 @@ class OppiaMLAuthInfoDomainTests(unittest.TestCase):
         super(OppiaMLAuthInfoDomainTests, self).setUp()
 
         self.oppia_ml_auth_info = classifier_domain.OppiaMLAuthInfo(
-            'hello', 'world', '!')
+            'hello'.encode('utf-8'), 'world', '!')
 
     def test_attributes(self) -> None:
-        self.assertEqual('hello', self.oppia_ml_auth_info.message)
+        self.assertEqual(b'hello', self.oppia_ml_auth_info.message)
         self.assertEqual('world', self.oppia_ml_auth_info.vm_id)
         self.assertEqual('!', self.oppia_ml_auth_info.signature)

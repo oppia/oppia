@@ -18,7 +18,7 @@
 
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import { TestBed, fakeAsync, flushMicrotasks, tick } from '@angular/core/testing';
 
 import { ContributionOpportunitiesBackendApiService } from
   // eslint-disable-next-line max-len
@@ -27,6 +27,8 @@ import { SkillOpportunity } from
   'domain/opportunity/skill-opportunity.model';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+import { UserInfo } from 'domain/user/user-info.model';
+import { UserService } from 'services/user.service';
 import { FeaturedTranslationLanguage } from 'domain/opportunity/featured-translation-language.model';
 import { ExplorationOpportunitySummary } from 'domain/opportunity/exploration-opportunity-summary.model';
 
@@ -35,6 +37,7 @@ describe('Contribution Opportunities backend API service', function() {
     ContributionOpportunitiesBackendApiService;
   let httpTestingController: HttpTestingController;
   let urlInterpolationService: UrlInterpolationService;
+  let userService: UserService;
   const skillOpportunityResponse = {
     opportunities: [{
       id: 'skill_id',
@@ -63,6 +66,33 @@ describe('Contribution Opportunities backend API service', function() {
     next_cursor: '6',
     more: true
   };
+  const userInfoDict = [
+    {
+      roles: ['USER_ROLE'],
+      is_moderator: false,
+      is_curriculum_admin: false,
+      is_super_admin: false,
+      is_topic_manager: false,
+      can_create_collections: false,
+      preferred_site_language_code: 'en',
+      username: 'user',
+      email: 'user@example.com',
+      user_is_logged_in: true
+    },
+    {
+      roles: ['USER_ROLE'],
+      is_moderator: false,
+      is_curriculum_admin: false,
+      is_super_admin: false,
+      is_topic_manager: false,
+      can_create_collections: false,
+      preferred_site_language_code: '',
+      username: 'guest',
+      email: '',
+      user_is_logged_in: false
+    }
+  ];
+  let userInfo: UserInfo[];
   let sampleSkillOpportunitiesResponse: SkillOpportunity[];
   let sampleTranslationOpportunitiesResponse: ExplorationOpportunitySummary[];
   let sampleVoiceoverOpportunitiesResponse: ExplorationOpportunitySummary[];
@@ -75,6 +105,11 @@ describe('Contribution Opportunities backend API service', function() {
       TestBed.get(ContributionOpportunitiesBackendApiService);
     httpTestingController = TestBed.get(HttpTestingController);
     urlInterpolationService = TestBed.get(UrlInterpolationService);
+    userService = TestBed.get(UserService);
+    userInfo = [
+      UserInfo.createFromBackendDict(userInfoDict[0]),
+      UserInfo.createFromBackendDict(userInfoDict[1])
+    ];
     sampleSkillOpportunitiesResponse = [
       SkillOpportunity.createFromBackendDict(
         skillOpportunityResponse.opportunities[0])
@@ -399,12 +434,12 @@ describe('Contribution Opportunities backend API service', function() {
     flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalledWith(
-      ['All', 'Topic 1', 'Topic 2']
+      ['Topic 1', 'Topic 2']
     );
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
-  it('should return empty response if \'gettranslatabletopicnames call fails',
+  it('should return empty response if \'gettranslatabletopicnames\' call fails',
     fakeAsync(() => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
@@ -429,4 +464,141 @@ describe('Contribution Opportunities backend API service', function() {
       expect(successHandler).toHaveBeenCalledWith(emptyResponse);
       expect(failHandler).not.toHaveBeenCalled();
     }));
+
+  it('should successfully save the preferred translation language.',
+    fakeAsync(() => {
+      const successHandler = jasmine.createSpy('success');
+      const failHandler = jasmine.createSpy('fail');
+      const params = 'en';
+
+      spyOn(userService, 'getUserInfoAsync').and.returnValue(
+        Promise.resolve(userInfo[0]));
+
+      contributionOpportunitiesBackendApiService
+        .savePreferredTranslationLanguageAsync(params)
+        .then(successHandler, failHandler);
+      tick();
+
+      const req = httpTestingController.expectOne(
+        '/preferredtranslationlanguage'
+      );
+      expect(req.request.method).toEqual('POST');
+      req.flush({});
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalledWith({});
+      expect(failHandler).not.toHaveBeenCalled();
+    }));
+
+  it('should fail to save the preferred translation language ' +
+    'given invalid language code when calling ' +
+    '\'savePreferredTranslationLanguageAsync\'', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+    const params = 'en';
+
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve(userInfo[0]));
+
+    contributionOpportunitiesBackendApiService
+      .savePreferredTranslationLanguageAsync(params)
+      .then(successHandler, failHandler);
+    tick();
+
+    const req = httpTestingController.expectOne(
+      urlInterpolationService.interpolateUrl(
+        '/preferredtranslationlanguage',
+        { language_code: 'invalidCode' }
+      )
+    );
+
+    expect(req.request.method).toEqual('POST');
+    req.flush({
+      error: 'Failed to save the preferred translation language.'
+    }, {
+      status: 500, statusText: 'Internal Server Error'
+    });
+
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      new Error('Failed to save the preferred translation language.'));
+  }));
+
+  it('should successfully fetch the preferred translation language',
+    fakeAsync(() => {
+      const successHandler = jasmine.createSpy('success');
+      const failHandler = jasmine.createSpy('fail');
+
+      spyOn(userService, 'getUserInfoAsync').and.returnValue(
+        Promise.resolve(userInfo[0]));
+
+      contributionOpportunitiesBackendApiService
+        .getPreferredTranslationLanguageAsync()
+        .then(successHandler, failHandler);
+      tick();
+
+      const req = httpTestingController.expectOne(
+        '/preferredtranslationlanguage'
+      );
+      expect(req.request.method).toEqual('GET');
+      req.flush({ preferred_translation_language_code: 'en' });
+
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalledWith('en');
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
+
+  it('should return null if \'preferredtranslationlanguage\' ' +
+    'call fails', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve(userInfo[0]));
+
+    contributionOpportunitiesBackendApiService
+      .getPreferredTranslationLanguageAsync()
+      .then(successHandler, failHandler);
+    tick();
+
+    const req = httpTestingController.expectOne(
+      '/preferredtranslationlanguage'
+    );
+
+    expect(req.request.method).toEqual('GET');
+    req.flush({
+      error: '500 Internal Server Error'
+    }, {
+      status: 500, statusText: 'Internal Server Error'
+    });
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(null);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should return null when calling ' +
+    '\'getPreferredTranslationLanguageAsync\' with guest ' +
+    'user.', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve(userInfo[1]));
+
+    contributionOpportunitiesBackendApiService
+      .getPreferredTranslationLanguageAsync()
+      .then(successHandler, failHandler);
+    tick();
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(null);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
 });
