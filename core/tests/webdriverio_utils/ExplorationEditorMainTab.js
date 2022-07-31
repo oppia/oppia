@@ -43,6 +43,7 @@ var ExplorationEditorMainTab = function() {
   var editOutcomeDestAddExplorationId = $(
     '.e2e-test-add-refresher-exploration-id');
   var editOutcomeDestBubble = $('.e2e-test-dest-bubble');
+  var editOutcomeDestForm = $('.e2e-test-dest-form');
   var editOutcomeDestDropdownOptions = $(
     '.e2e-test-destination-selector-dropdown');
   var editorWelcomeModal = $('.e2e-test-welcome-modal');
@@ -69,7 +70,7 @@ var ExplorationEditorMainTab = function() {
   };
   var multipleChoiceAnswerOptions = function(optionNum) {
     return $$(
-      `.e2e-test-html-select-selector=${optionNum}`)[0];
+      `.e2e-test-html-select-selector=${optionNum}`);
   };
   var nodeLabelLocator = '.e2e-test-node-label';
   var openOutcomeDestEditor = $('.e2e-test-open-outcome-dest-editor');
@@ -78,6 +79,7 @@ var ExplorationEditorMainTab = function() {
   var responseBody = function(responseNum) {
     return $(`.e2e-test-response-body-${responseNum}`);
   };
+  var responseTabElement = $('.e2e-test-response-tab');
   var ruleDetails = $('.e2e-test-rule-details');
   var stateContentDisplay = $('.e2e-test-state-content-display');
   var stateEditButton = $('.e2e-test-edit-content-pencil-button');
@@ -271,7 +273,6 @@ var ExplorationEditorMainTab = function() {
       if (responseNum === 'default') {
         headerElem = defaultResponseTab;
       } else {
-        var responseTabElement = $('.e2e-test-response-tab');
         await waitFor.visibilityOf(
           responseTabElement, 'Response tab is not visible');
         var responseTab = await $$('.e2e-test-response-tab');
@@ -438,8 +439,16 @@ var ExplorationEditorMainTab = function() {
 
     await editOutcomeDestDropdownOptions.selectByVisibleText(targetOption);
 
+    // 'End' is one of the key names present in Webdriver protocol,
+    // and so if we try to pass 'End' in setValue, webdriverio will
+    // press the 'End' key present in keyboard instead of typing 'End'
+    // as a string. Hence, to type 'End' as a string, we need to pass it
+    // as an array of string.
+    if (destName === 'End') {
+      destName = ['E', 'n', 'd'];
+    }
     if (createNewDest) {
-      var editOutcomeDestStateInput = editOutcomeDestBubble.$(
+      var editOutcomeDestStateInput = editOutcomeDestForm.$(
         '.e2e-test-add-state-input');
       await action.setValue(
         'Edit Outcome State Input', editOutcomeDestStateInput, destName);
@@ -731,7 +740,7 @@ var ExplorationEditorMainTab = function() {
           'Parameter Element Button', parameterElementButton);
 
         var multipleChoiceAnswerOption =
-          await multipleChoiceAnswerOptions(parameterValues[i]);
+          await multipleChoiceAnswerOptions(parameterValues[i])[0];
 
         await action.click(
           'Multiple Choice Answer Option: ' + i,

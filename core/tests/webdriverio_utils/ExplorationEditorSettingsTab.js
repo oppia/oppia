@@ -29,17 +29,26 @@ var ExplorationEditorSettingsTab = function() {
   var explorationCategoryInput = $('.e2e-test-exploration-category-input');
   var explorationLanguageInput = $('.e2e-test-exploration-language-select');
   var explorationObjectiveInput = $('.e2e-test-exploration-objective-input');
+  var explorationObjectiveWarning = $(
+    '.e2e-test-exploration-objective-warning');
+  var explorationSummaryTile = $('.e2e-test-exploration-summary-tile');
   var explorationTitleInput = $('.e2e-test-exploration-title-input');
+  var initialStateSelect = $('.e2e-test-initial-state-select');
+  var initialStateSelectOption = function(stateName) {
+    return initialStateSelect.$(`option=${stateName}`);
+  };
   var neutralElement = $('.e2e-test-settings-container');
 
   /*
    * Buttons
    */
+  var closePreviewSummaryButton = $('.e2e-test-close-preview-summary-modal');
   var confirmDeleteExplorationButton = $(
     '.e2e-test-really-delete-exploration-button');
   var deleteExplorationButton = $('.e2e-test-delete-exploration-button');
   var disableCorrectnessFeedbackButton = $(
     '.e2e-test-enable-mark-correctness-feedback');
+  var openPreviewSummaryButton = $('.e2e-test-open-preview-summary-modal');
 
   /*
    * Workflows
@@ -64,12 +73,49 @@ var ExplorationEditorSettingsTab = function() {
       'Disable Correctness Feedback Button', disableCorrectnessFeedbackButton);
   };
 
+  this.expectAvailableFirstStatesToBe = async function(names) {
+    await waitFor.presenceOf(
+      initialStateSelect, 'Initial state select takes too long to be visible.');
+    var options = await initialStateSelect.$$('<option>')
+      .map(async function(elem) {
+        await waitFor.visibilityOf(
+          elem,
+          'option element taking too long to appear');
+        return await elem.getText();
+      });
+    expect(options.sort()).toEqual(names.sort());
+  };
+
+  this.openAndClosePreviewSummaryTile = async function() {
+    await action.waitForAutosave();
+    await action.click('Open preview summary', openPreviewSummaryButton);
+    await waitFor.visibilityOf(
+      explorationSummaryTile, 'Summary Tile takes too long to appear');
+    expect(await explorationSummaryTile.isExisting()).toBeTruthy();
+    await action.click(
+      'Close Preview Summary Button',
+      closePreviewSummaryButton);
+    await waitFor.invisibilityOf(
+      explorationSummaryTile, 'Summary Tile takes too long to disappear');
+    await action.click('Neutral element', neutralElement);
+  };
+
   this.setCategory = async function(category) {
     await waitFor.presenceOf(
       explorationCategoryInput, 'Category input takes too long to be visible.');
     await (
       await forms.AutocompleteDropdownEditor(explorationCategoryInput)
     ).setValue(category);
+  };
+
+  this.setFirstState = async function(stateName) {
+    await action.click('Neutral element', neutralElement);
+    await action.waitForAutosave();
+    await waitFor.presenceOf(
+      initialStateSelect, 'Initial state select takes too long to be visible.');
+    await action.click(
+      'State name option', initialStateSelectOption(stateName));
+    await action.click('Neutral element', neutralElement);
   };
 
   this.setLanguage = async function(language) {
@@ -91,6 +137,51 @@ var ExplorationEditorSettingsTab = function() {
     await action.clear('Exploration Title Input', explorationTitleInput);
     await action.setValue(
       'Exploration Title Input', explorationTitleInput, title);
+  };
+
+  this.expectCategoryToBe = async function(category) {
+    await waitFor.presenceOf(
+      explorationCategoryInput,
+      'Exploration category input takes too long to be visible.');
+    expect(await explorationCategoryInput.$('option:checked').getText()).
+      toEqual(category);
+  };
+
+  this.expectFirstStateToBe = async function(firstState) {
+    await waitFor.presenceOf(
+      initialStateSelect, 'Initial state select takes too long to be visible.');
+    expect(await initialStateSelect.$('option:checked').getText()).
+      toEqual(firstState);
+  };
+
+  this.expectLanguageToBe = async function(language) {
+    await waitFor.presenceOf(
+      explorationLanguageInput, 'Language input takes too long to be visible.');
+    expect(await explorationLanguageInput.$('option:checked').getText()).
+      toEqual(language);
+  };
+
+  this.expectObjectiveToBe = async function(objective) {
+    await waitFor.presenceOf(
+      explorationObjectiveInput,
+      'Objective input takes too long to be visible.');
+    expect(await explorationObjectiveInput.getAttribute('value')).
+      toEqual(objective);
+  };
+
+  this.expectTitleToBe = async function(title) {
+    await waitFor.presenceOf(
+      explorationTitleInput, 'Title input takes too long to be visible.');
+    expect(await explorationTitleInput.getAttribute('value')).
+      toEqual(title);
+  };
+
+  this.expectWarningsColorToBe = async function(color) {
+    await waitFor.presenceOf(
+      explorationObjectiveWarning,
+      'Objective warning takes too long to be visible.');
+    expect(await explorationObjectiveWarning.getCSSProperty('color')).
+      toEqual(color);
   };
 };
 

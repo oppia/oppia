@@ -62,9 +62,11 @@ var getAttribute = async function(elementName, element, attribute) {
 };
 
 var select = async function(selectorName, selectorElement, optionToSelect) {
-  await click(selectorName, selectorElement);
-  var optionElement = await selectorElement.$(`option=${optionToSelect}`);
-  await click(`${optionToSelect} in ${selectorName}`, optionElement);
+  await waitFor.visibilityOf(
+    selectorElement,
+    `${selectorName} is not visible to select ${optionToSelect}`
+  );
+  await selectorElement.selectByVisibleText(optionToSelect);
 };
 
 var matSelect = async function(selectorName, selectorElement, optionToSelect) {
