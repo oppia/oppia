@@ -24,9 +24,8 @@
              *ngIf="userIsLoggedIn">
           Contributions
         </div>
-        <div class="oppia-contributions-dropdown-list-option"
-             *ngIf="tab?.enabled">
-          <div *ngFor="let tab of contributionTabs"
+        <div class="oppia-contributions-dropdown-list-option" *ngFor="let tab of contributionTabs">
+          <div *ngIf="tab?.enabled"
                (click)="switchToTab(TAB_TYPE_CONTRIBUTIONS, tab.suggestionType)"
                [ngClass]="isActiveTab(TAB_TYPE_CONTRIBUTIONS, tab.suggestionType) ? 'oppia-contributions-dropdown-list-option-selected' : ''">
             {{ tab.text }}
@@ -67,7 +66,8 @@
       <oppia-opportunities-list *ngIf="activeExplorationId === null && isReviewTranslationsTab()"
                                 [loadOpportunities]="loadReviewableTranslationOpportunities.bind(this)"
                                 (clickActionButton)="onClickReviewableTranslations($event)"
-                                [labelRequired]="!activeReviewTab">
+                                [labelRequired]="!activeReviewTab"
+                                [showOpportunityButton]="false">
       </oppia-opportunities-list>
       <div *ngIf="activeExplorationId !== null || !isReviewTranslationsTab()">
         <div *ngIf="isReviewTranslationsTab()" class="oppia-contributions-back-to-lessons-container">
@@ -82,7 +82,8 @@
                                   [loadMoreOpportunities]="loadMoreOpportunities.bind(this)"
                                   (clickActionButton)="onClickViewSuggestion($event)"
                                   [labelRequired]="!activeReviewTab"
-                                  [opportunityHeadingTruncationLength]="30">
+                                  [opportunityHeadingTruncationLength]="30"
+                                  [showOpportunityButton]="false">
         </oppia-opportunities-list>
       </div>
     </div>
@@ -306,6 +307,7 @@
       display: none;
     }
     .oppia-contributions-show-review-container {
+      background-color: transparent;
       width: 95%;
     }
   }
@@ -328,7 +330,7 @@
     .oppia-contributions-dropdown-section {
       margin-bottom: 20px;
       padding: auto 2vw;
-      width: 90%;
+      width: 100%;
     }
   }
 </style>

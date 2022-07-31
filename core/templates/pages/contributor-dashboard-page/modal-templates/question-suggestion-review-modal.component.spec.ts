@@ -27,7 +27,6 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { SuggestionModalService } from 'services/suggestion-modal.service';
 import { QuestionSuggestionReviewModalComponent } from './question-suggestion-review-modal.component';
 import { ThreadDataBackendApiService, ThreadMessages } from 'pages/exploration-editor-page/feedback-tab/services/thread-data-backend-api.service';
-import { SuggestionBackendDict } from 'domain/suggestion/suggestion.model';
 import { ContextService } from 'services/context.service';
 
 class MockActiveModal {
@@ -242,11 +241,30 @@ describe('Question Suggestion Review Modal component', () => {
       } as FetchSkillResponse));
 
     component.suggestion = {
+      author_name: null,
+      exploration_content_html: null,
+      language_code: null,
+      last_updated_msecs: null,
+      suggestion_id: '1',
+      suggestion_type: null,
+      target_id: null,
+      target_type: null,
       status: 'accepted',
       change: {
+        skill_difficulty: 1,
+        old_value: null,
+        new_value: null,
+        question_dict: null,
+        cmd: null,
+        content_html: null,
+        content_id: null,
+        data_format: null,
+        language_code: null,
+        state_name: null,
+        translation_html: null,
         skill_id: 'skill_1'
       }
-    } as SuggestionBackendDict;
+    };
 
     component.skillRubrics = [{
       explanations: ['explanation'],
@@ -430,10 +448,77 @@ describe('Question Suggestion Review Modal component', () => {
         messages: messages
       } as ThreadMessages));
 
-    component.init();
+    component.refreshContributionState();
     tick();
 
     expect(fetchMessagesAsyncSpy).toHaveBeenCalledWith('123');
     expect(component.reviewMessage).toBe('This is a rejection.');
   }));
+
+  it('should allow users to navigate between suggestions', function() {
+    spyOn(this, 'refreshActiveContributionState').and.callThrough();
+
+    expect(this.currentSuggestionId).toEqual('1');
+    expect(this.skippedContributionIds.length).toEqual(0);
+    expect(this.remainingContributionIdStack.length).toEqual(1);
+    expect(this.isLastItem).toBeFalse();
+    expect(this.isFirstItem).toBeTrue();
+
+    this.goToNextItem();
+    this.$apply();
+
+    expect(this.refreshActiveContributionState).toHaveBeenCalled();
+    expect(this.currentSuggestionId).toEqual('2');
+    expect(this.skippedContributionIds.length).toEqual(1);
+    expect(this.remainingContributionIdStack.length).toEqual(0);
+    expect(this.isLastItem).toBeTrue();
+    expect(this.isFirstItem).toBeFalse();
+
+    this.goToNextItem();
+    this.$apply();
+
+    expect(this.currentSuggestionId).toEqual('2');
+    expect(this.skippedContributionIds.length).toEqual(1);
+    expect(this.remainingContributionIdStack.length).toEqual(0);
+    expect(this.isLastItem).toBeTrue();
+    expect(this.isFirstItem).toBeFalse();
+
+    this.goToPreviousItem();
+    this.$apply();
+
+    expect(this.refreshActiveContributionState).toHaveBeenCalled();
+    expect(this.currentSuggestionId).toEqual('1');
+    expect(this.skippedContributionIds.length).toEqual(0);
+    expect(this.remainingContributionIdStack.length).toEqual(1);
+    expect(this.isLastItem).toBeFalse();
+    expect(this.isFirstItem).toBeTrue();
+
+    this.goToPreviousItem();
+    this.$apply();
+
+    expect(this.currentSuggestionId).toEqual('1');
+    expect(this.skippedContributionIds.length).toEqual(0);
+    expect(this.remainingContributionIdStack.length).toEqual(1);
+    expect(this.isLastItem).toBeFalse();
+    expect(this.isFirstItem).toBeTrue();
+  });
+
+  it('should not navigate if the corresponding opportunity is deleted',
+    function() {
+      let details1 = this.allContributions['1'].details;
+      let details2 = this.allContributions['2'].details;
+      this.allContributions['2'].details = null;
+
+      this.goToNextItem();
+      expect(cancelSuggestionSpy).toHaveBeenCalled();
+      this.allContributions['2'].details = details2;
+      this.goToNextItem();
+      this.allContributions['1'].details = null;
+
+      this.goToPreviousItem();
+      expect(cancelSuggestionSpy).toHaveBeenCalledWith();
+
+      this.allContributions['1'].details = details1;
+      this.allContributions['2'].details = details2;
+    });
 });

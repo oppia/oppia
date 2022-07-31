@@ -16,12 +16,12 @@
  * @fileoverview Component for question suggestion review modal.
  */
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
 import { MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
-import { Question } from 'domain/question/QuestionObjectFactory';
+import { Question, QuestionBackendDict, QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
 import { State } from 'domain/state/StateObjectFactory';
 import { SuggestionBackendDict } from 'domain/suggestion/suggestion.model';
@@ -47,21 +47,59 @@ interface SkillRubrics {
   explanations: string[] | string;
 }
 
+interface ActiveContributionDetailsDict {
+  skill_description: string;
+  skill_rubrics: SkillRubrics[];
+  'chapter_title': string;
+  'story_title': string;
+  'topic_name': string;
+}
+
+interface SuggestionChangeValue {
+  html: string;
+}
+
+interface SuggestionChangeDict {
+  'skill_difficulty': number;
+  'question_dict': QuestionBackendDict;
+  'new_value': SuggestionChangeValue;
+  'old_value': SuggestionChangeValue;
+  'skill_id'?: string;
+  'cmd': string;
+  'content_html': string | string[];
+  'content_id': string;
+  'data_format': string;
+  'language_code': string;
+  'state_name': string;
+  'translation_html': string;
+}
+
+interface ActiveSuggestionDict {
+  'author_name': string;
+  'change': SuggestionChangeDict;
+  'exploration_content_html': string | string[];
+  'language_code': string;
+  'last_updated_msecs': number;
+  'status': string;
+  'suggestion_id': string;
+  'suggestion_type': string;
+  'target_id': string;
+  'target_type': string;
+}
+
+interface ActiveContributionDict {
+  'details': ActiveContributionDetailsDict | null;
+  'suggestion': ActiveSuggestionDict;
+}
+
 @Component({
   selector: 'oppia-question-suggestion-review-modal',
   templateUrl: './question-suggestion-review.component.html'
 })
 export class QuestionSuggestionReviewModalComponent
   extends ConfirmOrCancelModal implements OnInit {
-  @Input() authorName: string;
-  @Input() contentHtml: string;
   @Input() reviewable: boolean;
-  @Input() question: Question;
-  @Input() questionHeader: string;
-  @Input() suggestion: SuggestionBackendDict;
-  @Input() skillRubrics: SkillRubrics[];
   @Input() suggestionId: string;
-  @Input() skillDifficulty: number;
   @Input() misconceptionsBySkill: MisconceptionSkillMap;
 
   @Output() editSuggestionEmitter = (
@@ -75,6 +113,22 @@ export class QuestionSuggestionReviewModalComponent
   skillRubricExplanations: string | string[];
   suggestionIsRejected: boolean;
   validationError: unknown;
+  allContributions!: Record<string, ActiveContributionDict>;
+  suggestion!: ActiveSuggestionDict;
+  question!: Question;
+  skillDifficulty!: number;
+  currentSuggestionId!: string;
+  isFirstItem: boolean = true;
+  isLastItem: boolean = true;
+  remainingContributionIdStack!: string[];
+  skippedContributionIds!: string[];
+  showQuestion: boolean = true;
+  skillRubrics!: SkillRubrics[];
+  currentSuggestion: ActiveContributionDict;
+  suggestionIdToContribution!: Record<string, ActiveContributionDict>;
+  contentHtml!: string;
+  questionHeader!: string;
+  authorName!: string;
 
   constructor(
     private contextService: ContextService,
@@ -85,6 +139,8 @@ export class QuestionSuggestionReviewModalComponent
     private skillBackendApiService: SkillBackendApiService,
     private suggestionModalService: SuggestionModalService,
     private threadDataBackendApiService: ThreadDataBackendApiService,
+    private changeDetectorRef: ChangeDetectorRef,
+    private questionObjectFactory: QuestionObjectFactory
   ) {
     super(ngbActiveModal);
   }
@@ -157,13 +213,52 @@ export class QuestionSuggestionReviewModalComponent
       });
   }
 
-  init(): void {
-    if (this.reviewable) {
-      this.siteAnalyticsService
-        .registerContributorDashboardViewSuggestionForReview('Question');
-    } else if (this.suggestionIsRejected) {
-      this._getThreadMessagesAsync(this.suggestionId);
+  refreshActiveContributionState(): void {
+    const nextContribution = this.allContributions[
+      this.currentSuggestionId];
+    this.suggestion = nextContribution.suggestion;
+
+    this.isLastItem = this.remainingContributionIdStack.length === 0;
+    this.isFirstItem = this.skippedContributionIds.length === 0;
+
+    if (!nextContribution.details) {
+      this.cancel();
+      return;
     }
+
+    this.skillBackendApiService.fetchSkillAsync(
+      this.suggestion.change.skill_id
+    ).then((skillDict) => {
+      let misconceptionsBySkill = {};
+      const skill = skillDict.skill;
+      misconceptionsBySkill[skill.getId()] = skill.getMisconceptions();
+      this.misconceptionsBySkill = misconceptionsBySkill;
+      this.refreshContributionState();
+    });
+  }
+
+  goToNextItem(): void {
+    if (this.isLastItem) {
+      return;
+    }
+    this.showQuestion = false;
+    this.skippedContributionIds.push(this.currentSuggestionId);
+
+    this.currentSuggestionId = this.remainingContributionIdStack.pop();
+
+    this.refreshActiveContributionState();
+  }
+
+  goToPreviousItem(): void {
+    if (this.isFirstItem) {
+      return;
+    }
+    this.showQuestion = false;
+    this.remainingContributionIdStack.push(this.currentSuggestionId);
+
+    this.currentSuggestionId = this.skippedContributionIds.pop();
+
+    this.refreshActiveContributionState();
   }
 
   invertMap(originalMap: unknown): unknown {
@@ -205,18 +300,54 @@ export class QuestionSuggestionReviewModalComponent
     this.validationError = null;
   }
 
-  ngOnInit(): void {
-    this.reviewMessage = '';
-
+  refreshContributionState(): void {
+    this.suggestion = (
+      this.allContributions[this.currentSuggestionId].suggestion);
+    this.question = this.questionObjectFactory.createFromBackendDict(
+      this.suggestion.change.question_dict);
+    this.authorName = this.suggestion.author_name;
+    this.contentHtml = this.question.getStateData().content.html;
+    this.questionHeader = (
+      this.allContributions[
+        this.currentSuggestionId].details.skill_description);
+    this.skillRubrics = (
+      this.allContributions[
+        this.currentSuggestionId].details.skill_rubrics);
     this.questionStateData = this.question.getStateData();
     this.questionId = this.question.getId();
     this.canEditQuestion = false;
+    this.skillDifficulty = this.suggestion.change.skill_difficulty;
     this.skillDifficultyLabel = this.getSkillDifficultyLabel();
     this.skillRubricExplanations = this.getRubricExplanation(
       this.skillDifficultyLabel);
     this.reviewMessage = '';
     this.suggestionIsRejected = this.suggestion.status === 'rejected';
-    this.init();
+    if (this.reviewable) {
+      this.siteAnalyticsService
+        .registerContributorDashboardViewSuggestionForReview('Question');
+    } else if (this.suggestionIsRejected) {
+      this._getThreadMessagesAsync(this.currentSuggestionId);
+    }
+    this.showQuestion = true;
+    this.changeDetectorRef.detectChanges();
+  }
+
+  ngOnInit(): void {
+    this.currentSuggestionId = this.suggestionId;
+
+    this.currentSuggestion = this.suggestionIdToContribution[this.suggestionId];
+    delete this.suggestionIdToContribution[this.suggestionId];
+    this.remainingContributionIdStack = Object.keys(
+      this.suggestionIdToContribution
+    ).reverse();
+    this.skippedContributionIds = [];
+    this.allContributions = this.suggestionIdToContribution;
+    this.allContributions[this.suggestionId] = this.currentSuggestion;
+
+    this.isLastItem = this.remainingContributionIdStack.length === 0;
+    this.isFirstItem = this.skippedContributionIds.length === 0;
+
+    this.refreshContributionState();
   }
 }
 
