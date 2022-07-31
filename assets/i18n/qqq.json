@@ -321,7 +321,6 @@
 	"I18N_EXPLORATION_SR1IKIdLxnm1_DESCRIPTION": "Description of the chapters displayed on story viewer page. Should be at most 100 characters.",
 	"I18N_EXPLORATION_SR1IKIdLxnm1_TITLE": "Title of the chapters displayed on topic viewer and story viewer page. Should be at most 36 characters.",
 	"I18N_EXPLORATION_STARTING_FROM_BEGINNING": "Alert message displayed to the user when they complete an exploration informing them that they would be starting from the begining the next time they come back.",
-	"I18N_EXPLORATION_STARTING_FROM_CHECKPOINT": "Alert message displayed to the user when they start playing an exploration from a checkpoint.",
 	"I18N_EXPLORATION_STATE_PREVIOUSLY_COMPLETED": "Message displayed to the user if the exploration state has been already completed by them in a previous session",
 	"I18N_EXPLORATION_VKXd8qHsxLml_DESCRIPTION": "Description of the chapters displayed on story viewer page. Should be at most 100 characters.",
 	"I18N_EXPLORATION_VKXd8qHsxLml_TITLE": "Title of the chapters displayed on topic viewer and story viewer page. Should be at most 36 characters.",
