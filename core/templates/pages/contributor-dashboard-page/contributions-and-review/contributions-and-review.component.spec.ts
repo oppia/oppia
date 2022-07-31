@@ -774,135 +774,115 @@ describe('Contributions and review component', () => {
         suggestion_id: 'string;',
         author_name: 'string;',
       };
-      let contributionDetails = {
-        skill_description: 'string',
-        skill_rubrics: []
-      };
-      let question = questionObjectFactory.createFromBackendDict(
-        {
-          question_state_data_schema_version: null,
-          id: 'question_1',
-          question_state_data: {
-            classifier_model_id: null,
-            card_is_checkpoint: null,
-            linked_skill_id: null,
-            next_content_id_index: null,
-            content: {
-              html: 'Question 1',
-              content_id: 'content_1'
-            },
-            interaction: {
-              answer_groups: [{
-                outcome: {
-                  missing_prerequisite_skill_id: null,
-                  dest: 'outcome 1',
-                  dest_if_really_stuck: null,
-                  feedback: {
-                    content_id: 'content_5',
-                    html: ''
+
+      let suggestionIdToContribution = {
+        suggestion_1: {
+          suggestion: {
+            exploration_content_html: null,
+            language_code: null,
+            target_type: null,
+            author_name: null,
+            last_updated_msecs: null,
+            suggestion_id: 'suggestion_1',
+            target_id: '1',
+            suggestion_type: 'translate_content',
+            change: {
+              cmd: null,
+              content_html: null,
+              content_id: null,
+              data_format: null,
+              language_code: null,
+              translation_html: null,
+              state_name: null,
+              new_value: null,
+              old_value: null,
+              skill_id: 'skill1',
+              question_dict: {
+                id: '1',
+                question_state_data: {
+                  content: {
+                    html: 'Question 1',
+                    content_id: 'content_1'
                   },
-                  labelled_as_correct: true,
-                  param_changes: [],
-                  refresher_exploration_id: null
-                },
-                training_data: null,
-                rule_specs: [{
-                  rule_type: 'Equals',
-                  inputs: {x: 10}
-                }],
-                tagged_skill_misconception_id: null
-              },
-              {
-                training_data: null,
-                outcome: {
-                  missing_prerequisite_skill_id: null,
-                  dest: 'outcome 1',
-                  dest_if_really_stuck: null,
-                  feedback: {
-                    content_id: 'content_5',
-                    html: ''
+                  interaction: {
+                    answer_groups: [{
+                      outcome: {
+                        dest: 'outcome 1',
+                        dest_if_really_stuck: null,
+                        feedback: {
+                          content_id: 'content_5',
+                          html: ''
+                        },
+                        labelled_as_correct: true,
+                        param_changes: [],
+                        refresher_exploration_id: null
+                      },
+                      rule_specs: [],
+                    }],
+                    confirmed_unclassified_answers: [],
+                    customization_args: {
+                      placeholder: {
+                        value: {
+                          content_id: 'ca_placeholder_0',
+                          unicode_str: ''
+                        }
+                      },
+                      rows: { value: 1 }
+                    },
+                    default_outcome: {
+                      dest: null,
+                      dest_if_really_stuck: null,
+                      feedback: {
+                        html: 'Correct Answer',
+                        content_id: 'content_2'
+                      },
+                      param_changes: [],
+                      labelled_as_correct: true
+                    },
+                    hints: [{
+                      hint_content: {
+                        html: 'Hint 1',
+                        content_id: 'content_3'
+                      }
+                    }],
+                    solution: {
+                      correct_answer: 'This is the correct answer',
+                      answer_is_exclusive: false,
+                      explanation: {
+                        html: 'Solution explanation',
+                        content_id: 'content_4'
+                      }
+                    },
+                    id: 'TextInput'
                   },
-                  labelled_as_correct: false,
                   param_changes: [],
-                  refresher_exploration_id: null
+                  recorded_voiceovers: {
+                    voiceovers_mapping: {}
+                  },
+                  written_translations: {
+                    translations_mapping: {}
+                  },
                 },
-                rule_specs: [{
-                  rule_type: 'Equals',
-                  inputs: {x: 10}
-                }],
-                tagged_skill_misconception_id: 'abc-1'
-              }],
-              confirmed_unclassified_answers: [],
-              customization_args: {
-                placeholder: {
-                  value: {
-                    content_id: 'ca_placeholder_0',
-                    unicode_str: ''
-                  }
-                },
-                rows: { value: 1 }
-              },
-              default_outcome: {
-                dest: null,
-                refresher_exploration_id: null,
-                missing_prerequisite_skill_id: null,
-                dest_if_really_stuck: null,
-                feedback: {
-                  html: 'Correct Answer',
-                  content_id: 'content_2'
-                },
-                param_changes: [],
-                labelled_as_correct: false
-              },
-              hints: [
-                {
-                  hint_content: {
-                    html: 'Hint 1',
-                    content_id: 'content_3'
-                  }
-                }
-              ],
-              solution: {
-                correct_answer: 'This is the correct answer',
-                answer_is_exclusive: false,
-                explanation: {
-                  html: 'Solution explanation',
-                  content_id: 'content_4'
-                }
-              },
-              id: 'TextInput'
-            },
-            param_changes: [],
-            recorded_voiceovers: {
-              voiceovers_mapping: {
-                content_1: {},
-                content_2: {},
-                content_3: {},
-                content_4: {},
-                content_5: {}
               }
             },
-            written_translations: {
-              translations_mapping: {
-                content_1: {},
-                content_2: {},
-                content_3: {},
-                content_4: {},
-                content_5: {}
-              }
-            },
-            solicit_answer_details: false
+            status: 'review'
           },
-          language_code: 'en',
-          version: 1,
-          linked_skill_ids: ['abc'],
-          inapplicable_skill_misconception_ids: ['abc-2']
-        });
+          details: {
+            skill_description: 'Skill description',
+            skill_id: null,
+            chapter_title: null,
+            story_title: null,
+            topic_name: null
+          }
+        }
+      };
+
       component._showQuestionSuggestionModal(
-        suggestion as Suggestion, contributionDetails as ContributionDetails,
+        suggestion as Suggestion,
+        suggestionIdToContribution,
         false,
         null,
-        question);
+        null);
 
       let value = {
         suggestionId: null,
