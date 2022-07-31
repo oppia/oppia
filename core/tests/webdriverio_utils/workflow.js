@@ -273,7 +273,7 @@ var getImageSource = async function(customImageElement) {
 var uploadImage = async function(
     imageClickableElement, imgPath, resetExistingImage) {
   await action.click('Image clickable element', imageClickableElement);
-  var thumbnailResetButton = await $(
+  var thumbnailResetButton = $(
     '.e2e-test-thumbnail-reset-button');
   if (resetExistingImage) {
     expect(await thumbnailResetButton.isExisting()).toBe(true);
@@ -283,7 +283,7 @@ var uploadImage = async function(
   }
 
   absPath = path.resolve(__dirname, imgPath);
-  var imageUploadInput = await $('.e2e-test-photo-upload-input');
+  var imageUploadInput = $('.e2e-test-photo-upload-input');
   return await action.setValue(
     'Image Upload Input', imageUploadInput, absPath, clickInputElement = false);
 };
@@ -296,9 +296,9 @@ var submitImage = async function(
   await uploadImage(imageClickableElement, imgPath, resetExistingImage);
   await waitFor.visibilityOf(
     imageContainer, 'Image container is taking too long to appear');
-  var imageSubmitButton = await $('.e2e-test-photo-upload-submit');
+  var imageSubmitButton = $('.e2e-test-photo-upload-submit');
   await action.click('Image submit button', imageSubmitButton);
-  var imageUploadInput = await $('.e2e-test-photo-upload-input');
+  var imageUploadInput = $('.e2e-test-photo-upload-input');
   await waitFor.invisibilityOf(
     imageUploadInput,
     'Image uploader is taking too long to disappear');
