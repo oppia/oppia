@@ -2390,7 +2390,8 @@ class QuestionContributionStatsModelUnitTests(test_utils.GenericTestBase):
             1
         )
 
-        question_contribution_stats_model = question_contribution_stats_models[0]
+        question_contribution_stats_model = question_contribution_stats_models[
+            0]
 
         # Ruling out the possibility of None for mypy type checking.
         assert question_contribution_stats_model is not None
