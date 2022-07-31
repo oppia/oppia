@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import types
 
 from core.platform import models
 from core.tests import test_utils
@@ -113,3 +114,38 @@ class ClassroomModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(
             classroom_models.ClassroomModel.get_by_id('incorrect_id'),
             None)
+
+    def test_raise_exception_by_mocking_collision(self) -> None:
+        """Tests create and generate_new_classroom_id methods for raising
+        exception.
+        """
+        classroom_model_cls = classroom_models.ClassroomModel
+
+        # Test create method.
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            Exception,
+            'A classroom with the given classroom ID exists already.'
+        ):
+            # Swap dependent method get_by_id to simulate collision every time.
+            with self.swap(
+                classroom_model_cls, 'get_by_id',
+                types.MethodType(
+                    lambda x, y: True,
+                    classroom_model_cls)):
+                classroom_model_cls.create(
+                    'classroom_id', 'math', 'math',
+                    'Curated math foundations course.',
+                    'Start from the basic math.', {}
+                    )
+
+        # Test generate_new_classroom_id method.
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            Exception,
+            'New classroom id generator is producing too many collisions.'):
+            # Swap dependent method get_by_id to simulate collision every time.
+            with self.swap(
+                classroom_model_cls, 'get_by_id',
+                types.MethodType(
+                    lambda x, y: True,
+                    classroom_model_cls)):
+                classroom_model_cls.generate_new_classroom_id()
