@@ -72,12 +72,12 @@
             ng-click="playAndPauseUnsavedAudio()"
             ng-disabled="voiceoverRecorder.status().isRecording"
             aria-label="Play recorded audio">
-        <div ng-if="unsavedAudioIsPlaying">
-          <i class="fas fa-pause"></i>
-        </div>
-        <div ng-if="!unsavedAudioIsPlaying">
-          <i class="fas fa-play oppia-play-icon"></i>
-        </div>
+      <div ng-if="unsavedAudioIsPlaying">
+        <i class="fas fa-pause"></i>
+      </div>
+      <div ng-if="!unsavedAudioIsPlaying">
+        <i class="fas fa-play oppia-play-icon"></i>
+      </div>
     </button>
   </div>
   <div class="oppia-content-wrapper oppia-flex-1-wrapper">
