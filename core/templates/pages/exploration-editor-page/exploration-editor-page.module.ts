@@ -64,6 +64,8 @@ import { RevertExplorationModalComponent } from './history-tab/modal-templates/r
 import { ExplorationMetadataDiffModalComponent } from './modal-templates/exploration-metadata-diff-modal.component';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
 import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
+import { ExplorationTitleEditorComponent } from './exploration-title-editor/exploration-title-editor.component';
+import { ExplorationObjectiveEditorComponent } from './exploration-objective-editor/exploration-objective-editor.component';
 
 @NgModule({
   imports: [
@@ -108,7 +110,9 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
     WelcomeTranslationModalComponent,
     DeleteAudioTranslationModalComponent,
     TranslationTabBusyModalComponent,
-    ExplorationMetadataDiffModalComponent
+    ExplorationMetadataDiffModalComponent,
+    ExplorationTitleEditorComponent,
+    ExplorationObjectiveEditorComponent
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
@@ -139,7 +143,9 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
     WelcomeTranslationModalComponent,
     DeleteAudioTranslationModalComponent,
     TranslationTabBusyModalComponent,
-    ExplorationMetadataDiffModalComponent
+    ExplorationMetadataDiffModalComponent,
+    ExplorationTitleEditorComponent,
+    ExplorationObjectiveEditorComponent
   ],
   providers: [
     {

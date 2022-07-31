@@ -17,15 +17,15 @@
         <div ng-if="$ctrl.EditabilityService.isEditable()">
           <div role="form" class="form-horizontal">
             <div class="oppia-settings-input-group">
-              <exploration-title-editor label-text="Title"
-                                        focus-label="<[::$ctrl.EXPLORATION_TITLE_INPUT_FOCUS_LABEL]>"
-                                        on-input-field-blur="$ctrl.saveExplorationTitle()">
-              </exploration-title-editor>
+              <oppia-exploration-title-editor [label-text]="'Title'"
+                                              [focus-label]="<[::$ctrl.EXPLORATION_TITLE_INPUT_FOCUS_LABEL]>"
+                                              (on-input-field-blur)="$ctrl.saveExplorationTitle()">
+              </oppia-exploration-title-editor>
             </div>
             <div class="oppia-settings-input-group">
-              <exploration-objective-editor label-text="Goal"
-                                            on-input-field-blur="$ctrl.saveExplorationObjective()">
-              </exploration-objective-editor>
+              <oppia-exploration-objective-editor [label-text]="'Goal'"
+                                                  (on-input-field-blur)="$ctrl.saveExplorationObjective()">
+              </oppia-exploration-objective-editor>
             </div>
 
             <div ng-class="{'has-error': !$ctrl.explorationCategoryService.displayed}" class="oppia-settings-input-group">

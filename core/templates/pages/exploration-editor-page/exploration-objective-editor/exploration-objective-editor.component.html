@@ -1,19 +1,24 @@
 <form name="objectiveForm">
-  <p ng-class="{'has-error': objectiveForm.$dirty && (!explorationObjectiveService.displayed || explorationObjectiveService.displayed.length < 15 || explorationObjectiveService.displayed.length > 100)}">
-    <label for="explorationObjective" ng-style="<[::$ctrl.formStyle]>"><[::$ctrl.labelText]></label>
-    <input id="explorationObjective" type="text"
+  <p [ngClass]="{'has-error': (explorationObjective.dirty || explorationObjective.touched) && (!explorationObjectiveService.displayed || explorationObjectiveService.displayed.length < 15 || explorationObjectiveService.displayed.length > 100)}">
+    <label for="explorationObjective" [ngStyle]="formStyle">{{ labelText }}</label>
+    <input id="explorationObjective"
+           type="text"
            class="form-control e2e-test-exploration-objective-input"
-           ng-model="explorationObjectiveService.displayed"
-           ng-blur="$ctrl.onInputFieldBlur()" placeholder="Learn how to..." ng-trim="false"
-           width="100%">
+           [(ngModel)]="explorationObjectiveService.displayed"
+           [ngModelOptions]="{standalone: true}"
+           (blur)="inputFieldBlur()"
+           placeholder="Learn how to..."
+           width="100%"
+           #explorationObjective="ngModel">
     <span class="form-text e2e-test-exploration-objective-warning">
       <em>In a complete sentence, tell people what they'll learn from this exploration.</em>
-      <span ng-if="explorationObjectiveService.displayed.length > 0">
-        <em>Characters used: <[explorationObjectiveService.displayed.length]>/100</em>
+      <span *ngIf="explorationObjectiveService.displayed.length > 0">
+        <em>Characters used: {{explorationObjectiveService.displayed.length}}/100</em>
       </span>
     </span>
   </p>
 </form>
+
 <style>
   @media (min-width: 768px) {
     exploration-objective-editor p {
@@ -22,7 +27,8 @@
       width: 100%;
     }
   }
-  exploration-objective-editor .form-text {
+
+  .form-text {
     font-size: smaller;
     margin-bottom: -8px;
   }

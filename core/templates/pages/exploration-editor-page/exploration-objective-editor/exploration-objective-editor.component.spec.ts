@@ -16,31 +16,44 @@
  * @fileoverview Unit tests for explorationObjectiveEditor component.
  */
 
-require(
-  'pages/exploration-editor-page/exploration-title-editor/' +
-  'exploration-title-editor.component.ts');
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { ExplorationObjectiveEditorComponent } from './exploration-objective-editor.component';
+import { ExplorationObjectiveService } from '../services/exploration-objective.service';
 
-describe('Exploration Objective Editor directive', function() {
-  var $scope = null;
-  var ExplorationObjectiveService = null;
+describe('Exploration Objective Editor Component', () => {
+  let component: ExplorationObjectiveEditorComponent;
+  let fixture: ComponentFixture<ExplorationObjectiveEditorComponent>;
 
-  beforeEach(angular.mock.module('oppia'));
-  importAllAngularServices();
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    var $rootScope = $injector.get('$rootScope');
-    ExplorationObjectiveService = $injector.get('ExplorationObjectiveService');
-
-    $scope = $rootScope.$new();
-    $componentController('explorationObjectiveEditor', {
-      $scope: $scope,
-      ExplorationObjectiveService: ExplorationObjectiveService
-    });
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      declarations: [
+        ExplorationObjectiveEditorComponent
+      ],
+      providers: [
+        ExplorationObjectiveService
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   }));
 
+  beforeEach(() => {
+    fixture = TestBed.createComponent(ExplorationObjectiveEditorComponent);
+    component = fixture.componentInstance;
+
+    fixture.detectChanges();
+  });
+
   it('should initialize controller properties after its initialization',
-    function() {
-      expect($scope.explorationObjectiveService).toEqual(
-        ExplorationObjectiveService);
+    () => {
+      const spyEmitter = spyOnProperty(
+        component.onInputFieldBlur, 'emit').and.stub();
+
+      component.inputFieldBlur();
+
+      expect(spyEmitter).toHaveBeenCalled();
+      expect(component).toBeDefined();
     });
 });

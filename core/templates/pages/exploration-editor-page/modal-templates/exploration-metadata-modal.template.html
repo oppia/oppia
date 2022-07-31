@@ -6,14 +6,14 @@
   <p>
     Just a few more things before you publish:
   </p>
-  <exploration-title-editor ng-if="requireTitleToBeSpecified"
-                            label-text="Add a title: what should your exploration be called?"
-                            form-style="{'font-weight':'normal'}">
-  </exploration-title-editor>
-  <exploration-objective-editor ng-if="requireObjectiveToBeSpecified"
-                                label-text="Add a goal: what does the exploration help people to do?"
-                                form-style="{'font-weight': 'normal'}">
-  </exploration-objective-editor>
+  <oppia-exploration-title-editor ng-if="requireTitleToBeSpecified"
+                                  [label-text]="'Add a title: what should your exploration be called?'"
+                                  [form-style]="{'font-weight':'normal'}">
+  </oppia-exploration-title-editor>
+  <oppia-exploration-objective-editor ng-if="requireObjectiveToBeSpecified"
+                                      [label-text]="'Add a goal: what does the exploration help people to do?'"
+                                      [form-style]="{'font-weight': 'normal'}">
+  </oppia-exploration-objective-editor>
   <p ng-if="requireCategoryToBeSpecified">
     <label class="font-weight-normal"> Add a category: How would you categorize your exploration?
       <select2-dropdown class="e2e-test-exploration-category-dropdown"
