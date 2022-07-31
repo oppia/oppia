@@ -79,6 +79,17 @@ describe('ListOfSetsOfTranslatableHtmlContentIdsEditorComponent', () => {
     ];
   });
 
+  it('should return empty list when there is no response', () => {
+    spyOn(component.valueChanged, 'emit');
+    // Use unknown type conversion to check input invalidity.
+    component.value = undefined as unknown as string[][];
+
+    component.ngOnInit();
+
+    expect(component.value).toEqual(
+      [['ca_choices_1'], ['ca_choices_2'], ['ca_choices_3'], ['ca_choices_4']]);
+  });
+
   it('should initialise component when user adds response', () => {
     spyOn(component.valueChanged, 'emit');
     // Use unknown type conversion to check input invalidity.

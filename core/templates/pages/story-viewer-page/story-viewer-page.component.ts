@@ -120,14 +120,9 @@ export class StoryViewerPageComponent implements OnInit, OnDestroy {
       i++) {
       this.thumbnailFilename = this.storyNodes[i].getThumbnailFilename();
       this.thumbnailBgColor = this.storyNodes[i].getThumbnailBgColor();
-      if (this.thumbnailFilename === null) {
-        this.iconUrl = '';
-        this.thumbnailFilename = '';
-      } else {
-        this.iconUrl = this.assetsBackendApiService.getThumbnailUrlForPreview(
-          AppConstants.ENTITY_TYPE.STORY, this.storyId,
-          this.thumbnailFilename);
-      }
+      this.iconUrl = this.assetsBackendApiService.getThumbnailUrlForPreview(
+        AppConstants.ENTITY_TYPE.STORY, this.storyId,
+        this.thumbnailFilename);
       iconParametersArray.push({
         thumbnailIconUrl: this.iconUrl,
         left: '225px',

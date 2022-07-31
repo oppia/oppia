@@ -19,7 +19,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { HttpClientTestingModule, HttpTestingController }
   from '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import { TestBed, fakeAsync, flushMicrotasks, tick } from '@angular/core/testing';
 
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { ImageData } from 'domain/skill/skill-creation-backend-api.service';
@@ -129,4 +129,18 @@ describe('Topic creation backend api service', () => {
       expect(failHandler).toHaveBeenCalled();
       expect(successHandler).not.toHaveBeenCalled();
     }));
+
+  it('should throw an error if image blob is null', fakeAsync(() => {
+    imagesData = [{
+      filename: 'image.svg',
+      imageBlob: null
+    }];
+    let successHandler = jasmine.createSpy('success');
+    expect(function() {
+      topicCreationBackendApiService.createTopicAsync(
+        topic, imagesData, thumbnailBgColor).then(
+        successHandler);
+      tick();
+    }).toThrowError();
+  }));
 });

@@ -80,14 +80,13 @@ export class ReleaseCoordinatorNavbarComponent implements OnInit {
     const userInfo = await this.userService.getUserInfoAsync();
 
     this.username = userInfo.getUsername();
-    if (this.username === null) {
-      throw new Error('User is not logged in.');
+    if (this.username) {
+      this.profileUrl = (
+        this.urlInterpolationService.interpolateUrl(
+          '/profile/<username>', {
+            username: this.username
+          }));
     }
-    this.profileUrl = (
-      this.urlInterpolationService.interpolateUrl(
-        '/profile/<username>', {
-          username: this.username
-        }));
   }
 
   ngOnInit(): void {

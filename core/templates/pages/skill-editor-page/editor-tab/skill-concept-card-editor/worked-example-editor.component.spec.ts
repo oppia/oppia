@@ -114,6 +114,12 @@ describe('Worked example editor component', () => {
     component.cancelEditQuestion();
 
     expect(component.questionEditorIsOpen).toBe(false);
+
+    component.questionEditorIsOpen = true;
+    component.workedExampleQuestionMemento = null;
+    component.cancelEditQuestion();
+
+    expect(component.questionEditorIsOpen).toBe(true);
   });
 
   it('should close explanation editor when clicking on cancel button', () => {
@@ -126,6 +132,12 @@ describe('Worked example editor component', () => {
     component.cancelEditExplanation();
 
     expect(component.explanationEditorIsOpen).toBe(false);
+
+    component.explanationEditorIsOpen = true;
+    component.workedExampleQuestionMemento = null;
+    component.cancelEditExplanation();
+
+    expect(component.explanationEditorIsOpen).toBe(true);
   });
 
   it('should save worked example when clicking on save button', () => {

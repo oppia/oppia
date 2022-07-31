@@ -136,17 +136,10 @@ export class ProfilePageComponent {
             const avgRating2 = (
               this.ratingComputationService.computeAverageRating(
                 exploration2.ratings));
-
-            if (avgRating1 === null) {
-              return -1;
-            }
             if (avgRating2 === null) {
               return 1;
             }
-            if (avgRating1 === null && avgRating2 === null) {
-              return -1;
-            }
-            if (avgRating1 > avgRating2) {
+            if (avgRating1 !== null && (avgRating1 > avgRating2)) {
               return 1;
             } else if (avgRating1 === avgRating2) {
               if (exploration1.numViews > exploration2.numViews) {

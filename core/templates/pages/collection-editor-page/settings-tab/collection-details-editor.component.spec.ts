@@ -126,6 +126,11 @@ describe('Collection details editor component', () => {
       ['category 1', 'category 2']);
   });
 
+  it('should return empty list if there are no tags on normalization', () => {
+    let tags = null;
+    expect(componentInstance.normalizeTags(tags)).toEqual([]);
+  });
+
   it('should update collection', () => {
     componentInstance.collection = mockCollection;
     componentInstance.displayedCollectionTitle = 'Title';
