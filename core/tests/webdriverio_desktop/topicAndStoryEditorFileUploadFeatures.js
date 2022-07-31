@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,18 +17,18 @@
  * page.
  */
 
-var forms = require('../protractor_utils/forms.js');
-var general = require('../protractor_utils/general.js');
-var users = require('../protractor_utils/users.js');
-var workflow = require('../protractor_utils/workflow.js');
+var forms = require('../webdriverio_utils/forms.js');
+var general = require('../webdriverio_utils/general.js');
+var users = require('../webdriverio_utils/users.js');
+var workflow = require('../webdriverio_utils/workflow.js');
 
 var TopicsAndSkillsDashboardPage =
-  require('../protractor_utils/TopicsAndSkillsDashboardPage.js');
-var TopicEditorPage = require('../protractor_utils/TopicEditorPage.js');
-var StoryEditorPage = require('../protractor_utils/StoryEditorPage.js');
-var SkillEditorPage = require('../protractor_utils/SkillEditorPage.js');
+  require('../webdriverio_utils/TopicsAndSkillsDashboardPage.js');
+var TopicEditorPage = require('../webdriverio_utils/TopicEditorPage.js');
+var StoryEditorPage = require('../webdriverio_utils/StoryEditorPage.js');
+var SkillEditorPage = require('../webdriverio_utils/SkillEditorPage.js');
 var ExplorationEditorPage =
-  require('../protractor_utils/ExplorationEditorPage.js');
+  require('../webdriverio_utils/ExplorationEditorPage.js');
 
 describe('Topic editor functionality', function() {
   var topicsAndSkillsDashboardPage = null;
@@ -187,7 +187,7 @@ describe('Chapter editor functionality', function() {
       info[0] += i.toString();
       info.push(i === 0);
       await workflow.createAndPublishExploration.apply(workflow, info);
-      var url = await browser.getCurrentUrl();
+      var url = await browser.getUrl();
       var id = url.split('/')[4].replace('#', '');
       ids.push(id);
     }
