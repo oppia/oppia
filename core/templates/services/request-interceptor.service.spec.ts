@@ -21,7 +21,7 @@ import {
   HttpTestingController
 } from '@angular/common/http/testing';
 // eslint-disable-next-line oppia/disallow-httpclient
-import { HTTP_INTERCEPTORS, HttpClient, HttpHandler, HttpRequest, HttpParams, HttpBackend } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClient, HttpHandler, HttpRequest, HttpParams } from '@angular/common/http';
 
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { CsrfTokenService } from './csrf-token.service';
