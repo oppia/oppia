@@ -1,56 +1,56 @@
 <div class="oppia-question-suggestion-editor-modal">
   <div class="modal-header">
-    <h3><[skill.getDescription()]></h3>
+    <h3>{{skill.getDescription()}}</h3>
   </div>
 
   <div class="modal-body">
     <div class="oppia-question-editor-section">
-      <h3>Selected Difficulty: <[skillDifficultyString]>
+      <h3>Selected Difficulty: {{skillDifficultyString}}
         <i role="button"
            class="material-icons oppia-editor-edit-icon select-difficulty-icon oppia-editable-section"
-           ng-click="onClickChangeDifficulty()"
+           (click)="onClickChangeDifficulty()"
            title="Edit Skill Difficulty">&#xE254;
         </i>
       </h3>
-      <div ng-if="skill.getRubricExplanations(skillDifficultyString).length > 0">
+      <div *ngIf="skill.getRubricExplanations(skillDifficultyString).length > 0">
         <h3 title="Use these notes to make sure your question is at the right difficulty.">
           Notes from Skill Rubric
         </h3>
         <ul>
-          <li ng-repeat="explanation in skill.getRubricExplanations(skillDifficultyString)">
-            <span ng-bind-html="explanation" class="d-block mt-1"></span>
+          <li *ngFor="let explanation of skill.getRubricExplanations(skillDifficultyString)">
+            <span [innerHtml]="explanation" class="d-block mt-1"></span>
           </li>
         </ul>
       </div>
       <h3>Your Practice Question</h3>
-      <question-editor question-id="questionId"
-                       misconceptions-by-skill="misconceptionsBySkill"
-                       question-state-data="questionStateData"
-                       question="question"
-                       can-edit-question="canEditQuestion">
-      </question-editor>
+      <oppia-question-editor [questionId]="questionId"
+                             [misconceptionsBySkill]="misconceptionsBySkill"
+                             [questionStateData]="questionStateData"
+                             [question]="question"
+                             [userCanEditQuestion]="canEditQuestion">
+      </oppia-question-editor>
     </div>
-    <div class="alert alert-danger" ng-if="question.getStateData().interaction.id && question.getValidationErrorMessage()">
-      <[question.getValidationErrorMessage()]>
+    <div class="alert alert-danger" *ngIf="question.getStateData().interaction.id && question.getValidationErrorMessage()">
+      {{question.getValidationErrorMessage()}}
     </div>
-    <div class="alert alert-danger" ng-if="question.getStateData().interaction.id && !question.getValidationErrorMessage() && question.getUnaddressedMisconceptionNames(misconceptionsBySkill).length">
+    <div class="alert alert-danger" *ngIf="question.getStateData().interaction.id && !question.getValidationErrorMessage() && question.getUnaddressedMisconceptionNames(misconceptionsBySkill).length">
       Remaining misconceptions that need to be addressed:
       <ul>
-        <li ng-repeat="misconceptionName in question.getUnaddressedMisconceptionNames(misconceptionsBySkill)">
-          <[misconceptionName]>
+        <li *ngFor="let misconceptionName of question.getUnaddressedMisconceptionNames(misconceptionsBySkill)">
+          {{misconceptionName}}
         </li>
       </ul>
     </div>
   </div>
 
   <div class="modal-footer">
-    <button class="btn btn-secondary" ng-click="cancel()">Cancel</button>
-    <button ng-if="newQuestionIsBeingCreated"
+    <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
+    <button *ngIf="newQuestionIsBeingCreated"
             title="To Save please add: interaction, hint, solution and address all misconceptions"
             class="btn btn-success e2e-test-save-question-button"
-            ng-click="done()"
-            ng-disabled="!isQuestionValid()">
-      <[isEditing ? 'Update' : 'Submit']> Question
+            (click)="done()"
+            [disabled]="!isQuestionValid()">
+      {{isEditing ? 'Update' : 'Submit'}} Question
     </button>
   </div>
 </div>
@@ -59,9 +59,11 @@
   .oppia-question-editor-section {
     padding: 0 100px;
   }
+
   .oppia-question-suggestion-editor-modal {
     padding: 0 25px;
   }
+
   .oppia-question-suggestion-editor-modal>.modal-header {
     padding-bottom: 0;
   }
@@ -69,6 +71,7 @@
   .select-difficulty-icon.oppia-editor-edit-icon {
     position: unset;
   }
+
   .select-difficulty-icon.oppia-editor-edit-icon:hover {
     opacity: 0.8;
   }
@@ -83,6 +86,7 @@
       padding: 0;
     }
   }
+
   @media only screen and (max-width: 510px) {
     .oppia-question-editor-section {
     padding: 0;

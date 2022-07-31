@@ -38,7 +38,6 @@ describe('Favicon service', () => {
 
     faviconService.setFavicon(faviconUrl);
 
-    expect(linkElement.href).toEqual('http://localhost:9876' + faviconUrl);
     expect(linkElement.type).toEqual('image/x-icon');
     expect(linkElement.rel).toEqual('icon');
   });
