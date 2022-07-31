@@ -138,7 +138,7 @@ describe('Full exploration editor', function() {
     await explorationEditorMainTab.setStateName('first');
     await explorationEditorMainTab.expectCurrentStateToBe('first');
     await explorationEditorMainTab.setContent(
-      await forms.toRichText('card1 content'));
+      await forms.toRichText('card1 content'), true);
 
     // Check deletion of states and changing the first state.
     await explorationEditorMainTab.setInteraction('TextInput');
