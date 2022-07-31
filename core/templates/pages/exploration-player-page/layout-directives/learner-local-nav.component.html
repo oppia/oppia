@@ -12,7 +12,7 @@
   <li *ngIf="feedbackOptionIsShown" placement="bottom-right"
       [ngbPopover]="popContent" triggers="manual" (click)="togglePopover()"
       class="nav-item" #feedbackPopOver="ngbPopover" [autoClose]="false">
-    <div class="nav-link protractor-test-exploration-feedback-popup-link"
+    <div class="nav-link e2e-test-exploration-feedback-popup-link"
        ngbTooltip="{{ 'I18N_PLAYER_FEEDBACK_TOOLTIP' | translate }}" placement="bottom">
       <i class="fas fa-comment-alt exploration-player-navbar-icons"></i>
       <span class="oppia-icon-accessibility-label">{{ 'I18N_PLAYER_FEEDBACK_TOOLTIP' | translate }}</span>

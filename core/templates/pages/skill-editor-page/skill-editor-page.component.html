@@ -8,7 +8,7 @@
         <li ng-class="{'uib-dropdown': $ctrl.getWarningsCount(), 'navbar-tab-active': $ctrl.getActiveTabName() === 'main'}"
             ng-attr-uib-dropdown="<[$ctrl.getWarningsCount()]>"
             ng-click="$ctrl.selectMainTab()" class="navbar-tab nav-list-item">
-          <a uib-tooltip="Main Editor" tooltip-placement="bottom" class="protractor-test-main-tab">
+          <a uib-tooltip="Main Editor" tooltip-placement="bottom" class="e2e-test-main-tab">
             <i class="material-icons navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTabName() === 'main'}">&#xE254;</i>
           </a>
           <div ng-show="$ctrl.getWarningsCount()"
@@ -27,7 +27,7 @@
             </li>
           </ul>
         </li>
-        <li class="navbar-tab icon nav-list-item protractor-test-questions-tab"
+        <li class="navbar-tab icon nav-list-item e2e-test-questions-tab"
             ng-class="{'navbar-tab-active': $ctrl.getActiveTabName() === 'questions'}"
             ng-click="$ctrl.selectQuestionsTab()">
           <a uib-tooltip="Questions" tooltip-placement="bottom" aria-label="Questions">

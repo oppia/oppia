@@ -33,13 +33,16 @@ import { ReadOnlyTopic } from 'domain/topic_viewer/read-only-topic-object.factor
   styleUrls: []
 })
 export class StoryViewerNavbarBreadcrumbComponent implements OnInit, OnDestroy {
-  topicName: string;
-  topicNameTranslationKey: string;
-  storyTitle: string;
-  storyTitleTranslationKey: string;
-  topicUrlFragment: string;
-  classroomUrlFragment: string;
-  storyUrlFragment: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  topicName!: string;
+  topicNameTranslationKey!: string;
+  storyTitle!: string;
+  storyTitleTranslationKey!: string;
+  topicUrlFragment!: string;
+  classroomUrlFragment!: string;
+  storyUrlFragment!: string;
   constructor(
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private storyViewerBackendApiService: StoryViewerBackendApiService,
@@ -63,8 +66,12 @@ export class StoryViewerNavbarBreadcrumbComponent implements OnInit, OnDestroy {
       this.urlService.getTopicUrlFragmentFromLearnerUrl());
     this.classroomUrlFragment =
      (this.urlService.getClassroomUrlFragmentFromLearnerUrl());
-    this.storyUrlFragment =
-     (this.urlService.getStoryUrlFragmentFromLearnerUrl());
+    let storyUrlFragment = (
+      this.urlService.getStoryUrlFragmentFromLearnerUrl());
+    if (storyUrlFragment === null) {
+      throw new Error('Story url fragment is null');
+    }
+    this.storyUrlFragment = storyUrlFragment;
     this.storyViewerBackendApiService.fetchStoryDataAsync(
       this.topicUrlFragment,
       this.classroomUrlFragment,

@@ -1,7 +1,4 @@
-<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/pages/about-page/about-page.component.css" as="style">
-<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/pages/about-page/about-page.component.rtl.css" as="style">
-
-<div class="about-page protractor-test-about-page">
+<div class="about-page e2e-test-about-page">
   <div class="oppia-about-page-section-one">
     <div class="oppia-about-page-section-one-right">
       <picture class="oppia-about-study-image float-right">
@@ -127,6 +124,3 @@
     </div>
   </div>
 </div>
-<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
-<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/about-page/about-page.component.css">
-<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/about-page/about-page.component.rtl.css">

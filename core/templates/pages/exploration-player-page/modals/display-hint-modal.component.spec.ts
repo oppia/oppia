@@ -16,7 +16,6 @@
  * @fileoverview Unit tests for DisplayHintModalComponent.
  */
 
-import { Component, Directive } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
@@ -31,17 +30,10 @@ import { PlayerPositionService } from '../services/player-position.service';
 import { PlayerTranscriptService } from '../services/player-transcript.service';
 import { DisplayHintModalComponent } from './display-hint-modal.component';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
-
-
-let MockAngularHtmlBindWrapperDirective = function(
-    options: Component): Directive {
-  const metadata: Directive = {
-    selector: options.selector,
-    inputs: options.inputs,
-    outputs: options.outputs
-  };
-  return Directive(metadata)(class _ { }) as undefined;
-};
+import { Interaction } from 'domain/exploration/InteractionObjectFactory';
+import { WrittenTranslations } from 'domain/exploration/WrittenTranslationsObjectFactory';
+import { AudioTranslationLanguageService } from '../services/audio-translation-language.service';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 describe('Display hint modal', () => {
   let fixture: ComponentFixture<DisplayHintModalComponent>;
@@ -59,9 +51,6 @@ describe('Display hint modal', () => {
       declarations: [
         DisplayHintModalComponent,
         MockTranslatePipe,
-        MockAngularHtmlBindWrapperDirective({
-          selector: 'angular-html-bind-wrapper',
-          inputs: ['htmlData'] })
       ],
       providers: [
         NgbActiveModal,
@@ -71,7 +60,8 @@ describe('Display hint modal', () => {
         HintsAndSolutionManagerService,
         PlayerPositionService,
         PlayerTranscriptService
-      ]
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
   }));
 
@@ -105,8 +95,9 @@ describe('Display hint modal', () => {
     let recordedVoiceovers = new RecordedVoiceovers({});
     let hint = new SubtitledHtml('html', contentId);
     let displayedCard = new StateCard(
-      'test_name', 'content', 'interaction', null, [],
-      recordedVoiceovers, null, contentId, null);
+      'test_name', 'content', 'interaction', {} as Interaction, [],
+      recordedVoiceovers, {} as WrittenTranslations, contentId,
+      {} as AudioTranslationLanguageService);
     spyOn(hintsAndSolutionManagerService, 'displayHint').and.returnValue(hint);
     spyOn(playerTranscriptService, 'getCard').and.returnValue(displayedCard);
     spyOn(audioTranslationManagerService, 'setSecondaryAudioTranslations');
@@ -122,6 +113,32 @@ describe('Display hint modal', () => {
     expect(audioTranslationManagerService.setSecondaryAudioTranslations)
       .toHaveBeenCalled();
     expect(audioPlayerService.onAutoplayAudio.emit).toHaveBeenCalled();
+  });
+
+  it('should throw error if display hint is invalid', () => {
+    spyOn(hintsAndSolutionManagerService, 'displayHint').and.returnValue(null);
+
+    expect(() => {
+      componentInstance.ngOnInit();
+    }).toThrowError('Hint not found.');
+  });
+
+  it('should throw error if content id is invalid', () => {
+    let contentId: string = 'content_id';
+    let recordedVoiceovers = new RecordedVoiceovers({});
+    let hint = new SubtitledHtml('html', null);
+    let displayedCard = new StateCard(
+      'test_name', 'content', 'interaction', {} as Interaction, [],
+      recordedVoiceovers, {} as WrittenTranslations, contentId,
+      {} as AudioTranslationLanguageService);
+    spyOn(hintsAndSolutionManagerService, 'displayHint').and.returnValue(hint);
+    spyOn(playerTranscriptService, 'getCard').and.returnValue(displayedCard);
+    spyOn(audioTranslationManagerService, 'setSecondaryAudioTranslations');
+    spyOn(audioPlayerService.onAutoplayAudio, 'emit');
+
+    expect(() => {
+      componentInstance.ngOnInit();
+    }).toThrowError('Content id not found.');
   });
 
   it('should close modal', () => {

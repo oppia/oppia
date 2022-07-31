@@ -4,15 +4,15 @@
   <ng-container *ngFor="let rubric of skillIdToRubricsObject[skillWithDifficulty.getId()]; index as idx">
     <mat-radio-button *ngIf="rubric.getExplanations().length > 0"
                       [value]="availableDifficultyValues[idx]"
-                      class="protractor-test-skill-difficulty-{{rubric.getDifficulty().toLowerCase()}} mat-radio-button">
+                      class="e2e-test-skill-difficulty-{{rubric.getDifficulty().toLowerCase()}} mat-radio-button">
       <strong>{{ rubric.getDifficulty() }}</strong>
       <mat-list>
         <mat-list-item class="pl-0" *ngFor="let explanation of rubric.getExplanations()">
           <div class="oppia-skill-description-label">Skill description:</div>
           <div class="oppia-skill-description-container">
-            <angular-html-bind-wrapper classStr="oppia-skill-description-text"
-                                       [htmlData]="explanation">
-            </angular-html-bind-wrapper>
+            <oppia-rte-output-display class="oppia-skill-description-text"
+                                      [rteString]="explanation">
+            </oppia-rte-output-display>
           </div>
           <div *ngIf="explanation === '' || explanation === '<p></p>'">
             <span class="oppia-placeholder">This rubric has not yet been specified</span>

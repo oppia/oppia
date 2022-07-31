@@ -23,6 +23,8 @@ import { CurrentInteractionService } from 'pages/exploration-player-page/service
 import { TranslateModule } from '@ngx-translate/core';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ObjectsDomainConstants } from 'domain/objects/objects-domain.constants';
+import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
+import { FractionAnswer } from 'interactions/answer-defs';
 
 describe('InteractiveFractionInputComponent', () => {
   let component: InteractiveFractionInputComponent;
@@ -30,7 +32,9 @@ describe('InteractiveFractionInputComponent', () => {
   let currentInteractionService: CurrentInteractionService;
 
   class mockInteractionAttributesExtractorService {
-    getValuesFromAttributes(interactionId, attributes) {
+    getValuesFromAttributes(
+        interactionId: InteractionSpecsKey, attributes: Record<string, string>
+    ) {
       return {
         requireSimplestForm: {
           value: JSON.parse(attributes.requireSimplestFormWithValue)
@@ -51,8 +55,10 @@ describe('InteractiveFractionInputComponent', () => {
 
   let mockCurrentInteractionService = {
     updateViewWithNewAnswer: () => {},
-    onSubmit: (answer, rulesService) => {},
-    registerCurrentInteraction: (submitAnswerFn, validateExpressionFn) => {
+    onSubmit: (
+        answer: FractionAnswer, rulesService: CurrentInteractionService) => {},
+    registerCurrentInteraction: (
+        submitAnswerFn: Function, validateExpressionFn: Function,) => {
       submitAnswerFn();
       validateExpressionFn();
     }

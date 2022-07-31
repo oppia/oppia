@@ -65,14 +65,15 @@ describe('Compare versions service', function() {
       httpTestingController.verify();
     });
 
-    // Helper function to get states data to pass to getDiffGraphData().
+    // Helper function to get states data and exploration metadata to pass
+    // to getDiffGraphData().
     // states is an object whose keys are state names and whose values are
     //  - contentStr: string which is the text content of the state
     //  - ruleDests: a list of strings which are state names of destinations of
     //    links
     // Only information accessed by getDiffGraphData is included in the return
     // value.
-    var _getStatesData = function(statesDetails) {
+    var _getStatesAndMetadata = function(statesDetails) {
       var statesData = {};
       for (var stateName in statesDetails) {
         var newStateData = {
@@ -91,6 +92,7 @@ describe('Compare versions service', function() {
             answer_groups: [],
             default_outcome: {
               dest: 'default',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'default_outcome',
                 html: ''
@@ -115,6 +117,7 @@ describe('Compare versions service', function() {
             return {
               outcome: {
                 dest: ruleDestName,
+                dest_if_really_stuck: null,
                 feedback: [],
                 labelled_as_correct: false,
                 param_changes: [],
@@ -125,10 +128,27 @@ describe('Compare versions service', function() {
           });
         statesData[stateName] = newStateData;
       }
+      var explorationMetadataDict = {
+        title: 'An exploration',
+        category: '',
+        objective: '',
+        language_code: 'en',
+        tags: [],
+        blurb: '',
+        author_notes: '',
+        states_schema_version: 50,
+        init_state_name: 'Introduction',
+        param_specs: {},
+        param_changes: [],
+        auto_tts_enabled: false,
+        correctness_feedback_enabled: true,
+        edits_allowed: true
+      };
       return {
         exploration: {
           states: statesData
-        }
+        },
+        exploration_metadata: explorationMetadataDict
       };
     };
 
@@ -293,7 +313,7 @@ describe('Compare versions service', function() {
     }];
 
     // Information for mock state data for getDiffGraphData() to be passed to
-    // _getStatesData.
+    // _getStatesAndMetadata.
     var testExplorationData1 = [{
       A: {
         contentStr: '',
@@ -435,12 +455,12 @@ describe('Compare versions service', function() {
 
       const req = httpTestingController.expectOne('/explorehandler/init/0?v=1');
       expect(req.request.method).toEqual('GET');
-      req.flush(_getStatesData(testExplorationData1[0]));
+      req.flush(_getStatesAndMetadata(testExplorationData1[0]));
 
       const req2 = httpTestingController.expectOne(
         '/explorehandler/init/0?v=7');
       expect(req2.request.method).toEqual('GET');
-      req2.flush(_getStatesData(testExplorationData1[6]));
+      req2.flush(_getStatesAndMetadata(testExplorationData1[6]));
 
       flushMicrotasks();
     }));
@@ -473,12 +493,12 @@ describe('Compare versions service', function() {
         const req = httpTestingController.expectOne(
           '/explorehandler/init/0?v=5');
         expect(req.request.method).toEqual('GET');
-        req.flush(_getStatesData(testExplorationData1[4]));
+        req.flush(_getStatesAndMetadata(testExplorationData1[4]));
 
         const req2 = httpTestingController.expectOne(
           '/explorehandler/init/0?v=8');
         expect(req2.request.method).toEqual('GET');
-        req2.flush(_getStatesData(testExplorationData1[7]));
+        req2.flush(_getStatesAndMetadata(testExplorationData1[7]));
 
         flushMicrotasks();
       }));
@@ -504,12 +524,12 @@ describe('Compare versions service', function() {
 
       const req = httpTestingController.expectOne('/explorehandler/init/0?v=7');
       expect(req.request.method).toEqual('GET');
-      req.flush(_getStatesData(testExplorationData1[6]));
+      req.flush(_getStatesAndMetadata(testExplorationData1[6]));
 
       const req2 = httpTestingController.expectOne(
         '/explorehandler/init/0?v=9');
       expect(req2.request.method).toEqual('GET');
-      req2.flush(_getStatesData(testExplorationData1[8]));
+      req2.flush(_getStatesAndMetadata(testExplorationData1[8]));
 
       flushMicrotasks();
     }));
@@ -540,12 +560,12 @@ describe('Compare versions service', function() {
 
       const req = httpTestingController.expectOne('/explorehandler/init/0?v=8');
       expect(req.request.method).toEqual('GET');
-      req.flush(_getStatesData(testExplorationData1[7]));
+      req.flush(_getStatesAndMetadata(testExplorationData1[7]));
 
       const req2 = httpTestingController.expectOne(
         '/explorehandler/init/0?v=10');
       expect(req2.request.method).toEqual('GET');
-      req2.flush(_getStatesData(testExplorationData1[9]));
+      req2.flush(_getStatesAndMetadata(testExplorationData1[9]));
 
       flushMicrotasks();
     }));
@@ -577,12 +597,12 @@ describe('Compare versions service', function() {
       const req = httpTestingController.expectOne(
         '/explorehandler/init/0?v=11');
       expect(req.request.method).toEqual('GET');
-      req.flush(_getStatesData(testExplorationData1[10]));
+      req.flush(_getStatesAndMetadata(testExplorationData1[10]));
 
       const req2 = httpTestingController.expectOne(
         '/explorehandler/init/0?v=13');
       expect(req2.request.method).toEqual('GET');
-      req2.flush(_getStatesData(testExplorationData1[12]));
+      req2.flush(_getStatesAndMetadata(testExplorationData1[12]));
 
       flushMicrotasks();
     }));
@@ -614,12 +634,12 @@ describe('Compare versions service', function() {
 
       const req = httpTestingController.expectOne('/explorehandler/init/0?v=1');
       expect(req.request.method).toEqual('GET');
-      req.flush(_getStatesData(testExplorationData1[0]));
+      req.flush(_getStatesAndMetadata(testExplorationData1[0]));
 
       const req2 = httpTestingController.expectOne(
         '/explorehandler/init/0?v=11');
       expect(req2.request.method).toEqual('GET');
-      req2.flush(_getStatesData(testExplorationData1[10]));
+      req2.flush(_getStatesAndMetadata(testExplorationData1[10]));
 
       flushMicrotasks();
     }));
@@ -641,12 +661,12 @@ describe('Compare versions service', function() {
 
       const req = httpTestingController.expectOne('/explorehandler/init/0?v=2');
       expect(req.request.method).toEqual('GET');
-      req.flush(_getStatesData(testExplorationData1[1]));
+      req.flush(_getStatesAndMetadata(testExplorationData1[1]));
 
       const req2 = httpTestingController.expectOne(
         '/explorehandler/init/0?v=4');
       expect(req2.request.method).toEqual('GET');
-      req2.flush(_getStatesData(testExplorationData1[3]));
+      req2.flush(_getStatesAndMetadata(testExplorationData1[3]));
 
       flushMicrotasks();
     }));
@@ -679,12 +699,12 @@ describe('Compare versions service', function() {
         const req = httpTestingController.expectOne(
           '/explorehandler/init/0?v=1');
         expect(req.request.method).toEqual('GET');
-        req.flush(_getStatesData(testExplorationData1[0]));
+        req.flush(_getStatesAndMetadata(testExplorationData1[0]));
 
         const req2 = httpTestingController.expectOne(
           '/explorehandler/init/0?v=13');
         expect(req2.request.method).toEqual('GET');
-        req2.flush(_getStatesData(testExplorationData1[12]));
+        req2.flush(_getStatesAndMetadata(testExplorationData1[12]));
 
         flushMicrotasks();
       }));
@@ -779,7 +799,7 @@ describe('Compare versions service', function() {
     }];
 
     // Information for mock state data for getDiffGraphData() to be passed to
-    // _getStatesData.
+    // _getStatesAndMetadata.
     var testExplorationData2 = [{
       A: {
         contentStr: '',
@@ -874,12 +894,12 @@ describe('Compare versions service', function() {
         const req = httpTestingController.expectOne(
           '/explorehandler/init/0?v=1');
         expect(req.request.method).toEqual('GET');
-        req.flush(_getStatesData(testExplorationData2[0]));
+        req.flush(_getStatesAndMetadata(testExplorationData2[0]));
 
         const req2 = httpTestingController.expectOne(
           '/explorehandler/init/0?v=5');
         expect(req2.request.method).toEqual('GET');
-        req2.flush(_getStatesData(testExplorationData2[4]));
+        req2.flush(_getStatesAndMetadata(testExplorationData2[4]));
 
         flushMicrotasks();
       }));
@@ -907,12 +927,12 @@ describe('Compare versions service', function() {
         const req = httpTestingController.expectOne(
           '/explorehandler/init/0?v=3');
         expect(req.request.method).toEqual('GET');
-        req.flush(_getStatesData(testExplorationData2[2]));
+        req.flush(_getStatesAndMetadata(testExplorationData2[2]));
 
         const req2 = httpTestingController.expectOne(
           '/explorehandler/init/0?v=5');
         expect(req2.request.method).toEqual('GET');
-        req2.flush(_getStatesData(testExplorationData2[4]));
+        req2.flush(_getStatesAndMetadata(testExplorationData2[4]));
 
         flushMicrotasks();
       }));
@@ -940,12 +960,12 @@ describe('Compare versions service', function() {
         const req = httpTestingController.expectOne(
           '/explorehandler/init/0?v=4');
         expect(req.request.method).toEqual('GET');
-        req.flush(_getStatesData(testExplorationData2[3]));
+        req.flush(_getStatesAndMetadata(testExplorationData2[3]));
 
         const req2 = httpTestingController.expectOne(
           '/explorehandler/init/0?v=5');
         expect(req2.request.method).toEqual('GET');
-        req2.flush(_getStatesData(testExplorationData2[4]));
+        req2.flush(_getStatesAndMetadata(testExplorationData2[4]));
 
         flushMicrotasks();
       }));
@@ -977,12 +997,12 @@ describe('Compare versions service', function() {
         const req = httpTestingController.expectOne(
           '/explorehandler/init/0?v=5');
         expect(req.request.method).toEqual('GET');
-        req.flush(_getStatesData(testExplorationData2[4]));
+        req.flush(_getStatesAndMetadata(testExplorationData2[4]));
 
         const req2 = httpTestingController.expectOne(
           '/explorehandler/init/0?v=8');
         expect(req2.request.method).toEqual('GET');
-        req2.flush(_getStatesData(testExplorationData2[7]));
+        req2.flush(_getStatesAndMetadata(testExplorationData2[7]));
 
         flushMicrotasks();
       }));
@@ -1227,12 +1247,12 @@ describe('Compare versions service', function() {
 
       const req = httpTestingController.expectOne('/explorehandler/init/0?v=1');
       expect(req.request.method).toEqual('GET');
-      req.flush(_getStatesData(testExplorationData3[0]));
+      req.flush(_getStatesAndMetadata(testExplorationData3[0]));
 
       const req2 = httpTestingController.expectOne(
         '/explorehandler/init/0?v=2');
       expect(req2.request.method).toEqual('GET');
-      req2.flush(_getStatesData(testExplorationData3[1]));
+      req2.flush(_getStatesAndMetadata(testExplorationData3[1]));
 
       flushMicrotasks();
     }));
@@ -1267,12 +1287,12 @@ describe('Compare versions service', function() {
 
       const req = httpTestingController.expectOne('/explorehandler/init/0?v=5');
       expect(req.request.method).toEqual('GET');
-      req.flush(_getStatesData(testExplorationData3[4]));
+      req.flush(_getStatesAndMetadata(testExplorationData3[4]));
 
       const req2 = httpTestingController.expectOne(
         '/explorehandler/init/0?v=6');
       expect(req2.request.method).toEqual('GET');
-      req2.flush(_getStatesData(testExplorationData3[5]));
+      req2.flush(_getStatesAndMetadata(testExplorationData3[5]));
 
       flushMicrotasks();
     }));
@@ -1307,12 +1327,12 @@ describe('Compare versions service', function() {
 
       const req = httpTestingController.expectOne('/explorehandler/init/0?v=3');
       expect(req.request.method).toEqual('GET');
-      req.flush(_getStatesData(testExplorationData3[2]));
+      req.flush(_getStatesAndMetadata(testExplorationData3[2]));
 
       const req2 = httpTestingController.expectOne(
         '/explorehandler/init/0?v=5');
       expect(req2.request.method).toEqual('GET');
-      req2.flush(_getStatesData(testExplorationData3[4]));
+      req2.flush(_getStatesAndMetadata(testExplorationData3[4]));
 
       flushMicrotasks();
     }));
@@ -1335,12 +1355,12 @@ describe('Compare versions service', function() {
 
       const req = httpTestingController.expectOne('/explorehandler/init/0?v=2');
       expect(req.request.method).toEqual('GET');
-      req.flush(_getStatesData(testExplorationData3[1]));
+      req.flush(_getStatesAndMetadata(testExplorationData3[1]));
 
       const req2 = httpTestingController.expectOne(
         '/explorehandler/init/0?v=7');
       expect(req2.request.method).toEqual('GET');
-      req2.flush(_getStatesData(testExplorationData3[6]));
+      req2.flush(_getStatesAndMetadata(testExplorationData3[6]));
 
       flushMicrotasks();
     }));
@@ -1375,12 +1395,12 @@ describe('Compare versions service', function() {
 
       const req = httpTestingController.expectOne('/explorehandler/init/0?v=6');
       expect(req.request.method).toEqual('GET');
-      req.flush(_getStatesData(testExplorationData3[5]));
+      req.flush(_getStatesAndMetadata(testExplorationData3[5]));
 
       const req2 = httpTestingController.expectOne(
         '/explorehandler/init/0?v=8');
       expect(req2.request.method).toEqual('GET');
-      req2.flush(_getStatesData(testExplorationData3[7]));
+      req2.flush(_getStatesAndMetadata(testExplorationData3[7]));
 
       flushMicrotasks();
     }));

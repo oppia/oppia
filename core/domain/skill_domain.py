@@ -26,6 +26,9 @@ from core.constants import constants
 from core.domain import change_domain
 from core.domain import state_domain
 
+from typing import List
+from typing_extensions import TypedDict
+
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
 
@@ -181,11 +184,34 @@ class SkillChange(change_domain.BaseChange):
     }]
 
 
+class MisconceptionDict(TypedDict):
+    """Dictionary representing the Misconception object."""
+
+    id: int
+    name: str
+    notes: str
+    feedback: str
+    must_be_addressed: bool
+
+
+class VersionedMisconceptionDict(TypedDict):
+    """Dictionary representing the versioned Misconception object."""
+
+    schema_version: int
+    misconceptions: List[MisconceptionDict]
+
+
 class Misconception:
     """Domain object describing a skill misconception."""
 
     def __init__(
-            self, misconception_id, name, notes, feedback, must_be_addressed):
+        self,
+        misconception_id: int,
+        name: str,
+        notes: str,
+        feedback: str,
+        must_be_addressed: bool
+    ) -> None:
         """Initializes a Misconception domain object.
 
         Args:
@@ -206,7 +232,7 @@ class Misconception:
         self.feedback = html_cleaner.clean(feedback)
         self.must_be_addressed = must_be_addressed
 
-    def to_dict(self):
+    def to_dict(self) -> MisconceptionDict:
         """Returns a dict representing this Misconception domain object.
 
         Returns:
@@ -221,7 +247,7 @@ class Misconception:
         }
 
     @classmethod
-    def from_dict(cls, misconception_dict):
+    def from_dict(cls, misconception_dict: MisconceptionDict) -> Misconception:
         """Returns a Misconception domain object from a dict.
 
         Args:
@@ -294,10 +320,28 @@ class Misconception:
                 self.feedback)
 
 
+class RubricDict(TypedDict):
+    """Dictionary representing the Rubric object."""
+
+    difficulty: str
+    explanations: List[str]
+
+
+class VersionedRubricDict(TypedDict):
+    """Dictionary representing the versioned Rubric object."""
+
+    schema_version: int
+    rubrics: List[RubricDict]
+
+
 class Rubric:
     """Domain object describing a skill rubric."""
 
-    def __init__(self, difficulty, explanations):
+    def __init__(
+        self,
+        difficulty: str,
+        explanations: List[str]
+    ) -> None:
         """Initializes a Rubric domain object.
 
         Args:
@@ -309,7 +353,7 @@ class Rubric:
         self.explanations = [
             html_cleaner.clean(explanation) for explanation in explanations]
 
-    def to_dict(self):
+    def to_dict(self) -> RubricDict:
         """Returns a dict representing this Rubric domain object.
 
         Returns:
@@ -321,7 +365,7 @@ class Rubric:
         }
 
     @classmethod
-    def from_dict(cls, rubric_dict):
+    def from_dict(cls, rubric_dict: RubricDict) -> Rubric:
         """Returns a Rubric domain object from a dict.
 
         Args:
@@ -335,7 +379,7 @@ class Rubric:
 
         return rubric
 
-    def validate(self):
+    def validate(self) -> None:
         """Validates various properties of the Rubric object.
 
         Raises:
@@ -379,10 +423,21 @@ class Rubric:
                 'Expected at least one explanation in medium level rubrics')
 
 
+class WorkedExampleDict(TypedDict):
+    """Dictionary representing the WorkedExample object."""
+
+    question: state_domain.SubtitledHtmlDict
+    explanation: state_domain.SubtitledHtmlDict
+
+
 class WorkedExample:
     """Domain object for representing the worked_example dict."""
 
-    def __init__(self, question, explanation):
+    def __init__(
+        self,
+        question: state_domain.SubtitledHtml,
+        explanation: state_domain.SubtitledHtml
+    ) -> None:
         """Constructs a WorkedExample domain object.
 
         Args:
@@ -411,7 +466,7 @@ class WorkedExample:
                 'received %s' % self.question)
         self.explanation.validate()
 
-    def to_dict(self):
+    def to_dict(self) -> WorkedExampleDict:
         """Returns a dict representing this WorkedExample domain object.
 
         Returns:
@@ -447,12 +502,32 @@ class WorkedExample:
         return worked_example
 
 
+class SkillContentsDict(TypedDict):
+    """Dictionary representing the SkillContents object."""
+
+    explanation: state_domain.SubtitledHtmlDict
+    worked_examples: List[WorkedExampleDict]
+    recorded_voiceovers: state_domain.RecordedVoiceoversDict
+    written_translations: state_domain.WrittenTranslationsDict
+
+
+class VersionedSkillContentsDict(TypedDict):
+    """Dictionary representing the versioned SkillContents object."""
+
+    schema_version: int
+    skill_contents: SkillContentsDict
+
+
 class SkillContents:
     """Domain object representing the skill_contents dict."""
 
     def __init__(
-            self, explanation, worked_examples, recorded_voiceovers,
-            written_translations):
+        self,
+        explanation: state_domain.SubtitledHtml,
+        worked_examples: List[WorkedExample],
+        recorded_voiceovers: state_domain.RecordedVoiceovers,
+        written_translations: state_domain.WrittenTranslations
+    ) -> None:
         """Constructs a SkillContents domain object.
 
         Args:
@@ -524,7 +599,7 @@ class SkillContents:
         }
 
     @classmethod
-    def from_dict(cls, skill_contents_dict):
+    def from_dict(cls, skill_contents_dict: SkillContentsDict) -> SkillContents:
         """Return a SkillContents domain object from a dict.
 
         Args:
@@ -645,7 +720,7 @@ class Skill:
                 'Skill description should be less than %d chars, received %s'
                 % (description_length_limit, description))
 
-    def validate(self):
+    def validate(self) -> None:
         """Validates various properties of the Skill object.
 
         Raises:

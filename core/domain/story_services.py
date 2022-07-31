@@ -39,12 +39,18 @@ from core.domain import suggestion_services
 from core.domain import topic_fetchers
 from core.platform import models
 
+from typing import List
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import story_models
+
 (exp_models, story_models, user_models,) = models.Registry.import_models(
     [models.NAMES.exploration, models.NAMES.story, models.NAMES.user])
 transaction_services = models.Registry.import_transaction_services()
 
 
-def get_new_story_id():
+def get_new_story_id() -> str:
     """Returns a new story id.
 
     Returns:
@@ -240,8 +246,9 @@ def does_story_exist_with_url_fragment(url_fragment):
 
 
 def validate_prerequisite_skills_in_story_contents(
-    skill_ids_in_corresponding_topic, story_contents
-):
+    skill_ids_in_corresponding_topic: List[str],
+    story_contents: story_domain.StoryContents
+) -> None:
     """Validates the prerequisites skills in the story contents.
 
     Args:
@@ -410,7 +417,9 @@ def validate_explorations_for_story(exp_ids, strict):
     return validation_error_messages
 
 
-def populate_story_model_fields(story_model, story):
+def populate_story_model_fields(
+    story_model: story_models.StoryModel, story: story_domain.Story
+) -> story_models.StoryModel:
     """Populate story model with the data from story object.
 
     Args:
@@ -673,7 +682,9 @@ def delete_story_summary(story_id):
     story_models.StorySummaryModel.get(story_id).delete()
 
 
-def compute_summary_of_story(story):
+def compute_summary_of_story(
+    story: story_domain.Story
+) -> story_domain.StorySummary:
     """Create a StorySummary domain object for a given Story domain
     object and return it.
 
@@ -706,7 +717,10 @@ def create_story_summary(story_id):
     save_story_summary(story_summary)
 
 
-def populate_story_summary_model_fields(story_summary_model, story_summary):
+def populate_story_summary_model_fields(
+    story_summary_model: story_models.StorySummaryModel,
+    story_summary: story_domain.StorySummary
+) -> story_models.StorySummaryModel:
     """Populate story summary model with the data from story summary object.
 
     Args:

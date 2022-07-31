@@ -25,10 +25,20 @@ from core.domain import caching_services
 from core.domain import skill_domain
 from core.platform import models
 
+from typing import List, Optional, overload
+from typing_extensions import Literal
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import skill_models
+
 (skill_models,) = models.Registry.import_models([models.NAMES.skill])
 
 
-def get_multi_skills(skill_ids, strict=True):
+def get_multi_skills(
+    skill_ids: List[str],
+    strict: bool = True
+) -> List[skill_domain.Skill]:
     """Returns a list of skills matching the skill IDs provided.
 
     Args:
@@ -52,7 +62,43 @@ def get_multi_skills(skill_ids, strict=True):
     return skills
 
 
-def get_skill_by_id(skill_id, strict=True, version=None):
+@overload
+def get_skill_by_id(
+    skill_id: str,
+) -> skill_domain.Skill: ...
+
+
+@overload
+def get_skill_by_id(
+    skill_id: str,
+    *,
+    version: Optional[int] = None
+) -> skill_domain.Skill: ...
+
+
+@overload
+def get_skill_by_id(
+    skill_id: str,
+    *,
+    strict: Literal[True],
+    version: Optional[int] = None
+) -> skill_domain.Skill: ...
+
+
+@overload
+def get_skill_by_id(
+    skill_id: str,
+    *,
+    strict: Literal[False],
+    version: Optional[int] = None
+) -> Optional[skill_domain.Skill]: ...
+
+
+def get_skill_by_id(
+    skill_id: str,
+    strict: bool = True,
+    version: Optional[int] = None
+) -> Optional[skill_domain.Skill]:
     """Returns a domain object representing a skill.
 
     Args:
@@ -88,7 +134,9 @@ def get_skill_by_id(skill_id, strict=True, version=None):
             return None
 
 
-def get_skill_from_model(skill_model):
+def get_skill_from_model(
+    skill_model: skill_models.SkillModel
+) -> skill_domain.Skill:
     """Returns a skill domain object given a skill model loaded
     from the datastore.
 
@@ -100,17 +148,17 @@ def get_skill_from_model(skill_model):
     """
 
     # Ensure the original skill model does not get altered.
-    versioned_skill_contents = {
+    versioned_skill_contents: skill_domain.VersionedSkillContentsDict = {
         'schema_version': skill_model.skill_contents_schema_version,
         'skill_contents': copy.deepcopy(skill_model.skill_contents)
     }
 
-    versioned_misconceptions = {
+    versioned_misconceptions: skill_domain.VersionedMisconceptionDict = {
         'schema_version': skill_model.misconceptions_schema_version,
         'misconceptions': copy.deepcopy(skill_model.misconceptions)
     }
 
-    versioned_rubrics = {
+    versioned_rubrics: skill_domain.VersionedRubricDict = {
         'schema_version': skill_model.rubric_schema_version,
         'rubrics': copy.deepcopy(skill_model.rubrics)
     }
@@ -128,7 +176,7 @@ def get_skill_from_model(skill_model):
             feconf.CURRENT_RUBRIC_SCHEMA_VERSION):
         _migrate_rubrics_to_latest_schema(versioned_rubrics)
 
-    return skill_domain.Skill(
+    return skill_domain.Skill(  # type: ignore[no-untyped-call]
         skill_model.id, skill_model.description,
         [
             skill_domain.Misconception.from_dict(misconception)
@@ -148,7 +196,7 @@ def get_skill_from_model(skill_model):
         skill_model.last_updated)
 
 
-def get_skill_by_description(description):
+def get_skill_by_description(description: str) -> Optional[skill_domain.Skill]:
     """Returns a domain object representing a skill.
 
     Args:
@@ -163,7 +211,9 @@ def get_skill_by_description(description):
     return get_skill_from_model(skill_model) if skill_model else None
 
 
-def _migrate_skill_contents_to_latest_schema(versioned_skill_contents):
+def _migrate_skill_contents_to_latest_schema(
+    versioned_skill_contents: skill_domain.VersionedSkillContentsDict
+) -> None:
     """Holds the responsibility of performing a step-by-step, sequential update
     of the skill contents structure based on the schema version of the input
     skill contents dictionary. If the current skill_contents schema changes, a
@@ -189,12 +239,14 @@ def _migrate_skill_contents_to_latest_schema(versioned_skill_contents):
 
     while (skill_contents_schema_version <
            feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION):
-        skill_domain.Skill.update_skill_contents_from_model(
+        skill_domain.Skill.update_skill_contents_from_model(  # type: ignore[no-untyped-call]
             versioned_skill_contents, skill_contents_schema_version)
         skill_contents_schema_version += 1
 
 
-def _migrate_misconceptions_to_latest_schema(versioned_misconceptions):
+def _migrate_misconceptions_to_latest_schema(
+    versioned_misconceptions: skill_domain.VersionedMisconceptionDict
+) -> None:
     """Holds the responsibility of performing a step-by-step, sequential update
     of the misconceptions structure based on the schema version of the input
     misconceptions dictionary. If the current misconceptions schema changes, a
@@ -221,12 +273,14 @@ def _migrate_misconceptions_to_latest_schema(versioned_misconceptions):
 
     while (misconception_schema_version <
            feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION):
-        skill_domain.Skill.update_misconceptions_from_model(
+        skill_domain.Skill.update_misconceptions_from_model(  # type: ignore[no-untyped-call]
             versioned_misconceptions, misconception_schema_version)
         misconception_schema_version += 1
 
 
-def _migrate_rubrics_to_latest_schema(versioned_rubrics):
+def _migrate_rubrics_to_latest_schema(
+    versioned_rubrics: skill_domain.VersionedRubricDict
+) -> None:
     """Holds the responsibility of performing a step-by-step, sequential update
     of the rubrics structure based on the schema version of the input
     rubrics dictionary. If the current rubrics schema changes, a
@@ -252,6 +306,6 @@ def _migrate_rubrics_to_latest_schema(versioned_rubrics):
 
     while (rubric_schema_version <
            feconf.CURRENT_RUBRIC_SCHEMA_VERSION):
-        skill_domain.Skill.update_rubrics_from_model(
+        skill_domain.Skill.update_rubrics_from_model(  # type: ignore[no-untyped-call]
             versioned_rubrics, rubric_schema_version)
         rubric_schema_version += 1

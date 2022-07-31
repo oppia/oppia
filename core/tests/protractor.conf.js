@@ -32,17 +32,12 @@ var suites = {
       'protractor_desktop/additionalEditorFeaturesModals.js'
     ],
 
-
     additionalPlayerFeatures: [
       'protractor_desktop/additionalPlayerFeatures.js'
     ],
 
     adminPage: [
       'protractor_desktop/adminTabFeatures.js'
-    ],
-
-    blogDashboard: [
-      'protractor_desktop/blogDashboard.js'
     ],
 
     classroomPage: [
@@ -53,20 +48,8 @@ var suites = {
       'protractor_desktop/classroomPageFileUploadFeatures.js'
     ],
 
-    collections: [
-      'protractor_desktop/collections.js'
-    ],
-
-    contributorDashboard: [
-      'protractor_desktop/contributorDashboard.js'
-    ],
-
     coreEditorAndPlayerFeatures: [
       'protractor_desktop/coreEditorAndPlayerFeatures.js'
-    ],
-
-    creatorDashboard: [
-      'protractor_desktop/creatorDashboard.js'
     ],
 
     embedding: [
@@ -109,14 +92,6 @@ var suites = {
       'protractor_desktop/fileUploadExtensions.js'
     ],
 
-    learnerDashboard: [
-      'protractor_desktop/learnerDashboard.js'
-    ],
-
-    learner: [
-      'protractor/learnerFlow.js'
-    ],
-
     library: [
       'protractor/libraryFlow.js'
     ],
@@ -129,32 +104,8 @@ var suites = {
       'protractor_desktop/playVoiceovers.js'
     ],
 
-    preferences: [
-      'protractor_desktop/preferences.js'
-    ],
-
-    profileFeatures: [
-      'protractor_desktop/profileFeatures.js'
-    ],
-
-    profileMenu: [
-      'protractor/profileMenuFlow.js'
-    ],
-
     publication: [
       'protractor_desktop/publicationAndLibrary.js'
-    ],
-
-    subscriptions: [
-      'protractor/subscriptionsFlow.js'
-    ],
-
-    topicAndStoryEditor: [
-      'protractor_desktop/topicAndStoryEditor.js'
-    ],
-
-    topicAndStoryEditorFileUploadFeatures: [
-      'protractor_desktop/topicAndStoryEditorFileUploadFeatures.js'
     ],
 
     topicsAndSkillsDashboard: [
@@ -163,14 +114,6 @@ var suites = {
 
     skillEditor: [
       'protractor_desktop/skillEditor.js'
-    ],
-
-    topicAndStoryViewer: [
-      'protractor_desktop/topicAndStoryViewer.js'
-    ],
-
-    users: [
-      'protractor_desktop/userJourneys.js',
     ],
 
     wipeout: [
@@ -368,8 +311,7 @@ exports.config = {
           }
         },
       });
-    }
-    else {
+    } else {
       console.log(
         'Videos will not be recorded for this suite either because videos' +
         ' have been disabled for it (using environment variables) or' +

@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import collections
+import itertools
 import logging
 
 from core import feconf
@@ -36,6 +37,12 @@ from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
+
+from typing import Dict, List, Optional
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import skill_models
 
 (skill_models, user_models, question_models, topic_models) = (
     models.Registry.import_models([
@@ -545,7 +552,7 @@ def get_skill_summary_by_id(skill_id, strict=True):
         return None
 
 
-def get_new_skill_id():
+def get_new_skill_id() -> str:
     """Returns a new skill id.
 
     Returns:
@@ -733,7 +740,9 @@ def apply_change_list(skill_id, change_list, committer_id):
         raise e
 
 
-def populate_skill_model_fields(skill_model, skill):
+def populate_skill_model_fields(
+    skill_model: skill_models.SkillModel, skill: skill_domain.Skill
+) -> skill_models.SkillModel:
     """Populate skill model with the data from skill object.
 
     Args:
@@ -895,7 +904,9 @@ def delete_skill_summary(skill_id):
         skill_summary_model.delete()
 
 
-def compute_summary_of_skill(skill):
+def compute_summary_of_skill(
+    skill: skill_domain.Skill
+) -> skill_domain.SkillSummary:
     """Create a SkillSummary domain object for a given Skill domain
     object and return it.
 
@@ -930,7 +941,10 @@ def create_skill_summary(skill_id):
     save_skill_summary(skill_summary)
 
 
-def populate_skill_summary_model_fields(skill_summary_model, skill_summary):
+def populate_skill_summary_model_fields(
+    skill_summary_model: skill_models.SkillSummaryModel,
+    skill_summary: skill_domain.SkillSummary
+) -> skill_models.SkillSummaryModel:
     """Populate skill summary model with the data from skill summary object.
 
     Args:
@@ -1082,6 +1096,46 @@ def get_multi_user_skill_mastery(user_id, skill_ids):
             degrees_of_mastery[skill_id] = skill_mastery_model.degree_of_mastery
 
     return degrees_of_mastery
+
+
+def get_multi_users_skills_mastery(
+    user_ids: List[str], skill_ids: List[str]
+) -> Dict[str, Dict[str, Optional[float]]]:
+    """Fetches the mastery of user in multiple skills.
+
+    Args:
+        user_ids: list(str). The user IDs of the users.
+        skill_ids: list(str). Skill IDs of the skill for which mastery degree is
+            requested.
+
+    Returns:
+        dict(str, dict(str, float|None)). The keys are the user IDs and values
+        are dictionaries with keys as requested skill IDs and values
+        as the corresponding mastery degree of the user or None if
+        UserSkillMasteryModel does not exist for the skill.
+    """
+    # We need to convert the resultant object of itertools product to a list
+    # to be able to use it multiple times as it otherwise gets exhausted after
+    # being iterated over once.
+    all_combinations = list(itertools.product(user_ids, skill_ids))
+    model_ids = []
+    for (user_id, skill_id) in all_combinations:
+        model_ids.append(user_models.UserSkillMasteryModel.construct_model_id(
+            user_id, skill_id))
+
+    skill_mastery_models = user_models.UserSkillMasteryModel.get_multi(
+        model_ids)
+    degrees_of_masteries = {user_id: {} for user_id in user_ids}
+    for i, (user_id, skill_id) in enumerate(all_combinations):
+        skill_mastery_model = skill_mastery_models[i]
+        if skill_mastery_model is None:
+            degrees_of_masteries[user_id][skill_id] = None
+        else:
+            degrees_of_masteries[user_id][skill_id] = (
+                skill_mastery_model.degree_of_mastery
+            )
+
+    return degrees_of_masteries
 
 
 def skill_has_associated_questions(skill_id):

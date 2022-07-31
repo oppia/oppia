@@ -20,7 +20,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFactory';
+import { MisconceptionSkillMap, MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFactory';
 import { QuestionMisconceptionSelectorComponent } from './question-misconception-selector.component';
 
 describe('Question Misconception Selector Component', () => {
@@ -29,7 +29,7 @@ describe('Question Misconception Selector Component', () => {
   let stateEditorService: StateEditorService;
 
   let misconceptionObjectFactory: MisconceptionObjectFactory;
-  let mockMisconceptionObject;
+  let mockMisconceptionObject: MisconceptionSkillMap;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({

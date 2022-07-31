@@ -108,6 +108,7 @@ describe('Solution Verification Service', () => {
           answer_groups: [{
             outcome: {
               dest: 'End State',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'feedback_1',
                 html: ''
@@ -135,6 +136,7 @@ describe('Solution Verification Service', () => {
           },
           default_outcome: {
             dest: 'First State',
+            dest_if_really_stuck: null,
             feedback: {
               content_id: 'default_outcome',
               html: ''
@@ -185,6 +187,7 @@ describe('Solution Verification Service', () => {
             rule_specs: [],
             outcome: {
               dest: 'default',
+              dest_if_really_stuck: null,
               feedback: {
                 content_id: 'feedback_1',
                 html: ''
@@ -205,6 +208,7 @@ describe('Solution Verification Service', () => {
           },
           default_outcome: {
             dest: 'default',
+            dest_if_really_stuck: null,
             feedback: {
               content_id: 'default_outcome',
               html: ''

@@ -12,7 +12,7 @@
     <mat-card layout="row" class="oppia-mat-card">
       <div class="average-ratings stats-card">
         <p class="stat-description" [innerHTML]="'I18N_DASHBOARD_STATS_AVERAGE_RATING' | translate"></p>
-        <h1 class="stat-value-with-rating protractor-test-oppia-average-rating"
+        <h1 class="stat-value-with-rating e2e-test-oppia-average-rating"
             [hidden]="!dashboardStats.numRatings || relativeChangeInTotalPlays">
             {{ dashboardStats.averageRatings || 'N/A' }}
         </h1>
@@ -31,7 +31,7 @@
       </div>
       <div class="total-plays stats-card">
         <p class="stat-description" [innerHTML]="'I18N_DASHBOARD_STATS_TOTAL_PLAYS' | translate"></p>
-        <h1 class="stat-value-with-rating protractor-test-oppia-total-plays"
+        <h1 class="stat-value-with-rating e2e-test-oppia-total-plays"
             [hidden]="!dashboardStats.numRatings || relativeChangeInTotalPlays">
             {{ dashboardStats.totalPlays }}
         </h1>
@@ -45,7 +45,7 @@
       </div>
       <div class="total-open-feedback stats-card">
         <p class="stat-description" [innerHTML]="'I18N_DASHBOARD_STATS_OPEN_FEEDBACK' | translate"></p>
-        <h1 class="stat-value-with-rating protractor-test-oppia-open-feedback"
+        <h1 class="stat-value-with-rating e2e-test-oppia-open-feedback"
             [hidden]="!dashboardStats.numRatings || relativeChangeInTotalPlays">
             {{ dashboardStats.totalOpenFeedback }}
         </h1>
@@ -53,7 +53,7 @@
       </div>
       <div class="total-open-feedback stats-card">
         <p class="stat-description" [innerHTML]="'I18N_DASHBOARD_STATS_TOTAL_SUBSCRIBERS' | translate"></p>
-        <h1 class="stat-value-with-rating protractor-test-oppia-total-subscribers"
+        <h1 class="stat-value-with-rating e2e-test-oppia-total-subscribers"
             [hidden]="!dashboardStats.numRatings || relativeChangeInTotalPlays">
             {{ subscribersList?.length }}
         </h1>
@@ -86,13 +86,13 @@
       </li>
       <li *ngIf="canCreateCollections && collectionsList?.length > 0"
           [ngClass]="{'oppia-dashboard-tabs-active': activeTab === 'myCollections'}">
-        <a class="oppia-dashboard-tabs-text protractor-test-collections-tab"
+        <a class="oppia-dashboard-tabs-text e2e-test-collections-tab"
            (click)="setActiveTab('myCollections')"
            [innerHTML]="'I18N_DASHBOARD_COLLECTIONS' | translate">
         </a>
       </li>
       <li *ngIf="subscribersList?.length > 0"
-          class="protractor-test-subscription-tab"
+          class="e2e-test-subscription-tab"
           [ngClass]="{'oppia-dashboard-tabs-active': activeTab === 'mySubscribers'}">
         <a class="oppia-dashboard-tabs-text"
            (click)="setActiveTab('mySubscribers')"
@@ -108,7 +108,7 @@
                 aria-label="Card View">
           <span class="fa fa-th-large"></span>
         </button>
-        <button class="list-view-btn protractor-test-oppia-list-view-btn"
+        <button class="list-view-btn e2e-test-oppia-list-view-btn"
                 [ngClass]="{'dashboard-active-view': myExplorationsView === 'list'}"
                 (click)="setMyExplorationsView('list')"
                 aria-label="List View">
@@ -125,7 +125,7 @@
         <div>
           <p [innerHTML]="'I18N_DASHBOARD_EXPLORATIONS_EMPTY_MESSAGE' | translate"></p>
           <button type="button"
-                  class="btn oppia-dashboard-intro-button oppia-transition-200 protractor-test-create-new-exploration-button"
+                  class="btn oppia-dashboard-intro-button oppia-transition-200 e2e-test-create-new-exploration-button"
                   (click)="showCreateQuestionModal()"
                   *ngIf="enableQuestionSuggestions && topicSummaries?.length > 0">
                   CREATE QUESTION
@@ -191,7 +191,7 @@
           <tr *ngFor="let exploration of explorationsList | sortBy: isCurrentSortDescending: sortByFunction(exploration?.ratings)"
               class="exploration-list-item">
             <td>
-              <a [href]="getExplorationUrl(exploration.id)" class="oppia-dashboard-list-summary protractor-test-exp-summary-row-title">
+              <a [href]="getExplorationUrl(exploration.id)" class="oppia-dashboard-list-summary e2e-test-exp-summary-row-title">
                 {{ exploration.title || DEFAULT_EMPTY_TITLE }}
               </a>
             </td>
@@ -203,23 +203,23 @@
               </a>
             </td>
             <td *ngIf="exploration.status !== 'private'">
-              <a [href]="getExplorationUrl(exploration.id)" class="oppia-dashboard-list-summary protractor-test-exp-summary-row-rating">
+              <a [href]="getExplorationUrl(exploration.id)" class="oppia-dashboard-list-summary e2e-test-exp-summary-row-rating">
                 {{ (getAverageRating(exploration.ratings) | number:'1.1-1') || 'N/A' }}
               </a>
             </td>
             <td *ngIf="exploration.status !== 'private'">
-              <a [href]="getExplorationUrl(exploration.id)" class="oppia-dashboard-list-summary protractor-test-exp-summary-row-num-views">
+              <a [href]="getExplorationUrl(exploration.id)" class="oppia-dashboard-list-summary e2e-test-exp-summary-row-num-views">
                 {{ exploration.numViews }}
               </a>
             </td>
             <td *ngIf="exploration.status !== 'private'">
               <a [href]="'/create/' + exploration.id +'#/feedback'"
-                 class="oppia-dashboard-list-summary protractor-test-exp-summary-row-open-feedback">
+                 class="oppia-dashboard-list-summary e2e-test-exp-summary-row-open-feedback">
                 {{ exploration.numOpenThreads }}
               </a>
             </td>
             <td>
-              <a [href]="getExplorationUrl(exploration.id)" class="oppia-dashboard-list-summary protractor-test-exp-summary-row-last-updated">
+              <a [href]="getExplorationUrl(exploration.id)" class="oppia-dashboard-list-summary e2e-test-exp-summary-row-last-updated">
                 {{ getLocaleAbbreviatedDatetimeString(exploration.lastUpdatedMsec) }}
               </a>
             </td>
@@ -231,7 +231,7 @@
     <div *ngIf="myExplorationsView === 'card' && explorationsList?.length > 0"
          class="oppia-card-view-wrap">
       <mat-card *ngFor="let exploration of explorationsList | sortBy: isCurrentSortDescending: sortByFunction(exploration?.ratings)"
-                class="oppia-activity-summary-tile oppia-dashboard-card-view-item protractor-test-exploration-dashboard-card"
+                class="oppia-activity-summary-tile oppia-dashboard-card-view-item e2e-test-exploration-dashboard-card"
                 is-private="exploration.status === 'private'">
         <a [href]="'/create/' + exploration.id">
           <div class="title-section"
@@ -239,11 +239,11 @@
             <img class="thumbnail-image"
                  alt=""
                  [src]="getCompleteThumbnailIconUrl(exploration.thumbnailIconUrl)">
-            <h2 class="activity-title protractor-test-exp-summary-tile-title">
+            <h2 class="activity-title e2e-test-exp-summary-tile-title">
               <span>{{ (exploration.title || DEFAULT_EMPTY_TITLE) | truncate:40 }}</span>
             </h2>
           </div>
-          <div class="mask-wrap protractor-test-title-mask">
+          <div class="mask-wrap e2e-test-title-mask">
             <div class="title-section-mask"></div>
           </div>
         </a>
@@ -261,7 +261,7 @@
               class="metrics"
               fxLayoutAlign="space-between center">
             <div class="row-one">
-              <li flex="50" class="protractor-test-exp-summary-tile-rating">
+              <li flex="50" class="e2e-test-exp-summary-tile-rating">
                 <span>
                   <span class="fa fa-star oppia-dashboard-card-statistic-icon"
                         ngbTooltip="{{ 'I18N_LIBRARY_RATINGS_TOOLTIP' | translate }}"
@@ -273,7 +273,7 @@
                 </span>
               </li>
 
-              <li flex="50" class="protractor-test-exp-summary-tile-open-feedback">
+              <li flex="50" class="e2e-test-exp-summary-tile-open-feedback">
                 <span class="fa fa-comments oppia-dashboard-card-statistic-icon"
                       ngbTooltip="{{ 'I18N_DASHBOARD_OPEN_FEEDBACK' | translate }}"
                       placement="top">
@@ -291,7 +291,7 @@
             </div>
 
             <div class="row-two">
-              <li flex="50" class="protractor-test-exp-summary-tile-num-views">
+              <li flex="50" class="e2e-test-exp-summary-tile-num-views">
                 <span class="fa fa-eye oppia-dashboard-card-statistic-icon"
                       ngbTooltip="{{ 'I18N_LIBRARY_VIEWS_TOOLTIP' | translate }}"
                       placement="top">
@@ -301,7 +301,7 @@
                 </span>
               </li>
 
-              <li flex="50" class="protractor-test-exp-summary-tile-last-updated">
+              <li flex="50" class="e2e-test-exp-summary-tile-last-updated">
                 <span class="far fa-clock oppia-dashboard-card-statistic-icon"
                       ngbTooltip="{{ 'I18N_LIBRARY_LAST_UPDATED' | translate }}"
                       placement="top">
@@ -355,7 +355,7 @@
         </span>
       </span>
     </div>
-    <mat-card class="oppia-subscription-card protractor-test-subscription-card"
+    <mat-card class="oppia-subscription-card e2e-test-subscription-card"
               *ngFor="let subscriber of subscribersList | sortBy: isCurrentSubscriptionSortDescending: sortSubscriptionFunction()">
       <a class="oppia-subscription-profile-link" [href]="'/profile/' + subscriber.username" target="_blank" rel="noopener">
         <img [src]="getTrustedResourceUrl(subscriber.pictureDataUrl)"
@@ -363,7 +363,7 @@
              alt="subscriberImageUrl">
         <span class="oppia-subscription-card-summary">
           <div class="oppia-subscription-name-container">
-            <strong class="protractor-test-subscription-name"
+            <strong class="e2e-test-subscription-name"
                     ngbPopover="showUsernamePopover(subscriber.username)">
               {{ subscriber.username| truncate:10 }}
             </strong>

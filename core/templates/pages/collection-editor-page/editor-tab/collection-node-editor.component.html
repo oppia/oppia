@@ -6,7 +6,7 @@
       {{ collectionNode.getExplorationTitle() }}
     </a>
   </div>
-  <span class="collection-editor-delete-node protractor-test-editor-delete-node">
+  <span class="collection-editor-delete-node e2e-test-editor-delete-node">
     <span (click)="deleteNode()"
           aria-hidden="true">
       <i class="material-icons mat-18">
@@ -16,7 +16,7 @@
   </span>
   <span (click)="shiftNodeLeft()"
         *ngIf="linearIndex > 0"
-        class="collection-editor-shift-left-arrow protractor-test-editor-shift-left"
+        class="collection-editor-shift-left-arrow e2e-test-editor-shift-left"
         aria-hidden="true">
     <i class="material-icons">
       &#xE5CB;
@@ -24,7 +24,7 @@
   </span>
   <span (click)="shiftNodeRight()"
         *ngIf="linearIndex < collection?.getCollectionNodeCount() - 1"
-        class="collection-editor-shift-right-arrow protractor-test-editor-shift-right"
+        class="collection-editor-shift-right-arrow e2e-test-editor-shift-right"
         aria-hidden="true">
     <i class="material-icons">
       &#xE5CC;

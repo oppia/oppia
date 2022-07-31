@@ -15,17 +15,17 @@
           <div ng-show="$ctrl.getTotalWarningsCount()"
                class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color"
                ng-mouseover="$ctrl.warningsAreShown=true" ng-mouseleave="$ctrl.warningsAreShown=false">
-            <span class="oppia-editor-warnings-count protractor-test-warning-indicator">
+            <span class="oppia-editor-warnings-count e2e-test-warning-indicator">
               <[$ctrl.getTotalWarningsCount()]>
             </span>
             <ul uib-dropdown-menu class="uib-dropdown-menu oppia-editor-warnings-box story-editor-warning-box" ng-if="$ctrl.warningsAreShown">
               <span class="oppia-editor-warnings-header">Warnings</span>
-              <li class="oppia-editor-warnings-text protractor-test-warnings-text"
+              <li class="oppia-editor-warnings-text e2e-test-warnings-text"
                   ng-repeat="issue in $ctrl.validationIssues.concat($ctrl.explorationValidationIssues) track by $index">
                 <hr class="oppia-editor-warnings-separator">
                 <[issue]>
               </li>
-              <li class="oppia-editor-warnings-text protractor-test-warnings-text"
+              <li class="oppia-editor-warnings-text e2e-test-warnings-text"
                   ng-repeat="issue in $ctrl.prepublishValidationIssues track by $index">
                 <hr class="oppia-editor-warnings-separator">
                 <[issue]>

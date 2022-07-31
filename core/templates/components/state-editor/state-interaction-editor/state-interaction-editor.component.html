@@ -18,7 +18,7 @@
     <div class="oppia-add-interaction-button-container"
          *ngIf="!interactionId">
       <button type="button"
-              class="btn btn-secondary oppia-add-interaction-button protractor-test-open-add-interaction-modal"
+              class="btn btn-secondary oppia-add-interaction-button e2e-test-open-add-interaction-modal"
               (click)="openInteractionCustomizerModal()"
               *ngIf="editabilityService.isEditable()">
         + ADD INTERACTION
@@ -43,14 +43,14 @@
         <div class="oppia-editor-card-section-container">
           <div class="oppia-editor-card-section oppia-mobile-collapsible-card-content">
             <button type="button"
-                    class="protractor-test-delete-interaction oppia-delete-interaction-button oppia-transition-200"
+                    class="e2e-test-delete-interaction oppia-delete-interaction-button oppia-transition-200"
                     (click)="deleteInteraction()"
                     *ngIf="editabilityService.isEditable()">
               <i class="fas fa-times"></i>
             </button>
 
             <div *ngIf="hasLoaded"
-                 class="protractor-test-interaction"
+                 class="e2e-test-interaction"
                  [ngClass]="{'oppia-editable-section': editabilityService.isEditable() && !interactionIsDisabled}">
               <div class="oppia-interaction-preview oppia-transition-200"
                    (click)="openInteractionCustomizerModal()"
@@ -58,9 +58,9 @@
                    aria-label="edit interaction">
               </div>
               <div>
-                <angular-html-bind-wrapper [htmlData]="interactionPreviewHtml"
+                <oppia-interaction-display [htmlData]="interactionPreviewHtml"
                                            classStr="oppia-interaction-preview-container">
-                </angular-html-bind-wrapper>
+                </oppia-interaction-display>
               </div>
             </div>
           </div>

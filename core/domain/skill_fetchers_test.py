@@ -26,17 +26,22 @@ from core.domain import state_domain
 from core.platform import models
 from core.tests import test_utils
 
+from typing_extensions import Final
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import skill_models
+
 (skill_models,) = models.Registry.import_models([models.NAMES.skill])
 
 
 class SkillFetchersUnitTests(test_utils.GenericTestBase):
     """Tests for skill fetchers."""
 
-    SKILL_ID = None
-    USER_ID = 'user'
-    MISCONCEPTION_ID_1 = 1
+    USER_ID: Final = 'user'
+    MISCONCEPTION_ID_1: Final = 1
 
-    def setUp(self):
+    def setUp(self) -> None:
         super(SkillFetchersUnitTests, self).setUp()
         example_1 = skill_domain.WorkedExample(
             state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
@@ -58,25 +63,25 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
         misconceptions = [skill_domain.Misconception(
             self.MISCONCEPTION_ID_1, 'name', '<p>description</p>',
             '<p>default_feedback</p>', True)]
-        self.SKILL_ID = skill_services.get_new_skill_id()
+        self.skill_id = skill_services.get_new_skill_id()
 
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.user_id_admin = (
-            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))  # type: ignore[no-untyped-call]
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])  # type: ignore[no-untyped-call]
 
-        self.skill = self.save_new_skill(
-            self.SKILL_ID, self.USER_ID, description='Description',
+        self.skill = self.save_new_skill(  # type: ignore[no-untyped-call]
+            self.skill_id, self.USER_ID, description='Description',
             misconceptions=misconceptions,
             skill_contents=skill_contents,
             prerequisite_skill_ids=['skill_id_1', 'skill_id_2'])
 
-    def test_get_multi_skills(self):
+    def test_get_multi_skills(self) -> None:
         example_1 = skill_domain.WorkedExample(
             state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
             state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>')
         )
-        self.save_new_skill(
+        self.save_new_skill(  # type: ignore[no-untyped-call]
             'skill_a', self.user_id_admin, description='Description A',
             misconceptions=[],
             skill_contents=skill_domain.SkillContents(
@@ -94,7 +99,7 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
                 })
             )
         )
-        self.save_new_skill(
+        self.save_new_skill(  # type: ignore[no-untyped-call]
             'skill_b', self.user_id_admin, description='Description B',
             misconceptions=[],
             skill_contents=skill_domain.SkillContents(
@@ -125,20 +130,21 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skills[1].description, 'Description B')
         self.assertEqual(skills[1].misconceptions, [])
 
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'No skill exists for ID skill_c'):
             skill_fetchers.get_multi_skills(['skill_a', 'skill_c'])
 
-    def test_get_skill_by_id(self):
+    def test_get_skill_by_id(self) -> None:
         expected_skill = self.skill.to_dict()
-        skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
-        self.assertEqual(skill.to_dict(), expected_skill)
+        skill = skill_fetchers.get_skill_by_id(self.skill_id)
+        self.assertEqual(skill.to_dict(), expected_skill)  # type: ignore[no-untyped-call]
         self.assertEqual(
             skill_fetchers.get_skill_by_id('Does Not Exist', strict=False), None
         )
 
     def test_get_skill_from_model_with_invalid_skill_contents_schema_version(
-            self):
+        self
+    ) -> None:
         commit_cmd = skill_domain.SkillChange({
             'cmd': skill_domain.CMD_CREATE_NEW
         })
@@ -158,14 +164,15 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
         model.commit(
             self.user_id_admin, 'skill model created', commit_cmd_dicts)
 
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception,
             'Sorry, we can only process v1-v%d skill schemas at '
             'present.' % feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION):
             skill_fetchers.get_skill_from_model(model)
 
     def test_get_skill_from_model_with_invalid_misconceptions_schema_version(
-            self):
+        self
+    ) -> None:
         commit_cmd = skill_domain.SkillChange({
             'cmd': skill_domain.CMD_CREATE_NEW
         })
@@ -184,7 +191,7 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
             rubric_schema_version=3,
             skill_contents_schema_version=2,
             all_questions_merged=False,
-            skill_contents=skill_domain.SkillContents(
+            skill_contents=skill_domain.SkillContents(  # type: ignore[no-untyped-call]
                 state_domain.SubtitledHtml('1', '<p>Explanation</p>'),
                 [example_1],
                 state_domain.RecordedVoiceovers.from_dict({
@@ -203,13 +210,15 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
         model.commit(
             self.user_id_admin, 'skill model created', commit_cmd_dicts)
 
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception,
             'Sorry, we can only process v1-v%d misconception schemas at '
             'present.' % feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION):
             skill_fetchers.get_skill_from_model(model)
 
-    def test_get_skill_from_model_with_invalid_rubric_schema_version(self):
+    def test_get_skill_from_model_with_invalid_rubric_schema_version(
+        self
+    ) -> None:
         commit_cmd = skill_domain.SkillChange({
             'cmd': skill_domain.CMD_CREATE_NEW
         })
@@ -228,7 +237,7 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
             rubric_schema_version=0,
             skill_contents_schema_version=2,
             all_questions_merged=False,
-            skill_contents=skill_domain.SkillContents(
+            skill_contents=skill_domain.SkillContents(  # type: ignore[no-untyped-call]
                 state_domain.SubtitledHtml('1', '<p>Explanation</p>'),
                 [example_1],
                 state_domain.RecordedVoiceovers.from_dict({
@@ -247,15 +256,18 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
         model.commit(
             self.user_id_admin, 'skill model created', commit_cmd_dicts)
 
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception,
             'Sorry, we can only process v1-v%d rubric schemas at '
             'present.' % feconf.CURRENT_RUBRIC_SCHEMA_VERSION):
             skill_fetchers.get_skill_from_model(model)
 
-    def test_get_skill_from_model_with_description(self):
+    def test_get_skill_from_model_with_description(self) -> None:
+        skill = skill_fetchers.get_skill_by_description('Description')
+        # Ruling out the possibility of None for mypy type checking.
+        assert skill is not None
         self.assertEqual(
-            skill_fetchers.get_skill_by_description('Description').to_dict(),
+            skill.to_dict(),  # type: ignore[no-untyped-call]
             self.skill.to_dict()
         )
         self.assertEqual(
@@ -263,7 +275,7 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
             None
         )
 
-    def test_get_skill_by_id_with_different_versions(self):
+    def test_get_skill_by_id_with_different_versions(self) -> None:
         changelist = [
             skill_domain.SkillChange({
                 'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
@@ -272,18 +284,18 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
                 'new_value': 'bn'
             })
         ]
-        skill_services.update_skill(
-            self.USER_ID, self.SKILL_ID, changelist, 'update language code')
+        skill_services.update_skill(  # type: ignore[no-untyped-call]
+            self.USER_ID, self.skill_id, changelist, 'update language code')
 
-        skill = skill_fetchers.get_skill_by_id(self.SKILL_ID, version=1)
-        self.assertEqual(skill.id, self.SKILL_ID)
+        skill = skill_fetchers.get_skill_by_id(self.skill_id, version=1)
+        self.assertEqual(skill.id, self.skill_id)
         self.assertEqual(skill.language_code, 'en')
 
-        skill = skill_fetchers.get_skill_by_id(self.SKILL_ID, version=2)
-        self.assertEqual(skill.id, self.SKILL_ID)
+        skill = skill_fetchers.get_skill_by_id(self.skill_id, version=2)
+        self.assertEqual(skill.id, self.skill_id)
         self.assertEqual(skill.language_code, 'bn')
 
-    def test_get_skill_from_model_with_latest_schemas_version(self):
+    def test_get_skill_from_model_with_latest_schemas_version(self) -> None:
         commit_cmd = skill_domain.SkillChange({
             'cmd': skill_domain.CMD_CREATE_NEW
         })
@@ -302,7 +314,7 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
             rubric_schema_version=2,
             skill_contents_schema_version=2,
             all_questions_merged=False,
-            skill_contents=skill_domain.SkillContents(
+            skill_contents=skill_domain.SkillContents(  # type: ignore[no-untyped-call]
                 state_domain.SubtitledHtml('1', '<p>Explanation</p>'),
                 [example_1],
                 state_domain.RecordedVoiceovers.from_dict({

@@ -151,6 +151,52 @@ RERUN_POLICIES = {
     'full': RERUN_POLICY_NEVER,
 }
 
+SUITES_MIGRATED_TO_WEBDRIVERIO = [
+    'blogDashboard',
+    'collections',
+    'contributorDashboard',
+    'creatorDashboard',
+    'learner',
+    'learnerDashboard',
+    'preferences',
+    'profileFeatures',
+    'profileMenu',
+    'subscriptions',
+    'topicAndStoryEditor',
+    'topicAndStoryEditorFileUploadFeatures',
+    'topicAndStoryViewer',
+    'users',
+]
+
+SUITES_STILL_IN_PROTRACTOR = [
+    'accessibility',
+    'additionalEditorFeatures',
+    'additionalEditorFeaturesModals',
+    'additionalPlayerFeatures',
+    'adminPage',
+    'classroomPage',
+    'classroomPageFileUploadFeatures',
+    'coreEditorAndPlayerFeatures',
+    'embedding',
+    'explorationImprovementsTab',
+    'explorationFeedbackTab',
+    'explorationHistoryTab',
+    'explorationStatisticsTab',
+    'explorationTranslationTab',
+    'extensions',
+    'featureGating',
+    'fileUploadFeatures',
+    'fileUploadExtensions',
+    'learner',
+    'library',
+    'navigation',
+    'playVoiceovers',
+    'publication',
+    'topicsAndSkillsDashboard',
+    'skillEditor',
+    'wipeout',
+]
+
 
 def is_oppia_server_already_running():
     """Check if the ports are taken by any other processes. If any one of
@@ -265,21 +311,62 @@ def run_tests(args):
                 'PORTSERVER_ADDRESS': common.PORTSERVER_SOCKET_FILEPATH,
             }))
 
-        stack.enter_context(servers.managed_webdriver_server(
-            chrome_version=args.chrome_driver_version))
+        if args.suite == 'full':
+            stack.enter_context(servers.managed_webdriver_server(
+                chrome_version=args.chrome_driver_version))
 
-        proc = stack.enter_context(servers.managed_protractor_server(
-            suite_name=args.suite,
-            dev_mode=dev_mode,
-            debug_mode=args.debug_mode,
-            sharding_instances=args.sharding_instances,
-            stdout=subprocess.PIPE))
+            print('Protractor suites are starting to run')
+            proc = stack.enter_context(servers.managed_protractor_server(
+                suite_name=args.suite,
+                dev_mode=dev_mode,
+                debug_mode=args.debug_mode,
+                sharding_instances=args.sharding_instances,
+                stdout=subprocess.PIPE))
 
-        print(
-            'Servers have come up.\n'
-            'Note: If ADD_SCREENSHOT_REPORTER is set to true in '
-            'core/tests/protractor.conf.js, you can view screenshots of the '
-            'failed tests in ../protractor-screenshots/')
+            print('WebdriverIO suites are starting to run')
+            proc = stack.enter_context(servers.managed_webdriverio_server(
+                suite_name=args.suite,
+                dev_mode=dev_mode,
+                debug_mode=args.debug_mode,
+                chrome_version=args.chrome_driver_version,
+                sharding_instances=args.sharding_instances,
+                stdout=subprocess.PIPE))
+
+        elif args.suite in SUITES_MIGRATED_TO_WEBDRIVERIO:
+            proc = stack.enter_context(servers.managed_webdriverio_server(
+                suite_name=args.suite,
+                dev_mode=dev_mode,
+                debug_mode=args.debug_mode,
+                chrome_version=args.chrome_driver_version,
+                sharding_instances=args.sharding_instances,
+                stdout=subprocess.PIPE))
+
+            print(
+                'Servers have come up.\n'
+                'Note: You can view screenshots of failed tests '
+                'in ../webdriverio-screenshots/')
+
+        elif args.suite in SUITES_STILL_IN_PROTRACTOR:
+            stack.enter_context(servers.managed_webdriver_server(
+                chrome_version=args.chrome_driver_version))
+
+            proc = stack.enter_context(servers.managed_protractor_server(
+                suite_name=args.suite,
+                dev_mode=dev_mode,
+                debug_mode=args.debug_mode,
+                sharding_instances=args.sharding_instances,
+                stdout=subprocess.PIPE))
+
+            print(
+                'Servers have come up.\n'
+                'Note: You can view screenshots of the failed tests '
+                'in ../protractor-screenshots/')
+
+        else:
+            print(
+                'The suite requested to run does not exist'
+                'Please provide a valid suite name')
+            sys.exit(1)
 
         output_lines = []
         while True:

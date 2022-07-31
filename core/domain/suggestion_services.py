@@ -602,7 +602,8 @@ def get_reviewable_translation_suggestions_by_offset(
             suggestions are fetched. If the list consists of some
             valid number of ids, suggestions corresponding to the
             IDs are fetched.
-        limit: int. The maximum number of results to return.
+        limit: int|None. The maximum number of results to return. If None,
+            all available results are returned.
         offset: int. The number of results to skip from the beginning of all
             results matching the query.
 
@@ -617,9 +618,12 @@ def get_reviewable_translation_suggestions_by_offset(
         user_id)
     language_codes = (
         contribution_rights.can_review_translation_for_language_codes)
+    # The user cannot review any translations, so return early.
+    if len(language_codes) == 0:
+        return [], offset
 
     in_review_translation_suggestions = []
-    next_offset = 0
+    next_offset = offset
     if opportunity_summary_exp_ids is None:
         in_review_translation_suggestions, next_offset = (
             suggestion_models.GeneralSuggestionModel
@@ -639,32 +643,6 @@ def get_reviewable_translation_suggestions_by_offset(
         for s in in_review_translation_suggestions
     ])
     return translation_suggestions, next_offset
-
-
-def get_reviewable_translation_suggestions(user_id):
-    """Returns the target IDs of translation suggestions for which the supplied
-    user can review.
-
-    Args:
-        user_id: str. The ID of the user.
-
-    Returns:
-        list(str). A set of target IDs of the translation suggestions that the
-        supplied user can review.
-    """
-    contribution_rights = user_services.get_user_contribution_rights(user_id)
-    language_codes = (
-        contribution_rights.can_review_translation_for_language_codes)
-    # The user cannot review any translations, so return early.
-    if len(language_codes) == 0:
-        return set()
-    in_review_translation_suggestions = (
-        suggestion_models.GeneralSuggestionModel
-        .get_in_review_translation_suggestions(user_id, language_codes))
-    return [
-        get_suggestion_from_model(s)
-        for s in in_review_translation_suggestions
-    ]
 
 
 def get_reviewable_question_suggestions_by_offset(

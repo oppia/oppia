@@ -21,13 +21,14 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { HtmlEscaperService } from 'services/html-escaper.service';
 import { ShortResponseTextInputComponent } from './oppia-short-response-text-input.component';
 import { TruncateAtFirstLinePipe } from 'filters/string-utility-filters/truncate-at-first-line.pipe';
+import { TextInputAnswer } from 'interactions/answer-defs';
 
 describe('ShortResponseTextInputComponent', () => {
   let component: ShortResponseTextInputComponent;
   let fixture: ComponentFixture<ShortResponseTextInputComponent>;
 
   let mockHtmlEscaperService = {
-    escapedJsonToObj: function(answer) {
+    escapedJsonToObj: function(answer: TextInputAnswer) {
       return answer;
     }
   };
@@ -49,7 +50,7 @@ describe('ShortResponseTextInputComponent', () => {
     fixture = TestBed.createComponent(ShortResponseTextInputComponent);
     component = fixture.componentInstance;
 
-    component.answerWithValue = 'answer';
+    component.answer = 'answer';
   });
 
   it('should initialise when users submits answer', () => {
