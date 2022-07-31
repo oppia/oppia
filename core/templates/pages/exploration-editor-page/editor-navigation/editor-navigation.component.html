@@ -249,9 +249,8 @@
             <button class="btn publish-button protractor-test-save-changes-for-small-screens" ng-class="{'btn-success': connectedToInternet && isExplorationSaveable()}" ng-click="saveChanges()" ng-disabled="!connectedToInternet || !isExplorationSaveable()">
               <span ng-if="!saveIsInProcess">
                 <span ng-if="isPrivate()">
-                  <i class="material-icons md-18 oppia-save-publish-button-icon"
+                  <i class="fas fa-save"
                      alt="Save Draft">
-                      &#xE161;
                   </i>
                   <span>Save Draft</span>
                   <span class="d-none d-md-block" ng-if="getChangeListLength()">(<[getChangeListLength()]>)</span>
@@ -289,9 +288,8 @@
                     ng-click="showPublishExplorationModal()"
                     ng-disabled="!connectedToInternet || isExplorationLockedForEditing() || countWarnings()">
               <span ng-if="!publishIsInProcess">
-                <i class="material-icons"
+                <i class="fas fa-cloud-upload-alt"
                    alt="Publish to Oppia Library">
-                  &#xE2C3;
                 </i>
                 <span>Publish</span>
               </span>

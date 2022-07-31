@@ -15,7 +15,7 @@
             <div class="oppia-profile-picture-mask">
               <div class="oppia-profile-picture-edit-prompt">
                Edit avatar
-                <i class="material-icons md-18" title="Edit Profile Picture">&#xE254;</i>
+                <i class="fas fa-pen" title="Edit Profile Picture"></i>
               </div>
             </div>
           </a>
@@ -141,18 +141,16 @@
       </mat-card-content>
 
       <span class="oppia-profile-portfolio-pages" *ngIf="numUserPortfolioExplorations > 6">
-        <button class="material-icons md-18 oppia-navigation-button"
+        <button class="fas fa-arrow-left oppia-navigation-button"
                 [disabled]="startingExplorationNumber === 1"
                 (click)="goToPreviousPage()"
                 [ngClass]="{'oppia-navigation-mouse-pointer': startingExplorationNumber !== 1}">
-          &#xE5C4;
         </button>
         Showing {{ startingExplorationNumber }} - {{ endingExplorationNumber }} of {{ numUserPortfolioExplorations }}
-        <button class="material-icons md-18 oppia-navigation-button"
+        <button class="fas fa-arrow-right oppia-navigation-button"
                 [disabled]="endingExplorationNumber >= numUserPortfolioExplorations"
                 (click)="goToNextPage()"
                 [ngClass]="{'oppia-navigation-mouse-pointer': endingExplorationNumber < numUserPortfolioExplorations}">
-          &#xE5C8;
         </button>
       </span>
     </div>

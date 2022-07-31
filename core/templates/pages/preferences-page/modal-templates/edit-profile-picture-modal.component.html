@@ -21,7 +21,7 @@
         <span>{{ 'I18N_PREFERENCES_PROFILE_PICTURE_DRAG' | translate }}</span>
         <div class="oppia-profile-picture-crop-area protractor-test-photo-crop">
           <button class="btn btn-secondary oppia-profile-picture-reset-button" (click)="reset()">
-            <i class="material-icons oppia-vcenter">&#xE14C;</i>
+            <i class="fas fa-times oppia-vcenter"></i>
           </button>
           <img id="croppable-image" [src]="uploadedImage" #croppableImage>
         </div>
@@ -56,7 +56,7 @@
   }
   .oppia-profile-picture-container .oppia-profile-picture-reset-button {
     position: absolute;
-    right: -50px;
+    right: -36px;
     top: 0;
   }
   .oppia-profile-picture-container .oppia-profile-image-uploader-container {

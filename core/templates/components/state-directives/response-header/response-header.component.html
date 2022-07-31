@@ -2,8 +2,8 @@
   <div class="oppia-response-header">
     <span *ngIf="showWarning">⚠</span>
     <div class="oppia-response-container-desktop">
-      <i class="material-icons md-18 oppia-response-tick-cross oppia-response-cross" *ngIf="!isCorrect() && isCorrectnessFeedbackEnabled() && isResponse && !isCurrentInteractionLinear()">&#x2718;</i>
-      <i class="material-icons md-18 oppia-response-tick-cross  oppia-response-tick protractor-test-correct-tick-mark" *ngIf="isCorrect() && isCorrectnessFeedbackEnabled() && isResponse && !isCurrentInteractionLinear()">&#10004;</i>
+      <i class="fas fa-times oppia-response-tick-cross oppia-response-cross" *ngIf="!isCorrect() && isCorrectnessFeedbackEnabled() && isResponse && !isCurrentInteractionLinear()"></i>
+      <i class="fas fa-check oppia-response-tick-cross  oppia-response-tick protractor-test-correct-tick-mark" *ngIf="isCorrect() && isCorrectnessFeedbackEnabled() && isResponse && !isCurrentInteractionLinear()"></i>
     </div>
     <div class="oppia-responses-mobile">
       <div class="oppia-response-mobile-item oppia-response-mobile-item-incorrect" *ngIf="!isCorrect() && isCorrectnessFeedbackEnabled() && isResponse && !isCurrentInteractionLinear()">
@@ -45,7 +45,7 @@
 <span class="oppia-delete-response-button oppia-transition-200 protractor-test-delete-response"
       *ngIf="editabilityService.isEditable() && !defaultOutcome"
       (click)="deleteResponse($event)">
-  <i class="material-icons md-18">&#xE5CD;</i>
+  <i class="fas fa-times"></i>
 </span>
 
 <style>
@@ -94,6 +94,7 @@
   }
   .oppia-response-tick {
     color: #00645c;
+    font-size: 14px;
   }
   .oppia-response-summary {
     display: flex;

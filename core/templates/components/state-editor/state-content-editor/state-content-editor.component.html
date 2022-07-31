@@ -19,8 +19,8 @@
   <div *ngIf="isContentEditable()"
        class="protractor-test-edit-content oppia-editable-section"
        (click)="openStateContentEditor()">
-    <i class="material-icons oppia-editor-edit-icon protractor-test-edit-content-pencil-button"
-       title="Edit Card Content">&#xE254;
+    <i class="fas fa-pen oppia-editor-edit-icon oppia-editor-edit-icon-position protractor-test-edit-content-pencil-button"
+       title="Edit Card Content">
     </i>
     <div class="oppia-prevent-selection oppia-state-content-display oppia-transition-200"
          title="Card Content">
@@ -104,5 +104,8 @@
     max-width: 560px;
     position: fixed;
     top: -30000px;
+  }
+  .oppia-editor-edit-icon-position {
+    top: 9px;
   }
 </style>

@@ -379,7 +379,8 @@
   font-size: 22px;
 }
 .oppia-user-avatar-icon {
-  margin-top: -1px;
+  font-size: 36px;
+  margin-top: 0px;
 }
 .oppia-admin-text {
   right: 4px;

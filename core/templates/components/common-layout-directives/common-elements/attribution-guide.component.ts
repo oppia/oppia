@@ -54,8 +54,8 @@ export class AttributionGuideComponent implements OnInit {
       '<a href=\"https://creativecommons.org/licenses/by-sa/4.0/\" ' +
       'rel=\"noopener\" target=\"_blank\"><span ' +
       'class=\"oppia-attribution-licence-link\">CC BY SA 4.0 license</span>' +
-      '<span class=\"material-icons oppia-open-new-tab-icon\">' +
-      'open_in_new</span></a>');
+      '<span class=\"fas fa-external-link-alt oppia-open-new-tab-icon\">' +
+      '</span></a>');
     this.generateAttibutionIsAllowed = (
       this.attributionService.isGenerateAttributionAllowed());
     if (this.generateAttibutionIsAllowed) {

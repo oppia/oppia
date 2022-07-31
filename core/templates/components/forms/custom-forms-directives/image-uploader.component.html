@@ -4,7 +4,7 @@
   <div class="image-uploader-text" *ngIf="!isBlogPostThumbnailUploader">{{ 'I18N_DIRECTIVES_DRAG_IMAGE_HERE' | translate }}</div>
   <span *ngIf="errorMessage"
         class="image-uploader-error-message protractor-test-upload-error">
-    <i class="material-icons">&#xE002;</i>
+    <i class="fas fa-exclamation-triangle"></i>
     {{ errorMessage }}
   </span>
   <span class="image-uploader-license-warning" *ngIf="!isBlogPostThumbnailUploader">
