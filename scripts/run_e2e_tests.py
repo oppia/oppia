@@ -358,20 +358,12 @@ def main(args=None):
 
             # Check whether we should rerun based on the instructions from the
             # flake checker server.
-            _, rerun_override = flake_checker.is_test_output_flaky(
+            rerun = flake_checker.check_test_flakiness(
                 output, parsed_args.suite)
-            if rerun_override == flake_checker.RERUN_YES:
-                print(
-                    'Rerunning as per instructions from logging '
-                    'server.')
-            elif rerun_override == flake_checker.RERUN_NO:
-                print(
-                    'Not rerunning as per instructions from '
-                    'logging server.')
-                break
+            if rerun:
+                print('Rerunning.')
             else:
-                print(
-                    'Not rerunning since no instructions from logging server.')
+                print('Not rerunning.')
                 break
 
     sys.exit(return_code)
