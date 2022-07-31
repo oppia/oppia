@@ -114,12 +114,19 @@ otherwise they will interfere with the iframed conversation skin directive. */
   margin: 0 auto;
 }
 
-.oppia-conversation-skin-next-lession-text-container {
+.oppia-conversation-skin-next-lesson-text-container {
   cursor: default;
+  margin-right: 10px;
+  margin-left: 10px;
 }
 
 .oppia-button-raised.md-raised {
-  background-color: #0d48a1
+  align-items: center;
+  background-color: #0d48a1;
+  display: flex;
+  height: 32px;
+  justify-content: center;
+  width: 32px;
 }
 
 .oppia-button-icon {
