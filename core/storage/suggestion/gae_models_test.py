@@ -2065,6 +2065,98 @@ class TranslationReviewStatsModelUnitTests(test_utils.GenericTestBase):
             ),
             base_models.DELETION_POLICY.DELETE)
 
+    def test_get_all_by_user_id(self) -> None:
+        suggestion_models.TranslationReviewStatsModel.create(
+            language_code=self.LANGUAGE_CODE,
+            contributor_user_id=self.CONTRIBUTOR_USER_ID,
+            topic_id=self.TOPIC_ID,
+            reviewed_translations_count=self.REVIEWED_TRANSLATIONS_COUNT,
+            reviewed_translation_word_count=(
+                self.REVIEWED_TRANSLATION_WORD_COUNT),
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_with_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            accepted_translations_with_reviewer_edits_word_count=(
+                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_WORD_COUNT
+            ),
+            review_months=self.REVIEW_MONTHS,
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=self.LAST_CONTRIBUTION_DATE
+        )
+
+        translation_review_stats_models = (
+            suggestion_models.TranslationReviewStatsModel.get_all_by_user_id(
+                self.CONTRIBUTOR_USER_ID
+            )
+        )
+
+        # Ruling out the possibility of None for mypy type checking.
+        assert translation_review_stats_models is not None
+
+        self.assertEqual(
+            len(translation_review_stats_models),
+            1
+        )
+
+        translation_review_stats_model = translation_review_stats_models[0]
+
+        self.assertEqual(
+            translation_review_stats_model.language_code,
+            self.LANGUAGE_CODE
+        )
+        self.assertEqual(
+            translation_review_stats_model.contributor_user_id,
+            self.CONTRIBUTOR_USER_ID
+        )
+        self.assertEqual(
+            translation_review_stats_model.reviewed_translations_count,
+            self.REVIEWED_TRANSLATIONS_COUNT
+        )
+        self.assertEqual(
+            (
+                translation_review_stats_model
+                .reviewed_translation_word_count
+            ),
+            self.REVIEWED_TRANSLATION_WORD_COUNT
+        )
+        self.assertEqual(
+            translation_review_stats_model.accepted_translations_count,
+            self.ACCEPTED_TRANSLATIONS_COUNT
+        )
+        self.assertEqual(
+            (
+                translation_review_stats_model
+                .accepted_translations_with_reviewer_edits_count
+            ),
+            self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT
+        )
+        self.assertEqual(
+            (
+                translation_review_stats_model
+                .accepted_translation_word_count
+            ),
+            self.ACCEPTED_TRANSLATION_WORD_COUNT
+        )
+        self.assertEqual(
+            translation_review_stats_model
+            .accepted_translations_with_reviewer_edits_word_count,
+            self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_WORD_COUNT
+        )
+        self.assertEqual(
+            translation_review_stats_model.review_months,
+            self.REVIEW_MONTHS
+        )
+        self.assertEqual(
+            translation_review_stats_model.first_contribution_date,
+            self.FIRST_CONTRIBUTION_DATE
+        )
+        self.assertEqual(
+            translation_review_stats_model.last_contribution_date,
+            self.LAST_CONTRIBUTION_DATE
+        )
+
     def test_apply_deletion_policy(self) -> None:
         suggestion_models.TranslationReviewStatsModel.create(
             language_code=self.LANGUAGE_CODE,
@@ -2271,6 +2363,69 @@ class QuestionContributionStatsModelUnitTests(test_utils.GenericTestBase):
             self.LAST_CONTRIBUTION_DATE
         )
 
+    def test_get_all_by_user_id(self) -> None:
+        suggestion_models.QuestionContributionStatsModel.create(
+            contributor_user_id=self.CONTRIBUTOR_USER_ID,
+            topic_id=self.TOPIC_ID,
+            submitted_questions_count=self.SUBMITTED_QUESTION_COUNT,
+            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+            accepted_questions_without_reviewer_edits_count=(
+                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            contribution_months=self.CONTRIBUTION_MONTHS,
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=self.LAST_CONTRIBUTION_DATE
+        )
+
+        question_contribution_stats_models = (
+            suggestion_models.QuestionContributionStatsModel.get_all_by_user_id(
+                self.CONTRIBUTOR_USER_ID
+            )
+        )
+
+        # Ruling out the possibility of None for mypy type checking.
+        assert question_contribution_stats_models is not None
+
+        self.assertEqual(
+            len(question_contribution_stats_models),
+            1
+        )
+
+        question_contribution_stats_model = question_contribution_stats_models[0]
+
+        # Ruling out the possibility of None for mypy type checking.
+        assert question_contribution_stats_model is not None
+        self.assertEqual(
+            question_contribution_stats_model.contributor_user_id,
+            self.CONTRIBUTOR_USER_ID
+        )
+        self.assertEqual(
+            question_contribution_stats_model.submitted_questions_count,
+            self.SUBMITTED_QUESTION_COUNT
+        )
+        self.assertEqual(
+            question_contribution_stats_model.accepted_questions_count,
+            self.ACCEPTED_QUESTIONS_COUNT
+        )
+        self.assertEqual(
+            (
+                question_contribution_stats_model
+                .accepted_questions_without_reviewer_edits_count
+            ),
+            self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT
+        )
+        self.assertEqual(
+            question_contribution_stats_model.contribution_months,
+            self.CONTRIBUTION_MONTHS
+        )
+        self.assertEqual(
+            question_contribution_stats_model.first_contribution_date,
+            self.FIRST_CONTRIBUTION_DATE
+        )
+        self.assertEqual(
+            question_contribution_stats_model.last_contribution_date,
+            self.LAST_CONTRIBUTION_DATE
+        )
+
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             (
@@ -2411,6 +2566,62 @@ class QuestionReviewStatsModelUnitTests(test_utils.GenericTestBase):
 
         # Ruling out the possibility of None for mypy type checking.
         assert question_review_stats_model is not None
+        self.assertEqual(
+            question_review_stats_model.contributor_user_id,
+            self.CONTRIBUTOR_USER_ID
+        )
+        self.assertEqual(
+            question_review_stats_model.reviewed_questions_count,
+            self.REVIEWED_QUESTIONS_COUNT
+        )
+        self.assertEqual(
+            question_review_stats_model.accepted_questions_count,
+            self.ACCEPTED_QUESTIONS_COUNT
+        )
+        self.assertEqual(
+            (
+                question_review_stats_model
+                .accepted_questions_with_reviewer_edits_count
+            ),
+            self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT
+        )
+        self.assertEqual(
+            question_review_stats_model.review_months,
+            self.REVIEW_MONTHS
+        )
+        self.assertEqual(
+            question_review_stats_model.first_contribution_date,
+            self.FIRST_CONTRIBUTION_DATE
+        )
+        self.assertEqual(
+            question_review_stats_model.last_contribution_date,
+            self.LAST_CONTRIBUTION_DATE
+        )
+
+    def test_get_all_by_user_id(self) -> None:
+        suggestion_models.QuestionReviewStatsModel.create(
+            contributor_user_id=self.CONTRIBUTOR_USER_ID,
+            topic_id=self.TOPIC_ID,
+            reviewed_questions_count=self.REVIEWED_QUESTIONS_COUNT,
+            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+            accepted_questions_with_reviewer_edits_count=(
+                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
+            review_months=self.REVIEW_MONTHS,
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=self.LAST_CONTRIBUTION_DATE
+        )
+
+        question_review_stats_models = (
+            suggestion_models.QuestionReviewStatsModel.get_all_by_user_id(
+                self.CONTRIBUTOR_USER_ID
+            )
+        )
+
+        # Ruling out the possibility of None for mypy type checking.
+        assert question_review_stats_models is not None
+
+        question_review_stats_model = question_review_stats_models[0]
+
         self.assertEqual(
             question_review_stats_model.contributor_user_id,
             self.CONTRIBUTOR_USER_ID
