@@ -37,9 +37,9 @@ import { ExplorationEngineService } from '../services/exploration-engine.service
 import { LearnerViewInfoBackendApiService } from '../services/learner-view-info-backend-api.service';
 import { PlayerPositionService } from '../services/player-position.service';
 import { PlayerTranscriptService } from '../services/player-transcript.service';
-import { LessonInformationCardModalComponent } from '../templates/lesson-information-card-modal.component';
+import { LessonInformationCardModalComponent } from 'pages/exploration-player-page/templates/lesson-information-card-modal.component';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { ProgressReminderModalComponent } from '../templates/progress-reminder-modal.component';
+import { ProgressReminderModalComponent } from 'pages/exploration-player-page/templates/progress-reminder-modal.component';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
 import './exploration-footer.component.css';

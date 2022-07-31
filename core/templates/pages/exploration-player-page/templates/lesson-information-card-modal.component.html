@@ -1,28 +1,36 @@
 <mat-card class="oppia-lesson-info-card">
   <div [ngStyle]="infoCardBackgroundCss" class="oppia-info-card-logo-thumbnail">
-    <img [src]="getStaticImageUrl(infoCardBackgroundImageUrl)" class="oppia-info-card-bg-image">
+    <img [src]="getStaticImageUrl(infoCardBackgroundImageUrl)"
+         class="oppia-info-card-bg-image">
     <h2 class="oppia-info-card-title break-word" *ngIf="isHackyExpTitleTranslationDisplayed()">
       {{ expTitleTranslationKey | translate }}
     </h2>
-    <h2 class="oppia-info-card-title break-word" *ngIf="!isHackyExpTitleTranslationDisplayed()">
+    <h2 class="oppia-info-card-title break-word"
+        *ngIf="!isHackyExpTitleTranslationDisplayed()">
       {{ expTitle }}
     </h2>
   </div>
   <div class="oppia-lesson-info-content">
     <div class="oppia-lesson-info-content-inner-container">
       <div class="oppia-lesson-exploration-progress-info">
-        <h4 class="oppia-exploration-description" *ngIf="!isHackyExpDescTranslationDisplayed()">
+        <h4 class="oppia-exploration-description"
+            *ngIf="!isHackyExpDescTranslationDisplayed()">
           {{ expDesc | truncateAndCapitalize: 90 }}
         </h4>
-        <h4 class="oppia-exploration-description" *ngIf="isHackyExpDescTranslationDisplayed()">
+        <h4 class="oppia-exploration-description"
+            *ngIf="isHackyExpDescTranslationDisplayed()">
           {{ expDescTranslationKey | translate | truncateAndCapitalize: 90 }}
         </h4>
         <h4 class="progress-bar-label-text">
           Learning Progress
         </h4>
-        <div class="progress-bar-container" [ngClass]="{'single-checkpoint-bar': checkpointCount === 1, 'multiple-checkpoints-bar': checkpointCount > 1, 'reverse-checkpoint-order': isLanguageRTL()}">
-          <div class="progress-bar" [ngClass]="{'reverse-checkpoint-order': isLanguageRTL()}">
-            <div class="completed-progress-bar" [style.width.%]="getCompletedProgressBarWidth()"></div>
+        <div class="progress-bar-container"
+             [ngClass]="{'single-checkpoint-bar': checkpointCount === 1, 'multiple-checkpoints-bar': checkpointCount > 1, 'reverse-checkpoint-order': isLanguageRTL()}">
+          <div class="progress-bar"
+               [ngClass]="{'reverse-checkpoint-order': isLanguageRTL()}">
+            <div class="completed-progress-bar"
+                 [style.width.%]="getCompletedProgressBarWidth()">
+            </div>
           </div>
           <div *ngFor="let checkpointNode of checkpointStatusArray; index as idx"
                [ngClass]="{'completed-checkpoint-node': checkpointStatusArray[idx] === 'completed', 'in-progress-checkpoint-node': checkpointStatusArray[idx] === 'in-progress', 'incomplete-checkpoint-node': checkpointStatusArray[idx] === 'incomplete'}">
@@ -38,40 +46,70 @@
             {{ 'I18N_SAVE_PROGRESS_TEXT' | translate }}
           </button>
         </div>
-        <p *ngIf="explorationIsPrivate" class="private-card-info">{{ 'I18N_PLAYER_IS_PRIVATE' | translate }}</p>
+        <p *ngIf="explorationIsPrivate"
+           class="private-card-info">
+           {{ 'I18N_PLAYER_IS_PRIVATE' | translate }}
+        </p>
 
-        <ul *ngIf="!explorationIsPrivate" class="card-metrics row space-between center">
+        <ul *ngIf="!explorationIsPrivate"
+            class="card-metrics row space-between center">
           <li class="e2e-test-info-card-rating row-item">
-            <span class="fas fa-star fa-lg learn-info-card-star" [ngbTooltip]="'I18N_PLAYER_RATINGS_TOOLTIP' | translate" placement="top">
-              <span class="oppia-icon-accessibility-label">{{ 'I18N_PLAYER_RATINGS_TOOLTIP' | translate }}</span>
+            <span class="fas fa-star fa-lg learn-info-card-star"
+                  [ngbTooltip]="'I18N_PLAYER_RATINGS_TOOLTIP' | translate"
+                  placement="top">
+              <span class="oppia-icon-accessibility-label">
+                {{ 'I18N_PLAYER_RATINGS_TOOLTIP' | translate }}
+              </span>
             </span>
-            <span *ngIf="!averageRating">{{ 'I18N_PLAYER_UNRATED' | translate }}</span>
-            <span *ngIf="averageRating">{{ averageRating | number:'1.1-1'}}</span>
+            <span *ngIf="!averageRating">
+              {{ 'I18N_PLAYER_UNRATED' | translate }}
+            </span>
+            <span *ngIf="averageRating">
+              {{ averageRating | number:'1.1-1'}}
+            </span>
           </li>
           <li class="row-item">
-            <span class="far fa-eye" [ngbTooltip]="'I18N_PLAYER_VIEWS_TOOLTIP' | translate" placement="top">
-              <span class="oppia-icon-accessibility-label">{{ 'I18N_PLAYER_VIEWS_TOOLTIP' | translate }}</span>
+            <span class="far fa-eye"
+                  [ngbTooltip]="'I18N_PLAYER_VIEWS_TOOLTIP' | translate"
+                  placement="top">
+              <span class="oppia-icon-accessibility-label">
+                {{ 'I18N_PLAYER_VIEWS_TOOLTIP' | translate }}
+              </span>
             </span>
             {{ numViews | summarizeNonnegativeNumber }}
           </li>
           <li class="row-item">
-            <span class="far fa-clock" [ngbTooltip]="'I18N_PLAYER_LAST_UPDATED_TOOLTIP' | translate" placement="top">
-              <span class="oppia-icon-accessibility-label">{{ 'I18N_PLAYER_LAST_UPDATED_TOOLTIP' | translate }}</span>
+            <span class="far fa-clock"
+                  [ngbTooltip]="'I18N_PLAYER_LAST_UPDATED_TOOLTIP' | translate"
+                  placement="top">
+              <span class="oppia-icon-accessibility-label">
+                {{ 'I18N_PLAYER_LAST_UPDATED_TOOLTIP' | translate }}
+              </span>
             </span>
             {{ lastUpdatedString }}
           </li>
           <ul class="oppia-info-card-exploration-contributors-profile row center row-item">
-            <i class="material-icons oppia-contributors-icon" [ngbTooltip]="'I18N_PLAYER_CONTRIBUTORS_TOOLTIP' | translate" placement="top">&#xE7EF;</i>
-            <span class="oppia-icon-accessibility-label">{{ 'I18N_PLAYER_CONTRIBUTORS_TOOLTIP' | translate }}</span>
+            <i class="material-icons oppia-contributors-icon"
+               [ngbTooltip]="'I18N_PLAYER_CONTRIBUTORS_TOOLTIP' | translate"
+               placement="top">
+               &#xE7EF;
+            </i>
+            <span class="oppia-icon-accessibility-label">
+              {{ 'I18N_PLAYER_CONTRIBUTORS_TOOLTIP' | translate }}
+            </span>
             <div class="named-contributors-container">
               <li *ngFor="let name of (contributorNames | limitTo: 2); index as idx"
-                  [ngbTooltip]="name" placement="top" class="contributor-{{idx}}">
+                  [ngbTooltip]="name"
+                  placement="top"
+                  class="contributor-{{idx}}">
                 <profile-link-image [username]="name"></profile-link-image>
               </li>
             </div>
-            <li *ngIf="contributorNames.length > 2" class="oppia-contributors-more-circle"
+            <li *ngIf="contributorNames.length > 2"
+                class="oppia-contributors-more-circle"
                 [ngbTooltip]="contributorNames.slice(2).join(', ')"
-                placement="top">+{{ contributorNames.length - 2 }}
+                placement="top">
+                +{{ contributorNames.length - 2 }}
             </li>
             <li *ngIf="contributorNames.length === 0"
                 [ngbTooltip]="'I18N_PLAYER_COMMUNITY_EDITABLE_TOOLTIP' | translate"
@@ -86,7 +124,9 @@
               <span class="fas fa-tags oppia-info-card-modal-tooltip"
                     [ngbTooltip]="'I18N_PLAYER_TAGS_TOOLTIP' | translate"
                     placement="top">
-                <span class="oppia-icon-accessibility-label">{{ 'I18N_PLAYER_TAGS_TOOLTIP' | translate }}</span>
+                <span class="oppia-icon-accessibility-label">
+                  {{ 'I18N_PLAYER_TAGS_TOOLTIP' | translate }}
+                </span>
               </span>
             </div>
 
