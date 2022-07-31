@@ -439,8 +439,11 @@ var ExplorationEditorMainTab = function() {
 
     await editOutcomeDestDropdownOptions.selectByVisibleText(targetOption);
 
-    // 'End' is one of the keys name for setValue function, so to insert
-    // 'End' as a string we need to pass it as an array of string.
+    // 'End' is one of the key names present in Webdriver protocol,
+    // and so if we try to pass 'End' in setValue, webdriverio will
+    // press the 'End' key present in keyboard instead of typing 'End'
+    // as a string. Hence, to type 'End' as a string, we need to pass it
+    // as an array of string.
     if (destName === 'End') {
       destName = ['E', 'n', 'd'];
     }
