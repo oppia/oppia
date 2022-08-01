@@ -3,8 +3,16 @@
 </div>
 
 <div class="modal-body oppia-state-graph-visualization-container">
-  <div state-graph-visualization class="oppia-state-graph-visualization" graph-data="graphData" allow-panning="true" current-state-id="currentStateName" on-click-function="selectState" on-delete-function="deleteState" center-at-current-state="true" is-editable="isEditable()">
-  </div>
+  <state-graph-visualization class="oppia-state-graph-visualization"
+                             [graph-data]="graphData"
+                             [allow-panning]="true"
+                             [current-state-id]="currentStateName"
+                             [version-graph-data]="null"
+                             (on-click-function)="selectState($event)"
+                             (on-delete-function)="deleteState($event)"
+                             [center-at-current-state]="true"
+                             [is-editable]="isEditable()">
+  </state-graph-visualization>
 </div>
 
 <div class="modal-footer oppia-close-button-container">
