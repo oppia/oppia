@@ -6,6 +6,7 @@ var childProcess = require('child_process');
 var Constants = require('./webdriverio_utils/WebdriverioConstants');
 var DOWNLOAD_PATH = path.resolve(__dirname, Constants.DOWNLOAD_PATH);
 var args = process.argv;
+require('longjohn');
 
 // When tests is running in debug mode, the chrome version number
 // is passed as 7th argument else it is passed as 6th argument.
@@ -112,6 +113,7 @@ exports.config = {
     browserName: 'chrome',
     'goog:chromeOptions': {
       args: [
+        'headless',
         '--lang=en-EN',
         '--window-size=1285x1000',
         // These arguments let us simulate recording from a microphone.
@@ -152,7 +154,7 @@ exports.config = {
 
   // Default timeout in milliseconds for request
   // if browser driver or grid doesn't send response.
-  connectionRetryTimeout: 120000,
+  connectionRetryTimeout: 150000,
 
   // Default request retries count.
   connectionRetryCount: 3,
@@ -185,6 +187,8 @@ exports.config = {
     }]
   ],
 
+  waitforTimeout: 20000,
+
   isMobile: false,
 
   // Options to be passed to Jasmine.
@@ -210,7 +214,7 @@ exports.config = {
    * @param {Array.<String>} specs   List of spec file paths that are to be run
    * @param {Object}         browser instance of created browser/device session
    */
-  before: function() {
+  before: async function() {
     if (process.env.GITHUB_ACTIONS &&
       // eslint-disable-next-line eqeqeq
       process.env.VIDEO_RECORDING_IS_ENABLED == 1) {
@@ -247,7 +251,7 @@ exports.config = {
     }
     // Set a wide enough window size for the navbar in the library pages to
     // display fully.
-    browser.setWindowSize(1285, 1000);
+    await browser.setWindowSize(1285, 1000);
 
 
     // Configure the Firebase Admin SDK to communicate with the emulator.
@@ -255,7 +259,7 @@ exports.config = {
     FirebaseAdmin.initializeApp({projectId: 'dev-project-id'});
 
     // Navigate to the splash page so that tests can begin on an Angular page.
-    browser.url('http://localhost:9001');
+    await browser.url('http://localhost:9001');
   },
   /**
    * Function to be executed after a test
