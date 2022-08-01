@@ -120,10 +120,10 @@ var createExplorationAsAdmin = async function() {
 // This will only work if all changes have been saved and there are no
 // outstanding warnings; run from the editor.
 var publishExploration = async function() {
-  await waitFor.elementToBeClickable(
-    $('.e2e-test-publish-exploration'));
-  await $('.e2e-test-publish-exploration').isDisplayed();
   var testPublishExploration = $('.e2e-test-publish-exploration');
+  await waitFor.visibilityOf(testPublishExploration);
+  await waitFor.elementToBeClickable(
+    testPublishExploration);
   await action.click('Test Publish Exploration', testPublishExploration);
   var prePublicationButtonElem = $('.e2e-test-confirm-pre-publication');
   await action.click(

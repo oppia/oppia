@@ -108,6 +108,8 @@ var LibraryPage = function() {
   };
 
   this.expectMainHeaderTextToBe = async function(expectedHeaderText) {
+    await waitFor.visibilityOf(
+      mainHeader, 'Main Header takes too long to appear');
     expect(await mainHeader.getText()).toEqual(expectedHeaderText);
   };
 

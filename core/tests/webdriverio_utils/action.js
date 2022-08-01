@@ -20,7 +20,7 @@ var waitFor = require('./waitFor.js');
 
 // Waits for the invisibility of the autosave message.
 var waitForAutosave = async function() {
-  var autoSaveIndicatorElement = $('.e2e-test-autosave-indicator');
+  var autoSaveIndicatorElement = await $('.e2e-test-autosave-indicator');
   await waitFor.invisibilityOf(
     autoSaveIndicatorElement, 'Auto save indicator didn\'t disappear');
 };

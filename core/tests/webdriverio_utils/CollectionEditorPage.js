@@ -42,6 +42,8 @@ var CollectionEditorPage = function() {
     await action.setValue(
       'Add Exploration Input', addExplorationInput, explorationId);
     // Waits until the button becomes active after debouncing.
+    await waitFor.visibilityOf(
+      addExplorationButton, 'Add Exploration button takes too long to appear');
     await waitFor.elementToBeClickable(
       addExplorationButton,
       'Unable to find exploration ID: ' + explorationId);
@@ -78,6 +80,8 @@ var CollectionEditorPage = function() {
 
   // Save draft of the collection.
   this.saveDraft = async function() {
+    await waitFor.visibilityOf(
+      saveDraftButton, 'Save Draft button takes too long to appear');
     await waitFor.elementToBeClickable(
       saveDraftButton, 'Collection Save Draft button is not clickable');
     await action.click('Save Draft Button', saveDraftButton);
@@ -85,6 +89,8 @@ var CollectionEditorPage = function() {
 
   // Closes the save modal.
   this.closeSaveModal = async function() {
+    await waitFor.visibilityOf(
+      closeSaveModalButton, 'Close Save Modal button takes too long to appear');
     await waitFor.elementToBeClickable(
       closeSaveModalButton, 'Publish Changes button is not clickable');
     await action.click('Close Save Modal Button', closeSaveModalButton);
@@ -94,6 +100,9 @@ var CollectionEditorPage = function() {
 
   // Click on publish collection.
   this.publishCollection = async function() {
+    await waitFor.visibilityOf(
+      editorPublishButton,
+      'Collection Publish button takes too long to appear');
     await waitFor.elementToBeClickable(
       editorPublishButton, 'Collection Publish button is not clickable');
     await action.click('Editor Publish Button', editorPublishButton);
@@ -121,6 +130,9 @@ var CollectionEditorPage = function() {
 
   // Saves changes and publishes collection.
   this.saveChanges = async function() {
+    await waitFor.visibilityOf(
+      saveChangesButton,
+      'Collection Publish button takes too long to appear');
     await waitFor.elementToBeClickable(
       saveChangesButton, 'Save Changes button is not clickable');
     await action.click('Save Changes Button', saveChangesButton);
