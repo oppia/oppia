@@ -1,5 +1,5 @@
 <div class="select-skill-dropdown-container" ng-if="!questionEditorIsShown && !activeQuestion">
-  <select class="form-control select-skill-dropdown protractor-test-select-skill-dropdown"
+  <select class="form-control select-skill-dropdown e2e-test-select-skill-dropdown"
           ng-model="selectedSkillId"
           ng-if="allSkillSummaries.length > 0"
           ng-change="reinitializeQuestionsList(selectedSkillId)"
@@ -9,19 +9,19 @@
   </select>
 </div>
 <div class="question-list-container">
-  <questions-list skill-descriptions-are-shown="true"
-                  select-skill-modal-is-shown="true"
-                  skill-ids="topic.getSkillIds()"
-                  selected-skill-id="selectedSkillId"
-                  all-skill-summaries="allSkillSummaries"
-                  can-edit-question="canEditQuestion"
-                  skill-id-to-rubrics-object="skillIdToRubricsObject"
-                  question-suggestion-threads="questionSuggestionThreads"
-                  fetch-from-backend="true"
-                  grouped-skill-summaries="groupedSkillSummaries"
-                  get-skills-categorized-by-topics="getSkillsCategorizedByTopics"
-                  get-untriaged-skill-summaries="getUntriagedSkillSummaries">
-  </questions-list>
+  <oppia-questions-list [skill-descriptions-are-shown]="true"
+                        [select-skill-modal-is-shown]="true"
+                        [skill-ids]="topic.getSkillIds()"
+                        [selected-skill-id]="selectedSkillId"
+                        [all-skill-summaries]="allSkillSummaries"
+                        [can-edit-question]="canEditQuestion"
+                        [skill-id-to-rubrics-object]="skillIdToRubricsObject"
+                        [question-suggestion-threads]="questionSuggestionThreads"
+                        [fetch-from-backend]="true"
+                        [grouped-skill-summaries]="groupedSkillSummaries"
+                        [skills-categorized-by-topics]="getSkillsCategorizedByTopics"
+                        [untriaged-skill-summaries]="getUntriagedSkillSummaries">
+  </oppia-questions-list>
 </div>
 
 <style>

@@ -16,7 +16,6 @@
 
 from __future__ import annotations
 
-import json
 import logging
 import random
 
@@ -254,6 +253,16 @@ class ExplorationHandler(base.BaseHandler):
                     }]
                 },
                 'default_value': None
+            },
+            'pid': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_PROGRESS_URL_ID_LENGTH
+                    }]
+                },
+                'default_value': None
             }
         }
     }
@@ -266,6 +275,7 @@ class ExplorationHandler(base.BaseHandler):
             exploration_id: str. The ID of the exploration.
         """
         version = self.normalized_request.get('v')
+        unique_progress_url_id = self.normalized_request.get('pid')
 
         exploration = exp_fetchers.get_exploration_by_id(
             exploration_id, strict=False, version=version)
@@ -274,9 +284,9 @@ class ExplorationHandler(base.BaseHandler):
 
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id, strict=False)
-        user_settings = user_services.get_user_settings(self.user_id)
-        exp_user_data = exp_fetchers.get_exploration_user_data(
-            self.user_id, exploration_id)
+        user_settings = user_services.get_user_settings(
+            self.user_id, strict=False
+        )
 
         preferred_audio_language_code = None
         preferred_language_codes = None
@@ -295,27 +305,23 @@ class ExplorationHandler(base.BaseHandler):
         most_recently_reached_checkpoint_exp_version = None
         most_recently_reached_checkpoint_state_name = None
 
-        # If exp_user_data is None, it means the exploration is started
-        # for the first time and no checkpoint progress of the user exists for
-        # the respective exploration.
-        # Exploration version 'v' passed as a parameter in GET request means a
-        # previous version of the exploration is being fetched. In that case,
-        # we want that exploration to start from the beginning and do not
-        # allow users to save their checkpoint progress in older exploration
-        # version.
-        if exp_user_data is not None and version is None:
+        if not self.user_id and unique_progress_url_id is not None:
+            logged_out_user_data = (
+                exp_fetchers.get_logged_out_user_progress(
+                    unique_progress_url_id))
+
             synced_exp_user_data = None
             # If the latest exploration version is ahead of the most recently
             # interacted exploration version.
             if (
-                exp_user_data.most_recently_reached_checkpoint_exp_version is not None and # pylint: disable=line-too-long
-                exp_user_data.most_recently_reached_checkpoint_exp_version < exploration.version # pylint: disable=line-too-long
+                logged_out_user_data.most_recently_reached_checkpoint_exp_version is not None and # pylint: disable=line-too-long
+                logged_out_user_data.most_recently_reached_checkpoint_exp_version < exploration.version # pylint: disable=line-too-long
             ):
                 synced_exp_user_data = (
-                    user_services.sync_learner_checkpoint_progress_with_current_exp_version( # pylint: disable=line-too-long
-                        self.user_id, exploration_id))
+                    exp_services.sync_logged_out_learner_checkpoint_progress_with_current_exp_version( # pylint: disable=line-too-long
+                        logged_out_user_data.exploration_id, unique_progress_url_id)) # pylint: disable=line-too-long
             else:
-                synced_exp_user_data = exp_user_data
+                synced_exp_user_data = logged_out_user_data
 
             furthest_reached_checkpoint_exp_version = (
                 synced_exp_user_data.furthest_reached_checkpoint_exp_version)
@@ -328,11 +334,49 @@ class ExplorationHandler(base.BaseHandler):
                 synced_exp_user_data
                     .most_recently_reached_checkpoint_state_name)
 
+        elif self.user_id is not None:
+            exp_user_data = exp_fetchers.get_exploration_user_data(
+                self.user_id, exploration_id)
+
+            # If exp_user_data is None, it means the exploration is started
+            # for the first time and no checkpoint progress of the user
+            #  exists for the respective exploration.
+            # Exploration version 'v' passed as a parameter in GET request
+            # means a previous version of the exploration is being fetched.
+            # In that case, we want that exploration to start from the
+            # beginning and do not allow users to save their checkpoint
+            # progress in older exploration version.
+            if exp_user_data is not None and version is None:
+                synced_exp_user_data = None
+                # If the latest exploration version is ahead of the most
+                # recently interacted exploration version.
+                if (
+                    exp_user_data.most_recently_reached_checkpoint_exp_version is not None and # pylint: disable=line-too-long
+                    exp_user_data.most_recently_reached_checkpoint_exp_version < exploration.version # pylint: disable=line-too-long
+                ):
+                    synced_exp_user_data = (
+                        user_services.sync_logged_in_learner_checkpoint_progress_with_current_exp_version( # pylint: disable=line-too-long
+                            self.user_id, exploration_id))
+                else:
+                    synced_exp_user_data = exp_user_data
+
+                furthest_reached_checkpoint_exp_version = (
+                    synced_exp_user_data.furthest_reached_checkpoint_exp_version) # pylint: disable=line-too-long
+                furthest_reached_checkpoint_state_name = (
+                    synced_exp_user_data.furthest_reached_checkpoint_state_name)
+                most_recently_reached_checkpoint_exp_version = (
+                    synced_exp_user_data
+                        .most_recently_reached_checkpoint_exp_version)
+                most_recently_reached_checkpoint_state_name = (
+                    synced_exp_user_data
+                        .most_recently_reached_checkpoint_state_name)
+
         self.values.update({
             'can_edit': (
                 rights_manager.check_can_edit_activity(
                     self.user, exploration_rights)),
             'exploration': exploration.to_player_dict(),
+            'exploration_metadata': exploration.get_metadata().to_dict(),
             'exploration_id': exploration_id,
             'is_logged_in': bool(self.user_id),
             'session_id': utils.generate_new_session_id(),
@@ -1063,11 +1107,6 @@ class ExplorationCompleteEventHandler(base.BaseHandler):
             learner_progress_services.mark_exploration_as_completed(
                 user_id, exploration_id)
 
-            # Clear learner's checkpoint progress on completion of the
-            # exploration.
-            user_services.clear_learner_checkpoint_progress(
-                self.user_id, exploration_id)
-
         if user_id and collection_id:
             collection_services.record_played_exploration_in_collection_context(
                 user_id, collection_id, exploration_id)
@@ -1330,18 +1369,72 @@ class RecommendationsHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'collection_id': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.ENTITY_ID_REGEX
+                    }]
+                },
+                'default_value': None
+            },
+            'include_system_recommendations': {
+                'schema': {
+                    'type': 'bool'
+                },
+                'default_value': True
+            },
+            'author_recommended_ids': {
+                'schema': {
+                    'type': 'custom',
+                    'obj_type': 'JsonEncodedInString'
+                }
+            },
+            'story_id': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.ENTITY_ID_REGEX
+                    }]
+                },
+                'default_value': None
+            },
+            'current_node_id': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'is_regex_matched',
+                        'regex_pattern': constants.ENTITY_ID_REGEX
+                    }]
+                },
+                'default_value': None
+            }
+        }
+    }
+
     @acl_decorators.can_play_exploration
     def get(self, exploration_id):
         """Handles GET requests."""
-        collection_id = self.request.get('collection_id')
-
-        include_system_recommendations = self.request.get(
+        collection_id = self.normalized_request.get('collection_id')
+        include_system_recommendations = self.normalized_request.get(
             'include_system_recommendations')
-        try:
-            author_recommended_exp_ids = json.loads(self.request.get(
-                'stringified_author_recommended_ids'))
-        except Exception as e:
-            raise self.PageNotFoundException from e
+        author_recommended_exp_ids = self.normalized_request.get(
+            'author_recommended_ids')
 
         system_recommended_exp_ids = []
         next_exp_id = None
@@ -1456,6 +1549,138 @@ class QuestionPlayerHandler(base.BaseHandler):
         self.values.update({
             'question_dicts': question_dicts[:feconf.QUESTION_BATCH_SIZE]
         })
+        self.render_json(self.values)
+
+
+class TransientCheckpointUrlPage(base.BaseHandler):
+    """Responsible for redirecting the learner to the checkpoint
+    last reached on the exploration page as a logged out user."""
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'unique_progress_url_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': constants.MAX_PROGRESS_URL_ID_LENGTH
+                }]
+            },
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
+    @acl_decorators.open_access
+    def get(self, unique_progress_url_id):
+        """Handles GET requests. Fetches the logged-out learner's progress."""
+
+        logged_out_user_data = (
+            exp_fetchers.get_logged_out_user_progress(unique_progress_url_id))
+
+        if logged_out_user_data is None:
+            raise self.PageNotFoundException()
+
+        redirect_url = '%s/%s?pid=%s' % (
+            feconf.EXPLORATION_URL_PREFIX,
+            logged_out_user_data.exploration_id,
+            unique_progress_url_id)
+
+        self.redirect(redirect_url)
+
+
+class SaveTransientCheckpointProgressHandler(base.BaseHandler):
+    """Responsible for storing progress of a logged-out learner."""
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': editor.SCHEMA_FOR_EXPLORATION_ID
+        },
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'most_recently_reached_checkpoint_state_name': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_STATE_NAME_LENGTH
+                    }]
+                }
+            },
+            'most_recently_reached_checkpoint_exp_version': {
+                'schema': editor.SCHEMA_FOR_VERSION
+            }
+        },
+        'PUT': {
+            'unique_progress_url_id': {
+                'schema': {
+                    'type': 'basestring',
+                }
+            },
+            'most_recently_reached_checkpoint_state_name': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_STATE_NAME_LENGTH
+                    }]
+                }
+            },
+            'most_recently_reached_checkpoint_exp_version': {
+                'schema': editor.SCHEMA_FOR_VERSION
+            }
+        }
+    }
+
+    @acl_decorators.can_play_exploration
+    def post(self, exploration_id):
+        """Handles POST requests. Creates a new unique progress
+        url ID and a new corresponding TransientCheckpointUrl model.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+        """
+        most_recently_reached_checkpoint_state_name = (
+            self.normalized_payload.get(
+                'most_recently_reached_checkpoint_state_name'))
+        most_recently_reached_checkpoint_exp_version = (
+            self.normalized_payload.get(
+                'most_recently_reached_checkpoint_exp_version'))
+
+        # Create a new unique_progress_url_id.
+        new_unique_progress_url_id = (
+            exp_fetchers.get_new_unique_progress_url_id())
+
+        # Create a new model corresponding to the new progress id.
+        exp_services.update_logged_out_user_progress(
+            exploration_id,
+            new_unique_progress_url_id,
+            most_recently_reached_checkpoint_state_name,
+            most_recently_reached_checkpoint_exp_version)
+
+        self.render_json({
+            'unique_progress_url_id': new_unique_progress_url_id
+        })
+
+    @acl_decorators.can_play_exploration
+    def put(self, exploration_id):
+        """"Handles the PUT requests. Saves the logged-out user's progress."""
+        unique_progress_url_id = (
+            self.normalized_payload.get('unique_progress_url_id'))
+        most_recently_reached_checkpoint_state_name = (
+            self.normalized_payload.get(
+                'most_recently_reached_checkpoint_state_name'))
+        most_recently_reached_checkpoint_exp_version = (
+            self.normalized_payload.get(
+                'most_recently_reached_checkpoint_exp_version'))
+
+        exp_services.update_logged_out_user_progress(
+            exploration_id,
+            unique_progress_url_id,
+            most_recently_reached_checkpoint_state_name,
+            most_recently_reached_checkpoint_exp_version)
+
         self.render_json(self.values)
 
 
@@ -1586,3 +1811,210 @@ class ExplorationRestartEventHandler(base.BaseHandler):
                 self.user_id, exploration_id)
 
         self.render_json(self.values)
+
+
+class SyncLoggedOutLearnerProgressHandler(base.BaseHandler):
+    """Syncs logged out progress of a learner with the logged in progress."""
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'POST': {
+            'unique_progress_url_id': {
+                'schema': {
+                    'type': 'basestring',
+                }
+            },
+        }
+    }
+
+    @acl_decorators.can_play_exploration
+    def post(self, exploration_id):
+        """Handles POST requests."""
+        unique_progress_url_id = self.normalized_payload.get(
+            'unique_progress_url_id')
+        if self.user_id is not None:
+            exp_services.sync_logged_out_learner_progress_with_logged_in_progress( # pylint: disable=line-too-long
+                self.user_id,
+                exploration_id,
+                unique_progress_url_id
+            )
+
+        self.render_json(self.values)
+
+
+class StateVersionHistoryHandler(base.BaseHandler):
+    """Handles the fetching of the version history for a state at the given
+    version of the exploration.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        },
+        'state_name': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': constants.MAX_STATE_NAME_LENGTH
+                }]
+            }
+        },
+        'version': {
+            'schema': {
+                'type': 'int',
+                'validators': [{
+                    'id': 'is_at_least',
+                    'min_value': 1
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
+    @acl_decorators.can_play_exploration
+    def get(self, exploration_id, state_name, version):
+        """Handles GET requests."""
+        version_history = exp_fetchers.get_exploration_version_history(
+            exploration_id, version
+        )
+
+        if version_history is None:
+            raise self.PageNotFoundException
+
+        state_version_history = (
+            version_history.state_version_history[state_name]
+        )
+        last_edited_version_number = (
+            state_version_history.previously_edited_in_version
+        )
+        state_name_in_previous_version = (
+            state_version_history.state_name_in_previous_version
+        )
+        state_in_previous_version = None
+        last_edited_committer_username = user_services.get_username(
+            state_version_history.committer_id
+        )
+
+        # If the state has not been updated after it was added for the
+        # first time, the value of last_edited_version_number will be None.
+        if last_edited_version_number is not None:
+            exploration = exp_fetchers.get_exploration_by_id(
+                exploration_id, version=last_edited_version_number
+            )
+            state_in_previous_version = (
+                exploration.states[state_name_in_previous_version]
+            )
+
+        self.render_json({
+            'last_edited_version_number': last_edited_version_number,
+            'state_name_in_previous_version': state_name_in_previous_version,
+            'state_dict_in_previous_version': (
+                state_in_previous_version.to_dict()
+                if state_in_previous_version is not None else None
+            ),
+            'last_edited_committer_username': last_edited_committer_username
+        })
+
+
+class MetadataVersionHistoryHandler(base.BaseHandler):
+    """Handles the fetching of the version history for the exploration metadata
+    at the given version of the exploration.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        },
+        'version': {
+            'schema': {
+                'type': 'int',
+                'validators': [{
+                    'id': 'is_at_least',
+                    'min_value': 1
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
+    @acl_decorators.can_play_exploration
+    def get(self, exploration_id, version):
+        """Handles GET requests."""
+        version_history = exp_fetchers.get_exploration_version_history(
+            exploration_id, version
+        )
+
+        if version_history is None:
+            raise self.PageNotFoundException
+
+        metadata_version_history = version_history.metadata_version_history
+        metadata_in_previous_version = None
+
+        # If the metadata has not been updated after the exploration was
+        # created, the value of last_edited_version_number will be None.
+        if metadata_version_history.last_edited_version_number is not None:
+            exploration = exp_fetchers.get_exploration_by_id(
+                exploration_id,
+                version=metadata_version_history.last_edited_version_number
+            )
+            metadata_in_previous_version = exploration.get_metadata()
+
+        self.render_json({
+            'last_edited_version_number': (
+                metadata_version_history.last_edited_version_number
+            ),
+            'last_edited_committer_username': user_services.get_username(
+                metadata_version_history.last_edited_committer_id
+            ),
+            'metadata_dict_in_previous_version': (
+                metadata_in_previous_version.to_dict()
+                if metadata_in_previous_version is not None else None
+            )
+        })
+
+
+class CheckpointsFeatureStatusHandler(base.BaseHandler):
+    """The handler for checking whether the checkpoints feature is enabled."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
+    @acl_decorators.open_access
+    def get(self):
+        self.render_json({
+            'checkpoints_feature_is_enabled': (
+                config_domain.CHECKPOINTS_FEATURE_IS_ENABLED.value)
+        })

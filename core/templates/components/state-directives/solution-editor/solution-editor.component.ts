@@ -41,8 +41,11 @@ export class SolutionEditor implements OnInit {
 
   @Output() openSolutionEditorModal: EventEmitter<void> = new EventEmitter();
 
-  isEditable: boolean;
-  EXPLANATION_FORM_SCHEMA: ExplanationFormSchema;
+  // This property is initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  EXPLANATION_FORM_SCHEMA!: ExplanationFormSchema;
+  isEditable: boolean = false;
 
   constructor(
     private editabilityService: EditabilityService,
@@ -53,8 +56,11 @@ export class SolutionEditor implements OnInit {
   ) {}
 
   getAnswerHtml(): string {
+    if (this.stateSolutionService.savedMemento === null) {
+      throw new Error('Expected solution to be defined');
+    }
     return this.explorationHtmlFormatterService.getAnswerHtml(
-      this.stateSolutionService.savedMemento.correctAnswer as string,
+      this.stateSolutionService.savedMemento.correctAnswer,
       this.stateInteractionIdService.savedMemento,
       this.stateCustomizationArgsService.savedMemento);
   }

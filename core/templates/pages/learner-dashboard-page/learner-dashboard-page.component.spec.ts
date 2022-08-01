@@ -626,7 +626,7 @@ describe('Learner dashboard page', () => {
 
       const feedbackListNameNodes =
         fixture.debugElement.nativeElement
-          .querySelectorAll('.protractor-test-feedback-exploration');
+          .querySelectorAll('.e2e-test-feedback-exploration');
 
       // The forEach loop is being used here because
       // getValueOfSubscriptionSortKey is used in a *ngFor directive.
@@ -665,7 +665,7 @@ describe('Learner dashboard page', () => {
 
       const feedbackListNameNodes =
         fixture.debugElement.nativeElement
-          .querySelectorAll('.protractor-test-feedback-exploration');
+          .querySelectorAll('.e2e-test-feedback-exploration');
 
       // The forEach loop is being used here because
       // getValueOfSubscriptionSortKey is used in a *ngFor directive.
@@ -707,7 +707,7 @@ describe('Learner dashboard page', () => {
 
       const feedbackListNameNodes =
         fixture.debugElement.nativeElement
-          .querySelectorAll('.protractor-test-feedback-exploration');
+          .querySelectorAll('.e2e-test-feedback-exploration');
 
       // The forEach loop is being used here because
       // getValueOfSubscriptionSortKey is used in a *ngFor directive.
@@ -753,7 +753,7 @@ describe('Learner dashboard page', () => {
 
       const feedbackListNameNodes =
         fixture.debugElement.nativeElement
-          .querySelectorAll('.protractor-test-feedback-exploration');
+          .querySelectorAll('.e2e-test-feedback-exploration');
 
       // The forEach loop is being used here because
       // getValueOfSubscriptionSortKey is used in a *ngFor directive.

@@ -27,11 +27,13 @@ import { ConfirmOrCancelModal } from 'components/common-layout-directives/common
 })
 export class TopicEditorSaveModalComponent extends ConfirmOrCancelModal
   implements OnInit {
-  @Input() topicIsPublished: boolean;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() topicIsPublished!: boolean;
+  MAX_COMMIT_MESSAGE_LENGTH!: number;
   commitMessage: string = '';
-
-  MAX_COMMIT_MESSAGE_LENGTH: number;
-  isTopicPublished: boolean;
+  isTopicPublished: boolean = false;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,

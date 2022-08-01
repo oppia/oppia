@@ -36,5 +36,5 @@ def inform_subscribers(
             has published.
     """
 
-    email_manager.send_emails_to_subscribers(  # type: ignore[no-untyped-call]
+    email_manager.send_emails_to_subscribers(
         creator_id, exploration_id, exploration_title)

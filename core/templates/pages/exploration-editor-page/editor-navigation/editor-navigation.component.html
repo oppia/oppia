@@ -246,7 +246,7 @@
 
         <div ng-if="isEditableOutsideTutorialMode()">
           <div title="<[getSaveButtonTooltip()]>" ng-class="{'disable-save-button': !connectedToInternet || !isExplorationSaveable()}">
-            <button class="btn publish-button protractor-test-save-changes-for-small-screens" ng-class="{'btn-success': connectedToInternet && isExplorationSaveable()}" ng-click="saveChanges()" ng-disabled="!connectedToInternet || !isExplorationSaveable()">
+            <button class="btn publish-button e2e-test-save-changes-for-small-screens" ng-class="{'btn-success': connectedToInternet && isExplorationSaveable()}" ng-click="saveChanges()" ng-disabled="!connectedToInternet || !isExplorationSaveable()">
               <span ng-if="!saveIsInProcess">
                 <span ng-if="isPrivate()">
                   <i class="material-icons md-18 oppia-save-publish-button-icon"

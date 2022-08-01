@@ -35,11 +35,14 @@ export class QuestionMisconceptionSelectorComponent implements OnInit {
   @Output() updateMisconceptionValues:
   EventEmitter<UpdatedValues> = (new EventEmitter());
 
-  @Input() selectedMisconception: Misconception;
-  @Input() selectedMisconceptionSkillId: string;
-  @Input() misconceptionFeedbackIsUsed: boolean;
-  @Input() taggedSkillMisconceptionId: string;
-  misconceptionsBySkill: MisconceptionSkillMap;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() selectedMisconception!: Misconception;
+  @Input() selectedMisconceptionSkillId!: string;
+  @Input() misconceptionFeedbackIsUsed!: boolean;
+  @Input() taggedSkillMisconceptionId!: string;
+  misconceptionsBySkill!: MisconceptionSkillMap;
 
   constructor(
     private stateEditorService: StateEditorService,

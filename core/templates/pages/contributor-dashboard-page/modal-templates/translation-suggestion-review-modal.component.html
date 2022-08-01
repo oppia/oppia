@@ -1,15 +1,24 @@
 <div class="modal-header">
-  <div class="row align-items-start">
-    <h3 class="col-3">Review translation</h3>
+  <div class="oppia-modal-info">
+    <h3 class="oppia-modal-info-header">Review Translation Contributions</h3>
     <span title="{{ subheading }}"
-          class="col-8 pt-1 mt-4 oppia-translation-modal-subheading protractor-translation-suggestion-review-subheading"
+          class="oppia-translation-modal-subheading e2e-translation-suggestion-review-subheading"
           aria-hidden="false"> {{ subheading }}
     </span>
-    <button type="button" class="col-1 close oppia-close-button-position" (click)="cancel()" aria-label="Close">
+    <span title="{{ activeContribution.details.chapter_title }}"
+          class="oppia-translation-modal-subheading-lesson protractor-translation-suggestion-review-subheading"
+          aria-hidden="false">
+      {{ activeContribution.details.chapter_title }}
+    </span>
+    <button type="button"
+            class="close oppia-close-button-position"
+            (click)="cancel()"
+            aria-label="Close">
       <span aria-hidden="true">&times;</span>
     </button>
-    <div class="w-100"></div>
-    <h4 class="col oppia-translation-modal-author-header">Submitted by {{ authorName }} in {{ languageDescription }} language</h4>
+    <h4 class="oppia-translation-modal-author-header">
+      Submitted by {{ authorName }} in {{ languageDescription }} language
+    </h4>
   </div>
 </div>
 
@@ -19,111 +28,257 @@
       <div class="oppia-suggestion-review-panel-header-container">
         <strong>Content to translate:</strong>
       </div>
-      <div class="oppia-suggestion-review-panel">
-        <angular-html-bind-wrapper [htmlData]="displayExplorationContent()">
-        </angular-html-bind-wrapper>
+      <div class="oppia-suggestion-review-panel"
+           [ngClass]="isContentExpanded ? 'oppia-content-expanded' : 'oppia-content-collapsed'"
+           #contentContainer>
+        <ul *ngIf="contentTypeIsSetOfStrings">
+          <li *ngFor="let item of displayExplorationContent(); index as idx">
+            {{ item }}
+          </li>
+        </ul>
+        <oppia-rte-output-display *ngIf="!contentTypeIsSetOfStrings"
+                                  [rteString]="displayExplorationContent()"
+                                  #contentPanel>
+        </oppia-rte-output-display>
+      </div>
+      <div class="oppia-collapse-content"
+           *ngIf="isContentOverflowing"
+           (click)="toggleExpansionState(0)">
+        {{ isContentExpanded ? "View Less" : "View More" }}
       </div>
     </div>
     <div class="oppia-suggestion-review-panel-container float-right">
-      <div dir="auto" class="oppia-suggestion-review-panel-header-container">
+      <div dir="auto"
+           class="oppia-suggestion-review-panel-header-container oppia-translation-panel">
         <strong> Translation:</strong>
-        <button class="btn btn-sm btn-secondary float-right" *ngIf="!startedEditing && status === 'review' && canEditTranslation" (click)="editSuggestion()">Edit</button>
+        <button class="btn btn-sm btn-secondary float-right"
+                *ngIf="!startedEditing && status === 'review' && canEditTranslation"
+                (click)="editSuggestion()">
+          Edit
+        </button>
       </div>
-      <div class="oppia-suggestion-review-panel">
+      <div class="oppia-suggestion-review-panel oppia-content"
+           [ngClass]="isTranslationExpanded ? 'oppia-content-expanded' : 'oppia-content-collapsed'"
+           #translationContainer>
         <div>
-          <angular-html-bind-wrapper [htmlData]="translationHtml" *ngIf="!startedEditing">
-          </angular-html-bind-wrapper>
+          <oppia-rte-output-display [rteString]="translationHtml"
+                                    *ngIf="!startedEditing"
+                                    #translationPanel>
+          </oppia-rte-output-display>
+          <ul *ngIf="contentTypeIsSetOfStrings">
+            <li *ngFor="let item of translationHtml; index as idx">
+              {{ item }}
+            </li>
+          </ul>
           <schema-based-editor [schema]="HTML_SCHEMA"
-                               *ngIf="startedEditing"
+                               *ngIf="startedEditing && contentTypeIsHtml"
                                [(ngModel)]="editedContent.html">
           </schema-based-editor>
           <schema-based-editor [schema]="UNICODE_SCHEMA"
-                               *ngIf="startedEditing"
+                               *ngIf="startedEditing && contentTypeIsUnicode"
                                [(ngModel)]="editedContent.html">
           </schema-based-editor>
           <schema-based-editor [schema]="SET_OF_STRINGS_SCHEMA"
-                               *ngIf="startedEditing"
+                               *ngIf="startedEditing && contentTypeIsSetOfStrings"
                                [(ngModel)]="editedContent.html">
           </schema-based-editor>
         </div>
         <div class="oppia-translation-review-edit-buttons">
-          <button class="btn btn-secondary" *ngIf="startedEditing" (click)="cancelEdit()">Cancel</button>
-          <button class="btn btn-success" *ngIf="startedEditing" (click)="updateSuggestion()">Update</button>
+          <button class="btn btn-secondary mr-2"
+                  *ngIf="startedEditing"
+                  (click)="cancelEdit()">
+            Cancel
+          </button>
+          <button class="btn btn-success ml-2"
+                  *ngIf="startedEditing"
+                  (click)="updateSuggestion()">
+            Update
+          </button>
         </div>
-        <div class="oppia-translation-error-section" *ngIf="startedEditing && errorFound">
+        <div class="oppia-translation-error-section"
+             *ngIf="startedEditing && errorFound">
           <p>
             {{ errorMessage }}
           </p>
         </div>
       </div>
+      <div class="oppia-collapse-content"
+           *ngIf="isTranslationOverflowing"
+           (click)="toggleExpansionState(1)">
+        {{ isTranslationExpanded ? "View Less" : "View More" }}
+      </div>
     </div>
   </section>
-  <section class="oppia-suggestion-review-exploration-change" *ngIf="hasExplorationContentChanged()">
+  <section class="oppia-suggestion-review-exploration-change"
+           *ngIf="hasExplorationContentChanged()">
     <p class="oppia-suggestion-review-exploration-change-note">
-      <strong>NOTE: The content has been modified since this translation has been submitted. Please edit the translation as necessary. The original content at the time of submission was:</strong>
+      <strong>
+        NOTE: The content has been modified since this translation has been submitted.
+        Please edit the translation as necessary.
+        The original content at the time of submission was:
+      </strong>
     </p>
     <div class="oppia-suggestion-review-panel">
-      <ul *ngIf="isSetOfStringsContent">
+      <ul *ngIf="contentTypeIsSetOfStrings">
         <li *ngFor="let item of contentHtml; index as idx">
           {{ item }}
         </li>
       </ul>
-      <angular-html-bind-wrapper *ngIf="!isSetOfStringsContent"
-                                 [htmlData]="contentHtml">
-      </angular-html-bind-wrapper>
+      <oppia-rte-output-display *ngIf="!contentTypeIsSetOfStrings"
+                                [rteString]="contentHtml">
+      </oppia-rte-output-display>
     </div>
   </section>
-  <div [hidden]="!reviewable" class="oppia-suggestion-review-message">
+  <div [hidden]="!reviewable"
+       class="oppia-suggestion-review-message">
     Review message (required if rejecting):
-    <textarea class="protractor-test-suggestion-review-message w-100" rows="3" [(ngModel)]="reviewMessage" [attr.maxlength]="MAX_REVIEW_MESSAGE_LENGTH"></textarea>
-    <div class="alert alert-danger" [hidden]="!(reviewMessage.length > MAX_REVIEW_MESSAGE_LENGTH)">
+    <textarea class="e2e-test-suggestion-review-message w-100"
+              rows="3"
+              [(ngModel)]="reviewMessage"
+              [attr.maxlength]="MAX_REVIEW_MESSAGE_LENGTH">
+    </textarea>
+    <div class="alert alert-danger"
+         [hidden]="!(reviewMessage.length > MAX_REVIEW_MESSAGE_LENGTH)">
       Review message should be at most {{ MAX_REVIEW_MESSAGE_LENGTH }} characters.
     </div>
   </div>
-  <div [hidden]="reviewable || !reviewMessage" class="oppia-suggestion-review-message">
-    <strong>Review message: </strong>{{ reviewMessage }}
+  <div [hidden]="reviewable || !reviewMessage"
+       class="oppia-suggestion-review-message">
+    <strong>Review message: </strong>
+    <div class="oppia-review-message">
+      {{ reviewMessage }}
+    </div>
   </div>
 </div>
 
 <div class="modal-footer">
-  <button class="btn btn-secondary" (click)="cancel()">Close</button>
-  <span ngbTooltip="Enter review message before rejecting" placement="bottom" [disableTooltip]="!(reviewMessage.length == 0)">
-    <button class="btn btn-danger oppia-suggestion-resolve-button" *ngIf="reviewable" [disabled]="reviewMessage.length == 0 || reviewMessage.length > MAX_REVIEW_MESSAGE_LENGTH || resolvingSuggestion" (click)="rejectAndReviewNext()">
-      <i [hidden]="!resolvingSuggestion" class="fa fa-spinner"></i>
-      <span [hidden]="resolvingSuggestion">{{ lastSuggestionToReview ? 'Reject' : 'Reject and review next' }}</span>
+  <div class="oppia-review-buttons">
+    <span ngbTooltip="Enter review message before rejecting"
+          placement="bottom"
+          [disableTooltip]="reviewMessage.length !== 0">
+      <button class="btn btn-danger oppia-suggestion-resolve-button"
+              *ngIf="reviewable"
+              [disabled]="reviewMessage.length == 0 || reviewMessage.length > MAX_REVIEW_MESSAGE_LENGTH || resolvingSuggestion"
+              (click)="rejectAndReviewNext()">
+        <i [hidden]="!resolvingSuggestion"
+           class="fa fa-spinner">
+        </i>
+        <span [hidden]="resolvingSuggestion">
+          {{ lastSuggestionToReview || isLastItem ? 'Reject' : 'Reject and review next' }}
+        </span>
+      </button>
+    </span>
+    <span>
+      <button class="btn btn-success oppia-suggestion-resolve-button"
+              [disabled]="resolvingSuggestion || reviewMessage.length > MAX_REVIEW_MESSAGE_LENGTH"
+              *ngIf="reviewable"
+              (click)="acceptAndReviewNext()">
+        <i [hidden]="!resolvingSuggestion"
+           class="fa fa-spinner">
+        </i>
+        <span [hidden]="resolvingSuggestion">
+          {{ lastSuggestionToReview || isLastItem ? 'Accept' : 'Accept and review next' }}
+        </span>
+      </button>
+    </span>
+  </div>
+  <div class="oppia-pagination-container">
+    <button type="button"
+            class="oppia-pagination-button"
+            (click)="goToPreviousItem()"
+            [disabled]="isFirstItem">
+      <span class="material-icons">navigate_before</span>Previous
     </button>
-  </span>
-  <span>
-    <button class="btn btn-success oppia-suggestion-resolve-button" [disabled]="resolvingSuggestion || reviewMessage.length > MAX_REVIEW_MESSAGE_LENGTH" *ngIf="reviewable" (click)="acceptAndReviewNext()">
-      <i [hidden]="!resolvingSuggestion" class="fa fa-spinner"></i>
-      <span [hidden]="resolvingSuggestion">{{ lastSuggestionToReview ? 'Accept' : 'Accept and review next' }}</span>
+    <button type="button"
+            class="oppia-pagination-button"
+            (click)="goToNextItem()"
+            [disabled]="isLastItem">
+      Next<span class="material-icons">navigate_next</span>
     </button>
-  </span>
+  </div>
 </div>
 
 <style>
-  .oppia-translation-modal-author-header {
-    margin-top: -12px;
+  .oppia-review-message {
+    border: 1px solid #ccc;
+    margin-top: 10px;
+    min-height: 100px;
+    padding: 10px;
+  }
+  .oppia-review-buttons {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+  }
+  .modal-footer {
+    display: flex;
+    flex-direction: column;
+  }
+  .oppia-pagination-container {
+    display: flex;
+    justify-content: space-between;
+    margin: 10px 0;
+    width: 100%;
+  }
+  .oppia-pagination-button {
+    background-color: transparent;
+    border: none;
+    box-sizing: border-box;
+    color: #009688;
+    font-size: 18px;
+    font-weight: bold;
+    min-height: 40px;
+    min-width: 100px;
+    text-align: center;
   }
 
+  .oppia-pagination-button:hover {
+    border: 2px solid #009688;
+    border-radius: 5px;
+  }
+  .oppia-pagination-button[disabled] {
+    color: #a9e5df;
+  }
+  .oppia-pagination-button[disabled]:hover {
+    border: none;
+  }
+  .oppia-collapse-content {
+    display: none;
+  }
+  .modal-body {
+    height: fit-content;
+  }
+  .oppia-modal-info {
+    display: flex;
+    flex-direction: column;
+  }
   .oppia-translation-modal-subheading {
-    margin: 18px 12px;
+    display: block;
+    margin: 0;
+  }
+  .oppia-translation-modal-subheading-lesson {
+    display: none;
+  }
+  .oppia-translation-modal-author-header {
+    margin-top: 12px;
   }
   .oppia-suggestion-review-panel {
     border: 1px solid #ccc;
     height: 88%;
-    padding: 10px 0 10px 10px;
+    max-height: none;
+    padding: 10px;
     position: relative;
   }
   .oppia-suggestion-review-message {
-    margin-left: 10px;
     margin-top: 20px;
   }
   .oppia-suggestion-resolve-button {
+    margin-left: 10px;
     min-width: 165px;
   }
   .oppia-suggestion-review-panel-header-container {
     height: 12%;
+    text-align: left;
   }
   .oppia-suggestion-review-exploration-change {
     padding: 0 10px;
@@ -132,7 +287,7 @@
     margin-top: 18px;
   }
   .oppia-translation-review-edit-buttons {
-    margin-left: 10px;
+    margin-bottom: 10px;
     margin-top: 10px;
   }
   .oppia-translation-error-section {
@@ -142,9 +297,20 @@
   }
   .oppia-close-button-position {
     font-size: 2.5rem;
+    height: fit-content;
     position: absolute;
-    right: 8px;
+    right: 12px;
     top: 12px;
+  }
+  .oppia-suggestion-review-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+  .oppia-suggestion-review-panel-container {
+    height: 100%;
+    padding: auto 10px;
+    width: 49%;
   }
   /* From 1023px onwards, the modal text branches to the next line.
      The use of line height ensures that alternate lines of the
@@ -153,7 +319,94 @@
   @media only screen and (max-width: 1023px) {
     .oppia-translation-modal-subheading {
       line-height: 1.1;
-      margin: 20px 12px;
+    }
+  }
+
+  @media only screen and (max-width: 700px) {
+    .oppia-translation-panel {
+      margin-top: 12px;
+    }
+    .oppia-content-expanded {
+      height: fit-content;
+      max-height: none;
+      overflow-y: hidden;
+    }
+    .oppia-content-collapsed {
+      max-height: 30vh;
+      overflow-y: scroll;
+    }
+    .oppia-cancel-button {
+      display: none;
+    }
+    .oppia-collapse-content {
+      background-color: #016a5d;
+      color: white;
+      cursor: pointer;
+      display: block;
+      font-size: 12px;
+      font-weight: bold;
+      margin: auto;
+      padding: 5px 10px;
+      position: relative;
+      text-align: center;
+      text-transform: uppercase;
+      top: -13px;
+      width: 85px;
+    }
+    .modal-body {
+      height: fit-content;
+    }
+
+    .oppia-suggestion-review-panel {
+      margin-top: 10px;
+      overflow-x: hidden;
+      padding-bottom: 16px;
+    }
+    .oppia-suggestion-review-panel-container {
+      margin-bottom: 0;
+      width: 100%;
+    }
+    .modal-header {
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 10px;
+    }
+    .oppia-suggestion-review-container {
+      display: flex;
+      flex-direction: column;
+      height: fit-content;
+      padding: 0;
+    }
+    .oppia-modal-info-header {
+      font-size: 16px;
+      font-weight: normal;
+      margin: 0;
+    }
+    .oppia-translation-modal-author-header {
+      display: none;
+    }
+    .oppia-translation-modal-subheading {
+      display: none;
+    }
+    .oppia-translation-modal-subheading-lesson {
+      display: block;
+      font-size: 24px;
+      font-weight: bold;
+    }
+    .oppia-content {
+      padding-bottom: 6px;
+    }
+  }
+  @media only screen and (max-width: 450px) {
+    .oppia-suggestion-resolve-button {
+      margin-left: 4px;
+      margin-right: 0;
+      min-width: 40vw;
+    }
+    .oppia-review-buttons {
+      justify-content: center;
+    }
+    .oppia-suggestion-review-message {
+      font-size: 16px;
     }
   }
 </style>

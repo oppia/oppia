@@ -41,7 +41,7 @@ CMD_CHANGE_PRIVATE_VIEWABILITY = feconf.CMD_CHANGE_PRIVATE_VIEWABILITY
 CMD_RELEASE_OWNERSHIP = feconf.CMD_RELEASE_OWNERSHIP
 CMD_UPDATE_FIRST_PUBLISHED_MSEC = feconf.CMD_UPDATE_FIRST_PUBLISHED_MSEC
 
-ACTIVITY_STATUS_PRIVATE = constants.ACTIVITY_STATUS_PRIVATE
+ACTIVITY_STATUS_PRIVATE: str = constants.ACTIVITY_STATUS_PRIVATE
 ACTIVITY_STATUS_PUBLIC = constants.ACTIVITY_STATUS_PUBLIC
 
 ROLE_OWNER = feconf.ROLE_OWNER
@@ -179,13 +179,13 @@ class ActivityRights:
                 'cloned_from': self.cloned_from,
                 'status': self.status,
                 'community_owned': False,
-                'owner_names': user_services.get_human_readable_user_ids(# type: ignore[no-untyped-call]
+                'owner_names': user_services.get_human_readable_user_ids(
                     self.owner_ids),
-                'editor_names': user_services.get_human_readable_user_ids(# type: ignore[no-untyped-call]
+                'editor_names': user_services.get_human_readable_user_ids(
                     self.editor_ids),
-                'voice_artist_names': user_services.get_human_readable_user_ids(# type: ignore[no-untyped-call]
+                'voice_artist_names': user_services.get_human_readable_user_ids(
                     self.voice_artist_ids),
-                'viewer_names': user_services.get_human_readable_user_ids(# type: ignore[no-untyped-call]
+                'viewer_names': user_services.get_human_readable_user_ids(
                     self.viewer_ids),
                 'viewable_if_private': self.viewable_if_private,
             }

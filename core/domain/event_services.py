@@ -272,8 +272,10 @@ def handle_exploration_start(exp_id):
     Args:
         exp_id: str. The exploration which has been started.
     """
-    exp_summary = exp_fetchers.get_exploration_summary_by_id(exp_id)
-    if exp_summary:
+    exp_summary = exp_fetchers.get_exploration_summary_by_id(
+        exp_id, strict=False
+    )
+    if exp_summary is not None:
         for user_id in exp_summary.owner_ids:
             _increment_total_plays_count_transactional(user_id)
 
@@ -287,8 +289,10 @@ def handle_exploration_rating(exp_id, rating, old_rating):
         old_rating: int. The old rating of the exploration before
             refreshing.
     """
-    exp_summary = exp_fetchers.get_exploration_summary_by_id(exp_id)
-    if exp_summary:
+    exp_summary = exp_fetchers.get_exploration_summary_by_id(
+        exp_id, strict=False
+    )
+    if exp_summary is not None:
         for user_id in exp_summary.owner_ids:
             _refresh_average_ratings_transactional(user_id, rating, old_rating)
 

@@ -181,7 +181,7 @@ describe('Learner Story Summary Tile Component', () => {
       url_fragment: 'story-title',
       all_node_dicts: [],
       topic_name: 'Topic',
-      classroom_url_fragment: null,
+      classroom_url_fragment: undefined,
       topic_url_fragment: 'topic'
     };
     component.storySummary = StorySummary.createFromBackendDict(

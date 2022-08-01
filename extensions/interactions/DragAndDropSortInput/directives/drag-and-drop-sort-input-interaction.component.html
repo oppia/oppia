@@ -32,7 +32,7 @@
                  [ngClass]="{'highlight-group': idx === highlightedGroup}"
                  cdkDrag>
               <div class="child-dnd-placeholder" *cdkDragPlaceholder></div>
-              <angular-html-bind-wrapper [htmlData]="item"></angular-html-bind-wrapper>
+              <oppia-rte-output-display [rteString]="item"></oppia-rte-output-display>
             </div>
           </div>
         </div>
@@ -45,7 +45,7 @@
          cdkDropList>
       <div class="child-dnd-item-box" *ngFor="let item of singleItemInSamePositionArray" cdkDrag>
         <div class="child-dnd-single-item-placeholder" *cdkDragPlaceholder></div>
-        <angular-html-bind-wrapper [htmlData]="item"></angular-html-bind-wrapper>
+        <oppia-rte-output-display [rteString]="item"></oppia-rte-output-display>
       </div>
     </div>
   </div>

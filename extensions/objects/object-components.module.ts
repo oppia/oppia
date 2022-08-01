@@ -41,7 +41,7 @@ import { NgbModalModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { ImageWithRegionsEditorComponent } from './templates/image-with-regions-editor.component';
 import { ImageWithRegionsResetConfirmationModalComponent } from './templates/image-with-regions-reset-confirmation.component';
 import { IntEditorComponent } from './templates/int-editor.component';
-import { DynamicContentModule } from 'components/angular-html-bind/dynamic-content.module';
+import { DynamicContentModule } from 'components/interaction-display/dynamic-content.module';
 import { ListOfSetsOfTranslatableHtmlContentIdsEditorComponent } from './templates/list-of-sets-of-translatable-html-content-ids-editor.component';
 import { DirectivesModule } from 'directives/directives.module';
 import { ListOfTabsEditorComponent } from './templates/list-of-tabs-editor.component';
@@ -75,6 +75,7 @@ import { TranslatableSetOfUnicodeStringEditorComponent } from './templates/trans
 import { ParameterNameEditorComponent } from './templates/parameter-name-editor.component';
 
 import { TranslateModule } from '@ngx-translate/core';
+import { RichTextComponentsModule } from 'rich_text_components/rich-text-components.module';
 
 @NgModule({
   imports: [
@@ -92,6 +93,7 @@ import { TranslateModule } from '@ngx-translate/core';
     NgbModalModule,
     NgbTooltipModule,
     NgxTrimDirectiveModule,
+    RichTextComponentsModule,
     TranslateModule
   ],
   declarations: [

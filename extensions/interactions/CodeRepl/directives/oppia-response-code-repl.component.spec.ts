@@ -53,7 +53,7 @@ describe('ResponseCodeReplComponent', () => {
   });
 
   it('should display a popup with response when user clicks response', () => {
-    component.answerWithValue = '{' +
+    component.answer = '{' +
       '  "code": "# Type your code here.\\nprint(\'hello\')",' +
       '  "error": "",' +
       '  "evaluation": "",' +
@@ -62,7 +62,7 @@ describe('ResponseCodeReplComponent', () => {
 
     component.ngOnInit();
 
-    expect(component.answer).toEqual({
+    expect(component.escapedAnswer).toEqual({
       code: "# Type your code here.\nprint('hello')",
       error: '',
       evaluation: '',
@@ -72,7 +72,7 @@ describe('ResponseCodeReplComponent', () => {
 
   it('should display a popup with error when user clicks response' +
   ' after compilation fails', () => {
-    component.answerWithValue = '{' +
+    component.answer = '{' +
       '  "code": "# Type your code here.\\nprint(\'hello\')",' +
       '  "error": "SyntaxError: bad token on line 2",' +
       '  "evaluation": "",' +

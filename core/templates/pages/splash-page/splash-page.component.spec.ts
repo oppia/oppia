@@ -50,7 +50,7 @@ class MockI18nLanguageCodeService {
 
 describe('Splash Page', () => {
   let siteAnalyticsService: SiteAnalyticsService;
-  let loaderService: LoaderService = null;
+  let loaderService: LoaderService;
   let userService: UserService;
   let windowDimensionsService: WindowDimensionsService;
   let resizeEvent = new Event('resize');
@@ -96,7 +96,7 @@ describe('Splash Page', () => {
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
   });
 
-  let component;
+  let component: SplashPageComponent;
   beforeEach(() => {
     const splashPageComponent = TestBed.createComponent(SplashPageComponent);
     component = splashPageComponent.componentInstance;
@@ -105,10 +105,6 @@ describe('Splash Page', () => {
   it('should get static image url', function() {
     expect(component.getStaticImageUrl('/path/to/image')).toBe(
       '/assets/images/path/to/image');
-  });
-
-  it('should get RTL language status correctly', () => {
-    expect(component.isLanguageRTL()).toBeTrue();
   });
 
   it('should record analytics when Browse Lessons is clicked', function() {

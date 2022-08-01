@@ -24,7 +24,6 @@ import { DragAndDropSortInputCustomizationArgs } from 'interactions/customizatio
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { DragAndDropSortInputRulesService } from 'interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-rules.service';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
-import { InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
 
 import { InteractionAnswer } from 'interactions/answer-defs';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
@@ -36,17 +35,21 @@ import { DragAndDropAnswer } from 'interactions/answer-defs';
   styleUrls: []
 })
 export class InteractiveDragAndDropSortInputComponent implements OnInit {
-  @Input() allowMultipleItemsInSamePositionWithValue: string;
-  @Input() choicesWithValue: string;
-  @Input() savedSolution: InteractionAnswer;
-  allowMultipleItemsInSamePosition: boolean;
-  choices: string[];
-  choicesValue: SubtitledHtml[];
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() allowMultipleItemsInSamePositionWithValue!: string;
+  @Input() choicesWithValue!: string;
+  // Save solution is undefined until the solution is set.
+  @Input() savedSolution!: InteractionAnswer | undefined;
+  choices!: string[];
+  choicesValue!: SubtitledHtml[];
+  multipleItemsInSamePositionArray!: string[][];
+  singleItemInSamePositionArray!: string[];
+  allowMultipleItemsInSamePosition: boolean = false;
   dragStarted: boolean = false;
   hide: number[] = [];
   highlightedGroup: number = -1;
-  multipleItemsInSamePositionArray: string[][];
-  singleItemInSamePositionArray: string[];
   noShow: number = -1;
   rootHeight: number = 40;
 
@@ -60,7 +63,7 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
   resetArray(): void {
     // Resets the array into the correct format.
     // For example, [[], [1, 2, 3], []].
-    const res = [[]];
+    const res: string[][] = [[]];
     for (let i = 0; i < this.multipleItemsInSamePositionArray.length; i++) {
       if (this.multipleItemsInSamePositionArray[i].length !== 0) {
         res.push(this.multipleItemsInSamePositionArray[i]);
@@ -206,7 +209,8 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
         for (let i = 0; i < savedSolution.length; i++) {
           let items = [];
           for (let j = 0; j < savedSolution[i].length; j++) {
-            items.push(this.getHtmlOfContentId(savedSolution[i][j]));
+            let htmlContent = this.getHtmlOfContentId(savedSolution[i][j]);
+            items.push(htmlContent);
           }
           this.multipleItemsInSamePositionArray.push([]);
           this.multipleItemsInSamePositionArray.push(items);
@@ -225,8 +229,8 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
       if (savedSolution.length) {
         // Pre populate with the saved solution, if present.
         for (let i = 0; i < savedSolution.length; i++) {
-          this.singleItemInSamePositionArray.push(
-            this.getHtmlOfContentId(savedSolution[i][0]));
+          let htmlContent = this.getHtmlOfContentId(savedSolution[i][0]);
+          this.singleItemInSamePositionArray.push(htmlContent);
         }
       } else {
         // Pre populate with the choices, if no saved solution is present.
@@ -242,8 +246,13 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
   }
 
   getContentIdOfHtml(html: string): string {
+    let contentId = this.choicesValue[this.choices.indexOf(html)].contentId;
+
+    if (contentId === null) {
+      throw new Error('contentId cannot be null');
+    }
     // Returns the content id of the html.
-    return this.choicesValue[this.choices.indexOf(html)].contentId;
+    return contentId;
   }
 
   getHtmlOfContentId(contentId: string): string {
@@ -253,6 +262,7 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
         return choice.html;
       }
     }
+    throw new Error('contentId not found');
   }
 
   submitAnswer(): void {
@@ -281,9 +291,7 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
       }
     }
     this.currentInteractionService.onSubmit(
-      answer as unknown as string,
-      this.dragAndDropSortInputRulesService as unknown as
-      InteractionRulesService);
+      answer, this.dragAndDropSortInputRulesService);
   }
 }
 

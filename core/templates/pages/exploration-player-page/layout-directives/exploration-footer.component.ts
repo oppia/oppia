@@ -39,6 +39,9 @@ import { PlayerPositionService } from '../services/player-position.service';
 import { PlayerTranscriptService } from '../services/player-transcript.service';
 import { LessonInformationCardModalComponent } from '../templates/lesson-information-card-modal.component';
 
+import './exploration-footer.component.css';
+
+
 @Component({
   selector: 'oppia-exploration-footer',
   templateUrl: './exploration-footer.component.html'
@@ -68,6 +71,7 @@ export class ExplorationFooterComponent {
   learnerHasViewedLessonInfoTooltip: boolean = false;
   userIsLoggedIn: boolean = false;
   footerIsInQuestionPlayerMode: boolean = false;
+  CHECKPOINTS_FEATURE_IS_ENABLED = false;
 
   constructor(
     private contextService: ContextService,
@@ -141,9 +145,17 @@ export class ExplorationFooterComponent {
         });
       this.footerIsInQuestionPlayerMode = true;
     } else if (this.explorationId) {
-      // Fetching the number of checkpoints.
-      this.getCheckpointCount();
-      this.setLearnerHasViewedLessonInfoTooltip();
+      this.readOnlyExplorationBackendApiService
+        .fetchCheckpointsFeatureIsEnabledStatus().then(
+          (checkpointsFeatureIsEnabled) => {
+            this.CHECKPOINTS_FEATURE_IS_ENABLED = checkpointsFeatureIsEnabled;
+            if (this.CHECKPOINTS_FEATURE_IS_ENABLED) {
+              // Fetching the number of checkpoints.
+              this.getCheckpointCount();
+              this.setLearnerHasViewedLessonInfoTooltip();
+            }
+          }
+        );
     }
   }
 
@@ -273,8 +285,10 @@ export class ExplorationFooterComponent {
 
   learnerHasViewedLessonInfo(): void {
     this.learnerHasViewedLessonInfoTooltip = true;
-    this.editableExplorationBackendApiService
-      .recordLearnerHasViewedLessonInfoModalOnce();
+    if (this.userIsLoggedIn) {
+      this.editableExplorationBackendApiService
+        .recordLearnerHasViewedLessonInfoModalOnce();
+    }
   }
 
   hasLearnerHasViewedLessonInfoTooltip(): boolean {

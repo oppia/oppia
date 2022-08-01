@@ -41,7 +41,8 @@
       "tests/*": ["core/templates/tests/*"],
       "stream": ["./node_modules/stream-browserify"],
       "zlib": ["./node_modules/browserify-zlib"],
-      "path": ["./node_modules/path-browserify"]
+      "path": ["./node_modules/path-browserify"],
+      "utility/*": ["core/templates/utility/*"]
     }
   },
   "files": [

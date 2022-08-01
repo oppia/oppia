@@ -92,6 +92,10 @@ export class CoordTwoDimEditorComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    if (this.value === undefined) {
+      this.value = [0, 0];
+    }
+
     this.options = {
       layers: [tileLayer(
         this.optionsSpec.layers[0].url,

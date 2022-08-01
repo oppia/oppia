@@ -134,6 +134,7 @@ class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
             }],
             'outcome': {
                 'dest': feconf.DEFAULT_INIT_STATE_NAME,
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': '<p>Try again</p>'
@@ -1495,6 +1496,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                         'name': 'invalid_handler_name',
                         'rule_specs': [{
                             'dest': 'END',
+                            'dest_if_really_stuck': None,
                             'feedback': [],
                             'param_changes': [],
                             'definition': {'rule_type': 'default'}
@@ -1616,6 +1618,7 @@ states:
       answer_groups:
       - outcome:
           dest: New state
+          dest_if_really_stuck: null
           feedback:
             content_id: feedback_1
             html: <p>Correct!</p>
@@ -1642,6 +1645,7 @@ states:
           value: 1
       default_outcome:
         dest: Introduction
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -1719,6 +1723,7 @@ states:
       customization_args: {}
       default_outcome:
         dest: New state
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -1862,6 +1867,7 @@ title: Title
               answer_groups:
               - outcome:
                   dest: New state
+                  dest_if_really_stuck: null
                   feedback:
                     audio_translations:
                         en:
@@ -1881,6 +1887,7 @@ title: Title
               customization_args: {}
               default_outcome:
                 dest: Introduction
+                dest_if_really_stuck: null
                 feedback:
                   audio_translations:
                     en:
@@ -1923,6 +1930,7 @@ title: Title
               customization_args: {}
               default_outcome:
                 dest: New state
+                dest_if_really_stuck: null
                 feedback:
                   audio_translations: {}
                   html: ''
@@ -2062,7 +2070,7 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
         state3.update_interaction_customization_args(customization_args_dict3)
 
         default_outcome1 = state_domain.Outcome(
-            'state2', state_domain.SubtitledHtml(
+            'state2', None, state_domain.SubtitledHtml(
                 'default_outcome', '<p>Default outcome for state1</p>'),
             False, [], None, None
         )
@@ -2090,7 +2098,7 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
 
         state_answer_group_list2 = [state_domain.AnswerGroup(
             state_domain.Outcome(
-                'state1', state_domain.SubtitledHtml(
+                'state1', None, state_domain.SubtitledHtml(
                     'feedback_1', (
                         '<p>Outcome1 for state2</p><oppia-noninteractive-image'
                         ' filepath-with-value='
@@ -2104,7 +2112,7 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                     ], [], None
         ), state_domain.AnswerGroup(
             state_domain.Outcome(
-                'state3', state_domain.SubtitledHtml(
+                'state3', None, state_domain.SubtitledHtml(
                     'feedback_2', '<p>Outcome2 for state2</p>'),
                 False, [], None, None),
             [
@@ -2115,7 +2123,7 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
         )]
         state_answer_group_list3 = [state_domain.AnswerGroup(
             state_domain.Outcome(
-                'state1', state_domain.SubtitledHtml(
+                'state1', None, state_domain.SubtitledHtml(
                     'feedback_1', '<p>Outcome for state3</p>'),
                 False, [], None, None),
             [
@@ -2202,6 +2210,7 @@ states:
           value: 1
       default_outcome:
         dest: %s
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -2244,6 +2253,7 @@ states:
           value: 1
       default_outcome:
         dest: New state
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -2311,6 +2321,7 @@ states:
           value: 1
       default_outcome:
         dest: %s
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -2353,6 +2364,7 @@ states:
           value: 1
       default_outcome:
         dest: Renamed state
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -2693,6 +2705,7 @@ interaction:
       value: 1
   default_outcome:
     dest: %s
+    dest_if_really_stuck: null
     feedback:
       content_id: default_outcome
       html: ''
@@ -2739,6 +2752,7 @@ interaction:
       value: 1
   default_outcome:
     dest: New state
+    dest_if_really_stuck: null
     feedback:
       content_id: default_outcome
       html: ''
@@ -2786,6 +2800,7 @@ interaction:
       value: 1
   default_outcome:
     dest: Renamed state
+    dest_if_really_stuck: null
     feedback:
       content_id: default_outcome
       html: ''
@@ -2981,6 +2996,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             }],
             'outcome': {
                 'dest': self.init_state_name,
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': '<p>Try again</p>'
@@ -2996,6 +3012,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         # Default outcome specification for an interaction.
         self.interaction_default_outcome = {
             'dest': self.init_state_name,
+            'dest_if_really_stuck': None,
             'feedback': {
                 'content_id': 'default_outcome',
                 'html': '<p><strong>Incorrect</strong></p>'
@@ -3478,6 +3495,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                     }],
                     'outcome': {
                         'dest': 'State 2',
+                        'dest_if_really_stuck': None,
                         'feedback': {
                             'content_id': 'feedback_3',
                             'html': '<p>Try again</p>'
@@ -3495,6 +3513,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
                 {
                     'dest': 'State 2',
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'default_outcome',
                         'html': '<p><strong>Incorrect</strong></p>'
@@ -5766,7 +5785,8 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
 
     def test_get_exploration_summary_by_id_with_invalid_exploration_id(self):
         exploration_summary = exp_fetchers.get_exploration_summary_by_id(
-            'invalid_exploration_id')
+            'invalid_exploration_id', strict=False
+        )
 
         self.assertIsNone(exploration_summary)
 
@@ -6133,6 +6153,7 @@ states:
             unicode_str: Continue
       default_outcome:
         dest: END
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -7490,7 +7511,7 @@ class ApplyDraftUnitTests(test_utils.GenericTestBase):
 
         migration_change_list = [exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
-            'from_version': 49,
+            'from_version': 50,
             'to_version': str(feconf.CURRENT_STATE_SCHEMA_VERSION)
         })]
         exp_services.update_exploration(
@@ -7532,3 +7553,1221 @@ class ApplyDraftUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             param_changes['customization_args'],
             {'list_of_values': ['1', '2'], 'parse_with_jinja': False})
+
+
+class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
+    """Tests for ensuring creation, deletion and updation of version history
+    data is carried out correctly.
+    """
+
+    def setUp(self):
+        super(UpdateVersionHistoryUnitTests, self).setUp()
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.EXP_0_ID)
+        exp_services.save_new_exploration(self.owner_id, exploration)
+        self.exploration = exploration
+        self.version_history_model_class = (
+            exp_models.ExplorationVersionHistoryModel)
+
+    def test_creating_new_exploration_creates_version_history_model(self):
+        version_history_id = (
+            self.version_history_model_class.get_instance_id(
+                self.exploration.id, self.exploration.version))
+        version_history_model = self.version_history_model_class.get(
+            version_history_id)
+        expected_state_version_history_dict = {
+            feconf.DEFAULT_INIT_STATE_NAME: state_domain.StateVersionHistory(
+                None, None, self.owner_id
+            ).to_dict()
+        }
+
+        self.assertEqual(
+            version_history_model.state_version_history,
+            expected_state_version_history_dict)
+        self.assertEqual(
+            version_history_model.metadata_last_edited_version_number, None)
+        self.assertEqual(
+            version_history_model.metadata_last_edited_committer_id,
+            self.owner_id)
+        self.assertIn(self.owner_id, version_history_model.committer_ids)
+
+    def test_soft_deletion_does_not_delete_version_history_models(self):
+        version_history_models_before_deletion = (
+            self.version_history_model_class.query(
+                self.version_history_model_class.exploration_id ==
+                    self.exploration.id
+            ).fetch())
+        exp_services.delete_exploration(self.owner_id, self.exploration.id)
+        version_history_models_after_deletion = (
+            self.version_history_model_class.query(
+                self.version_history_model_class.exploration_id ==
+                    self.exploration.id
+            ).fetch())
+
+        self.assertEqual(
+            version_history_models_before_deletion,
+            version_history_models_after_deletion)
+
+    def test_hard_deletion_deletes_version_history_models(self):
+        version_history_models_before_deletion = (
+            self.version_history_model_class.query(
+                self.version_history_model_class.exploration_id ==
+                    self.exploration.id
+            ).fetch())
+        exp_services.delete_exploration(
+            self.owner_id, self.exploration.id, force_deletion=True)
+        version_history_models_after_deletion = (
+            self.version_history_model_class.query(
+                self.version_history_model_class.exploration_id ==
+                    self.exploration.id
+            ).fetch())
+
+        self.assertNotEqual(
+            version_history_models_before_deletion,
+            version_history_models_after_deletion)
+
+    def test_version_history_on_add_state(self):
+        old_model = self.version_history_model_class.get(
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 1))
+
+        self.assertEqual(
+            old_model.state_version_history.get('New state'), None)
+
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'New state'
+            })], 'Added state')
+
+        new_model = self.version_history_model_class.get(
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 2))
+
+        self.assertEqual(
+            new_model.state_version_history.get('New state'),
+            state_domain.StateVersionHistory(
+                None, None, self.owner_id).to_dict())
+
+    def test_version_history_on_delete_state(self):
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'New state'
+            })], 'Added state')
+        old_model = self.version_history_model_class.get(
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 2))
+
+        self.assertEqual(
+            old_model.state_version_history.get('New state'),
+            state_domain.StateVersionHistory(
+                None, None, self.owner_id).to_dict())
+
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_DELETE_STATE,
+                'state_name': 'New state',
+            })], 'Deleted state')
+        new_model = self.version_history_model_class.get(
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 3))
+
+        self.assertEqual(
+            new_model.state_version_history.get('New state'), None)
+
+    def test_version_history_on_rename_state(self):
+        old_model = self.version_history_model_class.get(
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 1))
+        new_state_name = 'Another name'
+
+        self.assertEqual(
+            old_model.state_version_history.get(
+                feconf.DEFAULT_INIT_STATE_NAME),
+            state_domain.StateVersionHistory(
+                None, None, self.owner_id).to_dict())
+        self.assertEqual(
+            old_model.state_version_history.get(new_state_name), None)
+
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
+                'new_state_name': new_state_name
+            })], 'Renamed state')
+
+        new_model = self.version_history_model_class.get(
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 2))
+
+        self.assertEqual(
+            new_model.state_version_history.get(
+                feconf.DEFAULT_INIT_STATE_NAME), None)
+        self.assertEqual(
+            new_model.state_version_history.get(new_state_name),
+            state_domain.StateVersionHistory(
+                1, feconf.DEFAULT_INIT_STATE_NAME, self.owner_id).to_dict())
+
+    def test_version_history_on_cancelled_rename_state(self):
+        old_model = self.version_history_model_class.get(
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 1))
+        new_state_name = 'Another name'
+        expected_dict = state_domain.StateVersionHistory(
+            None, None, self.owner_id).to_dict()
+
+        self.assertEqual(
+            old_model.state_version_history.get(
+                feconf.DEFAULT_INIT_STATE_NAME), expected_dict)
+
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_RENAME_STATE,
+                    'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
+                    'new_state_name': new_state_name
+                }), exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_RENAME_STATE,
+                    'old_state_name': new_state_name,
+                    'new_state_name': feconf.DEFAULT_INIT_STATE_NAME
+                })
+            ], 'Renamed state')
+
+        new_model = self.version_history_model_class.get(
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 2))
+
+        self.assertEqual(
+            new_model.state_version_history.get(
+                feconf.DEFAULT_INIT_STATE_NAME), expected_dict)
+
+    def test_version_history_on_edit_state_property(self):
+        old_model = self.version_history_model_class.get(
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 1))
+
+        self.assertEqual(
+            old_model.state_version_history.get(
+                feconf.DEFAULT_INIT_STATE_NAME),
+            state_domain.StateVersionHistory(
+                None, None, self.owner_id).to_dict())
+
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                    'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+                    'new_value': 'TextInput'
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name':
+                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                    'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+                    'new_value': {
+                        'placeholder': {
+                            'value': {
+                                'content_id': 'ca_placeholder_0',
+                                'unicode_str': ''
+                            }
+                        },
+                        'rows': {'value': 1}
+                    }
+                })
+            ], 'Edited interaction'
+        )
+
+        new_model = self.version_history_model_class.get(
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 2))
+
+        self.assertEqual(
+            new_model.state_version_history.get(
+                feconf.DEFAULT_INIT_STATE_NAME),
+            state_domain.StateVersionHistory(
+                1, feconf.DEFAULT_INIT_STATE_NAME, self.owner_id).to_dict())
+
+    def test_version_history_on_cancelled_edit_state_property(self):
+        old_model = self.version_history_model_class.get(
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 1))
+        expected_dict = state_domain.StateVersionHistory(
+            None, None, self.owner_id).to_dict()
+
+        self.assertEqual(
+            old_model.state_version_history.get(
+                feconf.DEFAULT_INIT_STATE_NAME), expected_dict)
+
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                    'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+                    'new_value': 'TextInput'
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                    'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+                    'new_value': None
+                })
+            ], 'Edited interaction id'
+        )
+
+        new_model = self.version_history_model_class.get(
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 2))
+
+        self.assertEqual(
+            new_model.state_version_history.get(
+                feconf.DEFAULT_INIT_STATE_NAME), expected_dict)
+
+    def test_version_history_on_only_translation_commits(self):
+        old_model = self.version_history_model_class.get(
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 1))
+        expected_dict = state_domain.StateVersionHistory(
+            None, None, self.owner_id).to_dict()
+
+        self.assertEqual(
+            old_model.state_version_history.get(
+                feconf.DEFAULT_INIT_STATE_NAME), expected_dict)
+
+        recorded_voiceovers_dict = {
+            'voiceovers_mapping': {
+                'content': {
+                    'en': {
+                        'filename': 'filename3.mp3',
+                        'file_size_bytes': 3000,
+                        'needs_update': False,
+                        'duration_secs': 42.43
+                    }
+                },
+                'default_outcome': {}
+            }
+        }
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
+            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+            'new_value': recorded_voiceovers_dict
+        })]
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, change_list, 'Translation commits')
+
+        new_model = self.version_history_model_class.get(
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 2))
+
+        self.assertEqual(
+            new_model.state_version_history.get(
+                feconf.DEFAULT_INIT_STATE_NAME), expected_dict)
+
+    def test_version_history_on_edit_exploration_property(self):
+        old_model = self.version_history_model_class.get(
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 1))
+
+        self.assertEqual(old_model.metadata_last_edited_version_number, None)
+        self.assertEqual(
+            old_model.metadata_last_edited_committer_id, self.owner_id)
+
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
+              'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+              'property_name': 'title',
+              'new_value': 'New title'})], 'Changed title')
+
+        new_model = self.version_history_model_class.get(
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 2))
+
+        self.assertEqual(new_model.metadata_last_edited_version_number, 1)
+        self.assertEqual(
+            new_model.metadata_last_edited_committer_id, self.owner_id)
+
+    def test_version_history_on_cancelled_edit_exploration_property(self):
+        old_model = self.version_history_model_class.get(
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 1))
+
+        self.assertEqual(old_model.metadata_last_edited_version_number, None)
+        self.assertEqual(
+            old_model.metadata_last_edited_committer_id, self.owner_id)
+
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'New title'}
+                ), exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': feconf.DEFAULT_EXPLORATION_TITLE}
+                )
+            ], 'Changed title')
+
+        new_model = self.version_history_model_class.get(
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 2))
+
+        self.assertEqual(new_model.metadata_last_edited_version_number, None)
+        self.assertEqual(
+            new_model.metadata_last_edited_committer_id, self.owner_id)
+
+    def test_version_history_on_revert_exploration(self):
+        old_model = self.version_history_model_class.get(
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 1))
+
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
+              'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+              'property_name': 'title',
+              'new_value': 'New title'})], 'Changed title')
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_RENAME_STATE,
+                    'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
+                    'new_state_name': 'Another state'
+                })
+            ], 'Renamed state')
+        exp_services.revert_exploration(self.owner_id, self.EXP_0_ID, 3, 1)
+
+        new_model = self.version_history_model_class.get(
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 4))
+
+        self.assertEqual(
+            old_model.state_version_history,
+            new_model.state_version_history)
+        self.assertEqual(
+            old_model.metadata_last_edited_version_number,
+            new_model.metadata_last_edited_version_number)
+        self.assertEqual(
+            old_model.metadata_last_edited_committer_id,
+            new_model.metadata_last_edited_committer_id)
+        self.assertEqual(old_model.committer_ids, new_model.committer_ids)
+
+    def test_version_history_on_cancelled_add_state(self):
+        # In this case, the version history for that state should not be
+        # recorded because it was added and deleted in the same commit.
+        old_model = self.version_history_model_class.get(
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 1))
+        change_list = [
+          exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'New state'
+          }), exp_domain.ExplorationChange({
+              'cmd': exp_domain.CMD_DELETE_STATE,
+              'state_name': 'New state'
+          })
+        ]
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, change_list,
+            'Added and deleted state')
+        new_model = self.version_history_model_class.get(
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 2))
+
+        self.assertIsNone(old_model.state_version_history.get('New state'))
+        self.assertIsNone(new_model.state_version_history.get('New state'))
+
+    def test_version_history_on_state_name_interchange(self):
+        change_list_from_v1_to_v2 = [
+          exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'first'
+          }), exp_domain.ExplorationChange({
+              'cmd': exp_domain.CMD_ADD_STATE,
+              'state_name': 'second'
+          })
+        ]
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, change_list_from_v1_to_v2,
+            'Added two new states')
+        old_model = self.version_history_model_class.get(
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 2))
+
+        self.assertEqual(
+            old_model.state_version_history['first'],
+            state_domain.StateVersionHistory(
+                None, None, self.owner_id).to_dict())
+        self.assertEqual(
+            old_model.state_version_history['second'],
+            state_domain.StateVersionHistory(
+                None, None, self.owner_id).to_dict())
+
+        # Correctly interchanging the state names.
+        change_list_from_v2_to_v3 = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': 'first',
+                'new_state_name': 'temporary'
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': 'second',
+                'new_state_name': 'first'
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': 'temporary',
+                'new_state_name': 'second'
+            })
+        ]
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, change_list_from_v2_to_v3,
+            'Added two new states')
+        new_model = self.version_history_model_class.get(
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 3))
+
+        self.assertEqual(
+            new_model.state_version_history['second'],
+            state_domain.StateVersionHistory(
+                2, 'first', self.owner_id).to_dict())
+        self.assertEqual(
+            new_model.state_version_history['first'],
+            state_domain.StateVersionHistory(
+                2, 'second', self.owner_id).to_dict())
+
+    def test_new_committer_id_is_added_to_committer_ids_list(self):
+        old_model = self.version_history_model_class.get(
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 1))
+
+        self.assertNotIn(self.editor_id, old_model.committer_ids)
+
+        exp_services.update_exploration(
+            self.editor_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'New state'
+            })], 'Added a state')
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_0_ID, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'Another state'
+            })], 'Added a state')
+        new_model = self.version_history_model_class.get(
+            self.version_history_model_class.get_instance_id(self.EXP_0_ID, 3))
+
+        self.assertIn(self.editor_id, new_model.committer_ids)
+
+
+class LoggedOutUserProgressUpdateTests(test_utils.GenericTestBase):
+    """Tests whether logged-out user progress is updated correctly"""
+
+    EXP_ID = 'exp_id0'
+    UNIQUE_PROGRESS_URL_ID = 'pid123'
+
+    SAMPLE_EXPLORATION_YAML = (
+"""
+author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 47
+states:
+  Introduction:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: New state
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_3
+              normalizedStrSet:
+              - InputString
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_2
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: Introduction
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints:
+      - hint_content:
+          content_id: hint_1
+          html: <p>hint one,</p>
+      id: TextInput
+      solution:
+        answer_is_exclusive: false
+        correct_answer: helloworld!
+        explanation:
+          content_id: solution
+          html: <p>hello_world is a string</p>
+    linked_skill_id: null
+    next_content_id_index: 4
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_2: {}
+        content:
+          en:
+            duration_secs: 0.0
+            file_size_bytes: 99999
+            filename: introduction_state.mp3
+            needs_update: false
+        default_outcome:
+          en:
+            duration_secs: 0.0
+            file_size_bytes: 99999
+            filename: unknown_answer_feedback.mp3
+            needs_update: false
+        feedback_1:
+          en:
+            duration_secs: 0.0
+            file_size_bytes: 99999
+            filename: correct_answer_feedback.mp3
+            needs_update: false
+        hint_1:
+          en:
+            duration_secs: 0.0
+            file_size_bytes: 99999
+            filename: answer_hint.mp3
+            needs_update: false
+        rule_input_3: {}
+        solution:
+          en:
+            duration_secs: 0.0
+            file_size_bytes: 99999
+            filename: answer_solution.mp3
+            needs_update: false
+    solicit_answer_details: false
+    card_is_checkpoint: true
+    written_translations:
+      translations_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        hint_1: {}
+        rule_input_3: {}
+        solution: {}
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args: {}
+      default_outcome:
+        dest: New state
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: null
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    card_is_checkpoint: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+states_schema_version: 42
+tags: []
+title: Title
+""")
+
+    def setUp(self):
+        super(LoggedOutUserProgressUpdateTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        exp_services.save_new_exploration_from_yaml_and_assets(
+            self.owner_id, self.SAMPLE_EXPLORATION_YAML, self.EXP_ID, [])
+        self.exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
+
+    def test_logged_out_user_checkpoint_progress_is_updated_correctly(self):
+        logged_out_user_data = exp_fetchers.get_logged_out_user_progress(
+            self.UNIQUE_PROGRESS_URL_ID
+        )
+        self.assertIsNone(logged_out_user_data)
+
+        # First checkpoint reached.
+        exp_services.update_logged_out_user_progress(
+            self.EXP_ID, self.UNIQUE_PROGRESS_URL_ID, 'Introduction', 1)
+        logged_out_user_data = exp_fetchers.get_logged_out_user_progress(
+            self.UNIQUE_PROGRESS_URL_ID)
+        self.assertEqual(
+            logged_out_user_data.furthest_reached_checkpoint_exp_version, 1)
+        self.assertEqual(
+            logged_out_user_data.furthest_reached_checkpoint_state_name,
+            'Introduction')
+        self.assertEqual(
+            logged_out_user_data.
+                most_recently_reached_checkpoint_exp_version, 1)
+        self.assertEqual(
+            logged_out_user_data.
+                most_recently_reached_checkpoint_state_name, 'Introduction')
+
+        # Make 'New state' a checkpoint.
+        # Now version of the exploration becomes 2.
+        change_list = _get_change_list(
+            'New state',
+            exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
+            True)
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, change_list, '')
+
+        # Second checkpoint reached.
+        exp_services.update_logged_out_user_progress(
+            self.EXP_ID, self.UNIQUE_PROGRESS_URL_ID, 'New state', 2)
+        logged_out_user_data = exp_fetchers.get_logged_out_user_progress(
+            self.UNIQUE_PROGRESS_URL_ID)
+        self.assertEqual(
+            logged_out_user_data.furthest_reached_checkpoint_exp_version, 2)
+        self.assertEqual(
+            logged_out_user_data.furthest_reached_checkpoint_state_name,
+            'New state')
+        self.assertEqual(
+            logged_out_user_data.most_recently_reached_checkpoint_exp_version,
+            2)
+        self.assertEqual(
+            logged_out_user_data.most_recently_reached_checkpoint_state_name,
+            'New state')
+
+        # Unmark 'New state' as a checkpoint.
+        # Now version of the exploration becomes 3.
+        change_list = _get_change_list(
+            'New state',
+            exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
+            False)
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, change_list, '')
+
+        # First checkpoint reached again.
+        # Since the previously furthest reached checkpoint 'New state' doesn't
+        # exist in the current exploration, the first checkpoint behind
+        # 'New state' that exists in current exploration ('Introduction'
+        # state in this case) becomes the new furthest reached checkpoint.
+        exp_services.update_logged_out_user_progress(
+            self.EXP_ID, self.UNIQUE_PROGRESS_URL_ID, 'Introduction', 3)
+        logged_out_user_data = exp_fetchers.get_logged_out_user_progress(
+            self.UNIQUE_PROGRESS_URL_ID)
+        self.assertEqual(
+            logged_out_user_data.furthest_reached_checkpoint_exp_version, 3)
+        self.assertEqual(
+            logged_out_user_data.furthest_reached_checkpoint_state_name,
+            'Introduction')
+        self.assertEqual(
+            logged_out_user_data.most_recently_reached_checkpoint_exp_version,
+            3)
+        self.assertEqual(
+            logged_out_user_data.most_recently_reached_checkpoint_state_name,
+            'Introduction')
+
+        # Change state name of 'Introduction' state.
+        # Now version of exploration becomes 4.
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID,
+            [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': 'Introduction',
+                'new_state_name': 'Intro',
+            })], 'Change state name'
+        )
+
+        # First checkpoint reached again.
+        exp_services.update_logged_out_user_progress(
+            self.EXP_ID, self.UNIQUE_PROGRESS_URL_ID, 'Intro', 4)
+        logged_out_user_data = exp_fetchers.get_logged_out_user_progress(
+            self.UNIQUE_PROGRESS_URL_ID)
+        self.assertEqual(
+            logged_out_user_data.furthest_reached_checkpoint_exp_version, 4)
+        self.assertEqual(
+            logged_out_user_data.furthest_reached_checkpoint_state_name,
+            'Intro')
+        self.assertEqual(
+            logged_out_user_data.most_recently_reached_checkpoint_exp_version,
+            4)
+        self.assertEqual(
+            logged_out_user_data.most_recently_reached_checkpoint_state_name,
+            'Intro')
+
+    def test_sync_logged_out_learner_checkpoint_progress_with_current_exp_version(self): # pylint: disable=line-too-long
+        logged_out_user_data = (
+            exp_services.sync_logged_out_learner_checkpoint_progress_with_current_exp_version( # pylint: disable=line-too-long
+                self.EXP_ID, self.UNIQUE_PROGRESS_URL_ID))
+        self.assertIsNone(logged_out_user_data)
+
+        # First checkpoint reached.
+        exp_services.update_logged_out_user_progress(
+            self.EXP_ID, self.UNIQUE_PROGRESS_URL_ID, 'Introduction', 1)
+        logged_out_user_data = exp_fetchers.get_logged_out_user_progress(
+            self.UNIQUE_PROGRESS_URL_ID)
+        self.assertEqual(
+            logged_out_user_data.furthest_reached_checkpoint_exp_version, 1)
+        self.assertEqual(
+            logged_out_user_data.furthest_reached_checkpoint_state_name,
+            'Introduction')
+        self.assertEqual(
+            logged_out_user_data.most_recently_reached_checkpoint_exp_version,
+            1)
+        self.assertEqual(
+            logged_out_user_data.most_recently_reached_checkpoint_state_name,
+            'Introduction')
+
+        # Change state name of 'Introduction' state.
+        # Now version of exploration becomes 2.
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID,
+            [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': 'Introduction',
+                'new_state_name': 'Intro',
+            })], 'Change state name'
+        )
+
+        # This method is called when exploration data is fetched since now
+        # latest exploration version > most recently interacted exploration
+        # version.
+        # Working - First the furthest reached checkpoint ('Introduction' in
+        # this case) is searched in current exploration. It will not be found
+        # since its state name is changed to 'Intro'. It will then search for
+        # an checkpoint that had been reached in older exploration and also
+        # exists in current exploration. If such checkpoint is not found,
+        # furthest reached checkpoint is set to None. Similar workflow is
+        # carried out for most recently reached checkpoint.
+        logged_out_user_data = (
+            exp_services.sync_logged_out_learner_checkpoint_progress_with_current_exp_version( # pylint: disable=line-too-long
+                self.EXP_ID, self.UNIQUE_PROGRESS_URL_ID))
+        self.assertEqual(
+            logged_out_user_data.furthest_reached_checkpoint_exp_version, 2)
+        self.assertIsNone(
+            logged_out_user_data.furthest_reached_checkpoint_state_name)
+        self.assertEqual(
+            logged_out_user_data.most_recently_reached_checkpoint_exp_version,
+            2)
+        self.assertIsNone(
+            logged_out_user_data.most_recently_reached_checkpoint_state_name)
+
+
+class SyncLoggedInAndLoggedOutProgressTests(test_utils.GenericTestBase):
+    """Tests whether logged-in user progress is synced correctly"""
+
+    EXP_ID = 'exp_id0'
+    UNIQUE_PROGRESS_URL_ID = 'pid123'
+
+    SAMPLE_EXPLORATION_YAML = (
+"""
+author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+edits_allowed: true
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 47
+states:
+  Introduction:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: New state
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+              contentId: rule_input_3
+              normalizedStrSet:
+              - InputString
+          rule_type: Equals
+        tagged_skill_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value:
+            content_id: ca_placeholder_2
+            unicode_str: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: Introduction
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints:
+      - hint_content:
+          content_id: hint_1
+          html: <p>hint one,</p>
+      id: TextInput
+      solution:
+        answer_is_exclusive: false
+        correct_answer: helloworld!
+        explanation:
+          content_id: solution
+          html: <p>hello_world is a string</p>
+    linked_skill_id: null
+    next_content_id_index: 4
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        ca_placeholder_2: {}
+        content:
+          en:
+            duration_secs: 0.0
+            file_size_bytes: 99999
+            filename: introduction_state.mp3
+            needs_update: false
+        default_outcome:
+          en:
+            duration_secs: 0.0
+            file_size_bytes: 99999
+            filename: unknown_answer_feedback.mp3
+            needs_update: false
+        feedback_1:
+          en:
+            duration_secs: 0.0
+            file_size_bytes: 99999
+            filename: correct_answer_feedback.mp3
+            needs_update: false
+        hint_1:
+          en:
+            duration_secs: 0.0
+            file_size_bytes: 99999
+            filename: answer_hint.mp3
+            needs_update: false
+        rule_input_3: {}
+        solution:
+          en:
+            duration_secs: 0.0
+            file_size_bytes: 99999
+            filename: answer_solution.mp3
+            needs_update: false
+    solicit_answer_details: false
+    card_is_checkpoint: true
+    written_translations:
+      translations_mapping:
+        ca_placeholder_2: {}
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        hint_1: {}
+        rule_input_3: {}
+        solution: {}
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args: {}
+      default_outcome:
+        dest: Third state
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: null
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    card_is_checkpoint: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+  Third state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args: {}
+      default_outcome:
+        dest: Third state
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: null
+      solution: null
+    linked_skill_id: null
+    next_content_id_index: 0
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+    solicit_answer_details: false
+    card_is_checkpoint: false
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+states_schema_version: 42
+tags: []
+title: Title
+""")
+
+    def setUp(self):
+        super(SyncLoggedInAndLoggedOutProgressTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
+
+        exp_services.save_new_exploration_from_yaml_and_assets(
+            self.owner_id, self.SAMPLE_EXPLORATION_YAML, self.EXP_ID, [])
+        self.exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
+
+    def test_logged_in_user_progress_is_updated_correctly(self):
+        self.login(self.VIEWER_EMAIL)
+        exp_user_data = exp_fetchers.get_exploration_user_data(
+            self.viewer_id, self.EXP_ID)
+        self.assertIsNone(exp_user_data)
+
+        logged_out_user_data = exp_fetchers.get_logged_out_user_progress(
+            self.UNIQUE_PROGRESS_URL_ID
+        )
+        self.assertIsNone(logged_out_user_data)
+
+        # No sync occurs if there is no logged-out user data or if the data
+        # has been cleared by the cron job.
+        exp_services.sync_logged_out_learner_progress_with_logged_in_progress(
+            self.viewer_id, self.EXP_ID, self.UNIQUE_PROGRESS_URL_ID
+        )
+        exp_user_data = exp_fetchers.get_exploration_user_data(
+            self.viewer_id, self.EXP_ID)
+        self.assertIsNone(exp_user_data)
+
+        # First checkpoint reached as logged out user.
+        exp_services.update_logged_out_user_progress(
+            self.EXP_ID, self.UNIQUE_PROGRESS_URL_ID, 'Introduction', 1)
+
+        logged_out_user_data = exp_fetchers.get_logged_out_user_progress(
+            self.UNIQUE_PROGRESS_URL_ID)
+        self.assertEqual(
+            logged_out_user_data.furthest_reached_checkpoint_exp_version, 1)
+        self.assertEqual(
+            logged_out_user_data.furthest_reached_checkpoint_state_name,
+            'Introduction')
+        self.assertEqual(
+            logged_out_user_data.
+                most_recently_reached_checkpoint_exp_version, 1)
+        self.assertEqual(
+            logged_out_user_data.
+                most_recently_reached_checkpoint_state_name, 'Introduction')
+
+        exp_services.sync_logged_out_learner_progress_with_logged_in_progress(
+            self.viewer_id, self.EXP_ID, self.UNIQUE_PROGRESS_URL_ID
+        )
+
+        exp_user_data = exp_fetchers.get_exploration_user_data(
+            self.viewer_id, self.EXP_ID)
+        self.assertIsNotNone(exp_user_data)
+
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_exp_version,
+            logged_out_user_data.most_recently_reached_checkpoint_exp_version
+        )
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_state_name,
+            logged_out_user_data.most_recently_reached_checkpoint_state_name
+        )
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_exp_version,
+            logged_out_user_data.furthest_reached_checkpoint_exp_version
+        )
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_state_name,
+            logged_out_user_data.furthest_reached_checkpoint_state_name
+        )
+
+        # Mark 'New state' as a checkpoint.
+        # Now version of the exploration becomes 2.
+        change_list = _get_change_list(
+            'New state',
+            exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
+            True)
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, change_list, '')
+
+        # New second checkpoint reached as logged out user.
+        exp_services.update_logged_out_user_progress(
+            self.EXP_ID, self.UNIQUE_PROGRESS_URL_ID, 'New state', 2)
+
+        exp_services.sync_logged_out_learner_progress_with_logged_in_progress(
+            self.viewer_id, self.EXP_ID, self.UNIQUE_PROGRESS_URL_ID
+        )
+
+        logged_out_user_data = exp_fetchers.get_logged_out_user_progress(
+            self.UNIQUE_PROGRESS_URL_ID)
+
+        exp_user_data = exp_fetchers.get_exploration_user_data(
+            self.viewer_id, self.EXP_ID)
+
+        self.assertIsNotNone(exp_user_data)
+
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_exp_version,
+            logged_out_user_data.most_recently_reached_checkpoint_exp_version
+        )
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_state_name,
+            logged_out_user_data.most_recently_reached_checkpoint_state_name
+        )
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_exp_version,
+            logged_out_user_data.furthest_reached_checkpoint_exp_version
+        )
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_state_name,
+            logged_out_user_data.furthest_reached_checkpoint_state_name
+        )
+
+        # Mark 'Third state' as a checkpoint.
+        # Now version of the exploration becomes 3.
+        change_list = _get_change_list(
+            'Third state',
+            exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
+            True)
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, change_list, '')
+
+        # Unmark 'Next state' as a checkpoint.
+        # Now version of the exploration becomes 4.
+        change_list = _get_change_list(
+            'New state',
+            exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
+            False)
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, change_list, '')
+
+        # New third checkpoint reached as logged out user.
+        exp_services.update_logged_out_user_progress(
+            self.EXP_ID, self.UNIQUE_PROGRESS_URL_ID, 'Third state', 4)
+
+        exp_services.sync_logged_out_learner_progress_with_logged_in_progress(
+            self.viewer_id, self.EXP_ID, self.UNIQUE_PROGRESS_URL_ID
+        )
+
+        logged_out_user_data = exp_fetchers.get_logged_out_user_progress(
+            self.UNIQUE_PROGRESS_URL_ID)
+
+        exp_user_data = exp_fetchers.get_exploration_user_data(
+            self.viewer_id, self.EXP_ID)
+
+        self.assertIsNotNone(exp_user_data)
+
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_exp_version,
+            logged_out_user_data.most_recently_reached_checkpoint_exp_version
+        )
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_state_name,
+            logged_out_user_data.most_recently_reached_checkpoint_state_name
+        )
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_exp_version,
+            logged_out_user_data.furthest_reached_checkpoint_exp_version
+        )
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_state_name,
+            logged_out_user_data.furthest_reached_checkpoint_state_name
+        )
+
+        # Changing logged-in most recently reached state.
+        user_services.update_learner_checkpoint_progress(
+            self.viewer_id,
+            self.EXP_ID,
+            'Introduction',
+            4
+        )
+
+        exp_services.sync_logged_out_learner_progress_with_logged_in_progress(
+            self.viewer_id, self.EXP_ID, self.UNIQUE_PROGRESS_URL_ID
+        )
+
+        logged_out_user_data = exp_fetchers.get_logged_out_user_progress(
+            self.UNIQUE_PROGRESS_URL_ID)
+
+        exp_user_data = exp_fetchers.get_exploration_user_data(
+            self.viewer_id, self.EXP_ID)
+
+        self.assertIsNotNone(exp_user_data)
+
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_exp_version,
+            logged_out_user_data.most_recently_reached_checkpoint_exp_version
+        )
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_state_name,
+            logged_out_user_data.most_recently_reached_checkpoint_state_name
+        )
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_exp_version,
+            logged_out_user_data.furthest_reached_checkpoint_exp_version
+        )
+        self.assertEqual(
+            exp_user_data.furthest_reached_checkpoint_state_name,
+            logged_out_user_data.furthest_reached_checkpoint_state_name
+        )
+
+        self.logout()

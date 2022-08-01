@@ -35,6 +35,13 @@ import { SignupPageBackendApiService } from './services/signup-page-backend-api.
   templateUrl: './signup-page.component.html'
 })
 export class SignupPageComponent {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  username!: string;
+  emailPreferencesWarningText!: string;
+  // Null represents, if the user has not yet agreed to the latest terms.
+  canReceiveEmailUpdates!: string | null;
   MAX_USERNAME_LENGTH = AppConstants.MAX_USERNAME_LENGTH;
   warningI18nCode = '';
   siteName = AppConstants.SITE_NAME;
@@ -42,14 +49,11 @@ export class SignupPageComponent {
   usernameCheckIsInProgress = false;
   showEmailSignupLink = false;
   emailSignupLink = AppConstants.BULK_EMAIL_SERVICE_SIGNUP_URL;
-  username: string;
-  hasEverRegistered: boolean;
-  hasAgreedToLatestTerms: boolean;
-  showEmailPreferencesForm: boolean;
-  hasUsername: boolean;
+  hasEverRegistered: boolean = false;
+  hasAgreedToLatestTerms: boolean = false;
+  showEmailPreferencesForm: boolean = false;
+  hasUsername: boolean = false;
   blurredAtLeastOnce = false;
-  canReceiveEmailUpdates: string;
-  emailPreferencesWarningText: string;
 
   constructor(
     private ngbModal: NgbModal,
@@ -154,7 +158,7 @@ export class SignupPageComponent {
   submitPrerequisitesForm(
       agreedToTerms: boolean,
       username: string,
-      canReceiveEmailUpdates: string): void {
+      canReceiveEmailUpdates: string | null): void {
     if (!agreedToTerms) {
       this.alertsService.addWarning('I18N_SIGNUP_ERROR_MUST_AGREE_TO_TERMS');
       return;
@@ -176,14 +180,10 @@ export class SignupPageComponent {
 
     let requestParams = {
       agreed_to_terms: agreedToTerms,
-      can_receive_email_updates: null,
+      can_receive_email_updates: false,
       default_dashboard: defaultDashboard,
-      username: null
+      username: username
     };
-
-    if (!this.hasUsername) {
-      requestParams.username = username;
-    }
 
     if (this.showEmailPreferencesForm && !this.hasUsername) {
       if (canReceiveEmailUpdates === null) {

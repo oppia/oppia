@@ -20,14 +20,14 @@
       <ng-container ngbNavItem
                     *ngFor="let category of allowedInteractionCategories">
         <a ngbNavLink
-           class="protractor-test-interaction-tab-{{ getHyphenatedLowercaseCategoryName(category.name) }}">
+           class="e2e-test-interaction-tab-{{ getHyphenatedLowercaseCategoryName(category.name) }}">
           {{ category.name }}
         </a>
         <ng-template ngbNavContent>
           <div>
             <div *ngFor="let interactionId of category.interaction_ids"
                  (click)="onChangeInteractionId(interactionId)"
-                 class="oppia-interaction-tile protractor-test-interaction-tile-{{ interactionId }}"
+                 class="oppia-interaction-tile e2e-test-interaction-tile-{{ interactionId }}"
                  [ngbPopover]="getDescription(interactionId)"
                  placement="bottom"
                  triggers="mouseenter:mouseleave">
@@ -44,8 +44,8 @@
   </div>
 
   <div *ngIf="!isinteractionOpen && stateInteractionIdService.displayed && hasCustomizationArgs"
-       class="interaction-editor-form protractor-test-interaction-editor">
-    <div class="protractor-test-multiple-options"
+       class="interaction-editor-form e2e-test-interaction-editor">
+    <div class="e2e-test-multiple-options"
          *ngFor="let customizationArgSpec of customizationArgSpecs">
       <div *ngIf="customizationArgSpec.schema.type !== 'bool'"
            class="oppia-interaction-customization-label">
@@ -96,14 +96,14 @@
        [ngbPopover]="isSaveInteractionButtonEnabled() ? '' : getSaveInteractionButtonTooltip()"
        placement="bottom"
        triggers="mouseenter:mouseleave">
-    <button class="btn btn-success protractor-test-save-interaction"
+    <button class="btn btn-success e2e-test-save-interaction"
             (click)="save()"
             [disabled]="!isSaveInteractionButtonEnabled()">
       Save Interaction
     </button>
   </div>
 
-  <button class="btn btn-success protractor-test-close-no-customization-modal"
+  <button class="btn btn-success e2e-test-close-no-customization-modal"
           (click)="confirm('okay')"
           *ngIf="!hasCustomizationArgs && customizationModalReopened">
     Okay

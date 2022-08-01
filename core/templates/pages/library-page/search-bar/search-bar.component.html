@@ -1,19 +1,15 @@
-<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
-<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/library-page/search-bar/search-bar.component.css">
-<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/library-page/search-bar/search-bar.component.rtl.css">
-
 <div class="oppia-same-row-container">
   <form class="navbar-form search-bar-float-left oppia-search-bar-form" role="search">
     <div class="form-group">
       <div class="input-group oppia-input-group" [ngClass]="{'classroom-page-input-group': isSearchButtonActive()}">
         <div class="input-group-addon oppia-search-bar-icon">
-          <i class="material-icons oppia-translate-icon-down md-18" *ngIf="!isSearchInProgress()">&#xE8B6;</i>
+          <i class="fas fa-search material-icons oppia-translate-icon-down md-18" *ngIf="!isSearchInProgress()"></i>
           <span *ngIf="isSearchInProgress()">
-            <i class="material-icons md-18 oppia-animate-spin">&#xE863;</i>
+            <i class="fas fa-sync material-icons md-18 oppia-animate-spin"></i>
           </span>
         </div>
         <input type="text"
-               class="form-control oppia-search-bar-input oppia-search-bar-text-input protractor-test-search-input"
+               class="form-control oppia-search-bar-input oppia-search-bar-text-input e2e-test-search-input"
                [placeholder]="searchBarPlaceholder"
                [(ngModel)]="searchQuery"
                (ngModelChange)="searchButtonIsActive ? null : onSearchQueryChangeExec()"
@@ -27,35 +23,37 @@
 </div>
 
 <div class="oppia-same-row-container">
-  <div [ngClass]="{'open' : activeMenuName === 'category', 'dropup' : enableDropup}" ngbDropdown class="search-bar-float-left oppia-navbar-button-container oppia-search-bar-category-selector protractor-test-search-bar-category-selector dropdown" autoClose="outside">
+  <div [ngClass]="{'open' : activeMenuName === 'category', 'dropup' : enableDropup}" ngbDropdown class="search-bar-float-left oppia-navbar-button-container oppia-search-bar-category-selector e2e-test-search-bar-category-selector dropdown" autoClose="outside">
     <button ngbDropdownToggle
             (click)="openSubmenu($event, 'category')"
             (keydown)="onMenuKeypress($event, 'category', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
             type="button"
-            class="btn protractor-test-search-bar-dropdown-toggle oppia-search-bar-dropdown-toggle oppia-search-bar-input oppia-search-bar-category-input dropdown-toggle"
+            class="btn e2e-test-search-bar-dropdown-toggle oppia-search-bar-dropdown-toggle oppia-search-bar-input oppia-search-bar-category-input dropdown-toggle"
             title="{{ selectionDetails.categories.description | translate }}">
-      <i *ngIf="isMobileViewActive()" class="material-icons md-18 category-selector-icon">&#xE574;</i>
-      {{ categoryButtonText | truncate:14 }}
+      <i *ngIf="isMobileViewActive()" class="fas fa-shapes material-icons md-18 category-selector-icon"></i>
+      <span class="btn-text">
+        {{ categoryButtonText | truncate:14 }}
+      </span>
     </button>
     <ul ngbDropdownMenu
-        class="protractor-test-search-bar-dropdown-menu oppia-search-bar-dropdown-menu oppia-search-bar-dropdown-menu-section dropdown-menu"
+        class="e2e-test-search-bar-dropdown-menu oppia-search-bar-dropdown-menu oppia-search-bar-dropdown-menu-section dropdown-menu"
         role="menu">
       <ng-container *ngFor="let item of selectionDetails.categories.masterList">
         <li ngbDropdownItem *ngIf="selectionDetails.categories.selections[item.id]">
           <a (click)="toggleSelection('categories', item.id)" *ngIf="!first && !last" class="dropdown-item">
-            <span class="protractor-test-selected">{{ item.text | translate }}</span>
-            <i *ngIf="selectionDetails.categories.selections[item.id]" class="material-icons md-18 float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+            <span class="e2e-test-selected">{{ item.text | translate }}</span>
+            <i *ngIf="selectionDetails.categories.selections[item.id]" class="fas fa-check material-icons md-18 float-right oppia-search-bar-category-selection-symbol"></i>
           </a>
           <a (click)="toggleSelection('categories', item.id)" *ngIf="first" (keydown)="onMenuKeypress($event, 'category', {shiftTab: ACTION_CLOSE})" class="dropdown-item">
-            <span class="protractor-test-selected">{{ item.text | translate }}</span>
-            <i *ngIf="selectionDetails.categories.selections[item.id]" class="material-icons md-18 float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+            <span class="e2e-test-selected">{{ item.text | translate }}</span>
+            <i *ngIf="selectionDetails.categories.selections[item.id]" class="fas fa-check material-icons md-18 float-right oppia-search-bar-category-selection-symbol"></i>
           </a>
           <a (click)="toggleSelection('categories', item.id)"
              *ngIf="last"
              (keydown)="onMenuKeypress($event, 'category', {tab: ACTION_CLOSE})"
              class="dropdown-item">
-            <span class="protractor-test-selected">{{ item.text | translate }}</span>
-            <i *ngIf="selectionDetails.categories.selections[item.id]" class="material-icons md-18 float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+            <span class="e2e-test-selected">{{ item.text | translate }}</span>
+            <i *ngIf="selectionDetails.categories.selections[item.id]" class="fas fa-check material-icons md-18 float-right oppia-search-bar-category-selection-symbol"></i>
           </a>
         </li>
       </ng-container>
@@ -66,17 +64,17 @@
       <ng-container *ngFor="let item of selectionDetails.categories.masterList">
         <li ngbDropdownItem *ngIf="!selectionDetails.categories.selections[item.id]">
           <a (click)="toggleSelection('categories', item.id)" *ngIf="!first && !last" class="dropdown-item">
-            <span class="protractor-test-deselected">{{ item.text | translate }}</span>
-            <i *ngIf="selectionDetails.categories.selections[item.id]" class="material-icons md-18 float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+            <span class="e2e-test-deselected">{{ item.text | translate }}</span>
+            <i *ngIf="selectionDetails.categories.selections[item.id]" class="fas fa-check material-icons md-18 float-right oppia-search-bar-category-selection-symbol"></i>
           </a>
           <a (click)="toggleSelection('categories', item.id)" *ngIf="first" (keydown)="onMenuKeypress($event, 'category', {shiftTab: ACTION_CLOSE})" class="dropdown-item">
-            <span class="protractor-test-deselected">{{ item.text | translate }}</span>
-            <i *ngIf="selectionDetails.categories.selections[item.id]" class="material-icons md-18 float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+            <span class="e2e-test-deselected">{{ item.text | translate }}</span>
+            <i *ngIf="selectionDetails.categories.selections[item.id]" class="fas fa-check material-icons md-18 float-right oppia-search-bar-category-selection-symbol"></i>
           </a>
           <a (click)="toggleSelection('categories', item.id)" *ngIf="last" (keydown)="onMenuKeypress($event, 'category', {tab: ACTION_CLOSE})"
              class="dropdown-item">
-            <span class="protractor-test-deselected">{{ item.text | translate }}</span>
-            <i *ngIf="selectionDetails.categories.selections[item.id]" class="material-icons md-18 float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+            <span class="e2e-test-deselected">{{ item.text | translate }}</span>
+            <i *ngIf="selectionDetails.categories.selections[item.id]" class="fas fa-check material-icons md-18 float-right oppia-search-bar-category-selection-symbol"></i>
           </a>
         </li>
       </ng-container>
@@ -85,32 +83,34 @@
 </div>
 
 <div class="oppia-same-row-container">
-  <div ngbDropdown [ngClass]="{'open' : activeMenuName === 'language', 'dropup' : enableDropup}" class="search-bar-float-left oppia-navbar-button-container oppia-search-bar-language-selector protractor-test-search-bar-language-selector dropdown" autoClose="outside">
+  <div ngbDropdown [ngClass]="{'open' : activeMenuName === 'language', 'dropup' : enableDropup}" class="search-bar-float-left oppia-navbar-button-container oppia-search-bar-language-selector e2e-test-search-bar-language-selector dropdown" autoClose="outside">
     <button ngbDropdownToggle
             (click)="openSubmenu($event, 'language')"
             (keydown)="onMenuKeypress($event, 'language', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
             type="button"
-            class="btn protractor-test-search-bar-dropdown-toggle oppia-search-bar-input oppia-search-bar-language-input dropdown-toggle language-dropdown-toggle oppia-search-bar-dropdown-toggle-button"
+            class="btn e2e-test-search-bar-dropdown-toggle oppia-search-bar-input oppia-search-bar-language-input dropdown-toggle language-dropdown-toggle oppia-search-bar-dropdown-toggle-button"
             title="{{selectionDetails.languageCodes.description | translate}}">
-      <i *ngIf="isMobileViewActive()" class="material-icons md-18 language-selector-icon">&#xe8e2;</i>
-      {{ languageButtonText | truncate:14 }}
+      <i *ngIf="isMobileViewActive()" class="fas fa-globe material-icons md-18 language-selector-icon"></i>
+      <span class="btn-text">
+        {{ languageButtonText | truncate:14 }}
+      </span>
     </button>
-    <ul ngbDropdownMenu class="protractor-test-search-bar-dropdown-menu oppia-search-bar-dropdown-menu-section dropdown-menu"
+    <ul ngbDropdownMenu class="e2e-test-search-bar-dropdown-menu oppia-search-bar-dropdown-menu-section dropdown-menu"
         role="menu">
       <ng-container *ngFor="let item of selectionDetails.languageCodes.masterList">
         <li ngbDropdownItem *ngIf="selectionDetails.languageCodes.selections[item.id]">
           <a (click)="toggleSelection('languageCodes', item.id)" *ngIf="!first && !last" class="dropdown-item">
-            <span class="protractor-test-selected">{{ item.text | translate }}</span>
-            <i *ngIf="selectionDetails.languageCodes.selections[item.id]" class="material-icons md-18 float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+            <span class="e2e-test-selected">{{ item.text | translate }}</span>
+            <i *ngIf="selectionDetails.languageCodes.selections[item.id]" class="fas fa-check material-icons md-18 float-right oppia-search-bar-category-selection-symbol"></i>
           </a>
           <a (click)="toggleSelection('languageCodes', item.id)" *ngIf="first" (keydown)="onMenuKeypress($event, 'language', {shiftTab: ACTION_CLOSE})" class="dropdown-item">
-            <span class="protractor-test-selected">{{ item.text | translate }}</span>
-            <i *ngIf="selectionDetails.languageCodes.selections[item.id]" class="material-icons md-18 float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+            <span class="e2e-test-selected">{{ item.text | translate }}</span>
+            <i *ngIf="selectionDetails.languageCodes.selections[item.id]" class="fas fa-check material-icons md-18 float-right oppia-search-bar-category-selection-symbol"></i>
           </a>
           <a (click)="toggleSelection('languageCodes', item.id)" *ngIf="last" (keydown)="onMenuKeypress($event, 'language', {tab: ACTION_CLOSE})"
              class="dropdown-item">
-            <span class="protractor-test-selected">{{ item.text | translate }}</span>
-            <i *ngIf="selectionDetails.languageCodes.selections[item.id]" class="material-icons md-18 float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+            <span class="e2e-test-selected">{{ item.text | translate }}</span>
+            <i *ngIf="selectionDetails.languageCodes.selections[item.id]" class="fas fa-check material-icons md-18 float-right oppia-search-bar-category-selection-symbol"></i>
           </a>
         </li>
       </ng-container>
@@ -121,17 +121,17 @@
       <ng-container *ngFor="let item of selectionDetails.languageCodes.masterList">
         <li ngbDropdownItem *ngIf="!selectionDetails.languageCodes.selections[item.id]">
           <a (click)="toggleSelection('languageCodes', item.id)" *ngIf="!first && !last" class="dropdown-item">
-            <span class="protractor-test-deselected">{{ item.text | translate }}</span>
-            <i *ngIf="selectionDetails.languageCodes.selections[item.id]" class="material-icons md-18  float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+            <span class="e2e-test-deselected">{{ item.text | translate }}</span>
+            <i *ngIf="selectionDetails.languageCodes.selections[item.id]" class="fas fa-check material-icons md-18  float-right oppia-search-bar-category-selection-symbol"></i>
           </a>
           <a (click)="toggleSelection('languageCodes', item.id)" *ngIf="first" (keydown)="onMenuKeypress($event, 'language', {shiftTab: ACTION_CLOSE})" class="dropdown-item">
-            <span class="protractor-test-deselected">{{ item.text | translate }}</span>
-            <i *ngIf="selectionDetails.languageCodes.selections[item.id]" class="material-icons md-18  float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+            <span class="e2e-test-deselected">{{ item.text | translate }}</span>
+            <i *ngIf="selectionDetails.languageCodes.selections[item.id]" class="fas fa-check material-icons md-18  float-right oppia-search-bar-category-selection-symbol"></i>
           </a>
           <a (click)="toggleSelection('languageCodes', item.id)" *ngIf="last" (keydown)="onMenuKeypress($event, 'language', {tab: ACTION_CLOSE})"
              class="dropdown-item">
-            <span class="protractor-test-deselected">{{ item.text | translate }}</span>
-            <i *ngIf="selectionDetails.languageCodes.selections[item.id]" class="material-icons md-18  float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+            <span class="e2e-test-deselected">{{ item.text | translate }}</span>
+            <i *ngIf="selectionDetails.languageCodes.selections[item.id]" class="fas fa-check material-icons md-18  float-right oppia-search-bar-category-selection-symbol"></i>
           </a>
         </li>
       </ng-container>
@@ -140,10 +140,10 @@
   <div class="oppia-same-row-container">
     <div class="search-bar-float-left oppia-navbar-button-container">
       <div *ngIf="searchButtonIsActive"
-           class="oppia-search-button protractor-test-search-button"
+           class="oppia-search-button e2e-test-search-button"
            (click)="onSearchQueryChangeExec()"
            title="Click here to search">
-        <i class="material-icons md-18 search-button-icon">&#xe8b6;</i>
+        <i class="fas fa-search material-icons md-18 search-button-icon"></i>
       </div>
     </div>
   </div>

@@ -4,22 +4,22 @@
 <div class="oppia-shadow-preview-card" aria-hidden="true">
   <div class="oppia-learner-view-card-content">
     <div class="oppia-learner-view-card-top-section">
-      <angular-html-bind-wrapper classStr="oppia-rte-viewer oppia-learner-view-card-top-content"
-                                 [htmlData]="stateContentService.displayed._html">
-      </angular-html-bind-wrapper>
+      <oppia-rte-output-display class="oppia-rte-viewer oppia-learner-view-card-top-content"
+                                [rteString]="stateContentService.displayed._html">
+      </oppia-rte-output-display>
     </div>
   </div>
 </div>
 
 <div *ngIf="!contentEditorIsOpen">
-  <div *ngIf="isCardHeightLimitReached() && cardHeightLimitWarningIsShown" class="oppia-card-height-limit-warning protractor-test-card-height-limit-warning">
-    <i class="material-icons oppia-hide-card-height-warning-icon protractor-test-hide-card-height-warning-icon" ngbTooltip="Hide warning" (click)="hideCardHeightLimitWarning()">&#xe002;</i>
+  <div *ngIf="cardHeightLimitReached && cardHeightLimitWarningIsShown" class="oppia-card-height-limit-warning e2e-test-card-height-limit-warning">
+    <i class="material-icons oppia-hide-card-height-warning-icon e2e-test-hide-card-height-warning-icon" ngbTooltip="Hide warning" (click)="hideCardHeightLimitWarning()">&#xe002;</i>
     <span [innerHTML]="'I18N_CARD_HEIGHT_LIMIT_WARNING_MESSAGE' | translate"></span>
   </div>
   <div *ngIf="isContentEditable()"
-       class="protractor-test-edit-content oppia-editable-section"
+       class="e2e-test-edit-content oppia-editable-section"
        (click)="openStateContentEditor()">
-    <i class="material-icons oppia-editor-edit-icon protractor-test-edit-content-pencil-button"
+    <i class="material-icons oppia-editor-edit-icon e2e-test-edit-content-pencil-button"
        title="Edit Card Content">&#xE254;
     </i>
     <div class="oppia-prevent-selection oppia-state-content-display oppia-transition-200"
@@ -29,16 +29,16 @@
       </span>
       <span>
         <oppia-rte-output-display [rteString]="stateContentService.savedMemento.html"
-                                  class="oppia-rte-editor protractor-test-state-content-display">
+                                  class="oppia-rte-editor e2e-test-state-content-display">
         </oppia-rte-output-display>
       </span>
     </div>
     <!-- This is a dummy div created to mask the contents when the user hovers over the content. -->
-    <div class="oppia-editable-section-mask protractor-test-state-edit-content">
+    <div class="oppia-editable-section-mask e2e-test-state-edit-content">
     </div>
   </div>
   <div *ngIf="!isContentEditable()"
-       class="protractor-test-edit-content">
+       class="e2e-test-edit-content">
     <div class="oppia-prevent-selection oppia-state-content-display oppia-transition-200"
          title="Card Content">
       <span [hidden]="!stateContentService.savedMemento.isEmpty()" class="oppia-placeholder">
@@ -46,30 +46,30 @@
       </span>
       <span>
         <oppia-rte-output-display [rteString]="stateContentService.savedMemento.html"
-                                  class="oppia-rte-editor protractor-test-state-content-display">
+                                  class="oppia-rte-editor e2e-test-state-content-display">
         </oppia-rte-output-display>
       </span>
     </div>
   </div>
 </div>
 
-<div *ngIf="contentEditorIsOpen" class="protractor-test-state-content-editor">
+<div *ngIf="contentEditorIsOpen" class="e2e-test-state-content-editor">
   <!-- TODO(sll): Find a way to do this without resorting to private properties like _html -->
   <schema-based-editor [schema]="HTML_SCHEMA"
                        [(localValue)]="stateContentService.displayed._html">
   </schema-based-editor>
-  <div *ngIf="isCardHeightLimitReached() && cardHeightLimitWarningIsShown" class="oppia-card-height-limit-warning protractor-test-card-height-limit-warning mt-2">
-    <i class="material-icons oppia-hide-card-height-warning-icon protractor-test-hide-card-height-warning-icon" ngbTooltip="Hide warning" (click)="hideCardHeightLimitWarning()">&#xe002;</i>
+  <div *ngIf="cardHeightLimitReached && cardHeightLimitWarningIsShown" class="oppia-card-height-limit-warning e2e-test-card-height-limit-warning mt-2">
+    <i class="material-icons oppia-hide-card-height-warning-icon e2e-test-hide-card-height-warning-icon" ngbTooltip="Hide warning" (click)="hideCardHeightLimitWarning()">&#xe002;</i>
     <span [innerHTML]="'I18N_CARD_HEIGHT_LIMIT_WARNING_MESSAGE' | translate"></span>
   </div>
   <div class="mt-2">
-    <div *ngIf="isCardContentLengthLimitReached()" class="oppia-card-content-limit-error protractor-test-card-height-limit-warning mt-2">
-      <i class="material-icons oppia-hide-card-content-error-icon protractor-test-hide-card-height-warning-icon" ngbTooltip="Hide warning" (click)="hideCardHeightLimitWarning()">&#xe002;</i>
+    <div *ngIf="isCardContentLengthLimitReached()" class="oppia-card-content-limit-error e2e-test-card-height-limit-warning mt-2">
+      <i class="material-icons oppia-hide-card-content-error-icon e2e-test-hide-card-height-warning-icon" ngbTooltip="Hide warning" (click)="hideCardHeightLimitWarning()">&#xe002;</i>
       <span [innerHTML]="'I18N_CARD_CONTENT_LIMIT_ERROR_MESSAGE' | translate"></span>
     </div>
     <button type="button"
             [disabled]="isCardContentLengthLimitReached()"
-            class="btn btn-success oppia-save-state-item-button protractor-test-save-state-content float-right"
+            class="btn btn-success oppia-save-state-item-button e2e-test-save-state-content float-right"
             (click)="onSaveContentButtonClicked()">
       {{ stateContentSaveButtonPlaceholder }}
     </button>

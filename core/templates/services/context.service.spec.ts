@@ -450,8 +450,11 @@ describe('Context service', () => {
     );
 
     it('should detect editor tab context is preview', () => {
+      let urlServiceGetHash = spyOn(urlService, 'getHash');
+      urlServiceGetHash.and.returnValue('#/settings');
       expect(ecs.getEditorTabContext()).toBeNull();
-      spyOn(urlService, 'getHash').and.returnValue('#/preview');
+
+      urlServiceGetHash.and.returnValue('#/preview');
       expect(ecs.getEditorTabContext()).toBe('preview');
     });
 

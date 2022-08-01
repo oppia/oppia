@@ -25,13 +25,13 @@ var path = require('path');
 
 var ExplorationEditorTranslationTab = function() {
   var dismissWelcomeModalButton = element(
-    by.css('.protractor-test-translation-tab-dismiss-welcome-modal'));
+    by.css('.e2e-test-translation-tab-dismiss-welcome-modal'));
   var translationWelcomeModal = element(
-    by.css('.protractor-test-translation-tab-welcome-modal'));
+    by.css('.e2e-test-translation-tab-welcome-modal'));
   var buttons = element.all(by.css('.ng-joyride .skipBtn'));
   var nextTutorialStageButton = element.all(by.css('.ng-joyride .nextBtn'));
   var translationTabStartTutorialElement = element(by.css(
-    '.protractor-test-translation-tab-start-tutorial'));
+    '.e2e-test-translation-tab-start-tutorial'));
   var titleElement = element(by.css('.ng-joyride-title'));
 
   this.exitTutorial = async function() {
@@ -101,103 +101,103 @@ var ExplorationEditorTranslationTab = function() {
   };
 
   var startRecordButton = element(
-    by.css('.protractor-test-accessibility-translation-start-record'));
+    by.css('.e2e-test-accessibility-translation-start-record'));
   var stopRecordButton = element(
-    by.css('.protractor-test-stop-record-button'));
+    by.css('.e2e-test-stop-record-button'));
   var confirmRecordButton = element(
-    by.css('.protractor-test-confirm-record'));
+    by.css('.e2e-test-confirm-record'));
   var playRecordButton = element(
-    by.css('.protractor-test-play-pause-audio-button'));
+    by.css('.e2e-test-play-pause-audio-button'));
   // Two such elements are in the DOM, but only the second is visible.
   var uploadAudioButton = element.all(
-    by.css('.protractor-test-upload-audio-button')).last();
+    by.css('.e2e-test-upload-audio-button')).last();
   var audioUploadInput = element(
-    by.css('.protractor-test-upload-audio-input'));
+    by.css('.e2e-test-upload-audio-input'));
   var saveUploadedAudioButton = element(
-    by.css('.protractor-test-save-uploaded-audio-button'));
+    by.css('.e2e-test-save-uploaded-audio-button'));
   var deleteRecordButton = element(
-    by.css('.protractor-test-delete-record'));
+    by.css('.e2e-test-delete-record'));
   var confirmDeleteRecordButton = element(
-    by.css('.protractor-test-confirm-discard-changes'));
+    by.css('.e2e-test-confirm-discard-changes'));
   var contentTabButton = element(
-    by.css('.protractor-test-translation-content-tab'));
+    by.css('.e2e-test-translation-content-tab'));
   var feedbackTabButton = element(
-    by.css('.protractor-test-translation-feedback-tab'));
+    by.css('.e2e-test-translation-feedback-tab'));
   var hintsTabButton = element(
-    by.css('.protractor-test-translation-hints-tab'));
+    by.css('.e2e-test-translation-hints-tab'));
   var solutionTabButton = element(
-    by.css('.protractor-test-translation-solution-tab'));
-  var contentTabText = element(by.css('.protractor-test-content-text'));
-  var solutionTabText = element(by.css('.protractor-test-solution-text'));
+    by.css('.e2e-test-translation-solution-tab'));
+  var contentTabText = element(by.css('.e2e-test-content-text'));
+  var solutionTabText = element(by.css('.e2e-test-solution-text'));
   var numericalStatus = element(
-    by.css('.protractor-test-translation-numerical-status'));
+    by.css('.e2e-test-translation-numerical-status'));
   var translationTabContentAccessibility = element(
-    by.css('.protractor-test-accessibility-translation-content'));
+    by.css('.e2e-test-accessibility-translation-content'));
   var translationTabFeedbackAccessibility = element(
-    by.css('.protractor-test-accessibility-translation-feedback'));
+    by.css('.e2e-test-accessibility-translation-feedback'));
   var translationTabHintAccessibility = element(
-    by.css('.protractor-test-accessibility-translation-hint'));
+    by.css('.e2e-test-accessibility-translation-hint'));
   var translationTabSolutionAccessibility = element(
-    by.css('.protractor-test-accessibility-translation-solution'));
+    by.css('.e2e-test-accessibility-translation-solution'));
   var translationTabStartRecordingAccessibility = element(
-    by.css('.protractor-test-accessibility-translation-start-record'));
+    by.css('.e2e-test-accessibility-translation-start-record'));
   var translationTabUploadRecordingAccessibility = element(
-    by.css('.protractor-test-accessibility-translation-upload-audio'));
+    by.css('.e2e-test-accessibility-translation-upload-audio'));
   var translationTabPlayRecordingAccessibility = element(
-    by.css('.protractor-test-accessibility-translation-play-recorded-audio'));
+    by.css('.e2e-test-accessibility-translation-play-recorded-audio'));
   var selectedLanguageElement = element(
-    by.css('.protractor-test-translation-language-selector')).element(
+    by.css('.e2e-test-translation-language-selector')).element(
     by.css('option:checked'));
   var languageSelectorElement = element(
-    by.css('.protractor-test-translation-language-selector'));
+    by.css('.e2e-test-translation-language-selector'));
   var languageSelectorLabelElement = element(
-    by.css('.protractor-test-language-selector-label'));
+    by.css('.e2e-test-language-selector-label'));
   var progressBarLabelElement = element(
-    by.css('.protractor-test-progress-info'));
+    by.css('.e2e-test-progress-info'));
   var translationModeButton = element(
-    by.css('.protractor-test-translation-mode'));
-  var voiceoverModeButton = element(by.css('.protractor-test-voiceover-mode'));
+    by.css('.e2e-test-translation-mode'));
+  var voiceoverModeButton = element(by.css('.e2e-test-voiceover-mode'));
   var saveTranslationButton = element(
-    by.css('.protractor-test-save-translation'));
+    by.css('.e2e-test-save-translation'));
   var editTranslationButtton = element(
-    by.css('.protractor-test-edit-translation'));
+    by.css('.e2e-test-edit-translation'));
   var translationDisplay = element(
-    by.css('.protractor-test-translation-display'));
+    by.css('.e2e-test-translation-display'));
   var stateGraph = element(
-    by.css('.protractor-test-translation-graph'));
+    by.css('.e2e-test-translation-graph'));
   var feedbackList = element.all(
-    by.css('.protractor-test-translation-feedback'));
+    by.css('.e2e-test-translation-feedback'));
   var stateBackgroundNodes = stateGraph.all(
-    by.css('.protractor-test-node-background'));
+    by.css('.e2e-test-node-background'));
   var stateNodes = stateGraph.all(
-    by.css('.protractor-test-node'));
+    by.css('.e2e-test-node'));
   var audioOverFiveMinutesErrorMessageElement = element(
-    by.css('.protractor-test-audio-file-upload-field-error-message'));
+    by.css('.e2e-test-audio-file-upload-field-error-message'));
   var audioUploadErrorMessageElement = element(by.css(
-    '.protractor-test-upload-error-message'));
+    '.e2e-test-upload-error-message'));
   var playPauseAudioButton = element(
-    by.css('.protractor-test-play-pause-audio-button'));
+    by.css('.e2e-test-play-pause-audio-button'));
   var audioMaterialSliderDiv = element(by.css('.mat-slider'));
   var closeAudioUploaderModalButton = element(
-    by.css('.protractor-test-close-audio-upload-modal'));
+    by.css('.e2e-test-close-audio-upload-modal'));
   var audioUploadContainerElement = element(by.css(
-    '.protractor-test-audio-upload-container'));
-  var nodeLabelLocator = by.css('.protractor-test-node-label');
+    '.e2e-test-audio-upload-container'));
+  var nodeLabelLocator = by.css('.e2e-test-node-label');
   var stateTranslationEditorLocator = by.css(
-    '.protractor-test-state-translation-editor');
+    '.e2e-test-state-translation-editor');
   var activeTranslationTabElement = element(
-    by.css('.protractor-test-active-translation-tab'));
+    by.css('.e2e-test-active-translation-tab'));
   var translationFeedback = function(index) {
-    return element(by.css('.protractor-test-feedback-' + index));
+    return element(by.css('.e2e-test-feedback-' + index));
   };
   var translationFeedbackText = function(index) {
-    return element(by.css('.protractor-test-feedback-' + index + '-text'));
+    return element(by.css('.e2e-test-feedback-' + index + '-text'));
   };
   var translationHint = function(index) {
-    return element(by.css('.protractor-test-hint-' + index));
+    return element(by.css('.e2e-test-hint-' + index));
   };
   var translationHintText = function(index) {
-    return element(by.css('.protractor-test-hint-' + index + '-text'));
+    return element(by.css('.e2e-test-hint-' + index + '-text'));
   };
   var _selectLanguage = async function(language) {
     await waitFor.visibilityOf(

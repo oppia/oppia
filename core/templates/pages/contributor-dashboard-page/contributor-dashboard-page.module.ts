@@ -47,6 +47,10 @@ import { TranslationModalComponent } from './modal-templates/translation-modal.c
 import { TranslationOpportunitiesComponent } from './translation-opportunities/translation-opportunities.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
+import { ContributionsAndReview } from './contributions-and-review/contributions-and-review.component';
+import { QuestionOpportunitiesComponent } from './question-opportunities/question-opportunities.component';
+import { ContributorDashboardPageComponent } from './contributor-dashboard-page.component';
+import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
 
 @NgModule({
   imports: [
@@ -73,7 +77,10 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
     TranslationOpportunitiesComponent,
     TranslationSuggestionReviewModalComponent,
     TranslationTopicSelectorComponent,
-    TranslationModalComponent
+    TranslationModalComponent,
+    ContributionsAndReview,
+    QuestionOpportunitiesComponent,
+    ContributorDashboardPageComponent
   ],
   entryComponents: [
     LoginRequiredMessageComponent,
@@ -84,7 +91,10 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
     TranslationOpportunitiesComponent,
     TranslationSuggestionReviewModalComponent,
     TranslationTopicSelectorComponent,
-    TranslationModalComponent
+    TranslationModalComponent,
+    ContributionsAndReview,
+    QuestionOpportunitiesComponent,
+    ContributorDashboardPageComponent
   ],
   providers: [
     {
@@ -102,6 +112,7 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
       provide: HAMMER_GESTURE_CONFIG,
       useClass: MyHammerConfig
     },
+    AppErrorHandlerProvider,
     {
       provide: APP_BASE_HREF,
       useValue: '/'

@@ -16,277 +16,305 @@
  * @fileoverview Service that handles routing for the exploration editor page.
  */
 
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-editor.service.ts');
-require(
-  'pages/exploration-editor-page/services/' +
-  'exploration-init-state-name.service.ts');
-require(
-  'pages/exploration-editor-page/services/state-editor-refresh.service.ts');
-require('pages/exploration-editor-page/services/exploration-states.service.ts');
-require('services/exploration-improvements.service.ts');
-require('services/external-save.service.ts');
+import { PlatformLocation } from '@angular/common';
+import { Injectable, EventEmitter, NgZone } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import { ExplorationInitStateNameService } from 'pages/exploration-editor-page/services/exploration-init-state-name.service';
+import { StateEditorRefreshService } from 'pages/exploration-editor-page/services/state-editor-refresh.service';
+import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
+import { ExplorationImprovementsService } from 'services/exploration-improvements.service';
+import { ExternalSaveService } from 'services/external-save.service';
 
-import { EventEmitter } from '@angular/core';
+@Injectable({
+  providedIn: 'root'
+})
+export class RouterService {
+  TABS = {
+    MAIN: { name: 'main', path: '/main' },
+    TRANSLATION: { name: 'translation', path: '/translation' },
+    PREVIEW: { name: 'preview', path: '/preview' },
+    SETTINGS: { name: 'settings', path: '/settings' },
+    STATS: { name: 'stats', path: '/stats' },
+    IMPROVEMENTS: { name: 'improvements', path: '/improvements' },
+    HISTORY: { name: 'history', path: '/history' },
+    FEEDBACK: { name: 'feedback', path: '/feedback' },
+  };
 
-angular.module('oppia').factory('RouterService', [
-  '$interval', '$location', '$q', '$rootScope', '$timeout', '$window',
-  'ExplorationImprovementsService', 'ExplorationInitStateNameService',
-  'ExplorationStatesService', 'ExternalSaveService',
-  'StateEditorRefreshService', 'StateEditorService',
-  function(
-      $interval, $location, $q, $rootScope, $timeout, $window,
-      ExplorationImprovementsService, ExplorationInitStateNameService,
-      ExplorationStatesService, ExternalSaveService,
-      StateEditorRefreshService, StateEditorService) {
-    var TABS = {
-      MAIN: {name: 'main', path: '/main'},
-      TRANSLATION: {name: 'translation', path: '/translation'},
-      PREVIEW: {name: 'preview', path: '/preview'},
-      SETTINGS: {name: 'settings', path: '/settings'},
-      STATS: {name: 'stats', path: '/stats'},
-      IMPROVEMENTS: {name: 'improvements', path: '/improvements'},
-      HISTORY: {name: 'history', path: '/history'},
-      FEEDBACK: {name: 'feedback', path: '/feedback'},
-    };
-    /** @private */
-    var centerGraphEventEmitter = new EventEmitter();
-    var SLUG_GUI = 'gui';
-    var SLUG_PREVIEW = 'preview';
-    // PREVIEW_TAB_WAIT_TIME_MSEC is the minimum duration to wait
-    // before calling _actuallyNavigate. This is done in order to
-    // ensure all pending changes are saved before navigating to
-    // the preview tab.
-    // _savePendingChanges triggers 'externalSave' event which
-    // will be caught by appropriate editors that will
-    // save pending changes. However, the autosave / saving of
-    // changelist is async. Promises cannot be used here to
-    // ensure that _actuallyNavigate is called only after
-    // _savePendingChanges has completed because there is
-    // currently no way to check if all promises returned are
-    // resolved after the 'externalSave' is triggered. Therefore,
-    // to allow autosave / saving of change list to complete,
-    // PREVIEW_TAB_WAIT_TIME_MSEC is provided.
-    var PREVIEW_TAB_WAIT_TIME_MSEC = 200;
+  /** @private */
+  private centerGraphEventEmitter = new EventEmitter();
+  private SLUG_GUI = 'gui';
+  private SLUG_PREVIEW = 'preview';
+  private PREVIEW_TAB_WAIT_TIME_MSEC = 200;
+  private _activeTabName = this.TABS.MAIN.name;
+  private refreshSettingsTabEventEmitter = new EventEmitter();
+  private refreshStatisticsTabEventEmitter = new EventEmitter();
+  private refreshTranslationTabEventEmitter = new EventEmitter();
+  private refreshVersionHistoryEventEmitter = new EventEmitter();
 
-    var activeTabName = TABS.MAIN.name;
+  constructor(
+    private windowRef: WindowRef,
+    private explorationInitStateNameService: ExplorationInitStateNameService,
+    private stateEditorRefreshService: StateEditorRefreshService,
+    private explorationStatesService: ExplorationStatesService,
+    private explorationImprovementsService: ExplorationImprovementsService,
+    private externalSaveService: ExternalSaveService,
+    private stateEditorService: StateEditorService,
+    private location: PlatformLocation,
+    private ngZone: NgZone
+  ) {
+    this._changeTab(this.windowRef.nativeWindow.location.hash.split('#')[1]);
 
-    /** @private */
-    var refreshSettingsTabEventEmitter = new EventEmitter();
-    /** @private */
-    var refreshStatisticsTabEventEmitter = new EventEmitter();
-    /** @private */
-    var refreshTranslationTabEventEmitter = new EventEmitter();
-    /** @private */
-    var refreshVersionHistoryEventEmitter = new EventEmitter();
-
-    // When the URL path changes, reroute to the appropriate tab in the
-    // exploration editor page.
-    $rootScope.$watch(() => $location.path(), (newPath, oldPath) => {
-      if (newPath === '') {
-        $location.path(oldPath);
-        return;
-      }
-
-      if (!oldPath) {
-        // This can happen when clicking on links whose href is "#".
-        return;
-      }
-
-      // TODO(oparry): Determine whether this is necessary, since
-      // _savePendingChanges() is called by each of the navigateTo... functions.
-
-      ExternalSaveService.onExternalSave.emit();
-
-      if (newPath.indexOf(TABS.TRANSLATION.path) === 0) {
-        activeTabName = TABS.TRANSLATION.name;
-        var waitForStatesToLoad = $interval(function() {
-          if (ExplorationStatesService.isInitialized()) {
-            $interval.cancel(waitForStatesToLoad);
-            if (!StateEditorService.getActiveStateName()) {
-              StateEditorService.setActiveStateName(
-                ExplorationInitStateNameService.savedMemento);
-            }
-            refreshTranslationTabEventEmitter.emit();
-          }
-        }, 300);
-      } else if (newPath.indexOf(TABS.PREVIEW.path) === 0) {
-        activeTabName = TABS.PREVIEW.name;
-        _doNavigationWithState(newPath, SLUG_PREVIEW);
-      } else if (newPath === TABS.SETTINGS.path) {
-        activeTabName = TABS.SETTINGS.name;
-        refreshSettingsTabEventEmitter.emit();
-      } else if (newPath === TABS.STATS.path) {
-        activeTabName = TABS.STATS.name;
-        refreshStatisticsTabEventEmitter.emit();
-      } else if (newPath === TABS.IMPROVEMENTS.path) {
-        activeTabName = TABS.IMPROVEMENTS.name;
-        $q.when(ExplorationImprovementsService.isImprovementsTabEnabledAsync())
-          .then(improvementsTabIsEnabled => {
-            if (activeTabName === TABS.IMPROVEMENTS.name &&
-                !improvementsTabIsEnabled) {
-              // Redirect to the main tab.
-              _actuallyNavigate(SLUG_GUI, null);
-            }
-          });
-      } else if (newPath === TABS.HISTORY.path) {
-        // TODO(sll): Do this on-hover rather than on-click.
-        refreshVersionHistoryEventEmitter.emit({
-          forceRefresh: false
-        });
-        activeTabName = TABS.HISTORY.name;
-      } else if (newPath === TABS.FEEDBACK.path) {
-        activeTabName = TABS.FEEDBACK.name;
-      } else if (newPath.indexOf('/gui/') === 0) {
-        activeTabName = TABS.MAIN.name;
-        _doNavigationWithState(newPath, SLUG_GUI);
-      } else {
-        if (ExplorationInitStateNameService.savedMemento) {
-          $location.path(
-            '/gui/' + ExplorationInitStateNameService.savedMemento);
-        }
+    this.location.onPopState(() => {
+      if (window.location.hash === '') {
+        window.history.go(-1);
       }
     });
-
-    var _doNavigationWithState = function(path, pathType) {
-      var pathBase = '/' + pathType + '/';
-      var putativeStateName = path.substring(pathBase.length);
-      var waitForStatesToLoad = $interval(function() {
-        if (ExplorationStatesService.isInitialized()) {
-          $interval.cancel(waitForStatesToLoad);
-          if (ExplorationStatesService.hasState(putativeStateName)) {
-            StateEditorService.setActiveStateName(putativeStateName);
-            if (pathType === SLUG_GUI) {
-              StateEditorRefreshService.onRefreshStateEditor.emit();
-              // Fire an event to center the Graph in the Editor.
-              centerGraphEventEmitter.emit();
-            }
-          } else {
-            $location.path(
-              pathBase + ExplorationInitStateNameService.savedMemento);
-          }
-        }
-      }, 300);
-    };
-
-    var _savePendingChanges = function() {
-      ExternalSaveService.onExternalSave.emit();
-    };
-
-    var _getCurrentStateFromLocationPath = function() {
-      var location = $location.path();
-      if (location.indexOf('/gui/') !== -1) {
-        return location.substring('/gui/'.length);
-      } else {
-        return null;
-      }
-    };
-
-    var _actuallyNavigate = function(pathType, newStateName) {
-      if (newStateName) {
-        StateEditorService.setActiveStateName(newStateName);
-      }
-      $location.path(
-        '/' + pathType + '/' + StateEditorService.getActiveStateName());
-      $window.scrollTo(0, 0);
-    };
-
-    var RouterService = {
-      savePendingChanges: function() {
-        _savePendingChanges();
-      },
-      getActiveTabName: function() {
-        return activeTabName;
-      },
-      isLocationSetToNonStateEditorTab: function() {
-        var currentPath = $location.path();
-        return (
-          currentPath === TABS.TRANSLATION.path ||
-          currentPath === TABS.PREVIEW.path ||
-          currentPath === TABS.STATS.path ||
-          currentPath === TABS.IMPROVEMENTS.path ||
-          currentPath === TABS.SETTINGS.path ||
-          currentPath === TABS.HISTORY.path ||
-          currentPath === TABS.FEEDBACK.path);
-      },
-      getCurrentStateFromLocationPath: function() {
-        return _getCurrentStateFromLocationPath();
-      },
-      navigateToMainTab: function(stateName) {
-        _savePendingChanges();
-        if (_getCurrentStateFromLocationPath() === stateName) {
-          return;
-        }
-
-        if (activeTabName === TABS.MAIN.name) {
-          $('.oppia-editor-cards-container').fadeOut(function() {
-            _actuallyNavigate(SLUG_GUI, stateName);
-            // We need to use $apply to update all our bindings. However we
-            // can't directly use $apply, as there is already another $apply in
-            // progress, the one which angular itself has called at the start.
-            // So we use $applyAsync to ensure that this $apply is called just
-            // after the previous $apply is finished executing. Refer to this
-            // link for more information -
-            // http://blog.theodybrothers.com/2015/08/getting-inside-angular-scopeapplyasync.html
-            $rootScope.$applyAsync();
-            $timeout(function() {
-              $('.oppia-editor-cards-container').fadeIn();
-            }, 150);
-          });
-        } else {
-          _actuallyNavigate(SLUG_GUI, stateName);
-        }
-      },
-      navigateToTranslationTab: function() {
-        _savePendingChanges();
-        $location.path(TABS.TRANSLATION.path);
-      },
-      navigateToPreviewTab: function() {
-        if (activeTabName !== TABS.PREVIEW.name) {
-          _savePendingChanges();
-          $timeout(function() {
-            _actuallyNavigate(SLUG_PREVIEW, null);
-          }, PREVIEW_TAB_WAIT_TIME_MSEC);
-        }
-      },
-      navigateToStatsTab: function() {
-        _savePendingChanges();
-        $location.path(TABS.STATS.path);
-      },
-      navigateToImprovementsTab: function() {
-        _savePendingChanges();
-        $location.path(TABS.IMPROVEMENTS.path);
-      },
-      navigateToSettingsTab: function() {
-        _savePendingChanges();
-        $location.path(TABS.SETTINGS.path);
-      },
-      navigateToHistoryTab: function() {
-        _savePendingChanges();
-        $location.path(TABS.HISTORY.path);
-      },
-      navigateToFeedbackTab: function() {
-        _savePendingChanges();
-        $location.path(TABS.FEEDBACK.path);
-      },
-      get onCenterGraph() {
-        return centerGraphEventEmitter;
-      },
-      get onRefreshSettingsTab() {
-        return refreshSettingsTabEventEmitter;
-      },
-      get onRefreshStatisticsTab() {
-        return refreshStatisticsTabEventEmitter;
-      },
-      get onRefreshTranslationTab() {
-        return refreshTranslationTabEventEmitter;
-      },
-      get onRefreshVersionHistory() {
-        return refreshVersionHistoryEventEmitter;
-      }
-    };
-
-    return RouterService;
   }
-]);
+
+  _changeTab(newPath: string): void {
+    if (newPath === undefined || newPath === '') {
+      this._changeTab('/');
+      return;
+    }
+
+    this.windowRef.nativeWindow.location.hash = newPath;
+    newPath = decodeURI(newPath);
+
+    // TODO(oparry): Determine whether this is necessary, since
+    // _savePendingChanges() is called by each of the navigateTo... functions.
+    this.externalSaveService.onExternalSave.emit();
+
+    if (newPath.indexOf(this.TABS.TRANSLATION.path) === 0) {
+      this._activeTabName = this.TABS.TRANSLATION.name;
+      this.ngZone.runOutsideAngular(() => {
+        let waitForStatesToLoad = setInterval(() => {
+          this.ngZone.run(() => {
+            if (this.explorationStatesService.isInitialized()) {
+              clearInterval(waitForStatesToLoad);
+              if (!this.stateEditorService.getActiveStateName()) {
+                this.stateEditorService.setActiveStateName(
+                  this.explorationInitStateNameService.savedMemento);
+              }
+              this.refreshTranslationTabEventEmitter.emit();
+            }
+          });
+        }, 300);
+      });
+    } else if (newPath.indexOf(this.TABS.PREVIEW.path) === 0) {
+      this._activeTabName = this.TABS.PREVIEW.name;
+      this._doNavigationWithState(newPath, this.SLUG_PREVIEW);
+    } else if (newPath === this.TABS.SETTINGS.path) {
+      this._activeTabName = this.TABS.SETTINGS.name;
+      this.refreshSettingsTabEventEmitter.emit();
+    } else if (newPath === this.TABS.STATS.path) {
+      this._activeTabName = this.TABS.STATS.name;
+      this.refreshStatisticsTabEventEmitter.emit();
+    } else if (newPath === this.TABS.IMPROVEMENTS.path) {
+      this._activeTabName = this.TABS.IMPROVEMENTS.name;
+
+      Promise.resolve(
+        this.explorationImprovementsService.isImprovementsTabEnabledAsync()
+      ).then(improvementsTabIsEnabled => {
+        if (this._activeTabName === this.TABS.IMPROVEMENTS.name &&
+          !improvementsTabIsEnabled) {
+          // Redirect to the main tab.
+          this._actuallyNavigate(this.SLUG_GUI, null);
+        }
+      });
+    } else if (newPath === this.TABS.HISTORY.path) {
+      // TODO(sll): Do this on-hover rather than on-click.
+      this.refreshVersionHistoryEventEmitter.emit({
+        forceRefresh: false
+      });
+      this._activeTabName = this.TABS.HISTORY.name;
+    } else if (newPath === this.TABS.FEEDBACK.path) {
+      this._activeTabName = this.TABS.FEEDBACK.name;
+    } else if (newPath.indexOf('/gui/') === 0) {
+      this._activeTabName = this.TABS.MAIN.name;
+      this._doNavigationWithState(newPath, this.SLUG_GUI);
+    } else {
+      if (this.explorationInitStateNameService.savedMemento) {
+        this._changeTab(
+          '/gui/' + this.explorationInitStateNameService.savedMemento);
+      }
+    }
+
+    // Fire an event to center the Graph in the
+    // Editor Tabs, Translation Tab, History Tab.
+    this.centerGraphEventEmitter.emit();
+  }
+
+  _doNavigationWithState(path: string, pathType: string): void {
+    let pathBase = '/' + pathType + '/';
+    let putativeStateName = path.substring(pathBase.length);
+
+    this.ngZone.runOutsideAngular(() => {
+      let waitForStatesToLoad = setInterval(() => {
+        this.ngZone.run(() => {
+          if (this.explorationStatesService.isInitialized()) {
+            clearInterval(waitForStatesToLoad);
+            if (this.explorationStatesService.hasState(putativeStateName)) {
+              this.stateEditorService.setActiveStateName(putativeStateName);
+              // We need to check this._activeTabName because the user may have
+              // navigated to a different tab before the states finish loading.
+              // In such a case, we should not switch back to the editor main
+              // tab.
+              if (pathType === this.SLUG_GUI &&
+                  this._activeTabName === this.TABS.MAIN.name) {
+                this.windowRef.nativeWindow.location.hash = path;
+                this.stateEditorRefreshService.onRefreshStateEditor.emit();
+              }
+            } else {
+              this._changeTab(
+                pathBase + this.explorationInitStateNameService.savedMemento);
+            }
+          }
+        });
+      }, 300);
+    });
+  }
+
+  _savePendingChanges(): void {
+    this.externalSaveService.onExternalSave.emit();
+  }
+
+  _getCurrentStateFromLocationPath(): string | null {
+    let location = this.windowRef.nativeWindow.location.hash;
+    if (location.indexOf('/gui/') !== -1) {
+      return location.substring('/gui/'.length);
+    } else {
+      return null;
+    }
+  }
+
+  _actuallyNavigate(pathType: string, newStateName: string): void {
+    if (newStateName) {
+      this.stateEditorService.setActiveStateName(newStateName);
+    }
+
+    this._changeTab(
+      '/' + pathType + '/' + this.stateEditorService.getActiveStateName());
+    this.windowRef.nativeWindow.scrollTo(0, 0);
+  }
+
+  savePendingChanges(): void {
+    this._savePendingChanges();
+  }
+
+  getActiveTabName(): string {
+    return this._activeTabName;
+  }
+
+  isLocationSetToNonStateEditorTab(): boolean {
+    let currentPath = (
+      '/' +
+      this.windowRef.nativeWindow.location.hash.split('#')[1].split('/')[1]);
+
+    return (
+      currentPath === this.TABS.MAIN.path ||
+      currentPath === this.TABS.TRANSLATION.path ||
+      currentPath === this.TABS.PREVIEW.path ||
+      currentPath === this.TABS.STATS.path ||
+      currentPath === this.TABS.IMPROVEMENTS.path ||
+      currentPath === this.TABS.SETTINGS.path ||
+      currentPath === this.TABS.HISTORY.path ||
+      currentPath === this.TABS.FEEDBACK.path);
+  }
+
+  getCurrentStateFromLocationPath(): string | null {
+    return this._getCurrentStateFromLocationPath();
+  }
+
+  navigateToMainTab(stateName: string): void {
+    this._savePendingChanges();
+    let oldState = decodeURI(
+      this._getCurrentStateFromLocationPath());
+
+    if (oldState === ('/' + stateName)) {
+      return;
+    }
+
+    if (this._activeTabName === this.TABS.MAIN.name) {
+      $('.oppia-editor-cards-container').fadeOut(() => {
+        this._actuallyNavigate(this.SLUG_GUI, stateName);
+        // We need to use $apply to update all our bindings. However we
+        // can't directly use $apply, as there is already another $apply in
+        // progress, the one which angular itself has called at the start.
+        // So we use $applyAsync to ensure that this $apply is called just
+        // after the previous $apply is finished executing. Refer to this
+        // link for more information -
+        // http://blog.theodybrothers.com/2015/08/getting-inside-angular-scopeapplyasync.html
+
+        setTimeout(() => {
+          $('.oppia-editor-cards-container').fadeIn();
+        }, 150);
+      });
+    } else {
+      this._actuallyNavigate(this.SLUG_GUI, stateName);
+    }
+  }
+
+  navigateToTranslationTab(): void {
+    this._savePendingChanges();
+    this._changeTab(this.TABS.TRANSLATION.path);
+  }
+
+  navigateToPreviewTab(): void {
+    if (this._activeTabName !== this.TABS.PREVIEW.name) {
+      this._savePendingChanges();
+      setTimeout(() => {
+        this._actuallyNavigate(this.SLUG_PREVIEW, null);
+      }, this.PREVIEW_TAB_WAIT_TIME_MSEC);
+    }
+  }
+
+  navigateToStatsTab(): void {
+    this._savePendingChanges();
+    this._changeTab(this.TABS.STATS.path);
+  }
+
+  navigateToImprovementsTab(): void {
+    this._savePendingChanges();
+    this._changeTab(this.TABS.IMPROVEMENTS.path);
+  }
+
+  navigateToSettingsTab(): void {
+    this._savePendingChanges();
+    this._changeTab(this.TABS.SETTINGS.path);
+  }
+
+  navigateToHistoryTab(): void {
+    this._savePendingChanges();
+    this._changeTab(this.TABS.HISTORY.path);
+  }
+
+  navigateToFeedbackTab(): void {
+    this._savePendingChanges();
+    this._changeTab(this.TABS.FEEDBACK.path);
+  }
+
+  get onCenterGraph(): EventEmitter<void> {
+    return this.centerGraphEventEmitter;
+  }
+
+  get onRefreshSettingsTab(): EventEmitter<void> {
+    return this.refreshSettingsTabEventEmitter;
+  }
+
+  get onRefreshStatisticsTab(): EventEmitter<void> {
+    return this.refreshStatisticsTabEventEmitter;
+  }
+
+  get onRefreshTranslationTab(): EventEmitter<void> {
+    return this.refreshTranslationTabEventEmitter;
+  }
+
+  get onRefreshVersionHistory(): EventEmitter<void> {
+    return this.refreshVersionHistoryEventEmitter;
+  }
+}
+
+angular.module('oppia').factory('RouterService',
+  downgradeInjectable(RouterService));

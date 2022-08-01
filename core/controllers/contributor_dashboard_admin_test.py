@@ -528,6 +528,7 @@ class TranslationContributionStatsHandlerTest(test_utils.GenericTestBase):
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-three')]
         topic.next_subtopic_id = 2
+        topic.skill_ids_for_diagnostic_test = ['skill_id_3']
         topic_services.save_new_topic(self.admin_id, topic)
         topic_services.publish_topic(topic_id, self.admin_id)
 

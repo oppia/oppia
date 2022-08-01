@@ -26,9 +26,12 @@ import { ConfirmOrCancelModal } from 'components/common-layout-directives/common
   templateUrl: './question-editor-save-modal.component.html'
 })
 export class QuestionEditorSaveModalComponent extends ConfirmOrCancelModal
-    implements OnInit {
+  implements OnInit {
+  // This property is initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   commitMessage: string = '';
-  MAX_COMMIT_MESSAGE_LENGTH: number;
+  MAX_COMMIT_MESSAGE_LENGTH!: number;
 
   constructor(private ngbActiveModal: NgbActiveModal) {
     super(ngbActiveModal);

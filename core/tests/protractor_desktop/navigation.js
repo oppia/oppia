@@ -95,15 +95,15 @@ describe('DEV MODE Test', function() {
     await browser.get('/');
     await waitFor.pageToFullyLoad();
     expect(await element(
-      by.css('.protractor-test-dev-mode')).isPresent())
+      by.css('.e2e-test-dev-mode')).isPresent())
       .toBe(general.isInDevMode());
   });
 });
 
 describe('Donation flow', function() {
-  var payPalButton = element(by.css('.protractor-test-paypal-donate-button'));
+  var payPalButton = element(by.css('.e2e-test-paypal-donate-button'));
   var creditCardButton = element(
-    by.css('.protractor-test-credit-card-donate-button'));
+    by.css('.e2e-test-credit-card-donate-button'));
   it('should be able to donate via PayPal', async function() {
     await browser.get('/donate');
     await action.click('PayPal button', payPalButton);
@@ -123,21 +123,21 @@ describe('Static Pages Tour', function() {
     await getStartedPage.get();
     await waitFor.pageToFullyLoad();
     expect(await element(
-      by.css('.protractor-test-get-started-page')).isPresent()).toBe(true);
+      by.css('.e2e-test-get-started-page')).isPresent()).toBe(true);
   });
 
   it('should visit the Login page', async function() {
     await browser.get('/login');
     await waitFor.pageToFullyLoad();
-    var loginPage = element(by.css('.protractor-test-login-page'));
+    var loginPage = element(by.css('.e2e-test-login-page'));
     await waitFor.presenceOf(loginPage, 'Login page did not load');
   });
 
   it('should redirect away from the Login page when visited by logged-in user',
     async function() {
-      var loginPage = element(by.css('.protractor-test-login-page'));
+      var loginPage = element(by.css('.e2e-test-login-page'));
       var learnerDashboardPage = (
-        element(by.css('.protractor-test-learner-dashboard-page')));
+        element(by.css('.e2e-test-learner-dashboard-page')));
 
       await users.createAndLoginUser('user@navigation.com', 'navigationUser');
 
@@ -174,77 +174,77 @@ describe('Static Pages Tour', function() {
     await browser.get('/teach');
     await waitFor.pageToFullyLoad();
     expect(await element(
-      by.css('.protractor-test-teach-page')).isPresent()).toBe(true);
+      by.css('.e2e-test-teach-page')).isPresent()).toBe(true);
   });
 
   it('should visit the Home page', async function() {
     await browser.get('/');
     await waitFor.pageToFullyLoad();
     expect(await element(
-      by.css('.protractor-test-splash-page')).isPresent()).toBe(true);
+      by.css('.e2e-test-splash-page')).isPresent()).toBe(true);
   });
 
   it('should visit the About page', async function() {
     await browser.get('/about');
     await waitFor.pageToFullyLoad();
     expect(await element(
-      by.css('.protractor-test-about-page')).isPresent()).toBe(true);
+      by.css('.e2e-test-about-page')).isPresent()).toBe(true);
   });
 
   it('should visit the Contact page', async function() {
     await browser.get('/contact');
     await waitFor.pageToFullyLoad();
     expect(await element(
-      by.css('.protractor-test-contact-page')).isPresent()).toBe(true);
+      by.css('.e2e-test-contact-page')).isPresent()).toBe(true);
   });
 
   it('should visit the Donate page', async function() {
     await browser.get('/donate');
     await waitFor.pageToFullyLoad();
     expect(await element(
-      by.css('.protractor-test-donate-page')).isPresent()).toBe(true);
+      by.css('.e2e-test-donate-page')).isPresent()).toBe(true);
   });
 
   it('should visit the Partnerships page', async function() {
     await browser.get('/partnerships');
     await waitFor.pageToFullyLoad();
     expect(await element(
-      by.css('.protractor-test-partnerships-page')).isPresent()).toBe(true);
+      by.css('.e2e-test-partnerships-page')).isPresent()).toBe(true);
   });
 
   it('should visit the About the Oppia Foundation page', async function() {
     await browser.get('/about-foundation');
     await waitFor.pageToFullyLoad();
     expect(await element(
-      by.css('.protractor-test-about-foundation-page')).isPresent()).toBe(true);
+      by.css('.e2e-test-about-foundation-page')).isPresent()).toBe(true);
   });
 
   it('should visit the Privacy page', async function() {
     await browser.get('/privacy-policy');
     await waitFor.pageToFullyLoad();
     expect(await element(
-      by.css('.protractor-test-privacy-page')).isPresent()).toBe(true);
+      by.css('.e2e-test-privacy-page')).isPresent()).toBe(true);
   });
 
   it('should visit the Terms page', async function() {
     await browser.get('/terms');
     await waitFor.pageToFullyLoad();
     expect(await element(
-      by.css('.protractor-test-terms-page')).isPresent()).toBe(true);
+      by.css('.e2e-test-terms-page')).isPresent()).toBe(true);
   });
 
   it('should visit the Thanks page', async function() {
     await browser.get('/thanks');
     await waitFor.pageToFullyLoad();
     expect(await element(
-      by.css('.protractor-test-thanks-page')).isPresent()).toBe(true);
+      by.css('.e2e-test-thanks-page')).isPresent()).toBe(true);
   });
 
   it('should visit the Volunteer page', async function() {
     await browser.get('/volunteer');
     await waitFor.pageToFullyLoad();
     await waitFor.visibilityOf(
-      element(by.css('.protractor-test-volunteer-page')),
+      element(by.css('.e2e-test-volunteer-page')),
       'Volunteer page taking too long to appear');
   });
 

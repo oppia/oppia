@@ -84,7 +84,7 @@ describe('Library pages tour', function() {
     // exploration has to be rated by the user.
     await rateExploration();
     await libraryPage.get();
-    var topRatedButton = element(by.css('.protractor-test-library-top-rated'));
+    var topRatedButton = element(by.css('.e2e-test-library-top-rated'));
     await action.click('Top Rated Button', topRatedButton);
     await waitFor.pageToFullyLoad();
     expect(await browser.getCurrentUrl()).toContain(

@@ -23,6 +23,7 @@ import { NumberWithUnitsObjectFactory } from 'domain/objects/NumberWithUnitsObje
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { TranslateModule } from '@ngx-translate/core';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { NumberWithUnitsAnswer } from 'interactions/answer-defs';
 
 describe('Number with units interaction component', () => {
   let component: InteractiveNumberWithUnitsComponent;
@@ -33,8 +34,11 @@ describe('Number with units interaction component', () => {
 
   let mockCurrentInteractionService = {
     updateViewWithNewAnswer: () => {},
-    onSubmit: (answer, rulesService) => {},
-    registerCurrentInteraction: (submitAnswerFn, validateExpressionFn) => {
+    onSubmit: (
+        answer: NumberWithUnitsAnswer, rulesService: CurrentInteractionService
+    ) => {},
+    registerCurrentInteraction: (
+        submitAnswerFn: Function, validateExpressionFn: Function) => {
       submitAnswerFn();
       validateExpressionFn();
     }
