@@ -54,7 +54,9 @@ if MYPY:  # pragma: no cover
         List[state_domain.AnswerGroupDict],
         List[skill_domain.WorkedExampleDict],
         state_domain.SubtitledHtmlDict,
+        List[state_domain.HintDict],
         state_domain.OutcomeDict,
+        state_domain.SolutionDict,
         state_domain.RecordedVoiceoversDict,
         # This Dict type is added to allow BaseChange to accept
         # customization_args.

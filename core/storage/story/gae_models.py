@@ -143,7 +143,11 @@ class StoryModel(base_models.VersionedModel):
 
     # TODO(#13523): Change 'commit_cmds' to TypedDict/Domain Object
     # to remove Any used below.
-    def compute_models_to_commit(
+    # We have ignored [override] here because the signature of this method
+    # doesn't match with VersionedModel.compute_models_to_commit(). Because
+    # argument `commit_message` of super class can accept Optional[str] but
+    # this method can only accept str.
+    def compute_models_to_commit( # type: ignore[override]
         self,
         committer_id: str,
         commit_type: str,

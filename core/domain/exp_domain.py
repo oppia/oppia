@@ -39,7 +39,7 @@ from core.domain import param_domain
 from core.domain import state_domain
 from core.domain import translation_domain
 
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 from typing_extensions import TypedDict
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
@@ -689,12 +689,27 @@ class Exploration(translation_domain.BaseTranslatableObject):
     """Domain object for an Oppia exploration."""
 
     def __init__(
-            self, exploration_id, title, category, objective,
-            language_code, tags, blurb, author_notes,
-            states_schema_version, init_state_name, states_dict,
-            param_specs_dict, param_changes_list, version,
-            auto_tts_enabled, correctness_feedback_enabled, edits_allowed,
-            created_on=None, last_updated=None):
+        self,
+        exploration_id: str,
+        title: str,
+        category: str,
+        objective: str,
+        language_code: str,
+        tags: List[str],
+        blurb: str,
+        author_notes: str,
+        states_schema_version: int,
+        init_state_name: str,
+        states_dict: Dict[str, state_domain.StateDict],
+        param_specs_dict: Dict[str, param_domain.ParamSpecDict],
+        param_changes_list: List[param_domain.ParamChangeDict],
+        version: int,
+        auto_tts_enabled: bool,
+        correctness_feedback_enabled: bool,
+        edits_allowed: bool,
+        created_on: Optional[datetime.datetime] = None,
+        last_updated: Optional[datetime.datetime] = None
+    ) -> None:
         """Initializes an Exploration domain object.
 
         Args:
@@ -739,7 +754,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         self.states_schema_version = states_schema_version
         self.init_state_name = init_state_name
 
-        self.states = {}
+        self.states: Dict[str, state_domain.State] = {}
         for (state_name, state_dict) in states_dict.items():
             self.states[state_name] = state_domain.State.from_dict(state_dict)
 
@@ -1549,7 +1564,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
         state_names = list(self.states.keys())
         return state_name in state_names
 
-    def get_interaction_id_by_state_name(self, state_name):
+    def get_interaction_id_by_state_name(
+        self, state_name: str
+    ) -> Optional[str]:
         """Returns the interaction id of the state.
 
         Args:
@@ -3336,8 +3353,11 @@ class ExplorationChangeMergeVerifier:
                 STATE_PROPERTY_WRITTEN_TRANSLATIONS)
 
     def is_change_list_mergeable(
-            self, change_list,
-            exp_at_change_list_version, current_exploration):
+        self,
+        change_list: List[ExplorationChange],
+        exp_at_change_list_version: Exploration,
+        current_exploration: Exploration
+    ) -> Tuple[bool, bool]:
         """Checks whether the change list from the old version of an
         exploration can be merged on the latest version of an exploration.
 

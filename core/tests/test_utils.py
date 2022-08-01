@@ -1030,7 +1030,7 @@ class TestBase(unittest.TestCase):
         with self.assertRaisesRegex(utils.ValidationError, error_substring):
             item.validate()
 
-    def log_line(self, line):
+    def log_line(self, line: str) -> None:
         """Print the line with a prefix that can be identified by the script
         that calls the test.
         """
@@ -2540,7 +2540,11 @@ title: Title
         return response['token']
 
     def save_new_default_exploration(
-            self, exploration_id, owner_id, title='A title'):
+        self,
+        exploration_id: str,
+        owner_id: str,
+        title: str = 'A title'
+    ) -> exp_domain.Exploration:
         """Saves a new default exploration written by owner_id.
 
         Args:
@@ -2556,7 +2560,9 @@ title: Title
         exp_services.save_new_exploration(owner_id, exploration)
         return exploration
 
-    def set_interaction_for_state(self, state, interaction_id):
+    def set_interaction_for_state(
+        self, state: state_domain.State, interaction_id: str
+    ) -> None:
         """Sets the interaction_id, sets the fully populated default interaction
         customization arguments, and increments next_content_id_index as needed.
 

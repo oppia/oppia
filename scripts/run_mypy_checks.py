@@ -46,8 +46,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/event_services_test.py',
     'core/domain/exp_domain.py',
     'core/domain/exp_domain_test.py',
-    'core/domain/exp_services.py',
-    'core/domain/exp_services_test.py',
     'core/domain/expression_parser.py',
     'core/domain/expression_parser_test.py',
     'core/domain/feedback_services.py',

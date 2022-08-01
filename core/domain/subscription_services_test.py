@@ -245,7 +245,7 @@ class SubscriptionsTest(test_utils.GenericTestBase):
     def test_creating_exploration_results_in_subscription(self) -> None:
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(USER_ID), [])
-        exp_services.save_new_exploration(  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(
             USER_ID, exp_domain.Exploration.create_default_exploration(EXP_ID))  # type: ignore[no-untyped-call]
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(USER_ID), [EXP_ID])
@@ -254,7 +254,7 @@ class SubscriptionsTest(test_utils.GenericTestBase):
         self
     ) -> None:
         exploration = exp_domain.Exploration.create_default_exploration(EXP_ID)  # type: ignore[no-untyped-call]
-        exp_services.save_new_exploration(self.owner_id, exploration)  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(self.owner_id, exploration)
 
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(self.owner_2_id), [])
@@ -274,7 +274,7 @@ class SubscriptionsTest(test_utils.GenericTestBase):
         self
     ) -> None:
         exploration = exp_domain.Exploration.create_default_exploration(EXP_ID)  # type: ignore[no-untyped-call]
-        exp_services.save_new_exploration(self.owner_id, exploration)  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(self.owner_id, exploration)
 
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(self.viewer_id), [])
@@ -285,11 +285,11 @@ class SubscriptionsTest(test_utils.GenericTestBase):
 
     def test_deleting_exploration_does_not_delete_subscription(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration(EXP_ID)  # type: ignore[no-untyped-call]
-        exp_services.save_new_exploration(self.owner_id, exploration)  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(self.owner_id, exploration)
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(self.owner_id), [EXP_ID])
 
-        exp_services.delete_exploration(self.owner_id, EXP_ID)  # type: ignore[no-untyped-call]
+        exp_services.delete_exploration(self.owner_id, EXP_ID)
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(self.owner_id), [EXP_ID])
 

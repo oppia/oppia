@@ -2050,7 +2050,7 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
         self
     ) -> None:
         self.save_new_valid_exploration(self.EXP_2_ID, self.user_1_id)
-        exp_services.delete_exploration(self.user_1_id, self.EXP_2_ID)  # type: ignore[no-untyped-call]
+        exp_services.delete_exploration(self.user_1_id, self.EXP_2_ID)
 
         exp_rights_model = (
             exp_models.ExplorationRightsModel.get_by_id(self.EXP_2_ID))

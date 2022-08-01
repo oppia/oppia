@@ -2238,11 +2238,11 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             collection_playlist_summaries[0].title, 'Welcome Oppia Collection')
 
         # Delete an exploration in the completed section.
-        exp_services.delete_exploration(self.owner_id, self.EXP_ID_0)  # type: ignore[no-untyped-call]
+        exp_services.delete_exploration(self.owner_id, self.EXP_ID_0)
         # Delete an exploration in the incomplete section.
-        exp_services.delete_exploration(self.owner_id, self.EXP_ID_1)  # type: ignore[no-untyped-call]
+        exp_services.delete_exploration(self.owner_id, self.EXP_ID_1)
         # Delete an exploration in the playlist section.
-        exp_services.delete_exploration(self.owner_id, self.EXP_ID_3)  # type: ignore[no-untyped-call]
+        exp_services.delete_exploration(self.owner_id, self.EXP_ID_3)
         # Add an exploration to a collection that has already been completed.
         collection_services.update_collection(  # type: ignore[no-untyped-call]
             self.owner_id, self.COL_ID_0, [{

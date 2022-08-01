@@ -518,7 +518,7 @@ def remove_user_from_activities_with_associated_rights_models(
         exp_summary.is_private() and  # type: ignore[no-untyped-call]
         exp_summary.is_solely_owned_by_user(user_id)  # type: ignore[no-untyped-call]
     ]
-    exp_services.delete_explorations(  # type: ignore[no-untyped-call]
+    exp_services.delete_explorations(
         user_id, explorations_to_be_deleted_ids, force_deletion=True)
 
     # Release ownership of explorations that are public and are solely owned
@@ -553,7 +553,7 @@ def remove_user_from_activities_with_associated_rights_models(
         exploration_rights.is_private() and
         exploration_rights.is_solely_owned_by_user(user_id)
     ]
-    exp_services.delete_explorations(  # type: ignore[no-untyped-call]
+    exp_services.delete_explorations(
         user_id, explorations_to_be_deleted_ids, force_deletion=True)
 
     subscribed_collection_summaries = (

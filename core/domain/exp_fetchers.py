@@ -196,7 +196,7 @@ def get_exploration_from_model(
             feconf.CURRENT_STATE_SCHEMA_VERSION):
         _migrate_states_schema(versioned_exploration_states, init_state_name)
 
-    return exp_domain.Exploration(  # type: ignore[no-untyped-call]
+    return exp_domain.Exploration(
         exploration_model.id, exploration_model.title,
         exploration_model.category, exploration_model.objective,
         exploration_model.language_code, exploration_model.tags,
@@ -256,7 +256,7 @@ def get_exploration_summary_by_id(
 
 
 def get_exploration_summaries_from_models(
-    exp_summary_models: List[exp_models.ExpSummaryModel]
+    exp_summary_models: Sequence[exp_models.ExpSummaryModel]
 ) -> Dict[str, exp_domain.ExplorationSummary]:
     """Returns a dict with ExplorationSummary domain objects as values,
     keyed by their exploration id.

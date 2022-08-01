@@ -57,6 +57,8 @@ SELF_BASE_SNAPSHOT_CONTENT_MODEL = TypeVar(  # pylint: disable=invalid-name
 
 MYPY = False
 if MYPY: # pragma: no cover
+    # Here, change domain is imported only for type checking.
+    from core.domain import change_domain # pylint: disable=invalid-import # isort:skip
     from mypy_imports import datastore_services
     from mypy_imports import transaction_services
 
@@ -75,6 +77,17 @@ FETCH_BATCH_SIZE = 1000
 MAX_RETRIES = 10
 RAND_RANGE = (1 << 30) - 1
 ID_LENGTH = 12
+
+
+class SnapshotsMetadataDict(TypedDict):
+    """Dictionary representing the snapshot metadata for versioned models."""
+
+    committer_id: str
+    commit_message: str
+    commit_cmds: List[Dict[str, change_domain.AcceptableChangeDictTypes]]
+    commit_type: str
+    version_number: int
+    created_on_ms: float
 
 
 # Types of deletion policies. The pragma comment is needed because Enums are
@@ -708,7 +721,7 @@ class BaseCommitLogEntryModel(BaseModel):
             version: int,
             committer_id: str,
             commit_type: str,
-            commit_message: str,
+            commit_message: Optional[str],
             commit_cmds: Union[Dict[str, Any], List[Dict[str, Any]], None],
             status: str,
             community_owned: bool
@@ -725,7 +738,8 @@ class BaseCommitLogEntryModel(BaseModel):
                 change.
             commit_type: str. The type of commit. Possible values are in
                 core.storage.base_models.COMMIT_TYPE_CHOICES.
-            commit_message: str. The commit description message.
+            commit_message: str|None. The commit description message, or None if
+                draft (or unpublished) model is provided.
             commit_cmds: list(dict). A list of commands, describing changes
                 made in this model, which should give sufficient information to
                 reconstruct the commit. Each dict always contains:
@@ -971,7 +985,7 @@ class VersionedModel(BaseModel):
         self,
         committer_id: str,
         commit_type: str,
-        commit_message: str,
+        commit_message: Optional[str],
         commit_cmds: List[Dict[str, Any]],
         # We expect Mapping because we want to allow models that inherit
         # from BaseModel as the values, if we used Dict this wouldn't
@@ -984,7 +998,8 @@ class VersionedModel(BaseModel):
             committer_id: str. The user_id of the user who committed the change.
             commit_type: str. Unique identifier of commit type. Possible values
                 are in COMMIT_TYPE_CHOICES.
-            commit_message: str. The commit description message.
+            commit_message: str|None. The commit description message, or None if
+                draft (or unpublished) model is provided.
             commit_cmds: list(dict). A list of commands, describing changes
                 made in this model, should give sufficient information to
                 reconstruct the commit. Dict always contains:
@@ -1244,14 +1259,15 @@ class VersionedModel(BaseModel):
     def commit(
         self,
         committer_id: str,
-        commit_message: str,
+        commit_message: Optional[str],
         commit_cmds: List[Dict[str, Any]]
     ) -> None:
         """Saves a version snapshot and updates the model.
 
         Args:
             committer_id: str. The user_id of the user who committed the change.
-            commit_message: str. The commit description message.
+            commit_message: str|None. The commit description message, or None if
+                draft (or unpublished) model is provided.
             commit_cmds: list(dict). A list of commands, describing changes
                 made in this model, should give sufficient information to
                 reconstruct the commit. Dict always contains:
@@ -1562,7 +1578,7 @@ class VersionedModel(BaseModel):
             model_instance_id: str,
             version_numbers: List[int],
             allow_deleted: bool = False
-    ) -> List[Dict[str, Any]]:
+    ) -> List[SnapshotsMetadataDict]:
         """Gets a list of dicts, each representing a model snapshot.
 
         One dict is returned for each version number in the list of version

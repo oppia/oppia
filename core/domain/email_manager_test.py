@@ -237,7 +237,7 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)  # type: ignore[no-untyped-call]
 
-        self.exploration = self.save_new_default_exploration(  # type: ignore[no-untyped-call]
+        self.exploration = self.save_new_default_exploration(
             'A', self.editor_id, title=self.EXPLORATION_TITLE)
 
         self.expected_email_subject = (
@@ -1290,7 +1290,7 @@ class FeedbackMessageBatchEmailTests(test_utils.EmailTestBase):
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)  # type: ignore[no-untyped-call]
 
-        self.exploration = self.save_new_default_exploration(  # type: ignore[no-untyped-call]
+        self.exploration = self.save_new_default_exploration(
             'A', self.editor_id, title='Title')
 
         self.expected_email_subject = (
@@ -1432,7 +1432,7 @@ class SuggestionEmailTests(test_utils.EmailTestBase):
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)  # type: ignore[no-untyped-call]
 
-        self.exploration = self.save_new_default_exploration(  # type: ignore[no-untyped-call]
+        self.exploration = self.save_new_default_exploration(
             'A', self.editor_id, title='Title')
         self.recipient_list = [self.editor_id]
 
@@ -1540,7 +1540,7 @@ class SubscriptionEmailTests(test_utils.EmailTestBase):
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)  # type: ignore[no-untyped-call]
 
-        self.exploration = self.save_new_default_exploration(  # type: ignore[no-untyped-call]
+        self.exploration = self.save_new_default_exploration(
             'A', self.editor_id, title='Title')
         subscription_services.subscribe_to_creator(
             self.new_user_id, self.editor_id)
@@ -1641,7 +1641,7 @@ class FeedbackMessageInstantEmailTests(test_utils.EmailTestBase):
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)  # type: ignore[no-untyped-call]
 
-        self.exploration = self.save_new_default_exploration(  # type: ignore[no-untyped-call]
+        self.exploration = self.save_new_default_exploration(
             'A', self.editor_id, title='Title')
         self.recipient_list = [self.editor_id]
 
@@ -1761,7 +1761,7 @@ class FlagExplorationEmailTest(test_utils.EmailTestBase):
 
         self.set_moderators([self.moderator2_username, self.MODERATOR_USERNAME])  # type: ignore[no-untyped-call]
 
-        self.exploration = self.save_new_default_exploration(  # type: ignore[no-untyped-call]
+        self.exploration = self.save_new_default_exploration(
             'A', self.editor_id, title='Title')
         self.owner_ids = [self.editor_id]
 
@@ -6273,7 +6273,7 @@ class NotMergeableChangesEmailUnitTest(test_utils.EmailTestBase):
 
             # Send an account deletion failed email to admin.
             email_manager.send_not_mergeable_change_list_to_admin_for_review(
-                'testExploration', 1, 2, {'field1': 'value1'}
+                'testExploration', 1, 2, [{'field1': 'value1'}]
             )
 
             # Make sure emails are sent.

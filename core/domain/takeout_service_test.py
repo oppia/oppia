@@ -503,7 +503,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         self.save_new_valid_exploration(
             self.EXPLORATION_IDS[0], self.USER_ID_1, end_state_name='End')
 
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.USER_ID_1, self.EXPLORATION_IDS[0],
             [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',

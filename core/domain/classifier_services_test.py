@@ -35,7 +35,7 @@ from core.platform import models
 from core.tests import test_utils
 from proto_files import text_classifier_pb2
 
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -65,9 +65,9 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
         test_exp_filepath = os.path.join(
             feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
         yaml_content = utils.get_file_contents(test_exp_filepath)
-        assets_list: List[str] = []
+        assets_list: List[Tuple[str, bytes]] = []
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
-            exp_services.save_new_exploration_from_yaml_and_assets(  # type: ignore[no-untyped-call]
+            exp_services.save_new_exploration_from_yaml_and_assets(
                 feconf.SYSTEM_COMMITTER_ID, yaml_content, exploration_id,
                 assets_list)
 
@@ -140,7 +140,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             'new_value': state.recorded_voiceovers.to_dict()
         })]
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
-            exp_services.update_exploration(  # type: ignore[no-untyped-call]
+            exp_services.update_exploration(
                 feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
 
         # There should be two jobs and two mappings in the data store now.
@@ -158,7 +158,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             'new_value': 'New title'
         })]
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
-            exp_services.update_exploration(  # type: ignore[no-untyped-call]
+            exp_services.update_exploration(
                 feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
 
         # There should be two jobs and three mappings in the data store now.
@@ -179,7 +179,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             'new_state_name': 'Home3'
         })]
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
-            exp_services.update_exploration(  # type: ignore[no-untyped-call]
+            exp_services.update_exploration(
                 feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
 
         # There should still be only two jobs and four mappings in the data
@@ -229,7 +229,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             'new_value': state.recorded_voiceovers.to_dict()
         })]
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
-            exp_services.update_exploration(  # type: ignore[no-untyped-call]
+            exp_services.update_exploration(
                 feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
 
         # There should be two jobs and two mappings in the data store now.
@@ -247,7 +247,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             'new_value': 'New title'
         })]
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', False):
-            exp_services.update_exploration(  # type: ignore[no-untyped-call]
+            exp_services.update_exploration(
                 feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
 
         # There should be two jobs and two mappings in the data store now.
@@ -267,7 +267,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             'new_value': 'New title'
         })]
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
-            exp_services.update_exploration(  # type: ignore[no-untyped-call]
+            exp_services.update_exploration(
                 feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
 
         # There should be three jobs and three mappings in the data store now.
@@ -819,7 +819,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             'new_value': 'A new title'
         })]
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
-            exp_services.update_exploration(  # type: ignore[no-untyped-call]
+            exp_services.update_exploration(
                 feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
 
         current_exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
@@ -832,7 +832,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
         old_job_id = old_job.job_id
         # Revert the exploration.
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
-            exp_services.revert_exploration(  # type: ignore[no-untyped-call]
+            exp_services.revert_exploration(
                 feconf.SYSTEM_COMMITTER_ID,
                 self.exp_id,
                 current_exploration.version,

@@ -136,7 +136,7 @@ class ActivityServicesTests(test_utils.GenericTestBase):
                 self._create_collection_reference(self.COL_ID_2)])
 
         # Deleting an unfeatured activity does not affect the featured list.
-        exp_services.delete_exploration(self.owner_id, self.EXP_ID_1) # type: ignore[no-untyped-call]
+        exp_services.delete_exploration(self.owner_id, self.EXP_ID_1)
         self._compare_lists(
             activity_services.get_featured_activity_references(), [
                 self._create_exploration_reference(self.EXP_ID_0),
@@ -147,7 +147,7 @@ class ActivityServicesTests(test_utils.GenericTestBase):
         self._compare_lists(
             activity_services.get_featured_activity_references(), [
                 self._create_exploration_reference(self.EXP_ID_0)])
-        exp_services.delete_exploration(self.owner_id, self.EXP_ID_0) # type: ignore[no-untyped-call]
+        exp_services.delete_exploration(self.owner_id, self.EXP_ID_0)
         self._compare_lists(
             activity_services.get_featured_activity_references(), [])
 
@@ -166,7 +166,7 @@ class ActivityServicesTests(test_utils.GenericTestBase):
             activity_services.get_featured_activity_references(),
             exploration_references)
 
-        exp_services.delete_explorations( # type: ignore[no-untyped-call]
+        exp_services.delete_explorations(
             self.owner_id, [self.EXP_ID_0, self.EXP_ID_1])
         self._compare_lists(
             activity_services.get_featured_activity_references(), [])

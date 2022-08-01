@@ -937,7 +937,7 @@ class UserContributionsModelTests(test_utils.GenericTestBase):
         self.save_new_valid_exploration(
             self.EXP_ID_1, self.user_b_id, end_state_name='End')
 
-        exp_services.update_exploration( # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.user_a_id, self.EXP_ID_1, [exp_domain.ExplorationChange(
                 {
                     'cmd': 'edit_exploration_property',
@@ -948,7 +948,7 @@ class UserContributionsModelTests(test_utils.GenericTestBase):
         self.save_new_valid_exploration(
             self.EXP_ID_2, self.user_b_id, end_state_name='End')
 
-        exp_services.update_exploration( # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             self.user_a_id, self.EXP_ID_2, [exp_domain.ExplorationChange(
                 {
                     'cmd': 'edit_exploration_property',
