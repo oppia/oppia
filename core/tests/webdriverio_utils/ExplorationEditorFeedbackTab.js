@@ -171,7 +171,7 @@ var ExplorationEditorFeedbackTab = function() {
     await waitFor.visibilityOf(
       feedbackStatusElement, 'Feedback status is not visible.');
     await waitFor.textToBePresentInElement(
-      feedbackStatusElement,
+      '.e2e-test-oppia-feedback-status-name',
       feedbackStatus,
       `Expected ${await feedbackStatusElement.getText()} ` +
       `to be ${feedbackStatus}`);

@@ -76,7 +76,7 @@ var ContributorDashboardAdminPage = function() {
     await action.click('Submit assign reviewer button', submitButton);
 
     await waitFor.textToBePresentInElement(
-      statusMessage, 'Success', (
+      '.e2e-test-status-message', 'Success', (
         'Status message for adding contribution rights takes too long to' +
         ' appear'));
   };
@@ -100,7 +100,7 @@ var ContributorDashboardAdminPage = function() {
     await action.click('View reviewer role button', submitButton);
 
     await waitFor.textToBePresentInElement(
-      statusMessage, 'Success',
+      '.e2e-test-status-message', 'Success',
       'Could not view contribution rights successfully');
 
     if (category === CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION) {

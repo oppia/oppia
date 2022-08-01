@@ -6,7 +6,6 @@ var childProcess = require('child_process');
 var Constants = require('./webdriverio_utils/WebdriverioConstants');
 var DOWNLOAD_PATH = path.resolve(__dirname, Constants.DOWNLOAD_PATH);
 var args = process.argv;
-require('longjohn');
 
 // When tests is running in debug mode, the chrome version number
 // is passed as 7th argument else it is passed as 6th argument.
@@ -113,7 +112,6 @@ exports.config = {
     browserName: 'chrome',
     'goog:chromeOptions': {
       args: [
-        'headless',
         '--lang=en-EN',
         '--window-size=1285x1000',
         // These arguments let us simulate recording from a microphone.

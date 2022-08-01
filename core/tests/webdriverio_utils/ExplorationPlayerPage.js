@@ -216,9 +216,9 @@ var ExplorationPlayerPage = function() {
     var lastElement = conversationContents.length - 1;
     await waitFor.visibilityOf(
       conversationContents[lastElement], 'Ending message not visible');
-    await waitFor.textToBePresentInElement(
-      conversationContents[lastElement], 'Congratulations, you have finished!',
-      'Ending Message Not Visible');
+    // await waitFor.textToBePresentInElement(
+    //   conversationContents[lastElement], 'Congratulations, you have finished!',
+    //   'Ending Message Not Visible');
     let conversationContentText = await action.getText(
       'Conversation Content Element', conversationContents[lastElement]);
     expect(
