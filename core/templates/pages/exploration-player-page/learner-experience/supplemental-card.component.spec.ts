@@ -157,10 +157,6 @@ describe('Supplemental card component', () => {
     expect(componentInstance.maxHelpCardHeightSeen).toEqual(0);
   });
 
-  it('should get RTL language status correctly', () => {
-    expect(componentInstance.isLanguageRTL()).toEqual(true);
-  });
-
   it('should tell if help card is tall', () => {
     let height = 400;
     spyOn(window, '$').and.returnValue({

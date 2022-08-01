@@ -17,6 +17,7 @@
  */
 
 import { Component } from '@angular/core';
+
 import { AppConstants } from 'app.constants';
 import { RatingComputationService } from 'components/ratings/rating-computation/rating-computation.service';
 import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
@@ -25,10 +26,12 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { LoggerService } from 'services/contextual/logger.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { LoaderService } from 'services/loader.service';
 import { UserService } from 'services/user.service';
 import { ProfilePageBackendApiService } from './profile-page-backend-api.service';
+
+import './profile-page.component.css';
+
 
 interface ViewedProfileUsername {
   title: string;
@@ -87,7 +90,6 @@ export class ProfilePageComponent {
     private urlInterpolationService: UrlInterpolationService,
     private userService: UserService,
     private windowRef: WindowRef,
-    private i18nLanguageCodeService: I18nLanguageCodeService
   ) { }
 
   ngOnInit(): void {
@@ -264,9 +266,5 @@ export class ProfilePageComponent {
 
   getLocaleDateString(millisSinceEpoch: number): string {
     return this.dateTimeFormatService.getLocaleDateString(millisSinceEpoch);
-  }
-
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 }

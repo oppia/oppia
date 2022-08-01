@@ -33,6 +33,7 @@ import {
   FeaturedTranslationLanguage,
   FeaturedTranslationLanguageBackendDict,
 } from 'domain/opportunity/featured-translation-language.model';
+import { UserService } from 'services/user.service';
 
 import constants from 'assets/constants';
 
@@ -88,6 +89,10 @@ interface TopicNamesBackendDict {
   'topic_names': string[];
 }
 
+interface PreferredTranslationLanguageBackendDict {
+  'preferred_translation_language_code': string|null;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -96,6 +101,7 @@ export class ContributionOpportunitiesBackendApiService {
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private http: HttpClient,
+    private userService: UserService,
   ) {}
 
   private _getExplorationOpportunityFromDict(
@@ -240,12 +246,51 @@ export class ContributionOpportunitiesBackendApiService {
     try {
       const response = await this.http
         .get<TopicNamesBackendDict>('/gettranslatabletopicnames').toPromise();
-      response.topic_names.unshift('All');
+      // TODO(#15648): Re-enable "All Topics" after fetching latency is fixed.
+      // response.topic_names.unshift('All');
 
       return response.topic_names;
     } catch {
       return [];
     }
+  }
+
+  async savePreferredTranslationLanguageAsync(
+      languageCode: string
+  ): Promise<void> {
+    return this.userService.getUserInfoAsync().then(
+      (userInfo) => {
+        if (userInfo.isLoggedIn()) {
+          return this.http.post<void>(
+            '/preferredtranslationlanguage',
+            {language_code: languageCode}
+          ).toPromise().catch((errorResponse) => {
+            throw new Error(errorResponse.error.error);
+          });
+        }
+      }
+    );
+  }
+
+  async getPreferredTranslationLanguageAsync(
+  ): Promise<string|null> {
+    const emptyResponse = {
+      preferred_translation_language_code: null
+    };
+    return this.userService.getUserInfoAsync().then(
+      async(userInfo) => {
+        if (userInfo.isLoggedIn()) {
+          const res = (
+            await this.http.get<PreferredTranslationLanguageBackendDict>(
+              '/preferredtranslationlanguage'
+            ).toPromise().catch(() => emptyResponse)
+          );
+          return res.preferred_translation_language_code;
+        } else {
+          return null;
+        }
+      }
+    );
   }
 }
 

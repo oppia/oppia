@@ -24,7 +24,7 @@ import { Injectable, Pipe, PipeTransform} from '@angular/core';
 @Pipe({name: 'formatTime'})
 export class FormatTimePipe implements PipeTransform {
   transform(input: number): string {
-    let formatNum = function(n) {
+    let formatNum = function(n: number) {
       return (n < 10 ? '0' : '') + n;
     };
 

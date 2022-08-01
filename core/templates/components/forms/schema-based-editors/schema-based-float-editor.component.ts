@@ -49,7 +49,7 @@ interface OppiaValidator {
 })
 export class SchemaBasedFloatEditorComponent
 implements ControlValueAccessor, OnInit, Validator {
-  localValue: number;
+  localValue: number | null;
   @Input() disabled: boolean = false;
   @Input() validators: OppiaValidator[];
   @Input() labelForFocusTarget: string;
@@ -113,9 +113,9 @@ implements ControlValueAccessor, OnInit, Validator {
       ) === undefined);
   }
 
-  updateLocalValue(value: number): void {
-    this.localValue = value;
-    this.generateErrors();
+  updateLocalValue(value: string): void {
+    this.localStringValue = value;
+    this.parseInput();
     this.onChange(this.localValue);
   }
 
@@ -190,6 +190,7 @@ implements ControlValueAccessor, OnInit, Validator {
   onKeypress(evt: KeyboardEvent): void {
     if (evt.keyCode === 13) {
       if (
+        this.floatForm.form.controls.floatValue.errors !== null &&
         Object.keys(
           this.floatForm.form.controls.floatValue.errors
         ).length !== 0

@@ -39,7 +39,8 @@ from core.domain import param_domain
 from core.domain import state_domain
 from core.domain import translation_domain
 
-from typing import Dict, List
+from typing import Dict, List, Optional
+from typing_extensions import TypedDict
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
@@ -228,6 +229,23 @@ def clean_math_expression(math_expression):
     return math_expression
 
 
+class MetadataVersionHistoryDict(TypedDict):
+    """Dictionary representing MetadataVersionHistory object."""
+
+    last_edited_version_number: Optional[int]
+    last_edited_committer_id: str
+
+
+class ExplorationVersionHistoryDict(TypedDict):
+    """Dictionary representing ExplorationVersionHistory object."""
+
+    exploration_id: str
+    exploration_version: int
+    state_version_history: Dict[str, state_domain.StateVersionHistoryDict]
+    metadata_version_history: MetadataVersionHistoryDict
+    committer_ids: List[str]
+
+
 class ExplorationChange(change_domain.BaseChange):
     """Domain object class for an exploration change.
 
@@ -368,6 +386,104 @@ class ExplorationChange(change_domain.BaseChange):
     DEPRECATED_COMMANDS = [
         'clone', 'add_gadget', 'edit_gadget_property',
         'delete_gadget', 'rename_gadget']
+
+
+class TransientCheckpointUrl:
+    """Domain object representing the checkpoint progress of a
+    logged-out user.
+    """
+
+    def __init__(
+        self,
+        exploration_id,
+        furthest_reached_checkpoint_state_name,
+        furthest_reached_checkpoint_exp_version,
+        most_recently_reached_checkpoint_state_name,
+        most_recently_reached_checkpoint_exp_version
+    ):
+        """Initializes a TransientCheckpointUrl domain object.
+
+        Args:
+            exploration_id: str. Id of the exploration.
+            furthest_reached_checkpoint_state_name: str. State name of the
+                furthest reached checkpoint in the exploration.
+            furthest_reached_checkpoint_exp_version: int. Exploration version
+                in which the user has completed most checkpoints.
+            most_recently_reached_checkpoint_state_name: str. State name of
+                the most recently reached checkpoint in the exploration.
+            most_recently_reached_checkpoint_exp_version: int. Exploration
+                version in which a checkpoint was most recently reached.
+        """
+        self.exploration_id = exploration_id
+        self.furthest_reached_checkpoint_state_name = (
+            furthest_reached_checkpoint_state_name)
+        self.furthest_reached_checkpoint_exp_version = (
+            furthest_reached_checkpoint_exp_version)
+        self.most_recently_reached_checkpoint_state_name = (
+            most_recently_reached_checkpoint_state_name)
+        self.most_recently_reached_checkpoint_exp_version = (
+            most_recently_reached_checkpoint_exp_version)
+
+    def to_dict(self):
+        """Convert the TransientCheckpointUrl domain instance into a dictionary
+        form with its keys as the attributes of this class.
+
+        Returns:
+            dict. A dictionary containing the TransientCheckpointUrl class
+            information in a dictionary form.
+        """
+
+        return {
+            'exploration_id': self.exploration_id,
+            'furthest_reached_checkpoint_exp_version': (
+                self.furthest_reached_checkpoint_exp_version),
+            'furthest_reached_checkpoint_state_name': (
+                self.furthest_reached_checkpoint_state_name),
+            'most_recently_reached_checkpoint_exp_version': (
+                self.most_recently_reached_checkpoint_exp_version),
+            'most_recently_reached_checkpoint_state_name': (
+                self.most_recently_reached_checkpoint_state_name)
+        }
+
+    def validate(self):
+        """Validates properties of the TransientCheckpointUrl object.
+
+        Raises:
+            ValidationError. One or more attributes of the
+                TransientCheckpointUrl are invalid.
+        """
+        if not isinstance(self.exploration_id, str):
+            raise utils.ValidationError(
+            'Expected exploration_id to be a str, received %s'
+                % self.exploration_id)
+
+        if not isinstance(self.furthest_reached_checkpoint_state_name, str):
+            raise utils.ValidationError(
+                'Expected furthest_reached_checkpoint_state_name to be a str,'
+                'received %s' % self.furthest_reached_checkpoint_state_name
+            )
+
+        if not isinstance(self.furthest_reached_checkpoint_exp_version, int):
+            raise utils.ValidationError(
+                'Expected furthest_reached_checkpoint_exp_version to be an int'
+            )
+
+        if not isinstance(
+            self.most_recently_reached_checkpoint_state_name, str
+        ):
+            raise utils.ValidationError(
+                'Expected most_recently_reached_checkpoint_state_name to be a'
+                ' str, received %s'
+                % self.most_recently_reached_checkpoint_state_name
+            )
+
+        if not isinstance(
+            self.most_recently_reached_checkpoint_exp_version, int
+        ):
+            raise utils.ValidationError(
+                'Expected most_recently_reached_checkpoint_exp_version'
+                ' to be an int'
+            )
 
 
 class ExplorationCommitLogEntry:
@@ -560,6 +676,13 @@ class VersionedExplorationInteractionIdsMapping:
         """
         self.version = version
         self.state_interaction_ids_dict = state_interaction_ids_dict
+
+
+class VersionedExplorationStatesDict(TypedDict):
+    """Dictionary representing the versioned State objects for Exploration."""
+
+    states_schema_version: int
+    states: Dict[str, state_domain.StateDict]
 
 
 class Exploration(translation_domain.BaseTranslatableObject):
@@ -928,6 +1051,15 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     raise utils.ValidationError(
                         'Expected outcome dest to be a string, received %s'
                         % answer_group.outcome.dest)
+
+                outcome = answer_group.outcome
+                if outcome.dest_if_really_stuck is not None:
+                    if not isinstance(outcome.dest_if_really_stuck, str):
+                        raise utils.ValidationError(
+                            'Expected dest_if_really_stuck to be a '
+                            'string, received %s' %
+                            outcome.dest_if_really_stuck)
+
             if state.interaction.default_outcome is not None:
                 if not state.interaction.default_outcome.dest:
                     raise utils.ValidationError(
@@ -936,6 +1068,16 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     raise utils.ValidationError(
                         'Expected outcome dest to be a string, received %s'
                         % state.interaction.default_outcome.dest)
+
+                default_outcome = state.interaction.default_outcome
+                if default_outcome.dest_if_really_stuck is not None:
+                    if not isinstance(
+                        default_outcome.dest_if_really_stuck, str
+                    ):
+                        raise utils.ValidationError(
+                            'Expected dest_if_really_stuck to be a '
+                            'string, received %s'
+                            % default_outcome.dest_if_really_stuck)
 
         if self.states_schema_version is None:
             raise utils.ValidationError(
@@ -1032,10 +1174,27 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         'The destination %s is not a valid state.'
                         % default_outcome.dest)
 
+                # Check default if-stuck destinations.
+                if (
+                    default_outcome.dest_if_really_stuck is not None and
+                    default_outcome.dest_if_really_stuck not in all_state_names
+                ):
+                    raise utils.ValidationError(
+                        'The destination for the stuck learner %s '
+                        'is not a valid state.'
+                        % default_outcome.dest_if_really_stuck)
+
+                if default_outcome.dest_if_really_stuck == state_name:
+                    raise utils.ValidationError(
+                        'The destination for a stuck learner cannot be the '
+                        'same state.')
+
                 # Check that, if the outcome is a non-self-loop, then the
                 # refresher_exploration_id is None.
-                if (default_outcome.refresher_exploration_id is not None and
-                        default_outcome.dest != state_name):
+                if (
+                    default_outcome.refresher_exploration_id is not None and
+                    default_outcome.dest != state_name
+                ):
                     raise utils.ValidationError(
                         'The default outcome for state %s has a refresher '
                         'exploration ID, but is not a self-loop.' % state_name)
@@ -1047,10 +1206,30 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         'The destination %s is not a valid state.'
                         % group.outcome.dest)
 
+                # Check group if-stuck destinations.
+                if (
+                    group.outcome.dest_if_really_stuck is not None and
+                    group.outcome.dest_if_really_stuck not in all_state_names
+                ):
+                    raise utils.ValidationError(
+                        'The destination for the stuck learner %s '
+                        'is not a valid state.'
+                        % group.outcome.dest_if_really_stuck)
+
+                if (
+                    group.outcome.dest_if_really_stuck is not None and
+                    group.outcome.dest_if_really_stuck == state_name
+                ):
+                    raise utils.ValidationError(
+                        'The destination for a stuck learner cannot be the '
+                        'same state.')
+
                 # Check that, if the outcome is a non-self-loop, then the
                 # refresher_exploration_id is None.
-                if (group.outcome.refresher_exploration_id is not None and
-                        group.outcome.dest != state_name):
+                if (
+                    group.outcome.refresher_exploration_id is not None and
+                    group.outcome.dest != state_name
+                ):
                     raise utils.ValidationError(
                         'The outcome for an answer group in state %s has a '
                         'refresher exploration ID, but is not a self-loop.'
@@ -1179,8 +1358,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 if default_outcome is not None:
                     # Check that, if the outcome is a self-loop, then the
                     # outcome is not labelled as correct.
-                    if (default_outcome.dest == state_name and
-                            default_outcome.labelled_as_correct):
+                    if (
+                        default_outcome.dest == state_name and
+                        default_outcome.labelled_as_correct
+                    ):
                         raise utils.ValidationError(
                             'The default outcome for state %s is labelled '
                             'correct but is a self-loop.' % state_name)
@@ -1188,11 +1369,22 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 for group in interaction.answer_groups:
                     # Check that, if the outcome is a self-loop, then the
                     # outcome is not labelled as correct.
-                    if (group.outcome.dest == state_name and
-                            group.outcome.labelled_as_correct):
+                    if (
+                        group.outcome.dest == state_name and
+                        group.outcome.labelled_as_correct
+                    ):
                         raise utils.ValidationError(
                             'The outcome for an answer group in state %s is '
                             'labelled correct but is a self-loop.' % state_name)
+
+                    if (
+                        group.outcome.labelled_as_correct and
+                        group.outcome.dest_if_really_stuck is not None
+                    ):
+                        raise utils.ValidationError(
+                            'The outcome for the state is labelled '
+                            'correct but a destination for the stuck learner '
+                            'is specified.')
 
             if len(warnings_list) > 0:
                 warning_str = ''
@@ -1695,6 +1887,16 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         return content_count
 
+    def get_metadata(self):
+        """Gets the ExplorationMetadata domain object for the exploration."""
+        return ExplorationMetadata(
+            self.title, self. category, self.objective, self.language_code,
+            self.tags, self.blurb, self.author_notes,
+            self.states_schema_version, self.init_state_name,
+            self.param_specs, self.param_changes, self.auto_tts_enabled,
+            self.correctness_feedback_enabled, self.edits_allowed
+        )
+
     @classmethod
     def _convert_states_v41_dict_to_v42_dict(cls, states_dict):
         """Converts from version 41 to 42. Version 42 changes rule input types
@@ -2089,6 +2291,31 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return states_dict
 
     @classmethod
+    def _convert_states_v50_dict_to_v51_dict(cls, states_dict):
+        """Converts from version 50 to 51. Version 51 adds a new
+        dest_if_really_stuck field to Outcome class to redirect learners
+        to a state for strengthening concepts when they get really stuck.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        for state_dict in states_dict.values():
+            answer_groups = state_dict['interaction']['answer_groups']
+            for answer_group in answer_groups:
+                answer_group['outcome']['dest_if_really_stuck'] = None
+
+            if state_dict['interaction']['default_outcome'] is not None:
+                state_dict['interaction'][
+                    'default_outcome']['dest_if_really_stuck'] = None
+
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states,
             current_states_schema_version, init_state_name):
@@ -2125,7 +2352,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 55
+    CURRENT_EXP_SCHEMA_VERSION = 56
     EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION = 46
 
     @classmethod
@@ -2332,6 +2559,29 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return exploration_dict
 
     @classmethod
+    def _convert_v55_dict_to_v56_dict(cls, exploration_dict):
+        """Converts a v55 exploration dict into a v56 exploration dict.
+        Version 56 adds a new dest_if_really_stuck field to the Outcome class
+        to redirect the learners to a state for strengthening concepts when
+        they get really stuck.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v55.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v56.
+        """
+        exploration_dict['schema_version'] = 56
+
+        exploration_dict['states'] = cls._convert_states_v50_dict_to_v51_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 51
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(cls, yaml_content):
         """Return the YAML content of the exploration in the latest schema
         format.
@@ -2411,6 +2661,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
             exploration_dict = cls._convert_v54_dict_to_v55_dict(
                 exploration_dict)
             exploration_schema_version = 55
+
+        if exploration_schema_version == 55:
+            exploration_dict = cls._convert_v55_dict_to_v56_dict(
+                exploration_dict)
+            exploration_schema_version = 56
 
         return exploration_dict
 
@@ -3304,3 +3559,216 @@ class ExplorationChangeMergeVerifier:
             break
 
         return changes_are_mergeable, False
+
+
+class ExplorationMetadata:
+    """Class to represent the exploration metadata properties."""
+
+    def __init__(
+        self, title, category, objective, language_code, tags, blurb,
+        author_notes, states_schema_version, init_state_name, param_specs,
+        param_changes, auto_tts_enabled, correctness_feedback_enabled,
+        edits_allowed
+    ):
+        """Initializes an ExplorationMetadata domain object.
+
+        Args:
+            title: str. The exploration title.
+            category: str. The category of the exploration.
+            objective: str. The objective of the exploration.
+            language_code: str. The language code of the exploration.
+            tags: list(str). The tags given to the exploration.
+            blurb: str. The blurb of the exploration.
+            author_notes: str. The author notes.
+            states_schema_version: int. Tbe schema version of the exploration.
+            init_state_name: str. The name for the initial state of the
+                exploration.
+            param_specs: dict(str, ParamSpec). A dict where each key-value pair
+                represents respectively, a param spec name and a ParamSpec
+                domain object.
+            param_changes: list(ParamChange). List of ParamChange domain
+                objects.
+            auto_tts_enabled: bool. True if automatic text-to-speech is
+                enabled.
+            correctness_feedback_enabled: bool. True if correctness feedback is
+                enabled.
+            edits_allowed: bool. True when edits to the exploration is allowed.
+        """
+        self.title = title
+        self.category = category
+        self.objective = objective
+        self.language_code = language_code
+        self.tags = tags
+        self.blurb = blurb
+        self.author_notes = author_notes
+        self.states_schema_version = states_schema_version
+        self.init_state_name = init_state_name
+        self.param_specs = param_specs
+        self.param_changes = param_changes
+        self.auto_tts_enabled = auto_tts_enabled
+        self.correctness_feedback_enabled = correctness_feedback_enabled
+        self.edits_allowed = edits_allowed
+
+    def to_dict(self):
+        """Gets the dict representation of ExplorationMetadata domain object.
+
+        Returns:
+            dict. The dict representation of the ExplorationMetadata
+            domain object.
+        """
+        return {
+            'title': self.title,
+            'category': self.category,
+            'objective': self.objective,
+            'language_code': self.language_code,
+            'tags': self.tags,
+            'blurb': self.blurb,
+            'author_notes': self.author_notes,
+            'states_schema_version': self.states_schema_version,
+            'init_state_name': self.init_state_name,
+            'param_specs': {
+                ps_name: ps_value.to_dict()
+                for (ps_name, ps_value) in self.param_specs.items()
+            },
+            'param_changes': [
+                p_change.to_dict() for p_change in self.param_changes
+            ],
+            'auto_tts_enabled': self.auto_tts_enabled,
+            'correctness_feedback_enabled': self.correctness_feedback_enabled,
+            'edits_allowed': self.edits_allowed
+        }
+
+
+class MetadataVersionHistory:
+    """Class to represent an element of the version history list of the
+    exploration metadata.
+
+    Attributes:
+        last_edited_version_number: int. The version number of the
+            exploration in which the metadata was last edited.
+        last_edited_committer_id: str. The user id of the user who committed
+            the latest changes to the exploration metadata.
+    """
+
+    def __init__(
+        self,
+        last_edited_version_number: Optional[int],
+        last_edited_committer_id: str
+    ):
+        """Initializes the MetadataVersionHistory domain object.
+
+        Args:
+            last_edited_version_number: int. The version number of the
+                exploration in which the metadata was last edited.
+            last_edited_committer_id: str. The user id of the user who
+                committed the latest changes to the exploration metadata.
+        """
+        self.last_edited_version_number = last_edited_version_number
+        self.last_edited_committer_id = last_edited_committer_id
+
+    def to_dict(self) -> MetadataVersionHistoryDict:
+        """Returns a dict representation of the MetadataVersionHistory domain
+        object.
+
+        Returns:
+            dict. The dict representation of the MetadataVersionHistory domain
+            object.
+        """
+        return {
+            'last_edited_version_number': self.last_edited_version_number,
+            'last_edited_committer_id': self.last_edited_committer_id
+        }
+
+    @classmethod
+    def from_dict(
+        cls,
+        metadata_version_history_dict: MetadataVersionHistoryDict
+    ) -> MetadataVersionHistory:
+        """Returns an MetadataVersionHistory domain object from a dict.
+
+        Args:
+            metadata_version_history_dict: dict. The dict representation of
+                MetadataVersionHistory object.
+
+        Returns:
+            MetadataVersionHistory. The corresponding MetadataVersionHistory
+            domain object.
+        """
+        return cls(
+            metadata_version_history_dict['last_edited_version_number'],
+            metadata_version_history_dict['last_edited_committer_id']
+        )
+
+
+class ExplorationVersionHistory:
+    """Class to represent the version history of an exploration at a
+    particular version.
+
+    Attributes:
+        exploration_id: str. The id of the exploration.
+        exploration_version: int. The version number of the exploration.
+        state_version_history: Dict[str, StateVersionHistory].
+            The mapping of state names and StateVersionHistory domain objects.
+        metadata_version_history: MetadataVersionHistory. The details of the
+            last commit on the exploration metadata.
+        committer_ids: List[str]. A list of user ids who made the
+            'previous commit' on each state and the exploration metadata.
+    """
+
+    def __init__(
+        self,
+        exploration_id: str,
+        exploration_version: int,
+        state_version_history_dict: Dict[
+            str, state_domain.StateVersionHistoryDict
+        ],
+        metadata_last_edited_version_number: Optional[int],
+        metadata_last_edited_committer_id: str,
+        committer_ids: List[str]
+    ) -> None:
+        """Initializes the ExplorationVersionHistory domain object.
+
+        Args:
+            exploration_id: str. The id of the exploration.
+            exploration_version: int. The version number of the exploration.
+            state_version_history_dict: dict. The mapping of state names and
+                dicts of StateVersionHistory domain objects.
+            metadata_last_edited_version_number: int. The version number of the
+                exploration in which the metadata was last edited.
+            metadata_last_edited_committer_id: str. The user id of the user who
+                committed the latest changes to the exploration metadata.
+            committer_ids: List[str]. A list of user ids who made the
+                'previous commit' on each state and the exploration metadata.
+        """
+        self.exploration_id = exploration_id
+        self.exploration_version = exploration_version
+        self.state_version_history = {
+            state_name: state_domain.StateVersionHistory.from_dict(vh_dict)
+            for state_name, vh_dict in state_version_history_dict.items()
+        }
+        self.metadata_version_history = MetadataVersionHistory(
+            metadata_last_edited_version_number,
+            metadata_last_edited_committer_id
+        )
+        self.committer_ids = committer_ids
+
+    def to_dict(self) -> ExplorationVersionHistoryDict:
+        """Returns a dict representation of the ExplorationVersionHistory
+        domain object.
+
+        Returns:
+            dict. A dict representation of the ExplorationVersionHistory
+            domain object.
+        """
+        return {
+            'exploration_id': self.exploration_id,
+            'exploration_version': self.exploration_version,
+            'state_version_history': {
+                state_name: state_vh.to_dict()
+                for state_name, state_vh in self.state_version_history.items()
+            },
+            'metadata_version_history': (
+                self.metadata_version_history.to_dict()
+            ),
+            'committer_ids': self.committer_ids
+        }

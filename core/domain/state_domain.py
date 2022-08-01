@@ -34,6 +34,9 @@ from core.domain import param_domain
 from core.domain import translation_domain
 from extensions.objects.models import objects
 
+from typing import Any, Dict, List, Mapping, Optional, Union
+from typing_extensions import TypedDict
+
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import interaction_registry  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import rules_registry  # pylint: disable=invalid-import-from # isort:skip
@@ -41,6 +44,23 @@ from core.domain import translatable_object_registry  # pylint: disable=invalid-
 
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
+
+
+class AnswerGroupDict(TypedDict):
+    """Dictionary representing the AnswerGroup object."""
+
+    outcome: OutcomeDict
+    rule_specs: List[RuleSpecDict]
+    training_data: List[str]
+    tagged_skill_misconception_id: Optional[str]
+
+
+class StateVersionHistoryDict(TypedDict):
+    """Dictionary representing the StateVersionHistory object."""
+
+    previously_edited_in_version: Optional[int]
+    state_name_in_previous_version: Optional[str]
+    committer_id: str
 
 
 class AnswerGroup(translation_domain.BaseTranslatableObject):
@@ -52,8 +72,12 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
     """
 
     def __init__(
-            self, outcome, rule_specs, training_data,
-            tagged_skill_misconception_id):
+        self,
+        outcome: Outcome,
+        rule_specs: List[RuleSpec],
+        training_data: List[str],
+        tagged_skill_misconception_id: Optional[str]
+    ) -> None:
         """Initializes a AnswerGroup domain object.
 
         Args:
@@ -99,7 +123,7 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
             )
         return translatable_contents_collection
 
-    def to_dict(self):
+    def to_dict(self) -> AnswerGroupDict:
         """Returns a dict representing this AnswerGroup domain object.
 
         Returns:
@@ -114,7 +138,7 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
         }
 
     @classmethod
-    def from_dict(cls, answer_group_dict):
+    def from_dict(cls, answer_group_dict: AnswerGroupDict) -> AnswerGroup:
         """Return a AnswerGroup domain object from a dict.
 
         Args:
@@ -291,10 +315,19 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
         return answer_group_dict
 
 
+class HintDict(TypedDict):
+    """Dictionary representing the Hint object."""
+
+    hint_content: SubtitledHtmlDict
+
+
 class Hint(translation_domain.BaseTranslatableObject):
     """Value object representing a hint."""
 
-    def __init__(self, hint_content):
+    def __init__(
+        self,
+        hint_content: SubtitledHtml
+    ) -> None:
         """Constructs a Hint domain object.
 
         Args:
@@ -321,7 +354,7 @@ class Hint(translation_domain.BaseTranslatableObject):
             self.hint_content.html)
         return translatable_contents_collection
 
-    def to_dict(self):
+    def to_dict(self) -> HintDict:
         """Returns a dict representing this Hint domain object.
 
         Returns:
@@ -332,7 +365,7 @@ class Hint(translation_domain.BaseTranslatableObject):
         }
 
     @classmethod
-    def from_dict(cls, hint_dict):
+    def from_dict(cls, hint_dict: HintDict) -> Hint:
         """Return a Hint domain object from a dict.
 
         Args:
@@ -367,6 +400,18 @@ class Hint(translation_domain.BaseTranslatableObject):
         return hint_dict
 
 
+# Here, correct_answer is annotated with Any type. Because correct_answer
+# can accept values of type List[Set[str]], List[str], str, int, Dict and
+# other types too. So, to make it generalized for every types of values.
+# We used Any type here.
+class SolutionDict(TypedDict):
+    """Dictionary representing the Solution object."""
+
+    answer_is_exclusive: bool
+    correct_answer: Any
+    explanation: SubtitledHtmlDict
+
+
 class Solution(translation_domain.BaseTranslatableObject):
     """Value object representing a solution.
 
@@ -378,9 +423,17 @@ class Solution(translation_domain.BaseTranslatableObject):
     an explanation for the solution.
     """
 
+    # Here, argument `correct_answer` is annotated with Any type. Because
+    # correct_answer can accept values of type List[Set[str]], List[str], str,
+    # int, Dict and other types too. So, to make it generalized for every types
+    # of values. We used Any type here.
     def __init__(
-            self, interaction_id, answer_is_exclusive,
-            correct_answer, explanation):
+        self,
+        interaction_id: str,
+        answer_is_exclusive: bool,
+        correct_answer: Any,
+        explanation: SubtitledHtml
+    ) -> None:
         """Constructs a Solution domain object.
 
         Args:
@@ -419,7 +472,7 @@ class Solution(translation_domain.BaseTranslatableObject):
             self.explanation.html)
         return translatable_contents_collection
 
-    def to_dict(self):
+    def to_dict(self) -> SolutionDict:
         """Returns a dict representing this Solution domain object.
 
         Returns:
@@ -432,7 +485,11 @@ class Solution(translation_domain.BaseTranslatableObject):
         }
 
     @classmethod
-    def from_dict(cls, interaction_id, solution_dict):
+    def from_dict(
+        cls,
+        interaction_id: str,
+        solution_dict: SolutionDict
+    ) -> Solution:
         """Return a Solution domain object from a dict.
 
         Args:
@@ -531,15 +588,42 @@ class Solution(translation_domain.BaseTranslatableObject):
         return solution_dict
 
 
+# Here, in 'customization_args', we used Any type because it accepts
+# the values of customization args and that values can be of type str, int,
+# bool, List and other types too. So to make it generalize for every type
+# of values, we used Any here.
+class InteractionInstanceDict(TypedDict):
+    """Dictionary representing the InteractionInstance object."""
+
+    id: str
+    customization_args: Dict[str, Dict[str, Any]]
+    answer_groups: List[AnswerGroupDict]
+    default_outcome: OutcomeDict
+    confirmed_unclassified_answers: List[str]
+    hints: List[HintDict]
+    solution: SolutionDict
+
+
 class InteractionInstance(translation_domain.BaseTranslatableObject):
     """Value object for an instance of an interaction."""
 
     # The default interaction used for a new state.
     _DEFAULT_INTERACTION_ID = None
 
+    # In argument 'customization_args', we used Any type because it accepts
+    # the values of customization args and that values can be of type str, int,
+    # bool, List and other types too. So to make it generalize for every type
+    # of values, we used Any here.
     def __init__(
-            self, interaction_id, customization_args, answer_groups,
-            default_outcome, confirmed_unclassified_answers, hints, solution):
+        self,
+        interaction_id: str,
+        customization_args: Dict[str, Dict[str, Any]],
+        answer_groups: List[AnswerGroup],
+        default_outcome: Outcome,
+        confirmed_unclassified_answers: List[str],
+        hints: List[Hint],
+        solution: Solution
+    ) -> None:
         """Initializes a InteractionInstance domain object.
 
         Args:
@@ -881,6 +965,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
         """
         default_outcome = Outcome(
             default_dest_state_name,
+            None,
             SubtitledHtml.create_default_subtitled_html(
                 feconf.DEFAULT_OUTCOME_CONTENT_ID), False, {}, None, None)
 
@@ -1389,6 +1474,17 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
         }
 
 
+class OutcomeDict(TypedDict):
+    """Dictionary representing the Outcome object."""
+
+    dest: str
+    feedback: SubtitledHtmlDict
+    labelled_as_correct: bool
+    param_changes: List[param_domain.ParamChangeDict]
+    refresher_exploration_id: Optional[str]
+    missing_prerequisite_skill_id: Optional[str]
+
+
 class Outcome(translation_domain.BaseTranslatableObject):
     """Value object representing an outcome of an interaction. An outcome
     consists of a destination state, feedback to show the user, and any
@@ -1396,12 +1492,21 @@ class Outcome(translation_domain.BaseTranslatableObject):
     """
 
     def __init__(
-            self, dest, feedback, labelled_as_correct, param_changes,
-            refresher_exploration_id, missing_prerequisite_skill_id):
+        self,
+        dest: str,
+        dest_if_really_stuck: Optional[str],
+        feedback: SubtitledHtml,
+        labelled_as_correct: bool,
+        param_changes: List[param_domain.ParamChange],
+        refresher_exploration_id: Optional[str],
+        missing_prerequisite_skill_id: Optional[str]
+    ) -> None:
         """Initializes a Outcome domain object.
 
         Args:
             dest: str. The name of the destination state.
+            dest_if_really_stuck: str or None. The name of the optional state
+                to redirect the learner to strengthen their concepts.
             feedback: SubtitledHtml. Feedback to give to the user if this rule
                 is triggered.
             labelled_as_correct: bool. Whether this outcome has been labelled
@@ -1420,6 +1525,9 @@ class Outcome(translation_domain.BaseTranslatableObject):
         # Id of the destination state.
         # TODO(sll): Check that this state actually exists.
         self.dest = dest
+        # An optional destination state to redirect the learner to
+        # strengthen their concepts corresponding to a particular card.
+        self.dest_if_really_stuck = dest_if_really_stuck
         # Feedback to give the reader if this rule is triggered.
         self.feedback = feedback
         # Whether this outcome has been labelled by the creator as
@@ -1454,7 +1562,7 @@ class Outcome(translation_domain.BaseTranslatableObject):
             self.feedback.html)
         return translatable_contents_collection
 
-    def to_dict(self):
+    def to_dict(self) -> OutcomeDict:
         """Returns a dict representing this Outcome domain object.
 
         Returns:
@@ -1462,6 +1570,7 @@ class Outcome(translation_domain.BaseTranslatableObject):
         """
         return {
             'dest': self.dest,
+            'dest_if_really_stuck': self.dest_if_really_stuck,
             'feedback': self.feedback.to_dict(),
             'labelled_as_correct': self.labelled_as_correct,
             'param_changes': [
@@ -1471,7 +1580,7 @@ class Outcome(translation_domain.BaseTranslatableObject):
         }
 
     @classmethod
-    def from_dict(cls, outcome_dict):
+    def from_dict(cls, outcome_dict: OutcomeDict) -> Outcome:
         """Return a Outcome domain object from a dict.
 
         Args:
@@ -1484,6 +1593,7 @@ class Outcome(translation_domain.BaseTranslatableObject):
         feedback.validate()
         return cls(
             outcome_dict['dest'],
+            outcome_dict['dest_if_really_stuck'],
             feedback,
             outcome_dict['labelled_as_correct'],
             [param_domain.ParamChange(
@@ -1544,10 +1654,19 @@ class Outcome(translation_domain.BaseTranslatableObject):
         return outcome_dict
 
 
+class VoiceoverDict(TypedDict):
+    """Dictionary representing the Voiceover object."""
+
+    filename: str
+    file_size_bytes: int
+    needs_update: bool
+    duration_secs: float
+
+
 class Voiceover:
     """Value object representing an voiceover."""
 
-    def to_dict(self):
+    def to_dict(self) -> VoiceoverDict:
         """Returns a dict representing this Voiceover domain object.
 
         Returns:
@@ -1577,7 +1696,13 @@ class Voiceover:
             voiceover_dict['needs_update'],
             voiceover_dict['duration_secs'])
 
-    def __init__(self, filename, file_size_bytes, needs_update, duration_secs):
+    def __init__(
+        self,
+        filename: str,
+        file_size_bytes: int,
+        needs_update: bool,
+        duration_secs: float
+    ) -> None:
         """Initializes a Voiceover domain object.
 
         Args:
@@ -1646,6 +1771,14 @@ class Voiceover:
                 self.duration_secs)
 
 
+class WrittenTranslationDict(TypedDict):
+    """Dictionary representing the WrittenTranslation object."""
+
+    data_format: str
+    translation: Union[str, List[str]]
+    needs_update: bool
+
+
 class WrittenTranslation:
     """Value object representing a written translation for a content.
 
@@ -1685,7 +1818,12 @@ class WrittenTranslation:
             cls.DATA_FORMAT_SET_OF_UNICODE_STRING
         )
 
-    def __init__(self, data_format, translation, needs_update):
+    def __init__(
+        self,
+        data_format: str,
+        translation: Union[str, List[str]],
+        needs_update: bool
+    ) -> None:
         """Initializes a WrittenTranslation domain object.
 
         Args:
@@ -1701,7 +1839,7 @@ class WrittenTranslation:
         self.translation = translation
         self.needs_update = needs_update
 
-    def to_dict(self):
+    def to_dict(self) -> WrittenTranslationDict:
         """Returns a dict representing this WrittenTranslation domain object.
 
         Returns:
@@ -1714,7 +1852,9 @@ class WrittenTranslation:
         }
 
     @classmethod
-    def from_dict(cls, written_translation_dict):
+    def from_dict(
+        cls, written_translation_dict: WrittenTranslationDict
+    ) -> WrittenTranslation:
         """Return a WrittenTranslation domain object from a dict.
 
         Args:
@@ -1757,13 +1897,22 @@ class WrittenTranslation:
                 self.needs_update)
 
 
+class WrittenTranslationsDict(TypedDict):
+    """Dictionary representing the WrittenTranslations object."""
+
+    translations_mapping: Dict[str, Dict[str, WrittenTranslationDict]]
+
+
 class WrittenTranslations:
     """Value object representing a content translations which stores
     translated contents of all state contents (like hints, feedback etc.) in
     different languages linked through their content_id.
     """
 
-    def __init__(self, translations_mapping):
+    def __init__(
+        self,
+        translations_mapping: Dict[str, Dict[str, WrittenTranslation]]
+    ) -> None:
         """Initializes a WrittenTranslations domain object.
 
         Args:
@@ -1773,7 +1922,7 @@ class WrittenTranslations:
         """
         self.translations_mapping = translations_mapping
 
-    def to_dict(self):
+    def to_dict(self) -> WrittenTranslationsDict:
         """Returns a dict representing this WrittenTranslations domain object.
 
         Returns:
@@ -1794,7 +1943,9 @@ class WrittenTranslations:
         return written_translations_dict
 
     @classmethod
-    def from_dict(cls, written_translations_dict):
+    def from_dict(
+        cls, written_translations_dict: WrittenTranslationsDict
+    ) -> WrittenTranslations:
         """Return a WrittenTranslations domain object from a dict.
 
         Args:
@@ -1876,7 +2027,7 @@ class WrittenTranslations:
             self.translations_mapping[content_id][language_code] = (
                 written_translation)
 
-    def validate(self, expected_content_id_list):
+    def validate(self, expected_content_id_list: List[str]) -> None:
         """Validates properties of the WrittenTranslations.
 
         Args:
@@ -2051,13 +2202,21 @@ class WrittenTranslations:
         return written_translations_dict
 
 
+class RecordedVoiceoversDict(TypedDict):
+    """Dictionary representing the RecordedVoiceovers object."""
+
+    voiceovers_mapping: Dict[str, Dict[str, VoiceoverDict]]
+
+
 class RecordedVoiceovers:
     """Value object representing a recorded voiceovers which stores voiceover of
     all state contents (like hints, feedback etc.) in different languages linked
     through their content_id.
     """
 
-    def __init__(self, voiceovers_mapping):
+    def __init__(
+        self, voiceovers_mapping: Dict[str, Dict[str, Voiceover]]
+    ) -> None:
         """Initializes a RecordedVoiceovers domain object.
 
         Args:
@@ -2067,7 +2226,7 @@ class RecordedVoiceovers:
         """
         self.voiceovers_mapping = voiceovers_mapping
 
-    def to_dict(self):
+    def to_dict(self) -> RecordedVoiceoversDict:
         """Returns a dict representing this RecordedVoiceovers domain object.
 
         Returns:
@@ -2088,7 +2247,9 @@ class RecordedVoiceovers:
         return recorded_voiceovers_dict
 
     @classmethod
-    def from_dict(cls, recorded_voiceovers_dict):
+    def from_dict(
+        cls, recorded_voiceovers_dict: RecordedVoiceoversDict
+    ) -> RecordedVoiceovers:
         """Return a RecordedVoiceovers domain object from a dict.
 
         Args:
@@ -2110,7 +2271,7 @@ class RecordedVoiceovers:
 
         return cls(voiceovers_mapping)
 
-    def validate(self, expected_content_id_list):
+    def validate(self, expected_content_id_list: List[str]) -> None:
         """Validates properties of the RecordedVoiceovers.
 
         Args:
@@ -2210,10 +2371,21 @@ class RecordedVoiceovers:
         self.voiceovers_mapping.pop(content_id, None)
 
 
+class RuleSpecDict(TypedDict):
+    """Dictionary representing the RuleSpec object."""
+
+    rule_type: str
+    inputs: Mapping[str, Union[str, int, List[str], List[List[str]]]]
+
+
 class RuleSpec(translation_domain.BaseTranslatableObject):
     """Value object representing a rule specification."""
 
-    def __init__(self, rule_type, inputs):
+    def __init__(
+        self,
+        rule_type: str,
+        inputs: Mapping[str, Union[str, int, List[str], List[List[str]]]]
+    ) -> None:
         """Initializes a RuleSpec domain object.
 
         Args:
@@ -2227,6 +2399,9 @@ class RuleSpec(translation_domain.BaseTranslatableObject):
                 enclosed in {{...}} braces.
         """
         self.rule_type = rule_type
+        # Here, we are narrowing down the type from Mapping to Dict. Because
+        # Mapping is used just to accept the different types of allowed Dicts.
+        assert isinstance(inputs, dict)
         self.inputs = inputs
 
     def get_translatable_contents_collection(
@@ -2256,7 +2431,7 @@ class RuleSpec(translation_domain.BaseTranslatableObject):
                     input_value['unicodeStrSet'])
         return translatable_contents_collection
 
-    def to_dict(self):
+    def to_dict(self) -> RuleSpecDict:
         """Returns a dict representing this RuleSpec domain object.
 
         Returns:
@@ -2268,7 +2443,7 @@ class RuleSpec(translation_domain.BaseTranslatableObject):
         }
 
     @classmethod
-    def from_dict(cls, rulespec_dict):
+    def from_dict(cls, rulespec_dict: RuleSpecDict) -> RuleSpec:
         """Return a RuleSpec domain object from a dict.
 
         Args:
@@ -2439,10 +2614,21 @@ class RuleSpec(translation_domain.BaseTranslatableObject):
         return rule_spec_dict
 
 
+class SubtitledHtmlDict(TypedDict):
+    """Dictionary representing the SubtitledHtml object."""
+
+    content_id: str
+    html: str
+
+
 class SubtitledHtml:
     """Value object representing subtitled HTML."""
 
-    def __init__(self, content_id, html):
+    def __init__(
+        self,
+        content_id: str,
+        html: str
+    ) -> None:
         """Initializes a SubtitledHtml domain object. Note that initializing
         the SubtitledHtml object does not clean the html. This is because we
         sometimes need to initialize SubtitledHtml and migrate the contained
@@ -2463,7 +2649,7 @@ class SubtitledHtml:
         self.content_id = content_id
         self.html = html
 
-    def to_dict(self):
+    def to_dict(self) -> SubtitledHtmlDict:
         """Returns a dict representing this SubtitledHtml domain object.
 
         Returns:
@@ -2475,7 +2661,7 @@ class SubtitledHtml:
         }
 
     @classmethod
-    def from_dict(cls, subtitled_html_dict):
+    def from_dict(cls, subtitled_html_dict: SubtitledHtmlDict) -> SubtitledHtml:
         """Return a SubtitledHtml domain object from a dict.
 
         Args:
@@ -2488,7 +2674,7 @@ class SubtitledHtml:
         return cls(
             subtitled_html_dict['content_id'], subtitled_html_dict['html'])
 
-    def validate(self):
+    def validate(self) -> None:
         """Validates properties of the SubtitledHtml, and cleans the html.
 
         Raises:
@@ -2641,14 +2827,37 @@ class TranslatableItem:
         }
 
 
+class StateDict(TypedDict):
+    """Dictionary representing the State object."""
+
+    content: SubtitledHtmlDict
+    param_changes: List[param_domain.ParamChangeDict]
+    interaction: InteractionInstanceDict
+    recorded_voiceovers: RecordedVoiceoversDict
+    written_translations: WrittenTranslationsDict
+    solicit_answer_details: bool
+    card_is_checkpoint: bool
+    next_content_id_index: int
+    linked_skill_id: Optional[str]
+    classifier_model_id: Optional[str]
+
+
 class State(translation_domain.BaseTranslatableObject):
     """Domain object for a state."""
 
     def __init__(
-            self, content, param_changes, interaction, recorded_voiceovers,
-            written_translations, solicit_answer_details, card_is_checkpoint,
-            next_content_id_index, linked_skill_id=None,
-            classifier_model_id=None):
+        self,
+        content: SubtitledHtml,
+        param_changes: List[param_domain.ParamChange],
+        interaction: InteractionInstance,
+        recorded_voiceovers: RecordedVoiceovers,
+        written_translations: WrittenTranslations,
+        solicit_answer_details: bool,
+        card_is_checkpoint: bool,
+        next_content_id_index: int,
+        linked_skill_id: Optional[str] = None,
+        classifier_model_id: Optional[str] = None
+    ) -> None:
         """Initializes a State domain object.
 
         Args:
@@ -3562,7 +3771,7 @@ class State(translation_domain.BaseTranslatableObject):
 
         return content_id_to_translatable_item
 
-    def to_dict(self):
+    def to_dict(self) -> StateDict:
         """Returns a dict representing this State domain object.
 
         Returns:
@@ -3583,7 +3792,7 @@ class State(translation_domain.BaseTranslatableObject):
         }
 
     @classmethod
-    def from_dict(cls, state_dict):
+    def from_dict(cls, state_dict: StateDict) -> State:
         """Return a State domain object from a dict.
 
         Args:
@@ -3789,3 +3998,75 @@ class State(translation_domain.BaseTranslatableObject):
             self.interaction.get_all_html_content_strings() + [
                 self.content.html])
         return html_list
+
+
+class StateVersionHistory:
+    """Class to represent an element of the version history list of a state.
+    The version history list of a state is the list of exploration versions
+    in which the state has been edited.
+
+    Attributes:
+        previously_edited_in_version: int. The version number of the
+            exploration in which the state was previously edited.
+        state_name_in_previous_version: str. The name of the state in the
+            previously edited version. It is useful in case of state renames.
+        committer_id: str. The id of the user who committed the changes in the
+            previously edited version.
+    """
+
+    def __init__(
+        self,
+        previously_edited_in_version: Optional[int],
+        state_name_in_previous_version: Optional[str],
+        committer_id: str
+    ) -> None:
+        """Initializes the StateVersionHistory domain object.
+
+        Args:
+            previously_edited_in_version: int. The version number of the
+                exploration on which the state was previously edited.
+            state_name_in_previous_version: str. The name of the state in the
+                previously edited version. It is useful in case of state
+                renames.
+            committer_id: str. The id of the user who committed the changes in
+                the previously edited version.
+        """
+        self.previously_edited_in_version = previously_edited_in_version
+        self.state_name_in_previous_version = state_name_in_previous_version
+        self.committer_id = committer_id
+
+    def to_dict(self) -> StateVersionHistoryDict:
+        """Returns a dict representation of the StateVersionHistory domain
+        object.
+
+        Returns:
+            dict. The dict representation of the StateVersionHistory domain
+            object.
+        """
+        return {
+            'previously_edited_in_version': self.previously_edited_in_version,
+            'state_name_in_previous_version': (
+                self.state_name_in_previous_version),
+            'committer_id': self.committer_id
+        }
+
+    @classmethod
+    def from_dict(
+        cls,
+        state_version_history_dict: StateVersionHistoryDict
+    ) -> StateVersionHistory:
+        """Return a StateVersionHistory domain object from a dict.
+
+        Args:
+            state_version_history_dict: dict. The dict representation of
+                StateVersionHistory object.
+
+        Returns:
+            StateVersionHistory. The corresponding StateVersionHistory domain
+            object.
+        """
+        return cls(
+            state_version_history_dict['previously_edited_in_version'],
+            state_version_history_dict['state_name_in_previous_version'],
+            state_version_history_dict['committer_id']
+        )

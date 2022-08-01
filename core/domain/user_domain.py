@@ -55,6 +55,7 @@ class UserSettingsDict(TypedDict):
     preferred_language_codes: List[str]
     preferred_site_language_code: Optional[str]
     preferred_audio_language_code: Optional[str]
+    preferred_translation_language_code: Optional[str]
     pin: Optional[str]
     display_alias: Optional[str]
     deleted: bool
@@ -95,6 +96,9 @@ class UserSettings:
             preferences specified by the user.
         preferred_site_language_code: str or None. System language preference.
         preferred_audio_language_code: str or None. Audio language preference.
+        preferred_translation_language_code: str or None. Text Translation
+            language preference of the translator that persists on the
+            contributor dashboard.
         pin: str or None. The PIN of the user's profile for android.
         display_alias: str or None. Display name of a user who is logged
             into the Android app. None when the request is coming from web
@@ -129,6 +133,7 @@ class UserSettings:
         preferred_language_codes: Optional[List[str]] = None,
         preferred_site_language_code: Optional[str] = None,
         preferred_audio_language_code: Optional[str] = None,
+        preferred_translation_language_code: Optional[str] = None,
         pin: Optional[str] = None,
         display_alias: Optional[str] = None,
         deleted: bool = False,
@@ -173,6 +178,9 @@ class UserSettings:
                 preference.
             preferred_audio_language_code: str or None. Default language used
                 for audio translations preference.
+            preferred_translation_language_code: str or None. Text Translation
+                language preference of the translator that persists on the
+                contributor dashboard.
             pin: str or None. The PIN of the user's profile for android.
             display_alias: str or None. Display name of a user who is logged
                 into the Android app. None when the request is coming from
@@ -204,6 +212,8 @@ class UserSettings:
             preferred_language_codes if preferred_language_codes else [])
         self.preferred_site_language_code = preferred_site_language_code
         self.preferred_audio_language_code = preferred_audio_language_code
+        self.preferred_translation_language_code = (
+            preferred_translation_language_code)
         self.pin = pin
         self.display_alias = display_alias
         self.banned = banned
@@ -352,6 +362,8 @@ class UserSettings:
             modifiable_user_data.preferred_site_language_code)
         self.preferred_audio_language_code = (
             modifiable_user_data.preferred_audio_language_code)
+        self.preferred_translation_language_code = (
+            modifiable_user_data.preferred_translation_language_code)
         self.pin = modifiable_user_data.pin
 
     def to_dict(self) -> UserSettingsDict:
@@ -390,6 +402,8 @@ class UserSettings:
                 self.preferred_site_language_code),
             'preferred_audio_language_code': (
                 self.preferred_audio_language_code),
+            'preferred_translation_language_code': (
+                self.preferred_translation_language_code),
             'pin': self.pin,
             'display_alias': self.display_alias,
             'deleted': self.deleted,
@@ -1212,6 +1226,7 @@ class ModifiableUserDataDict(TypedDict):
     preferred_language_codes: List[str]
     preferred_site_language_code: Optional[str]
     preferred_audio_language_code: Optional[str]
+    preferred_translation_language_code: Optional[str]
     user_id: Optional[str]
 
 
@@ -1224,6 +1239,7 @@ class RawUserDataDict(TypedDict):
     preferred_language_codes: List[str]
     preferred_site_language_code: Optional[str]
     preferred_audio_language_code: Optional[str]
+    preferred_translation_language_code: Optional[str]
     user_id: Optional[str]
 
 
@@ -1239,6 +1255,7 @@ class ModifiableUserData:
         preferred_language_codes: List[str],
         preferred_site_language_code: Optional[str],
         preferred_audio_language_code: Optional[str],
+        preferred_translation_language_code: Optional[str],
         user_id: Optional[str] = None
     ) -> None:
         """Constructs a ModifiableUserData domain object.
@@ -1253,6 +1270,9 @@ class ModifiableUserData:
                 preference.
             preferred_audio_language_code: str or None. Audio language
                 preference.
+            preferred_translation_language_code: str or None. Text Translation
+                language preference of the translator that persists on the
+                contributor dashboard.
             user_id: str or None. User ID of the user whose data is being
                 updated. None if request did not have a user_id for the user
                 yet and expects the backend to create a new user entry for it.
@@ -1262,6 +1282,8 @@ class ModifiableUserData:
         self.preferred_language_codes = preferred_language_codes
         self.preferred_site_language_code = preferred_site_language_code
         self.preferred_audio_language_code = preferred_audio_language_code
+        self.preferred_translation_language_code = (
+            preferred_translation_language_code)
         # The user_id is not intended to be a modifiable attribute, it is just
         # needed to identify the object.
         self.user_id = user_id
@@ -1286,6 +1308,7 @@ class ModifiableUserData:
             modifiable_user_data_dict['preferred_language_codes'],
             modifiable_user_data_dict['preferred_site_language_code'],
             modifiable_user_data_dict['preferred_audio_language_code'],
+            modifiable_user_data_dict['preferred_translation_language_code'],
             modifiable_user_data_dict['user_id'],
         )
 
@@ -1481,3 +1504,117 @@ class ExplorationUserData:
             'most_recently_reached_checkpoint_state_name': (
                 self.most_recently_reached_checkpoint_state_name)
         }
+
+
+class LearnerGroupsUserDict(TypedDict):
+    """Dictionary for LearnerGroupsUser domain object."""
+
+    user_id: str
+    invited_to_learner_groups_ids: List[str]
+    learner_groups_user_details: List[LearnerGroupUserDetailsDict]
+    learner_groups_user_details_schema_version: int
+
+
+class LearnerGroupUserDetailsDict(TypedDict):
+    """Dictionary for user details of a particular learner group."""
+
+    group_id: str
+    progress_sharing_is_turned_on: bool
+
+
+class LearnerGroupUserDetails:
+    """Domain object for user details of a particular learner group."""
+
+    def __init__(
+        self,
+        group_id: str,
+        progress_sharing_is_turned_on: bool
+    ) -> None:
+        """Constructs a LearnerGroupUserDetails domain object.
+
+        Attributes:
+            group_id: str. The id of the learner group.
+            progress_sharing_is_turned_on: bool. Whether progress sharing is
+                turned on for the learner group.
+        """
+        self.group_id = group_id
+        self.progress_sharing_is_turned_on = progress_sharing_is_turned_on
+
+    def to_dict(self) -> LearnerGroupUserDetailsDict:
+        """Convert the LearnerGroupUserDetails domain instance into a
+        dictionary form with its keys as the attributes of this class.
+
+        Returns:
+            dict. A dictionary containing the LearnerGroupUserDetails class
+            information in a dictionary form.
+        """
+        return {
+            'group_id': self.group_id,
+            'progress_sharing_is_turned_on': self.progress_sharing_is_turned_on
+        }
+
+
+class LearnerGroupsUser:
+    """Domain object for learner groups user."""
+
+    def __init__(
+        self,
+        user_id: str,
+        invited_to_learner_groups_ids: List[str],
+        learner_groups_user_details: List[LearnerGroupUserDetails],
+        learner_groups_user_details_schema_version: int
+    ) -> None:
+        """Constructs a LearnerGroupsUser domain object.
+
+        Attributes:
+            user_id: str. The user id.
+            invited_to_learner_groups_ids: list(str). List of learner group ids
+                that the user has been invited to join as student.
+            learner_groups_user_details:
+                list(LearnerGroupUserDetails). List of user details of
+                all learner groups that the user is student of.
+            learner_groups_user_details_schema_version: int. The version
+                of the learner groups user details schema blob.
+        """
+        self.user_id = user_id
+        self.invited_to_learner_groups_ids = invited_to_learner_groups_ids
+        self.learner_groups_user_details = learner_groups_user_details
+        self.learner_groups_user_details_schema_version = (
+            learner_groups_user_details_schema_version)
+
+    def to_dict(self) -> LearnerGroupsUserDict:
+        """Convert the LearnerGroupsUser domain instance into a dictionary
+        form with its keys as the attributes of this class.
+
+        Returns:
+            dict. A dictionary containing the LearnerGroupsUser class
+            information in a dictionary form.
+        """
+        learner_groups_user_details_dict = [
+            learner_group_details.to_dict()
+            for learner_group_details in self.learner_groups_user_details
+        ]
+
+        return {
+            'user_id': self.user_id,
+            'invited_to_learner_groups_ids':
+                self.invited_to_learner_groups_ids,
+            'learner_groups_user_details': learner_groups_user_details_dict,
+            'learner_groups_user_details_schema_version': (
+                self.learner_groups_user_details_schema_version)
+        }
+
+    def validate(self) -> None:
+        """Validates the LearnerGroupsUser domain object.
+
+        Raises:
+            ValidationError. One or more attributes of the LearnerGroupsUser
+                are invalid.
+        """
+        for learner_group_details in self.learner_groups_user_details:
+            if learner_group_details.group_id in (
+                    self.invited_to_learner_groups_ids):
+                raise utils.ValidationError(
+                    'Learner cannot be invited to join learner group '
+                    '%s since they are already its student.' % (
+                        learner_group_details.group_id))

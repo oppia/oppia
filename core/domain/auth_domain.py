@@ -22,7 +22,7 @@ import collections
 
 from core import utils
 
-from typing import Any, Dict, Optional, Union
+from typing import Any, Optional
 from typing_extensions import TypedDict
 
 # Auth ID refers to an identifier that links many Identity Providers to a single
@@ -105,6 +105,15 @@ class AuthClaims:
             (other.auth_id, other.email, other.role_is_super_admin))
 
 
+class UserAuthDetailsDict(TypedDict):
+    """Dictionary representing the UserAuthDetails object."""
+
+    gae_id: Optional[str]
+    firebase_auth_id: Optional[str]
+    parent_user_id: Optional[str]
+    deleted: bool
+
+
 class UserAuthDetails:
     """Domain object representing a user's authentication details.
 
@@ -126,9 +135,9 @@ class UserAuthDetails:
     def __init__(
         self,
         user_id: str,
-        gae_id: str,
-        firebase_auth_id: str,
-        parent_user_id: str,
+        gae_id: Optional[str],
+        firebase_auth_id: Optional[str],
+        parent_user_id: Optional[str],
         deleted: bool = False
     ) -> None:
         self.user_id = user_id
@@ -198,7 +207,7 @@ class UserAuthDetails:
                     self.gae_id, self.firebase_auth_id, self.parent_user_id))
 
     @property
-    def auth_id(self) -> str:
+    def auth_id(self) -> Optional[str]:
         """Returns the auth ID corresponding to the user account, if any.
 
         This method is a utility for simplifying code that doesn't care about
@@ -213,7 +222,7 @@ class UserAuthDetails:
         """Returns whether self refers to a full user account."""
         return self.auth_id is not None
 
-    def to_dict(self) -> Dict[str, Union[str, bool]]:
+    def to_dict(self) -> UserAuthDetailsDict:
         """Returns values corresponding to UserAuthDetailsModel's properties.
 
         This method is a utility for assigning values to UserAuthDetailsModel:

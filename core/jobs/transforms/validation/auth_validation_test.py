@@ -28,12 +28,16 @@ from core.tests import test_utils
 
 import apache_beam as beam
 
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import auth_models
+
 (auth_models,) = models.Registry.import_models([models.NAMES.auth])
 
 
 class ValidateFirebaseSeedModelIdTests(job_test_utils.PipelinedTestBase):
 
-    def test_reports_error_for_invalid_id(self):
+    def test_reports_error_for_invalid_id(self) -> None:
         model_with_invalid_id = auth_models.FirebaseSeedModel(
             id='2', created_on=self.NOW, last_updated=self.NOW)
 
@@ -48,7 +52,7 @@ class ValidateFirebaseSeedModelIdTests(job_test_utils.PipelinedTestBase):
                 model_with_invalid_id, auth_models.ONLY_FIREBASE_SEED_MODEL_ID),
         ])
 
-    def test_reports_nothing_for_valid_id(self):
+    def test_reports_nothing_for_valid_id(self) -> None:
         model_with_valid_id = auth_models.FirebaseSeedModel(
             id=auth_models.ONLY_FIREBASE_SEED_MODEL_ID,
             created_on=self.NOW, last_updated=self.NOW)
@@ -65,7 +69,7 @@ class ValidateFirebaseSeedModelIdTests(job_test_utils.PipelinedTestBase):
 class ValidateUserIdByFirebaseAuthIdModelIdTests(
         job_test_utils.PipelinedTestBase):
 
-    def test_reports_error_for_invalid_id(self):
+    def test_reports_error_for_invalid_id(self) -> None:
         model_with_invalid_id = auth_models.UserIdByFirebaseAuthIdModel(
             id='-!\'"', user_id='1', created_on=self.NOW, last_updated=self.NOW)
 
@@ -81,7 +85,7 @@ class ValidateUserIdByFirebaseAuthIdModelIdTests(
                 model_with_invalid_id, feconf.FIREBASE_AUTH_ID_REGEX),
         ])
 
-    def test_reports_nothing_for_valid_id(self):
+    def test_reports_nothing_for_valid_id(self) -> None:
         model_with_valid_id = auth_models.UserIdByFirebaseAuthIdModel(
             id='123', user_id='1', created_on=self.NOW, last_updated=self.NOW)
 
@@ -97,24 +101,24 @@ class ValidateUserIdByFirebaseAuthIdModelIdTests(
 
 class RelationshipsOfTests(test_utils.TestBase):
 
-    def test_user_auth_details_model_relationships(self):
-        self.assertItemsEqual(
+    def test_user_auth_details_model_relationships(self) -> None:
+        self.assertItemsEqual(  # type: ignore[no-untyped-call]
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'UserAuthDetailsModel', 'firebase_auth_id'),
             ['UserIdByFirebaseAuthIdModel'])
-        self.assertItemsEqual(
+        self.assertItemsEqual(  # type: ignore[no-untyped-call]
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'UserAuthDetailsModel', 'gae_id'),
             ['UserIdentifiersModel'])
 
-    def test_user_id_by_firebase_auth_id_model_relationships(self):
-        self.assertItemsEqual(
+    def test_user_id_by_firebase_auth_id_model_relationships(self) -> None:
+        self.assertItemsEqual(  # type: ignore[no-untyped-call]
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'UserIdByFirebaseAuthIdModel', 'user_id'),
             ['UserAuthDetailsModel'])
 
-    def test_user_identifiers_model_relationships(self):
-        self.assertItemsEqual(
+    def test_user_identifiers_model_relationships(self) -> None:
+        self.assertItemsEqual(  # type: ignore[no-untyped-call]
             validation_decorators.RelationshipsOf.get_model_kind_references(
                 'UserIdentifiersModel', 'user_id'),
             ['UserAuthDetailsModel'])

@@ -43,6 +43,7 @@ import { ReleaseCoordinatorPageComponent } from 'pages/release-coordinator-page/
 import { ReleaseCoordinatorPageRootComponent } from './release-coordinator-page-root.component';
 import { ReleaseCoordinatorPageRoutingModule } from './release-coordinator-page-routing.module';
 import { Error404PageModule } from 'pages/error-pages/error-404/error-404-page.module';
+import { SmartRouterModule } from 'hybrid-router-module-provider';
 
 @NgModule({
   imports: [
@@ -63,6 +64,9 @@ import { Error404PageModule } from 'pages/error-pages/error-404/error-404-page.m
     MatTooltipModule,
     ReactiveFormsModule,
     SharedComponentsModule,
+    // TODO(#13443): Remove smart router module provider once all pages are
+    // migrated to angular router.
+    SmartRouterModule,
     ReleaseCoordinatorPageRoutingModule,
     Error404PageModule
   ],

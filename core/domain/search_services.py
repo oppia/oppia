@@ -18,49 +18,80 @@
 
 from __future__ import annotations
 
+from core.domain import collection_domain
+from core.domain import exp_domain
 from core.domain import rights_domain
 from core.domain import rights_manager
 from core.platform import models
 
+from typing import List, Optional, Tuple, cast
+from typing_extensions import Final, TypedDict
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import search_services as platform_search_services
+
 platform_search_services = models.Registry.import_search_services()
 
 # Name for the exploration search index.
-SEARCH_INDEX_EXPLORATIONS = 'explorations'
+SEARCH_INDEX_EXPLORATIONS: Final = 'explorations'
 
 # Name for the collection search index.
-SEARCH_INDEX_COLLECTIONS = 'collections'
+SEARCH_INDEX_COLLECTIONS: Final = 'collections'
 
 # This is done to prevent the rank hitting 0 too easily. Note that
 # negative ranks are disallowed in the Search API.
-_DEFAULT_RANK = 20
+_DEFAULT_RANK: Final = 20
 
 
-def index_exploration_summaries(exp_summaries):
+class DomainSearchDict(TypedDict):
+    """Dictionary representing the search dictionary of a domain object."""
+
+    id: str
+    language_code: str
+    title: str
+    category: str
+    tags: List[str]
+    objective: str
+    rank: int
+
+
+def index_exploration_summaries(
+    exp_summaries: List[exp_domain.ExplorationSummary]
+) -> None:
     """Adds the explorations to the search index.
 
     Args:
-        exp_summaries: list(ExpSummaryModel). List of Exp Summary domain
+        exp_summaries: list(ExplorationSummary). List of Exp Summary domain
             objects to be indexed.
     """
+    # The argument `documents` of add_documents_to_index() is annotated
+    # with List[Dict[str, Any]] because this method can accept any kind
+    # of dictionaries, but here we are providing a strict type
+    # `List[DomainSearchDict]` which causes a conflict in type assignment
+    # and due to this MyPy throws an error. So, to silent the error, we used
+    # ignore here.
     platform_search_services.add_documents_to_index([
-        _exp_summary_to_search_dict(exp_summary)
+        _exp_summary_to_search_dict(exp_summary)  # type: ignore[misc]
         for exp_summary in exp_summaries
         if _should_index_exploration(exp_summary)
     ], SEARCH_INDEX_EXPLORATIONS)
 
 
-def _exp_summary_to_search_dict(exp_summary):
+def _exp_summary_to_search_dict(
+    exp_summary: exp_domain.ExplorationSummary
+) -> DomainSearchDict:
     """Updates the dict to be returned, whether the given exploration is to
     be indexed for further queries or not.
 
     Args:
-        exp_summary: ExpSummaryModel. ExplorationSummary domain object.
+        exp_summary: ExplorationSummary. ExplorationSummary domain object.
 
     Returns:
         dict. The representation of the given exploration, in a form that can
         be used by the search index.
     """
-    doc = {
+    doc: DomainSearchDict = {
         'id': exp_summary.id,
         'language_code': exp_summary.language_code,
         'title': exp_summary.title,
@@ -72,12 +103,14 @@ def _exp_summary_to_search_dict(exp_summary):
     return doc
 
 
-def _should_index_exploration(exp_summary):
+def _should_index_exploration(
+    exp_summary: exp_domain.ExplorationSummary
+) -> bool:
     """Returns whether the given exploration should be indexed for future
     search queries.
 
     Args:
-        exp_summary: ExpSummaryModel. ExplorationSummary domain object.
+        exp_summary: ExplorationSummary. ExplorationSummary domain object.
 
     Returns:
         bool. Whether the given exploration should be indexed for future
@@ -89,7 +122,9 @@ def _should_index_exploration(exp_summary):
     )
 
 
-def get_search_rank_from_exp_summary(exp_summary):
+def get_search_rank_from_exp_summary(
+    exp_summary: exp_domain.ExplorationSummary
+) -> int:
     """Returns an integer determining the document's rank in search.
 
     Featured explorations get a ranking bump, and so do explorations that
@@ -117,31 +152,41 @@ def get_search_rank_from_exp_summary(exp_summary):
     return max(rank, 0)
 
 
-def index_collection_summaries(collection_summaries):
+def index_collection_summaries(
+    collection_summaries: List[collection_domain.CollectionSummary]
+) -> None:
     """Adds the collections to the search index.
 
     Args:
-        collection_summaries: list(CollectionSummaryModel). List of
-            Collection Summary domain objects to be indexed.
+        collection_summaries: list(CollectionSummary). List of collection
+            summary domain objects to be indexed.
     """
+    # The argument `documents` of add_documents_to_index() is annotated
+    # with List[Dict[str, Any]] because this method can accept any kind
+    # of dictionaries, but here we are providing a strict type
+    # `List[DomainSearchDict]` which causes a conflict in type assignment
+    # and due to this MyPy throws an error. So, to silent the error, we used
+    # ignore here.
     platform_search_services.add_documents_to_index([
-        _collection_summary_to_search_dict(collection_summary)
+        _collection_summary_to_search_dict(collection_summary)  # type: ignore[misc]
         for collection_summary in collection_summaries
         if _should_index_collection(collection_summary)
     ], SEARCH_INDEX_COLLECTIONS)
 
 
-def _collection_summary_to_search_dict(collection_summary):
+def _collection_summary_to_search_dict(
+    collection_summary: collection_domain.CollectionSummary
+) -> DomainSearchDict:
     """Converts a collection domain object to a search dict.
 
     Args:
-        collection_summary: CollectionSummaryModel. The collection
+        collection_summary: CollectionSummary. The collection
             summary object to be converted.
 
     Returns:
         dict. The search dict of the collection domain object.
     """
-    doc = {
+    doc: DomainSearchDict = {
         'id': collection_summary.id,
         'title': collection_summary.title,
         'category': collection_summary.category,
@@ -153,11 +198,13 @@ def _collection_summary_to_search_dict(collection_summary):
     return doc
 
 
-def _should_index_collection(collection):
+def _should_index_collection(
+    collection: collection_domain.CollectionSummary
+) -> bool:
     """Checks if a particular collection should be indexed.
 
     Args:
-        collection: CollectionSummaryModel. The collection summary model object.
+        collection: CollectionSummary. CollectionSummary domain object.
 
     Returns:
         bool. Whether a particular collection should be indexed.
@@ -166,11 +213,17 @@ def _should_index_collection(collection):
     return rights.status != rights_domain.ACTIVITY_STATUS_PRIVATE
 
 
-def search_explorations(query, categories, language_codes, size, offset=None):
+def search_explorations(
+    query: str,
+    categories: List[str],
+    language_codes: List[str],
+    size: int,
+    offset: Optional[int] = None
+) -> Tuple[List[str], Optional[int]]:
     """Searches through the available explorations.
 
     Args:
-        query: str or None. The query string to search for.
+        query: str. The query string to search for.
         categories: list(str). The list of categories to query for. If it is
             empty, no category filter is applied to the results. If it is not
             empty, then a result is considered valid if it matches at least one
@@ -191,12 +244,24 @@ def search_explorations(query, categories, language_codes, size, offset=None):
               fetch, None otherwise. If an offset is returned, it will be a
               web-safe string that can be used in URLs.
     """
-    return platform_search_services.search(
-        query, SEARCH_INDEX_EXPLORATIONS, categories, language_codes,
-        offset=offset, size=size, ids_only=True)
+    # The return type of 'platform_search_services.search()' method is
+    # tuple with 2 elements. For the first tuple element, it's return type
+    # is Union[List[Dict[str, Any]], List[str]], but here we are sure that
+    # the type of first element is always an List[str]. So, to narrow down
+    # the type from Union to List, we used cast here.
+    result_ids, result_offset = cast(
+        Tuple[List[str], Optional[int]],
+        platform_search_services.search(
+            query, SEARCH_INDEX_EXPLORATIONS,
+            categories, language_codes,
+            offset=offset, size=size,
+            ids_only=True
+        )
+    )
+    return result_ids, result_offset
 
 
-def delete_explorations_from_search_index(exploration_ids):
+def delete_explorations_from_search_index(exploration_ids: List[str]) -> None:
     """Deletes the documents corresponding to these exploration_ids from the
     search index.
 
@@ -208,18 +273,24 @@ def delete_explorations_from_search_index(exploration_ids):
         exploration_ids, SEARCH_INDEX_EXPLORATIONS)
 
 
-def clear_exploration_search_index():
+def clear_exploration_search_index() -> None:
     """WARNING: This runs in-request, and may therefore fail if there are too
     many entries in the index.
     """
     platform_search_services.clear_index(SEARCH_INDEX_EXPLORATIONS)
 
 
-def search_collections(query, categories, language_codes, size, offset=None):
+def search_collections(
+    query: str,
+    categories: List[str],
+    language_codes: List[str],
+    size: int,
+    offset: Optional[int] = None
+) -> Tuple[List[str], Optional[int]]:
     """Searches through the available collections.
 
     Args:
-        query: str or None. The query string to search for.
+        query: str. The query string to search for.
         categories: list(str). The list of categories to query for. If it is
             empty, no category filter is applied to the results. If it is not
             empty, then a result is considered valid if it matches at least one
@@ -240,12 +311,24 @@ def search_collections(query, categories, language_codes, size, offset=None):
               otherwise. If an offset is returned, it will be a web-safe string
               that can be used in URLs.
     """
-    return platform_search_services.search(
-        query, SEARCH_INDEX_COLLECTIONS, categories, language_codes,
-        offset=offset, size=size, ids_only=True)
+    # The return type of 'platform_search_services.search()' method is
+    # tuple with 2 elements. For the first tuple element, it's return type
+    # is Union[List[Dict[str, Any]], List[str]], but here we are sure that
+    # the type of first element is always an List[str]. So, to narrow down
+    # the type from Union to List, we used cast here.
+    result_ids, result_offset = cast(
+        Tuple[List[str], Optional[int]],
+        platform_search_services.search(
+            query, SEARCH_INDEX_COLLECTIONS,
+            categories, language_codes,
+            offset=offset, size=size,
+            ids_only=True
+        )
+    )
+    return result_ids, result_offset
 
 
-def delete_collections_from_search_index(collection_ids):
+def delete_collections_from_search_index(collection_ids: List[str]) -> None:
     """Removes the given collections from the search index.
 
     Args:
@@ -256,7 +339,7 @@ def delete_collections_from_search_index(collection_ids):
         collection_ids, SEARCH_INDEX_COLLECTIONS)
 
 
-def clear_collection_search_index():
+def clear_collection_search_index() -> None:
     """Clears the search index.
 
     WARNING: This runs in-request, and may therefore fail if there are too

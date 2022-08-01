@@ -1,6 +1,3 @@
-<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/pages/library-page/library-page.component.css" as="style">
-<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/pages/library-page/library-page.component.rtl.css" as="style">
-
 <div class="oppia-library-container d-flex">
   <div class="oppia-library-container-inner m-auto">
     <div>
@@ -34,7 +31,7 @@
                                             [numViews]="tile.num_views"
                                             [thumbnailIconUrl]="tile.thumbnail_icon_url"
                                             [thumbnailBgColor]="tile.thumbnail_bg_color"
-                                            class="protractor-test-exp-summary-tile">
+                                            class="e2e-test-exp-summary-tile">
             </oppia-exploration-summary-tile>
           </div>
         </div>
@@ -46,7 +43,7 @@
              width="100%"
              alt="page banner">
         <div class="text-center w-100 mt-4">
-          <h1 class="oppia-library-h1 protractor-test-library-main-header">{{ 'I18N_LIBRARY_MAIN_HEADER' | translate }}</h1>
+          <h1 class="oppia-library-h1 e2e-test-library-main-header">{{ 'I18N_LIBRARY_MAIN_HEADER' | translate }}</h1>
           <h2 class="oppia-library-h2">{{ 'I18N_LIBRARY_SUB_HEADER' | translate }}</h2>
         </div>
 
@@ -61,7 +58,7 @@
             <p class="oppia-classroom-p">{{ 'I18N_CLASSROOM_CALLOUT_PARAGRAPH_1' | translate }}</p>
             <a class="btn oppia-dashboard-intro-button oppia-transition-200"
                href="/learn/math"
-               routerLink="/learn/math">
+               smartRouterLink="/learn/math">
                {{ 'I18N_CLASSROOM_CALLOUT_BUTTON' | translate }}
             </a>
           </div>
@@ -88,7 +85,7 @@
           <div class="oppia-library-group-header-container">
             <h2 [ngClass]="{'active': !libraryWindowIsNarrow && activeGroupIndex === idx}" class="oppia-library-group-header">
               <a *ngIf="group.has_full_results_page"
-                 class="protractor-test-library-{{group.protractor_id}}"
+                 class="e2e-test-library-{{group.protractor_id}}"
                  (click)="showFullResultsPage(group.categories, group.full_results_url)"
                  tabindex="0">
                 <span [translate]="group.header_i18n_id"></span>
@@ -136,7 +133,7 @@
                                                   [numViews]="tile.num_views"
                                                   [thumbnailIconUrl]="tile.thumbnail_icon_url"
                                                   [thumbnailBgColor]="tile.thumbnail_bg_color"
-                                                  class="protractor-test-exp-summary-tile"
+                                                  class="e2e-test-exp-summary-tile"
                                                   [isOwnedByCurrentUser]="activitiesOwned.explorations[tile.id]"
                                                   [showLearnerDashboardIconsIfPossible]="true">
                   </oppia-exploration-summary-tile>
@@ -182,7 +179,7 @@
                                               [numViews]="activity.num_views"
                                               [thumbnailIconUrl]="activity.thumbnail_icon_url"
                                               [thumbnailBgColor]="activity.thumbnail_bg_color"
-                                              class="protractor-test-exp-summary-tile"
+                                              class="e2e-test-exp-summary-tile"
                                               [showLearnerDashboardIconsIfPossible]="true"
                                               [isContainerNarrow]="true"
                                               [mobileCutoffPx]="537">
@@ -203,6 +200,3 @@
     </div>
   </div>
 </div>
-<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
-<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/library-page/library-page.component.css">
-<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/library-page/library-page.component.rtl.css">

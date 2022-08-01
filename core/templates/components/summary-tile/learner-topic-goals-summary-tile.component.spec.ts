@@ -29,6 +29,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { LearnerTopicGoalsSummaryTileComponent } from
   './learner-topic-goals-summary-tile.component';
 import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
+import { StoryNode } from 'domain/story/story-node.model';
 
 
 describe('Learner Topic Goals Summary Tile Component', () => {
@@ -136,7 +137,8 @@ describe('Learner Topic Goals Summary Tile Component', () => {
 
   it('should get # as story node link url if all chapters' +
     ' are read', () => {
-    component.storyNodeToDisplay = null;
+    component.storyNodeToDisplay = StoryNode.createFromIdAndTitle(
+      '1', 'Story node title');
     let storyNodeLink = component.getStoryNodeLink();
     fixture.detectChanges();
     expect(storyNodeLink).toBe('#');

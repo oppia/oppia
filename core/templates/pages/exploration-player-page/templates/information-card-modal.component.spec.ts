@@ -177,8 +177,4 @@ describe('Information card modal component', () => {
       staticImageUrl);
     expect(componentInstance.getStaticImageUrl('')).toEqual(staticImageUrl);
   });
-
-  it('should get RTL language status correctly', () => {
-    expect(componentInstance.isLanguageRTL()).toEqual(true);
-  });
 });

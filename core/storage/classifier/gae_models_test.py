@@ -26,7 +26,7 @@ from core.domain import classifier_domain
 from core.platform import models
 from core.tests import test_utils
 
-from typing import List, cast
+from typing import List
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -448,12 +448,11 @@ class StateTrainingJobsMappingModelUnitTests(test_utils.GenericTestBase):
             classifier_domain.StateTrainingJobsMapping(
                 u'1', 2, 'Home', {'algorithm_id': 'job_id2'}))
 
-        state_training_jobs_mappings_model = cast(
-            List[classifier_models.StateTrainingJobsMappingModel],
-            state_training_jobs_mappings)
         mapping_ids = (
             classifier_models.StateTrainingJobsMappingModel.create_multi(
-                state_training_jobs_mappings_model))
+                state_training_jobs_mappings
+            )
+        )
         self.assertEqual(len(mapping_ids), 2)
 
         mapping1 = (

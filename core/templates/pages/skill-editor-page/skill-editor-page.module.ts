@@ -22,6 +22,9 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { RouterModule } from '@angular/router';
+import { APP_BASE_HREF } from '@angular/common';
+
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { OppiaAngularRootComponent } from
@@ -44,6 +47,8 @@ import { SkillEditorSaveModalComponent } from './modal-templates/skill-editor-sa
 import { SkillMisconceptionsEditorComponent } from './editor-tab/skill-misconceptions-editor/skill-misconceptions-editor.component';
 import { SkillPreviewModalComponent } from './editor-tab/skill-preview-modal.component';
 import { SkillConceptCardEditorComponent } from './editor-tab/skill-concept-card-editor/skill-concept-card-editor.component';
+import { SmartRouterModule } from 'hybrid-router-module-provider';
+import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
 
 @NgModule({
   imports: [
@@ -52,6 +57,10 @@ import { SkillConceptCardEditorComponent } from './editor-tab/skill-concept-card
     DragDropModule,
     HttpClientModule,
     InteractionExtensionsModule,
+    // TODO(#13443): Remove smart router module provider once all pages are
+    // migrated to angular router.
+    SmartRouterModule,
+    RouterModule.forRoot([]),
     SharedComponentsModule,
     ToastrModule.forRoot(toastrConfig)
   ],
@@ -102,6 +111,11 @@ import { SkillConceptCardEditorComponent } from './editor-tab/skill-concept-card
     {
       provide: HAMMER_GESTURE_CONFIG,
       useClass: MyHammerConfig
+    },
+    AppErrorHandlerProvider,
+    {
+      provide: APP_BASE_HREF,
+      useValue: '/'
     }
   ]
 })

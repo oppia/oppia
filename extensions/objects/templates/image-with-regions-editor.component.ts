@@ -338,11 +338,13 @@ export class ImageWithRegionsEditorComponent implements OnInit {
   // Use these two functions to get the calculated image width and
   // height.
   getImageWidth(): number {
-    return this._calculateImageDimensions().width;
+    const width = this._calculateImageDimensions().width;
+    return isNaN(width) ? 0 : width;
   }
 
   getImageHeight(): number {
-    return this._calculateImageDimensions().height;
+    const height = this._calculateImageDimensions().height;
+    return isNaN(height) ? 0 : height;
   }
 
   getPreviewUrl(imageUrl: string): string {

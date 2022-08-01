@@ -44,14 +44,17 @@ export interface Testimonial {
 })
 
 export class TeachPageComponent implements OnInit {
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  classroomUrlFragment!: string;
+  classroomUrl!: string;
+  displayedTestimonialId!: number;
+  libraryUrl!: string;
+  testimonialCount!: number;
+  testimonials: Testimonial[] = [];
   isWindowNarrow: boolean = false;
-  classroomUrlFragment: string;
-  classroomUrl: string;
-  displayedTestimonialId: number;
-  libraryUrl: string;
-  testimonialCount: number;
-  testimonials = [];
-  userIsLoggedIn: boolean = null;
+  userIsLoggedIn: boolean = false;
   directiveSubscriptions = new Subscription();
   constructor(
     private siteAnalyticsService: SiteAnalyticsService,

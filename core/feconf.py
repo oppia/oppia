@@ -25,7 +25,7 @@ import os
 
 from core.constants import constants
 
-from typing import Dict, List, Union
+from typing import Callable, Dict, List, Union
 from typing_extensions import TypedDict
 
 CommandType = (
@@ -148,6 +148,7 @@ class VALID_MODEL_NAMES(enum.Enum): # pylint: disable=invalid-name
     feedback = 'feedback' # pylint: disable=invalid-name
     improvements = 'improvements' # pylint: disable=invalid-name
     job = 'job' # pylint: disable=invalid-name
+    learner_group = 'learner_group' # pylint: disable=invalid-name
     opportunity = 'opportunity' # pylint: disable=invalid-name
     question = 'question' # pylint: disable=invalid-name
     recommendations = 'recommendations' # pylint: disable=invalid-name
@@ -327,7 +328,7 @@ EARLIEST_SUPPORTED_STATE_SCHEMA_VERSION = 41
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_STATE_SCHEMA_VERSION = 50
+CURRENT_STATE_SCHEMA_VERSION = 51
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -569,7 +570,7 @@ GOOGLE_APP_ENGINE_REGION = 'us-central1'
 DATAFLOW_TEMP_LOCATION = 'gs://todo/todo'
 DATAFLOW_STAGING_LOCATION = 'gs://todo/todo'
 
-OPPIA_VERSION = '3.2.5'
+OPPIA_VERSION = '3.2.6'
 OPPIA_PYTHON_PACKAGE_PATH = './build/oppia-beam-job-%s.tar.gz' % OPPIA_VERSION
 
 # Committer id for system actions. The username for the system committer
@@ -681,13 +682,16 @@ MESSAGE_TYPE_FEEDBACK = 'feedback'
 MESSAGE_TYPE_SUGGESTION = 'suggestion'
 
 MODERATOR_ACTION_UNPUBLISH_EXPLORATION = 'unpublish_exploration'
-DEFAULT_SALUTATION_HTML_FN = (
+DEFAULT_SALUTATION_HTML_FN: Callable[[str], str] = (
     lambda recipient_username: 'Hi %s,' % recipient_username)
-DEFAULT_SIGNOFF_HTML_FN = (
+DEFAULT_SIGNOFF_HTML_FN: Callable[[str], str] = (
     lambda sender_username: (
         'Thanks!<br>%s (Oppia moderator)' % sender_username))
 
-VALID_MODERATOR_ACTIONS = {
+VALID_MODERATOR_ACTIONS: Dict[
+    str,
+    Dict[str, Union[str, Callable[[str], str]]]
+] = {
     MODERATOR_ACTION_UNPUBLISH_EXPLORATION: {
         'email_config': 'unpublish_exploration_email_html_body',
         'email_subject_fn': (
@@ -948,6 +952,8 @@ LEARNER_ANSWER_DETAILS_SUBMIT_URL = '/learneranswerdetailshandler'
 LEARNER_DASHBOARD_URL = '/learner-dashboard'
 LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL = (
     '/learnerdashboardtopicsandstoriesprogresshandler/data')
+LEARNER_COMPLETED_CHAPTERS_COUNT_DATA_URL = (
+    '/learnercompletedchapterscounthandler/data')
 LEARNER_DASHBOARD_COLLECTION_DATA_URL = (
     '/learnerdashboardcollectionsprogresshandler/data')
 LEARNER_DASHBOARD_EXPLORATION_DATA_URL = (
@@ -968,6 +974,7 @@ LIBRARY_SEARCH_DATA_URL = '/searchhandler/data'
 LIBRARY_TOP_RATED_URL = '/community-library/top-rated'
 MACHINE_TRANSLATION_DATA_URL = '/machine_translated_state_texts_handler'
 MERGE_SKILLS_URL = '/merge_skills_handler'
+METADATA_VERSION_HISTORY_URL_PREFIX = '/version_history_handler/metadata'
 NEW_COLLECTION_URL = '/collection_editor_handler/create_new'
 NEW_EXPLORATION_URL = '/contributehandler/create_new'
 NEW_QUESTION_URL = '/question_editor_handler/create_new'
@@ -1005,6 +1012,7 @@ SKILL_EDITOR_QUESTION_URL = '/skill_editor_question_handler'
 SKILL_MASTERY_DATA_URL = '/skill_mastery_handler/data'
 SKILL_RIGHTS_URL_PREFIX = '/skill_editor_handler/rights'
 SKILL_DESCRIPTION_HANDLER = '/skill_description_handler'
+STATE_VERSION_HISTORY_URL_PREFIX = '/version_history_handler/state'
 STORY_DATA_HANDLER = '/story_data_handler'
 STORY_EDITOR_URL_PREFIX = '/story_editor'
 STORY_EDITOR_DATA_URL_PREFIX = '/story_editor_handler/data'
@@ -1045,6 +1053,9 @@ USER_EXPLORATION_EMAILS_PREFIX = '/createhandler/notificationpreferences'
 USER_PERMISSIONS_URL_PREFIX = '/createhandler/permissions'
 USERNAME_CHECK_DATA_URL = '/usernamehandler/data'
 VALIDATE_STORY_EXPLORATIONS_URL_PREFIX = '/validate_story_explorations'
+FACILITATOR_DASHBOARD_HANDLER = '/facilitator_dashboard_handler'
+FACILITATOR_DASHBOARD_PAGE_URL = '/facilitator-dashboard'
+CREATE_LEARNER_GROUP_PAGE_URL = '/create-learner-group'
 
 # Event types.
 EVENT_TYPE_ALL_STATS = 'all_stats'
@@ -1374,49 +1385,62 @@ ALLOWED_ACTIVITY_STATUS = [
     constants.ACTIVITY_STATUS_PRIVATE, constants.ACTIVITY_STATUS_PUBLIC]
 
 # Commands allowed in CollectionRightsChange and ExplorationRightsChange.
-COMMON_RIGHTS_ALLOWED_COMMANDS: List[CommandType] = [{
+COMMON_RIGHTS_ALLOWED_COMMANDS: List[ValidCmdDict] = [{
     'name': CMD_CREATE_NEW,
     'required_attribute_names': [],
     'optional_attribute_names': [],
-    'user_id_attribute_names': []
+    'user_id_attribute_names': [],
+    'allowed_values': {},
+    'deprecated_values': {}
 }, {
     'name': CMD_CHANGE_ROLE,
     'required_attribute_names': ['assignee_id', 'old_role', 'new_role'],
     'optional_attribute_names': [],
     'user_id_attribute_names': ['assignee_id'],
     'allowed_values': {
-        'new_role': ALLOWED_ACTIVITY_ROLES, 'old_role': ALLOWED_ACTIVITY_ROLES}
+        'new_role': ALLOWED_ACTIVITY_ROLES, 'old_role': ALLOWED_ACTIVITY_ROLES
+    },
+    'deprecated_values': {}
 }, {
     'name': CMD_REMOVE_ROLE,
     'required_attribute_names': ['removed_user_id', 'old_role'],
     'optional_attribute_names': [],
     'user_id_attribute_names': ['removed_user_id'],
-    'allowed_values': {'old_role': ALLOWED_ACTIVITY_ROLES}
+    'allowed_values': {'old_role': ALLOWED_ACTIVITY_ROLES},
+    'deprecated_values': {}
 }, {
     'name': CMD_CHANGE_PRIVATE_VIEWABILITY,
     'required_attribute_names': [
         'old_viewable_if_private', 'new_viewable_if_private'],
     'optional_attribute_names': [],
-    'user_id_attribute_names': []
+    'user_id_attribute_names': [],
+    'allowed_values': {},
+    'deprecated_values': {}
 }, {
     'name': CMD_RELEASE_OWNERSHIP,
     'required_attribute_names': [],
     'optional_attribute_names': [],
-    'user_id_attribute_names': []
+    'user_id_attribute_names': [],
+    'allowed_values': {},
+    'deprecated_values': {}
 }, {
     'name': CMD_UPDATE_FIRST_PUBLISHED_MSEC,
     'required_attribute_names': [
         'old_first_published_msec', 'new_first_published_msec'],
     'optional_attribute_names': [],
-    'user_id_attribute_names': []
+    'user_id_attribute_names': [],
+    'allowed_values': {},
+    'deprecated_values': {}
 }, {
     'name': CMD_DELETE_COMMIT,
     'required_attribute_names': [],
     'optional_attribute_names': [],
-    'user_id_attribute_names': []
+    'user_id_attribute_names': [],
+    'allowed_values': {},
+    'deprecated_values': {}
 }]
 
-COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS: List[CommandType] = copy.deepcopy(
+COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS: List[ValidCmdDict] = copy.deepcopy(
     COMMON_RIGHTS_ALLOWED_COMMANDS
 )
 COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS.append({
@@ -1427,7 +1451,8 @@ COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS.append({
     'allowed_values': {
         'old_status': ALLOWED_ACTIVITY_STATUS,
         'new_status': ALLOWED_ACTIVITY_STATUS
-    }
+    },
+    'deprecated_values': {}
 })
 
 EXPLORATION_RIGHTS_CHANGE_ALLOWED_COMMANDS = copy.deepcopy(
@@ -1459,11 +1484,13 @@ ROLE_MANAGER = 'manager'
 ALLOWED_TOPIC_ROLES = [ROLE_NONE, ROLE_MANAGER]
 
 # Commands allowed in TopicRightsChange.
-TOPIC_RIGHTS_CHANGE_ALLOWED_COMMANDS: List[CommandType] = [{
+TOPIC_RIGHTS_CHANGE_ALLOWED_COMMANDS: List[ValidCmdDict] = [{
     'name': CMD_CREATE_NEW,
     'required_attribute_names': [],
     'optional_attribute_names': [],
-    'user_id_attribute_names': []
+    'user_id_attribute_names': [],
+    'allowed_values': {},
+    'deprecated_values': {}
 }, {
     'name': CMD_CHANGE_ROLE,
     'required_attribute_names': ['assignee_id', 'new_role', 'old_role'],
@@ -1471,27 +1498,36 @@ TOPIC_RIGHTS_CHANGE_ALLOWED_COMMANDS: List[CommandType] = [{
     'user_id_attribute_names': ['assignee_id'],
     'allowed_values': {
         'new_role': ALLOWED_TOPIC_ROLES, 'old_role': ALLOWED_TOPIC_ROLES
-    }
+    },
+    'deprecated_values': {}
 }, {
     'name': CMD_REMOVE_MANAGER_ROLE,
     'required_attribute_names': ['removed_user_id'],
     'optional_attribute_names': [],
-    'user_id_attribute_names': ['removed_user_id']
+    'user_id_attribute_names': ['removed_user_id'],
+    'allowed_values': {},
+    'deprecated_values': {}
 }, {
     'name': CMD_PUBLISH_TOPIC,
     'required_attribute_names': [],
     'optional_attribute_names': [],
-    'user_id_attribute_names': []
+    'user_id_attribute_names': [],
+    'allowed_values': {},
+    'deprecated_values': {}
 }, {
     'name': CMD_UNPUBLISH_TOPIC,
     'required_attribute_names': [],
     'optional_attribute_names': [],
-    'user_id_attribute_names': []
+    'user_id_attribute_names': [],
+    'allowed_values': {},
+    'deprecated_values': {}
 }, {
     'name': CMD_DELETE_COMMIT,
     'required_attribute_names': [],
     'optional_attribute_names': [],
-    'user_id_attribute_names': []
+    'user_id_attribute_names': [],
+    'allowed_values': {},
+    'deprecated_values': {}
 }]
 
 USER_ID_RANDOM_PART_LENGTH = 32

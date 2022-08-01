@@ -78,6 +78,7 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
                 self.story_id_2))
         self.topic.meta_tag_content = 'topic meta content'
         self.topic.page_title_fragment_for_web = 'topic page title'
+        self.topic.skill_ids_for_diagnostic_test = [self.skill_id_2]
 
         topic_services.save_new_topic(self.admin_id, self.topic)
         story_services.save_new_story(self.admin_id, self.story_1)
@@ -306,11 +307,12 @@ class TopicPageDataHandlerTests(
             constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
         self.topic.practice_tab_is_displayed = True
         subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
-            1, 'Subtopic Title 1')
+            1, 'Subtopic Title 1', 'url-frag-one')
         subtopic_1.skill_ids = [self.skill_id_2]
         subtopic_1.url_fragment = 'sub-one-frag'
         self.topic.subtopics = [subtopic_1]
         self.topic.next_subtopic_id = 2
+        self.topic.skill_ids_for_diagnostic_test = [self.skill_id_2]
         topic_services.save_new_topic(self.admin_id, self.topic)
         topic_services.publish_topic(self.topic_id, self.admin_id)
         self.save_new_skill(
@@ -358,11 +360,12 @@ class TopicPageDataHandlerTests(
             constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
         self.topic.practice_tab_is_displayed = True
         subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
-            1, 'Subtopic Title 1')
+            1, 'Subtopic Title 1', 'url-frag-one')
         subtopic_1.skill_ids = [self.skill_id_2]
         subtopic_1.url_fragment = 'sub-one-frag'
         self.topic.subtopics = [subtopic_1]
         self.topic.next_subtopic_id = 2
+        self.topic.skill_ids_for_diagnostic_test = [self.skill_id_2]
         topic_services.save_new_topic(self.admin_id, self.topic)
         topic_services.publish_topic(self.topic_id, self.admin_id)
         self.save_new_skill(
@@ -412,11 +415,12 @@ class TopicPageDataHandlerTests(
             constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
         self.topic.practice_tab_is_displayed = True
         subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
-            1, 'Subtopic Title 1')
+            1, 'Subtopic Title 1', 'url-frag-one')
         subtopic_1.skill_ids = ['skill_id_1']
         subtopic_1.url_fragment = 'sub-one-frag'
         self.topic.subtopics = [subtopic_1]
         self.topic.next_subtopic_id = 2
+        self.topic.skill_ids_for_diagnostic_test = ['skill_id_1']
         topic_services.save_new_topic(self.admin_id, self.topic)
         topic_services.publish_topic(self.topic_id, self.admin_id)
         for i in range(number_of_skills):
@@ -461,11 +465,12 @@ class TopicPageDataHandlerTests(
             constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
         self.topic.practice_tab_is_displayed = False
         subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
-            1, 'Subtopic Title 1')
+            1, 'Subtopic Title 1', 'url-frag-one')
         subtopic_1.skill_ids = ['skill_id_1']
         subtopic_1.url_fragment = 'sub-one-frag'
         self.topic.subtopics = [subtopic_1]
         self.topic.next_subtopic_id = 2
+        self.topic.skill_ids_for_diagnostic_test = ['skill_id_1']
         topic_services.save_new_topic(self.admin_id, self.topic)
         topic_services.publish_topic(self.topic_id, self.admin_id)
         for i in range(number_of_skills):
@@ -512,11 +517,12 @@ class TopicPageDataHandlerTests(
             constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
         self.topic.practice_tab_is_displayed = True
         subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
-            1, 'Subtopic Title 1')
+            1, 'Subtopic Title 1', 'url-frag-one')
         subtopic_1.skill_ids = ['skill_id_1']
         subtopic_1.url_fragment = 'sub-one-frag'
         self.topic.subtopics = [subtopic_1]
         self.topic.next_subtopic_id = 2
+        self.topic.skill_ids_for_diagnostic_test = ['skill_id_1']
         topic_services.save_new_topic(self.admin_id, self.topic)
         topic_services.publish_topic(self.topic_id, self.admin_id)
         for i in range(number_of_skills):

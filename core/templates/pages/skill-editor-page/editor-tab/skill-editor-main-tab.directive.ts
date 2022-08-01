@@ -36,7 +36,6 @@ require(
   'skill-rubrics-editor.component.ts');
 require('components/rubrics-editor/rubrics-editor.component.ts');
 require('domain/utilities/url-interpolation.service.ts');
-require('pages/skill-editor-page/services/question-creation.service.ts');
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 require('services/ngb-modal.service.ts');
 

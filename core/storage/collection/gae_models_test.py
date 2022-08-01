@@ -404,7 +404,9 @@ class CollectionRightsModelRevertUnitTest(test_utils.GenericTestBase):
             'name': feconf.CMD_REVERT_COMMIT,
             'required_attribute_names': [],
             'optional_attribute_names': [],
-            'user_id_attribute_names': []
+            'user_id_attribute_names': [],
+            'allowed_values': {},
+            'deprecated_values': {}
         })
         self.allowed_commands_swap = self.swap(
             feconf,

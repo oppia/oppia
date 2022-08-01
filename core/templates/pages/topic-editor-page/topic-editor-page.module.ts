@@ -28,6 +28,8 @@ import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
 import { platformFeatureInitFactory, PlatformFeatureService } from
   'services/platform-feature.service';
+import { RouterModule } from '@angular/router';
+import { APP_BASE_HREF } from '@angular/common';
 
 import { StoriesListComponent } from
   'pages/topic-viewer-page/stories-list/topic-viewer-stories-list.component';
@@ -43,12 +45,18 @@ import { CreateNewSubtopicModalComponent } from 'pages/topic-editor-page/modal-t
 import { DeleteStoryModalComponent } from './modal-templates/delete-story-modal.component';
 import { TopicEditorSendMailComponent } from './modal-templates/topic-editor-send-mail-modal.component';
 import { TopicEditorSaveModalComponent } from './modal-templates/topic-editor-save-modal.component';
+import { SmartRouterModule } from 'hybrid-router-module-provider';
+import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
 
 @NgModule({
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
     HttpClientModule,
+    // TODO(#13443): Remove smart router module provider once all pages are
+    // migrated to angular router.
+    SmartRouterModule,
+    RouterModule.forRoot([]),
     InteractionExtensionsModule,
     SharedComponentsModule,
     ToastrModule.forRoot(toastrConfig)
@@ -92,6 +100,11 @@ import { TopicEditorSaveModalComponent } from './modal-templates/topic-editor-sa
     {
       provide: HAMMER_GESTURE_CONFIG,
       useClass: MyHammerConfig
+    },
+    AppErrorHandlerProvider,
+    {
+      provide: APP_BASE_HREF,
+      useValue: '/'
     }
   ]
 })

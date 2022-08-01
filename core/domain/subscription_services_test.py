@@ -31,39 +31,46 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
+from typing import List
+from typing_extensions import Final
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import user_models
+
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
-COLLECTION_ID = 'col_id'
-COLLECTION_ID_2 = 'col_id_2'
-EXP_ID = 'exp_id'
-EXP_ID_2 = 'exp_id_2'
-FEEDBACK_THREAD_ID = 'fthread_id'
-FEEDBACK_THREAD_ID_2 = 'fthread_id_2'
-USER_ID = 'user_id'
-USER_ID_2 = 'user_id_2'
+COLLECTION_ID: Final = 'col_id'
+COLLECTION_ID_2: Final = 'col_id_2'
+EXP_ID: Final = 'exp_id'
+EXP_ID_2: Final = 'exp_id_2'
+FEEDBACK_THREAD_ID: Final = 'fthread_id'
+FEEDBACK_THREAD_ID_2: Final = 'fthread_id_2'
+USER_ID: Final = 'user_id'
+USER_ID_2: Final = 'user_id_2'
 
 
 class SubscriptionsTest(test_utils.GenericTestBase):
     """Tests for subscription management."""
 
-    OWNER_2_EMAIL = 'owner2@example.com'
-    OWNER2_USERNAME = 'owner2'
+    OWNER_2_EMAIL: Final = 'owner2@example.com'
+    OWNER2_USERNAME: Final = 'owner2'
 
-    def setUp(self):
+    def setUp(self) -> None:
         super(SubscriptionsTest, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.signup(self.OWNER_2_EMAIL, self.OWNER2_USERNAME)
 
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
-        self.owner_2_id = self.get_user_id_from_email(self.OWNER_2_EMAIL)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)  # type: ignore[no-untyped-call]
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)  # type: ignore[no-untyped-call]
+        self.owner_2_id = self.get_user_id_from_email(self.OWNER_2_EMAIL)  # type: ignore[no-untyped-call]
 
         self.owner = user_services.get_user_actions_info(self.owner_id)
 
-    def _get_thread_ids_subscribed_to(self, user_id):
+    def _get_thread_ids_subscribed_to(self, user_id: str) -> List[str]:
         """Returns the feedback thread ids to which the user corresponding to
         the given user id is subscribed to.
 
@@ -71,16 +78,23 @@ class SubscriptionsTest(test_utils.GenericTestBase):
             user_id: str. The user id.
 
         Returns:
-            tuple(str). The tuple containing all the feedback thread ids to
+            List(str). The list containing all the feedback thread ids to
             which the user is subscribed to.
         """
         subscriptions_model = user_models.UserSubscriptionsModel.get(
             user_id, strict=False)
-        return (
-            subscriptions_model.general_feedback_thread_ids
-            if subscriptions_model else [])
+        # TODO(#15621): The explicit declaration of type for ndb properties
+        # should be removed. Currently, these ndb properties are annotated with
+        # Any return type. Once we have proper return type we can remove this.
+        if subscriptions_model:
+            feedback_thread_ids: List[str] = (
+                subscriptions_model.general_feedback_thread_ids
+            )
+            return feedback_thread_ids
+        else:
+            return []
 
-    def _get_exploration_ids_subscribed_to(self, user_id):
+    def _get_exploration_ids_subscribed_to(self, user_id: str) -> List[str]:
         """Returns all the exploration ids of the explorations to which the user
         has subscribed to.
 
@@ -88,16 +102,21 @@ class SubscriptionsTest(test_utils.GenericTestBase):
             user_id: str. The user id.
 
         Returns:
-            tuple(str). The tuple containing all the exploration ids of the
+            List(str). The list containing all the exploration ids of the
             explorations to which the user has subscribed to.
         """
         subscriptions_model = user_models.UserSubscriptionsModel.get(
             user_id, strict=False)
-        return (
-            subscriptions_model.exploration_ids
-            if subscriptions_model else [])
+        # TODO(#15621): The explicit declaration of type for ndb properties
+        # should be removed. Currently, these ndb properties are annotated with
+        # Any return type. Once we have proper return type we can remove this.
+        if subscriptions_model:
+            exploration_ids: List[str] = subscriptions_model.exploration_ids
+            return exploration_ids
+        else:
+            return []
 
-    def _get_collection_ids_subscribed_to(self, user_id):
+    def _get_collection_ids_subscribed_to(self, user_id: str) -> List[str]:
         """Returns all the collection ids of the collections to which the user
         has subscribed to.
 
@@ -105,16 +124,21 @@ class SubscriptionsTest(test_utils.GenericTestBase):
             user_id: str. The user id.
 
         Returns:
-            tuple(str). The tuple containing all the collection ids of the
+            List(str). The list containing all the collection ids of the
             collections to which the user has subscribed to.
         """
         subscriptions_model = user_models.UserSubscriptionsModel.get(
             user_id, strict=False)
-        return (
-            subscriptions_model.collection_ids
-            if subscriptions_model else [])
+        # TODO(#15621): The explicit declaration of type for ndb properties
+        # should be removed. Currently, these ndb properties are annotated with
+        # Any return type. Once we have proper return type we can remove this.
+        if subscriptions_model:
+            collection_ids: List[str] = subscriptions_model.collection_ids
+            return collection_ids
+        else:
+            return []
 
-    def test_subscribe_to_feedback_thread(self):
+    def test_subscribe_to_feedback_thread(self) -> None:
         self.assertEqual(self._get_thread_ids_subscribed_to(USER_ID), [])
 
         subscription_services.subscribe_to_thread(USER_ID, FEEDBACK_THREAD_ID)
@@ -132,7 +156,7 @@ class SubscriptionsTest(test_utils.GenericTestBase):
             self._get_thread_ids_subscribed_to(USER_ID),
             [FEEDBACK_THREAD_ID, FEEDBACK_THREAD_ID_2])
 
-    def test_subscribe_to_exploration(self):
+    def test_subscribe_to_exploration(self) -> None:
         self.assertEqual(self._get_exploration_ids_subscribed_to(USER_ID), [])
 
         subscription_services.subscribe_to_exploration(USER_ID, EXP_ID)
@@ -149,7 +173,7 @@ class SubscriptionsTest(test_utils.GenericTestBase):
             self._get_exploration_ids_subscribed_to(USER_ID),
             [EXP_ID, EXP_ID_2])
 
-    def test_get_exploration_ids_subscribed_to(self):
+    def test_get_exploration_ids_subscribed_to(self) -> None:
         self.assertEqual(
             subscription_services.get_exploration_ids_subscribed_to(
                 USER_ID), [])
@@ -164,7 +188,7 @@ class SubscriptionsTest(test_utils.GenericTestBase):
             subscription_services.get_exploration_ids_subscribed_to(USER_ID),
             [EXP_ID, EXP_ID_2])
 
-    def test_get_all_threads_subscribed_to(self):
+    def test_get_all_threads_subscribed_to(self) -> None:
         self.assertEqual(
             subscription_services.get_all_threads_subscribed_to(
                 USER_ID), [])
@@ -179,7 +203,9 @@ class SubscriptionsTest(test_utils.GenericTestBase):
             subscription_services.get_all_threads_subscribed_to(USER_ID),
             [FEEDBACK_THREAD_ID, FEEDBACK_THREAD_ID_2])
 
-    def test_thread_and_exp_subscriptions_are_tracked_individually(self):
+    def test_thread_and_exp_subscriptions_are_tracked_individually(
+        self
+    ) -> None:
         self.assertEqual(self._get_thread_ids_subscribed_to(USER_ID), [])
 
         subscription_services.subscribe_to_thread(USER_ID, FEEDBACK_THREAD_ID)
@@ -189,10 +215,10 @@ class SubscriptionsTest(test_utils.GenericTestBase):
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(USER_ID), [EXP_ID])
 
-    def test_posting_to_feedback_thread_results_in_subscription(self):
+    def test_posting_to_feedback_thread_results_in_subscription(self) -> None:
         # The viewer posts a message to the thread.
         message_text = 'text'
-        feedback_services.create_thread(
+        feedback_services.create_thread(  # type: ignore[no-untyped-call]
             feconf.ENTITY_TYPE_EXPLORATION, 'exp_id',
             self.viewer_id, 'subject', message_text)
 
@@ -202,12 +228,12 @@ class SubscriptionsTest(test_utils.GenericTestBase):
         thread_id = thread_ids_subscribed_to[0]
 
         self.assertEqual(
-            feedback_services.get_messages(thread_id)[0].text,
+            feedback_services.get_messages(thread_id)[0].text,  # type: ignore[no-untyped-call]
             message_text)
 
         # The editor posts a follow-up message to the thread.
         new_message_text = 'new text'
-        feedback_services.create_message(
+        feedback_services.create_message(  # type: ignore[no-untyped-call]
             thread_id, self.editor_id, '', '', new_message_text)
 
         # The viewer and editor are now both subscribed to the thread.
@@ -216,54 +242,58 @@ class SubscriptionsTest(test_utils.GenericTestBase):
         self.assertEqual(
             self._get_thread_ids_subscribed_to(self.editor_id), [thread_id])
 
-    def test_creating_exploration_results_in_subscription(self):
+    def test_creating_exploration_results_in_subscription(self) -> None:
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(USER_ID), [])
-        exp_services.save_new_exploration(
-            USER_ID, exp_domain.Exploration.create_default_exploration(EXP_ID))
+        exp_services.save_new_exploration(  # type: ignore[no-untyped-call]
+            USER_ID, exp_domain.Exploration.create_default_exploration(EXP_ID))  # type: ignore[no-untyped-call]
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(USER_ID), [EXP_ID])
 
-    def test_adding_new_exploration_owner_or_editor_role_results_in_subscription(self): # pylint: disable=line-too-long
-        exploration = exp_domain.Exploration.create_default_exploration(EXP_ID)
-        exp_services.save_new_exploration(self.owner_id, exploration)
+    def test_adding_new_exploration_owner_or_editor_role_results_in_subscription(  # pylint: disable=line-too-long
+        self
+    ) -> None:
+        exploration = exp_domain.Exploration.create_default_exploration(EXP_ID)  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(self.owner_id, exploration)  # type: ignore[no-untyped-call]
 
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(self.owner_2_id), [])
-        rights_manager.assign_role_for_exploration(
+        rights_manager.assign_role_for_exploration(  # type: ignore[no-untyped-call]
             self.owner, EXP_ID, self.owner_2_id, rights_domain.ROLE_OWNER)
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(self.owner_2_id), [EXP_ID])
 
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(self.editor_id), [])
-        rights_manager.assign_role_for_exploration(
+        rights_manager.assign_role_for_exploration(  # type: ignore[no-untyped-call]
             self.owner, EXP_ID, self.editor_id, rights_domain.ROLE_EDITOR)
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(self.editor_id), [EXP_ID])
 
-    def test_adding_new_exploration_viewer_role_does_not_result_in_subscription(self): # pylint: disable=line-too-long
-        exploration = exp_domain.Exploration.create_default_exploration(EXP_ID)
-        exp_services.save_new_exploration(self.owner_id, exploration)
+    def test_adding_new_exploration_viewer_role_does_not_result_in_subscription(
+        self
+    ) -> None:
+        exploration = exp_domain.Exploration.create_default_exploration(EXP_ID)  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(self.owner_id, exploration)  # type: ignore[no-untyped-call]
 
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(self.viewer_id), [])
-        rights_manager.assign_role_for_exploration(
+        rights_manager.assign_role_for_exploration(  # type: ignore[no-untyped-call]
             self.owner, EXP_ID, self.viewer_id, rights_domain.ROLE_VIEWER)
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(self.viewer_id), [])
 
-    def test_deleting_exploration_does_not_delete_subscription(self):
-        exploration = exp_domain.Exploration.create_default_exploration(EXP_ID)
-        exp_services.save_new_exploration(self.owner_id, exploration)
+    def test_deleting_exploration_does_not_delete_subscription(self) -> None:
+        exploration = exp_domain.Exploration.create_default_exploration(EXP_ID)  # type: ignore[no-untyped-call]
+        exp_services.save_new_exploration(self.owner_id, exploration)  # type: ignore[no-untyped-call]
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(self.owner_id), [EXP_ID])
 
-        exp_services.delete_exploration(self.owner_id, EXP_ID)
+        exp_services.delete_exploration(self.owner_id, EXP_ID)  # type: ignore[no-untyped-call]
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(self.owner_id), [EXP_ID])
 
-    def test_subscribe_to_collection(self):
+    def test_subscribe_to_collection(self) -> None:
         self.assertEqual(self._get_collection_ids_subscribed_to(USER_ID), [])
 
         subscription_services.subscribe_to_collection(USER_ID, COLLECTION_ID)
@@ -280,7 +310,7 @@ class SubscriptionsTest(test_utils.GenericTestBase):
             self._get_collection_ids_subscribed_to(USER_ID),
             [COLLECTION_ID, COLLECTION_ID_2])
 
-    def test_get_collection_ids_subscribed_to(self):
+    def test_get_collection_ids_subscribed_to(self) -> None:
         self.assertEqual(
             subscription_services.get_collection_ids_subscribed_to(
                 USER_ID), [])
@@ -295,20 +325,21 @@ class SubscriptionsTest(test_utils.GenericTestBase):
             subscription_services.get_collection_ids_subscribed_to(USER_ID),
             [COLLECTION_ID, COLLECTION_ID_2])
 
-    def test_creating_collection_results_in_subscription(self):
+    def test_creating_collection_results_in_subscription(self) -> None:
         self.assertEqual(
             self._get_collection_ids_subscribed_to(USER_ID), [])
-        self.save_new_default_collection(COLLECTION_ID, USER_ID)
+        self.save_new_default_collection(COLLECTION_ID, USER_ID)  # type: ignore[no-untyped-call]
         self.assertEqual(
             self._get_collection_ids_subscribed_to(USER_ID), [COLLECTION_ID])
 
     def test_adding_new_collection_owner_or_editor_role_results_in_subscription(
-            self):
-        self.save_new_default_collection(COLLECTION_ID, self.owner_id)
+        self
+    ) -> None:
+        self.save_new_default_collection(COLLECTION_ID, self.owner_id)  # type: ignore[no-untyped-call]
 
         self.assertEqual(
             self._get_collection_ids_subscribed_to(self.owner_2_id), [])
-        rights_manager.assign_role_for_collection(
+        rights_manager.assign_role_for_collection(  # type: ignore[no-untyped-call]
             self.owner, COLLECTION_ID, self.owner_2_id,
             rights_domain.ROLE_OWNER)
         self.assertEqual(
@@ -317,7 +348,7 @@ class SubscriptionsTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             self._get_collection_ids_subscribed_to(self.editor_id), [])
-        rights_manager.assign_role_for_collection(
+        rights_manager.assign_role_for_collection(  # type: ignore[no-untyped-call]
             self.owner, COLLECTION_ID, self.editor_id,
             rights_domain.ROLE_EDITOR)
         self.assertEqual(
@@ -325,32 +356,34 @@ class SubscriptionsTest(test_utils.GenericTestBase):
             [COLLECTION_ID])
 
     def test_adding_new_collection_viewer_role_does_not_result_in_subscription(
-            self):
-        self.save_new_default_collection(COLLECTION_ID, self.owner_id)
+        self
+    ) -> None:
+        self.save_new_default_collection(COLLECTION_ID, self.owner_id)  # type: ignore[no-untyped-call]
 
         self.assertEqual(
             self._get_collection_ids_subscribed_to(self.viewer_id), [])
-        rights_manager.assign_role_for_collection(
+        rights_manager.assign_role_for_collection(  # type: ignore[no-untyped-call]
             self.owner, COLLECTION_ID, self.viewer_id,
             rights_domain.ROLE_VIEWER)
         self.assertEqual(
             self._get_collection_ids_subscribed_to(self.viewer_id), [])
 
-    def test_deleting_collection_does_not_delete_subscription(self):
-        self.save_new_default_collection(COLLECTION_ID, self.owner_id)
+    def test_deleting_collection_does_not_delete_subscription(self) -> None:
+        self.save_new_default_collection(COLLECTION_ID, self.owner_id)  # type: ignore[no-untyped-call]
         self.assertEqual(
             self._get_collection_ids_subscribed_to(self.owner_id),
             [COLLECTION_ID])
 
-        collection_services.delete_collection(self.owner_id, COLLECTION_ID)
+        collection_services.delete_collection(self.owner_id, COLLECTION_ID)  # type: ignore[no-untyped-call]
 
         self.assertEqual(
             self._get_collection_ids_subscribed_to(self.owner_id),
             [COLLECTION_ID])
 
     def test_adding_exploration_to_collection_does_not_create_subscription(
-            self):
-        self.save_new_default_collection(COLLECTION_ID, self.owner_id)
+        self
+    ) -> None:
+        self.save_new_default_collection(COLLECTION_ID, self.owner_id)  # type: ignore[no-untyped-call]
 
         # The author is subscribed to the collection but to no explorations.
         self.assertEqual(
@@ -365,7 +398,7 @@ class SubscriptionsTest(test_utils.GenericTestBase):
         # If the collection author adds the exploration to his/her collection,
         # the collection author should not be subscribed to the exploration nor
         # should the exploration author be subscribed to the collection.
-        collection_services.update_collection(
+        collection_services.update_collection(  # type: ignore[no-untyped-call]
             self.owner_id, COLLECTION_ID, [{
                 'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
                 'exploration_id': EXP_ID
@@ -382,18 +415,18 @@ class SubscriptionsTest(test_utils.GenericTestBase):
 class UserSubscriptionsTest(test_utils.GenericTestBase):
     """Tests for subscription management."""
 
-    OWNER_2_EMAIL = 'owner2@example.com'
-    OWNER2_USERNAME = 'owner2'
+    OWNER_2_EMAIL: Final = 'owner2@example.com'
+    OWNER2_USERNAME: Final = 'owner2'
 
-    def setUp(self):
+    def setUp(self) -> None:
         super(UserSubscriptionsTest, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.OWNER_2_EMAIL, self.OWNER2_USERNAME)
 
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.owner_2_id = self.get_user_id_from_email(self.OWNER_2_EMAIL)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
+        self.owner_2_id = self.get_user_id_from_email(self.OWNER_2_EMAIL)  # type: ignore[no-untyped-call]
 
-    def _get_all_subscribers_of_creator(self, user_id):
+    def _get_all_subscribers_of_creator(self, user_id: str) -> List[str]:
         """Returns all the ids of the subscribers that have subscribed to the
         creator.
 
@@ -401,37 +434,47 @@ class UserSubscriptionsTest(test_utils.GenericTestBase):
             user_id: str. The user id.
 
         Returns:
-            tuple(str). The tuple containing all the ids of the subscribers that
+            List(str). The list containing all the ids of the subscribers that
             have subscribed to the creator.
         """
         subscribers_model = user_models.UserSubscribersModel.get(
             user_id, strict=False)
-        return (
-            subscribers_model.subscriber_ids
-            if subscribers_model else [])
+        # TODO(#15621): The explicit declaration of type for ndb properties
+        # should be removed. Currently, these ndb properties are annotated with
+        # Any return type. Once we have proper return type we can remove this.
+        if subscribers_model:
+            subscriber_ids: List[str] = subscribers_model.subscriber_ids
+            return subscriber_ids
+        else:
+            return []
 
-    def _get_all_creators_subscribed_to(self, user_id):
+    def _get_all_creators_subscribed_to(self, user_id: str) -> List[str]:
         """Returns the ids of the creators the given user has subscribed to.
 
         Args:
             user_id: str. The user id.
 
         Returns:
-            tuple(str). The tuple containing all the creator ids the given user
+            List(str). The list containing all the creator ids the given user
             has subscribed to.
         """
         subscriptions_model = user_models.UserSubscriptionsModel.get(
             user_id, strict=False)
-        return (
-            subscriptions_model.creator_ids
-            if subscriptions_model else [])
+        # TODO(#15621): The explicit declaration of type for ndb properties
+        # should be removed. Currently, these ndb properties are annotated with
+        # Any return type. Once we have proper return type we can remove this.
+        if subscriptions_model:
+            creator_ids: List[str] = subscriptions_model.creator_ids
+            return creator_ids
+        else:
+            return []
 
-    def test_exception_is_raised_when_user_self_subscribes(self):
-        with self.assertRaisesRegex(
+    def test_exception_is_raised_when_user_self_subscribes(self) -> None:
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'User %s is not allowed to self subscribe.' % USER_ID):
             subscription_services.subscribe_to_creator(USER_ID, USER_ID)
 
-    def test_subscribe_to_creator(self):
+    def test_subscribe_to_creator(self) -> None:
         self.assertEqual(self._get_all_subscribers_of_creator(
             self.owner_id), [])
 
@@ -461,7 +504,7 @@ class UserSubscriptionsTest(test_utils.GenericTestBase):
             self._get_all_creators_subscribed_to(
                 USER_ID_2), [self.owner_id])
 
-    def test_unsubscribe_from_creator(self):
+    def test_unsubscribe_from_creator(self) -> None:
         self.assertEqual(self._get_all_subscribers_of_creator(
             self.owner_id), [])
 
@@ -501,7 +544,7 @@ class UserSubscriptionsTest(test_utils.GenericTestBase):
             self._get_all_creators_subscribed_to(USER_ID_2),
             [])
 
-    def test_get_all_subscribers_of_creator(self):
+    def test_get_all_subscribers_of_creator(self) -> None:
         self.assertEqual(
             subscription_services.get_all_subscribers_of_creator(
                 self.owner_id), [])
@@ -516,7 +559,7 @@ class UserSubscriptionsTest(test_utils.GenericTestBase):
             subscription_services.get_all_subscribers_of_creator(self.owner_id),
             [USER_ID, USER_ID_2])
 
-    def test_get_all_creators_subscribed_to(self):
+    def test_get_all_creators_subscribed_to(self) -> None:
         self.assertEqual(
             subscription_services.get_all_creators_subscribed_to(
                 USER_ID), [])

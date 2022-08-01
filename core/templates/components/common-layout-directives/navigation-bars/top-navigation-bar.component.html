@@ -1,10 +1,7 @@
-<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/components/common-layout-directives/navigation-bars/top-navigation-bar.component.css">
-<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/components/common-layout-directives/navigation-bars/top-navigation-bar.component.rtl.css">
-
-<div class="navbar-header protractor-test-navbar-header oppia-top-navigation-bar">
+<div class="navbar-header e2e-test-navbar-header oppia-top-navigation-bar">
   <a *ngIf="windowIsNarrow"
      (click)="toggleSidebar($event)"
-     class="navbar-brand oppia-navbar-menu oppia-transition-200 protractor-mobile-test-navbar-button ml-0"
+     class="navbar-brand oppia-navbar-menu oppia-transition-200 e2e-mobile-test-navbar-button ml-0"
      tabindex="0">
     <i class="fas fa-bars oppia-navbar-menu-icon"
        *ngIf="!isSidebarShown()"
@@ -16,9 +13,9 @@
        &#10005;
     </i>
   </a>
-  <a class="oppia-navbar-brand-name oppia-transition-200 protractor-test-oppia-main-logo d-sm-block"
+  <a class="oppia-navbar-brand-name oppia-transition-200 e2e-test-oppia-main-logo d-sm-block"
      href="/"
-     [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.SPLASH.ROUTE"
+     [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.SPLASH.ROUTE"
      [oppiaFocusOn]="labelForClearingFocus"
      [ngClass]="windowIsNarrow ? 'oppia-logo-small ml-0' : 'oppia-logo-wide'">
     <picture>
@@ -54,7 +51,7 @@
             *ngIf="userIsLoggedIn"
             [hidden]="!navElementsVisibilityStatus.I18N_TOPNAV_HOME"
             aria-hidden="false"
-            class="nav-item  oppia-navbar-clickable-dropdown protractor-test-home-oppia-list-item">
+            class="nav-item  oppia-navbar-clickable-dropdown e2e-test-home-oppia-list-item">
           <a (keydown)="onMenuKeypress($event, 'homeMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
              class="nav-link oppia-navbar-tab"
              role="menuitem"
@@ -63,7 +60,7 @@
              aria-hidden="false"
              tabindex="0"
              href="/"
-             [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.SPLASH.ROUTE"
+             [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.SPLASH.ROUTE"
              autofocus>
             <span class="oppia-navbar-tab-content">
               {{ 'I18N_TOPNAV_HOME' | translate }}
@@ -74,7 +71,7 @@
             ngbDropdown
             [hidden]="!navElementsVisibilityStatus.I18N_TOPNAV_LEARN"
             aria-hidden="false"
-            class="nav-item  dropdown oppia-navbar-clickable-dropdown protractor-test-classroom-oppia-list-item">
+            class="nav-item  dropdown oppia-navbar-clickable-dropdown e2e-test-classroom-oppia-list-item">
           <a ngbDropdownToggle
              (keydown)="onMenuKeypress($event, 'learnMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
              class="nav-link oppia-navbar-tab dropdown-toggle learn-tab"
@@ -105,7 +102,7 @@
                    (click)="navigateToClassroomPage('/learn/' + DEFAULT_CLASSROOM_URL_FRAGMENT)">
                   <div class="nav-item-top d-flex justify-content-between">
                     <div class="nav-content d-flex flex-column">
-                      <div class="dropdown-item nav-link oppia-navbar-tab-content protractor-test-classroom-link nav-item-top-link">
+                      <div class="dropdown-item nav-link oppia-navbar-tab-content e2e-test-classroom-link nav-item-top-link">
                         <div (keydown)="onMenuKeypress($event, 'learnMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_CLOSE})"
                              class="nav-item-left-head">
                              {{ 'I18N_TOPNAV_CLASSROOM_BASIC_MATHS' | translate }}
@@ -164,7 +161,7 @@
         <li [ngClass]="{'open': activeMenuName === 'aboutMenu'}"
             ngbDropdown
             [hidden]="!navElementsVisibilityStatus.I18N_TOPNAV_ABOUT"
-            class="nav-item dropdown oppia-navbar-clickable-dropdown protractor-test-about-oppia-list-item">
+            class="nav-item dropdown oppia-navbar-clickable-dropdown e2e-test-about-oppia-list-item">
           <a (keydown)="onMenuKeypress($event, 'aboutMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
              ngbDropdownToggle
              class="nav-link oppia-navbar-tab dropdown-toggle"
@@ -185,16 +182,16 @@
               autofocus>
             <li class="nav-item">
               <a (keydown)="onMenuKeypress($event, 'aboutMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_CLOSE})"
-                 class="dropdown-item nav-link oppia-navbar-tab-content protractor-test-about-link about-link"
+                 class="dropdown-item nav-link oppia-navbar-tab-content e2e-test-about-link about-link"
                  href="/about"
-                 [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.ABOUT.ROUTE">
+                 [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.ABOUT.ROUTE">
                 <span class="link">{{'I18N_TOPNAV_ABOUT_OPPIA' | translate}}</span>
               </a>
             </li>
             <li class="nav-item">
               <a class="dropdown-item nav-link oppia-navbar-tab-content about-link"
                  href="/about-foundation"
-                 [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.ABOUT_FOUNDATION.ROUTE"
+                 [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.ABOUT_FOUNDATION.ROUTE"
                  (keydown)="onMenuKeypress($event, 'aboutMenu', {enter: ACTION_CLOSE})"
                  rel="noopener">
                 <span class="link">{{'I18N_TOPNAV_OPPIA_FOUNDATION' | translate}}</span>
@@ -215,7 +212,7 @@
         <li [ngClass]="{'open': activeMenuName === 'getInvolvedMenu'}"
             ngbDropdown
             [hidden]="navElementsVisibilityStatus.I18N_TOPNAV_GET_INVOLVED"
-            class="nav-item oppia-navbar-clickable-dropdown protractor-test-about-oppia-list-item">
+            class="nav-item oppia-navbar-clickable-dropdown e2e-test-about-oppia-list-item">
           <a ngbDropdownToggle (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
              class="nav-link oppia-navbar-tab dropdown-toggle get-involved"
              aria-haspopup="true"
@@ -237,7 +234,7 @@
               <div class="top-section d-flex">
                 <a class="item item-border d-flex flex-column innvolved-item"
                    href="/partnerships"
-                   [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS.ROUTE"
+                   [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS.ROUTE"
                    rel="noopener"
                    (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_CLOSE})">
                   <div class="heading">
@@ -250,7 +247,7 @@
                 </a>
                 <a class="item d-flex flex-column innvolved-item"
                    href="/volunteer"
-                   [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.VOLUNTEER.ROUTE"
+                   [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.VOLUNTEER.ROUTE"
                    (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {enter: ACTION_CLOSE})"
                    rel="noopener">
                   <div class="heading">
@@ -265,7 +262,7 @@
               <div class="bottom-section d-flex">
                 <a class="item item-border d-flex flex-column innvolved-item"
                    href="/contact"
-                   [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.CONTACT.ROUTE"
+                   [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.CONTACT.ROUTE"
                    (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {enter: ACTION_CLOSE})"
                    rel="noopener">
                   <div class="heading">
@@ -278,7 +275,7 @@
                 </a>
                 <a class="item d-flex flex-column innvolved-item"
                    href="/donate"
-                   [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE"
+                   [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE"
                    (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {enter: ACTION_CLOSE})"
                    rel="noopener">
                   <div class="heading">
@@ -296,13 +293,13 @@
         <li [ngClass]="{'open': activeMenuName === 'donateMenu'}"
             ngbDropdown
             [hidden]="!navElementsVisibilityStatus.I18N_TOPNAV_DONATE"
-            class="nav-item protractor-test-about-oppia-list-item">
+            class="nav-item e2e-test-about-oppia-list-item">
           <a class="nav-link oppia-navbar-tab donate-tab"
              aria-haspopup="true"
              aria-expanded="false"
              tabindex="0"
              href="/donate"
-             [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE"
+             [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE"
              rel="noopener"
              autofocus>
             <span class="oppia-navbar-tab-content"
@@ -321,7 +318,7 @@
         autofocus>
       <div class="oppia-navbar-button-container dropdown">
         <button ngbDropdownToggle
-                class="btn dropdown-toggle oppia-navbar-button oppia-language-dropdown-button protractor-test-language-dropdown"
+                class="btn dropdown-toggle oppia-navbar-button oppia-language-dropdown-button e2e-test-language-dropdown"
                 (keydown)="onMenuKeypress($event, 'languageMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})">
           <i class="fas fa-globe language-icon"></i>
           <span class="mobile-view-language-code" *ngIf="windowIsNarrow"> {{ currentLanguageCode }} </span>
@@ -333,7 +330,7 @@
           [style.margin-top]="userIsLoggedIn ? '-10px': '0'"
           (mouseover)="openSubmenu($event, 'languageMenu')"
           (mouseleave)="closeSubmenuIfNotMobile($event)">
-        <li class="nav-item" [ngClass]="'protractor-test-i18n-language-' + language.id" *ngFor="let language of supportedSiteLanguages">
+        <li class="nav-item" [ngClass]="'e2e-test-i18n-language-' + language.id" *ngFor="let language of supportedSiteLanguages">
           <a (click)="changeLanguage(language.id)" tabindex="0" (keydown.enter)="changeLanguage(language.id)"
              (keydown)="onMenuKeypress($event, 'languageMenu', {enter: ACTION_CLOSE})">
             <div class="language-element oppia-nav-right-dropdown" [ngClass]="{'language-element-selected': currentLanguageCode === language.id}">
@@ -351,9 +348,9 @@
     <li [ngClass]="{'open' : activeMenuName === 'profileMenu'}"
         ngbDropdown
         *ngIf="userIsLoggedIn"
-        class="nav-item protractor-test-profile-dropdown oppia-navbar-clickable-dropdown profile-dropdown">
+        class="nav-item e2e-test-profile-dropdown oppia-navbar-clickable-dropdown profile-dropdown">
       <a (keydown)="onMenuKeypress($event, 'profileMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
-         class="nav-link oppia-navbar-dropdown-toggle protractor-test-navbar-dropdown-toggle"
+         class="nav-link oppia-navbar-dropdown-toggle e2e-test-navbar-dropdown-toggle"
          aria-haspopup="true"
          aria-expanded="false"
          aria-label="User Menu"
@@ -383,7 +380,7 @@
              this font.
             -->
             <span *ngIf="isCurriculumAdmin"
-                  class="oppia-navbar-role-text oppia-admin-text protractor-test-admin-text">
+                  class="oppia-navbar-role-text oppia-admin-text e2e-test-admin-text">
                   A
             </span>
             <span *ngIf="isModerator && !isCurriculumAdmin"
@@ -401,8 +398,8 @@
         <li class="nav-item">
           <a (click)="closeSubmenuIfNotMobile($event)"
              [href]="profilePageUrl"
-             [routerLink]="profilePageUrl"
-             class="dropdown-item nav-link protractor-test-profile-link"
+             [smartRouterLink]="profilePageUrl"
+             class="dropdown-item nav-link e2e-test-profile-link"
              (keydown)="onMenuKeypress($event, 'profileMenu', {shiftTab: ACTION_CLOSE})">
             <strong>
               {{ username }}
@@ -413,21 +410,21 @@
         <li class="nav-item">
           <a (click)="closeSubmenuIfNotMobile($event)"
              href="/creator-dashboard"
-             class="dropdown-item nav-link protractor-test-creator-dashboard-link">
+             class="dropdown-item nav-link e2e-test-creator-dashboard-link">
             <span [innerHTML]="'I18N_TOPNAV_CREATOR_DASHBOARD' | translate"></span>
           </a>
         </li>
         <li class="nav-item">
           <a (click)="closeSubmenuIfNotMobile($event)"
              href="/learner-dashboard"
-             class="dropdown-item nav-link protractor-test-learner-dashboard-link">
+             class="dropdown-item nav-link e2e-test-learner-dashboard-link">
             <span [innerHTML]="'I18N_TOPNAV_LEARNER_DASHBOARD' | translate"></span>
           </a>
         </li>
         <li class="nav-item">
           <a (click)="closeSubmenuIfNotMobile($event)"
              href="/contributor-dashboard"
-             class="dropdown-item nav-link protractor-test-learner-dashboard-link">
+             class="dropdown-item nav-link e2e-test-learner-dashboard-link">
             <span [innerHTML]="'I18N_TOPNAV_CONTRIBUTOR_DASHBOARD' | translate"></span>
           </a>
         </li>
@@ -435,7 +432,7 @@
           <a *ngIf="(isCurriculumAdmin || isTopicManager)"
              (click)="closeSubmenuIfNotMobile($event)"
              href="/topics-and-skills-dashboard"
-             class="dropdown-item nav-link protractor-test-topics-and-skills-dashboard-link">
+             class="dropdown-item nav-link e2e-test-topics-and-skills-dashboard-link">
             <span [innerHTML]="'I18N_TOPNAV_TOPICS_AND_SKILLS_DASHBOARD' | translate"></span>
           </a>
         </li>
@@ -443,15 +440,15 @@
           <a *ngIf="(isBlogAdmin || isBlogPostEditor)"
              (click)="closeSubmenuIfNotMobile($event)"
              href="/blog-dashboard"
-             class="dropdown-item nav-link protractor-test-blog-dashboard-link">
+             class="dropdown-item nav-link e2e-test-blog-dashboard-link">
             <span [innerHTML]="'I18N_TOPNAV_BLOG_DASHBOARD' | translate"></span>
           </a>
         </li>
         <li class="nav-item">
           <a (click)="closeSubmenuIfNotMobile($event)"
              href="/preferences"
-             [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PREFERENCES.ROUTE"
-             class="dropdown-item nav-link protractor-test-preferences-link">
+             [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PREFERENCES.ROUTE"
+             class="dropdown-item nav-link e2e-test-preferences-link">
             <span [innerHTML]="'I18N_TOPNAV_PREFERENCES' | translate"></span>
           </a>
         </li>
@@ -466,7 +463,7 @@
         </li>
         <li class="nav-item"
             *ngIf="isSuperAdmin">
-          <a class="dropdown-item nav-link protractor-test-admin-link"
+          <a class="dropdown-item nav-link e2e-test-admin-link"
              (click)="closeSubmenuIfNotMobile($event)"
              href="/admin"
              rel="noopener">
@@ -477,8 +474,8 @@
         <li class="nav-item">
           <a (click)="closeSubmenuIfNotMobile($event);onLogoutButtonClicked()"
              [href]="'/' + PAGES_REGISTERED_WITH_FRONTEND.LOGOUT.ROUTE"
-             [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.LOGOUT.ROUTE"
-             class="dropdown-item nav-link protractor-test-logout-link"
+             [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.LOGOUT.ROUTE"
+             class="dropdown-item nav-link e2e-test-logout-link"
              (keydown)="onMenuKeypress($event, 'profileMenu', {tab: ACTION_CLOSE})">
             <span [innerHTML]="'I18N_TOPNAV_LOGOUT' | translate"></span>
           </a>
@@ -491,7 +488,7 @@
         class="nav-item oppia-navbar-clickable-dropdown dropdown">
       <div class="oppia-navbar-button-container dropdown oppia-navbar-button-container-extra-info">
         <button ngbDropdownToggle
-                class="btn dropdown-toggle oppia-navbar-button protractor-mobile-test-login"
+                class="btn dropdown-toggle oppia-navbar-button e2e-mobile-test-login"
                 (click)="onLoginButtonClicked()">
           <span [innerHTML]="'I18N_TOPNAV_SIGN_IN' | translate"></span>
         </button>

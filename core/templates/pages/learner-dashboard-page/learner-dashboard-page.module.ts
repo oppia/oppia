@@ -23,6 +23,8 @@ import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RequestInterceptor } from 'services/request-interceptor.service';
 import { SharedComponentsModule } from 'components/shared-component.module';
+import { RouterModule } from '@angular/router';
+import { APP_BASE_HREF } from '@angular/common';
 
 import { LearnerStorySummaryTileComponent } from 'components/summary-tile/learner-story-summary-tile.component';
 import { LearnerTopicGoalsSummaryTileComponent } from 'components/summary-tile/learner-topic-goals-summary-tile.component';
@@ -37,7 +39,6 @@ import { platformFeatureInitFactory, PlatformFeatureService } from 'services/pla
 import { RemoveActivityModalComponent } from 'pages/learner-dashboard-page/modal-templates/remove-activity-modal.component';
 import { LearnerDashboardSuggestionModalComponent } from './suggestion-modal/learner-dashboard-suggestion-modal.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { HybridRouterModuleProvider } from 'hybrid-router-module-provider';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
 
 @NgModule({
@@ -45,9 +46,10 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
     BrowserModule,
     BrowserAnimationsModule,
     HttpClientModule,
-    // TODO(#13443): Remove hybrid router module provider once all pages are
+    // TODO(#13443): Remove smart router module provider once all pages are
     // migrated to angular router.
-    HybridRouterModuleProvider.provide(),
+    SmartRouterModule,
+    RouterModule.forRoot([]),
     SharedComponentsModule,
     ToastrModule.forRoot(toastrConfig)
   ],
@@ -90,6 +92,11 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
     {
       provide: HAMMER_GESTURE_CONFIG,
       useClass: MyHammerConfig
+    },
+    AppErrorHandlerProvider,
+    {
+      provide: APP_BASE_HREF,
+      useValue: '/'
     }
   ]
 })
@@ -101,6 +108,8 @@ class LearnerDashboardPageModule {
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
 import { ToastrModule } from 'ngx-toastr';
+import { SmartRouterModule } from 'hybrid-router-module-provider';
+import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

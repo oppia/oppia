@@ -269,25 +269,6 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
         assert model_list is not None
         self.assertEqual(len(model_list), 0)
 
-    def test_delete_all(self) -> None:
-        results, _, more = (
-            opportunity_models.ExplorationOpportunitySummaryModel
-                .get_all_translation_opportunities(1, None, 'hi', ''))
-        # Ruling out the possibility of None for mypy type checking.
-        assert results is not None
-        self.assertEqual(len(results), 1)
-        self.assertTrue(more)
-
-        opportunity_models.ExplorationOpportunitySummaryModel.delete_all()
-
-        results, _, more = (
-            opportunity_models.ExplorationOpportunitySummaryModel
-                .get_all_translation_opportunities(1, None, 'hi', ''))
-        # Ruling out the possibility of None for mypy type checking.
-        assert results is not None
-        self.assertEqual(len(results), 0)
-        self.assertFalse(more)
-
 
 class SkillOpportunityModelTest(test_utils.GenericTestBase):
     """Tests for the SkillOpportunityModel class."""
@@ -363,22 +344,3 @@ class SkillOpportunityModelTest(test_utils.GenericTestBase):
         self.assertEqual(results[0].id, 'opportunity_id2')
         self.assertFalse(more)
         self.assertTrue(isinstance(cursor, str))
-
-    def test_delete_all_skill_opportunities(self) -> None:
-        results, _, more = (
-            opportunity_models.SkillOpportunityModel.get_skill_opportunities(
-                1, None))
-        # Ruling out the possibility of None for mypy type checking.
-        assert results is not None
-        self.assertEqual(len(results), 1)
-        self.assertTrue(more)
-
-        opportunity_models.SkillOpportunityModel.delete_all()
-
-        results, _, more = (
-            opportunity_models.SkillOpportunityModel.get_skill_opportunities(
-                1, None))
-        # Ruling out the possibility of None for mypy type checking.
-        assert results is not None
-        self.assertEqual(len(results), 0)
-        self.assertFalse(more)

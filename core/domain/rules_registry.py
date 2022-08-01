@@ -24,16 +24,32 @@ import os
 from core import constants
 from core import feconf
 
+from typing import Dict, List, Optional
+from typing_extensions import TypedDict
+
+
+class RuleSpecsExtensionDict(TypedDict):
+    """Dictionary representation of rule specs of an extension."""
+
+    interactionId: str
+    format: str
+    ruleTypes: Dict[str, Dict[str, List[str]]]
+
 
 class Registry:
     """Registry of rules."""
 
-    _state_schema_version_to_html_field_types_to_rule_specs = {}
+    _state_schema_version_to_html_field_types_to_rule_specs: Dict[
+        Optional[int],
+        Dict[str, RuleSpecsExtensionDict]
+    ] = {}
 
     @classmethod
-    def get_html_field_types_to_rule_specs(cls, state_schema_version=None):
+    def get_html_field_types_to_rule_specs(
+        cls, state_schema_version: Optional[int] = None
+    ) -> Dict[str, RuleSpecsExtensionDict]:
         """Returns a dict containing a html_field_types_to_rule_specs dict of
-        the specified state schema verison, if available.
+        the specified state schema version, if available.
 
         Args:
             state_schema_version: int|None. The state schema version to retrieve
@@ -49,29 +65,40 @@ class Registry:
             Exception. No html_field_types_to_rule_specs json file found for the
                 given state schema version.
         """
+        specs_from_json: Dict[str, RuleSpecsExtensionDict] = {}
         cached = (
             state_schema_version in
             cls._state_schema_version_to_html_field_types_to_rule_specs)
 
         if not cached and state_schema_version is None:
+            specs_from_json = json.loads(
+                constants.get_package_file_contents(
+                    'extensions',
+                    feconf.
+                    HTML_FIELD_TYPES_TO_RULE_SPECS_EXTENSIONS_MODULE_PATH
+                )
+            )
             cls._state_schema_version_to_html_field_types_to_rule_specs[
-                state_schema_version] = json.loads(
-                    constants.get_package_file_contents(
-                        'extensions',
-                        feconf
-                        .HTML_FIELD_TYPES_TO_RULE_SPECS_EXTENSIONS_MODULE_PATH))
+                state_schema_version
+            ] = specs_from_json
         elif not cached:
+            # Ruling out the possibility of None for mypy type checking.
+            assert state_schema_version is not None
             file_name = 'html_field_types_to_rule_specs_state_v%i.json' % (
-                state_schema_version)
+                state_schema_version
+            )
             spec_file = os.path.join(
                 feconf
                 .LEGACY_HTML_FIELD_TYPES_TO_RULE_SPECS_EXTENSIONS_MODULE_DIR,
-                file_name)
+                file_name
+            )
 
             try:
                 specs_from_json = json.loads(
                     constants.get_package_file_contents(
-                        'extensions', spec_file))
+                        'extensions', spec_file
+                    )
+                )
             except Exception as e:
                 raise Exception(
                     'No specs json file found for state schema v%i' %

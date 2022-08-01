@@ -54,7 +54,7 @@ class BaseSkillEditorControllerTests(test_utils.GenericTestBase):
             self.skill_id_2, self.admin_id, description='Description')
         self.topic_id = topic_fetchers.get_new_topic_id()
         subtopic = topic_domain.Subtopic.create_default_subtopic(
-            1, 'Subtopic1')
+            1, 'Subtopic1', 'url-frag-one')
         subtopic.skill_ids = [self.skill_id]
         self.save_new_topic(
             self.topic_id, self.admin_id, name='Name',
@@ -227,7 +227,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
             skill_id, self.admin_id, description='DescriptionSkill')
 
         subtopic = topic_domain.Subtopic.create_default_subtopic(
-            1, 'Addition')
+            1, 'Addition', 'addition')
         subtopic.skill_ids = [skill_id]
         topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_topic(
@@ -238,7 +238,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
             subtopics=[subtopic], next_subtopic_id=2)
 
         subtopic = topic_domain.Subtopic.create_default_subtopic(
-            1, 'Chemistry')
+            1, 'Chemistry', 'chemistry')
         subtopic.skill_ids = [skill_id]
         topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_topic(

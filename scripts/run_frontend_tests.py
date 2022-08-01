@@ -68,7 +68,12 @@ _PARSER.add_argument(
     action='store_true')
 _PARSER.add_argument(
     '--check_coverage',
-    help='option; if specified, checks frontend test coverage',
+    help='optional; if specified, checks frontend test coverage',
+    action='store_true'
+)
+_PARSER.add_argument(
+    '--download_combined_frontend_spec_file',
+    help='optional; if specifided, downloads the combined frontend file',
     action='store_true'
 )
 
@@ -140,6 +145,11 @@ def main(args: Optional[Sequence[str]] = None) -> None:
     # The value of `process.stdout` should not be None since we passed
     # the `stdout=subprocess.PIPE` argument to `Popen`.
     assert task.stdout is not None
+    # Prevents the wget command from running multiple times.
+    combined_spec_file_started_downloading = False
+    # This variable will be used to define the wget command to download
+    # the combined-test.spec.js file.
+    download_task = None
     # Reads and prints realtime output from the subprocess until it terminates.
     while True:
         line = task.stdout.readline()
@@ -152,10 +162,32 @@ def main(args: Optional[Sequence[str]] = None) -> None:
             # the line to print it.
             print(line.decode('utf-8'), end='')
             output_lines.append(line)
+        # Download the combined-tests.js file from the web-server.
+        if ('Executed' in line.decode('utf-8') and
+            not combined_spec_file_started_downloading and
+            parsed_args.download_combined_frontend_spec_file):
+            download_task = subprocess.Popen(
+                ['wget',
+                'http://localhost:9876/base/core/templates/' +
+                'combined-tests.spec.js',
+                '-P',
+                os.path.join('../karma_coverage_reports')])
+            # Wait for the wget command to download the combined-tests.spec.js
+            # file to complete.
+            download_task.wait()
+            combined_spec_file_started_downloading = True
     # Standard output is in bytes, we need to decode the line to print it.
     concatenated_output = ''.join(
         line.decode('utf-8') for line in output_lines)
-
+    if download_task:
+        # The result of the download is printed at the end for
+        # easy access to it.
+        if download_task.returncode:
+            print('Failed to download the combined-tests.spec.js file.')
+        else:
+            print(
+                'Downloaded the combined-tests.spec.js file and stored'
+                'in ../karma_coverage_reports')
     print('Done!')
 
     if 'Trying to get the Angular injector' in concatenated_output:
@@ -176,5 +208,5 @@ def main(args: Optional[Sequence[str]] = None) -> None:
         sys.exit(task.returncode)
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     main()

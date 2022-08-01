@@ -141,6 +141,10 @@ class _Gae(Platform):
             elif name == NAMES.job:
                 from core.storage.job import gae_models as job_models
                 returned_models.append(job_models)
+            elif name == NAMES.learner_group:
+                from core.storage.learner_group import (
+                    gae_models as learner_group_models)
+                returned_models.append(learner_group_models)
             elif name == NAMES.opportunity:
                 from core.storage.opportunity import (
                     gae_models as opportunity_models)

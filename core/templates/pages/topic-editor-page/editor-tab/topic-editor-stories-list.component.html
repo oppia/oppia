@@ -1,4 +1,4 @@
-<table class="dashboard-table protractor-test-story-list-table">
+<table class="dashboard-table e2e-test-story-list-table">
   <colgroup>
     <col class="oppia-colgroup-col-1">
     <col class="oppia-colgroup-col-2">
@@ -17,10 +17,10 @@
       dnd-dragstart="onMoveStoryStart($index)"
       dnd-drop="onMoveStoryFinish($index)"
       dnd-draggable="summary"
-      class="list-item protractor-test-story-list-item">
+      class="list-item e2e-test-story-list-item">
     <td>
       <a ng-click="openStoryEditor(summary.getId())" class="list-summary text-left">
-        <span class="protractor-test-story-title"> <[summary.getTitle()]> </span>
+        <span class="e2e-test-story-title"> <[summary.getTitle()]> </span>
       </a>
     </td>
     <td>
@@ -30,7 +30,7 @@
     </td>
     <td>
       <a ng-click="openStoryEditor(summary.getId())" class="list-summary text-center">
-        <span class="protractor-test-story-publication-status"> <[summary.isStoryPublished() ? "Yes" : "No"]> </span>
+        <span class="e2e-test-story-publication-status"> <[summary.isStoryPublished() ? "Yes" : "No"]> </span>
       </a>
     </td>
     <td>

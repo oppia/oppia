@@ -97,10 +97,11 @@ describe('Exploration Improvements Service', () => {
             unicode_str: '',
           },
         },
-        rows: { value: 1 },
+        rows: { value: 1 }
       },
       default_outcome: {
         dest: 'new state',
+        dest_if_really_stuck: null,
         feedback: {
           content_id: 'default_outcome',
           html: '',

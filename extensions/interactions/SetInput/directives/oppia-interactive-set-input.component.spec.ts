@@ -22,6 +22,8 @@ import { InteractionAttributesExtractorService } from 'interactions/interaction-
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { InteractiveSetInputComponent } from './oppia-interactive-set-input.component';
 import { TranslateModule } from '@ngx-translate/core';
+import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
+import { SetInputAnswer } from 'interactions/answer-defs';
 
 describe('InteractiveSetInputComponent', () => {
   let component: InteractiveSetInputComponent;
@@ -29,7 +31,9 @@ describe('InteractiveSetInputComponent', () => {
   let currentInteractionService: CurrentInteractionService;
 
   class mockInteractionAttributesExtractorService {
-    getValuesFromAttributes(interactionId, attributes) {
+    getValuesFromAttributes(
+        interactionId: InteractionSpecsKey, attributes: Record<string, string>
+    ) {
       return {
         buttonText: {
           value: {
@@ -40,8 +44,10 @@ describe('InteractiveSetInputComponent', () => {
   }
 
   let mockCurrentInteractionService = {
-    onSubmit: (answer, rulesService) => {},
-    registerCurrentInteraction: (submitAnswer, validateExpressionFn) => {
+    onSubmit: (
+        answer: SetInputAnswer, rulesService: CurrentInteractionService) => {},
+    registerCurrentInteraction: (
+        submitAnswer: Function, validateExpressionFn: Function) => {
       submitAnswer();
       validateExpressionFn();
     }
@@ -151,16 +157,16 @@ describe('InteractiveSetInputComponent', () => {
   it('should update answer when user edits saved solution', () => {
     component.answer = ['test1'];
 
-    component.updateAnswer(['test1', 'test2'] as unknown as number[]);
+    component.updateAnswer(['test1', 'test2']);
 
     expect(component.answer).toEqual(['test1', 'test2']);
   });
 
   it('should not update answer when user does not edit saved solution', () => {
-    component.answer = 'test1';
+    component.answer = ['test1'];
 
-    component.updateAnswer('test1' as unknown as number[]);
+    component.updateAnswer(['test1']);
 
-    expect(component.answer).toEqual('test1');
+    expect(component.answer).toEqual(['test1']);
   });
 });

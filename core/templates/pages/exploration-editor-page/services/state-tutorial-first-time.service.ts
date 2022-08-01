@@ -82,6 +82,7 @@ export class StateTutorialFirstTimeService {
 
     if (this._currentlyInTranslationFirstVisit) {
       this.enterTranslationForTheFirstTimeEventEmitter.emit();
+      this._currentlyInTranslationFirstVisit = false;
       this.editorFirstTimeEventsService.initRegisterEvents(expId);
       this.tutorialEventsBackendApiService
         .recordStartedTranslationTutorialEventAsync(expId).then(null, () => {

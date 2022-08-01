@@ -46,25 +46,28 @@ import { PreventPageUnloadEventService } from 'services/prevent-page-unload-even
   templateUrl: './blog-post-editor.component.html'
 })
 export class BlogPostEditorComponent implements OnInit {
-  blogPostData: BlogPostData;
-  blogPostId: string;
-  authorProfilePictureUrl: string;
-  uploadedImageDataUrl: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  blogPostData!: BlogPostData;
+  blogPostId!: string;
+  authorProfilePictureUrl!: string;
+  uploadedImageDataUrl!: string;
+  title!: string;
+  defaultTagsList!: string[];
+  maxAllowedTags!: number;
+  localEditedContent!: string;
+  thumbnailDataUrl!: string;
+  MAX_CHARS_IN_BLOG_POST_TITLE!: number;
+  MIN_CHARS_IN_BLOG_POST_TITLE!: number;
   DEFAULT_PROFILE_PICTURE_URL: string = '';
   dateTimeLastSaved: string = '';
   authorUsername: string = '';
-  title: string;
-  windowIsNarrow: boolean;
-  defaultTagsList: string[];
-  maxAllowedTags: number;
-  contentEditorIsActive: boolean = true;
-  localEditedContent: string;
-  thumbnailDataUrl: string;
+  windowIsNarrow: boolean = false;
+  contentEditorIsActive: boolean = false;
   invalidImageWarningIsShown: boolean = false;
   newChangesAreMade: boolean = false;
   lastChangesWerePublished: boolean = false;
-  MAX_CHARS_IN_BLOG_POST_TITLE: number;
-  MIN_CHARS_IN_BLOG_POST_TITLE: number;
   HTML_SCHEMA: EditorSchema = {
     type: 'html',
     ui_config: {
@@ -128,9 +131,8 @@ export class BlogPostEditorComponent implements OnInit {
           this.title = this.blogPostData.title;
           this.dateTimeLastSaved = this.getDateStringInWords(
             this.blogPostData.lastUpdated);
-          if (this.blogPostData.content.length > 0) {
-            this.contentEditorIsActive = false;
-          }
+          this.contentEditorIsActive = Boolean(
+            this.blogPostData.content.length === 0);
           if (this.blogPostData.thumbnailFilename) {
             this.thumbnailDataUrl = this.assetsBackendApiService
               .getThumbnailUrlForPreview(

@@ -130,7 +130,7 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
         # Add other structures to the topic.
         topic.add_canonical_story(story_id)
         topic.add_uncategorized_skill_id(skill_id)
-        topic.add_subtopic(1, 'Test Subtopic Title')
+        topic.add_subtopic(1, 'Test Subtopic Title', 'testsubtop')
 
         # Update and validate subtopic.
         topic_services.update_subtopic_thumbnail_filename(
@@ -138,6 +138,7 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
         topic.update_subtopic_thumbnail_bg_color(1, '#FFFFFF')
         topic.update_subtopic_url_fragment(1, 'suburl')
         topic.move_skill_id_to_subtopic(None, 1, skill_id)
+        topic.update_skill_ids_for_diagnostic_test([skill_id])
         subtopic_page = (
             subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
                 1, topic_id))
@@ -204,7 +205,8 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
             [topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_ADD_SUBTOPIC,
                 'subtopic_id': 1,
-                'title': 'Dummy Subtopic Title'
+                'title': 'Dummy Subtopic Title',
+                'url_fragment': 'dummy-fragment'
             })]
         )
 
@@ -288,7 +290,7 @@ class InitializeAndroidTestDataHandler(base.BaseHandler):
         state.update_interaction_hints(hints_list)
         state.update_interaction_default_outcome(
             state_domain.Outcome(
-                None, state_domain.SubtitledHtml(
+                None, None, state_domain.SubtitledHtml(
                     'feedback_id', '<p>Dummy Feedback</p>'),
                 True, [], None, None
             )

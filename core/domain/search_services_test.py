@@ -28,16 +28,19 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
+from typing import List, Optional, Tuple
+from typing_extensions import Final
+
 gae_search_services = models.Registry.import_search_services()
 
 
 class SearchServicesUnitTests(test_utils.GenericTestBase):
     """Test the search services module."""
 
-    EXP_ID = 'An_exploration_id'
-    COLLECTION_ID = 'A_collection_id'
+    EXP_ID: Final = 'An_exploration_id'
+    COLLECTION_ID: Final = 'A_collection_id'
 
-    def setUp(self):
+    def setUp(self) -> None:
         super(SearchServicesUnitTests, self).setUp()
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
@@ -46,19 +49,19 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        self.voice_artist_id = self.get_user_id_from_email(
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)  # type: ignore[no-untyped-call]
+        self.voice_artist_id = self.get_user_id_from_email(  # type: ignore[no-untyped-call]
             self.VOICE_ARTIST_EMAIL)
-        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)  # type: ignore[no-untyped-call]
 
         self.owner = user_services.get_user_actions_info(self.owner_id)
 
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])  # type: ignore[no-untyped-call]
         self.user_id_admin = (
-            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))  # type: ignore[no-untyped-call]
 
-    def test_get_search_rank(self):
+    def test_get_search_rank(self) -> None:
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
         exp_summary = exp_fetchers.get_exploration_summary_by_id(self.EXP_ID)
 
@@ -68,7 +71,7 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
             search_services.get_search_rank_from_exp_summary(exp_summary),
             base_search_rank)
 
-        rights_manager.publish_exploration(self.owner, self.EXP_ID)
+        rights_manager.publish_exploration(self.owner, self.EXP_ID)  # type: ignore[no-untyped-call]
         self.assertEqual(
             search_services.get_search_rank_from_exp_summary(exp_summary),
             base_search_rank)
@@ -87,7 +90,7 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
             search_services.get_search_rank_from_exp_summary(exp_summary),
             base_search_rank + 8)
 
-    def test_search_ranks_cannot_be_negative(self):
+    def test_search_ranks_cannot_be_negative(self) -> None:
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
         exp_summary = exp_fetchers.get_exploration_summary_by_id(self.EXP_ID)
 
@@ -115,7 +118,7 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(search_services.get_search_rank_from_exp_summary(
             exp_summary), 0)
 
-    def test_search_explorations(self):
+    def test_search_explorations(self) -> None:
         expected_query_string = 'a query string'
         expected_offset = 0
         expected_size = 30
@@ -123,8 +126,15 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
         doc_ids = ['id1', 'id2']
 
         def mock_search(
-                query_string, index, categories, language_codes, offset=None,
-                size=20, ids_only=False, retries=3):
+            query_string: str,
+            index: str,
+            categories: List[str],
+            language_codes: List[str],
+            offset: Optional[int] = None,
+            size: int = 20,
+            ids_only: bool = False,
+            retries: int = 3
+        ) -> Tuple[List[str], Optional[int]]:
             self.assertEqual(query_string, expected_query_string)
             self.assertEqual(index, search_services.SEARCH_INDEX_EXPLORATIONS)
             self.assertEqual(categories, [])
@@ -145,7 +155,7 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(result_offset, expected_result_offset)
         self.assertEqual(result, doc_ids)
 
-    def test_search_collections(self):
+    def test_search_collections(self) -> None:
         expected_query_string = 'a query string'
         expected_offset = 0
         expected_size = 30
@@ -153,8 +163,15 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
         doc_ids = ['id1', 'id2']
 
         def mock_search(
-                query_string, index, categories, language_codes, offset=None,
-                size=20, ids_only=False, retries=3):
+            query_string: str,
+            index: str,
+            categories: List[str],
+            language_codes: List[str],
+            offset: Optional[int] = None,
+            size: int = 20,
+            ids_only: bool = False,
+            retries: int = 3
+        ) -> Tuple[List[str], Optional[int]]:
             self.assertEqual(query_string, expected_query_string)
             self.assertEqual(
                 index, collection_services.SEARCH_INDEX_COLLECTIONS)
@@ -176,7 +193,7 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(result_offset, expected_result_offset)
         self.assertEqual(result, doc_ids)
 
-    def test_demo_collections_are_added_to_search_index(self):
+    def test_demo_collections_are_added_to_search_index(self) -> None:
         results = search_services.search_collections('Welcome', [], [], 2)[0]
         self.assertEqual(results, [])
 
@@ -184,7 +201,7 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
         results = search_services.search_collections('Welcome', [], [], 2)[0]
         self.assertEqual(results, ['0'])
 
-    def test_demo_explorations_are_added_to_search_index(self):
+    def test_demo_explorations_are_added_to_search_index(self) -> None:
         results, _ = search_services.search_explorations('Welcome', [], [], 2)
         self.assertEqual(results, [])
 
@@ -192,7 +209,7 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
         results, _ = search_services.search_explorations('Welcome', [], [], 2)
         self.assertEqual(results, ['0'])
 
-    def test_clear_exploration_search_index(self):
+    def test_clear_exploration_search_index(self) -> None:
         exp_services.load_demo('0')
         result = search_services.search_explorations('Welcome', [], [], 2)[0]
         self.assertEqual(result, ['0'])
@@ -200,7 +217,7 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
         result = search_services.search_explorations('Welcome', [], [], 2)[0]
         self.assertEqual(result, [])
 
-    def test_clear_collection_search_index(self):
+    def test_clear_collection_search_index(self) -> None:
         collection_services.load_demo('0')
         result = search_services.search_collections('Welcome', [], [], 2)[0]
         self.assertEqual(result, ['0'])
@@ -208,14 +225,14 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
         result = search_services.search_collections('Welcome', [], [], 2)[0]
         self.assertEqual(result, [])
 
-    def test_delete_explorations_from_search_index(self):
+    def test_delete_explorations_from_search_index(self) -> None:
 
-        def _mock_delete_docs(ids, index):
+        def _mock_delete_docs(ids: List[str], index: str) -> None:
             """Mocks delete_documents_from_index()."""
             self.assertEqual(ids, [self.EXP_ID])
             self.assertEqual(index, search_services.SEARCH_INDEX_EXPLORATIONS)
 
-        delete_docs_counter = test_utils.CallCounter(_mock_delete_docs)
+        delete_docs_counter = test_utils.CallCounter(_mock_delete_docs)  # type: ignore[no-untyped-call]
 
         delete_docs_swap = self.swap(
             gae_search_services, 'delete_documents_from_index',
@@ -226,14 +243,14 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(delete_docs_counter.times_called, 1)
 
-    def test_delete_collections_from_search_index(self):
+    def test_delete_collections_from_search_index(self) -> None:
 
-        def _mock_delete_docs(ids, index):
+        def _mock_delete_docs(ids: List[str], index: str) -> None:
             """Mocks delete_documents_from_index()."""
             self.assertEqual(ids, [self.COLLECTION_ID])
             self.assertEqual(index, search_services.SEARCH_INDEX_COLLECTIONS)
 
-        delete_docs_counter = test_utils.CallCounter(_mock_delete_docs)
+        delete_docs_counter = test_utils.CallCounter(_mock_delete_docs)  # type: ignore[no-untyped-call]
 
         delete_docs_swap = self.swap(
             gae_search_services, 'delete_documents_from_index',

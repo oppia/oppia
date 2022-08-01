@@ -22,65 +22,64 @@ var action = require('./action.js');
 var forms = require('./forms.js');
 var waitFor = require('./waitFor.js');
 var interactions = require('../../../extensions/interactions/protractor.js');
-var action = require('./action.js');
 const { browser } = require('protractor');
 
 var ExplorationPlayerPage = function() {
   var conversationInput = element(
-    by.css('.protractor-test-conversation-input'));
-  var nextCardButton = element(by.css('.protractor-test-next-card-button'));
+    by.css('.e2e-test-conversation-input'));
+  var nextCardButton = element(by.css('.e2e-test-next-card-button'));
   var conversationSkinCardsContainer = element(
-    by.css('.protractor-test-conversation-skin-cards-container'));
+    by.css('.e2e-test-conversation-skin-cards-container'));
   var conversationContent = element.all(
-    by.css('.protractor-test-conversation-content'));
+    by.css('.e2e-test-conversation-content'));
   var conversationFeedback = element(
-    by.css('.protractor-test-conversation-feedback-latest'));
+    by.css('.e2e-test-conversation-feedback-latest'));
   var explorationHeader = element(
-    by.css('.protractor-test-exploration-header'));
+    by.css('.e2e-test-exploration-header'));
   var infoCardRating = element(
-    by.css('.protractor-test-info-card-rating'));
+    by.css('.e2e-test-info-card-rating'));
   var feedbackTextArea = element(
-    by.css('.protractor-test-exploration-feedback-textarea'));
+    by.css('.e2e-test-exploration-feedback-textarea'));
   var waitingForResponseElem = element(by.css(
-    '.protractor-test-input-response-loading-dots'));
-  var ratingStars = element.all(by.css('.protractor-test-rating-star'));
+    '.e2e-test-input-response-loading-dots'));
+  var ratingStars = element.all(by.css('.e2e-test-rating-star'));
   var feedbackCloseButton = element(
-    by.css('.protractor-test-exploration-feedback-close-button'));
+    by.css('.e2e-test-exploration-feedback-close-button'));
   var reportExplorationButton = element(
-    by.css('.protractor-test-report-exploration-button'));
+    by.css('.e2e-test-report-exploration-button'));
   var feedbackSubmitButton = element(
-    by.css('.protractor-test-exploration-feedback-submit-btn'));
+    by.css('.e2e-test-exploration-feedback-submit-btn'));
   var explorationInfoIcon = element(
-    by.css('.protractor-test-exploration-info-icon'));
+    by.css('.e2e-test-exploration-info-icon'));
   var nextCardButton = element(
-    by.css('.protractor-test-continue-to-next-card-button'));
-  var viewHintButton = element(by.css('.protractor-test-view-hint'));
-  var viewSolutionButton = element(by.css('.protractor-test-view-solution'));
+    by.css('.e2e-test-continue-to-next-card-button'));
+  var viewHintButton = element(by.css('.e2e-test-view-hint'));
+  var viewSolutionButton = element(by.css('.e2e-test-view-solution'));
   var continueToSolutionButton = element(
-    by.css('.protractor-test-continue-to-solution-btn'));
-  var gotItButton = element(by.css('.protractor-test-learner-got-it-button'));
+    by.css('.e2e-test-continue-to-solution-btn'));
+  var gotItButton = element(by.css('.e2e-test-learner-got-it-button'));
   var confirmRedirectionButton =
-      element(by.css('.protractor-test-confirm-redirection-button'));
+      element(by.css('.e2e-test-confirm-redirection-button'));
   var cancelRedirectionButton = element(
-    by.css('.protractor-test-cancel-redirection-button'));
+    by.css('.e2e-test-cancel-redirection-button'));
   var returnToParentButton = element(
-    by.css('.protractor-test-return-to-parent-button'));
+    by.css('.e2e-test-return-to-parent-button'));
   var correctFeedbackElement = element(
-    by.css('.protractor-test-correct-feedback'));
+    by.css('.e2e-test-correct-feedback'));
 
   var feedbackPopupLink =
-    element(by.css('.protractor-test-exploration-feedback-popup-link'));
+    element(by.css('.e2e-test-exploration-feedback-popup-link'));
   var suggestionPopupLink =
-    element(by.css('.protractor-test-exploration-suggestion-popup-link'));
+    element(by.css('.e2e-test-exploration-suggestion-popup-link'));
 
-  var audioBarExpandButton = element(by.css('.protractor-test-audio-bar'));
+  var audioBarExpandButton = element(by.css('.e2e-test-audio-bar'));
   var voiceoverLanguageSelector = element(
-    by.css('.protractor-test-audio-lang-select'));
-  var playButton = element(by.css('.protractor-test-play-circle'));
-  var pauseButton = element(by.css('.protractor-test-pause-circle'));
-  let submitButton = element(by.css('.protractor-test-submit-report-button'));
+    by.css('.e2e-test-audio-lang-select'));
+  var playButton = element(by.css('.e2e-test-play-circle'));
+  var pauseButton = element(by.css('.e2e-test-pause-circle'));
+  let submitButton = element(by.css('.e2e-test-submit-report-button'));
   var flaggedSuccessElement = element(
-    by.css('.protractor-test-exploration-flagged-success-message'));
+    by.css('.e2e-test-exploration-flagged-success-message'));
 
   this.expandAudioBar = async function() {
     await action.click('Audio Bar Expand Button', audioBarExpandButton);
@@ -137,6 +136,8 @@ var ExplorationPlayerPage = function() {
     let textArea = element(by.tagName('textarea'));
     await action.sendKeys('Text Area', textArea, 'Reporting this exploration');
     await action.click('Submit Button', submitButton);
+    await waitFor.visibilityOf(
+      flaggedSuccessElement, 'Successfully-flagged modal not showing up.');
     let afterSubmitText = await flaggedSuccessElement.getText();
     expect(afterSubmitText).toMatch(
       'Your report has been forwarded to the moderators for review.');
@@ -186,6 +187,16 @@ var ExplorationPlayerPage = function() {
     await waitFor.elementToBeClickable(returnToParentButton);
     await action.click('Return To Parent Button', returnToParentButton);
     await waitFor.pageToFullyLoad();
+  };
+
+  this.clickCloseLessonInfoTooltip = async function(
+      closeLessonInfoTooltipElement
+  ) {
+    await waitFor.elementToBeClickable(
+      closeLessonInfoTooltipElement,
+      'Lesson Info Tooltip takes too long to appear');
+    await action.click(
+      'Close Lesson Info Tooltip', closeLessonInfoTooltipElement);
   };
 
   // This verifies the question just asked, including formatting and

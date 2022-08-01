@@ -24,7 +24,10 @@ from core import utils
 
 from typing import Any, List, Tuple # isort: skip
 
-MAX_OUTPUT_BYTES = 1500
+# This is just to make sure that the output of the job have some reasonable
+# length. The maximum that model can hold is around 1 MB and this is much lower.
+MAX_OUTPUT_CHARACTERS = 5000
+TRUNCATED_MARK = '[TRUNCATED]'
 
 
 class JobRunResult:
@@ -52,9 +55,14 @@ class JobRunResult:
 
         self.stdout, self.stderr = stdout, stderr
 
-        if self.len_in_bytes() > MAX_OUTPUT_BYTES:
-            raise ValueError(
-                'JobRunResult must not exceed %d bytes' % MAX_OUTPUT_BYTES)
+        if len(self.stdout) > MAX_OUTPUT_CHARACTERS:
+            self.stdout = '%s%s' % (
+                self.stdout[:MAX_OUTPUT_CHARACTERS], TRUNCATED_MARK
+            )
+        if len(self.stderr) > MAX_OUTPUT_CHARACTERS:
+            self.stderr = '%s%s' % (
+                self.stderr[:MAX_OUTPUT_CHARACTERS], TRUNCATED_MARK
+            )
 
     @classmethod
     def as_stdout(cls, value: Any, use_repr: bool = False) -> JobRunResult:
@@ -107,7 +115,10 @@ class JobRunResult:
         for i, result in enumerate(results):
             # Use i as a tie-breaker so that results, which don't implement the
             # comparison operators, don't get compared with one another.
-            heapq.heappush(results_heap, (result.len_in_bytes(), i, result))
+            heapq.heappush(
+                results_heap,
+                (len(result.stdout) + len(result.stderr), i, result)
+            )
 
         batches = []
         latest_batch_size, _, smallest = heapq.heappop(results_heap)
@@ -121,7 +132,8 @@ class JobRunResult:
             # them is empty).
             padding = 2 if next_smallest.stdout and next_smallest.stderr else 1
 
-            if latest_batch_size + padding + result_size < MAX_OUTPUT_BYTES:
+            overall_size = latest_batch_size + padding + result_size
+            if overall_size <= MAX_OUTPUT_CHARACTERS:
                 latest_batch_size += padding + result_size
                 batches[-1].append(next_smallest)
             else:
@@ -134,15 +146,6 @@ class JobRunResult:
             stderr = '\n'.join(r.stderr for r in batch if r.stderr)
             batched_results.append(JobRunResult(stdout=stdout, stderr=stderr))
         return batched_results
-
-    def len_in_bytes(self) -> int:
-        """Returns the number of bytes encoded by the JobRunResult instance.
-
-        Returns:
-            int. The number of bytes encoded by the JobRunResult instance.
-        """
-        output_bytes = (s.encode('utf-8') for s in (self.stdout, self.stderr))
-        return sum(len(output) for output in output_bytes)
 
     def __repr__(self) -> str:
         return '%s(stdout=%s, stderr=%s)' % (

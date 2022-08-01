@@ -19,6 +19,8 @@
 from __future__ import annotations
 
 import datetime
+import random
+import string
 
 from core import feconf
 from core import utils
@@ -375,6 +377,8 @@ class ExplorationModel(base_models.VersionedModel):
                 from storage, otherwise there are only marked as deleted.
                 Default is False.
         """
+        versioned_exp_models = cls.get_multi(entity_ids, include_deleted=True)
+
         super(ExplorationModel, cls).delete_multi(
             entity_ids, committer_id,
             commit_message, force_deletion=force_deletion)
@@ -383,10 +387,9 @@ class ExplorationModel(base_models.VersionedModel):
             commit_log_models = []
             exp_rights_models = ExplorationRightsModel.get_multi(
                 entity_ids, include_deleted=True)
-            versioned_models = cls.get_multi(entity_ids, include_deleted=True)
 
             versioned_and_exp_rights_models = zip(
-                versioned_models, exp_rights_models)
+                versioned_exp_models, exp_rights_models)
             for model, rights_model in versioned_and_exp_rights_models:
                 # Ruling out the possibility of None for mypy type checking.
                 assert model is not None
@@ -402,6 +405,24 @@ class ExplorationModel(base_models.VersionedModel):
             ExplorationCommitLogEntryModel.update_timestamps_multi(
                 commit_log_models)
             datastore_services.put_multi(commit_log_models)
+        else:
+            # Delete the ExplorationVersionHistoryModels if force_deletion is
+            # True.
+            versioned_exp_models_without_none = [
+                model for model in versioned_exp_models
+                if model is not None
+            ]
+            version_history_keys = []
+            for model in versioned_exp_models_without_none:
+                for version in range(1, model.version + 1):
+                    version_history_id = (
+                        ExplorationVersionHistoryModel.get_instance_id(
+                            model.id, version
+                        )
+                    )
+                    version_history_keys.append(datastore_services.Key(
+                        ExplorationVersionHistoryModel, version_history_id))
+            datastore_services.delete_multi(version_history_keys)
 
     # TODO(#13523): Change snapshot of this model to TypedDict/Domain Object
     # to remove Any used below.
@@ -865,6 +886,104 @@ class ExplorationRightsModel(base_models.VersionedModel):
         }
 
 
+class TransientCheckpointUrlModel(base_models.BaseModel):
+    """Model for storing the progress of a logged-out user."""
+
+    # The exploration id.
+    exploration_id = (
+        datastore_services.StringProperty(required=True, indexed=True))
+    # The state name of the furthest reached checkpoint.
+    furthest_reached_checkpoint_state_name = datastore_services.StringProperty(
+        default=None)
+    # The exploration version of the furthest reached checkpoint.
+    furthest_reached_checkpoint_exp_version = (
+        datastore_services.IntegerProperty(default=None))
+    # The state name of the most recently reached checkpoint.
+    most_recently_reached_checkpoint_state_name = (
+        datastore_services.StringProperty(default=None))
+    # The exploration version of the most recently reached checkpoint.
+    most_recently_reached_checkpoint_exp_version = (
+        datastore_services.IntegerProperty(default=None))
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            'exploration_id':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'furthest_reached_checkpoint_state_name':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'furthest_reached_checkpoint_exp_version':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'most_recently_reached_checkpoint_state_name':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'most_recently_reached_checkpoint_exp_version':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
+
+    @classmethod
+    def create(
+        cls,
+        exploration_id: str,
+        unique_progress_url_id: str
+    ) -> TransientCheckpointUrlModel:
+        """Creates a new TransientCheckpointUrlModel instance and returns it.
+
+        Note that the client is responsible for actually saving this entity to
+        the datastore.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+            unique_progress_url_id: str. The 6 digit long unique id
+                assigned to the progress made by a logged-out user.
+
+        Returns:
+            TransientCheckpointUrlModel. The newly created
+            TransientCheckpointUrlModel instance.
+        """
+        entity = cls(
+            id=unique_progress_url_id,
+            exploration_id=exploration_id)
+
+        entity.update_timestamps()
+        entity.put()
+        return entity
+
+    @classmethod
+    def get_new_progress_id(cls) -> str:
+        """Gets a new unique progress url id for the logged-out user.
+
+        The returned id is guaranteed to be unique among all instances of this
+        entity.
+
+        Returns:
+            str. New unique progress url id.
+
+        Raises:
+            Exception. An ID cannot be generated within a reasonable number
+                of attempts.
+        """
+        for _ in range(base_models.MAX_RETRIES):
+            new_id = '%s' % ''.join(
+                random.choice(string.ascii_letters)
+                for _ in range(constants.MAX_PROGRESS_URL_ID_LENGTH))
+            if not cls.get_by_id(new_id):
+                return new_id
+
+        raise Exception('New id generator is producing too many collisions.')
+
+
 class ExpSummaryModel(base_models.BaseModel):
     """Summary model for an Oppia exploration.
 
@@ -1112,4 +1231,127 @@ class ExpSummaryModel(base_models.BaseModel):
             'contributor_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'contributors_summary': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'version': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
+
+
+class ExplorationVersionHistoryModel(base_models.BaseModel):
+    """Version history model for an oppia exploration.
+
+    Version history means some information about the previous commit on each
+    state and the exploration metadata at a particular version of the
+    exploration. The information about each state includes the version
+    number of the exploration on which the state was previously edited,
+    the name of the state at the previous version and the id of the user who
+    committed those changes. For metadata, the information includes the
+    version number of the exploration on which the metadata was previously
+    edited and the id of the user who committed those changes.
+
+    A new instance of this model is created each time a new exploration
+    is created or some changes are saved in an exploration.
+
+    The id of the model is generated as follows:
+    {exploration_id}-{exploration_version}
+    """
+
+    # The id of the corresponding exploration.
+    exploration_id = datastore_services.StringProperty(
+        required=True, indexed=True)
+    # The version of the corresponding exploration.
+    exploration_version = datastore_services.IntegerProperty(
+        required=True, indexed=True)
+    # The details of the previous commit on each state at a particular
+    # version of the exploration. The json structure will look like the
+    # following:
+    # {
+    #   [state_name: str]: {
+    #     "previously_edited_in_version": int,
+    #     "state_name_in_previous_version": str,
+    #     "committer_id": str
+    #   }
+    # }
+    # The json object can have multiple keys in this case depending on
+    # the number of states.
+    state_version_history = datastore_services.JsonProperty(
+        default={}, indexed=False)
+    # The exploration version on which the metadata was previously edited.
+    # If its value is v, then it will indicate that the metadata was modified
+    # when the exploration was updated from version v -> v + 1.
+    # Its value will be None during the creation of an exploration. The value
+    # None indicates that the metadata was not modified after the creation of
+    # the exploration.
+    metadata_last_edited_version_number = datastore_services.IntegerProperty(
+        indexed=True)
+    # The user id of the user who committed the latest changes to the
+    # exploration metadata.
+    metadata_last_edited_committer_id = datastore_services.StringProperty(
+        required=True, indexed=True)
+    # The user ids of the users who did the 'previous commit' on each state
+    # in this version of the exploration. It is required during the
+    # wipeout process to query for the models efficiently.
+    committer_ids = datastore_services.StringProperty(
+        indexed=True, repeated=True)
+
+    @classmethod
+    def get_instance_id(cls, exp_id: str, exp_version: int) -> str:
+        """Returns ID of the exploration version history model.
+
+        Args:
+            exp_id: str. The ID of the exploration.
+            exp_version: int. The version of the exploration.
+
+        Returns:
+            str. A string containing exploration ID and
+            exploration version.
+        """
+        return '%s.%s' % (exp_id, exp_version)
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id: str) -> bool:
+        """Check whether ExplorationVersionHistoryModel references
+        the given user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return ExplorationVersionHistoryModel.query(
+            ExplorationVersionHistoryModel.committer_ids == user_id
+        ).get(keys_only=True) is not None
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model contains data to pseudonymize corresponding to a user:
+        committer_ids field, metadata_last_edited_committer_id field and the
+        user ids stored in state_version_history field.
+        """
+        return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
+
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """All the noteworthy data in this model which are related to a
+        user's contributions to an exploration is already contained in various
+        user models such as UserContributionsModel which fall under Takeout.
+        Hence, this model will not export any data.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model contains data corresponding to a user, but this isn't exported
+        because the all the noteworthy data related to a user's contributions
+        to an exploration is already contained in various user models such
+        as UserContributionsModel which fall under Takeout.
+        """
+        return dict(super(cls, cls).get_export_policy(), **{
+            'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exploration_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'state_version_history': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'metadata_last_edited_version_number': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE),
+            'metadata_last_edited_committer_id': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE),
+            'committer_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })

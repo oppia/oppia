@@ -27,7 +27,11 @@ describe('Rubrics Editor Component', () => {
   let fixture: ComponentFixture<RubricsEditorComponent>;
   let componentInstance: RubricsEditorComponent;
   let difficulty: string = 'medium';
-  let rubrics: Rubric[] = [new Rubric(difficulty, [])];
+  let rubrics: Rubric[] = [
+    new Rubric('easy', []),
+    new Rubric(difficulty, []),
+    new Rubric('hard', [])
+  ];
   let skillCreationService: SkillCreationService;
 
   beforeEach(waitForAsync(() => {
@@ -132,7 +136,7 @@ describe('Rubrics Editor Component', () => {
     let newExplanation: string = 'new';
     componentInstance.ngOnInit();
     componentInstance.editableExplanations[difficulty][index] = '';
-    componentInstance.rubric = rubrics[0];
+    componentInstance.rubric = rubrics[1];
     componentInstance.updateExplanation(newExplanation, index);
     expect(componentInstance.editableExplanations[difficulty][index])
       .toEqual(newExplanation);

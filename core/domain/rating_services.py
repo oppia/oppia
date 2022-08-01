@@ -70,7 +70,7 @@ def assign_rating_to_exploration(
     if new_rating not in ALLOWED_RATINGS:
         raise ValueError('Expected a rating 1-5, received %s.' % new_rating)
 
-    exploration = exp_fetchers.get_exploration_by_id(  # type: ignore[no-untyped-call]
+    exploration = exp_fetchers.get_exploration_by_id(
         exploration_id, strict=False)
     if exploration is None:
         raise ValueError('Invalid exploration id %s' % exploration_id)

@@ -33,12 +33,15 @@ import { PlayerTranscriptService } from '../services/player-transcript.service';
   templateUrl: './display-hint-modal.component.html'
 })
 export class DisplayHintModalComponent {
-  index: number;
-  COMPONENT_NAME_HINT: string;
-  hint: SubtitledHtml;
-  displayedCard: StateCard;
-  recordedVoiceovers: RecordedVoiceovers;
-  hintContentId: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  index!: number;
+  COMPONENT_NAME_HINT!: string;
+  hint!: SubtitledHtml;
+  displayedCard!: StateCard;
+  recordedVoiceovers!: RecordedVoiceovers;
+  hintContentId!: string;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -51,11 +54,20 @@ export class DisplayHintModalComponent {
   ) {}
 
   ngOnInit(): void {
-    this.hint = this.hintsAndSolutionManagerService.displayHint(this.index);
+    let displayHint = (
+      this.hintsAndSolutionManagerService.displayHint(this.index));
+    if (displayHint === null) {
+      throw new Error('Hint not found.');
+    }
+    this.hint = displayHint;
     this.displayedCard = this.playerTranscriptService.getCard(
       this.playerPositionService.getDisplayedCardIndex());
     this.recordedVoiceovers = this.displayedCard.getRecordedVoiceovers();
-    this.hintContentId = this.hint.contentId;
+    let contentId = this.hint.contentId;
+    if (contentId === null) {
+      throw new Error('Content id not found.');
+    }
+    this.hintContentId = contentId;
 
     this.audioTranslationManagerService
       .setSecondaryAudioTranslations(

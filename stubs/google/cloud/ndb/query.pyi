@@ -92,6 +92,12 @@ class Query:
         self,
         page_size: int,
         start_cursor: Optional[Cursor],
+    ) -> Tuple[Sequence[TYPE_MODEL], Cursor, bool]: ...
+    @overload
+    def fetch_page(
+        self,
+        page_size: int,
+        start_cursor: Optional[Cursor],
         keys_only: Literal[False] = ...,
     ) -> Tuple[Sequence[TYPE_MODEL], Cursor, bool]: ...
     @overload

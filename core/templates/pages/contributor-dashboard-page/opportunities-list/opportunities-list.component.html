@@ -1,14 +1,15 @@
 <div class="oppia-opportunities-list">
   <div [hidden]="loadingOpportunityData" *ngFor="let opportunity of visibleOpportunities">
     <oppia-opportunities-list-item [opportunity]="opportunity"
-                             (clickActionButton)="clickActionButton.emit($event)"
-                             [progressBarRequired]="progressBarRequired"
-                             [labelRequired]="labelRequired"
-                             [opportunityHeadingTruncationLength]="opportunityHeadingTruncationLength"
-                             [opportunityType]="opportunityType">
+                                   (clickActionButton)="clickActionButton.emit($event)"
+                                   [progressBarRequired]="progressBarRequired"
+                                   [labelRequired]="labelRequired"
+                                   [opportunityHeadingTruncationLength]="opportunityHeadingTruncationLength"
+                                   [opportunityType]="opportunityType"
+                                   [showOpportunityButton]="showOpportunityButton">
     </oppia-opportunities-list-item>
   </div>
-  <div [hidden]="!loadingOpportunityData" class="protractor-test-opportunity-loading-placeholder">
+  <div [hidden]="!loadingOpportunityData" class="e2e-test-opportunity-loading-placeholder">
     <oppia-opportunities-list-item></oppia-opportunities-list-item>
     <oppia-opportunities-list-item></oppia-opportunities-list-item>
   </div>
@@ -28,7 +29,7 @@
   </div>
   <div class="oppia-end-availability" [hidden]="!(visibleOpportunities.length === 0 && !loadingOpportunityData)">
     <div class="oppia-end-availability-line"></div>
-    <div class="oppia-opportunity-availablity-message protractor-test-opportunity-list-empty-availability-message">No opportunity available!</div>
+    <div class="oppia-opportunity-availablity-message e2e-test-opportunity-list-empty-availability-message">No opportunity available!</div>
     <div class="oppia-end-availability-line"></div>
   </div>
 </div>
@@ -73,7 +74,6 @@
     min-width: 100px;
     text-align: center;
   }
-
   .oppia-pagination-button:hover {
     border: 2px solid #009688;
     border-radius: 5px;
@@ -83,5 +83,11 @@
   }
   .oppia-pagination-button[disabled]:hover {
     border: none;
+  }
+  @media only screen and (max-width: 700px) {
+    .oppia-opportunities-list {
+      margin: auto 0;
+      width: 100%;
+    }
   }
 </style>

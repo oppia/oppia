@@ -24,17 +24,15 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { InteractiveNumericExpressionInput } from './oppia-interactive-numeric-expression-input.component';
 import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { NumericExpressionAnswer } from 'interactions/answer-defs';
 
 describe('NumericExpressionInputInteractive', () => {
-  importAllAngularServices();
-
   let component: InteractiveNumericExpressionInput;
   let fixture: ComponentFixture<InteractiveNumericExpressionInput>;
   let windowRef: WindowRef;
   let guppyInitializationService: GuppyInitializationService;
   let deviceInfoService: DeviceInfoService;
-  let mockCurrentInteractionService;
+  let mockCurrentInteractionService: CurrentInteractionService;
   let mockGuppyObject = {
     divId: '1',
     guppyInstance: {
@@ -61,8 +59,12 @@ describe('NumericExpressionInputInteractive', () => {
   }
 
   class MockCurrentInteractionService {
-    onSubmit(answer, rulesService) {}
-    registerCurrentInteraction(submitAnswerFn, validateExpressionFn) {
+    onSubmit(
+        answer: NumericExpressionAnswer, rulesService: CurrentInteractionService
+    ) {}
+
+    registerCurrentInteraction(
+        submitAnswerFn: Function, validateExpressionFn: Function) {
       submitAnswerFn();
       validateExpressionFn();
     }

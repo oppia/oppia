@@ -1,6 +1,3 @@
-<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/pages/collection-player-page/collection-player-page.component.css" as="style">
-<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/pages/collection-player-page/collection-player-page.component.rtl.css" as="style">
-
 <div>
   <background-banner></background-banner>
   <div *ngIf="!collection?.getCollectionNodeCount()" class="no-exploration-created">
@@ -74,7 +71,7 @@
             {{ node.getExplorationTitle() }}
         </div>
 
-        <svg class="oppia-collection-exploration protractor-test-collection-exploration"
+        <svg class="oppia-collection-exploration e2e-test-collection-exploration"
              width="100"
              height="125"
              xmlns="http://www.w3.org/2000/svg"
@@ -132,7 +129,7 @@
         <a href="#"
            [attr.title-data]="index + 1 + '. ' + node?.getExplorationTitle()"
            class="oppia-collection-node-small-screen">
-          <svg class="protractor-mobile-test-collection-exploration"
+          <svg class="e2e-mobile-test-collection-exploration"
                width="100"
                height="150"
                xmlns="http://www.w3.org/2000/svg"
@@ -260,7 +257,3 @@
   </div>
 </div>
 <attribution-guide></attribution-guide>
-
-<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
-<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/collection-player-page/collection-player-page.component.css">
-<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/collection-player-page/collection-player-page.component.rtl.css">
