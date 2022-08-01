@@ -38,12 +38,14 @@ from core.domain import change_domain
 from core.domain import param_domain
 from core.domain import state_domain
 from core.domain import translation_domain
+from extensions.objects.models import objects
 
 from typing import Dict, List, Optional
 from typing_extensions import TypedDict
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
+from core.domain import interaction_registry  # pylint: disable=invalid-import-from # isort:skip
 from core.platform import models  # pylint: disable=invalid-import-from # isort:skip
 
 # TODO(#14537): Refactor this file and remove imports marked
@@ -2330,59 +2332,66 @@ class Exploration(translation_domain.BaseTranslatableObject):
             dict. The converted states_dict.
         """
         for state_dict in states_dict.values():
+            interaction = state_dict['interaction']
             content_id_list = []
-            for answer_group in state_dict['interaction']['answer_groups']:
+            for answer_group in interaction['answer_groups']:
                 content_id_list.append(
                     answer_group['outcome']['feedback']['content_id']
                 )
 
-                for rule_spec in answer_group.rule_specs:
-                    for param_name, value in rule_spec.inputs.items():
+                for rule_spec in answer_group['rule_specs']:
+                    for param_name, value in rule_spec['inputs'].items():
                         param_type = (
                             interaction_registry.Registry.get_interaction_by_id(
-                                self.interaction.id
-                            ).get_rule_param_type(rule_spec.rule_type, param_name))
+                                interaction['id']
+                            ).get_rule_param_type(
+                                rule_spec['rule_type'], param_name
+                            )
+                        )
 
-                        if issubclass(param_type, objects.BaseTranslatableObject):
-                            if value['contentId'] in content_id_list:
-                                raise utils.ValidationError(
-                                    'Found a duplicate content '
-                                    'id %s' % value['contentId'])
+                        if issubclass(
+                            param_type, objects.BaseTranslatableObject
+                        ):
                             content_id_list.append(value['contentId'])
 
-            if state_dict['interaction']['default_outcome']:
-                default_outcome_content_id = (
-                    self.interaction.default_outcome.feedback.content_id)
-                if default_outcome_content_id in content_id_list:
-                    raise utils.ValidationError(
-                        'Found a duplicate content id %s'
-                        % default_outcome_content_id)
-                content_id_list.append(default_outcome_content_id)
-            for hint in self.interaction.hints:
-                hint_content_id = hint.hint_content.content_id
-                if hint_content_id in content_id_list:
-                    raise utils.ValidationError(
-                        'Found a duplicate content id %s' % hint_content_id)
-                content_id_list.append(hint_content_id)
-            if self.interaction.solution:
-                solution_content_id = (
-                    self.interaction.solution.explanation.content_id)
-                if solution_content_id in content_id_list:
-                    raise utils.ValidationError(
-                        'Found a duplicate content id %s' % solution_content_id)
-                content_id_list.append(solution_content_id)
+            default_outcome = interaction['default_outcome']
+            if default_outcome:
+                content_id_list.append(
+                    default_outcome['feedback']['content_id'])
 
-            if self.interaction.id is not None:
-                for ca_name in self.interaction.customization_args:
+            for hint in interaction['hints']:
+                content_id_list.append(hint['hint_content']['content_id'])
+
+            interaction_solution = interaction['solution']
+            if interaction_solution:
+                content_id_list.append(
+                    interaction_solution['explanation']['content_id'])
+
+            if interaction['id'] is not None:
+                customisation_args = (
+                    state_domain.InteractionInstance
+                    .convert_customization_args_dict_to_customization_args(
+                        interaction['id'],
+                        interaction['customization_args'],
+                        state_schema_version=51
+                    )
+                )
+                for ca_name in customisation_args:
                     content_id_list.extend(
-                        self.interaction.customization_args[ca_name]
-                        .get_content_ids()
+                        customisation_args[ca_name].get_content_ids()
                     )
 
-            if len(set(content_id_list)) != len(content_id_list):
-                raise utils.ValidationError(
-                    'Expected all content_ids to be unique, '
-                    'received %s' % content_id_list)
+            translations_mapping = (
+                state_dict['written_translations']['translations_mapping'])
+            for content_id in translations_mapping.keys():
+                if content_id not in content_id_list:
+                    del translations_mapping[content_id]
+
+            voiceovers_mapping = (
+                state_dict['recorded_voiceovers']['voiceovers_mapping'])
+            for content_id in voiceovers_mapping.keys():
+                if content_id not in content_id_list:
+                    del voiceovers_mapping[content_id]
 
         return states_dict
 
@@ -2423,7 +2432,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 56
+    CURRENT_EXP_SCHEMA_VERSION = 57
     EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION = 46
 
     @classmethod
@@ -2653,6 +2662,29 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return exploration_dict
 
     @classmethod
+    def _convert_v56_dict_to_v57_dict(cls, exploration_dict):
+        """Converts a v55 exploration dict into a v56 exploration dict.
+        Version 56 adds a new dest_if_really_stuck field to the Outcome class
+        to redirect the learners to a state for strengthening concepts when
+        they get really stuck.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v55.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v56.
+        """
+        exploration_dict['schema_version'] = 57
+
+        exploration_dict['states'] = cls._convert_states_v51_dict_to_v52_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 52
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(cls, yaml_content):
         """Return the YAML content of the exploration in the latest schema
         format.
@@ -2737,6 +2769,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
             exploration_dict = cls._convert_v55_dict_to_v56_dict(
                 exploration_dict)
             exploration_schema_version = 56
+
+        if exploration_schema_version == 56:
+            exploration_dict = cls._convert_v56_dict_to_v57_dict(
+                exploration_dict)
+            exploration_schema_version = 57
 
         return exploration_dict
 
