@@ -417,32 +417,35 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                         old_vh_model.metadata_last_edited_committer_id
                     )
 
-                    new_states_vh = (
-                        exp_services.update_states_version_history(
-                            old_states_vh, change_list, old_states,
-                            new_states, version, committer_id
+                    try:
+                        new_states_vh = (
+                            exp_services.update_states_version_history(
+                                old_states_vh, change_list, old_states,
+                                new_states, version, committer_id
+                            )
                         )
-                    )
-                    new_metadata_vh = (
-                        exp_services.update_metadata_version_history(
-                            old_metadata_vh, change_list, old_metadata,
-                            new_metadata, version, committer_id
+                        new_metadata_vh = (
+                            exp_services.update_metadata_version_history(
+                                old_metadata_vh, change_list, old_metadata,
+                                new_metadata, version, committer_id
+                            )
                         )
-                    )
-                    new_committer_ids = (
-                        exp_services.get_updated_committer_ids(
-                            new_states_vh,
-                            new_metadata_vh.last_edited_committer_id
+                        new_committer_ids = (
+                            exp_services.get_updated_committer_ids(
+                                new_states_vh,
+                                new_metadata_vh.last_edited_committer_id
+                            )
                         )
-                    )
 
-                    new_vh_model = self.get_updated_version_history_model(
-                        version_history_models[version - 1],
-                        exp_id, version, committer_id,
-                        new_states_vh, new_metadata_vh, new_committer_ids
-                    )
-                    new_vh_model.update_timestamps()
-                    version_history_models[version - 1] = new_vh_model
+                        new_vh_model = self.get_updated_version_history_model(
+                            version_history_models[version - 1],
+                            exp_id, version, committer_id,
+                            new_states_vh, new_metadata_vh, new_committer_ids
+                        )
+                        new_vh_model.update_timestamps()
+                        version_history_models[version - 1] = new_vh_model
+                    except Exception:
+                        return (exp_id, [])
 
             return (exp_id, version_history_models)
 
