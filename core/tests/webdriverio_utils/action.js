@@ -62,9 +62,11 @@ var getAttribute = async function(elementName, element, attribute) {
 };
 
 var select = async function(selectorName, selectorElement, optionToSelect) {
-  await click(selectorName, selectorElement);
-  var optionElement = await selectorElement.$(`option=${optionToSelect}`);
-  await click(`${optionToSelect} in ${selectorName}`, optionElement);
+  await waitFor.visibilityOf(
+    selectorElement,
+    `${selectorName} is not visible to select ${optionToSelect}`
+  );
+  await selectorElement.selectByVisibleText(optionToSelect);
 };
 
 var matSelect = async function(selectorName, selectorElement, optionToSelect) {
@@ -82,12 +84,24 @@ var select2 = async function(selectorName, selectorElement, optionToSelect) {
   await click(`${optionToSelect} in ${selectorName}`, option);
 };
 
+// This method send a sequence of key strokes to an element after clearing
+// it's value.
 var setValue = async function(
     inputName, inputElement, keys, clickInputElement = true) {
   if (clickInputElement) {
     await click(inputName, inputElement);
   }
   await inputElement.setValue(keys);
+};
+
+// This method send a sequence of key strokes to an element without clearing
+// it's value before.
+var addValue = async function(
+    inputName, inputElement, keys, clickInputElement = true) {
+  if (clickInputElement) {
+    await click(inputName, inputElement);
+  }
+  await inputElement.addValue(keys);
 };
 
 exports.clear = clear;
@@ -97,5 +111,6 @@ exports.getAttribute = getAttribute;
 exports.select = select;
 exports.select2 = select2;
 exports.matSelect = matSelect;
+exports.addValue = addValue;
 exports.setValue = setValue;
 exports.waitForAutosave = waitForAutosave;

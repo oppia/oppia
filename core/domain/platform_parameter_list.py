@@ -56,5 +56,5 @@ Registry.create_platform_parameter(
 Registry.create_feature_flag(
     PARAM_NAMES.end_chapter_celebration,
     'This flag is for the end chapter celebration feature.',
-    platform_parameter_domain.FeatureStages.DEV,
+    platform_parameter_domain.FeatureStages.PROD,
 )

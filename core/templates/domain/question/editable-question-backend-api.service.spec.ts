@@ -21,7 +21,7 @@ import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
 import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
-import { EditableQuestionBackendApiService} from 'domain/question/editable-question-backend-api.service';
+import { EditableQuestionBackendApiService, SkillLinkageModificationsArray} from 'domain/question/editable-question-backend-api.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 
 describe('Editable question backend API service', function() {
@@ -286,7 +286,10 @@ describe('Editable question backend API service', function() {
     let failHandler = jasmine.createSpy('fail');
 
     let questionId = '0';
-    let skillIdsTaskArray = ['1', '2', 1];
+    let skillIdsTaskArray = [{
+      id: 'skillId',
+      task: 'remove'
+    } as SkillLinkageModificationsArray];
 
     editableQuestionBackendApiService.editQuestionSkillLinksAsync(
       questionId, skillIdsTaskArray).then(
@@ -307,7 +310,10 @@ describe('Editable question backend API service', function() {
     let failHandler = jasmine.createSpy('fail');
 
     let questionId = '0';
-    let skillIdsTaskArray = ['1', '2', 1];
+    let skillIdsTaskArray = [{
+      id: 'skillId',
+      task: 'remove'
+    } as SkillLinkageModificationsArray];
 
     editableQuestionBackendApiService.editQuestionSkillLinksAsync(
       questionId, skillIdsTaskArray).then(

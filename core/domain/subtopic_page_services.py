@@ -329,18 +329,21 @@ def delete_subtopic_page(
 def get_topic_ids_from_subtopic_page_ids(
     subtopic_page_ids: List[str]
 ) -> List[str]:
-    """Returns the topic ids corresponding to the given subtopic page ids.
+    """Returns the topic ids corresponding to the given set of subtopic page
+    ids.
 
     Args:
         subtopic_page_ids: list(str). The ids of the subtopic pages.
 
     Returns:
         list(str). The topic ids corresponding to the given subtopic page ids.
+        The returned list of topic ids is deduplicated and ordered
+        alphabetically.
     """
-    return list({
+    return sorted(list({
         subtopic_page_id.split(':')[0] for subtopic_page_id in
         subtopic_page_ids
-    })
+    }))
 
 
 def get_multi_users_subtopic_pages_progress(
@@ -360,7 +363,7 @@ def get_multi_users_subtopic_pages_progress(
     """
 
     topic_ids = get_topic_ids_from_subtopic_page_ids(subtopic_page_ids)
-    topics = topic_fetchers.get_topics_by_ids(topic_ids) # type: ignore[no-untyped-call]
+    topics = topic_fetchers.get_topics_by_ids(topic_ids)
 
     all_skill_ids_lists = [
         topic.get_all_skill_ids() for topic in topics if topic
@@ -382,6 +385,8 @@ def get_multi_users_subtopic_pages_progress(
         str, List[subtopic_page_domain.SubtopicPageSummaryDict]
     ] = {user_id: [] for user_id in user_ids}
     for topic in topics:
+        # Ruling out the possibility of None for mypy type checking.
+        assert topic is not None
         for subtopic in topic.subtopics:
             subtopic_page_id = '{}:{}'.format(topic.id, subtopic.id)
             if subtopic_page_id not in subtopic_page_ids:
