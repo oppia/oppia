@@ -22,9 +22,11 @@ var action = require('./action.js');
 
 var SubTopicViewerPage = function() {
   var conceptCardExplanation = $('.e2e-test-concept-card-explanation');
+  var conceptCardListItem = $('.e2e-test-concept-card-link');
   var conceptCardListSelector = function() {
     return $$('.e2e-test-concept-card-link');
   };
+  var subTopicTileListItem = $('.e2e-test-subtopic-tile');
   var subTopicTileListSelector = function() {
     return $$('.e2e-test-subtopic-tile');
   };
@@ -44,8 +46,9 @@ var SubTopicViewerPage = function() {
       expect(subTopicTileList.length).toEqual(0);
     } else {
       await waitFor.visibilityOf(
-        subTopicTileList[0],
+        subTopicTileListItem,
         'Revisions cards take too long to be visible.');
+      var subTopicTileList = await subTopicTileListSelector();
       expect(subTopicTileList.length).toEqual(count);
     }
   };
@@ -56,8 +59,9 @@ var SubTopicViewerPage = function() {
       expect(conceptCardList.length).toEqual(0);
     } else {
       await waitFor.visibilityOf(
-        conceptCardList[0],
+        conceptCardListItem,
         'Concept cards take too long to be visible.');
+      var conceptCardList = await conceptCardListSelector();
       expect(conceptCardList.length).toEqual(count);
     }
   };
