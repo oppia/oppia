@@ -25,37 +25,37 @@ var ExplorationEditorFeedbackTab = function() {
    * Interactive elements
    */
   var feedbackTabRow = element(
-    by.css('.protractor-test-oppia-feedback-tab-row'));
+    by.css('.e2e-test-oppia-feedback-tab-row'));
   var explorationFeedback = element(
-    by.css('.protractor-test-exploration-feedback'));
+    by.css('.e2e-test-exploration-feedback'));
   var feedbackBackButton = element(
-    by.css('.protractor-test-oppia-feedback-back-button'));
+    by.css('.e2e-test-oppia-feedback-back-button'));
   var feedbackResponseTextArea = element(
-    by.css('.protractor-test-feedback-response-textarea'));
-  var suggestionRowClassName = '.protractor-test-oppia-feedback-tab-row';
+    by.css('.e2e-test-feedback-response-textarea'));
+  var suggestionRowClassName = '.e2e-test-oppia-feedback-tab-row';
   var feedbackSubjectClassName = (
-    '.protractor-test-exploration-feedback-subject');
+    '.e2e-test-exploration-feedback-subject');
   var suggestionCommitMessageInput = element(
-    by.css('.protractor-test-suggestion-commit-message'));
+    by.css('.e2e-test-suggestion-commit-message'));
   var suggestionReviewMessageInput = element(
-    by.css('.protractor-test-suggestion-review-message'));
+    by.css('.e2e-test-suggestion-review-message'));
   var feedbackStatusDropdown = element(
-    by.css('.protractor-test-oppia-feedback-status-menu'));
+    by.css('.e2e-test-oppia-feedback-status-menu'));
   var feedbackMessages = element.all(
-    by.css('.protractor-test-exploration-feedback'));
+    by.css('.e2e-test-exploration-feedback'));
   var feedbackStatusElement = element(
-    by.css('.protractor-test-oppia-feedback-status-name'));
+    by.css('.e2e-test-oppia-feedback-status-name'));
   /*
    * Buttons
    */
   var acceptSuggestionButton = element(
-    by.css('.protractor-test-exploration-accept-suggestion-btn'));
+    by.css('.e2e-test-exploration-accept-suggestion-btn'));
   var feedbackSendResponseButton = element(
-    by.css('.protractor-test-oppia-feedback-response-send-btn'));
+    by.css('.e2e-test-oppia-feedback-response-send-btn'));
   var rejectSuggestionButton = element(
-    by.css('.protractor-test-exploration-reject-suggestion-btn'));
+    by.css('.e2e-test-exploration-reject-suggestion-btn'));
   var viewSuggestionButton = element(
-    by.css('.protractor-test-view-suggestion-btn'));
+    by.css('.e2e-test-view-suggestion-btn'));
 
   /*
    * Workflows

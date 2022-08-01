@@ -156,7 +156,10 @@ angular.module('oppia').directive('skillEditorNavbar', [
                 () => {
                   $scope.$applyAsync();
                 }
-              )
+              ),
+              UndoRedoService._undoRedoChangeEventEmitter.subscribe(() => {
+                $scope.$applyAsync();
+              })
             );
           };
         }]

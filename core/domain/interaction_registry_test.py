@@ -64,7 +64,7 @@ class InteractionDependencyTests(test_utils.GenericTestBase):
     def test_dependency_loads_in_exploration_player_page(self) -> None:
         exp_id = '0'
 
-        exp_services.load_demo(exp_id)  # type: ignore[no-untyped-call]
+        exp_services.load_demo(exp_id)
 
         # Ensure that dependencies are added in the exploration reader page.
         response = self.get_html_response('/explore/%s' % exp_id)  # type: ignore[no-untyped-call]
@@ -76,7 +76,7 @@ class InteractionDependencyTests(test_utils.GenericTestBase):
 
     def test_dependencies_loaded_in_exploration_editor(self) -> None:
 
-        exp_services.load_demo('0')  # type: ignore[no-untyped-call]
+        exp_services.load_demo('0')
 
         # Ensure that dependencies are added in the exploration editor page.
         response = self.get_html_response('/create/0')  # type: ignore[no-untyped-call]

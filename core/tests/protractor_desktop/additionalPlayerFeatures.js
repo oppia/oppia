@@ -144,8 +144,8 @@ describe('Full exploration editor', function() {
 
     await general.moveToPlayer();
     await explorationPlayerPage.submitAnswer('Continue');
-    var backButton = element(by.css('.protractor-test-back-button'));
-    var nextCardButton = element(by.css('.protractor-test-next-card-button'));
+    var backButton = element(by.css('.e2e-test-back-button'));
+    var nextCardButton = element(by.css('.e2e-test-next-card-button'));
     expect(await backButton.isPresent()).toEqual(true);
     await explorationPlayerPage.submitAnswer('CodeRepl');
     await waitFor.visibilityOf(
@@ -258,12 +258,6 @@ describe('Full exploration editor', function() {
         await forms.toRichText('this is card 2 with previous answer 21'));
       await explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'return');
 
-      // Lesson info tooltip should appear when the 2nd checkpoint is reached.
-      var closeLessonInfoTooltipElement = element(by.css(
-        '.protractor-test-close-lesson-info-tooltip'));
-      await explorationPlayerPage.clickCloseLessonInfoTooltip(
-        closeLessonInfoTooltipElement
-      );
       await explorationPlayerPage.expectContentToMatch(
         await forms.toRichText('this is card 1'));
       await explorationPlayerPage.submitAnswer('NumericInput', 21);
@@ -367,7 +361,7 @@ describe('Full exploration editor', function() {
     await libraryPage.findExploration('Exploration with Recommendation');
     await libraryPage.playExploration('Exploration with Recommendation');
     var recommendedExplorationTile = element(
-      by.css('.protractor-test-exp-summary-tile-title'));
+      by.css('.e2e-test-exp-summary-tile-title'));
     var recommendedExplorationName = await action.getText(
       'Recommended Exploration Tile', recommendedExplorationTile);
     expect(recommendedExplorationName).toEqual('Recommended Exploration 1');

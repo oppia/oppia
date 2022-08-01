@@ -24,7 +24,6 @@ import { PlaybookPageComponent } from './playbook.component';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 
@@ -64,7 +63,6 @@ describe('Playbook Page', () => {
   let fixture: ComponentFixture<PlaybookPageComponent>;
   let windowRef: MockWindowRef;
   let siteAnalyticsService: SiteAnalyticsService;
-  let i18nLanguageCodeService: I18nLanguageCodeService;
 
   beforeEach(waitForAsync(() => {
     windowRef = new MockWindowRef();
@@ -89,7 +87,6 @@ describe('Playbook Page', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(PlaybookPageComponent);
     component = fixture.componentInstance;
-    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     fixture.detectChanges();
   });
 
@@ -116,10 +113,4 @@ describe('Playbook Page', () => {
       'https://goo.gl/forms/0p3Axuw5tLjTfiri1');
     expect(applyToTeachWithOppiaEventSpy).toHaveBeenCalled();
   }));
-
-  it('should get RTL language status correctly', () => {
-    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
-      true);
-    expect(component.isLanguageRTL()).toBeTrue();
-  });
 });

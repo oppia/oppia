@@ -25,6 +25,7 @@ storage model to be changed without affecting this module and others above it.
 from __future__ import annotations
 
 import collections
+import copy
 import datetime
 import io
 import logging
@@ -60,6 +61,8 @@ from core.domain import stats_services
 from core.domain import taskqueue_services
 from core.domain import user_services
 from core.platform import models
+
+import deepdiff
 
 datastore_services = models.Registry.import_datastore_services()
 (base_models, exp_models, feedback_models, user_models) = (
@@ -586,6 +589,285 @@ def apply_change_list(exploration_id, change_list):
         raise e
 
 
+def update_states_version_history(
+    states_version_history,
+    change_list,
+    old_states,
+    new_states,
+    current_version,
+    committer_id
+):
+    """Updates the version history of each state at a particular version
+    of an exploration.
+
+    Args:
+        states_version_history: dict(str, StateVersionHistory). The version
+            history data of each state in the previous version of the
+            exploration.
+        change_list: list(ExplorationChange). A list of changes introduced in
+            this commit.
+        old_states: dict(str, State). The states in the previous version of
+            the exploration.
+        new_states: dict(str, State). The states in the current version of
+            the exploration.
+        current_version: int. The latest version of the exploration.
+        committer_id: str. The id of the user who made the commit.
+
+    Returns:
+        states_version_history: dict(str, StateVersionHistory). The updated
+        version history data of each state.
+    """
+    exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
+    prev_version = current_version - 1
+    old_states_dict = copy.deepcopy({
+        state_name: state.to_dict()
+        for (state_name, state) in old_states.items()
+    })
+    new_states_dict = copy.deepcopy({
+        state_name: state.to_dict()
+        for (state_name, state) in new_states.items()
+    })
+
+    # Firstly, delete the states from the state version history which were
+    # deleted during this commit.
+    for state_name in exp_versions_diff.deleted_state_names:
+        del states_version_history[state_name]
+
+    # Now, add the states which were newly added during this commit. The
+    # version history of these states are initialized as None because they
+    # were newly added and have no 'previously edited version'.
+    for state_name in exp_versions_diff.added_state_names:
+        states_version_history[state_name] = (
+            state_domain.StateVersionHistory(None, None, committer_id))
+
+    # Now, handle the updation of version history of states which were renamed.
+    # Firstly, we need to clean up the exp_versions_diff.old_to_new_state_names
+    # dict from the state names which are not effectively changed. For example,
+    # if a state was renamed from state_1 to state_2 and then from state_2 to
+    # state_1 in the same commit, then there is no effective change in state
+    # name and we need to clear them from this dict.
+    effective_old_to_new_state_names = {}
+    for old_state_name, new_state_name in (
+        exp_versions_diff.old_to_new_state_names.items()
+    ):
+        if old_state_name != new_state_name:
+            effective_old_to_new_state_names[old_state_name] = new_state_name
+    for old_state_name in effective_old_to_new_state_names:
+        del states_version_history[old_state_name]
+    for old_state_name, new_state_name in (
+        effective_old_to_new_state_names.items()
+    ):
+        states_version_history[new_state_name] = (
+            state_domain.StateVersionHistory(
+                prev_version, old_state_name, committer_id))
+
+    # The following list includes states which exist in both the old states
+    # and new states and were not renamed.
+    states_which_were_not_renamed = []
+    for state_name in old_states:
+        if (
+            state_name not in exp_versions_diff.deleted_state_names and
+            state_name not in effective_old_to_new_state_names
+        ):
+            states_which_were_not_renamed.append(state_name)
+
+    # We have dealt with state additions, deletions and renames.
+    # Now we deal with states which were present in both versions and
+    # underwent changes only through the command EDIT_STATE_PROPERTY.
+    # The following dict stores whether the properties of states present
+    # in states_which_were_not_renamed were changed using EDIT_STATE_PROPERTY.
+    state_property_changed_data = {
+        state_name: False
+        for state_name in states_which_were_not_renamed
+    }
+    # The following ignore list contains those state properties which are
+    # related to translations. Hence, they are ignored in order to avoid
+    # updating the version history in case of translation-only commits.
+    state_property_ignore_list = [
+        exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS,
+        exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS
+    ]
+    for change in change_list:
+        if (
+            change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
+            change.property_name not in state_property_ignore_list
+        ):
+            state_name = change.state_name
+            if state_name in state_property_changed_data:
+                state_property_changed_data[state_name] = True
+
+    for state_name, state_property_changed in (
+        state_property_changed_data.items()):
+        if state_property_changed:
+            old_state_dict = copy.deepcopy(old_states_dict[state_name])
+            new_state_dict = copy.deepcopy(new_states_dict[state_name])
+
+            # Deleting the attributes from the state dicts which are present
+            # in the ignore list.
+            for property_name in state_property_ignore_list:
+                del new_state_dict[property_name]
+                del old_state_dict[property_name]
+
+            # The purpose of checking the diff_dict between the two state
+            # dicts ensure that we do not change the version history of that
+            # particular state if the overall changes (by EDIT_STATE_PROPERTY)
+            # get cancelled by each other and there is no 'net change'.
+            diff_dict = deepdiff.DeepDiff(
+                old_states_dict[state_name], new_states_dict[state_name])
+            if diff_dict:
+                states_version_history[state_name] = (
+                    state_domain.StateVersionHistory(
+                        prev_version, state_name, committer_id
+                    ))
+
+    return states_version_history
+
+
+def update_metadata_version_history(
+    metadata_version_history,
+    change_list,
+    old_metadata,
+    new_metadata,
+    current_version,
+    committer_id
+):
+    """Updates the version history of the exploration at a particular version
+    of an exploration.
+
+    Args:
+        metadata_version_history: MetadataVersionHistory. The metadata version
+            history at the previous version of the exploration.
+        change_list: list(ExplorationChange). A list of changes introduced in
+            this commit.
+        old_metadata: ExplorationMetadata. The exploration metadata at the
+            previous version of the exploration.
+        new_metadata: dict(str, State). The exploration metadata at the
+            current version of the exploration.
+        current_version: int. The latest version of the exploration.
+        committer_id: str. The id of the user who made the commit.
+
+    Returns:
+        MetadataVersionHistory. The updated metadata version history.
+    """
+    old_metadata_dict = copy.deepcopy(old_metadata.to_dict())
+    new_metadata_dict = copy.deepcopy(new_metadata.to_dict())
+    prev_version = current_version - 1
+
+    metadata_was_changed = any(
+        change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY
+        for change in change_list
+    )
+
+    if metadata_was_changed:
+        # The purpose of checking the diff_dict between the two metadata
+        # dicts ensure that we do not change the version history if the
+        # overall changes (by EDIT_EXPLORATION_PROPERTY) get cancelled by
+        # each other and there is no 'net change'.
+        diff_dict = deepdiff.DeepDiff(old_metadata_dict, new_metadata_dict)
+        if diff_dict:
+            metadata_version_history.last_edited_version_number = prev_version
+            metadata_version_history.last_edited_committer_id = committer_id
+
+    return metadata_version_history
+
+
+def get_updated_committer_ids(
+    states_version_history, metadata_last_edited_committer_id
+):
+    """Extracts a list of user ids who made the 'previous commit' on each state
+    and the exploration metadata from the exploration states and metadata
+    version history data.
+
+    Args:
+        states_version_history: dict(str, StateVersionHistory). The version
+            history data of each state at a particular version of an
+            exploration.
+        metadata_last_edited_committer_id: str. User id of the user who
+            committed the last change in the exploration metadata.
+
+    Returns:
+        list[str]. A list of user ids who made the 'previous commit' on each
+        state and the exploration metadata.
+    """
+    committer_ids = {
+        version_history.committer_id
+        for version_history in states_version_history.values()
+    }
+    committer_ids.add(metadata_last_edited_committer_id)
+    return list(committer_ids)
+
+
+def update_version_history(
+    exploration, change_list, committer_id, old_states, old_metadata
+):
+    """Creates the updated ExplorationVersionHistoryModel for the new version
+    of the exploration (after the commit) and puts it into the datastore.
+
+    Args:
+        exploration: Exploration. The explortion after the latest commit.
+        change_list: list(ExplorationChange). A list of changes introduced in
+            the latest commit.
+        committer_id: str. The id of the user who made the latest commit.
+        old_states: dict(str, State). The states in the previous version of
+            the exploration (before the latest commit).
+        old_metadata: ExplorationMetadata. The exploration metadata at the
+            previous version of the exploration (before the latest commit).
+    """
+    version_history_model_id = (
+        exp_models.ExplorationVersionHistoryModel.get_instance_id(
+            exploration.id, exploration.version - 1))
+    version_history_model = exp_models.ExplorationVersionHistoryModel.get(
+        version_history_model_id, strict=False)
+
+    if version_history_model is not None:
+        new_states = exploration.states
+        new_metadata = exploration.get_metadata()
+        states_version_history = {
+            state_name: state_domain.StateVersionHistory.from_dict(
+                state_version_history_dict)
+            for state_name, state_version_history_dict in (
+                version_history_model.state_version_history.items())
+        }
+        metadata_version_history = exp_domain.MetadataVersionHistory(
+            version_history_model.metadata_last_edited_version_number,
+            version_history_model.metadata_last_edited_committer_id)
+
+        updated_states_version_history = update_states_version_history(
+            states_version_history, change_list, old_states, new_states,
+            exploration.version, committer_id
+        )
+        updated_metadata_version_history = update_metadata_version_history(
+            metadata_version_history, change_list, old_metadata, new_metadata,
+            exploration.version, committer_id)
+        updated_committer_ids = get_updated_committer_ids(
+            updated_states_version_history,
+            updated_metadata_version_history.last_edited_committer_id)
+
+        updated_version_history_model_id = (
+            exp_models.ExplorationVersionHistoryModel.get_instance_id(
+                exploration.id, exploration.version))
+        updated_version_history_model = (
+            exp_models.ExplorationVersionHistoryModel(
+                id=updated_version_history_model_id,
+                exploration_id=exploration.id,
+                exploration_version=exploration.version,
+                state_version_history={
+                    state_name: version_history.to_dict()
+                    for state_name, version_history in (
+                        updated_states_version_history.items())
+                },
+                metadata_last_edited_version_number=(
+                    updated_metadata_version_history.last_edited_version_number
+                ),
+                metadata_last_edited_committer_id=(
+                    updated_metadata_version_history.last_edited_committer_id
+                ),
+                committer_ids=updated_committer_ids
+            ))
+        updated_version_history_model.update_timestamps()
+        updated_version_history_model.put()
+
+
 def _save_exploration(committer_id, exploration, commit_message, change_list):
     """Validates an exploration and commits it to persistent storage.
 
@@ -625,6 +907,8 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
 
     old_states = exp_fetchers.get_exploration_from_model(
         exploration_model).states
+    old_metadata = exp_fetchers.get_exploration_from_model(
+        exploration_model).get_metadata()
     exploration_model.category = exploration.category
     exploration_model.title = exploration.title
     exploration_model.objective = exploration.objective
@@ -654,6 +938,11 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
     exploration.version += 1
 
     exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
+
+    # Update the version history data for each state and the exploration
+    # metadata in the new version of the exploration.
+    update_version_history(
+        exploration, change_list, committer_id, old_states, old_metadata)
 
     # Trigger statistics model update.
     new_exp_stats = stats_services.get_stats_for_new_exp_version(
@@ -728,6 +1017,24 @@ def _create_exploration(
     commit_cmds_dict = [commit_cmd.to_dict() for commit_cmd in commit_cmds]
     model.commit(committer_id, commit_message, commit_cmds_dict)
     exploration.version += 1
+
+    version_history_model = exp_models.ExplorationVersionHistoryModel(
+        id=exp_models.ExplorationVersionHistoryModel.get_instance_id(
+            exploration.id, exploration.version),
+        exploration_id=exploration.id,
+        exploration_version=exploration.version,
+        state_version_history={
+            state_name: state_domain.StateVersionHistory(
+                None, None, committer_id
+            ).to_dict()
+            for state_name in exploration.states
+        },
+        metadata_last_edited_version_number=None,
+        metadata_last_edited_committer_id=committer_id,
+        committer_ids=[committer_id]
+    )
+    version_history_model.update_timestamps()
+    version_history_model.put()
 
     # Trigger statistics model creation.
     exploration_stats = stats_services.get_stats_for_new_exploration(
@@ -1380,6 +1687,42 @@ def delete_exploration_summaries(exploration_ids):
     exp_models.ExpSummaryModel.delete_multi(existing_summary_models)
 
 
+def revert_version_history(
+    exploration_id, current_version, revert_to_version
+):
+    """Reverts the version history to the given version number. Puts the
+    reverted version history model into the datastore.
+
+    Args:
+        exploration_id: str. The id of the exploration for which the version
+            history is to be reverted to the current version.
+        current_version: int. The current version of the exploration.
+        revert_to_version: int. The version to which the version history
+            is to be reverted.
+    """
+    version_history_model_id = (
+        exp_models.ExplorationVersionHistoryModel.get_instance_id(
+            exploration_id, revert_to_version))
+    version_history_model = exp_models.ExplorationVersionHistoryModel.get(
+        version_history_model_id, strict=False)
+
+    if version_history_model is not None:
+        new_version_history_model = exp_models.ExplorationVersionHistoryModel(
+            id=exp_models.ExplorationVersionHistoryModel.get_instance_id(
+                exploration_id, current_version + 1),
+            exploration_id=exploration_id,
+            exploration_version=current_version + 1,
+            state_version_history=version_history_model.state_version_history,
+            metadata_last_edited_version_number=(
+                version_history_model.metadata_last_edited_version_number),
+            metadata_last_edited_committer_id=(
+                version_history_model.metadata_last_edited_committer_id),
+            committer_ids=version_history_model.committer_ids
+        )
+        new_version_history_model.update_timestamps()
+        new_version_history_model.put()
+
+
 def revert_exploration(
         committer_id, exploration_id, current_version, revert_to_version):
     """Reverts an exploration to the given version number. Commits changes.
@@ -1428,6 +1771,8 @@ def revert_exploration(
     caching_services.delete_multi(
         caching_services.CACHE_NAMESPACE_EXPLORATION, None,
         [exploration.id])
+
+    revert_version_history(exploration_id, current_version, revert_to_version)
 
     regenerate_exploration_and_contributors_summaries(exploration_id)
 
@@ -1553,7 +1898,7 @@ def delete_demo(exploration_id):
             feconf.SYSTEM_COMMITTER_ID, exploration_id, force_deletion=True)
 
 
-def load_demo(exploration_id):
+def load_demo(exploration_id: str) -> None:
     """Loads a demo exploration.
 
     The resulting exploration will have two commits in its history (one for
@@ -2091,7 +2436,7 @@ def update_logged_out_user_progress(
             exploration_id, unique_progress_url_id)
 
     current_exploration = exp_fetchers.get_exploration_by_id(
-        exploration_id, True, exp_version)
+        exploration_id, strict=True, version=exp_version)
 
     # If the exploration is being visited the first time.
     if checkpoint_url_model.furthest_reached_checkpoint_state_name is None:
@@ -2244,12 +2589,17 @@ def sync_logged_out_learner_checkpoint_progress_with_current_exp_version(
 
 
 def sync_logged_out_learner_progress_with_logged_in_progress(
-    user_id, exploration_id, unique_progress_url_id):
+    user_id, exploration_id, unique_progress_url_id
+):
 
     """Syncs logged out and logged in learner's checkpoints progress."""
 
     logged_out_user_data = (
         exp_fetchers.get_logged_out_user_progress(unique_progress_url_id))
+
+    # If logged out progress has been cleared by the cron job.
+    if logged_out_user_data is None:
+        return
 
     latest_exploration = exp_fetchers.get_exploration_by_id(exploration_id)
     exp_user_data = exp_fetchers.get_exploration_user_data(
@@ -2323,19 +2673,18 @@ def sync_logged_out_learner_progress_with_logged_in_progress(
         logged_in_user_model.most_recently_reached_checkpoint_exp_version <
         logged_out_user_data.most_recently_reached_checkpoint_exp_version
     ):
-
         most_recently_interacted_exploration = (
             exp_fetchers.get_exploration_by_id(
                 exploration_id,
-                True,
-                exp_user_data.most_recently_reached_checkpoint_exp_version
+                strict=True,
+                version=exp_user_data.most_recently_reached_checkpoint_exp_version # pylint: disable=line-too-long
             )
         )
         furthest_reached_exploration = (
             exp_fetchers.get_exploration_by_id(
                 exploration_id,
-                True,
-                exp_user_data.furthest_reached_checkpoint_exp_version
+                strict=True,
+                version=exp_user_data.furthest_reached_checkpoint_exp_version
             )
         )
 
@@ -2391,7 +2740,8 @@ def sync_logged_out_learner_progress_with_logged_in_progress(
                 latest_exploration.states
             ).index(
                 exp_user_data.most_recently_reached_checkpoint_state_name
-                ))
+            )
+        )
 
         most_recently_reached_checkpoint_index_in_logged_out_progress = (
             user_services.get_checkpoints_in_order(

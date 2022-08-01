@@ -1,6 +1,3 @@
-<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/pages/learner-dashboard-page/community-lessons-tab.component.css" as="style">
-<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/pages/learner-dashboard-page/community-lessons-tab.component.rtl.css" as="style">
-
 <div class="community-lessons-section" [ngStyle]="!windowIsNarrow && {'margin-top': '64px'}">
   <p class="lessons-title" [ngClass]="{'oppia-force-right-align': isLanguageRTL()}" [innerHTML]="'I18N_LEARNER_DASHBOARD_COMMUNITY_LESSONS_SECTION' | translate">
   </p>
@@ -36,7 +33,7 @@
        [oppiaFocusOn]="'ourLessonsBtn'">
     </a>
   </div>
-  <div class="incomplete-section protractor-test-incomplete-community-lessons-section" *ngIf="!windowIsNarrow">
+  <div class="incomplete-section e2e-test-incomplete-community-lessons-section" *ngIf="!windowIsNarrow">
     <div *ngIf="totalIncompleteLessonsList.length !== 0">
       <p [ngClass]="{'oppia-force-right-align': isLanguageRTL()}" class="sub-section-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION' | translate">
       </p>
@@ -100,7 +97,7 @@
       </div>
     </div>
   </div>
-  <div class="completed-section protractor-test-completed-community-lessons-section" *ngIf="!windowIsNarrow">
+  <div class="completed-section e2e-test-completed-community-lessons-section" *ngIf="!windowIsNarrow">
     <div *ngIf="totalCompletedLessonsList.length !== 0">
       <p [ngClass]="{'oppia-force-right-align': isLanguageRTL()}" class="sub-section-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_COMPLETED_SECTION' | translate">
       </p>
@@ -253,7 +250,7 @@
     </div>
   </div>
 </div>
-<div class="playlist-section protractor-test-play-later-section">
+<div class="playlist-section e2e-test-play-later-section">
   <p [ngClass]="{'oppia-force-right-align': isLanguageRTL()}" class="lessons-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION' | translate">
   </p>
   <div *ngIf="noPlaylistActivity">
@@ -355,7 +352,7 @@
     </div>
   </div>
 </div>
-<div class="subscriptions-section protractor-test-subscriptions-section" *ngIf="subscriptionsList.length !== 0">
+<div class="subscriptions-section e2e-test-subscriptions-section" *ngIf="subscriptionsList.length !== 0">
   <p [ngClass]="{'oppia-force-right-align': isLanguageRTL()}" class="lessons-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_SUBSCRIPTIONS_SECTION' | translate"></p>
   <div *ngIf="subscriptionsList.length !== 0" class="oppia-subscriptions-container">
     <mat-card class="oppia-subscription-card oppia-subscription-container-list"
@@ -365,7 +362,7 @@
              class="oppia-subscription-card-profile-picture rounded-circle">
         <span class="oppia-subscription-card-summary text-dark">
           <div class="oppia-subscription-name">
-            <strong class="protractor-test-subscription-name"
+            <strong class="e2e-test-subscription-name"
                     container="body"
                     triggers="showUsernamePopover(subscription.username)" ngbPopover="subscription.username">
               {{ subscription.username| truncate:10 }}
@@ -392,6 +389,3 @@
     </div>
   </div>
 </div>
-<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
-<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/learner-dashboard-page/community-lessons-tab.component.css">
-<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/learner-dashboard-page/community-lessons-tab.component.rtl.css">

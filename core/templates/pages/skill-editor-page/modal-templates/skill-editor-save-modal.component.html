@@ -11,14 +11,14 @@
               [attr.maxlength]="MAX_COMMIT_MESSAGE_LENGTH"
               [(ngModel)]="commitMessage"
               (ngModelChange)="updateSaveDraftButton()"
-              class="protractor-test-commit-message-input"
+              class="e2e-test-commit-message-input"
               autofocus>
     </textarea>
   </p>
 </div>
 <div class="modal-footer">
   <button class="btn btn-secondary" (click)="cancel()" type="button">Cancel</button>
-  <button class="btn btn-success protractor-test-close-save-modal-button" [disabled]="!commitMessage" (click)="confirm(commitMessage)">
+  <button class="btn btn-success e2e-test-close-save-modal-button" [disabled]="!commitMessage" (click)="confirm(commitMessage)">
     <span>Save Draft</span>
   </button>
 </div>

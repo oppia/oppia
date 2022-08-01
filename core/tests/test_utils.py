@@ -72,7 +72,7 @@ import elasticsearch
 import requests_mock
 import webtest
 
-from typing import Any, Dict, List, Optional # isort: skip
+from typing import Any, Dict, List, Mapping, Optional # isort: skip
 
 (
     auth_models, base_models, exp_models,
@@ -1355,6 +1355,34 @@ class TestBase(unittest.TestCase):
         return super(TestBase, self).assertRaisesRegex(
             expected_exception, expected_regex, *args, **kwargs)
 
+    # Here we used Mapping[str, Any] because, in Oppia codebase TypedDict is
+    # used to define strict dictionaries and those strict dictionaries are not
+    # compatible with Dict[str, Any] type because of the invariant property of
+    # Dict type. Also, here value of Mapping is annotated as Any because this
+    # method can accept any kind of dictionaries for testing purposes. So, to
+    # make this method generalized for all test cases, we used Any here.
+    def assertDictEqual(
+        self,
+        dict_one: Mapping[str, Any],
+        dict_two: Mapping[str, Any],
+        msg: Optional[str] = None
+    ) -> None:
+        """Checks whether the given two dictionaries are populated with same
+        key-value pairs or not. If any difference occurred then the Assertion
+        error is raised.
+
+        Args:
+            dict_one: Mapping[Any, Any]. A dictionary which we have to check
+                against.
+            dict_two: Mapping[Any, Any]. A dictionary which we have to check
+                for.
+            msg: Optional[str]. Message displayed when test fails.
+
+        Raises:
+            AssertionError. When dictionaries doesn't match.
+        """
+        super(TestBase, self).assertDictEqual(dict_one, dict_two, msg=msg)
+
     def assertItemsEqual(self, *args, **kwargs):  # pylint: disable=invalid-name
         """Compares unordered sequences if they contain the same elements,
         regardless of order. If the same element occurs more than once,
@@ -1616,13 +1644,14 @@ class GenericTestBase(AppEngineTestBase):
                     'html': '',
                 },
                 'dest': None,
+                'dest_if_really_stuck': None,
                 'refresher_exploration_id': None,
                 'missing_prerequisite_skill_id': None,
                 'labelled_as_correct': True,
             },
             'customization_args': {
                 'rows': {'value': 1},
-                'placeholder': {'value': 'Enter text here'},
+                'placeholder': {'value': 'Enter text here'}
             },
             'confirmed_unclassified_answers': [],
             'id': 'TextInput',
@@ -1787,6 +1816,7 @@ states:
       customization_args: {}
       default_outcome:
         dest: %s
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -1821,6 +1851,7 @@ states:
       customization_args: {}
       default_outcome:
         dest: New state
+        dest_if_really_stuck: null
         feedback:
           content_id: default_outcome
           html: ''
@@ -2171,7 +2202,7 @@ title: Title
         # because those are always valid auth IDs.
         return str(abs(hash(email)))
 
-    def get_all_python_files(self):
+    def get_all_python_files(self) -> List[str]:
         """Recursively collects all Python files in the core/ and extensions/
         directory.
 
@@ -3123,6 +3154,10 @@ title: Title
         ]
         uncategorized_skill_ids = uncategorized_skill_ids or []
         subtopics = subtopics or []
+        skill_ids_for_diagnostic_test = []
+        for subtopic in subtopics:
+            skill_ids_for_diagnostic_test.extend(subtopic.skill_ids)
+
         topic = topic_domain.Topic(
             topic_id, name, abbreviated_name, url_fragment, thumbnail_filename,
             thumbnail_bg_color, thumbnail_size_in_bytes, description,
@@ -3131,7 +3166,7 @@ title: Title
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, next_subtopic_id,
             language_code, 0, feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION,
             meta_tag_content, practice_tab_is_displayed,
-            page_title_fragment_for_web)
+            page_title_fragment_for_web, skill_ids_for_diagnostic_test)
         topic_services.save_new_topic(owner_id, topic)
         return topic
 
@@ -3458,7 +3493,7 @@ title: Title
                     'unicode_str': 'Enter text here',
                 },
             },
-            'rows': {'value': 1},
+            'rows': {'value': 1}
         })
         state.update_next_content_id_index(2)
         state.interaction.default_outcome.labelled_as_correct = True
@@ -3517,8 +3552,16 @@ class EmailMessageMock:
     """Mock for core.platform.models email services messages."""
 
     def __init__(
-            self, sender_email, recipient_email, subject, plaintext_body,
-            html_body, bcc=None, reply_to=None, recipient_variables=None):
+        self,
+        sender_email: str,
+        recipient_email: str,
+        subject: str,
+        plaintext_body: str,
+        html_body: str,
+        bcc: Optional[List[str]] = None,
+        reply_to: Optional[str] = None,
+        recipient_variables: Optional[Dict[str, Dict[str, str]]] = None
+    ) -> None:
         """Inits a mock email message with all the necessary data.
 
         Args:

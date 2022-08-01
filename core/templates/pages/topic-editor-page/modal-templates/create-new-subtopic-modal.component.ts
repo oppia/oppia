@@ -87,7 +87,8 @@ export class CreateNewSubtopicModalComponent
     this.subtopicTitle = '';
     this.errorMsg = null;
     this.subtopicUrlFragmentExists = false;
-    this.topicUpdateService.addSubtopic(this.topic, this.subtopicTitle);
+    this.topicUpdateService
+      .addSubtopic(this.topic, this.subtopicTitle, this.editableUrlFragment);
   }
 
   getSchema(): object {

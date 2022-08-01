@@ -79,30 +79,16 @@ describe('SubtopicSummaryTileComponent', () => {
   });
 
   it('should set component properties on initialization', () => {
-    expect(component.thumbnailBgColor).toBe(undefined);
-    expect(component.subtopicTitle).toBe(undefined);
-    expect(component.thumbnailUrl).toBe(undefined);
-    expect(component.subtopicTitleTranslationKey).toBe(undefined);
-
     spyOn(abas, 'getThumbnailUrlForPreview').and.returnValue('/thumbnail/url');
     spyOn(i18nLanguageCodeService, 'getSubtopicTranslationKey')
       .and.returnValue('I18N_SUBTOPIC_123abcd_title_TITLE');
 
     component.ngOnInit();
 
-    expect(component.thumbnailBgColor).toBe('#a11f40');
     expect(component.subtopicTitle).toBe('Title');
     expect(component.thumbnailUrl).toBe('/thumbnail/url');
     expect(component.subtopicTitleTranslationKey).toBe(
       'I18N_SUBTOPIC_123abcd_title_TITLE');
-  });
-
-  it('should set thumbnail url as null if thumbnail is not present', () => {
-    spyOn(component.subtopic, 'getThumbnailFilename').and.returnValue(null);
-
-    component.ngOnInit();
-
-    expect(component.thumbnailUrl).toBe(null);
   });
 
   it('should check if subtopic translation is displayed correctly', () => {
@@ -123,9 +109,20 @@ describe('SubtopicSummaryTileComponent', () => {
     expect(hackySubtopicTitleTranslationIsDisplayed).toBe(true);
   });
 
+  it('should throw error if subtopic url is null', () => {
+    spyOn(abas, 'getThumbnailUrlForPreview').and.returnValue('/thumbnail/url');
+    spyOn(i18nLanguageCodeService, 'getSubtopicTranslationKey')
+      .and.returnValue('I18N_SUBTOPIC_123abcd_title_TITLE');
+    component.subtopic = Subtopic.createFromTitle(1, 'Title');
+
+    expect(() => {
+      component.ngOnInit();
+    }).toThrowError('Expected subtopic to have a URL fragment');
+  });
+
   it('should not open subtopic page if classroom or topic url' +
     ' does not exist', () => {
-    component.classroomUrlFragment = null;
+    component.subtopic = Subtopic.createFromTitle(1, 'Title');
     expect(component.openSubtopicPage()).toBe(undefined);
   });
 

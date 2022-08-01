@@ -58,6 +58,7 @@
 
   <schema-based-list-editor *ngIf="schema.type === 'list' && !schema.choices"
                             [(ngModel)]="localValue"
+                            [localValue]="localValue"
                             [disabled]="disabled"
                             [itemSchema]="schema.items"
                             [len]="schema.len"

@@ -43,7 +43,7 @@ ruleTester.run('no-test-blockers', rule, {
     {
       code:
       `xit('should test a feature', function() {
-        element(by.css('.protractor-test')).click();
+        element(by.css('.e2e-test')).click();
       });`,
       errors: [{
         message: 'Please use "it" instead of "xit".',

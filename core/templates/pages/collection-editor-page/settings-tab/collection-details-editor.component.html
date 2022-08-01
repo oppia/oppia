@@ -42,7 +42,7 @@
     <label for="collectionLanguage" class="col-lg-2 col-md-2 col-sm-2">Language</label>
     <div class="col-lg-10 col-md-10 col-sm-10">
       <select id="collectionLanguageCode"
-              class="form-control protractor-test-exploration-language-select"
+              class="form-control e2e-test-exploration-language-select"
               [(ngModel)]="displayedCollectionLanguage"
               (change)="updateCollectionLanguageCode()">
         <option *ngFor="let lc of languageListForSelect" [value]="lc.code">{{ lc.description }}</option>

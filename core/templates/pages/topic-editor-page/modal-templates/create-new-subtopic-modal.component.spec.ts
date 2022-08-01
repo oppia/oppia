@@ -150,7 +150,7 @@ describe('create new subtopic modal', function() {
       .toBe(constants.MAX_CHARS_IN_SUBTOPIC_TITLE);
     expect(component.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT)
       .toBe(constants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT);
-    expect(topicUpdateService.addSubtopic).toHaveBeenCalledWith(topic, '');
+    expect(topicUpdateService.addSubtopic).toHaveBeenCalledWith(topic, '', '');
 
     component.localValueChange('working fine');
     expect(component.htmlData).toBe('working fine');

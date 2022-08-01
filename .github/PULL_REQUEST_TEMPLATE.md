@@ -62,16 +62,15 @@ References:
 #### Proof of changes in Arabic language
 
 <!--
-If the PR changes the UI in any of the files listed in rtl_css.py (i.e, those that have
-a separate .rtl.css file for styling), make sure to add screenshots with the site
+If the PR changes the UI, make sure to add screenshots with the site
 language set to Arabic as well (we use Arabic as it is a language written from right to left).
 -->
 
 ## PR Pointers
 
-- Make sure to follow the [instructions for making a code change](https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#instructions-for-making-a-code-change).
+- Make sure to follow the [instructions for making a code change](https://github.com/oppia/oppia/wiki/Make-a-pull-request).
 - If you need a review or an answer to a question, and don't have permissions to assign people, **leave a comment** like the following: "{{Question/comment}} @{{reviewer_username}} PTAL". Oppiabot will help assign that person for you.
-- For what code owners will expect, see the [Code Owner's wiki page](https://github.com/oppia/oppia/wiki/Oppia%27s-code-owners-and-checks-to-be-carried-out-by-developers).
+- For what code owners will expect, see the [Code Owner's wiki page](https://github.com/oppia/oppia/wiki/Oppia's-code-owners-and-checks-to-be-carried-out-by-developers).
 - Make sure your PR follows conventions in the [style guide](https://github.com/oppia/oppia/wiki/Coding-style-guide), otherwise this will lead to review delays.
 - Never force push. If you do, your PR will be closed.
-- Some of the e2e tests are flaky, and can fail for reasons unrelated to your PR. We are working on fixing this, but in the meantime, if you need to restart the tests, please check the ["If your build fails" wiki page](https://github.com/oppia/oppia/wiki/If-your-build-fails).
+- Some of the e2e tests are flaky, and can fail for reasons unrelated to your PR. We are working on fixing this, but in the meantime, if you need to restart the tests, please check the ["If your build fails" wiki page](https://github.com/oppia/oppia/wiki/If-CI-checks-fail-on-your-PR).

@@ -1194,7 +1194,7 @@ def delete_demo(collection_id):
             feconf.SYSTEM_COMMITTER_ID, collection_id, force_deletion=True)
 
 
-def load_demo(collection_id):
+def load_demo(collection_id: str) -> None:
     """Loads a demo collection.
 
     The resulting collection will have version 2 (one for its initial

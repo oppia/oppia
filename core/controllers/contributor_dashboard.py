@@ -307,19 +307,27 @@ class ReviewableOpportunitiesHandler(base.BaseHandler):
             for topic in topics
             for reference in topic.get_all_story_references()
             if reference.story_is_published])
-        in_review_suggestions = (
-            suggestion_services.get_reviewable_translation_suggestions(user_id))
-        in_review_suggestion_target_ids = [
+        topic_exp_ids = [
+            node.exploration_id
+            for story in topic_stories
+            for node in story.story_contents.get_ordered_nodes()
+        ]
+        in_review_suggestions, _ = (
+            suggestion_services
+            .get_reviewable_translation_suggestions_by_offset(
+                user_id, topic_exp_ids, None, 0))
+        # Filter out suggestions that should not be shown to the user.
+        # This is defined as a set as we only care about the unique IDs.
+        in_review_suggestion_target_ids = {
             suggestion.target_id
             for suggestion in
             suggestion_services.get_suggestions_with_translatable_explorations(
                 in_review_suggestions)
-        ]
+        }
         exp_ids = [
-            node.exploration_id
-            for story in topic_stories
-            for node in story.story_contents.get_ordered_nodes()
-            if node.exploration_id in in_review_suggestion_target_ids
+            exp_id
+            for exp_id in topic_exp_ids
+            if exp_id in in_review_suggestion_target_ids
         ]
         return (
             opportunity_services.get_exploration_opportunity_summaries_by_ids(

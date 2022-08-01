@@ -42,7 +42,7 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
         super(LearnerGroupModelUnitTest, self).setUp()
 
         self.learner_group_model = learner_group_models.LearnerGroupModel(
-            id='3232',
+            id='learner_group_32',
             title='title',
             description='description',
             facilitator_user_ids=['user_1', 'user_11'],
@@ -145,7 +145,7 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
         student_user_data = (
             learner_group_models.LearnerGroupModel.export_data('user_2'))
         expected_student_user_data = {
-            '3232': {
+            'learner_group_32': {
                 'title': 'title',
                 'description': 'description',
                 'role_in_group': 'student',
@@ -162,7 +162,7 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
         invited_student_data = (
             learner_group_models.LearnerGroupModel.export_data('user_6'))
         expected_invited_student_data = {
-            '3232': {
+            'learner_group_32': {
                 'title': 'title',
                 'description': 'description',
                 'role_in_group': 'invited_student',
@@ -179,7 +179,7 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
         facilitator_user_data = (
             learner_group_models.LearnerGroupModel.export_data('user_1'))
         expected_facilitator_user_data = {
-            '3232': {
+            'learner_group_32': {
                 'title': 'title',
                 'description': 'description',
                 'role_in_group': 'facilitator',
@@ -253,3 +253,10 @@ class LearnerGroupModelUnitTest(test_utils.GenericTestBase):
         self.assertFalse(
             learner_group_models.LearnerGroupModel
             .has_reference_to_user_id('user_11'))
+
+    def test_get_by_facilitator_id(self) -> None:
+        """Test get_by_facilitator_id."""
+        learner_group_model = (
+            learner_group_models.LearnerGroupModel.get_by_facilitator_id(
+                'user_1'))
+        self.assertEqual(learner_group_model[0].id, 'learner_group_32')

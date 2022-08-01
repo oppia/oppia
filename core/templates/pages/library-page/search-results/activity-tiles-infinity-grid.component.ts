@@ -18,6 +18,7 @@
 
 import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { ExplorationSummaryDict } from 'domain/summary/exploration-summary-backend-api.service';
 import { Subscription } from 'rxjs';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { LoaderService } from 'services/loader.service';
@@ -28,12 +29,15 @@ import { SearchService } from 'services/search.service';
   templateUrl: './activity-tiles-infinity-grid.component.html'
 })
 export class ActivityTilesInfinityGridComponent {
+  // This property is initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  allActivitiesInOrder!: ExplorationSummaryDict[];
   loadingMessage: string = '';
   endOfPageIsReached: boolean = false;
-  searchResultsAreLoading: boolean;
-  allActivitiesInOrder;
+  searchResultsAreLoading: boolean = false;
   directiveSubscriptions = new Subscription();
-  libraryWindowIsNarrow: boolean;
+  libraryWindowIsNarrow: boolean = false;
 
   constructor(
     private loaderService: LoaderService,

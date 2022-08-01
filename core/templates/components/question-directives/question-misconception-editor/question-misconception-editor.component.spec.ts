@@ -23,7 +23,7 @@ import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { QuestionMisconceptionEditorComponent } from './question-misconception-editor.component';
 import { ExternalSaveService } from 'services/external-save.service';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFactory';
+import { MisconceptionSkillMap, MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFactory';
 
 class MockNgbModalRef {
   componentInstance = {
@@ -38,7 +38,7 @@ describe('Question Misconception Editor Component', () => {
   let stateEditorService: StateEditorService;
 
   let misconceptionObjectFactory: MisconceptionObjectFactory;
-  let mockMisconceptionObject;
+  let mockMisconceptionObject: MisconceptionSkillMap;
   let outcome = {
     feedback: {
       content_id: null,
@@ -178,10 +178,8 @@ describe('Question Misconception Editor Component', () => {
   });
 
   it('should update tagged misconception name correctly', () => {
-    component.outcome.feedback = {
-      html: null,
-      content_id: null,
-    };
+    component.misconceptionEditorIsOpen = false;
+
     component.editMisconception();
 
     expect(component.misconceptionEditorIsOpen).toBeTrue();

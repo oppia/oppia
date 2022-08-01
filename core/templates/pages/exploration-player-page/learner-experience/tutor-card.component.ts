@@ -18,6 +18,7 @@
 
 import { Component, Input, SimpleChanges, ViewChild, Renderer2 } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { TranslateService } from '@ngx-translate/core';
 import { AppConstants } from 'app.constants';
 import { BindableVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
 import { StateCard } from 'domain/state_card/state-card.model';
@@ -43,14 +44,21 @@ import { LearnerAnswerInfoService } from '../services/learner-answer-info.servic
 import { PlayerPositionService } from '../services/player-position.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { animate, keyframes, state, style, transition, trigger } from '@angular/animations';
+import { CollectionSummary } from 'domain/collection/collection-summary.model';
+import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
 import { EndChapterCheckMarkComponent } from './end-chapter-check-mark.component';
 import { EndChapterConfettiComponent } from './end-chapter-confetti.component';
 import { PlatformFeatureService } from 'services/platform-feature.service';
+import { QuestionPlayerConfig } from './ratings-and-recommendations.component';
 
 const CHECK_MARK_HIDE_DELAY_IN_MSECS = 500;
 const REDUCED_MOTION_ANIMATION_DURATION_IN_MSECS = 2000;
 const CONFETTI_ANIMATION_DELAY_IN_MSECS = 2000;
 const STANDARD_ANIMATION_DURATION_IN_MSECS = 4000;
+const MILESTONE_SPECIFIC_COMPLETED_CHAPTER_COUNTS = [1, 5, 10, 25, 50];
+
+import './tutor-card.component.css';
+
 
 @Component({
   selector: 'oppia-tutor-card',
@@ -91,7 +99,21 @@ export class TutorCardComponent {
   @Input() displayedCardWasCompletedInPrevSession: boolean;
   @Input() startCardChangeAnimation: boolean;
   @Input() avatarImageIsShown: boolean;
+  @Input() userIsLoggedIn: boolean;
+  @Input() explorationIsInPreviewMode: boolean;
+  @Input() questionPlayerConfig: QuestionPlayerConfig;
+  @Input() collectionSummary: CollectionSummary;
+  @Input() isRefresherExploration: boolean;
+  @Input() recommendedExplorationSummaries: LearnerExplorationSummary[];
+  @Input() parentExplorationIds: string[];
   @Input() inStoryMode: boolean;
+  // The below property will be undefined when the current chapter
+  // is the last chapter of a story.
+  @Input() nextLessonLink: string | undefined;
+  // 'completedChaptersCount' is fetched via a HTTP request.
+  // Until the response is received, it remains undefined.
+  @Input() completedChaptersCount: number | undefined;
+  @Input() milestoneMessageIsToBeDisplayed!: boolean;
   directiveSubscriptions = new Subscription();
   private _editorPreviewMode: boolean;
   arePreviousResponsesShown: boolean = false;
@@ -106,6 +128,7 @@ export class TutorCardComponent {
   OPPIA_AVATAR_IMAGE_URL: string;
   OPPIA_AVATAR_LINK_URL: string;
   profilePicture: string;
+  nextMilestoneChapterCount: number | null = null;
   checkMarkHidden: boolean = true;
   animationHasPlayedOnce: boolean = false;
   checkMarkSkipped: boolean = false;
@@ -131,7 +154,8 @@ export class TutorCardComponent {
     private windowDimensionsService: WindowDimensionsService,
     private windowRef: WindowRef,
     private platformFeatureService: PlatformFeatureService,
-    private renderer: Renderer2
+    private renderer: Renderer2,
+    private translateService: TranslateService
   ) {}
 
   ngOnInit(): void {
@@ -230,6 +254,72 @@ export class TutorCardComponent {
         this.skipClickListener = null;
       }, STANDARD_ANIMATION_DURATION_IN_MSECS);
     }
+  }
+
+  generateMilestoneMessage(): string {
+    if (!this.inStoryMode ||
+        !this.milestoneMessageIsToBeDisplayed ||
+        !this.completedChaptersCount ||
+        !MILESTONE_SPECIFIC_COMPLETED_CHAPTER_COUNTS.includes(
+          this.completedChaptersCount)) {
+      return '';
+    }
+    let chapterCountMessageIndex = (
+      MILESTONE_SPECIFIC_COMPLETED_CHAPTER_COUNTS.indexOf(
+        this.completedChaptersCount)) + 1;
+    let milestoneMessageTranslationKey = (
+      'I18N_END_CHAPTER_MILESTONE_MESSAGE_' + chapterCountMessageIndex);
+    return this.translateService.instant(milestoneMessageTranslationKey);
+  }
+
+  setNextMilestoneAndCheckIfProgressBarIsShown(): boolean {
+    if (
+      !this.inStoryMode ||
+      this.isCompletedChaptersCountGreaterThanLastMilestone() ||
+      this.isMilestoneReachedAndMilestoneMessageToBeDisplayed()
+    ) {
+      this.nextMilestoneChapterCount = null;
+      return false;
+    }
+
+    if (
+      !this.milestoneMessageIsToBeDisplayed &&
+      MILESTONE_SPECIFIC_COMPLETED_CHAPTER_COUNTS.includes(
+        this.completedChaptersCount)
+    ) {
+      let chapterCountIndex = (
+        MILESTONE_SPECIFIC_COMPLETED_CHAPTER_COUNTS.indexOf(
+          this.completedChaptersCount));
+      this.nextMilestoneChapterCount = (
+        MILESTONE_SPECIFIC_COMPLETED_CHAPTER_COUNTS[chapterCountIndex + 1]);
+      return true;
+    }
+
+    for (let milestoneCount of MILESTONE_SPECIFIC_COMPLETED_CHAPTER_COUNTS) {
+      if (milestoneCount > this.completedChaptersCount) {
+        this.nextMilestoneChapterCount = milestoneCount;
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  isMilestoneReachedAndMilestoneMessageToBeDisplayed(): boolean {
+    return (
+      this.milestoneMessageIsToBeDisplayed &&
+      MILESTONE_SPECIFIC_COMPLETED_CHAPTER_COUNTS.includes(
+        this.completedChaptersCount
+      )
+    );
+  }
+
+  isCompletedChaptersCountGreaterThanLastMilestone(): boolean {
+    return this.completedChaptersCount > 50;
+  }
+
+  getStaticImageUrl(imagePath: string): string {
+    return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
   isAudioBarExpandedOnMobileDevice(): boolean {

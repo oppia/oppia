@@ -553,6 +553,7 @@ interface TopicAddSubtopicChange {
   'cmd': 'add_subtopic';
   'subtopic_id': number;
   'title': string;
+  'url_fragment': string;
 }
 
 interface TopicAddUncategorizedSkillId {

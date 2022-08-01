@@ -41,7 +41,7 @@ EXCLUDED_PATHS = (
     'core/templates/combined-tests.spec.ts',
     'core/templates/css/oppia-material.css',
     'core/templates/google-analytics.initializer.ts',
-    'extensions/classifiers/proto/*', '*.rtl.css',
+    'extensions/classifiers/proto/*',
     '%s/*' % js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH)
 
 GENERATED_FILE_PATHS = (
@@ -49,6 +49,7 @@ GENERATED_FILE_PATHS = (
 
 CONFIG_FILE_PATHS = (
     'core/tests/.browserstack.env.example',
+    'core/tests/wdio.conf.js',
     'core/tests/protractor.conf.js',
     'core/tests/karma.conf.ts',
     'core/templates/mathjaxConfig.ts',
@@ -208,6 +209,19 @@ BAD_PATTERNS_PYTHON_REGEXP = [
                    'here->http://pylint-messages.wikidot.com/all-codes',
         'excluded_files': (),
         'excluded_dirs': ()
+    },
+    {
+        'regexp': re.compile(r'urlretrieve\('),
+        'message': 'Please use scripts.common.url_retrieve instead of '
+                   'urllib.request.urlretrieve.',
+        'excluded_files': (),
+        'excluded_dirs': (
+            'assets/',
+            'core/',
+            'data/',
+            'extensions/',
+            'jobs/',
+        ),
     },
 ]
 
@@ -532,7 +546,8 @@ class GeneralPurposeLinter:
                 ('.js')) and filepath.startswith(
                     ('core/templates', 'extensions')) and (
                         filepath not in build.JS_FILEPATHS_NOT_TO_BUILD
-                        ) and not filepath.endswith('protractor.js'):
+                        ) and not filepath.endswith(
+                        ('protractor.js', 'webdriverio.js')):
                 error_message = (
                     '%s  --> Found extra .js file' % filepath)
                 error_messages.append(error_message)
