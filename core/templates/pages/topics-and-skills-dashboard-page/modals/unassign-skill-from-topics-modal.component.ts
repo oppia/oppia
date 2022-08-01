@@ -46,6 +46,7 @@ export class UnassignSkillFromTopicsModalComponent
   topicsAssignmentsAreFetched: boolean = false;
   selectedTopicNames: string[] = [];
   selectedTopics: TopicAssignmentsSummary[] = [];
+  eligibleTopicsForUnassignment: string[] = [];
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -60,14 +61,39 @@ export class UnassignSkillFromTopicsModalComponent
       .fetchTopicAssignmentsForSkillAsync(
         this.skillId).then((response: AssignedSkill[]) => {
         this.topicsAssignments = {};
-        response.map((topic) => {
-          this.topicsAssignments[topic.topicName] = {
-            subtopicId: topic.subtopicId,
-            topicVersion: topic.topicVersion,
-            topicId: topic.topicId,
-          };
+        let allTopicIds = [];
+        for (let topic of response) {
+          allTopicIds.push(topic.topicId);
+        }
+
+        let topicIdsNotEligibleForUnassignment = [];
+        this.topicsAndSkillsDashboardBackendApiService
+        .fetchTopicIdToDiagnosticTestSkillIdsAsync(allTopicIds).then((dict) => {
+          for (let topicId in dict.topicIdToDiagnosticTestSkillIds) {
+            let diagnosticTestSkillIds = (
+              dict.topicIdToDiagnosticTestSkillIds[topicId])
+            if (diagnosticTestSkillIds.length === 1 &&
+                diagnosticTestSkillIds.indexOf(this.skillId) !== -1) {
+              topicIdsNotEligibleForUnassignment.push(topicId);
+            }
+          }
+
+          response = response.filter((topic) => {
+            return !(
+              topicIdsNotEligibleForUnassignment.indexOf(topic.topicId) !== -1);
+          })
+          response.map((topic) => {
+            this.topicsAssignments[topic.topicName] = {
+              subtopicId: topic.subtopicId,
+              topicVersion: topic.topicVersion,
+              topicId: topic.topicId,
+            };
+          });
+          this.eligibleTopicsForUnassignment = Object.keys(
+            this.topicsAssignments);
+          console.log(this.eligibleTopicsForUnassignment);
+          this.topicsAssignmentsAreFetched = true;
         });
-        this.topicsAssignmentsAreFetched = true;
       });
   }
 

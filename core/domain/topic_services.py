@@ -1232,3 +1232,24 @@ def update_subtopic_thumbnail_filename(
         raise Exception(
             'The thumbnail %s for subtopic with topic_id %s does not exist'
             ' in the filesystem.' % (new_thumbnail_filename, topic.id))
+
+
+def get_topic_id_to_diagnostic_test_skill_ids(topic_ids):
+    """Returns a dict with topic ID as key and a list of diagnostic test
+    skill IDs as value.
+
+    Args:
+        topic_ids: List(str). A list of topic IDs.
+
+    Returns:
+        dict(str, list(str)). A dict with topic ID as key and a list of
+        diagnostic test skill IDs as value.
+    """
+    topic_id_to_diagnostic_test_skill_ids = {}
+    for topic_id in topic_ids:
+        topic = topic_fetchers.get_topic_by_id(topic_id, strict=None)
+
+        topic_id_to_diagnostic_test_skill_ids[topic_id] = (
+            topic.skill_ids_for_diagnostic_test)
+
+    return topic_id_to_diagnostic_test_skill_ids

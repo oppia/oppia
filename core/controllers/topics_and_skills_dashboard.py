@@ -492,3 +492,19 @@ class MergeSkillHandler(base.BaseHandler):
         self.render_json({
             'merged_into_skill': new_skill_id
         })
+
+
+class TopicIdToDiagnosticTestSkillIdsHandler(base.BaseHandler):
+    """Handler class to get topic ID to diagnostic test skill IDs dict."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_access_topics_and_skills_dashboard
+    def get(self, comma_separated_topic_ids):
+        topic_ids = comma_separated_topic_ids.split(',')
+        self.values.update({
+            'topic_id_to_diagnostic_test_skill_ids': (
+                topic_services.get_topic_id_to_diagnostic_test_skill_ids(
+                    topic_ids))
+        })
+        self.render_json(self.values)

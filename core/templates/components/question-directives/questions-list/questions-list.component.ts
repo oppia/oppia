@@ -272,51 +272,73 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     this.windowRef.nativeWindow.location.hash = this.questionId;
   }
 
-  deleteQuestionFromSkill(
-      questionId: string, skillDescription: string): void {
+  async questionDeletionCheck() {
+    let questionDeletionIsAllowed = true;
     if (!this.canEditQuestion) {
       this.alertsService.addWarning(
         'User does not have enough rights to delete the question');
-      return;
+      questionDeletionIsAllowed = false;
+      return questionDeletionIsAllowed;
     }
 
-    this.deletedQuestionIds.push(questionId);
-    // For the case when, it is in the skill editor.
-    if (this.allSkillSummaries.length === 0) {
-      this.editableQuestionBackendApiService.editQuestionSkillLinksAsync(
-        questionId, [
-          {
-            id: this.selectedSkillId,
-            task: 'remove'
-          } as SkillLinkageModificationsArray
-        ]
-      ).then(() => {
-        this.questionsListService.resetPageNumber();
-        this.questionsListService.getQuestionSummariesAsync(
-          this.selectedSkillId, true, true);
-        this.alertsService.addSuccessMessage('Deleted Question');
-        this._removeArrayElement(questionId);
-      });
-    } else {
-      this.allSkillSummaries.forEach((summary) => {
-        if (summary.getDescription() === skillDescription) {
-          this.editableQuestionBackendApiService.editQuestionSkillLinksAsync(
-            questionId, [
-              {
-                id: summary.getId(),
-                task: 'remove'
-              } as SkillLinkageModificationsArray
-            ]
-          ).then(() => {
-            this.questionsListService.resetPageNumber();
-            this.questionsListService.getQuestionSummariesAsync(
-              this.selectedSkillId, true, true);
-            this.alertsService.addSuccessMessage('Deleted Question');
-            this._removeArrayElement(questionId);
-          });
+    let numberOfQuestions = this.questionSummariesForOneSkill.length;
+    await this.skillBackendApiService.checkSkillAssignmentForDiagnosticTest(
+      this.selectedSkillId).then((response) => {
+        if (response && (
+            numberOfQuestions <=
+            AppConstants.MINIMUM_QUESTION_COUNT_FOR_A_DIAGNOSTIC_TEST_SKILL)) {
+          this.alertsService.addInfoMessage(
+            'The skill must be removed from the diagnostic test first.');
+          questionDeletionIsAllowed = false;
         }
       });
-    }
+    return questionDeletionIsAllowed;
+  }
+
+  deleteQuestionFromSkill(
+      questionId: string, skillDescription: string) {
+    this.questionDeletionCheck().then((response) => {
+      if (!response) {
+        return;
+      }
+      this.deletedQuestionIds.push(questionId);
+      // For the case when, it is in the skill editor.
+      if (this.allSkillSummaries.length === 0) {
+        this.editableQuestionBackendApiService.editQuestionSkillLinksAsync(
+          questionId, [
+            {
+              id: this.selectedSkillId,
+              task: 'remove'
+            } as SkillLinkageModificationsArray
+          ]
+        ).then(() => {
+          this.questionsListService.resetPageNumber();
+          this.questionsListService.getQuestionSummariesAsync(
+            this.selectedSkillId, true, true);
+          this.alertsService.addSuccessMessage('Deleted Question');
+          this._removeArrayElement(questionId);
+        });
+      } else {
+        this.allSkillSummaries.forEach((summary) => {
+          if (summary.getDescription() === skillDescription) {
+            this.editableQuestionBackendApiService.editQuestionSkillLinksAsync(
+              questionId, [
+                {
+                  id: summary.getId(),
+                  task: 'remove'
+                } as SkillLinkageModificationsArray
+              ]
+            ).then(() => {
+              this.questionsListService.resetPageNumber();
+              this.questionsListService.getQuestionSummariesAsync(
+                this.selectedSkillId, true, true);
+              this.alertsService.addSuccessMessage('Deleted Question');
+              this._removeArrayElement(questionId);
+            });
+          }
+        });
+      }
+    });
   }
 
   _removeArrayElement(questionId: string): void {

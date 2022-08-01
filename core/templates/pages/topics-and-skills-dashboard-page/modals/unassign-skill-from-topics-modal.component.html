@@ -4,14 +4,25 @@
   </h3>
 </div>
 <div class="modal-body">
-  <span>This skill is assigned to these following topics, Tick the topics that you want this skill to be unassigned from.</span>
+  <span *ngIf="topicsAssignmentsAreFetched && eligibleTopicsForUnassignment.length !== 0">This skill is assigned to these following topics. Tick the topics that you want this skill to be unassigned from.</span>
+  <div>
+    <span *ngIf="topicsAssignmentsAreFetched && eligibleTopicsForUnassignment.length === 0">No eligible topics for unassignment.</span>
+  </div>
+  <div style="margin-left: 45%;" *ngIf="!topicsAssignmentsAreFetched">
+    <mat-spinner [diameter]="30"></mat-spinner>
+  </div>
   <div *ngFor="let topicsAssignment of topicsAssignments | keyvalue" class="e2e-test-unassign-topic-label">
-    <input type="checkbox" class="topic-name e2e-test-unassign-topic" (click)="selectedTopicToUnassign(topicsAssignment.key)"> {{topicsAssignment.key}}
+    <input type="checkbox"
+           class="topic-name e2e-test-unassign-topic"
+           (click)="selectedTopicToUnassign(topicsAssignment.key)">
+    {{topicsAssignment.key}}
   </div>
 </div>
 <div class="modal-footer">
   <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
-  <button class="btn btn-danger e2e-test-confirm-unassign-skill-button" (click)="close()"  [disabled]="!topicsAssignmentsAreFetched">
+  <button class="btn btn-danger e2e-test-confirm-unassign-skill-button"
+          (click)="close()" [disabled]="!topicsAssignmentsAreFetched"
+          *ngIf="eligibleTopicsForUnassignment.length !== 0">
     <span>Unassign Skill</span>
   </button>
 </div>
