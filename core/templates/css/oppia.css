@@ -2301,7 +2301,7 @@ oppia-parameter {
   .modal-dialog {
     margin-left: auto;
     margin-right: auto;
-    width: 90vw;
+    width: 95vw;
   }
 }
 @media(min-width: 1024px) {

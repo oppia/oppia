@@ -1,7 +1,7 @@
 // Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
+// you may not use component file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 //      http://www.apache.org/licenses/LICENSE-2.0
@@ -22,7 +22,6 @@ import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstra
 import { FetchSkillResponse, SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { SuggestionModalService } from 'services/suggestion-modal.service';
 import { QuestionSuggestionReviewModalComponent } from './question-suggestion-review-modal.component';
@@ -51,7 +50,6 @@ describe('Question Suggestion Review Modal component', () => {
   let component: QuestionSuggestionReviewModalComponent;
   let fixture: ComponentFixture<QuestionSuggestionReviewModalComponent>;
   let ngbModal: NgbModal;
-  let questionObjectFactory: QuestionObjectFactory;
   let siteAnalyticsService: SiteAnalyticsService;
   let suggestionModalService: SuggestionModalService;
   let skillBackendApiService: SkillBackendApiService;
@@ -65,7 +63,7 @@ describe('Question Suggestion Review Modal component', () => {
   const questionHeader = 'Question header';
   const reviewable = true;
   const skillDifficulty = 0.3;
-  const suggestionId = '123';
+  const suggestionId = '1';
   let misconceptionsBySkill = null;
   let suggestionIdToContribution = {
     1: {
@@ -98,7 +96,7 @@ describe('Question Suggestion Review Modal component', () => {
           translation_html: null,
           new_value: null,
           old_value: null,
-          content_html: null,
+          content_html: contentHtml,
           content_id: null,
           cmd: 'create_new_fully_specified_question',
           question_dict: {
@@ -110,7 +108,7 @@ describe('Question Suggestion Review Modal component', () => {
             inapplicable_skill_misconception_ids: null,
             question_state_data: {
               content: {
-                html: 'Question 1',
+                html: contentHtml,
                 content_id: 'content_1'
               },
               interaction: {
@@ -186,7 +184,10 @@ describe('Question Suggestion Review Modal component', () => {
         story_title: null,
         question_count: 1,
         skill_description: questionHeader,
-        skill_rubrics: []
+        skill_rubrics: [{
+          explanations: ['explanation'],
+          difficulty: 'Easy'
+        }]
       },
       suggestion: {
         suggestion_id: null,
@@ -196,7 +197,7 @@ describe('Question Suggestion Review Modal component', () => {
         exploration_content_html: null,
         language_code: null,
         last_updated_msecs: null,
-        status: '',
+        status: 'rejected',
         author_name: authorName,
         change: {
           data_format: null,
@@ -262,7 +263,7 @@ describe('Question Suggestion Review Modal component', () => {
                   }
                 }],
                 solution: {
-                  correct_answer: 'This is the correct answer',
+                  correct_answer: 'component is the correct answer',
                   answer_is_exclusive: false,
                   explanation: {
                     html: 'Solution explanation',
@@ -328,7 +329,6 @@ describe('Question Suggestion Review Modal component', () => {
     ngbModal = TestBed.inject(NgbModal);
     skillBackendApiService = TestBed.inject(SkillBackendApiService);
     skillObjectFactory = TestBed.inject(SkillObjectFactory);
-    questionObjectFactory = TestBed.inject(QuestionObjectFactory);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     threadDataBackendApiService = TestBed.inject(
       ThreadDataBackendApiService);
@@ -338,88 +338,6 @@ describe('Question Suggestion Review Modal component', () => {
       siteAnalyticsService,
       'registerContributorDashboardViewSuggestionForReview');
 
-    component.question = questionObjectFactory.createFromBackendDict({
-      id: '1',
-      question_state_data_schema_version: null,
-      language_code: null,
-      version: null,
-      linked_skill_ids: null,
-      inapplicable_skill_misconception_ids: null,
-      question_state_data: {
-        classifier_model_id: null,
-        solicit_answer_details: null,
-        card_is_checkpoint: null,
-        linked_skill_id: null,
-        next_content_id_index: null,
-        content: {
-          html: 'Question 1',
-          content_id: 'content_1'
-        },
-        interaction: {
-          answer_groups: [{
-            outcome: {
-              dest: 'outcome 1',
-              dest_if_really_stuck: null,
-              feedback: {
-                content_id: 'content_5',
-                html: ''
-              },
-              labelled_as_correct: true,
-              param_changes: [],
-              missing_prerequisite_skill_id: null,
-              refresher_exploration_id: null
-            },
-            rule_specs: [],
-            training_data: null,
-            tagged_skill_misconception_id: null,
-          }],
-          confirmed_unclassified_answers: [],
-          customization_args: {
-            placeholder: {
-              value: {
-                content_id: 'ca_placeholder_0',
-                unicode_str: ''
-              }
-            },
-            rows: { value: 1 }
-          },
-          default_outcome: {
-            dest: null,
-            dest_if_really_stuck: null,
-            feedback: {
-              html: 'Correct Answer',
-              content_id: 'content_2'
-            },
-            param_changes: [],
-            labelled_as_correct: true,
-            refresher_exploration_id: null,
-            missing_prerequisite_skill_id: null,
-          },
-          hints: [{
-            hint_content: {
-              html: 'Hint 1',
-              content_id: 'content_3'
-            }
-          }],
-          solution: {
-            correct_answer: 'This is the correct answer',
-            answer_is_exclusive: false,
-            explanation: {
-              html: 'Solution explanation',
-              content_id: 'content_4'
-            }
-          },
-          id: 'TextInput'
-        },
-        param_changes: [],
-        recorded_voiceovers: {
-          voiceovers_mapping: {}
-        },
-        written_translations: {
-          translations_mapping: {}
-        },
-      },
-    });
     spyOn(skillBackendApiService, 'fetchSkillAsync').and.returnValue(
       Promise.resolve({
         skill: skillObjectFactory.createFromBackendDict({
@@ -454,32 +372,6 @@ describe('Question Suggestion Review Modal component', () => {
           superseding_skill_id: ''
         })
       } as FetchSkillResponse));
-
-    component.suggestion = {
-      author_name: null,
-      exploration_content_html: null,
-      language_code: null,
-      last_updated_msecs: null,
-      suggestion_id: '1',
-      suggestion_type: null,
-      target_id: null,
-      target_type: null,
-      status: 'accepted',
-      change: {
-        skill_difficulty: 1,
-        old_value: null,
-        new_value: null,
-        question_dict: null,
-        cmd: null,
-        content_html: null,
-        content_id: null,
-        data_format: null,
-        language_code: null,
-        state_name: null,
-        translation_html: null,
-        skill_id: 'skill_1'
-      }
-    };
 
     component.skillRubrics = [{
       explanations: ['explanation'],
@@ -593,7 +485,7 @@ describe('Question Suggestion Review Modal component', () => {
 
     it('should reset validation error message when user updates question',
       () => {
-        component.validationError = 'This is an error message';
+        component.validationError = 'component is an error message';
         component.questionChanged();
         expect(component.validationError).toBe(null);
       });
@@ -645,6 +537,8 @@ describe('Question Suggestion Review Modal component', () => {
     });
 
   it('should fetch the rejection message', fakeAsync(() => {
+    component.currentSuggestionId = '2';
+
     component.skillRubrics = [{
       explanations: ['explanation'],
       difficulty: 'Easy'
@@ -657,6 +551,7 @@ describe('Question Suggestion Review Modal component', () => {
     component.reviewable = false;
     component.suggestionIsRejected = true;
 
+    spyOn(component, '_getThreadMessagesAsync').and.callThrough();
     const fetchMessagesAsyncSpy = spyOn(
       threadDataBackendApiService, 'fetchMessagesAsync')
       .and.returnValue(Promise.resolve({
@@ -664,76 +559,78 @@ describe('Question Suggestion Review Modal component', () => {
       } as ThreadMessages));
 
     component.refreshContributionState();
-    tick();
+    tick(1000);
 
-    expect(fetchMessagesAsyncSpy).toHaveBeenCalledWith('123');
+    expect(component._getThreadMessagesAsync).toHaveBeenCalled();
+    expect(fetchMessagesAsyncSpy).toHaveBeenCalledWith('2');
     expect(component.reviewMessage).toBe('This is a rejection.');
   }));
 
-  it('should allow users to navigate between suggestions', function() {
-    spyOn(this, 'refreshActiveContributionState').and.callThrough();
+  it('should allow users to navigate between suggestions', fakeAsync(()=>{
+    spyOn(component, 'refreshActiveContributionState').and.callThrough();
 
-    expect(this.currentSuggestionId).toEqual('1');
-    expect(this.skippedContributionIds.length).toEqual(0);
-    expect(this.remainingContributionIdStack.length).toEqual(1);
-    expect(this.isLastItem).toBeFalse();
-    expect(this.isFirstItem).toBeTrue();
+    expect(component.currentSuggestionId).toEqual('1');
+    expect(component.skippedContributionIds.length).toEqual(0);
+    expect(component.remainingContributionIdStack.length).toEqual(1);
+    expect(component.isLastItem).toBeFalse();
+    expect(component.isFirstItem).toBeTrue();
 
-    this.goToNextItem();
-    this.$apply();
+    component.goToNextItem();
+    tick(0);
 
-    expect(this.refreshActiveContributionState).toHaveBeenCalled();
-    expect(this.currentSuggestionId).toEqual('2');
-    expect(this.skippedContributionIds.length).toEqual(1);
-    expect(this.remainingContributionIdStack.length).toEqual(0);
-    expect(this.isLastItem).toBeTrue();
-    expect(this.isFirstItem).toBeFalse();
+    expect(component.refreshActiveContributionState).toHaveBeenCalled();
+    expect(component.currentSuggestionId).toEqual('2');
+    expect(component.skippedContributionIds.length).toEqual(1);
+    expect(component.remainingContributionIdStack.length).toEqual(0);
+    expect(component.isLastItem).toBeTrue();
+    expect(component.isFirstItem).toBeFalse();
 
-    this.goToNextItem();
-    this.$apply();
+    component.goToNextItem();
+    tick(0);
 
-    expect(this.currentSuggestionId).toEqual('2');
-    expect(this.skippedContributionIds.length).toEqual(1);
-    expect(this.remainingContributionIdStack.length).toEqual(0);
-    expect(this.isLastItem).toBeTrue();
-    expect(this.isFirstItem).toBeFalse();
+    expect(component.currentSuggestionId).toEqual('2');
+    expect(component.skippedContributionIds.length).toEqual(1);
+    expect(component.remainingContributionIdStack.length).toEqual(0);
+    expect(component.isLastItem).toBeTrue();
+    expect(component.isFirstItem).toBeFalse();
 
-    this.goToPreviousItem();
-    this.$apply();
+    component.goToPreviousItem();
+    tick(0);
 
-    expect(this.refreshActiveContributionState).toHaveBeenCalled();
-    expect(this.currentSuggestionId).toEqual('1');
-    expect(this.skippedContributionIds.length).toEqual(0);
-    expect(this.remainingContributionIdStack.length).toEqual(1);
-    expect(this.isLastItem).toBeFalse();
-    expect(this.isFirstItem).toBeTrue();
+    expect(component.refreshActiveContributionState).toHaveBeenCalled();
+    expect(component.currentSuggestionId).toEqual('1');
+    expect(component.skippedContributionIds.length).toEqual(0);
+    expect(component.remainingContributionIdStack.length).toEqual(1);
+    expect(component.isLastItem).toBeFalse();
+    expect(component.isFirstItem).toBeTrue();
 
-    this.goToPreviousItem();
-    this.$apply();
+    component.goToPreviousItem();
+    tick(0);
 
-    expect(this.currentSuggestionId).toEqual('1');
-    expect(this.skippedContributionIds.length).toEqual(0);
-    expect(this.remainingContributionIdStack.length).toEqual(1);
-    expect(this.isLastItem).toBeFalse();
-    expect(this.isFirstItem).toBeTrue();
-  });
+    expect(component.currentSuggestionId).toEqual('1');
+    expect(component.skippedContributionIds.length).toEqual(0);
+    expect(component.remainingContributionIdStack.length).toEqual(1);
+    expect(component.isLastItem).toBeFalse();
+    expect(component.isFirstItem).toBeTrue();
+  }));
 
   it('should not navigate if the corresponding opportunity is deleted',
     function() {
-      let details1 = this.allContributions['1'].details;
-      let details2 = this.allContributions['2'].details;
-      this.allContributions['2'].details = null;
+      spyOn(component, 'cancel');
+      let details1 = component.allContributions['1'].details;
+      let details2 = component.allContributions['2'].details;
+      component.allContributions['2'].details = null;
 
-      this.goToNextItem();
-      expect(cancelSuggestionSpy).toHaveBeenCalled();
-      this.allContributions['2'].details = details2;
-      this.goToNextItem();
-      this.allContributions['1'].details = null;
+      component.goToNextItem();
+      expect(component.cancel).toHaveBeenCalled();
+      component.allContributions['2'].details = details2;
+      component.goToNextItem();
+      component.allContributions['1'].details = null;
 
-      this.goToPreviousItem();
-      expect(cancelSuggestionSpy).toHaveBeenCalledWith();
+      component.goToPreviousItem();
+      expect(component.cancel).toHaveBeenCalledWith();
 
-      this.allContributions['1'].details = details1;
-      this.allContributions['2'].details = details2;
+      component.allContributions['1'].details = details1;
+      component.allContributions['2'].details = details2;
     });
 });

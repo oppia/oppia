@@ -16,7 +16,7 @@
  * @fileoverview Component for question suggestion review modal.
  */
 
-import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
@@ -139,8 +139,7 @@ export class QuestionSuggestionReviewModalComponent
     private skillBackendApiService: SkillBackendApiService,
     private suggestionModalService: SuggestionModalService,
     private threadDataBackendApiService: ThreadDataBackendApiService,
-    private changeDetectorRef: ChangeDetectorRef,
-    private questionObjectFactory: QuestionObjectFactory
+    private questionObjectFactory: QuestionObjectFactory,
   ) {
     super(ngbActiveModal);
   }
@@ -320,7 +319,6 @@ export class QuestionSuggestionReviewModalComponent
     this.skillDifficultyLabel = this.getSkillDifficultyLabel();
     this.skillRubricExplanations = this.getRubricExplanation(
       this.skillDifficultyLabel);
-    this.reviewMessage = '';
     this.suggestionIsRejected = this.suggestion.status === 'rejected';
     if (this.reviewable) {
       this.siteAnalyticsService
@@ -329,7 +327,6 @@ export class QuestionSuggestionReviewModalComponent
       this._getThreadMessagesAsync(this.currentSuggestionId);
     }
     this.showQuestion = true;
-    this.changeDetectorRef.detectChanges();
   }
 
   ngOnInit(): void {
@@ -346,6 +343,7 @@ export class QuestionSuggestionReviewModalComponent
 
     this.isLastItem = this.remainingContributionIdStack.length === 0;
     this.isFirstItem = this.skippedContributionIds.length === 0;
+    this.reviewMessage = '';
 
     this.refreshContributionState();
   }

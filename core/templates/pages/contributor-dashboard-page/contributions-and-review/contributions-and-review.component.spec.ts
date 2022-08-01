@@ -763,16 +763,139 @@ describe('Contributions and review component', () => {
         })
       } as NgbModalRef);
 
+      let questionDict = {
+        question_state_data_schema_version: null,
+        id: 'question_1',
+        question_state_data: {
+          classifier_model_id: null,
+          card_is_checkpoint: null,
+          linked_skill_id: null,
+          next_content_id_index: null,
+          content: {
+            html: 'Question 1',
+            content_id: 'content_1'
+          },
+          interaction: {
+            answer_groups: [{
+              outcome: {
+                missing_prerequisite_skill_id: null,
+                dest: 'outcome 1',
+                dest_if_really_stuck: null,
+                feedback: {
+                  content_id: 'content_5',
+                  html: ''
+                },
+                labelled_as_correct: true,
+                param_changes: [],
+                refresher_exploration_id: null
+              },
+              training_data: null,
+              rule_specs: [{
+                rule_type: 'Equals',
+                inputs: {x: 10}
+              }],
+              tagged_skill_misconception_id: null
+            },
+            {
+              training_data: null,
+              outcome: {
+                missing_prerequisite_skill_id: null,
+                dest: 'outcome 1',
+                dest_if_really_stuck: null,
+                feedback: {
+                  content_id: 'content_5',
+                  html: ''
+                },
+                labelled_as_correct: false,
+                param_changes: [],
+                refresher_exploration_id: null
+              },
+              rule_specs: [{
+                rule_type: 'Equals',
+                inputs: {x: 10}
+              }],
+              tagged_skill_misconception_id: 'abc-1'
+            }],
+            confirmed_unclassified_answers: [],
+            customization_args: {
+              placeholder: {
+                value: {
+                  content_id: 'ca_placeholder_0',
+                  unicode_str: ''
+                }
+              },
+              rows: { value: 1 }
+            },
+            default_outcome: {
+              dest: null,
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null,
+              dest_if_really_stuck: null,
+              feedback: {
+                html: 'Correct Answer',
+                content_id: 'content_2'
+              },
+              param_changes: [],
+              labelled_as_correct: false
+            },
+            hints: [
+              {
+                hint_content: {
+                  html: 'Hint 1',
+                  content_id: 'content_3'
+                }
+              }
+            ],
+            solution: {
+              correct_answer: 'This is the correct answer',
+              answer_is_exclusive: false,
+              explanation: {
+                html: 'Solution explanation',
+                content_id: 'content_4'
+              }
+            },
+            id: 'TextInput'
+          },
+          param_changes: [],
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content_1: {},
+              content_2: {},
+              content_3: {},
+              content_4: {},
+              content_5: {}
+            }
+          },
+          written_translations: {
+            translations_mapping: {
+              content_1: {},
+              content_2: {},
+              content_3: {},
+              content_4: {},
+              content_5: {}
+            }
+          },
+          solicit_answer_details: false
+        },
+        language_code: 'en',
+        version: 1,
+        linked_skill_ids: ['abc'],
+        inapplicable_skill_misconception_ids: ['abc-2']
+      };
+
       let suggestion = {
         change: {
           skill_id: 'string',
-          question_dict: null,
+          question_dict: questionDict,
           skill_difficulty: null,
-          translation_html: ['suggestion_1', 'suggestion_2']
+          translation_html: ['suggestion_1', 'suggestion_2'],
+          content_html: null,
         },
+        status: null,
         target_id: 'string;,',
         suggestion_id: 'string;',
         author_name: 'string;',
+        suggestion_type: 'question'
       };
 
       let suggestionIdToContribution = {
@@ -878,7 +1001,7 @@ describe('Contributions and review component', () => {
       };
 
       component._showQuestionSuggestionModal(
-        suggestion as Suggestion,
+        suggestion,
         suggestionIdToContribution,
         false,
         null,

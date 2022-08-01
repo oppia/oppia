@@ -4,7 +4,7 @@
       {{questionHeader}}
     </h3>
     <h3 class="oppia-mobile-question-header" title="{{questionHeader}}">
-      {{questionHeader | wrapTextWithEllipsis: 25}}
+      {{questionHeader.substring(0, 25)}}{{questionHeader.length > 25 ? "...": ""}}
     </h3>
     <h4 class="author-header"
         *ngIf="reviewable">
@@ -72,21 +72,20 @@
             (click)="reject()">Reject
     </button>
   </span>
-    <span tooltip-placement="bottom">
-      <button class="btn btn-secondary oppia-review-button e2e-test-question-suggestion-review-edit-button"
-              *ngIf="reviewable"
-              (click)="edit()">
-        Edit
-      </button>
-    </span>
-    <span tooltip-placement="bottom">
-      <button class="btn btn-success oppia-review-button e2e-test-question-suggestion-review-accept-button"
-              *ngIf="reviewable"
-              (click)="accept()">
-        Accept
-      </button>
-    </span>
-  </div>
+  <span tooltip-placement="bottom">
+    <button class="btn btn-secondary oppia-review-button e2e-test-question-suggestion-review-edit-button"
+            *ngIf="reviewable"
+            (click)="edit()">
+      Edit
+    </button>
+  </span>
+  <span tooltip-placement="bottom">
+    <button class="btn btn-success oppia-review-button e2e-test-question-suggestion-review-accept-button"
+            *ngIf="reviewable"
+            (click)="accept()">
+      Accept
+    </button>
+  </span>
   <div class="oppia-pagination-container">
     <button type="button"
             class="oppia-pagination-button"
