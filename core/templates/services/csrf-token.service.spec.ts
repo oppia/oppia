@@ -17,21 +17,18 @@
  */
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { TestBed } from '@angular/core/testing';
-import { HttpBackend } from '@angular/common/http';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
 describe('Csrf Token Service', function() {
   let csrfTokenService: CsrfTokenService;
-  let httpBackend: HttpBackend;
   let httpTestingController: HttpTestingController;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
     });
-    httpTestingController = TestBed.get(HttpTestingController);
-    httpBackend = TestBed.get(HttpBackend);
-    csrfTokenService = new CsrfTokenService(httpBackend);
+    httpTestingController = TestBed.inject(HttpTestingController);
+    csrfTokenService = TestBed.inject(CsrfTokenService);
   });
 
   it('should correctly set the csrf token', (done) => {
@@ -61,7 +58,6 @@ describe('Csrf Token Service', function() {
 
     httpTestingController.verify();
   });
-
 
   it('should error if initialize is called more than once', () => {
     csrfTokenService.initializeToken();

@@ -18,8 +18,9 @@
  */
 
 import { Injectable } from '@angular/core';
+// eslint-disable-next-line oppia/disallow-httpclient
+import { HttpClient } from '@angular/common/http';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { CsrfTokenService } from 'services/csrf-token.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { AlertsService } from 'services/alerts.service';
 import { LoaderService } from 'services/loader.service';
@@ -29,6 +30,10 @@ import { UploadActivityModalComponent } from 'pages/creator-dashboard-page/modal
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { ExplorationCreationBackendApiService } from './exploration-creation-backend-api.service';
 
+interface ExplorationUploadBackendResponse {
+  'exploration_id': string;
+}
+
  @Injectable({
    providedIn: 'root'
  })
@@ -36,8 +41,8 @@ export class ExplorationCreationService {
   CREATE_NEW_EXPLORATION_URL_TEMPLATE = '/create/<exploration_id>';
   explorationCreationInProgress: boolean = false;
   constructor(
+    private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService,
-    private csrfTokenService: CsrfTokenService,
     private siteAnalyticsService: SiteAnalyticsService,
     private alertsService: AlertsService,
     private loaderService: LoaderService,
@@ -85,37 +90,27 @@ export class ExplorationCreationService {
 
       this.loaderService.showLoadingScreen('Creating exploration');
 
-      var form = new FormData();
+      let form = new FormData();
       form.append('yaml_file', yamlFile);
       form.append('payload', JSON.stringify({}));
-      this.csrfTokenService.getTokenAsync().then((token) => {
-        form.append('csrf_token', token);
-        $.ajax({
-          contentType: false,
-          data: form,
-          dataFilter: (data) => {
-            // Remove the XSSI prefix.
-            return JSON.parse(data.substring(5));
-          },
-          dataType: 'text',
-          processData: false,
-          type: 'POST',
-          url: 'contributehandler/upload'
-        }).done((data) => {
+      this.http.post<ExplorationUploadBackendResponse>(
+        'contributehandler/upload', form
+      ).toPromise().then(
+        (data) => {
           this.windowRef.nativeWindow.location.href =
           this.urlInterpolationService.interpolateUrl(
             this.CREATE_NEW_EXPLORATION_URL_TEMPLATE, {
               exploration_id: data.exploration_id
             }
           );
-        }).fail((data) => {
+        },
+        (data) => {
           var transformedData = data.responseText.substring(5);
           var parsedResponse = JSON.parse(transformedData);
           this.alertsService.addWarning(
             parsedResponse.error || 'Error communicating with server.');
           this.loaderService.hideLoadingScreen();
         });
-      });
     });
   }
 }
