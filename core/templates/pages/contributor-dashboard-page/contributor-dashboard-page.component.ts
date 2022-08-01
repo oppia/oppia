@@ -33,12 +33,12 @@ import { TranslationTopicService } from 'pages/exploration-editor-page/translati
 import { UserService } from 'services/user.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
- @Component({
-   selector: 'contributor-dashboard-page',
-   templateUrl: './contributor-dashboard-page.component.html'
- })
+@Component({
+  selector: 'contributor-dashboard-page',
+  templateUrl: './contributor-dashboard-page.component.html'
+})
 export class ContributorDashboardPageComponent
-   implements OnInit {
+  implements OnInit {
   OPPIA_AVATAR_LINK_URL: string = AppConstants.OPPIA_AVATAR_LINK_URL;
   defaultHeaderVisible: boolean;
   profilePictureDataUrl: SafeUrl | string;
@@ -56,17 +56,17 @@ export class ContributorDashboardPageComponent
   activeTabName: string;
 
   constructor(
-     private contributionAndReviewService: ContributionAndReviewService,
-     private contributionOpportunitiesService: ContributionOpportunitiesService,
-     private focusManagerService: FocusManagerService,
-     private languageUtilService: LanguageUtilService,
-     private localStorageService: LocalStorageService,
-     private svgSanitizerService: SvgSanitizerService,
-     private translationLanguageService: TranslationLanguageService,
-     private translationTopicService: TranslationTopicService,
-     private urlInterpolationService: UrlInterpolationService,
-     private userService: UserService,
-     private windowRef: WindowRef,
+    private contributionAndReviewService: ContributionAndReviewService,
+    private contributionOpportunitiesService: ContributionOpportunitiesService,
+    private focusManagerService: FocusManagerService,
+    private languageUtilService: LanguageUtilService,
+    private localStorageService: LocalStorageService,
+    private svgSanitizerService: SvgSanitizerService,
+    private translationLanguageService: TranslationLanguageService,
+    private translationTopicService: TranslationTopicService,
+    private urlInterpolationService: UrlInterpolationService,
+    private userService: UserService,
+    private windowRef: WindowRef,
   ) {}
 
   onTabClick(activeTabName: string): void {
@@ -108,14 +108,14 @@ export class ContributorDashboardPageComponent
   showTopicSelector(): boolean {
     const activeTabDetail = this.tabsDetails[this.activeTabName];
     const activeSuggestionType =
-       this.contributionAndReviewService.getActiveSuggestionType();
+      this.contributionAndReviewService.getActiveSuggestionType();
     const activeTabType = this.contributionAndReviewService.getActiveTabType();
     return activeTabDetail.customizationOptions.includes('topic') ||
-       (
-         activeTabType === 'reviews' &&
-         activeSuggestionType === 'translate_content' &&
-         this.activeTabName !== 'submitQuestionTab'
-       );
+      (
+        activeTabType === 'reviews' &&
+        activeSuggestionType === 'translate_content' &&
+        this.activeTabName !== 'submitQuestionTab'
+      );
   }
 
   scrollFunction(): void {
@@ -172,9 +172,9 @@ export class ContributorDashboardPageComponent
         this.userIsReviewer = (
           this.userCanReviewTranslationSuggestionsInLanguages
             .length > 0 ||
-           this.userCanReviewVoiceoverSuggestionsInLanguages
-             .length > 0 ||
-           this.userCanReviewQuestions);
+          this.userCanReviewVoiceoverSuggestionsInLanguages
+            .length > 0 ||
+          this.userCanReviewQuestions);
 
         this.tabsDetails.submitQuestionTab.enabled = (
           userContributionRights.can_suggest_questions);
@@ -222,6 +222,6 @@ export class ContributorDashboardPageComponent
 }
 
 angular.module('oppia').directive('contributorDashboardPage',
-   downgradeComponent({
-     component: ContributorDashboardPageComponent
-   }) as angular.IDirectiveFactory);
+  downgradeComponent({
+    component: ContributorDashboardPageComponent
+  }) as angular.IDirectiveFactory);

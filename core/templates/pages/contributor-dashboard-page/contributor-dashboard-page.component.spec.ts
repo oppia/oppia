@@ -71,7 +71,7 @@ describe('Contributor dashboard page', () => {
     component = fixture.componentInstance;
 
     contributionOpportunitiesService =
-       TestBed.inject(ContributionOpportunitiesService);
+      TestBed.inject(ContributionOpportunitiesService);
     localStorageService = TestBed.inject(LocalStorageService);
     windowRef = TestBed.inject(WindowRef);
     translationLanguageService = TestBed.inject(TranslationLanguageService);
@@ -124,7 +124,7 @@ describe('Contributor dashboard page', () => {
 
     component.scrollFunction();
 
-    expect(component.defaultHeaderVisible).toBeFalse();
+    expect(component.defaultHeaderVisible).toBeTrue();
   });
 
   it('should username equal to "" when user is not loggedIn', fakeAsync(() => {
@@ -161,7 +161,7 @@ describe('Contributor dashboard page', () => {
     });
 
     it('should initialize $scope properties after controller is initialized' +
-       ' and get data from backend', () => {
+      ' and get data from backend', () => {
       expect(component.userIsLoggedIn).toBe(false);
       expect(component.username).toBe(null);
       expect(component.userCanReviewQuestions).toBe(false);
@@ -235,7 +235,7 @@ describe('Contributor dashboard page', () => {
     });
 
     it('should show default header if window pageYOffset is ' +
-       'less than 80', function() {
+      'less than 80', function() {
       const nativeWindowSpy = spyOnProperty(windowRef, 'nativeWindow');
       nativeWindowSpy.and.returnValue({
         pageYOffset: 79
@@ -247,7 +247,7 @@ describe('Contributor dashboard page', () => {
     });
 
     it('should show collapsed header if window pageYOffset is' +
-       ' scrolled greater than 80', fakeAsync(() => {
+      ' scrolled greater than 80', fakeAsync(() => {
       const nativeWindowSpy = spyOnProperty(windowRef, 'nativeWindow');
       nativeWindowSpy.and.returnValue({
         pageYOffset: 81

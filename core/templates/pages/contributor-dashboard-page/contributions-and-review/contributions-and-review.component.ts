@@ -38,57 +38,57 @@ import { ContributionAndReviewService } from '../services/contribution-and-revie
 import { ContributionOpportunitiesService } from '../services/contribution-opportunities.service';
 
 export interface Suggestion {
-   change: {
-     skill_id?: string;
-     content_html: string;
-     translation_html: string | string[];
-     question_dict?: QuestionBackendDict;
-     skill_difficulty?: string[];
-   };
-   status: string;
-   suggestion_type: string;
-   target_id: string;
-   suggestion_id: string;
-   author_name?: string;
- }
+  change: {
+    skill_id?: string;
+    content_html: string;
+    translation_html: string | string[];
+    question_dict?: QuestionBackendDict;
+    skill_difficulty?: string[];
+  };
+  status: string;
+  suggestion_type: string;
+  target_id: string;
+  suggestion_id: string;
+  author_name?: string;
+}
 
 export interface ContributionsSummary {
-   id: string;
-   heading: string;
-   subheading: string;
-   labelText: string;
-   labelColor: string;
-   actionButtonTitle: string;
- }
+  id: string;
+  heading: string;
+  subheading: string;
+  labelText: string;
+  labelColor: string;
+  actionButtonTitle: string;
+}
 
 export interface GetOpportunitiesResponse {
-   opportunitiesDicts: unknown;
-   more: unknown;
- }
+  opportunitiesDicts: unknown;
+  more: unknown;
+}
 
 export interface ContributionDetails {
-   skill_description: string;
-   skill_rubrics: Rubric[];
-   chapter_title: string;
-   story_title: string;
-   topic_name: string;
- }
+  skill_description: string;
+  skill_rubrics: Rubric[];
+  chapter_title: string;
+  story_title: string;
+  topic_name: string;
+}
 
 export interface SuggestionDetails {
-   suggestion: Suggestion;
-   details: ContributionDetails;
- }
+  suggestion: Suggestion;
+  details: ContributionDetails;
+}
 
 export interface TabDetails {
-   suggestionType: string;
-   text: string;
-   enabled?: boolean;
- }
+  suggestionType: string;
+  text: string;
+  enabled?: boolean;
+}
 
- @Component({
-   selector: 'oppia-contributions-and-review',
-   templateUrl: './contributions-and-review.component.html'
- })
+@Component({
+  selector: 'oppia-contributions-and-review',
+  templateUrl: './contributions-and-review.component.html'
+})
 export class ContributionsAndReview
    implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
@@ -124,21 +124,21 @@ export class ContributionsAndReview
   };
 
   constructor(
-     private alertsService: AlertsService,
-     private contextService: ContextService,
-     private contributionAndReviewService: ContributionAndReviewService,
-     private contributionOpportunitiesService: ContributionOpportunitiesService,
-     private formatRtePreviewPipe: FormatRtePreviewPipe,
-     private ngbModal: NgbModal,
-     private questionObjectFactory: QuestionObjectFactory,
-     private skillBackendApiService: SkillBackendApiService,
-     private translationTopicService: TranslationTopicService,
-     private userService: UserService,
+    private alertsService: AlertsService,
+    private contextService: ContextService,
+    private contributionAndReviewService: ContributionAndReviewService,
+    private contributionOpportunitiesService: ContributionOpportunitiesService,
+    private formatRtePreviewPipe: FormatRtePreviewPipe,
+    private ngbModal: NgbModal,
+    private questionObjectFactory: QuestionObjectFactory,
+    private skillBackendApiService: SkillBackendApiService,
+    private translationTopicService: TranslationTopicService,
+    private userService: UserService,
   ) {}
 
   getQuestionContributionsSummary(
       suggestionIdToSuggestions: Record<string, SuggestionDetails>):
-       ContributionsSummary[] {
+      ContributionsSummary[] {
     const questionContributionsSummaryList = [];
     Object.keys(suggestionIdToSuggestions).forEach((key) => {
       const suggestion = suggestionIdToSuggestions[key].suggestion;
@@ -159,7 +159,7 @@ export class ContributionsAndReview
         labelText: this.SUGGESTION_LABELS[suggestion.status].text,
         labelColor: this.SUGGESTION_LABELS[suggestion.status].color,
         actionButtonTitle: (
-           this.activeTabType === this.TAB_TYPE_REVIEWS ? 'Review' : 'View')
+          this.activeTabType === this.TAB_TYPE_REVIEWS ? 'Review' : 'View')
       };
 
       questionContributionsSummaryList.push(requiredData);
@@ -183,7 +183,7 @@ export class ContributionsAndReview
       } else {
         subheading = (
           details.topic_name + ' / ' + details.story_title +
-           ' / ' + details.chapter_title);
+          ' / ' + details.chapter_title);
       }
 
       const requiredData = {
@@ -193,7 +193,7 @@ export class ContributionsAndReview
         labelText: this.SUGGESTION_LABELS[suggestion.status].text,
         labelColor: this.SUGGESTION_LABELS[suggestion.status].color,
         actionButtonTitle: (
-           this.activeTabType === this.TAB_TYPE_REVIEWS ? 'Review' : 'View')
+          this.activeTabType === this.TAB_TYPE_REVIEWS ? 'Review' : 'View')
       };
 
       translationContributionsSummaryList.push(requiredData);
@@ -299,13 +299,13 @@ export class ContributionsAndReview
   isActiveTab(tabType: string, suggestionType: string): boolean {
     return (
       this.activeTabType === tabType &&
-       this.activeSuggestionType === suggestionType);
+      this.activeSuggestionType === suggestionType);
   }
 
   isReviewTranslationsTab(): boolean {
     return (
       this.activeTabType === this.TAB_TYPE_REVIEWS &&
-       this.activeSuggestionType === this.SUGGESTION_TYPE_TRANSLATE);
+      this.activeSuggestionType === this.SUGGESTION_TYPE_TRANSLATE);
   }
 
   openQuestionSuggestionModal(
@@ -427,7 +427,7 @@ export class ContributionsAndReview
   }
 
   loadContributions(shouldResetOffset: boolean):
-     Promise<GetOpportunitiesResponse> {
+    Promise<GetOpportunitiesResponse> {
     if (!this.activeTabType || !this.activeSuggestionType) {
       return new Promise((resolve, reject) => {
         resolve({opportunitiesDicts: [], more: false});
@@ -466,7 +466,7 @@ export class ContributionsAndReview
     }
 
     const clickOccurredWithinDropdown =
-       dropdown.contains(clickEvent.target);
+      dropdown.contains(clickEvent.target);
     if (clickOccurredWithinDropdown) {
       return;
     }
@@ -598,6 +598,6 @@ export class ContributionsAndReview
 }
 
 angular.module('oppia').directive('oppiaContributionsAndReview',
-   downgradeComponent({
-     component: ContributionsAndReview
-   }) as angular.IDirectiveFactory);
+  downgradeComponent({
+    component: ContributionsAndReview
+  }) as angular.IDirectiveFactory);
