@@ -51,17 +51,17 @@
                                       (addState)="updateState($event)">
     </oppia-outcome-destination-editor>
 
-    <div class="oppia-correctness-label-editor" ng-if="isCorrectnessFeedbackEnabled() && !isCurrentInteractionLinear()">
-      <strong>The answers in this group are correct</strong>
-      <input class="e2e-test-editor-correctness-toggle" type="checkbox" ng-model="tmpOutcome.labelledAsCorrect">
-    </div>
-
     <oppia-outcome-if-stuck-destination-editor [outcome]="tmpOutcome"
                                                *ngIf="!questionModeEnabled && destIfStuckFeatEnabled && !tmpOutcome.labelledAsCorrect"
                                                (getChanges)="validateChanges($event)"
                                                (addState)="updateState($event)">
     </oppia-outcome-if-stuck-destination-editor>
   </form>
+
+  <div class="oppia-correctness-label-editor" *ngIf="isCorrectnessFeedbackEnabled() && !isCurrentInteractionLinear()">
+    <strong>The answers in this group are correct</strong>
+    <input class="e2e-test-editor-correctness-toggle" type="checkbox" [(ngModel)]="tmpOutcome.labelledAsCorrect">
+  </div>
 
   <oppia-question-misconception-editor *ngIf="questionModeEnabled"
                                        (saveTaggedMisconception)="updateTaggedMisconception($event)"

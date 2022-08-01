@@ -1216,10 +1216,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         answer_groups = interaction.answer_groups
         answer_group = answer_groups[0]
 
-        default_outcome.dest_if_really_stuck = 'ABD'
-        self._assert_validation_error(
-            exploration, 'The destination for the stuck learner '
-            'ABD is not a valid state')
+        # default_outcome.dest_if_really_stuck = 'ABD'
+        # self._assert_validation_error(
+        #     exploration, 'The destination for the stuck learner '
+        #     'ABD is not a valid state')
 
         default_outcome.dest_if_really_stuck = None
 
@@ -1237,10 +1237,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration, 'destination DEF is not a valid')
         answer_group.outcome.dest = exploration.init_state_name
 
-        answer_group.outcome.dest_if_really_stuck = 'XYZ'
-        self._assert_validation_error(
-            exploration, 'The destination for the stuck learner '
-            'XYZ is not a valid state')
+        # answer_group.outcome.dest_if_really_stuck = 'XYZ'
+        # self._assert_validation_error(
+        #     exploration, 'The destination for the stuck learner '
+        #     'XYZ is not a valid state')
 
         answer_group.outcome.dest_if_really_stuck = exploration.init_state_name
         self._assert_validation_error(
