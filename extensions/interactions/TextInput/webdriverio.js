@@ -49,7 +49,7 @@ var expectInteractionDetailsToMatch = async function(
     expect(placeholderValueUnicode).toEqual(placeholderText);
   }
   if (heightOfBox) {
-    expect(textInputInteraction.getAttribute('rows-with-value'))
+    expect(await textInputInteraction.getAttribute('rows-with-value'))
       .toEqual(heightOfBox.toString());
   }
   expect(
@@ -66,6 +66,7 @@ var submitAnswer = async function(elem, answer) {
   if (await textAreaElem.isExisting()) {
     await action.setValue('Text Area Input', textAreaElem, answer);
     var submitAnswerBtn = $('.e2e-test-submit-answer-button');
+    await submitAnswerBtn.scrollIntoView();
     await action.click('Submit Answer Button', submitAnswerBtn);
   } else {
     // This must be chained in here due to the textInputElem possibly being
@@ -76,6 +77,7 @@ var submitAnswer = async function(elem, answer) {
       await action.clear('Text Input Element', inputElem);
       await action.setValue('Text Input Element', inputElem, answer);
       var submitAnswerBtn = $('.e2e-test-submit-answer-button');
+      await submitAnswerBtn.scrollIntoView();
       await action.click('Submit Answer Button', submitAnswerBtn);
     }
   }

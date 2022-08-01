@@ -1,8 +1,8 @@
 require('dotenv').config();
-const video = require('wdio-video-reporter');
 var FirebaseAdmin = require('firebase-admin');
 var path = require('path');
 var fs = require('fs');
+var childProcess = require('child_process');
 var Constants = require('./webdriverio_utils/WebdriverioConstants');
 var DOWNLOAD_PATH = path.resolve(__dirname, Constants.DOWNLOAD_PATH);
 var args = process.argv;
@@ -15,9 +15,12 @@ var chromeVersion = (args[0] == 'DEBUG=true') ? args[6] : args[5];
 var chromedriverPath =
 './node_modules/webdriver-manager/selenium/chromedriver_' + chromeVersion;
 
-// To record videos of the failed test suites locally,
-// update the value of LOCAL_VIDEO_RECORDING_IS_ENABLED to 1.
-var LOCAL_VIDEO_RECORDING_IS_ENABLED = 0;
+// If video recorder is not running the ffmpeg process will be null.
+var ffmpegProcess = null;
+// The absolute path where the recorded video of test will be stored.
+var videoPath = null;
+// Enable ALL_VIDEOS if you want success videos to be saved.
+const ALL_VIDEOS = false;
 
 var suites = {
   full: [
@@ -25,8 +28,16 @@ var suites = {
     './core/tests/webdriverio_desktop/**/*.js',
   ],
 
+  blogDashboard: [
+    './core/tests/webdriverio_desktop/blogDashboard.js'
+  ],
+
   collections: [
     './core/tests/webdriverio_desktop/collections.js'
+  ],
+
+  contributorDashboard: [
+    './core/tests/webdriverio_desktop/contributorDashboard.js'
   ],
 
   creatorDashboard: [
@@ -49,46 +60,30 @@ var suites = {
     './core/tests/webdriverio_desktop/profileFeatures.js'
   ],
 
+  profileMenu: [
+    './core/tests/webdriverio/profileMenuFlow.js'
+  ],
+
   subscriptions: [
     './core/tests/webdriverio/subscriptionsFlow.js'
+  ],
+
+  topicAndStoryEditor: [
+    './core/tests/webdriverio_desktop/topicAndStoryEditor.js'
+  ],
+
+  topicAndStoryEditorFileUploadFeatures: [
+    './core/tests/webdriverio_desktop/topicAndStoryEditorFileUploadFeatures.js'
+  ],
+
+  topicAndStoryViewer: [
+    './core/tests/webdriverio_desktop/topicAndStoryViewer.js'
   ],
 
   users: [
     './core/tests/webdriverio_desktop/userJourneys.js'
   ],
 };
-
-reportersArray = [
-  ['spec', {
-    showPreface: false,
-    realtimeReporting: true,
-  }]
-];
-
-if ((process.env.GITHUB_ACTIONS &&
-    // eslint-disable-next-line eqeqeq
-    process.env.VIDEO_RECORDING_IS_ENABLED == 1) ||
-    LOCAL_VIDEO_RECORDING_IS_ENABLED === 1) {
-  videoReporter = [video, {
-    outputDir: '../webdriverio-video',
-    // Enable saveAllVideos if you want to save the videos
-    // of the tests that pass as well.
-    saveAllVideos: false,
-    videoSlowdownMultiplier: 3,
-  }];
-
-  reportersArray.push(videoReporter);
-  // eslint-disable-next-line no-console
-  console.log(
-    'Videos of the failed tests can be viewed ' +
-    'in ../webdriverio-video');
-} else {
-  // eslint-disable-next-line no-console
-  console.log(
-    'Videos will not be recorded for this suite either because videos' +
-    ' have been disabled for it (using environment variables) or' +
-    ' because it\'s on CircleCI');
-}
 
 // A reference configuration file.
 exports.config = {
@@ -183,7 +178,12 @@ exports.config = {
   // Test reporter for stdout.
   // The only one supported by default is 'dot'
   // see also: https://webdriver.io/docs/dot-reporter
-  reporters: reportersArray,
+  reporters: [
+    ['spec', {
+      showPreface: false,
+      realtimeReporting: true,
+    }]
+  ],
 
   isMobile: false,
 
@@ -211,6 +211,40 @@ exports.config = {
    * @param {Object}         browser instance of created browser/device session
    */
   before: function() {
+    if (process.env.GITHUB_ACTIONS &&
+      // eslint-disable-next-line eqeqeq
+      process.env.VIDEO_RECORDING_IS_ENABLED == 1) {
+      let ffmpegArgs = [
+        '-y',
+        '-r', '30',
+        '-f', 'x11grab',
+        '-s', '1285x1000',
+        '-i', process.env.DISPLAY,
+        '-g', '300',
+        '-loglevel', '16',
+      ];
+      const uniqueString = Math.random().toString(36).substring(2, 8);
+      var name = uniqueString + '.mp4';
+      var dirPath = path.resolve(
+        '__dirname', '..', '..', 'webdriverio-video/');
+      try {
+        fs.mkdirSync(dirPath, { recursive: true });
+      } catch (err) {}
+      videoPath = path.resolve(dirPath, name);
+      ffmpegArgs.push(videoPath);
+      ffmpegProcess = childProcess.spawn('ffmpeg', ffmpegArgs);
+      ffmpegProcess.on('message', (message) => {
+        // eslint-disable-next-line no-console
+        console.log(`ffmpeg stdout: ${message}`);
+      });
+      ffmpegProcess.on('error', (errorMessage) => {
+        console.error(`ffmpeg stderr: ${errorMessage}`);
+      });
+      ffmpegProcess.on('close', (code) => {
+        // eslint-disable-next-line no-console
+        console.log(`ffmpeg exited with code ${code}`);
+      });
+    }
     // Set a wide enough window size for the navbar in the library pages to
     // display fully.
     browser.setWindowSize(1285, 1000);
@@ -252,6 +286,27 @@ exports.config = {
       var filePath = path.join(screenshotPath, fileName);
       // Save screenshot.
       await browser.saveScreenshot(filePath);
+    }
+  },
+  /**
+    * Gets executed after all tests are done. You still have access to all
+    * global variables from the test.
+    * @param {Number} result 0 - test pass, 1 - test fail
+    * @param {Array.<Object>} capabilities list of capabilities details
+    * @param {Array.<String>} specs List of spec file paths that ran
+    */
+  after: function(result, capabilities, specs) {
+    if (process.env.GITHUB_ACTIONS &&
+      // eslint-disable-next-line eqeqeq
+      process.env.VIDEO_RECORDING_IS_ENABLED == 1) {
+      ffmpegProcess.kill();
+      if (result === 0 && !ALL_VIDEOS && fs.existsSync(videoPath)) {
+        fs.unlinkSync(videoPath);
+        // eslint-disable-next-line no-console
+        console.log(
+          `Video for test: ${specs}` +
+          'was deleted successfully (test passed).');
+      }
     }
   },
 };

@@ -29,6 +29,21 @@ CODEOWNER_FILEPATH = '.github/CODEOWNERS'
 # This list needs to be in sync with the important patterns in the CODEOWNERS
 # file.
 CODEOWNER_IMPORTANT_PATHS = [
+    '/core/storage/',
+    '/dependencies.json',
+    '/package.json',
+    '/requirements.txt',
+    '/requirements.in',
+    '/requirements_dev.txt',
+    '/requirements_dev.in',
+    '/yarn.lock',
+    '/scripts/install_third_party_libs.py',
+    '/.github/',
+    '/.github/CODEOWNERS',
+    '/.github/stale.yml',
+    '/.github/workflows/',
+    '/core/android_validation_constants*.py',
+    '/extensions/interactions/rule_templates.json',
     '/core/templates/services/svg-sanitizer.service.ts',
     '/scripts/linters/warranted_angular_security_bypasses.py',
     '/core/controllers/access_validators*.py',
@@ -39,20 +54,16 @@ CODEOWNER_IMPORTANT_PATHS = [
     '/core/domain/rights_manager*.py',
     '/core/domain/role_services*.py',
     '/core/domain/user*.py',
-    '/core/storage/',
-    '/dependencies.json',
-    '/package.json',
-    '/requirements.txt',
-    '/requirements.in',
-    '/yarn.lock',
-    '/scripts/install_third_party_libs.py',
-    '/.github/',
-    '/.github/CODEOWNERS',
-    '/.github/stale.yml',
-    '/.github/workflows/',
-    '/core/android_validation_constants*.py',
-    '/extensions/interactions/rule_templates.json',
-    '/.rtlcssrc']
+    '/AUTHORS',
+    '/CONTRIBUTORS',
+    '/LICENSE',
+    '/NOTICE',
+    '/core/templates/pages/terms-page/terms-page.component.html',
+    '/core/templates/pages/privacy-page/privacy-page.component.html',
+    '/core/templates/pages/license-page/license-page.component.html',
+    '/core/domain/takeout_*.py',
+    '/core/domain/wipeout_*.py',
+]
 
 
 class CodeownerLintChecksManager:

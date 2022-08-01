@@ -21,7 +21,6 @@ import os
 import subprocess
 import sys
 import tarfile
-import urllib.request as urlrequest
 
 from typing import Optional, Sequence
 
@@ -41,7 +40,6 @@ def main(args: Optional[Sequence[str]] = None) -> None:
 
     sys.path.append('.')
     sys.path.append(common.GOOGLE_APP_ENGINE_SDK_HOME)
-    sys.path.append(os.path.join(common.OPPIA_TOOLS_DIR, 'webtest-3.0.0'))
 
     # Delete old *.pyc files.
     for directory, _, files in os.walk('.'):
@@ -60,10 +58,10 @@ def main(args: Optional[Sequence[str]] = None) -> None:
             # If the google cloud version is updated here, the corresponding
             # lines (GAE_DIR and GCLOUD_PATH) in assets/release_constants.json
             # should also be updated.
-            urlrequest.urlretrieve(
+            common.url_retrieve(
                 'https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/'
                 'google-cloud-sdk-364.0.0-linux-x86_64.tar.gz',
-                filename='gcloud-sdk.tar.gz')
+                'gcloud-sdk.tar.gz')
         except Exception as e:
             print('Error downloading Google Cloud SDK. Exiting.')
             raise Exception('Error downloading Google Cloud SDK.') from e

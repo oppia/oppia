@@ -69,12 +69,30 @@ jobs:
         with:
           name: protractor-video
           path: /home/runner/work/oppia/protractor-video
+      - name: Uploading webdriverio-video as Artifacts
+        if: ${{ steps.check-risk.outputs.is-low-risk != 0 && always() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: webdriverio-video
+          path: /home/runner/work/oppia/webdriverio-video
       - name: Uploading protractor screenshots as Artifacts
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 && always() }}
         uses: actions/upload-artifact@v2
         with:
           name: protractor-screenshots
           path: /home/runner/work/oppia/protractor-screenshots
+      - name: Uploading webdriverio screenshots as Artifacts
+        if: ${{ steps.check-risk.outputs.is-low-risk != 0 && always() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: webdriverio-screenshots
+          path: /home/runner/work/oppia/webdriverio-screenshots
+      - name: Uploading webpack bundles as an artifact
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: webpack-bundles
+          path: /home/runner/work/oppia/oppia/build
       - name: Checking Memory Usage
         if: ${{ always() }}
         run: cat /sys/fs/cgroup/memory/memory.max_usage_in_bytes

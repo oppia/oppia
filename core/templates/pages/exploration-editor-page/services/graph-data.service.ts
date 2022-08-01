@@ -17,10 +17,8 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-
+import { EventEmitter, Injectable } from '@angular/core';
 import cloneDeep from 'lodash/cloneDeep';
-
 import { ComputeGraphService, GraphData } from 'services/compute-graph.service';
 import { ExplorationInitStateNameService } from 'pages/exploration-editor-page/services/exploration-init-state-name.service';
 import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
@@ -30,6 +28,7 @@ import { ExplorationStatesService } from 'pages/exploration-editor-page/services
 })
 export class GraphDataService {
   _graphData: GraphData | null = null;
+  updateGraphData = new EventEmitter();
 
   constructor(
     private computeGraphService: ComputeGraphService,
@@ -45,6 +44,8 @@ export class GraphDataService {
     let states = this.explorationStatesService.getStates();
     let initStateId = this.explorationInitStateNameService.savedMemento;
     this._graphData = this.computeGraphService.compute(initStateId, states);
+
+    this.updateGraphData.emit(this._graphData);
   }
 
   /**
