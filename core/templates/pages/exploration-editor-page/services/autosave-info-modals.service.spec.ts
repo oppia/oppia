@@ -16,11 +16,13 @@
  * @fileoverview Unit tests for autosaveInfoModalsService.
  */
 
-import { LocalStorageService } from 'services/local-storage.service';
 import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
+import { HttpClientModule } from '@angular/common/http';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+
 import { AutosaveInfoModalsService } from './autosave-info-modals.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
+import { LocalStorageService } from 'services/local-storage.service';
 
 class showNonStrictValidationFailModalRef {
   componentInstance: {
@@ -49,10 +51,11 @@ describe('AutosaveInfoModalsService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
+      imports: [HttpClientModule],
       providers: [
         AutosaveInfoModalsService,
         LocalStorageService,
-        NgbModal,
+        NgbModal
       ]
     });
   });
