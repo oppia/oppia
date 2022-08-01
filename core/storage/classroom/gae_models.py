@@ -50,7 +50,7 @@ class ClassroomModel(base_models.BaseModel):
     # A text to provide an introduction for all the topics in the classroom.
     topic_list_intro = datastore_services.StringProperty(
         indexed=True, required=True)
-    # The property is used to establish dependencies among the topics in the
+    # A property that is used to establish dependencies among the topics in the
     # classroom. This field contains a dict with topic ID as key and a list of
     # prerequisite topic IDs as value.
     topic_id_to_prerequisite_topic_ids = datastore_services.JsonProperty(
@@ -124,11 +124,11 @@ class ClassroomModel(base_models.BaseModel):
             ClassroomModel. The newly created ClassroomModel instance.
 
         Raises:
-            Exception. A classroom with the given ID exists already.
+            Exception. A classroom with the given ID already exists.
         """
         if cls.get_by_id(classroom_id):
             raise Exception(
-                'A classroom with the given classroom ID exists already.')
+                'A classroom with the given classroom ID already exists.')
 
         entity = cls(
             id=classroom_id,

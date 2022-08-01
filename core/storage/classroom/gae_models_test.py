@@ -131,7 +131,9 @@ class ClassroomModelUnitTest(test_utils.GenericTestBase):
                 classroom_model_cls, 'get_by_id',
                 types.MethodType(
                     lambda x, y: True,
-                    classroom_model_cls)):
+                    classroom_model_cls
+                )
+            ):
                 classroom_model_cls.create(
                     'classroom_id', 'math', 'math',
                     'Curated math foundations course.',
@@ -141,11 +143,14 @@ class ClassroomModelUnitTest(test_utils.GenericTestBase):
         # Test generate_new_classroom_id method.
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception,
-            'New classroom id generator is producing too many collisions.'):
+            'New classroom id generator is producing too many collisions.'
+        ):
             # Swap dependent method get_by_id to simulate collision every time.
             with self.swap(
                 classroom_model_cls, 'get_by_id',
                 types.MethodType(
                     lambda x, y: True,
-                    classroom_model_cls)):
+                    classroom_model_cls
+                )
+            ):
                 classroom_model_cls.generate_new_classroom_id()
