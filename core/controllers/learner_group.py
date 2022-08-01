@@ -20,6 +20,7 @@ from core import feconf
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import config_domain
 from core.domain import learner_group_fetchers
 from core.domain import learner_group_services
 from core.domain import story_fetchers
@@ -317,21 +318,16 @@ class LearnerGroupSearchSyllabusHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    URL_PATH_ARGS_SCHEMAS = {
-        'learner_group_id': {
-            'schema': {
-                'type': 'basestring',
-                'validators': [{
-                    'id': 'is_regex_matched',
-                    'regex_pattern': constants.LEARNER_GROUP_ID_REGEX
-                }]
-            },
-            'default_value': None
-        }
-    }
+    URL_PATH_ARGS_SCHEMAS = {}
 
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
+            'learner_group_id': {
+                'schema': {
+                    'type': 'basestring',
+                },
+                'default_value': ''
+            },
             'search_keyword': {
                 'schema': {
                     'type': 'basestring',
@@ -360,7 +356,7 @@ class LearnerGroupSearchSyllabusHandler(base.BaseHandler):
     }
 
     @acl_decorators.can_access_learner_groups
-    def get(self, learner_group_id):
+    def get(self):
         """Handles GET requests for learner group syllabus views."""
 
         search_keyword = self.normalized_request.get('search_keyword')
@@ -368,6 +364,7 @@ class LearnerGroupSearchSyllabusHandler(base.BaseHandler):
         search_category = self.normalized_request.get('search_category')
         search_language_code = self.normalized_request.get(
             'search_language_code')
+        learner_group_id = self.normalized_request.get('learner_group_id')
 
         matching_syllabus = (
             learner_group_services.get_matching_learner_group_syllabus_to_add(
@@ -465,4 +462,106 @@ class FacilitatorLearnerGroupViewHandler(base.BaseHandler):
                 learner_group.invited_student_user_ids),
             'subtopic_page_ids': learner_group.subtopic_page_ids,
             'story_ids': learner_group.story_ids
+        })
+
+
+class FacilitatorDashboardPage(base.BaseHandler):
+    """Page showing the teacher dashboard."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
+    @acl_decorators.can_access_learner_groups
+    def get(self):
+        """Handles GET requests."""
+        if not config_domain.LEARNER_GROUPS_ARE_ENABLED.value:
+            raise self.PageNotFoundException
+
+        self.render_template('facilitator-dashboard-page.mainpage.html')
+
+
+class CreateLearnerGroupPage(base.BaseHandler):
+    """Page for creating a new learner group."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
+    @acl_decorators.can_access_learner_groups
+    def get(self):
+        """Handles GET requests."""
+        if not config_domain.LEARNER_GROUPS_ARE_ENABLED.value:
+            raise self.PageNotFoundException
+
+        self.render_template('create-learner-group-page.mainpage.html')
+
+
+class LearnerGroupSearchStudentHandler(base.BaseHandler):
+    """Handles searching of students to invite in learner group."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    URL_PATH_ARGS_SCHEMAS = {}
+
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'learner_group_id': {
+                'schema': {
+                    'type': 'basestring',
+                },
+                'default_value': ''
+            },
+            'username': {
+                'schema': {
+                    'type': 'basestring',
+                },
+                'default_value': ''
+            }
+        }
+    }
+
+    @acl_decorators.can_access_learner_groups
+    def get(self):
+        """Handles GET requests."""
+
+        username: str = self.normalized_request.get('username')
+        learner_group_id: str = self.normalized_request.get('learner_group_id')
+
+        user_settings = user_services.get_user_settings_from_username(username)
+
+        if user_settings is None:
+            self.render_json({
+                'username': username,
+                'profile_picture_data_url': '',
+                'error': ('User with username %s does not exist.' % username)
+            })
+            return
+
+        if self.username.lower() == username.lower():
+            self.render_json({
+                'username': user_settings.username,
+                'profile_picture_data_url': '',
+                'error': 'You cannot invite yourself to the group'
+            })
+            return
+
+        (valid_invitation, error) = learner_group_services.can_user_be_invited(
+            user_settings.user_id, user_settings.username, learner_group_id
+        )
+
+        if not valid_invitation:
+            self.render_json({
+                'username': user_settings.username,
+                'profile_picture_data_url': '',
+                'error': error
+            })
+            return
+
+        self.render_json({
+            'username': user_settings.username,
+            'profile_picture_data_url': user_settings.profile_picture_data_url,
+            'error': ''
         })
