@@ -325,6 +325,9 @@ class MigrateExplorationJob(base_jobs.JobBase):
             # detect that the value is passed through the pipe.
             | 'Add exploration keys' >> beam.WithKeys(  # pylint: disable=no-value-for-parameter
                 lambda exp_model: exp_model.id)
+            | 'Remove broken exploration' >> beam.Filter(
+                lambda id_and_exp: id_and_exp[0] not in (
+                    'umPkwp0L1M0-', '670bU6d9JGBh'))
         )
 
         exp_rights_models = (
