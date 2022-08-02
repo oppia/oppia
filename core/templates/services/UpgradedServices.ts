@@ -543,7 +543,6 @@ export class UpgradedServices {
       new ConstructTranslationIdsService();
     upgradedServices['ContinueRulesService'] = new ContinueRulesService();
     upgradedServices['CountVectorizerService'] = new CountVectorizerService();
-    upgradedServices['CsrfTokenService'] = new CsrfTokenService();
     upgradedServices['DateTimeFormatService'] = new DateTimeFormatService();
     upgradedServices['DebouncerService'] = new DebouncerService();
     upgradedServices['DragAndDropSortInputRulesService'] =
@@ -798,6 +797,8 @@ export class UpgradedServices {
         upgradedServices['WrittenTranslationObjectFactory']);
 
     // Topological level: 2.
+    upgradedServices['CsrfTokenService'] = new CsrfTokenService(
+      upgradedServices['HttpXhrBackend']);
     upgradedServices['AnswerGroupObjectFactory'] = new AnswerGroupObjectFactory(
       upgradedServices['OutcomeObjectFactory'],
       upgradedServices['RuleObjectFactory']);
