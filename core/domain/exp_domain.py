@@ -2319,7 +2319,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
     @classmethod
     def _convert_states_v51_dict_to_v52_dict(cls, states_dict):
-        """Converts from version 50 to 51. Version 51 adds a new
+        """Converts from version 51 to 52. Version 51 adds a new
         dest_if_really_stuck field to Outcome class to redirect learners
         to a state for strengthening concepts when they get really stuck.
 
@@ -2333,7 +2333,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """
         for state_dict in states_dict.values():
             interaction = state_dict['interaction']
-            content_id_list = []
+            content_id_list = [state_dict['content']['content_id']]
+
             for answer_group in interaction['answer_groups']:
                 content_id_list.append(
                     answer_group['outcome']['feedback']['content_id']
@@ -2383,15 +2384,21 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
             translations_mapping = (
                 state_dict['written_translations']['translations_mapping'])
-            for content_id in translations_mapping.keys():
-                if content_id not in content_id_list:
-                    del translations_mapping[content_id]
+            new_translations_mapping = {}
+            for content_id, value in translations_mapping.items():
+                if content_id in content_id_list:
+                    new_translations_mapping[content_id] = value
+            state_dict['written_translations']['translations_mapping'] = (
+                new_translations_mapping)
 
             voiceovers_mapping = (
                 state_dict['recorded_voiceovers']['voiceovers_mapping'])
-            for content_id in voiceovers_mapping.keys():
-                if content_id not in content_id_list:
-                    del voiceovers_mapping[content_id]
+            new_voiceovers_mapping = {}
+            for content_id, value in voiceovers_mapping.items():
+                if content_id in content_id_list:
+                    new_voiceovers_mapping[content_id] = value
+            state_dict['recorded_voiceovers']['voiceovers_mapping'] = (
+                voiceovers_mapping)
 
         return states_dict
 

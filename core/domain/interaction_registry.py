@@ -23,8 +23,8 @@ import itertools
 import json
 import os
 
-from core import feconf
 from core import constants
+from core import feconf
 
 from typing import Dict, List
 
