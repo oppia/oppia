@@ -192,6 +192,11 @@ var visibilityOfSuccessToast = async function(errorMessage) {
   await visibilityOf(toastSuccessElement, errorMessage);
 };
 
+var invisibilityOfSuccessToast = async function(errorMessage) {
+  var toastSuccessElement = await $('.toast-success');
+  await invisibilityOf(toastSuccessElement, errorMessage);
+};
+
 var fadeInToComplete = async function(element, errorMessage) {
   await visibilityOf(element, 'Editor taking too long to appear');
   await browser.waitUntil(async function() {
@@ -257,6 +262,7 @@ exports.invisibilityOfInfoToast = invisibilityOfInfoToast;
 exports.invisibilityOfLoadingMessage = invisibilityOfLoadingMessage;
 exports.visibilityOfInfoToast = visibilityOfInfoToast;
 exports.visibilityOfSuccessToast = visibilityOfSuccessToast;
+exports.invisibilityOfSuccessToast = invisibilityOfSuccessToast;
 exports.fadeInToComplete = fadeInToComplete;
 exports.modalPopupToAppear = modalPopupToAppear;
 exports.fileToBeDownloaded = fileToBeDownloaded;

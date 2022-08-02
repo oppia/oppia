@@ -85,10 +85,10 @@ var BlogDashboardPage = function() {
   };
 
   this.navigateToBlogDashboardPageWithBackButton = async function() {
-    await waitFor.pageToFullyLoad();
     await action.click(
       'Navigate back to blog dashboard button', navigateToBlogDashboardButton);
     await waitFor.pageToFullyLoad();
+    await waitFor.urlRedirection('http://localhost:9001/blog-dashboard');
   };
 
   this.waitForDraftBlogPostsToLoad = async function() {
@@ -145,6 +145,7 @@ var BlogDashboardPage = function() {
       blogPostContentDisplay, 'Blog Post content not showing up');
     await action.click('Save as draft Button', saveBlogPostAsDraftButton);
     await waitFor.visibilityOfSuccessToast('Blog Post Saved Successfully.');
+    await waitFor.invisibilityOfSuccessToast('Blog Post Saved Successfully.');
   };
 
   this.publishNewBlogPost = async function(
