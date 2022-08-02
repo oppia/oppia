@@ -11827,7 +11827,7 @@ class ExplorationMetadataDomainUnitTests(test_utils.GenericTestBase):
                 raise Exception(
                     'A new metadata property %s was added to the Exploration '
                     'domain object but not included in the '
-                    'ExplorationMetadata domain object. Please inlcude this '
+                    'ExplorationMetadata domain object. Please include this '
                     'new property in the ExplorationMetadata domain object '
                     'also.' % (metadata_property)
                 )

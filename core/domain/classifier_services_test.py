@@ -299,6 +299,18 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
         self.assertEqual(classifier_training_job.exp_id, self.exp_id)
         self.assertEqual(classifier_training_job.state_name, 'Home')
 
+    def test_handle_trainable_states_raises_error_for_invalid_interaction_id(
+        self
+    ) -> None:
+        """Test the handle_trainable_states method."""
+        exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
+        state_names = ['Home']
+        exploration.states['Home'].interaction.id = 'Invalid_id'
+        with self.assertRaisesRegex(Exception, (  # type: ignore[no-untyped-call]
+            'No classifier algorithm found for Invalid_id interaction')):
+            classifier_services.handle_trainable_states(
+                exploration, state_names)
+
     def test_handle_non_retrainable_states(self) -> None:
         """Test the handle_non_retrainable_states method."""
         exploration = exp_fetchers.get_exploration_by_id(self.exp_id)

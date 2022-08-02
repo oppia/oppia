@@ -1160,7 +1160,7 @@ def _release_ownership_of_activity(
 
     Raises:
         Exception. The committer does not have release rights.
-        Exception. The activity rights does not exits for the given activity_id.
+        Exception. The activity rights does not exist for the given activity_id.
     """
     committer_id = committer.user_id
     activity_rights = _get_activity_rights(
@@ -1208,7 +1208,7 @@ def _change_activity_status(
         commit_message: str. The human-written commit message for this change.
 
     Raises:
-        Exception. The activity rights does not exits for the given activity_id.
+        Exception. The activity rights does not exist for the given activity_id.
     """
     activity_rights = _get_activity_rights(
         activity_type, activity_id, strict=True

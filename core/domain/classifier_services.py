@@ -109,6 +109,9 @@ def handle_trainable_states(
     Args:
         exploration: Exploration. The Exploration domain object.
         state_names: list(str). List of state names.
+
+    Raises:
+        Exception. No classifier algorithm found for the given interaction id.
     """
     job_dicts_list = []
     exp_id = exploration.id
@@ -116,9 +119,11 @@ def handle_trainable_states(
     for state_name in state_names:
         state = exploration.states[state_name]
         training_data = state.get_training_data()  # type: ignore[no-untyped-call]
-        # Ruling out the possibility of None for mypy type checking.
         interaction_id = state.interaction.id
-        assert interaction_id is not None
+        if interaction_id not in feconf.INTERACTION_CLASSIFIER_MAPPING:
+            raise Exception(
+                'No classifier algorithm found for %s interaction' % (
+                    interaction_id))
         algorithm_id = feconf.INTERACTION_CLASSIFIER_MAPPING[
             interaction_id]['algorithm_id']
         next_scheduled_check_time = datetime.datetime.utcnow()
