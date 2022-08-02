@@ -188,7 +188,7 @@ var invisibilityOfLoadingMessage = async function(errorMessage) {
 };
 
 var visibilityOfSuccessToast = async function(errorMessage) {
-  var toastSuccessElement = $('.toast-success');
+  var toastSuccessElement = await $('.toast-success');
   await visibilityOf(toastSuccessElement, errorMessage);
 };
 
