@@ -589,6 +589,83 @@ def apply_change_list(exploration_id, change_list):
         raise e
 
 
+def populate_exp_model_fields(exp_model, exploration):
+    """Populate exploration model with the data from Exploration object.
+
+    Args:
+        exp_model: ExplorationModel. The model to populate.
+        exploration: Exploration. THe exploration domain object which should be
+            used to populate the model.
+
+    Returns:
+        ExplorationModel. Populated model.
+    """
+    exp_model.title = exploration.title
+    exp_model.category = exploration.category
+    exp_model.objective = exploration.objective
+    exp_model.language_code = exploration.language_code
+    exp_model.tags = exploration.tags
+    exp_model.blurb = exploration.blurb
+    exp_model.author_notes = exploration.author_notes
+    exp_model.states_schema_version = exploration.states_schema_version
+    exp_model.init_state_name = exploration.init_state_name
+    exp_model.states = {
+        state_name: state.to_dict()
+        for (state_name, state) in exploration.states.items()}
+    exp_model.param_specs = exploration.param_specs_dict
+    exp_model.param_changes = exploration.param_change_dicts
+    exp_model.auto_tts_enabled = exploration.auto_tts_enabled
+    exp_model.correctness_feedback_enabled = (
+        exploration.correctness_feedback_enabled)
+    exp_model.edits_allowed = exploration.edits_allowed
+
+    return exp_model
+
+
+def populate_exp_summary_model_fields(exp_summary_model, exp_summary):
+    """Populate exploration summary model with the data from
+    ExplorationSummary object.
+
+    Args:
+        exp_summary_model: ExpSummaryModel. The model to populate.
+        exp_summary: ExplorationSummary. THe exploration domain object which
+            should be used to populate the model.
+
+    Returns:
+        ExpSummaryModel. Populated model.
+    """
+    exp_summary_dict = {
+        'title': exp_summary.title,
+        'category': exp_summary.category,
+        'objective': exp_summary.objective,
+        'language_code': exp_summary.language_code,
+        'tags': exp_summary.tags,
+        'ratings': exp_summary.ratings,
+        'scaled_average_rating': exp_summary.scaled_average_rating,
+        'exploration_model_last_updated': (
+            exp_summary.exploration_model_last_updated),
+        'exploration_model_created_on': (
+            exp_summary.exploration_model_created_on),
+        'first_published_msec': exp_summary.first_published_msec,
+        'status': exp_summary.status,
+        'community_owned': exp_summary.community_owned,
+        'owner_ids': exp_summary.owner_ids,
+        'editor_ids': exp_summary.editor_ids,
+        'voice_artist_ids': exp_summary.voice_artist_ids,
+        'viewer_ids': exp_summary.viewer_ids,
+        'contributor_ids': list(exp_summary.contributors_summary.keys()),
+        'contributors_summary': exp_summary.contributors_summary,
+        'version': exp_summary.version
+    }
+    if exp_summary_model is not None:
+        exp_summary_model.populate(**exp_summary_dict)
+    else:
+        exp_summary_dict['id'] = exp_summary.id
+        exp_summary_model = exp_models.ExpSummaryModel(**exp_summary_dict)
+
+    return exp_summary_model
+
+
 def update_states_version_history(
     states_version_history,
     change_list,
@@ -909,24 +986,9 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
         exploration_model).states
     old_metadata = exp_fetchers.get_exploration_from_model(
         exploration_model).get_metadata()
-    exploration_model.category = exploration.category
-    exploration_model.title = exploration.title
-    exploration_model.objective = exploration.objective
-    exploration_model.language_code = exploration.language_code
-    exploration_model.tags = exploration.tags
-    exploration_model.blurb = exploration.blurb
-    exploration_model.author_notes = exploration.author_notes
 
-    exploration_model.states_schema_version = exploration.states_schema_version
-    exploration_model.init_state_name = exploration.init_state_name
-    exploration_model.states = {
-        state_name: state.to_dict()
-        for (state_name, state) in exploration.states.items()}
-    exploration_model.param_specs = exploration.param_specs_dict
-    exploration_model.param_changes = exploration.param_change_dicts
-    exploration_model.auto_tts_enabled = exploration.auto_tts_enabled
-    exploration_model.correctness_feedback_enabled = (
-        exploration.correctness_feedback_enabled)
+    exploration_model = populate_exp_model_fields(
+        exploration_model, exploration)
 
     change_list_dict = [change.to_dict() for change in change_list]
     exploration_model.commit(committer_id, commit_message, change_list_dict)
@@ -1514,8 +1576,13 @@ def regenerate_exploration_summary_with_new_contributor(
     """
     exploration = exp_fetchers.get_exploration_by_id(
         exploration_id, strict=False)
+    exp_rights = exp_models.ExplorationRightsModel.get(
+        exploration_id, strict=False)
+    exp_summary_model = exp_models.ExpSummaryModel.get(
+        exploration_id, strict=False)
     if exploration is not None:
-        exp_summary = _compute_summary_of_exploration(exploration)
+        exp_summary = compute_summary_of_exploration(
+            exploration, exp_rights, exp_summary_model)
         exp_summary.add_contribution_by_user(contributor_id)
         save_exploration_summary(exp_summary)
     else:
@@ -1531,40 +1598,64 @@ def regenerate_exploration_and_contributors_summaries(exploration_id):
         exploration_id: str. ID of the exploration.
     """
     exploration = exp_fetchers.get_exploration_by_id(exploration_id)
-    exp_summary = _compute_summary_of_exploration(exploration)
+    exp_rights = exp_models.ExplorationRightsModel.get(
+        exploration_id, strict=False)
+    exp_summary_model = exp_models.ExpSummaryModel.get(
+        exploration_id, strict=False)
+    exp_summary = compute_summary_of_exploration(
+        exploration, exp_rights, exp_summary_model)
     exp_summary.contributors_summary = (
         compute_exploration_contributors_summary(exp_summary.id))
     save_exploration_summary(exp_summary)
 
 
-def _compute_summary_of_exploration(exploration):
+def compute_summary_of_exploration(
+    exploration, exp_rights, exp_summary_model,
+    skip_exploration_model_last_updated=False):
     """Create an ExplorationSummary domain object for a given Exploration
     domain object and return it.
 
     Args:
         exploration: Exploration. The exploration whose summary is to be
             computed.
+        exp_rights: ExplorationRightsModel. The exploration rights model, used
+            to compute summary.
+        exp_summary_model: ExplorationSummaryModel. The exploration summary
+            model, whose summary is computed.
+        skip_exploration_model_last_updated: bool. This flag is used to
+            update exploration_model_last_updated, only when required.
 
     Returns:
         ExplorationSummary. The resulting exploration summary domain object.
+
+    Raises:
+        Exception. ExplorationSummaryModel cannot be None and
+            skip_exploration_model_last_updated cannot be set to True
+            at the same time.
     """
-    exp_rights = exp_models.ExplorationRightsModel.get_by_id(exploration.id)
-    exp_summary_model = exp_models.ExpSummaryModel.get_by_id(exploration.id)
     if exp_summary_model:
         old_exp_summary = exp_fetchers.get_exploration_summary_from_model(
             exp_summary_model)
         ratings = old_exp_summary.ratings or feconf.get_empty_ratings()
         scaled_average_rating = get_scaled_average_rating(ratings)
+        exploration_model_last_updated = (
+            old_exp_summary.exploration_model_last_updated)
     else:
+        if skip_exploration_model_last_updated:
+            raise Exception(
+                'ExplorationSummaryModel cannot be None, when '
+                'skip_exploration_model_last_updated is set to True'
+                'for exploration ID %s' % exploration.id)
         ratings = feconf.get_empty_ratings()
         scaled_average_rating = feconf.EMPTY_SCALED_AVERAGE_RATING
+
+    if not skip_exploration_model_last_updated:
+        exploration_model_last_updated = datetime.datetime.fromtimestamp(
+            get_last_updated_by_human_ms(exploration.id) / 1000.0)
 
     contributors_summary = (
         exp_summary_model.contributors_summary if exp_summary_model else {})
     contributor_ids = list(contributors_summary.keys())
-
-    exploration_model_last_updated = datetime.datetime.fromtimestamp(
-        get_last_updated_by_human_ms(exploration.id) / 1000.0)
     exploration_model_created_on = exploration.created_on
     first_published_msec = exp_rights.first_published_msec
     exp_summary = exp_domain.ExplorationSummary(
@@ -1629,42 +1720,13 @@ def save_exploration_summary(exp_summary):
     Args:
         exp_summary: ExplorationSummary. The exploration summary to save.
     """
-    exp_summary_dict = {
-        'title': exp_summary.title,
-        'category': exp_summary.category,
-        'objective': exp_summary.objective,
-        'language_code': exp_summary.language_code,
-        'tags': exp_summary.tags,
-        'ratings': exp_summary.ratings,
-        'scaled_average_rating': exp_summary.scaled_average_rating,
-        'status': exp_summary.status,
-        'community_owned': exp_summary.community_owned,
-        'owner_ids': exp_summary.owner_ids,
-        'editor_ids': exp_summary.editor_ids,
-        'voice_artist_ids': exp_summary.voice_artist_ids,
-        'viewer_ids': exp_summary.viewer_ids,
-        'contributor_ids': list(exp_summary.contributors_summary.keys()),
-        'contributors_summary': exp_summary.contributors_summary,
-        'version': exp_summary.version,
-        'exploration_model_last_updated': (
-            exp_summary.exploration_model_last_updated),
-        'exploration_model_created_on': (
-            exp_summary.exploration_model_created_on),
-        'first_published_msec': (
-            exp_summary.first_published_msec)
-    }
 
-    exp_summary_model = (exp_models.ExpSummaryModel.get_by_id(exp_summary.id))
-    if exp_summary_model is not None:
-        exp_summary_model.populate(**exp_summary_dict)
-        exp_summary_model.update_timestamps()
-        exp_summary_model.put()
-    else:
-        exp_summary_dict['id'] = exp_summary.id
-        model = exp_models.ExpSummaryModel(**exp_summary_dict)
-        model.update_timestamps()
-        model.put()
-
+    existing_exp_summary_model = (
+        exp_models.ExpSummaryModel.get(exp_summary.id, strict=False))
+    exp_summary_model = populate_exp_summary_model_fields(
+        existing_exp_summary_model, exp_summary)
+    exp_summary_model.update_timestamps()
+    exp_summary_model.put()
     # The index should be updated after saving the exploration
     # summary instead of after saving the exploration since the
     # index contains documents computed on basis of exploration
