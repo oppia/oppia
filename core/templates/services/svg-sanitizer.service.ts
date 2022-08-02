@@ -167,7 +167,7 @@ export class SvgSanitizerService {
     return domParser.parseFromString(svgString, 'image/svg+xml');
   }
 
-  convertBase64ToUnicodeString(base64String: string) {
+  convertBase64ToUnicodeString(base64String: string): string {
     // Coverting base64 to unicode string. This technique converts bytestream
     // to percent-encoding, to original string.
     // See https://stackoverflow.com/a/30106551
