@@ -33,6 +33,7 @@ import { SkillMasteryModalComponent } from './skill-mastery-modal.component';
 import { UserService } from 'services/user.service';
 import { QuestionPlayerStateService } from './services/question-player-state.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { ContextService } from 'services/context.service';
 
 interface QuestionData {
   linkedSkillIds: string[];
@@ -100,6 +101,7 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
   canCreateCollections: boolean;
 
   constructor(
+    private contextService: ContextService,
     private explorationPlayerStateService: ExplorationPlayerStateService,
     private location: Location,
     private ngbModal: NgbModal,
@@ -528,6 +530,7 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
             this.windowRef.nativeWindow.location.hash = (
               QuestionPlayerConstants.HASH_PARAM +
                encodeURIComponent(JSON.stringify(result)));
+            this.contextService.removeCustomEntityContext();
           })
       );
 

@@ -20,6 +20,7 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
+import { SvgSanitizerService } from './svg-sanitizer.service';
 
 import constants from 'assets/constants';
 
@@ -27,7 +28,10 @@ import constants from 'assets/constants';
   providedIn: 'root'
 })
 export class ImageUploadHelperService {
-  constructor(private assetsBackendApiService: AssetsBackendApiService) {}
+  constructor(
+    private assetsBackendApiService: AssetsBackendApiService,
+    private svgSanitizerService: SvgSanitizerService
+  ) {}
 
   private _generateDateTimeStringForFilename(): string {
     let date = new Date();
@@ -48,7 +52,8 @@ export class ImageUploadHelperService {
     // Convert base64/URLEncoded data component to raw binary data
     // held in a string.
     if (dataURI !== null) {
-      let byteString = atob(dataURI.split(',')[1]);
+      let byteString = this.svgSanitizerService.convertBase64ToUnicodeString(
+        dataURI.split(',')[1]);
 
       // Separate out the mime component.
       let mime = dataURI.split(',')[0].split(':')[1].split(';')[0];
