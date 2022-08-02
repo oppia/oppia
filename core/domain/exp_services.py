@@ -113,7 +113,7 @@ class UserExplorationDataDict(TypedDict):
     rights: rights_domain.ActivityRightsDict
     show_state_editor_tutorial_on_load: bool
     show_state_translation_tutorial_on_load: bool
-    is_version_of_draft_valid: bool
+    is_version_of_draft_valid: Optional[bool]
     draft_changes: Dict[str, str]
     email_preferences: user_domain.UserExplorationPrefsDict
 
@@ -2401,7 +2401,7 @@ def get_user_exploration_data(
         is_version_of_draft_valid(
             exploration_id, exp_user_data.draft_change_list_exp_version)
         if exp_user_data and exp_user_data.draft_change_list_exp_version
-        else False)
+        else None)
     if apply_draft:
         updated_exploration = (
             get_exp_with_draft_applied(exploration_id, user_id))
