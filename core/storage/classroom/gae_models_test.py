@@ -124,7 +124,7 @@ class ClassroomModelUnitTest(test_utils.GenericTestBase):
         # Test create method.
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception,
-            'A classroom with the given classroom ID exists already.'
+            'A classroom with the given classroom ID already exists.'
         ):
             # Swap dependent method get_by_id to simulate collision every time.
             with self.swap(
