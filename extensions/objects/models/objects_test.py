@@ -882,10 +882,26 @@ class SchemaValidityTests(test_utils.GenericTestBase):
                     continue
 
                 if hasattr(member, 'get_schema'):
-                    schema_utils_test.validate_schema(member.get_schema())
-                    count += 1
+                    # Here we are excluding all the classes where get_schema
+                    # is no implemented, because accessing get_schema() method
+                    # on these classes will throw an NotImplementedError
+                    # exception.
+                    try:
+                        schema_utils_test.validate_schema(member.get_schema())
+                    except NotImplementedError:
+                        continue
+                    else:
+                        count += 1
 
         self.assertEqual(count, 53)
+
+    def test_get_schema_method_raises_error_in_base_object(self):
+        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+            NotImplementedError,
+            re.escape(
+                'The get_schema() method is missing from the derived class. It '
+                'should be implemented in the derived class.')):
+            objects.BaseObject.get_schema()
 
 
 class ObjectDefinitionTests(test_utils.GenericTestBase):
