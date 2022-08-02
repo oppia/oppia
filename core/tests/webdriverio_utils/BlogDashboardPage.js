@@ -85,6 +85,7 @@ var BlogDashboardPage = function() {
   };
 
   this.navigateToBlogDashboardPageWithBackButton = async function() {
+    await waitFor.pageToFullyLoad();
     await action.click(
       'Navigate back to blog dashboard button', navigateToBlogDashboardButton);
     await waitFor.pageToFullyLoad();
@@ -140,7 +141,7 @@ var BlogDashboardPage = function() {
     await action.setValue(
       'New blog post title field', blogPostTitleFieldElement, blogPostTitle);
     await this.setContent(richTextInstructions);
-    await waitFor.presenceOf(
+    await waitFor.visibilityOf(
       blogPostContentDisplay, 'Blog Post content not showing up');
     await action.click('Save as draft Button', saveBlogPostAsDraftButton);
     await waitFor.visibilityOfSuccessToast('Blog Post Saved Successfully.');

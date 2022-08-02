@@ -114,15 +114,15 @@ describe('Blog dashboard functionality', function() {
     await blogDashboardPage.saveBlogPostAsDraft(
       'Sample Title1', await forms.toRichText(
         'Hi there, I’m Oppia! I’m an online personal tutor for everybody!'));
+    // eslint-disable-next-line oppia/e2e-practices
+    await browser.pause(5000);
     await blogDashboardPage.navigateToBlogDashboardPageWithBackButton();
-    await blogDashboardPage.navigateToDraftsTab();
 
     await blogDashboardPage.createNewBlogPost();
     await blogDashboardPage.saveBlogPostAsDraft(
       'Sample Title2', await forms.toRichText(
         'Hi there, I’m Oppia! I’m a tutor for everybody!'));
     await blogDashboardPage.navigateToBlogDashboardPageWithBackButton();
-    await blogDashboardPage.navigateToDraftsTab();
 
     await blogDashboardPage.createNewBlogPost();
     await blogDashboardPage.saveBlogPostAsDraft(
