@@ -198,6 +198,8 @@ var BlogDashboardPage = function() {
         `Blog Dashboard tab ${i}`, matTab);
       if (tabText.startsWith(tabName)) {
         await action.click(`${tabName} tab`, matTab);
+        await waitFor.elementAttributeToBe(
+          matTab, 'tabindex', '0', `${tabName} tab takes time to appear`);
         break;
       }
     }
@@ -228,13 +230,13 @@ var BlogDashboardPage = function() {
   this.expectNumberOfPublishedBlogPostsToBe = async function(number) {
     await this.waitForPublishedBlogPostsToLoad();
     var publishedBlogPostTiles = await publishedBlogPostTilesSelector();
-    expect(await publishedBlogPostTiles.length).toBe(number);
+    expect(publishedBlogPostTiles.length).toBe(number);
   };
 
   this.expectNumberOfBlogPostsRowsToBe = async function(number) {
     await this.waitForDraftBlogPostsToLoad();
     var blogPostListItems = await blogPostListItemsSelector();
-    expect(await blogPostListItems.length).toBe(number);
+    expect(blogPostListItems.length).toBe(number);
   };
 
   this.getBlogPostTileEditOption = async function(title) {
@@ -246,7 +248,7 @@ var BlogDashboardPage = function() {
       var blogPostTitleContainer = await blogPostTile.$(
         '.e2e-test-blog-post-title');
       // The element is not interactable when we call getText(), so it returns
-      // null. To avoid that we are waiting till the element becomes clicakble
+      // null. To avoid that we are waiting till the element becomes clickable
       // as we do not have any alternative for checking interactibility.
       await waitFor.elementToBeClickable(
         blogPostTitleContainer, 'Blog Post title is not interactable');
