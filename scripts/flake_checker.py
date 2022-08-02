@@ -139,8 +139,21 @@ def report_pass(suite_name):
             PASS_REPORT_URL))
 
 
-def is_test_output_flaky(output_lines, suite_name):
-    """Returns whether the test output matches any flaky test log."""
+def check_test_flakiness(output_lines, suite_name):
+    """Checks whether the test output matches any flaky test log.
+
+    Whether the test is flaky is printed to the console.
+
+    Args:
+        output_lines: list(str). The output from the test run.
+        suite_name: str. Name of the E2E test suite.
+
+    Returns:
+        bool. Whether the test should be rerun.
+
+    Raises:
+        ValueError. Raised if the response from the logging server is invalid.
+    """
     build_info = _get_build_info()
     payload = {
         'suite': suite_name,
@@ -159,18 +172,19 @@ def is_test_output_flaky(output_lines, suite_name):
             'Please report to E2E team in case server is down.'
             'Exception: %s') % (FLAKE_CHECK_AND_REPORT_URL, e))
 
-        return False, RERUN_UNKNOWN
+        return False
 
     if not response.ok:
         _print_color_message('Failed request with response code: %s (%s)' % (
             response.status_code, response.reason))
-        return False, RERUN_UNKNOWN
+        return False
 
     report = {}
     try:
         report = response.json()
     except ValueError as e:
         _print_color_message('Unable to convert json response: %s' % e)
+        return False
 
     if 'log' in report:
         log_str = '\n'.join(report['log'])
@@ -187,5 +201,13 @@ def is_test_output_flaky(output_lines, suite_name):
         _print_color_message('    Test: %s' % flake['test'])
         _print_color_message(
             '    Error Message: %s' % flake['flake_id'])
-    rerun = report.get('rerun', '')
-    return flaky, rerun or RERUN_UNKNOWN
+    rerun = report['rerun']
+    if rerun not in (RERUN_YES, RERUN_NO):
+        _print_color_message(
+            'Invalid rerun instruction from logging server: %s' % rerun)
+        return False
+    else:
+        _print_color_message(
+            'Rerun instruction from logging server: %s' %
+            'rerun' if rerun == RERUN_YES else 'do not rerun')
+    return rerun == RERUN_YES
