@@ -162,7 +162,9 @@ class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
                 exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX),
             'new_value': 4
         })]
-        with self.assertRaisesRegex(KeyError, 'NumericInput'):
+        with self.assertRaisesRegex(
+            Exception,
+            'No classifier algorithmfound for NumericInput interaction'):
             with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
                 with self.swap(feconf, 'MIN_TOTAL_TRAINING_EXAMPLES', 2):
                     with self.swap(feconf, 'MIN_ASSIGNED_LABELS', 1):
