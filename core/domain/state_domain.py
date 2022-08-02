@@ -3287,17 +3287,24 @@ class State(translation_domain.BaseTranslatableObject):
             yield (
                 outcome['feedback'],
                 translation_domain.ContentType.FEEDBACK,
-                None),
+                None)
 
             if interaction['id'] not in ['TextInput', 'SetInput']:
                 continue
 
             for rule_spec in answer_group['rule_specs']:
-                for input_value in sorted(rule_spec['inputs'].values()):
+                for input_name in sorted(rule_spec['inputs'].keys()):
+                    input_value = rule_spec['inputs'][input_name]
                     if 'normalizedStrSet' in input_value:
-                        yield input_value, translation_domain.ContentType.RULE
+                        yield (
+                            input_value,
+                            translation_domain.ContentType.RULE,
+                            None)
                     if 'unicodeStrSet' in input_value:
-                        yield input_value, translation_domain.ContentType.RULE
+                        yield (
+                            input_value,
+                            translation_domain.ContentType.RULE,
+                            None)
 
         for hint in interaction['hints']:
             yield (
@@ -3355,7 +3362,24 @@ class State(translation_domain.BaseTranslatableObject):
             states_dict: list(dict(State)). List of state dicts, with updated
             content-ids.
         """
+        OBJECT_CONTENT_IDS_REPLACERS = {
+            'TranslatableHtmlContentId': (
+                lambda old_id, id_mapping: id_mapping[old_id]),
+        }
+        OBJECT_CONTENT_IDS_REPLACERS['SetOfTranslatableHtmlContentIds'] = (
+            lambda ids_set, id_mapping: [
+                OBJECT_CONTENT_IDS_REPLACERS['TranslatableHtmlContentId'](old_id, id_mapping)
+                for old_id in ids_set
+            ]
+        )
+        OBJECT_CONTENT_IDS_REPLACERS['ListOfSetsOfTranslatableHtmlContentIds'] = (
+                lambda items, id_mapping: [
+                OBJECT_CONTENT_IDS_REPLACERS['SetOfTranslatableHtmlContentIds'](ids_set, id_mapping)
+                for ids_set in items
+            ]
+        )
         content_id_generator = translation_domain.ContentIdGenerator()
+        old_to_new_content_id = {}
         for state_name in sorted(states_dict.keys()):
             state = states_dict[state_name]
             voiceovers = []
@@ -3368,6 +3392,7 @@ class State(translation_domain.BaseTranslatableObject):
                 old_content_id = content[content_id_key]
                 new_content_id = content_id_generator.generate(
                     content_type, extra_prefix=extra_prefix)
+                old_to_new_content_id[old_content_id] = new_content_id
 
                 voiceovers_mapping = (
                     state['recorded_voiceovers'][
@@ -3382,6 +3407,46 @@ class State(translation_domain.BaseTranslatableObject):
                 content_id: voiceover
                 for content_id, voiceover in voiceovers
             }
+
+            interaction_specs = (
+                interaction_registry.Registry
+                    .get_all_specs_for_state_schema_version(
+                        feconf.CURRENT_STATE_SCHEMA_VERSION,
+                        can_fetch_latest_specs=True
+                )
+            )
+            interaction_id = state['interaction']['id']
+            interaction = state['interaction']
+            answer_groups = interaction['answer_groups']
+            rule_descriptions = interaction_specs[interaction_id][
+                'rule_descriptions']
+            answer_type = interaction_specs[interaction_id]['answer_type']
+
+            if interaction['solution'] and (
+                    answer_type in OBJECT_CONTENT_IDS_REPLACERS):
+                interaction['solution']['correct_answer'] = (
+                    OBJECT_CONTENT_IDS_REPLACERS[answer_type](
+                        interaction['solution']['correct_answer'],
+                        old_to_new_content_id)
+                )
+
+            if not rule_descriptions:
+                continue
+
+            rules_variables = {
+                name: re.findall(r'\{\{(.+?)\|(.+?)\}\}', description)
+                for name, description in rule_descriptions.items()
+            }
+
+            for answer_group in answer_groups:
+                for rule_spec in answer_group['rule_specs']:
+                    input = rule_spec['inputs']
+                    rule_type = rule_spec['rule_type']
+                    for key, value_class in rules_variables[rule_type]:
+                        if value_class not in OBJECT_CONTENT_IDS_REPLACERS:
+                            continue
+                        input[key] = OBJECT_CONTENT_IDS_REPLACERS[value_class](
+                            input[key], old_to_new_content_id)
 
         return states_dict, content_id_generator.next_content_id_index
 

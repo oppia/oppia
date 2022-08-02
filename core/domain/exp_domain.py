@@ -2606,6 +2606,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         exploration_dict['states_schema_version'] = 52
         exploration_dict['next_content_id_index'] = next_content_id_index
 
+        return exploration_dict
 
     @classmethod
     def _migrate_to_latest_yaml_version(cls, yaml_content):

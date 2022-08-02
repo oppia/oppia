@@ -650,10 +650,6 @@ describe('Exploration editor tab component', function() {
         explorationStatesService.getState('First State')
           .recordedVoiceovers.voiceoversMapping.feedback_1.en.needsUpdate).toBe(
         false);
-      expect(
-        explorationStatesService.getState('First State')
-          .writtenTranslations.translationsMapping.feedback_1.en.needsUpdate)
-        .toBe(false);
 
       ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired(['feedback_1']);
       tick();
@@ -663,10 +659,6 @@ describe('Exploration editor tab component', function() {
         explorationStatesService.getState('First State')
           .recordedVoiceovers.voiceoversMapping.feedback_1.en.needsUpdate).toBe(
         true);
-      expect(
-        explorationStatesService.getState('First State')
-          .writtenTranslations.translationsMapping.feedback_1.en.needsUpdate)
-        .toBe(true);
 
       flush();
     }));
@@ -682,10 +674,6 @@ describe('Exploration editor tab component', function() {
         explorationStatesService.getState('First State')
           .recordedVoiceovers.voiceoversMapping.feedback_1.en.needsUpdate).toBe(
         false);
-      expect(
-        explorationStatesService.getState('First State')
-          .writtenTranslations.translationsMapping.feedback_1.en.needsUpdate)
-        .toBe(false);
 
       ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired(['feedback_1']);
       $scope.$apply();
@@ -694,10 +682,6 @@ describe('Exploration editor tab component', function() {
         explorationStatesService.getState('First State')
           .recordedVoiceovers.voiceoversMapping.feedback_1.en.needsUpdate).toBe(
         false);
-      expect(
-        explorationStatesService.getState('First State')
-          .writtenTranslations.translationsMapping.feedback_1.en.needsUpdate)
-        .toBe(false);
     });
 
   it('should navigate to main tab in specific state name', function() {
