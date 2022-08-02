@@ -18,6 +18,8 @@
 
 from __future__ import annotations
 
+import logging
+
 from core import feconf
 from core.domain import state_domain
 from core.domain import translation_domain
@@ -31,14 +33,17 @@ import result
 
 MYPY = False
 if MYPY: # pragma: no cover
+    from mypy_imports import datastore_services
     from mypy_imports import exp_models
     from mypy_imports import translation_models
 
 (exp_models, translation_models) = models.Registry.import_models(
     [models.NAMES.exploration, models.NAMES.translation])
 
+datastore_services = models.Registry.import_datastore_services()
 
-class EntityTranslationModelGenerationOneOffJob(base_jobs.JobBase):
+
+class EntityTranslationsModelGenerationOneOffJob(base_jobs.JobBase):
     """Generate EntityTranslation models for explorations."""
 
     @staticmethod
@@ -68,33 +73,36 @@ class EntityTranslationModelGenerationOneOffJob(base_jobs.JobBase):
                     for language_code in translations_mapping[content_id]:
                         if language_code not in language_code_to_translation:
                             language_code_to_translation[language_code] = (
-                                EntityTranslation(
-                                    exploration.id, 'exploration',
+                                translation_domain.EntityTranslation(
+                                    exploration.id,
+                                    feconf.TranslatableEntityType.EXPLORATION,
                                     exploration.version, language_code, {}))
 
                         translation_dict = translations_mapping[content_id][
                             language_code]
                         (
                             language_code_to_translation[language_code]
-                            .translations.add_translation(
+                            .add_translation(
                                 new_content_id,
                                 translation_dict['translation'],
-                                translation_dict['data_format'],
+                                translation_domain.TranslatableContentFormat(
+                                    translation_dict['data_format']),
                                 translation_dict['needs_update'])
                         )
-            for entity_translation in language_code_to_translation.vaues():
+            for entity_translation in language_code_to_translation.values():
                 entity_translation.validate()
         except Exception as e:
-            return result.Err(e)
+            logging.exception('Got exception on main handler')
+            return result.Err((exploration.id, e))
 
-        return language_code_to_translation.values()
+        return result.Ok(language_code_to_translation.values())
 
     @staticmethod
     def _create_entity_translation_model(
         entity_translation: translation_domain.EntityTranslation
     ):
-        """Puts the given EntityTranslation objects into datastore as
-        EntityTranslationModel.
+        """Creates the EntityTranslationsModel from the given EntityTranslation
+        object.
 
         Args:
             suggestion_model: GeneralSuggestionModel. The suggestion model.
@@ -103,15 +111,16 @@ class EntityTranslationModelGenerationOneOffJob(base_jobs.JobBase):
         Returns:
             list(suggestion_model). List of suggestion models to update.
         """
-        translation_models.EntityTranslationModel.create_new(
-            entity_translation.entity_type,
-            entity_translation.entity_id,
-            entity_translation.entity_version,
-            entity_translation.language_code,
-            entity_translation.translations
-        )
-
-        return entity_translation_models
+        with datastore_services.get_ndb_context():
+            translation_model = translation_models.EntityTranslationsModel.create_new(
+                entity_translation.entity_type,
+                entity_translation.entity_id,
+                entity_translation.entity_version,
+                entity_translation.language_code,
+                entity_translation.to_dict()['translations']
+            )
+        translation_model.update_timestamps()
+        return translation_model
 
     def run(self):
 

@@ -98,7 +98,7 @@ class EntityTranslationsModel(base_models.BaseModel):
             [entity_type]-[entity_id]-[entity_version]-[language_code].
         """
         return '%s-%s-%s-%s' % (
-            entity_type.value, entity_id, entity_version, language_code)
+            entity_type, entity_id, entity_version, language_code)
 
     @classmethod
     def get_model(
@@ -184,7 +184,7 @@ class EntityTranslationsModel(base_models.BaseModel):
         return cls(
             id=cls._generate_id(
                 entity_type, entity_id, entity_version, language_code),
-            entity_type=entity_type.value,
+            entity_type=entity_type,
             entity_id=entity_id,
             entity_version=entity_version,
             language_code=language_code,

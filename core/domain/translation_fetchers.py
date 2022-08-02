@@ -85,11 +85,11 @@ def get_machine_translation(
 
 def _populate_entity_translation_from_model(entity_translation_model):
     """Returns the EntityTranslation domain object from its model representation
-    (EntityTranslationModel).
+    (EntityTranslationsModel).
 
     Args:
         entity_translation_model: EntityTranslatioModel. An instance of
-            EntityTranslationModel.
+            EntityTranslationsModel.
 
     Returns:
         EntityTranslation. An instance of EntityTranslation object, created from
