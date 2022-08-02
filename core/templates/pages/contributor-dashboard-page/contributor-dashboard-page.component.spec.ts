@@ -124,7 +124,7 @@ describe('Contributor dashboard page', () => {
 
     component.scrollFunction();
 
-    expect(component.defaultHeaderVisible).toBeFalse();
+    expect(component.defaultHeaderVisible).toBeTrue();
   });
 
   it('should username equal to "" when user is not loggedIn', fakeAsync(() => {
@@ -235,10 +235,10 @@ describe('Contributor dashboard page', () => {
     });
 
     it('should show default header if window pageYOffset is ' +
-      'less than 5', () => {
+      'less than 80', function() {
       const nativeWindowSpy = spyOnProperty(windowRef, 'nativeWindow');
       nativeWindowSpy.and.returnValue({
-        pageYOffset: 4
+        pageYOffset: 79
       });
 
       component.scrollFunction();
@@ -247,10 +247,10 @@ describe('Contributor dashboard page', () => {
     });
 
     it('should show collapsed header if window pageYOffset is' +
-      ' scrolled greater than 5', fakeAsync(() => {
+      ' scrolled greater than 80', fakeAsync(() => {
       const nativeWindowSpy = spyOnProperty(windowRef, 'nativeWindow');
       nativeWindowSpy.and.returnValue({
-        pageYOffset: 6
+        pageYOffset: 81
       });
 
       component.scrollFunction();

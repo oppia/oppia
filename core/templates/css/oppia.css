@@ -1463,6 +1463,7 @@ span.sort-explorations-select .sort-order {
 }
 .oppia-editor-card-with-avatar {
   background: rgb(255,255,255);
+  border: 1px solid #ccc;
   margin: 20px auto 0 auto;
   max-width: 700px;
   padding: 0;
@@ -2300,7 +2301,7 @@ oppia-parameter {
   .modal-dialog {
     margin-left: auto;
     margin-right: auto;
-    width: 90vw;
+    width: 95vw;
   }
 }
 @media(min-width: 1024px) {

@@ -119,7 +119,7 @@ export class ContributorDashboardPageComponent
   }
 
   scrollFunction(): void {
-    if (this.windowRef.nativeWindow.pageYOffset >= 5) {
+    if (this.windowRef.nativeWindow.pageYOffset >= 80) {
       this.defaultHeaderVisible = false;
     } else {
       this.defaultHeaderVisible = true;
