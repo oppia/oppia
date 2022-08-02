@@ -168,22 +168,7 @@ angular.module('oppia').directive('topicEditorTab', [
             $scope.addSkillForDiagnosticTest = async function() {
               let skillToAdd = $scope.selectedSkillForDiagnosticTest;
               $scope.selectedSkillForDiagnosticTest = null;
-              let numberOfQuestions;
 
-              await QuestionBackendApiService
-                .fetchTotalQuestionCountForSkillIdsAsync(
-                  [skillToAdd.getId()]).then((questionCount) => {
-                  numberOfQuestions = questionCount;
-                });
-
-              if (numberOfQuestions < 2) {
-                $scope.diagnosticTestSkillsDropdownIsShown = false;
-                AlertsService.addInfoMessage(
-                  'The skill should contain at least two questions for ' +
-                  'getting assigned to the diagnostic test.', 5000);
-                $scope.$applyAsync();
-                return;
-              }
               $scope.selectedSkillSummariesForDiagnosticTest.push(skillToAdd);
               let j = -1;
               for (let skill of

@@ -1820,6 +1820,22 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.topic.subtopics[0].thumbnail_size_in_bytes, len(raw_image))
 
+    def test_get_topic_id_to_diagnostic_test_skill_ids(self):
+        expected_dict = {
+            self.TOPIC_ID: self.topic.skill_ids_for_diagnostic_test
+        }
+        self.assertEqual(
+            topic_services.get_topic_id_to_diagnostic_test_skill_ids(
+                [self.TOPIC_ID]),
+            expected_dict
+        )
+
+        self.assertEqual(
+            topic_services.get_topic_id_to_diagnostic_test_skill_ids(
+                'incorrect_topic_id'),
+            {}
+        )
+
 
 # TODO(#7009): Remove this mock class and the SubtopicMigrationTests class
 # once the actual functions for subtopic migrations are implemented.

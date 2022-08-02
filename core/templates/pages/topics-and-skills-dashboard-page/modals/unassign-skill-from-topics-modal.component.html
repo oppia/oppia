@@ -4,6 +4,7 @@
   </h3>
 </div>
 <div class="modal-body">
+  <div><em>The topics with this skill as their only diagnostic test skill are not eligible for the unassignment.</em></div><br>
   <span *ngIf="topicsAssignmentsAreFetched && eligibleTopicsForUnassignment.length !== 0">This skill is assigned to these following topics. Tick the topics that you want this skill to be unassigned from.</span>
   <div>
     <span *ngIf="topicsAssignmentsAreFetched && eligibleTopicsForUnassignment.length === 0">No eligible topics for unassignment.</span>
@@ -41,6 +42,7 @@
     }
     .unassign-skill-from-topics-modal .modal-header {
       padding: 10px 15px;
+      display: inline-block;
     }
     .unassign-skill-from-topics-modal .modal-content {
       border: 0;

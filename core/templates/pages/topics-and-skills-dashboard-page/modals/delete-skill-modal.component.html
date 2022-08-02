@@ -10,7 +10,7 @@
       <span class="topic-name">{{ topic.topicName }}</span>
     </div>
   </div>
-  <div *ngIf="!allowSkillForDeletion"><span>This skill is the only diagnostic test skill for a topic, please unassign it for performing this operation.</span></div>
+  <div *ngIf="!allowSkillForDeletion"><span>It looks like, some topics contain this skill as their only diagnostic test skill. Please unassign from those topics first.</span></div>
 </div>
 <div class="modal-footer">
   <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
