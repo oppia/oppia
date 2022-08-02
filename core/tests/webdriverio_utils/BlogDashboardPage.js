@@ -263,7 +263,7 @@ var BlogDashboardPage = function() {
     var blogPostEditOptionButton = await this.getBlogPostTileEditOption(title);
     await action.click(
       'Blog post edit option', blogPostEditOptionButton);
-    var deleteButtonVisible = await deleteBlogPostButton.isDisplayed();
+    var deleteButtonVisible = await deleteBlogPostButton.isExisting();
     if (!deleteButtonVisible) {
       await action.click(
         'Blog post edit option', blogPostEditOptionButton);
@@ -310,7 +310,7 @@ var BlogDashboardPage = function() {
     var blogPostEditOptionButton = await this.getBlogPostTileEditOption(title);
     await action.click(
       'Blog post edit option', blogPostEditOptionButton);
-    var unpublishButtonVisible = await unpublishBlogPostButton.isDisplayed();
+    var unpublishButtonVisible = await unpublishBlogPostButton.isExisting();
     if (!unpublishButtonVisible) {
       await action.click(
         'Blog post edit option', blogPostEditOptionButton);

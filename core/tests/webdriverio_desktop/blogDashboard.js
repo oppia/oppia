@@ -115,12 +115,14 @@ describe('Blog dashboard functionality', function() {
       'Sample Title1', await forms.toRichText(
         'Hi there, I’m Oppia! I’m an online personal tutor for everybody!'));
     await blogDashboardPage.navigateToBlogDashboardPageWithBackButton();
+    await blogDashboardPage.navigateToDraftsTab();
 
     await blogDashboardPage.createNewBlogPost();
     await blogDashboardPage.saveBlogPostAsDraft(
       'Sample Title2', await forms.toRichText(
         'Hi there, I’m Oppia! I’m a tutor for everybody!'));
     await blogDashboardPage.navigateToBlogDashboardPageWithBackButton();
+    await blogDashboardPage.navigateToDraftsTab();
 
     await blogDashboardPage.createNewBlogPost();
     await blogDashboardPage.saveBlogPostAsDraft(
