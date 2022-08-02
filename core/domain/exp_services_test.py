@@ -4675,7 +4675,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         with change_list_swap, self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'version 1, which is too old'):
             exp_services.update_exploration(
-                second_committer_id, self.EXP_0_ID, [], 'commit_message')
+                second_committer_id, self.EXP_0_ID, None, 'commit_message')
 
         # Another person modifies the exploration.
         new_change_list = [exp_domain.ExplorationChange({
@@ -5677,6 +5677,9 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
 
         self.assertEqual(
             exp_services.get_average_rating(exp.ratings), 0)
+
+        self.assertEqual(
+            exp_services.get_average_rating({}), 0)
 
         rating_services.assign_rating_to_exploration(
             self.owner_id, self.EXP_0_ID, 5)

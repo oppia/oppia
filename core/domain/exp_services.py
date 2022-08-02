@@ -1577,7 +1577,7 @@ def validate_exploration_for_story(
 def update_exploration(
     committer_id: str,
     exploration_id: str,
-    change_list: List[exp_domain.ExplorationChange],
+    change_list: Optional[List[exp_domain.ExplorationChange]],
     commit_message: Optional[str],
     is_suggestion: bool = False,
     is_by_voice_artist: bool = False
@@ -2024,9 +2024,6 @@ def save_new_exploration_from_yaml_and_assets(
     Raises:
         Exception. The yaml file is invalid due to a missing schema version.
     """
-    if assets_list is None:
-        assets_list = []
-
     yaml_dict = utils.dict_from_yaml(yaml_content)
     if 'schema_version' not in yaml_dict:
         raise Exception('Invalid YAML file: missing schema version')
