@@ -57,19 +57,15 @@ SELF_BASE_SNAPSHOT_CONTENT_MODEL = TypeVar(  # pylint: disable=invalid-name
 
 MYPY = False
 if MYPY: # pragma: no cover
+    # Here, change domain is imported only for type checking.
+    from core.domain import change_domain  # pylint: disable=invalid-import # isort:skip
     from mypy_imports import datastore_services
     from mypy_imports import transaction_services
-    from core.domain import change_domain  # pylint: disable=invalid-import # isort:skip
 
-    BaseCommitLogEntryCmdType = Union[
-        Sequence[Mapping[str, change_domain.AcceptableChangeDictTypes]],
-        Mapping[str, change_domain.AcceptableChangeDictTypes],
-        None
-    ]
-
-    BaseVersionedCommitCmdType = Sequence[
+    AllowedCommitCmdsListType = Sequence[
         Mapping[str, change_domain.AcceptableChangeDictTypes]
     ]
+
 
 transaction_services = models.Registry.import_transaction_services()
 datastore_services = models.Registry.import_datastore_services()
@@ -717,7 +713,7 @@ class BaseCommitLogEntryModel(BaseModel):
             committer_id: str,
             commit_type: str,
             commit_message: str,
-            commit_cmds: BaseCommitLogEntryCmdType,
+            commit_cmds: AllowedCommitCmdsListType,
             status: str,
             community_owned: bool
     ) -> SELF_BASE_COMMIT_LOG_ENTRY_MODEL:
@@ -978,7 +974,7 @@ class VersionedModel(BaseModel):
         committer_id: str,
         commit_type: str,
         commit_message: str,
-        commit_cmds: BaseVersionedCommitCmdType,
+        commit_cmds: AllowedCommitCmdsListType,
         # We expect Mapping because we want to allow models that inherit
         # from BaseModel as the values, if we used Dict this wouldn't
         # be allowed.
@@ -1249,7 +1245,7 @@ class VersionedModel(BaseModel):
         self,
         committer_id: str,
         commit_message: str,
-        commit_cmds: BaseVersionedCommitCmdType
+        commit_cmds: AllowedCommitCmdsListType
     ) -> None:
         """Saves a version snapshot and updates the model.
 
