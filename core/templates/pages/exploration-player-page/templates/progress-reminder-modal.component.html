@@ -1,0 +1,29 @@
+<div class="oppia-progress-reminder-modal">
+  <div class="progress-reminder-text">
+    <p [innerHTML]="'I18N_PROGRESS_REMINDER_MODAL_HEADER' | translate:{ progress: getProgressInFractionForm() }" ></p>
+  </div>
+  <div class="exploration-title">
+    <p>
+      {{ explorationTitle }}
+    </p>
+  </div>
+
+  <div class="progress-bar-container" [ngClass]="{'single-checkpoint-bar': checkpointCount === 1, 'multiple-checkpoints-bar': checkpointCount > 1, 'reverse-checkpoint-order': isLanguageRTL()}">
+    <div class="progress-bar" [ngClass]="{'reverse-checkpoint-order': isLanguageRTL()}">
+      <div class="completed-progress-bar" [style.width.%]="getCompletedProgressBarWidth()"></div>
+    </div>
+    <div *ngFor="let checkpointNode of checkpointStatusArray; index as idx"
+         [ngClass]="{'completed-checkpoint-node': checkpointStatusArray[idx] === 'completed', 'in-progress-checkpoint-node': checkpointStatusArray[idx] === 'in-progress', 'incomplete-checkpoint-node': checkpointStatusArray[idx] === 'incomplete'}">
+      {{ idx + 1 }}
+    </div>
+  </div>
+  <div class="continue-text">
+    {{ 'I18N_PROGRESS_REMINDER_CONTINUE_TEXT' | translate }}
+  </div>
+  <button class="resume-button" (click)="cancel()">
+    {{ 'I18N_PROGRESS_REMINDER_RESUME_LESSON' | translate }}
+  </button>
+  <button class="restart-button" (click)="confirm()">
+    {{ 'I18N_PROGRESS_REMINDER_RESTART_LESSON' | translate}}
+  </button>
+</div>

@@ -735,6 +735,7 @@ export class ConversationSkinComponent {
 
           // Move to most recently reached checkpoint card.
           this.changeCard(indexToRedirectTo);
+          this.playerPositionService.onLoadedMostRecentCheckpoint.emit();
         }
       );
   }

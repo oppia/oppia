@@ -280,6 +280,8 @@ var ExplorationPlayerPage = function() {
       ratingValue) {
     await waitFor.elementToBeClickable(explorationInfoIcon);
     await action.click('Exploration Info Icon', explorationInfoIcon);
+    await waitFor.visibilityOf(
+      infoCardRating, 'Rating takes too long to appear');
     var value = await action.getText('Info Card Rating', infoCardRating);
     expect(value).toBe(ratingValue);
   };
