@@ -574,6 +574,15 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(next_cursor, None)
         self.assertFalse(more)
 
+        augmented_skill_summaries, next_cursor, more = (
+            skill_services.get_filtered_skill_summaries(
+                self.num_queries_to_fetch, 'invalid_status', None,
+                ['alp', 'bet'], None, None))
+
+        self.assertEqual(len(augmented_skill_summaries), 0)
+        self.assertEqual(next_cursor, None)
+        self.assertFalse(more)
+
     def test_get_all_topic_assignments_for_skill(self) -> None:
         topic_id = topic_fetchers.get_new_topic_id()
         topic_id_1 = topic_fetchers.get_new_topic_id()
