@@ -301,7 +301,9 @@ class MigrateExplorationJob(base_jobs.JobBase):
                                 .language_codes_needing_voice_artists),
                         language_codes_with_assigned_voice_artists=(
                             exp_opp_summary
-                                .language_codes_with_assigned_voice_artists)))
+                                .language_codes_with_assigned_voice_artists)
+                    )
+                )
 
             datastore_services.update_timestamps_multi([exp_opp_summary_model])
 
@@ -395,9 +397,15 @@ class MigrateExplorationJob(base_jobs.JobBase):
             }
             | 'Merge objects' >> beam.CoGroupByKey()
             | 'Get rid of ID' >> beam.Values() # pylint: disable=no-value-for-parameter
+        )
+
+        transformed_exp_objects_list = (
+            exp_objects_list
             | 'Remove unmigrated explorations' >> beam.Filter(
-                lambda x: len(x['exp_changes']) > 0
-                    and len(x['exploration']) > 0)
+                lambda x: (
+                    len(x['exp_changes']) > 0 and
+                    len(x['exploration']) > 0
+                ))
             | 'Reorganize the exploration objects' >> beam.Map(lambda objects: {
                 'exp_model': objects['exp_model'][0],
                 'exploration': objects['exploration'][0],
@@ -408,14 +416,26 @@ class MigrateExplorationJob(base_jobs.JobBase):
         )
 
         exp_objects_list_job_run_results = (
-            exp_objects_list
+            transformed_exp_objects_list
             | 'Transform exp objects into job run results' >> (
                 job_result_transforms.CountObjectsToJobRunResult(
                     'EXP MIGRATED'))
         )
 
-        cache_deletion_job_run_results = (
+        already_migrated_job_run_results = (
             exp_objects_list
+            | 'Remove migrated explorations' >> beam.Filter(
+                lambda x: (
+                        len(x['exp_changes']) == 0 and
+                        len(x['exploration']) > 0
+                ))
+            | 'Transform previously migrated exps into job run results' >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'EXP PREVIOUSLY MIGRATED'))
+        )
+
+        cache_deletion_job_run_results = (
+            transformed_exp_objects_list
             | 'Delete exploration from cache' >> beam.Map(
                 lambda exp_object: self._delete_exploration_from_cache(
                     exp_object['exploration']))
@@ -424,7 +444,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
         )
 
         exp_models_to_put = (
-            exp_objects_list
+            transformed_exp_objects_list
             | 'Generate exploration models to put' >> beam.FlatMap(
                 lambda exp_objects: self._update_exploration(
                     exp_objects['exp_model'],
@@ -435,7 +455,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
         )
 
         exp_summary_models_to_put = (
-            exp_objects_list
+            transformed_exp_objects_list
             | 'Generate exp summary models to put' >> beam.Map(
                 lambda exp_objects: self._update_exp_summary(
                     exp_objects['exploration'],
@@ -456,24 +476,21 @@ class MigrateExplorationJob(base_jobs.JobBase):
         unused_put_results = (
             (
                 exp_models_to_put,
-                exp_summary_models_to_put
+                exp_summary_models_to_put,
+                exp_opp_summary_models_to_put
             )
             | 'Merge models' >> beam.Flatten()
-            | 'Put models into datastore' >> ndb_io.PutModels()
-        )
-
-        unused_put_results = (
-            exp_opp_summary_models_to_put
             | 'Filter None models' >> beam.Filter(
                 lambda x: x is not None)
-            | 'Put exp opp summary models into datastore' >> (
-                ndb_io.PutModels()))
+            | 'Put models into datastore' >> ndb_io.PutModels()
+        )
 
         return (
             (
                 cache_deletion_job_run_results,
                 migrated_exp_job_run_results,
-                exp_objects_list_job_run_results
+                exp_objects_list_job_run_results,
+                already_migrated_job_run_results
             )
             | beam.Flatten()
         )
