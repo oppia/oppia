@@ -1,4 +1,4 @@
-// Copyright 2022 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,47 +14,48 @@
 
 /**
  * @fileoverview Page object for the contributor dashboard, for use in
- * Webdriverio tests.
+ * Protractor tests.
  */
 var waitFor = require('./waitFor.js');
 var action = require('./action.js');
 
 var ContributorDashboardTranslateTextTab = require(
-  '../webdriverio_utils/ContributorDashboardTranslateTextTab.js');
-
+  '../protractor_utils/ContributorDashboardTranslateTextTab.js');
 var ContributorDashboardPage = function() {
-  var navigateToTranslateTextTabButton = $('.e2e-test-translateTextTab');
-  var submitQuestionTabButton = $('.e2e-test-submitQuestionTab');
-  var opportunityLoadingPlaceholder = $(
-    '.e2e-test-opportunity-loading-placeholder');
-  var opportunityListEmptyAvailabilityMessage = $(
-    '.e2e-test-opportunity-list-empty-availability-message');
-  var opportunityListItemsSelector = function() {
-    return $$('.e2e-test-opportunity-list-item');
-  };
-  var opportunityHeadingCss = (
+  var navigateToTranslateTextTabButton = element(
+    by.css('.e2e-test-translateTextTab'));
+  var submitQuestionTabButton = element(
+    by.css('.e2e-test-submitQuestionTab'));
+  var opportunityLoadingPlaceholder = element(
+    by.css('.e2e-test-opportunity-loading-placeholder'));
+  var opportunityListEmptyAvailabilityMessage = element(
+    by.css('.e2e-test-opportunity-list-empty-availability-message'));
+  var opportunityListItems = element.all(
+    by.css('.e2e-test-opportunity-list-item'));
+  var opportunityHeadingCss = by.css(
     '.e2e-test-opportunity-list-item-heading');
-  var opportunitySubheadingCss = (
+  var opportunitySubheadingCss = by.css(
     '.e2e-test-opportunity-list-item-subheading');
-  var opportunityActionButtonCss = (
+  var opportunityActionButtonCss = by.css(
     '.e2e-test-opportunity-list-item-button');
-  var opportunityLabelCss = (
+  var opportunityLabelCss = by.css(
     '.e2e-test-opportunity-list-item-label');
-  var opportunityProgressPercentageCss = (
+  var opportunityProgressPercentageCss = by.css(
     '.e2e-test-opportunity-list-item-progress-percentage');
-  var acceptQuestionSuggestionButton = $(
-    '.e2e-test-question-suggestion-review-accept-button');
-  var rejectQuestionSuggestionButton = $(
-    '.e2e-test-question-suggestion-review-reject-button');
-  var questionSuggestionReviewMessageInput = $(
-    '.e2e-test-suggestion-review-message');
-  var questionReviewModalHeader = $(
-    '.e2e-test-question-suggestion-review-modal-header');
-  var usernameContainer = $('.e2e-test-username');
-  var reviewRightsDiv = $('.e2e-test-review-rights');
+  var acceptQuestionSuggestionButton = element(
+    by.css('.e2e-test-question-suggestion-review-accept-button'));
+  var rejectQuestionSuggestionButton = element(
+    by.css('.e2e-test-question-suggestion-review-reject-button'));
+  var questionSuggestionReviewMessageInput = element(
+    by.css('.e2e-test-suggestion-review-message'));
+  var questionReviewModalHeader = element(by.css(
+    '.e2e-test-question-suggestion-review-modal-header'));
+  var usernameContainer = element(by.css('.e2e-test-username'));
+
+  var reviewRightsDiv = element(by.css('.e2e-test-review-rights'));
 
   this.get = async function() {
-    await browser.url('/contributor-dashboard');
+    await browser.get('/contributor-dashboard');
     await waitFor.visibilityOf(
       usernameContainer, 'Username takes too much time to load');
   };
@@ -80,9 +81,9 @@ var ContributorDashboardPage = function() {
     await waitFor.visibilityOf(
       reviewRightsDiv, 'User does not have rights to review translation');
 
-    var translationReviewRightsElement = $(
-      `.e2e-test-translation-${
-        _convertlanguageToKebabCase(language)}-reviewer`);
+    var translationReviewRightsElement = element(by.css(
+      '.e2e-test-translation-' + (
+        _convertlanguageToKebabCase(language)) + '-reviewer'));
     await waitFor.visibilityOf(
       translationReviewRightsElement,
       'User does not have rights to review translation in language: ' + language
@@ -100,14 +101,14 @@ var ContributorDashboardPage = function() {
       reviewRightsDiv,
       'Review rights div is not visible, so user does not have rights to ' +
       'review ' + reviewCategory);
-    var reviewRightsElementClassName = (`.e2e-test-${reviewCategory}`);
+    var reviewRightsElementClassName = ('.e2e-test-' + reviewCategory);
     if (langaugeDescription !== null) {
       let language = _convertlanguageToKebabCase(langaugeDescription);
       reviewRightsElementClassName += '-' + language;
     }
     reviewRightsElementClassName += '-reviewer';
 
-    var reviewRightsElement = $(reviewRightsElementClassName);
+    var reviewRightsElement = element(by.css(reviewRightsElementClassName));
     await waitFor.visibilityOf(
       reviewRightsElement,
       'Review right element ' + reviewCategory + ' is not visible');
@@ -138,14 +139,13 @@ var ContributorDashboardPage = function() {
 
   var _getOpportunityElements = async function() {
     await waitFor.visibilityOf(
-      $(opportunityHeadingCss),
+      element(opportunityHeadingCss),
       'Opportunity Heading takes too long to appear.');
 
-    var opportunityListItems = await opportunityListItemsSelector();
-    var opportunityCount = opportunityListItems.length;
+    var opportunityCount = await opportunityListItems.count();
     var opportunityElements = [];
     for (var i = 0; i < opportunityCount; i++) {
-      var opportunityElement = opportunityListItems[i];
+      var opportunityElement = opportunityListItems.get(i);
       if (await opportunityElement.isDisplayed()) {
         opportunityElements.push(opportunityElement);
       }
@@ -160,13 +160,13 @@ var ContributorDashboardPage = function() {
     for (var i = 0; i < opportunityElements.length; i++) {
       var opportunity = opportunityElements[i];
 
-      var headingElement = opportunity.$(opportunityHeadingCss);
+      var headingElement = opportunity.element(opportunityHeadingCss);
       await waitFor.visibilityOf(
         headingElement,
         'Opportunity heading is taking too much time to appear');
       var heading = await headingElement.getText();
 
-      var subheadingElement = opportunity.$(opportunitySubheadingCss);
+      var subheadingElement = opportunity.element(opportunitySubheadingCss);
       await waitFor.visibilityOf(
         subheadingElement,
         'Opportunity subheading is taking too much time to appear');
@@ -185,10 +185,10 @@ var ContributorDashboardPage = function() {
     await this.waitForOpportunitiesToLoad();
     var opportunity = await _getOpportunityWithHeadingAndSubheading(
       expectedHeading, expectedSubheading);
-    expect(opportunity === null).toBeFalse();
+    expect(opportunity).not.toBe(null);
 
     if (expectedLabel !== null) {
-      var labelElement = opportunity.$(opportunityLabelCss);
+      var labelElement = opportunity.element(opportunityLabelCss);
       await waitFor.visibilityOf(
         labelElement, 'Opportunity label is taking too much time to appear');
       var label = await labelElement.getText();
@@ -196,7 +196,7 @@ var ContributorDashboardPage = function() {
     }
 
     if (expectedPercentage !== null) {
-      var percentageElement = opportunity.$(
+      var percentageElement = opportunity.element(
         opportunityProgressPercentageCss);
       await waitFor.visibilityOf(
         percentageElement,
@@ -214,10 +214,10 @@ var ContributorDashboardPage = function() {
     await waitFor.visibilityOf(
       opportunity,
       'Opportunity taking too long to appear.');
-    expect(opportunity === null).toBeFalse();
+    expect(opportunity).not.toBe(null);
     await action.click(
       'Opportunity action button',
-      opportunity.$(opportunityActionButtonCss));
+      opportunity.element(opportunityActionButtonCss));
   };
 
   this.clickAcceptQuestionSuggestionButton = async function() {
@@ -231,7 +231,7 @@ var ContributorDashboardPage = function() {
   };
 
   this.setQuestionSuggestionReviewMessage = async function(message) {
-    await action.setValue(
+    await action.sendKeys(
       'Question suggestion review message input field',
       questionSuggestionReviewMessageInput, message);
   };

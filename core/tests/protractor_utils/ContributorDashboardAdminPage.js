@@ -1,4 +1,4 @@
-// Copyright 2022 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,38 +14,42 @@
 
 /**
  * @fileoverview Page object for the contributor dashboard admin page,
- * for use in Webdriverio tests.
+ * for use in Protractor tests.
  */
 
 var action = require('./action.js');
 var waitFor = require('./waitFor.js');
 
 var ContributorDashboardAdminPage = function() {
-  var CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION = 'REVIEW_TRANSLATION';
+  var CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION = 'TRANSLATION';
   var CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER = 'VOICEOVER';
-  var CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION = 'REVIEW_QUESTION';
+  var CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION = 'QUESTION';
   var CATEGORY_SUBMIT_QUESTION = 'SUBMIT_QUESTION';
 
-  var addContributionRightsForm = $('.e2e-test-add-contribution-rights-form');
-  var viewContributionRightsForm = $(
-    '.e2e-test-view-contribution-rights-form');
-  var languageSelectCss = '.e2e-test-form-language-select';
-  var contributorUsernameCss = '.e2e-test-form-contributor-username';
-  var categorySelectCss = '.e2e-test-form-contribution-rights-category-select';
-  var contributionRightsFormSubmitButtonCss = (
+  var addContributionRightsForm = element(
+    by.css('.e2e-test-add-contribution-rights-form'));
+  var viewContributionRightsForm = element(by.css(
+    '.e2e-test-view-contribution-rights-form'));
+  var languageSelectCss = by.css('.e2e-test-form-language-select');
+  var contributorUsernameCss = by.css(
+    '.e2e-test-form-contributor-username');
+  var categorySelectCss = by.css(
+    '.e2e-test-form-contribution-rights-category-select');
+  var contributionRightsFormSubmitButtonCss = by.css(
     '.e2e-test-contribution-rights-form-submit-button');
-  var userTranslationReviewerLanguageCss = (
+  var userTranslationReviewerLanguageCss = by.css(
     '.e2e-test-translation-reviewer-language');
-  var userVoiceoverReviewerLanguageCss = (
+  var userVoiceoverReviewerLanguageCss = by.css(
     '.e2e-test-voiceover-reviewer-language');
-  var userQuestionReviewerCss = '.e2e-test-question-reviewer';
-  var userQuestionContributorCss = '.e2e-test-question-contributor';
-  var viewContributionRightsMethodInputCss = (
+  var userQuestionReviewerCss = by.css('.e2e-test-question-reviewer');
+  var userQuestionContributorCss = by.css(
+    '.e2e-test-question-contributor');
+  var viewContributionRightsMethodInputCss = by.css(
     '.e2e-test-view-contribution-rights-method');
-  var statusMessage = $('.e2e-test-status-message');
+  var statusMessage = element(by.css('.e2e-test-status-message'));
 
   this.get = async function() {
-    await browser.url('/contributor-dashboard-admin');
+    await browser.get('/contributor-dashboard-admin');
     await waitFor.pageToFullyLoad();
   };
 
@@ -54,24 +58,24 @@ var ContributorDashboardAdminPage = function() {
     await waitFor.visibilityOf(
       addContributionRightsForm, 'Assign reviewer form is not visible');
 
-    var usernameInputField = addContributionRightsForm.$(
+    var usernameInputField = addContributionRightsForm.element(
       contributorUsernameCss);
-    await action.setValue(
+    await action.sendKeys(
       'Username input field', usernameInputField, username);
 
-    var categorySelectField = addContributionRightsForm.$(
+    var categorySelectField = addContributionRightsForm.element(
       categorySelectCss);
     await action.select(
       'Review category selector', categorySelectField, category);
 
     if (languageDescription !== null) {
-      var languageSelectField = addContributionRightsForm.$(
+      var languageSelectField = addContributionRightsForm.element(
         languageSelectCss);
       await action.select(
         'Language selector', languageSelectField, languageDescription);
     }
 
-    var submitButton = addContributionRightsForm.$(
+    var submitButton = addContributionRightsForm.element(
       contributionRightsFormSubmitButtonCss);
     await action.click('Submit assign reviewer button', submitButton);
 
@@ -85,17 +89,17 @@ var ContributorDashboardAdminPage = function() {
     await waitFor.visibilityOf(
       viewContributionRightsForm, 'View reviewer form is not visible');
 
-    var viewMethodInput = viewContributionRightsForm.$(
+    var viewMethodInput = viewContributionRightsForm.element(
       viewContributionRightsMethodInputCss);
     await action.select(
       'Reviewer view method dropdown', viewMethodInput, 'By Username');
 
-    var usernameInputField = viewContributionRightsForm.$(
+    var usernameInputField = viewContributionRightsForm.element(
       contributorUsernameCss);
-    await action.setValue(
+    await action.sendKeys(
       'Username input field', usernameInputField, username);
 
-    var submitButton = viewContributionRightsForm.$(
+    var submitButton = viewContributionRightsForm.element(
       contributionRightsFormSubmitButtonCss);
     await action.click('View reviewer role button', submitButton);
 
@@ -104,13 +108,13 @@ var ContributorDashboardAdminPage = function() {
       'Could not view contribution rights successfully');
 
     if (category === CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION) {
-      return $$(userTranslationReviewerLanguageCss);
+      return element.all(userTranslationReviewerLanguageCss);
     } else if (category === CONTRIBUTION_RIGHT_CATEGORY_REVIEW_VOICEOVER) {
-      return $$(userVoiceoverReviewerLanguageCss);
+      return element.all(userVoiceoverReviewerLanguageCss);
     } else if (category === CONTRIBUTION_RIGHT_CATEGORY_REVIEW_QUESTION) {
-      return $(userQuestionReviewerCss);
+      return element(userQuestionReviewerCss);
     } else if (category === CATEGORY_SUBMIT_QUESTION) {
-      return $(userQuestionContributorCss);
+      return element(userQuestionContributorCss);
     }
   };
 

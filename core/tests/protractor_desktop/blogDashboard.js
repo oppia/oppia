@@ -1,4 +1,4 @@
-// Copyright 2022 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 // //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,11 +16,11 @@
  * @fileoverview End-to-end tests for the blog Dashboard page.
  */
 
-var forms = require('../webdriverio_utils/forms.js');
-var users = require('../webdriverio_utils/users.js');
-var general = require('../webdriverio_utils/general.js');
+var forms = require('../protractor_utils/forms.js');
+var users = require('../protractor_utils/users.js');
+var general = require('../protractor_utils/general.js');
 
-var BlogDashboardPage = require('../webdriverio_utils/BlogDashboardPage.js');
+var BlogDashboardPage = require('../protractor_utils/BlogDashboardPage.js');
 
 describe('Blog dashboard functionality', function() {
   var blogDashboardPage = null;
@@ -98,8 +98,6 @@ describe('Blog dashboard functionality', function() {
     await blogDashboardPage.navigateToPublishTab();
     await blogDashboardPage.expectNumberOfPublishedBlogPostsToBe(1);
     await blogDashboardPage.unpublishBlogPostWithTitle('Sample Blog Post');
-    await blogDashboardPage.navigateToDraftsTab();
-    await blogDashboardPage.navigateToPublishTab();
     await blogDashboardPage.expectNumberOfPublishedBlogPostsToBe(0);
 
     await blogDashboardPage.navigateToDraftsTab();
