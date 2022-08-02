@@ -21,6 +21,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AssignedSkillBackendDict, AssignedSkill } from 'domain/skill/assigned-skill.model';
 import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { TopicAssignments, UnassignSkillFromTopicsModalComponent } from './unassign-skill-from-topics-modal.component';
+import { MaterialModule } from 'modules/material.module';
 
 describe('Unassing SKill Modal', () => {
   let fixture: ComponentFixture<UnassignSkillFromTopicsModalComponent>;
@@ -48,6 +49,9 @@ describe('Unassing SKill Modal', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
+      imports: [
+        MaterialModule
+      ],
       declarations: [
         UnassignSkillFromTopicsModalComponent
       ],

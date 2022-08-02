@@ -235,32 +235,33 @@ export class TopicsAndSkillsDashboardBackendApiService {
       throw new Error(errorResponse.error.error);
     });
   }
+
   private _fetchTopicIdToDiagnosticTestSkillIdsAsync(
-    topicIds: string[],
-    successCallback: (value: FetchTopicIdToDiagnosticTestSkillIdsResponse) => void,
-    errorCallback: (reason: string) => void
+      topicIds: string[],
+      successCallback: (
+        value: FetchTopicIdToDiagnosticTestSkillIdsResponse) => void,
+      errorCallback: (reason: string) => void
   ): void {
-  const topicIdToSkillIdsUrl = this.urlInterpolationService.interpolateUrl(
-    'topic_id_to_diagnostic_test_skill_ids_handler/' +
-    '<comma_separated_topic_ids>', {
-      comma_separated_topic_ids: topicIds.join(',')
-    });
-  console.log(topicIdToSkillIdsUrl);
-  console.log(topicIds);
-  this.http.get<FetchTopicIdToDiagnosticTestSkillIdsBackendResponse>(
-    topicIdToSkillIdsUrl).toPromise().then((response) => {
-    if (successCallback) {
-      successCallback({
-        topicIdToDiagnosticTestSkillIds: (
-          response.topic_id_to_diagnostic_test_skill_ids)
+    const topicIdToSkillIdsUrl = this.urlInterpolationService.interpolateUrl(
+      'topic_id_to_diagnostic_test_skill_ids_handler/' +
+        '<comma_separated_topic_ids>', {
+        comma_separated_topic_ids: topicIds.join(',')
       });
-    }
-  }, (errorResponse) => {
-    errorCallback(errorResponse.error);
-  });
-}
+    this.http.get<FetchTopicIdToDiagnosticTestSkillIdsBackendResponse>(
+      topicIdToSkillIdsUrl).toPromise().then((response) => {
+      if (successCallback) {
+        successCallback({
+          topicIdToDiagnosticTestSkillIds: (
+            response.topic_id_to_diagnostic_test_skill_ids)
+        });
+      }
+    }, (errorResponse) => {
+      errorCallback(errorResponse.error);
+    });
+  }
+
   async fetchTopicIdToDiagnosticTestSkillIdsAsync(
-    topicIds: string[]
+      topicIds: string[]
   ): Promise<FetchTopicIdToDiagnosticTestSkillIdsResponse> {
     return new Promise((resolve, reject) => {
       this._fetchTopicIdToDiagnosticTestSkillIdsAsync(

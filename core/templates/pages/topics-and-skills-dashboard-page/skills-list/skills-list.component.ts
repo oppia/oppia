@@ -118,10 +118,6 @@ export class SkillsListComponent {
             'The skill is assigned to a subtopic in a published ' +
             'topic. Please unpublish the topic before deleting ' +
             'this skill.');
-        } else if (errorMessage.includes(
-          'The skill_ids_for_diagnostic_test field should not be empty.')) {
-          errorToast = (
-            'The skill must be removed from the diagnostic test first.');
         } else {
           errorToast = errorMessage;
         }

@@ -68,33 +68,31 @@ angular.module('oppia').directive('topicEditorTab', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topic-editor-page/editor-tab/topic-editor-tab.directive.html'),
       controller: [
-        '$rootScope', '$scope', '$uibModal', 'AlertsService', 'ContextService',
+        '$rootScope', '$scope', '$uibModal', 'ContextService',
         'EntityCreationService', 'FocusManagerService',
         'ImageUploadHelperService', 'NgbModal',
-        'PageTitleService', 'QuestionBackendApiService', 'StoryCreationService',
-        'TopicEditorRoutingService', 'TopicEditorStateService',
-        'TopicUpdateService', 'TopicsAndSkillsDashboardBackendApiService',
-        'UndoRedoService', 'UrlInterpolationService',
-        'WindowDimensionsService', 'WindowRef',
+        'PageTitleService', 'StoryCreationService', 'TopicEditorRoutingService',
+        'TopicEditorStateService', 'TopicUpdateService',
+        'TopicsAndSkillsDashboardBackendApiService', 'UndoRedoService',
+        'UrlInterpolationService', 'WindowDimensionsService', 'WindowRef',
         'MAX_CHARS_IN_META_TAG_CONTENT',
         'MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB',
         'MAX_CHARS_IN_TOPIC_DESCRIPTION', 'MAX_CHARS_IN_TOPIC_NAME',
-        'MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB',
         'MINIMUM_QUESTION_COUNT_FOR_A_DIAGNOSTIC_TEST_SKILL',
+        'MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB',
         function(
-            $rootScope, $scope, $uibModal, AlertsService, ContextService,
+            $rootScope, $scope, $uibModal, ContextService,
             EntityCreationService, FocusManagerService,
             ImageUploadHelperService, NgbModal,
-            PageTitleService, QuestionBackendApiService, StoryCreationService,
-            TopicEditorRoutingService, TopicEditorStateService,
-            TopicUpdateService, TopicsAndSkillsDashboardBackendApiService,
-            UndoRedoService, UrlInterpolationService,
-            WindowDimensionsService, WindowRef,
+            PageTitleService, StoryCreationService, TopicEditorRoutingService,
+            TopicEditorStateService, TopicUpdateService,
+            TopicsAndSkillsDashboardBackendApiService, UndoRedoService,
+            UrlInterpolationService, WindowDimensionsService, WindowRef,
             MAX_CHARS_IN_META_TAG_CONTENT,
             MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB,
             MAX_CHARS_IN_TOPIC_DESCRIPTION, MAX_CHARS_IN_TOPIC_NAME,
-            MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB,
-            MINIMUM_QUESTION_COUNT_FOR_A_DIAGNOSTIC_TEST_SKILL) {
+            MINIMUM_QUESTION_COUNT_FOR_A_DIAGNOSTIC_TEST_SKILL,
+            MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB,) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           $scope.MAX_CHARS_IN_TOPIC_URL_FRAGMENT = (
@@ -142,13 +140,13 @@ angular.module('oppia').directive('topicEditorTab', [
 
               return availableSkillSummaries.filter(skillSummary => {
                 if (
-                    $scope.skillQuestionCountDict[skillSummary.getId()] >=
+                  $scope.skillQuestionCountDict[skillSummary.getId()] >=
                     MINIMUM_QUESTION_COUNT_FOR_A_DIAGNOSTIC_TEST_SKILL) {
                   return true;
                 } else {
                   return false;
                 }
-              })
+              });
             };
             $scope.availableSkillSummariesForDiagnosticTest = (
               $scope.getEligibleSkillSummariesForDiagnosticTest());

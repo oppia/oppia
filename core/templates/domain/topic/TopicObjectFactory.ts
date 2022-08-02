@@ -581,9 +581,8 @@ export class Topic {
       skillIdToDiagnosticTestMap[skillSummary.getId()] = true;
     }
 
-    return topicSkillSummaries.filter(object1 => {
-      return !(skillIdToDiagnosticTestMap.hasOwnProperty(
-        object1.getId()) === true);
+    return topicSkillSummaries.filter(topic => {
+      return !skillIdToDiagnosticTestMap.hasOwnProperty(topic.getId());
     });
   }
 

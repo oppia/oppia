@@ -68,32 +68,33 @@ export class UnassignSkillFromTopicsModalComponent
 
         let topicIdsNotEligibleForUnassignment = [];
         this.topicsAndSkillsDashboardBackendApiService
-        .fetchTopicIdToDiagnosticTestSkillIdsAsync(allTopicIds).then((dict) => {
-          for (let topicId in dict.topicIdToDiagnosticTestSkillIds) {
-            let diagnosticTestSkillIds = (
-              dict.topicIdToDiagnosticTestSkillIds[topicId])
-            if (diagnosticTestSkillIds.length === 1 &&
-                diagnosticTestSkillIds.indexOf(this.skillId) !== -1) {
-              topicIdsNotEligibleForUnassignment.push(topicId);
-            }
-          }
+          .fetchTopicIdToDiagnosticTestSkillIdsAsync(allTopicIds).then(
+            (dict) => {
+              for (let topicId in dict.topicIdToDiagnosticTestSkillIds) {
+                let diagnosticTestSkillIds = (
+                  dict.topicIdToDiagnosticTestSkillIds[topicId]);
+                if (diagnosticTestSkillIds.length === 1 &&
+                      diagnosticTestSkillIds.indexOf(this.skillId) !== -1) {
+                  topicIdsNotEligibleForUnassignment.push(topicId);
+                }
+              }
 
-          response = response.filter((topic) => {
-            return !(
-              topicIdsNotEligibleForUnassignment.indexOf(topic.topicId) !== -1);
-          })
-          response.map((topic) => {
-            this.topicsAssignments[topic.topicName] = {
-              subtopicId: topic.subtopicId,
-              topicVersion: topic.topicVersion,
-              topicId: topic.topicId,
-            };
-          });
-          this.eligibleTopicsForUnassignment = Object.keys(
-            this.topicsAssignments);
-          console.log(this.eligibleTopicsForUnassignment);
-          this.topicsAssignmentsAreFetched = true;
-        });
+              response = response.filter((topic) => {
+                return !(
+                  topicIdsNotEligibleForUnassignment.indexOf(
+                    topic.topicId) !== -1);
+              });
+              response.map((topic) => {
+                this.topicsAssignments[topic.topicName] = {
+                  subtopicId: topic.subtopicId,
+                  topicVersion: topic.topicVersion,
+                  topicId: topic.topicId,
+                };
+              });
+              this.eligibleTopicsForUnassignment = Object.keys(
+                this.topicsAssignments);
+              this.topicsAssignmentsAreFetched = true;
+            });
       });
   }
 

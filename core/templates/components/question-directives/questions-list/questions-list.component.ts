@@ -272,7 +272,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     this.windowRef.nativeWindow.location.hash = this.questionId;
   }
 
-  async questionDeletionCheck() {
+  async questionDeletionCheck(): Promise<boolean> {
     let questionDeletionIsAllowed = true;
     if (!this.canEditQuestion) {
       this.alertsService.addWarning(
@@ -284,19 +284,19 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     let numberOfQuestions = this.questionSummariesForOneSkill.length;
     await this.skillBackendApiService.checkSkillAssignmentForDiagnosticTest(
       this.selectedSkillId).then((response) => {
-        if (response && (
-            numberOfQuestions <=
-            AppConstants.MINIMUM_QUESTION_COUNT_FOR_A_DIAGNOSTIC_TEST_SKILL)) {
-          this.alertsService.addInfoMessage(
-            'The skill must be removed from the diagnostic test first.');
-          questionDeletionIsAllowed = false;
-        }
-      });
+      if (response && (
+        numberOfQuestions <=
+          AppConstants.MINIMUM_QUESTION_COUNT_FOR_A_DIAGNOSTIC_TEST_SKILL)) {
+        this.alertsService.addInfoMessage(
+          'The skill must be removed from the diagnostic test first.');
+        questionDeletionIsAllowed = false;
+      }
+    });
     return questionDeletionIsAllowed;
   }
 
   deleteQuestionFromSkill(
-      questionId: string, skillDescription: string) {
+      questionId: string, skillDescription: string): void {
     this.questionDeletionCheck().then((response) => {
       if (!response) {
         return;

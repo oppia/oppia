@@ -52,20 +52,19 @@ export class DeleteSkillModalComponent extends ConfirmOrCancelModal {
           allTopicIds.push(topic.topicId);
         }
         this.topicsAndSkillsDashboardBackendApiService
-        .fetchTopicIdToDiagnosticTestSkillIdsAsync(allTopicIds).then((dict) => {
-          for (let topicId in dict.topicIdToDiagnosticTestSkillIds) {
-            let diagnosticTestSkillIds = (
-              dict.topicIdToDiagnosticTestSkillIds[topicId])
-            if (diagnosticTestSkillIds.length === 1 &&
-                diagnosticTestSkillIds.indexOf(this.skillId) !== -1) {
-              this.allowSkillForDeletion = false;
-            }
-          }
-          console.log(this.allowSkillForDeletion);
-
-          this.topicsAssignments = response;
-          this.topicsAssignmentsAreFetched = true;
-        });
+          .fetchTopicIdToDiagnosticTestSkillIdsAsync(allTopicIds).then(
+            (dict) => {
+              for (let topicId in dict.topicIdToDiagnosticTestSkillIds) {
+                let diagnosticTestSkillIds = (
+                  dict.topicIdToDiagnosticTestSkillIds[topicId]);
+                if (diagnosticTestSkillIds.length === 1 &&
+                    diagnosticTestSkillIds.indexOf(this.skillId) !== -1) {
+                  this.allowSkillForDeletion = false;
+                }
+              }
+              this.topicsAssignments = response;
+              this.topicsAssignmentsAreFetched = true;
+            });
       });
   }
 
