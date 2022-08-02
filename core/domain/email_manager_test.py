@@ -6291,7 +6291,7 @@ class NotMergeableChangesEmailUnitTest(test_utils.EmailTestBase):
                 'testExploration because the changes were conflicting and '
                 'could not be saved. Please see the '
                 'rejected change list below:<br>'
-                'Discarded change list: {\'field1\': \'value1\'} <br><br>'
+                'Discarded change list: [{\'field1\': \'value1\'}] <br><br>'
                 'Frontend Version: 1<br>'
                 'Backend Version: 2<br><br>'
                 'Thanks!',
