@@ -706,6 +706,7 @@ def managed_webdriverio_server(
 
     webdriverio_args = [
         common.NPX_BIN_PATH,
+        '--trace-warnings'
         # This flag ensures tests fail if the `waitFor()` calls time out.
         '--unhandled-rejections=strict',
         common.NODEMODULES_WDIO_BIN_PATH, common.WEBDRIVERIO_CONFIG_FILE_PATH,
