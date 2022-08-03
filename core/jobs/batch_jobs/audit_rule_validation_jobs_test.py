@@ -1,0 +1,928 @@
+# coding: utf-8
+#
+# Copyright 2022 The Oppia Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the 'License');
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an 'AS-IS' BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""Unit tests for jobs.batch_jobs.exp_validation_jobs."""
+
+from __future__ import annotations
+
+import datetime
+
+from core import feconf
+from core.constants import constants
+from core.domain import state_domain
+from core.jobs import job_test_utils
+from core.jobs.batch_jobs import audit_rule_validation_jobs
+from core.jobs.types import job_run_result
+from core.platform import models
+
+(exp_models, opportunity_models) = models.Registry.import_models(
+    [models.NAMES.exploration, models.NAMES.opportunity])
+
+
+class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
+
+    JOB_CLASS = (
+        audit_rule_validation_jobs.ExpAuditRuleChecksJob
+    )
+
+    EXPLORATION_ID_1 = '1'
+    EXPLORATION_ID_2 = '2'
+    EXPLORATION_ID_3 = '3'
+    EXPLORATION_ID_4 = '4'
+    EXPLORATION_ID_5 = '5'
+
+    # DragAndDrop Interaction.
+    EXP_1_STATE_1 = state_domain.State.create_default_state(
+        'EXP_1_STATE_1', is_initial_state=False).to_dict()
+    EXP_1_STATE_1['interaction'] = {
+      'id': 'DragAndDropSortInput',
+      'customization_args': {
+      'choices': {
+        'value': [
+          {
+            'content_id': 'ca_choices_68',
+            'html': '<p>1</p>'
+          },
+          {
+            'content_id': 'ca_choices_69',
+            'html': '<p>2</p>'
+          },
+          {
+            'content_id': 'ca_choices_70',
+            'html': '<p>3</p>'
+          }
+        ]
+      },
+      'allowMultipleItemsInSamePosition': {
+        'value': False
+      }
+    },
+      'answer_groups': [
+      {
+        'rule_specs': [
+          {
+            'rule_type': 'HasElementXBeforeElementY',
+            'inputs': {
+              'x': 'ca_choices_68',
+              'y': 'ca_choices_68'
+            }
+          }
+        ],
+        'outcome': {
+          'dest': 'EXP_1_STATE_2',
+          'feedback': {
+            'content_id': 'feedback_72',
+            'html': '<p>dvds</p>'
+          },
+          'labelled_as_correct': False,
+          'param_changes': [],
+          'refresher_exploration_id': None,
+          'missing_prerequisite_skill_id': None,
+          'dest_if_really_stuck': None
+        },
+        'training_data': [],
+        'tagged_skill_misconception_id': None
+      }
+    ],
+      'default_outcome': {
+        'dest': 'EXP_1_STATE_2',
+        'feedback': {
+          'content_id': 'default_outcome',
+          'html': '<p>sd</p>'
+        },
+        'labelled_as_correct': False,
+        'param_changes': [],
+        'refresher_exploration_id': None,
+        'missing_prerequisite_skill_id': None,
+        'dest_if_really_stuck': None
+      },
+      'confirmed_unclassified_answers': [],
+      'hints': [],
+      'solution': None
+    }
+
+    EXP_1_STATE_2 = state_domain.State.create_default_state(
+        'EXP_1_STATE_2', is_initial_state=False).to_dict()
+    EXP_1_STATE_2['interaction'] = {
+      'id': 'DragAndDropSortInput',
+      'customization_args': {
+      'choices': {
+        'value': [
+          {
+            'content_id': 'ca_choices_68',
+            'html': '<p>1</p>'
+          },
+          {
+            'content_id': 'ca_choices_69',
+            'html': '<p>2</p>'
+          },
+          {
+            'content_id': 'ca_choices_70',
+            'html': '<p>3</p>'
+          }
+        ]
+      },
+      'allowMultipleItemsInSamePosition': {
+        'value': False
+      }
+    },
+      'answer_groups': [
+      {
+        'rule_specs': [
+          {
+              'rule_type': 'IsEqualToOrdering',
+              'inputs': {
+                'x': [
+                  [
+                    'ca_choices_17', 'ca_choices_18'
+                  ],
+                  [
+                    'ca_choices_19'
+                  ],
+                  [
+                    'ca_choices_20'
+                  ]
+                ]
+              }
+            }
+        ],
+        'outcome': {
+          'dest': 'EXP_1_STATE_3',
+          'feedback': {
+            'content_id': 'feedback_72',
+            'html': '<p>dvds</p>'
+          },
+          'labelled_as_correct': False,
+          'param_changes': [],
+          'refresher_exploration_id': None,
+          'missing_prerequisite_skill_id': None,
+          'dest_if_really_stuck': None
+        },
+        'training_data': [],
+        'tagged_skill_misconception_id': None
+      }
+    ],
+      'default_outcome': {
+        'dest': 'EXP_1_STATE_3',
+        'feedback': {
+          'content_id': 'default_outcome',
+          'html': '<p>sd</p>'
+        },
+        'labelled_as_correct': False,
+        'param_changes': [],
+        'refresher_exploration_id': None,
+        'missing_prerequisite_skill_id': None,
+        'dest_if_really_stuck': None
+      },
+      'confirmed_unclassified_answers': [],
+      'hints': [],
+      'solution': None
+    }
+
+    EXP_1_STATE_3 = state_domain.State.create_default_state(
+        'EXP_1_STATE_3', is_initial_state=False).to_dict()
+    EXP_1_STATE_3['interaction'] = {
+      'id': 'DragAndDropSortInput',
+      'customization_args': {
+      'choices': {
+        'value': [
+          {
+            'content_id': 'ca_choices_68',
+            'html': '<p>1</p>'
+          },
+          {
+            'content_id': 'ca_choices_69',
+            'html': '<p>2</p>'
+          },
+          {
+            'content_id': 'ca_choices_70',
+            'html': '<p>3</p>'
+          }
+        ]
+      },
+      'allowMultipleItemsInSamePosition': {
+        'value': False
+      }
+    },
+      'answer_groups': [
+      {
+        'rule_specs': [
+          {
+            'rule_type': 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
+            'inputs': {
+              'x': [
+                [
+                  'ca_choices_68'
+                ],
+                [
+                  'ca_choices_69'
+                ],
+                [
+                  'ca_choices_70'
+                ]
+              ]
+            }
+          }
+        ],
+        'outcome': {
+          'dest': 'EXP_1_STATE_4',
+          'feedback': {
+            'content_id': 'feedback_72',
+            'html': '<p>dvds</p>'
+          },
+          'labelled_as_correct': False,
+          'param_changes': [],
+          'refresher_exploration_id': None,
+          'missing_prerequisite_skill_id': None,
+          'dest_if_really_stuck': None
+        },
+        'training_data': [],
+        'tagged_skill_misconception_id': None
+      }
+    ],
+      'default_outcome': {
+        'dest': 'EXP_1_STATE_4',
+        'feedback': {
+          'content_id': 'default_outcome',
+          'html': '<p>sd</p>'
+        },
+        'labelled_as_correct': False,
+        'param_changes': [],
+        'refresher_exploration_id': None,
+        'missing_prerequisite_skill_id': None,
+        'dest_if_really_stuck': None
+      },
+      'confirmed_unclassified_answers': [],
+      'hints': [],
+      'solution': None
+    }
+
+    EXP_1_STATE_4 = state_domain.State.create_default_state(
+        'EXP_1_STATE_4', is_initial_state=False).to_dict()
+    EXP_1_STATE_4['interaction'] = {
+      'id': 'DragAndDropSortInput',
+      'customization_args': {
+      'choices': {
+        'value': [
+          {
+            'content_id': 'ca_choices_68',
+            'html': '<p>1</p>'
+          },
+          {
+            'content_id': 'ca_choices_69',
+            'html': '<p>2</p>'
+          },
+          {
+            'content_id': 'ca_choices_70',
+            'html': '<p>3</p>'
+          }
+        ]
+      },
+      'allowMultipleItemsInSamePosition': {
+        'value': False
+      }
+    },
+      'answer_groups': [
+      {
+        'rule_specs': [
+          {
+              'rule_type': 'IsEqualToOrdering',
+              'inputs': {
+                'x': []
+              }
+            }
+        ],
+        'outcome': {
+          'dest': 'EXP_1_STATE_5',
+          'feedback': {
+            'content_id': 'feedback_72',
+            'html': '<p>dvds</p>'
+          },
+          'labelled_as_correct': False,
+          'param_changes': [],
+          'refresher_exploration_id': None,
+          'missing_prerequisite_skill_id': None,
+          'dest_if_really_stuck': None
+        },
+        'training_data': [],
+        'tagged_skill_misconception_id': None
+      }
+    ],
+      'default_outcome': {
+        'dest': 'EXP_1_STATE_5',
+        'feedback': {
+          'content_id': 'default_outcome',
+          'html': '<p>sd</p>'
+        },
+        'labelled_as_correct': False,
+        'param_changes': [],
+        'refresher_exploration_id': None,
+        'missing_prerequisite_skill_id': None,
+        'dest_if_really_stuck': None
+      },
+      'confirmed_unclassified_answers': [],
+      'hints': [],
+      'solution': None
+    }
+
+    # Continue Interaction.
+    EXP_2_STATE_1 = state_domain.State.create_default_state(
+        'EXP_2_STATE_1', is_initial_state=False).to_dict()
+    EXP_2_STATE_1['interaction'] = {
+      'id': 'Continue',
+      'customization_args': {
+        'buttonText': {
+          'value': {
+            'content_id': 'ca_buttonText_0',
+            'unicode_str': 'Continueeeeeeeeeeeeeeeeeeeeeeeeee'
+          }
+        }
+      },
+      'answer_groups': [
+        {
+          'rule_specs': [
+            {
+              'rule_type': 'Equals',
+              'inputs': {
+                'x': 0
+              }
+            }
+          ],
+          'outcome': {
+            'dest': 'EXP_2_STATE_2',
+            'feedback': {
+              'content_id': 'feedback_4',
+              'html': '<p>good</p>'
+            },
+            'labelled_as_correct': False,
+            'param_changes': [],
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None,
+            'dest_if_really_stuck': None
+          },
+          'training_data': [],
+          'tagged_skill_misconception_id': None
+        }
+      ],
+      'default_outcome': {
+        'dest': 'EXP_2_STATE_1',
+        'feedback': {
+          'content_id': 'default_outcome',
+          'html': '<p>try</p>'
+        },
+        'labelled_as_correct': False,
+        'param_changes': [],
+        'refresher_exploration_id': None,
+        'missing_prerequisite_skill_id': None,
+        'dest_if_really_stuck': None
+      },
+      'confirmed_unclassified_answers': [],
+      'hints': [],
+      'solution': None
+    }
+
+    # Itemselection interaction.
+    EXP_3_STATE_1 = state_domain.State.create_default_state(
+        'EXP_3_STATE_1', is_initial_state=False).to_dict()
+    EXP_3_STATE_1['interaction'] = {
+      'id': 'ItemSelectionInput',
+      'customization_args': {
+        'minAllowableSelectionCount': {
+          'value': 6
+        },
+        'maxAllowableSelectionCount': {
+          'value': 5
+        },
+        'choices': {
+          'value': [
+            {
+              'content_id': 'ca_choices_59',
+              'html': '<p>1</p>'
+            },
+            {
+              'content_id': 'ca_choices_60',
+              'html': '<p>2</p>'
+            },
+            {
+              'content_id': 'ca_choices_61',
+              'html': '<p>3</p>'
+            },
+            {
+              'content_id': 'ca_choices_62',
+              'html': '<p>4</p>'
+            }
+          ]
+        }
+      },
+      'answer_groups': [
+        {
+          'rule_specs': [
+            {
+              'rule_type': 'Equals',
+              'inputs': {
+                'x': [
+                  'ca_choices_59'
+                ]
+              }
+            }
+          ],
+          'outcome': {
+            'dest': 'EXP_3_STATE_1',
+            'feedback': {
+              'content_id': 'feedback_63',
+              'html': '<p>df</p>'
+            },
+            'labelled_as_correct': False,
+            'param_changes': [],
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None,
+            'dest_if_really_stuck': None
+          },
+          'training_data': [],
+          'tagged_skill_misconception_id': None
+        }
+      ],
+      'default_outcome': {
+        'dest': 'EXP_3_STATE_1',
+        'feedback': {
+          'content_id': 'default_outcome',
+          'html': '<p>sd</p>'
+        },
+        'labelled_as_correct': False,
+        'param_changes': [],
+        'refresher_exploration_id': None,
+        'missing_prerequisite_skill_id': None,
+        'dest_if_really_stuck': None
+      },
+      'confirmed_unclassified_answers': [],
+      'hints': [],
+      'solution': None
+    }
+
+    # NumericInput interaction.
+    EXP_4_STATE_1 = state_domain.State.create_default_state(
+        'EXP_4_STATE_1', is_initial_state=True).to_dict()
+    EXP_4_STATE_1['interaction'] = {
+      'id': 'NumericInput',
+      'customization_args': {
+        'requireNonnegativeInput': {
+          'value': False
+        }
+      },
+      'answer_groups': [
+        {
+          'rule_specs': [
+            {
+              'rule_type': 'IsLessThanOrEqualTo',
+              'inputs': {
+                'x': 'Not a number'
+              }
+            }
+          ],
+          'outcome': {
+            'dest': 'EXP_4_STATE_2',
+            'feedback': {
+              'content_id': 'feedback_4',
+              'html': '<p>good</p>'
+            },
+            'labelled_as_correct': False,
+            'param_changes': [],
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None,
+            'dest_if_really_stuck': None
+          },
+          'training_data': [],
+          'tagged_skill_misconception_id': None
+        }
+      ],
+      'default_outcome': {
+        'dest': 'EXP_4_STATE_2',
+        'feedback': {
+          'content_id': 'default_outcome',
+          'html': '<p>try</p>'
+        },
+        'labelled_as_correct': False,
+        'param_changes': [],
+        'refresher_exploration_id': None,
+        'missing_prerequisite_skill_id': None,
+        'dest_if_really_stuck': None
+      },
+      'confirmed_unclassified_answers': [],
+      'hints': [
+        {
+          'hint_content': {
+            'content_id': 'hint_1',
+            'html': '<p>c</p>'
+          }
+        }
+      ],
+      'solution': None
+    }
+
+    EXP_4_STATE_2 = state_domain.State.create_default_state(
+        'EXP_4_STATE_2', is_initial_state=True).to_dict()
+    EXP_4_STATE_2['interaction'] = {
+      'id': 'NumericInput',
+      'customization_args': {
+        'requireNonnegativeInput': {
+          'value': False
+        }
+      },
+      'answer_groups': [
+        {
+          'rule_specs': [
+            {
+              'rule_type': 'IsGreaterThanOrEqualTo',
+              'inputs': {
+                'x': 'Not a number'
+              }
+            }
+          ],
+          'outcome': {
+            'dest': 'EXP_4_STATE_3',
+            'feedback': {
+              'content_id': 'feedback_4',
+              'html': '<p>good</p>'
+            },
+            'labelled_as_correct': False,
+            'param_changes': [],
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None,
+            'dest_if_really_stuck': None
+          },
+          'training_data': [],
+          'tagged_skill_misconception_id': None
+        }
+      ],
+      'default_outcome': {
+        'dest': 'EXP_4_STATE_3',
+        'feedback': {
+          'content_id': 'default_outcome',
+          'html': '<p>try</p>'
+        },
+        'labelled_as_correct': False,
+        'param_changes': [],
+        'refresher_exploration_id': None,
+        'missing_prerequisite_skill_id': None,
+        'dest_if_really_stuck': None
+      },
+      'confirmed_unclassified_answers': [],
+      'hints': [
+        {
+          'hint_content': {
+            'content_id': 'hint_1',
+            'html': '<p>c</p>'
+          }
+        }
+      ],
+      'solution': None
+    }
+
+    EXP_4_STATE_3 = state_domain.State.create_default_state(
+        'EXP_4_STATE_3', is_initial_state=True).to_dict()
+    EXP_4_STATE_3['interaction'] = {
+      'id': 'NumericInput',
+      'customization_args': {
+        'requireNonnegativeInput': {
+          'value': False
+        }
+      },
+      'answer_groups': [
+        {
+          'rule_specs': [
+            {
+              'rule_type': 'IsGreaterThan',
+              'inputs': {
+                'x': 'Not a number'
+              }
+            }
+          ],
+          'outcome': {
+            'dest': 'EXP_4_STATE_4',
+            'feedback': {
+              'content_id': 'feedback_4',
+              'html': '<p>good</p>'
+            },
+            'labelled_as_correct': False,
+            'param_changes': [],
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None,
+            'dest_if_really_stuck': None
+          },
+          'training_data': [],
+          'tagged_skill_misconception_id': None
+        }
+      ],
+      'default_outcome': {
+        'dest': 'EXP_4_STATE_4',
+        'feedback': {
+          'content_id': 'default_outcome',
+          'html': '<p>try</p>'
+        },
+        'labelled_as_correct': False,
+        'param_changes': [],
+        'refresher_exploration_id': None,
+        'missing_prerequisite_skill_id': None,
+        'dest_if_really_stuck': None
+      },
+      'confirmed_unclassified_answers': [],
+      'hints': [
+        {
+          'hint_content': {
+            'content_id': 'hint_1',
+            'html': '<p>c</p>'
+          }
+        }
+      ],
+      'solution': None
+    }
+
+    EXP_4_STATE_4 = state_domain.State.create_default_state(
+        'EXP_4_STATE_4', is_initial_state=True).to_dict()
+    EXP_4_STATE_4['interaction'] = {
+      'id': 'NumericInput',
+      'customization_args': {
+        'requireNonnegativeInput': {
+          'value': False
+        }
+      },
+      'answer_groups': [
+        {
+          'rule_specs': [
+            {
+              'rule_type': 'IsLessThan',
+              'inputs': {
+                'x': 'Not a number'
+              }
+            }
+          ],
+          'outcome': {
+            'dest': 'EXP_4_STATE_5',
+            'feedback': {
+              'content_id': 'feedback_4',
+              'html': '<p>good</p>'
+            },
+            'labelled_as_correct': False,
+            'param_changes': [],
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None,
+            'dest_if_really_stuck': None
+          },
+          'training_data': [],
+          'tagged_skill_misconception_id': None
+        }
+      ],
+      'default_outcome': {
+        'dest': 'EXP_4_STATE_5',
+        'feedback': {
+          'content_id': 'default_outcome',
+          'html': '<p>try</p>'
+        },
+        'labelled_as_correct': False,
+        'param_changes': [],
+        'refresher_exploration_id': None,
+        'missing_prerequisite_skill_id': None,
+        'dest_if_really_stuck': None
+      },
+      'confirmed_unclassified_answers': [],
+      'hints': [
+        {
+          'hint_content': {
+            'content_id': 'hint_1',
+            'html': '<p>c</p>'
+          }
+        }
+      ],
+      'solution': None
+    }
+
+    EXP_4_STATE_5 = state_domain.State.create_default_state(
+        'EXP_4_STATE_5', is_initial_state=True).to_dict()
+    EXP_4_STATE_5['interaction'] = {
+      'id': 'NumericInput',
+      'customization_args': {
+        'requireNonnegativeInput': {
+          'value': False
+        }
+      },
+      'answer_groups': [
+        {
+          'rule_specs': [
+            {
+              'rule_type': 'Equals',
+              'inputs': {
+                'x': 'Not a number'
+              }
+            }
+          ],
+          'outcome': {
+            'dest': 'EXP_4_STATE_5',
+            'feedback': {
+              'content_id': 'feedback_4',
+              'html': '<p>good</p>'
+            },
+            'labelled_as_correct': False,
+            'param_changes': [],
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None,
+            'dest_if_really_stuck': None
+          },
+          'training_data': [],
+          'tagged_skill_misconception_id': None
+        }
+      ],
+      'default_outcome': {
+        'dest': 'EXP_4_STATE_5',
+        'feedback': {
+          'content_id': 'default_outcome',
+          'html': '<p>try</p>'
+        },
+        'labelled_as_correct': False,
+        'param_changes': [],
+        'refresher_exploration_id': None,
+        'missing_prerequisite_skill_id': None,
+        'dest_if_really_stuck': None
+      },
+      'confirmed_unclassified_answers': [],
+      'hints': [
+        {
+          'hint_content': {
+            'content_id': 'hint_1',
+            'html': '<p>c</p>'
+          }
+        }
+      ],
+      'solution': None
+    }
+
+    # Image tag.
+    EXP_5_STATE_1 = state_domain.State.create_default_state(
+        'EXP_5_STATE_1', is_initial_state=False).to_dict()
+    EXP_5_STATE_1['content']['html'] = (
+      '<p>dffddfdffdfd</p>\n\n<p>&nbsp;</p>\n<oppia-noninteractive-image>'
+      '</oppia-noninteractive-image>\n\n<p>&nbsp;</p>\n\n<p>&nbsp;</p>\n\n<p>'
+      '<oppia-noninteractive-link></oppia-noninteractive-link>'
+      '<oppia-noninteractive-math math_content-with-value=\"{&amp;quot;'
+      'svg_filename&amp;quot;:&amp;quot;mathImg_20220719_221502_sr5wjlbtbn_'
+      'height_3d205_width_1d784_vertical_1d306.svg&amp;quot;}\"></oppia-'
+      'noninteractive-math><oppia-noninteractive-skillreview></oppia-'
+      'noninteractive-skillreview></p><oppia-noninteractive-video>'
+      '</oppia-noninteractive-video>'
+      '<oppia-noninteractive-math math_content-with-value=\"{&amp;quot;'
+      'raw_latex&amp;quot;:&amp;quot;abcde&amp;quot;}\"></oppia-'
+      'noninteractive-math>'
+      '<oppia-noninteractive-math></oppia-noninteractive-math>'
+    )
+
+    TODAY_DATE = datetime.datetime.utcnow()
+    YEAR_AGO_DATE = (TODAY_DATE - datetime.timedelta(weeks=52)).date()
+
+    def setUp(self):
+        super().setUp()
+
+        self.exp_1 = self.create_model(
+            exp_models.ExplorationModel,
+            id=self.EXPLORATION_ID_1,
+            title='title1',
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            category=feconf.DEFAULT_EXPLORATION_CATEGORY,
+            objective=feconf.DEFAULT_EXPLORATION_OBJECTIVE,
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            tags=['Topic'],
+            blurb='blurb',
+            author_notes='author notes',
+            states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
+            param_specs={},
+            param_changes=[],
+            auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
+            correctness_feedback_enabled=False,
+            states={
+              'EXP_1_STATE_1': self.EXP_1_STATE_1,
+              'EXP_1_STATE_2': self.EXP_1_STATE_2,
+              'EXP_1_STATE_3': self.EXP_1_STATE_3,
+              'EXP_1_STATE_4': self.EXP_1_STATE_4
+            }
+        )
+
+        self.exp_2 = self.create_model(
+            exp_models.ExplorationModel,
+            id=self.EXPLORATION_ID_2,
+            title='title2',
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            category=feconf.DEFAULT_EXPLORATION_CATEGORY,
+            objective=feconf.DEFAULT_EXPLORATION_OBJECTIVE,
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            tags=['Topic'],
+            blurb='blurb',
+            author_notes='author notes',
+            states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
+            param_specs={},
+            param_changes=[],
+            auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
+            correctness_feedback_enabled=False,
+            states={
+              'EXP_2_STATE_1': self.EXP_2_STATE_1,
+            }
+        )
+
+        self.exp_3 = self.create_model(
+            exp_models.ExplorationModel,
+            id=self.EXPLORATION_ID_3,
+            title='title3',
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            category=feconf.DEFAULT_EXPLORATION_CATEGORY,
+            objective=feconf.DEFAULT_EXPLORATION_OBJECTIVE,
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            tags=['Topic'],
+            blurb='blurb',
+            author_notes='author notes',
+            states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
+            param_specs={},
+            param_changes=[],
+            auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
+            correctness_feedback_enabled=False,
+            states={
+              'EXP_3_STATE_1': self.EXP_3_STATE_1,
+            }
+        )
+
+        self.exp_4 = self.create_model(
+            exp_models.ExplorationModel,
+            id=self.EXPLORATION_ID_4,
+            title='title4',
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            category=feconf.DEFAULT_EXPLORATION_CATEGORY,
+            objective=feconf.DEFAULT_EXPLORATION_OBJECTIVE,
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            tags=['Topic'],
+            blurb='blurb',
+            author_notes='author notes',
+            states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
+            param_specs={},
+            param_changes=[],
+            auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
+            correctness_feedback_enabled=False,
+            states={
+              'EXP_4_STATE_1': self.EXP_4_STATE_1,
+              'EXP_4_STATE_2': self.EXP_4_STATE_2,
+              'EXP_4_STATE_3': self.EXP_4_STATE_3,
+              'EXP_4_STATE_4': self.EXP_4_STATE_4,
+              'EXP_4_STATE_5': self.EXP_4_STATE_5
+            }
+        )
+
+        self.exp_5 = self.create_model(
+            exp_models.ExplorationModel,
+            id=self.EXPLORATION_ID_5,
+            title='title5',
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            category=feconf.DEFAULT_EXPLORATION_CATEGORY,
+            objective=feconf.DEFAULT_EXPLORATION_OBJECTIVE,
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            tags=['Topic'],
+            blurb='blurb',
+            author_notes='author notes',
+            states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
+            param_specs={},
+            param_changes=[],
+            auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
+            correctness_feedback_enabled=False,
+            states={
+              'EXP_5_STATE_1': self.EXP_5_STATE_1
+            }
+        )
+
+        self.opportunity_model = self.create_model(
+            opportunity_models.ExplorationOpportunitySummaryModel,
+            id=self.EXPLORATION_ID_5,
+            topic_id='topic_id',
+            topic_name='a_topic name',
+            story_id='story_id',
+            story_title='A story title',
+            chapter_title='A chapter title',
+            content_count=20,
+            incomplete_translation_language_codes=['hi', 'ar'],
+            translation_counts={},
+            language_codes_needing_voice_artists=['en'],
+            language_codes_with_assigned_voice_artists=[]
+        )
+
+    def test_run_with_no_models(self) -> None:
+        self.assert_job_output_is([])
+
+    def test_various_interactions(self) -> None:
+        self.put_multi([self.exp_1])
+        self.assert_job_output_is([])
