@@ -148,6 +148,9 @@ var elementStoppedMoving = async function(
 ) {
   await browser.waitUntil(async function() {
     var firstValue = await element.getLocation('x');
+    // We need to pause the browser before getting the next
+    // location of element to make sure the elements provide equal
+    // location points only when they stopped moving.
     // eslint-disable-next-line oppia/e2e-practices
     await browser.pause(1000);
     var secondValue = await element.getLocation('x');
