@@ -197,10 +197,6 @@ export class ContributorDashboardPageComponent
           .getTrustedSvgResourceUrl(dataUrl);
       });
 
-    this.topicName = (
-      ContributorDashboardConstants.DEFAULT_OPPORTUNITY_TOPIC_NAME);
-    this.translationTopicService.setActiveTopicName(this.topicName);
-
     this.contributionOpportunitiesService.getTranslatableTopicNamesAsync()
       .then((topicNames) => {
         if (topicNames.indexOf(prevSelectedTopicName) !== -1) {
