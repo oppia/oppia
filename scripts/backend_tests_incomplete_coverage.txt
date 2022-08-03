@@ -34,11 +34,6 @@ core.domain.blog_services_test
 core.domain.calculation_registry_test
 core.domain.classifier_services_test
 core.domain.collection_domain_test
-scripts.install_python_prod_dependencies_test
-core.domain.subtopic_page_domain_test
-core.storage.skill.gae_models_test
-core.storage.topic.gae_models_test
-core.domain.app_feedback_report_domain_test
 core.domain.change_domain_test
 core.domain.collection_services_test
 core.domain.config_domain_test
@@ -133,7 +128,9 @@ scripts.common_test
 scripts.concurrent_task_utils_test
 scripts.create_topological_sort_of_all_services_test
 scripts.docstrings_checker_test
+scripts.flake_checker.py
 scripts.install_backend_python_libs_test
+scripts.install_python_prod_dependencies_test
 scripts.install_third_party_libs_test
 scripts.install_third_party_test
 scripts.linters.general_purpose_linter_test
