@@ -1097,7 +1097,8 @@ export class ImageEditorComponent implements OnInit, OnChanges {
   saveImage(
       dimensions: Dimensions,
       resampledFile: Blob,
-      imageType: string): void {
+      imageType: string
+  ): void {
     if (
       this.contextService.getImageSaveDestination() ===
       AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
@@ -1111,7 +1112,8 @@ export class ImageEditorComponent implements OnInit, OnChanges {
   postImageToServer(
       dimensions: Dimensions,
       resampledFile: Blob,
-      imageType: string = 'png'): void {
+      imageType: string = 'png'
+  ): void {
     let form = new FormData();
     form.append('image', resampledFile);
     form.append('payload', JSON.stringify({
@@ -1144,9 +1146,9 @@ export class ImageEditorComponent implements OnInit, OnChanges {
       img.src = this.getTrustedResourceUrlForImageFileName(
         data.filename) as string;
     },
-    (data) => {
+    (error) => {
       this.alertsService.addWarning(
-        data.error || 'Error communicating with server.');
+        error || 'Error communicating with server.');
     });
   }
 

@@ -83,8 +83,7 @@ export class ExplorationCreationService {
   showUploadExplorationModal(): void {
     this.alertsService.clearWarnings();
     this.ngbModal.open(
-      UploadActivityModalComponent,
-      {backdrop: 'static'}
+      UploadActivityModalComponent, {backdrop: 'static'}
     ).result.then((result) => {
       const yamlFile = result.yamlFile;
 
@@ -97,18 +96,17 @@ export class ExplorationCreationService {
         'contributehandler/upload', form
       ).toPromise().then(
         (data) => {
-          this.windowRef.nativeWindow.location.href =
-          this.urlInterpolationService.interpolateUrl(
-            this.CREATE_NEW_EXPLORATION_URL_TEMPLATE, {
-              exploration_id: data.exploration_id
-            }
+          this.windowRef.nativeWindow.location.href = (
+            this.urlInterpolationService.interpolateUrl(
+              this.CREATE_NEW_EXPLORATION_URL_TEMPLATE, {
+                exploration_id: data.exploration_id
+              }
+            )
           );
         },
-        (data) => {
-          var transformedData = data.responseText.substring(5);
-          var parsedResponse = JSON.parse(transformedData);
+        (response) => {
           this.alertsService.addWarning(
-            parsedResponse.error || 'Error communicating with server.');
+            response.error || 'Error communicating with server.');
           this.loaderService.hideLoadingScreen();
         });
     });

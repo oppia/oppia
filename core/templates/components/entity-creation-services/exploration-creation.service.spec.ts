@@ -16,13 +16,12 @@
  * @fileoverview Unit test for Exploration creation service.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import {HttpClientTestingModule, HttpTestingController} from '@angular/common/http/testing';
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { AlertsService } from 'services/alerts.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { CsrfTokenService } from 'services/csrf-token.service';
 import { LoaderService } from 'services/loader.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { ExplorationCreationBackendApiService, ExplorationCreationResponse } from './exploration-creation-backend-api.service';
@@ -47,16 +46,16 @@ class MockWindowRef {
   }
 }
 
-describe('ExplorationCreationService', () => {
+fdescribe('ExplorationCreationService', () => {
   let ecs: ExplorationCreationService;
   let ecbas: ExplorationCreationBackendApiService;
   let loaderService: LoaderService;
   let siteAnalyticsService: SiteAnalyticsService;
   let urlInterpolationService: UrlInterpolationService;
-  let csrfTokenService: CsrfTokenService;
   let alertsService: AlertsService;
   let windowRef: MockWindowRef;
   let ngbModal: NgbModal;
+  let httpTestingController: HttpTestingController;
 
   beforeEach(() => {
     windowRef = new MockWindowRef();
@@ -70,12 +69,12 @@ describe('ExplorationCreationService', () => {
       ]
     });
 
+    httpTestingController = TestBed.inject(HttpTestingController);
     ecs = TestBed.inject(ExplorationCreationService);
     ecbas = TestBed.inject(ExplorationCreationBackendApiService);
     loaderService = TestBed.inject(LoaderService);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
-    csrfTokenService = TestBed.inject(CsrfTokenService);
     alertsService = TestBed.inject(AlertsService);
     ngbModal = TestBed.inject(NgbModal);
   });
@@ -86,7 +85,7 @@ describe('ExplorationCreationService', () => {
       spyOn(ecbas, 'registerNewExplorationAsync');
       ecs.explorationCreationInProgress = true;
 
-      expect(ecs.createNewExploration()).toBeUndefined();
+      ecs.createNewExploration();
       expect(ecbas.registerNewExplorationAsync).not.toHaveBeenCalled();
     });
 
@@ -161,22 +160,17 @@ describe('ExplorationCreationService', () => {
           })
         } as NgbModalRef
       );
-      spyOn(csrfTokenService, 'getTokenAsync')
-        .and.resolveTo('sample-csrf-token');
-
-      // @ts-ignore in order to ignore JQuery properties that should
-      // be declared.
-      spyOn($, 'ajax').and.callFake((options: Promise) => {
-        let d = $.Deferred();
-        d.resolve(
-          options.dataFilter(')]}\',\n{"exploration_id": "expId"}')
-        );
-        return d.promise();
-      });
 
       ecs.showUploadExplorationModal();
-      tick();
+      tick(100);
 
+      let req = httpTestingController.expectOne('contributehandler/upload');
+      expect(req.request.method).toEqual('POST');
+      req.flush({exploration_id: 'expId'});
+
+      tick(100);
+
+      httpTestingController.verify();
       expect(windowRef.nativeWindow.location.href).toBe('/create/expId');
     }));
 
@@ -189,23 +183,18 @@ describe('ExplorationCreationService', () => {
           })
         } as NgbModalRef
       );
-      spyOn(csrfTokenService, 'getTokenAsync')
-        .and.resolveTo('sample-csrf-token');
       spyOn(alertsService, 'addWarning');
       spyOn(loaderService, 'hideLoadingScreen');
 
-      // @ts-ignore in order to ignore JQuery properties that should
-      // be declared.
-      spyOn($, 'ajax').and.callFake(() => {
-        let d = $.Deferred();
-        d.reject({
-          responseText: ')]}\',\n{"error": "Failed to upload exploration"}'
-        });
-        return d.promise();
-      });
-
       ecs.showUploadExplorationModal();
-      tick();
+      tick(100);
+
+      let req = httpTestingController.expectOne('contributehandler/upload');
+      expect(req.request.method).toEqual('POST');
+      req.error(new ErrorEvent('Failed to upload exploration'));
+      httpTestingController.verify();
+
+      tick(100);
 
       expect(alertsService.addWarning).toHaveBeenCalledWith(
         'Failed to upload exploration');
