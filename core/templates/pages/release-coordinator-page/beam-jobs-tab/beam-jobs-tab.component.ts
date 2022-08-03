@@ -51,7 +51,7 @@ export class BeamJobsTabComponent implements OnInit, OnDestroy {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   beamJobs!: BeamJob[];
   // Selected job is null if no job is selected.
-  selectedJob?: BeamJob | null;
+  selectedJob!: BeamJob | null;
   filteredJobNames!: Observable<string[]>;
   filteredBeamJobRuns!: Observable<BeamJobRun[]>;
   beamJobRunsRefreshIntervalSubscription!: Subscription;
@@ -142,7 +142,12 @@ export class BeamJobsTabComponent implements OnInit, OnDestroy {
   }
 
   onJobNameSelect(jobName: string): void {
-    this.selectedJob = this.beamJobs.find(job => job.name === jobName);
+    let selectedJob = this.beamJobs.find(job => job.name === jobName);
+    if (selectedJob === undefined) {
+      this.selectedJob = null;
+    } else {
+      this.selectedJob = selectedJob;
+    }
   }
 
   onStartNewClick(ev: Event): void {

@@ -25,7 +25,7 @@ import { Subscription } from 'rxjs';
 
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
-import { TopicLandingPageConstants, TopicLandingPageDataKey, TopicLandingPageMathDataKey } from
+import { TopicLandingPageConstants } from
   'pages/landing-pages/topic-landing-page/topic-landing-page.constants';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -33,6 +33,12 @@ import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { PageTitleService } from 'services/page-title.service';
 
 import constants from 'assets/constants';
+
+type TopicLandingPageDataKey = (
+  keyof typeof TopicLandingPageConstants.TOPIC_LANDING_PAGE_DATA);
+
+type TopicLandingPageMathDataKey = (
+    keyof typeof TopicLandingPageConstants.TOPIC_LANDING_PAGE_DATA.math);
 
 interface LessonsQuality {
   title: string;
