@@ -50,7 +50,7 @@ export class StateContentEditorComponent implements OnInit {
   @Input() stateContentSaveButtonPlaceholder: string;
   cardHeightLimitWarningIsShown: boolean;
   contentId: string;
-  contentEditorIsOpen: boolean;
+  contentEditorIsOpen: boolean = false;
   directiveSubscriptions = new Subscription();
   isEditable: boolean;
   HTML_SCHEMA: HTMLSchema;
@@ -80,7 +80,6 @@ export class StateContentEditorComponent implements OnInit {
       this.contentId = this.stateContentService.displayed.contentId;
     }
 
-    this.contentEditorIsOpen = false;
     this.cardHeightLimitWarningIsShown = true;
     this.directiveSubscriptions.add(
       this.externalSaveService.onExternalSave.subscribe(

@@ -76,7 +76,7 @@ export class StateEditorComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
   oppiaBlackImgUrl: string;
   currentStateIsTerminal: boolean;
-  conceptCardIsShown: boolean;
+  conceptCardIsShown: boolean = true;
   windowIsNarrow: boolean;
   interactionIdIsSet: boolean;
   servicesInitialized: boolean;
@@ -183,7 +183,6 @@ export class StateEditorComponent implements OnInit, OnDestroy {
     this.oppiaBlackImgUrl = this.urlInterpolationService.getStaticImageUrl(
       '/avatar/oppia_avatar_100px.svg');
     this.currentStateIsTerminal = false;
-    this.conceptCardIsShown = true;
     this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
     this.interactionIdIsSet = false;
     this.servicesInitialized = false;
