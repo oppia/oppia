@@ -20,7 +20,7 @@ if 'google' in sys.modules:
 import firebase_admin
 from firebase_admin import auth as firebase_auth
 
-base_url = 'http://localhost:8181'
+APP_BASE_URL = feconf.OPPIA_SITE_URL
 
 FIREBASE_AUTH_EMULATOR_HOST = 'localhost:%s' % feconf.FIREBASE_EMULATOR_PORT
 os.environ['FIREBASE_AUTH_EMULATOR_HOST'] = FIREBASE_AUTH_EMULATOR_HOST
@@ -37,7 +37,7 @@ CONTRIBUTOR_EMAIL = 'contributor@example.com'
 CONTRIBUTOR_USERNAME = 'b'
 
 def populate_data_for_contributor_dashboard_debug():
-
+    """Populate sample data to help develop for the contributor dashboard."""
     firebase_admin.initialize_app(
         options={'projectId': feconf.OPPIA_PROJECT_ID})
     
@@ -49,17 +49,29 @@ def populate_data_for_contributor_dashboard_debug():
     _generate_dummy_new_structures_data()
     _add_topics_to_classroom()
 
+def _make_request(method, url, params=None, headers=None, cookies=None):
+    """Makes a request to the Oppia server"""
+    if params is None:
+        params = {}
+    if headers is None:
+        headers = {}
+    if cookies is None:
+        cookies = {}
+
+    response = requests.request(
+        method, APP_BASE_URL + url, 
+        headers=headers, params=params, cookies=cookies)
+
+    return response
+
 def _create_new_user(email, username):
-    """Reloads the collection in dev_mode corresponding to the given
-    collection id.
-
+    """Creates a new user based on email and username. The password is generated
+    automatically from email.
+    
     Args:
-        collection_id: str. The collection id.
-
-    Raises:
-        Exception. Cannot reload a collection in production.
+        email: str. The email of the user.
+        username: str. The username of the user.
     """
-
     password = hashlib.md5(email.encode('utf-8')).hexdigest()
 
     # create new user in firebase
@@ -68,7 +80,7 @@ def _create_new_user(email, username):
     cookies = _get_session_cookies(email)
 
     # sign up new user in web app
-    requests.get(base_url + '/signup?return_url=/', cookies=cookies)
+    _make_request('GET', '/signup?return_url=/', cookies=cookies)
 
     csrf_token = _get_csrf_token(cookies)
 
@@ -77,10 +89,12 @@ def _create_new_user(email, username):
         'agreed_to_terms': True,
         'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
     }), 'csrf_token': csrf_token}
-    requests.post(
-        base_url + feconf.SIGNUP_DATA_URL, params=params, cookies=cookies)
+
+    _make_request(
+        'POST', feconf.SIGNUP_DATA_URL, params=params, cookies=cookies)
 
 def _get_session_cookies(email):
+    """Gets the session cookies for the user with the given email."""
     password = hashlib.md5(email.encode('utf-8')).hexdigest()
 
     token_id = requests.post(FIREBASE_SIGN_IN_URL,
@@ -91,23 +105,24 @@ def _get_session_cookies(email):
                     }).json()["idToken"]
     headers = {'Authorization': 'Bearer %s' % token_id}
 
-    response = requests.get(base_url + '/session_begin', headers=headers)
+    response = _make_request('GET', '/session_begin', headers=headers)
     
     return response.cookies
 
 def _get_csrf_token(cookies):
-    response = requests.get(base_url + '/csrfhandler', cookies=cookies)
+    """Gets the CSRF token from the cookies."""
+    response = _make_request('GET', '/csrfhandler', cookies=cookies)
     csrf_token = json.loads(response.text[len(feconf.XSSI_PREFIX):])['token']
 
     return csrf_token
 
 def _assign_admin_roles(roles, username):
-
+    """Assigns the given roles to the user with the given username."""
     cookies = _get_session_cookies(SUPER_ADMIN_EMAIL)
     csrf_token = _get_csrf_token(cookies)
 
     for role in roles:
-        requests.put(base_url + feconf.ADMIN_ROLE_HANDLER_URL, params={
+        _make_request('PUT', feconf.ADMIN_ROLE_HANDLER_URL, params={
             'payload': json.dumps({
                 'role': role,
                 'username': username
@@ -116,22 +131,22 @@ def _assign_admin_roles(roles, username):
         }, cookies=cookies)
 
 def _add_submit_question_rights(username):
-
+    """Adds the submit question rights to the user with the given username."""
     cookies = _get_session_cookies(SUPER_ADMIN_EMAIL)
     csrf_token = _get_csrf_token(cookies)
 
-    requests.post(base_url + '/contributionrightshandler/submit_question',
+    _make_request('POST', '/contributionrightshandler/submit_question',
         params={
             'payload': json.dumps({'username': username}),
             'csrf_token': csrf_token
         }, cookies=cookies)
 
 def _generate_dummy_new_structures_data():
-
+    """Generates dummy new structures data."""
     cookies = _get_session_cookies(SUPER_ADMIN_EMAIL)
     csrf_token = _get_csrf_token(cookies)
 
-    requests.post(base_url + '/adminhandler',
+    _make_request('POST', '/adminhandler',
         params={
             'payload': json.dumps({
                 'action': 'generate_dummy_new_structures_data'}),
@@ -139,18 +154,18 @@ def _generate_dummy_new_structures_data():
         }, cookies=cookies)
 
 def _add_topics_to_classroom():
-
+    """Adds all dummy topics to classroom."""
     cookies = _get_session_cookies(SUPER_ADMIN_EMAIL)
     csrf_token = _get_csrf_token(cookies)
 
-    response = requests.get(base_url + '/topics_and_skills_dashboard/data',
+    response = _make_request('GET', '/topics_and_skills_dashboard/data',
         cookies=cookies)
     topic_summary_dicts = json.loads(
         response.text[len(feconf.XSSI_PREFIX):])['topic_summary_dicts']
     topic_ids = [topic_summary_dict['id']
                     for topic_summary_dict in topic_summary_dicts]
 
-    requests.post(base_url + '/adminhandler',
+    _make_request('POST', '/adminhandler',
         params={
             'payload': json.dumps({
                 'action': 'save_config_properties',
