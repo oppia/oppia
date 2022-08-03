@@ -41,6 +41,18 @@ import { RemoveItemModalComponent } from
   '../templates/remove-item-modal.component';
 import { AddedSyllabusItemsSuccessfullyModalComponent } from
   '../templates/added-syllabus-items-successfully-modal.component';
+import { LearnerGroupPreferencesComponent } from
+  './learner-group-preferences.component';
+import { LearnerGroupDetailsComponent } from
+  '../create-group/learner-group-details.component';
+import { InviteStudentsModalComponent } from
+  '../templates/invite-students-modal.component';
+import { InviteStudentsComponent }
+  from '../create-group/invite-students.component';
+import { LearnerGroupStudentsProgressComponent }
+  from './learner-group-students-progress.component';
+import { LearnerGroupStudentSpecificProgressComponent }
+  from './learner-group-student-specific-progress.component';
 
 @NgModule({
   imports: [
@@ -60,6 +72,7 @@ import { AddedSyllabusItemsSuccessfullyModalComponent } from
     LearnerGroupSyllabusComponent,
     LearnerGroupStudentsProgressComponent,
     LearnerGroupPreferencesComponent,
+    LearnerGroupStudentSpecificProgressComponent,
     AddSyllabusItemsComponent,
     InviteStudentsComponent,
     LearnerGroupDetailsComponent,
@@ -73,6 +86,7 @@ import { AddedSyllabusItemsSuccessfullyModalComponent } from
     LearnerGroupSyllabusComponent,
     LearnerGroupStudentsProgressComponent,
     LearnerGroupPreferencesComponent,
+    LearnerGroupStudentSpecificProgressComponent,
     AddSyllabusItemsComponent,
     InviteStudentsComponent,
     LearnerGroupDetailsComponent,
@@ -115,11 +129,6 @@ import { ToastrModule } from 'ngx-toastr';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
-import { LearnerGroupPreferencesComponent } from './learner-group-preferences.component';
-import { LearnerGroupDetailsComponent } from '../create-group/learner-group-details.component';
-import { InviteStudentsModalComponent } from '../templates/invite-students-modal.component';
-import { InviteStudentsComponent } from '../create-group/invite-students.component';
-import { LearnerGroupStudentsProgressComponent } from './learner-group-students-progress.component';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

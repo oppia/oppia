@@ -1,4 +1,4 @@
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,9 +18,12 @@
 
 import { Component, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { LearnerGroupSyllabusBackendApiService } from 'domain/learner_group/learner-group-syllabus-backend-api.service';
-import { LearnerGroupUserInfo } from 'domain/learner_group/learner-group-user-info.model';
-import { LearnerGroupUserProgress } from 'domain/learner_group/learner-group-user-progress.model';
+import { LearnerGroupSyllabusBackendApiService } from
+  'domain/learner_group/learner-group-syllabus-backend-api.service';
+import { LearnerGroupUserInfo } from
+  'domain/learner_group/learner-group-user-info.model';
+import { LearnerGroupUserProgress } from
+  'domain/learner_group/learner-group-user-progress.model';
 import { LearnerGroupData } from 'domain/learner_group/learner-group.model';
 import { LearnerGroupPagesConstants } from '../learner-group-pages.constants';
 

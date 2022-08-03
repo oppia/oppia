@@ -1,0 +1,30 @@
+<div class="oppia-learner-group-student-specific-progress">
+  <div class="oppia-learner-group-students-progress-overview">
+    <div class="overview-tab-sections">
+      <div class="overview-tab-sections-header">
+        <div class="overview-tab-sections-header-title"
+             [ngClass]="{'active': isTabActive(EDIT_OVERVIEW_SECTIONS_I18N_IDS.SKILLS_ANALYSIS)}"
+             (click)="setActiveTab(EDIT_OVERVIEW_SECTIONS_I18N_IDS.SKILLS_ANALYSIS)">
+          <span translate="I18N_LEARNER_GROUP_SKILLS_ANALYSIS_SECTION"></span>
+        </div>
+        <div class="overview-tab-sections-header-title"
+             [ngClass]="{'active': isTabActive(EDIT_OVERVIEW_SECTIONS_I18N_IDS.PROGRESS_IN_STORIES)}"
+             (click)="setActiveTab(EDIT_OVERVIEW_SECTIONS_I18N_IDS.PROGRESS_IN_STORIES)">
+          <span translate="I18N_LEARNER_GROUP_PROGRESS_IN_STORIES_SECTION"></span>
+        </div>
+      </div>
+      <div class="skill-analysis-tab overview-tab-sections-subtab" *ngIf="isTabActive(EDIT_OVERVIEW_SECTIONS_I18N_IDS.SKILLS_ANALYSIS)">
+        <div class="tab-description">
+          This section shows the common skills which the learners of this group are struggling with.
+          <div *ngIf="studentProgress">
+          </div>
+        </div>
+      </div>
+      <div class="stories-progress-tab overview-tab-sections-subtab" *ngIf="isTabActive(EDIT_OVERVIEW_SECTIONS_I18N_IDS.PROGRESS_IN_STORIES)">
+        This section shows the common stories which the learners of this group have completed.
+        <div *ngIf="studentProgress">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
