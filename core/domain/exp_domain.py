@@ -2398,7 +2398,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 if content_id in content_id_list:
                     new_voiceovers_mapping[content_id] = value
             state_dict['recorded_voiceovers']['voiceovers_mapping'] = (
-                voiceovers_mapping)
+                new_voiceovers_mapping)
 
         return states_dict
 
