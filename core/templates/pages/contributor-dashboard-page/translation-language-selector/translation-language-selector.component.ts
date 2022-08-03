@@ -46,10 +46,10 @@ export class TranslationLanguageSelectorComponent implements OnInit {
   @Input() activeLanguageCode!: string | null;
   @Output() setActiveLanguageCode: EventEmitter<string> = new EventEmitter();
   @ViewChild('dropdown', {'static': false}) dropdownRef!: ElementRef;
-  @ViewChild('filterDiv') private filterDivRef: ElementRef;
+  @ViewChild('filterDiv') private filterDivRef!: ElementRef;
 
   options!: Options[];
-  filteredOptions: Options[];
+  filteredOptions: Options[] = [];
   optionsFilter: string = '';
   languageSelection!: string;
   languageIdToDescription: {[id: string]: string} = {};
