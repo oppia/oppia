@@ -51,6 +51,8 @@ core.domain.image_validation_services_test
 core.domain.interaction_registry_test
 core.domain.learner_goals_services_test
 core.domain.learner_group_domain_test
+core.domain.learner_group_fetchers_test
+core.domain.learner_group_services_test
 core.domain.learner_playlist_services_test
 core.domain.learner_progress_services_test
 core.domain.opportunity_services_test
