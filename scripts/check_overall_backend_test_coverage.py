@@ -23,6 +23,7 @@ import sys
 
 from scripts import common
 
+
 def main() -> None:
     env = os.environ.copy()
     cmd = [
@@ -36,7 +37,7 @@ def main() -> None:
         raise RuntimeError(
             'Run backend tests before running this script. %s' % process
         )
-    elif process.returncode:
+    if process.returncode:
         raise RuntimeError(
             'Failed to calculate coverage because subprocess failed. %s'
             % process
@@ -46,7 +47,7 @@ def main() -> None:
             r'TOTAL\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(?P<total>\d+)%\s+',
             process.stdout)
         uncovered_lines = float(coverage_result.group('total'))
-        if(uncovered_lines != 0):
+        if uncovered_lines != 0:
             print('--------------------------------------------')
             print('Backend overall line coverage checks failed.')
             print('--------------------------------------------')
@@ -55,6 +56,7 @@ def main() -> None:
             print('--------------------------------------------')
             print('Backend overall line coverage checks passed.')
             print('--------------------------------------------')
+
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
 # it will only be called when check_backend_associated_test_file.py
