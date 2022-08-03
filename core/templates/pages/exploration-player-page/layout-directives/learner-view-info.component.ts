@@ -19,7 +19,6 @@
 
 import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ClassroomDomainConstants } from 'domain/classroom/classroom-domain.constants';
 import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { StoryPlaythrough } from 'domain/story_viewer/story-playthrough.model';
@@ -29,13 +28,10 @@ import { TopicViewerBackendApiService } from 'domain/topic_viewer/topic-viewer-b
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { Subscription } from 'rxjs';
 import { ContextService } from 'services/context.service';
-import { LoggerService } from 'services/contextual/logger.service';
 import { UrlService } from 'services/contextual/url.service';
 import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { LearnerViewInfoBackendApiService } from '../services/learner-view-info-backend-api.service';
 import { StatsReportingService } from '../services/stats-reporting.service';
-import { InformationCardModalComponent } from '../templates/information-card-modal.component';
 
 import './learner-view-info.component.css';
 
@@ -54,15 +50,12 @@ export class LearnerViewInfoComponent {
   storyPlaythroughObject!: StoryPlaythrough;
   topicName!: string;
   topicNameTranslationKey!: string;
+  isLinkedToTopic!: boolean;
   expInfo?: LearnerExplorationSummaryBackendDict;
   directiveSubscriptions: Subscription = new Subscription();
-  isLinkedToTopic: boolean = false;
 
   constructor(
-    private ngbModal: NgbModal,
     private contextService: ContextService,
-    private learnerViewInfoBackendApiService: LearnerViewInfoBackendApiService,
-    private loggerService: LoggerService,
     private readOnlyExplorationBackendApiService:
     ReadOnlyExplorationBackendApiService,
     private siteAnalyticsService: SiteAnalyticsService,
@@ -148,40 +141,6 @@ export class LearnerViewInfoComponent {
           topic_url_fragment: topicUrlFragment,
           classroom_url_fragment: classroomUrlFragment,
         });
-  }
-
-  openInformationCardModal(): void {
-    let modalRef = this.ngbModal.open(InformationCardModalComponent, {
-      windowClass: 'oppia-modal-information-card'
-    });
-
-    modalRef.componentInstance.expInfo = this.expInfo;
-    modalRef.result.then(() => {}, () => {
-      // Note to developers:
-      // This callback is triggered when the Cancel button is clicked.
-      // No further action is needed.
-    });
-  }
-
-  showInformationCard(): void {
-    let stringifiedExpIds = JSON.stringify(
-      [this.explorationId]);
-    let includePrivateExplorations = JSON.stringify(true);
-    if (this.expInfo) {
-      this.openInformationCardModal();
-    } else {
-      this.learnerViewInfoBackendApiService.fetchLearnerInfoAsync(
-        stringifiedExpIds,
-        includePrivateExplorations
-      ).then((response) => {
-        this.expInfo = response.summaries[0];
-        this.openInformationCardModal();
-      }, () => {
-        this.loggerService.error(
-          'Information card failed to load for exploration ' +
-          this.explorationId);
-      });
-    }
   }
 
   isHackyTopicNameTranslationDisplayed(): boolean {
