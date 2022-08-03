@@ -22,7 +22,7 @@ import { ExternalRteSaveService } from './external-rte-save.service';
 import { ExternalSaveService } from './external-save.service';
 import { PlatformFeatureService } from './platform-feature.service';
 import { QuestionValidationService } from './question-validation.service';
-import { MockCsrfTokenService, RequestInterceptor } from './request-interceptor.service';
+import { RequestInterceptor } from './request-interceptor.service';
 import { EventBusService } from 'app-events/event-bus.service';
 import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
 import { PythonProgramTokenizer } from 'classifiers/python-program.tokenizer';
@@ -418,6 +418,7 @@ import { QuestionUpdateService } from 'domain/question/question-update.service';
 import { SkillEditorRoutingService } from 'pages/skill-editor-page/services/skill-editor-routing.service';
 import { QuestionUndoRedoService } from 'domain/editor/undo_redo/question-undo-redo.service';
 import { ExplorationMetadataObjectFactory } from 'domain/exploration/ExplorationMetadataObjectFactory';
+import { VersionHistoryBackendApiService } from 'pages/exploration-editor-page/services/version-history-backend-api.service';
 import { TranslationStatusService } from 'pages/exploration-editor-page/translation-tab/services/translation-status.service';
 import { YamlService } from './yaml.service';
 import { HistoryTabYamlConversionService } from 'pages/exploration-editor-page/services/history-tab-yaml-conversion.service';
@@ -655,7 +656,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['MessengerService', MessengerService],
   ['MetaTagCustomizationService', MetaTagCustomizationService],
   ['MisconceptionObjectFactory', MisconceptionObjectFactory],
-  ['MockCsrfTokenService', MockCsrfTokenService],
   ['ModeratorPageBackendApiService', ModeratorPageBackendApiService],
   ['MultipleChoiceInputRulesService', MultipleChoiceInputRulesService],
   ['MultipleChoiceInputValidationService',
@@ -861,6 +861,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['UtilsService', UtilsService],
   ['ValidatorsService', ValidatorsService],
   ['VersionedExplorationCachingService', VersionedExplorationCachingService],
+  ['VersionHistoryBackendApiService', VersionHistoryBackendApiService],
   ['VersionTreeService', VersionTreeService],
   ['WindowDimensionsService', WindowDimensionsService],
   ['WindowRef', WindowRef],

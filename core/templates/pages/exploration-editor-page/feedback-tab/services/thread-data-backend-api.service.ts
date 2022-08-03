@@ -40,7 +40,7 @@ interface FeedbackThreadData {
   'feedback_thread_dicts': FeedbackThreadBackendDict[];
 }
 
-interface ThreadMessages {
+export interface ThreadMessages {
   'messages': ThreadMessageBackendDict[];
 }
 

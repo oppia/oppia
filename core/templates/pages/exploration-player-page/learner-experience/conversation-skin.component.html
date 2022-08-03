@@ -43,7 +43,7 @@
         </oppia-progress-nav>
       </div>
       <div *ngIf="recommendedExplorationSummaries && recommendedExplorationSummaries.length > 0 && ((!isEndChapterCelebrationFeatureEnabled() && inStoryMode) || (collectionSummary && isOnTerminalCard() && isCurrentCardAtEndOfTranscript()))" class="conversation-skin-next-lesson-wrapper">
-        <div class="oppia-conversation-skin-next-lession-text-container">
+        <div class="oppia-conversation-skin-next-lesson-text-container">
           <span class="conversation-skin-next-lesson-text" translate="I18N_NEXT_LESSON"></span>
           <span *ngIf="!isHackyExpTitleTranslationDisplayed(recommendedExplorationSummaries[0].id)">
             {{ recommendedExplorationSummaries[0].title }}
@@ -83,16 +83,6 @@
   </div>
   <div class="conversation-skin-correctness-footer-container" *ngIf="isCorrectnessFooterEnabled()">
     <oppia-correctness-footer></oppia-correctness-footer>
-  </div>
-</div>
-
-<div *ngIf="CHECKPOINTS_FEATURE_IS_ENABLED && prevSessionStatesProgress.length != 0" class="oppia-exploration-checkpoints-message">
-  <div id="toast-container" class="toast-top-center toast-container">
-    <div class="toast-info checkpoints-toast-info ngx-toastr ng-trigger ng-trigger-flyInOut">
-      <div aria-live="polite" role="alertdialog" class="toast-message" attr.aria-label="{{'I18N_EXPLORATION_STARTING_FROM_CHECKPOINT' | translate}}">
-        {{ 'I18N_EXPLORATION_STARTING_FROM_CHECKPOINT' | translate }}
-      </div>
-    </div>
   </div>
 </div>
 
