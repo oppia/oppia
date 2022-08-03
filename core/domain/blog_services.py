@@ -29,7 +29,8 @@ from core.domain import role_services
 from core.domain import user_domain
 from core.platform import models
 
-from typing import Callable, List, Literal, Optional, Sequence, TypedDict, overload
+from typing import (
+        Callable, List, Literal, Optional, Sequence, TypedDict, overload)
 
 MYPY = False
 if MYPY: # pragma: no cover
