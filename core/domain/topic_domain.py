@@ -1203,6 +1203,16 @@ class Topic:
                 ' are not associated with the topic.' %
                 skill_ids_for_diagnostic_that_are_not_in_topic)
 
+        if strict:
+            if len(self.subtopics) == 0:
+                raise utils.ValidationError(
+                    'Topic should have at least 1 subtopic.')
+
+        if not self.are_subtopic_url_fragments_unique():
+            raise utils.ValidationError(
+                'Subtopic url fragments are not unique across '
+                'subtopics in the topic')
+
         if (
             strict and
             len(self.skill_ids_for_diagnostic_test) == 0
@@ -1214,16 +1224,6 @@ class Topic:
             raise utils.ValidationError(
                 'The skill_ids_for_diagnostic_test field should contain at '
                 'most 3 skill_ids.')
-
-        if strict:
-            if len(self.subtopics) == 0:
-                raise utils.ValidationError(
-                    'Topic should have at least 1 subtopic.')
-
-        if not self.are_subtopic_url_fragments_unique():
-            raise utils.ValidationError(
-                'Subtopic url fragments are not unique across '
-                'subtopics in the topic')
 
         if not utils.is_valid_language_code(self.language_code):
             raise utils.ValidationError(
