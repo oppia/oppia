@@ -25,6 +25,7 @@ from scripts import common
 
 
 def main() -> None:
+    """Checks if backend overall line coverage is 100%."""
     env = os.environ.copy()
     cmd = [
         sys.executable, '-m', 'coverage', 'report',
@@ -42,20 +43,19 @@ def main() -> None:
             'Failed to calculate coverage because subprocess failed. %s'
             % process
         )
+    coverage_result = re.search(
+        r'TOTAL\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(?P<total>\d+)%\s+',
+        process.stdout)
+    uncovered_lines = float(coverage_result.group('total'))
+    if uncovered_lines != 0:
+        print('--------------------------------------------')
+        print('Backend overall line coverage checks failed.')
+        print('--------------------------------------------')
+        sys.exit(1)
     else:
-        coverage_result = re.search(
-            r'TOTAL\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(?P<total>\d+)%\s+',
-            process.stdout)
-        uncovered_lines = float(coverage_result.group('total'))
-        if uncovered_lines != 0:
-            print('--------------------------------------------')
-            print('Backend overall line coverage checks failed.')
-            print('--------------------------------------------')
-            sys.exit(1)
-        else:
-            print('--------------------------------------------')
-            print('Backend overall line coverage checks passed.')
-            print('--------------------------------------------')
+        print('--------------------------------------------')
+        print('Backend overall line coverage checks passed.')
+        print('--------------------------------------------')
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
