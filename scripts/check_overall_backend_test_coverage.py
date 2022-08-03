@@ -44,7 +44,7 @@ def main() -> None:
             % process
         )
     coverage_result = re.search(
-        r'TOTAL\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(?P<total>\d+)%\s+',
+        r'TOTAL\s+(\d+)\s+(?P<total>\d+)\s+(\d+)\s+(\d+)\s+(\d+)%\s+',
         process.stdout)
     uncovered_lines = float(coverage_result.group('total'))
     if uncovered_lines != 0:
