@@ -73,6 +73,7 @@ var BlogDashboardPage = function() {
   var blogPostTilesSelector = function() {
     return $$('.e2e-test-blog-dashboard-tile');
   };
+  var matInkBar = $('.mat-ink-bar');
   var navigateToBlogDashboardButton = $('.e2e-test-back-button');
 
   this.get = async function() {
@@ -199,8 +200,9 @@ var BlogDashboardPage = function() {
         `Blog Dashboard tab ${i}`, matTab);
       if (tabText.startsWith(tabName)) {
         await action.click(`${tabName} tab`, matTab);
-        await waitFor.elementAttributeToBe(
-          matTab, 'tabindex', '0', `${tabName} tab takes time to appear`);
+        await waitFor.visibilityOf(matInkBar);
+        await waitFor.elementStoppedMoving(
+          matInkBar, `${tabName} tab takes too long to be active`);
         break;
       }
     }

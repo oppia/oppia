@@ -143,6 +143,22 @@ var elementAttributeToBe = async function(
   });
 };
 
+var elementStoppedMoving = async function(
+    element, errorMessage
+) {
+  await browser.waitUntil(async function() {
+    var firstValue = await element.getLocation('x');
+    // eslint-disable-next-line oppia/e2e-practices
+    await browser.pause(1000);
+    var secondValue = await element.getLocation('x');
+    return await firstValue === secondValue;
+  },
+  {
+    timeout: DEFAULT_WAIT_TIME_MSECS,
+    timeoutMsg: errorMessage + '\n' + new Error().stack + '\n'
+  });
+};
+
 /**
 * Wait for new tab is opened
 */
@@ -258,6 +274,7 @@ exports.textToBePresentInElement = textToBePresentInElement;
 exports.visibilityOf = visibilityOf;
 exports.presenceOf = presenceOf;
 exports.elementAttributeToBe = elementAttributeToBe;
+exports.elementStoppedMoving = elementStoppedMoving;
 exports.invisibilityOfInfoToast = invisibilityOfInfoToast;
 exports.invisibilityOfLoadingMessage = invisibilityOfLoadingMessage;
 exports.visibilityOfInfoToast = visibilityOfInfoToast;
