@@ -1,6 +1,3 @@
-<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/pages/story-viewer-page/story-viewer-page-root.component.css" as="style">
-<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/pages/story-viewer-page/story-viewer-page-root.component.rtl.css" as="style">
-
 <oppia-angular-root>
   <oppia-base-content>
     <navbar-pre-logo-action>
@@ -22,7 +19,3 @@
 
   </oppia-base-content>
 </oppia-angular-root>
-
-<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
-<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/story-viewer-page/story-viewer-page-root.component.css">
-<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/story-viewer-page/story-viewer-page-root.component.rtl.css">

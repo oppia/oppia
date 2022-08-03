@@ -88,7 +88,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         }
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
-                'Introduction', state_domain.SubtitledHtml(
+                'Introduction', None, state_domain.SubtitledHtml(
                     'feedback_1', '<p>State Feedback</p>'),
                 False, [], None, None),
             [
@@ -412,7 +412,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         }
         state_answer_group = [state_domain.AnswerGroup(
             state_domain.Outcome(
-                exploration.init_state_name, state_domain.SubtitledHtml(
+                exploration.init_state_name, None, state_domain.SubtitledHtml(
                     'feedback_1', '<p>state outcome html</p>'),
                 False, [], None, None),
             [
@@ -427,7 +427,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             None
         )]
         state_default_outcome = state_domain.Outcome(
-            'State1', state_domain.SubtitledHtml(
+            'State1', None, state_domain.SubtitledHtml(
                 'default_outcome', '<p>Default outcome for State1</p>'),
             False, [], None, None
         )
@@ -527,7 +527,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         }
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
-                exploration.init_state_name, state_domain.SubtitledHtml(
+                exploration.init_state_name, None, state_domain.SubtitledHtml(
                     'feedback', '<p>state outcome html</p>'),
                 False, [], None, None),
             [
@@ -646,7 +646,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state = exploration.states['State1']
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
-                exploration.init_state_name, state_domain.SubtitledHtml(
+                exploration.init_state_name, None, state_domain.SubtitledHtml(
                     'feedback', '<p>state outcome html</p>'),
                 False, [], None, None),
             [
@@ -747,7 +747,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state = exploration.states['State1']
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
-                exploration.init_state_name, state_domain.SubtitledHtml(
+                exploration.init_state_name, None, state_domain.SubtitledHtml(
                     'feedback', '<p>state outcome html</p>'),
                 False, [], None, None),
             [
@@ -944,6 +944,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'customization_args': {},
                 'default_outcome': {
                     'dest': 'New state',
+                    'dest_if_really_stuck': None,
                     'feedback': {
                         'content_id': 'default_outcome',
                         'html': ''
@@ -1091,7 +1092,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         self.assertTrue(init_state.is_rte_content_supported_on_android())
 
         default_outcome = state_domain.Outcome(
-            'Introduction', state_domain.SubtitledHtml(
+            'Introduction', None, state_domain.SubtitledHtml(
                 'default_outcome', (
                     '<oppia-noninteractive-collapsible content-with-value='
                     '"&amp;quot;&amp;lt;p&amp;gt;Hello&amp;lt;/p&amp;gt;&amp;'
@@ -1108,7 +1109,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
-                exploration.init_state_name, state_domain.SubtitledHtml(
+                exploration.init_state_name, None, state_domain.SubtitledHtml(
                     'feedback_1', (
                         '<oppia-noninteractive-tabs tab_contents-with-value'
                         '=\"[{&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;p'
@@ -1263,7 +1264,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             }))
         init_state.update_interaction_id('TextInput')
         default_outcome = state_domain.Outcome(
-            'Introduction', state_domain.SubtitledHtml(
+            'Introduction', None, state_domain.SubtitledHtml(
                 'default_outcome', '<p>The default outcome.</p>'),
             False, [], None, None
         )
@@ -1272,7 +1273,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
-                exploration.init_state_name, state_domain.SubtitledHtml(
+                exploration.init_state_name, None, state_domain.SubtitledHtml(
                     'feedback_1', '<p>Feedback</p>'), False, [], None, None),
             [
                 state_domain.RuleSpec(
@@ -1379,7 +1380,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             state_interaction_cust_args)
 
         default_outcome = state_domain.Outcome(
-            'Introduction', state_domain.SubtitledHtml(
+            'Introduction', None, state_domain.SubtitledHtml(
                 'default_outcome', '<p>The default outcome.</p>'),
             False, [], None, None
         )
@@ -1387,7 +1388,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_interaction_default_outcome(default_outcome)
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
-                exploration.init_state_name, state_domain.SubtitledHtml(
+                exploration.init_state_name, None, state_domain.SubtitledHtml(
                     'feedback_1', '<p>Feedback</p>'),
                 False, [], None, None),
             [
@@ -1499,7 +1500,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
-                exploration.init_state_name, state_domain.SubtitledHtml(
+                exploration.init_state_name, None, state_domain.SubtitledHtml(
                     'feedback_1', '<p>Feedback</p>'),
                 False, [], None, None),
             [
@@ -1574,7 +1575,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             state_interaction_cust_args)
         # Set the default outcome.
         default_outcome = state_domain.Outcome(
-            'Introduction', state_domain.SubtitledHtml(
+            'Introduction', None, state_domain.SubtitledHtml(
                 'default_outcome', '<p>The default outcome.</p>'),
             False, [], None, None
         )
@@ -1881,6 +1882,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         answer_group_dict_with_old_math_schema = {
             'outcome': {
                 'dest': 'Introduction',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': '<p>Feedback</p>'
@@ -1924,6 +1926,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         answer_group_dict_with_new_math_schema = {
             'outcome': {
                 'dest': 'Introduction',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': '<p>Feedback</p>'
@@ -1989,6 +1992,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         )
                     },
                     'dest': 'Introduction',
+                    'dest_if_really_stuck': None,
                     'refresher_exploration_id': None,
                     'missing_prerequisite_skill_id': None,
                     'labelled_as_correct': False
@@ -2071,6 +2075,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         )
                     },
                     'dest': 'Introduction',
+                    'dest_if_really_stuck': None,
                     'refresher_exploration_id': None,
                     'missing_prerequisite_skill_id': None,
                     'labelled_as_correct': False
@@ -2171,6 +2176,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             }],
             'outcome': {
                 'dest': 'Introduction',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback',
                     'html': html_with_old_math_schema
@@ -2208,6 +2214,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             }],
             'outcome': {
                 'dest': 'Introduction',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback',
                     'html': html_with_new_math_schema
@@ -2259,6 +2266,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         )
                     },
                     'dest': 'Introduction',
+                    'dest_if_really_stuck': None,
                     'refresher_exploration_id': None,
                     'missing_prerequisite_skill_id': None,
                     'labelled_as_correct': False
@@ -2330,6 +2338,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         )
                     },
                     'dest': 'Introduction',
+                    'dest_if_really_stuck': None,
                     'refresher_exploration_id': None,
                     'missing_prerequisite_skill_id': None,
                     'labelled_as_correct': False
@@ -2388,6 +2397,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         answer_group_with_old_math_schema = {
             'outcome': {
                 'dest': 'Introduction',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': html_with_old_math_schema
@@ -2409,6 +2419,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         answer_group_with_new_math_schema = {
             'outcome': {
                 'dest': 'Introduction',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': html_with_new_math_schema
@@ -2455,6 +2466,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         'html': html_with_old_math_schema
                     },
                     'dest': 'Introduction',
+                    'dest_if_really_stuck': None,
                     'refresher_exploration_id': None,
                     'missing_prerequisite_skill_id': None,
                     'labelled_as_correct': False
@@ -2515,6 +2527,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         'html': html_with_new_math_schema
                     },
                     'dest': 'Introduction',
+                    'dest_if_really_stuck': None,
                     'refresher_exploration_id': None,
                     'missing_prerequisite_skill_id': None,
                     'labelled_as_correct': False
@@ -2569,6 +2582,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         answer_group_with_old_math_schema = {
             'outcome': {
                 'dest': 'Introduction',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': html_with_old_math_schema
@@ -2590,6 +2604,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         answer_group_with_new_math_schema = {
             'outcome': {
                 'dest': 'Introduction',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': html_with_new_math_schema
@@ -2636,6 +2651,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         'html': html_with_old_math_schema
                     },
                     'dest': 'Introduction',
+                    'dest_if_really_stuck': None,
                     'refresher_exploration_id': None,
                     'missing_prerequisite_skill_id': None,
                     'labelled_as_correct': False
@@ -2686,6 +2702,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         'html': html_with_new_math_schema
                     },
                     'dest': 'Introduction',
+                    'dest_if_really_stuck': None,
                     'refresher_exploration_id': None,
                     'missing_prerequisite_skill_id': None,
                     'labelled_as_correct': False
@@ -2783,6 +2800,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         answer_group_dict_with_old_math_schema = {
             'outcome': {
                 'dest': 'Introduction',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': '<p>Feedback</p>'
@@ -2804,6 +2822,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         answer_group_dict_with_new_math_schema = {
             'outcome': {
                 'dest': 'Introduction',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_1',
                     'html': '<p>Feedback</p>'
@@ -2847,6 +2866,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         )
                     },
                     'dest': 'Introduction',
+                    'dest_if_really_stuck': None,
                     'refresher_exploration_id': None,
                     'missing_prerequisite_skill_id': None,
                     'labelled_as_correct': False
@@ -2929,6 +2949,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         )
                     },
                     'dest': 'Introduction',
+                    'dest_if_really_stuck': None,
                     'refresher_exploration_id': None,
                     'missing_prerequisite_skill_id': None,
                     'labelled_as_correct': False
@@ -3015,6 +3036,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             }],
             'outcome': {
                 'dest': 'Introduction',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback',
                     'html': html_with_old_math_schema
@@ -3054,6 +3076,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         )
                     },
                     'dest': 'Introduction',
+                    'dest_if_really_stuck': None,
                     'refresher_exploration_id': None,
                     'missing_prerequisite_skill_id': None,
                     'labelled_as_correct': False
@@ -3124,6 +3147,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             }],
             'outcome': {
                 'dest': 'Introduction',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback',
                     'html': html_with_old_math_schema
@@ -3163,6 +3187,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         )
                     },
                     'dest': 'Introduction',
+                    'dest_if_really_stuck': None,
                     'refresher_exploration_id': None,
                     'missing_prerequisite_skill_id': None,
                     'labelled_as_correct': False
@@ -3250,6 +3275,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         'html': html_with_old_math_schema
                     },
                     'dest': 'Introduction',
+                    'dest_if_really_stuck': None,
                     'refresher_exploration_id': None,
                     'missing_prerequisite_skill_id': None,
                     'labelled_as_correct': False
@@ -3336,6 +3362,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         'html': html_with_old_math_schema
                     },
                     'dest': 'Introduction',
+                    'dest_if_really_stuck': None,
                     'refresher_exploration_id': None,
                     'missing_prerequisite_skill_id': None,
                     'labelled_as_correct': False
@@ -3379,6 +3406,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         'html': html_with_new_math_schema
                     },
                     'dest': 'Introduction',
+                    'dest_if_really_stuck': None,
                     'refresher_exploration_id': None,
                     'missing_prerequisite_skill_id': None,
                     'labelled_as_correct': False
@@ -3840,7 +3868,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
-                exploration.init_state_name, state_domain.SubtitledHtml(
+                exploration.init_state_name, None, state_domain.SubtitledHtml(
                     'feedback_1', '<p>Feedback</p>'),
                 False, [], None, None),
             [
@@ -3873,7 +3901,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
-                exploration.init_state_name, state_domain.SubtitledHtml(
+                exploration.init_state_name, None, state_domain.SubtitledHtml(
                     'feedback_1', '<p>Feedback</p>'),
                 False, [], None, None),
             [
@@ -3908,7 +3936,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
     def test_validate_duplicate_content_id_with_default_outcome(self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
         default_outcome = state_domain.Outcome(
-            'Introduction', state_domain.SubtitledHtml('default_outcome', ''),
+            'Introduction', None,
+            state_domain.SubtitledHtml('default_outcome', ''),
             False, [], None, None
         )
         exploration.init_state.update_interaction_default_outcome(
@@ -4233,7 +4262,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
-                exploration.init_state_name, state_domain.SubtitledHtml(
+                exploration.init_state_name, None, state_domain.SubtitledHtml(
                     'feedback_1', '<p>Feedback</p>'),
                 False, [], None, None),
             [
@@ -4273,7 +4302,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
-                exploration.init_state_name, state_domain.SubtitledHtml(
+                exploration.init_state_name, None, state_domain.SubtitledHtml(
                     'feedback_1', '<p>Feedback</p>'),
                 False, [], None, None),
             [
@@ -4297,7 +4326,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
-                exploration.init_state_name, state_domain.SubtitledHtml(
+                exploration.init_state_name, None, state_domain.SubtitledHtml(
                     'feedback_1', '<p>Feedback</p>'), False, [], None, None
             ), {}, [], None
         )
@@ -4312,7 +4341,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
-                exploration.init_state_name, state_domain.SubtitledHtml(
+                exploration.init_state_name, None, state_domain.SubtitledHtml(
                     'feedback_1', '<p>Feedback</p>'),
                 False, [], None, None),
             [
@@ -4351,7 +4380,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
-                exploration.init_state_name, state_domain.SubtitledHtml(
+                exploration.init_state_name, None, state_domain.SubtitledHtml(
                     'feedback_1', '<p>Feedback</p>'),
                 False, [], None, None),
             [
@@ -4410,7 +4439,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_answer_group = [
             state_domain.AnswerGroup(
                 state_domain.Outcome(
-                    'destination', state_domain.SubtitledHtml(
+                    'destination', None, state_domain.SubtitledHtml(
                         'feedback_1', '<p>state outcome html</p>'),
                     False, [], None, None),
                 [
@@ -4446,7 +4475,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state_answer_group = [
             state_domain.AnswerGroup(
                 state_domain.Outcome(
-                    'destination', state_domain.SubtitledHtml(
+                    'destination', None, state_domain.SubtitledHtml(
                         'feedback', '<p>Feedback</p>'),
                     False, [], None, None),
                 [

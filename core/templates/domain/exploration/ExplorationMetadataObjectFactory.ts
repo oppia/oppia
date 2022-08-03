@@ -34,12 +34,18 @@ export interface ExplorationMetadataBackendDict {
   'init_state_name': string;
   'param_specs': ParamSpecsBackendDict;
   'param_changes': ParamChangeBackendDict[];
-  'auto_tts_enabled'?: boolean;
+  'auto_tts_enabled': boolean;
   'correctness_feedback_enabled': boolean;
   'edits_allowed': boolean;
 }
 
 export class ExplorationMetadata {
+  /**
+   * The properties of this domain object are required to be synced with the
+   * properties mentioned in constants.METADATA_PROPERTIES. If you have
+   * modified constants.METADATA_PROPERTIES, make sure to include them here
+   * also or the frontend tests will fail.
+   */
   _title: string;
   _category: string;
   _objective: string;

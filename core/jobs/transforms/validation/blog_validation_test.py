@@ -38,31 +38,31 @@ class RelationshipsOfTests(test_utils.TestBase):
 
     def test_blog_post_model_relationships(self) -> None:
         self.assertItemsEqual(  # type: ignore[no-untyped-call]
-            validation_decorators.RelationshipsOf.get_model_kind_references( # type: ignore[no-untyped-call]
+            validation_decorators.RelationshipsOf.get_model_kind_references(
                 'BlogPostModel', 'id'),
             ['BlogPostSummaryModel', 'BlogPostRightsModel'])
         self.assertItemsEqual(  # type: ignore[no-untyped-call]
-            validation_decorators.RelationshipsOf.get_model_kind_references( # type: ignore[no-untyped-call]
+            validation_decorators.RelationshipsOf.get_model_kind_references(
                 'BlogPostModel', 'author_id'),
             ['UserSettingsModel'])
 
     def test_blog_post_summary_model_relationships(self) -> None:
         self.assertItemsEqual(  # type: ignore[no-untyped-call]
-            validation_decorators.RelationshipsOf.get_model_kind_references( # type: ignore[no-untyped-call]
+            validation_decorators.RelationshipsOf.get_model_kind_references(
                 'BlogPostSummaryModel', 'id'),
             ['BlogPostModel', 'BlogPostRightsModel'])
         self.assertItemsEqual(  # type: ignore[no-untyped-call]
-            validation_decorators.RelationshipsOf.get_model_kind_references( # type: ignore[no-untyped-call]
+            validation_decorators.RelationshipsOf.get_model_kind_references(
                 'BlogPostSummaryModel', 'author_id'),
             ['UserSettingsModel'])
 
     def test_blog_post_rights_model_relationships(self) -> None:
         self.assertItemsEqual(  # type: ignore[no-untyped-call]
-            validation_decorators.RelationshipsOf.get_model_kind_references( # type: ignore[no-untyped-call]
+            validation_decorators.RelationshipsOf.get_model_kind_references(
                 'BlogPostRightsModel', 'id'),
             ['BlogPostModel', 'BlogPostSummaryModel'])
         self.assertItemsEqual(  # type: ignore[no-untyped-call]
-            validation_decorators.RelationshipsOf.get_model_kind_references( # type: ignore[no-untyped-call]
+            validation_decorators.RelationshipsOf.get_model_kind_references(
                 'BlogPostRightsModel', 'editor_ids'),
             ['UserSettingsModel'])
 
@@ -70,7 +70,7 @@ class RelationshipsOfTests(test_utils.TestBase):
 class ValidateModelPublishTimeFieldTests(job_test_utils.PipelinedTestBase):
 
     def test_reports_model_created_on_timestamp_relationship_error(
-            self
+        self
     ) -> None:
         invalid_timestamp = blog_models.BlogPostModel(
             id='validblogid1',
@@ -88,7 +88,7 @@ class ValidateModelPublishTimeFieldTests(job_test_utils.PipelinedTestBase):
             | beam.ParDo(blog_validation.ValidateModelPublishTimestamps())
         )
 
-        self.assert_pcoll_equal( # type: ignore[no-untyped-call]
+        self.assert_pcoll_equal(
             output, [
                 blog_validation_errors.InconsistentPublishTimestampsError(
                     invalid_timestamp),
@@ -114,7 +114,7 @@ class ValidateModelPublishTimeFieldTests(job_test_utils.PipelinedTestBase):
             | beam.ParDo(blog_validation.ValidateModelPublishTimestamps())
         )
 
-        self.assert_pcoll_equal( # type: ignore[no-untyped-call]
+        self.assert_pcoll_equal(
             output, [
                 blog_validation_errors
                 .InconsistentPublishLastUpdatedTimestampsError(
@@ -139,7 +139,7 @@ class ValidateModelPublishTimeFieldTests(job_test_utils.PipelinedTestBase):
             | beam.ParDo(blog_validation.ValidateModelPublishTimestamps())
         )
 
-        self.assert_pcoll_equal(output, []) # type: ignore[no-untyped-call]
+        self.assert_pcoll_equal(output, [])
 
     def test_process_reports_model_mutated_during_job_error(self) -> None:
         invalid_timestamp = blog_models.BlogPostModel(
@@ -158,7 +158,7 @@ class ValidateModelPublishTimeFieldTests(job_test_utils.PipelinedTestBase):
             | beam.ParDo(blog_validation.ValidateModelPublishTimestamps())
         )
 
-        self.assert_pcoll_equal( # type: ignore[no-untyped-call]
+        self.assert_pcoll_equal(
             output, [
                 blog_validation_errors.ModelMutatedDuringJobError(
                     invalid_timestamp),
@@ -197,7 +197,7 @@ class ValidateBlogPostModelDomainObjectsInstancesTests(
                 blog_validation.ValidateBlogPostModelDomainObjectsInstances())
         )
 
-        self.assert_pcoll_equal(output, []) # type: ignore[no-untyped-call]
+        self.assert_pcoll_equal(output, [])
 
 
 class ValidateBlogPostSummaryModelDomainObjectsInstancesTests(
@@ -231,4 +231,4 @@ class ValidateBlogPostSummaryModelDomainObjectsInstancesTests(
                 blog_validation.ValidateBlogSummaryModelDomainObjectsInstances()) # pylint: disable=line-too-long
         )
 
-        self.assert_pcoll_equal(output, []) # type: ignore[no-untyped-call]
+        self.assert_pcoll_equal(output, [])

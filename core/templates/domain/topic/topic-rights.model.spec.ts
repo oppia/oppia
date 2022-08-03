@@ -19,7 +19,7 @@
 import { TopicRights } from 'domain/topic/topic-rights.model';
 
 describe('Topic rights model', () => {
-  let sampleTopicRights: TopicRights = null;
+  let sampleTopicRights: TopicRights;
 
   beforeEach(() => {
     var initialTopicRightsBackendObject = {

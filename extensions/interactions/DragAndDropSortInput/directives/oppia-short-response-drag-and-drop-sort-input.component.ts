@@ -32,8 +32,8 @@ export class ShortResponseDragAndDropSortInputComponent implements OnInit {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() answer!: string;
   @Input() choices!: string;
-  isAnswerLengthGreaterThanZero: boolean;
-  responseList: DragAndDropAnswer;
+  responseList!: DragAndDropAnswer;
+  isAnswerLengthGreaterThanZero: boolean = false;
 
   constructor(private htmlEscaperService: HtmlEscaperService) {}
 

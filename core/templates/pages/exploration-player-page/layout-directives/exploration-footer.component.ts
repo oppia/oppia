@@ -37,7 +37,13 @@ import { ExplorationEngineService } from '../services/exploration-engine.service
 import { LearnerViewInfoBackendApiService } from '../services/learner-view-info-backend-api.service';
 import { PlayerPositionService } from '../services/player-position.service';
 import { PlayerTranscriptService } from '../services/player-transcript.service';
-import { LessonInformationCardModalComponent } from '../templates/lesson-information-card-modal.component';
+import { LessonInformationCardModalComponent } from 'pages/exploration-player-page/templates/lesson-information-card-modal.component';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { ProgressReminderModalComponent } from 'pages/exploration-player-page/templates/progress-reminder-modal.component';
+import { WindowRef } from 'services/contextual/window-ref.service';
+
+import './exploration-footer.component.css';
+
 
 @Component({
   selector: 'oppia-exploration-footer',
@@ -51,6 +57,7 @@ export class ExplorationFooterComponent {
   iframed!: boolean;
   windowIsNarrow!: boolean;
   resizeSubscription!: Subscription;
+  checkpointSubscription!: Subscription;
   contributorNames: string[] = [];
   hintsAndSolutionsAreSupported: boolean = true;
 
@@ -61,7 +68,6 @@ export class ExplorationFooterComponent {
   // and decide the completed width of the progress bar.
   checkpointArray: number[] = [0];
   expInfo: LearnerExplorationSummaryBackendDict;
-  completedWidth: number = 0;
   expStates: StateObjectsBackendDict;
   completedCheckpointsCount: number = 0;
   lastCheckpointWasCompleted: boolean = false;
@@ -88,7 +94,9 @@ export class ExplorationFooterComponent {
     private explorationEngineService: ExplorationEngineService,
     private userService: UserService,
     private editableExplorationBackendApiService:
-      EditableExplorationBackendApiService
+      EditableExplorationBackendApiService,
+    private urlInterpolationService: UrlInterpolationService,
+    private windowRef: WindowRef
   ) {}
 
   ngOnInit(): void {
@@ -154,6 +162,85 @@ export class ExplorationFooterComponent {
           }
         );
     }
+    this.checkpointSubscription = this.playerPositionService
+      .onLoadedMostRecentCheckpoint.subscribe(() => {
+        if (this.CHECKPOINTS_FEATURE_IS_ENABLED) {
+          if (this.checkpointCount) {
+            this.showProgressReminderModal();
+          } else {
+            this.getCheckpointCount().then(() => {
+              this.showProgressReminderModal();
+            });
+          }
+        }
+      });
+  }
+
+  showProgressReminderModal(): void {
+    const mostRecentlyReachedCheckpointIndex = (
+      this.getMostRecentlyReachedCheckpointIndex()
+    );
+
+    this.completedCheckpointsCount = mostRecentlyReachedCheckpointIndex - 1;
+
+    if (this.completedCheckpointsCount === 0) {
+      return;
+    }
+
+    if (this.expInfo) {
+      this.openProgressReminderModal();
+    } else {
+      let stringifiedExpIds = JSON.stringify(
+        [this.explorationId]);
+      let includePrivateExplorations = JSON.stringify(true);
+
+      this.learnerViewInfoBackendApiService.fetchLearnerInfoAsync(
+        stringifiedExpIds,
+        includePrivateExplorations
+      ).then((response) => {
+        this.expInfo = response.summaries[0];
+        this.openProgressReminderModal();
+      }, () => {
+        this.loggerService.error(
+          'Information card failed to load for exploration ' +
+          this.explorationId);
+      });
+    }
+  }
+
+  openProgressReminderModal(): void {
+    let modalRef = this.ngbModal.open(ProgressReminderModalComponent, {
+      windowClass: 'oppia-progress-reminder-modal'
+    });
+
+    let displayedCardIndex = (
+      this.playerPositionService.getDisplayedCardIndex()
+    );
+    if (displayedCardIndex > 0) {
+      let state = this.explorationEngineService.getState();
+      let stateCard = this.explorationEngineService.getStateCardByName(
+        state.name);
+      if (stateCard.isTerminal()) {
+        this.completedCheckpointsCount += 1;
+      }
+    }
+
+    modalRef.componentInstance.checkpointCount = this.checkpointCount;
+    modalRef.componentInstance.completedCheckpointsCount = (
+      this.completedCheckpointsCount);
+    modalRef.componentInstance.explorationTitle = this.expInfo.title;
+
+    modalRef.result.then(() => {
+      // This callback is used for when the learner chooses to restart
+      // the exploration.
+      this.editableExplorationBackendApiService.resetExplorationProgressAsync(
+        this.explorationId).then(() => {
+        this.windowRef.nativeWindow.location.reload();
+      });
+    }, () => {
+      // This callback is used for when the learner chooses to resume
+      // the exploration.
+    });
   }
 
   openInformationCardModal(): void {
@@ -185,15 +272,12 @@ export class ExplorationFooterComponent {
       this.lastCheckpointWasCompleted = true;
     }
 
-    this.completedWidth = (
-      (100 / (this.checkpointCount)) * this.completedCheckpointsCount
-    );
-
     if (this.lastCheckpointWasCompleted) {
-      this.completedWidth = 100;
+      this.completedCheckpointsCount = this.checkpointCount;
     }
 
-    modalRef.componentInstance.completedWidth = this.completedWidth;
+    modalRef.componentInstance.completedCheckpointsCount = (
+      this.completedCheckpointsCount);
     modalRef.componentInstance.contributorNames = this.contributorNames;
     modalRef.componentInstance.expInfo = this.expInfo;
     modalRef.componentInstance.userIsLoggedIn = this.userIsLoggedIn;
@@ -232,9 +316,16 @@ export class ExplorationFooterComponent {
     }
   }
 
+  getStaticImageUrl(imagePath: string): string {
+    return this.urlInterpolationService.getStaticImageUrl(imagePath);
+  }
+
   ngOnDestroy(): void {
     if (this.resizeSubscription) {
       this.resizeSubscription.unsubscribe();
+    }
+    if (this.checkpointSubscription) {
+      this.checkpointSubscription.unsubscribe();
     }
   }
 

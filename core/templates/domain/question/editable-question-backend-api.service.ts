@@ -34,6 +34,12 @@ export interface CreateQuestionResponseBackendDict {
   'question_id': string;
 }
 
+export interface SkillLinkageModificationsArray {
+  id: string;
+  task: string;
+  difficulty: number;
+}
+
 export interface FetchQuestionBackendResponse {
   'associated_skill_dicts': SkillBackendDict[];
   'is_super_admin': boolean;
@@ -161,7 +167,7 @@ export class EditableQuestionBackendApiService {
 
   private async _editQuestionSkillLinksAsync(
       questionId: string,
-      skillIdsTaskArray: (string | number)[],
+      skillIdsTaskArray: SkillLinkageModificationsArray[],
       successCallback: (value: void) => void,
       errorCallback: (reason?: string) => void): Promise<Question> {
     return new Promise((resolve, reject) => {
@@ -202,7 +208,7 @@ export class EditableQuestionBackendApiService {
 
   async editQuestionSkillLinksAsync(
       questionId: string,
-      skillIdsTaskArray: (string | number)[]): Promise<void> {
+      skillIdsTaskArray: SkillLinkageModificationsArray[]): Promise<void> {
     return new Promise((resolve, reject) => {
       this._editQuestionSkillLinksAsync(
         questionId, skillIdsTaskArray, resolve, reject);

@@ -72,6 +72,7 @@ describe('State Translation Editor Component', function() {
       answer_groups: [{
         outcome: {
           dest: 'outcome 1',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'content2',
             html: ''
@@ -85,6 +86,7 @@ describe('State Translation Editor Component', function() {
       }, {
         outcome: {
           dest: 'outcome 2',
+          dest_if_really_stuck: null,
           feedback: {
             content_id: 'content3',
             html: ''

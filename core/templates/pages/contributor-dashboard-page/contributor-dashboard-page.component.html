@@ -1,67 +1,83 @@
 <div>
   <div class="oppia-contributor-home">
     <div class="oppia-opportunities-tabs">
-      <ul class="oppia-opportunities-tabs-list">
-        <li ng-class="{'oppia-active-opportunities-tab': tabName === $ctrl.activeTabName}"
+      <ul class="oppia-opportunities-tabs-list" *ngIf="tabsDetails">
+        <li [ngClass]="{'oppia-active-opportunities-tab': item.key === activeTabName}"
             class="oppia-opportunities-tab-item"
-            ng-repeat="(tabName, tabDetails) in $ctrl.tabsDetails"
-            ng-if="tabDetails.enabled"
-            aria-label="<[tabDetails.ariaLabel]>">
-          <a role="button"
-             ng-click="$ctrl.onTabClick(tabName)"
-             href=""
-             class="oppia-opportunities-tabs-text e2e-test-<[tabName]>">
-            <[tabDetails.tabName]>
-          </a>
-          <div class="oppia-active-tab-hilighter"></div>
+            *ngFor="let item of tabsDetails | keyvalue"
+            [attr.aria-label]="item.value.ariaLabel">
+          <div *ngIf="item.value.enabled">
+            <a role="button"
+               (click)="onTabClick(item.key)"
+               href="#"
+               class="oppia-opportunities-tabs-text e2e-test-{{item.key}}">
+              {{item.value.tabName}}
+            </a>
+            <div class="oppia-active-tab-highlighter"></div>
+          </div>
         </li>
       </ul>
     </div>
-    <div ng-class="{'oppia-translate-y': $ctrl.defaultHeaderVisible, 'oppia-contributor-dashboard-header': !$ctrl.defaultHeaderVisible}">
+
+    <div [ngClass]="{'oppia-translate-y': defaultHeaderVisible, 'oppia-contributor-dashboard-header': !defaultHeaderVisible}">
       <div class="oppia-opportunities-tab-customization-container">
         <div class="oppia-opportunities-tab-header"
-             ng-if="$ctrl.activeTabName === 'myContributionTab'">
+             *ngIf="activeTabName === 'myContributionTab'">
           <div class="oppia-outer-container">
             <div class="oppia-user-and-rights">
               <div class="oppia-profile-details-container">
-                <span ng-if="$ctrl.profilePictureDataUrl">
-                  <img ng-src="<[$ctrl.profilePictureDataUrl]>"
+                <span *ngIf="profilePictureDataUrl">
+                  <img [src]="profilePictureDataUrl"
                        class="rounded-circle"
                        alt="User Avatar">
                 </span>
-                <span ng-if="!$ctrl.profilePictureDataUrl">
+                <span *ngIf="!profilePictureDataUrl">
                   <i class="material-icons oppia-profile-picture-icon">&#xE853;</i>
                 </span>
               </div>
               <div class="oppia-contributor-username-and-review-rights-container">
-                <div class="oppia-contributor-username-container"
-                     data-tab-name="username">
-                  <lazy-loading ng-show="$ctrl.userInfoIsLoading"></lazy-loading>
+                <div class="oppia-short-contributor-username-container"
+                     *ngIf="userIsLoggedIn || username?.length <= 8"
+                     [attr.data-tab-name]="username">
+                  <lazy-loading [hidden]="!userInfoIsLoading"></lazy-loading>
                   <span class="e2e-test-username"
-                        ng-show="!$ctrl.userInfoIsLoading">
-                    <[$ctrl.userIsLoggedIn ? $ctrl.username : 'Guest']>
+                        [hidden]="userInfoIsLoading">
+                    {{userIsLoggedIn ? username : 'Guest'}}
+                  </span>
+                </div>
+                <div class="oppia-long-contributor-username-container"
+                     *ngIf="userIsLoggedIn && username?.length > 8"
+                     [attr.data-tab-name]="username">
+                  <lazy-loading [hidden]="!userInfoIsLoading"></lazy-loading>
+                  <span class="e2e-test-username"
+                        [hidden]="userInfoIsLoading">
+                    {{userIsLoggedIn ? username : 'Guest'}}
                   </span>
                 </div>
                 <div class="oppia-review-right-details-container e2e-test-review-rights"
-                     ng-if="$ctrl.userIsReviewer">
+                     *ngIf="userIsReviewer">
                   <strong>Review rights:</strong>
-                  <div ng-if="$ctrl.userCanReviewTranslationSuggestionsInLanguages.length > 0">
+                  <div *ngIf="userCanReviewTranslationSuggestionsInLanguages.length > 0">
                     Translations in languages:
-                    <span ng-repeat="languageDescription in $ctrl.userCanReviewTranslationSuggestionsInLanguages">
-                      <span class="oppia-review-item-detail-container e2e-test-translation-<[$ctrl.provideLanguageForProtractorClass(languageDescription)]>-reviewer">
-                        <[languageDescription]>
+                    <div class="oppia-language-container">
+                      <span *ngFor="let languageDescription of userCanReviewTranslationSuggestionsInLanguages">
+                        <div class="oppia-review-item-detail-container e2e-test-translation-{{provideLanguageForProtractorClass(languageDescription)}}-reviewer">
+                          {{languageDescription}}
+                        </div>
                       </span>
-                    </span>
+                    </div>
                   </div>
-                  <div ng-if="$ctrl.userCanReviewVoiceoverSuggestionsInLanguages.length > 0">
+                  <div *ngIf="userCanReviewVoiceoverSuggestionsInLanguages.length > 0">
                     Voiceovers in languages:
-                    <span ng-repeat="languageDescription in $ctrl.userCanReviewVoiceoverSuggestionsInLanguages">
-                      <span class="oppia-review-item-detail-container e2e-test-voiceover-<[$ctrl.provideLanguageForProtractorClass(languageDescription)]>-reviewer">
-                        <[languageDescription]>
+                    <div class="oppia-language-container">
+                      <span *ngFor="let languageDescription of userCanReviewVoiceoverSuggestionsInLanguages">
+                        <span class="oppia-review-item-detail-container e2e-test-voiceover-{{provideLanguageForProtractorClass(languageDescription)}}-reviewer">
+                          {{languageDescription}}
+                        </span>
                       </span>
-                    </span>
+                    </div>
                   </div>
-                  <div ng-if="$ctrl.userCanReviewQuestions"
+                  <div *ngIf="userCanReviewQuestions"
                        class="e2e-test-question-reviewer">
                     Questions
                   </div>
@@ -69,53 +85,55 @@
               </div>
             </div>
             <div class="oppia-dropdown-container"
-                 ng-if="$ctrl.showTopicSelector()">
+                 *ngIf="showTopicSelector()">
               <div class="oppia-dashboard-topic-container">
                 <span class="oppia-dashboard-topic-container-label">Filter by Topic</span>
                 <translation-topic-selector class="oppia-topic-selector"
-                                            [active-topic-name]="$ctrl.topicName"
-                                            (set-active-topic-name)="$ctrl.onChangeTopic($event)">
+                                            [activeTopicName]="topicName"
+                                            (setActiveTopicName)="onChangeTopic($event)">
                 </translation-topic-selector>
               </div>
             </div>
           </div>
         </div>
         <div class="oppia-opportunities-tab-header"
-             ng-if="$ctrl.activeTabName !== 'myContributionTab'">
+             *ngIf="activeTabName !== 'myContributionTab'">
           <div class="oppia-outer-container">
             <div class="oppia-mascot-container">
               <div class="oppia-mascot-avatar-container">
-                <a ng-class="{'oppia-disabled-image-link': ($ctrl.OPPIA_AVATAR_LINK_URL === null)}"
-                   ng-href="<[$ctrl.OPPIA_AVATAR_LINK_URL]>"
+                <a [ngClass]="{'oppia-disabled-image-link': (OPPIA_AVATAR_LINK_URL === null)}"
+                   [href]="OPPIA_AVATAR_LINK_URL"
                    rel="noopener"
                    target="_blank">
                   <img class="oppia-mascot-avatar"
-                       ng-src="<[$ctrl.OPPIA_AVATAR_IMAGE_URL]>"
+                       [src]="OPPIA_AVATAR_IMAGE_URL"
                        alt="Oppia Mascot Avatar">
                 </a>
               </div>
               <div class="oppia-explanation-container">
-                <div class="oppia-opportunities-tabs-explanation"
-                     data-tab-name="<[$ctrl.tabsDetails[$ctrl.activeTabName].tabName]>">
-                  <[$ctrl.tabsDetails[$ctrl.activeTabName].description]>
+                <div class="oppia-opportunities-tabs-explanation">
+                  <div class="oppia-opportunities-tabs-explanation-before">
+                    {{tabsDetails[activeTabName].tabName}}
+                  </div>
+                  {{tabsDetails[activeTabName].description}}
                 </div>
               </div>
             </div>
             <div class="oppia-dropdown-container"
-                 ng-if="$ctrl.showLanguageSelector() || $ctrl.showTopicSelector()">
+                 *ngIf="showLanguageSelector() || showTopicSelector()">
               <div class="oppia-dashboard-language-container"
-                   ng-if="$ctrl.showLanguageSelector()">
+                   *ngIf="showLanguageSelector()">
                 <div class="oppia-dashboard-language-container-label">Translate to</div>
                 <translation-language-selector class="oppia-language-selector"
-                                               [active-language-code]="$ctrl.languageCode"
-                                               (set-active-language-code)="$ctrl.onChangeLanguage($event)">
+                                               [activeLanguageCode]="languageCode"
+                                               (setActiveLanguageCode)="onChangeLanguage($event)">
                 </translation-language-selector>
               </div>
-              <div class="oppia-dashboard-topic-container" ng-if="$ctrl.showTopicSelector()">
+              <div class="oppia-dashboard-topic-container" *ngIf="showTopicSelector()">
                 <div class="oppia-dashboard-topic-container-label">Subject</div>
                 <translation-topic-selector class="oppia-topic-selector"
-                                            [active-topic-name]="$ctrl.topicName"
-                                            (set-active-topic-name)="$ctrl.onChangeTopic($event)">
+                                            [activeTopicName]="topicName"
+                                            (setActiveTopicName)="onChangeTopic($event)">
                 </translation-topic-selector>
               </div>
             </div>
@@ -123,84 +141,88 @@
         </div>
       </div>
     </div>
-    <div ng-class="{'oppia-translate-y': !$ctrl.defaultHeaderVisible, 'oppia-contributor-dashboard-collapsible-header': $ctrl.defaultHeaderVisible}">
+    <div [ngClass]="{'oppia-translate-y': !defaultHeaderVisible, 'oppia-contributor-dashboard-collapsible-header': defaultHeaderVisible}">
       <div class="oppia-collapsed-opportunities-tab-customization-container">
         <div class="oppia-collapsed-opportunities-tab-header"
-             ng-if="$ctrl.activeTabName === 'myContributionTab'">
+             *ngIf="activeTabName === 'myContributionTab'">
           <div class="oppia-collapsed-user-info">
             <div class="oppia-profile-details-container">
-              <span ng-if="$ctrl.profilePictureDataUrl">
-                <img ng-src="<[$ctrl.profilePictureDataUrl]>"
+              <span *ngIf="profilePictureDataUrl">
+                <img [src]="profilePictureDataUrl"
                      class="rounded-circle collapsed-oppia-contributor-img"
                      alt="User Avatar">
               </span>
-              <span ng-if="!$ctrl.profilePictureDataUrl">
+              <span *ngIf="!profilePictureDataUrl">
                 <i class="material-icons oppia-profile-picture-icon collapsed-oppia-contributor-img">&#xE853;</i>
               </span>
             </div>
             <div class="collapsed-oppia-contributor-username-container">
-              <lazy-loading ng-show="$ctrl.userInfoIsLoading"></lazy-loading>
+              <lazy-loading [hidden]="!userInfoIsLoading"></lazy-loading>
               <span class="e2e-test-username"
-                    ng-show="!$ctrl.userInfoIsLoading">
-                <[$ctrl.userIsLoggedIn ? $ctrl.username : 'Guest']>
+                    [hidden]="userInfoIsLoading">
+                {{userIsLoggedIn ? username : 'Guest'}}
               </span>
             </div>
           </div>
           <div class="oppia-collapsed-review-right-details-container e2e-test-review-rights"
-               ng-if="$ctrl.userIsReviewer">
+               *ngIf="userIsReviewer">
             <strong>Review rights:</strong>
-            <div ng-if="$ctrl.userCanReviewTranslationSuggestionsInLanguages.length > 0">
+            <div *ngIf="userCanReviewTranslationSuggestionsInLanguages.length > 0">
               Translations in languages:
-              <span ng-repeat="languageDescription in $ctrl.userCanReviewTranslationSuggestionsInLanguages">
-                <span class="oppia-review-item-detail-container e2e-test-translation-<[languageDescription]>-reviewer">
-                  <[languageDescription]>
+              <div class="oppia-language-container">
+                <span *ngFor="let languageDescription of userCanReviewTranslationSuggestionsInLanguages">
+                  <span class="oppia-review-item-detail-container e2e-test-translation-{{languageDescription}}-reviewer">
+                    {{languageDescription}}
+                  </span>
                 </span>
-              </span>
+              </div>
             </div>
-            <div ng-if="$ctrl.userCanReviewVoiceoverSuggestionsInLanguages.length > 0">
+            <div *ngIf="userCanReviewVoiceoverSuggestionsInLanguages.length > 0">
               Voiceovers in languages:
-              <span ng-repeat="languageDescription in $ctrl.userCanReviewVoiceoverSuggestionsInLanguages">
-                <span class="oppia-review-item-detail-container e2e-test-voiceover-<[languageDescription]>-reviewer">
-                  <[languageDescription]>
+              <div class="oppia-language-container">
+                <span *ngFor="let languageDescription of userCanReviewVoiceoverSuggestionsInLanguages">
+                  <span class="oppia-review-item-detail-container e2e-test-voiceover-{{languageDescription}}-reviewer">
+                    {{ languageDescription }}
+                  </span>
                 </span>
-              </span>
+              </div>
             </div>
-            <div ng-if="$ctrl.userCanReviewQuestions"
+            <div *ngIf="userCanReviewQuestions"
                  class="e2e-test-question-reviewer">
               Questions
             </div>
           </div>
         </div>
         <div class="oppia-collapsed-opportunities-tab-header"
-             ng-if="$ctrl.activeTabName !== 'myContributionTab'">
+             *ngIf="activeTabName !== 'myContributionTab'">
           <div class="tab-info">
             <div class="oppia-collapsed-mascot-avatar-container">
-              <a ng-class="{'oppia-disabled-image-link': ($ctrl.OPPIA_AVATAR_LINK_URL === null)}"
-                 ng-href="<[$ctrl.OPPIA_AVATAR_LINK_URL]>"
+              <a [ngClass]="{'oppia-disabled-image-link': (OPPIA_AVATAR_LINK_URL === null)}"
+                 [href]="OPPIA_AVATAR_LINK_URL"
                  rel="noopener"
                  target="_blank">
                 <img class="oppia-mascot-avatar collapsed-oppia-contributor-img"
-                     ng-src="<[$ctrl.OPPIA_AVATAR_IMAGE_URL]>"
+                     [src]="OPPIA_AVATAR_IMAGE_URL"
                      alt="Oppia Mascot Avatar">
               </a>
             </div>
             <div class="oppia-collapsed-opportunities-tabs-explanation"
-                 ng-if="$ctrl.activeTabName === 'submitQuestionTab'">
+                 *ngIf="activeTabName === 'submitQuestionTab'">
               Submit Question
             </div>
             <div class="oppia-collapsed-opportunities-tabs-explanation"
-                 ng-if="$ctrl.activeTabName === 'translateTextTab'">
+                 *ngIf="activeTabName === 'translateTextTab'">
               Translate Text
             </div>
           </div>
           <div class="oppia-collapsed-language-selector-container"
-               ng-if="$ctrl.showLanguageSelector()">
+               *ngIf="showLanguageSelector()">
             <div class="oppia-collapsed-dashboard-language-container-label">Translate to</div>
             <button focus-on="selectLangDropDown"
                     class="oppia-autofocus oppia-collapsed-language-selector-button border-0 p-0">
               <translation-language-selector class="oppia-collapsed-language-selector"
-                                             [active-language-code]="$ctrl.languageCode"
-                                             (set-active-language-code)="$ctrl.onChangeLanguage($event)">
+                                             [activeLanguageCode]="languageCode"
+                                             (setActiveLanguageCode)="onChangeLanguage($event)">
               </translation-language-selector>
             </button>
           </div>
@@ -208,17 +230,27 @@
       </div>
     </div>
   </div>
-  <div ng-if="$ctrl.activeTabName === 'myContributionTab' || !$ctrl.activeTabName">
-    <contributions-and-review></contributions-and-review>
+  <div *ngIf="activeTabName === 'myContributionTab' || !activeTabName">
+    <oppia-contributions-and-review>
+    </oppia-contributions-and-review>
   </div>
-  <div ng-if="$ctrl.activeTabName === 'submitQuestionTab'" class="oppia-opportunities">
-    <question-opportunities></question-opportunities>
+  <div *ngIf="activeTabName === 'submitQuestionTab'"
+       class="oppia-opportunities">
+    <oppia-question-opportunities>
+    </oppia-question-opportunities>
   </div>
-  <div ng-if="$ctrl.activeTabName === 'translateTextTab'" class="oppia-opportunities">
-    <oppia-translation-opportunities></oppia-translation-opportunities>
+  <div *ngIf="activeTabName === 'translateTextTab'"
+       class="oppia-opportunities">
+    <oppia-translation-opportunities>
+    </oppia-translation-opportunities>
   </div>
 </div>
 <style>
+  .oppia-language-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
   .oppia-collapsed-user-info {
     display: flex;
     flex-direction: row;
@@ -249,7 +281,7 @@
     margin-right: 10px;
   }
   .oppia-opportunities {
-    margin-top: 20px;
+    margin: 20px 10px 0 10px;
   }
   .oppia-user-and-rights {
     display: flex;
@@ -283,7 +315,7 @@
     align-items: center;
     color: #4a4a4a;
     display: flex;
-    font-size: 20px;
+    font-size: 18px;
   }
   .oppia-collapsed-dashboard-language-container-label {
     color: #4a4a4a;
@@ -304,26 +336,25 @@
     height: 35px;
   }
   .oppia-opportunities-tabs-explanation {
-    padding-top: 20px;
     position: relative;
   }
-  .oppia-opportunities-tabs-explanation::before {
-    bottom: 65%;
+  .oppia-opportunities-tabs-explanation-before {
     color: #009688;
-    content: attr(data-tab-name);
     font-family: "Capriola", "Roboto", Arial, sans-serif;
     font-size: 24px;
-    margin-bottom: 10px;
-    position: absolute;
+    z-index: 100;
   }
-  .oppia-contributor-username-container {
+  .oppia-short-contributor-username-container,
+  .oppia-long-contributor-username-container {
     color: #009688;
     font-family: "Capriola", "Roboto", Arial, sans-serif;
     font-size: 24px;
     height: 30%;
     padding-top: 10px;
     position: relative;
-    width: 100px;
+  }
+  .oppia-short-contributor-username-container {
+    min-width: 100px;
   }
   .oppia-review-right-details-container {
     font-size: 18px;
@@ -342,7 +373,8 @@
     position: relative;
     width: 40%;
   }
-  .oppia-contributor-username-container::before {
+  .oppia-short-contributor-username-container::before,
+  .oppia-long-contributor-username-container::before {
     bottom: 65%;
     color: #4a4a4a;
     content: attr(data-tab-name);
@@ -378,7 +410,7 @@
     text-align: center;
     width: 80%;
   }
-.oppia-opportunities-tab-item {
+  .oppia-opportunities-tab-item {
     align-items: center;
     display: flex;
     flex-direction: column;
@@ -431,15 +463,15 @@
     color: #00645d;
     text-decoration: none;
   }
-  .oppia-active-tab-hilighter {
+  .oppia-active-tab-highlighter {
     height: 0;
     transform: scale(0);
     -webkit-transition: transform 200ms ease-out;
     -ms-transition: transform 200ms ease-out;
     transition: transform 200ms ease-out;
-    width: 60%;
+    width: 100%;
   }
-  .oppia-active-opportunities-tab .oppia-active-tab-hilighter {
+  .oppia-active-opportunities-tab .oppia-active-tab-highlighter {
     background-color: #00645d;
     border: 2px solid #00645d;
     text-decoration: none;
@@ -456,8 +488,10 @@
     background-color: #00645d;
     border-radius: 10%;
     color: #fff;
-    margin: auto 2px;
+    height: 29px;
+    margin: 1px 2px;
     padding: 1px 5px;
+    width: fit-content;
   }
   .oppia-contributor-home {
     position: -webkit-sticky;
@@ -501,9 +535,9 @@
     display: none;
   }
   .oppia-translate-y {
-      -webkit-animation: translate-y 0.5s ease-out alternate;
-      -moz-animation: translate-y 0.5s ease-out alternate;
-      animation: translate-y 0.5s ease-out alternate;
+    -webkit-animation: translate-y 0.5s ease-out alternate;
+    -moz-animation: translate-y 0.5s ease-out alternate;
+    animation: translate-y 0.5s ease-out alternate;
   }
   .oppia-topic-selector {
     width: 100%;
@@ -534,13 +568,24 @@
       from { transform: translateY(-100%); }
       to { transform: translateY(0); }
   }
+  @media only screen and (max-width: 800px) {
+    .oppia-contributor-username-container {
+      font-size: 20px;
+    }
+  }
   @media only screen and (max-width: 700px) {
+    .oppia-opportunities-tabs-explanation {
+      font-size: 18px;
+    }
+    .oppia-opportunities-tabs-explanation-before {
+      font-size: 20px;
+    }
     .oppia-opportunities-tabs {
       padding-bottom: 10px;
     }
     .oppia-collapsed-review-right-details-container {
       display: flex;
-      margin: auto 0;
+      margin: auto 40px;
       width: 500px;
     }
     .oppia-collapsed-opportunities-tab-header {
@@ -563,6 +608,7 @@
     }
     .oppia-outer-container {
       flex-direction: column;
+      margin-top: 0;
       width: 100%;
     }
     .oppia-mascot-container {
@@ -592,11 +638,13 @@
       width: 100%;
     }
     .oppia-dashboard-language-container-label, .oppia-dashboard-topic-container-label {
+      font-size: 18px;
       margin-right: 10px;
       padding: auto 0;
       width: 175px;
     }
     .oppia-opportunities-tabs-list {
+      padding: 5px;
       width: 100%;
     }
     .oppia-opportunities-tabs-text {
@@ -625,6 +673,15 @@
       margin-bottom: 0;
       padding-top: 1%;
     }
+
+    .collapsed-oppia-contributor-username-container,
+    .oppia-collapsed-user-info,
+    .oppia-short-contributor-username-container,
+    .oppia-long-contributor-username-container,
+    .oppia-profile-details-container {
+      display: none;
+    }
+
   }
   @media only screen and (max-width: 510px) {
     .oppia-collapsed-user-info {
@@ -636,10 +693,8 @@
       margin-left: 10px;
     }
     .oppia-opportunities-tabs-text {
-      font-size: 3.5vw;
-    }
-    .oppia-opportunities-tabs-explanation::before {
-      margin-bottom: 20px;
+      font-size: 15px;
+      padding: 10px 5px;
     }
     .oppia-collapsed-opportunities-tab-header {
       align-items: center;

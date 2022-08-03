@@ -69,6 +69,7 @@ describe('Outcome Feedback Editor Component', () => {
       changeDetectorRef.constructor.prototype, 'detectChanges');
     component.outcome = new Outcome(
       'default',
+      null,
       new SubtitledHtml('<p> Previous HTML string </p>', 'Id'),
       false,
       [],
@@ -93,6 +94,7 @@ describe('Outcome Feedback Editor Component', () => {
       changeDetectorRef.constructor.prototype, 'detectChanges');
     component.outcome = new Outcome(
       'default',
+      null,
       new SubtitledHtml('<p> Previous HTML string </p>', 'Id'),
       false,
       [],

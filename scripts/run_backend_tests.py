@@ -71,12 +71,6 @@ from . import common  # isort:skip  pylint: disable=wrong-import-position, wrong
 from . import concurrent_task_utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import servers  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
-COVERAGE_DIR = os.path.join(
-    os.getcwd(), os.pardir, 'oppia_tools',
-    'coverage-%s' % common.COVERAGE_VERSION)
-COVERAGE_MODULE_PATH = os.path.join(
-    os.getcwd(), os.pardir, 'oppia_tools',
-    'coverage-%s' % common.COVERAGE_VERSION, 'coverage')
 COVERAGE_EXCLUSION_LIST_PATH = os.path.join(
     os.getcwd(), 'scripts', 'backend_tests_incomplete_coverage.txt')
 
@@ -175,7 +169,7 @@ class TestingTaskSpec:
         test_target_flag = '--test_target=%s' % self.test_target
         if self.generate_coverage_report:
             exc_list = [
-                sys.executable, COVERAGE_MODULE_PATH, 'run',
+                sys.executable, '-m', 'coverage', 'run',
                 '--branch', TEST_RUNNER_PATH, test_target_flag
             ]
             rand = random.Random(os.urandom(8)).randint(0, 999999)
@@ -187,7 +181,19 @@ class TestingTaskSpec:
         else:
             exc_list = [sys.executable, TEST_RUNNER_PATH, test_target_flag]
 
-        result = run_shell_cmd(exc_list, env=env)
+        try:
+            result = run_shell_cmd(exc_list, env=env)
+        except Exception as e:
+            # Occasionally, tests fail spuriously because of an issue in grpc
+            # (see e.g. https://github.com/oppia/oppia/runs/7462764522) that
+            # causes a random polling error to be surfaced. Since this doesn't
+            # represent a 'real' test failure, we do a single extra run if we
+            # see that.
+            if 'ev_epollex_linux.cc' in str(e):
+                result = run_shell_cmd(exc_list, env=env)
+            else:
+                raise e
+
         messages = [result]
 
         if self.generate_coverage_report:
@@ -331,20 +337,6 @@ def main(args=None):
         sys.path.insert(1, directory)
 
     common.fix_third_party_imports()
-
-    if parsed_args.generate_coverage_report:
-        print(
-            'Checking whether coverage is installed in %s'
-            % common.OPPIA_TOOLS_DIR
-        )
-        if not os.path.exists(
-                os.path.join(
-                    common.OPPIA_TOOLS_DIR,
-                    'coverage-%s' % common.COVERAGE_VERSION
-                )
-        ):
-            raise Exception(
-                'Coverage is not installed, please run the start script.')
 
     test_specs_provided = sum([
         1 if argument else 0
@@ -526,7 +518,7 @@ def main(args=None):
             incomplete_coverage)
 
     if parsed_args.generate_coverage_report:
-        subprocess.check_call([sys.executable, COVERAGE_MODULE_PATH, 'combine'])
+        subprocess.check_call([sys.executable, '-m', 'coverage', 'combine'])
         report_stdout, coverage = _check_coverage(True)
         print(report_stdout)
 
@@ -559,7 +551,7 @@ def _check_coverage(
     """
     if combine:
         combine_process = subprocess.run(
-            [sys.executable, COVERAGE_MODULE_PATH, 'combine'],
+            [sys.executable, '-m', 'coverage', 'combine'],
             capture_output=True, encoding='utf-8', check=False)
         no_combine = combine_process.stdout.strip() == 'No data to combine'
         if (combine_process.returncode and not no_combine):
@@ -568,7 +560,7 @@ def _check_coverage(
                 '\n%s' % combine_process)
 
     cmd = [
-        sys.executable, COVERAGE_MODULE_PATH, 'report',
+        sys.executable, '-m', 'coverage', 'report',
          '--omit="%s*","third_party/*","/usr/share/*"'
          % common.OPPIA_TOOLS_DIR, '--show-missing']
     if include:

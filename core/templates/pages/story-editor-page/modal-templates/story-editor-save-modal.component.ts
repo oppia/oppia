@@ -24,7 +24,10 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
   templateUrl: './story-editor-save-modal.component.html'
 })
 export class StoryEditorSaveModalComponent {
-  bindedMessage;
+  // This property is initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  bindedMessage!: string;
   constructor(
      private activeModal: NgbActiveModal
   ) {}

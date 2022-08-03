@@ -16,10 +16,12 @@
  * @fileoverview End-to-end tests for the contributor dashboard page.
  */
 
+var action = require('../protractor_utils/action.js');
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
+var waitFor = require('../protractor_utils/waitFor.js');
 
 var AdminPage = require('../protractor_utils/AdminPage.js');
 var ContributorDashboardPage = require(
@@ -32,6 +34,15 @@ var SkillEditorPage = require(
   '../protractor_utils/SkillEditorPage.js');
 var TopicsAndSkillsDashboardPage = require(
   '../protractor_utils/TopicsAndSkillsDashboardPage.js');
+var StoryEditorPage = require('../protractor_utils/StoryEditorPage.js');
+var Constants = require('../protractor_utils/ProtractorConstants.js');
+var TopicEditorPage = require('../protractor_utils/TopicEditorPage.js');
+var ExplorationEditorPage = require(
+  '../protractor_utils/ExplorationEditorPage.js'
+);
+var CreatorDashboardPage = require(
+  '../protractor_utils/CreatorDashboardPage.js'
+);
 
 describe('Contributor dashboard page', function() {
   const TOPIC_NAMES = [
@@ -54,6 +65,9 @@ describe('Contributor dashboard page', function() {
   let explorationEditorMainTab = null;
   let adminPage = null;
   let contributorDashboardAdminPage = null;
+  let storyEditorPage = null;
+  let topicEditorPage = null;
+  let creatorDashboardPage = null;
 
   beforeAll(async function() {
     contributorDashboardPage = (
@@ -140,6 +154,91 @@ describe('Contributor dashboard page', function() {
       await users.logout();
     });
 
+  it('should allow the users to use the copy tool', async function() {
+    storyEditorPage = new StoryEditorPage.StoryEditorPage();
+    topicEditorPage = new TopicEditorPage.TopicEditorPage();
+    creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
+    let explorationEditorPage = new ExplorationEditorPage.
+      ExplorationEditorPage();
+
+    await users.login(ADMIN_EMAIL);
+
+    // Creating an exploration with an image.
+    await creatorDashboardPage.get();
+    await workflow.createExploration(true);
+    let explorationEditorMainTab = explorationEditorPage.getMainTab();
+    await explorationEditorMainTab.setContent(async function(richTextEditor) {
+      await richTextEditor.addRteComponent(
+        'Image',
+        'create',
+        ['rectangle', 'bezier', 'piechart', 'svgupload'],
+        'An svg diagram.');
+    });
+    await explorationEditorMainTab.setInteraction('EndExploration');
+    var explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
+    await explorationEditorPage.navigateToSettingsTab();
+    await explorationEditorSettingsTab.setTitle('exp1');
+    await explorationEditorSettingsTab.setLanguage('English');
+    await explorationEditorSettingsTab.setObjective(
+      'Dummy exploration for testing images'
+    );
+    await explorationEditorSettingsTab.setCategory('Algebra');
+    await explorationEditorPage.saveChanges();
+    await workflow.publishExploration();
+    let dummyExplorationId = await general.getExplorationIdFromEditor();
+
+    // Adding the exploration to a curated lesson.
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.waitForTopicsToLoad();
+    await topicsAndSkillsDashboardPage.navigateToTopicWithIndex(0);
+    await topicEditorPage.createStory(
+      'Story Title', 'topicandstoryeditorone', 'Story description',
+      Constants.TEST_SVG_PATH);
+    await storyEditorPage.createNewChapter(
+      'Chapter 1', dummyExplorationId, Constants.TEST_SVG_PATH);
+    await storyEditorPage.updateMetaTagContent('story meta tag');
+    await storyEditorPage.saveStory('Saving Story');
+    await storyEditorPage.publishStory();
+    await storyEditorPage.returnToTopic();
+
+    // Testing the copy tool.
+    let images = element.all(by.css('.e2e-test-image'));
+    let opportunityActionButtonCss = element(by.css(
+      '.e2e-test-opportunity-list-item-button'));
+    let copyButton = element(by.css('.e2e-test-copy-button'));
+    let doneButton = element(
+      by.css('.e2e-test-close-rich-text-component-editor'));
+    let cancelButton = element(
+      by.css('.e2e-test-cancel-rich-text-editor'));
+
+    await contributorDashboardPage.get();
+    await contributorDashboardPage.navigateToTranslateTextTab();
+    await contributorDashboardTranslateTextTab.changeLanguage(
+      GERMAN_LANGUAGE);
+    await contributorDashboardPage.waitForOpportunitiesToLoad();
+    await action.click('Opportunity button', opportunityActionButtonCss);
+    await waitFor.visibilityOf(
+      images.first(),
+      'Test image taking too long to appear.');
+    expect(await images.count()).toEqual(1);
+
+    // Copy tool should copy image on pressing 'Done'.
+    await waitFor.visibilityOf(
+      copyButton, 'Copy button taking too long to appear');
+    await action.click('Copy button', copyButton);
+    await action.click('Image', images.first());
+    await action.click('Done', doneButton);
+    expect(await images.count()).toEqual(2);
+
+    // Copy tool should not copy image on pressing 'Cancel'.
+    await waitFor.visibilityOf(
+      copyButton, 'Copy button taking too long to appear');
+    await action.click('Image', images.first());
+    await action.click('Cancel', cancelButton);
+    expect(await images.count()).toEqual(2);
+    await users.logout();
+  });
+
   it('should allow reviewer to accept question suggestions', async function() {
     // Baseline verification.
     await users.login(USER_EMAILS[0]);
@@ -148,7 +247,7 @@ describe('Contributor dashboard page', function() {
     await contributorDashboardPage.navigateToSubmitQuestionTab();
     await contributorDashboardPage.waitForOpportunitiesToLoad();
     await contributorDashboardPage.expectOpportunityWithPropertiesToExist(
-      SKILL_DESCRIPTIONS[0], TOPIC_NAMES[0], null, '(0.00%)');
+      SKILL_DESCRIPTIONS[0], TOPIC_NAMES[0], null, '(0%)');
 
     // Submit suggestion as user0.
     await contributorDashboardPage.clickOpportunityActionButton(
@@ -190,7 +289,7 @@ describe('Contributor dashboard page', function() {
     await contributorDashboardPage.waitForOpportunitiesToLoad();
     // After acceptance, progress percentage should be 1/50 = 2%.
     await contributorDashboardPage.expectOpportunityWithPropertiesToExist(
-      SKILL_DESCRIPTIONS[0], TOPIC_NAMES[0], null, '(10.00%)');
+      SKILL_DESCRIPTIONS[0], TOPIC_NAMES[0], null, '(10%)');
     await users.logout();
 
     // Validate the contribution status changed.
@@ -210,7 +309,7 @@ describe('Contributor dashboard page', function() {
     await contributorDashboardPage.navigateToSubmitQuestionTab();
     await contributorDashboardPage.waitForOpportunitiesToLoad();
     await contributorDashboardPage.expectOpportunityWithPropertiesToExist(
-      SKILL_DESCRIPTIONS[0], TOPIC_NAMES[0], null, '(10.00%)');
+      SKILL_DESCRIPTIONS[0], TOPIC_NAMES[0], null, '(10%)');
 
     // Submit suggestion as user0.
     await contributorDashboardPage.clickOpportunityActionButton(
@@ -253,7 +352,7 @@ describe('Contributor dashboard page', function() {
     await contributorDashboardPage.navigateToSubmitQuestionTab();
     await contributorDashboardPage.waitForOpportunitiesToLoad();
     await contributorDashboardPage.expectOpportunityWithPropertiesToExist(
-      SKILL_DESCRIPTIONS[0], TOPIC_NAMES[0], null, '(10.00%)');
+      SKILL_DESCRIPTIONS[0], TOPIC_NAMES[0], null, '(10%)');
     await users.logout();
 
     // Validate the contribution status changed.
