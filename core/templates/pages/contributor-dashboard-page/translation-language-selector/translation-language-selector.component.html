@@ -24,7 +24,7 @@
     <div class="material-icons oppia-translation-language-selector-inner-container-arrow" (click)="toggleDropdown()">
       arrow_drop_down
     </div>
-    
+
     <div class="oppia-translation-language-selector-dropdown-options-container">
       <div *ngIf="featuredLanguages.length > 0" class="e2e-test-featured-language-container">
         <div class="oppia-translation-language-selector-dropdown-label">Most needed</div>
@@ -80,8 +80,8 @@
   }
 
   .oppia-translation-language-selector-dropdown-options-container {
-    overflow-y: scroll;
     height: calc(100% - 26px);
+    overflow-y: scroll;
   }
 
   .oppia-translation-language-selector-dropdown-container {
@@ -166,8 +166,8 @@
   }
   
   .oppia-translation-language-selector-filter-input {
-    max-width: calc(100% - 32px);
     border: none;
+    max-width: calc(100% - 32px);
     outline: none;
   }
 </style>
