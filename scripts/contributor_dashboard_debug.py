@@ -1,11 +1,9 @@
 import json
+import sys
 import os
-from urllib import response
 import requests
 import hashlib
-import pprint
 
-import sys
 
 THIRD_PARTY_PYTHON_LIBS_DIR = 'third_party/python_libs/'
 sys.path.append(THIRD_PARTY_PYTHON_LIBS_DIR)
@@ -19,7 +17,6 @@ if 'google' in sys.modules:
     google_module.__path__ = [google_path, THIRD_PARTY_PYTHON_LIBS_DIR]
     google_module.__file__ = os.path.join(google_path, '__init__.py')
         
-import google.auth
 import firebase_admin
 from firebase_admin import auth as firebase_auth
 
@@ -49,6 +46,8 @@ def populate_data_for_contributor_dashboard_debug():
 
     _assign_admin_roles(SUPER_ADMIN_ROLES, SUPER_ADMIN_USERNAME)
     _add_submit_question_rights(CONTRIBUTOR_USERNAME)
+    _generate_dummy_new_structures_data()
+    _add_topics_to_classroom()
 
 def _create_new_user(email, username):
     """Reloads the collection in dev_mode corresponding to the given
@@ -122,7 +121,50 @@ def _add_submit_question_rights(username):
     csrf_token = _get_csrf_token(cookies)
 
     requests.post(base_url + '/contributionrightshandler/submit_question',
-        params={'payload': json.dumps({'username': username}),
-                'csrf_token': csrf_token}, cookies=cookies)
+        params={
+            'payload': json.dumps({'username': username}),
+            'csrf_token': csrf_token
+        }, cookies=cookies)
+
+def _generate_dummy_new_structures_data():
+
+    cookies = _get_session_cookies(SUPER_ADMIN_EMAIL)
+    csrf_token = _get_csrf_token(cookies)
+
+    requests.post(base_url + '/adminhandler',
+        params={
+            'payload': json.dumps({
+                'action': 'generate_dummy_new_structures_data'}),
+            'csrf_token': csrf_token
+        }, cookies=cookies)
+
+def _add_topics_to_classroom():
+
+    cookies = _get_session_cookies(SUPER_ADMIN_EMAIL)
+    csrf_token = _get_csrf_token(cookies)
+
+    response = requests.get(base_url + '/topics_and_skills_dashboard/data',
+        cookies=cookies)
+    topic_summary_dicts = json.loads(
+        response.text[len(feconf.XSSI_PREFIX):])['topic_summary_dicts']
+    topic_ids = [topic_summary_dict['id']
+                    for topic_summary_dict in topic_summary_dicts]
+
+    requests.post(base_url + '/adminhandler',
+        params={
+            'payload': json.dumps({
+                'action': 'save_config_properties',
+                'new_config_property_values': {
+                    'classroom_pages_data': [{
+                        'name': 'dummy',
+                        'url_fragment': 'dummy',
+                        'course_details': '',
+                        'topic_list_intro': '',
+                        'topic_ids': topic_ids
+                    }]
+                }
+            }),
+            'csrf_token': csrf_token
+        }, cookies=cookies)
 
 populate_data_for_contributor_dashboard_debug()
