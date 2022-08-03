@@ -46,8 +46,11 @@ export class TranslationLanguageSelectorComponent implements OnInit {
   @Input() activeLanguageCode!: string | null;
   @Output() setActiveLanguageCode: EventEmitter<string> = new EventEmitter();
   @ViewChild('dropdown', {'static': false}) dropdownRef!: ElementRef;
+  @ViewChild('filterDiv') private filterDivRef: ElementRef;
 
   options!: Options[];
+  filteredOptions: Options[];
+  optionsFilter: string = '';
   languageSelection!: string;
   languageIdToDescription: {[id: string]: string} = {};
   featuredLanguages: FeaturedTranslationLanguage[] = [];
@@ -70,7 +73,7 @@ export class TranslationLanguageSelectorComponent implements OnInit {
         this.languageSelection = this.languageIdToDescription[
           this.translationLanguageService.getActiveLanguageCode()];
       });
-    this.options = this.languageUtilService
+    this.filteredOptions = this.options = this.languageUtilService
       .getAllVoiceoverLanguageCodes().map(languageCode => {
         const description = this.languageUtilService
           .getAudioLanguageDescription(languageCode);
@@ -102,6 +105,11 @@ export class TranslationLanguageSelectorComponent implements OnInit {
 
   toggleDropdown(): void {
     this.dropdownShown = !this.dropdownShown;
+    if (this.dropdownShown) {
+      this.optionsFilter = '';
+      this.filteredOptions = this.options;
+      setTimeout(() => this.filterDivRef.nativeElement.focus(), 1);
+    }
   }
 
   populateLanguageSelection(languageCode: string): void {
@@ -146,6 +154,12 @@ export class TranslationLanguageSelectorComponent implements OnInit {
     ) {
       this.dropdownShown = false;
     }
+  }
+
+  filterOptions(): void {
+    this.filteredOptions = this.options.filter(
+      option => option.description.toLowerCase().includes(
+        this.optionsFilter.toLowerCase()));
   }
 }
 
