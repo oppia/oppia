@@ -39,8 +39,7 @@ from core.domain import param_domain
 from core.domain import state_domain
 from core.domain import translation_domain
 
-from typing import Dict, List, Optional
-from typing_extensions import TypedDict
+from typing import Dict, List, Optional, TypedDict
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip

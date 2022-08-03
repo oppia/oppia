@@ -29,8 +29,7 @@ from core.domain import interaction_registry
 from core.tests import test_utils
 from extensions.interactions import base
 
-from typing import Any, Dict
-from typing_extensions import Final
+from typing import Any, Dict, Final
 
 EXPECTED_TERMINAL_INTERACTIONS_COUNT: Final = 1
 

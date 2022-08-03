@@ -29,8 +29,7 @@ from core.domain import story_domain
 from core.domain import topic_domain
 from core.platform import models
 
-from typing import Any, Callable, Dict, List, cast, overload
-from typing_extensions import Final, Literal, TypedDict
+from typing import Any, Callable, Dict, Final, List, Literal, TypedDict, cast, overload
 
 MYPY = False
 if MYPY: # pragma: no cover
