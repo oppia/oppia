@@ -43,28 +43,33 @@ export class DeleteSkillModalComponent extends ConfirmOrCancelModal {
     super(ngbActiveModal);
   }
 
+  fetchTopicIdToDiagnosticTestSkillIds(
+      topicAssignments: AssignedSkill[]): void {
+    let allTopicIds = [];
+    for (let topic of topicAssignments) {
+      allTopicIds.push(topic.topicId);
+    }
+    this.topicsAndSkillsDashboardBackendApiService
+      .fetchTopicIdToDiagnosticTestSkillIdsAsync(allTopicIds).then(
+        (dict) => {
+          for (let topicId in dict.topicIdToDiagnosticTestSkillIds) {
+            let diagnosticTestSkillIds = (
+              dict.topicIdToDiagnosticTestSkillIds[topicId]);
+            if (diagnosticTestSkillIds.length === 1 &&
+                diagnosticTestSkillIds.indexOf(this.skillId) !== -1) {
+              this.allowSkillForDeletion = false;
+            }
+          }
+          this.topicsAssignments = topicAssignments;
+          this.topicsAssignmentsAreFetched = true;
+        });
+  }
+
   fetchTopicAssignmentsForSkill(): void {
     this.topicsAndSkillsDashboardBackendApiService
       .fetchTopicAssignmentsForSkillAsync(
         this.skillId).then((response: AssignedSkill[]) => {
-        let allTopicIds = [];
-        for (let topic of response) {
-          allTopicIds.push(topic.topicId);
-        }
-        this.topicsAndSkillsDashboardBackendApiService
-          .fetchTopicIdToDiagnosticTestSkillIdsAsync(allTopicIds).then(
-            (dict) => {
-              for (let topicId in dict.topicIdToDiagnosticTestSkillIds) {
-                let diagnosticTestSkillIds = (
-                  dict.topicIdToDiagnosticTestSkillIds[topicId]);
-                if (diagnosticTestSkillIds.length === 1 &&
-                    diagnosticTestSkillIds.indexOf(this.skillId) !== -1) {
-                  this.allowSkillForDeletion = false;
-                }
-              }
-              this.topicsAssignments = response;
-              this.topicsAssignmentsAreFetched = true;
-            });
+        this.fetchTopicIdToDiagnosticTestSkillIds(response);
       });
   }
 

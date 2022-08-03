@@ -19,29 +19,53 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AssignedSkillBackendDict, AssignedSkill } from 'domain/skill/assigned-skill.model';
-import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
-import { TopicAssignments, UnassignSkillFromTopicsModalComponent } from './unassign-skill-from-topics-modal.component';
+import { TopicsAndSkillsDashboardBackendApiService, TopicIdToDiagnosticTestSkillIdsResponse } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+import { TopicNameToTopicAssignments, UnassignSkillFromTopicsModalComponent } from './unassign-skill-from-topics-modal.component';
 import { MaterialModule } from 'modules/material.module';
 
 describe('Unassing SKill Modal', () => {
   let fixture: ComponentFixture<UnassignSkillFromTopicsModalComponent>;
   let componentInstance: UnassignSkillFromTopicsModalComponent;
   let ngbActiveModal: NgbActiveModal;
-  let skillBackendDict: AssignedSkillBackendDict = {
-    topic_id: 'test_id',
-    topic_name: 'topic_name',
+  let skillBackendDict1: AssignedSkillBackendDict = {
+    topic_id: 'test_id_1',
+    topic_name: 'topic_name_1',
     topic_version: 1,
     subtopic_id: 2
   };
-  const testSkills: AssignedSkill[] = [AssignedSkill
-    .createFromBackendDict(skillBackendDict)];
+  let skillBackendDict2: AssignedSkillBackendDict = {
+    topic_id: 'test_id_2',
+    topic_name: 'topic_name_2',
+    topic_version: 1,
+    subtopic_id: 2
+  };
+  const testSkills: AssignedSkill[] = [
+    AssignedSkill.createFromBackendDict(skillBackendDict1),
+    AssignedSkill.createFromBackendDict(skillBackendDict2)
+  ];
 
+  const testTopicIdToDiagnosticTestSkillIds:
+  TopicIdToDiagnosticTestSkillIdsResponse = {
+    topicIdToDiagnosticTestSkillIds: {
+      test_id_1: [],
+      test_id_2: ['skill_id']
+    }
+  };
 
   class MockTopicsAndSkillsDashboardBackendApiService {
     fetchTopicAssignmentsForSkillAsync(skillId: string) {
       return {
         then: (callback: (resp: AssignedSkill[]) => void) => {
           callback(testSkills);
+        }
+      };
+    }
+
+    fetchTopicIdToDiagnosticTestSkillIdsAsync(topicIds: string[]) {
+      return {
+        then: (callback: (
+          resp: TopicIdToDiagnosticTestSkillIdsResponse) => void) => {
+          callback(testTopicIdToDiagnosticTestSkillIds);
         }
       };
     }
@@ -86,7 +110,7 @@ describe('Unassing SKill Modal', () => {
   it('should close', () => {
     spyOn(ngbActiveModal, 'close');
     componentInstance.selectedTopicNames = ['Topic 1'];
-    componentInstance.topicsAssignments = {
+    componentInstance.topicNameToTopicsAssignments = {
       'Topic 1': {
         subtopicId: 0,
         topicVersion: 0,
@@ -107,14 +131,15 @@ describe('Unassing SKill Modal', () => {
   });
 
   it('should fetch topic assignments for skill', () => {
+    componentInstance.skillId = 'skill_id';
     componentInstance.fetchTopicAssignmentsForSkill();
-    let assignments: TopicAssignments = {};
-    assignments[skillBackendDict.topic_name] = {
-      subtopicId: skillBackendDict.subtopic_id,
-      topicVersion: skillBackendDict.topic_version,
-      topicId: skillBackendDict.topic_id
+    let assignments: TopicNameToTopicAssignments = {};
+    assignments[skillBackendDict1.topic_name] = {
+      subtopicId: skillBackendDict1.subtopic_id,
+      topicVersion: skillBackendDict1.topic_version,
+      topicId: skillBackendDict1.topic_id
     };
-    expect(componentInstance.topicsAssignments).toEqual(assignments);
+    expect(componentInstance.topicNameToTopicsAssignments).toEqual(assignments);
     expect(componentInstance.topicsAssignmentsAreFetched).toBeTrue();
   });
 });

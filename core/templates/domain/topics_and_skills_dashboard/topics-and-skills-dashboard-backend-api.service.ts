@@ -72,7 +72,7 @@ interface FetchTopicIdToDiagnosticTestSkillIdsBackendResponse {
   };
 }
 
-interface FetchTopicIdToDiagnosticTestSkillIdsResponse {
+export interface TopicIdToDiagnosticTestSkillIdsResponse {
   topicIdToDiagnosticTestSkillIds: {
     [topicId: string]: string[];
   };
@@ -239,7 +239,7 @@ export class TopicsAndSkillsDashboardBackendApiService {
   private _fetchTopicIdToDiagnosticTestSkillIdsAsync(
       topicIds: string[],
       successCallback: (
-        value: FetchTopicIdToDiagnosticTestSkillIdsResponse) => void,
+        value: TopicIdToDiagnosticTestSkillIdsResponse) => void,
       errorCallback: (reason: string) => void
   ): void {
     const topicIdToSkillIdsUrl = this.urlInterpolationService.interpolateUrl(
@@ -262,7 +262,7 @@ export class TopicsAndSkillsDashboardBackendApiService {
 
   async fetchTopicIdToDiagnosticTestSkillIdsAsync(
       topicIds: string[]
-  ): Promise<FetchTopicIdToDiagnosticTestSkillIdsResponse> {
+  ): Promise<TopicIdToDiagnosticTestSkillIdsResponse> {
     return new Promise((resolve, reject) => {
       this._fetchTopicIdToDiagnosticTestSkillIdsAsync(
         topicIds, resolve, reject);

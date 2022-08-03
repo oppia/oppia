@@ -16,10 +16,10 @@
  * @fileoverview Unit tests for Delete Skill Modal.
  */
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, waitForAsync, tick } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AssignedSkill, AssignedSkillBackendDict } from 'domain/skill/assigned-skill.model';
-import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+import { TopicsAndSkillsDashboardBackendApiService, TopicIdToDiagnosticTestSkillIdsResponse } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { DeleteSkillModalComponent } from './delete-skill-modal.component';
 
 describe('Assign Skill to Topic Modal Component', () => {
@@ -31,14 +31,32 @@ describe('Assign Skill to Topic Modal Component', () => {
     topic_version: 1,
     subtopic_id: 2
   };
-  const testSkills: AssignedSkill[] = [AssignedSkill
-    .createFromBackendDict(skillBackendDict)];
+
+  const testSkills: AssignedSkill[] = [
+    AssignedSkill.createFromBackendDict(skillBackendDict)
+  ];
+
+  const testTopicIdToDiagnosticTestSkillIds:
+    TopicIdToDiagnosticTestSkillIdsResponse = {
+      topicIdToDiagnosticTestSkillIds: {
+        test_id: []
+      }
+    };
 
   class MockTopicsAndSkillsDashboardBackendApiService {
     fetchTopicAssignmentsForSkillAsync(skillId: string) {
       return {
         then: (callback: (resp: AssignedSkill[]) => void) => {
           callback(testSkills);
+        }
+      };
+    }
+
+    fetchTopicIdToDiagnosticTestSkillIdsAsync(topicIds: string[]) {
+      return {
+        then: (callback: (
+          resp: TopicIdToDiagnosticTestSkillIdsResponse) => void) => {
+          callback(testTopicIdToDiagnosticTestSkillIds);
         }
       };
     }
@@ -92,4 +110,37 @@ describe('Assign Skill to Topic Modal Component', () => {
     expect(componentInstance.topicsAssignments).toEqual(testSkills);
     expect(componentInstance.topicsAssignmentsAreFetched).toBeTrue();
   });
+
+  it('should allow skill deletion', () => {
+    let topicsAndSkillsDashboardBackendApiService = TestBed.inject(
+      TopicsAndSkillsDashboardBackendApiService);
+    componentInstance.skillId = 'skill_id';
+    componentInstance.topicsAssignmentsAreFetched = false;
+    spyOn(
+      topicsAndSkillsDashboardBackendApiService,
+      'fetchTopicIdToDiagnosticTestSkillIdsAsync'
+    ).and.returnValue(Promise.resolve({
+      topicIdToDiagnosticTestSkillIds: {topic_id: []}
+    }));
+    componentInstance.fetchTopicAssignmentsForSkill();
+    tick(50);
+    expect(componentInstance.allowSkillForDeletion).toBeTrue();
+  });
+
+  it('should not allow skill deletion', fakeAsync(() => {
+    let topicsAndSkillsDashboardBackendApiService = TestBed.inject(
+      TopicsAndSkillsDashboardBackendApiService);
+    componentInstance.skillId = 'skill_id';
+    componentInstance.topicsAssignmentsAreFetched = false;
+    spyOn(
+      topicsAndSkillsDashboardBackendApiService,
+      'fetchTopicIdToDiagnosticTestSkillIdsAsync'
+    ).and.returnValue(Promise.resolve({
+      topicIdToDiagnosticTestSkillIds: {topic_id: ['skill_id']}
+    }));
+
+    componentInstance.fetchTopicAssignmentsForSkill();
+    tick(50);
+    expect(componentInstance.allowSkillForDeletion).toBeFalse();
+  }));
 });

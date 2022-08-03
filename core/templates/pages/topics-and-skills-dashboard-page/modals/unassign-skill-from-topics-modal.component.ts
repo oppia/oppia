@@ -20,7 +20,7 @@ import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { AssignedSkill } from 'domain/skill/assigned-skill.model';
-import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+import { TopicsAndSkillsDashboardBackendApiService, TopicIdToDiagnosticTestSkillIdsResponse } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 
 export interface TopicAssignmentsSummary {
   subtopicId: number;
@@ -28,7 +28,7 @@ export interface TopicAssignmentsSummary {
   topicId: string;
 }
 
-export interface TopicAssignments {
+export interface TopicNameToTopicAssignments {
   [key: string]: TopicAssignmentsSummary;
 }
 
@@ -42,11 +42,11 @@ export class UnassignSkillFromTopicsModalComponent
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   skillId!: string;
-  topicsAssignments!: TopicAssignments;
+  topicNameToTopicsAssignments!: TopicNameToTopicAssignments;
   topicsAssignmentsAreFetched: boolean = false;
   selectedTopicNames: string[] = [];
   selectedTopics: TopicAssignmentsSummary[] = [];
-  eligibleTopicsForUnassignment: string[] = [];
+  eligibleTopicNamesForUnassignment: string[] = [];
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -56,45 +56,50 @@ export class UnassignSkillFromTopicsModalComponent
     super(ngbActiveModal);
   }
 
+  fetchTopicIdToDiagnosticTestSkillIds(
+      topicAssignments: AssignedSkill[]): void {
+    let topicIdsNotEligibleForUnassignment = [];
+    let allTopicIds = [];
+    for (let topic of topicAssignments) {
+      allTopicIds.push(topic.topicId);
+    }
+
+    this.topicNameToTopicsAssignments = {};
+    this.topicsAndSkillsDashboardBackendApiService
+      .fetchTopicIdToDiagnosticTestSkillIdsAsync(allTopicIds).then(
+        (dict: TopicIdToDiagnosticTestSkillIdsResponse) => {
+          for (let topicId in dict.topicIdToDiagnosticTestSkillIds) {
+            let diagnosticTestSkillIds = (
+              dict.topicIdToDiagnosticTestSkillIds[topicId]);
+            if (diagnosticTestSkillIds.length === 1 &&
+                  diagnosticTestSkillIds.indexOf(this.skillId) !== -1) {
+              topicIdsNotEligibleForUnassignment.push(topicId);
+            }
+          }
+
+          topicAssignments = topicAssignments.filter((topic) => {
+            return !(
+              topicIdsNotEligibleForUnassignment.indexOf(
+                topic.topicId) !== -1);
+          });
+          topicAssignments.map((topic) => {
+            this.topicNameToTopicsAssignments[topic.topicName] = {
+              subtopicId: topic.subtopicId,
+              topicVersion: topic.topicVersion,
+              topicId: topic.topicId,
+            };
+          });
+          this.eligibleTopicNamesForUnassignment = Object.keys(
+            this.topicNameToTopicsAssignments);
+          this.topicsAssignmentsAreFetched = true;
+        });
+  }
+
   fetchTopicAssignmentsForSkill(): void {
     this.topicsAndSkillsDashboardBackendApiService
       .fetchTopicAssignmentsForSkillAsync(
         this.skillId).then((response: AssignedSkill[]) => {
-        this.topicsAssignments = {};
-        let allTopicIds = [];
-        for (let topic of response) {
-          allTopicIds.push(topic.topicId);
-        }
-
-        let topicIdsNotEligibleForUnassignment = [];
-        this.topicsAndSkillsDashboardBackendApiService
-          .fetchTopicIdToDiagnosticTestSkillIdsAsync(allTopicIds).then(
-            (dict) => {
-              for (let topicId in dict.topicIdToDiagnosticTestSkillIds) {
-                let diagnosticTestSkillIds = (
-                  dict.topicIdToDiagnosticTestSkillIds[topicId]);
-                if (diagnosticTestSkillIds.length === 1 &&
-                      diagnosticTestSkillIds.indexOf(this.skillId) !== -1) {
-                  topicIdsNotEligibleForUnassignment.push(topicId);
-                }
-              }
-
-              response = response.filter((topic) => {
-                return !(
-                  topicIdsNotEligibleForUnassignment.indexOf(
-                    topic.topicId) !== -1);
-              });
-              response.map((topic) => {
-                this.topicsAssignments[topic.topicName] = {
-                  subtopicId: topic.subtopicId,
-                  topicVersion: topic.topicVersion,
-                  topicId: topic.topicId,
-                };
-              });
-              this.eligibleTopicsForUnassignment = Object.keys(
-                this.topicsAssignments);
-              this.topicsAssignmentsAreFetched = true;
-            });
+        this.fetchTopicIdToDiagnosticTestSkillIds(response);
       });
   }
 
@@ -114,7 +119,7 @@ export class UnassignSkillFromTopicsModalComponent
   close(): void {
     for (let index in this.selectedTopicNames) {
       this.selectedTopics.push(
-        this.topicsAssignments[this.selectedTopicNames[index]]);
+        this.topicNameToTopicsAssignments[this.selectedTopicNames[index]]);
     }
     this.ngbActiveModal.close(this.selectedTopics);
   }
