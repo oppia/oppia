@@ -22,23 +22,35 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+// eslint-disable-next-line oppia/disallow-httpclient
+import { HttpClient, HttpBackend } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CsrfTokenService {
+  // 'tokenPromise' will be null when token is not initialized.
   tokenPromise: PromiseLike<string> | null = null;
+  http: HttpClient;
+
+  constructor(httpBackend: HttpBackend) {
+    this.http = new HttpClient(httpBackend);
+  }
 
   initializeToken(): void {
     if (this.tokenPromise !== null) {
       throw new Error('Token request has already been made');
     }
-    this.tokenPromise = fetch(
-      '/csrfhandler'
-    ).then((response: Response) => {
-      return response.text();
-    }).then((responseText: string) => {
+    this.tokenPromise = this.http.get(
+      '/csrfhandler', { responseType: 'text' }
+    ).toPromise().then((responseText: string) => {
+      // Remove the protective XSSI (cross-site scripting inclusion) prefix.
       return JSON.parse(responseText.substring(5)).token;
+    }, (err) => {
+      console.error(
+        'The following error is thrown while trying to get CSRF token.');
+      console.error(err);
+      throw err;
     });
   }
 
