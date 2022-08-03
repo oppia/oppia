@@ -85,11 +85,11 @@ export class StateEditorComponent implements OnInit, OnDestroy {
   stateData!: State;
   directiveSubscriptions = new Subscription();
   currentStateIsTerminal: boolean = false;
-  conceptCardIsShown: boolean = false;
   windowIsNarrow: boolean = false;
   interactionIdIsSet: boolean = false;
   servicesInitialized: boolean = false;
   currentInteractionCanHaveSolution: boolean = false;
+  conceptCardIsShown: boolean = true;
 
   constructor(
     private stateCardIsCheckpointService: StateCardIsCheckpointService,
@@ -191,7 +191,6 @@ export class StateEditorComponent implements OnInit, OnDestroy {
     this.oppiaBlackImgUrl = this.urlInterpolationService.getStaticImageUrl(
       '/avatar/oppia_avatar_100px.svg');
     this.currentStateIsTerminal = false;
-    this.conceptCardIsShown = true;
     this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
     this.interactionIdIsSet = false;
     this.servicesInitialized = false;

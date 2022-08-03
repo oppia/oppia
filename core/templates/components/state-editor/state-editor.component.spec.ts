@@ -143,7 +143,7 @@ describe('State Editor Component', () => {
 
     expect(component.oppiaBlackImgUrl).toBeUndefined();
     expect(component.currentStateIsTerminal).toBeFalse();
-    expect(component.conceptCardIsShown).toBeFalse();
+    expect(component.conceptCardIsShown).toBeTrue();
     expect(component.windowIsNarrow).toBeFalse();
     expect(component.interactionIdIsSet).toBeFalse();
     expect(component.stateName).toBe(undefined);
@@ -178,9 +178,8 @@ describe('State Editor Component', () => {
   });
 
   it('should toggle concept card', () => {
-    expect(component.conceptCardIsShown).toBeFalse();
+    expect(component.conceptCardIsShown).toBe(true);
 
-    component.conceptCardIsShown = true;
     component.toggleConceptCard();
 
     expect(component.conceptCardIsShown).toBe(false);
