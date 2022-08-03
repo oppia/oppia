@@ -264,8 +264,11 @@ describe('Question backend Api service', () => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
       questionBackendApiService.fetchQuestionsAsync(
-        // Use unknown type conversion to check input invalidity.
-        'x' as unknown as string[], 1, true).then(successHandler, failHandler);
+        // This throws "Type 'string' is not assignable to type 'string[]'."
+        // We need to suppress this error because of the need to test
+        // validations.
+        // @ts-ignore
+        'x', 1, true).then(successHandler, failHandler);
       flushMicrotasks();
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith(
@@ -278,8 +281,11 @@ describe('Question backend Api service', () => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
       questionBackendApiService.fetchQuestionsAsync(
-        // Use unknown type conversion to check input invalidity.
-        [1, 2] as unknown as string[], 1, true
+        // This throws "Type 'number[]' is not assignable to type 'string[]'."
+        // We need to suppress this error because of the need to test
+        // validations.
+        // @ts-ignore
+        [1, 2], 1, true
       ).then(successHandler, failHandler);
       flushMicrotasks();
       expect(successHandler).not.toHaveBeenCalled();
@@ -293,8 +299,11 @@ describe('Question backend Api service', () => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
       questionBackendApiService.fetchQuestionsAsync(
-        // Use unknown type conversion to check input invalidity.
-        null as unknown as string[], 1, true).then(successHandler, failHandler);
+        // This throws "Type 'null' is not assignable to type 'string[]'."
+        // We need to suppress this error because of the need to test
+        // validations.
+        // @ts-ignore
+        null, 1, true).then(successHandler, failHandler);
       flushMicrotasks();
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith(

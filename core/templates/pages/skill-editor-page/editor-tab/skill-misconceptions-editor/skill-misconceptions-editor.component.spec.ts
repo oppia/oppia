@@ -152,7 +152,7 @@ describe('Skill Misconceptions Editor Component', () => {
     spyOn(ngbModal, 'open').and.returnValue({
       result: Promise.reject()
     } as NgbModalRef);
-    spyOn(skillUpdateService, 'addMisconception').and.returnValue();
+    spyOn(skillUpdateService, 'addMisconception').and.callThrough();
 
     component.openAddMisconceptionModal();
 
@@ -191,7 +191,7 @@ describe('Skill Misconceptions Editor Component', () => {
       },
       result: Promise.reject()
     } as NgbModalRef);
-    spyOn(skillUpdateService, 'deleteMisconception').and.returnValue();
+    spyOn(skillUpdateService, 'deleteMisconception').and.callThrough();
 
     component.ngOnInit();
     component.openDeleteMisconceptionModal(1, '1');

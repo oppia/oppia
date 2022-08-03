@@ -83,9 +83,7 @@ export class CollectionNodeCreatorComponent {
 
         if (summaryBackendObject) {
           this.collectionLinearizerService.appendCollectionNode(
-            this.collection, newExplorationId,
-            summaryBackendObject as unknown as
-            LearnerExplorationSummaryBackendDict);
+            this.collection, newExplorationId, summaryBackendObject);
         } else {
           this.alertsService.addWarning(
             'That exploration does not exist or you do not have edit ' +

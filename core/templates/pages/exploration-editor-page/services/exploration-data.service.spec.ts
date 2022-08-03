@@ -436,12 +436,10 @@ describe('Exploration data service', function() {
   });
 
   it('should throw error when pathname is not valid', () => {
+    var errorCallback = jasmine.createSpy('error');
+    eds.getDataAsync(errorCallback);
+
     expect(logErrorSpy).toHaveBeenCalledWith(
       'Unexpected call to ExplorationDataService for pathname: ' + pathname);
-
-    var errorCallback = jasmine.createSpy('error');
-    expect(function() {
-      eds.getDataAsync(errorCallback);
-    }).toBeDefined();
   });
 });

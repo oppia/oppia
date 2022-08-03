@@ -147,7 +147,7 @@ describe('Skill Concept Card Editor Component', () => {
 
   it('should update skill on saving explanation', () => {
     let updateSpy = spyOn(skillUpdateService, 'setConceptCardExplanation')
-      .and.returnValue();
+      .and.callThrough();
 
     component.ngOnInit();
     component.onSaveExplanation(
@@ -182,7 +182,7 @@ describe('Skill Concept Card Editor Component', () => {
       result: Promise.resolve()
     } as NgbModalRef);
     let deleteWorkedExampleSpy = spyOn(
-      skillUpdateService, 'deleteWorkedExample').and.returnValue();
+      skillUpdateService, 'deleteWorkedExample').and.callThrough();
 
     component.ngOnInit();
     component.deleteWorkedExample(0, '');
@@ -219,7 +219,7 @@ describe('Skill Concept Card Editor Component', () => {
       })
     } as NgbModalRef);
     let addWorkedExampleSpy = spyOn(
-      skillUpdateService, 'addWorkedExample').and.returnValue();
+      skillUpdateService, 'addWorkedExample').and.callThrough();
 
     component.ngOnInit();
     component.openAddWorkedExampleModal();
@@ -236,7 +236,7 @@ describe('Skill Concept Card Editor Component', () => {
       result: Promise.reject()
     } as NgbModalRef);
     let addWorkedExampleSpy = spyOn(
-      skillUpdateService, 'addWorkedExample').and.returnValue();
+      skillUpdateService, 'addWorkedExample').and.callThrough();
 
     component.ngOnInit();
     component.openAddWorkedExampleModal();

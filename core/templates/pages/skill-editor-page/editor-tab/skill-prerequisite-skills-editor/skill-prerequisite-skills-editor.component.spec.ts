@@ -353,7 +353,7 @@ describe('Skill editor main tab Component', () => {
         }) as NgbModalRef;
       });
       let alertsSpy = spyOn(alertsService, 'addInfoMessage')
-        .and.returnValue();
+        .and.callThrough();
 
       component.skill = sampleSkill;
       component.addSkill();
@@ -375,7 +375,7 @@ describe('Skill editor main tab Component', () => {
       });
 
       let alertsSpy = spyOn(alertsService, 'addInfoMessage')
-        .and.returnValue();
+        .and.callThrough();
 
       component.skill = sampleSkill;
       component.addSkill();

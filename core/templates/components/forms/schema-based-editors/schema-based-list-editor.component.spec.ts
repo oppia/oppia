@@ -116,8 +116,11 @@ describe('Schema Based List Editor Component', () => {
   it('should delete last element if user clicks outside the text input box' +
     ' without entering any text', () => {
     component.localValue = [
-      // Use unknown type conversion to check input invalidity.
-      'item1', undefined as unknown as SchemaDefaultValue];
+      // This throws "Type 'undefined' is not assignable to type
+      // 'SchemaDefaultValue'." We need to suppress this error
+      // because of the need to test validations.
+      // @ts-ignore
+      'item1', undefined];
 
     component.lastElementOnBlur();
 

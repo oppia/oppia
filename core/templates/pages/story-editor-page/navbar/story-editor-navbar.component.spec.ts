@@ -456,7 +456,7 @@ describe('Story editor navbar component', () => {
       spyOnProperty(storyEditorStateService, 'onStoryInitialized')
         .and.returnValue(mockStoryInitializedEventEmitter);
       const alertsSpy = spyOn(
-        alertsService, 'addInfoMessage').and.returnValue();
+        alertsService, 'addInfoMessage').and.callThrough();
       const saveChangesSpy = spyOn(
         storyEditorStateService, 'saveStory')
         .and.callFake((commitMessage, successCallback, errorCallback) => {
