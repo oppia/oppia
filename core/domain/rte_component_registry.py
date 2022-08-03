@@ -26,8 +26,7 @@ from core import constants
 from core import feconf
 from core import utils
 
-from typing import Any, Dict, List, Type
-from typing_extensions import TypedDict
+from typing import Any, Dict, List, Type, TypedDict
 
 MYPY = False
 if MYPY: # pragma: no cover

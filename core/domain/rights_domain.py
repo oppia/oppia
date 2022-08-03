@@ -21,8 +21,7 @@ from core import utils
 from core.constants import constants
 from core.domain import change_domain
 
-from typing import List, Optional
-from typing_extensions import TypedDict
+from typing import List, Optional, TypedDict
 
 from core.domain import user_services  # pylint: disable=invalid-import-from # isort:skip
 

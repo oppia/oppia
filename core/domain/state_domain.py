@@ -34,8 +34,7 @@ from core.domain import param_domain
 from core.domain import translation_domain
 from extensions.objects.models import objects
 
-from typing import Any, Dict, List, Mapping, Optional, Union
-from typing_extensions import TypedDict
+from typing import Any, Dict, List, Mapping, Optional, TypedDict, Union
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import interaction_registry  # pylint: disable=invalid-import-from # isort:skip

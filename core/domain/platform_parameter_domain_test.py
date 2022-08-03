@@ -25,8 +25,7 @@ from core import utils
 from core.domain import platform_parameter_domain as parameter_domain
 from core.tests import test_utils
 
-from typing import Dict, List, Optional, Union
-from typing_extensions import Final
+from typing import Dict, Final, List, Optional, Union
 
 ServerMode = parameter_domain.ServerMode
 

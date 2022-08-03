@@ -31,8 +31,7 @@ from core.domain import taskqueue_services
 from core.domain import user_services
 from core.platform import models
 
-from typing import Optional, overload
-from typing_extensions import Literal
+from typing import Literal, Optional, overload
 
 datastore_services = models.Registry.import_datastore_services()
 (collection_models, exp_models) = models.Registry.import_models([

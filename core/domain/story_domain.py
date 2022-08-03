@@ -28,8 +28,7 @@ from core import utils
 from core.constants import constants
 from core.domain import change_domain
 
-from typing import List, Optional, overload
-from typing_extensions import Final, TypedDict
+from typing import Final, List, Optional, TypedDict, overload
 
 from core.domain import fs_services  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip

@@ -24,8 +24,7 @@ import os
 from core import constants
 from core import feconf
 
-from typing import Dict, List, Optional
-from typing_extensions import TypedDict
+from typing import Dict, List, Optional, TypedDict
 
 
 class RuleSpecsExtensionDict(TypedDict):
