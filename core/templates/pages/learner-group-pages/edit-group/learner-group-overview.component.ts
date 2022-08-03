@@ -16,7 +16,7 @@
  * @fileoverview Component for the learner group overview.
  */
 
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { LearnerGroupSyllabusBackendApiService } from
   'domain/learner_group/learner-group-syllabus-backend-api.service';
@@ -34,7 +34,7 @@ import './learner-group-overview.component.css';
   selector: 'oppia-learner-group-overview',
   templateUrl: './learner-group-overview.component.html'
 })
-export class LearnerGroupOverviewComponent {
+export class LearnerGroupOverviewComponent implements OnInit {
   @Input() learnerGroup: LearnerGroupData;
   studentsProgress!: LearnerGroupUserProgress[];
   activeTab: string;
@@ -47,16 +47,15 @@ export class LearnerGroupOverviewComponent {
       LearnerGroupSyllabusBackendApiService
   ) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.activeTab = this.EDIT_OVERVIEW_SECTIONS_I18N_IDS.SKILLS_ANALYSIS;
     if (this.learnerGroup.studentUsernames.length > 0) {
       this.learnerGroupSyllabusBackendApiService
-      .fetchStudentsProgressInAssignedSyllabus(
-        this.learnerGroup.id, this.learnerGroup.studentUsernames
-      ).then(studentsProgress => {
-        this.studentsProgress = studentsProgress;
-        console.log(this.studentsProgress, "progress");
-      });
+        .fetchStudentsProgressInAssignedSyllabus(
+          this.learnerGroup.id, this.learnerGroup.studentUsernames
+        ).then(studentsProgress => {
+          this.studentsProgress = studentsProgress;
+        });
     }
   }
 
@@ -73,7 +72,8 @@ export class LearnerGroupOverviewComponent {
     this.studentsProgress.forEach(studentProgress => {
       studentProgress.storiesProgress.map(storyProgress => {
         if (storyProgress.getId() === storyId &&
-        storyProgress.getCompletedNodeTitles().length === storyProgress.getNodeTitles().length
+          storyProgress.getCompletedNodeTitles().length ===
+          storyProgress.getNodeTitles().length
         ) {
           storyCompletionsInfo.push(
             new LearnerGroupUserInfo(
@@ -81,7 +81,7 @@ export class LearnerGroupOverviewComponent {
               studentProgress.profilePictureDataUrl,
               ''
             )
-          )
+          );
         }
       });
     });
@@ -104,7 +104,7 @@ export class LearnerGroupOverviewComponent {
               studentProgress.profilePictureDataUrl,
               ''
             )
-          )
+          );
         }
       });
     });

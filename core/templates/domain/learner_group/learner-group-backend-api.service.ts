@@ -185,10 +185,10 @@ export class LearnerGroupBackendApiService {
   }
 
   async updateLearnerGroupInviteAsync(
-    learnerGroupId: string,
-    studentUsername: string,
-    isInviatationAccepted: boolean,
-    progressSharingPermission = false
+      learnerGroupId: string,
+      studentUsername: string,
+      isInviatationAccepted: boolean,
+      progressSharingPermission = false
   ): Promise<LearnerGroupData> {
     return new Promise((resolve, reject) => {
       const learnerGroupUrl = (

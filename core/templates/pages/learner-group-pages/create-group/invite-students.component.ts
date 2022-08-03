@@ -70,7 +70,6 @@ export class InviteStudentsComponent {
       this.learnerGroupBackendApiService.searchNewStudentToAddAsync(
         this.learnerGroupID, username
       ).then(userInfo => {
-        console.log(userInfo, "erroruserInfo");
         if (!userInfo.error) {
           this.invitedUsersInfo.push(userInfo);
           this.invitedUsernames.push(userInfo.username);

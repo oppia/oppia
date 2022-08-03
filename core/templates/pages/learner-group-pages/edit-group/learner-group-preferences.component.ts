@@ -16,22 +16,15 @@
  * @fileoverview Component for the learner group syllabus.
  */
 
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { AppConstants } from 'app.constants';
 import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-group-backend-api.service';
-import { LearnerGroupSubtopicSummary } from 'domain/learner_group/learner-group-subtopic-summary.model';
-import { LearnerGroupSyllabusBackendApiService } from 'domain/learner_group/learner-group-syllabus-backend-api.service';
-import { LearnerGroupSyllabus } from 'domain/learner_group/learner-group-syllabus.model';
 import { LearnerGroupUserInfo } from 'domain/learner_group/learner-group-user-info.model';
 import { LearnerGroupData } from 'domain/learner_group/learner-group.model';
-import { StorySummary } from 'domain/story/story-summary.model';
-import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { LearnerGroupPagesConstants } from '../learner-group-pages.constants';
-import { AddedSyllabusItemsSuccessfullyModalComponent } from '../templates/added-syllabus-items-successfully-modal.component';
 import { InviteStudentsModalComponent } from '../templates/invite-students-modal.component';
-import { RemoveItemModalComponent } from 
+import { RemoveItemModalComponent } from
   '../templates/remove-item-modal.component';
 
 import './learner-group-preferences.component.css';
@@ -41,12 +34,13 @@ import './learner-group-preferences.component.css';
   selector: 'oppia-learner-group-preferences',
   templateUrl: './learner-group-preferences.component.html'
 })
-export class LearnerGroupPreferencesComponent {
+export class LearnerGroupPreferencesComponent implements OnInit {
   @Input() learnerGroup: LearnerGroupData;
   activeTab: string;
   EDIT_PREFERENCES_SECTIONS_I18N_IDS = (
     LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_PREFERENCES_SECTIONS
   );
+
   newLearnerGroupTitle!: string;
   newLearnerGroupDescription!: string;
   readOnlyMode = true;
@@ -55,20 +49,16 @@ export class LearnerGroupPreferencesComponent {
   invitedStudents: string[] = [];
 
   constructor(
-    private assetsBackendApiService: AssetsBackendApiService,
     private ngbModal: NgbModal,
     private learnerGroupBackendApiService:
-      LearnerGroupBackendApiService,
-    private learnerGroupSyllabusBackendApiService:
-      LearnerGroupSyllabusBackendApiService
+      LearnerGroupBackendApiService
   ) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.activeTab = this.EDIT_PREFERENCES_SECTIONS_I18N_IDS.GROUP_DETAILS;
     if (this.learnerGroup) {
       this.learnerGroupBackendApiService.fetchStudentsInfoAsync(
         this.learnerGroup.id).then((studentsInfo) => {
-        console.log(studentsInfo, "ssds");
         this.currentStudentsInfo = studentsInfo.studentsInfo;
         this.invitedStudentsInfo = studentsInfo.invitedStudentsInfo;
       });
@@ -111,7 +101,7 @@ export class LearnerGroupPreferencesComponent {
       );
       this.learnerGroupBackendApiService.updateLearnerGroupAsync(
         this.learnerGroup).then((learnerGroup) => {
-        this.learnerGroup = learnerGroup
+        this.learnerGroup = learnerGroup;
       });
     }
     this.toggleReadOnlyMode();
@@ -120,7 +110,7 @@ export class LearnerGroupPreferencesComponent {
   openInviteStudentsModal(): void {
     let modalRef = this.ngbModal.open(
       InviteStudentsModalComponent,
-      { 
+      {
         backdrop: 'static',
         windowClass: 'invite-students-modal'
       }
@@ -185,7 +175,6 @@ export class LearnerGroupPreferencesComponent {
       this.learnerGroupBackendApiService.updateLearnerGroupAsync(
         this.learnerGroup).then((learnerGroup) => {
         this.learnerGroup = learnerGroup;
-        console.log(this.learnerGroup, "learnerGroup");
       });
     });
   }
@@ -200,7 +189,7 @@ export class LearnerGroupPreferencesComponent {
 
   addStudentToLearnerGroup(student: LearnerGroupUserInfo): void {
     this.learnerGroup.addStudent(student.username);
-    this.learnerGroup.revokeInvitation(student.username)
+    this.learnerGroup.revokeInvitation(student.username);
     this.invitedStudentsInfo = this.invitedStudentsInfo.filter(
       (invitedStudent) => invitedStudent.username !== student.username
     );
@@ -209,7 +198,6 @@ export class LearnerGroupPreferencesComponent {
     ).then((learnerGroup) => {
       this.learnerGroup = learnerGroup;
       this.currentStudentsInfo.push(student);
-      console.log(this.learnerGroup, "learnerGroup");
     });
   }
 }

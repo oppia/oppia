@@ -16,7 +16,7 @@
  * @fileoverview Component for the learner group syllabus.
  */
 
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AppConstants } from 'app.constants';
@@ -37,7 +37,7 @@ import './learner-group-syllabus.component.css';
   selector: 'oppia-learner-group-syllabus',
   templateUrl: './learner-group-syllabus.component.html'
 })
-export class LearnerGroupSyllabusComponent {
+export class LearnerGroupSyllabusComponent implements OnInit {
   @Input() learnerGroup: LearnerGroupData;
   subtopicSummaries!: LearnerGroupSubtopicSummary[];
   storySummaries!: StorySummary[];
@@ -57,7 +57,7 @@ export class LearnerGroupSyllabusComponent {
       LearnerGroupSyllabusBackendApiService
   ) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.learnerGroupSyllabusBackendApiService.fetchLearnerGroupSyllabus(
       this.learnerGroup.id).then(groupSyllabus => {
       this.subtopicSummaries = groupSyllabus.subtopicPageSummaries;
@@ -171,18 +171,18 @@ export class LearnerGroupSyllabusComponent {
 
   saveNewSyllabusItems(): void {
     this.learnerGroup.addStoryIds(this.newlyAddedStoryIds);
-      this.learnerGroup.addSubtopicPageIds(this.newlyAddedSubtopicIds);
-      this.learnerGroupBackendApiService.updateLearnerGroupAsync(
-        this.learnerGroup).then((learnerGroup) => {
-        this.subtopicSummaries.push(...this.newlyAddedSubtopicSummaries);
-        this.storySummaries.push(...this.newlyAddedStorySummaries);
-        this.newlyAddedStoryIds = [];
-        this.newlyAddedSubtopicIds = [];
-        this.newlyAddedStorySummaries = [];
-        this.newlyAddedSubtopicSummaries = [];
-        this.learnerGroup = learnerGroup;
-        this.setDisplayOrderOfSyllabusItems();
-      });
+    this.learnerGroup.addSubtopicPageIds(this.newlyAddedSubtopicIds);
+    this.learnerGroupBackendApiService.updateLearnerGroupAsync(
+      this.learnerGroup).then((learnerGroup) => {
+      this.subtopicSummaries.push(...this.newlyAddedSubtopicSummaries);
+      this.storySummaries.push(...this.newlyAddedStorySummaries);
+      this.newlyAddedStoryIds = [];
+      this.newlyAddedSubtopicIds = [];
+      this.newlyAddedStorySummaries = [];
+      this.newlyAddedSubtopicSummaries = [];
+      this.learnerGroup = learnerGroup;
+      this.setDisplayOrderOfSyllabusItems();
+    });
 
     let modelRef = this.ngbModal.open(
       AddedSyllabusItemsSuccessfullyModalComponent, {

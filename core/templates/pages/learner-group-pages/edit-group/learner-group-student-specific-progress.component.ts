@@ -43,7 +43,7 @@ export class LearnerGroupStudentSpecificProgressComponent {
       LearnerGroupSyllabusBackendApiService
   ) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.activeTab = this.EDIT_OVERVIEW_SECTIONS_I18N_IDS.SKILLS_ANALYSIS;
   }
 
@@ -62,5 +62,7 @@ export class LearnerGroupStudentSpecificProgressComponent {
 
 angular.module('oppia').directive(
   'oppiaLearnerGroupStudentSpecificProgress',
-  downgradeComponent({component: LearnerGroupStudentSpecificProgressComponent}));
- 
+  downgradeComponent(
+    {component: LearnerGroupStudentSpecificProgressComponent}
+  )
+);

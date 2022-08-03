@@ -16,7 +16,7 @@
  * @fileoverview Component for the learner group overview.
  */
 
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { LearnerGroupSyllabusBackendApiService } from 'domain/learner_group/learner-group-syllabus-backend-api.service';
 import { LearnerGroupUserProgress } from 'domain/learner_group/learner-group-user-progress.model';
@@ -29,7 +29,7 @@ import './learner-group-students-progress.component.css';
   selector: 'oppia-learner-group-students-progress',
   templateUrl: './learner-group-students-progress.component.html'
 })
-export class LearnerGroupStudentsProgressComponent {
+export class LearnerGroupStudentsProgressComponent implements OnInit {
   @Input() learnerGroup: LearnerGroupData;
   studentsProgress!: LearnerGroupUserProgress[];
 
@@ -38,21 +38,19 @@ export class LearnerGroupStudentsProgressComponent {
       LearnerGroupSyllabusBackendApiService
   ) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     if (this.learnerGroup.studentUsernames.length > 0) {
       this.learnerGroupSyllabusBackendApiService
-      .fetchStudentsProgressInAssignedSyllabus(
-        this.learnerGroup.id, this.learnerGroup.studentUsernames
-      ).then(studentsProgress => {
-        this.studentsProgress = studentsProgress;
-        console.log(this.studentsProgress, "progress");
-      });
+        .fetchStudentsProgressInAssignedSyllabus(
+          this.learnerGroup.id, this.learnerGroup.studentUsernames
+        ).then(studentsProgress => {
+          this.studentsProgress = studentsProgress;
+        });
     }
   }
 
   getStudentsProgressToDisplay(): void {
     this.studentsProgress.forEach(studentProgress => {
-      console.log(studentProgress);
     });
   }
 
@@ -85,10 +83,6 @@ export class LearnerGroupStudentsProgressComponent {
 
   getProfileImageDataUrl(dataUrl: string): string {
     return decodeURIComponent(dataUrl);
-  }
-
-  isProgressSharingTurnedOn(progressSharing: boolean) {
-    return progressSharing;
   }
 }
 

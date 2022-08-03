@@ -16,7 +16,6 @@
  * @fileoverview Component for the edit learner group page.
  */
 
-import { Clipboard } from '@angular/cdk/clipboard';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { TranslateService } from '@ngx-translate/core';
@@ -28,13 +27,9 @@ import { LearnerGroupPagesConstants } from '../learner-group-pages.constants';
 import { LearnerGroupData } from 'domain/learner_group/learner-group.model';
 import { LearnerGroupBackendApiService } from
   'domain/learner_group/learner-group-backend-api.service';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
 import { ContextService } from 'services/context.service';
 
 import './edit-learner-group-page.component.css';
-import { LearnerGroupSyllabusBackendApiService } from 'domain/learner_group/learner-group-syllabus-backend-api.service';
 
 
 @Component({
@@ -96,7 +91,7 @@ export class EditLearnerGroupPageComponent implements OnInit, OnDestroy {
   }
 
   getStudentsCount(): number {
-    return this.learnerGroup.studentUsernames.length
+    return this.learnerGroup.studentUsernames.length;
   }
 
   ngOnDestroy(): void {

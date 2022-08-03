@@ -16,7 +16,7 @@
  * @fileoverview Component for Delete exploration modal.
  */
 
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { LearnerGroupUserInfo } from 'domain/learner_group/learner-group-user-info.model';
@@ -44,14 +44,12 @@ export class InviteStudentsModalComponent extends ConfirmOrCancelModal {
     });
   }
 
-  updateNewlyInvitedStudents(
-    invitedStudents: string[]
-  ): void {
+  updateNewlyInvitedStudents(invitedStudents: string[]): void {
     this.invitedStudents = invitedStudents;
   }
 
   updateNewlyInvitedStudentsInfo(
-    invitedStudentsInfo: LearnerGroupUserInfo[]
+      invitedStudentsInfo: LearnerGroupUserInfo[]
   ): void {
     this.invitedStudentsInfo = invitedStudentsInfo;
   }

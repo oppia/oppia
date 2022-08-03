@@ -6,7 +6,7 @@
            [(ngModel)]="searchUsername"
            (keyup)="searchUsernameKeyUp($event)"
            placeholder="Search Learner"
-    />
+    >
   </div>
   <div *ngFor="let studentProgress of studentsProgress; let idx = index">
     <div *ngIf="studentProgress.isProgressSharingTurnedOn" class="student-progress-summary">
