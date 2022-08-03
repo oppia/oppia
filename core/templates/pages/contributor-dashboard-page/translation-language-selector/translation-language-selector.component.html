@@ -30,9 +30,9 @@
         <div class="oppia-translation-language-selector-dropdown-label">Most needed</div>
         <div *ngFor="let featuredOption of featuredLanguages; index as i">
           <div class="oppia-translation-language-selector-dropdown-option e2e-test-featured-language"
-              *ngIf="languageIdToDescription[featuredOption.languageCode]"
-              (click)="selectOption(featuredOption.languageCode)"
-              [ngClass]="{'oppia-translation-language-selector-dropdown-option-selected' : featuredOption.languageCode === activeLanguageCode}">
+               *ngIf="languageIdToDescription[featuredOption.languageCode]"
+               (click)="selectOption(featuredOption.languageCode)"
+               [ngClass]="{'oppia-translation-language-selector-dropdown-option-selected' : featuredOption.languageCode === activeLanguageCode}">
             <span class="material-icons oppia-translation-language-selector-info-icon e2e-test-featured-language-tooltip"
                   *ngIf="featuredOption.explanation"
                   (mouseenter)="showExplanationPopup(i)"
@@ -47,9 +47,9 @@
       <div class="oppia-translation-language-selector-dropdown-label">All languages</div>
 
       <div class="oppia-translation-language-selector-dropdown-option e2e-test-language-selector-option"
-          *ngFor="let option of filteredOptions"
-          (click)="selectOption(option.id)"
-          [ngClass]="{'oppia-translation-language-selector-dropdown-option-selected' : option.id === activeLanguageCode}">
+           *ngFor="let option of filteredOptions"
+           (click)="selectOption(option.id)"
+           [ngClass]="{'oppia-translation-language-selector-dropdown-option-selected' : option.id === activeLanguageCode}">
         {{option.description}}
       </div>
     </div>
