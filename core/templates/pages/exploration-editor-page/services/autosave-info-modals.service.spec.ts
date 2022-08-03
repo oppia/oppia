@@ -211,7 +211,7 @@ describe('AutosaveInfoModalsService', () => {
     expect(autosaveInfoModalsService.isModalOpen()).toBe(false);
 
     const localStorageSpy = spyOn(localStorageService, 'removeExplorationDraft')
-      .and.returnValue();
+      .and.callThrough();
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
       return (
         { componentInstance: showLostChangesModalRef,

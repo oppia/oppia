@@ -174,8 +174,9 @@ export class StoryEditorNavbarComponent implements OnInit {
     modalRef.result.then((commitMessage) => {
       this.storyEditorStateService.saveStory(
         commitMessage, () => {
-        // The type of error 'e' is unknown because anything can be throw
-        // in TypeScript. We need to make sure to check the type of 'e'.
+        // The type of errorMessage is unknown because error messages
+        // can be of type anything. For example, it can be a string
+        // or an object.
         }, (errorMessage: unknown) => {
           this.alertsService.addInfoMessage(errorMessage as string, 5000);
         }

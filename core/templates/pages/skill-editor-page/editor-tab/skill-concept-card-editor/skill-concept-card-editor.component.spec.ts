@@ -199,7 +199,7 @@ describe('Skill Concept Card Editor Component', () => {
       result: Promise.reject()
     } as NgbModalRef);
     let deleteWorkedExampleSpy = spyOn(
-      skillUpdateService, 'deleteWorkedExample').and.returnValue();
+      skillUpdateService, 'deleteWorkedExample').and.callThrough();
 
     component.ngOnInit();
     component.deleteWorkedExample(0, '');

@@ -193,7 +193,7 @@ implements ControlValueAccessor, OnInit, Validator {
   generateErrors(): void {
     this.errorStringI18nKey = (
       this.numericInputValidationService.validateNumber(
-        this.localValue as number,
+        this.localValue,
         this.checkRequireNonnegativeInputValue,
         this.getCurrentDecimalSeparator())) || null;
   }

@@ -137,7 +137,7 @@ describe('Skill Misconceptions Editor Component', () => {
         misconception: sampleMisconception
       })
     } as NgbModalRef);
-    spyOn(skillUpdateService, 'addMisconception').and.returnValue();
+    spyOn(skillUpdateService, 'addMisconception').and.callThrough();
 
     component.openAddMisconceptionModal();
     tick();

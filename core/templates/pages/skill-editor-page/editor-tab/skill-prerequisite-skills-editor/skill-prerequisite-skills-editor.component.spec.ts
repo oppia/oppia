@@ -303,7 +303,7 @@ describe('Skill editor main tab Component', () => {
 
   it('should remove skill id when calling \'removeSkillId\'', () => {
     let deleteSpy = spyOn(skillUpdateService, 'deletePrerequisiteSkill')
-      .and.returnValue();
+      .and.callThrough();
 
     component.removeSkillId('xyz');
 

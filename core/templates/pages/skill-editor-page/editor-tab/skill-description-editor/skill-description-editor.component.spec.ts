@@ -116,7 +116,7 @@ describe('Skill Description Editor Component', () => {
 
   it('should save skill description successfully', () => {
     let saveSkillDescriptionSpy = spyOn(
-      skillUpdateService, 'setSkillDescription').and.returnValue();
+      skillUpdateService, 'setSkillDescription').and.callThrough();
     spyOn(component.onSaveDescription, 'emit').and.callThrough();
     spyOn(skillObjectFactory, 'hasValidDescription').and.returnValue(true);
     component.ngOnInit();
