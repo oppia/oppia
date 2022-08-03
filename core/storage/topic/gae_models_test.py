@@ -79,7 +79,8 @@ class TopicModelUnitTests(test_utils.GenericTestBase):
                 feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION),
             next_subtopic_id=1,
             language_code='en',
-            page_title_fragment_for_web='fragm'
+            page_title_fragment_for_web='fragm',
+            skill_ids_for_diagnostic_test=[]
         )
         # We check that topic has not been saved before calling commit().
         self.assertIsNone(topic_models.TopicModel.get_by_name(self.TOPIC_NAME))

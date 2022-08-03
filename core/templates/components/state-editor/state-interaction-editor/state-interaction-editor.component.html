@@ -58,9 +58,9 @@
                    aria-label="edit interaction">
               </div>
               <div>
-                <angular-html-bind-wrapper [htmlData]="interactionPreviewHtml"
+                <oppia-interaction-display [htmlData]="interactionPreviewHtml"
                                            classStr="oppia-interaction-preview-container">
-                </angular-html-bind-wrapper>
+                </oppia-interaction-display>
               </div>
             </div>
           </div>
@@ -71,24 +71,24 @@
 </mat-card>
 
 <style>
+  .oppia-editor-card-with-avatar {
+    margin-top: 40px;
+  }
   .oppia-exp-interaction-card-header {
     font-size: 18px;
     margin: 0;
-    padding: 15px 30px 0;
   }
 
   .oppia-exp-interaction-card-header-container {
+    align-content: center;
+    align-items: center;
     display: flex;
-    flex-wrap: wrap;
     justify-content: space-between;
+    padding: 15px 20px;
   }
 
   .oppia-add-interaction-button-container {
     padding: 20px 30px;
-  }
-
-  .oppia-exp-interaction-card-header-container i {
-    margin: 1.5rem 2rem;
   }
 
   .oppia-exp-interaction-container {
@@ -113,7 +113,6 @@
 
   @media screen and (max-width: 768px) {
     .oppia-exp-interaction-card-header {
-      font-size: 16px;
       padding: 0;
     }
 
@@ -123,6 +122,11 @@
 
     .oppia-exp-interaction-card-header-container {
       background-color: #fff;
+      padding: 0;
+    }
+
+    .oppia-editor-card-with-avatar {
+      margin-top: 20px;
     }
   }
 </style>

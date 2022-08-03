@@ -17,22 +17,13 @@
  */
 
 import { Component, ViewEncapsulation } from '@angular/core';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+
+import './story-viewer-page-root.component.css';
+
 
 @Component({
   selector: 'oppia-story-viewer-page-root',
   templateUrl: './story-viewer-page-root.component.html',
   encapsulation: ViewEncapsulation.None
 })
-export class StoryViewerPageRootComponent {
-  // Page title and meta tags are not required to be updated here
-  // as the page title is updated by story viewer page component
-  // and this pages uses default meta tags.
-  constructor(
-    private i18nLanguageCodeService: I18nLanguageCodeService
-  ) {}
-
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
-  }
-}
+export class StoryViewerPageRootComponent {}

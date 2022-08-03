@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import logging
 import os
+import subprocess
 import sys
 
 TOPMOST_LEVEL_PATH = './'
@@ -67,6 +68,24 @@ FILES_WITHOUT_ASSOCIATED_TEST_FILES = [
 ]
 
 
+def check_if_path_ignored(path_to_check: str) -> bool:
+    """Checks whether the given path is ignored by git.
+
+    Args:
+        path_to_check: str. A path to a file or a dir.
+
+    Returns:
+        bool. Whether the given path is ignored by git.
+    """
+    command = ['git', 'check-ignore', '-q', path_to_check]
+
+    # The "git check-ignore <path>" command returns 0 when the path is
+    # ignored otherwise it returns 1. subprocess.call then returns this
+    # returncode.
+
+    return subprocess.call(command) == 0
+
+
 def main() -> None:
     """Finds the non-empty backend files that lack an associated test file."""
 
@@ -75,11 +94,7 @@ def main() -> None:
         for file in files:
             full_path = os.path.join(root, file)
             _, file_extension = os.path.splitext(full_path)
-            if (
-                    file_extension == '.py' and
-                    '/third_party/' not in full_path and
-                    '/node_modules/' not in full_path
-            ):
+            if file_extension == '.py' and not check_if_path_ignored(full_path):
                 all_backend_files.append(full_path)
 
     all_backend_files.sort()

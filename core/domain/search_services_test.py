@@ -55,7 +55,7 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
             self.VOICE_ARTIST_EMAIL)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)  # type: ignore[no-untyped-call]
 
-        self.owner = user_services.get_user_actions_info(self.owner_id)  # type: ignore[no-untyped-call]
+        self.owner = user_services.get_user_actions_info(self.owner_id)
 
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])  # type: ignore[no-untyped-call]
         self.user_id_admin = (

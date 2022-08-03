@@ -37,7 +37,8 @@ from core.platform import models
 import apache_beam as beam
 
 import result
-from typing import Dict, Iterable, Optional, Tuple, Union
+
+from typing import Dict, Iterable, Iterator, List, Optional, Tuple, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -45,8 +46,9 @@ if MYPY: # pragma: no cover
     from mypy_imports import opportunity_models
     from mypy_imports import suggestion_models
 
-(opportunity_models, suggestion_models) = models.Registry.import_models(
-    [models.NAMES.opportunity, models.NAMES.suggestion])
+(opportunity_models, suggestion_models) = models.Registry.import_models([
+    models.NAMES.opportunity, models.NAMES.suggestion
+])
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -146,7 +148,9 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
     def _generate_stats(
         suggestions: Iterable[suggestion_registry.SuggestionTranslateContent],
         opportunity: Optional[opportunity_domain.ExplorationOpportunitySummary]
-    ) -> Tuple[str, result.Result[Dict[str, Union[bool, int, str]], str]]:
+    ) -> Iterator[
+        Tuple[str, result.Result[Dict[str, Union[bool, int, str]], str]]
+    ]:
         """Generates translation contribution stats for each suggestion.
 
         Args:
@@ -182,11 +186,11 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                 # we can easily count words.
                 if (
                         change.cmd == exp_domain.CMD_ADD_WRITTEN_TRANSLATION and
-                        state_domain.WrittenTranslation.is_data_format_list(
+                        state_domain.WrittenTranslation.is_data_format_list(  # type: ignore[no-untyped-call]
                             change.data_format
                         )
                 ):
-                    content_items = change.content_html
+                    content_items: Union[str, List[str]] = change.content_html
                 else:
                     content_items = [change.content_html]
 
@@ -194,7 +198,7 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                 for item in content_items:
                     # Count the number of words in the original content,
                     # ignoring any HTML tags and attributes.
-                    content_plain_text = html_cleaner.strip_html_tags(item) # type: ignore[no-untyped-call,attr-defined]
+                    content_plain_text = html_cleaner.strip_html_tags(item)
                     content_word_count += len(content_plain_text.split())
 
                 translation_contribution_stats_dict = {
@@ -255,6 +259,10 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
             return translation_contributions_stats_model
 
 
+# TODO(#15613): Due to incomplete typing of apache_beam library and absences of
+# stubs in Typeshed, MyPy assuming CombineFn class is of type Any. Thus to
+# avoid MyPy's error (Class cannot subclass 'CombineFn' (has type 'Any')),
+# we added an ignore here.
 class CombineStats(beam.CombineFn):  # type: ignore[misc]
     """CombineFn for combining the stats."""
 

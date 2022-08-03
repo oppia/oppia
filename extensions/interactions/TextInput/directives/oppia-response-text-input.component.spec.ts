@@ -49,7 +49,7 @@ describe('ResponseTextInputComponent', () => {
     fixture = TestBed.createComponent(ResponseTextInputComponent);
     component = fixture.componentInstance;
 
-    component.answerWithValue = 'answer';
+    component.answer = 'answer';
   });
 
   it('should initialise when user submits answer', () => {

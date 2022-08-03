@@ -16,6 +16,20 @@
  * @fileoverview Constants for the creator dashboard page.
  */
 
+interface TabDetails {
+  ariaLabel: string;
+  tabName: string;
+  description: string;
+  customizationOptions: string[];
+  enabled: boolean;
+}
+
+export interface ContributorDashboardTabsDetails {
+  myContributionTab: TabDetails;
+  submitQuestionTab: TabDetails;
+  translateTextTab: TabDetails;
+}
+
 export const ContributorDashboardConstants = {
   CONTRIBUTOR_DASHBOARD_TABS_DETAILS: {
     myContributionTab: {

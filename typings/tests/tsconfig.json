@@ -30,7 +30,8 @@
       "objects/*": ["../../extensions/objects/*"],
       "filters/*": ["../../core/templates/filters/*"],
       "static/*": ["../../third_party/static/*"],
-      "tests/*": ["../../core/templates/tests/*"]
+      "tests/*": ["../../core/templates/tests/*"],
+      "utility/*": ["../../core/templates/utility/*"]
     }
   },
   "include": ["../."]

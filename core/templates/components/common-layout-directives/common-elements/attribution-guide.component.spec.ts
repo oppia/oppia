@@ -175,10 +175,6 @@ describe('Attribution Guide Component', function() {
     expect(component.getExplorationTitle()).toEqual('Place Values');
   });
 
-  it('should get RTL language status correctly', () => {
-    expect(component.isLanguageRTL()).toBeTrue();
-  });
-
   it('should run the copy command and show a tooltip', () => {
     let dummyDivElement = document.createElement('div');
     let dummyTextNode = document.createTextNode('Text to be copied');

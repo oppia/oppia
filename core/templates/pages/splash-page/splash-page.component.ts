@@ -18,14 +18,16 @@
 import { Component, OnInit } from '@angular/core';
 
 import splashConstants from 'assets/constants';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { LoaderService } from 'services/loader.service';
 import { UserService } from 'services/user.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+
+import './splash-page.component.css';
+
 
 export interface Testimonial {
   quote: string;
@@ -72,10 +74,6 @@ export class SplashPageComponent implements OnInit {
       this.getStaticImageUrl(imageName + '15x.' + imageExt) + ' 1.5x, ' +
       this.getStaticImageUrl(imageName + '2x.' + imageExt) + ' 2x'
     );
-  }
-
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   onClickBrowseLessonsButton(): void {

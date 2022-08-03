@@ -2237,7 +2237,7 @@ class StoryProgressModelTests(test_utils.GenericTestBase):
         model.put()
 
         story_progress_models = user_models.StoryProgressModel.get_multi(
-            'user_id', ['story_id_1', 'story_id_2'])
+            ['user_id'], ['story_id_1', 'story_id_2'])
         # Ruling out the possibility of None for mypy type checking.
         assert story_progress_models[0] is not None
         assert story_progress_models[1] is not None

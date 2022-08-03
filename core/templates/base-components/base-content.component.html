@@ -1,6 +1,3 @@
-<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/base-components/base-content.component.css" as="style">
-<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/base-components/base-content.component.rtl.css" as="style">
-
 <ng-template #contentTpl><ng-content select="content"></ng-content></ng-template>
 <ng-template #footerTpl>
   <ng-container>
@@ -104,7 +101,3 @@
     Dev Mode
   </div>
 </main>
-
-<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
-<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/base-components/base-content.component.css">
-<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/base-components/base-content.component.rtl.css">

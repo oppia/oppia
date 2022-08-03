@@ -25,15 +25,27 @@ var Constants = require('./WebdriverioConstants');
 // server since the mobile tests are run on a real
 // mobile device.
 var DEFAULT_WAIT_TIME_MSECS = browser.isMobile ? 20000 : 10000;
-
+var DEFAULT_WAIT_TIME_MSECS_FOR_NEW_TAB = 15000;
 
 var alertToBePresent = async() => {
   await browser.waitUntil(
-    until.alertIsPresent(),
+    await until.alertIsPresent(),
     {
       timeout: DEFAULT_WAIT_TIME_MSECS,
-      timeoutMsg: 'Alert box took too long to appear.'
+      timeoutMsg: 'Alert box took too long to appear.\n' +
+      new Error().stack + '\n'
     });
+};
+
+// Wait for current url to change to a specific url.
+var urlToBe = async function(url) {
+  await browser.waitUntil(async function() {
+    return await browser.getUrl() === url;
+  },
+  {
+    timeout: DEFAULT_WAIT_TIME_MSECS,
+    timeoutMsg: 'Url takes too long to change'
+  });
 };
 
 /**
@@ -41,12 +53,10 @@ var alertToBePresent = async() => {
  * @param {string} errorMessage - Error message when element is not clickable.
  */
 var elementToBeClickable = async function(element, errorMessage) {
-  await browser.waitUntil(
-    until.elementToBeClickable(element),
-    {
-      timeout: DEFAULT_WAIT_TIME_MSECS,
-      timeoutMsg: errorMessage
-    });
+  await element.waitForClickable({
+    timeout: DEFAULT_WAIT_TIME_MSECS,
+    timeoutMsg: errorMessage + '\n' + new Error().stack + '\n'
+  });
 };
 
 /**
@@ -55,25 +65,24 @@ var elementToBeClickable = async function(element, errorMessage) {
  * @param {string} errorMessage - Error message when element is still visible.
  */
 var invisibilityOf = async function(element, errorMessage) {
-  await browser.waitUntil(
-    await until.invisibilityOf(element),
-    {
-      timeout: DEFAULT_WAIT_TIME_MSECS,
-      timeoutMsg: errorMessage
-    });
+  await element.waitForDisplayed({
+    timeout: DEFAULT_WAIT_TIME_MSECS,
+    reverse: true,
+    timeoutMsg: errorMessage + '\n' + new Error().stack + '\n'
+  });
 };
 
 /**
  * Consider adding this method after each browser.url() call.
  */
 var pageToFullyLoad = async function() {
-  var loadingMessage = $('.e2e-test-loading-fullpage');
-  await browser.waitUntil(
-    await until.invisibilityOf(loadingMessage),
-    {
-      timeout: 15000,
-      timeoutMsg: 'Page takes more than 15 secs to load'
-    });
+  var loadingMessage = await $('.e2e-test-loading-fullpage');
+  await loadingMessage.waitForDisplayed({
+    timeout: 15000,
+    reverse: true,
+    timeoutMsg: 'Pages takes more than 15 sec to load\n' +
+    new Error().stack + '\n'
+  });
 };
 
 /**
@@ -87,7 +96,7 @@ var textToBePresentInElement = async function(element, text, errorMessage) {
     await until.textToBePresentInElement(element, text),
     {
       timeout: DEFAULT_WAIT_TIME_MSECS,
-      timeoutMsg: errorMessage
+      timeoutMsg: errorMessage + '\n' + new Error().stack + '\n'
     });
 };
 
@@ -97,12 +106,10 @@ var textToBePresentInElement = async function(element, text, errorMessage) {
  * @param {string} errorMessage - Error message when element is not present.
  */
 var presenceOf = async function(element, errorMessage) {
-  await browser.waitUntil(
-    await until.presenceOf(element),
-    {
-      timeout: DEFAULT_WAIT_TIME_MSECS,
-      timeoutMsg: errorMessage
-    });
+  await element.waitForExist({
+    timeout: DEFAULT_WAIT_TIME_MSECS,
+    timeoutMsg: errorMessage + '\n' + new Error().stack + '\n'
+  });
 };
 
 /**
@@ -111,12 +118,10 @@ var presenceOf = async function(element, errorMessage) {
  * @param {string} errorMessage - Error message when element is invisible.
  */
 var visibilityOf = async function(element, errorMessage) {
-  await browser.waitUntil(
-    await until.visibilityOf(element),
-    {
-      timeout: DEFAULT_WAIT_TIME_MSECS,
-      timeoutMsg: errorMessage
-    });
+  await element.waitForDisplayed({
+    timeout: DEFAULT_WAIT_TIME_MSECS,
+    timeoutMsg: errorMessage + '\n' + new Error().stack + '\n'
+  });
 };
 
 /**
@@ -134,8 +139,37 @@ var elementAttributeToBe = async function(
   },
   {
     timeout: DEFAULT_WAIT_TIME_MSECS,
-    timeoutMsg: errorMessage
+    timeoutMsg: errorMessage + '\n' + new Error().stack + '\n'
   });
+};
+
+/**
+* Wait for new tab is opened
+*/
+var newTabToBeCreated = async function(errorMessage, urlToMatch) {
+  await browser.waitUntil(async function() {
+    var handles = await browser.getWindowHandles();
+    await browser.switchToWindow(await handles.pop());
+    var url = await browser.getUrl();
+    return await url.match(urlToMatch);
+  },
+  {
+    timeout: DEFAULT_WAIT_TIME_MSECS_FOR_NEW_TAB,
+    timeoutMsg: errorMessage + '\n' + new Error().stack + '\n'
+  });
+};
+
+/**
+ * @param {string} url - URL to redirect
+ */
+var urlRedirection = async function(url) {
+  // Checks that the current URL matches the expected text.
+  await browser.waitUntil(
+    await until.urlIs(url),
+    {
+      timeout: DEFAULT_WAIT_TIME_MSECS,
+      timeoutMsg: 'URL redirection took too long\n' + new Error().stack + '\n'
+    });
 };
 
 var visibilityOfInfoToast = async function(errorMessage) {
@@ -184,7 +218,7 @@ var fileToBeDownloaded = async function(filename) {
   },
   {
     timeout: DEFAULT_WAIT_TIME_MSECS,
-    timeoutMsg: 'File was not downloaded!'
+    timeoutMsg: 'File was not downloaded!\n' + new Error().stack + '\n'
   });
 };
 
@@ -211,6 +245,7 @@ var clientSideRedirection = async function(
 
 exports.DEFAULT_WAIT_TIME_MSECS = DEFAULT_WAIT_TIME_MSECS;
 exports.alertToBePresent = alertToBePresent;
+exports.urlToBe = urlToBe;
 exports.elementToBeClickable = elementToBeClickable;
 exports.invisibilityOf = invisibilityOf;
 exports.pageToFullyLoad = pageToFullyLoad;
@@ -225,4 +260,6 @@ exports.visibilityOfSuccessToast = visibilityOfSuccessToast;
 exports.fadeInToComplete = fadeInToComplete;
 exports.modalPopupToAppear = modalPopupToAppear;
 exports.fileToBeDownloaded = fileToBeDownloaded;
+exports.newTabToBeCreated = newTabToBeCreated;
+exports.urlRedirection = urlRedirection;
 exports.clientSideRedirection = clientSideRedirection;
