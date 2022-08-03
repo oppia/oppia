@@ -28,6 +28,7 @@ import { FeaturedTranslationLanguage } from 'domain/opportunity/featured-transla
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import { EventEmitter } from '@angular/core';
 import { AppConstants } from 'app.constants';
+import { FormsModule } from '@angular/forms';
 
 describe('Translation language selector', () => {
   let component: TranslationLanguageSelectorComponent;
@@ -66,6 +67,9 @@ describe('Translation language selector', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
+      imports: [
+        FormsModule,
+      ],
       declarations: [TranslationLanguageSelectorComponent],
       providers: [{
         provide: ContributionOpportunitiesBackendApiService,
