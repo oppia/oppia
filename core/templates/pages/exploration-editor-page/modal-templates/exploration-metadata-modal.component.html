@@ -1,4 +1,3 @@
-<button (click)="shivam()">SHivam</button>
 <div class="modal-header e2e-test-metadata-modal-header">
   <h3>Add Some Details</h3>
 </div>
@@ -26,58 +25,54 @@
                                  placeholderLabel="Type new category here...">
           </ngx-mat-select-search>
         </mat-option>
-        <mat-option (click)="updateCategoryListWithUserData()" *ngFor="let option of filteredChoices" [value]="option.id">
+        <mat-option (click)="updateCategoryListWithUserData()"
+                    *ngFor="let option of filteredChoices"
+                    [value]="option.id">
           {{ option.text }}
         </mat-option>
       </mat-select>
     </mat-form-field>
-
-      <!-- <select2-dropdown item="explorationCategoryService.displayed"
-                        choices="CATEGORY_LIST_FOR_SELECT2"
-                        new-choice-regex="^[A-Z a-z]+$"
-                        width="100%"
-                        invalid-search-term-message="Invalid category name">
-      </select2-dropdown> -->
   </p>
   <p *ngIf="askForLanguageCheck">
     <mat-form-field appearance="fill">
       <mat-label>Verify the language: Is your exploration written in this language</mat-label>
       <mat-select [(ngModel)]="explorationLanguageCodeService.displayed" name="language">
-        <mat-option *ngFor="let value of explorationLanguageCodeService.getSupportedContentLanguages()" [value]="value.code">
+        <mat-option *ngFor="let value of explorationLanguageCodeService.getSupportedContentLanguages()"
+                    [value]="value.code">
           {{value.description}}
         </mat-option>
       </mat-select>
     </mat-form-field>
-
-      <!-- <select class="form-control e2e-test-exploration-language-select"
-              ng-model="explorationLanguageCodeService.displayed"
-              ng-change="saveExplorationLanguageCode()"
-              ng-options="lc.code as lc.description for lc in explorationLanguageCodeService.getSupportedContentLanguages()"
-              width="100%">
-      </select> -->
   </p>
-  <p *ngIf="askForTags"> 
-      <mat-form-field class="example-chip-list" appearance="fill">
-        <mat-label>Add tags to help learners discover your exploration.</mat-label>
-        <mat-chip-list #chipList aria-label="Fruit selection">
-          <mat-chip *ngFor="let tags of explorationTags" (removed)="remove(tags)">
-            {{ tags }}
-              <mat-icon matChipRemove class="update-cross-icon">cancel</mat-icon>
-          </mat-chip>
-          <input placeholder="Add a new tag (using lowercase letters and spaces)..."
-                 pattern="[a-z]"
-                 [matChipInputFor]="chipList"
-                 [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
-                 [matChipInputAddOnBlur]="addOnBlur"
-                 (matChipInputTokenEnd)="add($event)">
-        </mat-chip-list>
-      </mat-form-field>
+  <p *ngIf="askForTags">
+    <mat-form-field class="example-chip-list" appearance="fill">
+      <mat-label>Add tags to help learners discover your exploration.</mat-label>
+      <mat-chip-list #chipList aria-label="Fruit selection">
+        <mat-chip *ngFor="let tags of explorationTags" (removed)="remove(tags)">
+          {{ tags }}
+          <mat-icon matChipRemove class="update-cross-icon">cancel</mat-icon>
+        </mat-chip>
+        <input placeholder="Add a new tag (using lowercase letters and spaces)..."
+               pattern="[a-z]"
+               [matChipInputFor]="chipList"
+               [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+               [matChipInputAddOnBlur]="addOnBlur"
+               (matChipInputTokenEnd)="add($event)">
+      </mat-chip-list>
+    </mat-form-field>
   </p>
 </div>
 
 <div class="modal-footer">
-  <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
-  <button class="btn btn-success e2e-test-confirm-pre-publication" (click)="save()" [disabled]="!isSavingAllowed()">Save Changes</button>
+  <button class="btn btn-secondary"
+          (click)="cancel()">
+    Cancel
+  </button>
+  <button class="btn btn-success e2e-test-confirm-pre-publication"
+          (click)="save()"
+          [disabled]="!isSavingAllowed()">
+    Save Changes
+  </button>
 </div>
 
 <style>

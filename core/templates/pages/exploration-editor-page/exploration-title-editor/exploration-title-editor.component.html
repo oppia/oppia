@@ -1,34 +1,39 @@
 <p [ngClass]="{'has-error': (explorationTitle.dirty || explorationTitle.touched) && !explorationTitleService.displayed.length > 0}">
-  <label for="explorationTitle" [ngStyle]="formStyle">{{ labelText }}</label>
-  <input id="explorationTitle"
-         type="text"
-         class="form-control e2e-test-exploration-title-input"
-         placeholder="Choose a title for your exploration."
-         (focus)="focusLabel"
-         (blur)="inputFieldBlur()" 
-         [(ngModel)]="explorationTitleService.displayed"
-         [maxlength]="MAX_CHARS_IN_EXPLORATION_TITLE"
-         #explorationTitle="ngModel"
-         autofocus>
-  <span class="form-text oppia-form-text">
-    <em>Please use at most {{MAX_CHARS_IN_EXPLORATION_TITLE}} characters, so that this fits in the summary card.</em>
-    <span *ngIf="explorationTitleService.displayed.length > 0">
-      <em>Characters used: {{explorationTitleService.displayed.length}}/{{MAX_CHARS_IN_EXPLORATION_TITLE}}</em>
-    </span>
-  </span>
+  <mat-form-field class="example-full-width" appearance="fill">
+    <mat-label>{{ labelText }}</mat-label>
+    <input matInput
+           id="explorationTitle"
+           type="text"
+           class="e2e-test-exploration-title-input"
+           placeholder="Choose a title for your exploration."
+           (focus)="focusLabel"
+           (blur)="inputFieldBlur()"
+           [(ngModel)]="explorationTitleService.displayed"
+           [maxlength]="MAX_CHARS_IN_EXPLORATION_TITLE"
+           #explorationTitle="ngModel"
+           autofocus>
+    <mat-hint>
+      <span class="form-text">
+        <em>Please use at most {{MAX_CHARS_IN_EXPLORATION_TITLE}} characters, so that this fits in the summary card.</em>
+        <span *ngIf="explorationTitleService.displayed.length > 0">
+          <em>Characters used: {{explorationTitleService.displayed.length}}/{{MAX_CHARS_IN_EXPLORATION_TITLE}}</em>
+        </span>
+      </span>
+    </mat-hint>
+  </mat-form-field>
 </p>
- 
+
 <style>
+  .mat-form-field {
+    width: 100%;
+  }
+
   @media (min-width: 768px) {
     exploration-title-editor p {
       display: table;
       margin-bottom: 0;
       width: 100%;
     }
-  }
-
-  .modal-body .form-text {
-    margin-bottom: -8px;
   }
 
   .modal-body exploration-title-editor input {
@@ -41,9 +46,5 @@
 
   .modal-body exploration-title-editor #explorationTitle {
     width: 100%;
-  }
-
-  .oppia-form-text {
-    font-size: smaller;
   }
 </style>

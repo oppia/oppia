@@ -1,35 +1,38 @@
-<form name="objectiveForm">
-  <p [ngClass]="{'has-error': (explorationObjective.dirty || explorationObjective.touched) && (!explorationObjectiveService.displayed || explorationObjectiveService.displayed.length < 15 || explorationObjectiveService.displayed.length > 100)}">
-    <label for="explorationObjective" [ngStyle]="formStyle">{{ labelText }}</label>
-    <input id="explorationObjective"
+<p [ngClass]="{'has-error': (explorationObjective.dirty || explorationObjective.touched) && (!explorationObjectiveService.displayed || explorationObjectiveService.displayed.length < 15 || explorationObjectiveService.displayed.length > 100)}">
+  <mat-form-field class="example-full-width" appearance="fill">
+    <mat-label>{{ labelText }}</mat-label>
+    <input matInput
+           id="explorationObjective"
            type="text"
-           class="form-control e2e-test-exploration-objective-input"
+           class="e2e-test-exploration-objective-input"
            [(ngModel)]="explorationObjectiveService.displayed"
            [ngModelOptions]="{standalone: true}"
            (blur)="inputFieldBlur()"
            placeholder="Learn how to..."
            width="100%"
            #explorationObjective="ngModel">
-    <span class="form-text e2e-test-exploration-objective-warning">
-      <em>In a complete sentence, tell people what they'll learn from this exploration.</em>
-      <span *ngIf="explorationObjectiveService.displayed.length > 0">
-        <em>Characters used: {{explorationObjectiveService.displayed.length}}/100</em>
+    <mat-hint>
+      <span class="form-text e2e-test-exploration-objective-warning">
+        <em>In a complete sentence, tell people what they'll learn from this exploration.</em>
+        <span *ngIf="explorationObjectiveService.displayed.length > 0">
+          <em>Characters used: {{explorationObjectiveService.displayed.length}}/100</em>
+        </span>
       </span>
-    </span>
-  </p>
-</form>
+    </mat-hint>
+  </mat-form-field>
+</p>
 
 <style>
+  .mat-form-field {
+    width: 100%;
+    z-index: 100;
+  }
+
   @media (min-width: 768px) {
     exploration-objective-editor p {
       display: table;
       margin-bottom: 2%;
       width: 100%;
     }
-  }
-
-  .form-text {
-    font-size: smaller;
-    margin-bottom: -8px;
   }
 </style>

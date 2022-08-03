@@ -55,4 +55,3 @@ export class PracticeSessionsBackendApiService {
 angular.module('oppia').factory(
   'PracticeSessionsBackendApiService',
   downgradeInjectable(PracticeSessionsBackendApiService));
-

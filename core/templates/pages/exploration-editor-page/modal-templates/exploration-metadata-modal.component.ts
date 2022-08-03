@@ -13,13 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for exploration metadata modal.
+ * @fileoverview Component for exploration metadata modal.
  */
 
 import { Component, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { FormControl } from '@angular/forms';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { AppConstants } from 'app.constants';
@@ -32,6 +31,11 @@ import { ExplorationTitleService } from '../services/exploration-title.service';
 import { AlertsService } from 'services/alerts.service';
 import { ExplorationStatesService } from '../services/exploration-states.service';
 
+
+interface CategoryChoices {
+  id: string;
+  text: string;
+}
 
 @Component({
   selector: 'oppia-exploration-metadata-modal',
@@ -46,17 +50,12 @@ export class ExplorationMetadataModalComponent
   requireCategoryToBeSpecified: boolean;
   askForLanguageCheck: boolean;
   askForTags: boolean;
-  CATEGORY_LIST_FOR_SELECT2;
-
-  myControl = new FormControl('');
-  options: string[] = ['One', 'Two', 'Three'];
-  addOnBlur = true;
-  readonly separatorKeysCodes = [ENTER, COMMA] as const;
-
+  addOnBlur: boolean = true;
   explorationTags: string[] = [];
-
-  filteredChoices;
-  newCategory;
+  CATEGORY_LIST_FOR_SELECT2;
+  filteredChoices: CategoryChoices[] = [];
+  newCategory: CategoryChoices;
+  readonly separatorKeysCodes = [ENTER, COMMA] as const;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -98,7 +97,7 @@ export class ExplorationMetadataModalComponent
 
     // Add our fruit.
     if (value) {
-      this.explorationTags.push(value);
+      this.explorationTags.push(value.toLowerCase());
     }
 
     // Clear the input value.
@@ -230,12 +229,6 @@ export class ExplorationMetadataModalComponent
 
     this.filteredChoices = this.CATEGORY_LIST_FOR_SELECT2;
     this.explorationTags = (this.explorationTagsService.displayed) as string[];
-  }
-
-  shivam(): void {
-    console.error('thisis erro');
-    console.error(this.explorationTagsService.displayed);
-    console.error(this.explorationCategoryService.displayed);
   }
 }
 
