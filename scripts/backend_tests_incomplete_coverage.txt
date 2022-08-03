@@ -128,7 +128,7 @@ scripts.common_test
 scripts.concurrent_task_utils_test
 scripts.create_topological_sort_of_all_services_test
 scripts.docstrings_checker_test
-scripts.flake_checker.py
+scripts.flake_checker_test
 scripts.install_backend_python_libs_test
 scripts.install_python_prod_dependencies_test
 scripts.install_third_party_libs_test
