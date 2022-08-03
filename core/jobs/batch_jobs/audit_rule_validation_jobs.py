@@ -58,6 +58,7 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
         """
         """
         states_with_errored_values = []
+        print("***********************************************")
 
         for state_name, state in states_dict.items():
             if state.interaction.id != 'DragAndDropSortInput':
@@ -356,22 +357,32 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                         states_with_errored_values.append(state_name)
         return states_with_errored_values
 
-    @staticmethod
-    def get_exploration_from_model(exp):
-        """Fetching exploration domain object from model
-
+    def get_exploration_from_models(
+        self,
+        model: Tuple[
+            exp_models.ExplorationModel,
+            opportunity_models.ExplorationOpportunitySummaryModel |
+            exp_models.ExplorationModel
+        ]
+    ) -> exp_domain.Exploration:
+        """Returns the exploration domain object.
         Args:
-            exp: ExplorationModel. The ExplorationModel from storage layer.
-
+            model: tuple|exp_models.ExplorationModel. The pair of exp and
+                opportunity models or just exp model.
         Returns:
-            exp_model|None: exp_domain.Exploration. The exploration domain
-            object.
+            exp_models.ExplorationModel. Returns the exp domain object.
         """
-        try:
-            exp_model = exp_fetchers.get_exploration_from_model(exp)
-        except Exception:
-            return None
-        return exp_model
+        print("**********************************************")
+        if isinstance(model, tuple):
+            try:
+                return exp_fetchers.get_exploration_from_model(model[0])
+            except:
+                return None
+        else:
+            try:
+                return exp_fetchers.get_exploration_from_model(model)
+            except:
+                return None
 
     @staticmethod
     def convert_into_model_pair(
@@ -403,8 +414,10 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
         Optional[opportunity_models.ExplorationOpportunitySummaryModel]
     ]) -> bool:
         """Returns whether the exp model is curated or not.
+
         Args:
             model_pair: tuple. The pair of exp and opportunity models.
+
         Returns:
             bool. Returns whether the exp model is curated or not.
         """
@@ -416,7 +429,7 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
             | 'Get all ExplorationModels' >> ndb_io.GetModels(
                 exp_models.ExplorationModel.get_all(include_deleted=False))
             | 'Get exploration from model' >> beam.Map(
-                self.get_exploration_from_model)
+                self.get_exploration_from_models)
             | 'Filter valid explorations' >> beam.Filter(
                 lambda exp: exp is not None)
         )
@@ -438,7 +451,7 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
         )
 
         all_exp_opportunities = (
-            all_explorations
+            exps_with_id_and_models
             | 'Get all ExplorationOpportunitySummaryModels' >>
                 ndb_io.GetModels(
                     opportunity_models.ExplorationOpportunitySummaryModel
@@ -459,7 +472,7 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
             | 'Filter curated explorations' >> beam.Filter(
                 self.filter_curated_explorations)
             | 'Get exploration from the model' >> beam.Map(
-                self.get_exploration_from_model)
+                self.get_exploration_from_models)
             | 'Filter valid curated explorations' >> beam.Filter(
                 lambda exp: exp is not None)
             | 'Combine curated exp id and states' >> beam.Map(
@@ -924,37 +937,37 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                 report_count_invalid_drag_drop_a_less_than_b_rule,
                 report_invalid_drag_drop_a_less_than_b_rule,
 
-                report_count_invalid_drag_drop_multi_item_at_same_place,
-                report_invalid_drag_drop_multi_item_at_same_place,
+                # report_count_invalid_drag_drop_multi_item_at_same_place,
+                # report_invalid_drag_drop_multi_item_at_same_place,
 
-                report_count_invalid_drag_drop_one_item_at_incorrect_position,
-                report_invalid_drag_drop_one_item_at_incorrect_position,
+                # report_count_invalid_drag_drop_one_item_at_incorrect_position,
+                # report_invalid_drag_drop_one_item_at_incorrect_position,
 
-                report_count_invalid_drag_drop_equals_rule_empty_values,
-                report_invalid_drag_drop_equals_rule_empty_values,
+                # report_count_invalid_drag_drop_equals_rule_empty_values,
+                # report_invalid_drag_drop_equals_rule_empty_values,
 
-                report_continue_text_language_code_values,
+                # report_continue_text_language_code_values,
 
-                report_count_invalid_item_selec_equals_value_between_min_max,
-                report_invalid_item_selec_equals_value_between_min_max,
+                # report_count_invalid_item_selec_equals_value_between_min_max,
+                # report_invalid_item_selec_equals_value_between_min_max,
 
-                report_count_invalid_numeric_less_than_equal_rule_value_string,
-                report_invalid_numeric_less_than_equal_rule_value_is_string,
+                # report_count_invalid_numeric_less_than_equal_rule_value_string,
+                # report_invalid_numeric_less_than_equal_rule_value_is_string,
 
-                report_count_invalid_numeric_greater_than_equal_rule_is_string,
-                report_invalid_numeric_greater_than_equal_rule_is_string,
+                # report_count_invalid_numeric_greater_than_equal_rule_is_string,
+                # report_invalid_numeric_greater_than_equal_rule_is_string,
 
-                report_count_invalid_numeric_less_than_rule_value_is_string,
-                report_invalid_numeric_less_than_rule_value_is_string,
+                # report_count_invalid_numeric_less_than_rule_value_is_string,
+                # report_invalid_numeric_less_than_rule_value_is_string,
 
-                report_count_invalid_numeric_greater_than_rule_value_is_string,
-                report_invalid_numeric_greater_than_rule_value_is_string,
+                # report_count_invalid_numeric_greater_than_rule_value_is_string,
+                # report_invalid_numeric_greater_than_rule_value_is_string,
 
-                report_count_invalid_numeric_equals_rule_value_is_string,
-                report_invalid_numeric_equals_rule_value_is_string,
+                # report_count_invalid_numeric_equals_rule_value_is_string,
+                # report_invalid_numeric_equals_rule_value_is_string,
 
-                report_count_invalid_rte_image_alt_value,
-                report_invalid_rte_image_alt_value
+                # report_count_invalid_rte_image_alt_value,
+                # report_invalid_rte_image_alt_value
             )
             | 'Combine results' >> beam.Flatten()
         )
