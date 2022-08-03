@@ -176,7 +176,11 @@ describe('GraphVizComponent', () => {
     spyOn(Element.prototype, 'querySelectorAll').and.callFake(
       jasmine.createSpy('querySelectorAll').and
         .returnValue([{
-          width: 527,
+          width: {
+            baseVal: {
+              value: 527
+            }
+          },
           getAttribute: (attr) => {
             if (attr === 'height') {
               return 250;
@@ -195,7 +199,6 @@ describe('GraphVizComponent', () => {
 
     component.ngAfterViewInit();
 
-    expect(component.vizWidth).toBe(527);
     expect(component.graphOptions).toEqual([{
       text: 'Labeled',
       option: 'isLabeled'
@@ -222,7 +225,11 @@ describe('GraphVizComponent', () => {
       spyOn(Element.prototype, 'querySelectorAll').and.callFake(
         jasmine.createSpy('querySelectorAll').and
           .returnValue([{
-            width: 120,
+            width: {
+              baseVal: {
+                value: 120
+              }
+            },
             getAttribute: (attr) => {
               if (attr === 'height') {
                 return 250;
@@ -660,7 +667,11 @@ describe('GraphVizComponent', () => {
     spyOn(Element.prototype, 'querySelectorAll').and.callFake(
       jasmine.createSpy('querySelectorAll').and
         .returnValue([{
-          width: 120,
+          width: {
+            baseVal: {
+              value: 120
+            }
+          },
           getAttribute: (attr) => {
             if (attr === 'height') {
               return 250;
