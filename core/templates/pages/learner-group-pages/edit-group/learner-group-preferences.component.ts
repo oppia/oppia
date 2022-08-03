@@ -24,15 +24,15 @@ import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-grou
 import { LearnerGroupSubtopicSummary } from 'domain/learner_group/learner-group-subtopic-summary.model';
 import { LearnerGroupSyllabusBackendApiService } from 'domain/learner_group/learner-group-syllabus-backend-api.service';
 import { LearnerGroupSyllabus } from 'domain/learner_group/learner-group-syllabus.model';
-import { LearnerGroupAllStudentsInfo, LearnerGroupUserInfo } from 'domain/learner_group/learner-group-user-progress.model';
+import { LearnerGroupUserInfo } from 'domain/learner_group/learner-group-user-info.model';
 import { LearnerGroupData } from 'domain/learner_group/learner-group.model';
 import { StorySummary } from 'domain/story/story-summary.model';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { LearnerGroupPagesConstants } from '../learner-group-pages.constants';
 import { AddedSyllabusItemsSuccessfullyModalComponent } from '../templates/added-syllabus-items-successfully-modal.component';
 import { InviteStudentsModalComponent } from '../templates/invite-students-modal.component';
-import { RemoveSyllabusItemModalComponent } from 
-  '../templates/remove-syllabus-item-modal.component';
+import { RemoveItemModalComponent } from 
+  '../templates/remove-item-modal.component';
 
 import './learner-group-preferences.component.css';
 
@@ -65,11 +65,14 @@ export class LearnerGroupPreferencesComponent {
 
   ngOnInit() {
     this.activeTab = this.EDIT_PREFERENCES_SECTIONS_I18N_IDS.GROUP_DETAILS;
-    this.learnerGroupBackendApiService.fetchStudentsInfoAsync(
-      this.learnerGroup.id).then((studentsInfo) => {
-      this.currentStudentsInfo = studentsInfo.students_info;
-      this.invitedStudentsInfo = studentsInfo.invited_students_info;
-    });
+    if (this.learnerGroup) {
+      this.learnerGroupBackendApiService.fetchStudentsInfoAsync(
+        this.learnerGroup.id).then((studentsInfo) => {
+        console.log(studentsInfo, "ssds");
+        this.currentStudentsInfo = studentsInfo.studentsInfo;
+        this.invitedStudentsInfo = studentsInfo.invitedStudentsInfo;
+      });
+    }
   }
 
   isTabActive(tabName: string): boolean {
@@ -115,13 +118,14 @@ export class LearnerGroupPreferencesComponent {
   }
 
   openInviteStudentsModal(): void {
-    const modalRef = this.ngbModal.open(
+    let modalRef = this.ngbModal.open(
       InviteStudentsModalComponent,
       { 
         backdrop: 'static',
         windowClass: 'invite-students-modal'
       }
     );
+    modalRef.componentInstance.learnerGroupId = this.learnerGroup.id;
 
     modalRef.result.then((data) => {
       this.invitedStudents = data.invitedStudents;
@@ -129,6 +133,7 @@ export class LearnerGroupPreferencesComponent {
       this.learnerGroupBackendApiService.updateLearnerGroupAsync(
         this.learnerGroup).then((learnerGroup) => {
         this.learnerGroup = learnerGroup;
+        this.invitedStudentsInfo.push(...data.invitedStudentsInfo);
       });
     }, () => {
       // Note to developers:
@@ -137,8 +142,75 @@ export class LearnerGroupPreferencesComponent {
     });
   }
 
+  openRemoveStudentFromGroupModal(student: LearnerGroupUserInfo): void {
+    let modalRef = this.ngbModal.open(
+      RemoveItemModalComponent,
+      {
+        backdrop: 'static',
+        windowClass: 'remove-student-modal'
+      }
+    );
+    modalRef.componentInstance.confirmationTitle = 'Remove Student';
+    modalRef.componentInstance.confirmationMessage = (
+      'Are you sure you want to remove this student from the group?'
+    );
+
+    modalRef.result.then(() => {
+      this.learnerGroup.removeStudent(student.username);
+      this.learnerGroupBackendApiService.updateLearnerGroupAsync(
+        this.learnerGroup).then((learnerGroup) => {
+        this.learnerGroup = learnerGroup;
+      });
+    });
+  }
+
+  openWithdrawStudentInvitationModal(student: LearnerGroupUserInfo): void {
+    let modalRef = this.ngbModal.open(
+      RemoveItemModalComponent,
+      {
+        backdrop: 'static',
+        windowClass: 'withdraw-student-invitation-modal'
+      }
+    );
+    modalRef.componentInstance.confirmationTitle = 'Withdraw Invitation';
+    modalRef.componentInstance.confirmationMessage = (
+      'Are you sure you want to withdraw this invitation?'
+    );
+
+    modalRef.result.then(() => {
+      this.learnerGroup.revokeInvitation(student.username);
+      this.invitedStudentsInfo = this.invitedStudentsInfo.filter(
+        (invitedStudent) => invitedStudent.username !== student.username
+      );
+      this.learnerGroupBackendApiService.updateLearnerGroupAsync(
+        this.learnerGroup).then((learnerGroup) => {
+        this.learnerGroup = learnerGroup;
+        console.log(this.learnerGroup, "learnerGroup");
+      });
+    });
+  }
+
   updateInvitedStudents(invitedStudents: string[]): void {
     this.invitedStudents = invitedStudents;
+  }
+
+  getProfileImageDataUrl(dataUrl: string): string {
+    return decodeURIComponent(dataUrl);
+  }
+
+  addStudentToLearnerGroup(student: LearnerGroupUserInfo): void {
+    this.learnerGroup.addStudent(student.username);
+    this.learnerGroup.revokeInvitation(student.username)
+    this.invitedStudentsInfo = this.invitedStudentsInfo.filter(
+      (invitedStudent) => invitedStudent.username !== student.username
+    );
+    this.learnerGroupBackendApiService.updateLearnerGroupInviteAsync(
+      this.learnerGroup.id, student.username, true, true
+    ).then((learnerGroup) => {
+      this.learnerGroup = learnerGroup;
+      this.currentStudentsInfo.push(student);
+      console.log(this.learnerGroup, "learnerGroup");
+    });
   }
 }
 

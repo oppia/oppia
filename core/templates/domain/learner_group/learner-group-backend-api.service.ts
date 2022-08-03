@@ -24,6 +24,7 @@ import { Injectable } from '@angular/core';
 import { LearnerGroupBackendDict, LearnerGroupData } from './learner-group.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import {
+  LearnerGroupAllStudentsInfo,
   LearnerGroupAllStudentsInfoBackendDict,
   LearnerGroupUserInfo, LearnerGroupUserInfoBackendDict
 } from './learner-group-user-info.model';
@@ -167,7 +168,7 @@ export class LearnerGroupBackendApiService {
 
   async fetchStudentsInfoAsync(
       learnerGroupId: string
-  ): Promise<LearnerGroupAllStudentsInfoBackendDict> {
+  ): Promise<LearnerGroupAllStudentsInfo> {
     return new Promise((resolve, reject) => {
       const learnerGroupUrl = (
         this.urlInterpolationService.interpolateUrl(
@@ -178,7 +179,33 @@ export class LearnerGroupBackendApiService {
       );
       this.http.get<LearnerGroupAllStudentsInfoBackendDict>(
         learnerGroupUrl).toPromise().then(response => {
-        resolve(response);
+        resolve(LearnerGroupAllStudentsInfo.createFromBackendDict(response));
+      });
+    });
+  }
+
+  async updateLearnerGroupInviteAsync(
+    learnerGroupId: string,
+    studentUsername: string,
+    isInviatationAccepted: boolean,
+    progressSharingPermission = false
+  ): Promise<LearnerGroupData> {
+    return new Promise((resolve, reject) => {
+      const learnerGroupUrl = (
+        this.urlInterpolationService.interpolateUrl(
+          '/learner_group_student_invitation_handler/<learner_group_id>', {
+            learner_group_id: learnerGroupId
+          }
+        )
+      );
+      const putData = {
+        student_username: studentUsername,
+        is_invitation_accepted: isInviatationAccepted.toString(),
+        progress_sharing_permission: progressSharingPermission.toString()
+      };
+      this.http.put<LearnerGroupBackendDict>(
+        learnerGroupUrl, putData).toPromise().then(response => {
+        resolve(LearnerGroupData.createFromBackendDict(response));
       });
     });
   }

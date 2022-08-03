@@ -160,6 +160,15 @@ def update_learner_group(
         remove_invited_students_from_learner_group(
             group_id, newly_removed_invites)
 
+    old_student_ids = set(learner_group_model.student_user_ids)
+    new_student_ids = set(student_ids)
+    if old_student_ids != new_student_ids:
+        newly_removed_students = list(
+            old_student_ids - new_student_ids
+        )
+        remove_students_from_learner_group(
+            group_id, newly_removed_students)
+
     learner_group_model.title = title
     learner_group_model.description = description
     learner_group_model.facilitator_user_ids = facilitator_user_ids
@@ -489,6 +498,41 @@ def add_student_to_learner_group(
 
     learner_grps_user_model.update_timestamps()
     learner_grps_user_model.put()
+
+    learner_group_model.update_timestamps()
+    learner_group_model.put()
+
+
+def remove_students_from_learner_group(
+    group_id: str,
+    user_ids: List[str]
+) -> None:
+    """Removes the given student from the given learner group.
+
+    Args:
+        group_id: str. The id of the learner group.
+        user_ids: List[str]. The id of the students to be removed.
+    """
+    learner_group_model = learner_group_models.LearnerGroupModel.get(
+        group_id, strict=True
+    )
+
+    learner_group_model.student_user_ids.remove(user_ids)
+
+    learner_grps_users_models = user_models.LearnerGroupsUserModel.get_multi(
+        user_ids)
+
+    models_to_put = []
+    for learner_grps_user_model in learner_grps_users_models:
+        learner_grps_user_model.learner_groups_user_details = [
+            details for details in
+            learner_grps_user_model.learner_groups_user_details
+            if details['group_id'] != group_id
+        ]
+        models_to_put.append(learner_grps_user_model)
+
+    user_models.LearnerGroupsUserModel.update_timestamps_multi(models_to_put)
+    user_models.LearnerGroupsUserModel.put_multi(models_to_put)
 
     learner_group_model.update_timestamps()
     learner_group_model.put()

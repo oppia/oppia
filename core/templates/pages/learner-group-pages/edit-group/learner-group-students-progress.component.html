@@ -1,0 +1,28 @@
+<div class="oppia-learner-group-students-progress">
+  <div class="search-bar-label">Search By Username</div>
+  <div>
+    <input class="search-bar-input"
+           type="text"
+           [(ngModel)]="searchUsername"
+           (keyup)="searchUsernameKeyUp($event)"
+           placeholder="Search Learner"
+    />
+  </div>
+  <div *ngFor="let studentProgress of studentsProgress; let idx = index">
+    <div class="student-progress-summary">
+      <div class="student-progress-summary-header">
+          <div class="student-info">
+            <img [src]="getProfileImageDataUrl(studentProgress.profilePictureDataUrl)">
+            <div>{{studentProgress.username}}</div>
+          </div>
+        <div class="view-details-button btn btn-primary">
+          View Details
+        </div>
+      </div>
+      <div class="student-progress-summary-info">
+        <span class="warning">Struggling with {{getStrugglingSubtopicsCountOfStudent(idx)}} skills | </span>
+        <span>Completed {{getCompletedStoriesCountByStudent(idx)}} stories</span>
+      </div>
+    </div>
+  </div>
+</div>

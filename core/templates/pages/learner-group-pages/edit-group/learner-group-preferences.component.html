@@ -45,16 +45,45 @@
               (click)="openInviteStudentsModal()">
         + <span>New Learner</span>
       </button>
-      <div class="current-group-students">
-        <span>Current group students({{learnerGroup.studentUsernames.length}})</span>
-        <div *ngFor="let studentInfo of invitedStudentsInfo">
-          <span>{{studentInfo.username}}</span>
+      <div class="current-group-students" *ngIf="learnerGroup">
+        <span class="group-students-title">Current Group Students({{learnerGroup.studentUsernames.length}})</span>
+        <div class="group-students-card" *ngFor="let studentInfo of currentStudentsInfo">
+          <div class="group-students-card-info">
+            <img class="group-students-card-avatar" [src]="getProfileImageDataUrl(studentInfo.userProfilePictureUrl)">
+            <span>{{studentInfo.username}}</span>
+          </div>
+          <div class="group-students-card-button">
+            <span (click)="openRemoveStudentFromGroupModal(studentInfo)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 11 11" fill="none">
+                <path d="M10.0234 0.871094L0.996712 9.89077" stroke="#00609C" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M10.0234 9.89077L0.996712 0.871093" stroke="#00609C" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </span>
+          </div>
+        </div>
+        <div *ngIf="currentStudentsInfo.length === 0" class="no-students-text">
+          No students have joined the group yet.
         </div>
       </div>
-      <div class="invited-group-students">
-        <span>Invited group students({{learnerGroup.invitedStudentUsernames.length}})</span>
-        <div *ngFor="let studentInfo of currentStudentsInfo">
-          <span>{{studentInfo.username}}</span>
+      <div class="invited-group-students" *ngIf="learnerGroup">
+        <span class="group-students-title">Invites Pending({{learnerGroup.invitedStudentUsernames.length}})</span>
+        <div class="group-students-card" *ngFor="let studentInfo of invitedStudentsInfo">
+          <div class="group-students-card-info">
+            <img class="group-students-card-avatar" [src]="getProfileImageDataUrl(studentInfo.userProfilePictureUrl)">
+            <span>{{studentInfo.username}}</span>
+          </div>
+          <div class="group-students-card-buttons">
+            <span (click)="addStudentToLearnerGroup(studentInfo)">+ Add Student</span>
+            <div class="group-students-card-button" (click)="openWithdrawStudentInvitationModal(studentInfo)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="12" viewBox="0 0 16 12" fill="none">
+                <path d="M14.3158 1V5H3.22526L6.24 1.41L5.05263 0L0 6L5.05263 12L6.24 10.58L3.22526 7H16V1H14.3158Z" fill="#00609C"/>
+              </svg>
+              <span>Withdraw</span>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="invitedStudentsInfo.length === 0" class="no-students-text">
+          No students have been invited to the group yet.
         </div>
       </div>
     </div>

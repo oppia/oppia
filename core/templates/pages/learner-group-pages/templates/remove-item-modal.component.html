@@ -1,13 +1,11 @@
 <div class="modal-header">
   <h3>
-    <span>Remove </span>
-    <span *ngIf="syllabusItemType === 'story'">Lesson</span>
-    <span *ngIf="syllabusItemType === 'skill'">Skill</span>
+    <span><p>{{confirmationTitle | translate}}</p></span>
   </h3>
 </div>
 
 <div class="modal-body">
-  <p>Are you sure you want to remove this item from the syllabus?</p>
+  <p>{{confirmationMessage | translate}}</p>
 </div>
 
 <div class="modal-footer">

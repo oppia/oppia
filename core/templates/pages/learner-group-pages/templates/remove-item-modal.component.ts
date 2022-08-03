@@ -21,11 +21,12 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 @Component({
-  selector: 'oppia-remove-syllabus-item-modal',
-  templateUrl: './remove-syllabus-item-modal.component.html'
+  selector: 'oppia-remove-item-modal',
+  templateUrl: './remove-item-modal.component.html'
 })
-export class RemoveSyllabusItemModalComponent extends ConfirmOrCancelModal {
-  syllabusItemType!: string;
+export class RemoveItemModalComponent extends ConfirmOrCancelModal {
+  confirmationTitle!: string;
+  confirmationMessage!: string;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,

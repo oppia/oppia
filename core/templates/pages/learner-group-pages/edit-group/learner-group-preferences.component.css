@@ -96,3 +96,89 @@
 .invite-students-modal .modal-dialog {
   margin: 200px auto;
 }
+
+.oppia-learner-group-preferences .group-students-title {
+  color: #00609c;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.oppia-learner-group-preferences .current-group-students {
+  margin-bottom: 20px;
+}
+
+.oppia-learner-group-preferences .group-students-card {
+  align-items: center;
+  border: 1px solid #e6e6e6;
+  border-radius: 4px;
+  box-shadow: 3px 3px 6px rgb(0 0 0 / 5%);
+  display: flex;
+  font-weight: 500;
+  gap: 10px;
+  justify-content: space-between;
+  margin-top: 8px;
+  padding: 10px 30px;
+}
+
+.oppia-learner-group-preferences .group-students-card .group-students-card-avatar {
+  border-radius: 50%;
+  height: 40px;
+  width: 40px;
+}
+
+.oppia-learner-group-preferences .group-students-card-info {
+  align-items: center;
+  display: flex;
+  font-size: 14px;
+  gap: 10px;
+}
+
+.oppia-learner-group-preferences .group-students-card-buttons {
+  display: flex;
+  font-size: 14px;
+  gap: 20px;
+}
+
+.oppia-learner-group-preferences .group-students-card-button {
+  align-items: center;
+  color: #00609c;
+  cursor: pointer;
+  display: flex;
+  font-size: 14px;
+  gap: 5px;
+}
+
+.oppia-learner-group-preferences .current-group-students .group-students-card {
+  background: #e5eef4;
+  border-color: #e5eef4;
+}
+
+.oppia-learner-group-preferences .no-students-text {
+  color: #9e9e9e;
+  font-size: 14px;
+  margin-top: 20px;
+  text-align: center;
+}
+
+.remove-student-modal .modal-dialog,
+.withdraw-student-invitation-modal .modal-dialog {
+  margin: 200px auto;
+}
+
+.remove-student-modal .modal-header,
+.withdraw-student-invitation-modal .modal-header {
+  border-bottom: unset;
+  padding-left: 40px
+}
+
+.remove-student-modal .modal-body,
+.withdraw-student-invitation-modal .modal-body {
+  padding: 0 40px 30px;
+}
+
+.remove-student-modal .modal-footer,
+.withdraw-student-invitation-modal .modal-footer {
+  border-top: unset;
+  padding-bottom: 40px;
+  padding-right: 40px;
+}

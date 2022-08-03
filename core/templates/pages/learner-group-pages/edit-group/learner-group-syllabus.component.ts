@@ -27,8 +27,8 @@ import { LearnerGroupData } from 'domain/learner_group/learner-group.model';
 import { StorySummary } from 'domain/story/story-summary.model';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 import { AddedSyllabusItemsSuccessfullyModalComponent } from '../templates/added-syllabus-items-successfully-modal.component';
-import { RemoveSyllabusItemModalComponent } from
-  '../templates/remove-syllabus-item-modal.component';
+import { RemoveItemModalComponent } from
+  '../templates/remove-item-modal.component';
 
 import './learner-group-syllabus.component.css';
 
@@ -204,15 +204,17 @@ export class LearnerGroupSyllabusComponent {
   }
 
   removeSubtopicPageIdFromSyllabus(subtopicPageId: string): void {
-    let modelRef = this.ngbModal.open(
-      RemoveSyllabusItemModalComponent, {
+    let modalRef = this.ngbModal.open(
+      RemoveItemModalComponent, {
         backdrop: true,
         windowClass: 'remove-syllabus-item-modal'
       });
+    modalRef.componentInstance.confirmationTitle = 'Remove Skill';
+    modalRef.componentInstance.confirmationMessage = (
+      'Are you sure you want to remove this item from the syllabus?'
+    );
 
-    modelRef.componentInstance.syllabusItemType = 'skill';
-
-    modelRef.result.then(() => {
+    modalRef.result.then(() => {
       this.learnerGroup.removeSubtopicPageId(subtopicPageId);
       this.learnerGroupBackendApiService.updateLearnerGroupAsync(
         this.learnerGroup).then((learnerGroup) => {
@@ -230,14 +232,17 @@ export class LearnerGroupSyllabusComponent {
   }
 
   removeStoryIdFromSyllabus(storyId: string): void {
-    let modelRef = this.ngbModal.open(
-      RemoveSyllabusItemModalComponent, {
+    let modalRef = this.ngbModal.open(
+      RemoveItemModalComponent, {
         backdrop: true,
         windowClass: 'remove-syllabus-item-modal'
       });
-    modelRef.componentInstance.syllabusItemType = 'story';
+    modalRef.componentInstance.confirmationTitle = 'Remove Lesson';
+    modalRef.componentInstance.confirmationMessage = (
+      'Are you sure you want to remove this item from the syllabus?'
+    );
 
-    modelRef.result.then(() => {
+    modalRef.result.then(() => {
       this.learnerGroup.removeStoryId(storyId);
       this.learnerGroupBackendApiService.updateLearnerGroupAsync(
         this.learnerGroup).then((learnerGroup) => {

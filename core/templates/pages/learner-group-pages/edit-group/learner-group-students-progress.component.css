@@ -1,0 +1,77 @@
+/*
+  NOTE to developers: We generate RTL CSS from this file in the webpack
+  compilation, here are sme additional rules that can be added to the CSS files:
+  https://rtlcss.com/learn/usage-guide/control-directives .
+*/
+
+.oppia-learner-group-students-progress {
+  background: #fff;
+  border-radius: 4px;
+  box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.1);
+  margin: 40px auto 0;
+  margin-bottom: 40px;
+  padding: 30px;
+  text-align: left;
+  width: 80%;
+}
+
+.oppia-learner-group-students-progress .search-bar-label {
+  font-weight: 500;
+}
+
+.oppia-learner-group-students-progress .search-bar-input {
+  border: 1px solid #27635c;
+  border-radius: 4px;
+  font-size: 14px;
+  margin-top: 10px;
+  max-width: 700px;
+  padding: 10px;
+  width: 100%;
+}
+
+.oppia-learner-group-students-progress .student-progress-summary {
+  background: #fff;
+  border: 1px solid #e6e6e6;
+  border-radius: 4px;
+  box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.05);
+  margin-top: 20px;
+}
+
+.oppia-learner-group-students-progress .student-progress-summary-header {
+  background: #eaf0ef;
+  display: flex;
+  justify-content: space-between;
+  padding: 12px;
+}
+
+.oppia-learner-group-students-progress .student-progress-summary-title {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.oppia-learner-group-students-progress .student-progress-summary-info {
+  color: #27635c;
+  font-size: 14px;
+  padding: 20px 12px;
+}
+
+.oppia-learner-group-students-progress .student-progress-summary-info .warning {
+  color: #c30000;
+}
+
+.oppia-learner-group-students-progress .student-info{
+  display: flex;
+  font-size: 18px;
+  font-weight: 500;
+  gap: 15px;
+  height: 46px;
+  padding: 10px;
+  width: max-content;
+}
+
+.oppia-learner-group-students-progress .view-details-button {
+  align-items: center;
+  align-self: center;
+  display: flex;
+  height: 40px;
+}

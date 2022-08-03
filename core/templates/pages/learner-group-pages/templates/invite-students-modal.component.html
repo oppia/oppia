@@ -1,5 +1,7 @@
 <div class="modal-body">
-  <oppia-invite-students (updateLearnerGroupInvitedStudents)="updateNewlyInvitedStudents($event)">
+  <oppia-invite-students [learnerGroupID]="learnerGroupId"
+                         (updateLearnerGroupInvitedStudents)="updateNewlyInvitedStudents($event)"
+                         (updateLearnerGroupInvitedStudentsInfo)="updateNewlyInvitedStudentsInfo($event)">
   </oppia-invite-students>
 </div>
 <div class="modal-footer">

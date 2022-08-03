@@ -19,14 +19,16 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import { LearnerGroupUserInfo } from 'domain/learner_group/learner-group-user-info.model';
 
 @Component({
   selector: 'oppia-invite-students-modal',
   templateUrl: './invite-students-modal.component.html'
 })
 export class InviteStudentsModalComponent extends ConfirmOrCancelModal {
-  syllabusItemType!: string;
+  learnerGroupId!: string;
   invitedStudents: string[] = [];
+  invitedStudentsInfo: LearnerGroupUserInfo[] = [];
 
 
   constructor(
@@ -38,6 +40,7 @@ export class InviteStudentsModalComponent extends ConfirmOrCancelModal {
   confirm(): void {
     this.ngbActiveModal.close({
       invitedStudents: this.invitedStudents,
+      invitedStudentsInfo: this.invitedStudentsInfo
     });
   }
 
@@ -45,5 +48,11 @@ export class InviteStudentsModalComponent extends ConfirmOrCancelModal {
     invitedStudents: string[]
   ): void {
     this.invitedStudents = invitedStudents;
+  }
+
+  updateNewlyInvitedStudentsInfo(
+    invitedStudentsInfo: LearnerGroupUserInfo[]
+  ): void {
+    this.invitedStudentsInfo = invitedStudentsInfo;
   }
 }

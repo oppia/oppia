@@ -16,7 +16,6 @@
   margin: 40px auto 0;
   padding: 25px;
   text-align: center;
-  width: 85%;
 }
 
 .oppia-learner-group-overview .learner-group-summary-card .students-info,
@@ -33,4 +32,88 @@
 .oppia-learner-group-overview .learner-group-summary-card .assigned-stories-count {
   font-family: 'Capriola', sans-serif;
   font-size: 26px;
+}
+
+.oppia-learner-group-overview .oppia-learner-group-students-progress-overview {
+  margin-top: 40px;
+}
+
+.oppia-learner-group-overview .overview-tab-sections {
+  background: #fff;
+  border-radius: 4px;
+  box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+}
+
+.oppia-learner-group-overview .overview-tab-sections-header {
+  border-bottom: 1px solid #e6e6e6;
+  display: flex;
+  justify-content: space-around;
+}
+
+.oppia-learner-group-overview .overview-tab-sections-header-title {
+  cursor: pointer;
+  font-weight: 500;
+  padding-bottom: 10px;
+}
+
+.oppia-learner-group-overview .overview-tab-sections-header-title.active {
+  border-bottom: 3px solid #33978f;
+  color: #015952;
+}
+
+.oppia-learner-group-overview .overview-tab-sections .tab-description {
+  font-size: 16px;
+}
+
+.oppia-learner-group-overview .overview-tab-sections-subtab {
+  margin-top: 30px;
+}
+
+.oppia-learner-group-overview .progress-summary {
+  background: #fff;
+  border: 1px solid #e6e6e6;
+  border-radius: 4px;
+  box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.05);
+  margin-top: 20px;
+}
+
+.oppia-learner-group-overview .progress-summary-header {
+  background: #eaf0ef;
+  display: flex;
+  justify-content: space-between;
+  padding: 18px 28px;
+}
+
+.oppia-learner-group-overview .progress-summary-title {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.oppia-learner-group-overview .progress-summary-info {
+  color: #27635c;
+  font-size: 14px;
+}
+
+.oppia-learner-group-overview .progress-summary-info.warning {
+  color: #c30000;
+}
+
+.oppia-learner-group-overview .progress-summary-students {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  overflow: auto;
+  padding: 30px;
+}
+
+.oppia-learner-group-overview .student-info-card{
+  background: #fff;
+  border: 1px solid #27635c;
+  border-radius: 5px;
+  display: flex;
+  gap: 15px;
+  height: 46px;
+  padding: 10px;
+  width: max-content;
 }

@@ -41,7 +41,7 @@
     </div>
 
     <div class="oppia-same-row-container">
-      <div [ngClass]="{'open' : activeMenuName === 'type', 'dropup' : enableDropup}" ngbDropdown class="search-bar-float-left oppia-search-bar-type-selector dropdown" autoClose="outside">
+      <div [ngClass]="{'open' : activeMenuName === 'type'}" ngbDropdown class="search-bar-float-left oppia-search-bar-type-selector dropdown" autoClose="outside">
         <button ngbDropdownToggle
                 (click)="openSubmenu($event, 'type')"
                 (keydown)="onMenuKeypress($event, 'type', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
@@ -76,7 +76,7 @@
     </div>
 
     <div class="oppia-same-row-container">
-      <div [ngClass]="{'open' : activeMenuName === 'category', 'dropup' : enableDropup}" ngbDropdown class="search-bar-float-left oppia-search-bar-category-selector dropdown" autoClose="outside">
+      <div [ngClass]="{'open' : activeMenuName === 'category'}" ngbDropdown class="search-bar-float-left oppia-search-bar-category-selector dropdown" autoClose="outside">
         <button ngbDropdownToggle
                 (click)="openSubmenu($event, 'category')"
                 (keydown)="onMenuKeypress($event, 'category', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
@@ -111,7 +111,7 @@
     </div>
 
     <div class="oppia-same-row-container">
-      <div ngbDropdown [ngClass]="{'open' : activeMenuName === 'language', 'dropup' : enableDropup}" class="search-bar-float-left oppia-search-bar-language-selector protractor-test-search-bar-language-selector dropdown" autoClose="outside">
+      <div ngbDropdown [ngClass]="{'open' : activeMenuName === 'language'}" class="search-bar-float-left oppia-search-bar-language-selector protractor-test-search-bar-language-selector dropdown" autoClose="outside">
         <button ngbDropdownToggle
                 (click)="openSubmenu($event, 'language')"
                 (keydown)="onMenuKeypress($event, 'language', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"

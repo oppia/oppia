@@ -970,6 +970,9 @@ URLS = [
         r'/learner_group_students_info_handler/<learner_group_id>',
         learner_group.LearnerGroupStudentsInfoHandler),
     get_redirect_route(
+        r'/learner_group_student_invitation_handler/<learner_group_id>',
+        learner_group.LearnerGroupStudentInvitationHandler),
+    get_redirect_route(
         r'/edit-learner-group/<group_id>', learner_group.EditLearnerGroupPage)
 ]
 

@@ -88,7 +88,8 @@ export class LearnerGroupSyllabusBackendApiService {
   }
 
   async fetchStudentsProgressInAssignedSyllabus(
-      learnerGroupId: string
+      learnerGroupId: string,
+      studentUsernames: string[]
   ): Promise<LearnerGroupUserProgress[]> {
     return new Promise((resolve, reject) => {
       const learnerGroupUrl = (
@@ -100,7 +101,12 @@ export class LearnerGroupSyllabusBackendApiService {
       );
 
       this.http.get<LearnerGroupUserProgressBackendDict[]>(
-        learnerGroupUrl).toPromise().then(usersProgressInfo => {
+        learnerGroupUrl, {
+          params: {
+            student_usernames: JSON.stringify(studentUsernames)
+          }
+        }).toPromise().then(usersProgressInfo => {
+          console.log(usersProgressInfo, "dsdfds");
         resolve(
           usersProgressInfo.map(
             progressInfo => LearnerGroupUserProgress.createFromBackendDict(

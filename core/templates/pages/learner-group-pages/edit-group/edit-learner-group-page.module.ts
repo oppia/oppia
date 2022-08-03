@@ -37,8 +37,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
 import { AddSyllabusItemsComponent } from
   '../create-group/add-syllabus-items.component';
-import { RemoveSyllabusItemModalComponent } from
-  '../templates/remove-syllabus-item-modal.component';
+import { RemoveItemModalComponent } from
+  '../templates/remove-item-modal.component';
 import { AddedSyllabusItemsSuccessfullyModalComponent } from
   '../templates/added-syllabus-items-successfully-modal.component';
 
@@ -58,11 +58,12 @@ import { AddedSyllabusItemsSuccessfullyModalComponent } from
     EditLearnerGroupPageComponent,
     LearnerGroupOverviewComponent,
     LearnerGroupSyllabusComponent,
+    LearnerGroupStudentsProgressComponent,
     LearnerGroupPreferencesComponent,
     AddSyllabusItemsComponent,
     InviteStudentsComponent,
     LearnerGroupDetailsComponent,
-    RemoveSyllabusItemModalComponent,
+    RemoveItemModalComponent,
     AddedSyllabusItemsSuccessfullyModalComponent,
     InviteStudentsModalComponent
   ],
@@ -70,11 +71,12 @@ import { AddedSyllabusItemsSuccessfullyModalComponent } from
     EditLearnerGroupPageComponent,
     LearnerGroupOverviewComponent,
     LearnerGroupSyllabusComponent,
+    LearnerGroupStudentsProgressComponent,
     LearnerGroupPreferencesComponent,
     AddSyllabusItemsComponent,
     InviteStudentsComponent,
     LearnerGroupDetailsComponent,
-    RemoveSyllabusItemModalComponent,
+    RemoveItemModalComponent,
     AddedSyllabusItemsSuccessfullyModalComponent,
     InviteStudentsModalComponent
   ],
@@ -117,6 +119,7 @@ import { LearnerGroupPreferencesComponent } from './learner-group-preferences.co
 import { LearnerGroupDetailsComponent } from '../create-group/learner-group-details.component';
 import { InviteStudentsModalComponent } from '../templates/invite-students-modal.component';
 import { InviteStudentsComponent } from '../create-group/invite-students.component';
+import { LearnerGroupStudentsProgressComponent } from './learner-group-students-progress.component';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

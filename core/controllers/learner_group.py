@@ -286,12 +286,15 @@ class LearnerGroupStudentProgressHandler(base.BaseHandler):
             )
         )
 
+        all_users_settings = user_services.get_users_settings(student_user_ids)
         all_students_progress = []
         for i, user_id in enumerate(student_user_ids):
             student_progress = {
                 'username': student_usernames[i],
                 'progress_sharing_is_turned_on':
                     progress_sharing_permissions[i],
+                'profile_picture_data_url':
+                    all_users_settings[i].profile_picture_data_url,
                 'stories_progress': [],
                 'subtopic_pages_progress': []
             }
@@ -308,9 +311,7 @@ class LearnerGroupStudentProgressHandler(base.BaseHandler):
             )
             all_students_progress.append(student_progress)
 
-        self.render_json({
-            'students_progress': all_students_progress
-        })
+        self.render_json(all_students_progress)
 
 
 class LearnerGroupSyllabusHandler(base.BaseHandler):
@@ -703,4 +704,86 @@ class LearnerGroupStudentsInfoHandler(base.BaseHandler):
                 }
                 for user_settings in invited_user_settings
             ]
+        })
+
+
+class LearnerGroupStudentInvitationHandler(base.BaseHandler):
+    """Handles a student accepting or declining a learner group invitation."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'learner_group_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.LEARNER_GROUP_ID_REGEX
+                }]
+            },
+            'default_value': None
+        }
+    }
+
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {
+            'student_username': {
+                'schema': {
+                    'type': 'basestring',
+                    'validators': [{
+                        'id': 'has_length_at_most',
+                        'max_value': constants.MAX_USERNAME_LENGTH
+                    }]
+                }
+            },
+            'is_invitation_accepted': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': 'false'
+            },
+            'progress_sharing_permission': {
+                'schema': {
+                    'type': 'basestring'
+                },
+                'default_value': 'false'
+            }
+        }
+    }
+
+    @acl_decorators.can_access_learner_groups
+    def put(self, learner_group_id):
+        """Handles PUT requests."""
+
+        student_username = self.normalized_payload.get('student_username')
+        is_invitation_accepted = (
+            self.normalized_payload.get('is_invitation_accepted') == 'true')
+        progress_sharing_permission = (
+            self.normalized_payload.get(
+                'progress_sharing_permission') == 'true')
+
+        student_user_id = user_services.get_user_id_from_username(
+            student_username)
+        if is_invitation_accepted:
+            learner_group_services.add_student_to_learner_group(
+                learner_group_id, student_user_id, progress_sharing_permission)
+        else:
+            learner_group_services.remove_invited_students_from_learner_group(
+                learner_group_id, [student_user_id])
+
+        learner_group = learner_group_fetchers.get_learner_group_by_id(
+            learner_group_id)
+
+        self.render_json({
+            'id': learner_group.group_id,
+            'title': learner_group.title,
+            'description': learner_group.description,
+            'facilitator_usernames': user_services.get_usernames(
+                learner_group.facilitator_user_ids),
+            'student_usernames': user_services.get_usernames(
+                learner_group.student_user_ids),
+            'invited_student_usernames': user_services.get_usernames(
+                learner_group.invited_student_user_ids),
+            'subtopic_page_ids': learner_group.subtopic_page_ids,
+            'story_ids': learner_group.story_ids
         })

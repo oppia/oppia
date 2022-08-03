@@ -13,4 +13,70 @@
       <div>Assigned Stories</div>
     </div>
   </div>
+
+  <div class="oppia-learner-group-students-progress-overview">
+    <div class="overview-tab-sections">
+      <div class="overview-tab-sections-header">
+        <div class="overview-tab-sections-header-title"
+             [ngClass]="{'active': isTabActive(EDIT_OVERVIEW_SECTIONS_I18N_IDS.SKILLS_ANALYSIS)}"
+             (click)="setActiveTab(EDIT_OVERVIEW_SECTIONS_I18N_IDS.SKILLS_ANALYSIS)">
+          <span translate="I18N_LEARNER_GROUP_SKILLS_ANALYSIS_SECTION"></span>
+        </div>
+        <div class="overview-tab-sections-header-title"
+             [ngClass]="{'active': isTabActive(EDIT_OVERVIEW_SECTIONS_I18N_IDS.PROGRESS_IN_STORIES)}"
+             (click)="setActiveTab(EDIT_OVERVIEW_SECTIONS_I18N_IDS.PROGRESS_IN_STORIES)">
+          <span translate="I18N_LEARNER_GROUP_PROGRESS_IN_STORIES_SECTION"></span>
+        </div>
+      </div>
+      <div class="skill-analysis-tab overview-tab-sections-subtab" *ngIf="isTabActive(EDIT_OVERVIEW_SECTIONS_I18N_IDS.SKILLS_ANALYSIS)">
+        <div class="tab-description">
+          This section shows the common skills which the learners of this group are struggling with.
+          <div *ngIf="studentsProgress">
+            <div *ngFor="let subtopicSummary of studentsProgress[0].subtopicsProgress">
+              <div class="progress-summary">
+                <div class="progress-summary-header">
+                  <div class="progress-summary-title">
+                    {{subtopicSummary.subtopicTitle}}
+                  </div>
+                  <div class="progress-summary-info"
+                       [ngClass]="{'warning': getStrugglingStudentsInfoInSubtopics(subtopicSummary.subtopicPageId).length > 0}">
+                    {{getStrugglingStudentsInfoInSubtopics(subtopicSummary.subtopicPageId).length}} students are struggling this skill
+                  </div>
+                </div>
+                <div *ngIf="getStrugglingStudentsInfoInSubtopics(subtopicSummary.subtopicPageId).length > 0" class="progress-summary-students">
+                  <div class="student-info-card" *ngFor="let studentInfo of getStrugglingStudentsInfoInSubtopics(subtopicSummary.subtopicPageId)">
+                    <img [src]="getProfileImageDataUrl(studentInfo.userProfilePictureUrl)">
+                    <div>{{studentInfo.username}}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="stories-progress-tab overview-tab-sections-subtab" *ngIf="isTabActive(EDIT_OVERVIEW_SECTIONS_I18N_IDS.PROGRESS_IN_STORIES)">
+        This section shows the common stories which the learners of this group have completed.
+        <div *ngIf="studentsProgress">
+          <div *ngFor="let storySummary of studentsProgress[0].storiesProgress">
+            <div class="progress-summary">
+              <div class="progress-summary-header">
+                <div class="progress-summary-title">
+                  {{storySummary.getTitle()}} · {{storySummary.getNodeTitles().length}} Lessons
+                </div>
+                <div class="progress-summary-info">
+                  {{getStoryCompletionsInfo(storySummary.getId()).length}} students have completed this story
+                </div>
+              </div>
+              <div *ngIf="getStoryCompletionsInfo(storySummary.getId()).length > 0" class="progress-summary-students">
+                <div class="student-info-card" *ngFor="let studentInfo of getStoryCompletionsInfo(storySummary.getId())">
+                  <img [src]="getProfileImageDataUrl(studentInfo.userProfilePictureUrl)">
+                  <div>{{studentInfo.username}}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

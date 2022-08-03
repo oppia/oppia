@@ -60,7 +60,7 @@ export class EditLearnerGroupPageComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.learnerGroupId = this.contextService.getLearnerGroupId();
-    this.activeTab = this.EDIT_LEARNER_GROUP_TABS_I18N_IDS.SYLLABUS;
+    this.activeTab = this.EDIT_LEARNER_GROUP_TABS_I18N_IDS.OVERVIEW;
     if (this.learnerGroupId) {
       this.loaderService.showLoadingScreen('Loading');
       this.learnerGroupBackendApiService.fetchLearnerGroupInfoAsync(
@@ -93,6 +93,10 @@ export class EditLearnerGroupPageComponent implements OnInit, OnDestroy {
 
   isTabActive(tabName: string): boolean {
     return this.activeTab === tabName;
+  }
+
+  getStudentsCount(): number {
+    return this.learnerGroup.studentUsernames.length
   }
 
   ngOnDestroy(): void {

@@ -19,8 +19,10 @@
 import { Component, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { LearnerGroupSyllabusBackendApiService } from 'domain/learner_group/learner-group-syllabus-backend-api.service';
+import { LearnerGroupUserInfo } from 'domain/learner_group/learner-group-user-info.model';
 import { LearnerGroupUserProgress } from 'domain/learner_group/learner-group-user-progress.model';
 import { LearnerGroupData } from 'domain/learner_group/learner-group.model';
+import { LearnerGroupPagesConstants } from '../learner-group-pages.constants';
 
 import './learner-group-overview.component.css';
 
@@ -32,6 +34,10 @@ import './learner-group-overview.component.css';
 export class LearnerGroupOverviewComponent {
   @Input() learnerGroup: LearnerGroupData;
   studentsProgress!: LearnerGroupUserProgress[];
+  activeTab: string;
+  EDIT_OVERVIEW_SECTIONS_I18N_IDS = (
+    LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_OVERVIEW_SECTIONS
+  );
 
   constructor(
     private learnerGroupSyllabusBackendApiService:
@@ -39,13 +45,71 @@ export class LearnerGroupOverviewComponent {
   ) {}
 
   ngOnInit() {
+    this.activeTab = this.EDIT_OVERVIEW_SECTIONS_I18N_IDS.SKILLS_ANALYSIS;
     if (this.learnerGroup.studentUsernames.length > 0) {
       this.learnerGroupSyllabusBackendApiService
       .fetchStudentsProgressInAssignedSyllabus(
-        this.learnerGroup.id).then(studentsProgress => {
+        this.learnerGroup.id, this.learnerGroup.studentUsernames
+      ).then(studentsProgress => {
         this.studentsProgress = studentsProgress;
+        console.log(this.studentsProgress, "progress");
       });
     }
+  }
+
+  isTabActive(tabName: string): boolean {
+    return this.activeTab === tabName;
+  }
+
+  setActiveTab(tabName: string): void {
+    this.activeTab = tabName;
+  }
+
+  getStoryCompletionsInfo(storyId: string): LearnerGroupUserInfo[] {
+    let storyCompletionsInfo: LearnerGroupUserInfo[] = [];
+    this.studentsProgress.forEach(studentProgress => {
+      studentProgress.storiesProgress.map(storyProgress => {
+        if (storyProgress.getId() === storyId &&
+        storyProgress.getCompletedNodeTitles().length === storyProgress.getNodeTitles().length
+        ) {
+          storyCompletionsInfo.push(
+            new LearnerGroupUserInfo(
+              studentProgress.username,
+              studentProgress.profilePictureDataUrl,
+              ''
+            )
+          )
+        }
+      });
+    });
+    return storyCompletionsInfo;
+  }
+
+  getStrugglingStudentsInfoInSubtopics(
+      subtopicPageId: string
+  ): LearnerGroupUserInfo[] {
+    let strugglingStudentsInfo: LearnerGroupUserInfo[] = [];
+    this.studentsProgress.forEach(studentProgress => {
+      studentProgress.subtopicsProgress.map(subtopicProgress => {
+        if (subtopicProgress.subtopicPageId === subtopicPageId &&
+        subtopicProgress.subtopicMastery &&
+        subtopicProgress.subtopicMastery < 0.6
+        ) {
+          strugglingStudentsInfo.push(
+            new LearnerGroupUserInfo(
+              studentProgress.username,
+              studentProgress.profilePictureDataUrl,
+              ''
+            )
+          )
+        }
+      });
+    });
+    return strugglingStudentsInfo;
+  }
+
+  getProfileImageDataUrl(dataUrl: string): string {
+    return decodeURIComponent(dataUrl);
   }
 }
 
