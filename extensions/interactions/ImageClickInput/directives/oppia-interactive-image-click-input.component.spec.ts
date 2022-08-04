@@ -432,8 +432,8 @@ describe('InteractiveImageClickInput', () => {
           height: 200
         }]));
     spyOn(component, 'updateCurrentlyHoveredRegions').and.callThrough();
-    spyOnProperty(MouseEvent.prototype, 'pageX', 'get').and.returnValue(290);
-    spyOnProperty(MouseEvent.prototype, 'pageY', 'get').and.returnValue(260);
+    spyOnProperty(MouseEvent.prototype, 'clientX', 'get').and.returnValue(290);
+    spyOnProperty(MouseEvent.prototype, 'clientY', 'get').and.returnValue(260);
     let evt = new MouseEvent('Mousemove');
     component.lastAnswer = null;
     component.ngOnInit();
@@ -456,8 +456,8 @@ describe('InteractiveImageClickInput', () => {
   it('should not check if mouse is over region when interaction is not' +
   ' active', () => {
     spyOn(component, 'updateCurrentlyHoveredRegions').and.callThrough();
-    spyOnProperty(MouseEvent.prototype, 'pageX', 'get').and.returnValue(290);
-    spyOnProperty(MouseEvent.prototype, 'pageY', 'get').and.returnValue(260);
+    spyOnProperty(MouseEvent.prototype, 'clientX', 'get').and.returnValue(290);
+    spyOnProperty(MouseEvent.prototype, 'clientY', 'get').and.returnValue(260);
     let evt = new MouseEvent('Mousemove');
     component.lastAnswer.clickPosition = [0.4, 0.4];
     component.ngOnInit();

@@ -132,7 +132,6 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
   shouldShowWrongWeightWarning: boolean;
   VERTEX_RADIUS: number;
   EDGE_WIDTH: number;
-  vizWidth: SVGAnimatedLength;
   graphOptions: GraphOption[];
   svgViewBox: string;
   constructor(
@@ -166,7 +165,6 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
     this.vizContainer = this.element.nativeElement.querySelectorAll(
       '.oppia-graph-viz-svg');
-    this.vizWidth = this.vizContainer[0].width;
 
     this.graphOptions = [{
       text: 'Labeled',
@@ -188,10 +186,10 @@ export class GraphVizComponent implements OnInit, AfterViewInit {
       boundingBox.height + boundingBox.y,
       svgContainer.getAttribute('height'));
     this.svgViewBox = (
-      0 + ' ' + 0 + ' ' + (boundingBox.width + boundingBox.x) +
-        ' ' + (viewBoxHeight));
-    // Initial value of SVG view box.
+      `0 0 ${svgContainer.width.baseVal.value} ${viewBoxHeight}`
+    );
 
+    // Initial value of SVG view box.
     if (this.interactionIsActive) {
       this.init();
     }

@@ -282,10 +282,10 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
     const images = this.el.nativeElement.querySelectorAll(
       '.oppia-image-click-img');
     const image: HTMLImageElement = images[0];
-    this.mouseX =
-      (event.pageX - image.getBoundingClientRect().left) / image.width;
-    this.mouseY =
-      (event.pageY - image.getBoundingClientRect().top) / image.height;
+    this.mouseX = (
+      (event.clientX - image.getBoundingClientRect().left) / image.width);
+    this.mouseY = (
+      (event.clientY - image.getBoundingClientRect().top) / image.height);
     this.currentlyHoveredRegions = [];
     this.updateCurrentlyHoveredRegions();
   }
