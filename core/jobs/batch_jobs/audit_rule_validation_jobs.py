@@ -54,11 +54,23 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
     """
 
     @staticmethod
-    def drag_drop_a_less_than_b_rule(states_dict):
-        """
+    def drag_drop_a_less_than_b_rule(
+        states_dict: Dict[str, state_domain.State]
+    ) -> List[str]:
+        """DragAndDropInput interaction rule `HasElementXBeforeElementY`
+        should not have value `X` equals to `Y`, if it does we need to remove
+        the rule and for that we check if the state contains only one answer
+        group and one rule spec because removing that will result in
+        disconnection of the current state to the next state
+
+        Args:
+            states_dict: dict[str, state_domain.State]. The state dictionary.
+
+        Returns:
+            states_with_errored_values: List[str]. Errored state names that
+            contains one answer group and one rule spec.
         """
         states_with_errored_values = []
-        print("***********************************************")
 
         for state_name, state in states_dict.items():
             if state.interaction.id != 'DragAndDropSortInput':
@@ -83,8 +95,22 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
         return states_with_errored_values
 
     @staticmethod
-    def drag_drop_multi_item_at_same_place(states_dict):
-        """
+    def drag_drop_multi_item_at_same_place(
+        states_dict: Dict[str, state_domain.State]
+    ) -> List[str]:
+        """DragAndDropInput interaction `allowMultipleItemsInSamePosition`
+        option is false then no rule should contain multiple items at same
+        place, if it does we need to remove the rule and for that we check
+        if the state contains only one answer group and one rule spec
+        because removing that will result in disconnection of the current
+        state to the next state
+
+        Args:
+            states_dict: dict[str, state_domain.State]. The state dictionary.
+
+        Returns:
+            states_with_errored_values: List[str]. Errored state names that
+            contains one answer group and one rule spec.
         """
         states_with_errored_values = []
 
@@ -112,8 +138,22 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
         return states_with_errored_values
 
     @staticmethod
-    def drag_drop_one_item_at_incorrect_position(states_dict):
-        """
+    def drag_drop_one_item_at_incorrect_position(
+        states_dict: Dict[str, state_domain.State]
+    ) -> List[str]:
+        """DragAndDropInput interaction, `allowMultipleItemsInSamePosition`
+        option should be true if we have rule `IsEqualToOrderingWithOne
+        ItemAtIncorrectPosition`, if it does we need to remove the rule
+        and for that we check if the state contains only one answer group
+        and one rule spec because removing that will result in disconnection
+        of the current state to the next state
+
+        Args:
+            states_dict: dict[str, state_domain.State]. The state dictionary.
+
+        Returns:
+            states_with_errored_values: List[str]. Errored state names that
+            contains one answer group and one rule spec.
         """
         states_with_errored_values = []
 
@@ -143,8 +183,21 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
         return states_with_errored_values
 
     @staticmethod
-    def drag_drop_equals_rule_empty_value(states_dict):
-        """
+    def drag_drop_equals_rule_empty_value(
+        states_dict: Dict[str, state_domain.State]
+    ) -> List[str]:
+        """DragAndDropInput interaction rule `IsEqualToOrdering`
+        should not be empty, if it is we need to remove
+        the rule and for that we check if the state contains only one answer
+        group and one rule spec because removing that will result in
+        disconnection of the current state to the next state
+
+        Args:
+            states_dict: dict[str, state_domain.State]. The state dictionary.
+
+        Returns:
+            states_with_errored_values: List[str]. Errored state names that
+            contains one answer group and one rule spec.
         """
         states_with_errored_values = []
 
@@ -167,8 +220,20 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
         return states_with_errored_values
 
     @staticmethod
-    def continue_interac_text_value_language(exp_lang_code, states_dict):
-        """
+    def continue_interac_text_value_language(
+        states_dict: Dict[str, state_domain.State],
+        exp_lang_code: str
+    ) -> List[str]:
+        """Continue interaction having text value should not exceed 20,
+        if it does we plan to set the default value. This function returns
+        the language codes of the errored states
+
+        Args:
+            states_dict: dict[str, state_domain.State]. The state dictionary.
+            exp_lang_code: str. The language code of the exploration.
+
+        Returns:
+            errored_language_codes: List[str]. The list of language codes.
         """
         errored_language_codes = []
 
@@ -185,8 +250,22 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
         return errored_language_codes
 
     @staticmethod
-    def item_selec_equals_value_between_min_max_value(states_dict):
-        """
+    def item_selec_equals_value_between_min_max_value(
+        states_dict: Dict[str, state_domain.State]
+    ) -> List[str]:
+        """ItemSelection interaction having rule type `Equals` should
+        have value between the minimum allowed selection and maximum
+        allowed selection if it is not we need to remove the rule
+        and for that we check if the state contains only one answer
+        group and one rule spec because removing that will result in
+        disconnection of the current state to the next state
+
+        Args:
+            states_dict: dict[str, state_domain.State]. The state dictionary.
+
+        Returns:
+            states_with_errored_values: List[str]. Errored state names that
+            contains one answer group and one rule spec.
         """
         states_with_errored_values = []
 
@@ -218,8 +297,21 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
         return states_with_errored_values
 
     @staticmethod
-    def numeric_is_less_than_or_equal_rule_value_is_string(states_dict):
-        """
+    def numeric_is_less_than_or_equal_rule_value_is_string(
+        states_dict: Dict[str, state_domain.State]
+    ) -> List[str]:
+        """NumericInput interaction having rule type `IsLessThanOrEqualTo`
+        should not contain string values, if it does we need to remove
+        the rule and for that we check if the state contains only one answer
+        group and one rule spec because removing that will result in
+        disconnection of the current state to the next state
+
+        Args:
+            states_dict: dict[str, state_domain.State]. The state dictionary.
+
+        Returns:
+            states_with_errored_values: List[str]. Errored state names that
+            contains one answer group and one rule spec.
         """
         states_with_errored_values = []
 
@@ -243,8 +335,21 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
         return states_with_errored_values
 
     @staticmethod
-    def numeric_is_greater_than_or_equal_rule_value_is_string(states_dict):
-        """
+    def numeric_is_greater_than_or_equal_rule_value_is_string(
+        states_dict: Dict[str, state_domain.State]
+    ) -> List[str]:
+        """NumericInput interaction having rule type `IsGreaterThanOrEqualTo`
+        should not contain string values, if it does we need to remove
+        the rule and for that we check if the state contains only one answer
+        group and one rule spec because removing that will result in
+        disconnection of the current state to the next state
+
+        Args:
+            states_dict: dict[str, state_domain.State]. The state dictionary.
+
+        Returns:
+            states_with_errored_values: List[str]. Errored state names that
+            contains one answer group and one rule spec.
         """
         states_with_errored_values = []
 
@@ -268,8 +373,21 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
         return states_with_errored_values
 
     @staticmethod
-    def numeric_is_greater_than_rule_value_is_string(states_dict):
-        """
+    def numeric_is_greater_than_rule_value_is_string(
+        states_dict: Dict[str, state_domain.State]
+    ) -> List[str]:
+        """NumericInput interaction having rule type `IsGreaterThan`
+        should not contain string values, if it does we need to remove
+        the rule and for that we check if the state contains only one answer
+        group and one rule spec because removing that will result in
+        disconnection of the current state to the next state
+
+        Args:
+            states_dict: dict[str, state_domain.State]. The state dictionary.
+
+        Returns:
+            states_with_errored_values: List[str]. Errored state names that
+            contains one answer group and one rule spec.
         """
         states_with_errored_values = []
 
@@ -293,8 +411,21 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
         return states_with_errored_values
 
     @staticmethod
-    def numeric_is_less_than_rule_value_is_string(states_dict):
-        """
+    def numeric_is_less_than_rule_value_is_string(
+        states_dict: Dict[str, state_domain.State]
+    ) -> List[str]:
+        """NumericInput interaction having rule type `IsLessThan`
+        should not contain string values, if it does we need to remove
+        the rule and for that we check if the state contains only one answer
+        group and one rule spec because removing that will result in
+        disconnection of the current state to the next state
+
+        Args:
+            states_dict: dict[str, state_domain.State]. The state dictionary.
+
+        Returns:
+            states_with_errored_values: List[str]. Errored state names that
+            contains one answer group and one rule spec.
         """
         states_with_errored_values = []
 
@@ -318,8 +449,21 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
         return states_with_errored_values
 
     @staticmethod
-    def numeric_equal_rule_value_is_string(states_dict):
-        """
+    def numeric_equal_rule_value_is_string(
+        states_dict: Dict[str, state_domain.State]
+    ) -> List[str]:
+        """NumericInput interaction having rule type `Equals`
+        should not contain string values, if it does we need to remove
+        the rule and for that we check if the state contains only one answer
+        group and one rule spec because removing that will result in
+        disconnection of the current state to the next state
+
+        Args:
+            states_dict: dict[str, state_domain.State]. The state dictionary.
+
+        Returns:
+            states_with_errored_values: List[str]. Errored state names that
+            contains one answer group and one rule spec.
         """
         states_with_errored_values = []
 
@@ -343,8 +487,19 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
         return states_with_errored_values
 
     @staticmethod
-    def image_tag_alt_with_value_attribute_missing(states_dict):
-        """
+    def image_tag_alt_with_value_attribute_missing(
+        states_dict: Dict[str, state_domain.State]
+    ) -> List[str]:
+        """Image tag should contain alt-with-value attribute even if
+        it is empty, this function specefically checks for the curated
+        explorations
+
+        Args:
+            states_dict: dict[str, state_domain.State]. The state dictionary.
+
+        Returns:
+            states_with_errored_values: List[str]. The list of states that do
+            not have alt-with-value as an attribute.
         """
         states_with_errored_values = []
 
@@ -357,22 +512,22 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                         states_with_errored_values.append(state_name)
         return states_with_errored_values
 
+    @staticmethod
     def get_exploration_from_models(
-        self,
         model: Tuple[
             exp_models.ExplorationModel,
-            opportunity_models.ExplorationOpportunitySummaryModel |
+            opportunity_models.ExplorationOpportunitySummaryModel] |
             exp_models.ExplorationModel
-        ]
     ) -> exp_domain.Exploration:
-        """Returns the exploration domain object.
+        """Returns the exploration domain object
+
         Args:
             model: tuple|exp_models.ExplorationModel. The pair of exp and
                 opportunity models or just exp model.
+
         Returns:
             exp_models.ExplorationModel. Returns the exp domain object.
         """
-        print("**********************************************")
         if isinstance(model, tuple):
             try:
                 return exp_fetchers.get_exploration_from_model(model[0])
@@ -502,10 +657,11 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
         )
 
         report_invalid_drag_drop_a_less_than_b_rule = (
-            filter_invalid_drag_drop_a_less_than_b_rule >> beam.MapTuple(
+            filter_invalid_drag_drop_a_less_than_b_rule
+            | 'Show info for drag drop a < b' >> beam.MapTuple(
                 lambda exp_id, exp_drag_errors, exp_created_on: (
                     job_run_result.JobRunResult.as_stderr(
-                       f'The id of curated exp is {exp_id}, '
+                       f'The id of exp is {exp_id}, '
                        f'created on {exp_created_on}, and the invalid '
                        f'drag drop a < b rule states are {exp_drag_errors}'
                     )
@@ -537,10 +693,11 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
         )
 
         report_invalid_drag_drop_multi_item_at_same_place = (
-            filter_invalid_drag_drop_multi_item_at_same_place >> beam.MapTuple(
+            filter_invalid_drag_drop_multi_item_at_same_place
+            | 'Show info for drag drop multi item same place' >> beam.MapTuple(
                 lambda exp_id, exp_drag_errors, exp_created_on: (
                     job_run_result.JobRunResult.as_stderr(
-                       f'The id of curated exp is {exp_id}, '
+                       f'The id of exp is {exp_id}, '
                        f'created on {exp_created_on}, and the invalid '
                        f'drag drop multi item at same place rule '
                        f'states are {exp_drag_errors}'
@@ -570,16 +727,17 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
             filter_invalid_drag_drop_one_item_at_incorrect_position
             | 'Report count for invalid drag drop incorrect by atmost 1' >> (
                 job_result_transforms.CountObjectsToJobRunResult(
-                    'NUMBER OF EXPS WITH INVALID DRAG DROP MULTI ITEM RULE')
+                    'NUMBER OF EXPS WITH INVALID DRAG DROP ONE AT '
+                    'INCORRECT RULE')
             )
         )
 
         report_invalid_drag_drop_one_item_at_incorrect_position = (
             filter_invalid_drag_drop_one_item_at_incorrect_position
-            >> beam.MapTuple(
+            | 'Show info for drag drop one item incorrect' >> beam.MapTuple(
                 lambda exp_id, exp_drag_errors, exp_created_on: (
                     job_run_result.JobRunResult.as_stderr(
-                       f'The id of curated exp is {exp_id}, '
+                       f'The id of exp is {exp_id}, '
                        f'created on {exp_created_on}, and the invalid '
                        f'drag drop one item at incorrect position rule '
                        f'states are {exp_drag_errors}'
@@ -614,10 +772,10 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
 
         report_invalid_drag_drop_equals_rule_empty_values = (
             filter_invalid_drag_drop_equals_rule_empty_values
-            >> beam.MapTuple(
+            | 'Show info for drag drop is equal a string' >> beam.MapTuple(
                 lambda exp_id, exp_drag_errors, exp_created_on: (
                     job_run_result.JobRunResult.as_stderr(
-                       f'The id of curated exp is {exp_id}, '
+                       f'The id of exp is {exp_id}, '
                        f'created on {exp_created_on}, and the invalid '
                        f'drag drop equals rule have empty values and the '
                        f'states are {exp_drag_errors}'
@@ -643,10 +801,10 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
 
         report_continue_text_language_code_values = (
             filter_invalid_continue_text_values
-            >> beam.MapTuple(
+            | 'Show info for continue invalid values' >> beam.MapTuple(
                 lambda exp_id, cont_lang, exp_created_on: (
                     job_run_result.JobRunResult.as_stderr(
-                       f'The id of curated exp is {exp_id}, '
+                       f'The id of exp is {exp_id}, '
                        f'created on {exp_created_on}, and the '
                        f'invalid continue interaction language codes '
                        f'are {cont_lang}'
@@ -683,12 +841,12 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
 
         report_invalid_item_selec_equals_value_between_min_max = (
             filter_invalid_item_selec_equals_value_between_min_max
-            >> beam.MapTuple(
+            | 'Show info for item selec equals value' >> beam.MapTuple(
                 lambda exp_id, exp_item_errors, exp_created_on: (
                     job_run_result.JobRunResult.as_stderr(
-                       f'The id of curated exp is {exp_id}, '
+                       f'The id of exp is {exp_id}, '
                        f'created on {exp_created_on}, and the invalid '
-                       f'item selection states are {exp_item_errors} '
+                       f'item selection states are {exp_item_errors}'
                     )
                 )
             )
@@ -722,13 +880,13 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
 
         report_invalid_numeric_less_than_equal_rule_value_is_string = (
             filter_invalid_numeric_less_than_or_equal_rule_value_is_string
-            >> beam.MapTuple(
+            | 'Show info for numeric less than or equal' >> beam.MapTuple(
                 lambda exp_id, exp_numeric_errors, exp_created_on: (
                     job_run_result.JobRunResult.as_stderr(
-                       f'The id of curated exp is {exp_id}, '
+                       f'The id of exp is {exp_id}, '
                        f'created on {exp_created_on}, and the invalid '
                        f'numeric input equal or less than rule '
-                       f'states are {exp_numeric_errors} '
+                       f'states are {exp_numeric_errors}'
                     )
                 )
             )
@@ -762,13 +920,13 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
 
         report_invalid_numeric_greater_than_equal_rule_is_string = (
             filter_invalid_numeric_greater_than_or_equal_rule_value_is_string
-            >> beam.MapTuple(
+            | 'Show info for numeric greater than or equal' >> beam.MapTuple(
                 lambda exp_id, exp_numeric_errors, exp_created_on: (
                     job_run_result.JobRunResult.as_stderr(
-                       f'The id of curated exp is {exp_id}, '
+                       f'The id of exp is {exp_id}, '
                        f'created on {exp_created_on}, and the invalid '
                        f'numeric input equal or greater than rule '
-                       f'states are {exp_numeric_errors} '
+                       f'states are {exp_numeric_errors}'
                     )
                 )
             )
@@ -802,13 +960,13 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
 
         report_invalid_numeric_less_than_rule_value_is_string = (
             filter_invalid_numeric_less_than_rule_value_is_string
-            >> beam.MapTuple(
+            | 'Show info for numeric less than' >> beam.MapTuple(
                 lambda exp_id, exp_numeric_errors, exp_created_on: (
                     job_run_result.JobRunResult.as_stderr(
-                       f'The id of curated exp is {exp_id}, '
+                       f'The id of exp is {exp_id}, '
                        f'created on {exp_created_on}, and the invalid '
                        f'numeric input less than rule '
-                       f'states are {exp_numeric_errors} '
+                       f'states are {exp_numeric_errors}'
                     )
                 )
             )
@@ -842,13 +1000,13 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
 
         report_invalid_numeric_greater_than_rule_value_is_string = (
             filter_invalid_numeric_greater_than_rule_value_is_string
-            >> beam.MapTuple(
+            | 'Show info for numeric greater than' >> beam.MapTuple(
                 lambda exp_id, exp_numeric_errors, exp_created_on: (
                     job_run_result.JobRunResult.as_stderr(
-                       f'The id of curated exp is {exp_id}, '
+                       f'The id of exp is {exp_id}, '
                        f'created on {exp_created_on}, and the invalid '
                        f'numeric input greater than rule '
-                       f'states are {exp_numeric_errors} '
+                       f'states are {exp_numeric_errors}'
                     )
                 )
             )
@@ -882,13 +1040,13 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
 
         report_invalid_numeric_equals_rule_value_is_string = (
             filter_invalid_numeric_equals_rule_value_is_string
-            >> beam.MapTuple(
+            | 'Show info for numeric equals' >> beam.MapTuple(
                 lambda exp_id, exp_numeric_errors, exp_created_on: (
                     job_run_result.JobRunResult.as_stderr(
-                       f'The id of curated exp is {exp_id}, '
+                       f'The id of exp is {exp_id}, '
                        f'created on {exp_created_on}, and the invalid '
                        f'numeric input equals rule '
-                       f'states are {exp_numeric_errors} '
+                       f'states are {exp_numeric_errors}'
                     )
                 )
             )
@@ -921,7 +1079,7 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
 
         report_invalid_rte_image_alt_value = (
             filter_invalid_rte_image_alt_value
-            >> beam.MapTuple(
+            | 'Show info for RTE image' >> beam.MapTuple(
                 lambda exp_id, exp_numeric_errors, exp_created_on: (
                     job_run_result.JobRunResult.as_stderr(
                        f'The id of curated exp is {exp_id}, '
@@ -937,37 +1095,37 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                 report_count_invalid_drag_drop_a_less_than_b_rule,
                 report_invalid_drag_drop_a_less_than_b_rule,
 
-                # report_count_invalid_drag_drop_multi_item_at_same_place,
-                # report_invalid_drag_drop_multi_item_at_same_place,
+                report_count_invalid_drag_drop_multi_item_at_same_place,
+                report_invalid_drag_drop_multi_item_at_same_place,
 
-                # report_count_invalid_drag_drop_one_item_at_incorrect_position,
-                # report_invalid_drag_drop_one_item_at_incorrect_position,
+                report_count_invalid_drag_drop_one_item_at_incorrect_position,
+                report_invalid_drag_drop_one_item_at_incorrect_position,
 
-                # report_count_invalid_drag_drop_equals_rule_empty_values,
-                # report_invalid_drag_drop_equals_rule_empty_values,
+                report_count_invalid_drag_drop_equals_rule_empty_values,
+                report_invalid_drag_drop_equals_rule_empty_values,
 
-                # report_continue_text_language_code_values,
+                report_continue_text_language_code_values,
 
-                # report_count_invalid_item_selec_equals_value_between_min_max,
-                # report_invalid_item_selec_equals_value_between_min_max,
+                report_count_invalid_item_selec_equals_value_between_min_max,
+                report_invalid_item_selec_equals_value_between_min_max,
 
-                # report_count_invalid_numeric_less_than_equal_rule_value_string,
-                # report_invalid_numeric_less_than_equal_rule_value_is_string,
+                report_count_invalid_numeric_less_than_equal_rule_value_string,
+                report_invalid_numeric_less_than_equal_rule_value_is_string,
 
-                # report_count_invalid_numeric_greater_than_equal_rule_is_string,
-                # report_invalid_numeric_greater_than_equal_rule_is_string,
+                report_count_invalid_numeric_greater_than_equal_rule_is_string,
+                report_invalid_numeric_greater_than_equal_rule_is_string,
 
-                # report_count_invalid_numeric_less_than_rule_value_is_string,
-                # report_invalid_numeric_less_than_rule_value_is_string,
+                report_count_invalid_numeric_less_than_rule_value_is_string,
+                report_invalid_numeric_less_than_rule_value_is_string,
 
-                # report_count_invalid_numeric_greater_than_rule_value_is_string,
-                # report_invalid_numeric_greater_than_rule_value_is_string,
+                report_count_invalid_numeric_greater_than_rule_value_is_string,
+                report_invalid_numeric_greater_than_rule_value_is_string,
 
-                # report_count_invalid_numeric_equals_rule_value_is_string,
-                # report_invalid_numeric_equals_rule_value_is_string,
+                report_count_invalid_numeric_equals_rule_value_is_string,
+                report_invalid_numeric_equals_rule_value_is_string,
 
-                # report_count_invalid_rte_image_alt_value,
-                # report_invalid_rte_image_alt_value
+                report_count_invalid_rte_image_alt_value,
+                report_invalid_rte_image_alt_value
             )
             | 'Combine results' >> beam.Flatten()
         )

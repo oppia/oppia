@@ -788,7 +788,7 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
     )
 
     TODAY_DATE = datetime.datetime.utcnow()
-    YEAR_AGO_DATE = (TODAY_DATE - datetime.timedelta(weeks=52)).date()
+    YEAR_AGO_DATE = str((TODAY_DATE - datetime.timedelta(weeks=52)).date())
 
     def setUp(self):
         super().setUp()
@@ -923,6 +923,125 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
     def test_run_with_no_models(self) -> None:
         self.assert_job_output_is([])
 
-    def test_various_interactions(self) -> None:
+    def test_continue_interaction(self) -> None:
+        self.put_multi([self.exp_2])
+        self.assert_job_output_is([
+          job_run_result.JobRunResult.as_stderr(
+            f'The id of exp is 2, created on {self.YEAR_AGO_DATE}, '
+            f'and the invalid continue interaction language codes are [\'en\']'
+          )
+        ])
+
+    def test_drag_drop_interaction(self) -> None:
         self.put_multi([self.exp_1])
-        self.assert_job_output_is([])
+        self.assert_job_output_is([
+          job_run_result.JobRunResult.as_stderr(
+            f'The id of exp is 1, created on {self.YEAR_AGO_DATE}, '
+            f'and the invalid drag drop multi item at same place '
+            f'rule states are [\'EXP_1_STATE_2\']'
+          ),
+          job_run_result.JobRunResult.as_stderr(
+            f'The id of exp is 1, created on {self.YEAR_AGO_DATE}, '
+            f'and the invalid drag drop equals rule have empty values and '
+            f'the states are [\'EXP_1_STATE_4\']'
+          ),
+          job_run_result.JobRunResult.as_stderr(
+            f'The id of exp is 1, created on {self.YEAR_AGO_DATE}, '
+            f'and the invalid drag drop one item at incorrect position rule '
+            f'states are [\'EXP_1_STATE_3\']'
+          ),
+          job_run_result.JobRunResult.as_stderr(
+            f'The id of exp is 1, created on {self.YEAR_AGO_DATE}, '
+            f'and the invalid drag drop a < b rule states '
+            f'are [\'EXP_1_STATE_1\']'
+          ),
+          job_run_result.JobRunResult.as_stdout(
+            'NUMBER OF EXPS WITH INVALID DRAG DROP EQUALS RULE '
+            'EMPTY SUCCESS: 1'
+          ),
+          job_run_result.JobRunResult.as_stdout(
+            'NUMBER OF EXPS WITH INVALID DRAG DROP a < b RULE SUCCESS: 1'
+          ),
+          job_run_result.JobRunResult.as_stdout(
+            'NUMBER OF EXPS WITH INVALID DRAG DROP MULTI ITEM RULE SUCCESS: 1'
+          ),
+          job_run_result.JobRunResult.as_stdout(
+            'NUMBER OF EXPS WITH INVALID DRAG DROP ONE AT INCORRECT '
+            'RULE SUCCESS: 1'
+          )
+        ])
+
+    def test_item_interaction(self) -> None:
+        self.put_multi([self.exp_3])
+        self.assert_job_output_is([
+          job_run_result.JobRunResult.as_stderr(
+            f'The id of exp is 3, created on {self.YEAR_AGO_DATE}, '
+            f'and the invalid item selection states are [\'EXP_3_STATE_1\']'
+          ),
+          job_run_result.JobRunResult.as_stdout(
+            'NUMBER OF EXPS WITH INVALID ITEM SELECTION SUCCESS: 1'
+          )
+        ])
+
+    def test_numeric_interaction(self) -> None:
+        self.put_multi([self.exp_4])
+        self.assert_job_output_is([
+          job_run_result.JobRunResult.as_stderr(
+            f'The id of exp is 4, '
+            f'created on {self.YEAR_AGO_DATE}, and the invalid '
+            f'numeric input equal or less than rule '
+            f'states are [\'EXP_4_STATE_1\']'
+          ),
+          job_run_result.JobRunResult.as_stderr(
+            f'The id of exp is 4, '
+            f'created on {self.YEAR_AGO_DATE}, and the invalid '
+            f'numeric input equal or greater than rule '
+            f'states are [\'EXP_4_STATE_2\']'
+          ),
+          job_run_result.JobRunResult.as_stderr(
+            f'The id of exp is 4, '
+            f'created on {self.YEAR_AGO_DATE}, and the invalid '
+            f'numeric input greater than rule '
+            f'states are [\'EXP_4_STATE_3\']'
+          ),
+          job_run_result.JobRunResult.as_stderr(
+            f'The id of exp is 4, '
+            f'created on {self.YEAR_AGO_DATE}, and the invalid '
+            f'numeric input less than rule '
+            f'states are [\'EXP_4_STATE_4\']'
+          ),
+          job_run_result.JobRunResult.as_stderr(
+            f'The id of exp is 4, '
+            f'created on {self.YEAR_AGO_DATE}, and the invalid '
+            f'numeric input equals rule '
+            f'states are [\'EXP_4_STATE_5\']'
+          ),
+          job_run_result.JobRunResult.as_stdout(
+            'NUMBER OF EXPS WITH INVALID NUMERIC EQUALS RULE SUCCESS: 1'
+          ),
+          job_run_result.JobRunResult.as_stdout(
+            'NUMBER OF EXPS WITH INVALID NUMERIC GREATER RULE SUCCESS: 1'
+          ),
+          job_run_result.JobRunResult.as_stdout(
+            'NUMBER OF EXPS WITH INVALID NUMERIC LESS RULE SUCCESS: 1'
+          ),
+          job_run_result.JobRunResult.as_stdout(
+            'NUMBER OF EXPS WITH INVALID NUMERIC GREATER EQUAL RULE SUCCESS: 1'
+          ),
+          job_run_result.JobRunResult.as_stdout(
+            'NUMBER OF EXPS WITH INVALID NUMERIC LESS EQUAL RULE SUCCESS: 1'
+          )
+        ])
+
+    def test_rte_image(self) -> None:
+        self.put_multi([self.exp_5, self.opportunity_model])
+        self.assert_job_output_is([
+          job_run_result.JobRunResult.as_stderr(
+            f'The id of curated exp is 5, '
+            f'created on {self.YEAR_AGO_DATE}, and the invalid '
+            f'RTE image states are [\'EXP_5_STATE_1\']'
+          ),
+          job_run_result.JobRunResult.as_stdout(
+            'NUMBER OF EXPS WITH INVALID RTE IMAGE SUCCESS: 1'
+          )
+        ])
