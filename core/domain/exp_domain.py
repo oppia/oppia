@@ -2359,7 +2359,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     'customization_args']['buttonText']['value']['unicode_str']
                 if len(text_value) > 20:
                     # Do something
-                    pass
+                    state_dict['interaction']['customization_args'][
+                        'buttonText']['value']['unicode_str'] = 'Continue'
 
         # End Interaction.
             if state_dict['interaction']['id'] == 'EndExploration':
