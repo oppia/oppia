@@ -213,10 +213,11 @@ def create_suggestion(
     suggestion_domain_class = (
         suggestion_registry.SUGGESTION_TYPES_TO_DOMAIN_CLASSES[
             suggestion_type])
-    # Here, argument `final_reviewer_id` of suggestion_domain_class method
-    # can only accept string values but here we are providing None value
-    # which causes MyPy to throw `incompatible argument type` error. Thus
-    # to avoid the error, we used ignore here.
+    # Here, suggestion_domain_class is of Union type which contains
+    # all suggestion classes, but out of these suggestion classes only
+    # `SuggestionEditStateContent` can accept Optional[str] value for
+    # language code and for other classes MyPy throws an `incompatible
+    # argument type` error. Thus to avoid the error, we used ignore here.
     suggestion = suggestion_domain_class(
         thread_id, target_id, target_version_at_submission, status, author_id,
         None, change, score_category, language_code, False)  # type: ignore[arg-type]

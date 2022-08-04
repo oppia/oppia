@@ -61,7 +61,7 @@ class BaseSuggestionDict(TypedDict):
     target_version_at_submission: int
     status: str
     author_name: str
-    final_reviewer_id: str
+    final_reviewer_id: Optional[str]
     change: Dict[str, change_domain.AcceptableChangeDictTypes]
     score_category: str
     language_code: str
@@ -109,7 +109,6 @@ class BaseSuggestion:
     target_id: str
     target_version_at_submission: int
     author_id: str
-    final_reviewer_id: str
     change: change_domain.BaseChange
     score_category: str
     last_updated: datetime.datetime
@@ -117,7 +116,7 @@ class BaseSuggestion:
     edited_by_reviewer: bool
     image_context: str
 
-    def __init__(self, status: str, final_reviewer_id: str) -> None:
+    def __init__(self, status: str, final_reviewer_id: Optional[str]) -> None:
         """Initializes a Suggestion object."""
         self.status = status
         self.final_reviewer_id = final_reviewer_id
@@ -399,7 +398,7 @@ class SuggestionEditStateContent(BaseSuggestion):
         target_version_at_submission: int,
         status: str,
         author_id: str,
-        final_reviewer_id: str,
+        final_reviewer_id: Optional[str],
         change: Mapping[str, change_domain.AcceptableChangeDictTypes],
         score_category: str,
         language_code: Optional[str],
@@ -639,7 +638,7 @@ class SuggestionTranslateContent(BaseSuggestion):
         target_version_at_submission: int,
         status: str,
         author_id: str,
-        final_reviewer_id: str,
+        final_reviewer_id: Optional[str],
         change: Mapping[str, change_domain.AcceptableChangeDictTypes],
         score_category: str,
         language_code: str,
@@ -864,7 +863,7 @@ class SuggestionAddQuestion(BaseSuggestion):
         target_version_at_submission: int,
         status: str,
         author_id: str,
-        final_reviewer_id: str,
+        final_reviewer_id: Optional[str],
         change: Mapping[str, change_domain.AcceptableChangeDictTypes],
         score_category: str,
         language_code: str,
