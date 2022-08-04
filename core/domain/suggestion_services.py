@@ -222,14 +222,10 @@ def create_suggestion(
         None, change, score_category, language_code, False)  # type: ignore[arg-type]
     suggestion.validate()
 
-    # Here, argument `final_reviewer_id` of create method can only accept
-    # string values but here we are providing None value which causes MyPy
-    # to throw `incompatible argument type` error. Thus to avoid the error,
-    # we used ignore here.
     suggestion_models.GeneralSuggestionModel.create(
         suggestion_type, target_type, target_id,
         target_version_at_submission, status, author_id,
-        None, change, score_category, thread_id, suggestion.language_code)  # type: ignore[arg-type]
+        None, change, score_category, thread_id, suggestion.language_code)
 
     # Update the community contribution stats so that the number of suggestions
     # of this type that are in review increases by one.

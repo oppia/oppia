@@ -21,10 +21,12 @@ import datetime
 from core import feconf
 from core.platform import models
 
-from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
+from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
+    # Here, change domain is imported only for type checking.
+    from core.domain import change_domain  # pylint: disable=invalid-import # isort:skip
     from mypy_imports import base_models
     from mypy_imports import datastore_services
 
@@ -210,8 +212,6 @@ class GeneralSuggestionModel(base_models.BaseModel):
             cls.author_id == user_id, cls.final_reviewer_id == user_id
         )).get(keys_only=True) is not None
 
-    # TODO(#13523): Change 'change_cmd' to TypedDict/Domain Object
-    # to remove Any used below.
     @classmethod
     def create(
             cls,
@@ -221,8 +221,10 @@ class GeneralSuggestionModel(base_models.BaseModel):
             target_version_at_submission: int,
             status: str,
             author_id: str,
-            final_reviewer_id: str,
-            change_cmd: Dict[str, Any],
+            final_reviewer_id: Optional[str],
+            change_cmd: Mapping[
+                str, change_domain.AcceptableChangeDictTypes
+            ],
             score_category: str,
             thread_id: str,
             language_code: Optional[str]
@@ -237,8 +239,9 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 entity at the time of creation of the suggestion.
             status: str. The status of the suggestion.
             author_id: str. The ID of the user who submitted the suggestion.
-            final_reviewer_id: str. The ID of the reviewer who has
-                accepted/rejected the suggestion.
+            final_reviewer_id: str|None. The ID of the reviewer who has
+                accepted/rejected the suggestion, or None if no reviewer is
+                assigned.
             change_cmd: dict. The actual content of the suggestion.
             score_category: str. The scoring category for the suggestion.
             thread_id: str. The ID of the feedback thread linked to the
