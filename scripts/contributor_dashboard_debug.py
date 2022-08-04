@@ -43,6 +43,7 @@ SUPER_ADMIN_ROLES = [feconf.ROLE_ID_CURRICULUM_ADMIN,
 CONTRIBUTOR_EMAIL = 'contributor@example.com'
 CONTRIBUTOR_USERNAME = 'b'
 
+
 class ClientRequests():
     """Requests to help develop for the contributor dashboard."""
 
@@ -69,7 +70,7 @@ class ClientRequests():
         self._add_topics_to_classroom()
 
     def _make_request(self, method, url, params=None, headers=None):
-        """Makes a request to the Oppia server"""
+        """Makes a request to the Oppia server."""
         if params is None:
             params = {}
         if headers is None:
@@ -102,7 +103,7 @@ class ClientRequests():
 
         self._make_request('POST', feconf.SIGNUP_DATA_URL, params=params)
 
-        # end current session, i.e. log out.
+        # End current session, i.e. log out.
         self._make_request('GET', '/session_end')
         self.csrf_token = None
 
@@ -110,12 +111,13 @@ class ClientRequests():
         """Begin a session with the given email, i.e. log in wtih the email."""
         password = hashlib.md5(email.encode('utf-8')).hexdigest()
 
-        token_id = requests.post(FIREBASE_SIGN_IN_URL,
-                        params={'key': 'fake-api-key'},
-                        json={
-                            'email': email,
-                            'password': password
-                        }).json()['idToken']
+        token_id = requests.post(
+            FIREBASE_SIGN_IN_URL,
+            params={'key': 'fake-api-key'},
+            json={
+                'email': email,
+                'password': password
+        }).json()['idToken']
         headers = {'Authorization': 'Bearer %s' % token_id}
 
         self._make_request('GET', '/session_begin', headers=headers)
