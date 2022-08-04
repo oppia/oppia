@@ -136,11 +136,6 @@ describe('Topic viewer page', () => {
     httpTestingController.verify();
   });
 
-  it('should get RTL language status correctly', () => {
-    expect(topicViewerPageComponent.isLanguageRTL()).toEqual(true);
-  });
-
-
   it('should successfully get topic data', fakeAsync(() => {
     spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
       topicUrlFragment);

@@ -39,6 +39,9 @@ import { PlayerPositionService } from '../services/player-position.service';
 import { PlayerTranscriptService } from '../services/player-transcript.service';
 import { LessonInformationCardModalComponent } from '../templates/lesson-information-card-modal.component';
 
+import './exploration-footer.component.css';
+
+
 @Component({
   selector: 'oppia-exploration-footer',
   templateUrl: './exploration-footer.component.html'

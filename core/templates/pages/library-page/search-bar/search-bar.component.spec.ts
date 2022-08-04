@@ -270,12 +270,6 @@ describe('Search bar component', () => {
     expect(navigationService.openSubmenu).toHaveBeenCalled();
   });
 
-  it('should get RTL language status correctly', () => {
-    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
-      true);
-    expect(component.isLanguageRTL()).toBeTrue();
-  });
-
   it('should handle menu keypress', () => {
     spyOn(navigationService, 'onMenuKeypress');
     let activeMenuName = 'test_menu';

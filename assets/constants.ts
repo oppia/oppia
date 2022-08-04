@@ -77,8 +77,6 @@ export default {
   // The default language code for an exploration.
   "DEFAULT_LANGUAGE_CODE": "en",
 
-  "RTL_LANGUAGE_CODES": ["ar"],
-
   // Hacky translation keys for classroom, topic, skill, exploration
   // and subtopic names and descriptions. Needs to be updated whenever
   // any new class, topic, skill, exploration or subtopic is added or a

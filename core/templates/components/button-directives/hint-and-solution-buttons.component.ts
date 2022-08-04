@@ -29,6 +29,9 @@ import { Subscription } from 'rxjs';
 import { ContextService } from 'services/context.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
+import './hint-and-solution-buttons.component.css';
+
+
 @Component({
   selector: 'oppia-hint-and-solution-buttons',
   templateUrl: './hint-and-solution-buttons.component.html'

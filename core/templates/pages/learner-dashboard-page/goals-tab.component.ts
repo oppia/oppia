@@ -29,6 +29,9 @@ import { Subscription } from 'rxjs';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
+import './goals-tab.component.css';
+
+
  @Component({
    selector: 'oppia-goals-tab',
    templateUrl: './goals-tab.component.html'
@@ -129,10 +132,6 @@ export class GoalsTabComponent implements OnInit {
     } else {
       return this.topicToIndexMapping.NEITHER;
     }
-  }
-
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   getStaticImageUrl(imagePath: string): string {

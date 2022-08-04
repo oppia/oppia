@@ -35,6 +35,8 @@ import { NumberConversionService } from 'services/number-conversion.service';
 import isNumber from 'lodash/isNumber';
 import isString from 'lodash/isString';
 
+import './input-response-pair.component.css';
+
 
 @Component({
   selector: 'oppia-input-response-pair',
@@ -79,10 +81,6 @@ export class InputResponsePairComponent {
   isCurrentCardAtEndOfTranscript(): boolean {
     return this.playerTranscriptService.isLastCard(
       this.playerPositionService.getDisplayedCardIndex());
-  }
-
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 
   isStringifiedNumber(value: string): boolean {
