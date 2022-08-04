@@ -32,7 +32,7 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { AlertsService } from 'services/alerts.service';
 import { AssignSkillToTopicModalComponent } from '../modals/assign-skill-to-topic-modal.component';
 import { DeleteSkillModalComponent } from '../modals/delete-skill-modal.component';
-import { TopicAssignments, UnassignSkillFromTopicsModalComponent } from '../modals/unassign-skill-from-topics-modal.component';
+import { TopicNameToTopicAssignments, UnassignSkillFromTopicsModalComponent } from '../modals/unassign-skill-from-topics-modal.component';
 import { SelectTopicsComponent } from '../topic-selector/select-topics.component';
 import { SkillsListComponent } from './skills-list.component';
 
@@ -56,7 +56,7 @@ describe('Skills List Component', () => {
     topic_names: ['a'],
     classroom_names: ['a']
   };
-  let topicAssignmentsSummary: TopicAssignments = {
+  let topicAssignmentsSummary: TopicNameToTopicAssignments = {
     topic1: {
       subtopicId: 12,
       topicVersion: 7,
@@ -140,7 +140,8 @@ describe('Skills List Component', () => {
           },
           result: {
             then: (
-                successCallback: (topicsToUnassign: TopicAssignments) => void,
+                successCallback: (
+                  topicsToUnassign: TopicNameToTopicAssignments) => void,
                 cancelCallback: () => void
             ) => {
               if (this.success) {

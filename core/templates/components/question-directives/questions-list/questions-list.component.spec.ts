@@ -759,6 +759,10 @@ describe('Questions List Component', () => {
         component.deletedQuestionIds = [];
         component.canEditQuestion = true;
         spyOn(alertsService, 'addSuccessMessage');
+        spyOn(
+          skillBackendApiService,
+          'checkSkillAssignmentForDiagnosticTest').and.returnValue(
+          Promise.resolve(false));
         component.allSkillSummaries = [];
         spyOn(editableQuestionBackendApiService, 'editQuestionSkillLinksAsync')
           .and.returnValue(Promise.resolve());
@@ -777,6 +781,10 @@ describe('Questions List Component', () => {
         component.deletedQuestionIds = [];
         component.canEditQuestion = true;
         spyOn(alertsService, 'addSuccessMessage');
+        spyOn(
+          skillBackendApiService,
+          'checkSkillAssignmentForDiagnosticTest').and.returnValue(
+          Promise.resolve(false));
         component.allSkillSummaries = ([
           ShortSkillSummary.createFromBackendDict({
             skill_id: '1',

@@ -111,7 +111,7 @@ describe('Assign Skill to Topic Modal Component', () => {
     expect(componentInstance.topicsAssignmentsAreFetched).toBeTrue();
   });
 
-  it('should allow skill deletion', () => {
+  it('should allow skill deletion', fakeAsync(() => {
     let topicsAndSkillsDashboardBackendApiService = TestBed.inject(
       TopicsAndSkillsDashboardBackendApiService);
     componentInstance.skillId = 'skill_id';
@@ -125,7 +125,7 @@ describe('Assign Skill to Topic Modal Component', () => {
     componentInstance.fetchTopicAssignmentsForSkill();
     tick(50);
     expect(componentInstance.allowSkillForDeletion).toBeTrue();
-  });
+  }));
 
   it('should not allow skill deletion', fakeAsync(() => {
     let topicsAndSkillsDashboardBackendApiService = TestBed.inject(

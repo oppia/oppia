@@ -53,7 +53,6 @@ describe('Topic editor tab directive', function() {
   var UndoRedoService = null;
   var TopicEditorRoutingService = null;
   var QuestionBackendApiService = null;
-  var AlertsService = null;
   var mockStorySummariesInitializedEventEmitter = new EventEmitter();
 
   var mockTasdReinitializedEventEmitter = null;
@@ -88,7 +87,6 @@ describe('Topic editor tab directive', function() {
     ngbModal = $injector.get('NgbModal');
     TopicEditorStateService = $injector.get('TopicEditorStateService');
     TopicObjectFactory = $injector.get('TopicObjectFactory');
-    AlertsService = $injector.get('AlertsService');
     var MockContextSerivce = {
       getEntityType: () => 'topic',
       getEntityId: () => 'dkfn32sxssasd'
@@ -689,21 +687,4 @@ describe('Topic editor tab directive', function() {
       $scope.removeDiagnosticTestSkillDropdown();
       expect($scope.diagnosticTestSkillsDropdownIsShown).toBeFalse();
     });
-
-  it('should warning message when a skill with less than 2 questions is added' +
-     ' for diagnostic test.', fakeAsync(function() {
-    let alert = spyOn(AlertsService, 'addInfoMessage');
-    spyOn(
-      QuestionBackendApiService,
-      'fetchTotalQuestionCountForSkillIdsAsync').and.returnValue(
-      Promise.resolve(1));
-    $scope.selectedSkillForDiagnosticTest = skillSummary;
-    $scope.addSkillForDiagnosticTest();
-    $rootScope.$apply();
-    tick();
-
-    expect(alert).toHaveBeenCalledWith(
-      'The skill should contain at least two questions for getting assigned' +
-      ' to the diagnostic test.', 5000);
-  }));
 });
