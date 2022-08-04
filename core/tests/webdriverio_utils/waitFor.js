@@ -143,7 +143,7 @@ var elementAttributeToBe = async function(
   });
 };
 
-var elementStoppedMoving = async function(
+var rightTransistionToComplete = async function(
     element, errorMessage
 ) {
   await browser.waitUntil(async function() {
@@ -277,7 +277,7 @@ exports.textToBePresentInElement = textToBePresentInElement;
 exports.visibilityOf = visibilityOf;
 exports.presenceOf = presenceOf;
 exports.elementAttributeToBe = elementAttributeToBe;
-exports.elementStoppedMoving = elementStoppedMoving;
+exports.rightTransistionToComplete = rightTransistionToComplete;
 exports.invisibilityOfInfoToast = invisibilityOfInfoToast;
 exports.invisibilityOfLoadingMessage = invisibilityOfLoadingMessage;
 exports.visibilityOfInfoToast = visibilityOfInfoToast;

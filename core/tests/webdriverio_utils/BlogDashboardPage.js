@@ -201,7 +201,7 @@ var BlogDashboardPage = function() {
       if (tabText.startsWith(tabName)) {
         await action.click(`${tabName} tab`, matTab);
         await waitFor.visibilityOf(matInkBar);
-        await waitFor.elementStoppedMoving(
+        await waitFor.rightTransistionToComplete(
           matInkBar, `${tabName} tab takes too long to be active`);
         break;
       }
