@@ -75,7 +75,7 @@ class DisplayableExplorationSummaryDict(TypedDict):
     num_views: int
 
 
-class PlayThroughDict(TypedDict):
+class PlaythroughDict(TypedDict):
     """Type for the user-specific playthrough information dictionary."""
 
     next_exploration_id: Optional[str]
@@ -98,7 +98,7 @@ class LearnerCollectionDict(TypedDict):
     language_code: str
     tags: List[str]
     schema_version: int
-    playthrough_dict: PlayThroughDict
+    playthrough_dict: PlaythroughDict
     version: int
     nodes: List[LearnerCollectionNodeDict]
 

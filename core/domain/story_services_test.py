@@ -568,8 +568,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         # Check version is updated.
         self.assertEqual(new_story_dict['version'], 2)
 
-        # Instead of Deleting the version key, we are making them equal to
-        # check if the other contents of the two dicts are same or not.
+        # Instead of deleting the version key, we are making them equal to
+        # check if the other contents of the two dicts are the same or not.
         orig_story_dict['version'] = new_story_dict['version']
         self.assertEqual(orig_story_dict, new_story_dict)
 
