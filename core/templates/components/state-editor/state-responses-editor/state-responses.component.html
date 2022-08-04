@@ -237,8 +237,8 @@
     transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
   }
 
-  .state-responses-header-container {
-    padding: 0 20px 0 30px
+  state-responses .state-responses-header-container {
+    padding: 15px 20px 15px 30px
   }
 
   .state-responses-header {
@@ -246,7 +246,7 @@
     align-items: center;
     display: flex;
     justify-content: space-between;
-    padding: 15px 0 15px;
+    padding: 15px 20px 15px;
   }
 
   .oppia-exp-answer-card-header {
@@ -328,7 +328,10 @@
   }
 
   @media screen and (max-width: 768px) {
-    .solicit-answer-checkbox {
+    state-responses .state-response-container {
+      padding: 15px 10px;
+    }
+    state-responses .solicit-answer-checkbox {
       width: 100%;
     }
 
@@ -341,7 +344,11 @@
     }
 
     .state-responses-header {
-      padding: 18px 15px;
+      padding: 16px;
+    }
+
+    .oppia-editor-card-with-avatar {
+      margin-top: 20px;
     }
   }
 </style>

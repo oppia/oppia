@@ -282,6 +282,7 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
                     'test': 'testName',
                     'flake_id': 'flake',
                 },
+                'rerun': 'rerun yes',
             }
             return MockResponse(True, response)
 
@@ -311,10 +312,63 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
             }])
 
         with getenv_swap, datetime_swap, post_swap:
-            flaky, rerun = flake_checker.is_test_output_flaky(
+            rerun = flake_checker.check_test_flakiness(
                 ['line1', 'line2'], 'suiteName')
-            self.assertTrue(flaky)
-            self.assertEqual(rerun, flake_checker.RERUN_UNKNOWN)
+            self.assertTrue(rerun)
+
+    def test_successful_report_unknown_rerun(self):
+
+        def mock_getenv(variable):
+            environment_vars = {
+                'CIRCLECI': 1,
+                'CIRCLE_USERNAME': 'user',
+                'CIRCLE_BUILD_URL': 'https://example.com',
+                'CIRCLE_BRANCH': 'develop',
+            }
+            return environment_vars.get(variable)
+
+        def mock_post(url, json, allow_redirects, headers):  # pylint: disable=unused-argument
+            response = {
+                'log': ['log1', 'log2'],
+                'result': True,
+                'flake': {
+                    'suite': 'suiteName',
+                    'test': 'testName',
+                    'flake_id': 'flake',
+                },
+                'rerun': 'unknown',
+            }
+            return MockResponse(True, response)
+
+        expected_payload = {
+            'suite': 'suiteName',
+            'output_lines': ['line1', 'line2'],
+            'metadata': {
+                'username': 'user',
+                'build_url': 'https://example.com',
+                'timestamp': '2020-01-01T00:00:00.000001+00:00',
+                'branch': 'develop',
+            }
+        }
+
+        getenv_swap = self.swap(os, 'getenv', mock_getenv)
+        datetime_swap = self.swap(
+            datetime, 'datetime', MockDatetime(self.example_date))
+        post_swap = self.swap_with_checks(
+            requests, 'post', mock_post, expected_args=[
+                (flake_checker.FLAKE_CHECK_AND_REPORT_URL,)],
+            expected_kwargs=[{
+                'json': expected_payload,
+                'allow_redirects': False,
+                'headers': {
+                    'report_key': flake_checker.REPORT_API_KEY
+                },
+            }])
+
+        with getenv_swap, datetime_swap, post_swap:
+            rerun = flake_checker.check_test_flakiness(
+                ['line1', 'line2'], 'suiteName')
+            self.assertFalse(rerun)
 
     def test_successful_report_construct_url(self):
 
@@ -337,6 +391,7 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
                     'test': 'testName',
                     'flake_id': 'flake',
                 },
+                'rerun': 'rerun no',
             }
             return MockResponse(True, response)
 
@@ -366,10 +421,9 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
             }])
 
         with getenv_swap, datetime_swap, post_swap:
-            flaky, rerun = flake_checker.is_test_output_flaky(
+            rerun = flake_checker.check_test_flakiness(
                 ['line1', 'line2'], 'suiteName')
-            self.assertTrue(flaky)
-            self.assertEqual(rerun, flake_checker.RERUN_UNKNOWN)
+            self.assertFalse(rerun)
 
     def test_unsuccessful_report_exception(self):
 
@@ -411,10 +465,9 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
             }])
 
         with getenv_swap, datetime_swap, post_swap:
-            flaky, rerun = flake_checker.is_test_output_flaky(
+            rerun = flake_checker.check_test_flakiness(
                 ['line1', 'line2'], 'suiteName')
-            self.assertFalse(flaky)
-            self.assertEqual(rerun, flake_checker.RERUN_UNKNOWN)
+            self.assertFalse(rerun)
 
     def test_unsuccessful_report_not_ok(self):
 
@@ -456,10 +509,9 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
             }])
 
         with getenv_swap, datetime_swap, post_swap:
-            flaky, rerun = flake_checker.is_test_output_flaky(
+            rerun = flake_checker.check_test_flakiness(
                 ['line1', 'line2'], 'suiteName')
-            self.assertFalse(flaky)
-            self.assertEqual(rerun, flake_checker.RERUN_UNKNOWN)
+            self.assertFalse(rerun)
 
     def test_unsuccessful_report_bad_payload(self):
 
@@ -501,7 +553,6 @@ class IsTestOutputFlakyTests(test_utils.GenericTestBase):
             }])
 
         with getenv_swap, datetime_swap, post_swap:
-            flaky, rerun = flake_checker.is_test_output_flaky(
+            rerun = flake_checker.check_test_flakiness(
                 ['line1', 'line2'], 'suiteName')
-            self.assertFalse(flaky)
-            self.assertEqual(rerun, flake_checker.RERUN_UNKNOWN)
+            self.assertFalse(rerun)
