@@ -2184,7 +2184,7 @@ def get_image_filenames_from_exploration(
                 'imageAndRegions'].value
             # Ruling out the possibility of any other type for mypy
             # type checking.
-            assert isinstance(image_paths, list)
+            assert isinstance(image_paths, dict)
             filenames.append(image_paths['imagePath'])
 
     html_list = exploration.get_all_html_content_strings()  # type: ignore[no-untyped-call]
