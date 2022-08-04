@@ -70,6 +70,7 @@ var AdminPage = function() {
       await action.click('Save All Configs Button', saveAllConfigs);
       await general.acceptAlert();
       // Waiting for success message.
+      await waitFor.visibilityOf(statusMessage);
       await waitFor.textToBePresentInElement(
         '.e2e-test-status-message', 'saved successfully',
         'New config could not be saved');

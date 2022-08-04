@@ -241,6 +241,7 @@ var ExplorationEditorPage = function() {
     // TODO(#13096): Remove browser.pause from e2e files.
     // eslint-disable-next-line oppia/e2e-practices
     await browser.pause(2500);
+    await waitFor.visibilityOf(saveDraftButtonTextContainer);
     await waitFor.textToBePresentInElement(
       '.e2e-test-save-draft-message', 'Save Draft',
       'Changes could not be saved');
@@ -255,6 +256,7 @@ var ExplorationEditorPage = function() {
     // TODO(#13096): Remove browser.pause from e2e files.
     /* eslint-disable-next-line oppia/e2e-practices */
     await browser.pause(2500);
+    await waitFor.visibilityOf(publishChangesButtonTextContainer);
     await waitFor.textToBePresentInElement(
       '.e2e-test-publish-changes-message', 'Publish Changes',
       'Changes could not be saved');

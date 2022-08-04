@@ -104,7 +104,7 @@ var ContributorDashboardAdminPage = function() {
     await action.click('View reviewer role button', submitButton);
 
     await waitFor.textToBePresentInElement(
-      '.e2e-test-status-message', 'Success',
+      statusMessage, 'Success',
       'Could not view contribution rights successfully');
 
     if (category === CONTRIBUTION_RIGHT_CATEGORY_REVIEW_TRANSLATION) {
