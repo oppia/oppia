@@ -4,18 +4,8 @@ import os
 import requests
 import hashlib
 
-
-THIRD_PARTY_PYTHON_LIBS_DIR = 'third_party/python_libs/'
-sys.path.append(THIRD_PARTY_PYTHON_LIBS_DIR)
-
 from core import feconf
 from core.constants import constants
-
-if 'google' in sys.modules:
-    google_path = os.path.join(THIRD_PARTY_PYTHON_LIBS_DIR, 'google')
-    google_module = sys.modules['google']
-    google_module.__path__ = [google_path, THIRD_PARTY_PYTHON_LIBS_DIR]
-    google_module.__file__ = os.path.join(google_path, '__init__.py')
         
 import firebase_admin
 from firebase_admin import auth as firebase_auth
@@ -176,6 +166,3 @@ class ClientRequests(object):
         }
 
         self._make_request('POST', '/adminhandler', params=params)
-
-client = ClientRequests(base_url='http://localhost:8181')
-client.populate_data_for_contributor_dashboard_debug()

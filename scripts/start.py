@@ -77,6 +77,11 @@ _PARSER.add_argument(
     '--source_maps',
     help='optional; if specified, build webpack with source maps.',
     action='store_true')
+_PARSER.add_argument(
+    '--contributor_dashboard_debug',
+    help='optional; if specified, populate sample data that can be used to help'
+         'develop for the contributor dashboard.',
+    action='store_true')
 
 PORT_NUMBER_FOR_GAE_SERVER = 8181
 
@@ -177,6 +182,13 @@ def main(args: Optional[Sequence[str]] = None) -> None:
             automatic_restart=not parsed_args.no_auto_restart,
             skip_sdk_update_check=True,
             port=PORT_NUMBER_FOR_GAE_SERVER))
+
+        if parsed_args.contributor_dashboard_debug:
+            from scripts import contributor_dashboard_debug # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+            client_requests = contributor_dashboard_debug.ClientRequests(
+                base_url='http://localhost:%s' % PORT_NUMBER_FOR_GAE_SERVER
+            )
+            client_requests.populate_data_for_contributor_dashboard_debug()
 
         managed_web_browser = (
             None if parsed_args.no_browser else
