@@ -207,6 +207,27 @@ describe('Translation opportunities component', () => {
       }));
 
     expect(Object.keys(component.allOpportunities).length).toEqual(2);
+    expect(component.allOpportunities['1']).toEqual({
+      id: '1',
+      heading: 'Chapter title 1',
+      subheading: 'topic_1 - Story title 1',
+      progressPercentage: '50.00',
+      actionButtonTitle: 'Translate',
+      inReviewCount: 2,
+      totalCount: 4,
+      translationsCount: 2,
+    });
+    expect(component.allOpportunities['2']).toEqual({
+      id: '2',
+      heading: 'Chapter title 2',
+      subheading: 'topic_2 - Story title 2',
+      progressPercentage: '40.00',
+      actionButtonTitle: 'Translate',
+      inReviewCount: 4,
+      totalCount: 10,
+      translationsCount: 4,
+    });
+
     expect(opportunitiesDicts.length).toBe(2);
     expect(opportunitiesDicts.sort((a, b) => {
       return parseInt(a.id) - parseInt(b.id);
