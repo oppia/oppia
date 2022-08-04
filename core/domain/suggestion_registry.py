@@ -1669,7 +1669,8 @@ class ContributorStatsSummary:
         return {
             'contributor_user_id': self.contributor_user_id,
             'translation_contribution_stats': [
-                stats.to_dict() for stats in self.translation_contribution_stats],
+                stats.to_dict() for stats in (
+                    self.translation_contribution_stats)],
             'question_contribution_stats': [
                 stats.to_dict() for stats in self.question_contribution_stats],
             'translation_review_stats': [

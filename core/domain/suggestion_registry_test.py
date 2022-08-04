@@ -3480,6 +3480,7 @@ class ReviewableSuggestionEmailInfoUnitTests(test_utils.GenericTestBase):
             reviewable_suggestion_email_info.submission_datetime,
             self.submission_datetime)
 
+
 class TranslationReviewStatsUnitTests(test_utils.GenericTestBase):
     """Tests for the TranslationReviewStats class."""
 
@@ -3729,27 +3730,30 @@ class ContributorStatsSummaryUnitTests(test_utils.GenericTestBase):
         }
         expected_contribution_summary = {
             'contributor_user_id': self.CONTRIBUTOR_USER_ID,
-            'translation_contribution_stats': [expected_translation_contribution_stats],
-            'question_contribution_stats': [expected_question_contribution_stats],
+            'translation_contribution_stats': [
+                expected_translation_contribution_stats],
+            'question_contribution_stats': [
+                expected_question_contribution_stats],
             'translation_review_stats': [expected_translation_review_stats],
             'question_review_stats': [expected_question_review_stats]
         }
-        translation_contribution_stats = suggestion_registry.TranslationContributionStats(
-            self.LANGUAGE_CODE,
-            self.CONTRIBUTOR_USER_ID,
-            self.TOPIC_ID,
-            self.SUBMITTED_TRANSLATIONS_COUNT,
-            self.SUBMITTED_TRANSLATION_WORD_COUNT,
-            self.ACCEPTED_TRANSLATIONS_COUNT,
-            (
-                self
-                .ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT
-            ),
-            self.ACCEPTED_TRANSLATION_WORD_COUNT,
-            self.REJECTED_TRANSLATIONS_COUNT,
-            self.REJECTED_TRANSLATION_WORD_COUNT,
-            self.CONTRIBUTION_DATES
-        )
+        translation_contribution_stats = (
+            suggestion_registry).TranslationContributionStats(
+                self.LANGUAGE_CODE,
+                self.CONTRIBUTOR_USER_ID,
+                self.TOPIC_ID,
+                self.SUBMITTED_TRANSLATIONS_COUNT,
+                self.SUBMITTED_TRANSLATION_WORD_COUNT,
+                self.ACCEPTED_TRANSLATIONS_COUNT,
+                (
+                    self
+                    .ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT
+                ),
+                self.ACCEPTED_TRANSLATION_WORD_COUNT,
+                self.REJECTED_TRANSLATIONS_COUNT,
+                self.REJECTED_TRANSLATION_WORD_COUNT,
+                self.CONTRIBUTION_DATES
+            )
         translation_review_stats = suggestion_registry.TranslationReviewStats(
             self.LANGUAGE_CODE, self.CONTRIBUTOR_USER_ID,
             self.TOPIC_ID, self.REVIEWED_TRANSLATIONS_COUNT,
@@ -3759,12 +3763,13 @@ class ContributorStatsSummaryUnitTests(test_utils.GenericTestBase):
             self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_WORD_COUNT,
             self.FIRST_CONTRIBUTION_DATE, self.LAST_CONTRIBUTION_DATE
         )
-        question_contribution_stats = suggestion_registry.QuestionContributionStats(
-            self.CONTRIBUTOR_USER_ID, self.TOPIC_ID,
-            self.SUBMITTED_QUESTION_COUNT, self.ACCEPTED_QUESTIONS_COUNT,
-            self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT,
-            self.FIRST_CONTRIBUTION_DATE, self.LAST_CONTRIBUTION_DATE
-        )
+        question_contribution_stats = (
+            suggestion_registry).QuestionContributionStats(
+                self.CONTRIBUTOR_USER_ID, self.TOPIC_ID,
+                self.SUBMITTED_QUESTION_COUNT, self.ACCEPTED_QUESTIONS_COUNT,
+                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT,
+                self.FIRST_CONTRIBUTION_DATE, self.LAST_CONTRIBUTION_DATE
+            )
         question_review_stats = suggestion_registry.QuestionReviewStats(
             self.CONTRIBUTOR_USER_ID, self.TOPIC_ID,
             self.REVIEWED_QUESTIONS_COUNT,
