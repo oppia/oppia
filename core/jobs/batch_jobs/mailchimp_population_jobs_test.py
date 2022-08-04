@@ -28,8 +28,7 @@ from core.platform import models
 
 from mailchimp3 import mailchimpclient
 
-from typing import Dict, List, Mapping, Type, Union
-from typing_extensions import Final, TypedDict
+from typing import Dict, Final, List, Mapping, Type, TypedDict, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
