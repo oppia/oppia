@@ -21,8 +21,7 @@ from __future__ import annotations
 from core import utils
 from core.platform import models
 
-from typing import Dict, List, Optional, Sequence
-from typing_extensions import Literal, TypedDict
+from typing import Dict, List, Literal, Optional, Sequence, TypedDict
 
 MYPY = False
 if MYPY: # pragma: no cover

@@ -27,8 +27,9 @@ from core import utils
 from core.constants import constants
 from core.platform import models
 
-from typing import Dict, List, Optional, Sequence, Tuple, Union, cast, overload
-from typing_extensions import Literal, TypedDict
+from typing import (
+        Dict, List, Literal, Optional, Sequence, Tuple, TypedDict, Union, cast,
+        overload)
 
 MYPY = False
 if MYPY: # pragma: no cover
