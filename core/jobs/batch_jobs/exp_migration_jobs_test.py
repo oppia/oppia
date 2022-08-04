@@ -63,9 +63,9 @@ class MigrateExplorationJobTests(
         self.assert_job_output_is_empty()
 
     def test_migrated_exp_is_not_migrated(self) -> None:
-        exploration = exp_domain.Exploration.create_default_exploration(
+        exploration = exp_domain.Exploration.create_default_exploration( # type: ignore[no-untyped-call]
             self.NEW_EXP_ID, title=self.EXP_TITLE, category='category')
-        exp_services.save_new_exploration(
+        exp_services.save_new_exploration( # type: ignore[no-untyped-call]
             feconf.SYSTEM_COMMITTER_ID, exploration)
 
         self.assertEqual(
@@ -90,9 +90,9 @@ class MigrateExplorationJobTests(
             exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 55)
 
         with swap_states_schema_48, swap_exp_schema_55:
-            exploration = exp_domain.Exploration.create_default_exploration(
+            exploration = exp_domain.Exploration.create_default_exploration( # type: ignore[no-untyped-call]
                 self.NEW_EXP_ID, title=self.EXP_TITLE, category='Algorithms')
-            exp_services.save_new_exploration(
+            exp_services.save_new_exploration( # type: ignore[no-untyped-call]
                 feconf.SYSTEM_COMMITTER_ID, exploration)
 
             self.assertEqual(exploration.states_schema_version, 48)
@@ -152,7 +152,7 @@ class MigrateExplorationJobTests(
         migrated_exp_model = exp_models.ExplorationModel.get(self.NEW_EXP_ID)
         self.assertEqual(migrated_exp_model.version, 1)
 
-    def create_story_linked_to_exploration(self):
+    def create_story_linked_to_exploration(self) -> None:
         """Creates a new story linked to the test exploration."""
         topic_id = 'topic_id_1'
         story_id = 'story_id_1'
@@ -167,16 +167,16 @@ class MigrateExplorationJobTests(
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-url')]
         topic.next_subtopic_id = 2
-        topic_services.save_new_topic(feconf.SYSTEM_COMMITTER_ID, topic)
-        topic_services.publish_topic(topic_id, feconf.SYSTEM_COMMITTER_ID)
+        topic_services.save_new_topic(feconf.SYSTEM_COMMITTER_ID, topic) # type: ignore[no-untyped-call]
+        topic_services.publish_topic(topic_id, feconf.SYSTEM_COMMITTER_ID) # type: ignore[no-untyped-call]
 
         story = story_domain.Story.create_default_story(
             story_id, 'A story title', 'description', topic_id,
             'story-one')
-        story_services.save_new_story(feconf.SYSTEM_COMMITTER_ID, story)
-        topic_services.add_canonical_story(
+        story_services.save_new_story(feconf.SYSTEM_COMMITTER_ID, story) # type: ignore[no-untyped-call]
+        topic_services.add_canonical_story( # type: ignore[no-untyped-call]
             feconf.SYSTEM_COMMITTER_ID, topic_id, story_id)
-        topic_services.publish_story(
+        topic_services.publish_story( # type: ignore[no-untyped-call]
             topic_id, story_id, feconf.SYSTEM_COMMITTER_ID)
         change_list = [
             story_domain.StoryChange({
@@ -193,7 +193,7 @@ class MigrateExplorationJobTests(
                 'new_value': self.NEW_EXP_ID
             })
         ]
-        story_services.update_story(
+        story_services.update_story( # type: ignore[no-untyped-call]
             feconf.SYSTEM_COMMITTER_ID, story_id, change_list,
             'Added node.')
 
@@ -204,14 +204,14 @@ class MigrateExplorationJobTests(
             exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 53)
 
         with swap_states_schema_48, swap_exp_schema_53:
-            exploration = exp_domain.Exploration.create_default_exploration(
+            exploration = exp_domain.Exploration.create_default_exploration( # type: ignore[no-untyped-call]
                 self.NEW_EXP_ID, title=self.EXP_TITLE, category='Algorithms')
-            exp_services.save_new_exploration(
+            exp_services.save_new_exploration( # type: ignore[no-untyped-call]
                 feconf.SYSTEM_COMMITTER_ID, exploration)
 
             owner_action = user_services.get_user_actions_info(
                 feconf.SYSTEM_COMMITTER_ID)
-            exp_services.publish_exploration_and_update_user_profiles(
+            exp_services.publish_exploration_and_update_user_profiles( # type: ignore[no-untyped-call]
                 owner_action, self.NEW_EXP_ID)
             opportunity_model = (
                 opportunity_models.ExplorationOpportunitySummaryModel(
@@ -244,7 +244,7 @@ class MigrateExplorationJobTests(
             opportunity_models.ExplorationOpportunitySummaryModel.get(
                 self.NEW_EXP_ID, strict=False))
         updated_opp_summary = (
-              opportunity_services
+              opportunity_services # type: ignore[no-untyped-call]
                   .get_exploration_opportunity_summary_from_model(
                       updated_opp_model))
 

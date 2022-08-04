@@ -26,7 +26,7 @@ import os
 from core import constants
 from core import feconf
 
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -147,6 +147,7 @@ class Registry:
                 'legacy_interaction_specs_by_state_version',
                 'interaction_specs_state_v%i.json' % state_schema_version
             )
+            spec_file_contents: Optional[str]
             try:
                 spec_file_contents = constants.get_package_file_contents(
                     'extensions', spec_file_path

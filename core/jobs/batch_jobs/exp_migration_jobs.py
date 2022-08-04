@@ -77,12 +77,12 @@ class MigrateExplorationJob(base_jobs.JobBase):
         """
         try:
             exploration = exp_fetchers.get_exploration_from_model(exp_model)
-            exploration.validate()
+            exploration.validate() # type: ignore[no-untyped-call]
 
             with datastore_services.get_ndb_context():
-                if exp_services.get_story_id_linked_to_exploration(
+                if exp_services.get_story_id_linked_to_exploration( # type: ignore[no-untyped-call]
                         exp_id) is not None:
-                    exp_services.validate_exploration_for_story(
+                    exp_services.validate_exploration_for_story( # type: ignore[no-untyped-call]
                         exploration, True)
 
         except Exception as e:
@@ -159,12 +159,12 @@ class MigrateExplorationJob(base_jobs.JobBase):
             ExpSummaryModel. The updated exploration summary model to put into
             the datastore.
         """
-        exp_summary = exp_services.compute_summary_of_exploration(
+        exp_summary = exp_services.compute_summary_of_exploration( # type: ignore[no-untyped-call]
             migrated_exp, exp_rights_model, exp_summary_model,
             skip_exploration_model_last_updated=True)
         exp_summary.version += 1
-        updated_exp_summary_model = (
-            exp_services.populate_exp_summary_model_fields(
+        updated_exp_summary_model: exp_models.ExpSummaryModel = (
+            exp_services.populate_exp_summary_model_fields( # type: ignore[no-untyped-call]
                 exp_summary_model, exp_summary
             )
         )
@@ -195,7 +195,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
             the datastore.
         """
         updated_exp_model = (
-            exp_services.populate_exp_model_fields(
+            exp_services.populate_exp_model_fields( # type: ignore[no-untyped-call]
                 exp_model, migrated_exp))
 
         commit_message = (
@@ -211,17 +211,22 @@ class MigrateExplorationJob(base_jobs.JobBase):
                 commit_message,
                 change_dicts,
                 additional_models={'rights_model': exp_rights_model}
-            ).values()
-
-            if opportunity_services.is_exploration_available_for_contribution(
-                migrated_exp.id):
+            )
+            models_to_put_values = []
+            for model in models_to_put.values():
+                # Here, we are narrowing down the type from object to BaseModel.
+                assert isinstance(model, base_models.BaseModel)
+                models_to_put_values.append(model)
+            if opportunity_services.is_exploration_available_for_contribution( # type: ignore[no-untyped-call]
+                migrated_exp.id
+            ):
                 (
-                    opportunity_services
+                    opportunity_services # type: ignore[no-untyped-call]
                     .update_opportunity_with_updated_exploration(
                         migrated_exp.id))
-        datastore_services.update_timestamps_multi(list(models_to_put))
+        datastore_services.update_timestamps_multi(list(models_to_put_values))
 
-        return models_to_put
+        return models_to_put_values
 
     @staticmethod
     def _update_exploration_opportunity_summary_models(
@@ -231,7 +236,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
             str,
             opportunity_models.ExplorationOpportunitySummaryModel
         ]] = None
-    ):
+    ) -> Optional[opportunity_models.ExplorationOpportunitySummaryModel]:
         """Generates newly updated exploration opportunity summary models.
 
         Args:
@@ -247,16 +252,17 @@ class MigrateExplorationJob(base_jobs.JobBase):
         exp_opp_summary_model = None
         if (
             exp_id_to_exp_opp_summary_model is not None and
-            exp_id in exp_id_to_exp_opp_summary_model):
-            content_count = migrated_exp.get_content_count()
-            translation_counts = migrated_exp.get_translation_counts()
+            exp_id in exp_id_to_exp_opp_summary_model
+        ):
+            content_count = migrated_exp.get_content_count() # type: ignore[no-untyped-call]
+            translation_counts = migrated_exp.get_translation_counts() # type: ignore[no-untyped-call]
             complete_translation_language_list = (
-                migrated_exp.get_languages_with_complete_translation())
+                migrated_exp.get_languages_with_complete_translation()) # type: ignore[no-untyped-call]
 
             exp_opp_summary_model = (
                 exp_id_to_exp_opp_summary_model[migrated_exp.id])
             exp_opp_summary = (
-                opportunity_services
+                opportunity_services # type: ignore[no-untyped-call]
                     .get_exploration_opportunity_summary_from_model(
                         exp_opp_summary_model))
             exp_opp_summary.content_count = content_count
