@@ -1,12 +1,31 @@
+# coding: utf-8
+#
+# Copyright 2022 The Oppia Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS-IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""This script helps develop for the contributor dashboard."""
+
+from __future__ import annotations
+
 import json
-import sys
 import os
 import requests
 import hashlib
 
 from core import feconf
 from core.constants import constants
-        
+
 import firebase_admin
 from firebase_admin import auth as firebase_auth
 
@@ -16,24 +35,26 @@ FIREBASE_SIGN_IN_URL = (
     'http://' + FIREBASE_AUTH_EMULATOR_HOST +
     '/identitytoolkit.googleapis.com/v1/accounts:signInWithPassword')
 
-class ClientRequests(object):
+SUPER_ADMIN_EMAIL = feconf.ADMIN_EMAIL_ADDRESS
+SUPER_ADMIN_USERNAME = 'a'
+SUPER_ADMIN_ROLES = [feconf.ROLE_ID_CURRICULUM_ADMIN,
+        feconf.ROLE_ID_TRANSLATION_ADMIN, feconf.ROLE_ID_QUESTION_ADMIN]
+
+CONTRIBUTOR_EMAIL = 'contributor@example.com'
+CONTRIBUTOR_USERNAME = 'b'
+
+class ClientRequests():
     """Requests to help develop for the contributor dashboard."""
+
     def __init__(self, base_url):
         self.client = requests.session()
         self.base_url = base_url
         self.csrf_token = None
 
     def populate_data_for_contributor_dashboard_debug(self):
-        """Populate sample data to help develop for the contributor dashboard.
+        """Populate sample data to help develop for the contributor
+        dashboard.
         """
-        SUPER_ADMIN_EMAIL = feconf.ADMIN_EMAIL_ADDRESS
-        SUPER_ADMIN_USERNAME = 'a'
-        SUPER_ADMIN_ROLES = [feconf.ROLE_ID_CURRICULUM_ADMIN,
-                feconf.ROLE_ID_TRANSLATION_ADMIN, feconf.ROLE_ID_QUESTION_ADMIN]
-
-        CONTRIBUTOR_EMAIL = 'contributor@example.com'
-        CONTRIBUTOR_USERNAME = 'b'
-        
         firebase_admin.initialize_app(
             options={'projectId': feconf.OPPIA_PROJECT_ID})
 
@@ -54,8 +75,8 @@ class ClientRequests(object):
         if headers is None:
             headers = {}
 
-        response = self.client.request(method, self.base_url + url, 
-            headers=headers, params=params)
+        response = self.client.request(
+            method, self.base_url + url, headers=headers, params=params)
 
         return response
 
@@ -65,10 +86,10 @@ class ClientRequests(object):
         """
         password = hashlib.md5(email.encode('utf-8')).hexdigest()
 
-        # create a new user in firebase
+        # Create a new user in firebase.
         firebase_auth.create_user(email=email, password=password)
 
-        # sign up the new user in Oppia and set its username
+        # Sign up the new user in Oppia and set its username.
         self._begin_session(email)
         self._make_request('GET', '/signup?return_url=/')
         self.csrf_token = self._get_csrf_token()
@@ -80,7 +101,7 @@ class ClientRequests(object):
         }), 'csrf_token': self.csrf_token}
 
         self._make_request('POST', feconf.SIGNUP_DATA_URL, params=params)
-        
+
         # end current session, i.e. log out.
         self._make_request('GET', '/session_end')
         self.csrf_token = None
@@ -90,11 +111,11 @@ class ClientRequests(object):
         password = hashlib.md5(email.encode('utf-8')).hexdigest()
 
         token_id = requests.post(FIREBASE_SIGN_IN_URL,
-                        params={"key": 'fake-api-key'},
+                        params={'key': 'fake-api-key'},
                         json={
                             'email': email,
-                            "password": password
-                        }).json()["idToken"]
+                            'password': password
+                        }).json()['idToken']
         headers = {'Authorization': 'Bearer %s' % token_id}
 
         self._make_request('GET', '/session_begin', headers=headers)
@@ -123,7 +144,7 @@ class ClientRequests(object):
     def _add_submit_question_rights(self, username):
         """Adds submit question rights to the user with the given username."""
         params = {
-            'payload': json.dumps({'username': username}), 
+            'payload': json.dumps({'username': username}),
             'csrf_token': self.csrf_token
         }
 
@@ -137,7 +158,7 @@ class ClientRequests(object):
                 'action': 'generate_dummy_new_structures_data'}),
             'csrf_token': self.csrf_token
         }
-        
+
         self._make_request('POST', '/adminhandler', params=params)
 
     def _add_topics_to_classroom(self):
@@ -148,7 +169,7 @@ class ClientRequests(object):
             response.text[len(feconf.XSSI_PREFIX):])['topic_summary_dicts']
         topic_ids = [topic_summary_dict['id']
                         for topic_summary_dict in topic_summary_dicts]
-        
+
         params = {
             'payload': json.dumps({
                 'action': 'save_config_properties',
