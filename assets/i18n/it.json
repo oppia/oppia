@@ -338,6 +338,7 @@
 	"I18N_PREFERENCES_USERNAME": "Nome utente",
 	"I18N_PREFERENCES_USERNAME_NOT_SELECTED": "Non ancora selezionato",
 	"I18N_PROFILE_NO_EXPLORATIONS": "Questo utente non ha ancora creato o modificato nessuna esplorazione.",
+	"I18N_PROGRESS_REMINDER_CONTINUE_TEXT": "Vuoi continuare?",
 	"I18N_QUESTION_PLAYER_NEW_SESSION": "Ripeti",
 	"I18N_QUESTION_PLAYER_SCORE": "Punteggio",
 	"I18N_SAVE_EXPLORATION_PROGRESS_TEXT_2": "Hai già un'utenza?",
