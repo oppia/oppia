@@ -16,16 +16,26 @@
  * @fileoverview Unit tests for contributionsAndReview.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { fakeAsync, tick } from '@angular/core/testing';
-import { EventEmitter } from '@angular/core';
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
-// ^^^ This block is to be removed.
-
+import { ComponentFixture, fakeAsync, flush, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ExplorationOpportunitySummary } from 'domain/opportunity/exploration-opportunity-summary.model';
-import { ContributorDashboardConstants } from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { ContributionDetails, ContributionsAndReview, Suggestion, SuggestionDetails } from './contributions-and-review.component';
+import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
+import { TranslationTopicService } from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
+import { MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFactory';
+import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
+import { ContextService } from 'services/context.service';
+import { UserService } from 'services/user.service';
+import { ContributionAndReviewService } from '../services/contribution-and-review.service';
+import { ContributionOpportunitiesService } from '../services/contribution-opportunities.service';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { UserInfo } from 'domain/user/user-info.model';
+import { CsrfTokenService } from 'services/csrf-token.service';
+import { AlertsService } from 'services/alerts.service';
+import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
+import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe';
+
 
 class MockNgbModalRef {
   componentInstance: {
@@ -36,633 +46,363 @@ class MockNgbModalRef {
   };
 }
 
-describe('Contributions and review component', function() {
-  var ctrl = null;
-  var $httpBackend = null;
-  var $q = null;
-  var $scope = null;
-  var $uibModal = null;
-  let ngbModal: NgbModal = null;
-  var contextService = null;
-  var contributionAndReviewService = null;
-  var contributionOpportunitiesService = null;
-  var csrfTokenService = null;
-  var misconceptionObjectFactory = null;
-  var skillBackendApiService = null;
-  var skillObjectFactory = null;
-  var translationTopicService = null;
-  var userService = null;
-  var getUserCreatedTranslationSuggestionsAsyncSpy = null;
+class MockNgbModal {
+  open() {
+    return {
+      result: Promise.resolve()
+    };
+  }
+}
 
+describe('Contributions and review component', () => {
+  let component: ContributionsAndReview;
+  let fixture: ComponentFixture<ContributionsAndReview>;
+  let ngbModal: NgbModal = null;
+  var contextService: ContextService;
+  var contributionAndReviewService: ContributionAndReviewService;
+  var contributionOpportunitiesService: ContributionOpportunitiesService;
+  var skillBackendApiService: SkillBackendApiService;
+  var skillObjectFactory: SkillObjectFactory;
+  var translationTopicService: TranslationTopicService;
+  var userService: UserService;
+  let alertsService: AlertsService;
+  let questionObjectFactory: QuestionObjectFactory;
+  var getUserCreatedTranslationSuggestionsAsyncSpy = null;
+  let getUserContributionRightsDataAsyncSpy = null;
+  let formatRtePreviewPipe: FormatRtePreviewPipe;
   const mockActiveTopicEventEmitter = new EventEmitter();
 
-  beforeEach(angular.mock.module('oppia'));
-
-  importAllAngularServices();
-
-  describe('when user is allowed to review questions', function() {
-    beforeEach(angular.mock.module('oppia', function($provide) {
-      $provide.value('NgbModal', {
-        open: () => {
-          return {
-            result: Promise.resolve()
-          };
-        }
-      });
-    }));
-
-    beforeEach(angular.mock.inject(function($injector, $componentController) {
-      $q = $injector.get('$q');
-      var $rootScope = $injector.get('$rootScope');
-      $uibModal = $injector.get('$uibModal');
-      ngbModal = $injector.get('NgbModal');
-      contributionAndReviewService = $injector.get(
-        'ContributionAndReviewService');
-      userService = $injector.get('UserService');
-      contextService = $injector.get('ContextService');
-      skillBackendApiService = $injector.get('SkillBackendApiService');
-      contributionOpportunitiesService = $injector.get(
-        'ContributionOpportunitiesService');
-      translationTopicService = $injector.get('TranslationTopicService');
-      spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
-      misconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
-
-      spyOn(userService, 'getUserInfoAsync')
-        .and.returnValue($q.resolve({
-          isLoggedIn: () => true
-        }));
-      spyOn(userService, 'getUserContributionRightsDataAsync')
-        .and.returnValue($q.resolve({
-          can_review_translation_for_language_codes: [{}],
-          can_review_questions: true
-        }));
-      spyOn(
-        contributionOpportunitiesService,
-        'getReviewableTranslationOpportunitiesAsync'
-      ).and.returnValue(
-        Promise.resolve({
-          opportunities: [
-            ExplorationOpportunitySummary.createFromBackendDict({
-              id: '1',
-              topic_name: 'Topic 1',
-              story_title: 'Story 1',
-              chapter_title: 'Chapter 1',
-              content_count: 1,
-              translation_counts: {
-                en: 2
-              },
-              translation_in_review_counts: {
-                en: 2
-              }
-            }),
-            ExplorationOpportunitySummary.createFromBackendDict({
-              id: '2',
-              topic_name: 'Topic 2',
-              story_title: 'Story 2',
-              chapter_title: 'Chapter 2',
-              content_count: 2,
-              translation_counts: {
-                en: 4
-              },
-              translation_in_review_counts: {
-                en: 4
-              }
-            })
-          ],
-          more: false
-        }));
-      spyOn(
-        contributionAndReviewService,
-        'getUserCreatedTranslationSuggestionsAsync').and.returnValue(
-        Promise.resolve({
-          suggestionIdToDetails: {
-            suggestion_1: {
-              suggestion: {
-                suggestion_id: 'suggestion_1',
-                target_id: '1',
-                suggestion_type: 'translate_content',
-                change: {
-                  content_html: 'Translation',
-                  translation_html: 'Tradução'
-                },
-                status: 'review'
-              },
-              details: 'skill_1'
-            }
-          },
-          more: false
-        }));
-      getUserCreatedTranslationSuggestionsAsyncSpy = spyOn(
-        contributionAndReviewService, 'getReviewableQuestionSuggestionsAsync')
-        .and.returnValue(Promise.resolve({
-          suggestionIdToDetails: {
-            suggestion_1: {
-              suggestion: {
-                suggestion_id: 'suggestion_1',
-                target_id: '1',
-                suggestion_type: 'translate_content',
-                change: {
-                  skill_id: 'skill1',
-                  question_dict: {
-                    id: '1',
-                    question_state_data: {
-                      content: {
-                        html: 'Question 1',
-                        content_id: 'content_1'
-                      },
-                      interaction: {
-                        answer_groups: [{
-                          outcome: {
-                            dest: 'outcome 1',
-                            dest_if_really_stuck: null,
-                            feedback: {
-                              content_id: 'content_5',
-                              html: ''
-                            },
-                            labelled_as_correct: true,
-                            param_changes: [],
-                            refresher_exploration_id: null
-                          },
-                          rule_specs: [],
-                        }],
-                        confirmed_unclassified_answers: [],
-                        customization_args: {
-                          placeholder: {
-                            value: {
-                              content_id: 'ca_placeholder_0',
-                              unicode_str: ''
-                            }
-                          },
-                          rows: { value: 1 }
-                        },
-                        default_outcome: {
-                          dest: null,
-                          dest_if_really_stuck: null,
-                          feedback: {
-                            html: 'Correct Answer',
-                            content_id: 'content_2'
-                          },
-                          param_changes: [],
-                          labelled_as_correct: true
-                        },
-                        hints: [{
-                          hint_content: {
-                            html: 'Hint 1',
-                            content_id: 'content_3'
-                          }
-                        }],
-                        solution: {
-                          correct_answer: 'This is the correct answer',
-                          answer_is_exclusive: false,
-                          explanation: {
-                            html: 'Solution explanation',
-                            content_id: 'content_4'
-                          }
-                        },
-                        id: 'TextInput'
-                      },
-                      param_changes: [],
-                      recorded_voiceovers: {
-                        voiceovers_mapping: {}
-                      },
-                      written_translations: {
-                        translations_mapping: {}
-                      },
-                    },
-                  }
-                },
-                status: 'review'
-              },
-              details: {
-                skill_description: 'Skill description'
-              }
-            }
-          },
-          more: false
-        }));
-      spyOnProperty(translationTopicService, 'onActiveTopicChanged')
-        .and.returnValue(mockActiveTopicEventEmitter);
-
-      $scope = $rootScope.$new();
-      ctrl = $componentController('contributionsAndReview', {
-        $scope: $scope,
-        ContextService: contextService,
-        MisconceptionObjectFactory: misconceptionObjectFactory
-      });
-      ctrl.$onInit();
-      $scope.$apply();
-      $scope.$apply();
-    }));
-
-    it('should initialize $scope properties after controller is' +
-      ' initialized', function() {
-      expect(ctrl.activeTabType).toBe('reviews');
-      expect(ctrl.activeSuggestionType).toBe('add_question');
-      expect(ctrl.activeDropdownTabChoice).toBe('Review Questions');
-      expect(ctrl.userIsLoggedIn).toBe(true);
-      expect(ctrl.userDetailsLoading).toBe(false);
-      expect(ctrl.reviewTabs.length).toEqual(2);
-      expect(ctrl.activeExplorationId).toBeNull();
-    });
-
-    it('should clear activeExplorationId when active topic changes',
-      fakeAsync(function() {
-        ctrl.onClickReviewableTranslations('explorationId');
-        expect(ctrl.activeExplorationId).toBe('explorationId');
-
-        mockActiveTopicEventEmitter.emit();
-        tick();
-
-        expect(ctrl.activeExplorationId).toBeNull();
-      }));
-
-    describe('ctrl.isReviewTranslationsTab', () => {
-      it('should return true on Review Translations tab', function() {
-        ctrl.switchToTab(ctrl.TAB_TYPE_REVIEWS, 'translate_content');
-        expect(ctrl.isReviewTranslationsTab()).toBeTrue();
-      });
-
-      it('should return false on Review Questions tab', function() {
-        ctrl.switchToTab(ctrl.TAB_TYPE_REVIEWS, 'add_question');
-        expect(ctrl.isReviewTranslationsTab()).toBeFalse();
-      });
-
-      it('should return false on Translation Contributions tab', function() {
-        ctrl.switchToTab(ctrl.TAB_TYPE_CONTRIBUTIONS, 'translate_content');
-        expect(ctrl.isReviewTranslationsTab()).toBeFalse();
-      });
-
-      it('should return false on Question Contributions tab', function() {
-        ctrl.switchToTab(ctrl.TAB_TYPE_CONTRIBUTIONS, 'add_question');
-        expect(ctrl.isReviewTranslationsTab()).toBeFalse();
-      });
-    });
-
-    describe('ctrl.onClickReviewableTranslations', () => {
-      it('should set activeExplorationId', function() {
-        expect(ctrl.activeExplorationId).toBeNull();
-        ctrl.onClickReviewableTranslations('explorationId');
-        expect(ctrl.activeExplorationId).toBe('explorationId');
-      });
-    });
-
-    describe('ctrl.onClickBackToReviewableLessons', () => {
-      it('should clear activeExplorationId', function() {
-        ctrl.onClickReviewableTranslations('explorationId');
-        expect(ctrl.activeExplorationId).toBe('explorationId');
-        ctrl.onClickBackToReviewableLessons();
-        expect(ctrl.activeExplorationId).toBeNull();
-      });
-    });
-
-    describe('ctrl.loadContributions', () => {
-      it('should load contributions correctly', () => {
-        ctrl.loadContributions().then(({opportunitiesDicts, more}) => {
-          expect(Object.keys(ctrl.contributions)).toContain('suggestion_1');
-          expect(opportunitiesDicts).toEqual([{
-            id: 'suggestion_1',
-            heading: 'Question 1',
-            subheading: 'Skill description',
-            labelText: 'Awaiting review',
-            labelColor: '#eeeeee',
-            actionButtonTitle: 'Review'
-          }]);
-          expect(more).toEqual(false);
-        });
-      });
-
-      it('should return empty list if tab is not initialized', () => {
-        ctrl.activeTabType = null;
-        ctrl.loadContributions().then(({opportunitiesDicts, more}) => {
-          expect(ctrl.contributions).toEqual({});
-          expect(opportunitiesDicts).toEqual([]);
-          expect(more).toEqual(false);
-        });
-      });
-
-      it('should return empty list if suggestion type is not initialized',
-        () => {
-          ctrl.activeTabType = null;
-          ctrl.loadContributions().then(({opportunitiesDicts, more}) => {
-            expect(ctrl.contributions).toEqual({});
-            expect(opportunitiesDicts).toEqual([]);
-            expect(more).toEqual(false);
-          });
-        });
-    });
-
-    describe('ctrl.loadReviewableTranslationOpportunities', () => {
-      it('should load opportunities correctly', () => {
-        ctrl.loadReviewableTranslationOpportunities().then(
-          ({opportunitiesDicts, more}) => {
-            expect(opportunitiesDicts).toEqual([
-              {
-                id: '1',
-                heading: 'Chapter 1',
-                subheading: 'Topic 1 - Story 1',
-                actionButtonTitle: 'Translations'
-              },
-              {
-                id: '2',
-                heading: 'Chapter 2',
-                subheading: 'Topic 2 - Story 2',
-                actionButtonTitle: 'Translations'
-              }
-            ]);
-            expect(more).toEqual(false);
-          });
-      });
-    });
-
-    describe('ctrl.loadOpportunities', () => {
-      it('should load contributions correctly', () => {
-        ctrl.loadOpportunities().then(({opportunitiesDicts, more}) => {
-          expect(Object.keys(ctrl.contributions)).toContain('suggestion_1');
-          expect(opportunitiesDicts).toEqual([{
-            id: 'suggestion_1',
-            heading: 'Question 1',
-            subheading: 'Skill description',
-            labelText: 'Awaiting review',
-            labelColor: '#eeeeee',
-            actionButtonTitle: 'Review'
-          }]);
-          expect(more).toEqual(false);
-        });
-
-        // Repeated calls should return the same results.
-        ctrl.loadOpportunities().then(({opportunitiesDicts, more}) => {
-          expect(Object.keys(ctrl.contributions)).toContain('suggestion_1');
-          expect(opportunitiesDicts).toEqual([{
-            id: 'suggestion_1',
-            heading: 'Question 1',
-            subheading: 'Skill description',
-            labelText: 'Awaiting review',
-            labelColor: '#eeeeee',
-            actionButtonTitle: 'Review'
-          }]);
-          expect(more).toEqual(false);
-        });
-      });
-    });
-
-    describe('ctrl.loadMoreOpportunities', () => {
-      it('should load contributions correctly', () => {
-        ctrl.loadMoreOpportunities().then(({opportunitiesDicts, more}) => {
-          expect(Object.keys(ctrl.contributions)).toContain('suggestion_1');
-          expect(opportunitiesDicts).toEqual([{
-            id: 'suggestion_1',
-            heading: 'Question 1',
-            subheading: 'Skill description',
-            labelText: 'Awaiting review',
-            labelColor: '#eeeeee',
-            actionButtonTitle: 'Review'
-          }]);
-          expect(more).toEqual(false);
-        });
-
-        getUserCreatedTranslationSuggestionsAsyncSpy
-          .and.returnValue(Promise.resolve({}));
-
-        // Subsequent calls should return the next batch of results.
-        ctrl.loadMoreOpportunities().then(({opportunitiesDicts, more}) => {
-          expect(Object.keys(ctrl.contributions).length).toBe(0);
-          expect(opportunitiesDicts.length).toBe(0);
-          expect(more).toEqual(false);
-        });
-      });
-    });
-
-    it('should open show translation suggestion modal when clicking on' +
-      ' suggestion', function() {
-      contributionOpportunitiesService
-        .reloadOpportunitiesEventEmitter.subscribe(() => {
-          ctrl.loadContributions().then(() => {
-            spyOn($uibModal, 'open').and.callThrough();
-            ctrl.onClickViewSuggestion('suggestion_1');
-
-            expect($uibModal.open).toHaveBeenCalled();
-          });
-        });
-
-      ctrl.switchToTab(ctrl.TAB_TYPE_CONTRIBUTIONS, 'translate_content');
-      $scope.$apply();
-    });
-
-    it('should remove resolved suggestions when suggestion ' +
-      'modal is opened and remove button is clicked', fakeAsync(function() {
-      spyOn(ngbModal, 'open').and.returnValue(
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      declarations: [
+        ContributionsAndReview
+      ],
+      providers: [
         {
-          componentInstance: MockNgbModalRef,
-          result: Promise.resolve(['id1', 'id2'])
-        } as NgbModalRef
-      );
-      const removeSpy = spyOn(
-        contributionOpportunitiesService.removeOpportunitiesEventEmitter,
-        'emit').and.returnValue(null);
-      ctrl.contributions = {
-        suggestion_1: {
-          suggestion: {
-            suggestion_id: 'suggestion_1',
-            target_id: '1',
-            suggestion_type: 'translate_content',
-            change: {
-              content_html: 'Translation',
-              translation_html: 'Tradução'
+          provide: NgbModal,
+          useClass: MockNgbModal
+        },
+        ContextService,
+        ContributionAndReviewService,
+        ContributionOpportunitiesService,
+        MisconceptionObjectFactory,
+        SkillBackendApiService,
+        FormatRtePreviewPipe,
+        QuestionObjectFactory,
+        SkillObjectFactory,
+        CsrfTokenService,
+        AlertsService,
+        TranslationTopicService,
+        UserService
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
+  }));
+
+  beforeEach(waitForAsync(() => {
+    fixture = TestBed.createComponent(ContributionsAndReview);
+    component = fixture.componentInstance;
+
+    ngbModal = TestBed.inject(NgbModal);
+    questionObjectFactory = TestBed.inject(QuestionObjectFactory);
+    alertsService = TestBed.inject(AlertsService);
+    skillObjectFactory = TestBed.inject(SkillObjectFactory);
+    contributionAndReviewService = TestBed.inject(ContributionAndReviewService);
+    userService = TestBed.inject(UserService);
+    contextService = TestBed.inject(ContextService);
+    skillBackendApiService = TestBed.inject(SkillBackendApiService);
+    contributionOpportunitiesService = TestBed.inject(
+      ContributionOpportunitiesService);
+    formatRtePreviewPipe = TestBed.inject(
+      FormatRtePreviewPipe);
+    translationTopicService = TestBed.inject(TranslationTopicService);
+
+    spyOn(
+      contributionOpportunitiesService.reloadOpportunitiesEventEmitter,
+      'emit').and.callThrough();
+    spyOn(
+      contributionOpportunitiesService.reloadOpportunitiesEventEmitter,
+      'subscribe').and.callThrough();
+    spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
+    spyOn(userService, 'getUserInfoAsync')
+      .and.returnValue(Promise.resolve({
+        isLoggedIn: () => true
+      } as UserInfo));
+    getUserContributionRightsDataAsyncSpy =
+      spyOn(userService, 'getUserContributionRightsDataAsync');
+
+    getUserContributionRightsDataAsyncSpy.and.returnValue(Promise.resolve({
+      can_review_translation_for_language_codes: [],
+      can_review_questions: true,
+      can_review_voiceover_for_language_codes: [],
+      can_suggest_questions: false,
+    }));
+    spyOn(
+      contributionOpportunitiesService,
+      'getReviewableTranslationOpportunitiesAsync'
+    ).and.returnValue(
+      Promise.resolve({
+        opportunities: [
+          ExplorationOpportunitySummary.createFromBackendDict({
+            id: '1',
+            topic_name: 'Topic 1',
+            story_title: 'Story 1',
+            chapter_title: 'Chapter 1',
+            content_count: 1,
+            translation_counts: {
+              en: 2
             },
-            status: 'review'
-          },
-          details: 'skill_1'
-        }
-      };
-
-      ctrl.onClickViewSuggestion('suggestion_1');
-      // Here '$scope.$apply' is used multiple times
-      // in order to traverse through nested promises.
-      $scope.$apply();
-      tick();
-      $scope.$apply();
-      tick();
-      $scope.$apply();
-
-      expect(removeSpy).toHaveBeenCalled();
-    }));
-
-    it('should resolve suggestion when closing show suggestion modal',
-      function() {
-        contributionOpportunitiesService
-          .reloadOpportunitiesEventEmitter.subscribe(() => {
-            ctrl.loadContributions().then(() => {
-              spyOn($uibModal, 'open').and.returnValue({
-                result: $q.resolve({
-                  action: 'add',
-                  reviewMessage: 'Review message',
-                  skillDifficulty: 'Easy'
-                })
-              });
-              ctrl.onClickViewSuggestion('suggestion_1');
-              $scope.$apply();
-
-              expect($uibModal.open).toHaveBeenCalled();
-            });
-          });
-        ctrl.switchToTab(ctrl.TAB_TYPE_CONTRIBUTIONS, 'translate_content');
-        $scope.$apply();
-      });
-
-    it('should not resolve suggestion when dismissing show suggestion modal',
-      function() {
-        contributionOpportunitiesService
-          .reloadOpportunitiesEventEmitter.subscribe(() => {
-            ctrl.loadContributions().then(() => {
-              spyOn($uibModal, 'open').and.returnValue({
-                result: $q.reject()
-              });
-              ctrl.onClickViewSuggestion('suggestion_1');
-              $scope.$apply();
-
-              expect($uibModal.open).toHaveBeenCalled();
-            });
-          });
-        ctrl.switchToTab(ctrl.TAB_TYPE_CONTRIBUTIONS, 'translate_content');
-        $scope.$apply();
-      });
-  });
-
-  describe('for the suggestion related to deleted opportunity', function() {
-    beforeEach(angular.mock.module('oppia', function($provide) {
-      $provide.value('NgbModal', {
-        open: () => {
-          return {
-            result: Promise.resolve()
-          };
-        }
-      });
-    }));
-
-    beforeEach(angular.mock.inject(function($injector, $componentController) {
-      $httpBackend = $injector.get('$httpBackend');
-      $q = $injector.get('$q');
-      var $rootScope = $injector.get('$rootScope');
-      $uibModal = $injector.get('$uibModal');
-      ngbModal = $injector.get('NgbModal');
-      contributionAndReviewService = $injector.get(
-        'ContributionAndReviewService');
-      contributionOpportunitiesService = $injector.get(
-        'ContributionOpportunitiesService');
-      csrfTokenService = $injector.get('CsrfTokenService');
-      userService = $injector.get('UserService');
-      contextService = $injector.get('ContextService');
-      skillBackendApiService = $injector.get('SkillBackendApiService');
-      skillObjectFactory = $injector.get('SkillObjectFactory');
-      spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
-      misconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
-
-      spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(
-        $q.resolve('sample-csrf-token'));
-
-      spyOn(userService, 'getUserInfoAsync')
-        .and.returnValue($q.resolve({
-          isLoggedIn: () => true
-        }));
-      spyOn(userService, 'getUserContributionRightsDataAsync')
-        .and.returnValue(
-          $q.resolve({
-            can_review_translation_for_language_codes: [],
-            can_review_questions: false
-          }));
-      spyOn(
-        contributionAndReviewService, 'getUserCreatedQuestionSuggestionsAsync')
-        .and.returnValue($q.resolve({
-          suggestionIdToDetails: {
-            suggestion_1: {
-              suggestion: {
-                suggestion_id: 'suggestion_1',
-                target_id: '1',
-                suggestion_type: 'add_question',
-                change: {
-                  skill_id: 'skill1',
-                  question_dict: {
-                    id: '1',
-                    question_state_data: {
-                      content: {
-                        html: 'Question 1',
-                        content_id: 'content_1'
-                      },
-                      interaction: {
-                        answer_groups: [{
-                          outcome: {
-                            dest: 'outcome 1',
-                            dest_if_really_stuck: null,
-                            feedback: {
-                              content_id: 'content_5',
-                              html: ''
-                            },
-                            labelled_as_correct: true,
-                            param_changes: [],
-                            refresher_exploration_id: null
-                          },
-                          rule_specs: [],
-                        }],
-                        confirmed_unclassified_answers: [],
-                        customization_args: {
-                          placeholder: {
-                            value: {
-                              content_id: 'ca_placeholder_0',
-                              unicode_str: ''
-                            }
-                          },
-                          rows: { value: 1 }
-                        },
-                        default_outcome: {
-                          dest: null,
+            translation_in_review_counts: {
+              en: 2
+            }
+          }),
+          ExplorationOpportunitySummary.createFromBackendDict({
+            id: '2',
+            topic_name: 'Topic 2',
+            story_title: 'Story 2',
+            chapter_title: 'Chapter 2',
+            content_count: 2,
+            translation_counts: {
+              en: 4
+            },
+            translation_in_review_counts: {
+              en: 4
+            }
+          })
+        ],
+        more: false
+      }));
+    spyOn(
+      contributionAndReviewService,
+      'getUserCreatedTranslationSuggestionsAsync').and.returnValue(
+      Promise.resolve({
+        suggestionIdToDetails: {
+          suggestion_1: {
+            suggestion: {
+              target_type: null,
+              author_name: null,
+              last_updated_msecs: null,
+              suggestion_id: 'suggestion_1',
+              target_id: '1',
+              suggestion_type: 'translate_content',
+              change: {
+                state_name: null,
+                new_value: null,
+                old_value: null,
+                content_html: 'Translation',
+                translation_html: 'Tradução'
+              },
+              status: 'review'
+            },
+            details: {
+              skill_id: 'skill_1',
+              skill_description: 'skill_1'
+            }
+          }
+        },
+        more: false
+      }));
+    getUserCreatedTranslationSuggestionsAsyncSpy = spyOn(
+      contributionAndReviewService, 'getReviewableQuestionSuggestionsAsync')
+      .and.returnValue(Promise.resolve({
+        suggestionIdToDetails: {
+          suggestion_1: {
+            suggestion: {
+              target_type: null,
+              author_name: null,
+              last_updated_msecs: null,
+              suggestion_id: 'suggestion_1',
+              target_id: '1',
+              suggestion_type: 'translate_content',
+              change: {
+                state_name: null,
+                new_value: null,
+                old_value: null,
+                skill_id: 'skill1',
+                question_dict: {
+                  id: '1',
+                  question_state_data: {
+                    content: {
+                      html: 'Question 1',
+                      content_id: 'content_1'
+                    },
+                    interaction: {
+                      answer_groups: [{
+                        outcome: {
+                          dest: 'outcome 1',
                           dest_if_really_stuck: null,
                           feedback: {
-                            html: 'Correct Answer',
-                            content_id: 'content_2'
+                            content_id: 'content_5',
+                            html: ''
                           },
+                          labelled_as_correct: true,
                           param_changes: [],
-                          labelled_as_correct: true
+                          refresher_exploration_id: null
                         },
-                        hints: [{
-                          hint_content: {
-                            html: 'Hint 1',
-                            content_id: 'content_3'
-                          }
-                        }],
-                        solution: {
-                          correct_answer: 'This is the correct answer',
-                          answer_is_exclusive: false,
-                          explanation: {
-                            html: 'Solution explanation',
-                            content_id: 'content_4'
+                        rule_specs: [],
+                      }],
+                      confirmed_unclassified_answers: [],
+                      customization_args: {
+                        placeholder: {
+                          value: {
+                            content_id: 'ca_placeholder_0',
+                            unicode_str: ''
                           }
                         },
-                        id: 'TextInput'
+                        rows: { value: 1 }
                       },
-                      param_changes: [],
-                      recorded_voiceovers: {
-                        voiceovers_mapping: {}
+                      default_outcome: {
+                        dest: null,
+                        dest_if_really_stuck: null,
+                        feedback: {
+                          html: 'Correct Answer',
+                          content_id: 'content_2'
+                        },
+                        param_changes: [],
+                        labelled_as_correct: true
                       },
-                      written_translations: {
-                        translations_mapping: {}
+                      hints: [{
+                        hint_content: {
+                          html: 'Hint 1',
+                          content_id: 'content_3'
+                        }
+                      }],
+                      solution: {
+                        correct_answer: 'This is the correct answer',
+                        answer_is_exclusive: false,
+                        explanation: {
+                          html: 'Solution explanation',
+                          content_id: 'content_4'
+                        }
                       },
+                      id: 'TextInput'
                     },
-                  }
-                },
-                status: 'accepted'
+                    param_changes: [],
+                    recorded_voiceovers: {
+                      voiceovers_mapping: {}
+                    },
+                    written_translations: {
+                      translations_mapping: {}
+                    },
+                  },
+                }
               },
-              details: null
+              status: 'review'
+            },
+            details: {
+              skill_description: 'Skill description',
+              skill_id: null,
             }
-          },
-          more: false
-        }));
-      spyOn(skillBackendApiService, 'fetchSkillAsync').and.returnValue(
-        $q.resolve({
+          }
+        },
+        more: false,
+      }));
+    spyOn(
+      contributionAndReviewService, 'getUserCreatedQuestionSuggestionsAsync')
+      .and.returnValue(Promise.resolve({
+        suggestionIdToDetails: {
+          suggestion_1: {
+            suggestion: {
+              target_type: null,
+              author_name: null,
+              last_updated_msecs: null,
+              suggestion_id: 'suggestion_1',
+              target_id: '1',
+              suggestion_type: 'add_question',
+              change: {
+                state_name: null,
+                new_value: null,
+                old_value: null,
+                skill_id: 'skill1',
+                question_dict: {
+                  id: '1',
+                  question_state_data: {
+                    content: {
+                      html: 'Question 1',
+                      content_id: 'content_1'
+                    },
+                    interaction: {
+                      answer_groups: [{
+                        outcome: {
+                          dest: 'outcome 1',
+                          dest_if_really_stuck: null,
+                          feedback: {
+                            content_id: 'content_5',
+                            html: ''
+                          },
+                          labelled_as_correct: true,
+                          param_changes: [],
+                          refresher_exploration_id: null
+                        },
+                        rule_specs: [],
+                      }],
+                      confirmed_unclassified_answers: [],
+                      customization_args: {
+                        placeholder: {
+                          value: {
+                            content_id: 'ca_placeholder_0',
+                            unicode_str: ''
+                          }
+                        },
+                        rows: { value: 1 }
+                      },
+                      default_outcome: {
+                        dest: null,
+                        dest_if_really_stuck: null,
+                        feedback: {
+                          html: 'Correct Answer',
+                          content_id: 'content_2'
+                        },
+                        param_changes: [],
+                        labelled_as_correct: true
+                      },
+                      hints: [{
+                        hint_content: {
+                          html: 'Hint 1',
+                          content_id: 'content_3'
+                        }
+                      }],
+                      solution: {
+                        correct_answer: 'This is the correct answer',
+                        answer_is_exclusive: false,
+                        explanation: {
+                          html: 'Solution explanation',
+                          content_id: 'content_4'
+                        }
+                      },
+                      id: 'TextInput'
+                    },
+                    param_changes: [],
+                    recorded_voiceovers: {
+                      voiceovers_mapping: {}
+                    },
+                    written_translations: {
+                      translations_mapping: {}
+                    },
+                  },
+                }
+              },
+              status: 'accepted'
+            },
+            details: {
+              skill_id: 'skill_1',
+              skill_description: 'skill_1'
+            }
+          }
+        },
+        more: false
+      }));
+    spyOnProperty(translationTopicService, 'onActiveTopicChanged')
+      .and.returnValue(mockActiveTopicEventEmitter);
+    spyOn(skillBackendApiService, 'fetchSkillAsync')
+      .and.returnValue(
+        Promise.resolve({
           skill: skillObjectFactory.createFromBackendDict({
             id: 'skill1',
             description: 'test description 1',
             misconceptions: [{
-              id: '2',
+              id: 2,
               name: 'test name',
               notes: 'test notes',
               feedback: 'test feedback',
@@ -684,466 +424,1196 @@ describe('Contributions and review component', function() {
             },
             language_code: 'en',
             version: 3,
-            prerequisite_skill_ids: ['skill_1']
-          })
+            prerequisite_skill_ids: ['skill_1'],
+            all_questions_merged: false,
+            next_misconception_id: 0,
+            superseding_skill_id: ''
+          }),
+          assignedSkillTopicData: null,
+          groupedSkillSummaries: null
         }));
-      spyOn(
-        contributionAndReviewService,
-        'getUserCreatedTranslationSuggestionsAsync')
-        .and.returnValue($q.resolve({
-          suggestionIdToDetails: {
-            suggestion_1: {
-              suggestion: {
-                suggestion_id: 'suggestion_1',
-                target_id: '1',
-                suggestion_type: 'translate_content',
-                change: {
-                  content_html: 'Translation',
-                  translation_html: 'Tradução'
-                },
-                status: 'review'
+    spyOn(
+      contributionAndReviewService,
+      'getReviewableTranslationSuggestionsAsync')
+      .and.returnValue(Promise.resolve({
+        suggestionIdToDetails: {
+          suggestion_1: {
+            suggestion: {
+              target_type: null,
+              author_name: null,
+              last_updated_msecs: null,
+              suggestion_id: 'suggestion_1',
+              target_id: '1',
+              suggestion_type: 'translate_content',
+              change: {
+                state_name: null,
+                new_value: null,
+                old_value: null,
+                content_html: 'Translation',
+                translation_html: 'Tradução'
               },
-              details: null
+              status: 'review'
+            },
+            details: {
+              skill_id: 'skill_1',
+              skill_description: 'skill_1'
             }
+          }
+        },
+        more: false
+      }));
+
+    fixture.detectChanges();
+
+    component.ngOnInit();
+  }));
+
+  afterEach(() => {
+    fixture.destroy();
+  });
+
+  describe('when user is allowed to review questions ', () => {
+    it('should open call openQuestionSuggestionModal', fakeAsync(() => {
+      let eventEmitter = new EventEmitter();
+
+      spyOn(contributionAndReviewService, 'reviewSkillSuggestion').and.callFake(
+        (_one, _two, _thre, _four, _five, _six, callBackfunction) => {
+          callBackfunction();
+          tick();
+          return null;
+        }
+      );
+      spyOn(ngbModal, 'open').and.returnValue({
+        componentInstance: {
+          authorName: null,
+          contentHtml: null,
+          reviewable: null,
+          question: null,
+          questionHeader: null,
+          suggestion: null,
+          skillRubrics: null,
+          suggestionId: null,
+          skillDifficulty: null,
+          misconceptionsBySkill: null,
+          editSuggestionEmitter: eventEmitter,
+        },
+        result: Promise.resolve({
+          action: null,
+          reviewMessage: null,
+          skillDifficulty: null,
+        })
+      } as NgbModalRef);
+
+      let suggestion = {
+        change: {
+          skill_id: 'skill1',
+          question_dict: null,
+          skill_difficulty: null,
+          translation_html: ['suggestion_1', 'suggestion_2']
+        },
+        target_id: 'string;,',
+        suggestion_id: 'suggestion_id',
+        author_name: 'string;',
+      };
+      let contributionDetails = {
+        skill_description: 'string',
+        skill_rubrics: []
+      };
+      let question = questionObjectFactory.createFromBackendDict(
+        {
+          question_state_data_schema_version: null,
+          id: 'question_1',
+          question_state_data: {
+            classifier_model_id: null,
+            card_is_checkpoint: null,
+            linked_skill_id: null,
+            next_content_id_index: null,
+            content: {
+              html: 'Question 1',
+              content_id: 'content_1'
+            },
+            interaction: {
+              answer_groups: [{
+                outcome: {
+                  missing_prerequisite_skill_id: null,
+                  dest: 'outcome 1',
+                  dest_if_really_stuck: null,
+                  feedback: {
+                    content_id: 'content_5',
+                    html: ''
+                  },
+                  labelled_as_correct: true,
+                  param_changes: [],
+                  refresher_exploration_id: null
+                },
+                training_data: null,
+                rule_specs: [{
+                  rule_type: 'Equals',
+                  inputs: {x: 10}
+                }],
+                tagged_skill_misconception_id: null
+              },
+              {
+                training_data: null,
+                outcome: {
+                  missing_prerequisite_skill_id: null,
+                  dest: 'outcome 1',
+                  dest_if_really_stuck: null,
+                  feedback: {
+                    content_id: 'content_5',
+                    html: ''
+                  },
+                  labelled_as_correct: false,
+                  param_changes: [],
+                  refresher_exploration_id: null
+                },
+                rule_specs: [{
+                  rule_type: 'Equals',
+                  inputs: {x: 10}
+                }],
+                tagged_skill_misconception_id: 'abc-1'
+              }],
+              confirmed_unclassified_answers: [],
+              customization_args: {
+                placeholder: {
+                  value: {
+                    content_id: 'ca_placeholder_0',
+                    unicode_str: ''
+                  }
+                },
+                rows: { value: 1 }
+              },
+              default_outcome: {
+                dest: null,
+                refresher_exploration_id: null,
+                missing_prerequisite_skill_id: null,
+                dest_if_really_stuck: null,
+                feedback: {
+                  html: 'Correct Answer',
+                  content_id: 'content_2'
+                },
+                param_changes: [],
+                labelled_as_correct: false
+              },
+              hints: [
+                {
+                  hint_content: {
+                    html: 'Hint 1',
+                    content_id: 'content_3'
+                  }
+                }
+              ],
+              solution: {
+                correct_answer: 'This is the correct answer',
+                answer_is_exclusive: false,
+                explanation: {
+                  html: 'Solution explanation',
+                  content_id: 'content_4'
+                }
+              },
+              id: 'TextInput'
+            },
+            param_changes: [],
+            recorded_voiceovers: {
+              voiceovers_mapping: {
+                content_1: {},
+                content_2: {},
+                content_3: {},
+                content_4: {},
+                content_5: {}
+              }
+            },
+            written_translations: {
+              translations_mapping: {
+                content_1: {},
+                content_2: {},
+                content_3: {},
+                content_4: {},
+                content_5: {}
+              }
+            },
+            solicit_answer_details: false
           },
-          more: false
-        }));
-      spyOn(
-        contributionOpportunitiesService.reloadOpportunitiesEventEmitter,
-        'emit').and.callThrough();
-      spyOn(
-        contributionOpportunitiesService.reloadOpportunitiesEventEmitter,
-        'subscribe').and.callThrough();
-      $scope = $rootScope.$new();
-      ctrl = $componentController('contributionsAndReview', {
-        $scope: $scope,
-        ContextService: contextService,
-        MisconceptionObjectFactory: misconceptionObjectFactory
-      });
-      ctrl.$onInit();
-      $scope.$apply();
+          language_code: 'en',
+          version: 1,
+          linked_skill_ids: ['abc'],
+          inapplicable_skill_misconception_ids: ['abc-2']
+        });
+      spyOn(contextService, 'setCustomEntityContext').and.stub();
+
+      component.contributions = {
+        suggestion_id: {
+          details: contributionDetails as ContributionDetails,
+          suggestion: null,
+        }
+      };
+      component.openQuestionSuggestionModal(
+        'suggestion_id', suggestion as Suggestion,
+        false,
+        question);
+
+      let value = {
+        suggestionId: null,
+        suggestion: null,
+        reviewable: null,
+        question: null,
+      };
+      eventEmitter.emit(value);
+      tick();
+      tick();
+
+      expect(contributionAndReviewService.reviewSkillSuggestion)
+        .toHaveBeenCalled();
+      expect(ngbModal.open).toHaveBeenCalled();
     }));
 
-    it('should show correct heading for translation suggestions', function() {
-      contributionOpportunitiesService
-        .reloadOpportunitiesEventEmitter.subscribe(() => {
-          ctrl.loadContributions().then(({opportunitiesDicts, more}) => {
-            expect(opportunitiesDicts).toEqual([{
-              id: 'suggestion_1',
-              heading: 'Tradução',
-              subheading: (
-                ContributorDashboardConstants
-                  .CORRESPONDING_DELETED_OPPORTUNITY_TEXT),
-              labelText: 'Awaiting review',
-              labelColor: '#eeeeee',
-              actionButtonTitle: 'View'
-            }]);
-          });
-        });
+    it('should clear activeExplorationId when active topic changes',
+      fakeAsync(() => {
+        component.onClickReviewableTranslations('explorationId');
+        expect(component.activeExplorationId).toBe('explorationId');
 
-      ctrl.switchToTab(ctrl.TAB_TYPE_CONTRIBUTIONS, 'translate_content');
-      expect(
-        contributionOpportunitiesService.reloadOpportunitiesEventEmitter
-          .subscribe).toHaveBeenCalled();
-      expect(
-        contributionOpportunitiesService.reloadOpportunitiesEventEmitter
-          .emit).toHaveBeenCalled();
+        mockActiveTopicEventEmitter.emit();
+        tick();
+
+        expect(component.activeExplorationId).toBeNull();
+      }));
+
+    it('should return true on Review Translations tab', fakeAsync(() => {
+      component.switchToTab(component.TAB_TYPE_REVIEWS, 'translate_content');
+      spyOn(alertsService, 'addSuccessMessage').and.stub();
+
+      let suggestion = {
+        change: {
+          skill_id: 'string',
+          question_dict: null,
+          skill_difficulty: null,
+          translation_html: ['suggestion_1', 'suggestion_2']
+        },
+        target_id: 'string;,',
+        suggestion_id: 'string;',
+        author_name: 'string;',
+      };
+
+      component.getTranslationSuggestionHeading(suggestion as Suggestion);
+      component.resolveSuggestionSuccess('suggestion_id');
+      tick();
+
+      expect(component.isReviewTranslationsTab()).toBeTrue();
+      expect(alertsService.addSuccessMessage)
+        .toHaveBeenCalledWith('Submitted suggestion review.');
+    }));
+
+    it('should return false on Review Questions tab', () => {
+      spyOn(component, 'openQuestionSuggestionModal').and.callFake(() => {
+        return;
+      });
+
+      component.switchToTab(component.TAB_TYPE_REVIEWS, 'add_question');
+      expect(component.isReviewTranslationsTab()).toBeFalse();
+
+      component.SUGGESTION_TYPE_QUESTION = 'SUGGESTION';
+      component.contributions = {
+        SUGGESTION: {
+          details: null,
+          suggestion: {
+            suggestion_type: 'SUGGESTION',
+            suggestion_id: '',
+            target_id: 'target_id',
+            change: {
+              content_html: '',
+              translation_html: '',
+            },
+            status: '',
+          }
+        }
+      };
+
+      component.onClickViewSuggestion('SUGGESTION');
     });
 
-    it('should show correct heading for question suggestions', function() {
-      contributionOpportunitiesService
-        .reloadOpportunitiesEventEmitter.subscribe(() => {
-          ctrl.loadContributions();
-        });
+    it('should open question suggestion modal', fakeAsync(() => {
+      let eventEmitter = new EventEmitter();
 
-      ctrl.switchToTab(ctrl.TAB_TYPE_CONTRIBUTIONS, 'add_question');
-      $scope.$apply();
+      spyOn(contributionAndReviewService, 'reviewSkillSuggestion').and.callFake(
+        (_one, _two, _thre, _four, _five, _six, callBackfunction) => {
+          callBackfunction();
+          tick();
+          return null;
+        }
+      );
+      spyOn(component, 'openQuestionSuggestionModal').and.stub();
+      spyOn(ngbModal, 'open').and.returnValue({
+        componentInstance: {
+          authorName: null,
+          contentHtml: null,
+          reviewable: null,
+          question: null,
+          questionHeader: null,
+          suggestion: null,
+          skillRubrics: null,
+          suggestionId: null,
+          skillDifficulty: null,
+          misconceptionsBySkill: null,
+          editSuggestionEmitter: eventEmitter,
+        },
+        result: Promise.resolve({
+          action: null,
+          reviewMessage: null,
+          skillDifficulty: null,
+        })
+      } as NgbModalRef);
 
-      ctrl.loadContributions().then(({opportunitiesDicts, more}) => {
+      let questionDict = {
+        question_state_data_schema_version: null,
+        id: 'question_1',
+        question_state_data: {
+          classifier_model_id: null,
+          card_is_checkpoint: null,
+          linked_skill_id: null,
+          next_content_id_index: null,
+          content: {
+            html: 'Question 1',
+            content_id: 'content_1'
+          },
+          interaction: {
+            answer_groups: [{
+              outcome: {
+                missing_prerequisite_skill_id: null,
+                dest: 'outcome 1',
+                dest_if_really_stuck: null,
+                feedback: {
+                  content_id: 'content_5',
+                  html: ''
+                },
+                labelled_as_correct: true,
+                param_changes: [],
+                refresher_exploration_id: null
+              },
+              training_data: null,
+              rule_specs: [{
+                rule_type: 'Equals',
+                inputs: {x: 10}
+              }],
+              tagged_skill_misconception_id: null
+            },
+            {
+              training_data: null,
+              outcome: {
+                missing_prerequisite_skill_id: null,
+                dest: 'outcome 1',
+                dest_if_really_stuck: null,
+                feedback: {
+                  content_id: 'content_5',
+                  html: ''
+                },
+                labelled_as_correct: false,
+                param_changes: [],
+                refresher_exploration_id: null
+              },
+              rule_specs: [{
+                rule_type: 'Equals',
+                inputs: {x: 10}
+              }],
+              tagged_skill_misconception_id: 'abc-1'
+            }],
+            confirmed_unclassified_answers: [],
+            customization_args: {
+              placeholder: {
+                value: {
+                  content_id: 'ca_placeholder_0',
+                  unicode_str: ''
+                }
+              },
+              rows: { value: 1 }
+            },
+            default_outcome: {
+              dest: null,
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null,
+              dest_if_really_stuck: null,
+              feedback: {
+                html: 'Correct Answer',
+                content_id: 'content_2'
+              },
+              param_changes: [],
+              labelled_as_correct: false
+            },
+            hints: [
+              {
+                hint_content: {
+                  html: 'Hint 1',
+                  content_id: 'content_3'
+                }
+              }
+            ],
+            solution: {
+              correct_answer: 'This is the correct answer',
+              answer_is_exclusive: false,
+              explanation: {
+                html: 'Solution explanation',
+                content_id: 'content_4'
+              }
+            },
+            id: 'TextInput'
+          },
+          param_changes: [],
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content_1: {},
+              content_2: {},
+              content_3: {},
+              content_4: {},
+              content_5: {}
+            }
+          },
+          written_translations: {
+            translations_mapping: {
+              content_1: {},
+              content_2: {},
+              content_3: {},
+              content_4: {},
+              content_5: {}
+            }
+          },
+          solicit_answer_details: false
+        },
+        language_code: 'en',
+        version: 1,
+        linked_skill_ids: ['abc'],
+        inapplicable_skill_misconception_ids: ['abc-2']
+      };
+
+      let suggestion = {
+        change: {
+          skill_id: 'string',
+          question_dict: questionDict,
+          skill_difficulty: null,
+          translation_html: ['suggestion_1', 'suggestion_2'],
+          content_html: null,
+        },
+        status: null,
+        target_id: 'string;,',
+        suggestion_id: 'string;',
+        author_name: 'string;',
+        suggestion_type: 'question'
+      };
+
+      let suggestionIdToContribution = {
+        suggestion_1: {
+          suggestion: {
+            exploration_content_html: null,
+            language_code: null,
+            target_type: null,
+            author_name: null,
+            last_updated_msecs: null,
+            suggestion_id: 'suggestion_1',
+            target_id: '1',
+            suggestion_type: 'translate_content',
+            change: {
+              cmd: null,
+              content_html: null,
+              content_id: null,
+              data_format: null,
+              language_code: 'en',
+              translation_html: null,
+              state_name: null,
+              new_value: null,
+              old_value: null,
+              skill_id: 'skill1',
+              question_dict: {
+                id: '1',
+                question_state_data: {
+                  content: {
+                    html: 'Question 1',
+                    content_id: 'content_1'
+                  },
+                  interaction: {
+                    answer_groups: [{
+                      outcome: {
+                        dest: 'outcome 1',
+                        dest_if_really_stuck: null,
+                        feedback: {
+                          content_id: 'content_5',
+                          html: ''
+                        },
+                        labelled_as_correct: true,
+                        param_changes: [],
+                        refresher_exploration_id: null
+                      },
+                      rule_specs: [],
+                    }],
+                    confirmed_unclassified_answers: [],
+                    customization_args: {
+                      placeholder: {
+                        value: {
+                          content_id: 'ca_placeholder_0',
+                          unicode_str: ''
+                        }
+                      },
+                      rows: { value: 1 }
+                    },
+                    default_outcome: {
+                      dest: null,
+                      dest_if_really_stuck: null,
+                      feedback: {
+                        html: 'Correct Answer',
+                        content_id: 'content_2'
+                      },
+                      param_changes: [],
+                      labelled_as_correct: true
+                    },
+                    hints: [{
+                      hint_content: {
+                        html: 'Hint 1',
+                        content_id: 'content_3'
+                      }
+                    }],
+                    solution: {
+                      correct_answer: 'This is the correct answer',
+                      answer_is_exclusive: false,
+                      explanation: {
+                        html: 'Solution explanation',
+                        content_id: 'content_4'
+                      }
+                    },
+                    id: 'TextInput'
+                  },
+                  param_changes: [],
+                  recorded_voiceovers: {
+                    voiceovers_mapping: {}
+                  },
+                  written_translations: {
+                    translations_mapping: {}
+                  },
+                },
+              }
+            },
+            status: 'review'
+          },
+          details: {
+            skill_description: 'Skill description',
+            skill_id: null,
+            chapter_title: null,
+            story_title: null,
+            topic_name: null
+          }
+        }
+      };
+
+      component._showQuestionSuggestionModal(
+        suggestion,
+        suggestionIdToContribution,
+        false,
+        null,
+        null);
+
+      let value = {
+        suggestionId: null,
+        suggestion: null,
+        reviewable: null,
+        question: null,
+      };
+      eventEmitter.emit(value);
+      tick();
+
+      expect(contributionAndReviewService.reviewSkillSuggestion)
+        .toHaveBeenCalled();
+      expect(component.openQuestionSuggestionModal).toHaveBeenCalled();
+      expect(ngbModal.open).toHaveBeenCalled();
+    }));
+
+    it('should return false on Translation Contributions tab', () => {
+      component.switchToTab(
+        component.TAB_TYPE_CONTRIBUTIONS, 'translate_content');
+      expect(component.isReviewTranslationsTab()).toBeFalse();
+    });
+
+    it('should return false on Question Contributions tab', () => {
+      component.switchToTab(component.TAB_TYPE_CONTRIBUTIONS, 'add_question');
+      expect(component.isReviewTranslationsTab()).toBeFalse();
+    });
+
+    it('should set activeExplorationId', () => {
+      expect(component.activeExplorationId).toBeNull();
+      component.onClickReviewableTranslations('explorationId');
+      expect(component.activeExplorationId).toBe('explorationId');
+    });
+
+    it('should clear activeExplorationId', () => {
+      component.onClickReviewableTranslations('explorationId');
+      expect(component.activeExplorationId).toBe('explorationId');
+      component.onClickBackToReviewableLessons();
+      expect(component.activeExplorationId).toBeNull();
+    });
+
+    it('should load contributions correctly', () => {
+      component.loadContributions(null).then(({opportunitiesDicts, more}) => {
+        expect(Object.keys(component.contributions)).toContain('suggestion_1');
         expect(opportunitiesDicts).toEqual([{
           id: 'suggestion_1',
           heading: 'Question 1',
-          subheading: (
-            ContributorDashboardConstants
-              .CORRESPONDING_DELETED_OPPORTUNITY_TEXT),
-          labelText: 'Accepted',
-          labelColor: '#8ed274',
-          actionButtonTitle: 'View'
+          subheading: 'Skill description',
+          labelText: 'Awaiting review',
+          labelColor: '#eeeeee',
+          actionButtonTitle: 'Review'
         }]);
+        expect(more).toEqual(false);
       });
+    });
+
+    it('should return empty list if tab is not initialized', () => {
+      component.activeTabType = null;
+      component.loadContributions(null).then(({opportunitiesDicts, more}) => {
+        expect(opportunitiesDicts).toEqual([]);
+        expect(more).toEqual(false);
+      });
+    });
+
+    it('should return empty list if suggestion type is not initialized',
+      () => {
+        component.activeTabType = null;
+        component.loadContributions(null).then(({opportunitiesDicts, more}) => {
+          expect(opportunitiesDicts).toEqual([]);
+          expect(more).toEqual(false);
+        });
+      });
+
+    it('should load opportunities correctly', () => {
+      component.loadReviewableTranslationOpportunities().then(
+        ({opportunitiesDicts, more}) => {
+          expect(opportunitiesDicts).toEqual([
+            {
+              id: '1',
+              heading: 'Chapter 1',
+              subheading: 'Topic 1 - Story 1',
+              actionButtonTitle: 'Translations'
+            },
+            {
+              id: '2',
+              heading: 'Chapter 2',
+              subheading: 'Topic 2 - Story 2',
+              actionButtonTitle: 'Translations'
+            }
+          ]);
+          expect(more).toEqual(false);
+        });
+    });
+
+    it('should cover other code too', fakeAsync(() => {
+      jasmine.createSpy('userReviewableSuggestionTypes.length')
+        .and.returnValue(0);
+      component.SUGGESTION_TYPE_TRANSLATE = null;
+      component.SUGGESTION_TYPE_QUESTION = null;
+      getUserContributionRightsDataAsyncSpy.and.returnValue(Promise.resolve({
+        can_review_translation_for_language_codes: ['something', 'cool'],
+        can_review_questions: false,
+        can_review_voiceover_for_language_codes: ['something', 'cool'],
+        can_suggest_questions: true,
+      }));
+
+      tick();
+      component.ngOnInit();
+      tick();
+
+      expect(getUserContributionRightsDataAsyncSpy).toHaveBeenCalled();
+    }));
+
+    it('should cover other code too', fakeAsync(() => {
+      jasmine.createSpy('userReviewableSuggestionTypes.length')
+        .and.returnValue(0);
+      component.SUGGESTION_TYPE_TRANSLATE = null;
+      component.SUGGESTION_TYPE_QUESTION = null;
+      getUserContributionRightsDataAsyncSpy.and.returnValue(Promise.resolve({
+        can_review_translation_for_language_codes: [],
+        can_review_questions: false,
+        can_review_voiceover_for_language_codes: ['something', 'cool'],
+        can_suggest_questions: true,
+      }));
+
+      tick();
+      component.ngOnInit();
+      tick();
+
+      expect(getUserContributionRightsDataAsyncSpy).toHaveBeenCalled();
+    }));
+
+    it('should completely test onInIt', fakeAsync(() => {
+      jasmine.createSpy('userReviewableSuggestionTypes.length')
+        .and.returnValue(0);
+      component.SUGGESTION_TYPE_TRANSLATE = null;
+      component.SUGGESTION_TYPE_QUESTION = null;
+      getUserContributionRightsDataAsyncSpy.and.returnValue(Promise.resolve({
+        can_review_translation_for_language_codes: [],
+        can_review_questions: false,
+        can_review_voiceover_for_language_codes: ['something', 'cool'],
+        can_suggest_questions: false,
+      }));
+
+      tick();
+      component.ngOnInit();
+      tick();
+
+      component
+        .tabNameToOpportunityFetchFunction[
+          component.SUGGESTION_TYPE_QUESTION][
+          component.TAB_TYPE_CONTRIBUTIONS]();
+
+      component
+        .tabNameToOpportunityFetchFunction[
+          component.SUGGESTION_TYPE_TRANSLATE][
+          component.TAB_TYPE_REVIEWS]();
+
+      expect(
+        contributionAndReviewService.getUserCreatedQuestionSuggestionsAsync)
+        .toHaveBeenCalled();
+      expect(
+        contributionAndReviewService.getReviewableTranslationSuggestionsAsync)
+        .toHaveBeenCalled();
+    }));
+
+    it('should get Translation Suggestion Heading', () => {
+      spyOn(formatRtePreviewPipe, 'transform').and.stub();
+      let value = {
+        change: {
+          translation_html: 'string'
+        }
+      };
+
+      component.getTranslationSuggestionHeading(value as Suggestion);
+
+      expect(formatRtePreviewPipe.transform).toHaveBeenCalled();
+    });
+
+    it('should load contributions correctly', () => {
+      component.loadOpportunities().then(({opportunitiesDicts, more}) => {
+        expect(Object.keys(component.contributions)).toContain('suggestion_1');
+        expect(opportunitiesDicts).toEqual([{
+          id: 'suggestion_1',
+          heading: 'Question 1',
+          subheading: 'Skill description',
+          labelText: 'Awaiting review',
+          labelColor: '#eeeeee',
+          actionButtonTitle: 'Review'
+        }]);
+        expect(more).toEqual(false);
+      });
+
+      // Repeated calls should return the same results.
+      component.loadOpportunities().then(({opportunitiesDicts, more}) => {
+        expect(Object.keys(component.contributions)).toContain('suggestion_1');
+        expect(opportunitiesDicts).toEqual([{
+          id: 'suggestion_1',
+          heading: 'Question 1',
+          subheading: 'Skill description',
+          labelText: 'Awaiting review',
+          labelColor: '#eeeeee',
+          actionButtonTitle: 'Review'
+        }]);
+        expect(more).toEqual(false);
+      });
+    });
+
+    it('should load contributions correctly', () => {
+      component.loadMoreOpportunities().then(({opportunitiesDicts, more}) => {
+        expect(Object.keys(component.contributions)).toContain('suggestion_1');
+        expect(opportunitiesDicts).toEqual([{
+          id: 'suggestion_1',
+          heading: 'Question 1',
+          subheading: 'Skill description',
+          labelText: 'Awaiting review',
+          labelColor: '#eeeeee',
+          actionButtonTitle: 'Review'
+        }]);
+        expect(more).toEqual(false);
+      });
+
+      getUserCreatedTranslationSuggestionsAsyncSpy
+        .and.returnValue(Promise.resolve({}));
+
+      // Subsequent calls should return the next batch of results.
+      component.loadMoreOpportunities().then(({opportunitiesDicts, more}) => {
+        expect(Object.keys(component.contributions).length).toBe(0);
+        expect(more).toEqual(false);
+      });
+    });
+
+    it('should set getQuestionContributionsSummary summary', () => {
+      let suggestion = {
+        key: {
+          suggestion: {
+            change: {
+              skill_id: 'string',
+              content_html: 'string',
+              translation_html: 'html',
+              question_dict: null,
+              skill_difficulty: null
+            },
+            target_id: 'string;,',
+            suggestion_id: 'suggestion_id',
+            author_name: 'string;',
+            status: 'review',
+            suggestion_type: 'string'
+          } as Suggestion,
+          details: null,
+        }
+      };
+
+      spyOn(formatRtePreviewPipe, 'transform').and.returnValue('heading');
+      component.getQuestionContributionsSummary(suggestion);
+
+      component.getTranslationContributionsSummary(suggestion);
+    });
+
+    it('should open show translation suggestion modal when clicking on' +
+      ' suggestion', () => {
+      contributionOpportunitiesService
+        .reloadOpportunitiesEventEmitter.subscribe(() => {
+          component.loadContributions(null).then(() => {
+            spyOn(ngbModal, 'open').and.callThrough();
+            component.onClickViewSuggestion('suggestion_1');
+
+            expect(ngbModal.open).toHaveBeenCalled();
+          });
+        });
+
+      component.switchToTab(
+        component.TAB_TYPE_CONTRIBUTIONS, 'translate_content');
+    });
+
+    it('should load new loadContributions', fakeAsync(() => {
+      spyOn(component, 'getContributionSummaries').and.returnValue(null);
+
+      component.activeTabType = 'activeTabType';
+      component.activeSuggestionType = 'activeSuggestionType';
+      component.contributions = {
+        1: null,
+        2: null,
+      };
+
+      component.tabNameToOpportunityFetchFunction = {
+        activeSuggestionType: {
+          activeTabType: (shouldResetOffset) => {
+            return Promise.resolve({
+              suggestionIdToDetails: {
+                1: {},
+                2: {}
+              },
+              more: false
+            });
+          }
+        }
+      };
+
+      component.loadContributions(true).then((value) => {
+        tick();
+        expect(value).toEqual({
+          opportunitiesDicts: null,
+          more: false
+        });
+      });
+    }));
+
+    it('should get Translation Contributions Summary', fakeAsync(() => {
+      spyOn(component, 'getTranslationSuggestionHeading')
+        .and.returnValue('heading');
+      let suggestionIdToSuggestions = {
+        suggestion: {
+          suggestion: {
+            suggestion_id: 'id',
+            status: 'review'
+          } as Suggestion,
+          details: {
+            skill_description: 'skill_description',
+            topic_name: 'topic_name',
+            story_title: 'story_title',
+            chapter_title: 'chapter_title'
+          }
+        }
+      } as unknown as Record<string, SuggestionDetails>;
+      component.activeTabType = component.TAB_TYPE_REVIEWS;
+      tick();
+
+      expect(component.getTranslationContributionsSummary(
+        suggestionIdToSuggestions)).toEqual([{
+        id: 'id',
+        heading: 'heading',
+        subheading: 'topic_name / story_title / chapter_title',
+        labelText: 'Awaiting review',
+        labelColor: '#eeeeee',
+        actionButtonTitle: 'Review'
+      }]);
+    }));
+
+    it('should get Question Contributions Summary', fakeAsync(() => {
+      spyOn(component, 'getTranslationSuggestionHeading')
+        .and.returnValue('heading');
+      spyOn(formatRtePreviewPipe, 'transform').and.returnValue('heading');
+      let suggestionIdToSuggestions = {
+        suggestion: {
+          suggestion: {
+            suggestion_type: null,
+            target_id: null,
+            suggestion_id: 'id',
+            status: 'review',
+            change: {
+              question_dict: null
+            }
+          } as Suggestion,
+          details: {
+            skill_description: 'skill_description',
+            topic_name: 'topic_name',
+            story_title: 'story_title',
+            chapter_title: 'chapter_title'
+          }
+        }
+      };
+
+      component.activeTabType = component.TAB_TYPE_REVIEWS;
+      tick();
+
+      expect(component.getQuestionContributionsSummary(
+        suggestionIdToSuggestions as
+        unknown as Record<string, SuggestionDetails>)).toEqual([{
+        id: 'id',
+        heading: 'heading',
+        subheading: 'skill_description',
+        labelText: 'Awaiting review',
+        labelColor: '#eeeeee',
+        actionButtonTitle: 'Review'
+      }]);
+    }));
+
+    it('should get Contribution Summaries', fakeAsync(() => {
+      spyOn(component, 'getTranslationContributionsSummary').and.stub();
+      spyOn(component, 'getQuestionContributionsSummary').and.stub();
+
+      component.activeSuggestionType = component.SUGGESTION_TYPE_TRANSLATE;
+      component.getContributionSummaries(null);
+      tick();
+
+      component.activeSuggestionType = component.SUGGESTION_TYPE_QUESTION;
+      component.getContributionSummaries(null);
+      tick();
+
+      expect(component.getTranslationContributionsSummary)
+        .toHaveBeenCalledWith(null);
+      expect(component.getTranslationContributionsSummary)
+        .toHaveBeenCalledWith(null);
+    }));
+
+    it('should remove resolved suggestions when suggestion ' +
+      'modal is opened and remove button is clicked', fakeAsync(() => {
+      spyOn(ngbModal, 'open').and.returnValue(
+        {
+          componentInstance: MockNgbModalRef,
+          result: Promise.resolve(['id1', 'id2'])
+        } as NgbModalRef
+      );
+      const removeSpy = spyOn(
+        contributionOpportunitiesService.removeOpportunitiesEventEmitter,
+        'emit').and.returnValue(null);
+      component.contributions = {
+        suggestion_1: {
+          suggestion: {
+            suggestion_id: 'suggestion_1',
+            target_id: '1',
+            suggestion_type: 'translate_content',
+            change: {
+              content_html: 'Translation',
+              translation_html: 'Tradução'
+            },
+            status: 'review'
+          },
+          details: {
+            skill_description: 'skill_description',
+            skill_rubrics: [],
+            chapter_title: 'skill_1',
+            story_title: 'skill_1',
+            topic_name: 'skill_1',
+          }
+        }
+      };
+
+      component.onClickViewSuggestion('suggestion_1');
+      tick();
+      tick();
+
+      expect(removeSpy).toHaveBeenCalled();
+    }));
+
+    it('should resolve suggestion when closing show suggestion modal',
+      () => {
+        contributionOpportunitiesService
+          .reloadOpportunitiesEventEmitter.subscribe(() => {
+            component.loadContributions(null).then(() => {
+              spyOn(ngbModal, 'open').and.returnValue({
+                result: Promise.resolve({
+                  action: 'add',
+                  reviewMessage: 'Review message',
+                  skillDifficulty: 'Easy'
+                })
+              } as NgbModalRef);
+              component.onClickViewSuggestion('suggestion_1');
+
+              expect(ngbModal.open).toHaveBeenCalled();
+            });
+          });
+        component.switchToTab(
+          component.TAB_TYPE_CONTRIBUTIONS, 'translate_content');
+      });
+
+    it('should not resolve suggestion when dismissing show suggestion modal',
+      () => {
+        contributionOpportunitiesService
+          .reloadOpportunitiesEventEmitter.subscribe(() => {
+            component.loadContributions(null).then(() => {
+              spyOn(ngbModal, 'open').and.returnValue({
+                result: Promise.reject()
+              } as NgbModalRef);
+              component.onClickViewSuggestion('suggestion_1');
+
+              expect(ngbModal.open).toHaveBeenCalled();
+            });
+          });
+        component.switchToTab(
+          component.TAB_TYPE_CONTRIBUTIONS, 'translate_content');
+      });
+  });
+
+
+  describe('when user is allowed to review questions and ' +
+  'skill details are empty', () => {
+    it('should open suggestion modal when user clicks on ' +
+    'view suggestion', () => {
+      contributionOpportunitiesService
+        .reloadOpportunitiesEventEmitter.subscribe(() => {
+          component.loadContributions(null).then(() => {
+            spyOn(ngbModal, 'open').and.returnValue({
+              result: Promise.reject()
+            } as NgbModalRef);
+            component.onClickViewSuggestion('suggestion_1');
+
+            expect(ngbModal.open).toHaveBeenCalled();
+          });
+        });
+      component.switchToTab(
+        component.TAB_TYPE_CONTRIBUTIONS, 'translate_content');
     });
   });
 
-  describe('when user is not allowed to review questions', function() {
-    let fetchSkillSpy = null;
-    beforeEach(angular.mock.module('oppia', function($provide) {
-      $provide.value('NgbModal', {
-        open: () => {
-          return {
-            result: Promise.resolve()
-          };
-        }
-      });
-    }));
-
-    beforeEach(angular.mock.inject(function($injector, $componentController) {
-      $httpBackend = $injector.get('$httpBackend');
-      $q = $injector.get('$q');
-      var $rootScope = $injector.get('$rootScope');
-      $uibModal = $injector.get('$uibModal');
-      ngbModal = $injector.get('NgbModal');
-      contributionOpportunitiesService = $injector.get(
-        'ContributionOpportunitiesService');
-      contributionAndReviewService = $injector.get(
-        'ContributionAndReviewService');
-      csrfTokenService = $injector.get('CsrfTokenService');
-      userService = $injector.get('UserService');
-      contextService = $injector.get('ContextService');
-      skillBackendApiService = $injector.get('SkillBackendApiService');
-      skillObjectFactory = $injector.get('SkillObjectFactory');
-      spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
-      misconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
-
-      spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(
-        $q.resolve('sample-csrf-token'));
-
-      spyOn(userService, 'getUserInfoAsync')
-        .and.returnValue($q.resolve({
-          isLoggedIn: () => true
-        }));
-      spyOn(userService, 'getUserContributionRightsDataAsync')
-        .and.returnValue(
-          $q.resolve({
-            can_review_translation_for_language_codes: [],
-            can_review_questions: false,
-            can_suggest_questions: true
-          }));
-      spyOn(
-        contributionAndReviewService, 'getUserCreatedQuestionSuggestionsAsync')
-        .and.returnValue($q.resolve({
-          suggestionIdToDetails: {
-            suggestion_1: {
-              suggestion: {
-                suggestion_id: 'suggestion_1',
-                target_id: '1',
-                suggestion_type: 'add_question',
-                change: {
-                  skill_id: 'skill1',
-                  question_dict: {
-                    id: '1',
-                    question_state_data: {
-                      content: {
-                        html: 'Question 1',
-                        content_id: 'content_1'
-                      },
-                      interaction: {
-                        answer_groups: [{
-                          outcome: {
-                            dest: 'outcome 1',
-                            dest_if_really_stuck: null,
-                            feedback: {
-                              content_id: 'content_5',
-                              html: ''
-                            },
-                            labelled_as_correct: true,
-                            param_changes: [],
-                            refresher_exploration_id: null
-                          },
-                          rule_specs: [],
-                        }],
-                        confirmed_unclassified_answers: [],
-                        customization_args: {
-                          placeholder: {
-                            value: {
-                              content_id: 'ca_placeholder_0',
-                              unicode_str: ''
-                            }
-                          },
-                          rows: { value: 1 }
-                        },
-                        default_outcome: {
-                          dest: null,
-                          dest_if_really_stuck: null,
-                          feedback: {
-                            html: 'Correct Answer',
-                            content_id: 'content_2'
-                          },
-                          param_changes: [],
-                          labelled_as_correct: true
-                        },
-                        hints: [{
-                          hint_content: {
-                            html: 'Hint 1',
-                            content_id: 'content_3'
-                          }
-                        }],
-                        solution: {
-                          correct_answer: 'This is the correct answer',
-                          answer_is_exclusive: false,
-                          explanation: {
-                            html: 'Solution explanation',
-                            content_id: 'content_4'
-                          }
-                        },
-                        id: 'TextInput'
-                      },
-                      param_changes: [],
-                      recorded_voiceovers: {
-                        voiceovers_mapping: {}
-                      },
-                      written_translations: {
-                        translations_mapping: {}
-                      },
-                    },
-                  }
-                },
-                status: 'accepted'
-              },
-              details: 'skill_1'
-            }
-          },
-          more: false
-        }));
-      fetchSkillSpy = spyOn(skillBackendApiService, 'fetchSkillAsync')
-        .and.returnValue(
-          $q.resolve({
-            skill: skillObjectFactory.createFromBackendDict({
-              id: 'skill1',
-              description: 'test description 1',
-              misconceptions: [{
-                id: '2',
-                name: 'test name',
-                notes: 'test notes',
-                feedback: 'test feedback',
-                must_be_addressed: true
-              }],
-              rubrics: [{
-                difficulty: 'Easy',
-                explanations: ['explanation']
-              }],
-              skill_contents: {
-                explanation: {
-                  html: 'test explanation',
-                  content_id: 'explanation',
-                },
-                worked_examples: [],
-                recorded_voiceovers: {
-                  voiceovers_mapping: {}
-                }
-              },
-              language_code: 'en',
-              version: 3,
-              prerequisite_skill_ids: ['skill_1']
-            })
-          }));
-
-      spyOn(
-        contributionAndReviewService,
-        'getReviewableTranslationSuggestionsAsync')
-        .and.returnValue($q.resolve({
-          suggestionIdToDetails: {
-            suggestion_1: {
-              suggestion: {
-                suggestion_id: 'suggestion_1',
-                target_id: '1',
-                suggestion_type: 'translate_content',
-                change: {
-                  content_html: 'Translation',
-                  translation_html: 'Tradução'
-                },
-                status: 'review'
-              },
-              details: {
-                topic_name: 'Topic 1',
-                story_title: 'Story title',
-                chapter_title: 'Chapter title'
-              }
-            }
-          },
-          more: false
-        }));
-
-      $scope = $rootScope.$new();
-      ctrl = $componentController('contributionsAndReview', {
-        $scope: $scope,
-        ContextService: contextService,
-        MisconceptionObjectFactory: misconceptionObjectFactory
-      });
-
-      contributionOpportunitiesService
-        .reloadOpportunitiesEventEmitter.subscribe(() => {
-          ctrl.loadContributions();
-        });
-      ctrl.$onInit();
-      $scope.$apply();
-    }));
-
+  describe('when user is not allowed to review questions', () => {
     it('should initialize $scope properties after controller is' +
-      ' initialized', function() {
-      expect(ctrl.activeTabType).toBe('contributions');
-      expect(ctrl.activeSuggestionType).toBe('add_question');
-      expect(ctrl.activeDropdownTabChoice).toBe('Questions');
-      expect(ctrl.userIsLoggedIn).toBe(true);
-      expect(ctrl.userDetailsLoading).toBe(false);
-      expect(ctrl.reviewTabs.length).toEqual(0);
-    });
-
-    it('should emit reload even when when switching to translation' +
-      ' in review tab', function() {
-      spyOn(
-        contributionOpportunitiesService.reloadOpportunitiesEventEmitter,
-        'emit').and.callThrough();
-
-      ctrl.switchToTab(ctrl.TAB_TYPE_REVIEWS, 'translate_content');
-      $scope.$apply();
-
-      expect(
-        contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit)
-        .toHaveBeenCalled();
+    ' initialized', () => {
+      expect(component.activeTabType).toBe('reviews');
+      expect(component.activeSuggestionType).toBe('add_question');
+      expect(component.activeDropdownTabChoice).toBe('Review Questions');
+      expect(component.userIsLoggedIn).toBe(true);
+      expect(component.userDetailsLoading).toBe(false);
+      expect(component.reviewTabs.length).toEqual(2);
     });
 
     it('should open show view question modal when clicking on' +
-      ' question suggestion', function() {
-      spyOn($uibModal, 'open').and.callThrough();
-      ctrl.switchToTab(ctrl.TAB_TYPE_REVIEWS, 'add_question');
-      ctrl.loadContributions().then(function() {
-        ctrl.onClickViewSuggestion('suggestion_1');
-        $scope.$apply();
+    ' question suggestion', () => {
+      spyOn(ngbModal, 'open').and.callThrough();
+      component.switchToTab(component.TAB_TYPE_REVIEWS, 'add_question');
+      component.loadContributions(null).then(() => {
+        component.onClickViewSuggestion('suggestion_1');
 
-        expect($uibModal.open).toHaveBeenCalled();
+        expect(ngbModal.open).toHaveBeenCalled();
       });
     });
 
     it('should resolve suggestion to skill when closing show question' +
-      ' suggestion modal', function() {
-      $httpBackend.expectPUT(
-        '/suggestionactionhandler/skill/1/suggestion_1').respond(200);
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.resolve({})
-      });
+    ' suggestion modal', () => {
+      spyOn(ngbModal, 'open').and.returnValue({
+        result: Promise.resolve({})
+      } as NgbModalRef);
 
-      ctrl.switchToTab(ctrl.TAB_TYPE_REVIEWS, 'add_question');
-      ctrl.loadContributions().then(function() {
-        expect(Object.keys(ctrl.contributions).length).toBe(1);
-        ctrl.onClickViewSuggestion('suggestion_1');
-        $scope.$apply();
-        $httpBackend.flush();
+      component.switchToTab(component.TAB_TYPE_REVIEWS, 'add_question');
+      component.loadContributions(null).then(() => {
+        expect(Object.keys(component.contributions).length).toBe(1);
+        component.onClickViewSuggestion('suggestion_1');
+        flush();
 
-        expect($uibModal.open).toHaveBeenCalled();
+        expect(ngbModal.open).toHaveBeenCalled();
       });
     });
 
     it('should not resolve suggestion to skill when dismissing show question' +
-      ' suggestion modal', function() {
-      ctrl.switchToTab(ctrl.TAB_TYPE_REVIEWS, 'add_question');
+    ' suggestion modal', () => {
+      component.switchToTab(component.TAB_TYPE_REVIEWS, 'add_question');
       spyOn(contributionAndReviewService, 'reviewSkillSuggestion');
-      spyOn($uibModal, 'open').and.returnValue({
-        result: $q.reject({})
+      spyOn(ngbModal, 'open').and.returnValue({
+        result: Promise.reject({})
+      } as NgbModalRef);
+
+      component.loadContributions(null).then(() => {
+        component.onClickViewSuggestion('suggestion_1');
+
+        expect(ngbModal.open).toHaveBeenCalled();
       });
-
-      ctrl.loadContributions().then(function() {
-        ctrl.onClickViewSuggestion('suggestion_1');
-        $scope.$apply();
-
-        expect($uibModal.open).toHaveBeenCalled();
-      });
     });
 
-    it('should fetch skill when user clicks on view suggestion',
-      fakeAsync(function() {
-        spyOn($uibModal, 'open').and.returnValue({
-          result: Promise.resolve([])
-        });
-        spyOn(contributionAndReviewService, 'reviewSkillSuggestion')
-          .and.callFake((
-              targetId, suggestionId, action, reviewMessage,
-              skillDifficulty, resolveSuggestion, cb) => {
-            resolveSuggestion();
-            cb();
-          });
+    it('should return correctly check the active tab', () => {
+      component.switchToTab(component.TAB_TYPE_REVIEWS, 'translate_content');
+      component.isActiveTab(component.TAB_TYPE_REVIEWS, 'translate_content');
 
-        ctrl.onClickViewSuggestion('suggestion_1');
-        // Here '$scope.$apply' is used multiple times
-        // in order to traverse through nested promises.
-        $scope.$apply();
-        tick();
-        $scope.$apply();
-        tick();
-        $scope.$apply();
-
-        expect(fetchSkillSpy).toHaveBeenCalled();
-      }));
-
-    it('should open suggestion modal when user clicks on view suggestion',
-      fakeAsync(function() {
-        const modalSpy = spyOn($uibModal, 'open').and.callThrough();
-
-        ctrl.onClickViewSuggestion('suggestion_1');
-        $scope.$apply();
-        tick();
-
-        expect(modalSpy).toHaveBeenCalled();
-      }));
-
-    it('should return correctly check the active tab', function() {
-      ctrl.switchToTab(ctrl.TAB_TYPE_REVIEWS, 'translate_content');
-      ctrl.isActiveTab(ctrl.TAB_TYPE_REVIEWS, 'translate_content');
-
-      ctrl.switchToTab(ctrl.TAB_TYPE_CONTRIBUTIONS, 'add_question');
-      ctrl.isActiveTab(ctrl.TAB_TYPE_CONTRIBUTIONS, 'add_question');
+      component.switchToTab(component.TAB_TYPE_CONTRIBUTIONS, 'add_question');
+      component.isActiveTab(component.TAB_TYPE_CONTRIBUTIONS, 'add_question');
     });
 
-    it('should toggle dropdown when it is clicked', function() {
-      ctrl.dropdownShown = false;
+    it('should toggle dropdown when it is clicked', () => {
+      component.dropdownShown = false;
 
-      ctrl.toggleDropdown();
-      expect(ctrl.dropdownShown).toBe(true);
+      component.toggleDropdown();
+      expect(component.dropdownShown).toBe(true);
 
-      ctrl.toggleDropdown();
-      expect(ctrl.dropdownShown).toBe(false);
+      component.toggleDropdown();
+      expect(component.dropdownShown).toBe(false);
     });
 
-    it('should set active dropdown choice correctly', function() {
-      ctrl.activeTabType = ctrl.TAB_TYPE_REVIEWS;
-      ctrl.activeSuggestionType = 'add_question';
+    it('should set active dropdown choice correctly', () => {
+      component.activeTabType = component.TAB_TYPE_REVIEWS;
+      component.activeSuggestionType = 'add_question';
 
-      expect(ctrl.getActiveDropdownTabChoice()).toBe('Review Questions');
+      expect(component.getActiveDropdownTabChoice()).toBe('Review Questions');
 
-      ctrl.activeTabType = ctrl.TAB_TYPE_REVIEWS;
-      ctrl.activeSuggestionType = 'translate_content';
+      component.activeTabType = component.TAB_TYPE_REVIEWS;
+      component.activeSuggestionType = 'translate_content';
 
-      expect(ctrl.getActiveDropdownTabChoice()).toBe('Review Translations');
+      expect(component.getActiveDropdownTabChoice())
+        .toBe('Review Translations');
 
-      ctrl.activeTabType = ctrl.TAB_TYPE_CONTRIBUTIONS;
-      ctrl.activeSuggestionType = 'add_question';
+      component.activeTabType = component.TAB_TYPE_CONTRIBUTIONS;
+      component.activeSuggestionType = 'add_question';
 
-      expect(ctrl.getActiveDropdownTabChoice()).toBe('Questions');
+      expect(component.getActiveDropdownTabChoice()).toBe('Questions');
 
-      ctrl.activeTabType = ctrl.TAB_TYPE_CONTRIBUTIONS;
-      ctrl.activeSuggestionType = 'translate_content';
+      component.activeTabType = component.TAB_TYPE_CONTRIBUTIONS;
+      component.activeSuggestionType = 'translate_content';
 
-      expect(ctrl.getActiveDropdownTabChoice()).toBe('Translations');
+      expect(component.getActiveDropdownTabChoice()).toBe('Translations');
     });
 
-    it('should close dropdown when a click is made outside', function() {
+    it('should close dropdown when a click is made outside', () => {
       const element = {
-        contains: function() {
+        contains: () => {
           return true;
         }
       };
       const clickEvent = {
-        target: {}
+        target: null
       };
       const querySelectorSpy = spyOn(document, 'querySelector').and
         .returnValue(null);
       const elementContainsSpy = spyOn(element, 'contains').and
         .returnValue(true);
-      ctrl.dropdownShown = true;
+      component.dropdownShown = true;
 
-      ctrl.closeDropdownWhenClickedOutside();
+      component.closeDropdownWhenClickedOutside(null);
       expect(querySelectorSpy).toHaveBeenCalled();
       expect(elementContainsSpy).not.toHaveBeenCalled();
-      expect(ctrl.dropdownShown).toBe(true);
+      expect(component.dropdownShown).toBe(true);
 
       // This throws "Argument of type '{ contains: () => boolean; }' is not
       // assignable to parameter of type 'Element'. Type '{ contains:
@@ -1154,207 +1624,32 @@ describe('Contributions and review component', function() {
       // @ts-expect-error
       querySelectorSpy.and.returnValue(element);
 
-      ctrl.closeDropdownWhenClickedOutside(clickEvent);
+      component.closeDropdownWhenClickedOutside(clickEvent);
       expect(querySelectorSpy).toHaveBeenCalled();
       expect(elementContainsSpy).toHaveBeenCalled();
-      expect(ctrl.dropdownShown).toBe(true);
+      expect(component.dropdownShown).toBe(true);
 
       elementContainsSpy.and.returnValue(false);
 
-      ctrl.closeDropdownWhenClickedOutside(clickEvent);
-      expect(ctrl.dropdownShown).toBe(false);
+      component.closeDropdownWhenClickedOutside(clickEvent);
+      expect(component.dropdownShown).toBe(false);
     });
 
-    it('should return back when user click is made outside', function() {
+    it('should return back when user click is made outside', () => {
       const clickEvent = {
-        target: {}
+        target: null
       };
       spyOn(document, 'querySelector').and.returnValue(null);
 
-      ctrl.closeDropdownWhenClickedOutside(clickEvent);
+      component.closeDropdownWhenClickedOutside(clickEvent);
       expect(document.querySelector).toHaveBeenCalled();
     });
 
-    it('should unbind event listener when onDestroy is called', function() {
+    it('should unbind event listener when onDestroy is called', () => {
       const unbindSpy = spyOn($.fn, 'off');
 
-      ctrl.$onDestroy();
+      component.ngOnDestroy();
       expect(unbindSpy).toHaveBeenCalled();
-    });
-  });
-
-  describe('when user is allowed to review questions and ' +
-    'skill details are empty', function() {
-    beforeEach(angular.mock.module('oppia', function($provide) {
-      $provide.value('NgbModal', {
-        open: () => {
-          return {
-            result: Promise.resolve()
-          };
-        }
-      });
-    }));
-
-    beforeEach(angular.mock.inject(function($injector, $componentController) {
-      $q = $injector.get('$q');
-      var $rootScope = $injector.get('$rootScope');
-      $uibModal = $injector.get('$uibModal');
-      ngbModal = $injector.get('NgbModal');
-      contributionAndReviewService = $injector.get(
-        'ContributionAndReviewService');
-      userService = $injector.get('UserService');
-      contextService = $injector.get('ContextService');
-      skillBackendApiService = $injector.get('SkillBackendApiService');
-      contributionOpportunitiesService = $injector.get(
-        'ContributionOpportunitiesService');
-      spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
-      misconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
-
-      spyOn(userService, 'getUserInfoAsync')
-        .and.returnValue($q.resolve({
-          isLoggedIn: () => true
-        }));
-      spyOn(userService, 'getUserContributionRightsDataAsync')
-        .and.returnValue($q.resolve({
-          can_review_translation_for_language_codes: [{}],
-          can_review_questions: true
-        }));
-      spyOn(
-        contributionAndReviewService,
-        'getUserCreatedTranslationSuggestionsAsync').and.returnValue(
-        Promise.resolve({
-          suggestionIdToDetails: {
-            suggestion_1: {
-              suggestion: {
-                suggestion_id: 'suggestion_1',
-                target_id: '1',
-                suggestion_type: 'translate_content',
-                change: {
-                  content_html: 'Translation',
-                  translation_html: ['Tradução']
-                },
-                status: 'review'
-              },
-              details: null
-            }
-          },
-          more: false
-        }));
-      spyOn(
-        contributionAndReviewService, 'getReviewableQuestionSuggestionsAsync')
-        .and.returnValue(Promise.resolve({
-          suggestionIdToDetails: {
-            suggestion_1: {
-              suggestion: {
-                suggestion_id: 'suggestion_1',
-                target_id: '1',
-                suggestion_type: 'translate_content',
-                change: {
-                  skill_id: 'skill1',
-                  question_dict: {
-                    id: '1',
-                    question_state_data: {
-                      content: {
-                        html: 'Question 1',
-                        content_id: 'content_1'
-                      },
-                      interaction: {
-                        answer_groups: [{
-                          outcome: {
-                            dest: 'outcome 1',
-                            dest_if_really_stuck: null,
-                            feedback: {
-                              content_id: 'content_5',
-                              html: ''
-                            },
-                            labelled_as_correct: true,
-                            param_changes: [],
-                            refresher_exploration_id: null
-                          },
-                          rule_specs: [],
-                        }],
-                        confirmed_unclassified_answers: [],
-                        customization_args: {
-                          placeholder: {
-                            value: {
-                              content_id: 'ca_placeholder_0',
-                              unicode_str: ''
-                            }
-                          },
-                          rows: { value: 1 }
-                        },
-                        default_outcome: {
-                          dest: null,
-                          dest_if_really_stuck: null,
-                          feedback: {
-                            html: 'Correct Answer',
-                            content_id: 'content_2'
-                          },
-                          param_changes: [],
-                          labelled_as_correct: true
-                        },
-                        hints: [{
-                          hint_content: {
-                            html: 'Hint 1',
-                            content_id: 'content_3'
-                          }
-                        }],
-                        solution: {
-                          correct_answer: 'This is the correct answer',
-                          answer_is_exclusive: false,
-                          explanation: {
-                            html: 'Solution explanation',
-                            content_id: 'content_4'
-                          }
-                        },
-                        id: 'TextInput'
-                      },
-                      param_changes: [],
-                      recorded_voiceovers: {
-                        voiceovers_mapping: {}
-                      },
-                      written_translations: {
-                        translations_mapping: {}
-                      },
-                    },
-                  }
-                },
-                status: 'review'
-              },
-              details: {
-                skill_description: 'Skill description'
-              }
-            }
-          },
-          more: false
-        }));
-
-      $scope = $rootScope.$new();
-      ctrl = $componentController('contributionsAndReview', {
-        $scope: $scope,
-        ContextService: contextService,
-        MisconceptionObjectFactory: misconceptionObjectFactory
-      });
-      ctrl.$onInit();
-      $scope.$apply();
-    }));
-
-    it('should open suggestion modal when user clicks on ' +
-      'view suggestion', function() {
-      contributionOpportunitiesService
-        .reloadOpportunitiesEventEmitter.subscribe(() => {
-          ctrl.loadContributions().then(() => {
-            spyOn($uibModal, 'open').and.returnValue({
-              result: $q.reject()
-            });
-            ctrl.onClickViewSuggestion('suggestion_1');
-            $scope.$apply();
-
-            expect($uibModal.open).toHaveBeenCalled();
-          });
-        });
-      ctrl.switchToTab(ctrl.TAB_TYPE_CONTRIBUTIONS, 'translate_content');
-      $scope.$apply();
     });
   });
 });

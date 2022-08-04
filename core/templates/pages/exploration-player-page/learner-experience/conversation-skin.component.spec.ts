@@ -1077,6 +1077,7 @@ describe('Conversation skin component', () => {
     });
     componentInstance.questionPlayerConfig = {};
     spyOn(explorationPlayerStateService.onPlayerStateChange, 'emit');
+    spyOn(playerPositionService.onLoadedMostRecentCheckpoint, 'emit');
     spyOn(focusManagerService, 'setFocusIfOnDesktop');
     spyOn(loaderService, 'hideLoadingScreen');
     spyOn(urlService, 'getPidFromUrl').and.returnValue(null);
