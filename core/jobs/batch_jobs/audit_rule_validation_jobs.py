@@ -237,7 +237,7 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
         """
         errored_language_codes = []
 
-        for _, state in states_dict.items():
+        for state in states_dict.values():
             if state.interaction.id != 'Continue':
                 continue
             text_value = (
@@ -790,7 +790,7 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
             | 'Get continue text language code values' >> beam.Map(
                 lambda exp: (
                     exp.id, self.continue_interac_text_value_language(
-                        exp.language_code, exp.states),
+                        exp.states, exp.language_code),
                     exp.created_on.date()
                 )
             )
