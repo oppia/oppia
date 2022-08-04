@@ -188,6 +188,8 @@ class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
         exp = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         interaction_id = exp.states[
             feconf.DEFAULT_INIT_STATE_NAME].interaction.id
+        # Ruling out the possibility of None for mypy type checking.
+        assert interaction_id is not None
         algorithm_id = feconf.INTERACTION_CLASSIFIER_MAPPING[
             interaction_id]['algorithm_id']
         job = classifier_services.get_classifier_training_job(
@@ -1409,7 +1411,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             'with ID %s is not supported on mobile for explorations '
             'in a story.' % (exploration.init_state_name, exploration.id))
         init_state = exploration.states[exploration.init_state_name]
-        init_state.update_interaction_id('TextInput')  # type: ignore[no-untyped-call]
+        init_state.update_interaction_id('TextInput')
         solution_dict: state_domain.SolutionDict = {
             'answer_is_exclusive': False,
             'correct_answer': 'helloworld!',
@@ -1422,10 +1424,12 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                     'quot;"></oppia-noninteractive-collapsible><p>&nbsp;</p>')
             },
         }
+        # Ruling out the possibility of None for mypy type checking.
+        assert init_state.interaction.id is not None
         solution = state_domain.Solution.from_dict(
             init_state.interaction.id, solution_dict
         )
-        init_state.update_interaction_solution(solution)  # type: ignore[no-untyped-call]
+        init_state.update_interaction_solution(solution)
         exploration.states[exploration.init_state_name] = init_state
         errors = exp_services.validate_exploration_for_story(
             exploration, False)
@@ -1836,6 +1840,9 @@ title: Title
 
         state = exp.states[exp.init_state_name]
         interaction = state.interaction
+        # Ruling out the possibility of None for mypy type checking.
+        assert interaction.solution is not None
+        assert interaction.default_outcome is not None
         content_id = state.content.content_id
         voiceovers_mapping = state.recorded_voiceovers.voiceovers_mapping
         content_voiceovers = voiceovers_mapping[content_id]
@@ -1868,6 +1875,9 @@ title: Title
 
         state = exp.states[exp.init_state_name]
         interaction = state.interaction
+        # Ruling out the possibility of None for mypy type checking.
+        assert interaction.solution is not None
+        assert interaction.default_outcome is not None
         content_id = state.content.content_id
         voiceovers_mapping = state.recorded_voiceovers.voiceovers_mapping
         content_voiceovers = voiceovers_mapping[content_id]
@@ -2453,6 +2463,8 @@ title: A title
             self.EXP_0_ID, self.owner_id, objective='The objective',
             category='Algebra')
         init_state = exploration.states[exploration.init_state_name]
+        # Ruling out the possibility of None for mypy type checking.
+        assert init_state.interaction.default_outcome is not None
         default_outcome_dict = init_state.interaction.default_outcome.to_dict()
         default_outcome_dict['dest'] = exploration.init_state_name
         exp_services.update_exploration(
@@ -2544,6 +2556,8 @@ title: A title
             self.EXP_0_ID, self.owner_id, objective='The objective',
             category='Algebra')
         init_state = exploration.states[exploration.init_state_name]
+        # Ruling out the possibility of None for mypy type checking.
+        assert init_state.interaction.default_outcome is not None
         default_outcome_dict = init_state.interaction.default_outcome.to_dict()
         default_outcome_dict['dest'] = exploration.init_state_name
         exp_services.update_exploration(
@@ -2635,6 +2649,8 @@ title: A title
         self.assertEqual(exploration.version, 1)
 
         init_state = exploration.states[exploration.init_state_name]
+        # Ruling out the possibility of None for mypy type checking.
+        assert init_state.interaction.default_outcome is not None
         default_outcome_dict = init_state.interaction.default_outcome.to_dict()
         default_outcome_dict['dest'] = exploration.init_state_name
         change_list = [exp_domain.ExplorationChange({
@@ -2880,6 +2896,8 @@ written_translations:
         exploration = self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, objective='The objective')
         init_state = exploration.states[exploration.init_state_name]
+        # Ruling out the possibility of None for mypy type checking.
+        assert init_state.interaction.default_outcome is not None
         default_outcome_dict = init_state.interaction.default_outcome.to_dict()
         default_outcome_dict['dest'] = exploration.init_state_name
         exp_services.update_exploration(
@@ -2937,6 +2955,8 @@ written_translations:
         self.assertEqual(exploration.version, 1)
 
         init_state = exploration.states[exploration.init_state_name]
+        # Ruling out the possibility of None for mypy type checking.
+        assert init_state.interaction.default_outcome is not None
         default_outcome_dict = init_state.interaction.default_outcome.to_dict()
         default_outcome_dict['dest'] = exploration.init_state_name
         change_list = [exp_domain.ExplorationChange({
@@ -3587,6 +3607,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         second_state = exploration.states['State 2']
         second_state_interaction = second_state.interaction
+        # Ruling out the possibility of None for mypy type checking.
+        assert second_state_interaction.default_outcome is not None
         rule_specs = second_state_interaction.answer_groups[0].rule_specs
         outcome = second_state_interaction.answer_groups[0].outcome
         self.assertEqual(rule_specs[0].rule_type, 'Equals')

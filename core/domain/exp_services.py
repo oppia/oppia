@@ -488,7 +488,7 @@ def apply_change_list(
                     state.update_content(content)
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_INTERACTION_ID):
-                    state.update_interaction_id(change.new_value)  # type: ignore[no-untyped-call]
+                    state.update_interaction_id(change.new_value)
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX):
                     # Ruling out the possibility of any other type for mypy
@@ -499,10 +499,13 @@ def apply_change_list(
                     state.update_next_content_id_index(next_content_id_index)
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_LINKED_SKILL_ID):
-                    state.update_linked_skill_id(change.new_value)  # type: ignore[no-untyped-call]
+                    state.update_linked_skill_id(change.new_value)
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
-                    state.update_interaction_customization_args(  # type: ignore[no-untyped-call]
+                    # Ruling out the possibility of any other type for mypy
+                    # type checking.
+                    assert isinstance(change.new_value, dict)
+                    state.update_interaction_customization_args(
                         change.new_value)
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_INTERACTION_HANDLERS):
@@ -531,10 +534,13 @@ def apply_change_list(
                         new_outcome = state_domain.Outcome.from_dict(
                             change.new_value
                         )
-                    state.update_interaction_default_outcome(new_outcome)  # type: ignore[no-untyped-call]
+                    state.update_interaction_default_outcome(new_outcome)
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_UNCLASSIFIED_ANSWERS):
-                    state.update_interaction_confirmed_unclassified_answers(  # type: ignore[no-untyped-call]
+                    # Ruling out the possibility of any other type for mypy
+                    # type checking.
+                    assert isinstance(change.new_value, list)
+                    state.update_interaction_confirmed_unclassified_answers(
                         change.new_value)
                 elif (change.property_name ==
                       exp_domain.STATE_PROPERTY_INTERACTION_HINTS):
@@ -614,16 +620,16 @@ def apply_change_list(
             elif change.cmd == exp_domain.DEPRECATED_CMD_ADD_TRANSLATION:
                 # DEPRECATED: This command is deprecated. Please do not use.
                 # The command remains here to support old suggestions.
-                exploration.states[change.state_name].add_translation(  # type: ignore[no-untyped-call]
+                exploration.states[change.state_name].add_translation(
                     change.content_id, change.language_code,
                     change.translation_html)
             elif change.cmd == exp_domain.CMD_ADD_WRITTEN_TRANSLATION:
-                exploration.states[change.state_name].add_written_translation(  # type: ignore[no-untyped-call]
+                exploration.states[change.state_name].add_written_translation(
                     change.content_id, change.language_code,
                     change.translation_html, change.data_format)
             elif (change.cmd ==
                   exp_domain.CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE):
-                exploration.states[  # type: ignore[no-untyped-call]
+                exploration.states[
                     change.state_name
                 ].mark_written_translation_as_needing_update(
                     change.content_id,
@@ -631,7 +637,7 @@ def apply_change_list(
                 )
             elif (change.cmd ==
                   exp_domain.CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE):
-                exploration.states[  # type: ignore[no-untyped-call]
+                exploration.states[
                     change.state_name
                 ].mark_written_translations_as_needing_update(change.content_id)
             elif change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY:
@@ -1168,7 +1174,7 @@ def _create_exploration(
         state_names_to_train = []
         for state_name in exploration.states:
             state = exploration.states[state_name]
-            if state.can_undergo_classification():  # type: ignore[no-untyped-call]
+            if state.can_undergo_classification():
                 state_names_to_train.append(state_name)
 
         if state_names_to_train:
@@ -1539,7 +1545,7 @@ def validate_exploration_for_story(
 
     for state_name in exp.states:
         state = exp.states[state_name]
-        if not state.interaction.is_supported_on_android_app():  # type: ignore[no-untyped-call]
+        if not state.interaction.is_supported_on_android_app():
             error_string = (
                 'Invalid interaction %s in exploration '
                 'with ID: %s. This interaction is not supported for '
@@ -1549,7 +1555,7 @@ def validate_exploration_for_story(
                 raise utils.ValidationError(error_string)
             validation_error_messages.append(error_string)
 
-        if not state.is_rte_content_supported_on_android():  # type: ignore[no-untyped-call]
+        if not state.is_rte_content_supported_on_android():
             error_string = (
                 'RTE content in state %s of exploration '
                 'with ID %s is not supported on mobile for explorations '
@@ -2174,8 +2180,12 @@ def get_image_filenames_from_exploration(
     filenames = []
     for state in exploration.states.values():
         if state.interaction.id == 'ImageClickInput':
-            filenames.append(state.interaction.customization_args[
-                'imageAndRegions'].value['imagePath'])
+            image_paths = state.interaction.customization_args[
+                'imageAndRegions'].value
+            # Ruling out the possibility of any other type for mypy
+            # type checking.
+            assert isinstance(image_paths, list)
+            filenames.append(image_paths['imagePath'])
 
     html_list = exploration.get_all_html_content_strings()  # type: ignore[no-untyped-call]
     filenames.extend(
@@ -2560,7 +2570,7 @@ def get_exp_with_draft_applied(
         # verify that all the math-tags are valid before returning the
         # updated exploration.
         for state in updated_exploration.states.values():
-            html_string = ''.join(state.get_all_html_content_strings())  # type: ignore[no-untyped-call]
+            html_string = ''.join(state.get_all_html_content_strings())
             error_list = (
                 html_validation_service.  # type: ignore[no-untyped-call]
                 validate_math_tags_in_html_with_attribute_math_content(

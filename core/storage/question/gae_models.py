@@ -28,6 +28,8 @@ from typing import Any, Dict, List, Mapping, Sequence
 
 MYPY = False
 if MYPY: # pragma: no cover
+    # Here, we are importing `state_domain` only for type checking.
+    from core.domain import state_domain  # pylint: disable=invalid-import # isort:skip
     from mypy_imports import base_models
     from mypy_imports import datastore_services
 
@@ -239,12 +241,10 @@ class QuestionModel(base_models.VersionedModel):
             'versioned_model': models_to_put['versioned_model'],
         }
 
-    # TODO(#13523): Change 'question_state_data' to TypedDict/Domain Object
-    # to remove Any used below.
     @classmethod
     def create(
         cls,
-        question_state_data: Dict[str, Any],
+        question_state_data: state_domain.StateDict,
         language_code: str,
         version: int,
         linked_skill_ids: List[str],
