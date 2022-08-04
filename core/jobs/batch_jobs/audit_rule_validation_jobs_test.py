@@ -790,7 +790,7 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
     TODAY_DATE = datetime.datetime.utcnow()
     YEAR_AGO_DATE = str((TODAY_DATE - datetime.timedelta(weeks=52)).date())
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
 
         self.exp_1 = self.create_model(

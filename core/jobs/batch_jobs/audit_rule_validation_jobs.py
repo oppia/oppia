@@ -18,10 +18,6 @@
 
 from __future__ import annotations
 
-import html
-import json
-
-from core.constants import constants
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import state_domain
@@ -86,8 +82,8 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                             rule_spec.inputs['x'] == rule_spec.inputs['y']
                         ):
                             if (
-                                len(answer_group.rule_specs) is 1 and
-                                len(answer_groups) is 1
+                                len(answer_group.rule_specs) == 1 and
+                                len(answer_groups) == 1
                             ):
                                 states_with_errored_values.append(
                                     state_name
@@ -128,8 +124,8 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                         for ele in rule_spec.inputs['x']:
                             if len(ele) > 1:
                                 if (
-                                    len(answer_group.rule_specs) is 1 and
-                                    len(answer_groups) is 1
+                                    len(answer_group.rule_specs) == 1 and
+                                    len(answer_groups) == 1
                                 ):
                                     states_with_errored_values.append(
                                         state_name
@@ -173,8 +169,8 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                             'IsEqualToOrderingWithOneItemAtIncorrectPosition'
                         ):
                             if (
-                                len(answer_group.rule_specs) is 1 and
-                                len(answer_groups) is 1
+                                len(answer_group.rule_specs) == 1 and
+                                len(answer_groups) == 1
                             ):
                                 states_with_errored_values.append(
                                     state_name
@@ -210,8 +206,8 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                     if rule_spec.rule_type == 'IsEqualToOrdering':
                         if len(rule_spec.inputs['x']) <= 0:
                             if (
-                                len(answer_group.rule_specs) is 1 and
-                                len(answer_groups) is 1
+                                len(answer_group.rule_specs) == 1 and
+                                len(answer_groups) == 1
                             ):
                                 states_with_errored_values.append(
                                     state_name
@@ -287,8 +283,8 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                             len(rule_spec.inputs['x']) > max_value
                         ):
                             if (
-                                len(answer_group.rule_specs) is 1 and
-                                len(answer_groups) is 1
+                                len(answer_group.rule_specs) == 1 and
+                                len(answer_groups) == 1
                             ):
                                 states_with_errored_values.append(
                                     state_name
@@ -326,8 +322,8 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                             float(rule_spec.inputs['x'])
                         except Exception:
                             if (
-                                len(answer_group.rule_specs) is 1 and
-                                len(answer_groups) is 1
+                                len(answer_group.rule_specs) == 1 and
+                                len(answer_groups) == 1
                             ):
                                 states_with_errored_values.append(
                                     state_name
@@ -364,8 +360,8 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                             float(rule_spec.inputs['x'])
                         except Exception:
                             if (
-                                len(answer_group.rule_specs) is 1 and
-                                len(answer_groups) is 1
+                                len(answer_group.rule_specs) == 1 and
+                                len(answer_groups) == 1
                             ):
                                 states_with_errored_values.append(
                                     state_name
@@ -402,8 +398,8 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                             float(rule_spec.inputs['x'])
                         except Exception:
                             if (
-                                len(answer_group.rule_specs) is 1 and
-                                len(answer_groups) is 1
+                                len(answer_group.rule_specs) == 1 and
+                                len(answer_groups) == 1
                             ):
                                 states_with_errored_values.append(
                                     state_name
@@ -440,8 +436,8 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                             float(rule_spec.inputs['x'])
                         except Exception:
                             if (
-                                len(answer_group.rule_specs) is 1 and
-                                len(answer_groups) is 1
+                                len(answer_group.rule_specs) == 1 and
+                                len(answer_groups) == 1
                             ):
                                 states_with_errored_values.append(
                                     state_name
@@ -478,8 +474,8 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                             float(rule_spec.inputs['x'])
                         except Exception:
                             if (
-                                len(answer_group.rule_specs) is 1 and
-                                len(answer_groups) is 1
+                                len(answer_group.rule_specs) == 1 and
+                                len(answer_groups) == 1
                             ):
                                 states_with_errored_values.append(
                                     state_name
@@ -518,7 +514,7 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
             exp_models.ExplorationModel,
             opportunity_models.ExplorationOpportunitySummaryModel] |
             exp_models.ExplorationModel
-    ) -> exp_domain.Exploration:
+    ) -> None | exp_domain.Exploration:
         """Returns the exploration domain object
 
         Args:
@@ -531,12 +527,12 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
         if isinstance(model, tuple):
             try:
                 return exp_fetchers.get_exploration_from_model(model[0])
-            except:
+            except Exception:
                 return None
         else:
             try:
                 return exp_fetchers.get_exploration_from_model(model)
-            except:
+            except Exception:
                 return None
 
     @staticmethod
@@ -549,8 +545,10 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
         Optional[opportunity_models.ExplorationOpportunitySummaryModel]
     ]:
         """Returns the pair of exp and opportunity models.
+
         Args:
             models_list_pair: tuple. The pair of models list.
+
         Returns:
             tuple. The pair of exp and opportunity models.
         """
