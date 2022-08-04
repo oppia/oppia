@@ -2316,6 +2316,123 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return states_dict
 
     @classmethod
+    def _convert_states_v51_dict_to_v52_dict(cls, states_dict):
+        """
+        """
+        # Update general state validations.
+        states_dict = cls._update_general_state(cls, states_dict)
+
+        # Update general state interaction validations.
+        states_dict = cls._update_general_state_interaction(
+            cls, states_dict)
+
+        # Update general state RTE validations.
+        states_dict = cls._update_general_state_rte(cls, states_dict)
+
+        return states_dict
+
+    @classmethod
+    def _update_general_state(cls, states_dict):
+        """
+        """
+        for state_name, state_dict in states_dict.items():
+            answer_groups = state_dict['interaction']['answer_groups']
+            for answer_group in answer_groups:
+                # lab_as_correct should not be True if dest is try again.
+                if (
+                    answer_group['outcome']['dest'] == state_name and
+                    answer_group['outcome']['labelled_as_correct']
+                ):
+                    answer_group['outcome']['labelled_as_correct'] = False
+
+                # ref_exp_id part is remaining.
+
+    @classmethod
+    def _update_general_state_interaction(cls, states_dict):
+        """
+        """
+        for state_dict in states_dict.items():
+        # Continue Interaction.
+            # Text should have a max-length of 20.
+            if state_dict['interaction']['id'] == 'Continue':
+                text_value = state_dict['interaction'][
+                    'customization_args']['buttonText']['value']['unicode_str']
+                if len(text_value) > 20:
+                    # Do something
+                    pass
+
+        # End Interaction.
+            if state_dict['interaction']['id'] == 'EndExploration':
+                recc_exp_ids = state_dict['interaction'][
+                    'customization_args']['recommendedExplorationIds']['value']
+                if len(recc_exp_ids) > 3:
+                    recc_exp_ids = recc_exp_ids[0:3]
+                    state_dict['interaction']['customization_args'][
+                        'recommendedExplorationIds']['value'] = recc_exp_ids
+
+                # All reccomended exp ids should be valid part is remaining.
+
+        # NumericInput Interaction.
+            if state_dict['interaction']['id'] == 'NumericInput':
+                answer_groups = state_dict['interaction']['answer_groups']
+                for answer_group in answer_groups:
+                    for rule_spec in answer_group['rule_specs']:
+                        # For x in [a-b, a+b], b must be a positive value.
+                        if rule_spec['rule_type'] == 'IsWithinTolerance':
+                            tol = rule_spec['inputs']['tol']
+                            if tol <= 0:
+                                rule_spec['inputs']['tol'] = abs(tol)
+
+                        # For x in [a, b], a must not be greater than b.
+                        if rule_spec['rule_type'] == 'IsInclusivelyBetween':
+                            if (
+                                rule_spec['inputs']['a'] > rule_spec[
+                                    'inputs']['b']
+                            ):
+                                rule_spec['inputs']['a'], rule_spec[
+                                    'inputs']['b'] = rule_spec['inputs'][
+                                        'b'], rule_spec['inputs']['a']
+
+        # FractionInput Interaction.
+            if state_dict['interaction']['id'] == 'FractionInput':
+                # All rules should have solutions that do not match previous rules' solutions.
+                pass
+
+        # MultipleChoiceInput Interaction.
+            if state_dict['interaction']['id'] == 'MultipleChoiceInput':
+                # No answer choice should appear in more than one answer group.
+                pass
+
+        # ItemSelectionInput Interaction.
+            if state_dict['interaction']['id'] == 'ItemSelectionInput':
+                min_value = (
+                    state_dict['interaction']['customization_args']
+                    ['minAllowableSelectionCount']['value']
+                )
+                max_value = (
+                    state_dict['interaction']['customization_args']
+                    ['maxAllowableSelectionCount']['value']
+                )
+                answer_groups = state_dict['interaction']['answer_groups']
+                for answer_group in answer_groups:
+                    for rule_spec in answer_group['rule_specs']:
+                        # `==` should have between min and max number of selections.
+                        if rule_spec['rule_type'] == 'Equals':
+                            if (
+                                len(rule_spec['inputs']['x']) < min_value or
+                                len(rule_spec['inputs']['x']) > max_value
+                            ):
+                                pass
+
+        # DragAndDropInput Interaction.
+
+        # TextInput Interaction.
+
+    @classmethod
+    def _update_general_state_rte(cls, states_dict):
+        pass
+
+    @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states,
             current_states_schema_version, init_state_name):
@@ -2352,7 +2469,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 56
+    CURRENT_EXP_SCHEMA_VERSION = 57
     EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION = 46
 
     @classmethod
@@ -2582,6 +2699,29 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return exploration_dict
 
     @classmethod
+    def _convert_v56_dict_to_v57_dict(cls, exploration_dict):
+        """Converts a v56 exploration dict into a v57 exploration dict.
+        Version 57 adds few exploration validation checks which are categorized
+        as General State validation, General Interaction validation
+        and General RTE validation.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v56.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v57.
+        """
+        exploration_dict['schema_version'] = 57
+
+        exploration_dict['states'] = cls._convert_states_v51_dict_to_v52_dict(
+            exploration_dict['states'], exploration_dict['id'])
+        exploration_dict['states_schema_version'] = 52
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(cls, yaml_content):
         """Return the YAML content of the exploration in the latest schema
         format.
@@ -2666,6 +2806,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
             exploration_dict = cls._convert_v55_dict_to_v56_dict(
                 exploration_dict)
             exploration_schema_version = 56
+
+        if exploration_schema_version == 56:
+            exploration_dict = cls._convert_v56_dict_to_v57_dict(
+                exploration_dict)
+            exploration_schema_version = 57
 
         return exploration_dict
 
