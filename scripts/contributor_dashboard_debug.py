@@ -18,16 +18,17 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
-import requests
-import hashlib
 
 from core import feconf
 from core.constants import constants
 
 import firebase_admin
 from firebase_admin import auth as firebase_auth
+
+import requests
 
 FIREBASE_AUTH_EMULATOR_HOST = 'localhost:%s' % feconf.FIREBASE_EMULATOR_PORT
 os.environ['FIREBASE_AUTH_EMULATOR_HOST'] = FIREBASE_AUTH_EMULATOR_HOST
