@@ -46,8 +46,7 @@ from core.domain import visualization_registry
 from extensions import domain
 from extensions.objects.models import objects
 
-from typing import Any, Dict, List, Optional
-from typing_extensions import TypedDict
+from typing import Any, Dict, List, Optional, TypedDict
 
 # Indicates that the learner view of the interaction should be displayed in the
 # context of the conversation.

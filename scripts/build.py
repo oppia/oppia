@@ -34,8 +34,8 @@ from scripts import common # isort:skip pylint: disable=wrong-import-position
 from core import utils # isort:skip pylint: disable=wrong-import-position
 from scripts import servers # isort:skip pylint: disable=wrong-import-position
 
-from typing import Deque, Dict, List, Optional, Sequence, TextIO, Tuple # isort:skip pylint: disable=wrong-import-position
-from typing_extensions import TypedDict # isort:skip pylint: disable=wrong-import-position
+from typing import ( # isort:skip pylint: disable=wrong-import-position
+        Deque, Dict, List, Optional, Sequence, TextIO, Tuple, TypedDict)
 
 ASSETS_DEV_DIR = os.path.join('assets', '')
 ASSETS_OUT_DIR = os.path.join('build', 'assets', '')

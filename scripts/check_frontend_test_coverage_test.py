@@ -24,8 +24,7 @@ import sys
 from core import utils
 from core.tests import test_utils
 
-from typing import Dict, List, Optional
-from typing_extensions import Literal
+from typing import Dict, List, Literal, Optional
 
 from . import check_frontend_test_coverage
 

@@ -42,9 +42,8 @@ import certifi
 import yaml
 
 from typing import ( # isort:skip
-    IO, Any, BinaryIO, Callable, Dict, Iterable, Iterator, List, Optional,
-    TextIO, Tuple, TypeVar, Union, overload)
-from typing_extensions import Literal # isort:skip
+    IO, Any, BinaryIO, Callable, Dict, Iterable, Iterator, List, Literal,
+    Optional, TextIO, Tuple, TypeVar, Union, overload)
 
 
 DATETIME_FORMAT = '%m/%d/%Y, %H:%M:%S:%f'
