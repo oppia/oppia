@@ -89,7 +89,6 @@ var BlogDashboardPage = function() {
     await action.click(
       'Navigate back to blog dashboard button', navigateToBlogDashboardButton);
     await waitFor.pageToFullyLoad();
-    await waitFor.urlRedirection('http://localhost:9001/blog-dashboard');
   };
 
   this.waitForDraftBlogPostsToLoad = async function() {
@@ -200,9 +199,10 @@ var BlogDashboardPage = function() {
         `Blog Dashboard tab ${i}`, matTab);
       if (tabText.startsWith(tabName)) {
         await action.click(`${tabName} tab`, matTab);
-        await waitFor.visibilityOf(matInkBar);
+        await waitFor.visibilityOf(
+          matInkBar, 'Mat Ink Bar takes too long to appear');
         await waitFor.rightTransistionToComplete(
-          matInkBar, `${tabName} tab takes too long to be active`);
+          matInkBar, `${tabName} tab transition takes too long to complete`);
         break;
       }
     }
