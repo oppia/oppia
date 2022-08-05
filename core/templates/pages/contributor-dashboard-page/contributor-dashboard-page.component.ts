@@ -199,10 +199,15 @@ export class ContributorDashboardPageComponent
 
     this.contributionOpportunitiesService.getTranslatableTopicNamesAsync()
       .then((topicNames) => {
+        // TODO(#15710): Set default active topic to 'All'.
+        if (topicNames.length <= 0) {
+          return;
+        }
+        this.topicName = topicNames[0];
         if (topicNames.indexOf(prevSelectedTopicName) !== -1) {
           this.topicName = prevSelectedTopicName;
-          this.translationTopicService.setActiveTopicName(this.topicName);
         }
+        this.translationTopicService.setActiveTopicName(this.topicName);
       });
 
     this.activeTabName = 'myContributionTab';

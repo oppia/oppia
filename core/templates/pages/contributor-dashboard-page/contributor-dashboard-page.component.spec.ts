@@ -144,14 +144,18 @@ describe('Contributor dashboard page', () => {
   }));
 
   describe('when user is logged in', () => {
-    it('should set specific properties after $onInit is called', () => {
-      expect(component.topicName).toBe('All');
-      expect(translationTopicService.setActiveTopicName)
-        .toHaveBeenCalled();
-      expect(component.activeTabName).toBe('myContributionTab');
-      expect(component.OPPIA_AVATAR_IMAGE_URL).toBe(
-        '/assets/images/avatar/oppia_avatar_100px.svg');
-    });
+    it('should set specific properties after $onInit is called',
+      fakeAsync(() => {
+        component.ngOnInit();
+        tick();
+
+        expect(component.topicName).toBe('Topic 1');
+        expect(translationTopicService.setActiveTopicName)
+          .toHaveBeenCalled();
+        expect(component.activeTabName).toBe('myContributionTab');
+        expect(component.OPPIA_AVATAR_IMAGE_URL).toBe(
+          '/assets/images/avatar/oppia_avatar_100px.svg');
+      }));
 
     it('should return language description in kebab case format', () => {
       let languageDescription = 'Deutsch (German)';
