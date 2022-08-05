@@ -160,4 +160,76 @@ describe('Checkpoint celebration utility service', () => {
     expect(computeGraphService.computeBfsTraversalOfStates)
       .toHaveBeenCalledWith('First State', states, 'First State');
   });
+
+  it('should get a random i18n key when message kind is specified', () => {
+    spyOn(Math, 'random').and.returnValue(0.45);
+
+    expect(checkpointCelebrationUtilityService.getRandomI18nKey(
+      'KEY_PREFIX', 10, 'KIND_A')).toEqual('KEY_PREFIX_KIND_A_5');
+  });
+
+  it('should get a random i18n key when message kind is not specified', () => {
+    spyOn(Math, 'random').and.returnValue(0.45);
+
+    expect(checkpointCelebrationUtilityService.getRandomI18nKey(
+      'KEY_PREFIX', 10)).toEqual('KEY_PREFIX_5');
+  });
+
+  it('should get the right kind of checkpoint message i18n key', () => {
+    spyOn(Math, 'random').and.returnValue(0.45);
+
+    expect(
+      checkpointCelebrationUtilityService.getCheckpointMessageI18nKey(1, 8))
+      .toEqual('I18N_CONGRATULATORY_CHECKPOINT_MESSAGE_A_2');
+    expect(
+      checkpointCelebrationUtilityService.getCheckpointMessageI18nKey(2, 8))
+      .toEqual('I18N_CONGRATULATORY_CHECKPOINT_MESSAGE_B_2');
+    expect(
+      checkpointCelebrationUtilityService.getCheckpointMessageI18nKey(4, 8))
+      .toEqual('I18N_CONGRATULATORY_CHECKPOINT_MESSAGE_C_2');
+    expect(
+      checkpointCelebrationUtilityService.getCheckpointMessageI18nKey(6, 8))
+      .toEqual('I18N_CONGRATULATORY_CHECKPOINT_MESSAGE_D_2');
+    expect(
+      checkpointCelebrationUtilityService.getCheckpointMessageI18nKey(7, 8))
+      .toEqual('I18N_CONGRATULATORY_CHECKPOINT_MESSAGE_E_2');
+    expect(
+      checkpointCelebrationUtilityService.getCheckpointMessageI18nKey(3, 8))
+      .toEqual('I18N_CONGRATULATORY_CHECKPOINT_MESSAGE_F_2');
+  });
+
+  it('should get the checkpoint message', () => {
+    spyOn(checkpointCelebrationUtilityService, 'getCheckpointMessageI18nKey')
+      .and.returnValue('DUMMY_CHECKPOINT_MESSAGE_KEY');
+    spyOn(translateService, 'instant').and.callThrough();
+
+    expect(checkpointCelebrationUtilityService.getCheckpointMessage(
+      2, 8)).toEqual('DUMMY_CHECKPOINT_MESSAGE_KEY');
+    expect(checkpointCelebrationUtilityService.getCheckpointMessageI18nKey)
+      .toHaveBeenCalledWith(2, 8);
+    expect(translateService.instant).toHaveBeenCalledWith(
+      'DUMMY_CHECKPOINT_MESSAGE_KEY');
+  });
+
+  it('should get a random checkpoint title i18n key', () => {
+    spyOn(Math, 'random').and.returnValue(0.45);
+    spyOn(checkpointCelebrationUtilityService, 'getRandomI18nKey')
+      .and.callThrough();
+
+    expect(checkpointCelebrationUtilityService.getCheckpointTitleI18nKey())
+      .toEqual('I18N_CONGRATULATORY_CHECKPOINT_TITLE_3');
+  });
+
+  it('should get the checkpoint title', () => {
+    spyOn(checkpointCelebrationUtilityService, 'getCheckpointTitleI18nKey')
+      .and.returnValue('DUMMY_CHECKPOINT_TITLE_I18N_KEY');
+    spyOn(translateService, 'instant').and.callThrough();
+
+    expect(checkpointCelebrationUtilityService.getCheckpointTitle())
+      .toEqual('DUMMY_CHECKPOINT_TITLE_I18N_KEY');
+    expect(checkpointCelebrationUtilityService.getCheckpointTitleI18nKey)
+      .toHaveBeenCalled();
+    expect(translateService.instant).toHaveBeenCalledWith(
+      'DUMMY_CHECKPOINT_TITLE_I18N_KEY');
+  });
 });

@@ -53,8 +53,8 @@ export class CheckpointCelebrationUtilityService {
   getRandomI18nKey(
       i18nKeyPrefix: string, availableKeyCount: number, messageKind?: string,
   ): string {
-    // 'randomValue' lies between 1 and availableKeyCount, the total number of
-    // i18n keys available to choose from.
+    // 'randomValue' is being set to lie between 1 and availableKeyCount, the
+    // total number of i18n keys available to choose from.
     const randomValue = Math.floor(Math.random() * availableKeyCount) + 1;
     if (messageKind) {
       return i18nKeyPrefix + '_' + messageKind + '_' + randomValue.toString();
