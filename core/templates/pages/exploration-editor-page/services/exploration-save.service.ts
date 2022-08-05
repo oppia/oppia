@@ -47,6 +47,7 @@ import { RouterService } from './router.service';
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import { LostChange } from 'domain/exploration/LostChangeObjectFactory';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { LoggerService } from 'services/contextual/logger.service';
 
 @Injectable({
   providedIn: 'root'
@@ -80,6 +81,7 @@ export class ExplorationSaveService {
     private explorationTitleService: ExplorationTitleService,
     private explorationWarningsService: ExplorationWarningsService,
     private externalSaveService: ExternalSaveService,
+    private logger: LoggerService,
     private ngbModal: NgbModal,
     private routerService: RouterService,
     private siteAnalyticsService: SiteAnalyticsService,
@@ -159,7 +161,8 @@ export class ExplorationSaveService {
             return;
           }
 
-          // $log.info('Changes to this exploration were saved successfully.');
+          this.logger.info(
+            'Changes to this exploration were saved successfully.');
 
           this.changeListService.discardAllChanges().then(() => {
             this._initExplorationPageEventEmitter.emit();
