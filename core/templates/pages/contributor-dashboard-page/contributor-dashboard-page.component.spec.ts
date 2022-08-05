@@ -29,7 +29,7 @@ import { LocalStorageService } from 'services/local-storage.service';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { UserInfo } from 'domain/user/user-info.model';
 
-fdescribe('Contributor dashboard page', () => {
+describe('Contributor dashboard page', () => {
   let component: ContributorDashboardPageComponent;
   let fixture: ComponentFixture<ContributorDashboardPageComponent>;
   let localStorageService: LocalStorageService;
@@ -46,9 +46,8 @@ fdescribe('Contributor dashboard page', () => {
   };
   let focusManagerService: FocusManagerService;
   let windowRef: WindowRef;
-  let getTranslatableTopicNamesAsyncSpy = spyOn(
-    contributionOpportunitiesService, 'getTranslatableTopicNamesAsync');
-  let getUserInfoAsyncSpy = spyOn(userService, 'getUserInfoAsync');
+  let getTranslatableTopicNamesAsyncSpy;
+  let getUserInfoAsyncSpy;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -81,6 +80,8 @@ fdescribe('Contributor dashboard page', () => {
     userService = TestBed.inject(UserService);
     focusManagerService = TestBed.inject(FocusManagerService);
 
+    getTranslatableTopicNamesAsyncSpy = spyOn(
+      contributionOpportunitiesService, 'getTranslatableTopicNamesAsync');
     getTranslatableTopicNamesAsyncSpy.and.returnValue(
       Promise.resolve(['Topic 1', 'Topic 2']));
     spyOn(localStorageService, 'getLastSelectedTranslationLanguageCode').and
@@ -100,6 +101,7 @@ fdescribe('Contributor dashboard page', () => {
       .and.returnValue(Promise.resolve(userProfileImage));
     spyOn(userService, 'getUserContributionRightsDataAsync')
       .and.returnValue(Promise.resolve(userContributionRights));
+    getUserInfoAsyncSpy = spyOn(userService, 'getUserInfoAsync')
     getUserInfoAsyncSpy.and.returnValue(
       Promise.resolve(userInfo as UserInfo));
 
