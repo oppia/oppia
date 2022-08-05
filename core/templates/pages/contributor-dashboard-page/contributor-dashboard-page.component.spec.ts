@@ -29,7 +29,7 @@ import { LocalStorageService } from 'services/local-storage.service';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { UserInfo } from 'domain/user/user-info.model';
 
-describe('Contributor dashboard page', () => {
+fdescribe('Contributor dashboard page', () => {
   let component: ContributorDashboardPageComponent;
   let fixture: ComponentFixture<ContributorDashboardPageComponent>;
   let localStorageService: LocalStorageService;
@@ -46,7 +46,9 @@ describe('Contributor dashboard page', () => {
   };
   let focusManagerService: FocusManagerService;
   let windowRef: WindowRef;
-  let getUserInfoAsyncSpy;
+  let getTranslatableTopicNamesAsyncSpy = spyOn(
+    contributionOpportunitiesService, 'getTranslatableTopicNamesAsync');
+  let getUserInfoAsyncSpy = spyOn(userService, 'getUserInfoAsync');
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -79,8 +81,8 @@ describe('Contributor dashboard page', () => {
     userService = TestBed.inject(UserService);
     focusManagerService = TestBed.inject(FocusManagerService);
 
-    spyOn(contributionOpportunitiesService, 'getTranslatableTopicNamesAsync')
-      .and.returnValue(Promise.resolve(['Topic 1', 'Topic 2']));
+    getTranslatableTopicNamesAsyncSpy.and.returnValue(
+      Promise.resolve(['Topic 1', 'Topic 2']));
     spyOn(localStorageService, 'getLastSelectedTranslationLanguageCode').and
       .returnValue('');
     spyOn(localStorageService, 'getLastSelectedTranslationTopicName').and
@@ -98,8 +100,6 @@ describe('Contributor dashboard page', () => {
       .and.returnValue(Promise.resolve(userProfileImage));
     spyOn(userService, 'getUserContributionRightsDataAsync')
       .and.returnValue(Promise.resolve(userContributionRights));
-    getUserInfoAsyncSpy = spyOn(userService, 'getUserInfoAsync');
-
     getUserInfoAsyncSpy.and.returnValue(
       Promise.resolve(userInfo as UserInfo));
 
@@ -155,6 +155,19 @@ describe('Contributor dashboard page', () => {
         expect(component.activeTabName).toBe('myContributionTab');
         expect(component.OPPIA_AVATAR_IMAGE_URL).toBe(
           '/assets/images/avatar/oppia_avatar_100px.svg');
+      }));
+
+    it('should not set active topic name when no topics are returned',
+      fakeAsync(() => {
+        getTranslatableTopicNamesAsyncSpy.and.returnValue(
+          Promise.resolve([]));
+
+        component.ngOnInit();
+        tick();
+
+        expect(component.topicName).toBe(undefined);
+        expect(translationTopicService.setActiveTopicName)
+          .not.toHaveBeenCalled();
       }));
 
     it('should return language description in kebab case format', () => {
