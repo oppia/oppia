@@ -49,6 +49,7 @@ export class ExplorationMetadataModalComponent
   requireObjectiveToBeSpecified: boolean;
   requireCategoryToBeSpecified: boolean;
   askForLanguageCheck: boolean;
+  isValueHasbeenUpdated: boolean = false;
   askForTags: boolean;
   addOnBlur: boolean = true;
   explorationTags: string[] = [];
@@ -229,6 +230,12 @@ export class ExplorationMetadataModalComponent
 
     this.filteredChoices = this.CATEGORY_LIST_FOR_SELECT2;
     this.explorationTags = (this.explorationTagsService.displayed) as string[];
+
+    // This logic has been used here to
+    // solve ExpressionChangedAfterItHasBeenCheckedError error.
+    setTimeout(() => {
+      this.isValueHasbeenUpdated = true;
+    });
   }
 }
 

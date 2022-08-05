@@ -16,7 +16,7 @@
  * @fileoverview Component for the exploration title field in forms.
  */
 
-import { ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { Subscription } from 'rxjs';
 import { RouterService } from 'pages/exploration-editor-page/services/router.service';
@@ -42,14 +42,7 @@ export class ExplorationTitleEditorComponent implements OnInit, OnDestroy {
     private focusManagerService: FocusManagerService,
     private routerService: RouterService,
     private explorationTitleService: ExplorationTitleService,
-    private changeDetectorRef: ChangeDetectorRef,
-  ) {
-    this.changeDetectorRef.detach();
-  }
-
-  ngAfterContentChecked(): void {
-    this.changeDetectorRef.detectChanges();
-  }
+  ) { }
 
   inputFieldBlur(): void {
     this.onInputFieldBlur.emit();
