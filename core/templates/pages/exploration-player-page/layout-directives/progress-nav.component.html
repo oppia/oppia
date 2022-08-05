@@ -33,7 +33,7 @@
       </button>
       <button mat-button
               *ngIf="shouldGenericSubmitButtonBeShown()"
-              class="oppia-learner-confirm-button e2e-test-submit-answer-button"
+              class="oppia-learner-confirm-button oppia-learner-submit-answer-button e2e-test-submit-answer-button"
               (click)="submit.emit()"
               [disabled]="submitButtonDisabled">
         {{ 'I18N_INTERACTIONS_SUBMIT' | translate }}
