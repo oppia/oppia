@@ -38,7 +38,6 @@ var LearnerDashboardPage = function() {
   var incompleteCommunityLessonsSection = $(
     '.e2e-test-incomplete-community-lessons-section');
   var progressSection = $('.e2e-test-progress-section');
-  var subscriptionSection = $('.e2e-test-subscriptions-section');
   var skillProficiencyTopicTitle = $('.e2e-test-skill-proficiency-topic-title');
   var stopicNamesInLearnerTopicSummaryTile = $(
     '.e2e-test-learner-topic-summary-tile-title');
@@ -209,9 +208,6 @@ var LearnerDashboardPage = function() {
   };
 
   this.expectSubscriptionFirstNameToMatch = async function(name) {
-    await waitFor.visibilityOf(
-      subscriptionSection, 'Subscription section takes too long to appear');
-    await subscriptionSection.scrollIntoView();
     await waitFor.visibilityOf(
       subscriptionNameElement,
       'Subscription First Name takes too long to appear');
