@@ -11933,7 +11933,7 @@ class ExplorationMetadataDomainUnitTests(test_utils.GenericTestBase):
         error_message = (
             'A new metadata property %s was added to the Exploration '
             'domain object but not included in the '
-            'ExplorationMetadata domain object. Please inlcude this '
+            'ExplorationMetadata domain object. Please include this '
             'new property in the ExplorationMetadata domain object '
             'also.' % ('new_property')
         )
