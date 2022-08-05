@@ -156,6 +156,7 @@ describe('Learner dashboard functionality', function() {
     await learnerDashboardPage.expectSubscriptionLastNameToMatch('collect...');
     console.log('Step no: 20');
     await users.logout();
+    console.log('Step 36');
   });
 
   it('should display learner feedback threads', async function() {
@@ -166,7 +167,7 @@ describe('Learner dashboard functionality', function() {
       'feedbackAdm@learnerDashboard.com', 'feedbackAdmlearnerDashboard');
       console.log('Step no: 22');
     await users.login('feedbackAdm@learnerDashboard.com');
-    console.log('Step no: 33');
+    console.log('Step no: 23');
     await workflow.createAndPublishExploration(
       'BUS101',
       'Business',
@@ -203,6 +204,7 @@ describe('Learner dashboard functionality', function() {
     await learnerDashboardPage.expectFeedbackMessageToMatch(feedback);
     console.log('Step no: 35');
     await users.logout();
+    console.log('Step 37');
   });
 
   it('should add exploration to play later list', async function() {
@@ -505,5 +507,6 @@ describe('Learner dashboard functionality', function() {
 
   afterEach(async function() {
     await general.checkForConsoleErrors([]);
+    console.log('AfterEach');
   });
 });

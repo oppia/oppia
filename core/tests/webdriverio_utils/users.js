@@ -84,15 +84,22 @@ var login = async function(email, useManualNavigation = true) {
 
 var logout = async function() {
   await waitFor.clientSideRedirection(async() => {
+    console.log('log 1')
     await browser.url(general.SERVER_URL_PREFIX + general.LOGOUT_URL_SUFFIX);
+    console.log('log 2')
   }, (url) => {
     // Wait until the URL has changed to something that is not /logout.
+    console.log('log 3')
     return !(/logout/.test(url));
   }, async() => {
+    console.log('log 4')
     var splashPage = $('.e2e-test-splash-page');
+    console.log('log 5')
     await waitFor.visibilityOf(
       splashPage, 'Splash page takes too long to appear');
+      console.log('log 6')
     await waitFor.pageToFullyLoad();
+    console.log('log 7')
   });
 };
 

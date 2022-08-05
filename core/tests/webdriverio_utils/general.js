@@ -74,6 +74,7 @@ var CONSOLE_ERRORS_TO_IGNORE = [
 
 var checkForConsoleErrors = async function(
     errorsToIgnore, skipDebugging = true) {
+  console.log('error 1')
   errorsToIgnore = errorsToIgnore.concat(CONSOLE_ERRORS_TO_IGNORE);
   // The mobile tests run on the latest version of Chrome.
   // The newer versions report 'Slow Network' as a console error.
@@ -83,10 +84,13 @@ var checkForConsoleErrors = async function(
   }
 
   var browserLogs = await browser.getLogs('browser');
+  console.log('error 2')
   var browserErrors = browserLogs.filter(logEntry => (
     logEntry.level.value > CONSOLE_LOG_THRESHOLD &&
     errorsToIgnore.every(e => logEntry.message.match(e) === null)));
+    console.log('error 3')
   expect(browserErrors).toEqual([]);
+  console.log('error 4')
 };
 
 var isInDevMode = async function() {
