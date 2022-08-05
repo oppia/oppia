@@ -348,13 +348,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             return mock_html_field_types_to_rule_specs_dict
 
         def mock_get_interaction_by_id(
+            cls: Type[interaction_registry.Registry],
             interaction_id: str
         ) -> base.BaseInteraction:
-            interaction: base.BaseInteraction = copy.deepcopy(
-                interaction_registry.Registry.get_interaction_by_id(
-                    interaction_id
-                )
-            )
+            interaction = copy.deepcopy(cls._interactions[interaction_id]) # pylint: disable=protected-access
             interaction.answer_type = 'ListOfSetsOfHtmlStrings'
             return interaction
 
@@ -364,7 +361,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         interaction_registry_swap = self.swap(
             interaction_registry.Registry, 'get_interaction_by_id',
-            mock_get_interaction_by_id)
+            classmethod(mock_get_interaction_by_id))
 
         with rules_registry_swap, interaction_registry_swap:
             html_list = state.get_all_html_content_strings()
@@ -620,20 +617,17 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             return mock_html_field_types_to_rule_specs_dict
 
         def mock_get_interaction_by_id(
+            cls: Type[interaction_registry.Registry],
             interaction_id: str
         ) -> base.BaseInteraction:
-            interaction: base.BaseInteraction = copy.deepcopy(
-                interaction_registry.Registry.get_interaction_by_id(
-                    interaction_id
-                )
-            )
+            interaction = copy.deepcopy(cls._interactions[interaction_id]) # pylint: disable=protected-access
             interaction.answer_type = 'SetOfHtmlString'
             interaction.can_have_solution = True
             return interaction
 
         rules_registry_swap = self.swap(
             rules_registry.Registry, 'get_html_field_types_to_rule_specs',
-            mock_get_html_field_types_to_rule_specs)
+            classmethod(mock_get_html_field_types_to_rule_specs))
 
         interaction_registry_swap = self.swap(
             interaction_registry.Registry, 'get_interaction_by_id',
@@ -2194,6 +2188,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 }
 
             },
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {}
+            },
+            'next_content_id_index': 0,
             'written_translations': (
                 written_translations_dict_with_new_math_schema)
         }
@@ -2443,7 +2441,14 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'confirmed_unclassified_answers': [],
                 'id': 'ItemSelectionInput',
                 'hints': []
-            }
+            },
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {}
+            },
+            'written_translations': {
+                'translations_mapping': {}
+            },
+            'next_content_id_index': 0
         }
         interaction_registry.Registry.get_all_specs_for_state_schema_version(
             41)['ItemSelectionInput']['can_have_solution'] = True
@@ -2639,7 +2644,14 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                             'html': html_with_new_math_schema
                         }
                     }]
-            }
+            },
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {}
+            },
+            'written_translations': {
+                'translations_mapping': {}
+            },
+            'next_content_id_index': 0
         }
         self.assertEqual(
             state_domain.State.convert_html_fields_in_state(
@@ -2811,7 +2823,14 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                             'html': html_with_new_math_schema
                         }
                     }]
-            }
+            },
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {}
+            },
+            'written_translations': {
+                'translations_mapping': {}
+            },
+            'next_content_id_index': 0
         }
         self.assertEqual(
             state_domain.State.convert_html_fields_in_state(
@@ -4524,6 +4543,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             exploration.init_state.update_interaction_answer_groups(
                 [state_answer_group])
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_cannot_update_answer_groups_with_invalid_rule_input_value(
         self
     ) -> None:
@@ -4531,7 +4553,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         test_inputs: Dict[str, Dict[str, Union[str, List[str]]]] = {
             'x': {
                 'contentId': 'rule_input_Equals',
-                'normalizedStrSet': []
+                'normalizedStrSet': [[]]  # type: ignore[list-item]
                 }
             }
         state_answer_group = state_domain.AnswerGroup(
