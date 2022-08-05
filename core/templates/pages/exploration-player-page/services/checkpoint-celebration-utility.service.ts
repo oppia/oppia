@@ -41,7 +41,7 @@ export class CheckpointCelebrationUtilityService {
       statesbackendDict);
     const bfsStateList = this.computeGraphService.computeBfsTraversalOfStates(
       initStateName, states, initStateName);
-    let stateListForCheckpointMessages = [];
+    let stateListForCheckpointMessages: string[] = [];
     bfsStateList.forEach((state) => {
       if (statesbackendDict[state].card_is_checkpoint) {
         stateListForCheckpointMessages.push(state);
