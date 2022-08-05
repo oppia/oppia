@@ -29,7 +29,7 @@ from core.platform import models
 
 import apache_beam as beam
 import bs4
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -510,15 +510,12 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
 
     @staticmethod
     def get_exploration_from_models(
-        model: Tuple[
-            exp_models.ExplorationModel,
-            opportunity_models.ExplorationOpportunitySummaryModel] |
-            exp_models.ExplorationModel
+        model: Tuple[Any, Any] | Any
     ) -> None | exp_domain.Exploration:
         """Returns the exploration domain object
 
         Args:
-            model: tuple|exp_models.ExplorationModel. The pair of exp and
+            model: tuple|Any. The pair of exp and
                 opportunity models or just exp model.
 
         Returns:
