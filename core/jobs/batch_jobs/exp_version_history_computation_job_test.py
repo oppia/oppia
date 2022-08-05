@@ -391,34 +391,6 @@ class ComputeExplorationVersionHistoryJobTests(
         for model in version_history_models:
             assert model is not None
 
-    def test_ignore_exps_having_outdated_states_schema_version(self) -> None:
-        self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
-        version_history_keys = [
-            datastore_services.Key(
-                exp_models.ExplorationVersionHistoryModel,
-                exp_models.ExplorationVersionHistoryModel.get_instance_id(
-                    self.EXP_ID_1, 1
-                )
-            )
-        ]
-        datastore_services.delete_multi(version_history_keys)
-        swap_earlier_state_to_60 = (
-            self.swap(feconf, 'EARLIEST_SUPPORTED_STATE_SCHEMA_VERSION', 60)
-        )
-        swap_current_state_61 = self.swap(
-            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 61)
-        with swap_earlier_state_to_60, swap_current_state_61:
-            self.assert_job_output_is([
-                job_run_result.JobRunResult.as_stdout(
-                    'EXPS FOR WHICH VERSION HISTORY CANNOT BE COMPUTED '
-                    'SUCCESS: 1'
-                ),
-                job_run_result.JobRunResult.as_stderr(
-                    'Version history cannot be computed for exploration '
-                    'with ID %s' % (self.EXP_ID_1)
-                )
-            ])
-
 
 class VerifyVersionHistoryModelsJobTests(
     test_utils.GenericTestBase, job_test_utils.JobTestBase
