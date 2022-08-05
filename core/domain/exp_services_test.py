@@ -164,7 +164,7 @@ class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
         })]
         with self.assertRaisesRegex(
             Exception,
-            'No classifier algorithmfound for NumericInput interaction'):
+            'No classifier algorithm found for NumericInput interaction'):
             with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
                 with self.swap(feconf, 'MIN_TOTAL_TRAINING_EXAMPLES', 2):
                     with self.swap(feconf, 'MIN_ASSIGNED_LABELS', 1):
