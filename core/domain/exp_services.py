@@ -364,13 +364,16 @@ def apply_change_list(exploration_id, change_list):
     """Applies a changelist to a pristine exploration and returns the result.
     Each entry in change_list is a dict that represents an ExplorationChange
     object.
+
     Args:
         exploration_id: str. The id of the exploration to which the change list
             is to be applied.
         change_list: list(ExplorationChange). The list of changes to apply.
+
     Returns:
         Exploration. The exploration domain object that results from applying
         the given changelist to the existing version of the exploration.
+
     Raises:
         Exception. Any entries in the changelist are invalid.
     """

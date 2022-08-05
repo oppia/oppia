@@ -22,7 +22,6 @@ import copy
 
 from core import feconf
 from core.domain import exp_domain
-from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import state_domain
 from core.jobs import base_jobs
