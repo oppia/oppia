@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import itertools
 import random
 import string
 
@@ -2054,21 +2055,24 @@ class StoryProgressModel(base_models.BaseModel):
     # doesn't match with BaseModel.get_multi().
     @classmethod
     def get_multi( # type: ignore[override]
-        cls, user_id: str, story_ids: List[str]
+        cls, user_ids: List[str], story_ids: List[str]
     ) -> List[Optional[StoryProgressModel]]:
-        """Gets the StoryProgressModels for the given user and story
+        """Gets the StoryProgressModels for the given user ids and story
         ids.
 
         Args:
-            user_id: str. The id of the user.
+            user_ids: list(str). The ids of the users.
             story_ids: list(str). The ids of the stories.
 
         Returns:
             list(StoryProgressModel|None). The list of StoryProgressModel
-            instances which matches the given user_id and story_ids.
+            instances which matches the given user_ids and story_ids.
         """
-        instance_ids = [cls._generate_id(user_id, story_id)
-                        for story_id in story_ids]
+        all_posssible_combinations = itertools.product(user_ids, story_ids)
+        instance_ids = [
+            cls._generate_id(user_id, story_id)
+            for (user_id, story_id) in all_posssible_combinations
+        ]
 
         return super(StoryProgressModel, cls).get_multi(
             instance_ids)

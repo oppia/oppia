@@ -6,9 +6,9 @@
     <ng-template ngbNavContent>
       <span>
         <br>
-        <angular-html-bind-wrapper [classStr]="'e2e-test-tab-content-' + idx"
-                                   [htmlData]="tabContent.content">
-        </angular-html-bind-wrapper>
+        <oppia-rte-output-display [class]="'e2e-test-tab-content-' + idx"
+                                  [rteString]="tabContent.content">
+        </oppia-rte-output-display>
       </span>
     </ng-template>
   </ng-container>

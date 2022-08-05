@@ -55,6 +55,7 @@ var ExplorationEditorMainTab = function() {
   var interaction = $('.e2e-test-interaction');
   var interactionEditor = $('.e2e-test-interaction-editor');
   var interactionHtmlElement = $('.e2e-test-interaction-html');
+  var parameterElementButton = $('.e2e-test-main-html-select-selector');
   var interactionTab = function(tabId) {
     return $('.e2e-test-interaction-tab-' + tabId);
   };
@@ -67,8 +68,8 @@ var ExplorationEditorMainTab = function() {
       `.e2e-test-html-item-select-option=${optionNum}`);
   };
   var multipleChoiceAnswerOptions = function(optionNum) {
-    return $(
-      `.e2e-test-html-multiple-select-option=${optionNum}`);
+    return $$(
+      `.e2e-test-html-select-selector=${optionNum}`)[0];
   };
   var nodeLabelLocator = '.e2e-test-node-label';
   var openOutcomeDestEditor = $('.e2e-test-open-outcome-dest-editor');
@@ -79,7 +80,6 @@ var ExplorationEditorMainTab = function() {
   };
   var ruleDetails = $('.e2e-test-rule-details');
   var stateContentDisplay = $('.e2e-test-state-content-display');
-  var stateContentEditorLocator = '.e2e-test-state-content-editor';
   var stateEditButton = $('.e2e-test-edit-content-pencil-button');
   var stateEditorTag = $('.e2e-test-state-content-editor');
   var stateNameContainer = $('.e2e-test-state-name-container');
@@ -271,8 +271,10 @@ var ExplorationEditorMainTab = function() {
       if (responseNum === 'default') {
         headerElem = defaultResponseTab;
       } else {
+        var responseTabElement = $('.e2e-test-response-tab');
+        await waitFor.visibilityOf(
+          responseTabElement, 'Response tab is not visible');
         var responseTab = await $$('.e2e-test-response-tab');
-        await waitFor.visibilityOf(responseTab[0]);
         headerElem = responseTab[responseNum];
       }
 
@@ -465,11 +467,7 @@ var ExplorationEditorMainTab = function() {
     await action.click('stateEditButton', stateEditButton);
     await waitFor.visibilityOf(
       stateEditorTag, 'State editor tag not showing up');
-    var stateContentEditor = stateEditorTag.$(stateContentEditorLocator);
-    await waitFor.visibilityOf(
-      stateContentEditor,
-      'stateContentEditor taking too long to appear to set content');
-    var richTextEditor = await forms.RichTextEditor(stateContentEditor);
+    var richTextEditor = await forms.RichTextEditor(stateEditorTag);
     await richTextEditor.clear();
     await richTextInstructions(richTextEditor);
     await action.click('Save State Content Button', saveStateContentButton);
@@ -525,7 +523,7 @@ var ExplorationEditorMainTab = function() {
     var explanationTextArea = await explanationTextAreaElement.$$('<p>')[0];
     await action.click('Explanation Text Area', explanationTextArea);
     var CKEditor = await ckEditorElement.$$(
-      'oppia-rte-resizer')[0];
+      '.oppia-rte-resizer')[0];
     await action.setValue(
       'Text CKEditor', CKEditor, solution.explanation);
     await action.click('Submit Solution Button', submitSolutionButton);
@@ -729,10 +727,12 @@ var ExplorationEditorMainTab = function() {
 
       if (interactionId === 'MultipleChoiceInput') {
         // This is a special case as it uses a dropdown to set a NonnegativeInt.
-        var parameterElementButton = parameterElement.$('<button>');
-        await action.click('Parameter Element Button', parameterElementButton);
+        await action.click(
+          'Parameter Element Button', parameterElementButton);
+
         var multipleChoiceAnswerOption =
-          multipleChoiceAnswerOptions(parameterValues[i]);
+          await multipleChoiceAnswerOptions(parameterValues[i]);
+
         await action.click(
           'Multiple Choice Answer Option: ' + i,
           multipleChoiceAnswerOption);
@@ -796,7 +796,7 @@ var ExplorationEditorMainTab = function() {
     var ruleDescriptionInDropdown = ruleDescription;
     await action.click('Answer Description', answerDescription);
     var ruleDropdownElement = await $$(
-      `.select2-results__option=${ruleDescriptionInDropdown}`)[0];
+      `.e2e-test-rule-type-selector=${ruleDescriptionInDropdown}`)[0];
     await action.click('Rule Dropdown Element', ruleDropdownElement);
   };
 
@@ -805,14 +805,15 @@ var ExplorationEditorMainTab = function() {
   this.deleteState = async function(stateName) {
     await action.waitForAutosave();
     await general.scrollToTop();
+    var nodeStateElement = await explorationGraph.$(
+      `.e2e-test-node=${stateName}`);
+    await waitFor.visibilityOf(
+      nodeStateElement,
+      'State ' + stateName + ' takes too long to appear or does not exist');
     var nodeElement = await explorationGraph.$$(
       `.e2e-test-node=${stateName}`)[0];
-    await waitFor.visibilityOf(
-      nodeElement,
-      'State ' + stateName + ' takes too long to appear or does not exist');
     var deleteNode = nodeElement.$(deleteNodeLocator);
     await action.click('Delete Node', deleteNode);
-
     await action.click('Confirm Delete State Button', confirmDeleteStateButton);
     await waitFor.invisibilityOf(
       confirmDeleteStateButton, 'Deleting state takes too long');

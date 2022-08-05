@@ -13,187 +13,235 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the state editor directive.
+ * @fileoverview Component for the state editor Component.
  */
 
-require(
-  'components/state-editor/state-hints-editor/state-hints-editor.component.ts');
-require(
-  'components/state-editor/state-skill-editor/' +
-  'state-skill-editor.component.ts');
-require(
-  'components/state-editor/state-responses-editor/' +
-  'state-responses.component.ts');
-require(
-  'components/state-editor/state-solution-editor/' +
-  'state-solution-editor.component.ts');
-
-require('domain/utilities/url-interpolation.service.ts');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-card-is-checkpoint.service.ts');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-editor.service.ts');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-skill.service');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-name.service.ts');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-next-content-id-index.service');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-param-changes.service.ts');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-property.service.ts');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-solicit-answer-details.service.ts');
-require('services/contextual/window-dimensions.service');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-interaction-id.service');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-solution.service');
-require(
-  'pages/exploration-editor-page/editor-tab/' +
-  'exploration-editor-tab.component.ts');
-
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { State } from 'domain/state/StateObjectFactory';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { Subscription } from 'rxjs';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { StateCardIsCheckpointService } from './state-editor-properties-services/state-card-is-checkpoint.service';
+import { StateContentService } from './state-editor-properties-services/state-content.service';
+import { StateCustomizationArgsService } from './state-editor-properties-services/state-customization-args.service';
+import { StateEditorService } from './state-editor-properties-services/state-editor.service';
+import { StateHintsService } from './state-editor-properties-services/state-hints.service';
+import { StateInteractionIdService } from './state-editor-properties-services/state-interaction-id.service';
+import { StateNameService } from './state-editor-properties-services/state-name.service';
+import { StateNextContentIdIndexService } from './state-editor-properties-services/state-next-content-id-index.service';
+import { StateParamChangesService } from './state-editor-properties-services/state-param-changes.service';
+import { StateLinkedSkillIdService } from './state-editor-properties-services/state-skill.service';
+import { StateSolicitAnswerDetailsService } from './state-editor-properties-services/state-solicit-answer-details.service';
+import { StateSolutionService } from './state-editor-properties-services/state-solution.service';
+import INTERACTION_SPECS from 'interactions/interaction_specs.json';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import { Solution } from 'domain/exploration/SolutionObjectFactory';
+import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
+import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
+import { Hint } from 'domain/exploration/HintObjectFactory';
 
-angular.module('oppia').component('stateEditor', {
-  bindings: {
-    addState: '=',
-    getStateContentPlaceholder: '&stateContentPlaceholder',
-    getStateContentSaveButtonPlaceholder: (
-      '&stateContentSaveButtonPlaceholder'),
-    isInteractionShown: '&interactionIsShown',
-    navigateToState: '=',
-    onSaveHints: '=',
-    onSaveInapplicableSkillMisconceptionIds: '=',
-    onSaveInteractionAnswerGroups: '=',
-    onSaveInteractionCustomizationArgs: '=',
-    onSaveInteractionDefaultOutcome: '=',
-    onSaveInteractionId: '=',
-    onSaveLinkedSkillId: '=',
-    onSaveNextContentIdIndex: '=',
-    onSaveSolicitAnswerDetails: '=',
-    onSaveSolution: '=',
-    onSaveStateContent: '=',
-    recomputeGraph: '=',
-    refreshWarnings: '=',
-    showMarkAllAudioAsNeedingUpdateModalIfRequired: '=',
-    explorationIsLinkedToStory: '='
-  },
-  template: require('./state-editor.component.html'),
-  controller: [
-    '$rootScope', '$scope', 'StateCardIsCheckpointService',
-    'StateContentService',
-    'StateCustomizationArgsService', 'StateEditorService',
-    'StateHintsService', 'StateInteractionIdService',
-    'StateLinkedSkillIdService', 'StateNameService',
-    'StateNextContentIdIndexService', 'StateParamChangesService',
-    'StateSolicitAnswerDetailsService', 'StateSolutionService',
-    'UrlInterpolationService', 'WindowDimensionsService', 'INTERACTION_SPECS',
-    function(
-        $rootScope, $scope, StateCardIsCheckpointService, StateContentService,
-        StateCustomizationArgsService, StateEditorService,
-        StateHintsService, StateInteractionIdService,
-        StateLinkedSkillIdService, StateNameService,
-        StateNextContentIdIndexService, StateParamChangesService,
-        StateSolicitAnswerDetailsService, StateSolutionService,
-        UrlInterpolationService, WindowDimensionsService, INTERACTION_SPECS) {
-      var ctrl = this;
-      ctrl.directiveSubscriptions = new Subscription();
-      var updateInteractionVisibility = function(newInteractionId) {
-        $scope.interactionIdIsSet = Boolean(newInteractionId);
-        $scope.currentInteractionCanHaveSolution = Boolean(
-          $scope.interactionIdIsSet &&
-          INTERACTION_SPECS[newInteractionId].can_have_solution);
-        $scope.currentStateIsTerminal = Boolean(
-          $scope.interactionIdIsSet && INTERACTION_SPECS[
-            newInteractionId].is_terminal);
-      };
+@Component({
+  selector: 'oppia-state-editor',
+  templateUrl: './state-editor.component.html'
+})
+export class StateEditorComponent implements OnInit, OnDestroy {
+  @Input() addState: (value: string) => void;
+  @Input() explorationIsLinkedToStory: boolean;
+  @Input() interactionIsShown: boolean = true;
+  @Input() stateContentSaveButtonPlaceholder: string;
+  @Input() stateContentPlaceholder: string;
 
-      // Remove this function once this component is migrated to
-      // Angular 2+.
-      $scope.getSolutionChange = function() {
-        $rootScope.$applyAsync();
-      };
+  @Output() onSaveHints = new EventEmitter<Hint[]>();
+  @Output() onSaveInapplicableSkillMisconceptionIds = (
+    new EventEmitter<string[]>());
 
-      $scope.reinitializeEditor = function() {
-        StateEditorService.onStateEditorInitialized.emit($scope.stateData);
-      };
+  @Output() onSaveInteractionAnswerGroups = new EventEmitter<unknown>();
+  @Output() onSaveInteractionCustomizationArgs = (
+    new EventEmitter<InteractionCustomizationArgs>());
 
-      $scope.toggleConceptCard = function() {
-        $scope.conceptCardIsShown = !$scope.conceptCardIsShown;
-      };
+  @Output() onSaveInteractionDefaultOutcome = new EventEmitter<Outcome>();
+  @Output() onSaveInteractionId = new EventEmitter<string>();
+  @Output() onSaveLinkedSkillId = new EventEmitter<string>();
+  @Output() onSaveNextContentIdIndex = new EventEmitter<number>();
+  @Output() onSaveSolicitAnswerDetails = new EventEmitter<boolean>();
+  @Output() onSaveSolution = new EventEmitter<Solution>();
+  @Output() onSaveStateContent = new EventEmitter<SubtitledHtml>();
+  @Output() recomputeGraph = new EventEmitter<void>();
+  @Output() refreshWarnings = new EventEmitter<void>();
+  @Output() navigateToState = new EventEmitter<string>();
+  @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired = (
+    new EventEmitter<string[]>());
 
-      ctrl.$onInit = function() {
-        $scope.oppiaBlackImgUrl = UrlInterpolationService.getStaticImageUrl(
-          '/avatar/oppia_avatar_100px.svg');
-        $scope.currentStateIsTerminal = false;
-        $scope.conceptCardIsShown = true;
-        $scope.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
-        $scope.interactionIdIsSet = false;
-        $scope.servicesInitialized = false;
-        $scope.stateName = StateEditorService.getActiveStateName();
-        ctrl.directiveSubscriptions.add(
-          StateInteractionIdService.onInteractionIdChanged.subscribe(
-            (newInteractionId) => {
-              updateInteractionVisibility(newInteractionId);
-            }
-          )
-        );
+  directiveSubscriptions = new Subscription();
+  oppiaBlackImgUrl: string;
+  currentStateIsTerminal: boolean;
+  conceptCardIsShown: boolean = true;
+  windowIsNarrow: boolean;
+  interactionIdIsSet: boolean;
+  servicesInitialized: boolean;
+  stateName: string | null;
+  stateData: State;
+  currentInteractionCanHaveSolution: boolean;
 
-        ctrl.directiveSubscriptions.add(
-          StateEditorService.onStateEditorInitialized.subscribe(
-            (stateData) => {
-              if (stateData === undefined || $.isEmptyObject(stateData)) {
-                throw new Error(
-                  'Expected stateData to be defined but ' +
-                  'received ' + stateData);
-              }
-              $scope.stateData = stateData;
-              $scope.stateName = StateEditorService.getActiveStateName();
-              StateEditorService.setInteraction(stateData.interaction);
-              StateContentService.init(
-                $scope.stateName, stateData.content);
-              StateLinkedSkillIdService.init(
-                $scope.stateName, stateData.linkedSkillId);
-              StateHintsService.init(
-                $scope.stateName, stateData.interaction.hints);
-              StateInteractionIdService.init(
-                $scope.stateName, stateData.interaction.id);
-              StateCustomizationArgsService.init(
-                $scope.stateName, stateData.interaction.customizationArgs);
-              StateNextContentIdIndexService.init(
-                $scope.stateName, stateData.nextContentIdIndex);
-              StateNameService.init($scope.stateName, stateData.name);
-              StateParamChangesService.init(
-                $scope.stateName, stateData.paramChanges);
-              StateSolicitAnswerDetailsService.init(
-                $scope.stateName, stateData.solicitAnswerDetails);
-              StateCardIsCheckpointService.init(
-                $scope.stateName, stateData.cardIsCheckpoint);
-              StateSolutionService.init(
-                $scope.stateName, stateData.interaction.solution);
-              updateInteractionVisibility(stateData.interaction.id);
-              $scope.servicesInitialized = true;
-            }
-          )
-        );
-        StateEditorService.onStateEditorDirectiveInitialized.emit();
-        StateEditorService.updateStateEditorDirectiveInitialised();
-      };
-      ctrl.$onDestroy = function() {
-        ctrl.directiveSubscriptions.unsubscribe();
-      };
-    }
-  ]
-});
+  constructor(
+    private stateCardIsCheckpointService: StateCardIsCheckpointService,
+    private stateContentService: StateContentService,
+    private stateCustomizationArgsService: StateCustomizationArgsService,
+    private stateEditorService: StateEditorService,
+    private stateHintsService: StateHintsService,
+    private stateInteractionIdService: StateInteractionIdService,
+    private stateLinkedSkillIdService: StateLinkedSkillIdService,
+    private stateNameService: StateNameService,
+    private stateNextContentIdIndexService: StateNextContentIdIndexService,
+    private stateParamChangesService: StateParamChangesService,
+    private stateSolicitAnswerDetailsService: StateSolicitAnswerDetailsService,
+    private stateSolutionService: StateSolutionService,
+    private urlInterpolationService: UrlInterpolationService,
+    private windowDimensionsService: WindowDimensionsService,
+  ) { }
+
+  sendRecomputeGraph(): void {
+    this.recomputeGraph.emit();
+  }
+
+  sendOnSaveLinkedSkillId($event: string): void {
+    this.onSaveLinkedSkillId.emit($event);
+  }
+
+  sendOnSaveSolicitAnswerDetails($event: boolean): void {
+    this.onSaveSolicitAnswerDetails.emit($event);
+  }
+
+  sendOnSaveHints($event: Hint[]): void {
+    this.onSaveHints.emit($event);
+  }
+
+  sendRefreshWarnings(): void {
+    this.refreshWarnings.emit();
+  }
+
+  sendOnSaveInteractionDefaultOutcome($event: Outcome): void {
+    this.onSaveInteractionDefaultOutcome.emit($event);
+  }
+
+  sendOnSaveInteractionAnswerGroups($event: string[]): void {
+    this.onSaveInteractionAnswerGroups.emit($event);
+  }
+
+  sendOnSaveInapplicableSkillMisconceptionIds($event: string[]): void {
+    this.onSaveInapplicableSkillMisconceptionIds.emit($event);
+  }
+
+  sendNavigateToState($event: string): void {
+    this.navigateToState.emit($event);
+  }
+
+  sendOnSaveSolution($event: Solution): void {
+    this.onSaveSolution.emit($event);
+  }
+
+  sendOnSaveNextContentIdIndex($event: number): void {
+    this.onSaveNextContentIdIndex.emit($event);
+  }
+
+  sendOnSaveInteractionCustomizationArgs($event: string): void {
+    this.onSaveInteractionCustomizationArgs.emit($event);
+  }
+
+  sendOnSaveInteractionId($event: string): void {
+    this.onSaveInteractionId.emit($event);
+  }
+
+  sendShowMarkAllAudioAsNeedingUpdateModalIfRequired($event: string[]): void {
+    this.showMarkAllAudioAsNeedingUpdateModalIfRequired.emit($event);
+  }
+
+  sendOnSaveStateContent($event: SubtitledHtml): void {
+    this.onSaveStateContent.emit($event);
+  }
+
+  updateInteractionVisibility(newInteractionId: string): void {
+    this.interactionIdIsSet = Boolean(newInteractionId);
+    this.currentInteractionCanHaveSolution = Boolean(
+      this.interactionIdIsSet &&
+      INTERACTION_SPECS[newInteractionId].can_have_solution);
+    this.currentStateIsTerminal = Boolean(
+      this.interactionIdIsSet && INTERACTION_SPECS[
+        newInteractionId].is_terminal);
+  }
+
+  reinitializeEditor(): void {
+    this.stateEditorService.onStateEditorInitialized.emit(this.stateData);
+  }
+
+  toggleConceptCard(): void {
+    this.conceptCardIsShown = !this.conceptCardIsShown;
+  }
+
+  ngOnInit(): void {
+    this.oppiaBlackImgUrl = this.urlInterpolationService.getStaticImageUrl(
+      '/avatar/oppia_avatar_100px.svg');
+    this.currentStateIsTerminal = false;
+    this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
+    this.interactionIdIsSet = false;
+    this.servicesInitialized = false;
+    this.stateName = this.stateEditorService.getActiveStateName();
+    this.directiveSubscriptions.add(
+      this.stateInteractionIdService.onInteractionIdChanged.subscribe(
+        (newInteractionId) => {
+          this.updateInteractionVisibility(newInteractionId);
+        }
+      )
+    );
+
+    this.directiveSubscriptions.add(
+      this.stateEditorService.onStateEditorInitialized.subscribe(
+        (stateData) => {
+          if (stateData === undefined || $.isEmptyObject(stateData)) {
+            throw new Error(
+              'Expected stateData to be defined but ' +
+              'received ' + stateData);
+          }
+          this.stateData = stateData;
+          this.stateName = this.stateEditorService.getActiveStateName();
+          this.stateEditorService.setInteraction(stateData.interaction);
+          this.stateContentService.init(
+            this.stateName, stateData.content);
+          this.stateLinkedSkillIdService.init(
+            this.stateName, stateData.linkedSkillId);
+          this.stateHintsService.init(
+            this.stateName, stateData.interaction.hints);
+          this.stateInteractionIdService.init(
+            this.stateName, stateData.interaction.id);
+          this.stateCustomizationArgsService.init(
+            this.stateName, stateData.interaction.customizationArgs);
+          this.stateNextContentIdIndexService.init(
+            this.stateName, stateData.nextContentIdIndex);
+          this.stateNameService.init();
+          this.stateParamChangesService.init(
+            this.stateName, stateData.paramChanges);
+          this.stateSolicitAnswerDetailsService.init(
+            this.stateName, stateData.solicitAnswerDetails);
+          this.stateCardIsCheckpointService.init(
+            this.stateName, stateData.cardIsCheckpoint);
+          this.stateSolutionService.init(
+            this.stateName, stateData.interaction.solution);
+          this.updateInteractionVisibility(stateData.interaction.id);
+          this.servicesInitialized = true;
+        }
+      )
+    );
+    this.stateEditorService.onStateEditorDirectiveInitialized.emit();
+    this.stateEditorService.updateStateEditorDirectiveInitialised();
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
+  }
+}
+
+angular.module('oppia').directive('oppiaStateEditor',
+  downgradeComponent({
+    component: StateEditorComponent
+  }) as angular.IDirectiveFactory);

@@ -19,19 +19,15 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
-import { LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exploration-summary.model';
 import { ReadOnlyTopicBackendDict, ReadOnlyTopicObjectFactory } from 'domain/topic_viewer/read-only-topic-object.factory';
 import { TopicViewerBackendApiService } from 'domain/topic_viewer/topic-viewer-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { ContextService } from 'services/context.service';
-import { LoggerService } from 'services/contextual/logger.service';
 import { UrlService } from 'services/contextual/url.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { LearnerViewInfoBackendApiService } from '../services/learner-view-info-backend-api.service';
 import { StatsReportingService } from '../services/stats-reporting.service';
 import { LearnerViewInfoComponent } from './learner-view-info.component';
 
@@ -39,8 +35,6 @@ describe('Learner view info component', () => {
   let fixture: ComponentFixture<LearnerViewInfoComponent>;
   let componentInstance: LearnerViewInfoComponent;
   let contextService: ContextService;
-  let learnerViewInfoBackendApiService: LearnerViewInfoBackendApiService;
-  let loggerService: LoggerService;
   let readOnlyExplorationBackendApiService:
     ReadOnlyExplorationBackendApiService;
   let siteAnalyticsService: SiteAnalyticsService;
@@ -61,10 +55,7 @@ describe('Learner view info component', () => {
         MockTranslatePipe
       ],
       providers: [
-        NgbModal,
         ContextService,
-        LearnerViewInfoBackendApiService,
-        LoggerService,
         ReadOnlyExplorationBackendApiService,
         SiteAnalyticsService,
         StatsReportingService,
@@ -81,9 +72,6 @@ describe('Learner view info component', () => {
     fixture = TestBed.createComponent(LearnerViewInfoComponent);
     componentInstance = fixture.componentInstance;
     contextService = TestBed.inject(ContextService);
-    learnerViewInfoBackendApiService = TestBed.inject(
-      LearnerViewInfoBackendApiService);
-    loggerService = TestBed.inject(LoggerService);
     readOnlyExplorationBackendApiService = TestBed.inject(
       ReadOnlyExplorationBackendApiService);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
@@ -170,67 +158,6 @@ describe('Learner view info component', () => {
     spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(topicUrl);
 
     expect(componentInstance.getTopicUrl()).toEqual(topicUrl);
-  });
-
-  it('should invoke information card modal', () => {
-    let ngbModal = TestBed.inject(NgbModal);
-
-    spyOn(ngbModal, 'open').and.returnValue({
-      componentInstance: {
-        expInfo: null
-      },
-      result: {
-        then: (successCallback: () => void, errorCallback: () => void) => {
-          successCallback();
-          errorCallback();
-        }
-      }
-    } as NgbModalRef);
-
-    componentInstance.openInformationCardModal();
-
-    expect(ngbModal.open).toHaveBeenCalled();
-  });
-
-  it('should display information card', fakeAsync(() => {
-    let explorationId = 'expId';
-    componentInstance.explorationId = explorationId;
-    componentInstance.expInfo = {} as LearnerExplorationSummaryBackendDict;
-
-    spyOn(componentInstance, 'openInformationCardModal');
-    componentInstance.showInformationCard();
-    spyOn(learnerViewInfoBackendApiService, 'fetchLearnerInfoAsync')
-      .and.returnValue(Promise.resolve({
-        summaries: []
-      }));
-
-    expect(componentInstance.openInformationCardModal).toHaveBeenCalled();
-    componentInstance.expInfo = null;
-
-    componentInstance.showInformationCard();
-    tick();
-
-    expect(learnerViewInfoBackendApiService.fetchLearnerInfoAsync)
-      .toHaveBeenCalled();
-  }));
-
-  it('should handle error if backend call fails', fakeAsync(() => {
-    let explorationId = 'expId';
-    componentInstance.explorationId = explorationId;
-    componentInstance.expInfo = null;
-
-    spyOn(learnerViewInfoBackendApiService, 'fetchLearnerInfoAsync')
-      .and.returnValue(Promise.reject());
-    spyOn(loggerService, 'error');
-
-    componentInstance.showInformationCard();
-    tick();
-
-    expect(loggerService.error).toHaveBeenCalled();
-  }));
-
-  it('should get RTL language status correctly', () => {
-    expect(componentInstance.isLanguageRTL()).toEqual(true);
   });
 
   it('should set topic name and subtopic title translation key and ' +

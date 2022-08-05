@@ -34,7 +34,8 @@ describe('I18n service', () => {
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let userService: UserService;
   let userBackendApiService: UserBackendApiService;
-  const CACHE_KEY = 'lang';
+  const CACHE_KEY_LANG = 'lang';
+  const CACHE_KEY_DIRECTION = 'direction';
 
   class MockWindowRef {
     nativeWindow = {
@@ -46,7 +47,8 @@ describe('I18n service', () => {
       location: {
         toString: () => {
           return '';
-        }
+        },
+        reload: () => {}
       },
       history: {
         pushState: () => {}
@@ -97,7 +99,8 @@ describe('I18n service', () => {
   it('should set cache language according to URL lang param', () => {
     // Setting 'en' as cache language code.
     if (i18nService.localStorage) {
-      i18nService.localStorage.setItem(CACHE_KEY, 'en');
+      i18nService.localStorage.setItem(CACHE_KEY_LANG, 'en');
+      i18nService.localStorage.setItem(CACHE_KEY_DIRECTION, 'ltr');
     }
     // This sets the url to 'http://localhost:8181/?lang=es'
     // when initialized.
@@ -105,20 +108,20 @@ describe('I18n service', () => {
       .and.returnValue('http://localhost:8181/?lang=es');
     expect(
       i18nService.localStorage ?
-      i18nService.localStorage.getItem(CACHE_KEY) : null)
+      i18nService.localStorage.getItem(CACHE_KEY_LANG) : null)
       .toBe('en');
 
     i18nService.initialize();
 
     expect(
       i18nService.localStorage ?
-      i18nService.localStorage.getItem(CACHE_KEY) : null)
+      i18nService.localStorage.getItem(CACHE_KEY_LANG) : null)
       .toBe('es');
   });
 
   it('should remove language param from URL if it is invalid', () => {
     if (i18nService.localStorage) {
-      i18nService.localStorage.setItem(CACHE_KEY, 'en');
+      i18nService.localStorage.setItem(CACHE_KEY_LANG, 'en');
     }
     // This sets the url to 'http://localhost:8181/?lang=invalid'
     // when initialized.
@@ -131,13 +134,14 @@ describe('I18n service', () => {
     // is invalid.
     expect(
       i18nService.localStorage ?
-      i18nService.localStorage.getItem(CACHE_KEY) : null).toBe('en');
+      i18nService.localStorage.getItem(CACHE_KEY_LANG) : null).toBe('en');
   });
 
   it('should not update translation cache if no language param is present in' +
   ' URL', () => {
     if (i18nService.localStorage) {
-      i18nService.localStorage.setItem(CACHE_KEY, 'en');
+      i18nService.localStorage.setItem(CACHE_KEY_LANG, 'en');
+      i18nService.localStorage.setItem(CACHE_KEY_DIRECTION, 'ltr');
     }
     // This sets the url to 'http://localhost:8181/' when initialized.
     spyOn(windowRef.nativeWindow.location, 'toString')
@@ -145,13 +149,13 @@ describe('I18n service', () => {
 
     expect(
       i18nService.localStorage ?
-      i18nService.localStorage.getItem(CACHE_KEY) : null).toBe('en');
+      i18nService.localStorage.getItem(CACHE_KEY_LANG) : null).toBe('en');
 
     i18nService.initialize();
 
     expect(
       i18nService.localStorage ?
-      i18nService.localStorage.getItem(CACHE_KEY) : null).toBe('en');
+      i18nService.localStorage.getItem(CACHE_KEY_LANG) : null).toBe('en');
   });
 
   it('should remove url lang param', () => {
@@ -165,25 +169,81 @@ describe('I18n service', () => {
   });
 
   it('should update user preferred language', fakeAsync(() => {
-    spyOn(i18nLanguageCodeService, 'setI18nLanguageCode');
     let userInfo = new UserInfo(
       [], true, true, true, true, true, 'es', '', '', true);
     spyOn(userService, 'getUserInfoAsync').and.returnValue(
       Promise.resolve(userInfo));
-    spyOn(userBackendApiService, 'updatePreferredSiteLanguageAsync');
+    spyOn(
+      userBackendApiService, 'updatePreferredSiteLanguageAsync'
+    ).and.returnValue(Promise.resolve({
+      site_language_code: 'es'
+    }));
     spyOn(i18nService, 'removeUrlLangParam');
 
     let newLangCode = 'en';
 
+    i18nLanguageCodeService.setI18nLanguageCode('es');
     expect(userInfo.getPreferredSiteLanguageCode()).toBe('es');
 
     i18nService.updateUserPreferredLanguage(newLangCode);
     tick();
 
-    expect(i18nLanguageCodeService.setI18nLanguageCode).toHaveBeenCalledWith(
-      newLangCode);
     expect(userBackendApiService.updatePreferredSiteLanguageAsync)
       .toHaveBeenCalledWith(newLangCode);
+    expect(i18nService.removeUrlLangParam).toHaveBeenCalled();
+  }));
+
+  it(
+    'should update user preferred language to arabic and reload',
+    fakeAsync(() => {
+      let userInfo = new UserInfo(
+        [], true, true, true, true, true, 'es', '', '', true);
+      spyOn(userService, 'getUserInfoAsync').and.returnValue(
+        Promise.resolve(userInfo));
+      spyOn(
+        userBackendApiService, 'updatePreferredSiteLanguageAsync'
+      ).and.returnValue(Promise.resolve({
+        site_language_code: 'es'
+      }));
+      spyOn(i18nService, 'removeUrlLangParam');
+      spyOn(windowRef.nativeWindow.location, 'reload');
+
+      let newLangCode = 'ar';
+
+      i18nLanguageCodeService.setI18nLanguageCode('es');
+      expect(userInfo.getPreferredSiteLanguageCode()).toBe('es');
+
+      i18nService.updateUserPreferredLanguage(newLangCode);
+      tick();
+
+      expect(windowRef.nativeWindow.location.reload).toHaveBeenCalled();
+      expect(userBackendApiService.updatePreferredSiteLanguageAsync)
+        .toHaveBeenCalledWith(newLangCode);
+      expect(i18nService.removeUrlLangParam).toHaveBeenCalled();
+    })
+  );
+
+  it('should update to arabic and refresh', fakeAsync(() => {
+    let userInfo = new UserInfo(
+      [], true, true, true, true, true, 'es', '', '', false);
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve(userInfo));
+    spyOn(
+      userBackendApiService, 'updatePreferredSiteLanguageAsync'
+    ).and.returnValue(Promise.resolve({
+      site_language_code: 'es'
+    }));
+    spyOn(i18nService, 'removeUrlLangParam');
+    spyOn(windowRef.nativeWindow.location, 'reload');
+
+    let newLangCode = 'ar';
+
+    i18nLanguageCodeService.setI18nLanguageCode('es');
+
+    i18nService.updateUserPreferredLanguage(newLangCode);
+    tick();
+
+    expect(windowRef.nativeWindow.location.reload).toHaveBeenCalled();
     expect(i18nService.removeUrlLangParam).toHaveBeenCalled();
   }));
 
@@ -205,7 +265,7 @@ describe('I18n service', () => {
     expect(i18nService.removeUrlLangParam).toHaveBeenCalled();
   }));
 
-  it('should not update site language if user doesnot have' +
+  it('should not update site language if user does not have' +
     ' a preferred language', fakeAsync(() => {
     let preferredLanguage = null;
     let userInfo = new UserInfo(

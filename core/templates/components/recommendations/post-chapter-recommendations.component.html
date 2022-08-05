@@ -1,0 +1,139 @@
+<div class="post-chapter-recommendations-container">
+  <p class="post-chapter-recommendation-text">
+    {{ 'I18N_END_EXPLORATION_RECOMMENDATION_MESSAGE' | translate }}
+  </p>
+  <div class="post-chapter-recommendation-cards-container">
+    <div *ngIf="nextStoryNodeTitle" class="recommendation-card-wrapper">
+      <div class="recommendation-card">
+        <svg width="192" height="150" class="recommendation-card-svg">
+          <title>Next chapter card</title>
+          <a [attr.href]="nextStoryNodeLink" class="e2e-test-recommended-next-chapter-button">
+            <rect width="192"
+                  height="150"
+                  [attr.fill]="nextStoryNodeThumbnailBgColor">
+            </rect>
+            <image x="0"
+                   y="0"
+                   height="180"
+                   width="240"
+                   class="next-story-node-image"
+                   [attr.xlink:href]="nextStoryNodeThumbnailUrl">
+            </image>
+          </a>
+        </svg>
+      </div>
+      <p class="to-the-next-lesson-text">
+        {{ 'I18N_END_CHAPTER_NEXT_CHAPTER_TEXT' | translate }}
+      </p>
+      <p class="font-italic">
+        {{ nextStoryNodeTitle }}
+      </p>
+    </div>
+    <p *ngIf="nextStoryNodeTitle" class="or-text">or</p>
+    <div *ngIf="practiceQuestionsAreEnabled" class="recommendation-card-wrapper">
+      <div class="recommendation-card">
+        <svg width="192" height="150" class="recommendation-card-svg">
+          <title>Practice session card</title>
+          <a [attr.href]="getPracticeTabUrl()" class="e2e-test-start-practice-from-recommendations-button">
+            <rect width="192"
+                  height="150"
+                  [attr.fill]="'#a6dacf'">
+            </rect>
+            <image x="17"
+                   y="20"
+                   height="180"
+                   width="240"
+                   class="post-chapter-recommendations-practice-icon"
+                   [attr.xlink:href]="getStaticImageUrl('/icons/train_icon_24px.svg')">
+            </image>
+          </a>
+        </svg>
+      </div>
+      <p class="font-italic">
+        {{ 'I18N_END_CHAPTER_PRACTICE_SESSION_TEXT' | translate }}
+      </p>
+    </div>
+    <div *ngIf="!practiceQuestionsAreEnabled" class="recommendation-card-wrapper">
+      <div class="recommendation-card">
+        <svg width="192" height="150" class="recommendation-card-svg">
+          <title>Revision card</title>
+          <a [attr.href]="getRevisionTabUrl()">
+            <rect width="192"
+                  height="150"
+                  [attr.fill]="'#be563c'">
+            </rect>
+            <image x="17"
+                   y="20"
+                   height="180"
+                   width="240"
+                   class="post-chapter-recommendations-revision-icon"
+                   [attr.xlink:href]="getStaticImageUrl('/icons/review_icon_24px.svg')">
+            </image>
+          </a>
+        </svg>
+      </div>
+      <p class="font-italic">
+        {{ 'I18N_END_CHAPTER_REVISION_TAB_TEXT' | translate }}
+      </p>
+    </div>
+  </div>
+</div>
+
+<style>
+  .post-chapter-recommendations-container {
+    margin-bottom: 30px;
+  }
+  .post-chapter-recommendations-container .post-chapter-recommendation-text {
+    font-size: 1.2em;
+    text-align: center;
+  }
+  .post-chapter-recommendations-container .post-chapter-recommendation-cards-container {
+    align-items: flex-start;
+    display: flex;
+    justify-content: space-evenly;
+  }
+  .post-chapter-recommendation-cards-container .recommendation-card-wrapper {
+    width: 192px;
+  }
+  .post-chapter-recommendation-cards-container .recommendation-card {
+    border-radius: 15px;
+    box-shadow: 7px 7px 5px rgba(0, 0, 0, 0.08);
+    height: 150px;
+    margin-bottom: 20px;
+    width: 192px;
+  }
+  .post-chapter-recommendation-cards-container .recommendation-card-svg {
+    border-radius: 15px;
+  }
+  .post-chapter-recommendation-cards-container .next-story-node-image {
+    transform: scale(0.8);
+  }
+  .post-chapter-recommendation-cards-container .post-chapter-recommendations-practice-icon {
+    transform: scale(0.7);
+  }
+  .post-chapter-recommendation-cards-container .post-chapter-recommendations-revision-icon {
+    transform: scale(0.7);
+  }
+  .post-chapter-recommendation-cards-container p {
+    font-size: 1.2em;
+    text-align: center;
+  }
+  .post-chapter-recommendation-cards-container .or-text {
+    margin-top: 65px;
+  }
+  .post-chapter-recommendation-cards-container .to-the-next-lesson-text {
+    font-weight: 800;
+    margin-bottom: 0;
+  }
+
+  @media (max-width: 1200px) {
+    .post-chapter-recommendations-container .post-chapter-recommendation-cards-container {
+      align-items: center;
+      flex-direction: column;
+    }
+    .post-chapter-recommendation-cards-container .or-text {
+      margin-bottom: 40px;
+      margin-top: 40px;
+    }
+  }
+</style>

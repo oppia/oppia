@@ -50,10 +50,12 @@ export class StateContentEditorComponent implements OnInit {
   @Input() stateContentSaveButtonPlaceholder: string;
   cardHeightLimitWarningIsShown: boolean;
   contentId: string;
-  contentEditorIsOpen: boolean;
+  contentEditorIsOpen: boolean = false;
   directiveSubscriptions = new Subscription();
   isEditable: boolean;
   HTML_SCHEMA: HTMLSchema;
+
+  cardHeightLimitReached = false;
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
@@ -78,7 +80,6 @@ export class StateContentEditorComponent implements OnInit {
       this.contentId = this.stateContentService.displayed.contentId;
     }
 
-    this.contentEditorIsOpen = false;
     this.cardHeightLimitWarningIsShown = true;
     this.directiveSubscriptions.add(
       this.externalSaveService.onExternalSave.subscribe(
@@ -103,6 +104,14 @@ export class StateContentEditorComponent implements OnInit {
     );
     let height = shadowPreviewCard.height();
     return (height > 630);
+  }
+
+  ngAfterViewChecked(): void {
+    let cardHeightLimitReached = this.isCardHeightLimitReached();
+    if (cardHeightLimitReached !== this.cardHeightLimitReached) {
+      this.cardHeightLimitReached = cardHeightLimitReached;
+      this.changeDetectorRef.detectChanges();
+    }
   }
 
   hideCardHeightLimitWarning(): void {

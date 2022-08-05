@@ -88,6 +88,7 @@ describe('Exploration object factory', () => {
         },
         default_outcome: {
           dest: 'new state',
+          dest_if_really_stuck: null,
           feedback: {} as SubtitledHtmlBackendDict,
           param_changes: [],
           labelled_as_correct: false,
@@ -137,6 +138,7 @@ describe('Exploration object factory', () => {
         },
         default_outcome: {
           dest: 'new state',
+          dest_if_really_stuck: null,
           feedback: {} as SubtitledHtmlBackendDict,
           param_changes: [],
           labelled_as_correct: false,

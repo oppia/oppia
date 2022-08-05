@@ -1,6 +1,3 @@
-<link *ngIf="!isLanguageRTL()" rel="preload" href="/templates/pages/topic-viewer-page/topic-viewer-page.component.css" as="style">
-<link *ngIf="isLanguageRTL()" rel="preload" href="/templates/pages/topic-viewer-page/topic-viewer-page.component.rtl.css" as="style">
-
 <div class="oppia-topic-viewer-container position-relative">
   <div class="oppia-topic-viewer-tabs-container position-relative" headroom>
     <div class="topic-viewer-tabs-list">
@@ -73,6 +70,3 @@
     </div>
   </div>
 </div>
-<!-- TODO(#14625): Incorporate the CSS file inclusion in webpack. -->
-<link *ngIf="!isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/topic-viewer-page/topic-viewer-page.component.css">
-<link *ngIf="isLanguageRTL()" rel="stylesheet" type="text/css" media="screen" href="/templates/pages/topic-viewer-page/topic-viewer-page.component.rtl.css">
