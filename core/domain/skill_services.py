@@ -446,7 +446,7 @@ def get_all_topic_assignments_for_skill(skill_id):
     return topic_assignments
 
 
-def check_skill_assignment_for_diagnostic_test(skill_id):
+def is_skill_assigned_to_a_diagnostic_test(skill_id):
     """Checks whether a skill is assigned for the diagnostic test in any of the
     existing topics.
 

@@ -34,6 +34,7 @@ export class DeleteSkillModalComponent extends ConfirmOrCancelModal {
   topicsAssignments!: AssignedSkill[];
   topicsAssignmentsAreFetched: boolean = false;
   allowSkillForDeletion: boolean = true;
+  topicNamesNotEligibleForUnassignment: string[] = [];
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -49,6 +50,7 @@ export class DeleteSkillModalComponent extends ConfirmOrCancelModal {
     for (let topic of topicAssignments) {
       allTopicIds.push(topic.topicId);
     }
+    let topicIdsNotEligibleForUnassignment = [];
     this.topicsAndSkillsDashboardBackendApiService
       .fetchTopicIdToDiagnosticTestSkillIdsAsync(allTopicIds).then(
         (dict) => {
@@ -58,8 +60,17 @@ export class DeleteSkillModalComponent extends ConfirmOrCancelModal {
             if (diagnosticTestSkillIds.length === 1 &&
                 diagnosticTestSkillIds.indexOf(this.skillId) !== -1) {
               this.allowSkillForDeletion = false;
+              topicIdsNotEligibleForUnassignment.push(topicId);
             }
           }
+          topicAssignments.filter((topic) => {
+            if (topicIdsNotEligibleForUnassignment.indexOf(
+              topic.topicId) === -1) {
+              return true;
+            }
+            this.topicNamesNotEligibleForUnassignment.push(topic.topicName);
+            return false;
+          });
           this.topicsAssignments = topicAssignments;
           this.topicsAssignmentsAreFetched = true;
         });

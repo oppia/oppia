@@ -379,7 +379,6 @@ class DiagnosticTestSkillAssignmentHandler(base.BaseHandler):
         """
         self.values.update({
             'skill_is_assigned_for_diagnostic_test': (
-                skill_services.check_skill_assignment_for_diagnostic_test(
-                    skill_id))
+                skill_services.is_skill_assigned_to_a_diagnostic_test(skill_id))
         })
         self.render_json(self.values)

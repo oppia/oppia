@@ -4,15 +4,30 @@
   </h3>
 </div>
 <div class="modal-body">
-  <div><em>The topics with this skill as their only diagnostic test skill are not eligible for the unassignment.</em></div><br>
-  <span *ngIf="topicsAssignmentsAreFetched && eligibleTopicNamesForUnassignment.length !== 0">This skill is assigned to these following topics. Tick the topics that you want this skill to be unassigned from.</span>
+  <div *ngIf="topicNamesNotEligibleForUnassignment.length > 0">
+    <div>
+      <p>This skill is used as the only diagnostic test skill in the following topics:</p>
+      <p>{{topicNamesNotEligibleForUnassignment.join(', ')}}</p>
+      <p>
+        Please remove this skill from the diagnostic test of those topics first
+        before unassigning it.
+      </p>
+    </div>
+    <br>
+  </div>
   <div>
-    <span *ngIf="topicsAssignmentsAreFetched && eligibleTopicNamesForUnassignment.length === 0">No eligible topics for unassignment.</span>
+    <div *ngIf="topicsAssignmentsAreFetched && eligibleTopicNamesForUnassignment.length !== 0">
+      Tick the eligible topics that you want this skill to be unassigned from.
+    </div>
+    <div *ngIf="topicsAssignmentsAreFetched && eligibleTopicNamesForUnassignment.length === 0">
+      No eligible topics for unassignment.
+    </div>
   </div>
   <div class="loading-spinner" *ngIf="!topicsAssignmentsAreFetched">
     <mat-spinner [diameter]="30"></mat-spinner>
   </div>
-  <div *ngFor="let topicNameToTopicsAssignment of topicNameToTopicsAssignments | keyvalue" class="e2e-test-unassign-topic-label">
+  <div *ngFor="let topicNameToTopicsAssignment of topicNameToTopicsAssignments | keyvalue"
+       class="e2e-test-unassign-topic-label">
     <input type="checkbox"
            class="topic-name e2e-test-unassign-topic"
            (click)="selectedTopicToUnassign(topicNameToTopicsAssignment.key)">
@@ -32,6 +47,9 @@
   .unassign-skill-from-topics-modal .topic-name {
     font-weight: bold;
   }
+  .unassign-skill-from-topics-modal .loading-spinner {
+    margin-left: 45%;
+  }
   @media screen and (max-width: 768px) {
     .unassign-skill-from-topics-modal .modal-dialog {
       border: 0;
@@ -48,9 +66,6 @@
       border: 0;
       border-radius: 0;
       top: 20vh;
-    }
-    .unassign-skill-from-topics-modal .loading-spinner {
-      margin-left: 45%;
     }
   }
 </style>

@@ -567,10 +567,10 @@ export class Topic {
   }
 
   getAvailableSkillSummariesForDiagnosticTest(): ShortSkillSummary[] {
-    let topicSkillSummaries = cloneDeep(this._uncategorizedSkillSummaries);
+    let skillSummaries = cloneDeep(this._uncategorizedSkillSummaries);
     let subtopics = this._subtopics;
     for (let i = 0; i < subtopics.length; i++) {
-      topicSkillSummaries = topicSkillSummaries.concat(
+      skillSummaries = skillSummaries.concat(
         subtopics[i].getSkillSummaries());
     }
     let diagnosticTestSkillSummaries = (
@@ -581,8 +581,8 @@ export class Topic {
       skillIdToDiagnosticTestMap[skillSummary.getId()] = true;
     }
 
-    return topicSkillSummaries.filter(topic => {
-      return !skillIdToDiagnosticTestMap.hasOwnProperty(topic.getId());
+    return skillSummaries.filter(skillSummary => {
+      return !skillIdToDiagnosticTestMap.hasOwnProperty(skillSummary.getId());
     });
   }
 

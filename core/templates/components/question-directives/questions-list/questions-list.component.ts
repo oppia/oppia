@@ -272,7 +272,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     this.windowRef.nativeWindow.location.hash = this.questionId;
   }
 
-  async questionDeletionCheck(): Promise<boolean> {
+  async isQuestionDeletionAllowed(): Promise<boolean> {
     let questionDeletionIsAllowed = true;
     if (!this.canEditQuestion) {
       this.alertsService.addWarning(
@@ -295,46 +295,37 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     return questionDeletionIsAllowed;
   }
 
+  editQuestionSkillLinks(questionId: string, skillId: string): void {
+    this.editableQuestionBackendApiService.editQuestionSkillLinksAsync(
+      questionId, [
+        {
+          id: skillId,
+          task: 'remove'
+        } as SkillLinkageModificationsArray
+      ]
+    ).then(() => {
+      this.questionsListService.resetPageNumber();
+      this.questionsListService.getQuestionSummariesAsync(
+        this.selectedSkillId, true, true);
+      this.alertsService.addSuccessMessage('Deleted Question');
+      this._removeArrayElement(questionId);
+    });
+  }
+
   deleteQuestionFromSkill(
       questionId: string, skillDescription: string): void {
-    this.questionDeletionCheck().then((response) => {
+    this.isQuestionDeletionAllowed().then((response) => {
       if (!response) {
         return;
       }
+
       this.deletedQuestionIds.push(questionId);
-      // For the case when, it is in the skill editor.
       if (this.allSkillSummaries.length === 0) {
-        this.editableQuestionBackendApiService.editQuestionSkillLinksAsync(
-          questionId, [
-            {
-              id: this.selectedSkillId,
-              task: 'remove'
-            } as SkillLinkageModificationsArray
-          ]
-        ).then(() => {
-          this.questionsListService.resetPageNumber();
-          this.questionsListService.getQuestionSummariesAsync(
-            this.selectedSkillId, true, true);
-          this.alertsService.addSuccessMessage('Deleted Question');
-          this._removeArrayElement(questionId);
-        });
+        this.editQuestionSkillLinks(questionId, this.selectedSkillId);
       } else {
         this.allSkillSummaries.forEach((summary) => {
           if (summary.getDescription() === skillDescription) {
-            this.editableQuestionBackendApiService.editQuestionSkillLinksAsync(
-              questionId, [
-                {
-                  id: summary.getId(),
-                  task: 'remove'
-                } as SkillLinkageModificationsArray
-              ]
-            ).then(() => {
-              this.questionsListService.resetPageNumber();
-              this.questionsListService.getQuestionSummariesAsync(
-                this.selectedSkillId, true, true);
-              this.alertsService.addSuccessMessage('Deleted Question');
-              this._removeArrayElement(questionId);
-            });
+            this.editQuestionSkillLinks(questionId, summary.getId());
           }
         });
       }

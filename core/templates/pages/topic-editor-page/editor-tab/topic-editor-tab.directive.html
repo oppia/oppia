@@ -282,20 +282,27 @@
         <h3>Diagnostic test</h3>
       </div>
       <div>
-        <em>
-          Add up to 3 key skills (the order doesn't matter) that a learner who has completed this topic should have mastered. These skills will be used to generate the diagnostic test that determines whether to recommend this topic to new learners.
-        </em>
-        <hr>
-        <em>Skill with less than two questions is not eligible for getting assigned to the diagnostic test.</em>
+        <p>
+          Add up to 3 key skills (the order doesn't matter) that a learner who
+          has completed this topic should have mastered. These skills will be
+          used to generate the diagnostic test that determines whether to
+          recommend this topic to new learners.
+        </p>
+        <p>Note that skills with fewer than two questions are not eligible for
+          getting assigned to the diagnostic test.
+        </p>
       </div>
       <div class="oppia-diagnostic-test-skill-list-header"
            ng-if="selectedSkillSummariesForDiagnosticTest.length">
         <strong>Diagnostic test skills</strong>
       </div>
       <md-list>
-        <md-list-item class="oppia-diagnostic-test-skill_items-container" ng-repeat="skill in selectedSkillSummariesForDiagnosticTest">
+        <md-list-item class="oppia-diagnostic-test-skill_items-container"
+                      ng-repeat="skill in selectedSkillSummariesForDiagnosticTest">
           <div class="oppia-diagnostic-test-skill-items">
-            <span>{{skill.getDescription()}}</span>
+            <span>
+              {{skill.getDescription()}}
+            </span>
             <button class="oppia-remove-diagnostic-test-skill-button e2e-test-remove-skill-from-diagnostic-test"
                     ng-click="removeSkillFromDiagnosticTest(skill)"
                     md-button
@@ -315,7 +322,7 @@
             </select>
           </md-form-field>
           <button class="oppia-remove-diagnostic-test-skill-button"
-                  md-button  md-icon-button
+                  md-button md-icon-button
                   aria-label="Clear"
                   ng-click="removeDiagnosticTestSkillDropdown()">
             <md-icon>close</md-icon>
@@ -329,13 +336,19 @@
               ng-disabled="availableSkillSummariesForDiagnosticTest.length === 0 || selectedSkillSummariesForDiagnosticTest.length === 3">
         <div class="oppia-flex">
           <md-icon aria-label="icon-button with a plus icon">add_circle</md-icon>
-          <h4 class="oppia-button-text">Add diagnostic test skills</h4>
+          <h4 class="oppia-button-text">Add diagnostic test skill</h4>
         </div>
       </button>
       <div class="oppia-diagnostic-test-card-note">
-        <span ng-if="!availableSkillSummariesForDiagnosticTest.length && selectedSkillSummariesForDiagnosticTest.length < 3"><em>(No more skills left for assignment.)</em></span>
-        <span ng-if="selectedSkillSummariesForDiagnosticTest.length === 3"><em>(The maximum limit was reached for adding skills to the diagnostic test.)</em></span>
-        <span ng-if="selectedSkillSummariesForDiagnosticTest.length === 0 && availableSkillSummariesForDiagnosticTest.length > 0"><em>(Please add at least 1 skill.)</em></span>
+        <span ng-if="!availableSkillSummariesForDiagnosticTest.length && selectedSkillSummariesForDiagnosticTest.length < 3">
+          <em>(No more skills left for assignment.)</em>
+        </span>
+        <span ng-if="selectedSkillSummariesForDiagnosticTest.length === 3">
+          <em>(The maximum limit was reached for adding skills to the diagnostic test.)</em>
+        </span>
+        <span ng-if="selectedSkillSummariesForDiagnosticTest.length === 0 && availableSkillSummariesForDiagnosticTest.length > 0">
+          <em>(Please add at least 1 skill.)</em>
+        </span>
       </div>
     </md-card>
   </div>

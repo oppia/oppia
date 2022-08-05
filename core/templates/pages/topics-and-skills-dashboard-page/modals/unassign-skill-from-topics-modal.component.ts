@@ -47,6 +47,7 @@ export class UnassignSkillFromTopicsModalComponent
   selectedTopicNames: string[] = [];
   selectedTopics: TopicAssignmentsSummary[] = [];
   eligibleTopicNamesForUnassignment: string[] = [];
+  topicNamesNotEligibleForUnassignment: string[] = [];
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -78,9 +79,12 @@ export class UnassignSkillFromTopicsModalComponent
           }
 
           topicAssignments = topicAssignments.filter((topic) => {
-            return !(
-              topicIdsNotEligibleForUnassignment.indexOf(
-                topic.topicId) !== -1);
+            if (topicIdsNotEligibleForUnassignment.indexOf(
+              topic.topicId) === -1) {
+              return true;
+            }
+            this.topicNamesNotEligibleForUnassignment.push(topic.topicName);
+            return false;
           });
           topicAssignments.map((topic) => {
             this.topicNameToTopicsAssignments[topic.topicName] = {
