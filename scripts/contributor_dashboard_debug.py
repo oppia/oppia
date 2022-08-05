@@ -29,6 +29,7 @@ import firebase_admin
 from firebase_admin import auth as firebase_auth
 
 import requests
+from typing import Any, Dict, List
 
 FIREBASE_AUTH_EMULATOR_HOST = 'localhost:%s' % feconf.FIREBASE_EMULATOR_PORT
 os.environ['FIREBASE_AUTH_EMULATOR_HOST'] = FIREBASE_AUTH_EMULATOR_HOST
@@ -48,12 +49,12 @@ CONTRIBUTOR_USERNAME = 'b'
 class ClientRequests():
     """Requests to help develop for the contributor dashboard."""
 
-    def __init__(self, base_url):
+    def __init__(self, base_url: str) -> None:
         self.client = requests.session()
         self.base_url = base_url
-        self.csrf_token = None
+        self.csrf_token = ''
 
-    def populate_data_for_contributor_dashboard_debug(self):
+    def populate_data_for_contributor_dashboard_debug(self) -> None:
         """Populate sample data to help develop for the contributor
         dashboard.
         """
@@ -70,7 +71,13 @@ class ClientRequests():
         self._generate_dummy_new_structures_data()
         self._add_topics_to_classroom()
 
-    def _make_request(self, method, url, params=None, headers=None):
+    def _make_request(
+        self,
+        method: str,
+        url: str,
+        params: Dict[str, Any] | None = None,
+        headers: Dict[str, Any] | None = None
+        ) -> requests.Response:
         """Makes a request to the Oppia server."""
         if params is None:
             params = {}
@@ -82,14 +89,14 @@ class ClientRequests():
 
         return response
 
-    def _create_new_user(self, email, username):
+    def _create_new_user(self, email: str, username: str) -> None:
         """Creates a new user based on email and username. The password is
         generated automatically from email.
         """
         password = hashlib.md5(email.encode('utf-8')).hexdigest()
 
         # Create a new user in firebase.
-        firebase_auth.create_user(email=email, password=password)
+        firebase_auth.create_user(email=email, password=password) # type: ignore
 
         # Sign up the new user in Oppia and set its username.
         self._begin_session(email)
@@ -106,9 +113,9 @@ class ClientRequests():
 
         # End current session, i.e. log out.
         self._make_request('GET', '/session_end')
-        self.csrf_token = None
+        self.csrf_token = ''
 
-    def _begin_session(self, email):
+    def _begin_session(self, email: str) -> None:
         """Begin a session with the given email, i.e. log in wtih the email."""
         password = hashlib.md5(email.encode('utf-8')).hexdigest()
 
@@ -123,15 +130,15 @@ class ClientRequests():
 
         self._make_request('GET', '/session_begin', headers=headers)
 
-    def _get_csrf_token(self):
+    def _get_csrf_token(self) -> str:
         """Gets the CSRF token."""
         response = self._make_request('GET', '/csrfhandler')
-        csrf_token = json.loads(
-            response.text[len(feconf.XSSI_PREFIX):])['token']
+        csrf_token = str(
+            json.loads(response.text[len(feconf.XSSI_PREFIX):])['token'])
 
         return csrf_token
 
-    def _assign_admin_roles(self, roles, username):
+    def _assign_admin_roles(self, roles: List[str], username: str) -> None:
         """Assigns the given roles to the user with the given username."""
         for role in roles:
             params = {
@@ -144,7 +151,7 @@ class ClientRequests():
             self._make_request(
                 'PUT', feconf.ADMIN_ROLE_HANDLER_URL, params=params)
 
-    def _add_submit_question_rights(self, username):
+    def _add_submit_question_rights(self, username: str) -> None:
         """Adds submit question rights to the user with the given username."""
         params = {
             'payload': json.dumps({'username': username}),
@@ -154,7 +161,7 @@ class ClientRequests():
         self._make_request(
             'POST', '/contributionrightshandler/submit_question', params=params)
 
-    def _generate_dummy_new_structures_data(self):
+    def _generate_dummy_new_structures_data(self) -> None:
         """Generates dummy new structures data."""
         params = {
             'payload': json.dumps({
@@ -164,7 +171,7 @@ class ClientRequests():
 
         self._make_request('POST', '/adminhandler', params=params)
 
-    def _add_topics_to_classroom(self):
+    def _add_topics_to_classroom(self) -> None:
         """Adds all dummy topics to classroom."""
         response = self._make_request(
             'GET', '/topics_and_skills_dashboard/data')
