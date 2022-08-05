@@ -424,6 +424,7 @@ import { TranslationStatusService } from 'pages/exploration-editor-page/translat
 import { YamlService } from './yaml.service';
 import { HistoryTabYamlConversionService } from 'pages/exploration-editor-page/services/history-tab-yaml-conversion.service';
 import { VersionedExplorationCachingService } from 'pages/exploration-editor-page/services/versioned-exploration-caching.service';
+import { ExplorationSaveService } from 'pages/exploration-editor-page/services/exploration-save.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -879,5 +880,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['NumberConversionService', NumberConversionService],
   ['ParameterMetadataService', ParameterMetadataService],
   ['ExplorationWarningsService', ExplorationWarningsService],
-  ['PracticeSessionsBackendApiService', PracticeSessionsBackendApiService]
+  ['PracticeSessionsBackendApiService', PracticeSessionsBackendApiService],
+  ['ExplorationSaveService', ExplorationSaveService]
 ];

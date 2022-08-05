@@ -68,6 +68,7 @@ import { ExplorationTitleEditorComponent } from './exploration-title-editor/expl
 import { ExplorationObjectiveEditorComponent } from './exploration-objective-editor/exploration-objective-editor.component';
 import { ExplorationMetadataModalComponent } from 'pages/exploration-editor-page/modal-templates/exploration-metadata-modal.component';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { ExplorationSaveModalComponent } from './modal-templates/exploration-save-modal.component';
 
 @NgModule({
   imports: [
@@ -118,7 +119,8 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
     ExplorationMetadataDiffModalComponent,
     ExplorationTitleEditorComponent,
     ExplorationObjectiveEditorComponent,
-    ExplorationMetadataModalComponent
+    ExplorationMetadataModalComponent,
+    ExplorationSaveModalComponent
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
@@ -152,7 +154,8 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
     ExplorationMetadataDiffModalComponent,
     ExplorationTitleEditorComponent,
     ExplorationObjectiveEditorComponent,
-    ExplorationMetadataModalComponent
+    ExplorationMetadataModalComponent,
+    ExplorationSaveModalComponent
   ],
   providers: [
     {
