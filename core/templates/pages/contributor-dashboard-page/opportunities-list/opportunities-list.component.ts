@@ -139,6 +139,11 @@ export class OpportunitiesListComponent {
           this.visibleOpportunities = this.opportunities.slice(
             startIndex, endIndex);
           this.loadingOpportunityData = false;
+          this.userIsOnLastPage = this.calculateUserIsOnLastPage(
+            this.opportunities,
+            this.OPPORTUNITIES_PAGE_SIZE,
+            pageNumber,
+            this.more);
         });
     } else {
       this.visibleOpportunities = this.opportunities.slice(
