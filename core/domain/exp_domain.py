@@ -2320,14 +2320,13 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """
         """
         # Update general state validations.
-        states_dict = cls._update_general_state(cls, states_dict)
+        states_dict = cls._update_general_state(states_dict)
 
         # Update general state interaction validations.
-        states_dict = cls._update_general_state_interaction(
-            cls, states_dict)
+        states_dict = cls._update_general_state_interaction(states_dict)
 
         # Update general state RTE validations.
-        states_dict = cls._update_general_state_rte(cls, states_dict)
+        states_dict = cls._update_general_state_rte(states_dict)
 
         return states_dict
 
@@ -2346,12 +2345,13 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     answer_group['outcome']['labelled_as_correct'] = False
 
                 # ref_exp_id part is remaining.
+        return states_dict
 
     @classmethod
     def _update_general_state_interaction(cls, states_dict):
         """
         """
-        for state_dict in states_dict.items():
+        for state_dict in states_dict.values():
         # Continue Interaction.
             # Text should have a max-length of 20.
             if state_dict['interaction']['id'] == 'Continue':
@@ -2429,9 +2429,12 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         # TextInput Interaction.
 
+        return states_dict
+
     @classmethod
     def _update_general_state_rte(cls, states_dict):
         pass
+        return states_dict
 
     @classmethod
     def update_states_from_model(
