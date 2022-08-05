@@ -56,6 +56,7 @@ import os
 import random
 import re
 import socket
+import string
 import subprocess
 import sys
 import threading
@@ -172,8 +173,8 @@ class TestingTaskSpec:
                 sys.executable, '-m', 'coverage', 'run',
                 TEST_RUNNER_PATH, test_target_flag
             ]
-            rand = random.Random(os.urandom(8)).randint(0, 999999)
-            data_file = '.coverage.%s.%s.%06d' % (
+            rand = ''.join(random.choices(string.ascii_lowercase, k=16))
+            data_file = '.coverage.%s.%s.%s' % (
                 socket.gethostname(), os.getpid(), rand)
             env['COVERAGE_FILE'] = data_file
             concurrent_task_utils.log('Coverage data for %s is in %s' % (
@@ -181,7 +182,19 @@ class TestingTaskSpec:
         else:
             exc_list = [sys.executable, TEST_RUNNER_PATH, test_target_flag]
 
-        result = run_shell_cmd(exc_list, env=env)
+        try:
+            result = run_shell_cmd(exc_list, env=env)
+        except Exception as e:
+            # Occasionally, tests fail spuriously because of an issue in grpc
+            # (see e.g. https://github.com/oppia/oppia/runs/7462764522) that
+            # causes a random polling error to be surfaced. Since this doesn't
+            # represent a 'real' test failure, we do a single extra run if we
+            # see that.
+            if 'ev_epollex_linux.cc' in str(e):
+                result = run_shell_cmd(exc_list, env=env)
+            else:
+                raise e
+
         messages = [result]
 
         if self.generate_coverage_report:
