@@ -299,6 +299,18 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
         self.assertEqual(classifier_training_job.exp_id, self.exp_id)
         self.assertEqual(classifier_training_job.state_name, 'Home')
 
+    def test_handle_trainable_states_raises_error_for_invalid_interaction_id(
+        self
+    ) -> None:
+        """Test the handle_trainable_states method."""
+        exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
+        state_names = ['Home']
+        exploration.states['Home'].interaction.id = 'Invalid_id'
+        with self.assertRaisesRegex(Exception, (  # type: ignore[no-untyped-call]
+            'No classifier algorithm found for Invalid_id interaction')):
+            classifier_services.handle_trainable_states(
+                exploration, state_names)
+
     def test_handle_non_retrainable_states(self) -> None:
         """Test the handle_non_retrainable_states method."""
         exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
@@ -851,3 +863,33 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
         assert new_job is not None
         new_job_id = new_job.job_id
         self.assertEqual(old_job_id, new_job_id)
+
+    def test_migrate_state_training_jobs_with_invalid_interaction_id(
+        self
+    ) -> None:
+        """Test the migrate_state_training_jobs method."""
+
+        exploration = self.save_new_valid_exploration(
+            '44', feconf.SYSTEM_COMMITTER_ID, objective='The objective',
+            category='Algebra')
+        self.assertEqual(exploration.version, 1)
+
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_ADD_STATE,
+            'state_name': 'New state'
+        }), exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': 'New state',
+            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+            'new_value': None
+        })]
+        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+            feconf.SYSTEM_COMMITTER_ID, exploration.id, change_list, '')
+        state_training_jobs_mapping = (
+            classifier_domain.StateTrainingJobsMapping('44', 2, 'New state', {})
+        )
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            Exception, 'Interaction id does not exist.'):
+            classifier_services.migrate_state_training_jobs(
+                state_training_jobs_mapping
+            )

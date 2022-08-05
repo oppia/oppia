@@ -1304,7 +1304,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                         'html': 'Hint 1'
                     }
                 }],
-                'solution': {},
+                'solution': None,
                 'id': 'SetInput'
             },
             'param_changes': [],
@@ -1397,7 +1397,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                         'html': 'Hint 1'
                     }
                 }],
-                'solution': {},
+                'solution': None,
                 'id': 'MultipleChoiceInput'
             },
             'param_changes': [],
@@ -1495,7 +1495,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                         'html': 'Hint 1'
                     }
                 }],
-                'solution': {},
+                'solution': None,
                 'id': 'MultipleChoiceInput'
             },
             'param_changes': [],
@@ -2103,7 +2103,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                     'missing_prerequisite_skill_id': None
                 },
                 'hints': [],
-                'solution': {},
+                'solution': None,
                 'id': 'PencilCodeEditor'
             },
             'param_changes': [],
@@ -2172,7 +2172,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                     'missing_prerequisite_skill_id': None
                 },
                 'hints': [],
-                'solution': {},
+                'solution': None,
                 'id': 'MultipleChoiceInput'
             },
             'param_changes': [],
@@ -2244,7 +2244,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                     'missing_prerequisite_skill_id': None
                 },
                 'hints': [],
-                'solution': {},
+                'solution': None,
                 'id': 'MultipleChoiceInput'
             },
             'param_changes': [],
@@ -2349,7 +2349,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                     'missing_prerequisite_skill_id': None
                 },
                 'hints': [],
-                'solution': {},
+                'solution': None,
                 'id': 'TextInput'
             },
             'next_content_id_index': 2,
@@ -2452,7 +2452,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                         'html': 'Hint 1'
                     }
                 }],
-                'solution': {},
+                'solution': None,
                 'id': 'AlgebraicExpressionInput'
             },
             'next_content_id_index': 3,
@@ -2541,7 +2541,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                         'html': 'Hint 1'
                     }
                 }],
-                'solution': {},
+                'solution': None,
                 'id': 'NumericExpressionInput'
             },
             'next_content_id_index': 3,
@@ -2634,7 +2634,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                     'missing_prerequisite_skill_id': None
                 },
                 'hints': [],
-                'solution': {},
+                'solution': None,
                 'id': 'TextInput'
             },
             'next_content_id_index': 4,
@@ -2731,7 +2731,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                     'missing_prerequisite_skill_id': None
                 },
                 'hints': [],
-                'solution': {},
+                'solution': None,
                 'id': 'SetInput'
             },
             'next_content_id_index': 4,
@@ -3074,7 +3074,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                         'html': 'Hint 1'
                     }
                 }],
-                'solution': {},
+                'solution': None,
                 'id': 'NumericExpressionInput'
             },
             'next_content_id_index': 3,
@@ -3166,7 +3166,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                     'missing_prerequisite_skill_id': None
                 },
                 'hints': [],
-                'solution': {},
+                'solution': None,
                 'id': 'TextInput'
             },
             'next_content_id_index': 4,
@@ -3255,7 +3255,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                     'missing_prerequisite_skill_id': None
                 },
                 'hints': [],
-                'solution': {},
+                'solution': None,
                 'id': 'NumericInput'
             },
             'next_content_id_index': 4,
@@ -3392,7 +3392,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                     'missing_prerequisite_skill_id': None
                 },
                 'hints': [],
-                'solution': {},
+                'solution': None,
                 'id': 'AlgebraicExpressionInput'
             },
             'next_content_id_index': 4,
