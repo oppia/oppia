@@ -11,10 +11,10 @@
   <div *ngFor="let studentProgress of studentsProgress; let idx = index">
     <div *ngIf="studentProgress.isProgressSharingTurnedOn" class="student-progress-summary">
       <div class="student-progress-summary-header">
-          <div class="student-info">
-            <img [src]="getProfileImageDataUrl(studentProgress.profilePictureDataUrl)">
-            <div>{{studentProgress.username}}</div>
-          </div>
+        <div class="student-info">
+          <img [src]="getProfileImageDataUrl(studentProgress.profilePictureDataUrl)">
+          <div>{{studentProgress.username}}</div>
+        </div>
         <div class="view-details-button btn btn-primary">
           View Details
         </div>
@@ -26,10 +26,10 @@
     </div>
     <div *ngIf="!studentProgress.isProgressSharingTurnedOn" class="student-progress-summary">
       <div class="student-progress-summary-header">
-          <div class="student-info">
-            <img [src]="getProfileImageDataUrl(studentProgress.profilePictureDataUrl)">
-            <div>{{studentProgress.username}}</div>
-          </div>
+        <div class="student-info">
+          <img [src]="getProfileImageDataUrl(studentProgress.profilePictureDataUrl)">
+          <div>{{studentProgress.username}}</div>
+        </div>
         <div class="permissions-message">
           Permission Not Given &nbsp;
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">

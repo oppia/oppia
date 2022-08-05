@@ -78,7 +78,8 @@ import { LearnerGroupStudentSpecificProgressComponent }
     LearnerGroupDetailsComponent,
     RemoveItemModalComponent,
     AddedSyllabusItemsSuccessfullyModalComponent,
-    InviteStudentsModalComponent
+    InviteStudentsModalComponent,
+    InviteSuccessfullModalComponent
   ],
   entryComponents: [
     EditLearnerGroupPageComponent,
@@ -92,7 +93,8 @@ import { LearnerGroupStudentSpecificProgressComponent }
     LearnerGroupDetailsComponent,
     RemoveItemModalComponent,
     AddedSyllabusItemsSuccessfullyModalComponent,
-    InviteStudentsModalComponent
+    InviteStudentsModalComponent,
+    InviteSuccessfullModalComponent
   ],
   providers: [
     {
@@ -129,6 +131,7 @@ import { ToastrModule } from 'ngx-toastr';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
 import { OppiaAngularRootComponent } from
   'components/oppia-angular-root.component';
+import { InviteSuccessfullModalComponent } from '../templates/invite-successfull-modal.component';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

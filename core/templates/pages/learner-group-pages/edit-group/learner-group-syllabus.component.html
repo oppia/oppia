@@ -14,7 +14,10 @@
       <div *ngIf="isDisplayedItemStory(displayedItem)" class="assigned-sylabus-card">
         <div class="assigned-syllabus-item-image" [ngStyle]="{'background-color': storySummaries[getIndexToDisplay(displayedItem)].getThumbnailBgColor()}">
           <img class="thumbnail-image assigned-syllabus-item-image" [src]="getStoryThumbnailUrl(storySummaries[getIndexToDisplay(displayedItem)])">
-          <div class="type-tag-pill">Lessons</div>
+          <div class="type-tag-pill">
+            Lessons
+            <div class="type-tag-pill-design"></div>
+          </div>
         </div>
         <div class="assigned-syllabus-info">
           <div class="same-row-container">
@@ -36,7 +39,7 @@
       <div *ngIf="isDisplayedItemSubtopic(displayedItem)" class="assigned-sylabus-card">
         <div class="assigned-syllabus-item-image" [ngStyle]="{'background-color': subtopicSummaries[getIndexToDisplay(displayedItem)].thumbnailBgColor}">
           <img class="thumbnail-image assigned-syllabus-item-image" [src]="getSubtopicThumbnailUrl(subtopicSummaries[getIndexToDisplay(displayedItem)])">
-          <div class="type-tag-pill">Skills</div>
+          <div class="type-tag-pill">Skill</div>
         </div>
         <div class="assigned-syllabus-info">
           <div class="same-row-container">
@@ -51,6 +54,11 @@
             <span>{{subtopicSummaries[getIndexToDisplay(displayedItem)].subtopicTitle}}</span>
           </div>
         </div>
+      </div>
+    </div>
+    <div *ngIf="displayOrderOfSyllabusItems && displayOrderOfSyllabusItems.length === 0">
+      <div class="assigned-syllabus-empty-message">
+        <span translate="I18N_ASSIGNED_STORIES_AND_SKILLS_EMPTY_MESSAGE"></span>
       </div>
     </div>
   </div>

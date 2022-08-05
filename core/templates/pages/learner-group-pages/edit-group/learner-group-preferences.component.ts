@@ -24,6 +24,7 @@ import { LearnerGroupUserInfo } from 'domain/learner_group/learner-group-user-in
 import { LearnerGroupData } from 'domain/learner_group/learner-group.model';
 import { LearnerGroupPagesConstants } from '../learner-group-pages.constants';
 import { InviteStudentsModalComponent } from '../templates/invite-students-modal.component';
+import { InviteSuccessfullModalComponent } from '../templates/invite-successfull-modal.component';
 import { RemoveItemModalComponent } from
   '../templates/remove-item-modal.component';
 
@@ -125,6 +126,27 @@ export class LearnerGroupPreferencesComponent implements OnInit {
         this.learnerGroup = learnerGroup;
         this.invitedStudentsInfo.push(...data.invitedStudentsInfo);
       });
+      let successModalRef = this.ngbModal.open(
+        InviteSuccessfullModalComponent,
+        {
+          backdrop: 'static',
+          windowClass: 'invite-successfull-modal'
+        }
+      );
+      successModalRef.componentInstance.successMessage = (
+        'An invitation has been sent to ');
+      successModalRef.componentInstance.invitedUsernames = (
+        this.invitedStudents);
+
+      successModalRef.result.then(() => {
+        // Note to developers:
+        // This callback is triggered when the Confirm button is clicked.
+        // No further action is needed.
+      }, () => {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is clicked.
+        // No further action is needed.
+      });
     }, () => {
       // Note to developers:
       // This callback is triggered when the Cancel button is clicked.
@@ -150,6 +172,9 @@ export class LearnerGroupPreferencesComponent implements OnInit {
       this.learnerGroupBackendApiService.updateLearnerGroupAsync(
         this.learnerGroup).then((learnerGroup) => {
         this.learnerGroup = learnerGroup;
+        this.currentStudentsInfo = this.currentStudentsInfo.filter(
+          (currentStudent) => currentStudent.username !== student.username
+        );
       });
     });
   }

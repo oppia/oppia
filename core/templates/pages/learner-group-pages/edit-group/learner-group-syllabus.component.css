@@ -97,22 +97,20 @@
   border-left: none;
   color: #00645c;
   left: -20px;
+  min-width: 80px;
   padding: 2px 5px 3px 20px;
   position: absolute;
+  text-align: center;
   top: 10px;
 }
 
-.oppia-learner-group-syllabus .type-tag-pill:before {
-  border-color: transparent transparent transparent #a00;
-  border-width: 11px;
-  top: 9px;
-}
-
 .oppia-learner-group-syllabus .type-tag-pill:after {
-  border-bottom: solid 15px #00645c;
-  border-left: solid 15px #fff;
-  border-top: solid 15px #00645c;
+  border-color: transparent transparent transparent #fff;
+  border-style: solid;
+  border-width: 15.5px 0 15.5px 15px;
   content: "";
+  display: block;
+  filter: drop-shadow(1px 0 0 #00645c);
   height: 0;
   left: 0;
   position: absolute;

@@ -21,9 +21,11 @@ from __future__ import annotations
 from core.constants import constants
 from core.domain import config_domain
 from core.domain import learner_group_domain
+from core.domain import learner_group_fetchers
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import subtopic_page_domain
+from core.domain import subtopic_page_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.platform import models
@@ -517,13 +519,18 @@ def remove_students_from_learner_group(
         group_id, strict=True
     )
 
-    learner_group_model.student_user_ids.remove(user_ids)
+    learner_group_model.student_user_ids = [
+        user_id for user_id in learner_group_model.student_user_ids
+        if user_id not in user_ids
+    ]
 
     learner_grps_users_models = user_models.LearnerGroupsUserModel.get_multi(
         user_ids)
 
     models_to_put = []
     for learner_grps_user_model in learner_grps_users_models:
+        # Ruling out the possibility of None for mypy type checking.
+        assert learner_grps_user_model is not None 
         learner_grps_user_model.learner_groups_user_details = [
             details for details in
             learner_grps_user_model.learner_groups_user_details
@@ -657,3 +664,55 @@ def can_user_be_invited(
         )
 
     return (True, '')
+
+
+def sync_syllabus_to_stories_and_skills(
+    learner_group: learner_group_domain.LearnerGroup
+) -> learner_group_domain.LearnerGroup:
+    """Synchronizes the assigned syllabus items in the learner group with the
+    stories and skills on oppia server.
+
+    Args:
+        learner_group: LearnerGroup. Domain object storing the version of
+            learner group prior to sync.
+
+    Returns:
+        learner_group: LearnerGroup. Domain object storing the synced in
+        syllabus.
+    """
+    story_ids = learner_group.story_ids
+    all_valid_stories = [
+        story for story in story_fetchers.get_stories_by_ids(story_ids) if story
+    ]
+    valid_story_ids = [
+        story.id for story in all_valid_stories
+        if story.corresponding_topic_id
+    ]
+
+    learner_group_model = learner_group_models.LearnerGroupModel.get(
+        learner_group.group_id, strict=True
+    )
+    learner_group_model.story_ids = valid_story_ids
+
+    subtopic_page_ids = learner_group.subtopic_page_ids
+    topic_ids = subtopic_page_services.get_topic_ids_from_subtopic_page_ids(
+        subtopic_page_ids)
+    all_topics = topic_fetchers.get_topics_by_ids(topic_ids)
+    valid_subtopic_page_ids: List[str] = []
+    for topic in all_topics:
+        # Ruling out the possibility of None for mypy type checking.
+        assert topic is not None
+        valid_subtopic_page_ids.extend([
+            '{}:{}'.format(topic.id, subtopic.id) for subtopic in
+            topic.subtopics if '{}:{}'.format(topic.id, subtopic.id) in
+            subtopic_page_ids
+        ])
+    learner_group_model.subtopic_page_ids = valid_subtopic_page_ids
+
+    learner_group_model.update_timestamps()
+    learner_group_model.put()
+
+    updated_model = learner_group_models.LearnerGroupModel.get(
+        learner_group_model.id, strict=True
+    )
+    return get_learner_group_from_model(updated_model)

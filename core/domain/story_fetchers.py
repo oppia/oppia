@@ -345,8 +345,12 @@ def get_learner_group_syllabus_story_summaries(
     topic_ids = list(
         {story.corresponding_topic_id for story in all_stories}
     )
-    topics = topic_fetchers.get_topics_by_ids(topic_ids) # type: ignore[no-untyped-call]
-    topic_id_to_topic_map = {topic.id: topic for topic in topics}
+    topics = topic_fetchers.get_topics_by_ids(topic_ids)
+    topic_id_to_topic_map = {}
+    for topic in topics:
+        # Ruling out the possibility of None for mypy type checking.
+        assert topic is not None
+        topic_id_to_topic_map[topic.id] = topic
 
     story_summaries_dicts = [
         story_summary.to_dict() for story_summary in

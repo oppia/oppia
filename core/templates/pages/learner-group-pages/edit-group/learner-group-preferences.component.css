@@ -161,7 +161,8 @@
 }
 
 .remove-student-modal .modal-dialog,
-.withdraw-student-invitation-modal .modal-dialog {
+.withdraw-student-invitation-modal .modal-dialog,
+.invite-successfull-modal .modal-dialog {
   margin: 200px auto;
 }
 
@@ -181,4 +182,28 @@
   border-top: unset;
   padding-bottom: 40px;
   padding-right: 40px;
+}
+
+.invite-successfull-modal .modal-content,
+.invite-successfull-modal .modal-dialog {
+  min-width: unset;
+}
+
+.invite-successfull-modal .modal-header {
+  border-bottom: unset;
+  min-height: unset;
+  padding: unset;
+}
+
+.invite-successfull-modal .modal-body {
+  padding: 50px;
+}
+
+.invite-successfull-modal .close {
+  cursor: pointer;
+  font-size: 2.7rem;
+  font-weight: 400;
+  position: absolute;
+  right: 15px;
+  top: 15px;
 }

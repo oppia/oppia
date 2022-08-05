@@ -41,7 +41,7 @@
       </button>
     </div>
     <div *ngIf="isTabActive(EDIT_PREFERENCES_SECTIONS_I18N_IDS.GROUP_STUDENTS)" class="edit-learner-group-students-section">
-      <button class="btn btn-primary"
+      <button class="btn btn-primary add-new-learner-button"
               (click)="openInviteStudentsModal()">
         + <span>New Learner</span>
       </button>
@@ -73,7 +73,7 @@
             <span>{{studentInfo.username}}</span>
           </div>
           <div class="group-students-card-buttons">
-            <span (click)="addStudentToLearnerGroup(studentInfo)">+ Add Student</span>
+            <span class="btn btn-primary" (click)="addStudentToLearnerGroup(studentInfo)">+ Add Student</span>
             <div class="group-students-card-button" (click)="openWithdrawStudentInvitationModal(studentInfo)">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="12" viewBox="0 0 16 12" fill="none">
                 <path d="M14.3158 1V5H3.22526L6.24 1.41L5.05263 0L0 6L5.05263 12L6.24 10.58L3.22526 7H16V1H14.3158Z" fill="#00609C"/>
