@@ -737,8 +737,12 @@ def update_states_version_history(
             # Deleting the attributes from the state dicts which are present
             # in the ignore list.
             for property_name in state_property_ignore_list:
-                del new_state_dict[property_name]
-                del old_state_dict[property_name]
+                if (
+                    property_name in old_state_dict and
+                    property_name in new_state_dict
+                ):
+                    del new_state_dict[property_name]
+                    del old_state_dict[property_name]
 
             # The purpose of checking the diff_dict between the two state
             # dicts ensure that we do not change the version history of that
