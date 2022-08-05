@@ -883,7 +883,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
             'new_value': None
         })]
-        exp_services.update_exploration(  # type: ignore[no-untyped-call]
+        exp_services.update_exploration(
             feconf.SYSTEM_COMMITTER_ID, exploration.id, change_list, '')
         state_training_jobs_mapping = (
             classifier_domain.StateTrainingJobsMapping('44', 2, 'New state', {})
