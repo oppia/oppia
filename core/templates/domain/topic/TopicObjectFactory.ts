@@ -576,7 +576,7 @@ export class Topic {
     let diagnosticTestSkillSummaries = (
       this.getSkillSummariesForDiagnosticTest());
 
-    const skillIdToDiagnosticTestMap = {};
+    const skillIdToDiagnosticTestMap: {[id:string]: boolean} = {};
     for (let skillSummary of diagnosticTestSkillSummaries) {
       skillIdToDiagnosticTestMap[skillSummary.getId()] = true;
     }

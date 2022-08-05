@@ -50,7 +50,7 @@ export class DeleteSkillModalComponent extends ConfirmOrCancelModal {
     for (let topic of topicAssignments) {
       allTopicIds.push(topic.topicId);
     }
-    let topicIdsNotEligibleForUnassignment = [];
+    let topicIdsNotEligibleForUnassignment: string[] = [];
     this.topicsAndSkillsDashboardBackendApiService
       .fetchTopicIdToDiagnosticTestSkillIdsAsync(allTopicIds).then(
         (dict) => {

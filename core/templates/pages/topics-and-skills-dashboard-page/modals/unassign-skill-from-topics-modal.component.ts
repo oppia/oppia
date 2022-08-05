@@ -59,7 +59,7 @@ export class UnassignSkillFromTopicsModalComponent
 
   fetchTopicIdToDiagnosticTestSkillIds(
       topicAssignments: AssignedSkill[]): void {
-    let topicIdsNotEligibleForUnassignment = [];
+    let topicIdsNotEligibleForUnassignment: string[] = [];
     let allTopicIds = [];
     for (let topic of topicAssignments) {
       allTopicIds.push(topic.topicId);
