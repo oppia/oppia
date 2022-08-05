@@ -95,12 +95,16 @@ describe('Learner dashboard functionality', function() {
   it('should display learners subscriptions', async function() {
     await users.createUser(
       'learner1@learnerDashboard.com', 'learner1learnerDashboard');
+    console.log('Step no: 1');
     var creator1Id = 'creatorName';
     await users.createUser(creator1Id + '@learnerDashboard.com', creator1Id);
+    console.log('Step no: 2');
     var creator2Id = 'collectionAdm';
     await users.createUser(
       creator2Id + '@learnerDashboard.com', creator2Id);
+      console.log('Step no: 3');
     await users.login(creator1Id + '@learnerDashboard.com');
+    console.log('Step no: 4');
     await workflow.createAndPublishExploration(
       'Activations',
       'Chemistry',
@@ -108,42 +112,61 @@ describe('Learner dashboard functionality', function() {
       'English',
       true
     );
+    console.log('Step no: 5');
     await users.logout();
+    console.log('Step no: 6');
 
     await users.login('learner1@learnerDashboard.com');
+    console.log('Step no: 7');
     // Subscribe to both the creators.
     await subscriptionDashboardPage.navigateToUserSubscriptionPage(creator1Id);
+    console.log('Step no: 8');
     await subscriptionDashboardPage.navigateToSubscriptionButton();
+    console.log('Step no: 9');
     await subscriptionDashboardPage.navigateToUserSubscriptionPage(creator2Id);
+    console.log('Step no: 10');
     await subscriptionDashboardPage.navigateToSubscriptionButton();
+    console.log('Step no: 11');
 
     // Completing exploration 'Activations' to activate /learner_dashboard.
     await libraryPage.get();
+    console.log('Step no: 12');
     await libraryPage.findExploration('Activations');
+    console.log('Step no: 13');
     await libraryPage.playExploration('Activations');
+    console.log('Step no: 14');
     await explorationPlayerPage.expectExplorationNameToBe('Activations');
+    console.log('Step no: 15');
     await explorationPlayerPage.rateExploration(4);
+    console.log('Step no: 16');
 
     // Both creators should be present in the subscriptions section of the
     // dashboard.
     await learnerDashboardPage.get();
+    console.log('Step no: 17');
     await learnerDashboardPage.navigateToCommunityLessonsSection();
+    console.log('Step no: 18');
     // The last user (creatorName) that learner subsribes to is placed first
     // in the list.
     await learnerDashboardPage.expectSubscriptionFirstNameToMatch(
       'creator...');
+      console.log('Step no: 19');
     // The first user (collectionAdm) that learner subscribes to is placed
     // last in the list.
     await learnerDashboardPage.expectSubscriptionLastNameToMatch('collect...');
+    console.log('Step no: 20');
     await users.logout();
   });
 
   it('should display learner feedback threads', async function() {
     await users.createUser(
       'learner2@learnerDashboard.com', 'learner2learnerDashboard');
+      console.log('Step no: 21');
     await users.createUser(
       'feedbackAdm@learnerDashboard.com', 'feedbackAdmlearnerDashboard');
+      console.log('Step no: 22');
     await users.login('feedbackAdm@learnerDashboard.com');
+    console.log('Step no: 33');
     await workflow.createAndPublishExploration(
       'BUS101',
       'Business',
@@ -151,22 +174,34 @@ describe('Learner dashboard functionality', function() {
       'English',
       true
     );
+    console.log('Step no: 24');
     await users.logout();
+    console.log('Step no: 25');
 
     await users.login('learner2@learnerDashboard.com');
+    console.log('Step no: 26');
     var feedback = 'A good exploration. Would love to see a few ' +
       'more questions';
     await libraryPage.get();
+    console.log('Step no: 27');
     await libraryPage.findExploration('BUS101');
+    console.log('Step no: 28');
     await libraryPage.playExploration('BUS101');
+    console.log('Step no: 29');
     await explorationPlayerPage.submitFeedback(feedback);
+    console.log('Step no: 30');
 
     // Verify feedback thread is created.
     await learnerDashboardPage.get();
+    console.log('Step no: 31');
     await learnerDashboardPage.navigateToFeedbackSection();
+    console.log('Step no: 32');
     await learnerDashboardPage.expectFeedbackExplorationTitleToMatch('BUS101');
+    console.log('Step no: 33');
     await learnerDashboardPage.navigateToFeedbackThread();
+    console.log('Step no: 34');
     await learnerDashboardPage.expectFeedbackMessageToMatch(feedback);
+    console.log('Step no: 35');
     await users.logout();
   });
 
