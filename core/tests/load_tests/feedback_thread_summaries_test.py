@@ -26,45 +26,47 @@ from core import feconf
 from core.domain import feedback_services
 from core.tests import test_utils
 
+from typing_extensions import Final
+
 
 class FeedbackThreadSummariesLoadTests(test_utils.GenericTestBase):
 
-    EXP_ID_1 = 'eid1'
+    EXP_ID_1: Final = 'eid1'
 
-    EXPECTED_THREAD_DICT = {
+    EXPECTED_THREAD_DICT: Final = {
         'status': u'open',
         'summary': None,
         'original_author_username': None,
         'subject': u'a subject'
     }
 
-    USER_EMAIL = 'user@example.com'
-    USER_USERNAME = 'user'
+    USER_EMAIL: Final = 'user@example.com'
+    USER_USERNAME: Final = 'user'
 
-    def setUp(self):
+    def setUp(self) -> None:
         super(FeedbackThreadSummariesLoadTests, self).setUp()
 
         self.signup(self.USER_EMAIL, self.USER_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
+        self.user_id = self.get_user_id_from_email(self.USER_EMAIL)  # type: ignore[no-untyped-call]
 
         self.save_new_valid_exploration(
             self.EXP_ID_1, self.owner_id, title='Bridges in England',
             category='Architecture', language_code='en')
 
-    def test_get_thread_summaries_load_test(self):
+    def test_get_thread_summaries_load_test(self) -> None:
         # The speed of fetching the summaries of 100 threads having 5 messages
         # should be less than 1.7 second. In reality, the time taken to fetch
         # all the summaries is less than 0.2s. However since it seems to take
         # longer on Travis, the constant has been set to 1.7s.
         # Create 100 threads.
         for _ in range(100):
-            feedback_services.create_thread(
+            feedback_services.create_thread(  # type: ignore[no-untyped-call]
                 feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID_1,
                 self.user_id, self.EXPECTED_THREAD_DICT['subject'],
                 'not used here')
-        threadlist = feedback_services.get_all_threads(
+        threadlist = feedback_services.get_all_threads(  # type: ignore[no-untyped-call]
             feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID_1, False)
 
         thread_ids = []
@@ -72,11 +74,11 @@ class FeedbackThreadSummariesLoadTests(test_utils.GenericTestBase):
             thread_ids.append(thread.id)
             # Create 5 messages in each thread.
             for _ in range(5):
-                feedback_services.create_message(
+                feedback_services.create_message(  # type: ignore[no-untyped-call]
                     thread.id, self.user_id, None, None, 'editor message')
 
         start = time.time()
         # Fetch the summaries of all the threads.
-        feedback_services.get_exp_thread_summaries(self.user_id, thread_ids)
+        feedback_services.get_exp_thread_summaries(self.user_id, thread_ids)  # type: ignore[no-untyped-call]
         elapsed_time = time.time() - start
         self.assertLessEqual(elapsed_time, 1.7)
