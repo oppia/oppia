@@ -21,7 +21,6 @@ from __future__ import annotations
 from core.constants import constants
 from core.domain import config_domain
 from core.domain import learner_group_domain
-from core.domain import learner_group_fetchers
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import subtopic_page_domain
@@ -530,7 +529,7 @@ def remove_students_from_learner_group(
     models_to_put = []
     for learner_grps_user_model in learner_grps_users_models:
         # Ruling out the possibility of None for mypy type checking.
-        assert learner_grps_user_model is not None 
+        assert learner_grps_user_model is not None
         learner_grps_user_model.learner_groups_user_details = [
             details for details in
             learner_grps_user_model.learner_groups_user_details
