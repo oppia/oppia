@@ -1199,3 +1199,37 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
             )
             | 'Flatten' >> beam.Flatten()
         )
+
+
+class DeleteExplorationVersionHistoryModelsJob(base_jobs.JobBase):
+    """Job that deletes SkillOpportunityModels."""
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        """Returns a PCollection of 'SUCCESS' or 'FAILURE' results from
+        deleting ExplorationVersionHistoryModel.
+
+        Returns:
+            PCollection. A PCollection of 'SUCCESS' or 'FAILURE' results from
+            deleting ExplorationVersionHistoryModel.
+        """
+        version_history_models = (
+            self.pipeline
+            | 'Get all ExplorationVersionHistoryModels' >>
+                ndb_io.GetModels(
+                    exp_models.ExplorationVersionHistoryModel.get_all(
+                        include_deleted=False
+                    )
+                )
+        )
+
+        unused_delete_result = (
+            version_history_models
+            | beam.Map(lambda model: model.key)
+            | 'Delete all models' >> ndb_io.DeleteModels()
+        )
+
+        return (
+            version_history_models
+            | 'Create job run result' >> (
+                job_result_transforms.CountObjectsToJobRunResult())
+        )
