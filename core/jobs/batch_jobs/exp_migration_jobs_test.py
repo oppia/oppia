@@ -73,7 +73,10 @@ class MigrateExplorationJobTests(
             feconf.CURRENT_STATE_SCHEMA_VERSION)
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='EXP PROCESSED SUCCESS: 1')
+            job_run_result.JobRunResult(
+                stdout='EXP PREVIOUSLY MIGRATED SUCCESS: 1'),
+            job_run_result.JobRunResult(
+                stdout='EXP PROCESSED SUCCESS: 1')
         ])
 
         exp_model = exp_models.ExplorationModel.get(self.NEW_EXP_ID)
@@ -107,7 +110,7 @@ class MigrateExplorationJobTests(
             ])
 
         migrated_exp_model = exp_models.ExplorationModel.get(self.NEW_EXP_ID)
-        self.assertEqual(migrated_exp_model.states_schema_version, 50)
+        self.assertEqual(migrated_exp_model.states_schema_version, 52)
 
     def test_broken_exp_is_not_migrated(self) -> None:
         exploration_rights = rights_domain.ActivityRights(
