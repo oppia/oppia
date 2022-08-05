@@ -46,7 +46,9 @@ def main() -> None:
     coverage_result = re.search(
         r'TOTAL\s+(\d+)\s+(?P<total>\d+)\s+(\d+)\s+(\d+)\s+(\d+)%\s+',
         process.stdout)
-    uncovered_lines = float(coverage_result.group('total'))
+    uncovered_lines = 0
+    if coverage_result:
+        uncovered_lines = float(coverage_result.group('total'))
     if uncovered_lines != 0:
         print('--------------------------------------------')
         print('Backend overall line coverage checks failed.')
