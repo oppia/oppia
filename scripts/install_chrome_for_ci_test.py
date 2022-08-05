@@ -27,10 +27,10 @@ from typing import Iterable, List, NoReturn
 
 URL = (
     'https://github.com/webnicer/chrome-downloads/raw/master/x64.deb/'
-    'google-chrome-stable_80.0.3987.87-1_amd64.deb'
+    'google-chrome-stable_90.0.4430.93-1_amd64.deb'
 )
-DOWNLOAD_VERSION = '80.0.3987.87-1'
-INSTALLED_VERSION = '80.0.3987.87'
+DOWNLOAD_VERSION = '90.0.4430.93-1'
+INSTALLED_VERSION = '90.0.4430.93'
 CHROME_DEB_FILE = 'google-chrome.deb'
 
 
