@@ -75,7 +75,6 @@ describe('Exploration Title Editor Component', () => {
     routerService.refreshSettingsTabEmitter = new EventEmitter();
 
     component.ngOnInit();
-    component.ngAfterContentChecked();
     fixture.detectChanges();
   });
 
