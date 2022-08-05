@@ -1132,23 +1132,6 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             changed_exploration_objective.objective,
             'new objective')
 
-    def test_apply_change_list_with_incorrect_version(self):
-        exploration = self.save_new_valid_exploration(
-            self.EXP_0_ID, self.owner_id)
-        change_list = [exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-            'property_name': 'objective',
-            'new_value': 'new objective'
-        })]
-        error_string = (
-            'Trying to get the new version of the exploration from version '
-            '%d which is not equal to the current version of the exploration '
-            'i.e. %d.' % (exploration.version, 2)
-        )
-        with self.assertRaisesRegex(Exception, error_string):
-            exp_services.apply_change_list_to_exploration(
-                exploration, 2, change_list)
-
     def test_publish_exploration_and_update_user_profiles(self):
         self.save_new_valid_exploration(self.EXP_0_ID, self.owner_id)
         exp_services.update_exploration(
