@@ -28,14 +28,20 @@ from core.jobs.batch_jobs import audit_rule_validation_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
 
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import exp_models
+    from mypy_imports import opportunity_models
+
 (exp_models, opportunity_models) = models.Registry.import_models(
     [models.NAMES.exploration, models.NAMES.opportunity])
 
 
 class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
+    """Tests for ExpAuditRuleChecksJob"""
 
     JOB_CLASS = (
-        audit_rule_validation_jobs.ExpAuditRuleChecksJob
+      audit_rule_validation_jobs.ExpAuditRuleChecksJob
     )
 
     EXPLORATION_ID_1 = '1'
@@ -45,7 +51,7 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
     EXPLORATION_ID_5 = '5'
 
     # DragAndDrop Interaction.
-    EXP_1_STATE_1 = state_domain.State.create_default_state(
+    EXP_1_STATE_1 = state_domain.State.create_default_state( # type: ignore[no-untyped-call] # type: ignore[no-untyped-call]
         'EXP_1_STATE_1', is_initial_state=False).to_dict()
     EXP_1_STATE_1['interaction'] = {
       'id': 'DragAndDropSortInput',
@@ -114,7 +120,7 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
       'solution': None
     }
 
-    EXP_1_STATE_2 = state_domain.State.create_default_state(
+    EXP_1_STATE_2 = state_domain.State.create_default_state( # type: ignore[no-untyped-call] # type: ignore[no-untyped-call]
         'EXP_1_STATE_2', is_initial_state=False).to_dict()
     EXP_1_STATE_2['interaction'] = {
       'id': 'DragAndDropSortInput',
@@ -192,7 +198,7 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
       'solution': None
     }
 
-    EXP_1_STATE_3 = state_domain.State.create_default_state(
+    EXP_1_STATE_3 = state_domain.State.create_default_state( # type: ignore[no-untyped-call] # type: ignore[no-untyped-call]
         'EXP_1_STATE_3', is_initial_state=False).to_dict()
     EXP_1_STATE_3['interaction'] = {
       'id': 'DragAndDropSortInput',
@@ -270,7 +276,7 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
       'solution': None
     }
 
-    EXP_1_STATE_4 = state_domain.State.create_default_state(
+    EXP_1_STATE_4 = state_domain.State.create_default_state( # type: ignore[no-untyped-call] # type: ignore[no-untyped-call]
         'EXP_1_STATE_4', is_initial_state=False).to_dict()
     EXP_1_STATE_4['interaction'] = {
       'id': 'DragAndDropSortInput',
@@ -339,7 +345,7 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
     }
 
     # Continue Interaction.
-    EXP_2_STATE_1 = state_domain.State.create_default_state(
+    EXP_2_STATE_1 = state_domain.State.create_default_state( # type: ignore[no-untyped-call] # type: ignore[no-untyped-call]
         'EXP_2_STATE_1', is_initial_state=False).to_dict()
     EXP_2_STATE_1['interaction'] = {
       'id': 'Continue',
@@ -395,7 +401,7 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
     }
 
     # Itemselection interaction.
-    EXP_3_STATE_1 = state_domain.State.create_default_state(
+    EXP_3_STATE_1 = state_domain.State.create_default_state( # type: ignore[no-untyped-call] # type: ignore[no-untyped-call]
         'EXP_3_STATE_1', is_initial_state=False).to_dict()
     EXP_3_STATE_1['interaction'] = {
       'id': 'ItemSelectionInput',
@@ -473,7 +479,7 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
     }
 
     # NumericInput interaction.
-    EXP_4_STATE_1 = state_domain.State.create_default_state(
+    EXP_4_STATE_1 = state_domain.State.create_default_state( # type: ignore[no-untyped-call]
         'EXP_4_STATE_1', is_initial_state=True).to_dict()
     EXP_4_STATE_1['interaction'] = {
       'id': 'NumericInput',
@@ -532,7 +538,7 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
       'solution': None
     }
 
-    EXP_4_STATE_2 = state_domain.State.create_default_state(
+    EXP_4_STATE_2 = state_domain.State.create_default_state( # type: ignore[no-untyped-call]
         'EXP_4_STATE_2', is_initial_state=True).to_dict()
     EXP_4_STATE_2['interaction'] = {
       'id': 'NumericInput',
@@ -591,7 +597,7 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
       'solution': None
     }
 
-    EXP_4_STATE_3 = state_domain.State.create_default_state(
+    EXP_4_STATE_3 = state_domain.State.create_default_state( # type: ignore[no-untyped-call]
         'EXP_4_STATE_3', is_initial_state=True).to_dict()
     EXP_4_STATE_3['interaction'] = {
       'id': 'NumericInput',
@@ -650,7 +656,7 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
       'solution': None
     }
 
-    EXP_4_STATE_4 = state_domain.State.create_default_state(
+    EXP_4_STATE_4 = state_domain.State.create_default_state( # type: ignore[no-untyped-call]
         'EXP_4_STATE_4', is_initial_state=True).to_dict()
     EXP_4_STATE_4['interaction'] = {
       'id': 'NumericInput',
@@ -709,7 +715,7 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
       'solution': None
     }
 
-    EXP_4_STATE_5 = state_domain.State.create_default_state(
+    EXP_4_STATE_5 = state_domain.State.create_default_state( # type: ignore[no-untyped-call]
         'EXP_4_STATE_5', is_initial_state=True).to_dict()
     EXP_4_STATE_5['interaction'] = {
       'id': 'NumericInput',
@@ -769,7 +775,7 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
     }
 
     # Image tag.
-    EXP_5_STATE_1 = state_domain.State.create_default_state(
+    EXP_5_STATE_1 = state_domain.State.create_default_state( # type: ignore[no-untyped-call]
         'EXP_5_STATE_1', is_initial_state=False).to_dict()
     EXP_5_STATE_1['content']['html'] = (
       '<p>dffddfdffdfd</p>\n\n<p>&nbsp;</p>\n<oppia-noninteractive-image>'
@@ -920,6 +926,8 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
             language_codes_with_assigned_voice_artists=[]
         )
 
+        self.mock_function_for_exp_fetcher()
+
     def test_run_with_no_models(self) -> None:
         self.assert_job_output_is([])
 
@@ -1045,3 +1053,23 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
             'NUMBER OF EXPS WITH INVALID RTE IMAGE SUCCESS: 1'
           )
         ])
+
+    def mock_function_for_exp_fetcher(self) -> None:
+        temp_tuple = ('invalid_model', 'invalid_opportunity_model')
+        model = (
+          audit_rule_validation_jobs.ExpAuditRuleChecksJob.
+          get_exploration_from_models(temp_tuple)
+        )
+
+        self.assertEqual(
+          model, None
+        )
+
+        model = (
+          audit_rule_validation_jobs.ExpAuditRuleChecksJob.
+          get_exploration_from_models('invalid_model')
+        )
+
+        self.assertEqual(
+          model, None
+        )

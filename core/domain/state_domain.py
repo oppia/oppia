@@ -617,7 +617,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
     def __init__(
         self,
         interaction_id: str,
-        customization_args: Dict[str, Dict[str, Any]],
+        customization_args: Dict[str, InteractionCustomizationArg],
         answer_groups: List[AnswerGroup],
         default_outcome: Outcome,
         confirmed_unclassified_answers: List[str],
