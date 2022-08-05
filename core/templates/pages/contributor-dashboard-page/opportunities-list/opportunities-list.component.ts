@@ -95,13 +95,7 @@ export class OpportunitiesListComponent {
           this.opportunities = this.opportunities.filter((opportunity) => {
             return opportunityIds.indexOf(opportunity.id) < 0;
           });
-          this.visibleOpportunities = this.opportunities.slice(
-            0, this.OPPORTUNITIES_PAGE_SIZE);
-          this.userIsOnLastPage = this.calculateUserIsOnLastPage(
-            this.opportunities,
-            this.OPPORTUNITIES_PAGE_SIZE,
-            this.activePageNumber,
-            this.more);
+          this.gotoPage(this.activePageNumber);
         }));
   }
 
@@ -144,17 +138,17 @@ export class OpportunitiesListComponent {
           this.opportunities = this.opportunities.concat(opportunitiesDicts);
           this.visibleOpportunities = this.opportunities.slice(
             startIndex, endIndex);
-          this.userIsOnLastPage = this.calculateUserIsOnLastPage(
-            this.opportunities,
-            this.OPPORTUNITIES_PAGE_SIZE,
-            pageNumber,
-            this.more);
           this.loadingOpportunityData = false;
         });
     } else {
       this.visibleOpportunities = this.opportunities.slice(
         startIndex, endIndex);
     }
+    this.userIsOnLastPage = this.calculateUserIsOnLastPage(
+      this.opportunities,
+      this.OPPORTUNITIES_PAGE_SIZE,
+      pageNumber,
+      this.more);
     this.activePageNumber = pageNumber;
   }
 
