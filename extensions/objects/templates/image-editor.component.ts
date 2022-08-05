@@ -1146,9 +1146,9 @@ export class ImageEditorComponent implements OnInit, OnChanges {
       img.src = this.getTrustedResourceUrlForImageFileName(
         data.filename) as string;
     },
-    (error) => {
+    (response) => {
       this.alertsService.addWarning(
-        error || 'Error communicating with server.');
+        response.error || 'Error communicating with server.');
     });
   }
 

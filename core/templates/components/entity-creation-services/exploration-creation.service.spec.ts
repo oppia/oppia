@@ -16,9 +16,10 @@
  * @fileoverview Unit test for Exploration creation service.
  */
 
-import {HttpClientTestingModule, HttpTestingController} from '@angular/common/http/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { AlertsService } from 'services/alerts.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
@@ -46,7 +47,7 @@ class MockWindowRef {
   }
 }
 
-fdescribe('ExplorationCreationService', () => {
+describe('ExplorationCreationService', () => {
   let ecs: ExplorationCreationService;
   let ecbas: ExplorationCreationBackendApiService;
   let loaderService: LoaderService;
@@ -55,7 +56,6 @@ fdescribe('ExplorationCreationService', () => {
   let alertsService: AlertsService;
   let windowRef: MockWindowRef;
   let ngbModal: NgbModal;
-  let httpTestingController: HttpTestingController;
 
   beforeEach(() => {
     windowRef = new MockWindowRef();
@@ -69,7 +69,6 @@ fdescribe('ExplorationCreationService', () => {
       ]
     });
 
-    httpTestingController = TestBed.inject(HttpTestingController);
     ecs = TestBed.inject(ExplorationCreationService);
     ecbas = TestBed.inject(ExplorationCreationBackendApiService);
     loaderService = TestBed.inject(LoaderService);
@@ -160,17 +159,16 @@ fdescribe('ExplorationCreationService', () => {
           })
         } as NgbModalRef
       );
+      spyOn(ecbas, 'uploadExploration').and.callFake((_: string) => {
+        return Promise.resolve({
+          explorationId: 'expId'
+        });
+      });
 
       ecs.showUploadExplorationModal();
-      tick(100);
 
-      let req = httpTestingController.expectOne('contributehandler/upload');
-      expect(req.request.method).toEqual('POST');
-      req.flush({exploration_id: 'expId'});
+      tick(200);
 
-      tick(100);
-
-      httpTestingController.verify();
       expect(windowRef.nativeWindow.location.href).toBe('/create/expId');
     }));
 
@@ -185,16 +183,16 @@ fdescribe('ExplorationCreationService', () => {
       );
       spyOn(alertsService, 'addWarning');
       spyOn(loaderService, 'hideLoadingScreen');
+      let form = new FormData();
+      form.append(
+        'payload', JSON.stringify({error: 'Failed to upload exploration'}));
+      spyOn(ecbas, 'uploadExploration').and.callFake((_: string) => {
+        return Promise.reject(new Response(form, { status: 404 }));
+      });
 
       ecs.showUploadExplorationModal();
-      tick(100);
 
-      let req = httpTestingController.expectOne('contributehandler/upload');
-      expect(req.request.method).toEqual('POST');
-      req.error(new ErrorEvent('Failed to upload exploration'));
-      httpTestingController.verify();
-
-      tick(100);
+      tick(200);
 
       expect(alertsService.addWarning).toHaveBeenCalledWith(
         'Failed to upload exploration');

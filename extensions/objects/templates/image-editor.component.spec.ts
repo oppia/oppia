@@ -18,7 +18,7 @@
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, waitForAsync, TestBed, tick, fakeAsync } from '@angular/core/testing';
+import {ComponentFixture, waitForAsync, TestBed, tick, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 import { ImageEditorComponent } from './image-editor.component';
 import { ImageUploadHelperService } from 'services/image-upload-helper.service';
 import { ContextService } from 'services/context.service';
@@ -37,7 +37,7 @@ declare global {
   }
 }
 
-fdescribe('ImageEditor', () => {
+describe('ImageEditor', () => {
   let component: ImageEditorComponent;
   let fixture: ComponentFixture<ImageEditorComponent>;
   let contextService: ContextService;
@@ -2067,16 +2067,21 @@ fdescribe('ImageEditor', () => {
       '/createhandler/imageupload/question/2'
     );
     expect(req.request.method).toEqual('POST');
-    req.error(new ErrorEvent('Failed to upload exploration'));
-    httpTestingController.verify();
+    req.flush('Failed to upload image', {
+      status: 500,
+      statusText: 'Failed to upload image'
+    });
+
 
     tick(100);
 
     expect(alertsService.addWarning)
-      .toHaveBeenCalledWith('Failed to upload exploration');
+      .toHaveBeenCalledWith('Failed to upload image');
+
+    httpTestingController.verify();
   }));
 
-  it('should alert user with defualt error if it fails to post' +
+  it('should alert user with default error if it fails to post' +
   ' image to server when user savesimage', fakeAsync(() => {
     spyOn(alertsService, 'addWarning');
     spyOn(imagePreloaderService, 'getDimensionsOfImage')
@@ -2093,13 +2098,17 @@ fdescribe('ImageEditor', () => {
       '/createhandler/imageupload/question/2'
     );
     expect(req.request.method).toEqual('POST');
-    req.error(new ErrorEvent(null));
-    httpTestingController.verify();
+    req.flush(null, {
+      status: 500,
+      statusText: null
+    });
 
+    flushMicrotasks();
     tick(100);
 
     expect(alertsService.addWarning)
       .toHaveBeenCalledWith('Error communicating with server.');
+    httpTestingController.verify();
   }));
 
   it('should save uploaded gif when user clicks \`Use Image\`' +
@@ -2222,7 +2231,7 @@ fdescribe('ImageEditor', () => {
 
     spyOn(imageUploadHelperService, 'convertImageDataToImageFile')
       .and.returnValue(null);
-    
+
     component.saveUploadedFile();
     tick(200);
 
@@ -2240,7 +2249,6 @@ fdescribe('ImageEditor', () => {
     expect(alertsService.addWarning)
       .toHaveBeenCalledWith('Could not get resampled file.');
     expect(component.data.mode).toBe(component.MODE_UPLOADED);
-
   }));
 
   it('should save uploaded svg when user clicks \`Use Image\`' +

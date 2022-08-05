@@ -18,21 +18,16 @@
  */
 
 import { Injectable } from '@angular/core';
-// eslint-disable-next-line oppia/disallow-httpclient
-import { HttpClient } from '@angular/common/http';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 import { AlertsService } from 'services/alerts.service';
 import { LoaderService } from 'services/loader.service';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { UploadActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/upload-activity-modal.component';
-import { downgradeInjectable } from '@angular/upgrade/static';
 import { ExplorationCreationBackendApiService } from './exploration-creation-backend-api.service';
-
-interface ExplorationUploadBackendResponse {
-  'exploration_id': string;
-}
 
  @Injectable({
    providedIn: 'root'
@@ -41,7 +36,6 @@ export class ExplorationCreationService {
   CREATE_NEW_EXPLORATION_URL_TEMPLATE = '/create/<exploration_id>';
   explorationCreationInProgress: boolean = false;
   constructor(
-    private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService,
     private siteAnalyticsService: SiteAnalyticsService,
     private alertsService: AlertsService,
@@ -49,7 +43,7 @@ export class ExplorationCreationService {
     private ngbModal: NgbModal,
     private windowRef: WindowRef,
     private explorationCreationBackendApiService:
-     ExplorationCreationBackendApiService
+      ExplorationCreationBackendApiService
   ) {}
 
   createNewExploration(): void {
@@ -88,18 +82,14 @@ export class ExplorationCreationService {
       const yamlFile = result.yamlFile;
 
       this.loaderService.showLoadingScreen('Creating exploration');
-
-      let form = new FormData();
-      form.append('yaml_file', yamlFile);
-      form.append('payload', JSON.stringify({}));
-      this.http.post<ExplorationUploadBackendResponse>(
-        'contributehandler/upload', form
-      ).toPromise().then(
+      this.explorationCreationBackendApiService.uploadExploration(
+        yamlFile
+      ).then(
         (data) => {
           this.windowRef.nativeWindow.location.href = (
             this.urlInterpolationService.interpolateUrl(
               this.CREATE_NEW_EXPLORATION_URL_TEMPLATE, {
-                exploration_id: data.exploration_id
+                exploration_id: data.explorationId
               }
             )
           );
@@ -108,7 +98,8 @@ export class ExplorationCreationService {
           this.alertsService.addWarning(
             response.error || 'Error communicating with server.');
           this.loaderService.hideLoadingScreen();
-        });
+        }
+      );
     });
   }
 }
