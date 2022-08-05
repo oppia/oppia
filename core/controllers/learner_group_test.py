@@ -642,7 +642,7 @@ class CreateLearnerGroupPageTests(test_utils.GenericTestBase):
     """Checks the access and rendering of the create learner group page."""
 
     def setUp(self):
-        super(CreateLearnerGroupPageTests, self).setUp()
+        super().setUp()
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.login(self.NEW_USER_EMAIL)
 
@@ -667,7 +667,7 @@ class FacilitatorDashboardPageTests(test_utils.GenericTestBase):
     """Checks the access and rendering of the facilitator dashboard page."""
 
     def setUp(self):
-        super(FacilitatorDashboardPageTests, self).setUp()
+        super().setUp()
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.login(self.NEW_USER_EMAIL)
 
@@ -693,7 +693,7 @@ class LearnerGroupSearchStudentHandlerTests(test_utils.GenericTestBase):
     """Tests searching a given user to invite to the learner group"""
 
     def setUp(self):
-        super(LearnerGroupSearchStudentHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
