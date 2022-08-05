@@ -632,8 +632,8 @@ def apply_change_list(exploration_id, change_list):
 def update_states_version_history(
     states_version_history,
     change_list,
-    old_states,
-    new_states,
+    old_states_dict,
+    new_states_dict,
     current_version,
     committer_id
 ):
@@ -646,9 +646,9 @@ def update_states_version_history(
             exploration.
         change_list: list(ExplorationChange). A list of changes introduced in
             this commit.
-        old_states: dict(str, State). The states in the previous version of
+        old_states_dict: dict(str, dict). The states in the previous version of
             the exploration.
-        new_states: dict(str, State). The states in the current version of
+        new_states_dict: dict(str, dict). The states in the current version of
             the exploration.
         current_version: int. The latest version of the exploration.
         committer_id: str. The id of the user who made the commit.
@@ -659,14 +659,6 @@ def update_states_version_history(
     """
     exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
     prev_version = current_version - 1
-    old_states_dict = copy.deepcopy({
-        state_name: state.to_dict()
-        for (state_name, state) in old_states.items()
-    })
-    new_states_dict = copy.deepcopy({
-        state_name: state.to_dict()
-        for (state_name, state) in new_states.items()
-    })
 
     # Firstly, delete the states from the state version history which were
     # deleted during this commit.
@@ -704,7 +696,7 @@ def update_states_version_history(
     # The following list includes states which exist in both the old states
     # and new states and were not renamed.
     states_which_were_not_renamed = []
-    for state_name in old_states:
+    for state_name in old_states_dict:
         if (
             state_name not in exp_versions_diff.deleted_state_names and
             state_name not in effective_old_to_new_state_names
@@ -766,8 +758,8 @@ def update_states_version_history(
 def update_metadata_version_history(
     metadata_version_history,
     change_list,
-    old_metadata,
-    new_metadata,
+    old_metadata_dict,
+    new_metadata_dict,
     current_version,
     committer_id
 ):
@@ -779,9 +771,9 @@ def update_metadata_version_history(
             history at the previous version of the exploration.
         change_list: list(ExplorationChange). A list of changes introduced in
             this commit.
-        old_metadata: ExplorationMetadata. The exploration metadata at the
+        old_metadata_dict: dict. The exploration metadata at the
             previous version of the exploration.
-        new_metadata: dict(str, State). The exploration metadata at the
+        new_metadata_dict: dict. The exploration metadata at the
             current version of the exploration.
         current_version: int. The latest version of the exploration.
         committer_id: str. The id of the user who made the commit.
@@ -789,8 +781,6 @@ def update_metadata_version_history(
     Returns:
         MetadataVersionHistory. The updated metadata version history.
     """
-    old_metadata_dict = copy.deepcopy(old_metadata.to_dict())
-    new_metadata_dict = copy.deepcopy(new_metadata.to_dict())
     prev_version = current_version - 1
 
     metadata_was_changed = any(
@@ -860,8 +850,16 @@ def update_version_history(
         version_history_model_id, strict=False)
 
     if version_history_model is not None:
-        new_states = exploration.states
-        new_metadata = exploration.get_metadata()
+        old_states_dict = {
+            state_name: state.to_dict()
+            for state_name, state in old_states.items()
+        }
+        new_states_dict = {
+            state_name: state.to_dict()
+            for state_name, state in exploration.states.items()
+        }
+        old_metadata_dict = old_metadata.to_dict()
+        new_metadata_dict = exploration.get_metadata().to_dict()
         states_version_history = {
             state_name: state_domain.StateVersionHistory.from_dict(
                 state_version_history_dict)
@@ -873,12 +871,12 @@ def update_version_history(
             version_history_model.metadata_last_edited_committer_id)
 
         updated_states_version_history = update_states_version_history(
-            states_version_history, change_list, old_states, new_states,
-            exploration.version, committer_id
+            states_version_history, change_list, old_states_dict,
+            new_states_dict, exploration.version, committer_id
         )
         updated_metadata_version_history = update_metadata_version_history(
-            metadata_version_history, change_list, old_metadata, new_metadata,
-            exploration.version, committer_id)
+            metadata_version_history, change_list, old_metadata_dict,
+            new_metadata_dict, exploration.version, committer_id)
         updated_committer_ids = get_updated_committer_ids(
             updated_states_version_history,
             updated_metadata_version_history.last_edited_committer_id)

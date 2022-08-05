@@ -1202,7 +1202,7 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
 
 
 class DeleteExplorationVersionHistoryModelsJob(base_jobs.JobBase):
-    """Job that deletes SkillOpportunityModels."""
+    """Job that deletes ExplorationVersionHistoryModels."""
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns a PCollection of 'SUCCESS' or 'FAILURE' results from
