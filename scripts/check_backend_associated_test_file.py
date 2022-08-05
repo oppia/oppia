@@ -54,6 +54,7 @@ FILES_WITHOUT_ASSOCIATED_TEST_FILES = [
 
     # The files below are to be tested.
     # GSoC'22: Improve line and branch coverage for the backend and frontend.
+    'scripts/check_overall_backend_test_coverage.py',
     'scripts/run_custom_eslint_tests.py',
     'scripts/run_backend_tests.py',
     'scripts/run_lighthouse_tests.py',
