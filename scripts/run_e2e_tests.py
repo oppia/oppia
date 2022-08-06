@@ -281,6 +281,9 @@ def run_tests(args):
                 stdout=subprocess.PIPE))
 
         elif args.suite in SUITES_MIGRATED_TO_WEBDRIVERIO:
+            stack.enter_context(servers.managed_webdriver_server(
+                chrome_version=args.chrome_driver_version))
+
             proc = stack.enter_context(servers.managed_webdriverio_server(
                 suite_name=args.suite,
                 dev_mode=dev_mode,

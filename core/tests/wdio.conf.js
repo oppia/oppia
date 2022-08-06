@@ -150,7 +150,10 @@ exports.config = {
   // They enhance your test setup with almost no effort. Unlike plugins,
   // they don't add newcommands. Instead, they hook themselves up into
   // the test process.
-  services: ['devtools'],
+  services: [
+    ['chromedriver', {
+      chromedriverCustomPath: chromedriverPath
+    }]],
 
   // Framework you want to run your specs with.
   // The following are supported: Mocha, Jasmine, and Cucumber
