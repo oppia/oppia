@@ -12,6 +12,10 @@ var args = process.argv;
 // eslint-disable-next-line eqeqeq
 var chromeVersion = (args[0] == 'DEBUG=true') ? args[6] : args[5];
 
+const drivers = {
+  chrome: { version: chromeVersion }, // https://chromedriver.chromium.org/
+};
+
 var chromedriverPath =
 './node_modules/webdriver-manager/selenium/chromedriver_' + chromeVersion;
 
@@ -141,7 +145,7 @@ exports.config = {
   // Define all options that are relevant for the WebdriverIO instance here
   //
   // Level of logging verbosity: trace | debug | info | warn | error | silent.
-  logLevel: 'warn',
+  logLevel: 'info',
 
   // Set a base URL in order to shorten url command calls. If your `url`
   // parameter starts with `/`, the base url gets prepended, not including
@@ -163,9 +167,10 @@ exports.config = {
   // they don't add newcommands. Instead, they hook themselves up into
   // the test process.
   services: [
-    ['chromedriver', {
-      chromedriverCustomPath: chromedriverPath
-    }]],
+    ['selenium-standalone', {
+      logPath: 'logs',
+    }]
+  ],
 
   // Framework you want to run your specs with.
   // The following are supported: Mocha, Jasmine, and Cucumber
