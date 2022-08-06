@@ -60,10 +60,9 @@ AllowedRuleSpecInputTypes = Union[
     Dict[str, Union[str, List[str]]],
 ]
 
-# Here, in 'customization_args', we used Any type because it accepts
-# the values of customization args and that values can be of type str, int,
-# bool, List and other types too. So to make it generalize for every type
-# of values, we used Any here.
+# Here, `CustomizationArgsDictType` is a type for customization_args dictionary,
+# and we used Any type here because it accepts the values of customization args
+# and that values can be of type str, int, bool, List and other types too.
 CustomizationArgsDictType = Dict[str, Dict[str, Any]]
 
 
@@ -1041,7 +1040,8 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
 
         for answer_group in self.answer_groups:
             # Here, we are asserting that self.id is never going to be None,
-            # because interaction_id cannot exists without answer answer_groups.
+            # because interaction_id can only be None when there are no answer
+            # groups.
             assert self.id is not None
             html_list += answer_group.get_all_html_content_strings(self.id)
 
@@ -1252,8 +1252,8 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
 
     # Here, we used Any type because this method returns the values of
     # customization args and that values can be of type str, int, bool,
-    # List and other types too. So to make it generalize for every type
-    # of values, we used Any here.
+    # List and other types too. So to make the return type generalize
+    # for every type of values, we used Any here.
     def to_customization_arg_dict(self) -> Dict[str, Any]:
         """Converts a InteractionCustomizationArgument domain object to a
         customization argument dictionary. This is done by
@@ -2328,9 +2328,9 @@ class WrittenTranslations:
                     # because here we are working with previous versions of
                     # the domain object and in previous versions of the domain
                     # object there are some fields that are discontinued in
-                    # the latest domain object. So, while accessing these
-                    # discontinued fields MyPy throws an error. Thus to avoid
-                    # the error, we used ignore here.
+                    # the latest domain object (eg. html). So, while accessing
+                    # these discontinued fields MyPy throws an error. Thus to
+                    # avoid the error, we used ignore here.
                     written_translations_dict['translations_mapping'][
                         content_id][language_code]['html'] = (  # type: ignore[misc]
                             conversion_fn(translation_dict['html']))  # type: ignore[misc]

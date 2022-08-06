@@ -1164,6 +1164,9 @@ def get_user_skill_mastery(user_id: str, skill_id: str) -> Optional[float]:
     if not user_skill_mastery_model:
         return None
 
+    # TODO(#15621): The explicit declaration of type for ndb properties
+    # should be removed. Currently, these ndb properties are annotated with
+    # Any return type. Once we have proper return type we can remove this.
     degree_of_mastery: float = user_skill_mastery_model.degree_of_mastery
     return degree_of_mastery
 

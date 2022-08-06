@@ -243,6 +243,4 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'No interaction exists for the None interaction_id.'
         ):
-            (
-                interaction_registry.Registry.get_interaction_by_id(None)
-            )
+            interaction_registry.Registry.get_interaction_by_id(None)

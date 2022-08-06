@@ -86,7 +86,7 @@ if MYPY:  # pragma: no cover
 
 datastore_services = models.Registry.import_datastore_services()
 
-AcceptableActivityTypes = Union[
+AcceptableActivityModelTypes = Union[
     user_models.CompletedActivitiesModel,
     user_models.IncompleteActivitiesModel
 ]
@@ -1385,10 +1385,10 @@ def delete_explorations_from_activities(exploration_ids: List[str]) -> None:
         user_models.CompletedActivitiesModel,
         user_models.IncompleteActivitiesModel,
     ]
-    all_entities: List[AcceptableActivityTypes] = []
+    all_entities: List[AcceptableActivityModelTypes] = []
     for model_class in model_classes:
         entities: Sequence[
-            AcceptableActivityTypes
+            AcceptableActivityModelTypes
         ] = model_class.query(
             model_class.exploration_ids.IN(exploration_ids)
         ).fetch()
