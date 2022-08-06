@@ -49,7 +49,7 @@ var expectInteractionDetailsToMatch = async function(
     expect(placeholderValueUnicode).toEqual(placeholderText);
   }
   if (heightOfBox) {
-    expect(textInputInteraction.getAttribute('rows-with-value'))
+    expect(await textInputInteraction.getAttribute('rows-with-value'))
       .toEqual(heightOfBox.toString());
   }
   expect(

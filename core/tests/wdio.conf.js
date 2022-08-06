@@ -28,8 +28,16 @@ var suites = {
     './core/tests/webdriverio_desktop/**/*.js',
   ],
 
+  blogDashboard: [
+    './core/tests/webdriverio_desktop/blogDashboard.js'
+  ],
+
   collections: [
     './core/tests/webdriverio_desktop/collections.js'
+  ],
+
+  contributorDashboard: [
+    './core/tests/webdriverio_desktop/contributorDashboard.js'
   ],
 
   creatorDashboard: [
@@ -62,6 +70,10 @@ var suites = {
 
   topicAndStoryEditor: [
     './core/tests/webdriverio_desktop/topicAndStoryEditor.js'
+  ],
+
+  topicAndStoryEditorFileUploadFeatures: [
+    './core/tests/webdriverio_desktop/topicAndStoryEditorFileUploadFeatures.js'
   ],
 
   topicAndStoryViewer: [
