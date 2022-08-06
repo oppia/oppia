@@ -18,19 +18,12 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { SuggestionThreadObjectFactory } from 'domain/suggestion/SuggestionThreadObjectFactory';
+import { SuggestionThread } from 'domain/suggestion/suggestion-thread-object.model';
 import { ThreadMessage } from 'domain/feedback_message/ThreadMessage.model';
 import { FeedbackThreadBackendDict } from 'domain/feedback_thread/FeedbackThreadObjectFactory';
 import { SuggestionBackendDict } from './suggestion.model';
 
 describe('SuggestionThreadObjectFactory', () => {
-  let suggestionThreadObjectFactory: SuggestionThreadObjectFactory;
-
-  beforeEach(() => {
-    suggestionThreadObjectFactory =
-      TestBed.inject(SuggestionThreadObjectFactory);
-  });
-
   let suggestionThreadBackendDict: FeedbackThreadBackendDict;
   let suggestionBackendDict: SuggestionBackendDict;
 
@@ -68,7 +61,7 @@ describe('SuggestionThreadObjectFactory', () => {
       'edit_exploration_state_content';
 
     let suggestionThread =
-      suggestionThreadObjectFactory.createFromBackendDicts(
+    SuggestionThread.createFromBackendDicts(
         suggestionThreadBackendDict, suggestionBackendDict);
 
     expect(suggestionThread.lastUpdatedMsecs).toEqual(1000);
@@ -109,7 +102,7 @@ describe('SuggestionThreadObjectFactory', () => {
 
   it('should create a new suggestion thread.', () => {
     let suggestionThread =
-      suggestionThreadObjectFactory.createFromBackendDicts(
+    SuggestionThread.createFromBackendDicts(
         suggestionThreadBackendDict, suggestionBackendDict);
 
     expect(suggestionThread.lastUpdatedMsecs).toEqual(1000);
@@ -125,7 +118,7 @@ describe('SuggestionThreadObjectFactory', () => {
   describe('.setMessages', () => {
     it('should handle message getter and setter.', () => {
       let suggestionThread =
-        suggestionThreadObjectFactory.createFromBackendDicts(
+      SuggestionThread.createFromBackendDicts(
           suggestionThreadBackendDict, suggestionBackendDict);
 
       expect(suggestionThread.getMessages()).toEqual([]);

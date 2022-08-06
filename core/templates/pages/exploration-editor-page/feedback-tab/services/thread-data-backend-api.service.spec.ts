@@ -23,7 +23,7 @@ import { ThreadMessageBackendDict } from 'domain/feedback_message/ThreadMessage.
 
 import { FeedbackThread, FeedbackThreadBackendDict, FeedbackThreadObjectFactory } from 'domain/feedback_thread/FeedbackThreadObjectFactory';
 import { SuggestionBackendDict } from 'domain/suggestion/suggestion.model';
-import { SuggestionThreadObjectFactory } from 'domain/suggestion/SuggestionThreadObjectFactory';
+import { SuggestionThread } from 'domain/suggestion/suggestion-thread-object.model';
 import { ThreadDataBackendApiService } from 'pages/exploration-editor-page/feedback-tab/services/thread-data-backend-api.service';
 import { ContextService } from 'services/context.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
@@ -33,7 +33,6 @@ describe('retrieving threads service', () => {
   let contextService: ContextService;
   let csrfTokenService: CsrfTokenService;
   let feedbackThreadObjectFactory: FeedbackThreadObjectFactory;
-  let suggestionThreadObjectFactory: SuggestionThreadObjectFactory;
   let threadDataBackendApiService: ThreadDataBackendApiService;
 
   let mockFeedbackThreads: FeedbackThreadBackendDict[];
@@ -141,8 +140,6 @@ describe('retrieving threads service', () => {
     contextService = TestBed.inject(ContextService);
     csrfTokenService = TestBed.inject(CsrfTokenService);
     feedbackThreadObjectFactory = TestBed.inject(FeedbackThreadObjectFactory);
-    suggestionThreadObjectFactory = (
-      TestBed.inject(SuggestionThreadObjectFactory));
     threadDataBackendApiService = TestBed.inject(ThreadDataBackendApiService);
 
     spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
@@ -494,7 +491,7 @@ describe('retrieving threads service', () => {
     }));
 
   it('should successfully resolve a suggestion', fakeAsync(() => {
-    let thread = suggestionThreadObjectFactory.createFromBackendDicts(
+    let thread = SuggestionThread.createFromBackendDicts(
       mockSuggestionThreads[0], mockSuggestions[0]);
 
     threadDataBackendApiService.resolveSuggestionAsync(
