@@ -3926,7 +3926,6 @@ class WipeoutServiceDeleteSuggestionModelsTests(test_utils.GenericTestBase):
             accepted_translations_count=1,
             accepted_translations_with_reviewer_edits_count=2,
             accepted_translation_word_count=3,
-            accepted_translations_with_reviewer_edits_word_count=1,
             first_contribution_date=(
                 datetime.date.fromtimestamp(1616173837)),
             last_contribution_date=(

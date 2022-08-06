@@ -431,7 +431,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
     ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT: Final = 0
     REVIEWED_QUESTIONS_COUNT: Final = 2
     ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT: Final = 0
-    ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_WORD_COUNT: Final = 0
     # Timestamp dates in sec since epoch for Mar 19 2021 UTC.
     CONTRIBUTION_DATES: Final = [
         datetime.date.fromtimestamp(1616173836),
@@ -762,9 +761,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
             accepted_translation_word_count=(
                 self.ACCEPTED_TRANSLATION_WORD_COUNT),
-            accepted_translations_with_reviewer_edits_word_count=(
-                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_WORD_COUNT
-            ),
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=self.LAST_CONTRIBUTION_DATE
         )
@@ -1851,9 +1847,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                         .ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
                     'accepted_translation_word_count': (
                         self.ACCEPTED_TRANSLATION_WORD_COUNT),
-                    'accepted_translations_with_reviewer_edits_word_count': (
-                        self
-                        .ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_WORD_COUNT),
                     'first_contribution_date': (
                         self.FIRST_CONTRIBUTION_DATE.isoformat()),
                     'last_contribution_date': (

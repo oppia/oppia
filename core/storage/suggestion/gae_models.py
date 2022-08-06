@@ -1329,10 +1329,6 @@ class TranslationReviewStatsModel(base_models.BaseModel):
     # attributes.
     accepted_translation_word_count = datastore_services.IntegerProperty(
         required=True, indexed=True)
-    # The total word count of accepted translations with reviewer edits.
-    # Excludes HTML tags and attributes.
-    accepted_translations_with_reviewer_edits_word_count = (
-        datastore_services.IntegerProperty(required=True, indexed=True))
     # The first date that the reviewer made a translation review.
     first_contribution_date = datastore_services.DateProperty(indexed=True)
     # The last date that the reviewer made a translation review.
@@ -1349,7 +1345,6 @@ class TranslationReviewStatsModel(base_models.BaseModel):
             accepted_translations_count: int,
             accepted_translations_with_reviewer_edits_count: int,
             accepted_translation_word_count: int,
-            accepted_translations_with_reviewer_edits_word_count: int,
             first_contribution_date: datetime.date,
             last_contribution_date: datetime.date
     ) -> str:
@@ -1368,9 +1363,6 @@ class TranslationReviewStatsModel(base_models.BaseModel):
             accepted_translations_count=accepted_translations_count,
             accepted_translations_with_reviewer_edits_count=(
                 accepted_translations_with_reviewer_edits_count),
-            accepted_translations_with_reviewer_edits_word_count=(
-                accepted_translations_with_reviewer_edits_word_count
-            ),
             accepted_translation_word_count=accepted_translation_word_count,
             first_contribution_date=first_contribution_date,
             last_contribution_date=last_contribution_date)
@@ -1479,8 +1471,6 @@ class TranslationReviewStatsModel(base_models.BaseModel):
                 base_models.EXPORT_POLICY.EXPORTED,
             'accepted_translation_word_count':
                 base_models.EXPORT_POLICY.EXPORTED,
-            'accepted_translations_with_reviewer_edits_word_count':
-                base_models.EXPORT_POLICY.EXPORTED,
             'first_contribution_date':
                 base_models.EXPORT_POLICY.EXPORTED,
             'last_contribution_date':
@@ -1529,8 +1519,6 @@ class TranslationReviewStatsModel(base_models.BaseModel):
                     model.accepted_translations_with_reviewer_edits_count),
                 'accepted_translation_word_count': (
                     model.accepted_translation_word_count),
-                'accepted_translations_with_reviewer_edits_word_count': (
-                    model.accepted_translations_with_reviewer_edits_word_count),
                 'first_contribution_date': (
                     model.first_contribution_date.isoformat()),
                 'last_contribution_date': (
