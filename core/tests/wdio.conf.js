@@ -161,7 +161,8 @@ exports.config = {
     ['chromedriver', {
       logFileName: 'wdio-chromedriver.log',
       outputDir: screenshotPath,
-      chromedriverCustomPath: chromedriverPath
+      chromedriverCustomPath: chromedriverPath,
+      args: ['--verbose']
     }]],
 
   // Framework you want to run your specs with.
