@@ -1,0 +1,23 @@
+/*
+  NOTE to developers: We generate RTL CSS from this file in the webpack
+  compilation, here are sme additional rules that can be added to the CSS files:
+  https://rtlcss.com/learn/usage-guide/control-directives .
+*/
+
+.oppia-learner-group-details {
+  display: grid;
+  grid-gap: 40px;
+}
+
+.oppia-learner-group-details .required-field {
+  color: #c55f45;
+}
+
+.oppia-learner-group-details .form-group {
+  display: grid;
+  grid-gap: 10px;
+}
+
+.oppia-learner-group-details .oppia-long-text textarea {
+  resize: none;
+}

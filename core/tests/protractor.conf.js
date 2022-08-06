@@ -40,20 +40,12 @@ var suites = {
       'protractor_desktop/adminTabFeatures.js'
     ],
 
-    blogDashboard: [
-      'protractor_desktop/blogDashboard.js'
-    ],
-
     classroomPage: [
       'protractor_desktop/classroomPage.js'
     ],
 
     classroomPageFileUploadFeatures: [
       'protractor_desktop/classroomPageFileUploadFeatures.js'
-    ],
-
-    contributorDashboard: [
-      'protractor_desktop/contributorDashboard.js'
     ],
 
     coreEditorAndPlayerFeatures: [
@@ -112,20 +104,8 @@ var suites = {
       'protractor_desktop/playVoiceovers.js'
     ],
 
-    profileMenu: [
-      'protractor/profileMenuFlow.js'
-    ],
-
     publication: [
       'protractor_desktop/publicationAndLibrary.js'
-    ],
-
-    topicAndStoryEditor: [
-      'protractor_desktop/topicAndStoryEditor.js'
-    ],
-
-    topicAndStoryEditorFileUploadFeatures: [
-      'protractor_desktop/topicAndStoryEditorFileUploadFeatures.js'
     ],
 
     topicsAndSkillsDashboard: [
@@ -134,10 +114,6 @@ var suites = {
 
     skillEditor: [
       'protractor_desktop/skillEditor.js'
-    ],
-
-    topicAndStoryViewer: [
-      'protractor_desktop/topicAndStoryViewer.js'
     ],
 
     wipeout: [
@@ -335,8 +311,7 @@ exports.config = {
           }
         },
       });
-    }
-    else {
+    } else {
       console.log(
         'Videos will not be recorded for this suite either because videos' +
         ' have been disabled for it (using environment variables) or' +

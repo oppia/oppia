@@ -570,7 +570,7 @@ GOOGLE_APP_ENGINE_REGION = 'us-central1'
 DATAFLOW_TEMP_LOCATION = 'gs://todo/todo'
 DATAFLOW_STAGING_LOCATION = 'gs://todo/todo'
 
-OPPIA_VERSION = '3.2.6'
+OPPIA_VERSION = '3.2.7'
 OPPIA_PYTHON_PACKAGE_PATH = './build/oppia-beam-job-%s.tar.gz' % OPPIA_VERSION
 
 # Committer id for system actions. The username for the system committer
@@ -974,6 +974,7 @@ LIBRARY_SEARCH_DATA_URL = '/searchhandler/data'
 LIBRARY_TOP_RATED_URL = '/community-library/top-rated'
 MACHINE_TRANSLATION_DATA_URL = '/machine_translated_state_texts_handler'
 MERGE_SKILLS_URL = '/merge_skills_handler'
+METADATA_VERSION_HISTORY_URL_PREFIX = '/version_history_handler/metadata'
 NEW_COLLECTION_URL = '/collection_editor_handler/create_new'
 NEW_EXPLORATION_URL = '/contributehandler/create_new'
 NEW_QUESTION_URL = '/question_editor_handler/create_new'
@@ -1011,6 +1012,7 @@ SKILL_EDITOR_QUESTION_URL = '/skill_editor_question_handler'
 SKILL_MASTERY_DATA_URL = '/skill_mastery_handler/data'
 SKILL_RIGHTS_URL_PREFIX = '/skill_editor_handler/rights'
 SKILL_DESCRIPTION_HANDLER = '/skill_description_handler'
+STATE_VERSION_HISTORY_URL_PREFIX = '/version_history_handler/state'
 STORY_DATA_HANDLER = '/story_data_handler'
 STORY_EDITOR_URL_PREFIX = '/story_editor'
 STORY_EDITOR_DATA_URL_PREFIX = '/story_editor_handler/data'
@@ -1052,6 +1054,8 @@ USER_PERMISSIONS_URL_PREFIX = '/createhandler/permissions'
 USERNAME_CHECK_DATA_URL = '/usernamehandler/data'
 VALIDATE_STORY_EXPLORATIONS_URL_PREFIX = '/validate_story_explorations'
 FACILITATOR_DASHBOARD_HANDLER = '/facilitator_dashboard_handler'
+FACILITATOR_DASHBOARD_PAGE_URL = '/facilitator-dashboard'
+CREATE_LEARNER_GROUP_PAGE_URL = '/create-learner-group'
 
 # Event types.
 EVENT_TYPE_ALL_STATS = 'all_stats'
