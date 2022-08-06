@@ -1489,7 +1489,6 @@ class TranslationReviewStats:
             reviewed_translations_count, reviewed_translation_word_count,
             accepted_translations_count,
             accepted_translations_with_reviewer_edits_count,
-            accepted_translations_with_reviewer_edits_word_count,
             first_contribution_date, last_contribution_date):
         self.language_code = language_code
         self.contributor_user_id = contributor_user_id
@@ -1500,8 +1499,6 @@ class TranslationReviewStats:
         self.accepted_translations_with_reviewer_edits_count = (
             accepted_translations_with_reviewer_edits_count
         )
-        self.accepted_translations_with_reviewer_edits_word_count = (
-            accepted_translations_with_reviewer_edits_word_count)
         self.first_contribution_date = first_contribution_date
         self.last_contribution_date = last_contribution_date
 
@@ -1523,8 +1520,6 @@ class TranslationReviewStats:
             'accepted_translations_count': self.accepted_translations_count,
             'accepted_translations_with_reviewer_edits_count': (
                 self.accepted_translations_with_reviewer_edits_count),
-            'accepted_translations_with_reviewer_edits_word_count': (
-                self.accepted_translations_with_reviewer_edits_word_count),
             'first_contribution_date': self.first_contribution_date,
             'last_contribution_date': self.last_contribution_date,
         }

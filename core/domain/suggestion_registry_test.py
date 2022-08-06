@@ -3491,7 +3491,6 @@ class TranslationReviewStatsUnitTests(test_utils.GenericTestBase):
     REVIEWED_TRANSLATION_WORD_COUNT = 100
     ACCEPTED_TRANSLATIONS_COUNT = 1
     ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT = 0
-    ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_WORD_COUNT = 0
     ACCEPTED_TRANSLATION_WORD_COUNT = 50
     FIRST_CONTRIBUTION_DATE = datetime.date.fromtimestamp(1616173836)
     LAST_CONTRIBUTION_DATE = datetime.date.fromtimestamp(1616173836)
@@ -3507,8 +3506,6 @@ class TranslationReviewStatsUnitTests(test_utils.GenericTestBase):
             'accepted_translations_count': self.ACCEPTED_TRANSLATIONS_COUNT,
             'accepted_translations_with_reviewer_edits_count': (
                 self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
-            'accepted_translations_with_reviewer_edits_word_count': (
-                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_WORD_COUNT),
             'first_contribution_date': self.FIRST_CONTRIBUTION_DATE,
             'last_contribution_date': self.LAST_CONTRIBUTION_DATE,
         }
@@ -3519,7 +3516,6 @@ class TranslationReviewStatsUnitTests(test_utils.GenericTestBase):
             self.REVIEWED_TRANSLATION_WORD_COUNT,
             self.ACCEPTED_TRANSLATIONS_COUNT,
             self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT,
-            self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_WORD_COUNT,
             self.FIRST_CONTRIBUTION_DATE, self.LAST_CONTRIBUTION_DATE
         )
 
@@ -3656,7 +3652,6 @@ class ContributorStatsSummaryUnitTests(test_utils.GenericTestBase):
     REVIEWED_TRANSLATION_WORD_COUNT = 100
     ACCEPTED_TRANSLATIONS_COUNT = 1
     ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT = 0
-    ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_WORD_COUNT = 0
     ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT = 0
     ACCEPTED_TRANSLATION_WORD_COUNT = 50
     SUBMITTED_QUESTION_COUNT = 2
@@ -3696,8 +3691,6 @@ class ContributorStatsSummaryUnitTests(test_utils.GenericTestBase):
             'accepted_translations_count': self.ACCEPTED_TRANSLATIONS_COUNT,
             'accepted_translations_with_reviewer_edits_count': (
                 self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
-            'accepted_translations_with_reviewer_edits_word_count': (
-                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_WORD_COUNT),
             'first_contribution_date': self.FIRST_CONTRIBUTION_DATE,
             'last_contribution_date': self.LAST_CONTRIBUTION_DATE,
         }
@@ -3760,7 +3753,6 @@ class ContributorStatsSummaryUnitTests(test_utils.GenericTestBase):
             self.REVIEWED_TRANSLATION_WORD_COUNT,
             self.ACCEPTED_TRANSLATIONS_COUNT,
             self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT,
-            self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_WORD_COUNT,
             self.FIRST_CONTRIBUTION_DATE, self.LAST_CONTRIBUTION_DATE
         )
         question_contribution_stats = (
