@@ -19,6 +19,9 @@
     <h4 class="oppia-translation-modal-author-header">
       Submitted by {{ authorName }} in {{ languageDescription }} language
     </h4>
+    <h4 class="oppia-mobile-translation-modal-author-header">
+      Submitted by {{ authorName }}
+    </h4>
   </div>
 </div>
 
@@ -199,6 +202,9 @@
 </div>
 
 <style>
+  .oppia-mobile-translation-modal-author-header {
+    display: none;
+  }
   .oppia-review-message {
     border: 1px solid #ccc;
     margin-top: 10px;
@@ -383,6 +389,10 @@
     }
     .oppia-translation-modal-author-header {
       display: none;
+    }
+    .oppia-mobile-translation-modal-author-header {
+      display: block;
+      font-size: 14px;
     }
     .oppia-translation-modal-subheading {
       display: none;
