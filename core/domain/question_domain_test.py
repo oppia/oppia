@@ -2027,15 +2027,14 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             }
         )
 
-    def test_question_state_dict_conversion_from_v49_to_v50(self) -> None:
+,    def test_question_state_dict_conversion_from_v49_to_v50(self):
         question_data = (
             question_domain.Question.create_default_question_state().to_dict())
 
         question_data['interaction']['id'] = 'AlgebraicExpressionInput'
         question_data['interaction']['customization_args'] = {
-            'customOskLetters': {'value': ['a', 'b', 'c']}
+            'customOskLetters': ['a', 'b', 'c']
         }
-        inputs_variable_test_dict: List[str] = []
         question_data['interaction']['answer_groups'] = [{
             'outcome': {
                 'dest': 'abc',
@@ -2081,7 +2080,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self.assertEqual(rule_specs[0]['rule_type'], 'MatchesExactlyWith')
         self.assertEqual(
             test_value['state']['interaction']['customization_args'], {
-                'allowedVariables': {'value': ['a', 'b', 'c']}
+                'allowedVariables': ['a', 'b', 'c']
             }
         )
 
