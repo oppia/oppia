@@ -1649,7 +1649,7 @@ class ContributorStatsSummary:
             QuestionContributionStats corresponding to the user.
         translation_review_stats: list(TranslationReviewStats). A list of
             TranslationReviewStats corresponding to the user.
-        question_review_stats: list(QuestionReviewStats). A list of 
+        question_review_stats: list(QuestionReviewStats). A list of
             QuestionReviewStats  corresponding to the user.
     """
 
