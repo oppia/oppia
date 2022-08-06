@@ -27,8 +27,17 @@ from core.domain import role_services
 from core.domain import user_domain
 from core.domain import user_services
 from core.tests import test_utils
+from core.platform import models
 
 from typing_extensions import Final
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import exp_models
+
+(exp_models,) = models.Registry.import_models([
+    models.NAMES.exploration
+])
 
 
 class ExplorationRightsTests(test_utils.GenericTestBase):
@@ -855,6 +864,61 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             Exception, 'This user does not have any role in'):
             rights_manager.deassign_role_for_exploration(
                 self.user_a, self.EXP_ID, self.user_id_b)
+
+    def test_deassign_editor_is_successful_with_all_valid_commit_messages(
+        self
+    ) -> None:
+        editor_username = 'B'
+        self.assertEqual(
+            user_services.get_username(self.user_id_b),
+            editor_username
+        )
+
+        # Creating new exploration.
+        exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
+        exp_services.save_new_exploration(self.user_id_a, exp)  # type: ignore[no-untyped-call]
+
+        snapshots_data = (
+            exp_models.ExplorationRightsModel.get_snapshots_metadata(
+                self.EXP_ID, [1]
+            )
+        )
+        self.assertEqual(
+            snapshots_data[0]['commit_message'],
+            'Created new exploration'
+        )
+
+        # Assigning editor role to editor_username ('B').
+        rights_manager.assign_role_for_exploration(
+            self.user_a, self.EXP_ID, self.user_id_b, rights_domain.ROLE_EDITOR)
+        exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
+        self.assertTrue(exp_rights.is_editor(self.user_id_b))
+
+        snapshots_data = (
+            exp_models.ExplorationRightsModel.get_snapshots_metadata(
+                self.EXP_ID, [2]
+            )
+        )
+        self.assertEqual(
+            snapshots_data[0]['commit_message'],
+            'Changed role of %s from none to editor' % editor_username
+        )
+
+        # De-assigning editor role from editor_username ('B').
+        rights_manager.deassign_role_for_exploration(
+            self.user_a, self.EXP_ID, self.user_id_b)
+        exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
+        self.assertFalse(exp_rights.is_editor(self.user_id_b))
+
+        snapshots_data = (
+            exp_models.ExplorationRightsModel.get_snapshots_metadata(
+                self.EXP_ID, [3]
+            )
+        )
+        self.assertEqual(
+            snapshots_data[0]['commit_message'],
+            'Remove %s from role editor for exploration' % editor_username
+        )
 
 
 class CollectionRightsTests(test_utils.GenericTestBase):
