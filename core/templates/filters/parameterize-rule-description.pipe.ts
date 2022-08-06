@@ -49,7 +49,7 @@ export class ParameterizeRuleDescriptionPipe implements PipeTransform {
       console.error('Cannot find interaction with id ' + interactionId);
       return '';
     }
-    var description = INTERACTION_SPECS[
+    let description = INTERACTION_SPECS[
       interactionId as InteractionSpecsKey].rule_descriptions[
       rule.type];
     if (!description) {
