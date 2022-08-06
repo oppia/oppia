@@ -65,27 +65,29 @@
 </div>
 
 <div class="modal-footer">
-  <span ngbTooltip="Enter review message before rejecting" placement="bottom" disableTooltip="!(reviewMessage.length == 0)">
-    <button class="btn btn-danger e2e-test-question-suggestion-review-reject-button"
-            *ngIf="reviewable"
-            [disabled]="reviewMessage.length == 0"
-            (click)="reject()">Reject
-    </button>
-  </span>
-  <span tooltip-placement="bottom">
-    <button class="btn btn-secondary oppia-review-button e2e-test-question-suggestion-review-edit-button"
-            *ngIf="reviewable"
-            (click)="edit()">
-      Edit
-    </button>
-  </span>
-  <span tooltip-placement="bottom">
-    <button class="btn btn-success oppia-review-button e2e-test-question-suggestion-review-accept-button"
-            *ngIf="reviewable"
-            (click)="accept()">
-      Accept
-    </button>
-  </span>
+  <div class="oppia-review-buttons">
+    <div ngbTooltip="Enter review message before rejecting" placement="bottom" disableTooltip="!(reviewMessage.length == 0)">
+      <button class="btn btn-danger e2e-test-question-suggestion-review-reject-button"
+              *ngIf="reviewable"
+              [disabled]="reviewMessage.length == 0"
+              (click)="reject()">Reject
+      </button>
+    </div>
+    <div tooltip-placement="bottom">
+      <button class="btn btn-secondary oppia-review-button e2e-test-question-suggestion-review-edit-button"
+              *ngIf="reviewable"
+              (click)="edit()">
+        Edit
+      </button>
+    </div>
+    <div tooltip-placement="bottom">
+      <button class="btn btn-success oppia-review-button e2e-test-question-suggestion-review-accept-button"
+              *ngIf="reviewable"
+              (click)="accept()">
+        Accept
+      </button>
+    </div>
+  </div>
   <div class="oppia-pagination-container">
     <button type="button"
             class="oppia-pagination-button"
@@ -123,7 +125,7 @@
   }
   .modal-footer {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
   }
   .oppia-review-buttons {
     display: flex;
@@ -140,7 +142,7 @@
     background-color: transparent;
     border: none;
     box-sizing: border-box;
-    color: #009688;
+    color: #000;
     font-size: 18px;
     font-weight: bold;
     min-height: 40px;
@@ -148,11 +150,12 @@
     text-align: center;
   }
   .oppia-pagination-button:hover {
-    border: 2px solid #009688;
+    border: 2px solid #000;
     border-radius: 5px;
   }
   .oppia-pagination-button[disabled] {
-    color: #a9e5df;
+    color: #000;
+    opacity: 0.239;
   }
   .oppia-pagination-button[disabled]:hover {
     border: none;

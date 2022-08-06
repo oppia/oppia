@@ -67,7 +67,7 @@
                                 [loadOpportunities]="loadReviewableTranslationOpportunities.bind(this)"
                                 (clickActionButton)="onClickReviewableTranslations($event)"
                                 [labelRequired]="!activeReviewTab"
-                                [showOpportunityButton]="false">
+                                [showOpportunityButton]="true">
       </oppia-opportunities-list>
       <div *ngIf="activeExplorationId !== null || !isReviewTranslationsTab()">
         <div *ngIf="isReviewTranslationsTab()" class="oppia-contributions-back-to-lessons-container">
