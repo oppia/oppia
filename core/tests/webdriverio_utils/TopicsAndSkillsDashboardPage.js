@@ -211,12 +211,6 @@ var TopicsAndSkillsDashboardPage = function() {
     await workflow.submitImage(
       topicThumbnailButton, thumbnailContainer,
       ('../data/test_svg.svg'), false);
-    var cookieBannerAcceptButton = $(
-      '.e2e-test-oppia-cookie-banner-accept-button');
-    var cookieButtonPresent = await cookieBannerAcceptButton.isDisplayed();
-    if (cookieButtonPresent) {
-      await action.click('Accept Cookie Button', cookieBannerAcceptButton);
-    }
 
     await action.click(
       'Confirm Topic creation button', confirmTopicCreationButton);
