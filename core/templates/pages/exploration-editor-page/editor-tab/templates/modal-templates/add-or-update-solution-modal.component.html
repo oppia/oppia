@@ -20,7 +20,7 @@
         </oppia-interaction-display>
       </div>
       <br>
-      <button class="md-button oppia-learner-confirm-button e2e-test-submit-answer-button"
+      <button class="md-button oppia-learner-confirm-button oppia-learner-submit-answer-button e2e-test-submit-answer-button"
               (click)="onSubmitFromSubmitButton()"
               *ngIf="data.correctAnswer === undefined && shouldAdditionalSubmitButtonBeShown()"
               [disabled]="isSubmitButtonDisabled()">
