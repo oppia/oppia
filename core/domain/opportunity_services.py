@@ -964,17 +964,15 @@ def regenerate_opportunities_related_to_topic(
 
     topic = topic_fetchers.get_topic_by_id(topic_id)
     story_ids = topic.get_canonical_story_ids()
-    stories_with_none = story_fetchers.get_stories_by_ids(story_ids)
-    stories: List[story_domain.Story] = []
+    stories = story_fetchers.get_stories_by_ids(story_ids)
     exp_ids = []
     non_existing_story_ids = []
 
-    for index, story in enumerate(stories_with_none):
+    for index, story in enumerate(stories):
         if story is None:
             non_existing_story_ids.append(story_ids[index])
         else:
             exp_ids += story.story_contents.get_all_linked_exp_ids()
-            stories.append(story)
 
     exp_ids_to_exp = exp_fetchers.get_multiple_explorations_by_id(
         exp_ids, strict=False)
@@ -988,6 +986,9 @@ def regenerate_opportunities_related_to_topic(
 
     exploration_opportunity_summary_list = []
     for story in stories:
+        # Ruling out the possibility of None for mypy type checking, because
+        # above we are already validating that story is not None.
+        assert story is not None
         for exp_id in story.story_contents.get_all_linked_exp_ids():
             exploration_opportunity_summary_list.append(
                 create_exp_opportunity_summary(
