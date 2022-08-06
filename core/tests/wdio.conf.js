@@ -7,6 +7,13 @@ var Constants = require('./webdriverio_utils/WebdriverioConstants');
 var DOWNLOAD_PATH = path.resolve(__dirname, Constants.DOWNLOAD_PATH);
 var args = process.argv;
 
+var dirPath = path.resolve(
+  '__dirname', '..', '..', 'webdriverio-screenshots/');
+try {
+  fs.mkdirSync(dirPath, { recursive: true });
+  var screenshotPath = '../webdriverio-screenshots';
+} catch (err) {}
+
 // When tests is running in debug mode, the chrome version number
 // is passed as 7th argument else it is passed as 6th argument.
 // eslint-disable-next-line eqeqeq
@@ -152,6 +159,8 @@ exports.config = {
   // the test process.
   services: [
     ['chromedriver', {
+      logFileName: 'wdio-chromedriver.log',
+      outputDir: screenshotPath,
       chromedriverCustomPath: chromedriverPath
     }]],
 
@@ -262,13 +271,6 @@ exports.config = {
     // If a test fails then only the error will be defined and
     // the screenshot will be taken and saved.
     if (error) {
-      var dirPath = path.resolve(
-        '__dirname', '..', '..', 'webdriverio-screenshots/');
-      try {
-        fs.mkdirSync(dirPath, { recursive: true });
-        var screenshotPath = '../webdriverio-screenshots';
-      } catch (err) {}
-
       var testName = encodeURIComponent(test.fullName.replace(/\s+/g, '-'));
       var fileName = testName + '.png';
       var filePath = path.join(screenshotPath, fileName);
