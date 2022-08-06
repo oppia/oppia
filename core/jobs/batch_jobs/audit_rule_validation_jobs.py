@@ -75,19 +75,14 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
             for answer_group in answer_groups:
                 for rule_spec in answer_group.rule_specs:
                     if (
-                        rule_spec.rule_type ==
-                        'HasElementXBeforeElementY'
+                        rule_spec.rule_type == 'HasElementXBeforeElementY' and
+                        rule_spec.inputs['x'] == rule_spec.inputs['y'] and
+                        len(answer_group.rule_specs) == 1 and
+                        len(answer_groups) == 1
                     ):
-                        if (
-                            rule_spec.inputs['x'] == rule_spec.inputs['y']
-                        ):
-                            if (
-                                len(answer_group.rule_specs) == 1 and
-                                len(answer_groups) == 1
-                            ):
-                                states_with_errored_values.append(
-                                    state_name
-                                )
+                         states_with_errored_values.append(
+                             state_name
+                         )
         return states_with_errored_values
 
     @staticmethod
@@ -120,17 +115,18 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
             answer_groups = state.interaction.answer_groups
             for answer_group in answer_groups:
                 for rule_spec in answer_group.rule_specs:
-                    if not multi_item_value:
-                        for ele in rule_spec.inputs['x']:
-                            if len(ele) > 1:
-                                if (
-                                    len(answer_group.rule_specs) == 1 and
-                                    len(answer_groups) == 1
-                                ):
-                                    states_with_errored_values.append(
-                                        state_name
-                                    )
-                                    break
+                    if multi_item_value:
+                        continue
+                    for ele in rule_spec.inputs['x']:
+                        if ( 
+                            len(ele) > 1 and
+                            len(answer_group.rule_specs) == 1 and
+                            len(answer_groups) == 1
+                        ):
+                            states_with_errored_values.append(
+                                state_name
+                            )
+                            break
         return states_with_errored_values
 
     @staticmethod
@@ -167,15 +163,13 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                         if (
                             rule_spec.rule_type ==
                             'IsEqualToOrderingWithOneItemAtIncorrectPosition'
+                            and len(answer_group.rule_specs) == 1 and
+                            len(answer_groups) == 1
                         ):
-                            if (
-                                len(answer_group.rule_specs) == 1 and
-                                len(answer_groups) == 1
-                            ):
-                                states_with_errored_values.append(
-                                    state_name
-                                )
-                                break
+                            states_with_errored_values.append(
+                                state_name
+                            )
+                            break
         return states_with_errored_values
 
     @staticmethod
@@ -204,15 +198,15 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
             for answer_group in answer_groups:
                 for rule_spec in answer_group.rule_specs:
                     if rule_spec.rule_type == 'IsEqualToOrdering':
-                        if len(rule_spec.inputs['x']) <= 0:
-                            if (
-                                len(answer_group.rule_specs) == 1 and
-                                len(answer_groups) == 1
-                            ):
-                                states_with_errored_values.append(
-                                    state_name
-                                )
-                                break
+                        if (
+                            len(rule_spec.inputs['x']) <= 0 and
+                            len(answer_group.rule_specs) == 1 and
+                            len(answer_groups) == 1
+                        ):
+                            states_with_errored_values.append(
+                                state_name
+                            )
+                            break
         return states_with_errored_values
 
     @staticmethod
@@ -240,9 +234,11 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                 state.interaction.customization_args
                 ['buttonText'].value.unicode_str
             )
-            if len(text_value) > 20:
-                if exp_lang_code not in errored_language_codes:
-                    errored_language_codes.append(exp_lang_code)
+            if (
+                len(text_value) > 20 and
+                exp_lang_code not in errored_language_codes
+            ):
+                errored_language_codes.append(exp_lang_code)
         return errored_language_codes
 
     @staticmethod
