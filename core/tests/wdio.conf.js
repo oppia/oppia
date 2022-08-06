@@ -13,7 +13,7 @@ var args = process.argv;
 var chromeVersion = (args[0] == 'DEBUG=true') ? args[6] : args[5];
 
 const drivers = {
-  chrome: { version: chromeVersion }, // https://chromedriver.chromium.org/
+  chrome: { version: chromeVersion },
 };
 
 var chromedriverPath =
@@ -169,6 +169,8 @@ exports.config = {
   services: [
     ['selenium-standalone', {
       logPath: 'logs',
+      installArgs: { drivers }, // drivers to install
+      args: { drivers } // drivers to use
     }]
   ],
 
