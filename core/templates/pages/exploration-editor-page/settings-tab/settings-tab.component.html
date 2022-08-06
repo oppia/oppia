@@ -19,11 +19,13 @@
             <div class="oppia-settings-input-group">
               <oppia-exploration-title-editor [label-text]="'Title'"
                                               [focus-label]="<[::$ctrl.EXPLORATION_TITLE_INPUT_FOCUS_LABEL]>"
+                                              [title-editor-class]="'e2e-test-exploration-title-input'"
                                               (on-input-field-blur)="$ctrl.saveExplorationTitle()">
               </oppia-exploration-title-editor>
             </div>
             <div class="oppia-settings-input-group">
               <oppia-exploration-objective-editor [label-text]="'Goal'"
+                                                  [objective-editor-class]="'e2e-test-exploration-objective-input'"
                                                   (on-input-field-blur)="$ctrl.saveExplorationObjective()">
               </oppia-exploration-objective-editor>
             </div>

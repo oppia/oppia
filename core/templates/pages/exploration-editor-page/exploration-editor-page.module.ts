@@ -69,6 +69,9 @@ import { ExplorationObjectiveEditorComponent } from './exploration-objective-edi
 import { ExplorationMetadataModalComponent } from 'pages/exploration-editor-page/modal-templates/exploration-metadata-modal.component';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { ExplorationSaveModalComponent } from './modal-templates/exploration-save-modal.component';
+import { EditorNavbarBreadcrumbComponent } from './editor-navigation/editor-navbar-breadcrumb.component';
+import { ExplorationGraphModalComponent } from './editor-tab/templates/modal-templates/exploration-graph-modal.component';
+import { ExplorationGraphComponent } from './editor-tab/graph-directives/exploration-graph.component';
 
 @NgModule({
   imports: [
@@ -120,7 +123,10 @@ import { ExplorationSaveModalComponent } from './modal-templates/exploration-sav
     ExplorationTitleEditorComponent,
     ExplorationObjectiveEditorComponent,
     ExplorationMetadataModalComponent,
-    ExplorationSaveModalComponent
+    ExplorationSaveModalComponent,
+    EditorNavbarBreadcrumbComponent,
+    ExplorationGraphModalComponent,
+    ExplorationGraphComponent
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
@@ -155,7 +161,10 @@ import { ExplorationSaveModalComponent } from './modal-templates/exploration-sav
     ExplorationTitleEditorComponent,
     ExplorationObjectiveEditorComponent,
     ExplorationMetadataModalComponent,
-    ExplorationSaveModalComponent
+    ExplorationSaveModalComponent,
+    EditorNavbarBreadcrumbComponent,
+    ExplorationGraphModalComponent,
+    ExplorationGraphComponent
   ],
   providers: [
     {

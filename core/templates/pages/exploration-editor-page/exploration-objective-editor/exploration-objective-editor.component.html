@@ -4,7 +4,7 @@
     <input matInput
            id="explorationObjective"
            type="text"
-           class="e2e-test-exploration-objective-input"
+           [ngClass]="objectiveEditorClass"
            [(ngModel)]="explorationObjectiveService.displayed"
            [ngModelOptions]="{standalone: true}"
            (blur)="inputFieldBlur()"

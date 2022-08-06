@@ -351,6 +351,47 @@ var AutocompleteDropdownEditor = function(elem) {
   };
 };
 
+var AutocompleteDropdownEditorMigratedInAngular = function(elem) {
+  var containerLocator = by.css('.e2e-test-exploration-category-dropdown');
+  var dropdownElement = element(by.css('.select2-dropdown'));
+  var searchInputLocator = by.css(
+    '.e2e-test-exploration-new-category-add');
+
+  return {
+    setValue: async function(text) {
+      await action.click('Container Element', element(containerLocator));
+      await action.waitForAutosave();
+      // NOTE: the input field is top-level in the DOM, and is outside the
+      // context of 'elem'. The 'select2-dropdown' id is assigned to the input
+      // field when it is 'activated', i.e. when the dropdown is clicked.
+
+      await action.sendKeys(
+        'Dropdown Element',
+        element(searchInputLocator),
+        text);
+
+      await action.sendKeys(
+        'Dropdown Element',
+        element(searchInputLocator),
+        protractor.Key.ENTER);
+    },
+    expectOptionsToBe: async function(expectedOptions) {
+      await action.click('Container Element', elem.element(containerLocator));
+      var actualOptions = await dropdownElement.all(by.tagName('li')).map(
+        async function(optionElem) {
+          return await action.getText('Option Elem', optionElem);
+        }
+      );
+      expect(actualOptions).toEqual(expectedOptions);
+      // Re-close the dropdown.
+      await action.sendKeys(
+        'Dropdown Element',
+        dropdownElement.element(searchInputLocator),
+        '\n');
+    }
+  };
+};
+
 var AutocompleteMultiDropdownEditor = function(elem) {
   var selectionChoiceRemoveLocator = by.css(
     '.select2-selection__choice__remove');
@@ -781,6 +822,8 @@ exports.SetOfTranslatableHtmlContentIdsEditor = (
   SetOfTranslatableHtmlContentIdsEditor);
 exports.UnicodeEditor = UnicodeEditor;
 exports.AutocompleteDropdownEditor = AutocompleteDropdownEditor;
+exports.AutocompleteDropdownEditorMigratedInAngular = (
+  AutocompleteDropdownEditorMigratedInAngular);
 exports.AutocompleteMultiDropdownEditor = AutocompleteMultiDropdownEditor;
 exports.MultiSelectEditor = MultiSelectEditor;
 exports.GraphEditor = GraphEditor;

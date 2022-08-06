@@ -13,73 +13,80 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for showing Editor Navbar breadcrumb
+ * @fileoverview Component for showing Editor Navbar breadcrumb
  * in editor navbar.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
-require('pages/exploration-editor-page/services/exploration-title.service.ts');
-require('pages/exploration-editor-page/services/router.service.ts');
-require('services/stateful/focus-manager.service.ts');
-
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { Subscription } from 'rxjs';
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
+import { ExplorationEditorPageConstants } from '../exploration-editor-page.constants';
+import { ExplorationTitleService } from '../services/exploration-title.service';
+import { RouterService } from '../services/router.service';
 
-angular.module('oppia').component('editorNavbarBreadcrumb', {
-  template: require('./editor-navbar-breadcrumb.component.html'),
-  controller: [
-    '$rootScope', '$scope', 'ExplorationTitleService',
-    'FocusManagerService', 'RouterService',
-    'EXPLORATION_TITLE_INPUT_FOCUS_LABEL',
-    function(
-        $rootScope, $scope, ExplorationTitleService,
-        FocusManagerService, RouterService,
-        EXPLORATION_TITLE_INPUT_FOCUS_LABEL) {
-      var ctrl = this;
-      ctrl.directiveSubscriptions = new Subscription();
-      $scope.editTitle = function() {
-        RouterService.navigateToSettingsTab();
-        FocusManagerService.setFocus(EXPLORATION_TITLE_INPUT_FOCUS_LABEL);
-      };
+@Component({
+  selector: 'oppia-editor-navbar-breadcrumb',
+  templateUrl: './editor-navbar-breadcrumb.component.html'
+})
+export class EditorNavbarBreadcrumbComponent implements OnInit, OnDestroy {
+  directiveSubscriptions = new Subscription();
+  navbarTitle: string;
+  _TAB_NAMES_TO_HUMAN_READABLE_NAMES: object = {
+    main: 'Edit',
+    translation: 'Translation',
+    preview: 'Preview',
+    settings: 'Settings',
+    stats: 'Statistics',
+    improvements: 'Improvements',
+    history: 'History',
+    feedback: 'Feedback',
+  };
 
-      var _TAB_NAMES_TO_HUMAN_READABLE_NAMES = {
-        main: 'Edit',
-        translation: 'Translation',
-        preview: 'Preview',
-        settings: 'Settings',
-        stats: 'Statistics',
-        improvements: 'Improvements',
-        history: 'History',
-        feedback: 'Feedback',
-      };
+  constructor(
+    private explorationTitleService: ExplorationTitleService,
+    private routerService: RouterService,
+    private focusManagerService: FocusManagerService,
+  ) {}
 
-      $scope.getCurrentTabName = function() {
-        if (!RouterService.getActiveTabName()) {
-          return '';
-        } else {
-          return _TAB_NAMES_TO_HUMAN_READABLE_NAMES[
-            RouterService.getActiveTabName()];
-        }
-      };
-      ctrl.$onInit = function() {
-        $scope.navbarTitle = null;
-        ctrl.directiveSubscriptions.add(
-          ExplorationTitleService.onExplorationPropertyChanged.subscribe(
-            (propertyName) => {
-              const _MAX_TITLE_LENGTH = 20;
-              $scope.navbarTitle = ExplorationTitleService.savedMemento;
-              if ($scope.navbarTitle.length > _MAX_TITLE_LENGTH) {
-                $scope.navbarTitle = (
-                  $scope.navbarTitle.substring(
-                    0, _MAX_TITLE_LENGTH - 3) + '...');
-              }
-              $rootScope.$applyAsync();
-            }
-          )
-        );
-      };
-      ctrl.$onDestroy = function() {
-        ctrl.directiveSubscriptions.unsubscribe();
-      };
+  editTitle(): void {
+    this.routerService.navigateToSettingsTab();
+    this.focusManagerService.setFocus(
+      ExplorationEditorPageConstants.EXPLORATION_TITLE_INPUT_FOCUS_LABEL);
+  }
+
+  getCurrentTabName(): string {
+    if (!this.routerService.getActiveTabName()) {
+      return '';
+    } else {
+      return this._TAB_NAMES_TO_HUMAN_READABLE_NAMES[
+        this.routerService.getActiveTabName()];
     }
-  ]
-});
+  }
+
+  ngOnInit(): void {
+    this.navbarTitle = null;
+    this.directiveSubscriptions.add(
+      this.explorationTitleService.onExplorationPropertyChanged.subscribe(
+        (propertyName) => {
+          const _MAX_TITLE_LENGTH = 20;
+          this.navbarTitle = String(this.explorationTitleService.savedMemento);
+          if (this.navbarTitle.length > _MAX_TITLE_LENGTH) {
+            this.navbarTitle = (
+              this.navbarTitle.substring(
+                0, _MAX_TITLE_LENGTH - 3) + '...');
+          }
+        }
+      )
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
+  }
+}
+
+angular.module('oppia').directive('oppiaEditorNavbarBreadcrumb',
+  downgradeComponent({
+    component: EditorNavbarBreadcrumbComponent
+  }) as angular.IDirectiveFactory);

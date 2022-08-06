@@ -32,6 +32,7 @@ export class ExplorationTitleEditorComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
 
   @Input() labelText: string;
+  @Input() titleEditorClass: string;
   @Input() formStyle: string;
   @Input() focusLabel: string;
   @Output() onInputFieldBlur = new EventEmitter<void>();
