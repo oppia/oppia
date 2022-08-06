@@ -1390,7 +1390,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             categorized_skills.to_dict(),
             expected_categorized_skills_dict)
 
-    def test_is_skill_assigned_to_a_diagnostic_test(self) -> None:
+    def test_get_topic_names_with_given_skill_as_diagnostic_test(self) -> None:
         """Checks whether a skill is assigned for the diagnostic test in
         any of the existing topics.
         """
@@ -1410,12 +1410,12 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         topic.skill_ids_for_diagnostic_test = ['skill_id_1']
         topic_services.save_new_topic(owner_id, topic)
 
-        self.assertTrue(
-            skill_services.is_skill_assigned_to_a_diagnostic_test(
-                'skill_id_1'))
-        self.assertFalse(
-            skill_services.is_skill_assigned_to_a_diagnostic_test(
-                'incorrect_skill_id'))
+        self.assertEqual(
+            skill_services.get_topic_names_with_given_skill_as_diagnostic_test(
+                'skill_id_1'), ['topic'])
+        self.assertEqual(
+            skill_services.get_topic_names_with_given_skill_as_diagnostic_test(
+                'incorrect_skill_id'), [])
 
 
 class SkillMasteryServicesUnitTests(test_utils.GenericTestBase):

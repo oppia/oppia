@@ -256,7 +256,7 @@ export class TopicsAndSkillsDashboardBackendApiService {
         });
       }
     }, (errorResponse) => {
-      errorCallback(errorResponse.error);
+      errorCallback(errorResponse.error.error);
     });
   }
 

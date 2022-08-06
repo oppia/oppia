@@ -258,14 +258,15 @@ describe('Skill backend API service', () => {
     'should make a request to check if skill assigned for diagnostic test.',
     fakeAsync(() => {
       const backendResponse = {
-        skill_is_assigned_for_diagnostic_test: false,
+        topic_names: [],
       };
+      const successHandler = jasmine.createSpy('success');
+      const failHandler = jasmine.createSpy('fail');
       const skillId = 'skill1';
 
-      skillBackendApiService.checkSkillAssignmentForDiagnosticTest(
-        skillId).then(response => {
-        expect(response).toEqual(false);
-      });
+      skillBackendApiService
+        .getTopicNamesWithGivenSkillAssignedForDiagnosticTest(
+          skillId).then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
         '/diagnostic_test_skill_assignment_handler/skill1'
@@ -274,6 +275,9 @@ describe('Skill backend API service', () => {
       req.flush(backendResponse);
 
       flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalledWith();
     }));
 
   it(
@@ -284,8 +288,9 @@ describe('Skill backend API service', () => {
 
       const skillId = 'skill1';
 
-      skillBackendApiService.checkSkillAssignmentForDiagnosticTest(
-        skillId).then(successHandler, failHandler);
+      skillBackendApiService
+        .getTopicNamesWithGivenSkillAssignedForDiagnosticTest(
+          skillId).then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
         '/diagnostic_test_skill_assignment_handler/skill1'

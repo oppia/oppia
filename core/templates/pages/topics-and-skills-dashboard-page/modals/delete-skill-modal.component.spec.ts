@@ -136,7 +136,10 @@ describe('Assign Skill to Topic Modal Component', () => {
       topicsAndSkillsDashboardBackendApiService,
       'fetchTopicIdToDiagnosticTestSkillIdsAsync'
     ).and.returnValue(Promise.resolve({
-      topicIdToDiagnosticTestSkillIds: {topic_id: ['skill_id']}
+      topicIdToDiagnosticTestSkillIds: {
+        test_id: ['skill_id'],
+        test_id_2: []
+      }
     }));
 
     componentInstance.fetchTopicAssignmentsForSkill();

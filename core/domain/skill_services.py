@@ -446,22 +446,23 @@ def get_all_topic_assignments_for_skill(skill_id):
     return topic_assignments
 
 
-def is_skill_assigned_to_a_diagnostic_test(skill_id):
-    """Checks whether a skill is assigned for the diagnostic test in any of the
-    existing topics.
+def get_topic_names_with_given_skill_as_diagnostic_test(skill_id):
+    """Returns a list of topic names in which the given skill is assigned
+    for the diagnostic test.
 
     Args:
         skill_id: str. ID of the skill.
 
     Returns:
-        bool. A boolean value that represents whether the skill is assigned
+        list(str). A list of topic names in which the given skill is assigned
         for the diagnostic test.
     """
     topics = topic_fetchers.get_all_topics()
+    topic_names = []
     for topic in topics:
         if skill_id in topic.skill_ids_for_diagnostic_test:
-            return True
-    return False
+            topic_names.append(topic.name)
+    return topic_names
 
 
 def replace_skill_id_in_all_topics(user_id, old_skill_id, new_skill_id):

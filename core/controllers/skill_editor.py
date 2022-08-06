@@ -374,11 +374,12 @@ class DiagnosticTestSkillAssignmentHandler(base.BaseHandler):
 
     @acl_decorators.can_edit_skill
     def get(self, skill_id) -> None:
-        """Returns a boolean value that represents whether the skill is assigned
+        """Returns a list of topic names in which the given skill is assigned
         for the diagnostic test.
         """
         self.values.update({
-            'skill_is_assigned_for_diagnostic_test': (
-                skill_services.is_skill_assigned_to_a_diagnostic_test(skill_id))
+            'topic_names': (
+                skill_services
+                .get_topic_names_with_given_skill_as_diagnostic_test(skill_id))
         })
         self.render_json(self.values)

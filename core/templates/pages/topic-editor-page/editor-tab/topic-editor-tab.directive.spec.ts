@@ -657,11 +657,8 @@ describe('Topic editor tab directive', function() {
      'diagnostic test', fakeAsync(function() {
     var updateSkillIdForDiagosticTestSpy = spyOn(
       TopicUpdateService, 'updateDiagnosticTestSkills');
-    spyOn(
-      QuestionBackendApiService,
-      'fetchTotalQuestionCountForSkillIdsAsync').and.returnValue(
-      Promise.resolve(2));
     $scope.selectedSkillForDiagnosticTest = skillSummary;
+    $scope.availableSkillSummariesForDiagnosticTest = [skillSummary];
     $scope.addSkillForDiagnosticTest();
     $rootScope.$apply();
     tick();
@@ -672,10 +669,23 @@ describe('Topic editor tab directive', function() {
      'diagnostic test', function() {
     var updateSkillIdForDiagosticTestSpy = spyOn(
       TopicUpdateService, 'updateDiagnosticTestSkills');
-    $scope.selectedSkillsForDiagnosticTest = [skillSummary];
+    $scope.selectedSkillSummariesForDiagnosticTest = [skillSummary];
 
     $scope.removeSkillFromDiagnosticTest(skillSummary);
     expect(updateSkillIdForDiagosticTestSpy).toHaveBeenCalled();
+  });
+
+  it('should get eligible skill for diagnostic test selection', function() {
+    $scope.skillQuestionCountDict = {
+      skill_1: 3
+    };
+    spyOn(
+      $scope.topic,
+      'getAvailableSkillSummariesForDiagnosticTest').and.returnValue(
+      [skillSummary]
+    );
+    expect($scope.getEligibleSkillSummariesForDiagnosticTest()).toEqual(
+      [skillSummary]);
   });
 
   it('should be able to present diagnostic test dropdown selector correctly',

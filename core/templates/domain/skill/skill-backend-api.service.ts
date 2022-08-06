@@ -62,8 +62,8 @@ interface DoesSkillWithDescriptionExistBackendResponse {
   'skill_description_exists': boolean;
 }
 
-interface CheckSkillAssignmnetForDiagnosticTestBackendResponse {
-  'skill_is_assigned_for_diagnostic_test': boolean;
+interface SkillAssignmnetForDiagnosticTestBackendResponse {
+  'topic_names': string[];
 }
 
 @Injectable({
@@ -188,9 +188,9 @@ export class SkillBackendApiService {
     });
   }
 
-  private _checkSkillAssignmentForDiagnosticTest(
+  private _getTopicNamesWithGivenSkillAssignedForDiagnosticTest(
       skillId: string,
-      successCallback: (value: boolean | PromiseLike<boolean>) => void,
+      successCallback: (value: string[] | PromiseLike<string[]>) => void,
       errorCallback: (reason?: string) => void): void {
     let skillAssignmentForDiagnosticTestUrl = (
       this.urlInterpolationService.interpolateUrl(
@@ -198,20 +198,21 @@ export class SkillBackendApiService {
           .SKILL_ASSIGNMENT_FOR_DIAGNOSTIC_TEST_URL_TEMPLATE, {
           skill_id: skillId
         }));
-    this.http.get<CheckSkillAssignmnetForDiagnosticTestBackendResponse>(
+    this.http.get<SkillAssignmnetForDiagnosticTestBackendResponse>(
       skillAssignmentForDiagnosticTestUrl).toPromise().then((response) => {
       if (successCallback) {
-        successCallback(response.skill_is_assigned_for_diagnostic_test);
+        successCallback(response.topic_names);
       }
     }, (errorResponse) => {
       errorCallback(errorResponse.error.error);
     });
   }
 
-  async checkSkillAssignmentForDiagnosticTest(skillId: string):
-      Promise<boolean> {
+  async getTopicNamesWithGivenSkillAssignedForDiagnosticTest(skillId: string):
+      Promise<string[]> {
     return new Promise((resolve, reject) => {
-      this._checkSkillAssignmentForDiagnosticTest(skillId, resolve, reject);
+      this._getTopicNamesWithGivenSkillAssignedForDiagnosticTest(
+        skillId, resolve, reject);
     });
   }
 }

@@ -282,16 +282,21 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     }
 
     let numberOfQuestions = this.questionSummariesForOneSkill.length;
-    await this.skillBackendApiService.checkSkillAssignmentForDiagnosticTest(
-      this.selectedSkillId).then((response) => {
-      if (response && (
-        numberOfQuestions <=
-          AppConstants.MINIMUM_QUESTION_COUNT_FOR_A_DIAGNOSTIC_TEST_SKILL)) {
-        this.alertsService.addInfoMessage(
-          'The skill must be removed from the diagnostic test first.');
-        questionDeletionIsAllowed = false;
-      }
-    });
+    await this.skillBackendApiService
+      .getTopicNamesWithGivenSkillAssignedForDiagnosticTest(
+        this.selectedSkillId).then((topicNames) => {
+        if ((topicNames.length > 0) && (
+          numberOfQuestions <=
+            AppConstants.MINIMUM_QUESTION_COUNT_FOR_A_DIAGNOSTIC_TEST_SKILL)) {
+          let alertMessge = (
+            'This skill is used as the only diagnostic test skill in the ' +
+            'following topics: ' + topicNames.join(', ') + '. Please remove ' +
+            'this skill from the diagnostic test of those topics first'
+          );
+          this.alertsService.addInfoMessage(alertMessge, 7000);
+          questionDeletionIsAllowed = false;
+        }
+      });
     return questionDeletionIsAllowed;
   }
 
