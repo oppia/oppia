@@ -178,19 +178,38 @@ describe('Translation opportunities component', () => {
     spyOn(translationLanguageService, 'getActiveLanguageCode').and.returnValue(
       'en');
 
-    expect(component.allOpportunities).toEqual({});
-
     const {opportunitiesDicts, } = (
       component.getPresentableOpportunitiesData({
         opportunities: opportunitiesArray,
         more: false
       }));
 
-    expect(Object.keys(component.allOpportunities).length).toEqual(2);
+    expect(opportunitiesDicts.length).toBe(2);
     expect(
       opportunitiesDicts[opportunitiesDicts.length - 1].translationsCount +
       opportunitiesDicts[opportunitiesDicts.length - 1].inReviewCount ===
       opportunitiesDicts[opportunitiesDicts.length - 1].totalCount).toBeTrue();
+    expect(opportunitiesDicts).toEqual([{
+      id: '2',
+      heading: 'Chapter title 2',
+      subheading: 'topic_2 - Story title 2',
+      progressPercentage: '40.00',
+      actionButtonTitle: 'Translate',
+      inReviewCount: 4,
+      totalCount: 10,
+      translationsCount: 4,
+    },
+    {
+      id: '1',
+      heading: 'Chapter title 1',
+      subheading: 'topic_1 - Story title 1',
+      progressPercentage: '50.00',
+      actionButtonTitle: 'Translate',
+      inReviewCount: 2,
+      totalCount: 4,
+      translationsCount: 2,
+    }
+    ]);
   });
 
   it('should not chagne contents of each opportunity when get presentable ' +
