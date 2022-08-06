@@ -100,7 +100,9 @@ _PARSER.add_argument(
 
 
 SUITES_MIGRATED_TO_WEBDRIVERIO = [
+    'blogDashboard',
     'collections',
+    'contributorDashboard',
     'creatorDashboard',
     'learner',
     'learnerDashboard',
@@ -109,6 +111,7 @@ SUITES_MIGRATED_TO_WEBDRIVERIO = [
     'profileMenu',
     'subscriptions',
     'topicAndStoryEditor',
+    'topicAndStoryEditorFileUploadFeatures',
     'topicAndStoryViewer',
     'users',
 ]
@@ -119,10 +122,8 @@ SUITES_STILL_IN_PROTRACTOR = [
     'additionalEditorFeaturesModals',
     'additionalPlayerFeatures',
     'adminPage',
-    'blogDashboard',
     'classroomPage',
     'classroomPageFileUploadFeatures',
-    'contributorDashboard',
     'coreEditorAndPlayerFeatures',
     'embedding',
     'explorationImprovementsTab',
@@ -139,7 +140,6 @@ SUITES_STILL_IN_PROTRACTOR = [
     'navigation',
     'playVoiceovers',
     'publication',
-    'topicAndStoryEditorFileUploadFeatures',
     'topicsAndSkillsDashboard',
     'skillEditor',
     'wipeout',
