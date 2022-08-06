@@ -3513,7 +3513,7 @@ class TranslationReviewStatsUnitTests(test_utils.GenericTestBase):
             'last_contribution_date': self.LAST_CONTRIBUTION_DATE,
         }
 
-        observed_stats = suggestion_registry.TranslationReviewStats(
+        actual_stats = suggestion_registry.TranslationReviewStats(
             self.LANGUAGE_CODE, self.CONTRIBUTOR_USER_ID,
             self.TOPIC_ID, self.REVIEWED_TRANSLATIONS_COUNT,
             self.REVIEWED_TRANSLATION_WORD_COUNT,
@@ -3524,7 +3524,7 @@ class TranslationReviewStatsUnitTests(test_utils.GenericTestBase):
         )
 
         self.assertDictEqual(
-            observed_stats.to_dict(), expected_stats_dict)
+            actual_stats.to_dict(), expected_stats_dict)
 
 
 class QuestionContributionStatsUnitTests(test_utils.GenericTestBase):
@@ -3555,7 +3555,7 @@ class QuestionContributionStatsUnitTests(test_utils.GenericTestBase):
                 self.LAST_CONTRIBUTION_DATE)
         }
 
-        observed_stats = suggestion_registry.QuestionContributionStats(
+        actual_stats = suggestion_registry.QuestionContributionStats(
             self.CONTRIBUTOR_USER_ID, self.TOPIC_ID,
             self.SUBMITTED_QUESTION_COUNT, self.ACCEPTED_QUESTIONS_COUNT,
             self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT,
@@ -3563,7 +3563,7 @@ class QuestionContributionStatsUnitTests(test_utils.GenericTestBase):
         )
 
         self.assertDictEqual(
-            observed_stats.to_dict(), expected_stats_dict)
+            actual_stats.to_dict(), expected_stats_dict)
 
 
 class QuestionReviewStatsUnitTests(test_utils.GenericTestBase):
@@ -3591,7 +3591,7 @@ class QuestionReviewStatsUnitTests(test_utils.GenericTestBase):
             'last_contribution_date': self.LAST_CONTRIBUTION_DATE
         }
 
-        observed_stats = suggestion_registry.QuestionReviewStats(
+        actual_stats = suggestion_registry.QuestionReviewStats(
             self.CONTRIBUTOR_USER_ID, self.TOPIC_ID,
             self.REVIEWED_QUESTIONS_COUNT,
             self.ACCEPTED_QUESTIONS_COUNT,
@@ -3600,7 +3600,7 @@ class QuestionReviewStatsUnitTests(test_utils.GenericTestBase):
         )
 
         self.assertDictEqual(
-            observed_stats.to_dict(), expected_stats_dict)
+            actual_stats.to_dict(), expected_stats_dict)
 
 
 class ContributorMilestoneEmailInfoUnitTests(test_utils.GenericTestBase):
@@ -3614,26 +3614,26 @@ class ContributorMilestoneEmailInfoUnitTests(test_utils.GenericTestBase):
 
     def test_create_contribution_milestone_email_info(self):
 
-        observed_stats = suggestion_registry.ContributorMilestoneEmailInfo(
+        actual_info = suggestion_registry.ContributorMilestoneEmailInfo(
             self.CONTRIBUTOR_USER_ID, self.CONTRIBUTION_TYPE,
             self.CONTRIBUTION_SUB_TYPE, self.LANGUAGE_CODE,
             self.CONTRIBUTIONS_COUNT
         )
 
         self.assertEqual(
-            observed_stats.contributor_user_id, self.CONTRIBUTOR_USER_ID
+            actual_info.contributor_user_id, self.CONTRIBUTOR_USER_ID
         )
         self.assertEqual(
-            observed_stats.contribution_type, self.CONTRIBUTION_TYPE
+            actual_info.contribution_type, self.CONTRIBUTION_TYPE
         )
         self.assertEqual(
-            observed_stats.contribution_sub_type, self.CONTRIBUTION_SUB_TYPE
+            actual_info.contribution_sub_type, self.CONTRIBUTION_SUB_TYPE
         )
         self.assertEqual(
-            observed_stats.language_code, self.LANGUAGE_CODE
+            actual_info.language_code, self.LANGUAGE_CODE
         )
         self.assertEqual(
-            observed_stats.contributions_count, self.CONTRIBUTIONS_COUNT
+            actual_info.contributions_count, self.CONTRIBUTIONS_COUNT
         )
 
 

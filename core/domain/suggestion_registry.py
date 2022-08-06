@@ -1613,16 +1613,16 @@ class QuestionReviewStats:
 
 
 class ContributorMilestoneEmailInfo:
-    """Stores key information that is used to create the email content for
+    """Encapsulates key information that is used to create the email content for
     notifying contributors about milestones they achieved.
 
     Attributes:
-        contributor_user_id: str. The type of the suggestion.
+        contributor_user_id: str. The id of the contributor.
         language_code: str. The language code of the suggestion.
         contribution_type: str. The type of the contribution i.e.
             translation or question.
         contribution_sub_type: str. The sub type of the contribution
-            i.e. submissions/acceptances/reviews/corrections.
+            i.e. submissions/acceptances/reviews/edits.
         contributions_count: int. The number of contributions made to
             reach the milestone.
     """
@@ -1645,6 +1645,17 @@ class ContributorMilestoneEmailInfo:
 class ContributorStatsSummary:
     """Stores key information that is used to send to the frontend regarding
     contributor stats.
+
+    Attributes:
+        contributor_user_id: str. The id of the contributor.
+        translation_contribution_stats: list(TranslationContributionStats). A
+            list of TranslationContributionStats corresponding to the user.
+        question_contribution_stats: list(QuestionContributionStats). A list of
+            QuestionContributionStats corresponding to the user.
+        translation_review_stats: list(TranslationReviewStats). A list of
+            TranslationReviewStats corresponding to the user.
+        question_review_stats: list(QuestionReviewStats). A list of 
+            QuestionReviewStats  corresponding to the user.
     """
 
     def __init__(
