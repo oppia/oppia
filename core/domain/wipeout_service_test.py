@@ -3927,7 +3927,6 @@ class WipeoutServiceDeleteSuggestionModelsTests(test_utils.GenericTestBase):
             accepted_translations_with_reviewer_edits_count=2,
             accepted_translation_word_count=3,
             accepted_translations_with_reviewer_edits_word_count=1,
-            review_months=[],
             first_contribution_date=(
                 datetime.date.fromtimestamp(1616173837)),
             last_contribution_date=(
@@ -3940,7 +3939,6 @@ class WipeoutServiceDeleteSuggestionModelsTests(test_utils.GenericTestBase):
             submitted_questions_count=1,
             accepted_questions_count=1,
             accepted_questions_without_reviewer_edits_count=2,
-            contribution_months=[],
             first_contribution_date=(
                 datetime.date.fromtimestamp(1616173837)),
             last_contribution_date=(
@@ -3953,7 +3951,6 @@ class WipeoutServiceDeleteSuggestionModelsTests(test_utils.GenericTestBase):
             reviewed_questions_count=1,
             accepted_questions_count=1,
             accepted_questions_with_reviewer_edits_count=1,
-            review_months=[],
             first_contribution_date=(
                 datetime.date.fromtimestamp(1616173837)),
             last_contribution_date=(

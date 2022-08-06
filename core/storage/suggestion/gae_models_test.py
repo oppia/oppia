@@ -1962,14 +1962,6 @@ class TranslationReviewStatsModelUnitTests(test_utils.GenericTestBase):
     ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT = 0
     ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_WORD_COUNT = 0
     ACCEPTED_TRANSLATION_WORD_COUNT = 50
-    # Timestamp dates in sec since epoch for Mar 19 2021 UTC.
-    # CONTRIBUTION_DATES = [
-    #     datetime.date.fromtimestamp(1616173836),
-    #     datetime.date.fromtimestamp(1616173837)
-    # ]
-    REVIEW_MONTHS = [
-        'Jan 2021', 'Feb 2021'
-    ]
     FIRST_CONTRIBUTION_DATE = datetime.date.fromtimestamp(1616173836)
     LAST_CONTRIBUTION_DATE = datetime.date.fromtimestamp(1616173836)
 
@@ -1989,7 +1981,6 @@ class TranslationReviewStatsModelUnitTests(test_utils.GenericTestBase):
             accepted_translations_with_reviewer_edits_word_count=(
                 self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_WORD_COUNT
             ),
-            review_months=self.REVIEW_MONTHS,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=self.LAST_CONTRIBUTION_DATE
         )
@@ -2045,10 +2036,6 @@ class TranslationReviewStatsModelUnitTests(test_utils.GenericTestBase):
             self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_WORD_COUNT
         )
         self.assertEqual(
-            translation_review_stats_model.review_months,
-            self.REVIEW_MONTHS
-        )
-        self.assertEqual(
             translation_review_stats_model.first_contribution_date,
             self.FIRST_CONTRIBUTION_DATE
         )
@@ -2081,7 +2068,6 @@ class TranslationReviewStatsModelUnitTests(test_utils.GenericTestBase):
             accepted_translations_with_reviewer_edits_word_count=(
                 self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_WORD_COUNT
             ),
-            review_months=self.REVIEW_MONTHS,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=self.LAST_CONTRIBUTION_DATE
         )
@@ -2145,10 +2131,6 @@ class TranslationReviewStatsModelUnitTests(test_utils.GenericTestBase):
             self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_WORD_COUNT
         )
         self.assertEqual(
-            translation_review_stats_model.review_months,
-            self.REVIEW_MONTHS
-        )
-        self.assertEqual(
             translation_review_stats_model.first_contribution_date,
             self.FIRST_CONTRIBUTION_DATE
         )
@@ -2173,7 +2155,6 @@ class TranslationReviewStatsModelUnitTests(test_utils.GenericTestBase):
             accepted_translations_with_reviewer_edits_word_count=(
                 self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_WORD_COUNT
             ),
-            review_months=self.REVIEW_MONTHS,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=self.LAST_CONTRIBUTION_DATE
         )
@@ -2214,7 +2195,6 @@ class TranslationReviewStatsModelUnitTests(test_utils.GenericTestBase):
             accepted_translations_with_reviewer_edits_word_count=(
                 self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_WORD_COUNT
             ),
-            review_months=self.REVIEW_MONTHS,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=self.LAST_CONTRIBUTION_DATE
         )
@@ -2233,7 +2213,6 @@ class TranslationReviewStatsModelUnitTests(test_utils.GenericTestBase):
             accepted_translations_with_reviewer_edits_word_count=(
                 self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_WORD_COUNT
             ),
-            review_months=self.REVIEW_MONTHS,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=self.LAST_CONTRIBUTION_DATE
         )
@@ -2259,7 +2238,6 @@ class TranslationReviewStatsModelUnitTests(test_utils.GenericTestBase):
                     self.ACCEPTED_TRANSLATION_WORD_COUNT),
                 'accepted_translations_with_reviewer_edits_word_count': (
                     self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_WORD_COUNT),
-                'review_months': self.REVIEW_MONTHS,
                 'first_contribution_date': (
                     self.FIRST_CONTRIBUTION_DATE.isoformat()),
                 'last_contribution_date': (
@@ -2280,7 +2258,6 @@ class TranslationReviewStatsModelUnitTests(test_utils.GenericTestBase):
                     self.ACCEPTED_TRANSLATION_WORD_COUNT),
                 'accepted_translations_with_reviewer_edits_word_count': (
                     self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_WORD_COUNT),
-                'review_months': self.REVIEW_MONTHS,
                 'first_contribution_date': (
                     self.FIRST_CONTRIBUTION_DATE.isoformat()),
                 'last_contribution_date': (
@@ -2303,10 +2280,6 @@ class QuestionContributionStatsModelUnitTests(test_utils.GenericTestBase):
     SUBMITTED_QUESTION_COUNT = 2
     ACCEPTED_QUESTIONS_COUNT = 1
     ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT = 0
-    # Timestamp dates in sec since epoch for Mar 19 2021 UTC.
-    CONTRIBUTION_MONTHS = [
-        'Jan 2021', 'Feb 2021'
-    ]
     FIRST_CONTRIBUTION_DATE = datetime.date.fromtimestamp(1616173836)
     LAST_CONTRIBUTION_DATE = datetime.date.fromtimestamp(1616173836)
 
@@ -2318,7 +2291,6 @@ class QuestionContributionStatsModelUnitTests(test_utils.GenericTestBase):
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
             accepted_questions_without_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
-            contribution_months=self.CONTRIBUTION_MONTHS,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=self.LAST_CONTRIBUTION_DATE
         )
@@ -2351,10 +2323,6 @@ class QuestionContributionStatsModelUnitTests(test_utils.GenericTestBase):
             self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT
         )
         self.assertEqual(
-            question_contribution_stats_model.contribution_months,
-            self.CONTRIBUTION_MONTHS
-        )
-        self.assertEqual(
             question_contribution_stats_model.first_contribution_date,
             self.FIRST_CONTRIBUTION_DATE
         )
@@ -2371,7 +2339,6 @@ class QuestionContributionStatsModelUnitTests(test_utils.GenericTestBase):
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
             accepted_questions_without_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
-            contribution_months=self.CONTRIBUTION_MONTHS,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=self.LAST_CONTRIBUTION_DATE
         )
@@ -2415,10 +2382,6 @@ class QuestionContributionStatsModelUnitTests(test_utils.GenericTestBase):
             self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT
         )
         self.assertEqual(
-            question_contribution_stats_model.contribution_months,
-            self.CONTRIBUTION_MONTHS
-        )
-        self.assertEqual(
             question_contribution_stats_model.first_contribution_date,
             self.FIRST_CONTRIBUTION_DATE
         )
@@ -2443,7 +2406,6 @@ class QuestionContributionStatsModelUnitTests(test_utils.GenericTestBase):
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
             accepted_questions_without_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
-            contribution_months=self.CONTRIBUTION_MONTHS,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=self.LAST_CONTRIBUTION_DATE
         )
@@ -2476,7 +2438,6 @@ class QuestionContributionStatsModelUnitTests(test_utils.GenericTestBase):
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
             accepted_questions_without_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
-            contribution_months=self.CONTRIBUTION_MONTHS,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=self.LAST_CONTRIBUTION_DATE
         )
@@ -2487,7 +2448,6 @@ class QuestionContributionStatsModelUnitTests(test_utils.GenericTestBase):
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
             accepted_questions_without_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
-            contribution_months=self.CONTRIBUTION_MONTHS,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=self.LAST_CONTRIBUTION_DATE
         )
@@ -2502,7 +2462,6 @@ class QuestionContributionStatsModelUnitTests(test_utils.GenericTestBase):
                     self.ACCEPTED_QUESTIONS_COUNT),
                 'accepted_questions_without_reviewer_edits_count': (
                     self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
-                'contribution_months': self.CONTRIBUTION_MONTHS,
                 'first_contribution_date': (
                     self.FIRST_CONTRIBUTION_DATE.isoformat()),
                 'last_contribution_date': (
@@ -2516,7 +2475,6 @@ class QuestionContributionStatsModelUnitTests(test_utils.GenericTestBase):
                     self.ACCEPTED_QUESTIONS_COUNT),
                 'accepted_questions_without_reviewer_edits_count': (
                     self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
-                'contribution_months': self.CONTRIBUTION_MONTHS,
                 'first_contribution_date': (
                     self.FIRST_CONTRIBUTION_DATE.isoformat()),
                 'last_contribution_date': (
@@ -2539,10 +2497,6 @@ class QuestionReviewStatsModelUnitTests(test_utils.GenericTestBase):
     REVIEWED_QUESTIONS_COUNT = 2
     ACCEPTED_QUESTIONS_COUNT = 1
     ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT = 0
-    # Timestamp dates in sec since epoch for Mar 19 2021 UTC.
-    REVIEW_MONTHS = [
-        'Jan 2021', 'Feb 2021'
-    ]
     FIRST_CONTRIBUTION_DATE = datetime.date.fromtimestamp(1616173836)
     LAST_CONTRIBUTION_DATE = datetime.date.fromtimestamp(1616173836)
 
@@ -2554,7 +2508,6 @@ class QuestionReviewStatsModelUnitTests(test_utils.GenericTestBase):
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
             accepted_questions_with_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
-            review_months=self.REVIEW_MONTHS,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=self.LAST_CONTRIBUTION_DATE
         )
@@ -2587,10 +2540,6 @@ class QuestionReviewStatsModelUnitTests(test_utils.GenericTestBase):
             self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT
         )
         self.assertEqual(
-            question_review_stats_model.review_months,
-            self.REVIEW_MONTHS
-        )
-        self.assertEqual(
             question_review_stats_model.first_contribution_date,
             self.FIRST_CONTRIBUTION_DATE
         )
@@ -2607,7 +2556,6 @@ class QuestionReviewStatsModelUnitTests(test_utils.GenericTestBase):
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
             accepted_questions_with_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
-            review_months=self.REVIEW_MONTHS,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=self.LAST_CONTRIBUTION_DATE
         )
@@ -2643,10 +2591,6 @@ class QuestionReviewStatsModelUnitTests(test_utils.GenericTestBase):
             self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT
         )
         self.assertEqual(
-            question_review_stats_model.review_months,
-            self.REVIEW_MONTHS
-        )
-        self.assertEqual(
             question_review_stats_model.first_contribution_date,
             self.FIRST_CONTRIBUTION_DATE
         )
@@ -2671,7 +2615,6 @@ class QuestionReviewStatsModelUnitTests(test_utils.GenericTestBase):
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
             accepted_questions_with_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
-            review_months=self.REVIEW_MONTHS,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=self.LAST_CONTRIBUTION_DATE
         )
@@ -2704,7 +2647,6 @@ class QuestionReviewStatsModelUnitTests(test_utils.GenericTestBase):
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
             accepted_questions_with_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
-            review_months=self.REVIEW_MONTHS,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=self.LAST_CONTRIBUTION_DATE
         )
@@ -2715,7 +2657,6 @@ class QuestionReviewStatsModelUnitTests(test_utils.GenericTestBase):
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
             accepted_questions_with_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
-            review_months=self.REVIEW_MONTHS,
             first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
             last_contribution_date=self.LAST_CONTRIBUTION_DATE
         )
@@ -2730,7 +2671,6 @@ class QuestionReviewStatsModelUnitTests(test_utils.GenericTestBase):
                     self.ACCEPTED_QUESTIONS_COUNT),
                 'accepted_questions_with_reviewer_edits_count': (
                     self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
-                'review_months': self.REVIEW_MONTHS,
                 'first_contribution_date': (
                     self.FIRST_CONTRIBUTION_DATE.isoformat()),
                 'last_contribution_date': (
@@ -2744,7 +2684,6 @@ class QuestionReviewStatsModelUnitTests(test_utils.GenericTestBase):
                     self.ACCEPTED_QUESTIONS_COUNT),
                 'accepted_questions_with_reviewer_edits_count': (
                     self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
-                'review_months': self.REVIEW_MONTHS,
                 'first_contribution_date': (
                     self.FIRST_CONTRIBUTION_DATE.isoformat()),
                 'last_contribution_date': (

@@ -1297,7 +1297,7 @@ class TranslationContributionStatsModel(base_models.BaseModel):
 class TranslationReviewStatsModel(base_models.BaseModel):
     """Records the contributor dashboard translation review stats. There
     is one instance of this model per (language_code, reviewer_user_id,
-    topic_id) tuple. See related design doc for more details:
+    topic_id) tuple.
     """
 
     # We use the model id as a key in the Takeout dict.
@@ -1333,9 +1333,6 @@ class TranslationReviewStatsModel(base_models.BaseModel):
     # Excludes HTML tags and attributes.
     accepted_translations_with_reviewer_edits_word_count = (
         datastore_services.IntegerProperty(required=True, indexed=True))
-    # The unique last_updated dates of the translation reviews.
-    review_months = datastore_services.StringProperty(
-        repeated=True, indexed=True)
     # The first date that the reviewer made a translation review.
     first_contribution_date = datastore_services.DateProperty(indexed=True)
     # The last date that the reviewer made a translation review.
@@ -1353,7 +1350,6 @@ class TranslationReviewStatsModel(base_models.BaseModel):
             accepted_translations_with_reviewer_edits_count: int,
             accepted_translation_word_count: int,
             accepted_translations_with_reviewer_edits_word_count: int,
-            review_months: List[str],
             first_contribution_date: datetime.date,
             last_contribution_date: datetime.date
     ) -> str:
@@ -1376,7 +1372,6 @@ class TranslationReviewStatsModel(base_models.BaseModel):
                 accepted_translations_with_reviewer_edits_word_count
             ),
             accepted_translation_word_count=accepted_translation_word_count,
-            review_months=review_months,
             first_contribution_date=first_contribution_date,
             last_contribution_date=last_contribution_date)
         entity.update_timestamps()
@@ -1486,8 +1481,6 @@ class TranslationReviewStatsModel(base_models.BaseModel):
                 base_models.EXPORT_POLICY.EXPORTED,
             'accepted_translations_with_reviewer_edits_word_count':
                 base_models.EXPORT_POLICY.EXPORTED,
-            'review_months':
-                base_models.EXPORT_POLICY.EXPORTED,
             'first_contribution_date':
                 base_models.EXPORT_POLICY.EXPORTED,
             'last_contribution_date':
@@ -1538,7 +1531,6 @@ class TranslationReviewStatsModel(base_models.BaseModel):
                     model.accepted_translation_word_count),
                 'accepted_translations_with_reviewer_edits_word_count': (
                     model.accepted_translations_with_reviewer_edits_word_count),
-                'review_months': list(model.review_months),
                 'first_contribution_date': (
                     model.first_contribution_date.isoformat()),
                 'last_contribution_date': (
@@ -1550,7 +1542,7 @@ class TranslationReviewStatsModel(base_models.BaseModel):
 class QuestionContributionStatsModel(base_models.BaseModel):
     """Records the contributor dashboard question contribution stats. There
     is one instance of this model per (contributor_user_id,
-    topic_id) tuple. See related design doc for more details:
+    topic_id) tuple.
     """
 
     # We use the model id as a key in the Takeout dict.
@@ -1570,9 +1562,6 @@ class QuestionContributionStatsModel(base_models.BaseModel):
     # The number of accepted questions without reviewer edits.
     accepted_questions_without_reviewer_edits_count = (
         datastore_services.IntegerProperty(required=True, indexed=True))
-    # The unique last_updated dates of the question suggestions.
-    contribution_months = datastore_services.StringProperty(
-        repeated=True, indexed=True)
     # The first date that the submitter made a question submission.
     first_contribution_date = datastore_services.DateProperty(indexed=True)
     # The last date that the submitter made a question submission.
@@ -1586,7 +1575,6 @@ class QuestionContributionStatsModel(base_models.BaseModel):
             submitted_questions_count: int,
             accepted_questions_count: int,
             accepted_questions_without_reviewer_edits_count: int,
-            contribution_months: List[str],
             first_contribution_date: datetime.date,
             last_contribution_date: datetime.date
     ) -> str:
@@ -1603,7 +1591,6 @@ class QuestionContributionStatsModel(base_models.BaseModel):
             accepted_questions_count=accepted_questions_count,
             accepted_questions_without_reviewer_edits_count=(
                 accepted_questions_without_reviewer_edits_count),
-            contribution_months=contribution_months,
             first_contribution_date=first_contribution_date,
             last_contribution_date=last_contribution_date)
         entity.update_timestamps()
@@ -1704,8 +1691,6 @@ class QuestionContributionStatsModel(base_models.BaseModel):
                 base_models.EXPORT_POLICY.EXPORTED,
             'accepted_questions_without_reviewer_edits_count':
                 base_models.EXPORT_POLICY.EXPORTED,
-            'contribution_months':
-                base_models.EXPORT_POLICY.EXPORTED,
             'first_contribution_date':
                 base_models.EXPORT_POLICY.EXPORTED,
             'last_contribution_date':
@@ -1749,7 +1734,6 @@ class QuestionContributionStatsModel(base_models.BaseModel):
                     model.accepted_questions_count),
                 'accepted_questions_without_reviewer_edits_count': (
                     model.accepted_questions_without_reviewer_edits_count),
-                'contribution_months': list(model.contribution_months),
                 'first_contribution_date': (
                     model.first_contribution_date.isoformat()),
                 'last_contribution_date': (
@@ -1761,7 +1745,7 @@ class QuestionContributionStatsModel(base_models.BaseModel):
 class QuestionReviewStatsModel(base_models.BaseModel):
     """Records the contributor dashboard question review stats. There
     is one instance of this model per (contributor_user_id,
-    topic_id) tuple. See related design doc for more details:
+    topic_id) tuple.
     """
 
     # We use the model id as a key in the Takeout dict.
@@ -1781,9 +1765,6 @@ class QuestionReviewStatsModel(base_models.BaseModel):
     # The number of accepted questions with reviewer edits.
     accepted_questions_with_reviewer_edits_count = (
         datastore_services.IntegerProperty(required=True, indexed=True))
-    # The unique last_updated dates of the question suggestions.
-    review_months = datastore_services.StringProperty(
-        repeated=True, indexed=True)
     # The first date that the reviewer made a question review.
     first_contribution_date = datastore_services.DateProperty(indexed=True)
     # The last date that the reviewer made a question review.
@@ -1797,7 +1778,6 @@ class QuestionReviewStatsModel(base_models.BaseModel):
             reviewed_questions_count: int,
             accepted_questions_count: int,
             accepted_questions_with_reviewer_edits_count: int,
-            review_months: List[str],
             first_contribution_date: datetime.date,
             last_contribution_date: datetime.date
     ) -> str:
@@ -1814,7 +1794,6 @@ class QuestionReviewStatsModel(base_models.BaseModel):
             accepted_questions_count=accepted_questions_count,
             accepted_questions_with_reviewer_edits_count=(
                 accepted_questions_with_reviewer_edits_count),
-            review_months=review_months,
             first_contribution_date=first_contribution_date,
             last_contribution_date=last_contribution_date)
         entity.update_timestamps()
@@ -1915,8 +1894,6 @@ class QuestionReviewStatsModel(base_models.BaseModel):
                 base_models.EXPORT_POLICY.EXPORTED,
             'accepted_questions_with_reviewer_edits_count':
                 base_models.EXPORT_POLICY.EXPORTED,
-            'review_months':
-                base_models.EXPORT_POLICY.EXPORTED,
             'first_contribution_date':
                 base_models.EXPORT_POLICY.EXPORTED,
             'last_contribution_date':
@@ -1960,7 +1937,6 @@ class QuestionReviewStatsModel(base_models.BaseModel):
                     model.accepted_questions_count),
                 'accepted_questions_with_reviewer_edits_count': (
                     model.accepted_questions_with_reviewer_edits_count),
-                'review_months': list(model.review_months),
                 'first_contribution_date': (
                     model.first_contribution_date.isoformat()),
                 'last_contribution_date': (
