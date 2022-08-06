@@ -2720,7 +2720,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         exploration_dict['schema_version'] = 57
 
         exploration_dict['states'] = cls._convert_states_v51_dict_to_v52_dict(
-            exploration_dict['states'], exploration_dict['id'])
+            exploration_dict['states'])
         exploration_dict['states_schema_version'] = 52
 
         return exploration_dict
