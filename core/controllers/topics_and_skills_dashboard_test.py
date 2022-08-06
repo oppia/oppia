@@ -1089,7 +1089,7 @@ class TopicIdToDiagnosticTestSkillIdsHandlerTests(
         self.topic.skill_ids_for_diagnostic_test = ['skill_id_1']
         topic_services.save_new_topic(self.admin_id, self.topic)
 
-    def test_skill_assignment_handler_for_diagnostic_test_returns_correctly(
+    def test_topic_id_to_diagnostic_test_skill_ids_handler_returns_correctly(
         self
     ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)

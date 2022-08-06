@@ -513,7 +513,7 @@ class DiagnosticTestSkillAssignmentHandlerTest(BaseSkillEditorControllerTests):
     ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         json_response = self.get_json(self.url)
-        self.assertFalse(json_response['skill_is_assigned_for_diagnostic_test'])
+        self.assertEqual(json_response['topic_names'], [])
 
         changelist = [
             topic_domain.TopicChange({
@@ -528,4 +528,4 @@ class DiagnosticTestSkillAssignmentHandlerTest(BaseSkillEditorControllerTests):
             'Updated diagnostic test.')
 
         json_response = self.get_json(self.url)
-        self.assertTrue(json_response['skill_is_assigned_for_diagnostic_test'])
+        self.assertEqual(json_response['topic_names'], ['topic'])
