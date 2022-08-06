@@ -1,5 +1,96 @@
 This file contains a summary of changes to the Oppia code base.
 
+v3.2.7 (05 Aug 2022)
+------------------------
+Learner/Creator Pages
+* Fix #15743 and #15685: UI issues with the search bar on the Math classroom page (#15778)
+* Fix #15745 and #15744: Fix UI issues on learner-facing pages. (#15773)
+* Fix #15147: filter box toggle issue on /topics-and-skill-dashboard (#15673)
+* Milestone 1.3 (Learner group MVP): Add frontend models and backend service api for Learner groups (#15656)
+* Fix #15650 and #15591: Update progress nav when state content changes; Update z-index for modals that need to be stacked (#15651)
+* Fix #15150: Learner Dashboard fix for no scroll bar present to check the progress of community lessons if more than 3 lessons are present. (#15616)
+* (Celebrating learners' accomplishments) Milestone 1.2: Modify the ratings-and-recommendations component and make sign up section dismissable (#15611)
+* Fix part of #13764: Frontend validation for at least one explanation for Medium Rubric (#15609)
+* (Celebrating learners' accomplishments) Milestone 1.1: Add end chapter check-mark and confetti (#15589)
+* Fix #14199: Fixed math OSK UI for iOS devices. (#15585)
+* Milestone 1.1 (Learner group MVP): Add learner group related models and domains (#15583)
+* Milestone 1.1 (Improving the lesson creation experience): Create the new domain objects (#15582)
+* Fix #15511: Add a Uploading animation when user clicks 'Use This Image' (#15564)
+* Fix #15540: Misplaced icon in EndExploration interaction (#15558)
+* Fix #15507: The mobile UI for the answer selection modal is offset to the left (#15520)
+* Backend changes for Logged-out experience (User Checkpoints Project) (#15422)
+* Fix part of #14702: Add the stale tab detection functionality for topic editor page (#15278)
+* Fix #15739: Link author list items to profile page in the lesson info modal (#15798)
+* Fix editor issues: schema-based-list-editor not populating the choices; editing images not working (#15704)
+* Learner checkpointing: Follow up changes (#15547)
+* Improved validation and minor fixes to clear the erroring deferred job queue (#15491)
+* Frontend changes for logged-out experience (User checkpoints project) (#15482)
+
+Bug fixes
+* Fix CSS scoping  (#15724)
+
+Miscellaneous
+* Rearrange import order to fix typing_extensions error when deploying (#15691)
+* Add gtag.js to the app (#15683)
+* Milestone 1.2 (Improving the lesson creation experience): Create the new storage model and implement its lifecycle (#15607)
+
+Automated QA Team
+* Fix e2e CI error (Failed to load resource: the server responded with a status of 405 ()) (#15688)
+* Fix #15676: Fixes the flake in ImageWithRegionsEditorComponent (#15678)
+* Fix part of #14219: Increase Per-File Backend Test Coverage for tasks.py (#15566)
+* Fix part of #14219: Increase Per-File Backend Test Coverage (#15356)
+* Milestone 1.2 (Migrate away from protractor): Setup webdriverio and migrate few tests suite from protractor to webdriverIO (#15614)
+
+Dev Workflow
+* Changes in logged-out User Checkpoints backend (Follow-up to #15422) (#15667)
+* Fix Part of #10700: Refactor Object Factories (#15652)
+* Add new flag "download_combined_frontend_file" to frontend test execution file (#15635)
+* Fix part of #8668: Document url-interpolation.service.ts with jsdoc (#15628)
+* Codeowner changes for LaCE team (#15619)
+* Fix #15152, #15153, #15224, #14625: Move generation of RTL CSS into webpack (#15576)
+* Remove import from utils (#15557)
+* Fix codemirror (#15555)
+* Purge python utils (#15441)
+* Revert "Fix part of #14702: Add the stale tab detection functionality for topic editor page" (#15593)
+
+Release team
+* Fix #15381: Update CODEOWNERS to add Nithesh (#15661)
+
+Data handling
+* Allow bigger JobRunResult  (#15658)
+* Fix Part of #13162: Add schema for UsernameCheckHandler and ReaderFeedbackHandler (#15605)
+* Fix Part of #13162: Add schema for RecommendationsHandler (#15597)
+* Fix part of #13822: Added backend validation for sub-topic url fragment (#15500)
+* Fix part of #13822: Added backend validation for story_is_published to be boolean (#15417)
+
+Contributor Pages
+* Fix #15648: Remove limit from in-review translation suggestion query (#15649)
+* (Making Contributor Dashboard UI Responsive) Milestone 1.1: Implement the mobile UI for dashboard tabs and navigation (#15594)
+* Fix #15570: Fix change detection issue in question editor modal. (#15573)
+* Fix #12425: Change Drag and Drop sort input so it displays the answer HTML instead of the contentID (#15496)
+* Fix #15385: Added functionality to persist translator language on [CD - Translate Text]. (#15460)
+
+Typing
+* Fix part of #14033: Added Mypy type annotations to some files of domain folder. -- M1.5 (#15640)
+* Fix part of #14033: Added Mypy type annotations to some files of `domain` folder. -- M1.4 (#15618)
+* Fix #13500: Data passed to platform storage service is always in bytes (#15598)
+* Fix part of #14033: Added Mypy type annotations to some files of `domain` folder. -- M1.3 (#15596)
+* Fix part of #14033: Added Mypy type annotations to some files of `domain` folder. -- M1.2 (#15580)
+* Fix part of #10474: Enable typescript strict mode for all the newly added files and number of errors along with errors log. (#15578)
+* Improve splash page loading speed : Remove material icons (#15549)
+* Added Mypy type annotations to `validation_decorators.py` and `job_result_transforms.py` (#15501)
+* Fix part of #10474: Cover ExtractImageFilenamesFromModelService with strict checks (#15495)
+* Fix part of #14033: Added Mypy type annotations to `param_domain` and `story_domain` (#15483)
+* Fix part of #14033: Type annotate html_cleaner.py (#15435)
+
+Angular Migration
+* Fix part of 9749: Migration of training-data.service.ts, training-panel, exploration-warnings.service.ts, parameter-metadata.service.ts and more. (#15604)
+* Fix Part of #9749: Migrate Outcome editor (#15438)
+
+Speed improvement
+* Improve loading speed of splash and math page (#15477)
+
+
 v3.2.6 (03 Jul 2022)
 ------------------------
 Contributor Pages
