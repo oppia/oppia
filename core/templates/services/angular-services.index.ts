@@ -426,6 +426,7 @@ import { HistoryTabYamlConversionService } from 'pages/exploration-editor-page/s
 import { VersionedExplorationCachingService } from 'pages/exploration-editor-page/services/versioned-exploration-caching.service';
 import { ExplorationSaveService } from 'pages/exploration-editor-page/services/exploration-save.service';
 import { ExplorationAutomaticTextToSpeechService } from 'pages/exploration-editor-page/services/exploration-automatic-text-to-speech.service';
+import { TeachOppiaModalBackendApiService } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/teach-oppia-modal-backend-api.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -884,5 +885,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['PracticeSessionsBackendApiService', PracticeSessionsBackendApiService],
   ['ExplorationSaveService', ExplorationSaveService],
   ['ExplorationAutomaticTextToSpeechService',
-    ExplorationAutomaticTextToSpeechService]
+    ExplorationAutomaticTextToSpeechService],
+  ['TeachOppiaModalBackendApiService', TeachOppiaModalBackendApiService]
 ];

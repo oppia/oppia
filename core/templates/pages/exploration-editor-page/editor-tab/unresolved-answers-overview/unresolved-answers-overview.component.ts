@@ -16,13 +16,10 @@
  * @fileoverview Component for the state graph visualization.
  */
 
+import { TeachOppiaModalComponent } from '../templates/modal-templates/teach-oppia-modal.component';
 require(
   'components/common-layout-directives/common-elements/' +
   'loading-dots.component.ts');
-require(
-  'pages/exploration-editor-page/editor-tab/templates/modal-templates/' +
-  'teach-oppia-modal.controller.ts');
-
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-editor-page/services/exploration-rights.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
@@ -40,23 +37,23 @@ require('services/editability.service.ts');
 require('services/improvements.service.ts');
 require('services/state-top-answers-stats.service.ts');
 require('services/external-save.service.ts');
-
+require('services/ngb-modal.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 
 angular.module('oppia').component('unresolvedAnswersOverview', {
   template: require('./unresolved-answers-overview.component.html'),
   controller: [
-    '$scope', '$uibModal', 'EditabilityService',
+    '$scope', 'EditabilityService',
     'ExplorationStatesService', 'ExternalSaveService',
-    'ImprovementsService', 'StateEditorService',
+    'ImprovementsService', 'NgbModal', 'StateEditorService',
     'StateInteractionIdService', 'StateTopAnswersStatsService',
     'INTERACTION_SPECS',
     'SHOW_TRAINABLE_UNRESOLVED_ANSWERS',
     function(
-        $scope, $uibModal, EditabilityService,
+        $scope, EditabilityService,
         ExplorationStatesService, ExternalSaveService,
-        ImprovementsService, StateEditorService,
+        ImprovementsService, NgbModal, StateEditorService,
         StateInteractionIdService, StateTopAnswersStatsService,
         INTERACTION_SPECS,
         SHOW_TRAINABLE_UNRESOLVED_ANSWERS) {
@@ -97,13 +94,9 @@ angular.module('oppia').component('unresolvedAnswersOverview', {
       $scope.openTeachOppiaModal = function() {
         ExternalSaveService.onExternalSave.emit();
 
-        $uibModal.open({
-          template: require(
-            'pages/exploration-editor-page/editor-tab/templates/' +
-            'modal-templates/teach-oppia-modal.template.html'),
-          backdrop: 'static',
-          controller: 'TeachOppiaModalController'
-        }).result.then(function() {}, function() {
+        NgbModal.open(TeachOppiaModalComponent, {
+          backdrop: 'static'
+        }).result.then(() => {}, () => {
           // Note to developers:
           // This callback is triggered when the Cancel button is clicked.
           // No further action is needed.

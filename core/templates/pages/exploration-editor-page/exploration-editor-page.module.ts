@@ -74,6 +74,7 @@ import { ExplorationGraphModalComponent } from './editor-tab/templates/modal-tem
 import { ExplorationGraphComponent } from './editor-tab/graph-directives/exploration-graph.component';
 import { StateNameEditorComponent } from './editor-tab/state-name-editor/state-name-editor.component';
 import { EditorNavigationComponent } from './editor-navigation/editor-navigation.component';
+import { TeachOppiaModalComponent } from './editor-tab/templates/modal-templates/teach-oppia-modal.component';
 
 @NgModule({
   imports: [
@@ -130,7 +131,8 @@ import { EditorNavigationComponent } from './editor-navigation/editor-navigation
     ExplorationGraphModalComponent,
     ExplorationGraphComponent,
     StateNameEditorComponent,
-    EditorNavigationComponent
+    EditorNavigationComponent,
+    TeachOppiaModalComponent
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
@@ -170,7 +172,8 @@ import { EditorNavigationComponent } from './editor-navigation/editor-navigation
     ExplorationGraphModalComponent,
     ExplorationGraphComponent,
     StateNameEditorComponent,
-    EditorNavigationComponent
+    EditorNavigationComponent,
+    TeachOppiaModalComponent
   ],
   providers: [
     {
