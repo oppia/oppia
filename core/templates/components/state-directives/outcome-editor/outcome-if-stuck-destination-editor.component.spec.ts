@@ -277,14 +277,4 @@ describe('Outcome Destination If Stuck Editor', () => {
 
     expect(component.getChanges.emit).toHaveBeenCalled();
   });
-
-  it('should update outcomeNewStateName', () => {
-    component.outcomeNewStateName = 'Introduction';
-
-    expect(component.outcomeNewStateName).toBe('Introduction');
-
-    component.updateChanges('New State');
-
-    expect(component.outcomeNewStateName).toBe('New State');
-  });
 });
