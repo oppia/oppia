@@ -581,7 +581,7 @@ class LearnerGroupStudentProgressHandlerTests(test_utils.GenericTestBase):
             '/learner_group_user_progress_handler/%s' % (
                 self.LEARNER_GROUP_ID), params=params)
 
-        students_prog = response['students_progress']
+        students_prog = response
         student1_stories_prog = students_prog[0]['stories_progress']
         student2_stories_prog = students_prog[1]['stories_progress']
         student1_subtopics_prog = students_prog[0]['subtopic_pages_progress']
@@ -776,3 +776,163 @@ class LearnerGroupSearchStudentHandlerTests(test_utils.GenericTestBase):
         )
         self.assertEqual(response['error'], '')
         self.logout()
+
+
+class EditLearnerGroupPageTests(test_utils.GenericTestBase):
+    """Checks the access and rendering of the edit learner page."""
+
+    STUDENT_ID = 'student_user_1'
+
+    def setUp(self):
+        super(EditLearnerGroupPageTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.FACILITATOR_ID = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.login(self.OWNER_EMAIL)
+        self.LEARNER_GROUP_ID = (
+            learner_group_fetchers.get_new_learner_group_id()
+        )
+        self.learner_group = learner_group_services.create_learner_group(
+            self.LEARNER_GROUP_ID, 'Learner Group Name', 'Description',
+            [self.FACILITATOR_ID], [self.STUDENT_ID], ['subtopic_id_1'],
+            ['story_id_1'])
+
+    def test_page_with_disabled_learner_groups_leads_to_404(self):
+        config_services.set_property(
+            'admin', 'learner_groups_are_enabled', False)
+        self.get_html_response(
+            '/edit-learner-group/%s' % self.LEARNER_GROUP_ID,
+            expected_status_int=404)
+        self.logout()
+
+    def test_page_with_enabled_learner_groups_loads_correctly_for_facilitator(
+        self
+    ):
+        config_services.set_property(
+            'admin', 'learner_groups_are_enabled', True)
+        response = self.get_html_response(
+            '/edit-learner-group/%s' % self.LEARNER_GROUP_ID)
+        response.mustcontain(
+            '<oppia-edit-learner-group-page>'
+            '</oppia-edit-learner-group-page>')
+        self.logout()
+
+    def test_page_with_enabled_learner_groups_leads_to_404_for_non_facilitators(
+        self
+    ):
+        config_services.set_property(
+            'admin', 'learner_groups_are_enabled', True)
+        self.logout()
+        self.login(self.NEW_USER_EMAIL)
+        self.get_html_response(
+            '/edit-learner-group/%s' % self.LEARNER_GROUP_ID,
+            expected_status_int=404)
+        self.logout()
+
+
+class LearnerGroupStudentInvitationHandlerTests(test_utils.GenericTestBase):
+    """Checks student successfully accepting or declining a learner group
+    invitation.
+    """
+
+    def setUp(self):
+        super(LearnerGroupStudentInvitationHandlerTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.FACILITATOR_ID = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.STUDENT_ID = self.get_user_id_from_email(self.NEW_USER_EMAIL)
+        self.LEARNER_GROUP_ID = (
+            learner_group_fetchers.get_new_learner_group_id()
+        )
+        self.learner_group = learner_group_services.create_learner_group(
+            self.LEARNER_GROUP_ID, 'Learner Group Name', 'Description',
+            [self.FACILITATOR_ID], [self.STUDENT_ID], ['subtopic_id_1'],
+            ['story_id_1'])
+
+    def test_invitation_accepted_by_the_student(self) -> None:
+        self.login(self.NEW_USER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        payload = {
+            'student_username': self.NEW_USER_USERNAME,
+            'is_invitation_accepted': 'true',
+            'progress_sharing_permission': 'true'
+        }
+        response = self.put_json(
+            '/learner_group_student_invitation_handler/%s' % (
+                self.LEARNER_GROUP_ID),
+            payload, csrf_token=csrf_token)
+
+        self.assertEqual(response['id'], self.LEARNER_GROUP_ID)
+        self.assertEqual(
+            response['student_usernames'], [self.NEW_USER_USERNAME])
+        self.assertEqual(response['invited_student_usernames'], [])
+
+    def test_invitation_declined_by_the_student(self) -> None:
+        self.login(self.NEW_USER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        payload = {
+            'student_username': self.NEW_USER_USERNAME,
+            'is_invitation_accepted': 'false',
+            'progress_sharing_permission': 'false'
+        }
+        response = self.put_json(
+            '/learner_group_student_invitation_handler/%s' % (
+                self.LEARNER_GROUP_ID),
+            payload, csrf_token=csrf_token)
+
+        self.assertEqual(response['id'], self.LEARNER_GROUP_ID)
+        self.assertEqual(response['student_usernames'], [])
+        self.assertEqual(response['invited_student_usernames'], [])
+
+
+class LearnerGroupStudentsInfoHandlerTests(test_utils.GenericTestBase):
+    """Checks fetching info of joined and invited to join students of a
+    learner group
+    """
+
+    STUDENT_EMAIL = 'some.student@user.com'
+    STUDENT_USERNAME = 'somestudent'
+
+    def setUp(self):
+        super(LearnerGroupStudentsInfoHandlerTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.FACILITATOR_ID = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.STUDENT_ID_1 = self.get_user_id_from_email(self.NEW_USER_EMAIL)
+        self.signup(self.STUDENT_EMAIL, self.STUDENT_USERNAME)
+        self.STUDENT_ID_2 = self.get_user_id_from_email(self.STUDENT_EMAIL)
+
+        self.LEARNER_GROUP_ID = (
+            learner_group_fetchers.get_new_learner_group_id()
+        )
+        self.learner_group = learner_group_services.create_learner_group(
+            self.LEARNER_GROUP_ID, 'Learner Group Name', 'Description',
+            [self.FACILITATOR_ID], [self.STUDENT_ID_1, self.STUDENT_ID_2],
+            ['subtopic_id_1'], ['story_id_1'])
+        learner_group_services.add_student_to_learner_group(
+            self.LEARNER_GROUP_ID, self.STUDENT_ID_1, False)
+
+    def test_getting_info_of_students_and_invities(self) -> None:
+        self.login(self.OWNER_EMAIL)
+        response = self.get_json(
+            '/learner_group_students_info_handler/%s' % self.LEARNER_GROUP_ID
+        )
+
+        students_user_settings = user_services.get_users_settings(
+            [self.STUDENT_ID_1, self.STUDENT_ID_2], strict=True)
+
+        student_info = [{
+            'username': self.NEW_USER_USERNAME,
+            'profile_picture_data_url':
+                students_user_settings[0].profile_picture_data_url
+        }]
+        invited_student_info = [{
+            'username': self.STUDENT_USERNAME,
+            'profile_picture_data_url':
+                students_user_settings[1].profile_picture_data_url
+        }]
+        self.assertEqual(response['students_info'], student_info)
+        self.assertEqual(
+            response['invited_students_info'], invited_student_info)

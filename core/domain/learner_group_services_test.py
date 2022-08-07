@@ -257,35 +257,35 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
 
     def test_add_student_to_learner_group(self) -> None:
         # Test for invited student.
-        learner_group = learner_group_fetchers.get_learner_group_by_id(
+        learner_grp = learner_group_fetchers.get_learner_group_by_id(
             self.LEARNER_GROUP_ID)
         # Ruling out the possibility of None for mypy type checking.
-        assert learner_group is not None
+        assert learner_grp is not None
 
         learner_grps_user_model = user_models.LearnerGroupsUserModel.get(
             self.STUDENT_ID, strict=True)
         self.assertEqual(
-            learner_group.invited_student_user_ids, [self.STUDENT_ID])
+            learner_grp.invited_student_user_ids, [self.STUDENT_ID])
         self.assertEqual(
-            learner_group.student_user_ids, [])
+            learner_grp.student_user_ids, [])
         self.assertEqual(
             learner_grps_user_model.learner_groups_user_details, [])
 
         learner_group_services.add_student_to_learner_group(
             self.LEARNER_GROUP_ID, self.STUDENT_ID, True)
 
-        learner_group = learner_group_fetchers.get_learner_group_by_id(
+        learner_grp = learner_group_fetchers.get_learner_group_by_id(
             self.LEARNER_GROUP_ID)
         # Ruling out the possibility of None for mypy type checking.
-        assert learner_group is not None
+        assert learner_grp is not None
 
         learner_grps_user_model = user_models.LearnerGroupsUserModel.get(
             self.STUDENT_ID, strict=True)
 
         self.assertEqual(
-            learner_group.invited_student_user_ids, [])
+            learner_grp.invited_student_user_ids, [])
         self.assertEqual(
-            learner_group.student_user_ids, [self.STUDENT_ID])
+            learner_grp.student_user_ids, [self.STUDENT_ID])
         self.assertEqual(
             learner_grps_user_model.learner_groups_user_details,
             [
@@ -396,3 +396,34 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
                 'uninvolved_user_id', 'username2', self.LEARNER_GROUP_ID))
         self.assertTrue(is_valid_invite)
         self.assertEqual(error_message, '')
+
+    def test_remove_students_from_learner_group(self) -> None:
+        learner_group_services.add_student_to_learner_group(
+            self.LEARNER_GROUP_ID, self.STUDENT_ID, True)
+
+        self.learner_group = learner_group_services.update_learner_group(
+            self.LEARNER_GROUP_ID, self.learner_group.title,
+            self.learner_group.description,
+            self.learner_group.facilitator_user_ids, [],
+            ['student2', 'student3'], self.learner_group.subtopic_page_ids,
+            self.learner_group.story_ids)
+        learner_group_services.add_student_to_learner_group(
+            self.LEARNER_GROUP_ID, 'student2', True)
+        learner_group_services.add_student_to_learner_group(
+            self.LEARNER_GROUP_ID, 'student3', False)
+
+        learner_group = learner_group_fetchers.get_learner_group_by_id(
+            self.LEARNER_GROUP_ID)
+        # Ruling out the possibility of None for mypy type checking.
+        assert learner_group is not None
+        self.assertEqual(
+            learner_group.student_user_ids,
+            ['student2', 'student3'])
+        learner_group_services.remove_students_from_learner_group(
+            self.LEARNER_GROUP_ID, ['student2', 'student3'])
+
+        learner_group = learner_group_fetchers.get_learner_group_by_id(
+            self.LEARNER_GROUP_ID)
+        # Ruling out the possibility of None for mypy type checking.
+        assert learner_group is not None
+        self.assertEqual(learner_group.student_user_ids, [])

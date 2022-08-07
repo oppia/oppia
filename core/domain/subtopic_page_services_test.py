@@ -679,3 +679,21 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
             student_1_progress[0]['subtopic_mastery'], degree_of_mastery
         )
         self.assertIsNone(student_2_progress[0]['subtopic_mastery'])
+
+    def test_get_learner_group_syllabus_subtopic_page_summaries(self) -> None:
+        subtopic_page_id = '{}:{}'.format(self.TOPIC_ID_1, 1)
+        expected_summaries = [{
+            'subtopic_id': 1,
+            'subtopic_title': 'Naming Numbers',
+            'parent_topic_id': self.TOPIC_ID_1,
+            'parent_topic_name': 'Place Values',
+            'thumbnail_filename': 'image.svg',
+            'thumbnail_bg_color':
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+            'subtopic_mastery': None
+        }]
+        summaries = (
+            subtopic_page_services
+                .get_learner_group_syllabus_subtopic_page_summaries(
+                    [subtopic_page_id]))
+        self.assertEqual(summaries, expected_summaries)

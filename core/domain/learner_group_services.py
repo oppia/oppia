@@ -600,6 +600,17 @@ def remove_invited_students_from_learner_group(
     user_models.LearnerGroupsUserModel.update_timestamps_multi(models_to_put)
     user_models.LearnerGroupsUserModel.put_multi(models_to_put)
 
+    learner_group_model = learner_group_models.LearnerGroupModel.get(
+        group_id, strict=True
+    )
+    learner_group_model.invited_student_user_ids = [
+        student_id for student_id in
+        learner_group_model.invited_student_user_ids if
+        student_id not in student_ids
+    ]
+    learner_group_model.update_timestamps()
+    learner_group_model.put()
+
 
 def get_learner_group_from_model(
     learner_group_model: learner_group_models.LearnerGroupModel

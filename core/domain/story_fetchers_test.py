@@ -303,3 +303,16 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
             Exception, 'Story with id story_id_2 does not exist.'):
             story_fetchers.get_node_index_by_story_id_and_node_id(
                 'story_id_2', self.NODE_ID_1)
+
+    def test_get_learner_group_syllabus_story_summaries(self) -> None:
+        story_summaries = (
+            story_fetchers.get_learner_group_syllabus_story_summaries(
+                [self.story_id]))
+
+        self.assertEqual(len(story_summaries), 1)
+        self.assertEqual(story_summaries[0]['id'], self.story_id)
+        self.assertEqual(story_summaries[0]['title'], 'Title')
+        self.assertEqual(story_summaries[0]['description'], 'Description')
+        self.assertEqual(story_summaries[0]['node_titles'], ['Title 1'])
+        self.assertEqual(story_summaries[0]['thumbnail_bg_color'], None)
+        self.assertEqual(story_summaries[0]['thumbnail_filename'], None)
