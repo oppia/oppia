@@ -18,6 +18,8 @@
 
 from __future__ import annotations
 
+import datetime
+
 from core import utils
 from core.jobs.types import base_validation_errors
 from core.platform import models
@@ -59,13 +61,15 @@ class DuplicateBlogUrlError(base_validation_errors.BaseAuditError):
         super(DuplicateBlogUrlError, self).__init__(message, model)
 
 
-class InconsistentPublishTimestampsError(base_validation_errors.BaseAuditError):
+class InconsistentLastUpdatedTimestampsError(
+    base_validation_errors.BaseAuditError):
     """Error class for models with inconsistent timestamps."""
 
     def __init__(self, model: blog_models.BlogPostModel) -> None:
-        message = 'created_on=%r is later than published_on=%r' % (
-            model.created_on, model.published_on)
-        super(InconsistentPublishTimestampsError, self).__init__(message, model)
+        message = 'created_on=%r is later than last_updated=%r' % (
+            model.created_on, model.last_updated)
+        super(InconsistentLastUpdatedTimestampsError, self).__init__(
+            message, model)
 
 
 class InconsistentPublishLastUpdatedTimestampsError(
@@ -83,8 +87,10 @@ class InconsistentPublishLastUpdatedTimestampsError(
 class ModelMutatedDuringJobError(base_validation_errors.BaseAuditError):
     """Error class for models mutated during a job."""
 
-    def __init__(self, model: blog_models.BlogPostModel) -> None:
+    def __init__(
+        self, timestamp: datetime.datetime, timestamp_type: str) -> None:
         message = (
-            'published_on=%r is later than the audit job\'s start time' % (
-                model.published_on))
-        super(ModelMutatedDuringJobError, self).__init__(message, model)
+            '%s=%r is later than the audit job\'s start time' % (
+                timestamp, timestamp_type))
+        super(ModelMutatedDuringJobError, self).__init__(
+            message, timestamp, timestamp_type)

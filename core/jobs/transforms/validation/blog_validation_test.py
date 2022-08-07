@@ -67,7 +67,7 @@ class RelationshipsOfTests(test_utils.TestBase):
             ['UserSettingsModel'])
 
 
-class ValidateModelPublishTimeFieldTests(job_test_utils.PipelinedTestBase):
+class ValidateModelTimeFieldTests(job_test_utils.PipelinedTestBase):
 
     def test_reports_model_created_on_timestamp_relationship_error(
         self
@@ -85,12 +85,12 @@ class ValidateModelPublishTimeFieldTests(job_test_utils.PipelinedTestBase):
         output = (
             self.pipeline
             | beam.Create([invalid_timestamp])
-            | beam.ParDo(blog_validation.ValidateModelPublishTimestamps())
+            | beam.ParDo(blog_validation.ValidateModelTimestamps())
         )
 
         self.assert_pcoll_equal(
             output, [
-                blog_validation_errors.InconsistentPublishTimestampsError(
+                blog_validation_errors.InconsistentLastUpdatedTimestampsError(
                     invalid_timestamp),
             ]
         )
@@ -111,7 +111,7 @@ class ValidateModelPublishTimeFieldTests(job_test_utils.PipelinedTestBase):
         output = (
             self.pipeline
             | beam.Create([invalid_timestamp])
-            | beam.ParDo(blog_validation.ValidateModelPublishTimestamps())
+            | beam.ParDo(blog_validation.ValidateModelTimestamps())
         )
 
         self.assert_pcoll_equal(
@@ -129,7 +129,7 @@ class ValidateModelPublishTimeFieldTests(job_test_utils.PipelinedTestBase):
             content='<p>hello</p>,',
             author_id='user',
             url_fragment='url-fragment-1',
-            created_on=self.NOW,
+            created_on=self.YEAR_AGO,
             last_updated=self.NOW,
             published_on=None)
 
@@ -141,27 +141,53 @@ class ValidateModelPublishTimeFieldTests(job_test_utils.PipelinedTestBase):
 
         self.assert_pcoll_equal(output, [])
 
-    def test_process_reports_model_mutated_during_job_error(self) -> None:
+    def test_process_reports_model_mutated_during_job_error_for_published_on(
+        self) -> None:
         invalid_timestamp = blog_models.BlogPostModel(
             id='124',
             title='Sample Title',
             content='<p>hello</p>,',
             author_id='user',
             url_fragment='url-fragment-1',
-            created_on=self.NOW,
-            last_updated=self.YEAR_LATER,
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW,
             published_on=self.YEAR_LATER)
 
         output = (
             self.pipeline
             | beam.Create([invalid_timestamp])
-            | beam.ParDo(blog_validation.ValidateModelPublishTimestamps())
+            | beam.ParDo(blog_validation.ValidateModelTimestamps())
         )
 
         self.assert_pcoll_equal(
             output, [
                 blog_validation_errors.ModelMutatedDuringJobError(
-                    invalid_timestamp),
+                    invalid_timestamp.published_on, 'published_on'),
+            ]
+        )
+
+    def test_process_reports_model_mutated_during_job_error_for_last_updated(
+        self) -> None:
+        invalid_timestamp = blog_models.BlogPostModel(
+            id='124',
+            title='Sample Title',
+            content='<p>hello</p>,',
+            author_id='user',
+            url_fragment='url-fragment-1',
+            created_on=self.YEAR_AGO,
+            last_updated=self.YEAR_LATER,
+            published_on=self.YEAR_AGO)
+
+        output = (
+            self.pipeline
+            | beam.Create([invalid_timestamp])
+            | beam.ParDo(blog_validation.ValidateModelTimestamps())
+        )
+
+        self.assert_pcoll_equal(
+            output, [
+                blog_validation_errors.ModelMutatedDuringJobError(
+                    invalid_timestamp.last_updated, 'last_updated'),
             ]
         )
 
