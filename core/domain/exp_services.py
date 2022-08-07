@@ -1743,10 +1743,8 @@ def get_exploration_version_valid_info(exploration_id, revert_to_version):
         exploration_id, version=revert_to_version)
     exploration_rights = rights_manager.get_exploration_rights(exploration.id)
     try:
-        if exploration_rights.status != rights_domain.ACTIVITY_STATUS_PRIVATE:
-            exploration.validate(strict=True)
-        else:
-            exploration.validate()
+        exploration.validate(
+            exploration_rights.status == rights_domain.ACTIVITY_STATUS_PUBLIC)
     except Exception as ex:
         return {'valid': False, 'details': str(ex)}
 

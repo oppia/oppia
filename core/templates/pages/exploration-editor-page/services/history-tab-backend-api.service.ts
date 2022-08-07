@@ -20,20 +20,11 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-interface HistoryTabBackendDict {
-  'summaries': string[];
-}
-
-interface HistoryTabResponse {
+interface HistoryTabDict {
   summaries: string[];
 }
 
-interface HistoryTabCheckRevertValidBackendDict {
-  'valid': boolean;
-  'details': string | null;
-}
-
-interface HistoryTabCheckRevertValidResponse {
+interface HistoryTabCheckRevertValidDict {
   valid: boolean;
   details: string | null;
 }
@@ -52,20 +43,21 @@ export class HistoryTabBackendApiService {
         private http: HttpClient
   ) {}
 
-  getData(explorationAllSnapshotsUrl: string): Promise<HistoryTabResponse> {
-    return this.http.get<HistoryTabBackendDict>(
+  getData(explorationAllSnapshotsUrl: string): Promise<HistoryTabDict> {
+    return this.http.get<HistoryTabDict>(
       explorationAllSnapshotsUrl
     ).toPromise();
   }
 
-  getCheckRevertValidData(revertExplorationUrl: string):
-      Promise<HistoryTabCheckRevertValidResponse> {
-    return this.http.get<HistoryTabCheckRevertValidBackendDict>(
+  getCheckRevertValidData(
+      revertExplorationUrl: string
+  ): Promise<HistoryTabCheckRevertValidDict> {
+    return this.http.get<HistoryTabCheckRevertValidDict>(
       revertExplorationUrl).toPromise();
   }
 
-  postData(data: HistoryTabData): Promise<HistoryTabResponse> {
-    return this.http.post<HistoryTabBackendDict>(
+  postData(data: HistoryTabData): Promise<HistoryTabDict> {
+    return this.http.post<HistoryTabDict>(
       data.revertExplorationUrl,
       {
         current_version: data.currentVersion,

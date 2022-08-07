@@ -1,4 +1,4 @@
-// Copyright 2021 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
  * @fileoverview Component for revert exploration modal.
  */
 
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { CheckRevertService } from 'pages/exploration-editor-page/history-tab/services/check-revert.service';
@@ -25,8 +25,7 @@ import { CheckRevertService } from 'pages/exploration-editor-page/history-tab/se
   selector: 'oppia-check-revert-exploration-modal',
   templateUrl: './check-revert-exploration-modal.component.html'
 })
-
-export class CheckRevertExplorationModalComponent {
+export class CheckRevertExplorationModalComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -37,7 +36,9 @@ export class CheckRevertExplorationModalComponent {
   constructor(
     private ngbActiveModal: NgbActiveModal,
     private checkRevertService: CheckRevertService
-  ) {
+  ) {}
+
+  ngOnInit(): void {
     this.checkRevertService.detailsEventEmitter.subscribe((details) => {
       this.details = details;
     });
