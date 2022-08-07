@@ -568,11 +568,6 @@ def managed_webdriver_server(chrome_version=None):
 
     print('\n\nCHROME VERSION: %s' % chrome_version)
 
-    subprocess.check_call([
-        common.NODE_BIN_PATH, common.WEBDRIVER_MANAGER_BIN_PATH, 'update',
-        '--versions.chrome', chrome_version,
-    ])
-
     with contextlib.ExitStack() as exit_stack:
         if common.is_windows_os():
             # NOTE: webdriver-manager (version 13.0.0) uses `os.arch()` to
