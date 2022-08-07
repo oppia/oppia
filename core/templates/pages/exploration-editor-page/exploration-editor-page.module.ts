@@ -72,6 +72,8 @@ import { ExplorationSaveModalComponent } from './modal-templates/exploration-sav
 import { EditorNavbarBreadcrumbComponent } from './editor-navigation/editor-navbar-breadcrumb.component';
 import { ExplorationGraphModalComponent } from './editor-tab/templates/modal-templates/exploration-graph-modal.component';
 import { ExplorationGraphComponent } from './editor-tab/graph-directives/exploration-graph.component';
+import { StateNameEditorComponent } from './editor-tab/state-name-editor/state-name-editor.component';
+import { EditorNavigationComponent } from './editor-navigation/editor-navigation.component';
 
 @NgModule({
   imports: [
@@ -126,7 +128,9 @@ import { ExplorationGraphComponent } from './editor-tab/graph-directives/explora
     ExplorationSaveModalComponent,
     EditorNavbarBreadcrumbComponent,
     ExplorationGraphModalComponent,
-    ExplorationGraphComponent
+    ExplorationGraphComponent,
+    StateNameEditorComponent,
+    EditorNavigationComponent
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
@@ -164,7 +168,9 @@ import { ExplorationGraphComponent } from './editor-tab/graph-directives/explora
     ExplorationSaveModalComponent,
     EditorNavbarBreadcrumbComponent,
     ExplorationGraphModalComponent,
-    ExplorationGraphComponent
+    ExplorationGraphComponent,
+    StateNameEditorComponent,
+    EditorNavigationComponent
   ],
   providers: [
     {

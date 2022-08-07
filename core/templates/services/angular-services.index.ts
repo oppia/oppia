@@ -425,6 +425,7 @@ import { YamlService } from './yaml.service';
 import { HistoryTabYamlConversionService } from 'pages/exploration-editor-page/services/history-tab-yaml-conversion.service';
 import { VersionedExplorationCachingService } from 'pages/exploration-editor-page/services/versioned-exploration-caching.service';
 import { ExplorationSaveService } from 'pages/exploration-editor-page/services/exploration-save.service';
+import { ExplorationAutomaticTextToSpeechService } from 'pages/exploration-editor-page/services/exploration-automatic-text-to-speech.service';
 
 export const angularServices: [string, Type<{}>][] = [
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
@@ -881,5 +882,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['ParameterMetadataService', ParameterMetadataService],
   ['ExplorationWarningsService', ExplorationWarningsService],
   ['PracticeSessionsBackendApiService', PracticeSessionsBackendApiService],
-  ['ExplorationSaveService', ExplorationSaveService]
+  ['ExplorationSaveService', ExplorationSaveService],
+  ['ExplorationAutomaticTextToSpeechService',
+    ExplorationAutomaticTextToSpeechService]
 ];
