@@ -73,6 +73,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-url')]
         topic.next_subtopic_id = 2
+        topic.skill_ids_for_diagnostic_test = ['skill_id_1']
         topic_services.save_new_topic(self.admin_id, topic) # type: ignore[no-untyped-call]
         self.save_new_story( # type: ignore[no-untyped-call]
             self.STORY_ID_0, self.admin_id, self.TOPIC_ID_0,
@@ -97,6 +98,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-url-one')]
         topic.next_subtopic_id = 2
+        topic.skill_ids_for_diagnostic_test = ['skill_id_1']
 
         topic_services.save_new_topic(self.admin_id, topic) # type: ignore[no-untyped-call]
         self.save_new_story( # type: ignore[no-untyped-call]
@@ -344,3 +346,53 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             user_model_2.invited_to_learner_groups_ids,
             ['group_id_2'])
+
+    def test_can_already_invited_user_be_invited_to_learner_group(
+        self
+    ) -> None:
+        (is_valid_invite, error_message) = (
+            learner_group_services.can_user_be_invited(
+                self.STUDENT_ID, 'username1', self.LEARNER_GROUP_ID))
+        self.assertFalse(is_valid_invite)
+        self.assertEqual(
+            error_message,
+            'User with username username1 has been already invited to '
+            'join the group'
+        )
+
+    def test_can_user_be_invited_to_a_new_learner_group(self) -> None:
+        (is_valid_invite, error_message) = (
+            learner_group_services.can_user_be_invited(
+                self.STUDENT_ID, 'username1', ''))
+        self.assertTrue(is_valid_invite)
+        self.assertEqual(error_message, '')
+
+    def test_can_facilitator_be_invited_to_learner_group(self) -> None:
+        (is_valid_invite, error_message) = (
+            learner_group_services.can_user_be_invited(
+                self.FACILITATOR_ID, 'facilitator_name',
+                self.LEARNER_GROUP_ID))
+        self.assertFalse(is_valid_invite)
+        self.assertEqual(
+            error_message,
+            'User with username facilitator_name is already a facilitator.'
+        )
+
+    def test_can_a_student_be_invited_to_learner_group(self) -> None:
+        learner_group_services.add_student_to_learner_group(
+            self.LEARNER_GROUP_ID, self.STUDENT_ID, True)
+        (is_valid_invite, error_message) = (
+            learner_group_services.can_user_be_invited(
+                self.STUDENT_ID, 'username1', self.LEARNER_GROUP_ID))
+        self.assertFalse(is_valid_invite)
+        self.assertEqual(
+            error_message,
+            'User with username username1 is already a student.'
+        )
+
+    def test_can_uninvolved_user_be_invited_to_learner_group(self) -> None:
+        (is_valid_invite, error_message) = (
+            learner_group_services.can_user_be_invited(
+                'uninvolved_user_id', 'username2', self.LEARNER_GROUP_ID))
+        self.assertTrue(is_valid_invite)
+        self.assertEqual(error_message, '')

@@ -19,8 +19,12 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
+import { Solution } from 'domain/exploration/SolutionObjectFactory';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { State } from 'domain/state/StateObjectFactory';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
 import { StateEditorService } from './state-editor-properties-services/state-editor.service';
 import { StateInteractionIdService } from './state-editor-properties-services/state-interaction-id.service';
 import { StateEditorComponent } from './state-editor.component';
@@ -31,6 +35,7 @@ describe('State Editor Component', () => {
   let windowDimensionsService: WindowDimensionsService;
   let stateEditorService: StateEditorService;
   let stateInteractionIdService: StateInteractionIdService;
+  let explorationHtmlFormatterService: ExplorationHtmlFormatterService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -54,6 +59,8 @@ describe('State Editor Component', () => {
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     stateEditorService = TestBed.inject(StateEditorService);
     stateInteractionIdService = TestBed.inject(StateInteractionIdService);
+    explorationHtmlFormatterService =
+      TestBed.inject(ExplorationHtmlFormatterService);
 
     spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
       'Introduction');
@@ -86,16 +93,30 @@ describe('State Editor Component', () => {
     component.sendOnSaveSolicitAnswerDetails(false);
     component.sendOnSaveHints([]);
     component.sendRefreshWarnings();
-    component.sendOnSaveInteractionDefaultOutcome(null);
+    component.sendOnSaveInteractionDefaultOutcome(new Outcome(
+      'Hola',
+      null,
+      new SubtitledHtml('<p> Previous HTML string </p>', 'Id'),
+      true,
+      [],
+      null,
+      null,
+    ));
     component.sendOnSaveInteractionAnswerGroups([]);
     component.sendOnSaveInapplicableSkillMisconceptionIds([]);
     component.sendNavigateToState('');
-    component.sendOnSaveSolution(null);
-    component.sendOnSaveNextContentIdIndex(null);
+    component.sendOnSaveSolution(new Solution(
+      explorationHtmlFormatterService,
+      true,
+      [],
+      new SubtitledHtml('<p> Previous HTML string </p>', 'Id'),
+    ));
+    component.sendOnSaveNextContentIdIndex(0);
     component.sendOnSaveInteractionCustomizationArgs('');
     component.sendOnSaveInteractionId('');
     component.sendShowMarkAllAudioAsNeedingUpdateModalIfRequired([]);
-    component.sendOnSaveStateContent(null);
+    component.sendOnSaveStateContent(
+      new SubtitledHtml('<p> Previous HTML string </p>', 'Id'));
 
     expect(component.recomputeGraph.emit).toHaveBeenCalled();
     expect(component.onSaveLinkedSkillId.emit).toHaveBeenCalled();
@@ -120,11 +141,11 @@ describe('State Editor Component', () => {
   it('should set component properties initialization', () => {
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
 
-    expect(component.oppiaBlackImgUrl).toBe(undefined);
-    expect(component.currentStateIsTerminal).toBe(undefined);
-    expect(component.conceptCardIsShown).toBe(undefined);
-    expect(component.windowIsNarrow).toBe(undefined);
-    expect(component.interactionIdIsSet).toBe(undefined);
+    expect(component.oppiaBlackImgUrl).toBeUndefined();
+    expect(component.currentStateIsTerminal).toBeFalse();
+    expect(component.conceptCardIsShown).toBeTrue();
+    expect(component.windowIsNarrow).toBeFalse();
+    expect(component.interactionIdIsSet).toBeFalse();
     expect(component.stateName).toBe(undefined);
 
     component.ngOnInit();
@@ -143,9 +164,9 @@ describe('State Editor Component', () => {
     spyOnProperty(stateInteractionIdService, 'onInteractionIdChanged')
       .and.returnValue(onInteractionIdChangedEmitter);
 
-    expect(component.interactionIdIsSet).toBe(undefined);
-    expect(component.currentInteractionCanHaveSolution).toBe(undefined);
-    expect(component.currentStateIsTerminal).toBe(undefined);
+    expect(component.interactionIdIsSet).toBeFalse();
+    expect(component.currentInteractionCanHaveSolution).toBeFalse();
+    expect(component.currentStateIsTerminal).toBeFalse();
 
     component.ngOnInit();
 
@@ -157,9 +178,8 @@ describe('State Editor Component', () => {
   });
 
   it('should toggle concept card', () => {
-    expect(component.conceptCardIsShown).toBe(undefined);
+    expect(component.conceptCardIsShown).toBe(true);
 
-    component.conceptCardIsShown = true;
     component.toggleConceptCard();
 
     expect(component.conceptCardIsShown).toBe(false);
@@ -219,16 +239,16 @@ describe('State Editor Component', () => {
   it('should throw error if state data is not defined and' +
     ' component is reinitialized', fakeAsync(() => {
     let onStateEditorInitializedEmitter = new EventEmitter<State>();
-    let stateData = undefined;
+    let stateData: State | null = null;
     spyOnProperty(stateEditorService, 'onStateEditorInitialized')
       .and.returnValue(onStateEditorInitializedEmitter);
 
     component.ngOnInit();
 
     expect(() => {
-      onStateEditorInitializedEmitter.emit(stateData);
+      onStateEditorInitializedEmitter.emit(stateData as State);
       tick();
-    }).toThrowError('Expected stateData to be defined but received undefined');
+    }).toThrowError('Expected stateData to be defined but received null');
   }));
 
   it('should reinitialize editor when responses change', () => {

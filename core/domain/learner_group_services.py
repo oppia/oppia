@@ -21,7 +21,6 @@ from __future__ import annotations
 from core.constants import constants
 from core.domain import config_domain
 from core.domain import learner_group_domain
-from core.domain import learner_group_fetchers
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import subtopic_page_domain
@@ -29,7 +28,7 @@ from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.platform import models
 
-from typing import List, Optional
+from typing import List, Optional, Sequence, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -241,15 +240,14 @@ def get_matching_learner_group_syllabus_to_add(
     group_subtopic_page_ids: List[str] = []
     group_story_ids: List[str] = []
 
-    learner_group = learner_group_fetchers.get_learner_group_by_id(
-        learner_group_id)
-
     # Case when syllabus is being added to an existing group.
-    if learner_group is not None:
-        group_subtopic_page_ids = learner_group.subtopic_page_ids
-        group_story_ids = learner_group.story_ids
+    if learner_group_id:
+        learner_group_model = learner_group_models.LearnerGroupModel.get(
+            learner_group_id, strict=True
+        )
+        group_subtopic_page_ids = learner_group_model.subtopic_page_ids
+        group_story_ids = learner_group_model.story_ids
 
-    matching_topics: List[topic_domain.Topic] = []
     matching_topic_ids: List[str] = []
     all_classrooms_dict = config_domain.CLASSROOM_PAGES_DATA.value
 
@@ -262,13 +260,21 @@ def get_matching_learner_group_syllabus_to_add(
         for classroom in all_classrooms_dict:
             if category and classroom['name'] == category:
                 matching_topic_ids.extend(classroom['topic_ids'])
-        matching_topics = topic_fetchers.get_topics_by_ids(matching_topic_ids) # type: ignore[no-untyped-call]
+        matching_topics_with_none: Sequence[
+            Optional[topic_domain.Topic]
+        ] = (
+            topic_fetchers.get_topics_by_ids(matching_topic_ids)
+        )
     else:
-        matching_topics = topic_fetchers.get_all_topics() # type: ignore[no-untyped-call]
+        matching_topics_with_none = topic_fetchers.get_all_topics()
 
     keyword = keyword.lower()
-    for topic in matching_topics:
-        if language_code and language_code != topic.language_code:
+    for topic in matching_topics_with_none:
+        # Ruling out the possibility of None for mypy type checking.
+        assert topic is not None
+        if language_code not in (
+            constants.DEFAULT_ADD_SYLLABUS_FILTER, topic.language_code
+        ):
             continue
 
         if keyword in topic.canonical_name:
@@ -569,3 +575,41 @@ def get_learner_group_from_model(
         learner_group_model.subtopic_page_ids,
         learner_group_model.story_ids
     )
+
+
+def can_user_be_invited(
+    user_id: str, username: str, group_id: str
+) -> Tuple[bool, str]:
+    """Checks if the user can be invited to the learner group.
+
+    Args:
+        user_id: str. The id of the user.
+        username: str. The username of the user.
+        group_id: str. The id of the learner group.
+
+    Returns:
+        bool. True if the user can be invited to the learner group. False
+        otherwise.
+        str. Error message if the user cannot be invited to the learner group.
+    """
+    # Case of inviting to new learner group.
+    if not group_id:
+        return (True, '')
+
+    learner_group_model = learner_group_models.LearnerGroupModel.get(
+        group_id, strict=True
+    )
+
+    if user_id in learner_group_model.student_user_ids:
+        return (
+            False, 'User with username %s is already a student.' % username)
+    elif user_id in learner_group_model.invited_student_user_ids:
+        return (
+            False, 'User with username %s has been already invited to '
+            'join the group' % username)
+    elif user_id in learner_group_model.facilitator_user_ids:
+        return (
+            False, 'User with username %s is already a facilitator.' % username
+        )
+
+    return (True, '')

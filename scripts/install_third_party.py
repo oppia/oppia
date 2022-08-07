@@ -30,7 +30,7 @@ import zipfile
 from core import utils
 
 from . import common
-from . import install_backend_python_libs
+from . import install_python_prod_dependencies
 
 TOOLS_DIR = os.path.join('..', 'oppia_tools')
 THIRD_PARTY_DIR = os.path.join('.', 'third_party')
@@ -99,9 +99,9 @@ def download_files(source_url_root, target_dir, source_filenames):
     for filename in source_filenames:
         if not os.path.exists(os.path.join(target_dir, filename)):
             print('Downloading file %s to %s ...' % (filename, target_dir))
-            urllib.request.urlretrieve(
+            common.url_retrieve(
                 '%s/%s' % (source_url_root, filename),
-                filename=os.path.join(target_dir, filename))
+                os.path.join(target_dir, filename))
 
             print('Download of %s succeeded.' % filename)
 
@@ -130,7 +130,7 @@ def download_and_unzip_files(
             zip_root_name, target_parent_dir))
         common.ensure_directory_exists(target_parent_dir)
 
-        urllib.request.urlretrieve(source_url, filename=TMP_UNZIP_PATH)
+        common.url_retrieve(source_url, TMP_UNZIP_PATH)
 
         try:
             with zipfile.ZipFile(TMP_UNZIP_PATH, 'r') as zfile:
@@ -181,7 +181,7 @@ def download_and_untar_files(
             tar_root_name, target_parent_dir))
         common.ensure_directory_exists(target_parent_dir)
 
-        urllib.request.urlretrieve(source_url, filename=TMP_UNZIP_PATH)
+        common.url_retrieve(source_url, TMP_UNZIP_PATH)
         with contextlib.closing(tarfile.open(
             name=TMP_UNZIP_PATH, mode='r:gz')) as tfile:
             tfile.extractall(target_parent_dir)
@@ -458,7 +458,7 @@ def main(args=None):
             'The redis command line interface will not be installed because '
             'your machine is on the Windows operating system.')
     unused_parsed_args = _PARSER.parse_args(args=args)
-    install_backend_python_libs.main()
+    install_python_prod_dependencies.main()
     download_all_dependencies(DEPENDENCIES_FILE_PATH)
     install_redis_cli()
     install_elasticsearch_dev_server()

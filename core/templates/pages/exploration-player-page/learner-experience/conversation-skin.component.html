@@ -18,7 +18,10 @@
                         [isRefresherExploration]="isRefresherExploration"
                         [recommendedExplorationSummaries]="recommendedExplorationSummaries"
                         [parentExplorationIds]="parentExplorationIds"
-                        [inStoryMode]="inStoryMode">
+                        [inStoryMode]="inStoryMode"
+                        [nextLessonLink]="getExplorationLink()"
+                        [completedChaptersCount]="completedChaptersCount"
+                        [milestoneMessageIsToBeDisplayed]="chapterIsCompletedForTheFirstTime">
       </oppia-tutor-card>
       <div *ngIf="isCurrentSupplementalCardNonempty() && !canWindowShowTwoCards()">
         <oppia-supplemental-card (clickContinueButton)="showUpcomingCard()"
@@ -39,8 +42,8 @@
                             (changeCard)="changeCard($event)">
         </oppia-progress-nav>
       </div>
-      <div *ngIf="recommendedExplorationSummaries && recommendedExplorationSummaries.length > 0 && (inStoryMode  || (collectionSummary && isOnTerminalCard() && isCurrentCardAtEndOfTranscript()))" class="conversation-skin-next-lesson-wrapper">
-        <div class="oppia-conversation-skin-next-lession-text-container">
+      <div *ngIf="recommendedExplorationSummaries && recommendedExplorationSummaries.length > 0 && ((!isEndChapterCelebrationFeatureEnabled() && inStoryMode) || (collectionSummary && isOnTerminalCard() && isCurrentCardAtEndOfTranscript()))" class="conversation-skin-next-lesson-wrapper">
+        <div class="oppia-conversation-skin-next-lesson-text-container">
           <span class="conversation-skin-next-lesson-text" translate="I18N_NEXT_LESSON"></span>
           <span *ngIf="!isHackyExpTitleTranslationDisplayed(recommendedExplorationSummaries[0].id)">
             {{ recommendedExplorationSummaries[0].title }}
@@ -69,7 +72,7 @@
         <div class="conversation-skin-supplemental-nav" *ngIf="isSupplementalNavShown() && !getCanAskLearnerForAnswerInfo()">
           <button mat-button
                   type="submit"
-                  class="oppia-learner-confirm-button e2e-test-submit-answer-button conversation-skin-supplemental-nav-submit-button"
+                  class="oppia-learner-confirm-button oppia-learner-submit-answer-button e2e-test-submit-answer-button conversation-skin-supplemental-nav-submit-button"
                   (click)="submitAnswerFromProgressNav()"
                   [disabled]="isSubmitButtonDisabled()">
             {{ 'I18N_INTERACTIONS_SUBMIT' | translate }}
@@ -80,16 +83,6 @@
   </div>
   <div class="conversation-skin-correctness-footer-container" *ngIf="isCorrectnessFooterEnabled()">
     <oppia-correctness-footer></oppia-correctness-footer>
-  </div>
-</div>
-
-<div *ngIf="CHECKPOINTS_FEATURE_IS_ENABLED && prevSessionStatesProgress.length != 0" class="oppia-exploration-checkpoints-message">
-  <div id="toast-container" class="toast-top-center toast-container">
-    <div class="toast-info checkpoints-toast-info ngx-toastr ng-trigger ng-trigger-flyInOut">
-      <div aria-live="polite" role="alertdialog" class="toast-message" attr.aria-label="{{'I18N_EXPLORATION_STARTING_FROM_CHECKPOINT' | translate}}">
-        {{ 'I18N_EXPLORATION_STARTING_FROM_CHECKPOINT' | translate }}
-      </div>
-    </div>
   </div>
 </div>
 

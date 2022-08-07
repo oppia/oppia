@@ -20,6 +20,7 @@ import json
 
 from core import feconf
 from core.constants import constants
+from core.domain import config_services
 from core.domain import learner_group_fetchers
 from core.domain import learner_group_services
 from core.domain import skill_services
@@ -266,6 +267,7 @@ class LearnerGroupSearchSyllabusHandlerTests(test_utils.GenericTestBase):
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-url')]
         topic.next_subtopic_id = 2
+        topic.skill_ids_for_diagnostic_test = ['skill_id_1']
         topic_services.save_new_topic(self.admin_id, topic)
         self.save_new_story(
             self.STORY_ID_0, self.admin_id, self.TOPIC_ID_0,
@@ -290,6 +292,7 @@ class LearnerGroupSearchSyllabusHandlerTests(test_utils.GenericTestBase):
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-url-one')]
         topic.next_subtopic_id = 2
+        topic.skill_ids_for_diagnostic_test = ['skill_id_1']
 
         topic_services.save_new_topic(self.admin_id, topic)
         self.save_new_story(
@@ -307,14 +310,14 @@ class LearnerGroupSearchSyllabusHandlerTests(test_utils.GenericTestBase):
         self.login(self.NEW_USER_EMAIL)
 
         params = {
+            'learner_group_id': self.LEARNER_GROUP_ID,
             'search_keyword': 'Place',
             'search_category': 'All',
             'search_language_code': constants.DEFAULT_LANGUAGE_CODE,
         }
 
         response = self.get_json(
-            '/learner_group_search_syllabus_handler/%s' % (
-                self.LEARNER_GROUP_ID),
+            '/learner_group_search_syllabus_handler',
             params=params
         )
 
@@ -632,4 +635,144 @@ class LearnerGroupStudentProgressHandlerTests(test_utils.GenericTestBase):
             '/learner_group_user_progress_handler/%s' % (
                 'invalidId'), params=params, expected_status_int=400)
 
+        self.logout()
+
+
+class CreateLearnerGroupPageTests(test_utils.GenericTestBase):
+    """Checks the access and rendering of the create learner group page."""
+
+    def setUp(self):
+        super(CreateLearnerGroupPageTests, self).setUp()
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.login(self.NEW_USER_EMAIL)
+
+    def test_page_with_disabled_learner_groups_leads_to_404(self):
+        config_services.set_property(
+            'admin', 'learner_groups_are_enabled', False)
+        self.get_html_response(
+            feconf.CREATE_LEARNER_GROUP_PAGE_URL, expected_status_int=404)
+        self.logout()
+
+    def test_page_with_enabled_learner_groups_loads_correctly(self):
+        config_services.set_property(
+            'admin', 'learner_groups_are_enabled', True)
+        response = self.get_html_response(feconf.CREATE_LEARNER_GROUP_PAGE_URL)
+        response.mustcontain(
+            '<oppia-create-learner-group-page>'
+            '</oppia-create-learner-group-page>')
+        self.logout()
+
+
+class FacilitatorDashboardPageTests(test_utils.GenericTestBase):
+    """Checks the access and rendering of the facilitator dashboard page."""
+
+    def setUp(self):
+        super(FacilitatorDashboardPageTests, self).setUp()
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.login(self.NEW_USER_EMAIL)
+
+    def test_page_with_disabled_learner_groups_leads_to_404(self):
+        config_services.set_property(
+            'admin', 'learner_groups_are_enabled', False)
+        self.get_html_response(
+            feconf.FACILITATOR_DASHBOARD_PAGE_URL, expected_status_int=404)
+        self.logout()
+
+    def test_page_with_enabled_learner_groups_loads_correctly(self):
+        config_services.set_property(
+            'admin', 'learner_groups_are_enabled', True)
+        response = self.get_html_response(
+            feconf.FACILITATOR_DASHBOARD_PAGE_URL)
+        response.mustcontain(
+            '<oppia-facilitator-dashboard-page>'
+            '</oppia-facilitator-dashboard-page>')
+        self.logout()
+
+
+class LearnerGroupSearchStudentHandlerTests(test_utils.GenericTestBase):
+    """Tests searching a given user to invite to the learner group"""
+
+    def setUp(self):
+        super(LearnerGroupSearchStudentHandlerTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
+        self.login(self.OWNER_EMAIL)
+
+    def test_searching_invalid_user(self):
+        params = {
+            'username': 'invalid_username',
+            'learner_group_id': 'groupId'
+        }
+        response = self.get_json(
+            '/learner_group_search_student_handler', params=params
+        )
+
+        self.assertEqual(response['username'], 'invalid_username')
+        self.assertEqual(response['profile_picture_data_url'], '')
+        self.assertEqual(
+            response['error'],
+            'User with username invalid_username does not exist.'
+        )
+        self.logout()
+
+    def test_searching_user_to_add_being_the_owner(self):
+        params = {
+            'username': self.OWNER_USERNAME,
+            'learner_group_id': 'groupId'
+        }
+        response = self.get_json(
+            '/learner_group_search_student_handler', params=params
+        )
+
+        self.assertEqual(response['username'], self.OWNER_USERNAME)
+        self.assertEqual(response['profile_picture_data_url'], '')
+        self.assertEqual(
+            response['error'],
+            'You cannot invite yourself to the group'
+        )
+        self.logout()
+
+    def test_searching_an_already_invited_user(self):
+        learner_group_services.create_learner_group(
+            'groupId', 'Group Title', 'Group Description',
+            [self.owner_id], [self.new_user_id], ['subtopic1'], [])
+        params = {
+            'username': self.NEW_USER_USERNAME,
+            'learner_group_id': 'groupId'
+        }
+        response = self.get_json(
+            '/learner_group_search_student_handler', params=params
+        )
+
+        self.assertEqual(response['username'], self.NEW_USER_USERNAME)
+        self.assertEqual(response['profile_picture_data_url'], '')
+        self.assertEqual(
+            response['error'],
+            'User with username %s has been already invited to join the '
+            'group' % self.NEW_USER_USERNAME
+        )
+        self.logout()
+
+    def test_searching_a_valid_user_to_invite(self):
+        learner_group_services.create_learner_group(
+            'groupId', 'Group Title', 'Group Description',
+            [self.owner_id], [], ['subtopic1'], [])
+        params = {
+            'username': self.NEW_USER_USERNAME,
+            'learner_group_id': 'groupId'
+        }
+        response = self.get_json(
+            '/learner_group_search_student_handler', params=params
+        )
+
+        user_settings = user_services.get_user_settings_from_username(
+            self.NEW_USER_USERNAME)
+        self.assertEqual(response['username'], user_settings.username)
+        self.assertEqual(
+            response['profile_picture_data_url'],
+            user_settings.profile_picture_data_url
+        )
+        self.assertEqual(response['error'], '')
         self.logout()

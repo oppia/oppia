@@ -115,6 +115,34 @@
         </div>
       </div>
     </div>
+    <div *ngIf="platformFeatureService.status.EndChapterCelebration.isEnabled && isOnTerminalCard() && milestoneMessageIsToBeDisplayed && generateMilestoneMessage() && !setNextMilestoneAndCheckIfProgressBarIsShown()">
+      <div class="conversation-skin-milestone-message">
+        <div class="milestone-message-star-container">
+          <img [src]="getStaticImageUrl('/general/milestone-message-star-icon.svg')" class="star-icon">
+          <p class="completed-chapter-count">{{ completedChaptersCount }}</p>
+        </div>
+        <span class="milestone-message-text">{{ generateMilestoneMessage() }}</span>
+      </div>
+    </div>
+    <div *ngIf="platformFeatureService.status.EndChapterCelebration.isEnabled && isOnTerminalCard() && setNextMilestoneAndCheckIfProgressBarIsShown()">
+      <div class="conversation-skin-milestone-message milestone-progress-message">
+        <div class="milestone-message-progress-bar-container">
+          <div class="milestone-progress-bar-outer">
+            <div class="milestone-progress-bar-inner"
+                 [style.width.%]="(completedChaptersCount / nextMilestoneChapterCount) * 100">
+            </div>
+          </div>
+          <div class="milestone-message-star-container">
+            <img [src]="getStaticImageUrl('/general/milestone-message-star-icon.svg')"
+                 class="star-icon">
+            <p class="chapters-left-count">{{ nextMilestoneChapterCount }}</p>
+          </div>
+        </div>
+        <span class="milestone-message-text">
+          {{ 'I18N_END_CHAPTER_MILESTONE_PROGRESS_MESSAGE' | translate:{chaptersToGo: nextMilestoneChapterCount - completedChaptersCount, messageFormat: true} }}
+        </span>
+      </div>
+    </div>
 
     <oppia-ratings-and-recommendations *ngIf="isOnTerminalCard() && isCurrentCardAtEndOfTranscript()"
                                        [userIsLoggedIn]="userIsLoggedIn"
@@ -123,7 +151,8 @@
                                        [collectionSummary]="collectionSummary"
                                        [isRefresherExploration]="isRefresherExploration"
                                        [recommendedExplorationSummaries]="recommendedExplorationSummaries"
-                                       [parentExplorationIds]="parentExplorationIds">
+                                       [parentExplorationIds]="parentExplorationIds"
+                                       [nextLessonLink]="nextLessonLink">
     </oppia-ratings-and-recommendations>
 
     <div *ngIf="displayedCardWasCompletedInPrevSession && !conceptCardIsBeingShown && (displayedCard.getInteractionId() != 'Continue')">

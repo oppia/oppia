@@ -2,85 +2,88 @@
   <div class="oppia-contributions-dropdown-section">
     <div class="dropdown-label">View</div>
     <div class="oppia-contributions-dropdown-container">
-      <div class="oppia-contributions-selection-container" ng-click="$ctrl.toggleDropdown()">
-        {{ $ctrl.activeDropdownTabChoice }}
-        <span class="material-icons oppia-contributions-dropdown-arrow" ng-style="{ 'transform': $ctrl.dropdownShown ? 'scaleY(-1)' : 'scaleY(1)' }">
+      <div class="oppia-contributions-selection-container" (click)="toggleDropdown()">
+        {{ activeDropdownTabChoice }}
+        <span class="material-icons oppia-contributions-dropdown-arrow" [ngStyle]="{ 'transform': dropdownShown ? 'scaleY(-1)' : 'scaleY(1)' }">
           arrow_drop_down
         </span>
       </div>
 
-      <div ng-if="$ctrl.dropdownShown" class="oppia-contributions-dropdown-list-container">
+      <div *ngIf="dropdownShown" class="oppia-contributions-dropdown-list-container">
         <div class="oppia-contributions-option-group-label"
-             ng-if="$ctrl.reviewTabs.length > 0">
+             *ngIf="reviewTabs.length > 0">
           Available Tasks
         </div>
         <div class="oppia-contributions-dropdown-list-option"
-             ng-repeat="tab in $ctrl.reviewTabs"
-             ng-click="$ctrl.switchToTab($ctrl.TAB_TYPE_REVIEWS, tab.suggestionType)"
-             ng-class="$ctrl.isActiveTab($ctrl.TAB_TYPE_REVIEWS, tab.suggestionType) ? 'oppia-contributions-dropdown-list-option-selected' : ''">
+             *ngFor="let tab of reviewTabs"
+             (click)="switchToTab(TAB_TYPE_REVIEWS, tab.suggestionType)"
+             [ngClass]="isActiveTab(TAB_TYPE_REVIEWS, tab.suggestionType) ? 'oppia-contributions-dropdown-list-option-selected' : ''">
           {{ tab.text }}
         </div>
         <div class="oppia-contributions-option-group-label"
-             ng-if="$ctrl.userIsLoggedIn">
+             *ngIf="userIsLoggedIn">
           Contributions
         </div>
-        <div class="oppia-contributions-dropdown-list-option"
-             ng-if="tab.enabled"
-             ng-repeat="tab in $ctrl.contributionTabs"
-             ng-click="$ctrl.switchToTab($ctrl.TAB_TYPE_CONTRIBUTIONS, tab.suggestionType)"
-             ng-class="$ctrl.isActiveTab($ctrl.TAB_TYPE_CONTRIBUTIONS, tab.suggestionType) ? 'oppia-contributions-dropdown-list-option-selected' : ''">
-          {{ tab.text }}
+        <div class="oppia-contributions-dropdown-list-option" *ngFor="let tab of contributionTabs">
+          <div *ngIf="tab?.enabled"
+               (click)="switchToTab(TAB_TYPE_CONTRIBUTIONS, tab.suggestionType)"
+               [ngClass]="isActiveTab(TAB_TYPE_CONTRIBUTIONS, tab.suggestionType) ? 'oppia-contributions-dropdown-list-option-selected' : ''">
+            {{ tab.text }}
+          </div>
         </div>
       </div>
 
     </div>
   </div>
   <div class="oppia-contributions-show-review-side-navbar-container" >
-    <div class="oppia-contributions-side-navbar-part" ng-if="$ctrl.reviewTabs.length > 0">
+    <div class="oppia-contributions-side-navbar-part" *ngIf="reviewTabs.length > 0">
       <div class="oppia-contributions-navbar-items-list" navbar-label="Available Tasks">
-        <div class="oppia-contributions-navbar-item" ng-repeat="tab in $ctrl.reviewTabs">
+        <div class="oppia-contributions-navbar-item" *ngFor="let tab of reviewTabs">
           <button class="oppia-contributions-navbar-button"
-                  ng-click="$ctrl.switchToTab($ctrl.TAB_TYPE_REVIEWS, tab.suggestionType)"
-                  ng-class="$ctrl.isActiveTab($ctrl.TAB_TYPE_REVIEWS, tab.suggestionType) ? 'oppia-contributions-active-navbar' : ''"><[tab.text]>
+                  (click)="switchToTab(TAB_TYPE_REVIEWS, tab.suggestionType)"
+                  [ngClass]="isActiveTab(TAB_TYPE_REVIEWS, tab.suggestionType) ? 'oppia-contributions-active-navbar' : ''">{{tab.text}}
           </button>
         </div>
       </div>
     </div>
-    <div class="oppia-contributions-side-navbar-part" ng-if="$ctrl.userIsLoggedIn">
+    <div class="oppia-contributions-side-navbar-part" *ngIf="userIsLoggedIn">
       <div class="oppia-contributions-navbar-items-list" navbar-label="Contributions">
-        <div class="oppia-contributions-navbar-item" ng-repeat="tab in $ctrl.contributionTabs" ng-if="tab.enabled">
-          <button class="oppia-contributions-navbar-button"
-                  ng-click="$ctrl.switchToTab($ctrl.TAB_TYPE_CONTRIBUTIONS, tab.suggestionType)"
-                  ng-class="$ctrl.isActiveTab($ctrl.TAB_TYPE_CONTRIBUTIONS, tab.suggestionType) ? 'oppia-contributions-active-navbar' : ''"><[tab.text]>
+        <div class="oppia-contributions-navbar-item" *ngFor="let tab of contributionTabs">
+          <button *ngIf="tab?.enabled"
+                  class="oppia-contributions-navbar-button"
+                  (click)="switchToTab(TAB_TYPE_CONTRIBUTIONS, tab.suggestionType)"
+                  [ngClass]="isActiveTab(TAB_TYPE_CONTRIBUTIONS, tab.suggestionType) ? 'oppia-contributions-active-navbar' : ''">{{tab.text}}
           </button>
         </div>
       </div>
     </div>
   </div>
   <div class="oppia-contributions-show-review-container">
-    <div class="oppia-login-required" ng-if="!$ctrl.userDetailsLoading && !$ctrl.userIsLoggedIn">
+    <div class="oppia-login-required" *ngIf="!userDetailsLoading && !userIsLoggedIn">
       <login-required-message></login-required-message>
     </div>
-    <div class="oppia-login-required" ng-if="ctrl.userDetailsLoading || $ctrl.userIsLoggedIn">
-      <oppia-opportunities-list ng-if="$ctrl.activeExplorationId === null && $ctrl.isReviewTranslationsTab()"
-                                [load-opportunities]="$ctrl.loadReviewableTranslationOpportunities"
-                                (click-action-button)="$ctrl.onClickReviewableTranslations($event)"
-                                [label-required]="!$ctrl.activeReviewTab">
+    <div class="oppia-login-required" *ngIf="userDetailsLoading || userIsLoggedIn">
+      <oppia-opportunities-list *ngIf="activeExplorationId === null && isReviewTranslationsTab()"
+                                [loadOpportunities]="loadReviewableTranslationOpportunities.bind(this)"
+                                (clickActionButton)="onClickReviewableTranslations($event)"
+                                [labelRequired]="!activeReviewTab"
+                                [showOpportunityButton]="true">
       </oppia-opportunities-list>
-      <div ng-if="$ctrl.activeExplorationId !== null || !$ctrl.isReviewTranslationsTab()">
-        <div ng-if="$ctrl.isReviewTranslationsTab()" class="oppia-contributions-back-to-lessons-container">
-          <md-button aria-label="Back to reviewable lessons"
-                     ng-click="$ctrl.onClickBackToReviewableLessons()"
-                     class="oppia-contributions-back-button md-raised">
+      <div *ngIf="activeExplorationId !== null || !isReviewTranslationsTab()">
+        <div *ngIf="isReviewTranslationsTab()" class="oppia-contributions-back-to-lessons-container">
+          <button aria-label="Back to reviewable lessons"
+                  (click)="onClickBackToReviewableLessons()"
+                  class="oppia-contributions-back-button md-raised">
             <i class="material-icons oppia-vcenter" aria-hidden="true">&#xE5C4;</i>
-          </md-button>
+          </button>
           <div class="oppia-contributions-back-button-label">Back to lessons</div>
         </div>
-        <oppia-opportunities-list [load-opportunities]="$ctrl.loadOpportunities"
-                                  [load-more-opportunities]="$ctrl.loadMoreOpportunities"
-                                  (click-action-button)="$ctrl.onClickViewSuggestion($event)"
-                                  [label-required]="!$ctrl.activeReviewTab"
-                                  [opportunity-heading-truncation-length]="30">
+        <oppia-opportunities-list [loadOpportunities]="loadOpportunities.bind(this)"
+                                  [loadMoreOpportunities]="loadMoreOpportunities.bind(this)"
+                                  (clickActionButton)="onClickViewSuggestion($event)"
+                                  [labelRequired]="!activeReviewTab"
+                                  [opportunityHeadingTruncationLength]="30"
+                                  [showOpportunityButton]="false">
         </oppia-opportunities-list>
       </div>
     </div>
@@ -88,7 +91,7 @@
 </div>
 
 <style>
-  contributions-and-review .oppia-contributions-show-review {
+  .oppia-contributions-show-review {
     display: flex;
     justify-content: center;
     margin: auto;
@@ -96,11 +99,13 @@
     min-height: 70vh;
     width: 80%;
   }
-  contributions-and-review .oppia-contributions-show-review-side-navbar-container {
+
+  .oppia-contributions-show-review-side-navbar-container {
     background-color: #009688;
     width: 25%;
   }
-  contributions-and-review .oppia-contributions-dropdown-section {
+
+  .oppia-contributions-dropdown-section {
     background-color: white;
     display: none;
     font-size: 20px;
@@ -108,13 +113,15 @@
     padding: 0 20px;
     width: 100%;
   }
-  contributions-and-review .dropdown-label {
+
+  .dropdown-label {
     color: #4a4a4a;
     font-size: 20px;
     margin-right: 10px;
     width: 175px;
   }
-  contributions-and-review .oppia-contributions-dropdown-container {
+
+  .oppia-contributions-dropdown-container {
     background-color: #fff;
     border-radius: 4px;
     box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
@@ -124,16 +131,19 @@
     position: relative;
     width: 100%;
   }
-  contributions-and-review .oppia-contributions-selection-container {
+
+  .oppia-contributions-selection-container {
     display: flex;
     flex: 1;
     font-weight: lighter;
     justify-content: space-between;
   }
-  contributions-and-review .oppia-contributions-dropdown-arrow {
+
+  .oppia-contributions-dropdown-arrow {
     color: #009688;
   }
-  contributions-and-review .oppia-contributions-dropdown-list-container {
+
+  .oppia-contributions-dropdown-list-container {
     background-color: #fff;
     border-radius: 4px;
     box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
@@ -145,80 +155,87 @@
     width: 100%;
     z-index: 1;
   }
-  contributions-and-review .oppia-contributions-option-group-label {
+
+  .oppia-contributions-option-group-label {
     color: #009688;
     font-weight: 500;
     margin-left: 12px;
     margin-right: 12px;
     margin-top: 8px;
   }
-  contributions-and-review .oppia-contributions-dropdown-list-option {
+
+  .oppia-contributions-dropdown-list-option {
     color: rgb(104, 104, 104);
     display: flex;
     flex: 1;
     margin-left: 16px;
     padding: 8px;
   }
-  contributions-and-review .oppia-contributions-dropdown-list-option-selected {
+
+  .oppia-contributions-dropdown-list-option-selected {
     background-color: rgb(238, 238, 238);
     border-radius: 4px;
   }
 
-  contributions-and-review .oppia-contributions-show-review-container {
+  .oppia-contributions-show-review-container {
     background-color: white;
     width: 75%;
   }
-  contributions-and-review .oppia-contributions-show-review-container::-webkit-scrollbar {
+
+  .oppia-contributions-show-review-container::-webkit-scrollbar {
     width: 7px;
   }
-  contributions-and-review .oppia-contributions-show-review-container::-webkit-scrollbar-track {
+
+  .oppia-contributions-show-review-container::-webkit-scrollbar-track {
     border-radius: 5px;
     box-shadow: inset 0 0 3px grey;
   }
-  contributions-and-review .oppia-contributions-show-review-container::-webkit-scrollbar-thumb {
+
+  .oppia-contributions-show-review-container::-webkit-scrollbar-thumb {
     background: grey;
     border-radius: 5px;
     transition: background 0.5s ease;
   }
-  contributions-and-review .oppia-contributions-show-review-container::-webkit-scrollbar-thumb:hover {
+
+  .oppia-contributions-show-review-container::-webkit-scrollbar-thumb:hover {
     background: black;
   }
 
-  contributions-and-review .oppia-contributions-back-to-lessons-container {
+  .oppia-contributions-back-to-lessons-container {
     align-items: center;
     display: flex;
     padding-top: 12px;
   }
 
-  contributions-and-review .oppia-contributions-back-button {
+  .oppia-contributions-back-button {
     height: 36px;
     margin-left: 12px;
     min-width: 36px;
     padding: 6px;
   }
 
-  contributions-and-review .oppia-contributions-back-button-label {
+  .oppia-contributions-back-button-label {
     color: #009688;
     font-weight: bold;
     margin-left: 6px;
   }
 
-  contributions-and-review .oppia-contributions-side-navbar-part {
+  .oppia-contributions-side-navbar-part {
     padding-top: 30%;
     width: 100%;
   }
 
-  contributions-and-review .oppia-contributions-navbar-items-list {
+  .oppia-contributions-navbar-items-list {
     position: relative;
   }
 
-  contributions-and-review .oppia-contributions-navbar-item {
+  .oppia-contributions-navbar-item {
     display: flex;
     flex-direction: column;
     margin-top: 7%;
   }
 
-  contributions-and-review .oppia-contributions-navbar-button {
+  .oppia-contributions-navbar-button {
     background-color: unset;
     border: unset;
     border-bottom-right-radius: 10px;
@@ -232,12 +249,12 @@
     width: 80%;
   }
 
-  contributions-and-review .oppia-contributions-active-navbar,
-  contributions-and-review .oppia-contributions-navbar-button:hover {
+  .oppia-contributions-active-navbar,
+  .oppia-contributions-navbar-button:hover {
     background-color: #0b6c63;
   }
 
-  contributions-and-review .oppia-contributions-navbar-items-list::before {
+  .oppia-contributions-navbar-items-list::before {
     border-bottom: 1px solid #fff;
     bottom: 110%;
     color: #fff;
@@ -249,36 +266,12 @@
     width: 90%;
   }
 
-  contributions-and-review .oppia-login-required {
+  .oppia-login-required {
     height: 100%;
     width: 100%;
   }
 
-  @media only screen and (max-width: 700px) {
-    contributions-and-review .oppia-contributions-dropdown-section {
-      align-items: center;
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 20px;
-      padding-bottom: 30px;
-      padding-top: 5px;
-    }
-    contributions-and-review .oppia-contributions-show-review {
-      align-items: center;
-      flex-direction: column;
-      justify-content: start;
-      margin-top: 0;
-      width: 100%;
-    }
-    contributions-and-review .oppia-contributions-show-review-side-navbar-container {
-      display: none;
-    }
-    contributions-and-review .oppia-contributions-show-review-container {
-      width: 95%;
-    }
-  }
-
-  @media only screen and (min-width: 601px) and (max-width: 1500px) {
+  @media only screen and (max-width: 1500px) {
     contributions-and-review .oppia-contributions-navbar-button {
       font-size: 1.6vw;
     }
@@ -287,8 +280,49 @@
     }
   }
 
+  @media only screen and (max-width: 700px) {
+    contributions-and-review .oppia-contributions-dropdown-container {
+      font-size: 18px;
+    }
+    .oppia-opportunities-list {
+      background-color: #e8e7e3;
+    }
+
+    .oppia-contributions-dropdown-section {
+      align-items: center;
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      padding-bottom: 30px;
+      padding-top: 5px;
+    }
+    .oppia-contributions-show-review {
+      align-items: center;
+      flex-direction: column;
+      justify-content: start;
+      margin-top: 0;
+      width: 100%;
+    }
+    .oppia-contributions-show-review-side-navbar-container {
+      display: none;
+    }
+    .oppia-contributions-show-review-container {
+      background-color: transparent;
+      width: 95%;
+    }
+  }
+
+  @media only screen and (min-width: 601px) and (max-width: 1500px) {
+    .oppia-contributions-navbar-button {
+      font-size: 1.6vw;
+    }
+    .oppia-contributions-navbar-items-list::before {
+      font-size: 2vw;
+    }
+  }
+
   @media only screen and (max-width: 420px) {
-    contributions-and-review .dropdown-label {
+    .dropdown-label {
       font-size: 18px;
       margin-right: 2vw;
       width: 100px;
@@ -296,7 +330,7 @@
     .oppia-contributions-dropdown-section {
       margin-bottom: 20px;
       padding: auto 2vw;
-      width: 90%;
+      width: 100%;
     }
   }
 </style>
