@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for SuggestionThreadObjectFactory.
  */
 
-import { TestBed } from '@angular/core/testing';
-
 import { SuggestionThread } from 'domain/suggestion/suggestion-thread-object.model';
 import { ThreadMessage } from 'domain/feedback_message/ThreadMessage.model';
 import { FeedbackThreadBackendDict } from 'domain/feedback_thread/FeedbackThreadObjectFactory';
@@ -62,7 +60,7 @@ describe('SuggestionThreadObjectFactory', () => {
 
     let suggestionThread =
     SuggestionThread.createFromBackendDicts(
-        suggestionThreadBackendDict, suggestionBackendDict);
+      suggestionThreadBackendDict, suggestionBackendDict);
 
     expect(suggestionThread.lastUpdatedMsecs).toEqual(1000);
     expect(suggestionThread.originalAuthorName).toEqual('author');
@@ -103,7 +101,7 @@ describe('SuggestionThreadObjectFactory', () => {
   it('should create a new suggestion thread.', () => {
     let suggestionThread =
     SuggestionThread.createFromBackendDicts(
-        suggestionThreadBackendDict, suggestionBackendDict);
+      suggestionThreadBackendDict, suggestionBackendDict);
 
     expect(suggestionThread.lastUpdatedMsecs).toEqual(1000);
     expect(suggestionThread.originalAuthorName).toEqual('author');
@@ -119,7 +117,7 @@ describe('SuggestionThreadObjectFactory', () => {
     it('should handle message getter and setter.', () => {
       let suggestionThread =
       SuggestionThread.createFromBackendDicts(
-          suggestionThreadBackendDict, suggestionBackendDict);
+        suggestionThreadBackendDict, suggestionBackendDict);
 
       expect(suggestionThread.getMessages()).toEqual([]);
 
