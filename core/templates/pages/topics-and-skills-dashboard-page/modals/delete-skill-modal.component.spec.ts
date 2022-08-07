@@ -124,7 +124,7 @@ describe('Assign Skill to Topic Modal Component', () => {
     }));
     componentInstance.fetchTopicAssignmentsForSkill();
     tick(50);
-    expect(componentInstance.allowSkillForDeletion).toBeTrue();
+    expect(componentInstance.allowDeletionOfSkill).toBeTrue();
   }));
 
   it('should not allow skill deletion', fakeAsync(() => {
@@ -144,6 +144,6 @@ describe('Assign Skill to Topic Modal Component', () => {
 
     componentInstance.fetchTopicAssignmentsForSkill();
     tick(50);
-    expect(componentInstance.allowSkillForDeletion).toBeFalse();
+    expect(componentInstance.allowDeletionOfSkill).toBeFalse();
   }));
 });

@@ -78,7 +78,7 @@ export class UnassignSkillFromTopicsModalComponent
             }
           }
 
-          topicAssignments = topicAssignments.filter((topic) => {
+          let eligibleTopicAssignments = topicAssignments.filter((topic) => {
             if (topicIdsNotEligibleForUnassignment.indexOf(
               topic.topicId) === -1) {
               return true;
@@ -86,7 +86,7 @@ export class UnassignSkillFromTopicsModalComponent
             this.topicNamesNotEligibleForUnassignment.push(topic.topicName);
             return false;
           });
-          topicAssignments.map((topic) => {
+          eligibleTopicAssignments.map((topic) => {
             this.topicNameToTopicsAssignments[topic.topicName] = {
               subtopicId: topic.subtopicId,
               topicVersion: topic.topicVersion,

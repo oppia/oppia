@@ -354,8 +354,8 @@ class SkillDescriptionHandler(base.BaseHandler):
 
 
 class DiagnosticTestSkillAssignmentHandler(base.BaseHandler):
-    """A handler for checking if a skill is assigned for the diagnostic test
-    in any of the existing topics.
+    """A handler that returns a list of topic names in which the given skill
+    is assigned for the diagnostic test.
     """
 
     URL_PATH_ARGS_SCHEMAS = {

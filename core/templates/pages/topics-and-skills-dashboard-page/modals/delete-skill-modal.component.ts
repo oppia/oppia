@@ -33,7 +33,7 @@ export class DeleteSkillModalComponent extends ConfirmOrCancelModal {
   skillId!: string;
   topicsAssignments!: AssignedSkill[];
   topicsAssignmentsAreFetched: boolean = false;
-  allowSkillForDeletion: boolean = true;
+  allowDeletionOfSkill: boolean = true;
   topicNamesNotEligibleForUnassignment: string[] = [];
 
   constructor(
@@ -59,7 +59,7 @@ export class DeleteSkillModalComponent extends ConfirmOrCancelModal {
               dict.topicIdToDiagnosticTestSkillIds[topicId]);
             if (diagnosticTestSkillIds.length === 1 &&
                 diagnosticTestSkillIds.indexOf(this.skillId) !== -1) {
-              this.allowSkillForDeletion = false;
+              this.allowDeletionOfSkill = false;
               topicIdsNotEligibleForUnassignment.push(topicId);
             }
           }

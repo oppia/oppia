@@ -20,7 +20,7 @@
       Tick the eligible topics that you want this skill to be unassigned from.
     </div>
     <div *ngIf="topicsAssignmentsAreFetched && eligibleTopicNamesForUnassignment.length === 0">
-      No eligible topics for unassignment.
+      This skill is not currently assigned to any topics.
     </div>
   </div>
   <div class="loading-spinner" *ngIf="!topicsAssignmentsAreFetched">

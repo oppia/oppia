@@ -62,7 +62,7 @@ interface DoesSkillWithDescriptionExistBackendResponse {
   'skill_description_exists': boolean;
 }
 
-interface SkillAssignmnetForDiagnosticTestBackendResponse {
+interface SkillAssignmentForDiagnosticTestBackendResponse {
   'topic_names': string[];
 }
 
@@ -198,7 +198,7 @@ export class SkillBackendApiService {
           .SKILL_ASSIGNMENT_FOR_DIAGNOSTIC_TEST_URL_TEMPLATE, {
           skill_id: skillId
         }));
-    this.http.get<SkillAssignmnetForDiagnosticTestBackendResponse>(
+    this.http.get<SkillAssignmentForDiagnosticTestBackendResponse>(
       skillAssignmentForDiagnosticTestUrl).toPromise().then((response) => {
       if (successCallback) {
         successCallback(response.topic_names);

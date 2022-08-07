@@ -4,7 +4,7 @@
   </h3>
 </div>
 <div class="modal-body" *ngIf="showTopicsAssignments()">
-  <div *ngIf="allowSkillForDeletion">
+  <div *ngIf="allowDeletionOfSkill">
     <span>
       This skill is assigned to these following topics, If you delete the
       skill, it will automatically be removed from these topics.
@@ -13,7 +13,7 @@
       <span class="topic-name">{{ topic.topicName }}</span>
     </div>
   </div>
-  <div *ngIf="!allowSkillForDeletion">
+  <div *ngIf="!allowDeletionOfSkill">
     <p>
       This skill is used as the only diagnostic test skill in the following topics:
     </p>
@@ -30,7 +30,7 @@
   <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
   <button class="btn btn-danger e2e-test-confirm-skill-deletion-button"
           (click)="confirm()"
-          *ngIf="allowSkillForDeletion"
+          *ngIf="allowDeletionOfSkill"
           [disabled]="!topicsAssignmentsAreFetched">
     <span>Delete Skill</span>
   </button>

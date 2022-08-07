@@ -1826,15 +1826,11 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         }
         self.assertEqual(
             topic_services.get_topic_id_to_diagnostic_test_skill_ids(
-                [self.TOPIC_ID]),
-            expected_dict
-        )
+                [self.TOPIC_ID]), expected_dict)
 
         self.assertEqual(
             topic_services.get_topic_id_to_diagnostic_test_skill_ids(
-                'incorrect_topic_id'),
-            {}
-        )
+                'incorrect_topic_id'), {})
 
 
 # TODO(#7009): Remove this mock class and the SubtopicMigrationTests class
