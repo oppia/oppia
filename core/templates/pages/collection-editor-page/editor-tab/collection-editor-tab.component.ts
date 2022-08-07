@@ -27,7 +27,10 @@ import { CollectionLinearizerService } from '../services/collection-linearizer.s
   templateUrl: './collection-editor-tab.component.html'
 })
 export class CollectionEditorTabComponent {
-  collection: Collection;
+  // This property is initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  collection!: Collection;
 
   constructor(
     private collectionEditorStateService: CollectionEditorStateService,

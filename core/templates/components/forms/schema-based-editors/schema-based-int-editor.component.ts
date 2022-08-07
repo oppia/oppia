@@ -22,6 +22,12 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 
+interface OppiaValidator {
+  id: string;
+  'min_value': number;
+  'max_value': number;
+}
+
 @Component({
   selector: 'schema-based-int-editor',
   templateUrl: './schema-based-int-editor.component.html',
@@ -41,13 +47,16 @@ import { FocusManagerService } from 'services/stateful/focus-manager.service';
 })
 export class SchemaBasedIntEditorComponent
 implements ControlValueAccessor, OnInit, Validator {
-  localValue;
-  @Input() disabled;
-  @Input() notRequired;
-  @Input() validators;
-  @Input() labelForFocusTarget;
   @Output() inputBlur = new EventEmitter<void>();
   @Output() inputFocus = new EventEmitter<void>();
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() disabled!: boolean;
+  @Input() notRequired!: boolean;
+  @Input() validators!: OppiaValidator[];
+  @Input() labelForFocusTarget!: string;
+  localValue!: number;
   onChange: (val: number) => void = () => {};
   constructor(
     private focusManagerService: FocusManagerService,

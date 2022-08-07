@@ -79,7 +79,7 @@ describe('Questions List Service', () => {
   it('should not get question summaries when no skill id is provided',
     fakeAsync(() => {
       httpTestingController.expectNone('/questions_list_handler/?offset=');
-      qls.getQuestionSummariesAsync(null, false, false);
+      qls.getQuestionSummariesAsync('', false, false);
       flushMicrotasks();
     })
   );

@@ -31,6 +31,7 @@ import { AlertsService } from 'services/alerts.service';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('Cancel beam job dialog', () => {
   const beamJobRun = (
@@ -51,6 +52,7 @@ describe('Cancel beam job dialog', () => {
         CancelBeamJobDialogComponent,
       ],
       imports: [
+        HttpClientTestingModule,
         BrowserDynamicTestingModule,
         MatButtonModule,
         MatCardModule,
@@ -61,15 +63,9 @@ describe('Cancel beam job dialog', () => {
         NoopAnimationsModule,
       ],
       providers: [
+        ReleaseCoordinatorBackendApiService,
         { provide: MAT_DIALOG_DATA, useValue: beamJobRun },
         { provide: MatDialogRef, useValue: mockDialogRef },
-        {
-          provide: ReleaseCoordinatorBackendApiService,
-          useValue: jasmine.createSpyObj<ReleaseCoordinatorBackendApiService>(
-            'ReleaseCoordinatorBackendApiService', null, {
-              cancelBeamJobRun: _ => of(null)
-            }),
-        },
       ],
     });
     // NOTE: This allows tests to compile the DOM of each dialog component.

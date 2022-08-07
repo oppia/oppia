@@ -67,7 +67,8 @@ export class CollectionRightsBackendApiService {
 
   private _setCollectionStatus(
       collectionId: string,
-      collectionVersion: number,
+      // Collection version is null for the default collection.
+      collectionVersion: number | null,
       isPublic: boolean,
       successCallback: (value: CollectionRights) => void,
       errorCallback: (reason: string) => void): void {
@@ -171,7 +172,7 @@ export class CollectionRightsBackendApiService {
    */
   async setCollectionPublicAsync(
       collectionId: string,
-      collectionVersion: number): Promise<CollectionRights> {
+      collectionVersion: number | null): Promise<CollectionRights> {
     return new Promise((resolve, reject) => {
       this._setCollectionStatus(
         collectionId, collectionVersion, true, resolve, reject);

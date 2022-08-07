@@ -25,7 +25,7 @@ import { NormalizeWhitespacePipe } from 'filters/string-utility-filters/normaliz
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('Exploration Title Service', function() {
-  let ets: ExplorationTitleService = null;
+  let ets: ExplorationTitleService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({

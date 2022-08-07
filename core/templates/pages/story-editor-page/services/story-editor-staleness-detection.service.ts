@@ -36,7 +36,10 @@ import { UnsavedChangesStatusInfoModalComponent } from 'components/unsaved-chang
 export class StoryEditorStalenessDetectionService {
   _staleTabEventEmitter = new EventEmitter<void>();
   _presenceOfUnsavedChangesEventEmitter = new EventEmitter<void>();
-  unsavedChangesWarningModalRef: NgbModalRef = null;
+  // This property is initialized using init method and we need to do
+  // non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  unsavedChangesWarningModalRef!: NgbModalRef;
 
   constructor(
     private ngbModal: NgbModal,
@@ -64,7 +67,7 @@ export class StoryEditorStalenessDetectionService {
   showStaleTabInfoModal(): void {
     const story = this.storyEditorStateService.getStory();
     if (story) {
-      const storyEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
+      const storyEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo | null = (
         this.localStorageService.getEntityEditorBrowserTabsInfo(
           EntityEditorBrowserTabsInfoDomainConstants
             .OPENED_STORY_EDITOR_BROWSER_TABS, story.getId()));

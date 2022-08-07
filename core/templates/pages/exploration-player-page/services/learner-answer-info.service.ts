@@ -36,13 +36,16 @@ export class LearnerAnswerInfoService {
     private learnerAnswerDetailsBackendApiService:
       LearnerAnswerDetailsBackendApiService) {}
 
-  private submittedAnswerInfoCount = 0;
-  private currentEntityId: string = null;
-  private stateName: string = null;
-  private interactionId = null;
-  private currentAnswer: string = null;
-  private currentInteractionRulesService: InteractionRulesService = null;
-  private canAskLearnerForAnswerInfo = false;
+  // These properties are initialized using init method and we need to do
+  // non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  private submittedAnswerInfoCount: number = 0;
+  private currentEntityId!: string;
+  private stateName!: string;
+  private interactionId!: string;
+  private currentAnswer!: string;
+  private currentInteractionRulesService!: InteractionRulesService;
+  private canAskLearnerForAnswerInfo: boolean = false;
   private visitedStates: string[] = [];
   private probabilityIndexes = {
     // The probability that a request for explanation of the answer that is
@@ -58,6 +61,9 @@ export class LearnerAnswerInfoService {
     // and it is not marked as correct i.e. it is any general outcome.
     typeC: 0.05
   };
+
+  INTERACTION_IDS_WITHOUT_ANSWER_DETAILS: readonly string[] = (
+    AppConstants.INTERACTION_IDS_WITHOUT_ANSWER_DETAILS);
 
   getRandomProbabilityIndex(): number {
     const min = 0;
@@ -84,7 +90,7 @@ export class LearnerAnswerInfoService {
       return;
     }
 
-    if (AppConstants.INTERACTION_IDS_WITHOUT_ANSWER_DETAILS.indexOf(
+    if (this.INTERACTION_IDS_WITHOUT_ANSWER_DETAILS.indexOf(
       this.interactionId) !== -1) {
       return;
     }

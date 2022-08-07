@@ -50,7 +50,7 @@ describe('Apply validation directive', () => {
   it('should return null on validating with empty validators', () => {
     directiveInstance.validators = [];
 
-    expect(directiveInstance.validate(null)).toBeNull();
+    expect(directiveInstance.validate(new FormControl(1))).toBeNull();
   });
 
   it('should validate value', () => {

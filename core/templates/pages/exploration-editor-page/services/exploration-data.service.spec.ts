@@ -25,7 +25,7 @@ import { LoggerService } from 'services/contextual/logger.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { ExplorationDraft } from 'domain/exploration/exploration-draft.model';
+import { ExplorationChange, ExplorationDraft } from 'domain/exploration/exploration-draft.model';
 import { ExplorationBackendDict } from 'domain/exploration/ExplorationObjectFactory';
 import { FetchExplorationBackendResponse } from 'domain/exploration/read-only-exploration-backend-api.service';
 
@@ -325,7 +325,7 @@ describe('Exploration data service', function() {
     const explorationDraft: ExplorationDraft = new ExplorationDraft([], 1);
     spyOn(explorationDraft, 'isValid').and.callFake(() => true);
     spyOn(lss, 'getExplorationDraft').and.returnValue(explorationDraft);
-    const changeList = [];
+    const changeList: ExplorationChange[] = [];
     eds.getDataAsync(errorCallback).then(data => {
       expect(data).toEqual(sampleDataResults);
       expect(errorCallback).not.toHaveBeenCalled();
@@ -352,7 +352,7 @@ describe('Exploration data service', function() {
     const explorationDraft: ExplorationDraft = new ExplorationDraft([], 1);
     spyOn(explorationDraft, 'isValid').and.callFake(() => false);
     spyOn(lss, 'getExplorationDraft').and.returnValue(explorationDraft);
-    const changeList = [];
+    const changeList: ExplorationChange[] = [];
     let toBeResolved = false;
     // The data.exploration won't receive a value.
     spyOn(eebas, 'updateExplorationAsync').and.callFake(
@@ -387,7 +387,7 @@ describe('Exploration data service', function() {
       const explorationDraft: ExplorationDraft = new ExplorationDraft([], 1);
       spyOn(explorationDraft, 'isValid').and.callFake(() => true);
       spyOn(lss, 'getExplorationDraft').and.returnValue(explorationDraft);
-      const changeList = [];
+      const changeList: ExplorationChange[] = [];
       eds.getDataAsync(errorCallback).then(function(data) {
         expect(data).toEqual(sampleDataResults);
         expect(errorCallback).not.toHaveBeenCalled();
@@ -412,9 +412,9 @@ describe('Exploration data service', function() {
 });
 
 describe('Exploration data service', function() {
-  var eds = null;
+  var eds: ExplorationDataService;
   var ls = null;
-  var logErrorSpy;
+  var logErrorSpy: jasmine.Spy;
   var pathname = '/exploration/0';
 
   beforeEach(() => {
@@ -436,12 +436,10 @@ describe('Exploration data service', function() {
   });
 
   it('should throw error when pathname is not valid', () => {
+    var errorCallback = jasmine.createSpy('error');
+    eds.getDataAsync(errorCallback);
+
     expect(logErrorSpy).toHaveBeenCalledWith(
       'Unexpected call to ExplorationDataService for pathname: ' + pathname);
-
-    var errorCallback = jasmine.createSpy('error');
-    expect(function() {
-      eds.getData(errorCallback);
-    }).toThrowError('eds.getData is not a function');
   });
 });

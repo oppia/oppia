@@ -22,7 +22,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import { ConceptCardBackendDict } from './ConceptCardObjectFactory';
 import { MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFactory';
 import { SkillContentsWorkedExamplesChange } from 'domain/editor/undo_redo/change.model';
-import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
+import { SkillBackendDict, SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { SkillUpdateService } from 'domain/skill/skill-update.service';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
@@ -32,17 +32,17 @@ import { EntityEditorBrowserTabsInfo } from 'domain/entity_editor_browser_tabs_i
 import { EventEmitter } from '@angular/core';
 
 describe('Skill update service', () => {
-  let skillUpdateService: SkillUpdateService = null;
-  let skillObjectFactory: SkillObjectFactory = null;
-  let misconceptionObjectFactory: MisconceptionObjectFactory = null;
-  let workedExampleObjectFactory: WorkedExampleObjectFactory = null;
-  let undoRedoService: UndoRedoService = null;
-  let localStorageService: LocalStorageService = null;
+  let skillUpdateService: SkillUpdateService;
+  let skillObjectFactory: SkillObjectFactory;
+  let misconceptionObjectFactory: MisconceptionObjectFactory;
+  let workedExampleObjectFactory: WorkedExampleObjectFactory;
+  let undoRedoService: UndoRedoService;
+  let localStorageService: LocalStorageService;
 
-  let skillDict = null;
-  let skillContentsDict: ConceptCardBackendDict = null;
-  let example1: WorkedExampleBackendDict = null;
-  let example2: WorkedExampleBackendDict = null;
+  let skillDict: SkillBackendDict;
+  let skillContentsDict: ConceptCardBackendDict;
+  let example1: WorkedExampleBackendDict;
+  let example2: WorkedExampleBackendDict;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -132,7 +132,7 @@ describe('Skill update service', () => {
       language_code: 'en',
       version: 3,
       prerequisite_skill_ids: ['skill_1'],
-    };
+    } as SkillBackendDict;
   });
 
   it('should set/unset the skill description', () => {

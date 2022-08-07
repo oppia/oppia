@@ -25,7 +25,7 @@ import { ServicesConstants } from './services.constants';
 describe('Promo bar backend api service', () => {
   const initialValue = ServicesConstants.ENABLE_PROMO_BAR;
   let promoBarBackendApiService:
-    PromoBarBackendApiService = null;
+    PromoBarBackendApiService;
   let httpTestingController: HttpTestingController;
   let promoBar = {
     promoBarEnabled: true,

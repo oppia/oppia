@@ -33,7 +33,10 @@ import { CollectionLinearizerService } from '../services/collection-linearizer.s
   templateUrl: './collection-node-creator.component.html'
 })
 export class CollectionNodeCreatorComponent {
-  collection: Collection;
+  // This property is initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  collection!: Collection;
   newExplorationId: string = '';
   newExplorationTitle: string = '';
   searchQueryHasError: boolean = false;
@@ -120,7 +123,7 @@ export class CollectionNodeCreatorComponent {
   // editor page.
   isIdMalformed(typedExplorationId: string): boolean {
     return (
-      typedExplorationId &&
+      Boolean(typedExplorationId) &&
       typedExplorationId.lastIndexOf('#') ===
       typedExplorationId.length - 1);
   }

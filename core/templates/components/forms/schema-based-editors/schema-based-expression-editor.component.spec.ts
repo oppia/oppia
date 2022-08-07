@@ -22,6 +22,7 @@ import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angul
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
 import { SchemaBasedExpressionEditorComponent } from './schema-based-expression-editor.component';
+import { FormControl } from '@angular/forms';
 
 describe('Schema Based Expression Editor Component', () => {
   let component: SchemaBasedExpressionEditorComponent;
@@ -49,14 +50,14 @@ describe('Schema Based Expression Editor Component', () => {
   });
 
   it('should set component properties on initialization', fakeAsync(() => {
-    let mockFunction = function(value: number) {
+    let mockFunction = function(value: unknown) {
       return value;
     };
     component.registerOnChange(mockFunction);
     component.registerOnTouched();
 
     expect(component).toBeDefined();
-    expect(component.validate(null)).toEqual({});
+    expect(component.validate(new FormControl(1))).toEqual({});
     expect(component.onChange).toEqual(mockFunction);
     expect(component.onChange(true)).toEqual(true);
   }));

@@ -21,6 +21,7 @@ import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { UrlSerializer } from '@angular/router';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { CollectionPlaythrough } from 'domain/collection/collection-playthrough.model';
 import { CollectionRightsBackendApiService } from 'domain/collection/collection-rights-backend-api.service';
 import { CollectionRights } from 'domain/collection/collection-rights.model';
 import { CollectionValidationService } from 'domain/collection/collection-validation.service';
@@ -51,7 +52,8 @@ describe('Collection editor navbar component', () => {
   let collectionId = 'collection_id';
   let mockCollection = new Collection(
     collectionId, collectionTitle, collectionObjective, languageCode,
-    collectionTags, null, collectionCategory, 0, 1, []);
+    collectionTags, new CollectionPlaythrough(null, []), collectionCategory,
+    0, 1, []);
   let mockPrivateCollectionRights = new CollectionRights({
     collection_id: collectionId,
     can_edit: true,
@@ -279,7 +281,7 @@ describe('Collection editor navbar component', () => {
     expect(collectionEditorStateService.setCollectionRights).toHaveBeenCalled();
 
     let mockCollectionWithoutMetadata = new Collection(
-      'id', '', '', '', [], null, '', 0, 1, []);
+      'id', '', '', '', [], new CollectionPlaythrough(null, []), '', 0, 1, []);
 
     componentInstance.collection = mockCollectionWithoutMetadata;
 

@@ -36,10 +36,13 @@ export class SkillDescriptionEditorComponent implements OnInit, OnDestroy {
   MAX_CHARS_IN_SKILL_DESCRIPTION = (
     AppConstants.MAX_CHARS_IN_SKILL_DESCRIPTION);
 
-  skillRights: SkillRights = null;
-  skill: Skill = null;
-  skillDescriptionEditorIsShown: boolean = null;
-  tmpSkillDescription: string = null;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  skillRights!: SkillRights;
+  skill!: Skill;
+  tmpSkillDescription!: string;
+  skillDescriptionEditorIsShown: boolean = false;
   constructor(
     private skillUpdateService: SkillUpdateService,
     private skillEditorStateService: SkillEditorStateService,

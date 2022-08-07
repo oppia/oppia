@@ -31,7 +31,7 @@ import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/t
 import { NgbModal, NgbModalRef, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 class MockNgbModalRef {
-  componentInstance: {
+  componentInstance!: {
     bindedMessage: null;
   };
 }
@@ -41,7 +41,7 @@ describe('Story editor navbar component', () => {
   let fixture: ComponentFixture<StoryEditorNavbarComponent>;
   let story: Story;
   let alertsService: AlertsService;
-  let storyObjectFactory = null;
+  let storyObjectFactory: StoryObjectFactory;
   let storyEditorStateService: StoryEditorStateService;
   let undoRedoService: UndoRedoService;
   let editableStoryBackendApiService: EditableStoryBackendApiService;
@@ -180,7 +180,7 @@ describe('Story editor navbar component', () => {
     it('should show validation error when url ' +
       'fragment is empty', () => {
       // Setting url fragment to be empty.
-      storyBackendDict.url_fragment = null;
+      storyBackendDict.url_fragment = '';
       story = storyObjectFactory.createFromBackendDict(storyBackendDict);
       let mockStoryInitializedEventEmitter = new EventEmitter();
 
@@ -318,7 +318,6 @@ describe('Story editor navbar component', () => {
     spyOnProperty(storyEditorStateService, 'onStoryInitialized')
       .and.returnValue(mockStoryInitializedEventEmitter);
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      setTimeout(opt.beforeDismiss);
       return ({
         result: Promise.resolve('success')
       } as NgbModalRef);
@@ -328,7 +327,7 @@ describe('Story editor navbar component', () => {
     mockStoryInitializedEventEmitter.emit();
     fixture.detectChanges();
 
-    expect(component.storyIsPublished).toBe(undefined);
+    expect(component.storyIsPublished).toBeFalse();
 
     storyEditorStateService.setStory(story);
     fixture.detectChanges();
@@ -377,7 +376,7 @@ describe('Story editor navbar component', () => {
   });
 
   it('should navigate to main tab in story editor page', () => {
-    expect(component.activeTab).toBe(undefined);
+    expect(component.activeTab).toBeUndefined();
 
     component.selectMainTab();
 
@@ -385,7 +384,7 @@ describe('Story editor navbar component', () => {
   });
 
   it('should navigate to preview tab in story editor page', () => {
-    expect(component.activeTab).toBe(undefined);
+    expect(component.activeTab).toBeUndefined();
 
     component.selectPreviewTab();
 
@@ -425,7 +424,6 @@ describe('Story editor navbar component', () => {
           return true;
         });
       const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        setTimeout(opt.beforeDismiss);
         return (
           { componentInstance: MockNgbModalRef,
             result: Promise.resolve(commitMessage)
@@ -458,7 +456,7 @@ describe('Story editor navbar component', () => {
       spyOnProperty(storyEditorStateService, 'onStoryInitialized')
         .and.returnValue(mockStoryInitializedEventEmitter);
       const alertsSpy = spyOn(
-        alertsService, 'addInfoMessage').and.returnValue(null);
+        alertsService, 'addInfoMessage').and.callThrough();
       const saveChangesSpy = spyOn(
         storyEditorStateService, 'saveStory')
         .and.callFake((commitMessage, successCallback, errorCallback) => {
@@ -470,7 +468,6 @@ describe('Story editor navbar component', () => {
           return true;
         });
       const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        setTimeout(opt.beforeDismiss);
         return (
           { componentInstance: MockNgbModalRef,
             result: Promise.resolve(commitMessage)
@@ -485,7 +482,7 @@ describe('Story editor navbar component', () => {
       expect(modalSpy).not.toHaveBeenCalled();
       expect(saveChangesSpy).not.toHaveBeenCalled();
 
-      component.commitMessage = null;
+      component.commitMessage = '';
       component.saveChanges();
       tick();
       fixture.detectChanges();
@@ -514,7 +511,6 @@ describe('Story editor navbar component', () => {
           return true;
         });
       const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        setTimeout(opt.beforeDismiss);
         return (
           { componentInstance: MockNgbModalRef,
             result: Promise.reject()

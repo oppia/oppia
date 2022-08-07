@@ -22,6 +22,7 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
 import { SkillUpdateService } from 'domain/skill/skill-update.service';
 import { Skill } from 'domain/skill/SkillObjectFactory';
+import { WorkedExample } from 'domain/skill/WorkedExampleObjectFactory';
 import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
 import { WorkedExampleEditorComponent } from './worked-example-editor.component';
 
@@ -74,7 +75,7 @@ describe('Worked example editor component', () => {
           content_id: 'worked_example_e_1',
         };
       }
-    };
+    } as WorkedExample;
     component.ngOnInit();
   });
 
@@ -113,6 +114,12 @@ describe('Worked example editor component', () => {
     component.cancelEditQuestion();
 
     expect(component.questionEditorIsOpen).toBe(false);
+
+    component.questionEditorIsOpen = true;
+    component.workedExampleQuestionMemento = null;
+    component.cancelEditQuestion();
+
+    expect(component.questionEditorIsOpen).toBe(true);
   });
 
   it('should close explanation editor when clicking on cancel button', () => {
@@ -125,11 +132,17 @@ describe('Worked example editor component', () => {
     component.cancelEditExplanation();
 
     expect(component.explanationEditorIsOpen).toBe(false);
+
+    component.explanationEditorIsOpen = true;
+    component.workedExampleQuestionMemento = null;
+    component.cancelEditExplanation();
+
+    expect(component.explanationEditorIsOpen).toBe(true);
   });
 
   it('should save worked example when clicking on save button', () => {
     let skillUpdateSpy = spyOn(skillUpdateService, 'updateWorkedExample')
-      .and.returnValue(null);
+      .and.returnValue();
 
     component.saveWorkedExample(true);
 
@@ -142,7 +155,7 @@ describe('Worked example editor component', () => {
 
   it('should save worked example when clicking on save button', () => {
     let skillUpdateSpy = spyOn(skillUpdateService, 'updateWorkedExample')
-      .and.returnValue(null);
+      .and.returnValue();
 
     component.saveWorkedExample(false);
 

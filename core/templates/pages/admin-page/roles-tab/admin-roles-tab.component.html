@@ -176,7 +176,7 @@
     </div>
 
     <div class="col-md-4">
-      <div class="oppia-page-card oppia-long-text" *ngIf="roleToActions !== null">
+      <div class="oppia-page-card oppia-long-text" *ngIf="roleToActions !== undefined">
         <legend class="text-center">Roles</legend>
         <oppia-roles-and-actions-visualizer [roleToActions]="roleToActions" [viewableRoles]="VIEWABLE_ROLES" [humanReadableRoles]="HUMAN_READABLE_ROLES"></oppia-roles-and-actions-visualizer>
       </div>

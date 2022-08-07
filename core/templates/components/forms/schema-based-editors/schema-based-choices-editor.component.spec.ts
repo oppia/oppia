@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for Schema Based Choices Editor Component
  */
 
-import { FormsModule } from '@angular/forms';
+import { FormControl, FormsModule } from '@angular/forms';
 import { ComponentFixture, fakeAsync, TestBed, waitForAsync } from '@angular/core/testing';
 import { SchemaBasedChoicesEditorComponent } from './schema-based-choices-editor.component';
 
@@ -48,23 +48,20 @@ describe('Schema Based Choices Editor Component', () => {
     component.registerOnTouched();
 
     expect(component).toBeDefined();
-    expect(component.validate(null)).toEqual({});
+    expect(component.validate(new FormControl(1))).toEqual({});
     expect(component.onChange).toEqual(mockFunction);
     expect(component.onChange('true')).toEqual('true');
   }));
 
   it('should get empty object on validating', () => {
-    expect(component.validate(null)).toEqual({});
+    expect(component.validate(new FormControl(1))).toEqual({});
   });
 
   it('should write value', () => {
-    component.localValue = null;
-    component.writeValue(null);
+    component.localValue = 'item1';
 
-    expect(component.localValue).toEqual(null);
-
-    component.writeValue('item');
-    expect(component.localValue).toBe('item');
+    component.writeValue('item2');
+    expect(component.localValue).toBe('item2');
   });
 
   it('should update value when local value change', () => {

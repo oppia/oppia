@@ -232,18 +232,22 @@ export class NumericInputValidationService {
 
   // Returns 'undefined' when no error occurs.
   validateNumber(
-      value: number,
+      // Null can also be passed in as a value, which is further validated.
+      value: number | null,
       requireNonnegativeInput: boolean,
       decimalSeparator: string = '.'
   ): string | undefined {
-    if (requireNonnegativeInput && value < 0) {
+    if (requireNonnegativeInput && value && value < 0) {
       return 'I18N_INTERACTIONS_NUMERIC_INPUT_LESS_THAN_ZERO';
     }
 
     let stringValue = null;
     // Value of sign is '-' if value of number is negative,
     // '' if non-negative.
-    let sign = value < 0 ? '-' : '';
+    let sign: string = '';
+    if (value !== null) {
+      sign = value < 0 ? '-' : '';
+    }
 
     // Convert exponential notation to decimal number.
     // Logic derived from https://stackoverflow.com/a/16139848.

@@ -28,7 +28,10 @@ import { ExplorationDataService } from 'pages/exploration-editor-page/services/e
 })
 
 export class RevertExplorationModalComponent extends ConfirmOrCancelModal {
-  @Input() version: string;
+  // This property is initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() version!: string;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,

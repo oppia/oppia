@@ -21,9 +21,10 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import { ReplaceInputsWithEllipsesPipe } from 'filters/string-utility-filters/replace-inputs-with-ellipses.pipe';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
+import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
 
 interface Choice {
-  id: unknown;
+  id: string;
   text: string;
 }
 
@@ -32,7 +33,10 @@ interface Choice {
   templateUrl: './rule-type-selector.component.html'
 })
 export class RuleTypeSelector implements OnInit {
-  @Input() localValue;
+  // This property is initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() localValue!: string;
   @Output() onSelectionChange = new EventEmitter();
   choices: Choice[] = [];
 
@@ -47,7 +51,12 @@ export class RuleTypeSelector implements OnInit {
 
   ngOnInit(): void {
     let ruleTypesToDescriptions = INTERACTION_SPECS[
-      this.stateInteractionIdService.savedMemento].rule_descriptions;
+      this.stateInteractionIdService.savedMemento as InteractionSpecsKey
+    ].rule_descriptions;
+
+    type RuleTypeToDescription = {
+      [key in keyof typeof ruleTypesToDescriptions]: string;
+    };
 
     let equalToIndex = null;
     let idx = 0;
@@ -59,7 +68,7 @@ export class RuleTypeSelector implements OnInit {
       this.choices.push({
         id: ruleType,
         text: this.replaceInputsWithEllipsesPipe.transform(
-          ruleTypesToDescriptions[ruleType])
+          ruleTypesToDescriptions[ruleType as keyof RuleTypeToDescription])
       });
       idx++;
     }

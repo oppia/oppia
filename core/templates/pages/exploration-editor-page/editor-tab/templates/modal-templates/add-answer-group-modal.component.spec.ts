@@ -178,7 +178,7 @@ describe('Add Answer Group Modal Component', () => {
   });
 
   it('should save answer group response when closing the modal', () => {
-    component.saveResponse(null);
+    component.saveResponse(false);
     component.updateState('update');
 
     expect(saveOutcomeDestDetailsSpy).toHaveBeenCalled();

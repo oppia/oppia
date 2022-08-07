@@ -20,6 +20,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
+import { CollectionPlaythrough } from 'domain/collection/collection-playthrough.model';
 import { CollectionUpdateService } from 'domain/collection/collection-update.service';
 import { Collection } from 'domain/collection/collection.model';
 import { AlertsService } from 'services/alerts.service';
@@ -67,7 +68,7 @@ describe('Collection editor pre publish modal component', () => {
     let collectionObjective = 'collection_objective';
     let mockCollection = new Collection(
       'collection_id', collectionTitle, collectionObjective, 'en', [],
-      null, '', 2, 3, []);
+      new CollectionPlaythrough(null, []), '', 2, 3, []);
     spyOn(collectionEditorStateService, 'getCollection')
       .and.returnValue(mockCollection);
     componentInstance.ngOnInit();
@@ -93,7 +94,7 @@ describe('Collection editor pre publish modal component', () => {
     let collectionObjective = 'collection_objective';
     let mockCollection = new Collection(
       'collection_id', collectionTitle, collectionObjective, 'en', [],
-      null, '', 2, 3, []);
+      new CollectionPlaythrough(null, []), '', 2, 3, []);
     spyOn(collectionEditorStateService, 'getCollection')
       .and.returnValue(mockCollection);
     componentInstance.ngOnInit();

@@ -41,14 +41,14 @@ describe('Schema Based Bool Editor Component', () => {
   });
 
   it('should set component properties on initialization', fakeAsync(() => {
-    let mockFunction = function(value: number) {
+    let mockFunction = function(value: boolean) {
       return value;
     };
     component.registerOnChange(mockFunction);
     component.registerOnTouched();
 
     expect(component).toBeDefined();
-    expect(component.validate(null)).toEqual(null);
+    expect(component.validate(new FormControl(false))).toEqual(null);
     expect(component.onChange).toEqual(mockFunction);
     expect(component.onChange(true)).toEqual(true);
   }));
@@ -64,12 +64,10 @@ describe('Schema Based Bool Editor Component', () => {
   });
 
   it('should write value', () => {
-    component.localValue = null;
-    component.writeValue(null);
-
-    expect(component.localValue).toEqual(null);
+    component.localValue = false;
 
     component.writeValue(true);
+
     expect(component.localValue).toBeTrue();
   });
 

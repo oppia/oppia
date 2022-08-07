@@ -49,6 +49,7 @@ import { StartNewBeamJobDialogComponent } from 'pages/release-coordinator-page/c
 import { ViewBeamJobOutputDialogComponent } from 'pages/release-coordinator-page/components/view-beam-job-output-dialog.component';
 import { ReleaseCoordinatorBackendApiService } from 'pages/release-coordinator-page/services/release-coordinator-backend-api.service';
 import { BeamJobRunResult } from 'domain/jobs/beam-job-run-result.model';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('Beam Jobs Tab Component', () => {
   let fixture: ComponentFixture<BeamJobsTabComponent>;
@@ -73,6 +74,7 @@ describe('Beam Jobs Tab Component', () => {
   beforeEach(waitForAsync(async() => {
     TestBed.configureTestingModule({
       imports: [
+        HttpClientTestingModule,
         ClipboardModule,
         MatAutocompleteModule,
         MatButtonModule,
@@ -97,13 +99,15 @@ describe('Beam Jobs Tab Component', () => {
         {
           provide: ReleaseCoordinatorBackendApiService,
           useValue: jasmine.createSpyObj<ReleaseCoordinatorBackendApiService>(
-            'ReleaseCoordinatorBackendApiService', null, {
+            'ReleaseCoordinatorBackendApiService', {}, {
               getBeamJobs: () => of(beamJobs),
               getBeamJobRuns: () => of(beamJobRuns),
-              startNewBeamJob: _ => of(null),
-              cancelBeamJobRun: _ => of(null),
-              getBeamJobRunOutput: _ => of(new BeamJobRunResult('abc', '123')),
-            }),
+              startNewBeamJob: () => (
+                of(new BeamJobRun('123', 'FooJob', 'RUNNING', 0, 0, false))),
+              cancelBeamJobRun: () => (
+                of(new BeamJobRun('123', 'FooJob', 'CANCELLED', 0, 0, false))),
+              getBeamJobRunOutput: () => of(new BeamJobRunResult('abc', '123')),
+            } as Partial<ReleaseCoordinatorBackendApiService>),
         },
       ],
     });
@@ -151,7 +155,7 @@ describe('Beam Jobs Tab Component', () => {
   }));
 
   it('should return empty array when jobs fail to load', marbles(m => {
-    const beamJobs = m.hot('^-#', null, new Error('err'));
+    const beamJobs = m.hot('^-#', undefined, new Error('err'));
     const expectedNames = ' e-e';
     spyOn(backendApiService, 'getBeamJobs').and.returnValue(beamJobs);
 
@@ -162,7 +166,7 @@ describe('Beam Jobs Tab Component', () => {
   }));
 
   it('should return empty array when runs fail to load', marbles(m => {
-    const beamJobRuns = m.hot('^-#', null, new Error('err'));
+    const beamJobRuns = m.hot('^-#', undefined, new Error('err'));
     const expectedRuns = '     e-e';
     spyOn(backendApiService, 'getBeamJobRuns').and.returnValue(beamJobRuns);
 

@@ -62,9 +62,9 @@ describe('User Email Preferences Service', () => {
 
   it('should successfully intialise the service', () => {
     expect(userEmailPreferencesService.feedbackNotificationsMuted)
-      .toBeUndefined();
+      .toBeFalse();
     expect(userEmailPreferencesService.suggestionNotificationsMuted)
-      .toBeUndefined();
+      .toBeFalse();
 
     userEmailPreferencesService.init(true, true);
 

@@ -26,7 +26,7 @@ import { ConfirmOrCancelModal } from 'components/common-layout-directives/common
   templateUrl: 'collection-editor-save-modal.component.html'
 })
 export class CollectionEditorSaveModalComponent extends ConfirmOrCancelModal {
-  collectionIsPrivate: boolean;
+  collectionIsPrivate: boolean = false;
   MAX_COMMIT_MESSAGE_LENGTH = AppConstants.MAX_COMMIT_MESSAGE_LENGTH;
 
   constructor(private ngbActiveModal: NgbActiveModal) {

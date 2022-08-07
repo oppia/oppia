@@ -20,6 +20,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { AppConstants } from 'app.constants';
+import { CollectionPlaythrough } from 'domain/collection/collection-playthrough.model';
 import { CollectionUpdateService } from 'domain/collection/collection-update.service';
 import { CollectionValidationService } from 'domain/collection/collection-validation.service';
 import { Collection } from 'domain/collection/collection.model';
@@ -43,7 +44,7 @@ describe('Collection details editor component', () => {
   let collectionTags = ['mock tag'];
   let mockCollection = new Collection(
     'id', collectionTitle, collectionObjective, languageCode, collectionTags,
-    null, collectionCategory, 0, 1, []);
+    new CollectionPlaythrough(null, []), collectionCategory, 0, 1, []);
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -123,6 +124,11 @@ describe('Collection details editor component', () => {
     let tags = ['   category 1  ', 'category 2   '];
     expect(componentInstance.normalizeTags(tags)).toEqual(
       ['category 1', 'category 2']);
+  });
+
+  it('should return empty list if there are no tags on normalization', () => {
+    let tags = null;
+    expect(componentInstance.normalizeTags(tags)).toEqual([]);
   });
 
   it('should update collection', () => {
