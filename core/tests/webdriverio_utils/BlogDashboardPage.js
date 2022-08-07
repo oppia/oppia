@@ -1,4 +1,4 @@
-// Copyright 2021 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,86 +14,67 @@
 
 /**
  * @fileoverview Page object for the blog Dashboard page, for use
- * in Protractor tests.
+ * in Webdriverio tests.
  */
 
-const { element } = require('protractor');
 var action = require('./action.js');
 var waitFor = require('./waitFor.js');
-var forms = require('../protractor_utils/forms.js');
-var workflow = require('../protractor_utils/workflow.js');
-var general = require('../protractor_utils/general.js');
+var forms = require('../webdriverio_utils/forms.js');
+var workflow = require('../webdriverio_utils/workflow.js');
+var general = require('../webdriverio_utils/general.js');
 
 var BlogDashboardPage = function() {
-  var currUserProfilePhoto = element(
-    by.css('.e2e-test-profile-current-user-photo'));
-  var createBlogPostButton = element(
-    by.css('.e2e-test-create-blog-post-button'));
-  var editBlogPostButton = element(
-    by.css('.e2e-test-edit-blog-post-button'));
-  var unpublishBlogPostButton = element(
-    by.css('.e2e-test-unpublish-blog-post-button'));
-  var deleteBlogPostButton = element(
-    by.css('.e2e-test-delete-blog-post-button'));
-  var matTabLabels = element.all(by.css('.mat-tab-label'));
-  var blogPostEditOptions = by.css(
-    '.e2e-test-blog-post-edit-box');
-  var blogPostContentEditor = element(
-    by.css('.e2e-test-content-editor'));
-  var blogPostTitleFieldElement = element(
-    by.css('.e2e-test-blog-post-title-field'));
-  var listViewButton = element(
-    by.css('.e2e-test-list-view-button'));
-  var tilesViewButton = element(
-    by.css('.e2e-test-tiles-view-button'));
-  var draftBlogPostsTable = element(
-    by.css('.e2e-test-drafts-blog-post-table'));
-  var publishedBlogPostsTable = element(
-    by.css('.e2e-test-published-blog-post-table'));
-  var blogPostListItems = element.all(
-    by.css('.e2e-test-blog-post-list-item'));
-  var draftBlogPostTiles = element.all(
-    by.css('.e2e-test-draft-blog-post-tile-item'));
-  var publishedBlogPostTiles = element.all(
-    by.css('.e2e-test-published-blog-post-tile-item'));
-  var blogPostTags = element.all(
-    by.css('.e2e-test-blog-post-tags'));
-  var saveBlogPostAsDraftButton = element(
-    by.css('.e2e-test-save-as-draft-button'));
-  var publishBlogPostButton = element(
-    by.css('.e2e-test-publish-blog-post-button'));
-  var thumbnailClickable = element(
-    by.css('.e2e-test-photo-clickable'));
-  var customThumbnail = element(
-    by.css('.e2e-test-custom-photo'));
-  var thumbnailCropper = element(
-    by.css('.e2e-test-photo-crop .cropper-container'));
-  var thumbnailUploadError = element(
-    by.css('.e2e-test-upload-error'));
-  var saveBlogPostContentButton = element(
-    by.css('.e2e-test-save-blog-post-content'));
-  var blogPostContentDisplay = element(
-    by.css('.e2e-test-content-display'));
-  var confirmButton = element(
-    by.css('.e2e-test-confirm-button'));
-  var currUsername = element(
-    by.css('.e2e-test-username-visible'));
-  var cancelThumbnailUploadButton = element(
-    by.css('.e2e-test-photo-upload-cancel'));
-  var blogDashboardIntroMessageContainer = element(
-    by.css('.e2e-test-intro-message-container'));
-  var closeBlogCardPreviewButton = element(
-    by.css('.e2e-test-close-preview-button'));
-  var blogCardPreviewButton = element(
-    by.css('.e2e-test-blog-card-preview-button'));
-  var blogDashboardLink = element(by.css(
-    '.e2e-test-blog-dashboard-link'));
-  var blogPostTiles = element.all(by.css(
-    '.e2e-test-blog-dashboard-tile'));
-  var blogPostTileTitle = by.css(
-    '.e2e-test-blog-post-title');
-  var navigateToBlogDashboardButton = element(
-    by.css('.e2e-test-back-button'));
+  var currUserProfilePhoto = $('.e2e-test-profile-current-user-photo');
+  var createBlogPostButton = $('.e2e-test-create-blog-post-button');
+  var editBlogPostButton = $('.e2e-test-edit-blog-post-button');
+  var unpublishBlogPostButton = $('.e2e-test-unpublish-blog-post-button');
+  var deleteBlogPostButton = $('.e2e-test-delete-blog-post-button');
+  var matTabLabel = $('.mat-tab-label');
+  var matTabLabelsSelector = function() {
+    return $$('.mat-tab-label');
+  };
+  var blogPostContentEditor = $('.e2e-test-content-editor');
+  var blogPostTitleFieldElement = $('.e2e-test-blog-post-title-field');
+  var listViewButton = $('.e2e-test-list-view-button');
+  var tilesViewButton = $('.e2e-test-tiles-view-button');
+  var draftBlogPostsTable = $('.e2e-test-drafts-blog-post-table');
+  var publishedBlogPostsTable = $('.e2e-test-published-blog-post-table');
+  var blogPostListItem = $('.e2e-test-blog-post-list-item');
+  var blogPostListItemsSelector = function() {
+    return $$('.e2e-test-blog-post-list-item');
+  };
+  var draftBlogPostTilesSelector = function() {
+    return $$('.e2e-test-draft-blog-post-tile-item');
+  };
+  var publishedBlogPostTilesSelector = function() {
+    return $$('.e2e-test-published-blog-post-tile-item');
+  };
+  var blogPostTag = $('.e2e-test-blog-post-tags');
+  var blogPostTagsSelector = function() {
+    return $$('.e2e-test-blog-post-tags');
+  };
+  var saveBlogPostAsDraftButton = $('.e2e-test-save-as-draft-button');
+  var publishBlogPostButton = $('.e2e-test-publish-blog-post-button');
+  var thumbnailClickable = $('.e2e-test-photo-clickable');
+  var customThumbnail = $('.e2e-test-custom-photo');
+  var thumbnailCropper = $('.e2e-test-photo-crop .cropper-container');
+  var thumbnailUploadError = $('.e2e-test-upload-error');
+  var saveBlogPostContentButton = $('.e2e-test-save-blog-post-content');
+  var blogPostContentDisplay = $('.e2e-test-content-display');
+  var confirmButton = $('.e2e-test-confirm-button');
+  var currUsername = $('.e2e-test-username-visible');
+  var cancelThumbnailUploadButton = $('.e2e-test-photo-upload-cancel');
+  var blogDashboardIntroMessageContainer = $(
+    '.e2e-test-intro-message-container');
+  var closeBlogCardPreviewButton = $('.e2e-test-close-preview-button');
+  var blogCardPreviewButton = $('.e2e-test-blog-card-preview-button');
+  var blogDashboardLink = $('.e2e-test-blog-dashboard-link');
+  var blogPostTileElement = $('.e2e-test-blog-dashboard-tile');
+  var blogPostTilesSelector = function() {
+    return $$('.e2e-test-blog-dashboard-tile');
+  };
+  var matInkBar = $('.mat-ink-bar');
+  var navigateToBlogDashboardButton = $('.e2e-test-back-button');
 
   this.get = async function() {
     await waitFor.pageToFullyLoad();
@@ -142,8 +123,8 @@ var BlogDashboardPage = function() {
   };
 
   this.setContent = async function(richTextInstructions) {
-    var schemaBasedEditorTag = blogPostContentEditor.element(
-      by.tagName('schema-based-editor'));
+    var schemaBasedEditorTag = await blogPostContentEditor.$(
+      '<schema-based-editor>');
     await waitFor.visibilityOf(
       schemaBasedEditorTag, 'Schema based editor tag not showing up');
     var richTextEditor = await forms.RichTextEditor(schemaBasedEditorTag);
@@ -157,18 +138,19 @@ var BlogDashboardPage = function() {
 
   this.saveBlogPostAsDraft = async function(
       blogPostTitle, richTextInstructions) {
-    await action.sendKeys(
+    await action.setValue(
       'New blog post title field', blogPostTitleFieldElement, blogPostTitle);
     await this.setContent(richTextInstructions);
-    await waitFor.presenceOf(
+    await waitFor.visibilityOf(
       blogPostContentDisplay, 'Blog Post content not showing up');
     await action.click('Save as draft Button', saveBlogPostAsDraftButton);
     await waitFor.visibilityOfSuccessToast('Blog Post Saved Successfully.');
+    await waitFor.invisibilityOfSuccessToast('Blog Post Saved Successfully.');
   };
 
   this.publishNewBlogPost = async function(
       blogPostTitle, richTextInstructions, tags) {
-    await action.sendKeys(
+    await action.setValue(
       'New blog post title field', blogPostTitleFieldElement, blogPostTitle);
     await this.selectTags(tags);
     await this.setContent(richTextInstructions);
@@ -194,9 +176,10 @@ var BlogDashboardPage = function() {
 
   this.selectTags = async function(tags) {
     await waitFor.visibilityOf(
-      blogPostTags.first(), 'Tags take too long to appear.');
-    for (i = 0; i < await blogPostTags.count(); i++) {
-      var tag = blogPostTags.get(i);
+      blogPostTag, 'Tags take too long to appear.');
+    var blogPostTags = await blogPostTagsSelector();
+    for (i = 0; i < blogPostTags.length; i++) {
+      var tag = blogPostTags[i];
       var tagName = await action.getText(
         `Blog Post Editor tag ${i}`, tag);
       if (tags.includes(tagName)) {
@@ -208,13 +191,18 @@ var BlogDashboardPage = function() {
 
   this.getMatTab = async function(tabName) {
     await waitFor.visibilityOf(
-      matTabLabels.first(), 'Mat Tab Toggle options take too long to appear.');
-    for (i = 0; i < await matTabLabels.count(); i++) {
-      var matTab = matTabLabels.get(i);
+      matTabLabel, 'Mat Tab Toggle options take too long to appear.');
+    var matTabLabels = await matTabLabelsSelector();
+    for (i = 0; i < matTabLabels.length; i++) {
+      var matTab = matTabLabels[i];
       var tabText = await action.getText(
         `Blog Dashboard tab ${i}`, matTab);
       if (tabText.startsWith(tabName)) {
         await action.click(`${tabName} tab`, matTab);
+        await waitFor.visibilityOf(
+          matInkBar, 'Mat Ink Bar takes too long to appear');
+        await waitFor.rightTransistionToComplete(
+          matInkBar, `${tabName} tab transition takes too long to complete`);
         break;
       }
     }
@@ -232,7 +220,8 @@ var BlogDashboardPage = function() {
 
   this.expectNumberOfDraftBlogPostsToBe = async function(number) {
     await this.waitForDraftBlogPostsToLoad();
-    expect(await draftBlogPostTiles.count()).toBe(number);
+    var draftBlogPostTiles = await draftBlogPostTilesSelector();
+    expect(draftBlogPostTiles.length).toBe(number);
   };
 
   this.blogDashboardIntroMessageIsVisible = async function() {
@@ -243,26 +232,34 @@ var BlogDashboardPage = function() {
 
   this.expectNumberOfPublishedBlogPostsToBe = async function(number) {
     await this.waitForPublishedBlogPostsToLoad();
-    expect(await publishedBlogPostTiles.count()).toBe(number);
+    var publishedBlogPostTiles = await publishedBlogPostTilesSelector();
+    expect(publishedBlogPostTiles.length).toBe(number);
   };
 
   this.expectNumberOfBlogPostsRowsToBe = async function(number) {
     await this.waitForDraftBlogPostsToLoad();
-    expect(await blogPostListItems.count()).toBe(number);
+    var blogPostListItems = await blogPostListItemsSelector();
+    expect(blogPostListItems.length).toBe(number);
   };
 
   this.getBlogPostTileEditOption = async function(title) {
     await waitFor.visibilityOf(
-      blogPostTiles.first(), 'Blog Post tiles take too long to be visible.');
-    for (i = 0; i < await blogPostTiles.count(); i++) {
-      var blogPostTile = blogPostTiles.get(i);
-      var blogPostTitleContainer = blogPostTile.element(
-        blogPostTileTitle);
+      blogPostTileElement, 'Blog Post tiles take too long to be visible.');
+    var blogPostTiles = await blogPostTilesSelector();
+    for (i = 0; i < blogPostTiles.length; i++) {
+      var blogPostTile = blogPostTiles[i];
+      var blogPostTitleContainer = await blogPostTile.$(
+        '.e2e-test-blog-post-title');
+      // The element is not interactable when we call getText(), so it returns
+      // null. To avoid that we are waiting till the element becomes clickable
+      // as we do not have any alternative for checking interactibility.
+      await waitFor.elementToBeClickable(
+        blogPostTitleContainer, 'Blog Post title is not interactable');
       var blogPostTitle = await action.getText(
         `Blog Post Tile Title ${i}`, blogPostTitleContainer);
       if (blogPostTitle === title) {
-        var blogPostEditOptionButton = blogPostTile.element(
-          blogPostEditOptions);
+        var blogPostEditOptionButton = await blogPostTile.$(
+          '.e2e-test-blog-post-edit-box');
         return blogPostEditOptionButton;
       }
     }
@@ -281,11 +278,17 @@ var BlogDashboardPage = function() {
 
   this.navigateToBlogPostEditorWithTitleFromList = async function(title) {
     await waitFor.visibilityOf(
-      blogPostListItems.first(), 'Blog post list take too long to be visible.');
-    for (i = 0; i < await blogPostListItems.count(); i++) {
-      var blogPostRow = blogPostListItems.get(i);
-      var blogPostTitleContainer = blogPostRow.element(
-        blogPostTileTitle);
+      blogPostListItem, 'Blog post list take too long to be visible.');
+    var blogPostListItems = await blogPostListItemsSelector();
+    for (i = 0; i < blogPostListItems.length; i++) {
+      var blogPostRow = blogPostListItems[i];
+      var blogPostTitleContainer = await blogPostRow.$(
+        '.e2e-test-blog-post-title');
+      // The element is not interactable when we call getText(), so it returns
+      // null. To avoid that we are waiting till the element becomes clicakble
+      // as we do not have any alternative for checking interactibility.
+      await waitFor.elementToBeClickable(
+        blogPostTitleContainer, 'Blog Post title is not interactable');
       var blogPostTitle = await action.getText(
         `Blog Post Tile Title ${i}`, blogPostTitleContainer);
       if (blogPostTitle === title) {

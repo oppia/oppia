@@ -18,10 +18,11 @@
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, waitForAsync } from '@angular/core/testing';
-import { FormsModule } from '@angular/forms';
+import { FormControl, FormsModule } from '@angular/forms';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { IdGenerationService } from 'services/id-generation.service';
 import { SchemaBasedDictEditorComponent } from './schema-based-dict-editor.component';
+import { Schema } from 'services/schema-default-value.service';
 
 describe('Schema Based Dict Editor Component', () => {
   let component: SchemaBasedDictEditorComponent;
@@ -49,25 +50,31 @@ describe('Schema Based Dict Editor Component', () => {
   });
 
   it('should set component properties on initialization', fakeAsync(() => {
-    let mockFunction = function(value: number) {
+    let mockFunction = function(value: Record<string, unknown>) {
       return value;
     };
     component.registerOnChange(mockFunction);
     component.registerOnTouched();
 
     expect(component).toBeDefined();
-    expect(component.validate(null)).toEqual({});
+    expect(component.validate(new FormControl(1))).toEqual({});
     expect(component.onChange).toEqual(mockFunction);
-    expect(component.onChange(true)).toEqual(true);
+    expect(component.onChange({first: 'true'})).toEqual({first: 'true'});
   }));
 
   it('should set directive properties on initialization', () => {
     component.propertySchemas = [
       {
-        name: 'Name1'
+        name: 'Name1',
+        schema: {
+          type: 'int'
+        }
       },
       {
-        name: 'Name2'
+        name: 'Name2',
+        schema: {
+          type: 'int'
+        }
       }
     ];
     spyOn(idGenerationService, 'generateNewId')
@@ -86,13 +93,12 @@ describe('Schema Based Dict Editor Component', () => {
   });
 
   it('should write value', () => {
-    component.localValue = null;
-    component.writeValue(null);
+    component.localValue = {
+      first: 'false'
+    };
 
-    expect(component.localValue).toEqual(null);
-
-    component.writeValue(true);
-    expect(component.localValue).toBeTrue();
+    component.writeValue({first: 'true'});
+    expect(component.localValue).toEqual({first: 'true'});
   });
 
   it('should update value when local value change', () => {
@@ -124,13 +130,13 @@ describe('Schema Based Dict Editor Component', () => {
   });
 
   it('should get empty object on validating', () => {
-    expect(component.validate(null)).toEqual({});
+    expect(component.validate(new FormControl(1))).toEqual({});
   });
 
   it('should get schema', () => {
     const HTML_SCHEMA = {
       type: 'html'
-    };
+    } as Schema;
 
     component.propertySchemas = [
       {
