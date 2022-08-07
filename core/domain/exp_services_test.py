@@ -1431,7 +1431,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             feconf.DEFAULT_INIT_STATE_NAME
         ].interaction.answer_groups = [state_domain.AnswerGroup(
             state_domain.Outcome(
-                'state 1', state_domain.SubtitledHtml(
+                'state 1', None, state_domain.SubtitledHtml(
                     'feedback_1', '<p>state outcome html</p>'),
                 False, [], None, None),
             [
@@ -1484,7 +1484,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             feconf.DEFAULT_INIT_STATE_NAME
         ].interaction.default_outcome = (
             state_domain.Outcome(
-                'state 1', state_domain.SubtitledHtml(
+                'state 1', None, state_domain.SubtitledHtml(
                     'default_outcome', '<p>Default outcome for state 4</p>'
                 ), False, [param_domain.ParamChange(
                     'ParamChange', 'RandomSelector', {
