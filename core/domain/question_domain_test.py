@@ -1781,7 +1781,9 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
         question_data['interaction']['id'] = 'AlgebraicExpressionInput'
         question_data['interaction']['customization_args'] = {
-            'customOskLetters': ['a', 'b', 'c']
+            'customOskLetters': {
+                'value': ['a', 'b', 'c']
+            }
         }
         question_data['interaction']['answer_groups'] = [{
             'outcome': {
@@ -1827,7 +1829,9 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self.assertEqual(rule_specs[0]['rule_type'], 'MatchesExactlyWith')
         self.assertEqual(
             test_value['state']['interaction']['customization_args'], {
-                'allowedVariables': ['a', 'b', 'c']
+                'allowedVariables': {
+                    'value': ['a', 'b', 'c']
+                }
             }
         )
 
