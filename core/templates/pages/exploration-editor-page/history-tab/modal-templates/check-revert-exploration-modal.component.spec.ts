@@ -69,6 +69,7 @@ describe('Check Revert Exploration Modal Component', function() {
   it('should initialize properties after component is initialized', () => {
     expect(component.version).toBe('1');
 
+    component.ngOnInit();
     mockDetailsEventEmitter.emit('details');
 
     expect(component.details).toBe('details');

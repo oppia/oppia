@@ -71,9 +71,9 @@
               <i class="fa fa-ellipsis-v"></i>
             </div>
             <div class="dropdown-menu dropdown-menu-left" aria-labelledby="<['dropdownMenuButton-' + $index]>">
-              <a class="dropdown-item e2e-test-revert-version" 
-                 href="#" 
-                 ng-if="metadata.versionNumber !== $ctrl.currentVersion && $ctrl.isEditable()" 
+              <a class="dropdown-item e2e-test-revert-version"
+                 href="#"
+                 ng-if="metadata.versionNumber !== $ctrl.currentVersion && $ctrl.isEditable()"
                  ng-click="$ctrl.showCheckRevertExplorationModal(metadata.versionNumber)">
                 Revert
               </a>
@@ -139,10 +139,10 @@
         </div>
         <div class="state-changes-container">
           <div>Changes in exploration states:</div>
-          <version-diff-visualization diff-data="$ctrl.diffData"
-                                      earlier-version-header="$ctrl.earlierVersionHeader"
-                                      later-version-header="$ctrl.laterVersionHeader">
-          </version-diff-visualization>
+          <oppia-version-diff-visualization [diff-data]="$ctrl.diffData"
+                                            [earlier-version-header]="$ctrl.earlierVersionHeader"
+                                            [later-version-header]="$ctrl.laterVersionHeader">
+          </oppia-version-diff-visualization>
         </div>
       </div>
     </div>
@@ -293,7 +293,7 @@
     height: 35px;
   }
   history-tab .exploration-metadata-changes-container {
-    margin-bottom: 30px;
+    margin-bottom: 10px;
   }
   history-tab .view-metadata-changes-button {
     white-space: nowrap;
