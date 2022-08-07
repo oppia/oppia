@@ -36,19 +36,22 @@ def main() -> None:
         check=False)
     if process.stdout.strip() == 'No data to report.':
         raise RuntimeError(
-            'Run backend tests before running this script. %s' % process
+            'Run backend tests before running this script. ' +
+            '\nOUTPUT: %s\nERROR: %s' % (process.stdout, process.stderr)
         )
     if process.returncode:
         raise RuntimeError(
-            'Failed to calculate coverage because subprocess failed. %s'
-            % process
+            'Failed to calculate coverage because subprocess failed. ' +
+            '\nOUTPUT: %s\nERROR: %s' % (process.stdout, process.stderr)
         )
     coverage_result = re.search(
         r'TOTAL\s+(\d+)\s+(?P<total>\d+)\s+(\d+)\s+(\d+)\s+(\d+)%\s+',
         process.stdout)
-    uncovered_lines = 0.0
+    uncovered_lines = -1
     if coverage_result:
         uncovered_lines = float(coverage_result.group('total'))
+    if uncovered_lines == -1:
+        raise RuntimeError('Error in parsing coverage report.')
     if uncovered_lines != 0:
         print('--------------------------------------------')
         print('Backend overall line coverage checks failed.')
