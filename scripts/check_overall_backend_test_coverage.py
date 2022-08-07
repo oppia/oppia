@@ -47,10 +47,10 @@ def main() -> None:
     coverage_result = re.search(
         r'TOTAL\s+(\d+)\s+(?P<total>\d+)\s+(\d+)\s+(\d+)\s+(\d+)%\s+',
         process.stdout)
-    uncovered_lines = -1
+    uncovered_lines = -1.0
     if coverage_result:
         uncovered_lines = float(coverage_result.group('total'))
-    if uncovered_lines == -1:
+    else:
         raise RuntimeError('Error in parsing coverage report.')
     if uncovered_lines != 0:
         print('--------------------------------------------')

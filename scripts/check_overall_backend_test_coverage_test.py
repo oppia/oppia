@@ -22,6 +22,7 @@ import sys
 
 from core.tests import test_utils
 from scripts import check_overall_backend_test_coverage
+from typing import Any
 
 
 class CheckOverallBackendTestCoverageTests(test_utils.GenericTestBase):
@@ -40,11 +41,11 @@ class CheckOverallBackendTestCoverageTests(test_utils.GenericTestBase):
             returncode = 0
             stdout = 'No data to report.'
             stderr = 'None'
-        def mock_subprocess_run(*args, **kwargs) -> MockProcess: # pylint: disable=unused-argument
+        def mock_subprocess_run(*args: Any, **kwargs: Any) -> MockProcess: # pylint: disable=unused-argument
             return MockProcess()
         swap_subprocess_run = self.swap(subprocess, 'run', mock_subprocess_run)
 
-        with swap_subprocess_run, self.assertRaisesRegex(
+        with swap_subprocess_run, self.assertRaisesRegex( # type: ignore[no-untyped-call]
             RuntimeError,
             'Run backend tests before running this script. ' +
             '\nOUTPUT: No data to report.\nERROR: None'):
@@ -55,11 +56,11 @@ class CheckOverallBackendTestCoverageTests(test_utils.GenericTestBase):
             returncode = 1
             stdout = 'Some error occured.'
             stderr = 'Some error.'
-        def mock_subprocess_run(*args, **kwargs) -> MockProcess: # pylint: disable=unused-argument
+        def mock_subprocess_run(*args: Any, **kwargs: Any) -> MockProcess: # pylint: disable=unused-argument
             return MockProcess()
         swap_subprocess_run = self.swap(subprocess, 'run', mock_subprocess_run)
 
-        with swap_subprocess_run, self.assertRaisesRegex(
+        with swap_subprocess_run, self.assertRaisesRegex( # type: ignore[no-untyped-call]
             RuntimeError,
             'Failed to calculate coverage because subprocess failed. ' +
             '\nOUTPUT: Some error occured.\nERROR: Some error.'):
@@ -69,11 +70,11 @@ class CheckOverallBackendTestCoverageTests(test_utils.GenericTestBase):
         class MockProcess:
             returncode = 0
             stdout = 'TOTALL     40571  10682  13759   1161   70% '
-        def mock_subprocess_run(*args, **kwargs) -> MockProcess: # pylint: disable=unused-argument
+        def mock_subprocess_run(*args: Any, **kwargs: Any) -> MockProcess: # pylint: disable=unused-argument
             return MockProcess()
         swap_subprocess_run = self.swap(subprocess, 'run', mock_subprocess_run)
 
-        with swap_subprocess_run, self.assertRaisesRegex(
+        with swap_subprocess_run, self.assertRaisesRegex( # type: ignore[no-untyped-call]
             RuntimeError, 'Error in parsing coverage report.'):
             check_overall_backend_test_coverage.main()
 
@@ -81,7 +82,7 @@ class CheckOverallBackendTestCoverageTests(test_utils.GenericTestBase):
         class MockProcess:
             returncode = 0
             stdout = 'TOTAL     40571  10682  13759   1161   70% '
-        def mock_subprocess_run(*args, **kwargs) -> MockProcess: # pylint: disable=unused-argument
+        def mock_subprocess_run(*args: Any, **kwargs: Any) -> MockProcess: # pylint: disable=unused-argument
             return MockProcess()
         swap_subprocess_run = self.swap(subprocess, 'run', mock_subprocess_run)
         swap_sys_exit = self.swap(sys, 'exit', lambda _: None)
@@ -96,7 +97,7 @@ class CheckOverallBackendTestCoverageTests(test_utils.GenericTestBase):
         class MockProcess:
             returncode = 0
             stdout = 'TOTAL     40571  0  13759   0   100% '
-        def mock_subprocess_run(*args, **kwargs) -> MockProcess: # pylint: disable=unused-argument
+        def mock_subprocess_run(*args: Any, **kwargs: Any) -> MockProcess: # pylint: disable=unused-argument
             return MockProcess()
         swap_subprocess_run = self.swap(subprocess, 'run', mock_subprocess_run)
 
