@@ -713,6 +713,7 @@ class ExplorationSnapshotsHandler(EditorHandler):
 class ExplorationCheckRevertValidHandler(EditorHandler):
     """Checks if an older version of an exploration is valid."""
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {
             'schema': SCHEMA_FOR_EXPLORATION_ID
