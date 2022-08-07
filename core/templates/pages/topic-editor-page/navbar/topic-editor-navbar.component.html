@@ -7,9 +7,8 @@
               ng-click="saveChanges()"
               ng-disabled="!isTopicSaveable()">
         <span ng-if="!isSaveInProgress()">
-          <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
+          <i class="fas fa-save md-18 md-dark oppia-save-publish-button-icon topic-editor-save-icon"
              alt="Save Topic">
-            &#xE161;
           </i>
           <span class="oppia-save-publish-button-label float-left">Save Changes</span>
           <span class="d-none d-md-block float-left oppia-change-count"
@@ -37,9 +36,8 @@
             ng-click="publishTopic()"
             ng-class="{'btn-success': !isTopicSaveable() && getWarningsCount() === 0 && prepublishValidationIssues.length === 0}"
             ng-disabled="isTopicSaveable() || getWarningsCount() > 0 || prepublishValidationIssues.length > 0">
-      <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
+      <i class="fas fa-cloud-upload-alt md-18 md-dark oppia-save-publish-button-icon"
          alt="Publish to Oppia Library">
-        &#xE2C3;
       </i>
       <span class="oppia-save-publish-button-label">Publish Topic</span>
     </button>
@@ -159,6 +157,9 @@
     margin-right: 20px;
     margin-top: 8px;
   }
+  .topic-editor-save-icon{
+      padding-left: 5px;
+    }
   @media screen and (max-width: 768px) {
     topic-editor-navbar .navbar-desktop {
       display: none;
