@@ -58,12 +58,6 @@ export class ComputeGraphService {
             source: stateName,
             target: groups[h].outcome.dest,
           });
-          // if(groups[h].outcome.destIfReallyStuck){
-          //   links.push({
-          //     source: stateName,
-          //     target: groups[h].outcome.destIfReallyStuck,
-          //   });
-          // }
         }
 
         if (interaction.defaultOutcome) {
@@ -71,16 +65,9 @@ export class ComputeGraphService {
             source: stateName,
             target: interaction.defaultOutcome.dest,
           });
-          // if(interaction.defaultOutcome.destIfReallyStuck){
-          //   links.push({
-          //     source: stateName,
-          //     target: interaction.defaultOutcome.destIfReallyStuck,
-          //   });
-          // }
         }
       }
     });
-
     return {
       finalStateIds: finalStateIds,
       initStateId: initStateId,

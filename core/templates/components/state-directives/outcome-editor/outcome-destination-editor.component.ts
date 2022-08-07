@@ -200,7 +200,6 @@ export class OutcomeDestinationEditorComponent implements OnInit {
 
           let newStateName = this.outcomeNewStateName;
           this.outcome.dest = newStateName;
-
           this.addState.emit(newStateName);
         }
       }));

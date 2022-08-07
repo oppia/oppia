@@ -193,8 +193,6 @@
   </div>
 </div>
 
-<br *ngIf="displayFeedback">
-
 <div *ngIf="destIfStuckFeatEnabled && !destinationIfStuckEditorIsOpen && !isInQuestionMode() && outcome && !outcome.labelledAsCorrect"
      class="h-100"
      title="{{ isEditable ? 'Change the if stuck destination card' : '' }}">
@@ -225,7 +223,7 @@
         name="editOutcomeForm.editDestIfStuckForm"
         (submit)="saveThisIfStuckDestination()">
     <oppia-outcome-if-stuck-destination-editor [outcome]="outcome"
-                                      (addState)="addState($event)">
+                                               (addState)="addState($event)">
     </oppia-outcome-if-stuck-destination-editor>
   </form>
 

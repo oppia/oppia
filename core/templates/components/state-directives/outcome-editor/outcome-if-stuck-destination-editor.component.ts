@@ -81,7 +81,8 @@ export class OutcomeIfStuckDestinationEditorComponent implements OnInit {
   }
 
   onDestIfStuckSelectorChange(): void {
-    if (this.outcome.destIfReallyStuck === this.PLACEHOLDER_OUTCOME_DEST_IF_STUCK) {
+    if (this.outcome.destIfReallyStuck ===
+      this.PLACEHOLDER_OUTCOME_DEST_IF_STUCK) {
       this.focusManagerService.setFocus('newStateNameInputField');
     }
 
@@ -190,7 +191,6 @@ export class OutcomeIfStuckDestinationEditorComponent implements OnInit {
 
             let newStateName = this.outcomeNewStateName;
             this.outcome.destIfReallyStuck = newStateName;
-
             this.addState.emit(newStateName);
           }
         }));
