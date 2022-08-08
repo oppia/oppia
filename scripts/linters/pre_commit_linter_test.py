@@ -83,7 +83,7 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
     """Tests for methods in pre_commit_linter module."""
 
     def setUp(self):
-        super(PreCommitLinterTests, self).setUp()
+        super().setUp()
         self.sys_swap = self.swap(sys, 'exit', mock_exit)
         self.install_swap = self.swap_with_checks(
             install_third_party_libs, 'main',
