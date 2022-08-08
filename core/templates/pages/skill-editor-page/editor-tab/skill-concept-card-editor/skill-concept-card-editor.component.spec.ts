@@ -30,6 +30,8 @@ import { UrlInterpolationService } from 'domain/utilities/url-interpolation.serv
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { AppConstants } from 'app.constants';
 import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
+import { CdkDragSortEvent } from '@angular/cdk/drag-drop';
+import { WorkedExample } from 'domain/skill/WorkedExampleObjectFactory';
 
 class MockNgbModalRef {
   componentInstance = {};
@@ -126,13 +128,11 @@ describe('Skill Concept Card Editor Component', () => {
     const event = {
       previousIndex: 1,
       currentIndex: 2,
-      container: undefined,
-      item: undefined,
     };
     spyOn(skillUpdateService, 'updateWorkedExamples').and.callThrough();
     spyOn(component.getConceptCardChange, 'emit').and.callThrough();
 
-    component.drop(event);
+    component.drop(event as CdkDragSortEvent<WorkedExample[]>);
 
     expect(skillUpdateService.updateWorkedExamples).toHaveBeenCalled();
     expect(component.getConceptCardChange.emit).toHaveBeenCalled();
@@ -147,10 +147,12 @@ describe('Skill Concept Card Editor Component', () => {
 
   it('should update skill on saving explanation', () => {
     let updateSpy = spyOn(skillUpdateService, 'setConceptCardExplanation')
-      .and.returnValue(null);
+      .and.callThrough();
 
     component.ngOnInit();
-    component.onSaveExplanation(null);
+    component.onSaveExplanation(
+      SubtitledHtml.createDefault(
+        'review material', AppConstants.COMPONENT_NAME_EXPLANATION));
 
     expect(updateSpy).toHaveBeenCalled();
   });
@@ -180,7 +182,7 @@ describe('Skill Concept Card Editor Component', () => {
       result: Promise.resolve()
     } as NgbModalRef);
     let deleteWorkedExampleSpy = spyOn(
-      skillUpdateService, 'deleteWorkedExample').and.returnValue(null);
+      skillUpdateService, 'deleteWorkedExample').and.callThrough();
 
     component.ngOnInit();
     component.deleteWorkedExample(0, '');
@@ -197,7 +199,7 @@ describe('Skill Concept Card Editor Component', () => {
       result: Promise.reject()
     } as NgbModalRef);
     let deleteWorkedExampleSpy = spyOn(
-      skillUpdateService, 'deleteWorkedExample').and.returnValue(null);
+      skillUpdateService, 'deleteWorkedExample').and.callThrough();
 
     component.ngOnInit();
     component.deleteWorkedExample(0, '');
@@ -217,7 +219,7 @@ describe('Skill Concept Card Editor Component', () => {
       })
     } as NgbModalRef);
     let addWorkedExampleSpy = spyOn(
-      skillUpdateService, 'addWorkedExample').and.returnValue(null);
+      skillUpdateService, 'addWorkedExample').and.callThrough();
 
     component.ngOnInit();
     component.openAddWorkedExampleModal();
@@ -234,7 +236,7 @@ describe('Skill Concept Card Editor Component', () => {
       result: Promise.reject()
     } as NgbModalRef);
     let addWorkedExampleSpy = spyOn(
-      skillUpdateService, 'addWorkedExample').and.returnValue(null);
+      skillUpdateService, 'addWorkedExample').and.callThrough();
 
     component.ngOnInit();
     component.openAddWorkedExampleModal();

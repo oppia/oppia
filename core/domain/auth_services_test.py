@@ -38,7 +38,7 @@ auth_models, = models.Registry.import_models([models.NAMES.auth])
 class AuthServicesTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(AuthServicesTests, self).setUp()
+        super().setUp()
 
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.full_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)  # type: ignore[no-untyped-call]
