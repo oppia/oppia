@@ -27,7 +27,6 @@ import { ContributionAndReviewService } from './services/contribution-and-review
 import { ContributionOpportunitiesService } from './services/contribution-opportunities.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { LocalStorageService } from 'services/local-storage.service';
-import { SvgSanitizerService } from 'services/svg-sanitizer.service';
 import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import { TranslationTopicService } from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
 import { UserService } from 'services/user.service';
@@ -61,7 +60,6 @@ export class ContributorDashboardPageComponent
     private focusManagerService: FocusManagerService,
     private languageUtilService: LanguageUtilService,
     private localStorageService: LocalStorageService,
-    private svgSanitizerService: SvgSanitizerService,
     private translationLanguageService: TranslationLanguageService,
     private translationTopicService: TranslationTopicService,
     private urlInterpolationService: UrlInterpolationService,
@@ -193,8 +191,7 @@ export class ContributorDashboardPageComponent
 
     this.userService.getProfileImageDataUrlAsync().then(
       (dataUrl) => {
-        this.profilePictureDataUrl = this.svgSanitizerService
-          .getTrustedSvgResourceUrl(dataUrl);
+        this.profilePictureDataUrl = decodeURIComponent(dataUrl);
       });
 
     this.contributionOpportunitiesService.getTranslatableTopicNamesAsync()

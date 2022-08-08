@@ -29,9 +29,9 @@ import { SchemaBasedDictEditorComponent } from './schema-based-dict-editor.compo
 export class SchemaBasedExpressionEditorComponent
 implements ControlValueAccessor, Validator, OnInit {
   localValue!: unknown;
-  @Input() disabled: boolean = false;
-  @Input() outputType: 'bool' | 'int' | 'float';
-  @Input() labelForFocusTarget: string;
+  @Input() disabled!: boolean;
+  @Input() outputType!: 'bool' | 'int' | 'float';
+  @Input() labelForFocusTarget!: string;
   onChange: (val: unknown) => void = (val: unknown) => {};
 
   constructor(private focusManagerService: FocusManagerService) {}
