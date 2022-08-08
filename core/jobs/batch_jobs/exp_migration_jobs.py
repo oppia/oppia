@@ -22,11 +22,13 @@ import logging
 
 from core import feconf
 from core import utils
+from core.constants import constants
 from core.domain import caching_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import opportunity_services
+from core.domain import rights_manager
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
@@ -96,8 +98,8 @@ class MigrateExplorationJob(base_jobs.JobBase):
         exp_id: str, exp_model: exp_models.ExplorationModel
     ) -> Iterable[Tuple[str, exp_domain.ExplorationChange]]:
         """Generates exploration change objects. ExplorationChange object is
-        generated schema version for some field is lower than the latest
-        schema version.
+        only generated when schema version is lower than the latest schema
+        version.
 
         Args:
             exp_id: str. The ID of the exploration.
@@ -152,15 +154,17 @@ class MigrateExplorationJob(base_jobs.JobBase):
             migrated_exp: Exploration. The migrated exploration domain object.
             exp_summary_model: ExpSummaryModel. The exploration summary model
                 to update.
-            exp_rights_model: ExplorationRightsmodel. The exploration rights
+            exp_rights_model: ExplorationRightsModel. The exploration rights
                 model used to update the exploration summary.
 
         Returns:
             ExpSummaryModel. The updated exploration summary model to put into
             the datastore.
         """
+        exp_rights = rights_manager.get_activity_rights_from_model( # type: ignore[no-untyped-call]
+            exp_rights_model, constants.ACTIVITY_TYPE_EXPLORATION)
         exp_summary = exp_services.compute_summary_of_exploration( # type: ignore[no-untyped-call]
-            migrated_exp, exp_rights_model, exp_summary_model,
+            migrated_exp, exp_rights, exp_summary_model,
             skip_exploration_model_last_updated=True)
         exp_summary.version += 1
         updated_exp_summary_model: exp_models.ExpSummaryModel = (
@@ -187,11 +191,11 @@ class MigrateExplorationJob(base_jobs.JobBase):
                 model which is to be updated.
             migrated_exp: Exploration. The migrated exploration domain
                 object.
-            exp_changes: sequence(ExplorationChange). The exploration changes
+            exp_changes: Sequence(ExplorationChange). The exploration changes
                 to apply.
 
         Returns:
-            sequence(BaseModel). Sequence of models which should be put into
+            Sequence(BaseModel). Sequence of models which should be put into
             the datastore.
         """
         updated_exp_model = (

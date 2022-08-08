@@ -2324,7 +2324,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
     @classmethod
     def _convert_states_v51_dict_to_v52_dict(cls, states_dict):
         """Converts from version 51 to 52. Version 52 correctly updates
-        the content IDs for translations and for voiceovers.
+        the content IDs for translations and for voiceovers. In the 49 to 50
+        conversion we removed some interaction rules and thus also some parts of
+        the exploration that had its content IDs, but then the content IDs in
+        translations and voiceovers were not updated.
 
         Args:
             states_dict: dict. A dict where each key-value pair represents,

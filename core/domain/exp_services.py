@@ -594,7 +594,7 @@ def populate_exp_model_fields(exp_model, exploration):
 
     Args:
         exp_model: ExplorationModel. The model to populate.
-        exploration: Exploration. THe exploration domain object which should be
+        exploration: Exploration. The exploration domain object which should be
             used to populate the model.
 
     Returns:
@@ -627,7 +627,8 @@ def populate_exp_summary_model_fields(exp_summary_model, exp_summary):
     ExplorationSummary object.
 
     Args:
-        exp_summary_model: ExpSummaryModel. The model to populate.
+        exp_summary_model: ExpSummaryModel|None. The model to populate,
+            can be None, in that case we create a new model.
         exp_summary: ExplorationSummary. THe exploration domain object which
             should be used to populate the model.
 
@@ -1576,7 +1577,7 @@ def regenerate_exploration_summary_with_new_contributor(
     """
     exploration = exp_fetchers.get_exploration_by_id(
         exploration_id, strict=False)
-    exp_rights = exp_models.ExplorationRightsModel.get(
+    exp_rights = rights_manager.get_exploration_rights(
         exploration_id, strict=False)
     exp_summary_model = exp_models.ExpSummaryModel.get(
         exploration_id, strict=False)
@@ -1598,7 +1599,7 @@ def regenerate_exploration_and_contributors_summaries(exploration_id):
         exploration_id: str. ID of the exploration.
     """
     exploration = exp_fetchers.get_exploration_by_id(exploration_id)
-    exp_rights = exp_models.ExplorationRightsModel.get(
+    exp_rights = rights_manager.get_exploration_rights(
         exploration_id, strict=False)
     exp_summary_model = exp_models.ExpSummaryModel.get(
         exploration_id, strict=False)
@@ -1610,18 +1611,22 @@ def regenerate_exploration_and_contributors_summaries(exploration_id):
 
 
 def compute_summary_of_exploration(
-    exploration, exp_rights, exp_summary_model,
-    skip_exploration_model_last_updated=False):
+    exploration,
+    exp_rights,
+    exp_summary_model,
+    skip_exploration_model_last_updated=False
+):
     """Create an ExplorationSummary domain object for a given Exploration
     domain object and return it.
 
     Args:
         exploration: Exploration. The exploration whose summary is to be
             computed.
-        exp_rights: ExplorationRightsModel. The exploration rights model, used
+        exp_rights: ActivityRights. The exploration rights model, used
             to compute summary.
-        exp_summary_model: ExplorationSummaryModel. The exploration summary
-            model, whose summary is computed.
+        exp_summary_model: ExplorationSummaryMode|None. The exploration summary
+            model, whose summary is computed, can be None, it that case we
+            generate a new exploration summary.
         skip_exploration_model_last_updated: bool. This flag is used to
             update exploration_model_last_updated, only when required.
 
@@ -1633,7 +1638,7 @@ def compute_summary_of_exploration(
             skip_exploration_model_last_updated cannot be set to True
             at the same time.
     """
-    if exp_summary_model:
+    if exp_summary_model is not None:
         old_exp_summary = exp_fetchers.get_exploration_summary_from_model(
             exp_summary_model)
         ratings = old_exp_summary.ratings or feconf.get_empty_ratings()
@@ -1722,7 +1727,7 @@ def save_exploration_summary(exp_summary):
     """
 
     existing_exp_summary_model = (
-        exp_models.ExpSummaryModel.get(exp_summary.id, strict=False))
+        exp_models.ExpSummaryModel.get(exp_summary.id, strict=True))
     exp_summary_model = populate_exp_summary_model_fields(
         existing_exp_summary_model, exp_summary)
     exp_summary_model.update_timestamps()

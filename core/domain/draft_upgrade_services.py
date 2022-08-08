@@ -210,9 +210,9 @@ class DraftUpgradeUtil:
     @classmethod
     def _convert_states_v51_dict_to_v52_dict(cls, draft_change_list):
         """Converts from version 51 to 52. Version 52 fixes content IDs
-        in translations and voiceovers. As this only affects content IDs and
-        therefore doesn't affect any pre-existing drafts, there should be
-        no changes to drafts.
+        in translations and voiceovers (some content IDs are removed).
+        We discard drafts that work with content IDs to make sure that they
+        don't contain content IDs that were removed.
 
         Args:
             draft_change_list: list(ExplorationChange). The list of

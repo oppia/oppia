@@ -544,9 +544,9 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
     def test_compute_summary_of_exploration_raises_exception(self):
         # Ensure that compute_summary_of_exploration raises exception when
         # ExplorationSummaryModel is None and
-        #  skip_exploration_model_last_updated is true.
+        # skip_exploration_model_last_updated is true.
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID_0)
-        exp_rights_model = exp_models.ExplorationRightsModel.get(
+        exp_rights = rights_manager.get_exploration_rights(
             self.EXP_ID_0, strict=False)
 
         with self.assertRaisesRegex(
@@ -555,7 +555,7 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
             'skip_exploration_model_last_updated is set to True'
             'for exploration ID %s' % exploration.id):
             exp_services.compute_summary_of_exploration(
-                exploration, exp_rights_model, None, True)
+                exploration, exp_rights, None, True)
 
 
 class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
