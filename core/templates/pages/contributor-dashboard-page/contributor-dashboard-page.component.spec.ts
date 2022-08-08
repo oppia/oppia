@@ -101,7 +101,7 @@ describe('Contributor dashboard page', () => {
       .and.returnValue(Promise.resolve(userProfileImage));
     spyOn(userService, 'getUserContributionRightsDataAsync')
       .and.returnValue(Promise.resolve(userContributionRights));
-    getUserInfoAsyncSpy = spyOn(userService, 'getUserInfoAsync')
+    getUserInfoAsyncSpy = spyOn(userService, 'getUserInfoAsync');
     getUserInfoAsyncSpy.and.returnValue(
       Promise.resolve(userInfo as UserInfo));
 
