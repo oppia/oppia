@@ -732,14 +732,11 @@ def get_multiple_threads(
     feedback_thread_models_with_none = (
         feedback_models.GeneralFeedbackThreadModel.get_multi(thread_ids)
     )
-    domain_feedback_thread_list: List[feedback_domain.FeedbackThread] = []
-    for model in feedback_thread_models_with_none:
-        # Ruling out the possibility of None for mypy type checking.
-        assert model is not None
-        domain_feedback_thread_list.append(
-            _get_thread_from_model(model)
-        )
-    return domain_feedback_thread_list
+    return [
+        _get_thread_from_model(model)
+        for model in feedback_thread_models_with_none
+        if model is not None
+    ]
 
 
 def _get_thread_from_model(
@@ -864,7 +861,7 @@ def get_exp_thread_summaries(
             author_id: str = second_last_message_model.author_id
             author_second_last_message = (
                 author_id and
-                user_services.get_username(second_last_message_model.author_id)
+                user_services.get_username(author_id)
             )
         # Ruling out the possibility of None for mypy type checking.
         assert exp_model is not None
