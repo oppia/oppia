@@ -136,7 +136,7 @@ def _update_report_stats_model_in_transaction( # type: ignore[no-untyped-def]
             stats_id))
 
     stats_parameter_names = (
-        app_feedback_report_constants.STATS_PARAMETER_NAMES)
+        app_feedback_report_constants.StatsParameterNames)
     if stats_model is None:
         assert delta > 0
         # Create new stats model entity. These are the individual report fields

@@ -63,13 +63,13 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
     USER_ID = 'user_1'
     REPORT_TYPE_SUGGESTION = (
         app_feedback_report_constants.ReportType.SUGGESTION)
-    CATEGORY_OTHER = app_feedback_report_constants.CATEGORY.other_suggestion
+    CATEGORY_OTHER = app_feedback_report_constants.Category.other_suggestion
     ANDROID_PLATFORM_VERSION = '0.1-alpha-abcdef1234'
     COUNTRY_LOCALE_CODE_INDIA = 'in'
     ANDROID_DEVICE_MODEL = 'Pixel 4a'
     ANDROID_SDK_VERSION = 23
     ENTRY_POINT_NAVIGATION_DRAWER = (
-        app_feedback_report_constants.ENTRY_POINT.navigation_drawer)
+        app_feedback_report_constants.EntryPoint.navigation_drawer)
     TEXT_LANGUAGE_CODE_ENGLISH = 'en'
     AUDIO_LANGUAGE_CODE_ENGLISH = 'en'
     ANDROID_REPORT_INFO = {
@@ -615,7 +615,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                 unticketed_stats_id))
 
         stats_parameter_names = (
-            app_feedback_report_constants.STATS_PARAMETER_NAMES)
+            app_feedback_report_constants.StatsParameterNames)
         expected_json = {
             stats_parameter_names.report_type.name: {
                 self.REPORT_TYPE_SUGGESTION.name: 2
@@ -667,7 +667,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                 all_report_stats_id))
 
         stats_parameter_names = (
-            app_feedback_report_constants.STATS_PARAMETER_NAMES)
+            app_feedback_report_constants.StatsParameterNames)
         expected_json = {
             stats_parameter_names.report_type.name: {
                 self.REPORT_TYPE_SUGGESTION.name: 2
@@ -889,7 +889,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                 new_stats_id))
 
         stats_parameter_names = (
-            app_feedback_report_constants.STATS_PARAMETER_NAMES)
+            app_feedback_report_constants.StatsParameterNames)
         expected_json = {
             stats_parameter_names.report_type.name: {
                 self.REPORT_TYPE_SUGGESTION.name: 1
@@ -952,7 +952,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                 old_stats_id))
 
         stats_parameter_names = (
-            app_feedback_report_constants.STATS_PARAMETER_NAMES)
+            app_feedback_report_constants.StatsParameterNames)
         expected_json = {
             stats_parameter_names.report_type.name: {
                 self.REPORT_TYPE_SUGGESTION.name: 0
@@ -1007,7 +1007,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
                 old_stats_id))
 
         stats_parameter_names = (
-            app_feedback_report_constants.STATS_PARAMETER_NAMES)
+            app_feedback_report_constants.StatsParameterNames)
         expected_json = {
             stats_parameter_names.report_type.name: {
                 self.REPORT_TYPE_SUGGESTION.name: 0

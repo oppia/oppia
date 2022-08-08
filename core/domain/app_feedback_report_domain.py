@@ -335,7 +335,7 @@ class AppFeedbackReport:
 
     @classmethod
     def get_category_from_string(cls, category_name: str) -> (
-        app_feedback_report_constants.CATEGORY):
+        app_feedback_report_constants.Category):
         """Determines the category based on the JSON value.
 
         Args:
@@ -387,21 +387,21 @@ class AppFeedbackReport:
         """
         entry_point_name = entry_point_json['entry_point_name']
         if entry_point_name == (
-            app_feedback_report_constants.ENTRY_POINT.navigation_drawer.name):
+            app_feedback_report_constants.EntryPoint.navigation_drawer.name):
             return NavigationDrawerEntryPoint()
         elif entry_point_name == (
-            app_feedback_report_constants.ENTRY_POINT.lesson_player.name):
+            app_feedback_report_constants.EntryPoint.lesson_player.name):
             return LessonPlayerEntryPoint(
                 entry_point_json['entry_point_topic_id'],
                 entry_point_json['entry_point_story_id'],
                 entry_point_json['entry_point_exploration_id'])
         elif entry_point_name == (
-            app_feedback_report_constants.ENTRY_POINT.revision_card.name):
+            app_feedback_report_constants.EntryPoint.revision_card.name):
             return RevisionCardEntryPoint(
                 entry_point_json['entry_point_topic_id'],
                 entry_point_json['entry_point_subtopic_id'])
         elif entry_point_name == (
-            app_feedback_report_constants.ENTRY_POINT.crash.name):
+            app_feedback_report_constants.EntryPoint.crash.name):
             return CrashEntryPoint()
         else:
             raise utils.InvalidInputException(
@@ -433,7 +433,7 @@ class UserSuppliedFeedback:
     def __init__(
         self,
         report_type: app_feedback_report_constants.ReportType,
-        category: app_feedback_report_constants.CATEGORY,
+        category: app_feedback_report_constants.Category,
         user_feedback_selected_items: List[str],
         user_feedback_other_text_input: str
     ) -> None:
@@ -514,7 +514,7 @@ class UserSuppliedFeedback:
 
     @classmethod
     def require_valid_category(
-        cls, category: app_feedback_report_constants.CATEGORY
+        cls, category: app_feedback_report_constants.Category
     ) -> None:
         """Checks whether the category is valid.
 
@@ -535,7 +535,7 @@ class UserSuppliedFeedback:
     @classmethod
     def require_valid_user_feedback_items_for_category(
         cls,
-        category: app_feedback_report_constants.CATEGORY,
+        category: app_feedback_report_constants.Category,
         selected_items: List[str],
         other_text_input: str
     ) -> None:
@@ -1096,7 +1096,7 @@ class EntryPoint:
 
     def __init__(
         self,
-        entry_point: app_feedback_report_constants.ENTRY_POINT,
+        entry_point: app_feedback_report_constants.EntryPoint,
         topic_id: Optional[str] = None,
         story_id: Optional[str] = None,
         exploration_id: Optional[str] = None,
@@ -1148,7 +1148,7 @@ class EntryPoint:
     def require_valid_entry_point_name(
         cls,
         actual_name: str,
-        expected_entry_point: app_feedback_report_constants.ENTRY_POINT
+        expected_entry_point: app_feedback_report_constants.EntryPoint
     ) -> None:
         """Validates this EntryPoint name.
 
@@ -1206,7 +1206,7 @@ class NavigationDrawerEntryPoint(EntryPoint):
     def __init__(self) -> None:
         """Constructs an NavigationDrawerEntryPoint domain object."""
         super(NavigationDrawerEntryPoint, self).__init__(
-            app_feedback_report_constants.ENTRY_POINT.navigation_drawer, None,
+            app_feedback_report_constants.EntryPoint.navigation_drawer, None,
             None, None, None)
 
     def to_dict(self) -> Dict[str, Any]:
@@ -1230,7 +1230,7 @@ class NavigationDrawerEntryPoint(EntryPoint):
         """
         self.require_valid_entry_point_name(
             self.entry_point_name,
-            app_feedback_report_constants.ENTRY_POINT.navigation_drawer)
+            app_feedback_report_constants.EntryPoint.navigation_drawer)
 
 
 class LessonPlayerEntryPoint(EntryPoint):
@@ -1250,7 +1250,7 @@ class LessonPlayerEntryPoint(EntryPoint):
                 user is playing when intiating the report.
         """
         super(LessonPlayerEntryPoint, self).__init__(
-            app_feedback_report_constants.ENTRY_POINT.lesson_player,
+            app_feedback_report_constants.EntryPoint.lesson_player,
             topic_id=topic_id, story_id=story_id, exploration_id=exploration_id)
 
     def to_dict(self) -> Dict[str, Any]:
@@ -1276,7 +1276,7 @@ class LessonPlayerEntryPoint(EntryPoint):
         """
         self.require_valid_entry_point_name(
             self.entry_point_name,
-            app_feedback_report_constants.ENTRY_POINT.lesson_player)
+            app_feedback_report_constants.EntryPoint.lesson_player)
         topic_domain.Topic.require_valid_topic_id(self.topic_id)
         if self.story_id is None:
             raise utils.ValidationError(
@@ -1299,7 +1299,7 @@ class RevisionCardEntryPoint(EntryPoint):
                 reviewing when intiating the report.
         """
         super(RevisionCardEntryPoint, self).__init__(
-            app_feedback_report_constants.ENTRY_POINT.revision_card,
+            app_feedback_report_constants.EntryPoint.revision_card,
             topic_id, None, None, subtopic_id)
 
     def to_dict(self) -> Dict[str, Any]:
@@ -1325,7 +1325,7 @@ class RevisionCardEntryPoint(EntryPoint):
         """
         self.require_valid_entry_point_name(
             self.entry_point_name,
-            app_feedback_report_constants.ENTRY_POINT.revision_card)
+            app_feedback_report_constants.EntryPoint.revision_card)
         topic_domain.Topic.require_valid_topic_id(self.topic_id)
         if not isinstance(self.subtopic_id, int):
             raise utils.ValidationError(
@@ -1340,7 +1340,7 @@ class CrashEntryPoint(EntryPoint):
         """Constructs an CrashEntryPoint domain object."""
         super(
             CrashEntryPoint, self).__init__(
-                app_feedback_report_constants.ENTRY_POINT.crash, None, None,
+                app_feedback_report_constants.EntryPoint.crash, None, None,
                 None, None)
 
     def to_dict(self) -> Dict[str, Any]:
@@ -1363,7 +1363,7 @@ class CrashEntryPoint(EntryPoint):
         """
         self.require_valid_entry_point_name(
             self.entry_point_name,
-            app_feedback_report_constants.ENTRY_POINT.crash)
+            app_feedback_report_constants.EntryPoint.crash)
 
 
 class AppFeedbackReportTicket:
