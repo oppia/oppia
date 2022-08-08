@@ -450,7 +450,7 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
     EXP_ID_1: Final = 'exp_id1'
     COLLECTION_ID: Final = 'A_collection_id'
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
@@ -906,7 +906,7 @@ class ActivityReferenceAccessCheckerTests(test_utils.GenericTestBase):
     EXP_ID_1: Final = 'exp_id_1'
     COL_ID_2: Final = 'col_id_2'
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
@@ -974,7 +974,7 @@ class CollectionNodeMetadataDictsTest(
     EXP_ID5: Final = 'eid5'
     INVALID_EXP_ID: Final = 'invalid_exp_id'
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
 
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)

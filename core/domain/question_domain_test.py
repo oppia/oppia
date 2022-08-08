@@ -2145,7 +2145,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 class QuestionSummaryTest(test_utils.GenericTestBase):
     """Test for Question Summary object."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.fake_date_created = datetime.datetime(
             2018, 11, 17, 20, 2, 45, 0)
