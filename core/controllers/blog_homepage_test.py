@@ -34,7 +34,7 @@ class BlogHomepageDataHandlerTest(test_utils.GenericTestBase):
 
     def setUp(self):
         """Complete the setup process for testing."""
-        super(BlogHomepageDataHandlerTest, self).setUp()
+        super().setUp()
         self.signup(
             self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
         self.blog_admin_id = (
@@ -99,7 +99,7 @@ class BlogPostHandlerTest(test_utils.GenericTestBase):
 
     def setUp(self):
         """Complete the setup process for testing."""
-        super(BlogPostHandlerTest, self).setUp()
+        super().setUp()
         self.signup(
             self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
         self.blog_admin_id = (
@@ -179,7 +179,7 @@ class AuthorsPageHandlerTest(test_utils.GenericTestBase):
 
     def setUp(self):
         """Complete the setup process for testing."""
-        super(AuthorsPageHandlerTest, self).setUp()
+        super().setUp()
         self.signup(
             self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
         self.blog_admin_id = (

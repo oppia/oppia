@@ -222,7 +222,7 @@
   flex-direction: row-reverse;
 }
 
-.progress-bar {
+.lesson-progress-bar {
   background-color: #bbb;
   border-radius: 5px;
   display: flex;
