@@ -260,7 +260,7 @@ export class QuestionSuggestionReviewModalComponent
     this.refreshActiveContributionState();
   }
 
-  invertMap(originalMap: unknown): unknown {
+  invertMap(originalMap: object): object {
     return Object.keys(originalMap).reduce(
       (invertedMap, key) => {
         invertedMap[originalMap[key]] = key;
