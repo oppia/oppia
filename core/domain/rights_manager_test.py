@@ -908,7 +908,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             'Changed role of TestUser from none to editor'
         )
 
-        # De-assigning editor role from editor_username ('B').
+        # De-assigning editor role from editor_username ('TestUser').
         rights_manager.deassign_role_for_exploration(
             self.user_a, self.EXP_ID, test_user)
         exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
