@@ -180,22 +180,22 @@ describe('Checkpoint celebration utility service', () => {
 
     expect(
       checkpointCelebrationUtilityService.getCheckpointMessageI18nKey(1, 8))
-      .toEqual('I18N_CONGRATULATORY_CHECKPOINT_MESSAGE_A_2');
+      .toEqual('I18N_CONGRATULATORY_CHECKPOINT_MESSAGE_FIRST_2');
     expect(
       checkpointCelebrationUtilityService.getCheckpointMessageI18nKey(2, 8))
-      .toEqual('I18N_CONGRATULATORY_CHECKPOINT_MESSAGE_B_2');
+      .toEqual('I18N_CONGRATULATORY_CHECKPOINT_MESSAGE_SECOND_2');
     expect(
       checkpointCelebrationUtilityService.getCheckpointMessageI18nKey(4, 8))
-      .toEqual('I18N_CONGRATULATORY_CHECKPOINT_MESSAGE_C_2');
+      .toEqual('I18N_CONGRATULATORY_CHECKPOINT_MESSAGE_MIDWAY_2');
     expect(
       checkpointCelebrationUtilityService.getCheckpointMessageI18nKey(6, 8))
-      .toEqual('I18N_CONGRATULATORY_CHECKPOINT_MESSAGE_D_2');
+      .toEqual('I18N_CONGRATULATORY_CHECKPOINT_MESSAGE_TWO_REMAINING_2');
     expect(
       checkpointCelebrationUtilityService.getCheckpointMessageI18nKey(7, 8))
-      .toEqual('I18N_CONGRATULATORY_CHECKPOINT_MESSAGE_E_2');
+      .toEqual('I18N_CONGRATULATORY_CHECKPOINT_MESSAGE_ONE_REMAINING_2');
     expect(
       checkpointCelebrationUtilityService.getCheckpointMessageI18nKey(3, 8))
-      .toEqual('I18N_CONGRATULATORY_CHECKPOINT_MESSAGE_F_2');
+      .toEqual('I18N_CONGRATULATORY_CHECKPOINT_MESSAGE_GENERIC_2');
   });
 
   it('should get the checkpoint message', () => {
