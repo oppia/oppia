@@ -3609,7 +3609,6 @@ class ContributorMilestoneEmailInfoUnitTests(test_utils.GenericTestBase):
     CONTRIBUTIONS_COUNT = 1
 
     def test_create_contribution_milestone_email_info(self):
-
         actual_info = suggestion_registry.ContributorMilestoneEmailInfo(
             self.CONTRIBUTOR_USER_ID, self.CONTRIBUTION_TYPE,
             self.CONTRIBUTION_SUB_TYPE, self.LANGUAGE_CODE,
@@ -3663,7 +3662,6 @@ class ContributorStatsSummaryUnitTests(test_utils.GenericTestBase):
     LAST_CONTRIBUTION_DATE = datetime.date.fromtimestamp(1616173836)
 
     def test_create_contribution_stats_summary(self):
-
         expected_translation_contribution_stats = {
             'language_code': self.LANGUAGE_CODE,
             'contributor_user_id': self.CONTRIBUTOR_USER_ID,
@@ -3769,6 +3767,7 @@ class ContributorStatsSummaryUnitTests(test_utils.GenericTestBase):
             self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT,
             self.FIRST_CONTRIBUTION_DATE, self.LAST_CONTRIBUTION_DATE
         )
+
         contribution_summary = suggestion_registry.ContributorStatsSummary(
             self.CONTRIBUTOR_USER_ID,
             [translation_contribution_stats], [question_contribution_stats],

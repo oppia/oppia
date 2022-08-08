@@ -1638,11 +1638,11 @@ class ContributorMilestoneEmailInfo:
 
 
 class ContributorStatsSummary:
-    """Stores key information that is used to send to the frontend regarding
+    """Encapsulates key information that is used to send to the frontend regarding
     contributor stats.
 
     Attributes:
-        contributor_user_id: str. The id of the contributor.
+        contributor_user_id: str. The ID of the contributor.
         translation_contribution_stats: list(TranslationContributionStats). A
             list of TranslationContributionStats corresponding to the user.
         question_contribution_stats: list(QuestionContributionStats). A list of
@@ -1687,7 +1687,7 @@ class ContributorStatsSummary:
 
 
 class ReviewableSuggestionEmailInfo:
-    """Stores key information that is used to create the email content for
+    """Encapsulates key information that is used to create the email content for
     notifying admins and reviewers that there are suggestions that need to be
     reviewed.
 
