@@ -37,7 +37,6 @@ from scripts import contributor_dashboard_debug
 import firebase_admin
 from firebase_admin import auth as firebase_auth
 
-import requests
 from typing import Any, Dict, List
 
 auth_services = models.Registry.import_auth_services()
@@ -68,7 +67,7 @@ class ContributorDashboardDebugRequestsTests(test_utils.GenericTestBase):
         url: str,
         params: Dict[str, Any] | None = None,
         headers: Dict[str, Any] | None = None
-        ) -> requests.Response:
+        ) -> Any:
         """Returns a mock response for the given request."""
         if method == 'GET':
             return self.testapp.get(url, params=params, headers=headers)
@@ -77,10 +76,10 @@ class ContributorDashboardDebugRequestsTests(test_utils.GenericTestBase):
         if method == 'PUT':
             return self.testapp.put(url, params=params, headers=headers)
 
-    def mock_firebase_auth_create_user(self, **kwargs):
+    def mock_firebase_auth_create_user(self, **kwargs: Any) -> Any:
         """Mock for firebase_auth.create_user()."""
         email = kwargs['email']
-        auth_id = self.get_auth_id_from_email(email)
+        auth_id = self.get_auth_id_from_email(email) # type: ignore
         self.firebase_sdk_stub.create_user(auth_id, email)
 
     def mock_login_as_admin(self, email: str) -> None:
@@ -128,12 +127,12 @@ class ContributorDashboardDebugRequestsTests(test_utils.GenericTestBase):
 
         self.assertIsNotNone(self.firebase_sdk_stub.get_user_by_email(email))
         self.assertEqual(
-            user_services.get_user_settings_from_email(email).username,
+            user_services.get_user_settings_from_email(email).username, # type: ignore
             username)
 
     def test_begin_session(self) -> None:
         email = 'user1@example.com'
-        auth_id = self.get_auth_id_from_email(email)
+        auth_id = self.get_auth_id_from_email(email) # type: ignore
         token_id = self.firebase_sdk_stub.create_user(auth_id, email=email)
         sign_in_swap = self.swap_to_always_return(
                 self.contributor_dashboard_debug,
@@ -148,10 +147,10 @@ class ContributorDashboardDebugRequestsTests(test_utils.GenericTestBase):
 
         self.assertEqual(establish_session_counter.times_called, 1)
 
-    def test_get_csrf_token(self) -> str:
+    def test_get_csrf_token(self) -> None:
         with self.request_swap:
             csrf_token = self.contributor_dashboard_debug.get_csrf_token()
-        base.CsrfTokenManager.is_csrf_token_valid(None, csrf_token)
+        base.CsrfTokenManager.is_csrf_token_valid(None, csrf_token) # type: ignore
 
     def test_assign_admin_roles(self) -> None:
         email = 'user1@example.com'
@@ -161,7 +160,7 @@ class ContributorDashboardDebugRequestsTests(test_utils.GenericTestBase):
         self.signup(email, username)
 
         self.login(self.SUPER_ADMIN_EMAIL, is_super_admin=True)
-        self.contributor_dashboard_debug.csrf_token = self.get_new_csrf_token()
+        self.contributor_dashboard_debug.csrf_token = self.get_new_csrf_token() # type: ignore
 
         with self.request_swap:
             self.contributor_dashboard_debug.assign_admin_roles(roles, username)
@@ -173,7 +172,7 @@ class ContributorDashboardDebugRequestsTests(test_utils.GenericTestBase):
     def _assert_user_roles(self, username: str, roles: List[str]) -> None:
         """Asserts that the user has the given roles."""
         self.assertEqual(
-            user_services.get_user_settings_from_username(username).roles,
+            user_services.get_user_settings_from_username(username).roles, # type: ignore
             [feconf.ROLE_ID_FULL_USER] + roles)
 
     def test_add_submit_question_rights(self) -> None:
@@ -185,7 +184,7 @@ class ContributorDashboardDebugRequestsTests(test_utils.GenericTestBase):
             self.SUPER_ADMIN_USERNAME, feconf.ROLE_ID_QUESTION_ADMIN)
 
         self.login(self.SUPER_ADMIN_EMAIL, is_super_admin=True)
-        self.contributor_dashboard_debug.csrf_token = self.get_new_csrf_token()
+        self.contributor_dashboard_debug.csrf_token = self.get_new_csrf_token() # type: ignore
 
         with self.request_swap:
             self.contributor_dashboard_debug.add_submit_question_rights(
@@ -198,12 +197,12 @@ class ContributorDashboardDebugRequestsTests(test_utils.GenericTestBase):
     def _assert_can_submit_question_suggestions(self, username: str) -> None:
         """Asserts that the user can submit question suggestions."""
         user_id = user_services.get_user_id_from_username(username)
-        self.assertTrue(user_services.can_submit_question_suggestions(user_id))
+        self.assertTrue(user_services.can_submit_question_suggestions(user_id)) # type: ignore
 
     def test_generate_dummy_new_structures_data(self) -> None:
-        self.set_curriculum_admins([self.SUPER_ADMIN_USERNAME])
+        self.set_curriculum_admins([self.SUPER_ADMIN_USERNAME]) # type: ignore
         self.login(self.SUPER_ADMIN_EMAIL, is_super_admin=True)
-        self.contributor_dashboard_debug.csrf_token = self.get_new_csrf_token()
+        self.contributor_dashboard_debug.csrf_token = self.get_new_csrf_token() # type: ignore
 
         with self.request_swap:
             (
@@ -226,7 +225,7 @@ class ContributorDashboardDebugRequestsTests(test_utils.GenericTestBase):
                 topic_id).canonical_story_references[0].story_id)
         self.assertIsNotNone(
             story_fetchers.get_story_by_id(story_id, strict=False))
-        skill_summaries = skill_services.get_all_skill_summaries()
+        skill_summaries = skill_services.get_all_skill_summaries() # type: ignore
         self.assertEqual(len(skill_summaries), 3)
         questions, _ = (
             question_fetchers.get_questions_and_skill_descriptions_by_skill_ids(
@@ -236,11 +235,11 @@ class ContributorDashboardDebugRequestsTests(test_utils.GenericTestBase):
         )
         self.assertEqual(len(questions), 3)
         translation_opportunities, _, _ = (
-            opportunity_services.get_translation_opportunities('hi', '', None))
+            opportunity_services.get_translation_opportunities('hi', '', None)) # type: ignore
         self.assertEqual(len(translation_opportunities), 3)
 
     def test_add_topics_to_classroom(self) -> None:
-        admin_id = self.get_user_id_from_email(self.SUPER_ADMIN_EMAIL)
+        admin_id = self.get_user_id_from_email(self.SUPER_ADMIN_EMAIL) # type: ignore
         classroom_name = 'math'
         classroom_url_fragment = 'math'
         topic_id_1 = topic_fetchers.get_new_topic_id()
@@ -251,12 +250,12 @@ class ContributorDashboardDebugRequestsTests(test_utils.GenericTestBase):
         topic_2 = topic_domain.Topic.create_default_topic(
             topic_id_2, 'Empty Topic', 'empty-topic', 'description',
             'fragm')
-        topic_services.save_new_topic(admin_id, topic_1)
-        topic_services.save_new_topic(admin_id, topic_2)
+        topic_services.save_new_topic(admin_id, topic_1) # type: ignore
+        topic_services.save_new_topic(admin_id, topic_2) # type: ignore
 
-        self.set_curriculum_admins([self.SUPER_ADMIN_USERNAME])
+        self.set_curriculum_admins([self.SUPER_ADMIN_USERNAME]) # type: ignore
         self.login(self.SUPER_ADMIN_EMAIL, is_super_admin=True)
-        self.contributor_dashboard_debug.csrf_token = self.get_new_csrf_token()
+        self.contributor_dashboard_debug.csrf_token = self.get_new_csrf_token() # type: ignore
 
         with self.request_swap:
             self.contributor_dashboard_debug.add_topics_to_classroom(
@@ -273,6 +272,6 @@ class ContributorDashboardDebugRequestsTests(test_utils.GenericTestBase):
         topic_summaries = topic_fetchers.get_all_topic_summaries()
         for topic_summary in topic_summaries:
             topic_summary_dict = topic_summary.to_dict()
-            topic_summary_dict['is_published'] = False
+            topic_summary_dict['is_published'] = False # type: ignore
             self.assertIn(
                 topic_summary_dict, classroom_dict['topic_summary_dicts'])

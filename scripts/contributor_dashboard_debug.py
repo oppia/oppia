@@ -93,7 +93,7 @@ class ContributorDashboardDebugRequests():
         return response
 
     def _sign_in_with_email_and_password(
-            self, email: str, password: str) -> None:
+            self, email: str, password: str) -> Any:
         """Signs in with email and password, and returns the token id."""
         token_id = requests.post(
             FIREBASE_SIGN_IN_URL,
