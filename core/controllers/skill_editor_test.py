@@ -36,7 +36,7 @@ class BaseSkillEditorControllerTests(test_utils.GenericTestBase):
 
     def setUp(self):
         """Completes the sign-up process for the various users."""
-        super(BaseSkillEditorControllerTests, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
 
@@ -83,7 +83,7 @@ class SkillEditorTest(BaseSkillEditorControllerTests):
     """Tests for SkillEditorPage."""
 
     def setUp(self):
-        super(SkillEditorTest, self).setUp()
+        super().setUp()
         self.url = '%s/%s' % (feconf.SKILL_EDITOR_URL_PREFIX, self.skill_id)
 
     def test_access_skill_editor_page(self):
@@ -113,7 +113,7 @@ class SkillRightsHandlerTest(BaseSkillEditorControllerTests):
     """Tests for SkillRightsHandler."""
 
     def setUp(self):
-        super(SkillRightsHandlerTest, self).setUp()
+        super().setUp()
         self.url = '%s/%s' % (feconf.SKILL_RIGHTS_URL_PREFIX, self.skill_id)
 
     def test_skill_rights_handler_succeeds(self):
@@ -136,7 +136,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
     """Tests for EditableSkillDataHandler."""
 
     def setUp(self):
-        super(EditableSkillDataHandlerTest, self).setUp()
+        super().setUp()
         self.url = '%s/%s' % (
             feconf.SKILL_EDITOR_DATA_URL_PREFIX, self.skill_id)
         self.put_payload = {
@@ -379,7 +379,7 @@ class SkillDataHandlerTest(BaseSkillEditorControllerTests):
     """Tests for SkillDataHandler."""
 
     def setUp(self):
-        super(SkillDataHandlerTest, self).setUp()
+        super().setUp()
         self.url = '%s/%s,%s' % (
             feconf.SKILL_DATA_URL_PREFIX, self.skill_id, self.skill_id_2)
         self.put_payload = {
@@ -416,7 +416,7 @@ class FetchSkillsHandlerTest(BaseSkillEditorControllerTests):
     """Tests for FetchSkillsHandler."""
 
     def setUp(self):
-        super(FetchSkillsHandlerTest, self).setUp()
+        super().setUp()
         self.url = feconf.FETCH_SKILLS_URL_PREFIX
 
     def test_skill_data_handler_get_multiple_skills(self):
@@ -432,7 +432,7 @@ class SkillDescriptionHandlerTest(BaseSkillEditorControllerTests):
     """Tests for SkillDescriptionHandler."""
 
     def setUp(self):
-        super(SkillDescriptionHandlerTest, self).setUp()
+        super().setUp()
         self.skill_description = 'Adding Fractions'
         self.url = '%s/%s' % (
             feconf.SKILL_DESCRIPTION_HANDLER, self.skill_description)
