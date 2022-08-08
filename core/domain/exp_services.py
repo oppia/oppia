@@ -1727,7 +1727,7 @@ def save_exploration_summary(exp_summary):
     """
 
     existing_exp_summary_model = (
-        exp_models.ExpSummaryModel.get(exp_summary.id, strict=True))
+        exp_models.ExpSummaryModel.get(exp_summary.id, strict=False))
     exp_summary_model = populate_exp_summary_model_fields(
         existing_exp_summary_model, exp_summary)
     exp_summary_model.update_timestamps()
