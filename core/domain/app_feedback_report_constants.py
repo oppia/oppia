@@ -65,7 +65,7 @@ class ReportType(enum.Enum):
 # to PascalCase and its values to UPPER_CASE. Because we want to be consistent
 # throughout the codebase according to the coding style guide.
 # https://github.com/oppia/oppia/wiki/Coding-style-guide
-class CATEGORY(enum.Enum): # pylint: disable=invalid-name
+class Category(enum.Enum): # pylint: disable=invalid-name
     """Enum for categories."""
 
     feature_suggestion = 'feature_suggestion' # pylint: disable=invalid-name
@@ -89,7 +89,7 @@ class CATEGORY(enum.Enum): # pylint: disable=invalid-name
 # to PascalCase and its values to UPPER_CASE. Because we want to be consistent
 # throughout the codebase according to the coding style guide.
 # https://github.com/oppia/oppia/wiki/Coding-style-guide
-class ENTRY_POINT(enum.Enum): # pylint: disable=invalid-name
+class EntryPoint(enum.Enum): # pylint: disable=invalid-name
     """Enum for entry points."""
 
     navigation_drawer = 'navigation_drawer' # pylint: disable=invalid-name
@@ -102,7 +102,7 @@ class ENTRY_POINT(enum.Enum): # pylint: disable=invalid-name
 # to PascalCase and its values to UPPER_CASE. Because we want to be consistent
 # throughout the codebase according to the coding style guide.
 # https://github.com/oppia/oppia/wiki/Coding-style-guide
-class STATS_PARAMETER_NAMES(enum.Enum): # pylint: disable=invalid-name
+class StatsParameterNames(enum.Enum): # pylint: disable=invalid-name
     """Enum for stats parameter names."""
 
     platform = 'platform' # pylint: disable=invalid-name
@@ -136,36 +136,36 @@ class AndroidNetworkType(enum.Enum):
 FILTER_FIELD_NAMES = app_feedback_report_models.FILTER_FIELD_NAMES
 
 ANDROID_ENTRY_POINT = [
-    ENTRY_POINT.navigation_drawer, ENTRY_POINT.lesson_player,
-    ENTRY_POINT.revision_card, ENTRY_POINT.crash]
+    EntryPoint.navigation_drawer, EntryPoint.lesson_player,
+    EntryPoint.revision_card, EntryPoint.crash]
 ALLOWED_REPORT_TYPES = [
     ReportType.SUGGESTION, ReportType.ISSUE, ReportType.CRASH]
 ALLOWED_CATEGORIES = [
-    CATEGORY.feature_suggestion, CATEGORY.language_suggestion,
-    CATEGORY.other_suggestion, CATEGORY.language_general_issue,
-    CATEGORY.language_audio_issue, CATEGORY.language_text_issue,
-    CATEGORY.topics_issue, CATEGORY.profile_issue, CATEGORY.other_issue,
-    CATEGORY.lesson_player_crash, CATEGORY.practice_questions_crash,
-    CATEGORY.options_page_crash, CATEGORY.profile_page_crash,
-    CATEGORY.other_crash]
+    Category.feature_suggestion, Category.language_suggestion,
+    Category.other_suggestion, Category.language_general_issue,
+    Category.language_audio_issue, Category.language_text_issue,
+    Category.topics_issue, Category.profile_issue, Category.other_issue,
+    Category.lesson_player_crash, Category.practice_questions_crash,
+    Category.options_page_crash, Category.profile_page_crash,
+    Category.other_crash]
 ALLOWED_ONLY_INPUT_TEXT_CATEGORIES = [
-    CATEGORY.feature_suggestion, CATEGORY.language_suggestion,
-    CATEGORY.other_suggestion, CATEGORY.other_issue,
-    CATEGORY.lesson_player_crash, CATEGORY.practice_questions_crash,
-    CATEGORY.options_page_crash, CATEGORY.profile_page_crash,
-    CATEGORY.other_crash]
+    Category.feature_suggestion, Category.language_suggestion,
+    Category.other_suggestion, Category.other_issue,
+    Category.lesson_player_crash, Category.practice_questions_crash,
+    Category.options_page_crash, Category.profile_page_crash,
+    Category.other_crash]
 ALLOWED_SELECTION_ITEMS_CATEGORIES = [
-    CATEGORY.language_audio_issue, CATEGORY.language_text_issue,
-    CATEGORY.topics_issue, CATEGORY.profile_issue]
+    Category.language_audio_issue, Category.language_text_issue,
+    Category.topics_issue, Category.profile_issue]
 ALLOWED_STATS_PARAMETERS = [
-    STATS_PARAMETER_NAMES.platform,
-    STATS_PARAMETER_NAMES.report_type,
-    STATS_PARAMETER_NAMES.country_locale_code,
-    STATS_PARAMETER_NAMES.entry_point_name,
-    STATS_PARAMETER_NAMES.text_language_code,
-    STATS_PARAMETER_NAMES.audio_language_code,
-    STATS_PARAMETER_NAMES.android_sdk_version,
-    STATS_PARAMETER_NAMES.version_name]
+    StatsParameterNames.platform,
+    StatsParameterNames.report_type,
+    StatsParameterNames.country_locale_code,
+    StatsParameterNames.entry_point_name,
+    StatsParameterNames.text_language_code,
+    StatsParameterNames.audio_language_code,
+    StatsParameterNames.android_sdk_version,
+    StatsParameterNames.version_name]
 ALLOWED_FILTERS = [
     FILTER_FIELD_NAMES.report_type, FILTER_FIELD_NAMES.platform,
     FILTER_FIELD_NAMES.entry_point, FILTER_FIELD_NAMES.submitted_on,
