@@ -2323,11 +2323,15 @@ class Exploration(translation_domain.BaseTranslatableObject):
     def _convert_states_v51_dict_to_v52_dict(cls, states_dict):
         """
         """
+        explorations = exp_models.ExplorationModel.get_all(
+            include_deleted=False)
+        exp_models = [exp['id'] for exp in explorations]
         # Update general state validations.
         states_dict = cls._update_general_state(states_dict)
 
         # Update general state interaction validations.
-        states_dict = cls._update_general_state_interaction(states_dict)
+        states_dict = cls._update_general_state_interaction(
+            states_dict, exp_models)
 
         # Update general state RTE validations.
         states_dict = cls._update_general_state_rte(states_dict)
@@ -2348,11 +2352,365 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 ):
                     answer_group['outcome']['labelled_as_correct'] = False
 
-                # ref_exp_id part is remaining.
+                # refresher_exploration_id be None for all lessons.
+
+                if (
+                    answer_group['outcome']['refresher_exploration_id'] is
+                    not None
+                ):
+                    answer_group['outcome']['refresher_exploration_id'] = None
+
+            # refresher_exploration_id be None for all lessons.
+            default_outcome = state_dict['interaction']['default_outcome']
+            if default_outcome is not None:
+                def_ref_exp_id = default_outcome['refresher_exploration_id']
+                if def_ref_exp_id is not None:
+                    state_dict['interaction']['default_outcome'][
+                        'refresher_exploration_id'] = None
         return states_dict
 
+    def _choices_should_be_unique_and_non_empty(self, choices):
+        """
+        """
+        empty_choices = []
+        seen_choices = []
+        choices_to_save = []
+        for choice in choices:
+            if choice['html'].strip() in ('<p></p>', ''):
+                empty_choices.append(choice)
+
+        if len(empty_choices) == 1:
+            choices.remove(empty_choices[0])
+        else:
+            for idx, empty_choice in enumerate(empty_choices):
+                empty_choice['html'] = (
+                    '<p>' + 'Choice ' + str(idx+1) + '</p>'
+                )
+
+        for choice in choices:
+            if choice['html'] not in seen_choices:
+                seen_choices.append(choice['html'])
+                choices_to_save.append(choice)
+
+        return choices_to_save
+
+    def _item_selec_no_ans_group_should_be_same(self, answer_groups):
+        """
+        """
+        equals_rule_values = []
+        equals_rule_to_remove = []
+        for answer_group in answer_groups:
+            for rule_spec in answer_group['rule_specs']:
+                if rule_spec['rule_type'] == 'Equals':
+                    rule_spec_x = rule_spec.inputs['x']
+                    if rule_spec_x in equals_rule_values:
+                        equals_rule_to_remove.append(rule_spec)
+                    else:
+                        equals_rule_values.append(rule_spec_x)
+
+        for rule_to_remove in equals_rule_to_remove:
+            for answer_group in answer_groups:
+                for rule_spec in answer_group['rule_specs']:
+                    if rule_spec == rule_to_remove:
+                        answer_group['rule_specs'].remove(rule_spec)
+
+        return answer_groups
+
+    def _equals_should_come_before_idx_rule(self, answer_groups):
+        """
+        """
+        ele_x_at_y_rules = []
+        rules_to_remove = []
+        for answer_group in answer_groups:
+            for rule_spec in answer_group['rule_specs']:
+                if rule_spec['rule_type'] == 'HasElementXAtPositionY':
+                    element = rule_spec['inputs']['x']
+                    position = rule_spec['inputs']['y']
+                    ele_x_at_y_rules.append(
+                        {'element': element, 'position': position}
+                    )
+
+                if rule_spec['rule_type'] == 'IsEqualToOrdering':
+                    if len(rule_spec.inputs['x']) <= 0:
+                        rules_to_remove.append(rule_spec)
+                        continue
+                    for ele in ele_x_at_y_rules:
+                        ele_position = ele['position']
+                        ele_element = ele['element']
+                        rule_choice = rule_spec['inputs']['x'][
+                            ele_position - 1]
+
+                        if len(rule_choice) > 1:
+                            for choice in rule_choice:
+                                if choice == ele_element:
+                                    rules_to_remove.append(rule_spec)
+                        else:
+                            if len(rule_choice) <= 0:
+                                rules_to_remove.append(rule_spec)
+                                continue
+                            if rule_choice[0] == ele_element:
+                                rules_to_remove.append(rule_spec)
+
+        for rule_to_remove in rules_to_remove:
+            for answer_group in answer_groups:
+                for rule_spec in answer_group['rule_specs']:
+                    if rule_to_remove == rule_spec:
+                        answer_group['rule_specs'].remove(rule_to_remove)
+
+        return answer_groups
+
+    def _equals_should_come_before_misplace_by_one_rule(self, answer_groups):
+        """
+        """
+        equal_ordering_one_at_incorec_posn = []
+        rules_to_remove = []
+        for answer_group in answer_groups:
+            for rule_spec in answer_group['rule_specs']:
+                if (
+                        rule_spec['rule_type'] ==
+                        'IsEqualToOrderingWithOneItemAtIncorrectPosition'
+                ):
+                    equal_ordering_one_at_incorec_posn.append(
+                        rule_spec['inputs']['x']
+                    )
+
+                if rule_spec['rule_type'] == 'IsEqualToOrdering':
+                    dictionary = {}
+                    for layer_idx, layer in enumerate(
+                        rule_spec['inputs']['x']
+                    ):
+                        for item in layer:
+                            dictionary[item] = layer_idx
+
+                    for ele in equal_ordering_one_at_incorec_posn:
+                        wrong_positions = 0
+                        for layer_idx, layer in enumerate(ele):
+                            for item in layer:
+                                if layer_idx != dictionary[item]:
+                                    wrong_positions += 1
+                        if wrong_positions <= 1:
+                            rules_to_remove.append(rule_spec)
+
+        for rule_to_remove in rules_to_remove:
+            for answer_group in answer_groups:
+                for rule_spec in answer_group['rule_specs']:
+                    if rule_to_remove == rule_spec:
+                        answer_group['rule_specs'].remove(rule_to_remove)
+        return answer_groups
+
+    def _set_lower_and_upper_bounds(
+        self, range_var, lower_bound, upper_bound,
+        lb_inclusive, ub_inclusive
+    ) -> None:
+        """Sets the lower and upper bounds for the range_var, mainly
+        we need to set the range so to keep track if any other rule's
+        range lies in between or not to prevent redundancy
+
+        Args:
+            range_var: dict[str, Any]. To keep track of each rule's
+                ans group index, rule spec index, lower bound, upper bound,
+                lb inclusive, ub inclusive.
+            lower_bound: float. The lower bound.
+            upper_bound: float. The upper bound.
+            lb_inclusive: bool. If lower bound is inclusive.
+            ub_inclusive: bool. If upper bound is inclusive.
+        """
+        range_var['lower_bound'] = lower_bound
+        range_var['upper_bound'] = upper_bound
+        range_var['lb_inclusive'] = lb_inclusive
+        range_var['ub_inclusive'] = ub_inclusive
+
+    def _is_enclosed_by(self, range_compare_to, range_compare_with) -> bool:
+        """Checks whether the ranges of rules enclosed or not
+
+        Args:
+            range_compare_to: dict[str, Any]. To keep track of each rule's
+                ans group index, rule spec index, lower bound, upper bound,
+                lb inclusive, ub inclusive, It represents the variable for
+                which we have to check the range.
+            range_compare_with: dict[str, Any]. To keep track of other rule's
+                ans group index, rule spec index, lower bound, upper bound,
+                lb inclusive, ub inclusive, It is the variable to which the
+                range is compared.
+
+        Returns:
+            is_enclosed: bool. Returns True if both rule's ranges are enclosed.
+        """
+        if (
+            range_compare_with['lower_bound'] is None or
+            range_compare_to['lower_bound'] is None or
+            range_compare_with['upper_bound'] is None or
+            range_compare_to['upper_bound'] is None
+        ):
+            return False
+        lb_satisfied = (
+            range_compare_with['lower_bound'] < range_compare_to[
+                'lower_bound'] or
+            (
+                range_compare_with['lower_bound'] == range_compare_to[
+                    'lower_bound'] and
+                (
+                    not range_compare_to['lb_inclusive'] or
+                    range_compare_with['lb_inclusive']
+                )
+            )
+        )
+        ub_satisfied = (
+            range_compare_with['upper_bound'] > range_compare_to[
+                'upper_bound'] or
+            (
+                range_compare_with['upper_bound'] == range_compare_to[
+                    'upper_bound'] and
+                (
+                    not range_compare_to['ub_inclusive'] or
+                    range_compare_with['ub_inclusive']
+                )
+            )
+        )
+        is_enclosed = lb_satisfied and ub_satisfied
+        return is_enclosed
+
+    def _should_check_range_criteria(self, earlier_rule, later_rule) -> bool:
+        """Checks the range criteria between two rules by comparing their
+        rule type
+
+        Args:
+            earlier_rule: state_domain.RuleSpec. Previous rule.
+            later_rule: state_domain.RuleSpec. Current rule.
+
+        Returns:
+            bool. Returns True if the rules passes the range criteria check.
+        """
+        if earlier_rule.rule_type != 'IsExactlyEqualTo':
+            return True
+        return later_rule.rule_type in (
+            'IsExactlyEqualTo', 'IsEquivalentTo',
+            'IsEquivalentToAndInSimplestForm'
+        )
+
+    def _numeric_ans_group_should_not_be_subset(self, answer_groups):
+        """
+        """
+        lower_infinity = float('-inf')
+        upper_infinity = float('inf')
+        invalid_rules = []
+        ranges = []
+        for ans_group_index, answer_group in enumerate(answer_groups):
+            for rule_spec_index, rule_spec in enumerate(
+                answer_group['rule_specs']):
+                range_var = {
+                    'ans_group_index': int(ans_group_index),
+                    'rule_spec_index': int(rule_spec_index),
+                    'lower_bound': None,
+                    'upper_bound': None,
+                    'lb_inclusive': False,
+                    'ub_inclusive': False
+                }
+                if rule_spec['rule_type'] == 'IsLessThanOrEqualTo':
+                    try:
+                        rule_value = float(rule_spec.inputs['x'])
+                        (
+                            self._set_lower_and_upper_bounds(
+                                range_var, lower_infinity,
+                                rule_value, False, True
+                            )
+                        )
+                    except Exception:
+                        invalid_rules.append(rule_spec)
+
+                if rule_spec['rule_type'] == 'IsGreaterThanOrEqualTo':
+                    try:
+                        rule_value = float(rule_spec.inputs['x'])
+                        (
+                            self._set_lower_and_upper_bounds(
+                                range_var, rule_value,
+                                upper_infinity, True, False
+                            )
+                        )
+                    except Exception:
+                        invalid_rules.append(rule_spec)
+
+                if rule_spec['rule_type'] == 'Equals':
+                    try:
+                        rule_value = float(rule_spec.inputs['x'])
+                        (
+                            self._set_lower_and_upper_bounds(
+                                range_var, rule_value,
+                                rule_value, True, True
+                            )
+                        )
+                    except Exception:
+                        invalid_rules.append(rule_spec)
+
+                if rule_spec['rule_type'] == 'IsLessThan':
+                    try:
+                        rule_value = float(rule_spec.inputs['x'])
+                        (
+                            self._set_lower_and_upper_bounds(
+                                range_var, lower_infinity,
+                                rule_value, False, False
+                            )
+                        )
+                    except Exception:
+                        invalid_rules.append(rule_spec)
+
+                if rule_spec['rule_type'] == 'IsWithinTolerance':
+                    try:
+                        rule_value_x = float(rule_spec.inputs['x'])
+                        rule_value_tol = float(rule_spec.inputs['tol'])
+                        (
+                            self._set_lower_and_upper_bounds(
+                                range_var, rule_value_x - rule_value_tol,
+                                rule_value_x + rule_value_tol, True, True
+                            )
+                        )
+                    except Exception:
+                        pass
+
+                if rule_spec['rule_type'] == 'IsGreaterThan':
+                    try:
+                        rule_value = float(rule_spec.inputs['x'])
+                        (
+                            self._set_lower_and_upper_bounds(
+                                range_var, rule_value,
+                                upper_infinity, False, False
+                            )
+                        )
+                    except Exception:
+                        invalid_rules.append(rule_spec)
+
+                if rule_spec['rule_type'] == 'IsInclusivelyBetween':
+                    try:
+                        rule_value_a = float(rule_spec.inputs['a'])
+                        rule_value_b = float(rule_spec.inputs['b'])
+                        (
+                            self._set_lower_and_upper_bounds(
+                                range_var, rule_value_a,
+                                rule_value_b, True, True
+                            )
+                        )
+                    except Exception:
+                        pass
+
+                for range_ele in ranges:
+                    if (
+                        self._is_enclosed_by(range_var, range_ele)
+                    ):
+                        invalid_rules.append(rule_spec)
+                ranges.append(range_var)
+
+        for invalid_rule in invalid_rules:
+            for answer_group in answer_groups:
+                for rule_spec in answer_group['rule_specs']:
+                    if rule_spec == invalid_rule:
+                        answer_group['rule_specs'].remove(rule_spec)
+
+                if len(answer_group['rule_specs']) == 0:
+                    answer_groups.remove(answer_group)
+        return answer_groups
+
     @classmethod
-    def _update_general_state_interaction(cls, states_dict):
+    def _update_general_state_interaction(cls, states_dict, exp_models):
         """
         """
         for state_dict in states_dict.values():
@@ -2370,16 +2728,30 @@ class Exploration(translation_domain.BaseTranslatableObject):
             if state_dict['interaction']['id'] == 'EndExploration':
                 recc_exp_ids = state_dict['interaction'][
                     'customization_args']['recommendedExplorationIds']['value']
+                # All recommended explorations should be valid.
+                valid_recc_exp_ids = []
+                for recc_exp in recc_exp_ids:
+                    if recc_exp in exp_models:
+                        valid_recc_exp_ids.append(recc_exp)
+                if len(valid_recc_exp_ids) > 0:
+                    recc_exp_ids = valid_recc_exp_ids
+                    state_dict['interaction'][
+                    'customization_args']['recommendedExplorationIds'][
+                        'value'] = valid_recc_exp_ids
+
+                # Should be at most 3 recommended explorations.
                 if len(recc_exp_ids) > 3:
                     recc_exp_ids = recc_exp_ids[0:3]
                     state_dict['interaction']['customization_args'][
                         'recommendedExplorationIds']['value'] = recc_exp_ids
 
-                # All reccomended exp ids should be valid part is remaining.
-
         # NumericInput Interaction.
             if state_dict['interaction']['id'] == 'NumericInput':
                 answer_groups = state_dict['interaction']['answer_groups']
+                # Each answer group should not be a subset of any answer
+                # group that comes before it.
+                answer_groups = cls._numeric_ans_group_should_not_be_subset(
+                    answer_groups)
                 for answer_group in answer_groups:
                     for rule_spec in answer_group['rule_specs']:
                         # For x in [a-b, a+b], b must be a positive value.
@@ -2398,6 +2770,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
                                     'inputs']['b'] = rule_spec['inputs'][
                                         'b'], rule_spec['inputs']['a']
 
+                state_dict['interaction']['answer_groups'] = answer_groups
+
         # FractionInput Interaction.
             if state_dict['interaction']['id'] == 'FractionInput':
                 # All rules should have solutions that do not match previous rules' solutions.
@@ -2405,8 +2779,35 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         # MultipleChoiceInput Interaction.
             if state_dict['interaction']['id'] == 'MultipleChoiceInput':
+                selected_equals_choices = []
+                unwanted_rule = []
+                answer_groups = state_dict['interaction']['answer_groups']
                 # No answer choice should appear in more than one answer group.
-                pass
+                for answer_group in answer_groups:
+                    for rule_spec in answer_group['rule_specs']:
+                        if rule_spec['rule_type'] == 'Equals':
+                            if (
+                                rule_spec['inputs']['x'] in
+                                selected_equals_choices
+                            ):
+                                unwanted_rule.append(rule_spec)
+                            else:
+                                selected_equals_choices.append(
+                                    rule_spec['inputs']['x'])
+                for ele in unwanted_rule:
+                    answer_group['rule_specs'].remove(ele)
+
+                # Answer choices should be non-empty and unique.
+                choices = (
+                    state_dict['interaction']['customization_args'][
+                        'choices']['value']
+                )
+
+                state_dict['interaction']['customization_args']['choices'][
+                    'value'] = cls._choices_should_be_unique_and_non_empty(
+                        choices)
+
+                state_dict['interaction']['answer_groups'] = answer_groups
 
         # ItemSelectionInput Interaction.
             if state_dict['interaction']['id'] == 'ItemSelectionInput':
@@ -2418,20 +2819,152 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     state_dict['interaction']['customization_args']
                     ['maxAllowableSelectionCount']['value']
                 )
+
+                # None of the answer groups should be the same.
                 answer_groups = state_dict['interaction']['answer_groups']
+
+                answer_groups = cls._item_selec_no_ans_group_should_be_same(
+                    answer_groups)
+                state_dict['interaction']['answer_groups'] = answer_groups
+
+                invalid_ans_groups = []
                 for answer_group in answer_groups:
+                    invalid_rules = []
                     for rule_spec in answer_group['rule_specs']:
-                        # `==` should have between min and max number of selections.
+                        # `==` should have between min and max
+                        # number of selections.
                         if rule_spec['rule_type'] == 'Equals':
                             if (
                                 len(rule_spec['inputs']['x']) < min_value or
                                 len(rule_spec['inputs']['x']) > max_value
                             ):
-                                pass
+                                invalid_rules.append(rule_spec)
+
+                    for invalid_rule in invalid_rules:
+                        answer_group['rule_specs'].remove(invalid_rule)
+                    if len(answer_group['rule_specs']) == 0:
+                        invalid_ans_groups.append(answer_group)
+
+                for invalid_ans_group in invalid_ans_groups:
+                    answer_groups.remove(invalid_ans_group)
+
+                state_dict['interaction']['answer_groups'] = answer_groups
+
+                # Min no of selec should be no greater than max num.
+                if min_value > max_value:
+                    min_value, max_value = max_value, min_value
+
+                # There should be enough choice to have min num of selec.
+                if len(choices) < min_value:
+                    min_value = 1
+
+                state_dict['interaction']['customization_args'][
+                    'minAllowableSelectionCount']['value'] = min_value
+                state_dict['interaction']['customization_args'][
+                    'maxAllowableSelectionCount']['value'] = max_value
+
+                # Answer choices should be non-empty and unique.
+                state_dict['interaction']['customization_args']['choices'][
+                    'value'] = cls._choices_should_be_unique_and_non_empty(
+                        choices)
 
         # DragAndDropInput Interaction.
+            if state_dict['interaction']['id'] == 'DragAndDropSortInput':
+                answer_groups = state_dict['interaction']['answer_groups']
+                # `==` should come before idx(a) == b if it satisfies
+                # that condition.
+                answer_groups = cls._equals_should_come_before_idx_rule(
+                    answer_groups)
+                # `==` should come before == +/- 1 if they are off by
+                # at most 1 value.
+                answer_groups = (
+                    cls._equals_should_come_before_misplace_by_one_rule(
+                        answer_groups)
+                )
+                state_dict['interaction']['answer_groups'] = answer_groups
+                multi_item_value = (
+                    state_dict['interaction']['customization_args']
+                    ['allowMultipleItemsInSamePosition']['value']
+                )
+                invalid_rules = []
+                for answer_group in answer_groups:
+                    for rule_spec in answer_group['rule_specs']:
+                        # Multi items in same place iff setting on.
+                        if not multi_item_value:
+                            for ele in rule_spec['inputs']['x']:
+                                if len(ele) > 1:
+                                    invalid_rules.append(rule_spec)
+
+                        # == +/- 1 no option if multi item set off.
+                        if not multi_item_value:
+                            if rule_spec['rule_type'] == (
+                            'IsEqualToOrderingWithOneItemAtIncorrectPosition'):
+                                invalid_rules.append(rule_spec)
+
+                        # Validates for a < b, a should not be the same as b.
+                        if (
+                            rule_spec.rule_type == 'HasElementXBeforeElementY'
+                            and rule_spec.inputs['x'] == rule_spec.inputs['y']
+                        ):
+                            invalid_rules.append(rule_spec)
+
+                for invalid_rule in invalid_rules:
+                    for answer_group in answer_groups:
+                        for rule_spec in answer_group['rule_specs']:
+                            if rule_spec == invalid_rule:
+                                answer_group['rule_specs'].remove(rule_spec)
+
+                        if len(answer_group['rule_specs']) == 0:
+                            answer_groups.remove(answer_group)
+
+                state_dict['interaction']['answer_groups'] = answer_groups
 
         # TextInput Interaction.
+            if state_dict['interaction']['id'] == 'TextInput':
+                answer_groups = state_dict['interaction']['answer_groups']
+                # Text input height >= 1 and <= 10.
+                rows_value = int(
+                    state_dict['interaction']['customization_args'][
+                        'rows']['value']
+                )
+                if rows_value < 1 or rows_value > 10:
+                    rows_value = 10
+                state_dict['interaction']['customization_args'][
+                    'rows']['value'] = rows_value
+
+                seen_strings_contains = []
+                seen_strings_startswith = []
+                invalid_rules = []
+                for answer_group in answer_groups:
+                    for rule_spec in answer_group['rule_specs']:
+                        if rule_spec['rule_type'] == 'Contains':
+                            seen_strings_contains.append(
+                                rule_spec['inputs']['x']['normalizedStrSet'])
+                        elif rule_spec['rule_type'] == 'Contains':
+                            seen_strings_startswith.append(
+                                rule_spec['inputs']['x']['normalizedStrSet']
+                            )
+                        else:
+                            rule_values = rule_spec['inputs']['x'][
+                                'normalizedStrSet']
+                            for contain_ele in seen_strings_contains:
+                                for item in contain_ele:
+                                    for ele in rule_values:
+                                        if item in ele:
+                                            invalid_rules.append(rule_spec)
+                            for start_with_ele in seen_strings_startswith:
+                                for item in start_with_ele:
+                                    for ele in rule_values:
+                                        if ele.startswith(item):
+                                            invalid_rules.append(rule_spec)
+
+                for invalid_rule in invalid_rules:
+                    for answer_group in answer_groups:
+                        for rule_spec in answer_group['rule_specs']:
+                            if rule_spec == invalid_rule:
+                                answer_group['rule_specs'].remove(rule_spec)
+
+                state_dict['interaction']['answer_groups'] = answer_groups
 
         return states_dict
 
