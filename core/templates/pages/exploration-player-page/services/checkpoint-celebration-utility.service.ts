@@ -67,20 +67,20 @@ export class CheckpointCelebrationUtilityService {
   ): string {
     const messageI18nKeyPrefix = 'I18N_CONGRATULATORY_CHECKPOINT_MESSAGE';
     if (completedCheckpointCount === 1) {
-      return this.getRandomI18nKey(messageI18nKeyPrefix, 3, 'A');
+      return this.getRandomI18nKey(messageI18nKeyPrefix, 3, 'FIRST');
     } else if (completedCheckpointCount === 2) {
-      return this.getRandomI18nKey(messageI18nKeyPrefix, 3, 'B');
+      return this.getRandomI18nKey(messageI18nKeyPrefix, 3, 'SECOND');
     } else if (
       completedCheckpointCount / totalCheckpointCount >= 0.5 &&
       (completedCheckpointCount - 1) / totalCheckpointCount < 0.5
     ) {
-      return this.getRandomI18nKey(messageI18nKeyPrefix, 3, 'C');
+      return this.getRandomI18nKey(messageI18nKeyPrefix, 3, 'MIDWAY');
     } else if (totalCheckpointCount - completedCheckpointCount === 2) {
-      return this.getRandomI18nKey(messageI18nKeyPrefix, 3, 'D');
+      return this.getRandomI18nKey(messageI18nKeyPrefix, 3, 'TWO_REMAINING');
     } else if (totalCheckpointCount - completedCheckpointCount === 1) {
-      return this.getRandomI18nKey(messageI18nKeyPrefix, 3, 'E');
+      return this.getRandomI18nKey(messageI18nKeyPrefix, 3, 'ONE_REMAINING');
     } else {
-      return this.getRandomI18nKey(messageI18nKeyPrefix, 3, 'F');
+      return this.getRandomI18nKey(messageI18nKeyPrefix, 3, 'GENERIC');
     }
   }
 
