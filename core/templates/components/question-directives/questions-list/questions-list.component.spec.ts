@@ -869,6 +869,9 @@ describe('Questions List Component', () => {
     } as State);
 
     expect(component.showSolutionCheckpoint()).toBe(true);
+
+    component.question = null;
+    expect(component.showSolutionCheckpoint()).toBe(false);
   });
 
   it('should show info message if skills is already linked to question',
