@@ -82,7 +82,7 @@ class ExplorationDisplayableSummariesTest(
         - (3) User_4 edits the title of EXP_ID_4.
         """
 
-        super(ExplorationDisplayableSummariesTest, self).setUp()
+        super().setUp()
 
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.signup(self.BOB_EMAIL, self.BOB_NAME)
@@ -270,7 +270,7 @@ class LibraryGroupsTest(exp_services_test.ExplorationServicesUnitTests):
         - (4) Admin logs out.
         """
 
-        super(LibraryGroupsTest, self).setUp()
+        super().setUp()
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
@@ -340,7 +340,7 @@ class FeaturedExplorationDisplayableSummariesTest(
         - (5) Admin user is set up.
         """
 
-        super(FeaturedExplorationDisplayableSummariesTest, self).setUp()
+        super().setUp()
 
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
@@ -444,7 +444,7 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
     COLLECTION_ID = 'A_collection_id'
 
     def setUp(self):
-        super(CollectionLearnerDictTests, self).setUp()
+        super().setUp()
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
@@ -626,7 +626,7 @@ class TopRatedExplorationDisplayableSummariesTest(
         - (19) Admin user is set up.
         """
 
-        super(TopRatedExplorationDisplayableSummariesTest, self).setUp()
+        super().setUp()
 
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
@@ -784,8 +784,7 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
         - (7) Admin user is set up.
         """
 
-        super(
-            RecentlyPublishedExplorationDisplayableSummariesTest, self).setUp()
+        super().setUp()
 
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
@@ -893,7 +892,7 @@ class ActivityReferenceAccessCheckerTests(test_utils.GenericTestBase):
     COL_ID_2 = 'col_id_2'
 
     def setUp(self):
-        super(ActivityReferenceAccessCheckerTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.owner = user_services.get_user_actions_info(self.owner_id)
@@ -957,7 +956,7 @@ class CollectionNodeMetadataDictsTest(
     INVALID_EXP_ID = 'invalid_exp_id'
 
     def setUp(self):
-        super(CollectionNodeMetadataDictsTest, self).setUp()
+        super().setUp()
 
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.signup(self.BOB_EMAIL, self.BOB_NAME)

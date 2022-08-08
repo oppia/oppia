@@ -128,7 +128,6 @@ disable=abstract-method,
         import-outside-toplevel,
         non-explicit-keyword-args,
         not-an-iterable,
-        super-with-arguments,
         unnecessary-pass,
         consider-using-f-string,
 # TODO(#14322): Reinstate this.

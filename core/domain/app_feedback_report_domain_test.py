@@ -101,7 +101,7 @@ WEB_PLATFORM_VERSION = '3.0.8'
 class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(AppFeedbackReportDomainTests, self).setUp()
+        super().setUp()
         self.android_report_id = (
             app_feedback_report_models.AppFeedbackReportModel.generate_id(
                 PLATFORM_ANDROID, REPORT_SUBMITTED_TIMESTAMP))
@@ -436,7 +436,7 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
 class UserSuppliedFeedbackDomainTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(UserSuppliedFeedbackDomainTests, self).setUp()
+        super().setUp()
         self.user_supplied_feedback = (
             app_feedback_report_domain.UserSuppliedFeedback(
                 REPORT_TYPE_SUGGESTION, CATEGORY_SUGGESTION_OTHER,
@@ -549,7 +549,7 @@ class UserSuppliedFeedbackDomainTests(test_utils.GenericTestBase):
 class DeviceSystemContextDomainTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(DeviceSystemContextDomainTests, self).setUp()
+        super().setUp()
         self.device_system_context = (
             app_feedback_report_domain.DeviceSystemContext(
                 WEB_PLATFORM_VERSION, COUNTRY_LOCALE_CODE_INDIA))
@@ -573,7 +573,7 @@ class DeviceSystemContextDomainTests(test_utils.GenericTestBase):
 class AndroidDeviceSystemContextTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(AndroidDeviceSystemContextTests, self).setUp()
+        super().setUp()
         self.device_system_context = (
             app_feedback_report_domain.AndroidDeviceSystemContext(
                 ANDROID_PLATFORM_VERSION, ANDROID_PACKAGE_VERSION_CODE,
@@ -736,7 +736,7 @@ class AndroidDeviceSystemContextTests(test_utils.GenericTestBase):
 class EntryPointDomainTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(EntryPointDomainTests, self).setUp()
+        super().setUp()
         self.entry_point = (
             app_feedback_report_domain.EntryPoint(
                 app_feedback_report_constants.ENTRY_POINT.navigation_drawer,
@@ -758,7 +758,7 @@ class EntryPointDomainTests(test_utils.GenericTestBase):
 class NavigationDrawerEntryPointDomainTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(NavigationDrawerEntryPointDomainTests, self).setUp()
+        super().setUp()
         self.entry_point = (
             app_feedback_report_domain.NavigationDrawerEntryPoint())
 
@@ -800,7 +800,7 @@ class NavigationDrawerEntryPointDomainTests(test_utils.GenericTestBase):
 class LessonPlayerEntryPointDomainTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(LessonPlayerEntryPointDomainTests, self).setUp()
+        super().setUp()
         self.entry_point = (
             app_feedback_report_domain.LessonPlayerEntryPoint(
                 'topic_id', 'story_id', 'exploration_id'))
@@ -904,7 +904,7 @@ class LessonPlayerEntryPointDomainTests(test_utils.GenericTestBase):
 class RevisionCardEntryPointDomainTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(RevisionCardEntryPointDomainTests, self).setUp()
+        super().setUp()
         self.entry_point = (
             app_feedback_report_domain.RevisionCardEntryPoint(
                 'topic_id', 'subtopic_id'))
@@ -975,7 +975,7 @@ class RevisionCardEntryPointDomainTests(test_utils.GenericTestBase):
 class CrashEntryPointDomainTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(CrashEntryPointDomainTests, self).setUp()
+        super().setUp()
         self.entry_point = (
             app_feedback_report_domain.CrashEntryPoint())
 
@@ -1017,7 +1017,7 @@ class CrashEntryPointDomainTests(test_utils.GenericTestBase):
 class AppContextDomainTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(AppContextDomainTests, self).setUp()
+        super().setUp()
         entry_point = (
             app_feedback_report_domain.NavigationDrawerEntryPoint())
         self.app_context = (
@@ -1047,7 +1047,7 @@ class AppContextDomainTests(test_utils.GenericTestBase):
 class AndroidAppContextDomainTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(AndroidAppContextDomainTests, self).setUp()
+        super().setUp()
         entry_point = (
             app_feedback_report_domain.NavigationDrawerEntryPoint())
         self.app_context = (
@@ -1167,7 +1167,7 @@ class AndroidAppContextDomainTests(test_utils.GenericTestBase):
 class AppFeedbackReportTicketDomainTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(AppFeedbackReportTicketDomainTests, self).setUp()
+        super().setUp()
 
         self.ticket_id = (
             app_feedback_report_models.AppFeedbackReportTicketModel.generate_id(
@@ -1312,7 +1312,7 @@ class AppFeedbackReportTicketDomainTests(test_utils.GenericTestBase):
 class AppFeedbackReportDailyStatsDomainTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(AppFeedbackReportDailyStatsDomainTests, self).setUp()
+        super().setUp()
 
         self.ticket_id = (
             app_feedback_report_models.AppFeedbackReportTicketModel.generate_id(
@@ -1524,7 +1524,7 @@ class ReportStatsParameterValueCountsDomainTests(test_utils.GenericTestBase):
 class AppFeedbackReportFilterDomainTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(AppFeedbackReportFilterDomainTests, self).setUp()
+        super().setUp()
         self.filter = app_feedback_report_domain.AppFeedbackReportFilter(
             app_feedback_report_constants.FILTER_FIELD_NAMES.platform,
             ['web', 'android'])

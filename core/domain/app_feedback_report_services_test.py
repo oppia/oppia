@@ -150,7 +150,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
     }
 
     def setUp(self) -> None:
-        super(AppFeedbackReportServicesUnitTests, self).setUp()
+        super().setUp()
         self.signup(self.USER_EMAIL, self.USER_USERNAME)
         self.user_id = self.get_user_id_from_email(self.USER_EMAIL) # type: ignore[no-untyped-call]
 

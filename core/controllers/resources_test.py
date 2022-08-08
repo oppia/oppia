@@ -43,7 +43,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
 
     def setUp(self):
         """Load a demo exploration and register self.EDITOR_EMAIL."""
-        super(AssetDevHandlerImageTests, self).setUp()
+        super().setUp()
 
         exp_services.delete_demo('0')
         self.system_user = user_services.get_system_user()
@@ -513,7 +513,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
     AUDIO_UPLOAD_URL_PREFIX = '/createhandler/audioupload'
 
     def setUp(self):
-        super(AssetDevHandlerAudioTest, self).setUp()
+        super().setUp()
         exp_services.delete_demo('0')
         self.system_user = user_services.get_system_user()
         exp_services.load_demo('0')
@@ -863,7 +863,7 @@ class PromoBarHandlerTest(test_utils.GenericTestBase):
     """Test for the PromoBarHandler."""
 
     def setUp(self):
-        super(PromoBarHandlerTest, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(
             self.RELEASE_COORDINATOR_EMAIL, self.RELEASE_COORDINATOR_USERNAME)

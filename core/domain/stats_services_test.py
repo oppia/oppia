@@ -41,7 +41,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
     """
 
     def setUp(self):
-        super(StatisticsServicesTests, self).setUp()
+        super().setUp()
         self.exp_id = 'exp_id1'
         self.exp_version = 1
         self.stats_model_id = (
@@ -920,7 +920,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
     """Unit tests focused on services related to exploration issues."""
 
     def setUp(self):
-        super(ExplorationIssuesTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.exp = self.save_new_linear_exp_with_state_names_and_interactions(
@@ -1615,7 +1615,7 @@ class RecordAnswerTests(test_utils.GenericTestBase):
     EXP_ID = 'exp_id0'
 
     def setUp(self):
-        super(RecordAnswerTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.exploration = self.save_new_valid_exploration(
@@ -1965,7 +1965,7 @@ class SampleAnswerTests(test_utils.GenericTestBase):
     EXP_ID = 'exp_id0'
 
     def setUp(self):
-        super(SampleAnswerTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.exploration = self.save_new_valid_exploration(
@@ -2081,7 +2081,7 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
     """Test for services related to learner answer details."""
 
     def setUp(self):
-        super(LearnerAnswerDetailsServicesTest, self).setUp()
+        super().setUp()
         self.exp_id = 'exp_id1'
         self.state_name = 'intro'
         self.question_id = 'q_id_1'

@@ -61,7 +61,7 @@ class BuildTests(test_utils.GenericTestBase):
     """Test the build methods."""
 
     def tearDown(self) -> None:
-        super(BuildTests, self).tearDown()
+        super().tearDown()
         build.safe_delete_directory_tree(TEST_DIR)
         build.safe_delete_directory_tree(EMPTY_DIR)
 

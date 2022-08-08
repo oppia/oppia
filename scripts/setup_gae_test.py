@@ -38,7 +38,7 @@ class SetupGaeTests(test_utils.GenericTestBase):
     """Test the methods for setup gae script."""
 
     def setUp(self) -> None:
-        super(SetupGaeTests, self).setUp()
+        super().setUp()
         self.check_function_calls = {
             'walk_is_called': False,
             'remove_is_called': False,

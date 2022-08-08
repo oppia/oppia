@@ -59,7 +59,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
     skill_id_3 = 'skill_3'
 
     def setUp(self):
-        super(TopicServicesUnitTests, self).setUp()
+        super().setUp()
         self.TOPIC_ID = topic_fetchers.get_new_topic_id()
         changelist = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_ADD_SUBTOPIC,

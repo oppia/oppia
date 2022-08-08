@@ -29,7 +29,7 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
     """Test the ExplorationOpportunitySummary domain."""
 
     def setUp(self) -> None:
-        super(ExplorationOpportunitySummaryDomainTests, self).setUp()
+        super().setUp()
         self.mock_supported_audio_languages = [{
             'id': 'en'
         }, {
@@ -292,7 +292,7 @@ class SkillOpportunityDomainTest(test_utils.GenericTestBase):
     """Tests for the SkillOpportunity domain object."""
 
     def setUp(self) -> None:
-        super(SkillOpportunityDomainTest, self).setUp()
+        super().setUp()
         valid_skill_opportunity_dict: (
             opportunity_domain.SkillOpportunityDict
         ) = {

@@ -50,7 +50,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
     story = None
 
     def setUp(self):
-        super(StoryServicesUnitTests, self).setUp()
+        super().setUp()
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
@@ -1953,7 +1953,7 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
             user_id, STORY_ID, node_id)
 
     def setUp(self):
-        super(StoryProgressUnitTests, self).setUp()
+        super().setUp()
 
         self.STORY_1_ID = 'story_id'
         self.STORY_ID_1 = 'story_id_1'

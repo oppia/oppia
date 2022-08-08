@@ -25,7 +25,7 @@ class ReleaseCoordinatorPageTest(test_utils.GenericTestBase):
 
     def setUp(self):
         """Complete the signup process for self.RELEASE_COORDINATOR_EMAIL."""
-        super(ReleaseCoordinatorPageTest, self).setUp()
+        super().setUp()
         self.signup(
             self.RELEASE_COORDINATOR_EMAIL, self.RELEASE_COORDINATOR_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
@@ -39,7 +39,7 @@ class MemoryCacheHandlerTest(test_utils.GenericTestBase):
     """Tests MemoryCacheHandler."""
 
     def setUp(self):
-        super(MemoryCacheHandlerTest, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(
             self.RELEASE_COORDINATOR_EMAIL, self.RELEASE_COORDINATOR_USERNAME)

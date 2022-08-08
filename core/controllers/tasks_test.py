@@ -44,7 +44,7 @@ class TasksTests(test_utils.EmailTestBase):
     MODERATOR_EMAIL = 'm@example.com'
 
     def setUp(self):
-        super(TasksTests, self).setUp()
+        super().setUp()
         self.signup(self.MODERATOR_EMAIL, 'moderator')
         self.moderator_id = self.get_user_id_from_email(
             self.MODERATOR_EMAIL)

@@ -88,7 +88,7 @@ class ConfigPropertyModel(base_models.VersionedModel):
         committer_id: str,
         commit_cmds: List[Dict[str, Any]]
     ) -> None:
-        super(ConfigPropertyModel, self).commit(committer_id, '', commit_cmds)
+        super().commit(committer_id, '', commit_cmds)
 
 
 class PlatformParameterSnapshotMetadataModel(

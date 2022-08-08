@@ -50,7 +50,7 @@ class DraftUpgradeUnitTests(test_utils.GenericTestBase):
         'new_value': 'Updated title'})]
 
     def setUp(self):
-        super(DraftUpgradeUnitTests, self).setUp()
+        super().setUp()
         self.save_new_valid_exploration(self.EXP_ID, self.USER_ID)
 
     def test_try_upgrade_with_no_version_difference(self):

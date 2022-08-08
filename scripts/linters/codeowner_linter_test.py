@@ -66,7 +66,7 @@ class CodeownerLinterTests(test_utils.LinterTestBase):
     """Unit test for the CodeownerLintChecksManager class."""
 
     def setUp(self):
-        super(CodeownerLinterTests, self).setUp()
+        super().setUp()
 
         def mock_listdir(unused_arg):
             return [

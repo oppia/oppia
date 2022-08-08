@@ -40,7 +40,7 @@ class PlatformFeatureListTest(test_utils.GenericTestBase):
     """Tests for feature flags listed in platform_feature_list.py."""
 
     def setUp(self):
-        super(PlatformFeatureListTest, self).setUp()
+        super().setUp()
 
         self.all_features_list = (
             platform_feature_list.DEV_FEATURES_LIST +

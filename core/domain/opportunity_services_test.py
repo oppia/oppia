@@ -64,7 +64,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
     }
 
     def setUp(self):
-        super(OpportunityServicesIntegrationTest, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
@@ -777,7 +777,7 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
     """Test the opportunity services methods."""
 
     def setUp(self):
-        super(OpportunityServicesUnitTest, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 

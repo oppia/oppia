@@ -42,7 +42,7 @@ class JobMetaclassTests(test_utils.TestBase):
 
     def tearDown(self) -> None:
         MockJobMetaclass.clear()
-        super(JobMetaclassTests, self).tearDown()
+        super().tearDown()
 
     def test_does_not_put_base_classes_in_registry(self) -> None:
         class FooJobBase(base_jobs.JobBase, metaclass=MockJobMetaclass): # pylint: disable=unused-variable

@@ -32,7 +32,7 @@ class LearnerGroupFetchersUnitTests(test_utils.GenericTestBase):
     STUDENT_ID_2 = 'student_user_2'
 
     def setUp(self) -> None:
-        super(LearnerGroupFetchersUnitTests, self).setUp()
+        super().setUp()
 
         self.LEARNER_GROUP_ID = (
             learner_group_fetchers.get_new_learner_group_id()

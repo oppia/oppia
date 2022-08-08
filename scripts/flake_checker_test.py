@@ -71,7 +71,7 @@ class MockDatetime:
 class ReportPassTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(ReportPassTests, self).setUp()
+        super().setUp()
         self.example_date = datetime.datetime(2020, 1, 1, 0, 0, 0, 1)
 
     def test_successful_report(self):
@@ -259,7 +259,7 @@ class MockResponse:
 class IsTestOutputFlakyTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(IsTestOutputFlakyTests, self).setUp()
+        super().setUp()
         self.example_date = datetime.datetime(2020, 1, 1, 0, 0, 0, 1)
 
     def test_successful_report(self):

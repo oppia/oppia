@@ -451,7 +451,7 @@ class ThirdPartyJsTsLintChecksManager:
         Args:
             files_to_lint: list(str). A list of filepaths to lint.
         """
-        super(ThirdPartyJsTsLintChecksManager, self).__init__()
+        super().__init__()
         self.files_to_lint = files_to_lint
 
     @property

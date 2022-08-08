@@ -34,7 +34,7 @@ class RegistryUnitTest(test_utils.TestBase):
     """Tests the Registry class interface."""
 
     def setUp(self) -> None:
-        super(RegistryUnitTest, self).setUp()
+        super().setUp()
         self.registry_instance = models.Registry()
 
     def test_import_models_activity(self) -> None:

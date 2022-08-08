@@ -33,7 +33,7 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
     subtopic_id: int = 1
 
     def setUp(self) -> None:
-        super(SubtopicPageDomainUnitTests, self).setUp()
+        super().setUp()
         self.subtopic_page = (
             subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
                 self.subtopic_id, self.topic_id))
@@ -290,7 +290,7 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
 
 class SubtopicPageContentsDomainUnitTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
-        super(SubtopicPageContentsDomainUnitTests, self).setUp()
+        super().setUp()
         self.subtopic_page_contents = (
             subtopic_page_domain.SubtopicPageContents
             .create_default_subtopic_page_contents())
@@ -462,7 +462,7 @@ class SubtopicPageSummaryTests(test_utils.GenericTestBase):
     SUBTOPIC_MASTERY = 0.5
 
     def setUp(self) -> None:
-        super(SubtopicPageSummaryTests, self).setUp()
+        super().setUp()
 
         self.subtopic_page_summary = subtopic_page_domain.SubtopicPageSummary(
             self.SUBTOPIC_ID, self.SUBTOPIC_TITLE, self.TOPIC_ID,

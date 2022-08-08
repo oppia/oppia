@@ -81,7 +81,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
     suggestion_id_3 = 'exploration.exp3.thread_3'
 
     def setUp(self):
-        super(SuggestionServicesUnitTests, self).setUp()
+        super().setUp()
 
         self.signup(self.AUTHOR_EMAIL, 'author')
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
@@ -1102,7 +1102,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         return translation_suggestion
 
     def setUp(self):
-        super(SuggestionGetServicesUnitTests, self).setUp()
+        super().setUp()
 
         self.signup(self.AUTHOR_EMAIL_1, 'author1')
         self.author_id_1 = self.get_user_id_from_email(self.AUTHOR_EMAIL_1)
@@ -1748,7 +1748,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         return self.THREAD_ID
 
     def setUp(self):
-        super(SuggestionIntegrationTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.AUTHOR_EMAIL, 'author')
@@ -2144,7 +2144,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
 class UserContributionProficiencyUnitTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(UserContributionProficiencyUnitTests, self).setUp()
+        super().setUp()
         self.signup('user1@example.com', 'user1')
         self.signup('user2@example.com', 'user2')
         self.user_1_id = self.get_user_id_from_email('user1@example.com')
@@ -2210,7 +2210,7 @@ class VoiceoverApplicationServiceUnitTest(test_utils.GenericTestBase):
     """Tests for the ExplorationVoiceoverApplication class."""
 
     def setUp(self):
-        super(VoiceoverApplicationServiceUnitTest, self).setUp()
+        super().setUp()
         self.signup('author@example.com', 'author')
         self.author_id = self.get_user_id_from_email('author@example.com')
 
@@ -2351,8 +2351,7 @@ class ReviewableSuggestionEmailInfoUnitTests(
             expected_reviewable_suggestion_email_info.submission_datetime)
 
     def setUp(self):
-        super(
-            ReviewableSuggestionEmailInfoUnitTests, self).setUp()
+        super().setUp()
         self.signup(self.AUTHOR_EMAIL, 'author')
         self.author_id = self.get_user_id_from_email(
             self.AUTHOR_EMAIL)
@@ -2996,9 +2995,7 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
             )
 
     def setUp(self):
-        super(
-            GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests,
-            self).setUp()
+        super().setUp()
         self.signup(self.AUTHOR_EMAIL, 'author')
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         self.signup(self.REVIEWER_1_EMAIL, 'reviewer1')
@@ -3593,8 +3590,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             community_contribution_stats.question_suggestion_count, 0)
 
     def setUp(self):
-        super(
-            CommunityContributionStatsUnitTests, self).setUp()
+        super().setUp()
         self.signup(self.AUTHOR_EMAIL, 'author')
         self.author_id = self.get_user_id_from_email(
             self.AUTHOR_EMAIL)
@@ -4106,9 +4102,7 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
             )
 
     def setUp(self):
-        super(
-            GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests,
-            self).setUp()
+        super().setUp()
         self.signup(self.AUTHOR_EMAIL, 'author')
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         self.signup(self.REVIEWER_1_EMAIL, 'reviewer1')
@@ -4353,9 +4347,7 @@ class GetSuggestionTypesThatNeedReviewersUnitTests(test_utils.GenericTestBase):
             community_contribution_stats.question_suggestion_count, 0)
 
     def setUp(self):
-        super(
-            GetSuggestionTypesThatNeedReviewersUnitTests,
-            self).setUp()
+        super().setUp()
         self.signup(self.AUTHOR_EMAIL, 'author')
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         self.save_new_valid_exploration(self.target_id, self.author_id)

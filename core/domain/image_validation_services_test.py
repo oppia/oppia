@@ -29,7 +29,7 @@ from typing import Union
 class ImageValidationServiceTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(ImageValidationServiceTests, self).setUp()
+        super().setUp()
         with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
             'rb', encoding=None) as f:

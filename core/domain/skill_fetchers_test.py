@@ -42,7 +42,7 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
     MISCONCEPTION_ID_1: Final = 1
 
     def setUp(self) -> None:
-        super(SkillFetchersUnitTests, self).setUp()
+        super().setUp()
         example_1 = skill_domain.WorkedExample(
             state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
             state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>')

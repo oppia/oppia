@@ -43,7 +43,7 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
     USER_ID: Final = 'user'
 
     def setUp(self) -> None:
-        super(StoryFetchersUnitTests, self).setUp()
+        super().setUp()
         self.story_id = story_services.get_new_story_id()
         self.TOPIC_ID = topic_fetchers.get_new_topic_id()
         self.save_new_topic(  # type: ignore[no-untyped-call]

@@ -88,7 +88,7 @@ class ColorMessagePrintTest(test_utils.GenericTestBase):
     """Test for color message print."""
 
     def setUp(self):
-        super(ColorMessagePrintTest, self).setUp()
+        super().setUp()
         self.log = ''
 
         def mock_print(*args):

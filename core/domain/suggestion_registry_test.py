@@ -49,7 +49,7 @@ class BaseSuggestionUnitTests(test_utils.GenericTestBase):
     """Tests for the BaseSuggestion class."""
 
     def setUp(self):
-        super(BaseSuggestionUnitTests, self).setUp()
+        super().setUp()
         self.base_suggestion = MockInvalidSuggestion()
 
     def test_base_class_accept_raises_error(self):
@@ -122,7 +122,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
     fake_date = datetime.datetime(2016, 4, 10, 0, 0, 0, 0)
 
     def setUp(self):
-        super(SuggestionEditStateContentUnitTests, self).setUp()
+        super().setUp()
 
         self.signup(self.AUTHOR_EMAIL, 'author')
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
@@ -836,7 +836,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
     fake_date = datetime.datetime(2016, 4, 10, 0, 0, 0, 0)
 
     def setUp(self):
-        super(SuggestionTranslateContentUnitTests, self).setUp()
+        super().setUp()
 
         self.signup(self.AUTHOR_EMAIL, 'author')
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
@@ -1588,7 +1588,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
     fake_date = datetime.datetime(2016, 4, 10, 0, 0, 0, 0)
 
     def setUp(self):
-        super(SuggestionAddQuestionTest, self).setUp()
+        super().setUp()
 
         self.signup(self.AUTHOR_EMAIL, 'author')
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
@@ -2670,7 +2670,7 @@ class BaseVoiceoverApplicationUnitTests(test_utils.GenericTestBase):
     """Tests for the BaseVoiceoverApplication class."""
 
     def setUp(self):
-        super(BaseVoiceoverApplicationUnitTests, self).setUp()
+        super().setUp()
         self.base_voiceover_application = MockInvalidVoiceoverApplication()
 
     def test_base_class_init_raises_error(self):
@@ -2697,7 +2697,7 @@ class ExplorationVoiceoverApplicationUnitTest(test_utils.GenericTestBase):
     """Tests for the ExplorationVoiceoverApplication class."""
 
     def setUp(self):
-        super(ExplorationVoiceoverApplicationUnitTest, self).setUp()
+        super().setUp()
         self.signup('author@example.com', 'author')
         self.author_id = self.get_user_id_from_email('author@example.com')
 

@@ -86,7 +86,7 @@ class ExplorationServicesUnitTests(test_utils.GenericTestBase):
 
     def setUp(self):
         """Before each individual test, create a dummy exploration."""
-        super(ExplorationServicesUnitTests, self).setUp()
+        super().setUp()
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
@@ -302,7 +302,7 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
     EXP_ID_7 = '7_en_languages_private_exploration_in_spanish'
 
     def setUp(self):
-        super(ExplorationSummaryQueriesUnitTests, self).setUp()
+        super().setUp()
 
         # Setup the explorations to fit into 2 different categoriers and 2
         # different language groups. Also, ensure 2 of them have similar
@@ -1755,7 +1755,7 @@ title: Title
     HINT_AUDIO_FILE, SOLUTION_AUDIO_FILE)
 
     def setUp(self):
-        super(ExplorationYamlImportingTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
@@ -2975,7 +2975,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
     """Test updating a single state."""
 
     def setUp(self):
-        super(UpdateStateTests, self).setUp()
+        super().setUp()
         exploration = self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id)
 
@@ -4450,7 +4450,7 @@ class CommitMessageHandlingTests(ExplorationServicesUnitTests):
     """Test the handling of commit messages."""
 
     def setUp(self):
-        super(CommitMessageHandlingTests, self).setUp()
+        super().setUp()
         exploration = self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, end_state_name='End')
         self.init_state_name = exploration.init_state_name
@@ -5397,7 +5397,7 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
         - Bob tries to publish EXP_ID_2, and is denied access.
         - (8) Albert publishes EXP_ID_2.
         """
-        super(ExplorationCommitLogUnitTests, self).setUp()
+        super().setUp()
 
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.signup(self.BOB_EMAIL, self.BOB_NAME)
@@ -5668,7 +5668,7 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
     EXP_ID_2 = 'eid2'
 
     def setUp(self):
-        super(ExplorationSummaryTests, self).setUp()
+        super().setUp()
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.signup(self.BOB_EMAIL, self.BOB_NAME)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
@@ -5866,7 +5866,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         - (9) Albert publishes EXP_ID_3.
         - (10) Albert deletes EXP_ID_3.
         """
-        super(ExplorationSummaryGetTests, self).setUp()
+        super().setUp()
 
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.signup(self.BOB_EMAIL, self.BOB_NAME)
@@ -6191,7 +6191,7 @@ title: Old Title
     ALBERT_NAME = 'albert'
 
     def setUp(self):
-        super(ExplorationConversionPipelineTests, self).setUp()
+        super().setUp()
 
         # Setup user who will own the test explorations.
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
@@ -7205,7 +7205,7 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
     NEW_CHANGELIST_DICT = [NEW_CHANGELIST[0].to_dict()]
 
     def setUp(self):
-        super(EditorAutoSavingUnitTests, self).setUp()
+        super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
@@ -7494,7 +7494,7 @@ class ApplyDraftUnitTests(test_utils.GenericTestBase):
     DATETIME = datetime.datetime.strptime('2016-02-16', '%Y-%m-%d')
 
     def setUp(self):
-        super(ApplyDraftUnitTests, self).setUp()
+        super().setUp()
         # Create explorations.
         exploration = self.save_new_valid_exploration(
             self.EXP_ID1, self.USER_ID)
@@ -7561,7 +7561,7 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
     """
 
     def setUp(self):
-        super(UpdateVersionHistoryUnitTests, self).setUp()
+        super().setUp()
         exploration = exp_domain.Exploration.create_default_exploration(
             self.EXP_0_ID)
         exp_services.save_new_exploration(self.owner_id, exploration)
@@ -8198,7 +8198,7 @@ title: Title
 """)
 
     def setUp(self):
-        super(LoggedOutUserProgressUpdateTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
@@ -8567,7 +8567,7 @@ title: Title
 """)
 
     def setUp(self):
-        super(SyncLoggedInAndLoggedOutProgressTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)

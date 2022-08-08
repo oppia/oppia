@@ -32,7 +32,7 @@ class BaseVoiceArtistControllerTests(test_utils.GenericTestBase):
 
     def setUp(self):
         """Completes the sign-up process for self.VOICE_ARTIST_EMAIL."""
-        super(BaseVoiceArtistControllerTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VOICE_ARTIST_EMAIL, self.VOICE_ARTIST_USERNAME)
         self.signup('voiceoveradmin@app.com', 'voiceoverManager')
@@ -71,7 +71,7 @@ class VoiceArtistTest(BaseVoiceArtistControllerTests):
     }
 
     def setUp(self):
-        super(VoiceArtistTest, self).setUp()
+        super().setUp()
         self.login(self.OWNER_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.save_new_valid_exploration(
@@ -196,7 +196,7 @@ class VoiceArtistAutosaveTest(BaseVoiceArtistControllerTests):
         'new_value': 'New title'}]
 
     def setUp(self):
-        super(VoiceArtistAutosaveTest, self).setUp()
+        super().setUp()
         self.login(self.OWNER_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
@@ -289,7 +289,7 @@ class TranslationFirstTimeTutorialTest(BaseVoiceArtistControllerTests):
     EXP_ID = 'exp1'
 
     def setUp(self):
-        super(TranslationFirstTimeTutorialTest, self).setUp()
+        super().setUp()
         self.login(self.OWNER_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
@@ -324,7 +324,7 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
 
     def setUp(self):
         """Completes the sign-up process for self.VOICE_ARTIST_EMAIL."""
-        super(VoiceArtistManagementTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VOICE_ARTIST_EMAIL, self.VOICE_ARTIST_USERNAME)
         self.signup(self.VOICEOVER_ADMIN_EMAIL, self.VOICEOVER_ADMIN_USERNAME)

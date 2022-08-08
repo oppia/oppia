@@ -33,7 +33,7 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
     """Test the typescript checks."""
 
     def setUp(self) -> None:
-        super(TypescriptChecksTests, self).setUp()
+        super().setUp()
         process = subprocess.Popen(
             ['test'], stdout=subprocess.PIPE, encoding='utf-8')
         def mock_popen(

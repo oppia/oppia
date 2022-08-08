@@ -36,7 +36,7 @@ class ThirdPartyCSSLintChecksManager:
         Args:
             files_to_lint: list(str). A list of filepaths to lint.
         """
-        super(ThirdPartyCSSLintChecksManager, self).__init__()
+        super().__init__()
         self.files_to_lint = files_to_lint
 
     @property

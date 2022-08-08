@@ -35,4 +35,4 @@ class InvalidCompositeEntityError(base_validation_errors.BaseAuditError):
     def __init__(self, model: improvements_models.TaskEntryModel) -> None:
         message = 'model has invalid composite entity %s' % (
             model.composite_entity_id)
-        super(InvalidCompositeEntityError, self).__init__(message, model)
+        super().__init__(message, model)

@@ -57,7 +57,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
     mocked_datetime_utcnow = datetime.datetime(2020, 6, 15, 5)
 
     def setUp(self) -> None:
-        super(SuggestionModelUnitTests, self).setUp()
+        super().setUp()
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,

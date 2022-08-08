@@ -38,7 +38,7 @@ class ImageServicesUnitTests(test_utils.GenericTestBase):
     TEST_IMAGE_HEIGHT = 2092
 
     def setUp(self) -> None:
-        super(ImageServicesUnitTests, self).setUp()
+        super().setUp()
         with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'dummy_large_image.jpg'),
             'rb', encoding=None) as f:

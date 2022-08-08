@@ -38,7 +38,7 @@ class MypyScriptChecks(test_utils.GenericTestBase):
     """Tests for MyPy type check runner script."""
 
     def setUp(self):
-        super(MypyScriptChecks, self).setUp()
+        super().setUp()
 
         self.install_swap = self.swap_with_checks(
             install_third_party_libs, 'main',

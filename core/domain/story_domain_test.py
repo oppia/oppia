@@ -229,7 +229,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
     USER_ID_1: Final = 'user1'
 
     def setUp(self) -> None:
-        super(StoryDomainUnitTests, self).setUp()
+        super().setUp()
         self.story_id = story_services.get_new_story_id()
         self.TOPIC_ID = utils.generate_random_string(12)
         self.story = self.save_new_story(  # type: ignore[no-untyped-call]
@@ -1413,7 +1413,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
 class StorySummaryTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(StorySummaryTests, self).setUp()
+        super().setUp()
         current_time = datetime.datetime.utcnow()
         time_in_millisecs = utils.get_time_in_millisecs(current_time)
         self.story_summary_dict = {

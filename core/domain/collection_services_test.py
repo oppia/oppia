@@ -60,7 +60,7 @@ class CollectionServicesUnitTests(test_utils.GenericTestBase):
 
     def setUp(self):
         """Before each individual test, create dummy users."""
-        super(CollectionServicesUnitTests, self).setUp()
+        super().setUp()
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
@@ -491,7 +491,7 @@ class CollectionProgressUnitTests(CollectionServicesUnitTests):
             user_id, collection_id, exploration_id)
 
     def setUp(self):
-        super(CollectionProgressUnitTests, self).setUp()
+        super().setUp()
 
         # Create a new collection and exploration.
         self.save_new_valid_collection(
@@ -652,7 +652,7 @@ class CollectionSummaryQueriesUnitTests(CollectionServicesUnitTests):
     COL_ID_5 = '5_languages_private_collection_in_spanish'
 
     def setUp(self):
-        super(CollectionSummaryQueriesUnitTests, self).setUp()
+        super().setUp()
 
         # Setup the collections to fit into 2 different categoriers. Ensure 2 of
         # them have similar titles.
@@ -1304,7 +1304,7 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
     COLLECTION_OBJECTIVE = 'objective'
 
     def setUp(self):
-        super(UpdateCollectionNodeTests, self).setUp()
+        super().setUp()
         self.save_new_valid_collection(
             self.COLLECTION_0_ID, self.owner_id, title=self.COLLECTION_TITLE,
             category=self.COLLECTION_CATEGORY,
@@ -1542,7 +1542,7 @@ class CommitMessageHandlingTests(CollectionServicesUnitTests):
     EXP_ID = 'an_exploration_id'
 
     def setUp(self):
-        super(CommitMessageHandlingTests, self).setUp()
+        super().setUp()
         self.save_new_valid_collection(
             self.COLLECTION_0_ID, self.owner_id, exploration_id=self.EXP_ID)
 
@@ -1878,7 +1878,7 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
     COLLECTION_ID_2 = 'cid2'
 
     def setUp(self):
-        super(CollectionSummaryTests, self).setUp()
+        super().setUp()
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.signup(self.BOB_EMAIL, self.BOB_NAME)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)

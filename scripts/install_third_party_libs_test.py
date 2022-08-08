@@ -43,7 +43,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
     """Test the methods for installing third party libs."""
 
     def setUp(self):
-        super(InstallThirdPartyLibsTests, self).setUp()
+        super().setUp()
 
         self.check_function_calls = {
             'check_call_is_called': False,

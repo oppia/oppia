@@ -156,7 +156,7 @@ class BaseModel(datastore_services.Model):
     # overridden constructor of the parent class i.e datastore_services.Model
     # here.
     def __init__(self, *args: Any, **kwargs: Any) -> None:
-        super(BaseModel, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self._last_updated_timestamp_is_fresh = False
 
     def _pre_put_hook(self) -> None:
@@ -165,7 +165,7 @@ class BaseModel(datastore_services.Model):
         Raises:
             Exception. The model has not refreshed the value of last_updated.
         """
-        super(BaseModel, self)._pre_put_hook()
+        super()._pre_put_hook()
 
         if self.created_on is None:
             self.created_on = datetime.datetime.utcnow()
@@ -571,11 +571,11 @@ class BaseHumanMaintainedModel(BaseModel):
     def put_for_human(self) -> None:
         """Stores the model instance on behalf of a human."""
         self.last_updated_by_human = datetime.datetime.utcnow()
-        return super(BaseHumanMaintainedModel, self).put()
+        return super().put()
 
     def put_for_bot(self) -> None:
         """Stores the model instance on behalf of a non-human."""
-        return super(BaseHumanMaintainedModel, self).put()
+        return super().put()
 
     @classmethod
     def put_multi(cls, unused_instances: List[SELF_BASE_MODEL]) -> None:
@@ -1077,7 +1077,7 @@ class VersionedModel(BaseModel):
             datastore_services.delete_multi(
                 content_keys + metadata_keys + commit_log_keys)
 
-            super(VersionedModel, self).delete()
+            super().delete()
         else:
             self._require_not_marked_deleted()  # pylint: disable=protected-access
             self.deleted = True

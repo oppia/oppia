@@ -37,7 +37,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
     """Tests for blog services."""
 
     def setUp(self) -> None:
-        super(BlogServicesUnitTests, self).setUp()
+        super().setUp()
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
         self.user_id_a = self.get_user_id_from_email('a@example.com')  # type: ignore[no-untyped-call]

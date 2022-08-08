@@ -42,7 +42,7 @@ class ExplorationStatsTests(test_utils.GenericTestBase):
     """Tests the ExplorationStats domain object."""
 
     def setUp(self) -> None:
-        super(ExplorationStatsTests, self).setUp()
+        super().setUp()
 
         self.state_stats_dict = {
             'total_answers_count_v1': 0,
@@ -249,7 +249,7 @@ class StateStatsTests(test_utils.GenericTestBase):
     """Tests the StateStats domain object."""
 
     def setUp(self) -> None:
-        super(StateStatsTests, self).setUp()
+        super().setUp()
 
         self.state_stats = stats_domain.StateStats(
             0, 10, 0, 4, 0, 18, 0, 7, 2, 0, 2)
@@ -736,7 +736,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
     """Tests the ExplorationIssues domain object."""
 
     def setUp(self) -> None:
-        super(ExplorationIssuesTests, self).setUp()
+        super().setUp()
 
         self.exp_issues = stats_domain.ExplorationIssues(
             'exp_id1', 1, [
@@ -859,7 +859,7 @@ class PlaythroughTests(test_utils.GenericTestBase):
     """Tests the Playthrough domain object."""
 
     def setUp(self) -> None:
-        super(PlaythroughTests, self).setUp()
+        super().setUp()
 
         self.playthrough = self._get_valid_early_quit_playthrough()
 
@@ -1075,7 +1075,7 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
     DUMMY_TIME_SPENT_IN_MSECS = 1000.0
 
     def setUp(self) -> None:
-        super(ExplorationIssueTests, self).setUp()
+        super().setUp()
 
         self.exp_issue = stats_domain.ExplorationIssue(
             'EarlyQuit', {
@@ -1384,7 +1384,7 @@ class LearnerActionTests(test_utils.GenericTestBase):
     """Tests the LearnerAction domain object."""
 
     def setUp(self) -> None:
-        super(LearnerActionTests, self).setUp()
+        super().setUp()
 
         self.learner_action = stats_domain.LearnerAction(
             'ExplorationStart', {
@@ -1631,7 +1631,7 @@ class StateAnswersValidationTests(test_utils.GenericTestBase):
     """Tests the StateAnswers domain object for validation."""
 
     def setUp(self) -> None:
-        super(StateAnswersValidationTests, self).setUp()
+        super().setUp()
         self.state_answers = stats_domain.StateAnswers(
             'exp_id', 1, 'initial_state', 'TextInput', [])
 
@@ -1963,7 +1963,7 @@ class SubmittedAnswerValidationTests(test_utils.GenericTestBase):
     """Tests the SubmittedAnswer domain object for validation."""
 
     def setUp(self) -> None:
-        super(SubmittedAnswerValidationTests, self).setUp()
+        super().setUp()
         self.submitted_answer = stats_domain.SubmittedAnswer(
             'Text', 'TextInput', 0, 0, exp_domain.EXPLICIT_CLASSIFICATION, {},
             'session_id', 0.)
@@ -2245,7 +2245,7 @@ class StateAnswersCalcOutputValidationTests(test_utils.GenericTestBase):
         pass
 
     def setUp(self) -> None:
-        super(StateAnswersCalcOutputValidationTests, self).setUp()
+        super().setUp()
         self.state_answers_calc_output = stats_domain.StateAnswersCalcOutput(
             'exp_id', 1, 'initial_state', 'TextInput', 'AnswerFrequencies',
             stats_domain.AnswerFrequencyList.from_raw_type([]))
@@ -2306,7 +2306,7 @@ class StateAnswersCalcOutputValidationTests(test_utils.GenericTestBase):
 class LearnerAnswerDetailsTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(LearnerAnswerDetailsTests, self).setUp()
+        super().setUp()
         self.learner_answer_details = stats_domain.LearnerAnswerDetails(
             'exp_id:state_name', feconf.ENTITY_TYPE_EXPLORATION,
             'TextInput', [stats_domain.LearnerAnswerInfo(
@@ -2534,7 +2534,7 @@ class LearnerAnswerDetailsTests(test_utils.GenericTestBase):
 class LearnerAnswerInfoTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(LearnerAnswerInfoTests, self).setUp()
+        super().setUp()
         self.learner_answer_info = stats_domain.LearnerAnswerInfo(
             'id_1', 'This is my answer', 'This is my answer details',
             datetime.datetime(2019, 6, 19, 13, 59, 29, 153073))

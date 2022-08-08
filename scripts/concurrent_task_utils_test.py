@@ -35,7 +35,7 @@ class ConcurrentTaskUtilsTests(test_utils.GenericTestBase):
     """Test for concurrent_task_utils.py flie."""
 
     def setUp(self):
-        super(ConcurrentTaskUtilsTests, self).setUp()
+        super().setUp()
         self.semaphore = threading.Semaphore(1)
         self.task_stdout = []
 

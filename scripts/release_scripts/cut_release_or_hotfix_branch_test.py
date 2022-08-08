@@ -34,7 +34,7 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
     """Test the methods for cutting the release or hotfix branch."""
 
     def setUp(self):
-        super(CutReleaseOrHotfixBranchTests, self).setUp()
+        super().setUp()
 
         self.all_cmd_tokens = []
         self.check_function_calls = {
