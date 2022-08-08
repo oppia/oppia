@@ -24,7 +24,6 @@ import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { Question } from 'domain/question/QuestionObjectFactory';
 import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
-import { SkillDifficulty } from 'domain/skill/skill-difficulty.model';
 import { Skill } from 'domain/skill/SkillObjectFactory';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { QuestionSuggestionBackendApiService } from './question-suggestion-backend-api.service';
@@ -85,9 +84,8 @@ describe('Question Suggestion Backend Api Service', () => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
 
-    let skillDifficulty = new SkillDifficulty('test_id', 'test_description', 1);
     qsbas.submitSuggestionAsync(
-      question as unknown as Question, associatedSkill, skillDifficulty, [{
+      question as unknown as Question, associatedSkill, 1, [{
         filename: 'image',
         imageBlob: fakeImage()
       }])

@@ -24,7 +24,6 @@ import { MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
 import { Question } from 'domain/question/QuestionObjectFactory';
 import { QuestionUndoRedoService } from 'domain/editor/undo_redo/question-undo-redo.service';
 import { Skill } from 'domain/skill/SkillObjectFactory';
-import { SkillDifficulty } from 'domain/skill/skill-difficulty.model';
 import { State } from 'domain/state/StateObjectFactory';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { ConfirmQuestionExitModalComponent } from 'components/question-directives/modal-templates/confirm-question-exit-modal.component';
@@ -46,7 +45,7 @@ export class QuestionSuggestionEditorModalComponent
   @Input() questionStateData: State;
   @Input() questionId: string;
   @Input() skill: Skill;
-  @Input() skillDifficulty: SkillDifficulty | string;
+  @Input() skillDifficulty: number;
   @Input() suggestionId: string;
 
   canEditQuestion: boolean;
@@ -136,7 +135,7 @@ export class QuestionSuggestionEditorModalComponent
       const questionDict = this.question.toBackendDict(false);
       this.contributionAndReviewService.updateQuestionSuggestionAsync(
         this.suggestionId,
-        this.skillDifficulty as string,
+        this.skillDifficulty,
         questionDict.question_state_data,
         imagesData,
         () => {
@@ -145,7 +144,7 @@ export class QuestionSuggestionEditorModalComponent
         () => {});
     } else {
       this.questionSuggestionBackendApiService.submitSuggestionAsync(
-        this.question, this.skill, this.skillDifficulty as SkillDifficulty,
+        this.question, this.skill, this.skillDifficulty,
         imagesData).then(
         () => {
           this.alertsService.addSuccessMessage(

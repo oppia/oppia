@@ -239,7 +239,7 @@ describe('Question opportunities component', () => {
         },
         language_code: 'en',
         version: 3,
-      }), '1');
+      }), 1);
 
     expect(ngbModal.open).toHaveBeenCalled();
   });

@@ -125,12 +125,10 @@ describe('Graph Data Service', () => {
       initStateId: 'property_1',
       links: [{
         source: 'Hola',
-        target: 'Me Llamo',
-        linkProperty: ''
+        target: 'Me Llamo'
       }, {
         source: 'Hola',
-        target: 'Hola',
-        linkProperty: ''
+        target: 'Hola'
       }],
       nodes: { Hola: 'Hola' }
     };

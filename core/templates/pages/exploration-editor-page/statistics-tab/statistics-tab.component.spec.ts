@@ -209,12 +209,10 @@ describe('Statistics Tab Component', function() {
       initStateId: 'State1',
       links: [{
         source: 'State1',
-        target: 'outcome 1',
-        linkProperty: ''
+        target: 'outcome 1'
       }, {
         source: 'State1',
-        target: 'outcome 2',
-        linkProperty: ''
+        target: 'outcome 2'
       }],
       nodes: {
         State1: 'State1'
