@@ -20,23 +20,19 @@ from __future__ import annotations
 
 from core import feconf
 from core.controllers import base
-from core.tests import test_utils
-from core.platform.auth.firebase_auth_services_test import FirebaseAdminSdkStub
-from core.platform import models
-from core.domain import user_services
 from core.domain import opportunity_services
 from core.domain import question_fetchers
 from core.domain import skill_services
 from core.domain import story_fetchers
 from core.domain import topic_domain
-from core.domain import topic_services
 from core.domain import topic_fetchers
+from core.domain import topic_services
 from core.domain import user_services
+from core.platform import models
+from core.platform.auth import firebase_auth_services_test
+from core.tests import test_utils
 
-from scripts.contributor_dashboard_debug import (
-    ContributorDashboardDebugRequests,
-    SUPER_ADMIN_USERNAME, SUPER_ADMIN_ROLES,
-    CONTRIBUTOR_USERNAME, CLASSROOM_NAME)
+from scripts import contributor_dashboard_debug
 
 import firebase_admin
 from firebase_admin import auth as firebase_auth
@@ -51,9 +47,11 @@ class ContributorDashboardDebugRequestsTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super(ContributorDashboardDebugRequestsTests, self).setUp()
-        self.firebase_sdk_stub = FirebaseAdminSdkStub()
+        self.firebase_sdk_stub = (
+            firebase_auth_services_test.FirebaseAdminSdkStub())
         self.firebase_sdk_stub.install(self)
-        self.contributor_dashboard_debug = (ContributorDashboardDebugRequests(
+        self.contributor_dashboard_debug = (
+            contributor_dashboard_debug.ContributorDashboardDebugRequests(
                 base_url=''))
         self.request_swap = self.swap(
             self.contributor_dashboard_debug.session,
@@ -78,13 +76,13 @@ class ContributorDashboardDebugRequestsTests(test_utils.GenericTestBase):
             return self.testapp.post(url, params=params, headers=headers)
         if method == 'PUT':
             return self.testapp.put(url, params=params, headers=headers)
-    
+
     def mock_firebase_auth_create_user(self, **kwargs):
         """Mock for firebase_auth.create_user()."""
         email = kwargs['email']
         auth_id = self.get_auth_id_from_email(email)
         self.firebase_sdk_stub.create_user(auth_id, email)
-    
+
     def mock_login_as_admin(self, email: str) -> None:
         """Sets the environment variables to simulate a login of admin."""
         self.login(email, is_super_admin=True)
@@ -100,14 +98,19 @@ class ContributorDashboardDebugRequestsTests(test_utils.GenericTestBase):
 
         with self.request_swap, sign_up_swap, begin_session_swap, (
             init_app_swap) as init_app_counter:
-            (self.contributor_dashboard_debug.
+            (
+                self.contributor_dashboard_debug.
                 populate_data_for_contributor_dashboard_debug())
 
         self.assertEqual(init_app_counter.times_called, 1)
-        self._assert_user_roles(SUPER_ADMIN_USERNAME, SUPER_ADMIN_ROLES)
-        self._assert_can_submit_question_suggestions(CONTRIBUTOR_USERNAME)
+        self._assert_user_roles(
+            contributor_dashboard_debug.SUPER_ADMIN_USERNAME,
+            contributor_dashboard_debug.SUPER_ADMIN_ROLES)
+        self._assert_can_submit_question_suggestions(
+            contributor_dashboard_debug.CONTRIBUTOR_USERNAME)
         self._assert_generate_dummy_new_structures_data()
-        self._assert_topics_in_classroom(CLASSROOM_NAME)
+        self._assert_topics_in_classroom(
+            contributor_dashboard_debug.CLASSROOM_NAME)
 
     def test_sign_up_new_user(self) -> None:
         email = 'user1@example.com'
@@ -166,8 +169,9 @@ class ContributorDashboardDebugRequestsTests(test_utils.GenericTestBase):
         self.logout()
 
         self._assert_user_roles(username, roles)
-    
+
     def _assert_user_roles(self, username: str, roles: List[str]) -> None:
+        """Asserts that the user has the given roles."""
         self.assertEqual(
             user_services.get_user_settings_from_username(username).roles,
             [feconf.ROLE_ID_FULL_USER] + roles)
@@ -190,8 +194,9 @@ class ContributorDashboardDebugRequestsTests(test_utils.GenericTestBase):
         self.logout()
 
         self._assert_can_submit_question_suggestions(username)
-    
+
     def _assert_can_submit_question_suggestions(self, username: str) -> None:
+        """Asserts that the user can submit question suggestions."""
         user_id = user_services.get_user_id_from_username(username)
         self.assertTrue(user_services.can_submit_question_suggestions(user_id))
 
@@ -201,7 +206,8 @@ class ContributorDashboardDebugRequestsTests(test_utils.GenericTestBase):
         self.contributor_dashboard_debug.csrf_token = self.get_new_csrf_token()
 
         with self.request_swap:
-            (self.contributor_dashboard_debug.
+            (
+                self.contributor_dashboard_debug.
                 generate_dummy_new_structures_data())
 
         self.logout()
@@ -209,6 +215,7 @@ class ContributorDashboardDebugRequestsTests(test_utils.GenericTestBase):
         self._assert_generate_dummy_new_structures_data()
 
     def _assert_generate_dummy_new_structures_data(self) -> None:
+        """Asserts that the dummy new structures data is generated."""
         topic_summaries = topic_fetchers.get_all_topic_summaries()
         self.assertEqual(len(topic_summaries), 2)
         for summary in topic_summaries:
@@ -247,7 +254,6 @@ class ContributorDashboardDebugRequestsTests(test_utils.GenericTestBase):
         topic_services.save_new_topic(admin_id, topic_1)
         topic_services.save_new_topic(admin_id, topic_2)
 
-
         self.set_curriculum_admins([self.SUPER_ADMIN_USERNAME])
         self.login(self.SUPER_ADMIN_EMAIL, is_super_admin=True)
         self.contributor_dashboard_debug.csrf_token = self.get_new_csrf_token()
@@ -261,6 +267,7 @@ class ContributorDashboardDebugRequestsTests(test_utils.GenericTestBase):
         self._assert_topics_in_classroom('math')
 
     def _assert_topics_in_classroom(self, classroom_name: str) -> None:
+        """Asserts that test topics are in the classroom."""
         classroom_dict = self.get_json(
             '%s/%s' % (feconf.CLASSROOM_DATA_HANDLER, classroom_name))
         topic_summaries = topic_fetchers.get_all_topic_summaries()

@@ -104,7 +104,7 @@ class ContributorDashboardDebugRequests():
         }).json()['idToken']
 
         return token_id
-    
+
     def sign_up_new_user(self, email: str, username: str) -> None:
         """Sign up a new user based on email and username. The password is
         generated automatically from email.
