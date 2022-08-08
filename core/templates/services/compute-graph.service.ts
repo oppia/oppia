@@ -28,6 +28,7 @@ export interface GraphLink {
   linkProperty?: string;
 }
 
+
 export interface GraphNodes {
   [stateName: string]: string;
 }

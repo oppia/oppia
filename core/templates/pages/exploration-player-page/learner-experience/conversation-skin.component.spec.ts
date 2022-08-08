@@ -771,6 +771,8 @@ describe('Conversation skin component', () => {
 
     componentInstance.ngOnInit();
     windowRef.nativeWindow.onresize(null);
+
+    // Tick has been used here to handle flake in frontend.
     tick(100);
   }));
 
@@ -859,6 +861,8 @@ describe('Conversation skin component', () => {
 
     componentInstance.ngOnInit();
     windowRef.nativeWindow.onresize(null);
+
+    // Tick has been used here to handle flake in frontend.
     tick(100);
   }));
 

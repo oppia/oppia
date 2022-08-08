@@ -68,7 +68,11 @@ describe('Graph Layout Service', () => {
       label: 'State1',
       height: 0.08,
       width: 0.2,
-      reachableFromEnd: true
+      reachableFromEnd: true,
+      style: 'string',
+      secondaryLabel: 'string',
+      nodeClass: 'string',
+      canDelete: false
     },
     State2: {
       depth: 1,
@@ -82,7 +86,11 @@ describe('Graph Layout Service', () => {
       label: 'State2',
       height: 0.08,
       width: 0.2,
-      reachableFromEnd: true
+      reachableFromEnd: true,
+      style: 'string',
+      secondaryLabel: 'string',
+      nodeClass: 'string',
+      canDelete: false
     },
     State3: {
       depth: 1,
@@ -96,7 +104,11 @@ describe('Graph Layout Service', () => {
       label: 'State3',
       height: 0.08,
       width: 0.2,
-      reachableFromEnd: true
+      reachableFromEnd: true,
+      style: 'string',
+      secondaryLabel: 'string',
+      nodeClass: 'string',
+      canDelete: false
     },
     State4: {
       depth: 4,
@@ -110,7 +122,11 @@ describe('Graph Layout Service', () => {
       label: 'State4',
       height: 0.08,
       width: 0.2,
-      reachableFromEnd: true
+      reachableFromEnd: true,
+      style: 'string',
+      secondaryLabel: 'string',
+      nodeClass: 'string',
+      canDelete: false
     },
     State5: {
       depth: 1,
@@ -124,7 +140,11 @@ describe('Graph Layout Service', () => {
       label: 'State5',
       height: 0.08,
       width: 0.2,
-      reachableFromEnd: false
+      reachableFromEnd: false,
+      style: 'string',
+      secondaryLabel: 'string',
+      nodeClass: 'string',
+      canDelete: false
     },
     State6: {
       depth: 2,
@@ -138,7 +158,11 @@ describe('Graph Layout Service', () => {
       label: 'State6',
       height: 0.08,
       width: 0.2,
-      reachableFromEnd: false
+      reachableFromEnd: false,
+      style: 'string',
+      secondaryLabel: 'string',
+      nodeClass: 'string',
+      canDelete: false
     },
     State7: {
       depth: 2,
@@ -152,7 +176,11 @@ describe('Graph Layout Service', () => {
       label: 'State7',
       height: 0.08,
       width: 0.2,
-      reachableFromEnd: false
+      reachableFromEnd: false,
+      style: 'string',
+      secondaryLabel: 'string',
+      nodeClass: 'string',
+      canDelete: false
     },
     State8: {
       depth: 3,
@@ -166,7 +194,11 @@ describe('Graph Layout Service', () => {
       label: 'State8',
       height: 0.08,
       width: 0.2,
-      reachableFromEnd: true
+      reachableFromEnd: true,
+      style: 'string',
+      secondaryLabel: 'string',
+      nodeClass: 'string',
+      canDelete: false
     },
     State9: {
       depth: 1,
@@ -180,7 +212,11 @@ describe('Graph Layout Service', () => {
       label: 'State9',
       height: 0.08,
       width: 0.2,
-      reachableFromEnd: true
+      reachableFromEnd: true,
+      style: 'string',
+      secondaryLabel: 'string',
+      nodeClass: 'string',
+      canDelete: false
     },
     Orphaned: {
       depth: 5,
@@ -194,7 +230,11 @@ describe('Graph Layout Service', () => {
       label: 'Orphaned',
       height: 0.08,
       width: 0.2,
-      reachableFromEnd: false
+      reachableFromEnd: false,
+      style: 'string',
+      secondaryLabel: 'string',
+      nodeClass: 'string',
+      canDelete: false
     }
   };
   let links1: GraphLink[] = [
@@ -407,7 +447,11 @@ describe('Graph Layout Service', () => {
         label: 'State1',
         height: 0.16,
         width: 0.18000000000000002,
-        reachableFromEnd: false
+        reachableFromEnd: false,
+        style: 'style',
+        secondaryLabel: 'secondaryLabel',
+        nodeClass: 'nodeClass',
+        canDelete: false
       },
       State2: {
         depth: 1,
@@ -421,7 +465,11 @@ describe('Graph Layout Service', () => {
         label: 'State2',
         height: 0.16,
         width: 0.18000000000000002,
-        reachableFromEnd: false
+        reachableFromEnd: false,
+        style: 'style',
+        secondaryLabel: 'secondaryLabel',
+        nodeClass: 'nodeClass',
+        canDelete: false
       },
       State3: {
         depth: 1,
@@ -435,7 +483,11 @@ describe('Graph Layout Service', () => {
         label: 'State3',
         height: 0.16,
         width: 0.18000000000000002,
-        reachableFromEnd: false
+        reachableFromEnd: false,
+        style: 'style',
+        secondaryLabel: 'secondaryLabel',
+        nodeClass: 'nodeClass',
+        canDelete: false
       },
       State4: {
         depth: 2,
@@ -449,7 +501,11 @@ describe('Graph Layout Service', () => {
         label: 'State4',
         height: 0.16,
         width: 0.18000000000000002,
-        reachableFromEnd: false
+        reachableFromEnd: false,
+        style: 'style',
+        secondaryLabel: 'secondaryLabel',
+        nodeClass: 'nodeClass',
+        canDelete: false
       }
     };
 
@@ -499,7 +555,11 @@ describe('Graph Layout Service', () => {
         label: 'State1',
         height: 0.16,
         width: 0.18000000000000002,
-        reachableFromEnd: false
+        reachableFromEnd: false,
+        style: 'style',
+        secondaryLabel: 'secondaryLabel',
+        nodeClass: 'nodeClass',
+        canDelete: false
       },
       State2: {
         depth: 1,
@@ -513,7 +573,11 @@ describe('Graph Layout Service', () => {
         label: 'State2',
         height: 0.16,
         width: 0.18000000000000002,
-        reachableFromEnd: false
+        reachableFromEnd: false,
+        style: 'style',
+        secondaryLabel: 'secondaryLabel',
+        nodeClass: 'nodeClass',
+        canDelete: false
       }
     };
 
@@ -541,7 +605,11 @@ describe('Graph Layout Service', () => {
         label: 'State1',
         height: 0.16,
         width: 0.18000000000000002,
-        reachableFromEnd: false
+        reachableFromEnd: false,
+        style: 'style',
+        secondaryLabel: 'secondaryLabel',
+        nodeClass: 'nodeClass',
+        canDelete: false
       },
       Introduction: {
         depth: 0,
@@ -555,7 +623,11 @@ describe('Graph Layout Service', () => {
         label: 'Introduction',
         height: 0.16,
         width: 0.18000000000000002,
-        reachableFromEnd: false
+        reachableFromEnd: false,
+        style: 'style',
+        secondaryLabel: 'secondaryLabel',
+        nodeClass: 'nodeClass',
+        canDelete: false
       },
       End: {
         depth: 2,
@@ -569,7 +641,11 @@ describe('Graph Layout Service', () => {
         label: 'End',
         height: 0.16,
         width: 0.18000000000000002,
-        reachableFromEnd: false
+        reachableFromEnd: false,
+        style: 'style',
+        secondaryLabel: 'secondaryLabel',
+        nodeClass: 'nodeClass',
+        canDelete: false
       },
       State2: {
         depth: 1,
@@ -583,7 +659,11 @@ describe('Graph Layout Service', () => {
         label: 'State2',
         height: 0.16,
         width: 0.18000000000000002,
-        reachableFromEnd: false
+        reachableFromEnd: false,
+        style: 'style',
+        secondaryLabel: 'secondaryLabel',
+        nodeClass: 'nodeClass',
+        canDelete: false
       }
     };
 
@@ -797,7 +877,11 @@ describe('Graph Layout Service', () => {
         label: 'State1',
         height: 33.6,
         width: 126,
-        reachableFromEnd: false
+        reachableFromEnd: false,
+        style: 'style',
+        secondaryLabel: 'secondaryLabel',
+        nodeClass: 'nodeClass',
+        canDelete: false
       },
       State2: {
         depth: 1,
@@ -811,7 +895,11 @@ describe('Graph Layout Service', () => {
         label: 'State2',
         height: 33.6,
         width: 126,
-        reachableFromEnd: false
+        reachableFromEnd: false,
+        style: 'style',
+        secondaryLabel: 'secondaryLabel',
+        nodeClass: 'nodeClass',
+        canDelete: false
       },
       State3: {
         depth: 1,
@@ -825,7 +913,11 @@ describe('Graph Layout Service', () => {
         label: 'State3',
         height: 33.6,
         width: 126,
-        reachableFromEnd: false
+        reachableFromEnd: false,
+        style: 'style',
+        secondaryLabel: 'secondaryLabel',
+        nodeClass: 'nodeClass',
+        canDelete: false
       },
       Introduction: {
         depth: 0,
@@ -839,7 +931,11 @@ describe('Graph Layout Service', () => {
         label: 'Introduction',
         height: 33.6,
         width: 126,
-        reachableFromEnd: false
+        reachableFromEnd: false,
+        style: 'style',
+        secondaryLabel: 'secondaryLabel',
+        nodeClass: 'nodeClass',
+        canDelete: false
       }
     };
 
@@ -863,7 +959,11 @@ describe('Graph Layout Service', () => {
         label: 'State1',
         height: 33.6,
         width: 126,
-        reachableFromEnd: false
+        reachableFromEnd: false,
+        style: 'style',
+        secondaryLabel: 'secondaryLabel',
+        nodeClass: 'nodeClass',
+        canDelete: false
       },
       State2: {
         depth: 1,
@@ -877,7 +977,11 @@ describe('Graph Layout Service', () => {
         label: 'State2',
         height: 33.6,
         width: 126,
-        reachableFromEnd: false
+        reachableFromEnd: false,
+        style: 'style',
+        secondaryLabel: 'secondaryLabel',
+        nodeClass: 'nodeClass',
+        canDelete: false
       },
       State3: {
         depth: 1,
@@ -891,7 +995,11 @@ describe('Graph Layout Service', () => {
         label: 'State3',
         height: 33.6,
         width: 126,
-        reachableFromEnd: false
+        reachableFromEnd: false,
+        style: 'style',
+        secondaryLabel: 'secondaryLabel',
+        nodeClass: 'nodeClass',
+        canDelete: false
       },
       Introduction: {
         depth: 0,
@@ -905,7 +1013,11 @@ describe('Graph Layout Service', () => {
         label: 'Introduction',
         height: 33.6,
         width: 126,
-        reachableFromEnd: false
+        reachableFromEnd: false,
+        style: 'style',
+        secondaryLabel: 'secondaryLabel',
+        nodeClass: 'nodeClass',
+        canDelete: false
       },
       State4: {
         depth: 1,
@@ -919,7 +1031,11 @@ describe('Graph Layout Service', () => {
         label: 'State4',
         height: 33.6,
         width: 126,
-        reachableFromEnd: false
+        reachableFromEnd: false,
+        style: 'style',
+        secondaryLabel: 'secondaryLabel',
+        nodeClass: 'nodeClass',
+        canDelete: false
       }
     };
 
@@ -947,7 +1063,11 @@ describe('Graph Layout Service', () => {
         label: 'State1',
         height: 33.6,
         width: 126,
-        reachableFromEnd: false
+        reachableFromEnd: false,
+        style: 'style',
+        secondaryLabel: 'secondaryLabel',
+        nodeClass: 'nodeClass',
+        canDelete: false
       },
       State2: {
         depth: 1,
@@ -961,7 +1081,11 @@ describe('Graph Layout Service', () => {
         label: 'State2',
         height: 33.6,
         width: 126,
-        reachableFromEnd: false
+        reachableFromEnd: false,
+        style: 'style',
+        secondaryLabel: 'secondaryLabel',
+        nodeClass: 'nodeClass',
+        canDelete: false
       },
       State3: {
         depth: 1,
@@ -975,7 +1099,11 @@ describe('Graph Layout Service', () => {
         label: 'State3',
         height: 33.6,
         width: 126,
-        reachableFromEnd: false
+        reachableFromEnd: false,
+        style: 'style',
+        secondaryLabel: 'secondaryLabel',
+        nodeClass: 'nodeClass',
+        canDelete: false
       },
       Introduction: {
         depth: 0,
@@ -989,7 +1117,11 @@ describe('Graph Layout Service', () => {
         label: 'Introduction',
         height: 33.6,
         width: 126,
-        reachableFromEnd: false
+        reachableFromEnd: false,
+        style: 'style',
+        secondaryLabel: 'secondaryLabel',
+        nodeClass: 'nodeClass',
+        canDelete: false
       },
       State4: {
         depth: 1,
@@ -1003,7 +1135,11 @@ describe('Graph Layout Service', () => {
         label: 'State4',
         height: 33.6,
         width: 126,
-        reachableFromEnd: false
+        reachableFromEnd: false,
+        style: 'style',
+        secondaryLabel: 'secondaryLabel',
+        nodeClass: 'nodeClass',
+        canDelete: false
       },
       State5: {
         depth: 2,
@@ -1017,7 +1153,11 @@ describe('Graph Layout Service', () => {
         label: 'State5',
         height: 33.6,
         width: 126,
-        reachableFromEnd: false
+        reachableFromEnd: false,
+        style: 'style',
+        secondaryLabel: 'secondaryLabel',
+        nodeClass: 'nodeClass',
+        canDelete: false
       }
     };
 
@@ -1090,7 +1230,11 @@ describe('Graph Layout Service', () => {
         label: 'State1',
         height: 0.16,
         width: 0.18000000000000002,
-        reachableFromEnd: false
+        reachableFromEnd: false,
+        style: 'style',
+        secondaryLabel: 'secondaryLabel',
+        nodeClass: 'nodeClass',
+        canDelete: false
       },
       Introduction: {
         depth: 0,
@@ -1104,7 +1248,11 @@ describe('Graph Layout Service', () => {
         label: 'Introduction',
         height: 0.16,
         width: 0.18000000000000002,
-        reachableFromEnd: false
+        reachableFromEnd: false,
+        style: 'style',
+        secondaryLabel: 'secondaryLabel',
+        nodeClass: 'nodeClass',
+        canDelete: false
       },
       End: {
         depth: 2,
@@ -1118,7 +1266,11 @@ describe('Graph Layout Service', () => {
         label: 'End',
         height: 0.16,
         width: 0.18000000000000002,
-        reachableFromEnd: false
+        reachableFromEnd: false,
+        style: 'style',
+        secondaryLabel: 'secondaryLabel',
+        nodeClass: 'nodeClass',
+        canDelete: false
       },
       State2: {
         depth: 1,
@@ -1132,7 +1284,11 @@ describe('Graph Layout Service', () => {
         label: 'State2',
         height: 0.16,
         width: 0.18000000000000002,
-        reachableFromEnd: false
+        reachableFromEnd: false,
+        style: 'style',
+        secondaryLabel: 'secondaryLabel',
+        nodeClass: 'nodeClass',
+        canDelete: false
       }
     };
     let graphWidthUpperBoundInPixels = sgls.getGraphWidth(
@@ -1177,7 +1333,11 @@ describe('Graph Layout Service', () => {
         label: 'State1',
         height: 0.08,
         width: 0.2,
-        reachableFromEnd: true
+        reachableFromEnd: true,
+        style: 'style',
+        secondaryLabel: 'secondaryLabel',
+        nodeClass: 'nodeClass',
+        canDelete: false
       },
       State2: {
         depth: 1,
@@ -1191,7 +1351,11 @@ describe('Graph Layout Service', () => {
         label: 'State2',
         height: 0.08,
         width: 0.2,
-        reachableFromEnd: true
+        reachableFromEnd: true,
+        style: 'style',
+        secondaryLabel: 'secondaryLabel',
+        nodeClass: 'nodeClass',
+        canDelete: false
       },
       State3: {
         depth: 1,
@@ -1205,7 +1369,11 @@ describe('Graph Layout Service', () => {
         label: 'State3',
         height: 0.08,
         width: 0.2,
-        reachableFromEnd: true
+        reachableFromEnd: true,
+        style: 'style',
+        secondaryLabel: 'secondaryLabel',
+        nodeClass: 'nodeClass',
+        canDelete: false
       },
       State4: {
         depth: 4,
@@ -1219,7 +1387,11 @@ describe('Graph Layout Service', () => {
         label: 'State4',
         height: 0.08,
         width: 0.2,
-        reachableFromEnd: true
+        reachableFromEnd: true,
+        style: 'style',
+        secondaryLabel: 'secondaryLabel',
+        nodeClass: 'nodeClass',
+        canDelete: false
       },
       State5: {
         depth: 1,
@@ -1233,7 +1405,11 @@ describe('Graph Layout Service', () => {
         label: 'State5',
         height: 0.08,
         width: 0.2,
-        reachableFromEnd: false
+        reachableFromEnd: false,
+        style: 'style',
+        secondaryLabel: 'secondaryLabel',
+        nodeClass: 'nodeClass',
+        canDelete: false
       },
       State6: {
         depth: 2,
@@ -1247,7 +1423,11 @@ describe('Graph Layout Service', () => {
         label: 'State6',
         height: 0.08,
         width: 0.2,
-        reachableFromEnd: false
+        reachableFromEnd: false,
+        style: 'style',
+        secondaryLabel: 'secondaryLabel',
+        nodeClass: 'nodeClass',
+        canDelete: false
       },
       State7: {
         depth: 2,
@@ -1261,7 +1441,11 @@ describe('Graph Layout Service', () => {
         label: 'State7',
         height: 0.08,
         width: 0.2,
-        reachableFromEnd: false
+        reachableFromEnd: false,
+        style: 'style',
+        secondaryLabel: 'secondaryLabel',
+        nodeClass: 'nodeClass',
+        canDelete: false
       },
       State8: {
         depth: 3,
@@ -1275,7 +1459,11 @@ describe('Graph Layout Service', () => {
         label: 'State8',
         height: 0.08,
         width: 0.2,
-        reachableFromEnd: true
+        reachableFromEnd: true,
+        style: 'style',
+        secondaryLabel: 'secondaryLabel',
+        nodeClass: 'nodeClass',
+        canDelete: false
       },
       State9: {
         depth: 1,
@@ -1289,7 +1477,11 @@ describe('Graph Layout Service', () => {
         label: 'State9',
         height: 0.08,
         width: 0.2,
-        reachableFromEnd: true
+        reachableFromEnd: true,
+        style: 'style',
+        secondaryLabel: 'secondaryLabel',
+        nodeClass: 'nodeClass',
+        canDelete: false
       },
       Orphaned: {
         depth: 5,
@@ -1303,7 +1495,11 @@ describe('Graph Layout Service', () => {
         label: 'Orphaned',
         height: 0.08,
         width: 0.2,
-        reachableFromEnd: false
+        reachableFromEnd: false,
+        style: 'style',
+        secondaryLabel: 'secondaryLabel',
+        nodeClass: 'nodeClass',
+        canDelete: false
       }
     };
 
