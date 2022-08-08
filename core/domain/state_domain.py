@@ -3818,7 +3818,8 @@ class State(translation_domain.BaseTranslatableObject):
 
     @classmethod
     def create_default_state(
-            cls, default_dest_state_name, is_initial_state=False):
+        cls, default_dest_state_name: str, is_initial_state: bool = False
+    ) -> State:
         """Return a State domain object with default value.
 
         Args:

@@ -46,7 +46,7 @@ class UtilsTests(test_utils.GenericTestBase):
             self.assertIsNotNone(file_content)
 
     def test_can_not_open_file(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             FileNotFoundError,
             'No such file or directory: \'invalid_file.py\''
         ):
@@ -106,7 +106,7 @@ class UtilsTests(test_utils.GenericTestBase):
             yaml_dict = utils.dict_from_yaml(yaml_str)
             self.assertEqual(adict, yaml_dict)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.InvalidInputException,
             'while parsing a flow node\n'
             'expected the node content, but found \'<stream end>\'\n'):
@@ -189,7 +189,7 @@ class UtilsTests(test_utils.GenericTestBase):
             'http://test.com?a=b&redirectUrl=http%3A%2F%2Fredirect.com'
         )
 
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'URL query parameter name must be a string'
             ):
             utils.set_url_query_parameter('http://test.com?a=b', None, 'value') # type: ignore[arg-type]
@@ -255,7 +255,7 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(len(random_string), 12)
 
     def test_convert_png_data_url_to_binary_with_incorrect_prefix(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'The given string does not represent a PNG data URL'
         ):
             utils.convert_png_data_url_to_binary('data:image/jpg;base64,')
@@ -311,7 +311,7 @@ class UtilsTests(test_utils.GenericTestBase):
     ) -> None:
         timedelta_object = datetime.timedelta(days=0)
 
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Expected a positive timedelta, received: %s.' % (
                 timedelta_object.total_seconds())):
             utils.create_string_from_largest_unit_in_timedelta(timedelta_object)
@@ -321,7 +321,7 @@ class UtilsTests(test_utils.GenericTestBase):
     ) -> None:
         timedelta_object = datetime.timedelta(days=-40)
 
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Expected a positive timedelta, received: %s.' % (
                 timedelta_object.total_seconds())):
             utils.create_string_from_largest_unit_in_timedelta(timedelta_object)
@@ -462,7 +462,7 @@ class UtilsTests(test_utils.GenericTestBase):
         utils.require_valid_name(name, 'name_type')
 
         invalid_name = 0
-        with self.assertRaisesRegex(Exception, '0 must be a string.'): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, '0 must be a string.'):
             # Type ignore is used below because we are providing integer
             # argument instead of string for invalid_name for testing purposes.
             utils.require_valid_name(invalid_name, 'name_type') # type: ignore[arg-type]
@@ -474,14 +474,14 @@ class UtilsTests(test_utils.GenericTestBase):
         non_string_meta_tag_content = 0
         invalid_type_error = (
             'Expected meta tag content to be a string, received 0')
-        with self.assertRaisesRegex(Exception, invalid_type_error): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, invalid_type_error):
             utils.require_valid_meta_tag_content(non_string_meta_tag_content) # type: ignore[arg-type]
         lengthy_meta_tag_content = 'a' * 200
         max_length_error = (
             'Meta tag content should not be longer than %s characters.'
             % constants.MAX_CHARS_IN_META_TAG_CONTENT)
 
-        with self.assertRaisesRegex(Exception, max_length_error): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, max_length_error):
             utils.require_valid_meta_tag_content(lengthy_meta_tag_content)
 
     def test_require_valid_page_title_fragment_for_web(self) -> None:
@@ -492,7 +492,7 @@ class UtilsTests(test_utils.GenericTestBase):
         non_string_page_title_fragment_for_web = 0
         invalid_type_error = (
             'Expected page title fragment to be a string, received 0')
-        with self.assertRaisesRegex(Exception, invalid_type_error): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, invalid_type_error):
             utils.require_valid_page_title_fragment_for_web(
                 non_string_page_title_fragment_for_web) # type: ignore[arg-type]
         lengthy_page_title_fragment_for_web = 'a' * 60
@@ -500,7 +500,7 @@ class UtilsTests(test_utils.GenericTestBase):
             'Page title fragment should not be longer than %s characters.'
             % constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB)
 
-        with self.assertRaisesRegex(Exception, max_length_error): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, max_length_error):
             utils.require_valid_page_title_fragment_for_web(
                 lengthy_page_title_fragment_for_web)
 
@@ -508,7 +508,7 @@ class UtilsTests(test_utils.GenericTestBase):
         min_length_error = (
             'Page title fragment should not be shorter than %s characters.'
             % constants.MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB)
-        with self.assertRaisesRegex(Exception, min_length_error): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, min_length_error):
             utils.require_valid_page_title_fragment_for_web(
                 short_page_title_fragment_for_web)
 
@@ -521,7 +521,7 @@ class UtilsTests(test_utils.GenericTestBase):
             'name-type field contains invalid characters. Only '
             'lowercase words separated by hyphens are allowed. '
             'Received name with spaces.')
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, name_with_spaces_expected_error):
             utils.require_valid_url_fragment(
                 name_with_spaces, 'name-type', 20)
@@ -530,7 +530,7 @@ class UtilsTests(test_utils.GenericTestBase):
         name_in_caps_expected_error = (
             'name-type field contains invalid characters. Only '
             'lowercase words separated by hyphens are allowed. Received NAME.')
-        with self.assertRaisesRegex(Exception, name_in_caps_expected_error): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, name_in_caps_expected_error):
             utils.require_valid_url_fragment(
                 name_in_caps, 'name-type', 20)
 
@@ -538,7 +538,7 @@ class UtilsTests(test_utils.GenericTestBase):
         name_with_numbers_expected_error = (
             'name-type field contains invalid characters. Only '
             'lowercase words separated by hyphens are allowed. Received nam3.')
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, name_with_numbers_expected_error):
             utils.require_valid_url_fragment(
                 name_with_numbers, 'name-type', 20)
@@ -547,23 +547,23 @@ class UtilsTests(test_utils.GenericTestBase):
         long_name_expected_error = (
             'name-type field should not exceed 10 characters, '
             'received %s' % long_name)
-        with self.assertRaisesRegex(Exception, long_name_expected_error): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, long_name_expected_error):
             utils.require_valid_url_fragment(
                 long_name, 'name-type', 10)
 
         empty_name = ''
         empty_name_expected_error = 'name-type field should not be empty.'
-        with self.assertRaisesRegex(Exception, empty_name_expected_error): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, empty_name_expected_error):
             utils.require_valid_url_fragment(empty_name, 'name-type', 20)
 
         non_string_name = 0
         non_string_name_expected_error = (
             'name-type field must be a string. Received 0.')
-        with self.assertRaisesRegex(Exception, non_string_name_expected_error): # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, non_string_name_expected_error):
             utils.require_valid_url_fragment(non_string_name, 'name-type', 20) # type: ignore[arg-type]
 
     def test_validate_convert_to_hash(self) -> None:
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Expected string, received 1 of type %s' % type(1)):
             utils.convert_to_hash(1, 10) # type: ignore[arg-type]
 
@@ -571,16 +571,16 @@ class UtilsTests(test_utils.GenericTestBase):
             self
     ) -> None:
         favicon_filepath = os.path.join(
-            self.get_static_asset_filepath(), 'assets', 'favicon.ico') # type: ignore[no-untyped-call]
+            self.get_static_asset_filepath(), 'assets', 'favicon.ico')
 
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'The given string does not represent a PNG image.'):
             utils.convert_png_to_data_url(favicon_filepath)
 
     def test_get_exploration_components_from_dir_with_invalid_path_raises_error(
             self
     ) -> None:
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Found invalid non-asset file .+'
             'There should only be a single non-asset file, and it should have '
@@ -588,14 +588,14 @@ class UtilsTests(test_utils.GenericTestBase):
         ):
             utils.get_exploration_components_from_dir('core/tests/load_tests')
 
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'The only directory in . should be assets/'):
             utils.get_exploration_components_from_dir('.')
 
     def test_get_exploration_components_from_dir_with_multiple_yaml_files(
             self
     ) -> None:
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'More than one non-asset file specified for '
             'core/tests/data/dummy_assets/assets'):
@@ -605,7 +605,7 @@ class UtilsTests(test_utils.GenericTestBase):
     def test_get_exploration_components_from_dir_with_no_yaml_file(
             self
     ) -> None:
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'No yaml file specifed for core/tests/data/dummy_assets'):
             utils.get_exploration_components_from_dir(
@@ -629,7 +629,7 @@ class UtilsTests(test_utils.GenericTestBase):
             expected_language_description)
 
         invalid_language_code = 'invalid_code'
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Unsupported audio language code: invalid_code'):
             utils.get_supported_audio_language_description(
                 invalid_language_code)
@@ -678,7 +678,7 @@ class UtilsTests(test_utils.GenericTestBase):
             thumbnail_filename: str
     ) -> None:
         """Helper method for test_require_valid_thumbnail_filename."""
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, expected_error_substring):
             utils.require_valid_thumbnail_filename(
                 thumbnail_filename)
@@ -706,7 +706,7 @@ class UtilsTests(test_utils.GenericTestBase):
             self, expected_error_substring: str, image_filename: str
     ) -> None:
         """Helper method for test_require_valid_image_filename."""
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, expected_error_substring):
             utils.require_valid_image_filename(image_filename)
 
@@ -782,7 +782,7 @@ class UtilsTests(test_utils.GenericTestBase):
     ) -> None:
         image_data_url = urllib.parse.quote(base64.b64encode(b'test123'))
 
-        self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        self.assertRaisesRegex(
             Exception, 'The given string does not represent a PNG data URL.',
             lambda: utils.convert_png_data_url_to_binary(image_data_url))
 
@@ -810,7 +810,7 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertGreaterEqual(utils.get_random_int(5), 0)
         self.assertLess(utils.get_random_int(True), 1)
         self.assertGreaterEqual(utils.get_random_int(True), 0)
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             AssertionError, 'Only positive integers allowed'):
             utils.get_random_int(-1)
 
@@ -818,7 +818,7 @@ class UtilsTests(test_utils.GenericTestBase):
         list_instance = [1, 5, 9, 11, 15]
         list_instance2: List[str] = []
         self.assertIn(utils.get_random_choice(list_instance), list_instance)
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             AssertionError, 'Only non-empty lists allowed'):
             utils.get_random_choice(list_instance2)
 
@@ -827,7 +827,7 @@ class UtilsTests(test_utils.GenericTestBase):
             'December 12 06:42:12',
             utils.get_human_readable_time_string(944980932342.38)
         )
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             AssertionError, 'Time cannot be negative'):
             utils.get_human_readable_time_string(-1.42)
 
@@ -840,23 +840,23 @@ class UtilsTests(test_utils.GenericTestBase):
             self.assertNotIn(i, test_string)
 
     def test_require_valid_name_with_incorrect_input(self) -> None:
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'The length of the exploration title should be between 1 and 50 ' 'characters; received '):   # pylint: disable=line-too-long
             utils.require_valid_name('', 'the exploration title')
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Names should not start or end with whitespace.'):
             utils.require_valid_name(' 123\n', 'the exploration title')
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Adjacent whitespace in the exploration title should be collapsed.'):   # pylint: disable=line-too-long
             utils.require_valid_name('1  23', 'the exploration title')
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Invalid character : in the exploration title: 1\n:23'):
             utils.require_valid_name('1\n:23', 'the exploration title')
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             r'Invalid character \\n in the exploration title: 1\\n23'):
             utils.require_valid_name('1\\n23', 'the exploration title')

@@ -36,6 +36,8 @@ from core.domain import translation_domain
 from extensions import domain
 
 from pylatexenc import latex2text
+
+from typing import List
 from typing_extensions import TypedDict
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
@@ -130,6 +132,18 @@ class QuestionSuggestionChange(change_domain.BaseChange):
             'user_id_attribute_names': []
         }
     ]
+
+
+class QuestionDict(TypedDict):
+    """Dictionary representing the Question domain object."""
+
+    id: str
+    question_state_data: state_domain.StateDict
+    question_state_data_schema_version: int
+    language_code: str
+    version: int
+    linked_skill_ids: List[str]
+    inapplicable_skill_misconception_ids: List[str]
 
 
 class VersionedQuestionStateDict(TypedDict):

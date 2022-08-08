@@ -169,7 +169,7 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(results), 2)
 
         # Check that it accepts only DateTime objects.
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Expected datetime, received Not a datetime object of type '
             '<class \'str\'>'
@@ -183,7 +183,7 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
 
     def test_raise_exception_by_mocking_collision(self) -> None:
         # Test Exception for SentEmailModel.
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'The id generator for SentEmailModel is '
             'producing too many collisions.'
         ):

@@ -67,7 +67,7 @@ class BuildTests(test_utils.GenericTestBase):
 
     def test_minify_func_with_invalid_filepath(self) -> None:
         """Tests minify_func with an invalid filepath."""
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             subprocess.CalledProcessError,
             'returned non-zero exit status 1') as called_process:
             build.minify_func(
@@ -79,7 +79,7 @@ class BuildTests(test_utils.GenericTestBase):
 
     def test_minify_and_create_sourcemap(self) -> None:
         """Tests _minify_and_create_sourcemap with an invalid filepath."""
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             subprocess.CalledProcessError,
             'returned non-zero exit status 1') as called_process:
             build._minify_and_create_sourcemap(  # pylint: disable=protected-access
@@ -168,7 +168,7 @@ class BuildTests(test_utils.GenericTestBase):
         target_dir_file_count = build.get_file_count(MOCK_ASSETS_DEV_DIR)
         # Ensure that ASSETS_DEV_DIR has at least 1 file.
         assert target_dir_file_count > 0
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             ValueError, (
                 '%s files in first dir list != %s files in second dir list') %
             (source_dir_file_count, target_dir_file_count)):
@@ -180,7 +180,7 @@ class BuildTests(test_utils.GenericTestBase):
 
         # Ensure that MOCK_EXTENSIONS_DIR has at least 1 file.
         assert target_dir_file_count > 0
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             ValueError, (
                 '%s files in first dir list != %s files in second dir list') %
             (source_dir_file_count, target_dir_file_count)):
@@ -199,13 +199,13 @@ class BuildTests(test_utils.GenericTestBase):
         # Final filepath example: base.240933e7564bd72a4dde42ee23260c5f.html.
         file_hashes: Dict[str, str] = {}
         base_filename = 'base.html'
-        with self.assertRaisesRegex(ValueError, 'Hash dict is empty'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(ValueError, 'Hash dict is empty'):
             build._verify_filepath_hash(base_filename, file_hashes)  # pylint: disable=protected-access
 
         # Generate a random hash dict for base.html.
         file_hashes = {base_filename: (
-            test_utils.generate_random_hexa_str())}  # type: ignore[no-untyped-call]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            test_utils.generate_random_hexa_str())}
+        with self.assertRaisesRegex(
             ValueError, '%s is expected to contain MD5 hash' % base_filename):
             build._verify_filepath_hash(base_filename, file_hashes)  # pylint: disable=protected-access
 
@@ -214,13 +214,13 @@ class BuildTests(test_utils.GenericTestBase):
             base_without_hash_filename, file_hashes)
 
         bad_filepath = 'README'
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             ValueError, 'Filepath has less than 2 partitions after splitting'):
             build._verify_filepath_hash(bad_filepath, file_hashes)  # pylint: disable=protected-access
 
         hashed_base_filename = build._insert_hash(  # pylint: disable=protected-access
-            base_filename, test_utils.generate_random_hexa_str())  # type: ignore[no-untyped-call]
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            base_filename, test_utils.generate_random_hexa_str())
+        with self.assertRaisesRegex(
             KeyError,
             'Hash from file named %s does not match hash dict values' %
             hashed_base_filename):
@@ -472,7 +472,7 @@ class BuildTests(test_utils.GenericTestBase):
             if thread in build_thread_names]
         self.assertEqual(len(extra_build_threads), 0)
         build._execute_tasks(build_tasks)  # pylint: disable=protected-access
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             OSError, 'threads can only be started once'):
             build._execute_tasks(build_tasks)  # pylint: disable=protected-access
         # Assert that all threads are joined.
@@ -757,7 +757,7 @@ class BuildTests(test_utils.GenericTestBase):
 
         with app_dev_yaml_filepath_swap, app_yaml_filepath_swap:
             with env_vars_to_remove_from_deployed_app_yaml_swap:
-                with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+                with self.assertRaisesRegex(
                         Exception,
                         'Environment variable \'DATASTORE_HOST\' to be '
                         'removed does not exist.'
@@ -892,7 +892,7 @@ class BuildTests(test_utils.GenericTestBase):
         error_message = ('File %s does not exist.') % re.escape(
             non_existent_filepaths[0])
         # Exception will be raised at first file determined to be non-existent.
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             OSError, error_message):
             build.safe_delete_file(non_existent_filepaths[0])
 
@@ -1113,7 +1113,7 @@ class BuildTests(test_utils.GenericTestBase):
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
     def test_cannot_maintenance_mode_in_dev_mode(self) -> None:
-        assert_raises_regexp_context_manager = self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception,
             'maintenance_mode should only be enabled in prod build.')
         with assert_raises_regexp_context_manager:
@@ -1138,7 +1138,7 @@ class BuildTests(test_utils.GenericTestBase):
         ensure_files_exist_swap = self.swap(
             build, '_ensure_files_exist', mock_ensure_files_exist)
         clean_swap = self.swap(build, 'clean', mock_clean)
-        assert_raises_regexp_context_manager = self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception,
             'minify_third_party_libs_only should not be set in non-prod env.')
         with ensure_files_exist_swap, assert_raises_regexp_context_manager:
@@ -1226,7 +1226,7 @@ class BuildTests(test_utils.GenericTestBase):
             build, 'get_file_count', mock_get_file_count)
 
         with webpack_compiler_swap, get_file_count_swap:
-            with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            with self.assertRaisesRegex(
                 AssertionError, 'webpack_bundles should be non-empty.'
             ):
                 build.build_using_webpack(build.WEBPACK_PROD_CONFIG)

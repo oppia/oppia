@@ -45,7 +45,7 @@ class BeamJobRunModelTest(test_utils.GenericTestBase):
             utils, 'convert_to_hash', value=model.id)
 
         with collision_context:
-            self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            self.assertRaisesRegex(
                 RuntimeError,
                 r'Failed to generate a unique ID after \d+ attempts',
                 beam_job_models.BeamJobRunModel.get_new_id)
@@ -88,7 +88,7 @@ class BeamJobRunResultModelTest(test_utils.GenericTestBase):
             utils, 'convert_to_hash', value=model.id)
 
         with collision_context:
-            self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            self.assertRaisesRegex(
                 RuntimeError,
                 r'Failed to generate a unique ID after \d+ attempts',
                 beam_job_models.BeamJobRunResultModel.get_new_id)

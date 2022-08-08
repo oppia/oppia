@@ -48,8 +48,8 @@ class FeedbackThreadSummariesLoadTests(test_utils.GenericTestBase):
 
         self.signup(self.USER_EMAIL, self.USER_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
-        self.user_id = self.get_user_id_from_email(self.USER_EMAIL)  # type: ignore[no-untyped-call]
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
 
         self.save_new_valid_exploration(
             self.EXP_ID_1, self.owner_id, title='Bridges in England',

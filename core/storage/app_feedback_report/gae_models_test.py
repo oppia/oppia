@@ -87,7 +87,7 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
         super(AppFeedbackReportModelTests, self).setUp()
 
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
-        self.user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL) # type: ignore[no-untyped-call]
+        self.user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
 
         self.feedback_report_model = (
             app_feedback_report_models.AppFeedbackReportModel(
@@ -171,7 +171,7 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
     def test_create_raises_exception_by_mocking_collision(self) -> None:
         model_class = app_feedback_report_models.AppFeedbackReportModel
         # Test Exception for AppFeedbackReportModel.
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'The id generator for AppFeedbackReportModel is '
             'producing too many collisions.'):
             # Swap dependent method get_by_id to simulate collision every time.
@@ -318,7 +318,7 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
             """Invalid filter."""
 
             INVALID_FIELD = 'invalid_field'
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.InvalidInputException,
             'The field %s is not a valid field to filter reports on' % (
                 InvalidFilter.INVALID_FIELD.name)
@@ -390,7 +390,7 @@ class AppFeedbackReportTicketModelTests(test_utils.GenericTestBase):
     def test_create_raises_exception_by_mocking_collision(self) -> None:
         model_class = app_feedback_report_models.AppFeedbackReportTicketModel
         # Test Exception for AppFeedbackReportTicketModel.
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'The id generator for AppFeedbackReportTicketModel is producing too'
             'many collisions.'

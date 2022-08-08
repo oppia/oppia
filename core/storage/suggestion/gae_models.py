@@ -221,7 +221,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
             target_version_at_submission: int,
             status: str,
             author_id: str,
-            final_reviewer_id: str,
+            final_reviewer_id: Optional[str],
             change_cmd: Dict[str, Any],
             score_category: str,
             thread_id: str,
@@ -237,8 +237,9 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 entity at the time of creation of the suggestion.
             status: str. The status of the suggestion.
             author_id: str. The ID of the user who submitted the suggestion.
-            final_reviewer_id: str. The ID of the reviewer who has
-                accepted/rejected the suggestion.
+            final_reviewer_id: str|None. The ID of the reviewer who has
+                accepted/rejected the suggestion, or None if no reviewer is
+                assigned.
             change_cmd: dict. The actual content of the suggestion.
             score_category: str. The scoring category for the suggestion.
             thread_id: str. The ID of the feedback thread linked to the

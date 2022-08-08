@@ -277,7 +277,7 @@ class TakeoutServiceProfileUserUnitTests(test_utils.GenericTestBase):
 
         self.set_up_trivial()
         error_msg = 'Takeout for profile users is not yet supported.'
-        with self.assertRaisesRegex(NotImplementedError, error_msg):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(NotImplementedError, error_msg):
             takeout_service.export_data_for_user(self.PROFILE_ID_1)
 
     def test_export_data_for_profile_user_nontrivial_raises_error(self) -> None:
@@ -285,7 +285,7 @@ class TakeoutServiceProfileUserUnitTests(test_utils.GenericTestBase):
 
         self.set_up_non_trivial()
         error_msg = 'Takeout for profile users is not yet supported.'
-        with self.assertRaisesRegex(NotImplementedError, error_msg):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(NotImplementedError, error_msg):
             takeout_service.export_data_for_user(self.PROFILE_ID_1)
 
 
@@ -959,7 +959,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
 
     def test_export_nonexistent_full_user_raises_error(self) -> None:
         """Setup for nonexistent user test of export_data functionality."""
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             user_models.UserSettingsModel.EntityNotFoundError,
             'Entity for class UserSettingsModel with id fake_user_id '
             'not found'):
@@ -1217,7 +1217,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         # Retrieve all models for export.
         all_models = [
             clazz
-            for clazz in test_utils.get_storage_model_classes()  # type: ignore[no-untyped-call]
+            for clazz in test_utils.get_storage_model_classes()
             if (not clazz.__name__ in
                 test_utils.BASE_MODEL_CLASSES_WITHOUT_DATA_POLICIES)
         ]
@@ -1282,7 +1282,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         # Retrieve all models for export.
         all_models = [
             clazz
-            for clazz in test_utils.get_storage_model_classes()  # type: ignore[no-untyped-call]
+            for clazz in test_utils.get_storage_model_classes()
             if (not clazz.__name__ in
                 test_utils.BASE_MODEL_CLASSES_WITHOUT_DATA_POLICIES)
         ]
@@ -1323,10 +1323,15 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                   base_models
                   .MODEL_ASSOCIATION_TO_USER
                   .ONE_INSTANCE_SHARED_ACROSS_USERS):
+                # Here, model is of BaseModel type and BaseModel does not
+                # contain get_field_name_mapping_to_takeout_keys attribute
+                # and get_field_name_mapping_to_takeout_keys(), so because
+                # of this MyPy throws an error. Thus to avoid the error, we
+                # used ignore here. 
                 self.assertIsNotNone(
-                    model.get_field_name_mapping_to_takeout_keys)
+                    model.get_field_name_mapping_to_takeout_keys)  # type: ignore[attr-defined]
                 exported_data = model.export_data(self.USER_ID_1)
-                field_mapping = model.get_field_name_mapping_to_takeout_keys()
+                field_mapping = model.get_field_name_mapping_to_takeout_keys()  # type: ignore[attr-defined]
                 self.assertEqual(
                     sorted(exported_field_names),
                     sorted(field_mapping.keys())
@@ -1832,10 +1837,10 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             self.USER_ID_1)
         observed_data = user_takeout_object.user_data
         observed_images = user_takeout_object.user_images
-        self.assertItemsEqual(observed_data, expected_user_data)  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(observed_data, expected_user_data)
         observed_json = json.dumps(observed_data)
         expected_json = json.dumps(expected_user_data)
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             json.loads(observed_json), json.loads(expected_json))
         expected_images = [
             takeout_domain.TakeoutImage(

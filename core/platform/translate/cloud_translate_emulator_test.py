@@ -35,12 +35,12 @@ class CloudTranslateEmulatorUnitTests(test_utils.TestBase):
             self.emulator.PREGENERATED_TRANSLATIONS)
 
     def test_translate_with_invalid_source_language_raises_error(self) -> None:
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             ValueError, 'Invalid source language code: invalid'):
             self.emulator.translate('hello world', 'invalid', 'es')
 
     def test_translate_with_invalid_target_language_raises_error(self) -> None:
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             ValueError, 'Invalid target language code: invalid'):
             self.emulator.translate('hello world', 'en', 'invalid')
 

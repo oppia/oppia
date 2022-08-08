@@ -50,7 +50,7 @@ class ConstantsTests(test_utils.GenericTestBase):
                 'No such file or directory: \'assets/non_exist.xy\''
             )
         ):
-            with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+            with self.assertRaisesRegex(
                 FileNotFoundError,
                 'No such file or directory: \'assets/non_exist.xy\''
             ):
@@ -67,7 +67,7 @@ class ConstantsTests(test_utils.GenericTestBase):
     def test_loading_file_in_non_existent_package_throws_error(self) -> None:
         """Test get_package_file_contents with imaginary file."""
         with self.swap_to_always_return(pkgutil, 'get_data', None):
-            with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+            with self.assertRaisesRegex(
                 FileNotFoundError,
                 'No such file or directory: \'assets/non_exist.xy\''
             ):
@@ -82,7 +82,7 @@ class ConstantsTests(test_utils.GenericTestBase):
                 constants.constants.SKILL_DIFFICULTY_EASY,
                 constants.constants.SKILL_DIFFICULTY_MEDIUM,
                 constants.constants.SKILL_DIFFICULTY_HARD])
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual( 
             list(constants.constants.SKILL_DIFFICULTY_LABEL_TO_FLOAT.keys()),
             constants.constants.SKILL_DIFFICULTIES)
         self.assertEqual(

@@ -529,7 +529,7 @@ class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
         self.assertFalse(more)
 
     def test_get_all_non_private_commits_with_invalid_max_age(self) -> None:
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'max_age must be a datetime.timedelta instance or None.'):
             # TODO(#13528): Remove this test after the backend is fully

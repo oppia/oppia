@@ -984,7 +984,12 @@ class Skill:
         return skill
 
     @classmethod
-    def create_default_skill(cls, skill_id, description, rubrics):
+    def create_default_skill(
+        cls,
+        skill_id: str,
+        description: str,
+        rubrics: List[Rubric]
+    ) -> Skill:
         """Returns a skill domain object with default values. This is for
         the frontend where a default blank skill would be shown to the user
         when the skill is created for the first time.
