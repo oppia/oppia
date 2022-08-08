@@ -48,7 +48,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         """Before each individual test, create dummy user."""
-        super(QuestionServicesUnitTest, self).setUp()
+        super().setUp()
         self.signup(self.TOPIC_MANAGER_EMAIL, self.TOPIC_MANAGER_USERNAME)
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)

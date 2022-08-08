@@ -1243,13 +1243,13 @@ class Question(translation_domain.BaseTranslatableObject):
                 'interaction']['answer_groups'] = filtered_answer_groups
 
             # Renaming cust arg.
+        if question_state_dict[
+                'interaction']['id'] in exp_domain.ALGEBRAIC_MATH_INTERACTIONS:
             customization_args = question_state_dict[
                 'interaction']['customization_args']
-            customization_args['allowedVariables'] = []
-            if 'customOskLetters' in customization_args:
-                customization_args['allowedVariables'] = copy.deepcopy(
-                    customization_args['customOskLetters'])
-                del customization_args['customOskLetters']
+            customization_args['allowedVariables'] = copy.deepcopy(
+                customization_args['customOskLetters'])
+            del customization_args['customOskLetters']
 
         return question_state_dict
 

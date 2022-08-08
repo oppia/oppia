@@ -564,7 +564,7 @@ class CollectionRightsModel(base_models.VersionedModel):
                     cmd: str. Unique command.
                 and additional arguments for that command.
         """
-        super(CollectionRightsModel, self).commit(
+        super().commit(
             committer_id, commit_message, commit_cmds)
 
     # TODO(#13523): Change 'model_dict' to domain object/TypedDict to

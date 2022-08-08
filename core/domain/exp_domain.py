@@ -144,6 +144,10 @@ MATH_INTERACTION_TYPES = [
     TYPE_VALID_NUMERIC_EXPRESSION,
     TYPE_VALID_MATH_EQUATION
 ]
+ALGEBRAIC_MATH_INTERACTIONS = [
+    TYPE_VALID_ALGEBRAIC_EXPRESSION,
+    TYPE_VALID_MATH_EQUATION
+]
 MATH_INTERACTION_DEPRECATED_RULES = [
     'ContainsSomeOf', 'OmitsSomeOf', 'MatchesWithGeneralForm']
 
@@ -2295,10 +2299,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     'interaction']['answer_groups'] = filtered_answer_groups
 
                 # Renaming cust arg.
-                customization_args = state_dict[
-                    'interaction']['customization_args']
-                customization_args['allowedVariables'] = []
-                if 'customOskLetters' in customization_args:
+                if state_dict[
+                        'interaction']['id'] in ALGEBRAIC_MATH_INTERACTIONS:
+                    customization_args = state_dict[
+                        'interaction']['customization_args']
                     customization_args['allowedVariables'] = copy.deepcopy(
                         customization_args['customOskLetters'])
                     del customization_args['customOskLetters']

@@ -68,7 +68,7 @@ class ActivityServicesTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         """Publish two explorations and one collection."""
-        super(ActivityServicesTests, self).setUp()
+        super().setUp()
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL) # type: ignore[no-untyped-call]

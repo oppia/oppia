@@ -517,8 +517,7 @@ class JSONEncoderForHTML(json.JSONEncoder):
         return ''.join(chunks) if self.ensure_ascii else u''.join(chunks)
 
     def iterencode(self, o: str, _one_shot: bool = False) -> Iterator[str]:
-        chunks = super(
-            JSONEncoderForHTML, self).iterencode(o, _one_shot=_one_shot)
+        chunks = super().iterencode(o, _one_shot=_one_shot)
         for chunk in chunks:
             yield chunk.replace('&', '\\u0026').replace(
                 '<', '\\u003c').replace('>', '\\u003e')

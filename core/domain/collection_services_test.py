@@ -71,7 +71,7 @@ class CollectionServicesUnitTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         """Before each individual test, create dummy users."""
-        super(CollectionServicesUnitTests, self).setUp()
+        super().setUp()
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
@@ -518,8 +518,8 @@ class CollectionProgressUnitTests(CollectionServicesUnitTests):
         collection_services.record_played_exploration_in_collection_context(
             user_id, collection_id, exploration_id)
 
-    def setUp(self) -> None:
-        super(CollectionProgressUnitTests, self).setUp()
+    def setUp(self):
+        super().setUp()
 
         # Create a new collection and exploration.
         self.save_new_valid_collection(
@@ -686,8 +686,8 @@ class CollectionSummaryQueriesUnitTests(CollectionServicesUnitTests):
     COL_ID_4: Final = '4_languages_learning_basic_verbs_in_spanish'
     COL_ID_5: Final = '5_languages_private_collection_in_spanish'
 
-    def setUp(self) -> None:
-        super(CollectionSummaryQueriesUnitTests, self).setUp()
+    def setUp(self):
+        super().setUp()
 
         # Setup the collections to fit into 2 different categoriers. Ensure 2 of
         # them have similar titles.
@@ -1370,8 +1370,8 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
     COLLECTION_CATEGORY: Final = 'category'
     COLLECTION_OBJECTIVE: Final = 'objective'
 
-    def setUp(self) -> None:
-        super(UpdateCollectionNodeTests, self).setUp()
+    def setUp(self):
+        super().setUp()
         self.save_new_valid_collection(
             self.COLLECTION_0_ID, self.owner_id, title=self.COLLECTION_TITLE,
             category=self.COLLECTION_CATEGORY,
@@ -1618,8 +1618,8 @@ class CommitMessageHandlingTests(CollectionServicesUnitTests):
 
     EXP_ID: Final = 'an_exploration_id'
 
-    def setUp(self) -> None:
-        super(CommitMessageHandlingTests, self).setUp()
+    def setUp(self):
+        super().setUp()
         self.save_new_valid_collection(
             self.COLLECTION_0_ID, self.owner_id, exploration_id=self.EXP_ID)
 
@@ -1956,8 +1956,8 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
     COLLECTION_ID_1: Final = 'cid1'
     COLLECTION_ID_2: Final = 'cid2'
 
-    def setUp(self) -> None:
-        super(CollectionSummaryTests, self).setUp()
+    def setUp(self):
+        super().setUp()
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.signup(self.BOB_EMAIL, self.BOB_NAME)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)  # type: ignore[no-untyped-call]
