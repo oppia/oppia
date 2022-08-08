@@ -101,7 +101,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
     EXP_TITLE_3 = 'Exploration title 3'
 
     def setUp(self):
-        super(CreatorDashboardHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.OWNER_EMAIL_1, self.OWNER_USERNAME_1)
         self.signup(self.OWNER_EMAIL_2, self.OWNER_USERNAME_2)
@@ -509,7 +509,7 @@ class CreationButtonsTests(test_utils.GenericTestBase):
         raw_yaml = f.read()
 
     def setUp(self):
-        super(CreationButtonsTests, self).setUp()
+        super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 

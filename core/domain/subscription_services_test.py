@@ -57,7 +57,7 @@ class SubscriptionsTest(test_utils.GenericTestBase):
     OWNER2_USERNAME: Final = 'owner2'
 
     def setUp(self) -> None:
-        super(SubscriptionsTest, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
@@ -419,7 +419,7 @@ class UserSubscriptionsTest(test_utils.GenericTestBase):
     OWNER2_USERNAME: Final = 'owner2'
 
     def setUp(self) -> None:
-        super(UserSubscriptionsTest, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.OWNER_2_EMAIL, self.OWNER2_USERNAME)
 
