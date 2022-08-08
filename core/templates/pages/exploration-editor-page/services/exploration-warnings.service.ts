@@ -62,6 +62,7 @@ interface _verifyParametersResult {
 interface _getReversedLinksResult {
   source: string;
   target: string;
+  linkProperty: string;
 }
 
 const INTERACTION_SERVICE_MAPPING = {
@@ -181,7 +182,7 @@ export class ExplorationWarningsService {
       return {
         source: link.target,
         target: link.source,
-      };
+      } as GraphLink;
     });
   }
 

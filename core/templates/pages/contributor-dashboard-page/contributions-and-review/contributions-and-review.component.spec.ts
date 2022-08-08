@@ -191,7 +191,8 @@ describe('Contributions and review component', () => {
                 new_value: null,
                 old_value: null,
                 content_html: 'Translation',
-                translation_html: 'Tradução'
+                translation_html: 'Tradução',
+                skill_id: ''
               },
               status: 'review'
             },
@@ -450,7 +451,8 @@ describe('Contributions and review component', () => {
                 new_value: null,
                 old_value: null,
                 content_html: 'Translation',
-                translation_html: 'Tradução'
+                translation_html: 'Tradução',
+                skill_id: ''
               },
               status: 'review'
             },
