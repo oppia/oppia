@@ -1612,7 +1612,7 @@ class ContributorMilestoneEmailInfo:
     notifying contributors about milestones they achieved.
 
     Attributes:
-        contributor_user_id: str. The id of the contributor.
+        contributor_user_id: str. The ID of the contributor.
         language_code: str. The language code of the suggestion.
         contribution_type: str. The type of the contribution i.e.
             translation or question.
