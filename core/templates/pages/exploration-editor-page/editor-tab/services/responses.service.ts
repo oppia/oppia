@@ -334,7 +334,7 @@ export class ResponsesService {
   }
 
   updateActiveAnswerGroup(
-      updates: AnswerGroup,
+      updates: AnswerGroup | object,
       callback: (value: AnswerGroup) => void
   ): void {
     this._updateAnswerGroup(this._activeAnswerGroupIndex, updates, callback);

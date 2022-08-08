@@ -72,11 +72,12 @@ export class QuestionUpdateService {
       }, apply, reverse);
   }
 
-  _getParameterFromChangeDict(changeDict: unknown, paramName: string): string {
+  _getParameterFromChangeDict(
+      changeDict: BackendChangeObject, paramName: string): string {
     return changeDict[paramName];
   }
 
-  _getNewPropertyValueFromChangeDict(changeDict: unknown): string {
+  _getNewPropertyValueFromChangeDict(changeDict: BackendChangeObject): string {
     return this._getParameterFromChangeDict(changeDict, 'new_value');
   }
 
