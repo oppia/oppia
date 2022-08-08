@@ -171,7 +171,7 @@ export class QuestionSuggestionReviewModalComponent
         this.editSuggestionEmitter.emit(
           {
             suggestionId: this.suggestionId,
-            suggestion: this.suggestion,
+            suggestion: this.suggestion as SuggestionBackendDict,
             reviewable: this.reviewable,
             question: this.question
           });
@@ -179,7 +179,7 @@ export class QuestionSuggestionReviewModalComponent
         this.contextService.resetImageSaveDestination();
         this.editSuggestionEmitter.emit({
           suggestionId: this.suggestionId,
-          suggestion: this.suggestion,
+          suggestion: this.suggestion as SuggestionBackendDict,
           reviewable: this.reviewable,
           question: undefined
         });
