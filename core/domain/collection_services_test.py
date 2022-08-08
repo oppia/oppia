@@ -518,7 +518,7 @@ class CollectionProgressUnitTests(CollectionServicesUnitTests):
         collection_services.record_played_exploration_in_collection_context(
             user_id, collection_id, exploration_id)
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
 
         # Create a new collection and exploration.
@@ -686,7 +686,7 @@ class CollectionSummaryQueriesUnitTests(CollectionServicesUnitTests):
     COL_ID_4: Final = '4_languages_learning_basic_verbs_in_spanish'
     COL_ID_5: Final = '5_languages_private_collection_in_spanish'
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
 
         # Setup the collections to fit into 2 different categoriers. Ensure 2 of
@@ -1370,7 +1370,7 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
     COLLECTION_CATEGORY: Final = 'category'
     COLLECTION_OBJECTIVE: Final = 'objective'
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.save_new_valid_collection(
             self.COLLECTION_0_ID, self.owner_id, title=self.COLLECTION_TITLE,
@@ -1618,7 +1618,7 @@ class CommitMessageHandlingTests(CollectionServicesUnitTests):
 
     EXP_ID: Final = 'an_exploration_id'
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.save_new_valid_collection(
             self.COLLECTION_0_ID, self.owner_id, exploration_id=self.EXP_ID)
@@ -1956,7 +1956,7 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
     COLLECTION_ID_1: Final = 'cid1'
     COLLECTION_ID_2: Final = 'cid2'
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.signup(self.BOB_EMAIL, self.BOB_NAME)
