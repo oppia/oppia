@@ -41,7 +41,7 @@ class ModelIncorrectKeyError(base_validation_errors.BaseAuditError):
         incorrect_keys: List[str]
     ) -> None:
         message = 'contains keys %s are not allowed' % (incorrect_keys)
-        super(ModelIncorrectKeyError, self).__init__(message, model)
+        super().__init__(message, model)
 
 
 class ModelExpiringError(base_validation_errors.BaseAuditError):
@@ -50,7 +50,7 @@ class ModelExpiringError(base_validation_errors.BaseAuditError):
     def __init__(self, model: user_models.UserQueryModel) -> None:
         message = 'mark model as deleted when older than %s days' % (
             feconf.PERIOD_TO_MARK_MODELS_AS_DELETED.days)
-        super(ModelExpiringError, self).__init__(message, model)
+        super().__init__(message, model)
 
 
 class DraftChangeListLastUpdatedNoneError(
@@ -64,7 +64,7 @@ class DraftChangeListLastUpdatedNoneError(
         message = (
             'draft change list %s exists but draft change list '
             'last updated is None' % model.draft_change_list)
-        super(DraftChangeListLastUpdatedNoneError, self).__init__(
+        super().__init__(
             message, model)
 
 
@@ -77,7 +77,7 @@ class DraftChangeListLastUpdatedInvalidError(
         message = (
             'draft change list last updated %s is greater than the time '
             'when job was run' % model.draft_change_list_last_updated)
-        super(DraftChangeListLastUpdatedInvalidError, self).__init__(
+        super().__init__(
             message, model)
 
 
@@ -88,4 +88,4 @@ class ArchivedModelNotMarkedDeletedError(
 
     def __init__(self, model: user_models.UserQueryModel) -> None:
         message = 'model is archived but not marked as deleted'
-        super(ArchivedModelNotMarkedDeletedError, self).__init__(message, model)
+        super().__init__(message, model)

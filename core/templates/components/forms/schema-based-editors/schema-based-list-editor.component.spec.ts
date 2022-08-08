@@ -19,11 +19,11 @@
 import { ComponentFixture, fakeAsync, TestBed, waitForAsync } from '@angular/core/testing';
 import { SchemaBasedListEditorComponent } from './schema-based-list-editor.component';
 import { NO_ERRORS_SCHEMA, EventEmitter } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormControl, FormsModule } from '@angular/forms';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 
 import { Validator as OppiaValidator } from 'interactions/TextInput/directives/text-input-validation.service';
-import { SchemaDefaultValueService } from 'services/schema-default-value.service';
+import { SchemaDefaultValue, SchemaDefaultValueService } from 'services/schema-default-value.service';
 import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
 
 describe('Schema Based List Editor Component', () => {
@@ -77,14 +77,14 @@ describe('Schema Based List Editor Component', () => {
   });
 
   it('should set component properties on initialization', fakeAsync(() => {
-    let mockFunction = function(value: number) {
+    let mockFunction = function(value: SchemaDefaultValue[]) {
       return value;
     };
     component.registerOnChange(mockFunction);
-    component.registerOnTouched(null);
+    component.registerOnTouched(() => {});
 
     expect(component).toBeDefined();
-    expect(component.validate(null)).toEqual({});
+    expect(component.validate(new FormControl(1))).toEqual({});
     expect(component.onChange).toEqual(mockFunction);
   }));
 
@@ -115,7 +115,12 @@ describe('Schema Based List Editor Component', () => {
 
   it('should delete last element if user clicks outside the text input box' +
     ' without entering any text', () => {
-    component.localValue = ['item1', undefined];
+    component.localValue = [
+      // This throws "Type 'undefined' is not assignable to type
+      // 'SchemaDefaultValue'." We need to suppress this error
+      // because of the need to test validations.
+      // @ts-ignore
+      'item1', undefined];
 
     component.lastElementOnBlur();
 

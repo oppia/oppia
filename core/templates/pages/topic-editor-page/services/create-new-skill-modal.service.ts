@@ -69,7 +69,7 @@ export class CreateNewSkillModalService {
       // Here, the new tab is created as soon as the user clicks the
       // 'Create' button and filled with URL once the details are
       // fetched from the backend.
-      let newTab = this.windowRef.nativeWindow.open();
+      let newTab = this.windowRef.nativeWindow.open() as WindowProxy;
       let imagesData = this.imageLocalStorageService.getStoredImagesData();
       this.skillCreationBackendApiService.createSkillAsync(
         result.description, rubrics, result.explanation,

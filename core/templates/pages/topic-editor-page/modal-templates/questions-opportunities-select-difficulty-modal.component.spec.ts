@@ -21,9 +21,12 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { ConceptCardBackendDict } from 'domain/skill/ConceptCardObjectFactory';
+import { MisconceptionBackendDict } from 'domain/skill/MisconceptionObjectFactory';
+import { RubricBackendDict } from 'domain/skill/rubric.model';
 import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
 import { SkillDifficultyBackendDict } from 'domain/skill/skill-difficulty.model';
-import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
+import { Skill, SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { ImageFile } from 'domain/utilities/image-file.model';
 import { ExtractImageFilenamesFromModelService } from 'pages/exploration-player-page/services/extract-image-filenames-from-model.service';
 import { AlertsService } from 'services/alerts.service';
@@ -42,14 +45,14 @@ class MockActiveModal {
 
 class MockReaderObject {
   result = null;
-  onload = null;
+  onload: () => string;
   constructor() {
     this.onload = () => {
       return 'Fake onload executed';
     };
   }
 
-  readAsDataURL(file) {
+  readAsDataURL(file: string) {
     this.onload();
     return 'The file is loaded';
   }
@@ -72,12 +75,12 @@ describe(
     let mockImageFile: ImageFile;
     let mockBlob: Blob;
 
-    let misconceptionDict1 = null;
-    let rubricDict = null;
-    let skill = null;
-    let skillContentsDict = null;
-    let skillDifficulties = ['easy', 'medium'];
-    let skillId = 'skill_1';
+    let misconceptionDict1: MisconceptionBackendDict;
+    let rubricDict: RubricBackendDict;
+    let skill: Skill;
+    let skillContentsDict: ConceptCardBackendDict;
+    let skillDifficulties: string[] = ['easy', 'medium'];
+    let skillId: string = 'skill_1';
 
     beforeEach(waitForAsync(() => {
       TestBed.configureTestingModule({
