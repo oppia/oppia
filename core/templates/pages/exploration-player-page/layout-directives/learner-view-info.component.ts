@@ -22,6 +22,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { ClassroomDomainConstants } from 'domain/classroom/classroom-domain.constants';
 import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { StoryPlaythrough } from 'domain/story_viewer/story-playthrough.model';
+import { LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exploration-summary.model';
 import { ReadOnlyTopic } from 'domain/topic_viewer/read-only-topic-object.factory';
 import { TopicViewerBackendApiService } from 'domain/topic_viewer/topic-viewer-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
@@ -40,14 +41,18 @@ import './learner-view-info.component.css';
   templateUrl: './learner-view-info.component.html'
 })
 export class LearnerViewInfoComponent {
-  explorationId: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  explorationId!: string;
+  explorationTitle!: string;
+  explorationTitleTranslationKey!: string;
+  storyPlaythroughObject!: StoryPlaythrough;
+  topicName!: string;
+  topicNameTranslationKey!: string;
+  isLinkedToTopic!: boolean;
+  expInfo?: LearnerExplorationSummaryBackendDict;
   directiveSubscriptions: Subscription = new Subscription();
-  explorationTitle: string;
-  explorationTitleTranslationKey: string;
-  isLinkedToTopic: boolean;
-  storyPlaythroughObject: StoryPlaythrough;
-  topicName: string;
-  topicNameTranslationKey: string;
 
   constructor(
     private contextService: ContextService,
@@ -119,8 +124,8 @@ export class LearnerViewInfoComponent {
   }
 
   getTopicUrl(): string {
-    let topicUrlFragment: string;
-    let classroomUrlFragment: string;
+    let topicUrlFragment!: string;
+    let classroomUrlFragment!: string;
 
     try {
       topicUrlFragment = (
