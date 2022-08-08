@@ -67,7 +67,7 @@ class RelationshipsOfTests(test_utils.TestBase):
             ['UserSettingsModel'])
 
 
-class ValidateModelTimeFieldTests(job_test_utils.PipelinedTestBase):
+class ValidateBlogModelTimeFieldTests(job_test_utils.PipelinedTestBase):
 
     def test_reports_model_created_on_timestamp_relationship_error(
         self
@@ -85,7 +85,7 @@ class ValidateModelTimeFieldTests(job_test_utils.PipelinedTestBase):
         output = (
             self.pipeline
             | beam.Create([invalid_timestamp])
-            | beam.ParDo(blog_validation.ValidateModelTimestamps())
+            | beam.ParDo(blog_validation.ValidateBlogModelTimestamps())
         )
 
         self.assert_pcoll_equal(
@@ -111,7 +111,7 @@ class ValidateModelTimeFieldTests(job_test_utils.PipelinedTestBase):
         output = (
             self.pipeline
             | beam.Create([invalid_timestamp])
-            | beam.ParDo(blog_validation.ValidateModelTimestamps())
+            | beam.ParDo(blog_validation.ValidateBlogModelTimestamps())
         )
 
         self.assert_pcoll_equal(
@@ -136,7 +136,7 @@ class ValidateModelTimeFieldTests(job_test_utils.PipelinedTestBase):
         output = (
             self.pipeline
             | beam.Create([valid_timestamp])
-            | beam.ParDo(blog_validation.ValidateModelTimestamps())
+            | beam.ParDo(blog_validation.ValidateBlogModelTimestamps())
         )
 
         self.assert_pcoll_equal(output, [])
@@ -156,7 +156,7 @@ class ValidateModelTimeFieldTests(job_test_utils.PipelinedTestBase):
         output = (
             self.pipeline
             | beam.Create([invalid_timestamp])
-            | beam.ParDo(blog_validation.ValidateModelTimestamps())
+            | beam.ParDo(blog_validation.ValidateBlogModelTimestamps())
         )
 
         self.assert_pcoll_equal(
@@ -183,7 +183,7 @@ class ValidateModelTimeFieldTests(job_test_utils.PipelinedTestBase):
         output = (
             self.pipeline
             | beam.Create([invalid_timestamp])
-            | beam.ParDo(blog_validation.ValidateModelTimestamps())
+            | beam.ParDo(blog_validation.ValidateBlogModelTimestamps())
         )
 
         self.assert_pcoll_equal(

@@ -96,7 +96,7 @@ class ValidateBlogPostModelDomainObjectsInstances(
 @validation_decorators.AuditsExisting(
     blog_models.BlogPostModel,
     blog_models.BlogPostSummaryModel)
-class ValidateModelTimestamps(beam.DoFn):  # type: ignore[misc]
+class ValidateBlogModelTimestamps(beam.DoFn):  # type: ignore[misc]
     """DoFn to check whether created_on, last_updated and published_on
     timestamps are valid for both blog post models and blog post summary models.
     """
