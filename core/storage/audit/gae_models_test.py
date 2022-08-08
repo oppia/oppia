@@ -42,7 +42,7 @@ class RoleQueryAuditModelUnitTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         """Set up user models in datastore for use in testing."""
-        super(RoleQueryAuditModelUnitTests, self).setUp()
+        super().setUp()
 
         audit_models.RoleQueryAuditModel(
             id=self.ID,
@@ -108,7 +108,7 @@ class UsernameChangeAuditModelUnitTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         """Set up user models in datastore for use in testing."""
-        super(UsernameChangeAuditModelUnitTests, self).setUp()
+        super().setUp()
 
         audit_models.UsernameChangeAuditModel(
             id=self.ID,

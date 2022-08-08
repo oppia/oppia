@@ -408,7 +408,7 @@ class SuggestionEditStateContent(BaseSuggestion):
         """Initializes an object of type SuggestionEditStateContent
         corresponding to the SUGGESTION_TYPE_EDIT_STATE_CONTENT choice.
         """
-        super(SuggestionEditStateContent, self).__init__(
+        super().__init__(
             status, final_reviewer_id)
         self.suggestion_id = suggestion_id
         self.suggestion_type = (
@@ -448,7 +448,7 @@ class SuggestionEditStateContent(BaseSuggestion):
             ValidationError. One or more attributes of the
                 SuggestionEditStateContent object are invalid.
         """
-        super(SuggestionEditStateContent, self).validate()
+        super().validate()
 
         if not isinstance(self.change, exp_domain.ExplorationChange):
             raise utils.ValidationError(
@@ -648,7 +648,7 @@ class SuggestionTranslateContent(BaseSuggestion):
         """Initializes an object of type SuggestionTranslateContent
         corresponding to the SUGGESTION_TYPE_TRANSLATE_CONTENT choice.
         """
-        super(SuggestionTranslateContent, self).__init__(
+        super().__init__(
             status, final_reviewer_id)
         self.suggestion_id = suggestion_id
         self.suggestion_type = (
@@ -678,7 +678,7 @@ class SuggestionTranslateContent(BaseSuggestion):
             ValidationError. One or more attributes of the
                 SuggestionTranslateContent object are invalid.
         """
-        super(SuggestionTranslateContent, self).validate()
+        super().validate()
 
         if not isinstance(self.change, exp_domain.ExplorationChange):
             raise utils.ValidationError(
@@ -873,7 +873,7 @@ class SuggestionAddQuestion(BaseSuggestion):
         """Initializes an object of type SuggestionAddQuestion
         corresponding to the SUGGESTION_TYPE_ADD_QUESTION choice.
         """
-        super(SuggestionAddQuestion, self).__init__(status, final_reviewer_id)
+        super().__init__(status, final_reviewer_id)
         self.suggestion_id = suggestion_id
         self.suggestion_type = feconf.SUGGESTION_TYPE_ADD_QUESTION
         self.target_type = feconf.ENTITY_TYPE_SKILL
@@ -940,7 +940,7 @@ class SuggestionAddQuestion(BaseSuggestion):
             ValidationError. One or more attributes of the SuggestionAddQuestion
                 object are invalid.
         """
-        super(SuggestionAddQuestion, self).validate()
+        super().validate()
 
         if self.get_score_type() != suggestion_models.SCORE_TYPE_QUESTION:
             raise utils.ValidationError(

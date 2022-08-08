@@ -55,8 +55,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
     NODE_ID_2: Final = 'node_2'
     USER_ID: Final = 'user'
 
-    def setUp(self) -> None:
-        super(StoryServicesUnitTests, self).setUp()
+    def setUp(self):
+        super().setUp()
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
@@ -2008,8 +2008,8 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
         story_services.record_completed_node_in_story_context(
             user_id, STORY_ID, node_id)
 
-    def setUp(self) -> None:
-        super(StoryProgressUnitTests, self).setUp()
+    def setUp(self):
+        super().setUp()
 
         self.STORY_1_ID = 'story_id'
         self.STORY_ID_1 = 'story_id_1'

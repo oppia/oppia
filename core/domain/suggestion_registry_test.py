@@ -59,8 +59,13 @@ class MockInvalidSuggestion(suggestion_registry.BaseSuggestion):
 class BaseSuggestionUnitTests(test_utils.GenericTestBase):
     """Tests for the BaseSuggestion class."""
 
+<<<<<<< HEAD
     def setUp(self) -> None:
         super(BaseSuggestionUnitTests, self).setUp()
+=======
+    def setUp(self):
+        super().setUp()
+>>>>>>> upstream/develop
         self.base_suggestion = MockInvalidSuggestion()
 
     def test_base_class_accept_raises_error(self) -> None:
@@ -133,8 +138,13 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
     ASSIGNED_REVIEWER_EMAIL: Final = 'assigned_reviewer@example.com'
     fake_date: datetime.datetime = datetime.datetime(2016, 4, 10, 0, 0, 0, 0)
 
+<<<<<<< HEAD
     def setUp(self) -> None:
         super(SuggestionEditStateContentUnitTests, self).setUp()
+=======
+    def setUp(self):
+        super().setUp()
+>>>>>>> upstream/develop
 
         self.signup(self.AUTHOR_EMAIL, 'author')
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)  # type: ignore[no-untyped-call]
@@ -892,8 +902,13 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
     ASSIGNED_REVIEWER_EMAIL: Final = 'assigned_reviewer@example.com'
     fake_date: datetime.datetime = datetime.datetime(2016, 4, 10, 0, 0, 0, 0)
 
+<<<<<<< HEAD
     def setUp(self) -> None:
         super(SuggestionTranslateContentUnitTests, self).setUp()
+=======
+    def setUp(self):
+        super().setUp()
+>>>>>>> upstream/develop
 
         self.signup(self.AUTHOR_EMAIL, 'author')
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)  # type: ignore[no-untyped-call]
@@ -1689,8 +1704,13 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
     ASSIGNED_REVIEWER_EMAIL: Final = 'assigned_reviewer@example.com'
     fake_date: datetime.datetime = datetime.datetime(2016, 4, 10, 0, 0, 0, 0)
 
+<<<<<<< HEAD
     def setUp(self) -> None:
         super(SuggestionAddQuestionTest, self).setUp()
+=======
+    def setUp(self):
+        super().setUp()
+>>>>>>> upstream/develop
 
         self.signup(self.AUTHOR_EMAIL, 'author')
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)  # type: ignore[no-untyped-call]
@@ -2855,8 +2875,13 @@ class MockInvalidVoiceoverApplication(
 class BaseVoiceoverApplicationUnitTests(test_utils.GenericTestBase):
     """Tests for the BaseVoiceoverApplication class."""
 
+<<<<<<< HEAD
     def setUp(self) -> None:
         super(BaseVoiceoverApplicationUnitTests, self).setUp()
+=======
+    def setUp(self):
+        super().setUp()
+>>>>>>> upstream/develop
         self.base_voiceover_application = MockInvalidVoiceoverApplication()
 
     def test_base_class_init_raises_error(self) -> None:
@@ -2882,8 +2907,13 @@ class BaseVoiceoverApplicationUnitTests(test_utils.GenericTestBase):
 class ExplorationVoiceoverApplicationUnitTest(test_utils.GenericTestBase):
     """Tests for the ExplorationVoiceoverApplication class."""
 
+<<<<<<< HEAD
     def setUp(self) -> None:
         super(ExplorationVoiceoverApplicationUnitTest, self).setUp()
+=======
+    def setUp(self):
+        super().setUp()
+>>>>>>> upstream/develop
         self.signup('author@example.com', 'author')
         self.author_id = self.get_user_id_from_email('author@example.com')  # type: ignore[no-untyped-call]
 

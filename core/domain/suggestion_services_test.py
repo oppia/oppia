@@ -89,8 +89,8 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
     suggestion_id_2: str = 'exploration.exp2.thread_2'
     suggestion_id_3: str = 'exploration.exp3.thread_3'
 
-    def setUp(self) -> None:
-        super(SuggestionServicesUnitTests, self).setUp()
+    def setUp(self):
+        super().setUp()
 
         self.signup(self.AUTHOR_EMAIL, 'author')
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)  # type: ignore[no-untyped-call]
@@ -1224,8 +1224,8 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
 
         return translation_suggestion
 
-    def setUp(self) -> None:
-        super(SuggestionGetServicesUnitTests, self).setUp()
+    def setUp(self):
+        super().setUp()
 
         self.signup(self.AUTHOR_EMAIL_1, 'author1')
         self.author_id_1 = self.get_user_id_from_email(self.AUTHOR_EMAIL_1)  # type: ignore[no-untyped-call]
@@ -1894,8 +1894,8 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
     ) -> str:
         return self.THREAD_ID
 
-    def setUp(self) -> None:
-        super(SuggestionIntegrationTests, self).setUp()
+    def setUp(self):
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.AUTHOR_EMAIL, 'author')
@@ -2299,8 +2299,8 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
 
 class UserContributionProficiencyUnitTests(test_utils.GenericTestBase):
 
-    def setUp(self) -> None:
-        super(UserContributionProficiencyUnitTests, self).setUp()
+    def setUp(self):
+        super().setUp()
         self.signup('user1@example.com', 'user1')
         self.signup('user2@example.com', 'user2')
         self.user_1_id = self.get_user_id_from_email('user1@example.com')  # type: ignore[no-untyped-call]
@@ -2365,8 +2365,8 @@ class UserContributionProficiencyUnitTests(test_utils.GenericTestBase):
 class VoiceoverApplicationServiceUnitTest(test_utils.GenericTestBase):
     """Tests for the ExplorationVoiceoverApplication class."""
 
-    def setUp(self) -> None:
-        super(VoiceoverApplicationServiceUnitTest, self).setUp()
+    def setUp(self):
+        super().setUp()
         self.signup('author@example.com', 'author')
         self.author_id = self.get_user_id_from_email('author@example.com')  # type: ignore[no-untyped-call]
 
@@ -2523,9 +2523,8 @@ class ReviewableSuggestionEmailInfoUnitTests(
             reviewable_suggestion_email_info.submission_datetime,
             expected_reviewable_suggestion_email_info.submission_datetime)
 
-    def setUp(self) -> None:
-        super(
-            ReviewableSuggestionEmailInfoUnitTests, self).setUp()
+    def setUp(self):
+        super().setUp()
         self.signup(self.AUTHOR_EMAIL, 'author')
         self.author_id = self.get_user_id_from_email(  # type: ignore[no-untyped-call]
             self.AUTHOR_EMAIL)
@@ -3202,10 +3201,8 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
                     index + 1].submission_datetime
             )
 
-    def setUp(self) -> None:
-        super(
-            GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests,
-            self).setUp()
+    def setUp(self):
+        super().setUp()
         self.signup(self.AUTHOR_EMAIL, 'author')
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)  # type: ignore[no-untyped-call]
         self.signup(self.REVIEWER_1_EMAIL, 'reviewer1')
@@ -3827,9 +3824,8 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             community_contribution_stats.question_suggestion_count, 0)
 
-    def setUp(self) -> None:
-        super(
-            CommunityContributionStatsUnitTests, self).setUp()
+    def setUp(self):
+        super().setUp()
         self.signup(self.AUTHOR_EMAIL, 'author')
         self.author_id = self.get_user_id_from_email(  # type: ignore[no-untyped-call]
             self.AUTHOR_EMAIL)
@@ -4384,10 +4380,8 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
                     index + 1].submission_datetime
             )
 
-    def setUp(self) -> None:
-        super(
-            GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests,
-            self).setUp()
+    def setUp(self):
+        super().setUp()
         self.signup(self.AUTHOR_EMAIL, 'author')
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)  # type: ignore[no-untyped-call]
         self.signup(self.REVIEWER_1_EMAIL, 'reviewer1')
@@ -4647,10 +4641,8 @@ class GetSuggestionTypesThatNeedReviewersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             community_contribution_stats.question_suggestion_count, 0)
 
-    def setUp(self) -> None:
-        super(
-            GetSuggestionTypesThatNeedReviewersUnitTests,
-            self).setUp()
+    def setUp(self):
+        super().setUp()
         self.signup(self.AUTHOR_EMAIL, 'author')
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)  # type: ignore[no-untyped-call]
         self.save_new_valid_exploration(self.target_id, self.author_id)

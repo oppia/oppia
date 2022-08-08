@@ -76,7 +76,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
     """Test the user services methods."""
 
     def setUp(self) -> None:
-        super(UserServicesUnitTests, self).setUp()
+        super().setUp()
         user_data_dict: user_domain.RawUserDataDict = {
             'schema_version': 1,
             'display_alias': 'display_alias',
@@ -2333,7 +2333,7 @@ title: Title
 """)
 
     def setUp(self) -> None:
-        super(UserCheckpointProgressUpdateTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
@@ -2548,7 +2548,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
     COLLECTION_OBJECTIVE: Final = 'objective'
 
     def setUp(self) -> None:
-        super(UpdateContributionMsecTests, self).setUp()
+        super().setUp()
 
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)  # type: ignore[no-untyped-call]
@@ -2824,7 +2824,7 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
     CURRENT_DATE_AS_STRING: Final = user_services.get_current_date_as_string()
 
     def setUp(self) -> None:
-        super(UserDashboardStatsTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
 
@@ -3014,7 +3014,7 @@ class SubjectInterestsUnitTests(test_utils.GenericTestBase):
     """Test the update_subject_interests method."""
 
     def setUp(self) -> None:
-        super(SubjectInterestsUnitTests, self).setUp()
+        super().setUp()
         self.auth_id = 'someUser'
         self.username = 'username'
         self.user_email = 'user@example.com'
@@ -3075,7 +3075,7 @@ class LastLoginIntegrationTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         """Create exploration with two versions."""
-        super(LastLoginIntegrationTests, self).setUp()
+        super().setUp()
 
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)  # type: ignore[no-untyped-call]
@@ -3144,7 +3144,7 @@ class LastExplorationEditedIntegrationTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         """Create users for creating and editing exploration."""
-        super(LastExplorationEditedIntegrationTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
@@ -3220,7 +3220,7 @@ class LastExplorationCreatedIntegrationTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         """Create user for creating exploration."""
-        super(LastExplorationCreatedIntegrationTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
 
@@ -3298,8 +3298,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             community_contribution_stats.question_suggestion_count, 0)
 
     def setUp(self) -> None:
-        super(
-            CommunityContributionStatsUnitTests, self).setUp()
+        super().setUp()
 
         self.signup(self.REVIEWER_1_EMAIL, 'reviewer1')
         self.reviewer_1_id = self.get_user_id_from_email(  # type: ignore[no-untyped-call]
@@ -3667,7 +3666,7 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
     QUESTION_SUBMITTER_USERNAME: Final = 'questionsubmitter'
 
     def setUp(self) -> None:
-        super(UserContributionReviewRightsTests, self).setUp()
+        super().setUp()
         self.signup(self.TRANSLATOR_EMAIL, self.TRANSLATOR_USERNAME)
         self.translator_id = self.get_user_id_from_email(self.TRANSLATOR_EMAIL)  # type: ignore[no-untyped-call]
 

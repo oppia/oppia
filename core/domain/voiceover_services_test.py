@@ -47,8 +47,8 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
     APPLICANT_USERNAME: Final = 'applicant'
     APPLICANT_EMAIL: Final = 'applicant@example.com'
 
-    def setUp(self) -> None:
-        super(VoiceoverApplicationServicesUnitTests, self).setUp()
+    def setUp(self):
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.APPLICANT_EMAIL, self.APPLICANT_USERNAME)
