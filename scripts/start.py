@@ -185,10 +185,11 @@ def main(args: Optional[Sequence[str]] = None) -> None:
 
         if parsed_args.contributor_dashboard_debug:
             from scripts import contributor_dashboard_debug # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-            client_requests = contributor_dashboard_debug.ClientRequests(
+            debug_requests = (
+                contributor_dashboard_debug.ContributorDashboardDebugRequests(
                 base_url='http://localhost:%s' % PORT_NUMBER_FOR_GAE_SERVER
-            )
-            client_requests.populate_data_for_contributor_dashboard_debug()
+            ))
+            debug_requests.populate_data_for_contributor_dashboard_debug()
 
         managed_web_browser = (
             None if parsed_args.no_browser else

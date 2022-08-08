@@ -45,12 +45,15 @@ SUPER_ADMIN_ROLES = [feconf.ROLE_ID_CURRICULUM_ADMIN,
 CONTRIBUTOR_EMAIL = 'contributor@example.com'
 CONTRIBUTOR_USERNAME = 'b'
 
+CLASSROOM_NAME = 'math'
+CLASSROOM_URL_FRAGMENT = 'math'
 
-class ClientRequests():
-    """Requests to help develop for the contributor dashboard."""
+
+class ContributorDashboardDebugRequests():
+    """Client-side requests to help develop for the contributor dashboard."""
 
     def __init__(self, base_url: str) -> None:
-        self.client = requests.session()
+        self.session = requests.session()
         self.base_url = base_url
         self.csrf_token = ''
 
@@ -61,15 +64,15 @@ class ClientRequests():
         firebase_admin.initialize_app(
             options={'projectId': feconf.OPPIA_PROJECT_ID})
 
-        self._create_new_user(SUPER_ADMIN_EMAIL, SUPER_ADMIN_USERNAME)
-        self._create_new_user(CONTRIBUTOR_EMAIL, CONTRIBUTOR_USERNAME)
+        self.sign_up_new_user(SUPER_ADMIN_EMAIL, SUPER_ADMIN_USERNAME)
+        self.sign_up_new_user(CONTRIBUTOR_EMAIL, CONTRIBUTOR_USERNAME)
 
-        self._begin_session(SUPER_ADMIN_EMAIL)
-        self.csrf_token = self._get_csrf_token()
-        self._assign_admin_roles(SUPER_ADMIN_ROLES, SUPER_ADMIN_USERNAME)
-        self._add_submit_question_rights(CONTRIBUTOR_USERNAME)
-        self._generate_dummy_new_structures_data()
-        self._add_topics_to_classroom()
+        self.begin_session(SUPER_ADMIN_EMAIL)
+        self.csrf_token = self.get_csrf_token()
+        self.assign_admin_roles(SUPER_ADMIN_ROLES, SUPER_ADMIN_USERNAME)
+        self.add_submit_question_rights(CONTRIBUTOR_USERNAME)
+        self.generate_dummy_new_structures_data()
+        self.add_topics_to_classroom(CLASSROOM_NAME, CLASSROOM_URL_FRAGMENT)
 
     def _make_request(
         self,
@@ -84,13 +87,26 @@ class ClientRequests():
         if headers is None:
             headers = {}
 
-        response = self.client.request(
+        response = self.session.request(
             method, self.base_url + url, headers=headers, params=params)
 
         return response
 
-    def _create_new_user(self, email: str, username: str) -> None:
-        """Creates a new user based on email and username. The password is
+    def _sign_in_with_email_and_password(
+            self, email: str, password: str) -> None:
+        """Signs in with email and password, and returns the token id."""
+        token_id = requests.post(
+            FIREBASE_SIGN_IN_URL,
+            params={'key': 'fake-api-key'},
+            json={
+                'email': email,
+                'password': password
+        }).json()['idToken']
+
+        return token_id
+    
+    def sign_up_new_user(self, email: str, username: str) -> None:
+        """Sign up a new user based on email and username. The password is
         generated automatically from email.
         """
         password = hashlib.md5(email.encode('utf-8')).hexdigest()
@@ -99,9 +115,9 @@ class ClientRequests():
         firebase_auth.create_user(email=email, password=password) # type: ignore
 
         # Sign up the new user in Oppia and set its username.
-        self._begin_session(email)
+        self.begin_session(email)
         self._make_request('GET', '/signup?return_url=/')
-        self.csrf_token = self._get_csrf_token()
+        self.csrf_token = self.get_csrf_token()
 
         params = {'payload': json.dumps({
             'username': username,
@@ -115,22 +131,16 @@ class ClientRequests():
         self._make_request('GET', '/session_end')
         self.csrf_token = ''
 
-    def _begin_session(self, email: str) -> None:
+    def begin_session(self, email: str) -> None:
         """Begin a session with the given email, i.e. log in wtih the email."""
         password = hashlib.md5(email.encode('utf-8')).hexdigest()
 
-        token_id = requests.post(
-            FIREBASE_SIGN_IN_URL,
-            params={'key': 'fake-api-key'},
-            json={
-                'email': email,
-                'password': password
-        }).json()['idToken']
+        token_id = self._sign_in_with_email_and_password(email, password)
         headers = {'Authorization': 'Bearer %s' % token_id}
 
         self._make_request('GET', '/session_begin', headers=headers)
 
-    def _get_csrf_token(self) -> str:
+    def get_csrf_token(self) -> str:
         """Gets the CSRF token."""
         response = self._make_request('GET', '/csrfhandler')
         csrf_token = str(
@@ -138,7 +148,7 @@ class ClientRequests():
 
         return csrf_token
 
-    def _assign_admin_roles(self, roles: List[str], username: str) -> None:
+    def assign_admin_roles(self, roles: List[str], username: str) -> None:
         """Assigns the given roles to the user with the given username."""
         for role in roles:
             params = {
@@ -151,7 +161,7 @@ class ClientRequests():
             self._make_request(
                 'PUT', feconf.ADMIN_ROLE_HANDLER_URL, params=params)
 
-    def _add_submit_question_rights(self, username: str) -> None:
+    def add_submit_question_rights(self, username: str) -> None:
         """Adds submit question rights to the user with the given username."""
         params = {
             'payload': json.dumps({'username': username}),
@@ -161,7 +171,7 @@ class ClientRequests():
         self._make_request(
             'POST', '/contributionrightshandler/submit_question', params=params)
 
-    def _generate_dummy_new_structures_data(self) -> None:
+    def generate_dummy_new_structures_data(self) -> None:
         """Generates dummy new structures data."""
         params = {
             'payload': json.dumps({
@@ -171,8 +181,9 @@ class ClientRequests():
 
         self._make_request('POST', '/adminhandler', params=params)
 
-    def _add_topics_to_classroom(self) -> None:
-        """Adds all dummy topics to classroom."""
+    def add_topics_to_classroom(
+            self, classroom_name: str, classroom_url_fragment: str) -> None:
+        """Adds all dummy topics to a classroom."""
         response = self._make_request(
             'GET', '/topics_and_skills_dashboard/data')
         topic_summary_dicts = json.loads(
@@ -185,8 +196,8 @@ class ClientRequests():
                 'action': 'save_config_properties',
                 'new_config_property_values': {
                     'classroom_pages_data': [{
-                        'name': 'dummy',
-                        'url_fragment': 'dummy',
+                        'name': classroom_name,
+                        'url_fragment': classroom_url_fragment,
                         'course_details': '',
                         'topic_list_intro': '',
                         'topic_ids': topic_ids
