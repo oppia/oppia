@@ -716,6 +716,8 @@ describe('Graph Layout Service', () => {
 
 
   it('should compute graph layout', () => {
+    spyOn(sgls, 'computeLayout').and.returnValue(nodeData1);
+
     let nodes: GraphNodes = {
       State1: 'State1',
       State2: 'State2',
