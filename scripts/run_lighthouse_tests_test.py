@@ -31,6 +31,20 @@ from scripts import run_lighthouse_tests
 from scripts import servers
 from typing import Any
 
+LIGHTHOUSE_MODE_PERFORMANCE = 'performance'
+LIGHTHOUSE_MODE_ACCESSIBILITY = 'accessibility'
+LIGHTHOUSE_CONFIG_FILENAMES = {
+    LIGHTHOUSE_MODE_PERFORMANCE: {
+        '1': '.lighthouserc-1.js',
+        '2': '.lighthouserc-2.js'
+    },
+    LIGHTHOUSE_MODE_ACCESSIBILITY: {
+        '1': '.lighthouserc-accessibility-1.js',
+        '2': '.lighthouserc-accessibility-2.js'
+    }
+}
+
+
 class RunLighthouseTestsTests(test_utils.GenericTestBase):
     """Unit tests for scripts/run_lighthouse_tests.py."""
 
@@ -42,28 +56,110 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             self.print_arr.append(msg)
         self.print_swap = self.swap(builtins, 'print', mock_print)
 
-        node_path = os.path.join(common.NODE_PATH, 'bin', 'node')
-        nyc_path = os.path.join('node_modules', 'nyc', 'bin', 'nyc.js')
-        mocha_path = os.path.join('node_modules', 'mocha', 'bin', 'mocha')
-        filepath = 'scripts/linters/custom_eslint_checks/rules/'
-        self.proc_args = [node_path, nyc_path, mocha_path, filepath]
+        self.swap_sys_exit = self.swap(sys, 'exit', lambda _: None)
+        puppeteer_path = (
+            os.path.join('core', 'tests', 'puppeteer', 'lighthouse_setup.js'))
+        self.puppeteer_bash_command = [common.NODE_BIN_PATH, puppeteer_path]
+        lhci_path = os.path.join('node_modules', '@lhci', 'cli', 'src', 'cli.js')
+        self.lighthouse_check_bash_command = [
+            common.NODE_BIN_PATH, lhci_path, 'autorun',
+            '--config=%s' % LIGHTHOUSE_CONFIG_FILENAMES[LIGHTHOUSE_MODE_PERFORMANCE]['1'],
+            '--max-old-space-size=4096'
+        ]
 
-        self.cmd_token_list: list[list[str]] = []
-
-        self.sys_exit_code: int = 0
-        def mock_sys_exit(err_code: int) -> None:
-            self.sys_exit_code = err_code
-        self.swap_sys_exit = self.swap(sys, 'exit', mock_sys_exit)
-
-    def test_run_lighthouse_puppeteer_script(self) -> None:
+    def test_run_lighthouse_puppeteer_script_successfully(self) -> None:
         class MockTask:
+            returncode = 0
             def communicate(self) -> tuple[bytes, bytes]:   # pylint: disable=missing-docstring
                 return (
-                    b'All files | 100 | 100 | 100 | 100 | ',
-                    b'Path not found.')
+                    b'https://oppia.org/collection_editor/create/5\n' +
+                    b'https://oppia.org/create/4\n' +
+                    b'https://oppia.org/topic_editor/4\n' +
+                    b'https://oppia.org/story_editor/4\n' +
+                    b'https://oppia.org/skill_editor/4\n',
+                    b'Task output.')
 
-        def mock_popen(
-            cmd_tokens: list[str], **unsued_kwargs: Any) -> MockTask:  # pylint: disable=unused-argument
-            self.cmd_token_list.append(cmd_tokens)
+        def mock_popen(*unused_args: Any, **unsued_kwargs: Any) -> MockTask:  # pylint: disable=unused-argument
             return MockTask()
-        swap_popen = self.swap(subprocess, 'Popen', mock_popen)
+        swap_popen = self.swap_with_checks(
+            subprocess, 'Popen', mock_popen,
+            expected_args=((self.puppeteer_bash_command,),))
+
+        with self.print_swap, swap_popen:
+            run_lighthouse_tests.run_lighthouse_puppeteer_script()
+
+        self.assertIn(
+            'Puppeteer script completed successfully.', self.print_arr)
+
+    def test_run_lighthouse_puppeteer_script_failed(self) -> None:
+        class MockTask:
+            returncode = 1
+            def communicate(self) -> tuple[bytes, bytes]:   # pylint: disable=missing-docstring
+                return (
+                    b'https://oppia.org/collection_editor/create/5\n' +
+                    b'https://oppia.org/create/4\n' +
+                    b'https://oppia.org/topic_editor/4\n' +
+                    b'https://oppia.org/story_editor/4\n' +
+                    b'https://oppia.org/skill_editor/4\n',
+                    b'ABC error.')
+
+        def mock_popen(*unused_args: Any, **unsued_kwargs: Any) -> MockTask:  # pylint: disable=unused-argument
+            return MockTask()
+        swap_popen = self.swap_with_checks(
+            subprocess, 'Popen', mock_popen,
+            expected_args=((self.puppeteer_bash_command,),))
+
+        with self.print_swap, self.swap_sys_exit, swap_popen:
+            run_lighthouse_tests.run_lighthouse_puppeteer_script()
+
+        self.assertIn('Return code: 1', self.print_arr)
+        self.assertIn('ABC error.', self.print_arr)
+        self.assertIn(
+            'Puppeteer script failed. More details can be found above.',
+            self.print_arr)
+
+    def test_run_lighthouse_checks_succesfully(self) -> None:
+        class MockTask:
+            returncode = 0
+            def communicate(self) -> tuple[bytes, bytes]:   # pylint: disable=missing-docstring
+                return (
+                    b'Task output',
+                    b'No error.')
+
+        def mock_popen(*unused_args: Any, **unsued_kwargs: Any) -> MockTask:  # pylint: disable=unused-argument
+            return MockTask()
+        swap_popen = self.swap_with_checks(
+            subprocess, 'Popen', mock_popen,
+            expected_args=((self.lighthouse_check_bash_command,),))
+
+        with self.print_swap, swap_popen:
+            run_lighthouse_tests.run_lighthouse_checks(
+                LIGHTHOUSE_MODE_PERFORMANCE, '1')
+
+        self.assertIn(
+            'Lighthouse checks completed successfully.', self.print_arr)
+
+    def test_run_lighthouse_checks_failed(self) -> None:
+        class MockTask:
+            returncode = 1
+            def communicate(self) -> tuple[bytes, bytes]:   # pylint: disable=missing-docstring
+                return (
+                    b'Task failed.',
+                    b'ABC error.')
+
+        def mock_popen(*unused_args: Any, **unsued_kwargs: Any) -> MockTask:  # pylint: disable=unused-argument
+            return MockTask()
+        swap_popen = self.swap_with_checks(
+            subprocess, 'Popen', mock_popen,
+            expected_args=((self.lighthouse_check_bash_command,),))
+
+        with self.print_swap, self.swap_sys_exit, swap_popen:
+            run_lighthouse_tests.run_lighthouse_checks(
+                LIGHTHOUSE_MODE_PERFORMANCE, '1')
+
+        self.assertIn('Return code: 1', self.print_arr)
+        self.assertIn('ABC error.', self.print_arr)
+        self.assertIn(
+            'Lighthouse checks failed. More details can be found above.',
+            self.print_arr)
+        

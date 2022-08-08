@@ -215,5 +215,5 @@ def main(args=None):
         run_lighthouse_checks(lighthouse_mode, parsed_args.shard)
 
 
-if __name__ == '__main__':
+if __name__ == '__main__': # pragma: no cover
     main()
