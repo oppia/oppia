@@ -729,12 +729,11 @@ def get_multiple_threads(
     Returns:
         list(FeedbackThread). The list of feedback threads.
     """
-    feedback_thread_models_with_none = (
-        feedback_models.GeneralFeedbackThreadModel.get_multi(thread_ids)
-    )
     return [
         _get_thread_from_model(model)
-        for model in feedback_thread_models_with_none
+        for model in feedback_models.GeneralFeedbackThreadModel.get_multi(
+            thread_ids
+        )
         if model is not None
     ]
 
@@ -800,7 +799,7 @@ def get_exp_thread_summaries(
 
     # Here, cast is used to narrow down the return type of following method from
     # List[Optional[Model]] to List[Optional[exp_models.ExplorationModel]].
-    exp_thread_user_models, exp_models_list = (
+    exp_thread_user_models, exploration_models = (
         cast(
             Tuple[
                 List[Optional[feedback_models.GeneralFeedbackThreadUserModel]],
@@ -833,7 +832,7 @@ def get_exp_thread_summaries(
     for thread, last_two_message_models, thread_user_model, exp_model in (
             zip(
                 threads, last_two_message_models_of_threads,
-                exp_thread_user_models, exp_models_list)):
+                exp_thread_user_models, exploration_models)):
         message_ids_read_by_user = (
             () if thread_user_model is None else
             thread_user_model.message_ids_read_by_user)
