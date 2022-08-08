@@ -105,8 +105,7 @@ class ModelMutatedDuringJobErrorForLastUpdated(
         message = (
             'last_updated=%r is later than the audit job\'s start time' % (
                 model.last_updated))
-        super(ModelMutatedDuringJobErrorForLastUpdated, self).__init__(
-            message, model)
+        super().__init__(message, model)
 
 
 class ModelMutatedDuringJobErrorForPublishedOn(
