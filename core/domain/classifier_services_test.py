@@ -306,8 +306,10 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
         exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
         state_names = ['Home']
         exploration.states['Home'].interaction.id = 'Invalid_id'
-        with self.assertRaisesRegex(Exception, (  # type: ignore[no-untyped-call]
-            'No classifier algorithm found for Invalid_id interaction')):
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            Exception,
+            'No classifier algorithm found for Invalid_id interaction'
+        ):
             classifier_services.handle_trainable_states(
                 exploration, state_names)
 

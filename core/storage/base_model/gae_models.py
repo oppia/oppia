@@ -84,7 +84,7 @@ RAND_RANGE = (1 << 30) - 1
 ID_LENGTH = 12
 
 
-class SnapshotsMetaDataDict(TypedDict):
+class SnapshotsMetadataDict(TypedDict):
     """Dictionary representing the snapshot metadata for versioned models."""
 
     committer_id: str

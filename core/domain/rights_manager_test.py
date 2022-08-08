@@ -294,7 +294,8 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self
     ) -> None:
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
-            Exception, 'Cannot get activity rights for unknown activity'):
+            Exception, 'Cannot get activity rights for unknown activity'
+        ):
             rights_manager._get_activity_rights('invalid_type', self.user_id_a)  # pylint: disable=protected-access
 
     def test_inviting_playtester_to_exploration(self) -> None:
@@ -784,7 +785,8 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         exp_services.save_new_exploration(self.user_id_a, exp)  # type: ignore[no-untyped-call]
 
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
-            Exception, 'No activity_rights exists for the given activity_id'):
+            Exception, 'No activity_rights exists for the given activity_id'
+        ):
             rights_manager.deassign_role_for_exploration(
                 self.user_b, 'abcdefg', self.user_id_a)
 
@@ -868,9 +870,11 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
     def test_deassign_editor_is_successful_with_all_valid_commit_messages(
         self
     ) -> None:
-        editor_username = 'B'
+        self.signup('testuser@example.com', 'TestUser')
+        test_user = self.get_user_id_from_email('testuser@example.com')
+        editor_username = 'TestUser'
         self.assertEqual(
-            user_services.get_username(self.user_id_b),
+            user_services.get_username(test_user),
             editor_username
         )
 
@@ -888,11 +892,11 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             'Created new exploration'
         )
 
-        # Assigning editor role to editor_username ('B').
+        # Assigning editor role to editor_username ('TestUser').
         rights_manager.assign_role_for_exploration(
-            self.user_a, self.EXP_ID, self.user_id_b, rights_domain.ROLE_EDITOR)
+            self.user_a, self.EXP_ID, test_user, rights_domain.ROLE_EDITOR)
         exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
-        self.assertTrue(exp_rights.is_editor(self.user_id_b))
+        self.assertTrue(exp_rights.is_editor(test_user))
 
         snapshots_data = (
             exp_models.ExplorationRightsModel.get_snapshots_metadata(
@@ -901,14 +905,14 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         )
         self.assertEqual(
             snapshots_data[0]['commit_message'],
-            'Changed role of %s from none to editor' % editor_username
+            'Changed role of TestUser from none to editor'
         )
 
         # De-assigning editor role from editor_username ('B').
         rights_manager.deassign_role_for_exploration(
-            self.user_a, self.EXP_ID, self.user_id_b)
+            self.user_a, self.EXP_ID, test_user)
         exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
-        self.assertFalse(exp_rights.is_editor(self.user_id_b))
+        self.assertFalse(exp_rights.is_editor(test_user))
 
         snapshots_data = (
             exp_models.ExplorationRightsModel.get_snapshots_metadata(
@@ -917,7 +921,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         )
         self.assertEqual(
             snapshots_data[0]['commit_message'],
-            'Remove %s from role editor for exploration' % editor_username
+            'Remove TestUser from role editor for exploration'
         )
 
 
