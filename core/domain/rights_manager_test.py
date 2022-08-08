@@ -871,7 +871,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self
     ) -> None:
         self.signup('testuser@example.com', 'TestUser')
-        test_user = self.get_user_id_from_email('testuser@example.com')
+        test_user = self.get_user_id_from_email('testuser@example.com')  # type: ignore[no-untyped-call]
         editor_username = 'TestUser'
         self.assertEqual(
             user_services.get_username(test_user),

@@ -1560,7 +1560,7 @@ class VersionedModel(BaseModel):
             model_instance_id: str,
             version_numbers: List[int],
             allow_deleted: bool = False
-    ) -> List[SnapshotsMetaDataDict]:
+    ) -> List[SnapshotsMetadataDict]:
         """Gets a list of dicts, each representing a model snapshot.
 
         One dict is returned for each version number in the list of version
