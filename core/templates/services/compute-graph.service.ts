@@ -56,17 +56,15 @@ export class ComputeGraphService {
         for (let h = 0; h < groups.length; h++) {
           links.push({
             source: stateName,
-            target: groups[h].outcome.dest,
-            linkProperty: ''
-          });
+            target: groups[h].outcome.dest
+          } as GraphLink);
         }
 
         if (interaction.defaultOutcome) {
           links.push({
             source: stateName,
             target: interaction.defaultOutcome.dest,
-            linkProperty: ''
-          });
+          } as GraphLink);
         }
       }
     });
