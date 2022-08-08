@@ -112,7 +112,7 @@ export class QuestionSuggestionReviewModalComponent
   skillDifficultyLabel: string;
   skillRubricExplanations: string | string[];
   suggestionIsRejected: boolean;
-  validationError: unknown;
+  validationError: string;
   allContributions!: Record<string, ActiveContributionDict>;
   suggestion!: ActiveSuggestionDict;
   question!: Question;
@@ -286,7 +286,7 @@ export class QuestionSuggestionReviewModalComponent
     return 'This rubric has not yet been specified.';
   }
 
-  _getThreadMessagesAsync(threadId: string): unknown {
+  _getThreadMessagesAsync(threadId: string): Promise<void | string[]> {
     return this.threadDataBackendApiService.fetchMessagesAsync(
       threadId).then((response) => {
       const threadMessageBackendDicts = response.messages;

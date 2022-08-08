@@ -448,7 +448,7 @@ export class StateGraphVisualization
         'normal-node');
 
       this.nodeData[nodeId].canDelete = (nodeId !== initStateId);
-      this.nodeList.push(this.nodeData[nodeId] as unknown as NodeData);
+      this.nodeList.push(this.nodeData[nodeId] as NodeData);
     }
 
     this.overallTransformStr = 'translate(0,0)';

@@ -26,11 +26,10 @@ import { PlayerPositionService } from 'pages/exploration-player-page/services/pl
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { PreventPageUnloadEventService } from 'services/prevent-page-unload-event.service';
 import { UserService } from 'services/user.service';
-import { QuestionPlayerComponent, QuestionPlayerConfig } from './question-player.component';
+import { Answer, QuestionPlayerComponent, QuestionPlayerConfig } from './question-player.component';
 import { QuestionPlayerStateService } from './services/question-player-state.service';
 import { Location } from '@angular/common';
 import { UserInfo } from 'domain/user/user-info.model';
-import { State } from 'domain/state/StateObjectFactory';
 
 class MockNgbModal {
   open() {
@@ -354,12 +353,19 @@ describe('Question Player Component', () => {
   it('should calculate score based on question state data', () => {
     let questionStateData = {
       ques1: {
-        answers: ['1'],
+        answers: null,
         usedHints: [],
         viewedSolution: false,
+        linkedSkillIds: null
       },
       ques2: {
-        answers: ['3', '4'],
+        answers: [{
+          isCorrect: false,
+          taggedSkillMisconceptionId: 'skillId1-misconception1'
+        } as Answer, {
+          isCorrect: true,
+        } as Answer
+        ],
         usedHints: ['hint1'],
         viewedSolution: true,
         linkedSkillIds: ['skillId1', 'skillId2']
@@ -371,7 +377,7 @@ describe('Question Player Component', () => {
     } as QuestionPlayerConfig;
     component.totalScore = 0.0;
 
-    component.calculateScores(questionStateData as unknown as State);
+    component.calculateScores(questionStateData);
 
     expect(component.totalScore).toBe(50);
     expect(questionPlayerStateService.resultsPageIsLoadedEventEmitter.emit)
@@ -388,14 +394,16 @@ describe('Question Player Component', () => {
         answers: [],
         usedHints: ['hint1'],
         viewedSolution: false,
+        linkedSkillIds: null
       },
       ques2: {
         answers: [{
           isCorrect: false,
           taggedSkillMisconceptionId: 'skillId1-misconception1'
-        }, {
+        } as Answer, {
           isCorrect: true,
-        }],
+        } as Answer
+        ],
         usedHints: ['hint1'],
         viewedSolution: true,
         linkedSkillIds: ['skillId1', 'skillId2']
@@ -404,7 +412,7 @@ describe('Question Player Component', () => {
         answers: [{
           isCorrect: false,
           taggedSkillMisconceptionId: 'skillId1-misconception1'
-        }],
+        } as Answer],
         usedHints: ['hint1'],
         viewedSolution: false,
         linkedSkillIds: ['skillId1']
@@ -412,7 +420,7 @@ describe('Question Player Component', () => {
       ques4: {
         answers: [{
           isCorrect: false,
-        }],
+        } as Answer],
         usedHints: ['hint1'],
         viewedSolution: false,
         linkedSkillIds: ['skillId1']
@@ -421,7 +429,7 @@ describe('Question Player Component', () => {
 
     expect(component.masteryPerSkillMapping).toEqual(undefined);
 
-    component.calculateMasteryDegrees(questionStateData as unknown as State);
+    component.calculateMasteryDegrees(questionStateData);
 
     expect(component.masteryPerSkillMapping).toEqual({
       skillId1: -0.04000000000000001

@@ -483,7 +483,22 @@ describe('Questions List Component', () => {
     component.question = question;
     component.questionIsBeingUpdated = false;
     component.skillLinkageModificationsArray = (
-      [1, 2, 1] as unknown as SkillLinkageModificationsArray[]);
+      [
+        {
+          id: '1',
+          task: null,
+          difficulty: 1
+        },
+        {
+          id: '2',
+          task: null,
+          difficulty: 2
+        },
+        {
+          id: '1',
+          task: null,
+          difficulty: 1
+        }]);
 
     spyOn(component.question, 'getValidationErrorMessage').and.returnValue('');
     spyOn(component.question, 'getUnaddressedMisconceptionNames')
@@ -500,7 +515,22 @@ describe('Questions List Component', () => {
     expect(editableQuestionBackendApiService.editQuestionSkillLinksAsync)
       .toHaveBeenCalledWith(
         'qId',
-        [1, 2, 1] as unknown as SkillLinkageModificationsArray[]);
+        [
+          {
+            id: '1',
+            task: null,
+            difficulty: 1
+          },
+          {
+            id: '2',
+            task: null,
+            difficulty: 2
+          },
+          {
+            id: '1',
+            task: null,
+            difficulty: 1
+          }]);
   }));
 
   it('should save question when another question is being updated',
@@ -1058,7 +1088,11 @@ describe('Questions List Component', () => {
 
     // If skillLinkageModificationsArray is present.
     component.skillLinkageModificationsArray = (
-      [1, 2] as unknown as SkillLinkageModificationsArray[]);
+      [{
+        id: '1',
+        task: null,
+        difficulty: 1,
+      }]);
 
     component.saveQuestion();
     tick();
@@ -1094,7 +1128,18 @@ describe('Questions List Component', () => {
       component.questionIsBeingUpdated = true;
       spyOn(component, 'saveAndPublishQuestion');
       component.skillLinkageModificationsArray = (
-        [1, 2] as unknown as SkillLinkageModificationsArray[]);
+        [
+          {
+            id: '1',
+            task: null,
+            difficulty: 1,
+          },
+          {
+            id: '2',
+            task: null,
+            difficulty: 2,
+          }
+        ]);
 
       spyOn(ngbModal, 'open').and.returnValue({
         result: Promise.reject()

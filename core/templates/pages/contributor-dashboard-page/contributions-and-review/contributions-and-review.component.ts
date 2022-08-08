@@ -61,9 +61,18 @@ export interface ContributionsSummary {
   actionButtonTitle: string;
 }
 
+export interface OpportunitiesDicts {
+  id: string;
+  heading: string;
+  subheading: string;
+  labelText: string;
+  labelColor: string;
+  actionButtonTitle: string;
+}
+
 export interface GetOpportunitiesResponse {
-  opportunitiesDicts: unknown;
-  more: unknown;
+  opportunitiesDicts: OpportunitiesDicts[];
+  more: boolean;
 }
 
 export interface ContributionDetails {
@@ -107,7 +116,7 @@ export class ContributionsAndReview
   activeDropdownTabChoice: string;
   reviewTabs: TabDetails[] = [];
   contributionTabs: TabDetails[] = [];
-  tabNameToOpportunityFetchFunction: unknown;
+  tabNameToOpportunityFetchFunction: object;
   SUGGESTION_LABELS = {
     review: {
       text: 'Awaiting review',

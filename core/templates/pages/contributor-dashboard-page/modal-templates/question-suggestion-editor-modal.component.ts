@@ -154,7 +154,7 @@ export class QuestionSuggestionEditorModalComponent
     this.ngbActiveModal.close();
   }
 
-  setDifficultyString(skillDifficulty: unknown): void {
+  setDifficultyString(skillDifficulty: number): void {
     this.skillDifficultyString = Object.entries(
       AppConstants.SKILL_DIFFICULTY_LABEL_TO_FLOAT).find(
       entry => entry[1] === skillDifficulty)[0];

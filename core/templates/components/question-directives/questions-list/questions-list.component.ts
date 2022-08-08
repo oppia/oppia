@@ -77,7 +77,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
   editorIsOpen: boolean;
   isSkillDifficultyChanged: boolean;
   linkedSkillsWithDifficulty: SkillDifficulty[];
-  misconceptionIdsForSelectedSkill: unknown[];
+  misconceptionIdsForSelectedSkill: number[];
   misconceptionsBySkill: MisconceptionSkillMap;
   newQuestionIsBeingCreated: boolean;
   newQuestionSkillDifficulties: number[] | number;
@@ -485,7 +485,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
       this.editableQuestionBackendApiService.createQuestionAsync(
         this.newQuestionSkillIds, (
           this.newQuestionSkillDifficulties as number[]),
-        (this.question.toBackendDict(true) as unknown as Question), imagesData
+        (this.question.toBackendDict(true)), imagesData
       ).then((response) => {
         if (this.skillLinkageModificationsArray &&
             this.skillLinkageModificationsArray.length > 0) {
@@ -510,7 +510,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
           this.editableQuestionBackendApiService.updateQuestionAsync(
             this.questionId, String(this.question.getVersion()), commitMessage,
             this.questionUndoRedoService
-              .getCommittableChangeList() as unknown as string[]).then(
+              .getCommittableChangeList()).then(
             () => {
               this.questionUndoRedoService.clearChanges();
               this.editorIsOpen = false;

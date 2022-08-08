@@ -20,7 +20,7 @@ import { ComponentFixture, fakeAsync, flush, TestBed, tick, waitForAsync } from 
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ExplorationOpportunitySummary } from 'domain/opportunity/exploration-opportunity-summary.model';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { ContributionDetails, ContributionsAndReview, Suggestion, SuggestionDetails } from './contributions-and-review.component';
+import { ContributionDetails, ContributionsAndReview, OpportunitiesDicts, Suggestion, SuggestionDetails } from './contributions-and-review.component';
 import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
 import { TranslationTopicService } from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
 import { MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFactory';
@@ -1089,13 +1089,13 @@ describe('Contributions and review component', () => {
               heading: 'Chapter 1',
               subheading: 'Topic 1 - Story 1',
               actionButtonTitle: 'Translations'
-            },
+            } as OpportunitiesDicts,
             {
               id: '2',
               heading: 'Chapter 2',
               subheading: 'Topic 2 - Story 2',
               actionButtonTitle: 'Translations'
-            }
+            } as OpportunitiesDicts
           ]);
           expect(more).toEqual(false);
         });
@@ -1329,9 +1329,9 @@ describe('Contributions and review component', () => {
             topic_name: 'topic_name',
             story_title: 'story_title',
             chapter_title: 'chapter_title'
-          }
+          } as ContributionDetails
         }
-      } as unknown as Record<string, SuggestionDetails>;
+      } as Record<string, SuggestionDetails>;
       component.activeTabType = component.TAB_TYPE_REVIEWS;
       tick();
 
@@ -1366,7 +1366,7 @@ describe('Contributions and review component', () => {
             topic_name: 'topic_name',
             story_title: 'story_title',
             chapter_title: 'chapter_title'
-          }
+          } as ContributionDetails
         }
       };
 
@@ -1374,8 +1374,8 @@ describe('Contributions and review component', () => {
       tick();
 
       expect(component.getQuestionContributionsSummary(
-        suggestionIdToSuggestions as
-        unknown as Record<string, SuggestionDetails>)).toEqual([{
+        suggestionIdToSuggestions as Record<string, SuggestionDetails>)
+      ).toEqual([{
         id: 'id',
         heading: 'heading',
         subheading: 'skill_description',
