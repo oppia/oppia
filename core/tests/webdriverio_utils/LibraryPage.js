@@ -179,9 +179,9 @@ var LibraryPage = function() {
 
   this.getExplorationObjective = async function(name) {
     var elems = await _getExplorationElements(name);
-    var value = await action.getText(
+    var explorationObjective = await action.getText(
       'Exp Summary Tile', elems[0].$(expSummaryTileObjectiveLocator));
-    return value;
+    return explorationObjective;
   };
 
   this.expectExplorationRatingToEqual = async function(name, ratingValue) {
