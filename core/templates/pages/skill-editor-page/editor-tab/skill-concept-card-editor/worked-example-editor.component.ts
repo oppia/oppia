@@ -21,6 +21,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import cloneDeep from 'lodash/cloneDeep';
 import { SkillUpdateService } from 'domain/skill/skill-update.service';
 import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
+import { WorkedExample } from 'domain/skill/WorkedExampleObjectFactory';
 
 interface HtmlFormSchema {
   type: 'html';
@@ -37,16 +38,20 @@ interface Container {
   templateUrl: './worked-example-editor.component.html'
 })
 export class WorkedExampleEditorComponent implements OnInit {
-  @Input() index: number;
-  @Input() isEditable: boolean;
-  @Input() workedExample;
-  container: Container;
-  explanationEditorIsOpen: boolean;
-  questionEditorIsOpen: boolean;
-  tmpWorkedExampleQuestionHtml: string;
-  tmpWorkedExampleExplanationHtml: string;
-  workedExampleQuestionMemento: string;
-  workedExampleExplanationMemento: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() index!: number;
+  @Input() isEditable!: boolean;
+  @Input() workedExample!: WorkedExample;
+  container!: Container;
+  tmpWorkedExampleQuestionHtml!: string;
+  tmpWorkedExampleExplanationHtml!: string;
+  // Below properties are null when the editor is closed.
+  workedExampleQuestionMemento!: string | null;
+  workedExampleExplanationMemento!: string | null;
+  explanationEditorIsOpen: boolean = false;
+  questionEditorIsOpen: boolean = false;
   WORKED_EXAMPLE_FORM_SCHEMA: HtmlFormSchema = {
     type: 'html',
     ui_config: {}
@@ -130,6 +135,9 @@ export class WorkedExampleEditorComponent implements OnInit {
   }
 
   cancelEditQuestion(): void {
+    if (this.workedExampleQuestionMemento === null) {
+      return;
+    }
     this.container.workedExampleQuestionHtml = cloneDeep(
       this.workedExampleQuestionMemento);
     this.workedExampleQuestionMemento = null;
@@ -137,6 +145,9 @@ export class WorkedExampleEditorComponent implements OnInit {
   }
 
   cancelEditExplanation(): void {
+    if (this.workedExampleExplanationMemento === null) {
+      return;
+    }
     this.container.workedExampleExplanationHtml = cloneDeep(
       this.workedExampleExplanationMemento);
     this.workedExampleExplanationMemento = null;

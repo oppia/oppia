@@ -31,20 +31,23 @@ import { UserService } from 'services/user.service';
   templateUrl: './release-coordinator-navbar.component.html',
 })
 export class ReleaseCoordinatorNavbarComponent implements OnInit {
-  @Input() activeTab: string;
   @Output() activeTabChange = new EventEmitter();
-
-  TAB_ID_BEAM_JOBS: string = ReleaseCoordinatorPageConstants.TAB_ID_BEAM_JOBS;
-  TAB_ID_MISC: string = ReleaseCoordinatorPageConstants.TAB_ID_MISC;
-  profilePictureDataUrl: string;
-  username: string;
-  profileUrl: string;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() activeTab!: string;
+  profilePictureDataUrl!: string;
+  // User name is null if the user is not logged in.
+  username!: string | null;
+  profileUrl!: string;
+  logoWebpImageSrc!: string;
+  logoPngImageSrc!: string;
   logoutUrl: string = (
     '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LOGOUT.ROUTE);
 
   profileDropdownIsActive: boolean = false;
-  logoWebpImageSrc: string;
-  logoPngImageSrc: string;
+  TAB_ID_BEAM_JOBS: string = ReleaseCoordinatorPageConstants.TAB_ID_BEAM_JOBS;
+  TAB_ID_MISC: string = ReleaseCoordinatorPageConstants.TAB_ID_MISC;
   PAGES_REGISTERED_WITH_FRONTEND = (
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
 
@@ -77,11 +80,13 @@ export class ReleaseCoordinatorNavbarComponent implements OnInit {
     const userInfo = await this.userService.getUserInfoAsync();
 
     this.username = userInfo.getUsername();
-    this.profileUrl = (
-      this.urlInterpolationService.interpolateUrl(
-        '/profile/<username>', {
-          username: this.username
-        }));
+    if (this.username) {
+      this.profileUrl = (
+        this.urlInterpolationService.interpolateUrl(
+          '/profile/<username>', {
+            username: this.username
+          }));
+    }
   }
 
   ngOnInit(): void {

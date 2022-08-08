@@ -34,8 +34,12 @@ import { AlertsService } from 'services/alerts.service';
 })
 export class ViewBeamJobOutputDialogComponent implements OnInit, OnDestroy {
   selectedTab = new FormControl(0);
-  output: BeamJobRunResult = null;
-  subscription: Subscription = null;
+  // Output is null if the job has not finished yet.
+  output: BeamJobRunResult | null = null;
+  // This property is initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  subscription!: Subscription;
 
   constructor(
       @Inject(MAT_DIALOG_DATA) public beamJobRun: BeamJobRun,
