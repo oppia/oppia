@@ -45,8 +45,8 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
     EXP_ID: Final = 'exp_id'
 
-    def setUp(self) -> None:
-        super(ExplorationRightsTests, self).setUp()
+    def setUp(self):
+        super().setUp()
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
         self.signup('c@example.com', 'C')
@@ -931,8 +931,8 @@ class CollectionRightsTests(test_utils.GenericTestBase):
     COLLECTION_ID: Final = 'collection_id'
     EXP_ID_FOR_COLLECTION: Final = 'exp_id_for_collection'
 
-    def setUp(self) -> None:
-        super(CollectionRightsTests, self).setUp()
+    def setUp(self):
+        super().setUp()
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
         self.signup('c@example.com', 'C')
@@ -1503,8 +1503,8 @@ class CheckCanReleaseOwnershipTest(test_utils.GenericTestBase):
     published_exp_id: str = 'exp_id_1'
     private_exp_id: str = 'exp_id_2'
 
-    def setUp(self) -> None:
-        super(CheckCanReleaseOwnershipTest, self).setUp()
+    def setUp(self):
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.set_moderators([self.MODERATOR_USERNAME])
@@ -1555,8 +1555,8 @@ class CheckCanUnpublishActivityTest(test_utils.GenericTestBase):
     private_col_id: str = 'col_id_1'
     published_col_id: str = 'col_id_2'
 
-    def setUp(self) -> None:
-        super(CheckCanUnpublishActivityTest, self).setUp()
+    def setUp(self):
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)  # type: ignore[no-untyped-call]

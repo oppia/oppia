@@ -232,8 +232,8 @@ class ExplorationChangeTests(test_utils.GenericTestBase):
 class ExplorationVersionsDiffDomainUnitTests(test_utils.GenericTestBase):
     """Test the exploration versions difference domain object."""
 
-    def setUp(self) -> None:
-        super(ExplorationVersionsDiffDomainUnitTests, self).setUp()
+    def setUp(self):
+        super().setUp()
         self.exp_id = 'exp_id1'
         test_exp_filepath = os.path.join(
             feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
@@ -474,7 +474,7 @@ class TransientCheckpointUrlTests(test_utils.GenericTestBase):
     """Testing TransientCheckpointUrl domain object."""
 
     def setUp(self) -> None:
-        super(TransientCheckpointUrlTests, self).setUp()
+        super().setUp()
         self.transient_checkpoint_url = exp_domain.TransientCheckpointUrl(
             'exp_id', 'frcs_name', 1, 'mrrcs_name', 1)
 
@@ -567,8 +567,8 @@ class TransientCheckpointUrlTests(test_utils.GenericTestBase):
 class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
     """Test checkpoints validations in an exploration. """
 
-    def setUp(self) -> None:
-        super(ExplorationCheckpointsUnitTests, self).setUp()
+    def setUp(self):
+        super().setUp()
         self.exploration = (
             exp_domain.Exploration.create_default_exploration('eid'))
         self.new_state = state_domain.State.create_default_state(  # type: ignore[no-untyped-call]
@@ -1113,8 +1113,8 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
 class ExplorationDomainUnitTests(test_utils.GenericTestBase):
     """Test the exploration domain object."""
 
-    def setUp(self) -> None:
-        super(ExplorationDomainUnitTests, self).setUp()
+    def setUp(self):
+        super().setUp()
         translation_dict = {
             'content_id_3': translation_domain.TranslatedContent(
                 'My name is Nikhil.', True)
@@ -2780,8 +2780,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
 class ExplorationSummaryTests(test_utils.GenericTestBase):
 
-    def setUp(self) -> None:
-        super(ExplorationSummaryTests, self).setUp()
+    def setUp(self):
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
         exploration = exp_domain.Exploration.create_default_exploration('eid')

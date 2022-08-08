@@ -36,6 +36,7 @@ import { ReadOnlyStoryNode } from 'domain/story_viewer/read-only-story-node.mode
 import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
 
 import './story-viewer-page.component.css';
+import { StoryNode } from 'domain/story/story-node.model';
 
 
 interface IconParametersArray {
@@ -119,14 +120,9 @@ export class StoryViewerPageComponent implements OnInit, OnDestroy {
       i++) {
       this.thumbnailFilename = this.storyNodes[i].getThumbnailFilename();
       this.thumbnailBgColor = this.storyNodes[i].getThumbnailBgColor();
-      if (this.thumbnailFilename === null) {
-        this.iconUrl = '';
-        this.thumbnailFilename = '';
-      } else {
-        this.iconUrl = this.assetsBackendApiService.getThumbnailUrlForPreview(
-          AppConstants.ENTITY_TYPE.STORY, this.storyId,
-          this.thumbnailFilename);
-      }
+      this.iconUrl = this.assetsBackendApiService.getThumbnailUrlForPreview(
+        AppConstants.ENTITY_TYPE.STORY, this.storyId,
+        this.thumbnailFilename);
       iconParametersArray.push({
         thumbnailIconUrl: this.iconUrl,
         left: '225px',
@@ -149,9 +145,7 @@ export class StoryViewerPageComponent implements OnInit, OnDestroy {
       });
   }
 
-  getExplorationUrl(
-      node: { getExplorationId: () => string;
-              getId: () => string; }): string {
+  getExplorationUrl(node: StoryNode): string {
     let result = '/explore/' + node.getExplorationId();
     result = this.urlService.addField(
       result, 'topic_url_fragment',

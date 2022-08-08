@@ -49,8 +49,8 @@ class FeedbackServicesUnitTests(test_utils.EmailTestBase):
     USER_USERNAME: Final = 'user'
     EXP_1_ID: Final = 'exp_1_id'
 
-    def setUp(self) -> None:
-        super(FeedbackServicesUnitTests, self).setUp()
+    def setUp(self):
+        super().setUp()
         self.signup(self.USER_EMAIL, self.USER_USERNAME)
         self.user_id = self.get_user_id_from_email(self.USER_EMAIL)  # type: ignore[no-untyped-call]
 
@@ -179,8 +179,8 @@ class FeedbackDeletionUnitTests(test_utils.GenericTestBase):
     EXP_1_ID: Final = 'exp_1_id'
     EXP_2_ID: Final = 'exp_2_id'
 
-    def setUp(self) -> None:
-        super(FeedbackDeletionUnitTests, self).setUp()
+    def setUp(self):
+        super().setUp()
         self.signup(self.USER_EMAIL, self.USER_USERNAME)
         self.user_id = self.get_user_id_from_email(self.USER_EMAIL)  # type: ignore[no-untyped-call]
 
@@ -327,8 +327,8 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
     USER_EMAIL: Final = 'user@example.com'
     USER_USERNAME: Final = 'user'
 
-    def setUp(self) -> None:
-        super(FeedbackThreadUnitTests, self).setUp()
+    def setUp(self):
+        super().setUp()
 
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.signup(self.USER_EMAIL, self.USER_USERNAME)
@@ -876,8 +876,8 @@ class EmailsTaskqueueTests(test_utils.GenericTestBase):
 class FeedbackMessageEmailTests(test_utils.EmailTestBase):
     """Tests for feedback message emails."""
 
-    def setUp(self) -> None:
-        super(FeedbackMessageEmailTests, self).setUp()
+    def setUp(self):
+        super().setUp()
         self.signup('a@example.com', 'A')
         self.user_id_a = self.get_user_id_from_email('a@example.com')  # type: ignore[no-untyped-call]
         self.signup('b@example.com', 'B')
@@ -1236,8 +1236,8 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
 
 class FeedbackMessageBatchEmailHandlerTests(test_utils.EmailTestBase):
 
-    def setUp(self) -> None:
-        super(FeedbackMessageBatchEmailHandlerTests, self).setUp()
+    def setUp(self):
+        super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)  # type: ignore[no-untyped-call]
 
@@ -1392,8 +1392,8 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.EmailTestBase):
 
 class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
 
-    def setUp(self) -> None:
-        super(FeedbackMessageInstantEmailHandlerTests, self).setUp()
+    def setUp(self):
+        super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)  # type: ignore[no-untyped-call]
 
