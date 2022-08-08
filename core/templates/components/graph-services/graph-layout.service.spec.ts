@@ -240,74 +240,91 @@ describe('Graph Layout Service', () => {
   let links1: GraphLink[] = [
     {
       source: 'State1',
-      target: 'State1'
+      target: 'State1',
+      linkProperty: ''
     },
     {
       source: 'State1',
-      target: 'State2'
+      target: 'State2',
+      linkProperty: ''
     },
     {
       source: 'State1',
-      target: 'State3'
+      target: 'State3',
+      linkProperty: ''
     },
     {
       source: 'State1',
-      target: 'State5'
+      target: 'State5',
+      linkProperty: ''
     },
     {
       source: 'State1',
-      target: 'State6'
+      target: 'State6',
+      linkProperty: ''
     },
     {
       source: 'State1',
-      target: 'State7'
+      target: 'State7',
+      linkProperty: ''
     },
     {
       source: 'State1',
-      target: 'State8'
+      target: 'State8',
+      linkProperty: ''
     },
     {
       source: 'State1',
-      target: 'State9'
+      target: 'State9',
+      linkProperty: ''
     },
     {
       source: 'State2',
-      target: 'State4'
+      target: 'State4',
+      linkProperty: ''
     },
     {
       source: 'State3',
-      target: 'State4'
+      target: 'State4',
+      linkProperty: ''
     },
     {
       source: 'State9',
-      target: 'State8'
+      target: 'State8',
+      linkProperty: ''
     },
     {
       source: 'State8',
-      target: 'State4'
+      target: 'State4',
+      linkProperty: ''
     },
   ];
 
   let links2: GraphLink[] = [
     {
       source: 'State1',
-      target: 'State1'
+      target: 'State1',
+      linkProperty: ''
     },
     {
       source: 'State1',
-      target: 'State2'
+      target: 'State2',
+      linkProperty: ''
     },
     {
       source: 'State1',
-      target: 'State3'
+      target: 'State3',
+      linkProperty: ''
     },
     {
       source: 'State2',
-      target: 'State4'
+      target: 'State4',
+      linkProperty: ''
     },
     {
       source: 'State3',
-      target: 'State4'
+      target: 'State4',
+      linkProperty: ''
     },
   ];
 
@@ -584,7 +601,8 @@ describe('Graph Layout Service', () => {
     let links = [
       {
         source: 'State1',
-        target: 'State2'
+        target: 'State2',
+        linkProperty: ''
       }
     ];
 
@@ -736,11 +754,13 @@ describe('Graph Layout Service', () => {
 
       links.push({
         source: 'State0',
-        target: stateName
+        target: stateName,
+        linkProperty: ''
       });
       links.push({
         source: stateName,
-        target: 'End'
+        target: 'End',
+        linkProperty: ''
       });
     }
 
@@ -771,47 +791,58 @@ describe('Graph Layout Service', () => {
     let links = [
       {
         source: 'State5',
-        target: 'End'
+        target: 'End',
+        linkProperty: ''
       },
       {
         source: 'State4',
-        target: 'End'
+        target: 'End',
+        linkProperty: ''
       },
       {
         source: 'State3',
-        target: 'End'
+        target: 'End',
+        linkProperty: ''
       },
       {
         source: 'State2',
-        target: 'End'
+        target: 'End',
+        linkProperty: ''
       },
       {
         source: 'State1',
-        target: 'End'
+        target: 'End',
+        linkProperty: ''
       },
       {
         source: 'State0',
-        target: 'State1'
+        target: 'State1',
+        linkProperty: ''
       },
       {
         source: 'State0',
-        target: 'State2'
+        target: 'State2',
+        linkProperty: ''
       },
       {
         source: 'State0',
-        target: 'State3'
+        target: 'State3',
+        linkProperty: ''
       },
       {
         source: 'State0',
-        target: 'State4'
+        target: 'State4',
+        linkProperty: ''
       },
       {
         source: 'State0',
-        target: 'State5'
+        target: 'State5',
+        linkProperty: ''
       },
       {
         source: 'State0',
-        target: 'State0'
+        target: 'State0',
+        linkProperty: ''
       }
     ];
     let initNodeId = 'State0';
