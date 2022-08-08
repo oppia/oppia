@@ -928,13 +928,13 @@ class FirebaseAuthServicesTestBase(test_utils.AppEngineTestBase):
     EMAIL = 'foo@bar.com'
 
     def setUp(self) -> None:
-        super(FirebaseAuthServicesTestBase, self).setUp()
+        super().setUp()
         self.firebase_sdk_stub = FirebaseAdminSdkStub()
         self.firebase_sdk_stub.install(self)
 
     def tearDown(self) -> None:
         self.firebase_sdk_stub.uninstall()
-        super(FirebaseAuthServicesTestBase, self).tearDown()
+        super().tearDown()
 
     def capture_logging(
         self, min_level: int = logging.INFO
@@ -952,7 +952,7 @@ class FirebaseAuthServicesTestBase(test_utils.AppEngineTestBase):
         Returns:
             Context manager. The context manager for capturing logging messages.
         """
-        return super(FirebaseAuthServicesTestBase, self).capture_logging(
+        return super().capture_logging(
             min_level=min_level)
 
     def create_request(
@@ -1064,7 +1064,7 @@ class SuperAdminPrivilegesTests(FirebaseAuthServicesTestBase):
 class EstablishAuthSessionTests(FirebaseAuthServicesTestBase):
 
     def setUp(self) -> None:
-        super(EstablishAuthSessionTests, self).setUp()
+        super().setUp()
         self.id_token = (
             self.firebase_sdk_stub.create_user(self.AUTH_ID, email=self.EMAIL))
 
@@ -1422,7 +1422,7 @@ class FirebaseSpecificAssociationTests(FirebaseAuthServicesTestBase):
     AUTH_ID = 'sub'
 
     def setUp(self) -> None:
-        super(FirebaseSpecificAssociationTests, self).setUp()
+        super().setUp()
         self.firebase_sdk_stub.create_user(self.AUTH_ID)
         firebase_auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair(self.AUTH_ID, self.USER_ID))
@@ -1461,7 +1461,7 @@ class DeleteAuthAssociationsTests(FirebaseAuthServicesTestBase):
     UNKNOWN_ERROR = firebase_exceptions.UnknownError('error')
 
     def setUp(self) -> None:
-        super(DeleteAuthAssociationsTests, self).setUp()
+        super().setUp()
         self.firebase_sdk_stub.create_user(self.AUTH_ID)
         user_settings = user_services.create_new_user(self.AUTH_ID, self.EMAIL)
         self.user_id = user_settings.user_id
