@@ -37,6 +37,7 @@ describe('SuggestionsService', () => {
         status: 'pending',
         author_name: 'someone',
         change: {
+          skill_id: '',
           state_name: 'State 1',
           new_value: {
             html: 'new value'

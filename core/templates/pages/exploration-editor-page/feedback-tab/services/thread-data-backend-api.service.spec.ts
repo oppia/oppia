@@ -97,6 +97,7 @@ describe('retrieving threads service', () => {
       {
         author_name: 'author_1',
         change: {
+          skill_id: '',
           new_value: {
             html: 'new content html'
           },
