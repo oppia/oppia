@@ -136,7 +136,7 @@ class ValidateModelTimeFieldTests(job_test_utils.PipelinedTestBase):
         output = (
             self.pipeline
             | beam.Create([valid_timestamp])
-            | beam.ParDo(blog_validation.ValidateModelPublishTimestamps())
+            | beam.ParDo(blog_validation.ValidateModelTimestamps())
         )
 
         self.assert_pcoll_equal(output, [])
@@ -161,8 +161,10 @@ class ValidateModelTimeFieldTests(job_test_utils.PipelinedTestBase):
 
         self.assert_pcoll_equal(
             output, [
-                blog_validation_errors.ModelMutatedDuringJobError(
-                    invalid_timestamp.published_on, 'published_on'),
+                blog_validation_errors.ModelMutatedDuringJobErrorForPublishedOn(
+                    invalid_timestamp),
+                blog_validation_errors.InconsistentPublishLastUpdatedTimestampsError( # pylint: disable=line-too-long
+                    invalid_timestamp),
             ]
         )
 
@@ -186,8 +188,8 @@ class ValidateModelTimeFieldTests(job_test_utils.PipelinedTestBase):
 
         self.assert_pcoll_equal(
             output, [
-                blog_validation_errors.ModelMutatedDuringJobError(
-                    invalid_timestamp.last_updated, 'last_updated'),
+                blog_validation_errors.ModelMutatedDuringJobErrorForLastUpdated(
+                    invalid_timestamp),
             ]
         )
 

@@ -18,13 +18,12 @@
 
 from __future__ import annotations
 
-import datetime
-
 from core import utils
 from core.jobs.types import base_validation_errors
 from core.platform import models
 
 from typing import Union
+
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -40,7 +39,7 @@ class DuplicateBlogTitleError(base_validation_errors.BaseAuditError):
         self,
         model: Union[
             blog_models.BlogPostModel,
-            blog_models.BlogPostSummaryModel
+            blog_models.BlogPostSummaryModel,
         ]
     ) -> None:
         message = 'title=%s is not unique' % utils.quoted(model.title)
@@ -54,7 +53,7 @@ class DuplicateBlogUrlError(base_validation_errors.BaseAuditError):
         self,
         model: Union[
             blog_models.BlogPostModel,
-            blog_models.BlogPostSummaryModel
+            blog_models.BlogPostSummaryModel,
         ]
     ) -> None:
         message = 'url=%s is not unique' % utils.quoted(model.url_fragment)
@@ -65,7 +64,13 @@ class InconsistentLastUpdatedTimestampsError(
     base_validation_errors.BaseAuditError):
     """Error class for models with inconsistent timestamps."""
 
-    def __init__(self, model: blog_models.BlogPostModel) -> None:
+    def __init__(
+        self,
+        model: Union[
+            blog_models.BlogPostModel,
+            blog_models.BlogPostSummaryModel
+         ]
+    ) -> None:
         message = 'created_on=%r is later than last_updated=%r' % (
             model.created_on, model.last_updated)
         super(InconsistentLastUpdatedTimestampsError, self).__init__(
@@ -76,7 +81,12 @@ class InconsistentPublishLastUpdatedTimestampsError(
         base_validation_errors.BaseAuditError):
     """Error class for models with inconsistent timestamps."""
 
-    def __init__(self, model: blog_models.BlogPostModel) -> None:
+    def __init__(
+        self,
+        model: Union[
+            blog_models.BlogPostModel,
+            blog_models.BlogPostSummaryModel
+            ]) -> None:
         message = 'published_on=%r is later than last_updated=%r' % (
             model.published_on, model.last_updated)
         super(
@@ -84,13 +94,37 @@ class InconsistentPublishLastUpdatedTimestampsError(
             ).__init__(message, model)
 
 
-class ModelMutatedDuringJobError(base_validation_errors.BaseAuditError):
+class ModelMutatedDuringJobErrorForLastUpdated(
+    base_validation_errors.BaseAuditError):
     """Error class for models mutated during a job."""
 
     def __init__(
-        self, timestamp: datetime.datetime, timestamp_type: str) -> None:
+        self,
+        model: Union[
+            blog_models.BlogPostModel,
+            blog_models.BlogPostSummaryModel
+            ]
+        ) -> None:
         message = (
-            '%s=%r is later than the audit job\'s start time' % (
-                timestamp, timestamp_type))
-        super(ModelMutatedDuringJobError, self).__init__(
-            message, timestamp, timestamp_type)
+            'last_updated=%r is later than the audit job\'s start time' % (
+                model.last_updated))
+        super(ModelMutatedDuringJobErrorForLastUpdated, self).__init__(
+            message, model)
+
+
+class ModelMutatedDuringJobErrorForPublishedOn(
+    base_validation_errors.BaseAuditError):
+    """Error class for models mutated during a job."""
+
+    def __init__(
+        self,
+        model: Union[
+            blog_models.BlogPostModel,
+            blog_models.BlogPostSummaryModel
+            ]
+        ) -> None:
+        message = (
+            'published_on=%r is later than the audit job\'s start time' % (
+                model.published_on))
+        super(ModelMutatedDuringJobErrorForPublishedOn, self).__init__(
+            message, model)

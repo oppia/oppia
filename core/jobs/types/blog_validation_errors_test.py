@@ -86,7 +86,7 @@ class InconsistentLastUpdatedTimestampsErrorTests(
 
         self.assertEqual(
             error.stderr,
-            'InconsistentTimestampsError in BlogPostModel'
+            'InconsistentLastUpdatedTimestampsError in BlogPostModel'
             '(id="validblogid1"): created_on=%r is later than last_updated=%r' %
             (self.NOW, self.YEAR_AGO))
 
@@ -128,13 +128,14 @@ class ModelMutatedDuringJobErrorTests(
             created_on=self.YEAR_AGO,
             last_updated=self.NOW,
             published_on=self.YEAR_LATER)
-        error = blog_validation_errors.ModelMutatedDuringJobError(model)
+        error = blog_validation_errors.ModelMutatedDuringJobErrorForPublishedOn(
+            model)
 
         self.assertEqual(
             error.stderr,
-            'ModelMutatedDuringJobError in BlogPostModel(id="validblogid1"): '
-            'published_on=%r is later than the audit job\'s start time' % (
-                model.published_on))
+            'ModelMutatedDuringJobErrorForPublishedOn in BlogPostModel('
+            'id="validblogid1"): published_on=%r is later than the audit job\'s'
+            ' start time' % (model.published_on))
 
     def test_message_for_last_updated(self) -> None:
         model = blog_models.BlogPostModel(
@@ -146,10 +147,11 @@ class ModelMutatedDuringJobErrorTests(
             created_on=self.YEAR_AGO,
             last_updated=self.YEAR_LATER,
             published_on=self.YEAR_AGO)
-        error = blog_validation_errors.ModelMutatedDuringJobError(model)
+        error = blog_validation_errors.ModelMutatedDuringJobErrorForLastUpdated(
+            model)
 
         self.assertEqual(
             error.stderr,
-            'ModelMutatedDuringJobError in BlogPostModel(id="validblogid1"): '
-            'last_updated=%r is later than the audit job\'s start time' % (
-                model.published_on))
+            'ModelMutatedDuringJobErrorForLastUpdated in BlogPostModel('
+            'id="validblogid1"): last_updated=%r is later than the audit job\'s'
+            ' start time' % (model.last_updated))

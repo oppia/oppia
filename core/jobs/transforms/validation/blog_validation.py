@@ -108,8 +108,9 @@ class ValidateModelTimestamps(beam.DoFn):  # type: ignore[misc]
             ]
     ) -> Iterator[
         Union[
-            blog_validation_errors.InconsistentPublishTimestampsError,
-            blog_validation_errors.ModelMutatedDuringJobError,
+            blog_validation_errors.InconsistentLastUpdatedTimestampsError,
+            blog_validation_errors.ModelMutatedDuringJobErrorForLastUpdated,
+            blog_validation_errors.ModelMutatedDuringJobErrorForPublishedOn,
             blog_validation_errors.InconsistentPublishLastUpdatedTimestampsError
         ]
     ]:
@@ -137,19 +138,18 @@ class ValidateModelTimestamps(beam.DoFn):  # type: ignore[misc]
                 model)
 
         current_datetime = datetime.datetime.utcnow()
-        if (model.published_on - base_validation.MAX_CLOCK_SKEW_SECS) > (
-                current_datetime):
-            yield blog_validation_errors.ModelMutatedDuringJobError(
-                model.published_on, 'published_on')
+        if model.published_on:
+            if (model.published_on - base_validation.MAX_CLOCK_SKEW_SECS) > (
+                    current_datetime):
+                yield blog_validation_errors.ModelMutatedDuringJobErrorForPublishedOn(model) # pylint: disable=line-too-long
+
+            if (model.published_on - base_validation.MAX_CLOCK_SKEW_SECS) > (
+                    model.last_updated):
+                yield blog_validation_errors.InconsistentPublishLastUpdatedTimestampsError(model) # pylint: disable=line-too-long
 
         if (model.last_updated - base_validation.MAX_CLOCK_SKEW_SECS) > (
                 current_datetime):
-            yield blog_validation_errors.ModelMutatedDuringJobError(
-                model.last_updated, 'last_updated')
-
-        if (model.published_on - base_validation.MAX_CLOCK_SKEW_SECS) > (
-                model.last_updated):
-            yield blog_validation_errors.InconsistentPublishLastUpdatedTimestampsError(model) # pylint: disable=line-too-long
+            yield blog_validation_errors.ModelMutatedDuringJobErrorForLastUpdated(model) # pylint: disable=line-too-long
 
 
 @validation_decorators.AuditsExisting(

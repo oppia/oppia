@@ -169,8 +169,6 @@ class BlogPost:
             raise utils.ValidationError(
                 'Expected contents to be a string, received: %s' % self.content)
 
-
-
     @classmethod
     def require_valid_tags(cls, tags: List[str], strict: bool) -> None:
         """Validates tags for the blog post object.
@@ -478,7 +476,7 @@ class BlogPostSummary:
                     'Expected thumbnail filename to be a string, received: %s.'
                     % self.thumbnail_filename
                 )
-                
+
             self.require_valid_thumbnail_filename(
                 self.thumbnail_filename, strict=strict)
 
@@ -490,7 +488,6 @@ class BlogPostSummary:
         if not isinstance(self.summary, str):
             raise utils.ValidationError(
                 'Expected summary to be a string, received: %s' % self.summary)
-
 
     @classmethod
     def require_valid_url_fragment(cls, url_fragment: str) -> None:
