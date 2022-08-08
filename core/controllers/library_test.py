@@ -54,7 +54,7 @@ class OldLibraryRedirectPageTest(test_utils.GenericTestBase):
 class LibraryPageTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(LibraryPageTests, self).setUp()
+        super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
@@ -296,7 +296,7 @@ class LibraryPageTests(test_utils.GenericTestBase):
 class LibraryIndexHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(LibraryIndexHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
@@ -418,7 +418,7 @@ class LibraryIndexHandlerTests(test_utils.GenericTestBase):
 class LibraryGroupPageTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(LibraryGroupPageTests, self).setUp()
+        super().setUp()
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
@@ -591,7 +591,7 @@ class ExplorationSummariesHandlerTests(test_utils.GenericTestBase):
     PRIVATE_EXP_ID_VIEWER = 'eid2'
 
     def setUp(self):
-        super(ExplorationSummariesHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 

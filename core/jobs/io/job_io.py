@@ -48,7 +48,7 @@ class PutResults(beam.PTransform): # type: ignore[misc]
             job_id: str. The Oppia ID associated with the current pipeline.
             label: str|None. The label of the PTransform.
         """
-        super(PutResults, self).__init__(label=label)
+        super().__init__(label=label)
         self.job_id = job_id
 
     def expand(
