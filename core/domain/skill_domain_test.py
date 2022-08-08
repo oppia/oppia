@@ -35,7 +35,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
     SKILL_ID: Final = 'skill_id'
     MISCONCEPTION_ID: Final = 0
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         example_1 = skill_domain.WorkedExample(
             state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
@@ -1179,7 +1179,7 @@ class SkillChangeTests(test_utils.GenericTestBase):
 
 class SkillSummaryTests(test_utils.GenericTestBase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         current_time = datetime.datetime.utcnow()
         time_in_millisecs = utils.get_time_in_millisecs(current_time)
@@ -1275,7 +1275,7 @@ class SkillSummaryTests(test_utils.GenericTestBase):
 
 class AugmentedSkillSummaryTests(test_utils.GenericTestBase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         current_time = datetime.datetime.utcnow()
         self.time_in_millisecs = utils.get_time_in_millisecs(current_time)
@@ -1304,7 +1304,7 @@ class AugmentedSkillSummaryTests(test_utils.GenericTestBase):
 
 class TopicAssignmentTests(test_utils.GenericTestBase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.topic_assignments = skill_domain.TopicAssignment(
             'topic_id1', 'Topic1', 2, 1)
@@ -1323,7 +1323,7 @@ class TopicAssignmentTests(test_utils.GenericTestBase):
 
 class CategorizedSkillsTests(test_utils.GenericTestBase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.categorized_skills = skill_domain.CategorizedSkills()
         self.subtopic_titles = ['Subtopic Title 1', 'Subtopic Title 2']
@@ -1387,7 +1387,7 @@ class CategorizedSkillsTests(test_utils.GenericTestBase):
 
 class ShortSkillSummaryTests(test_utils.GenericTestBase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.skill_summary = skill_domain.SkillSummary(
             'skill_1', 'Description 1', 'en', 1,

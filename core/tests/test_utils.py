@@ -3625,7 +3625,7 @@ class GenericEmailTestBase(GenericTestBase):
             self._send_email_to_recipients):
             super().run(result=result)
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self._wipe_emails_dict()
 

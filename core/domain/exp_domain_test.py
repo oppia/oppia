@@ -232,7 +232,7 @@ class ExplorationChangeTests(test_utils.GenericTestBase):
 class ExplorationVersionsDiffDomainUnitTests(test_utils.GenericTestBase):
     """Test the exploration versions difference domain object."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.exp_id = 'exp_id1'
         test_exp_filepath = os.path.join(
@@ -567,7 +567,7 @@ class TransientCheckpointUrlTests(test_utils.GenericTestBase):
 class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
     """Test checkpoints validations in an exploration. """
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.exploration = (
             exp_domain.Exploration.create_default_exploration('eid'))
@@ -1113,7 +1113,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
 class ExplorationDomainUnitTests(test_utils.GenericTestBase):
     """Test the exploration domain object."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         translation_dict = {
             'content_id_3': translation_domain.TranslatedContent(
@@ -2780,7 +2780,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
 class ExplorationSummaryTests(test_utils.GenericTestBase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
