@@ -160,6 +160,57 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             msg='Current schema version is %d but DraftUpgradeUtil.%s is '
             'unimplemented.' % (state_schema_version, conversion_fn_name))
 
+    def test_convert_states_v51_dict_to_v52_dict(self):
+        draft_change_list_v51_1 = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'content',
+                'new_value': 'new value'
+            })
+        ]
+        draft_change_list_v51_2 = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'next_content_id_index',
+                'new_value': 'new value'
+            })
+        ]
+        draft_change_list_v51_3 = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                'state_name': 'Intro',
+                'content_id': 'content_id',
+                'language_code': 'en',
+                'content_html': 'content',
+                'translation_html': 'content',
+                'data_format': 'format_1',
+            })
+        ]
+        self.create_and_migrate_new_exploration('51', '52')
+
+        migrated_draft_change_list_v52_1 = (
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                draft_change_list_v51_1, 1, 2, self.EXP_ID)
+        )
+        self.assertEqual(
+            [change.to_dict() for change in draft_change_list_v51_1],
+            [change.to_dict() for change in migrated_draft_change_list_v52_1]
+        )
+
+        migrated_draft_change_list_v52_2 = (
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                draft_change_list_v51_2, 1, 2, self.EXP_ID)
+        )
+        self.assertIsNone(migrated_draft_change_list_v52_2)
+
+        migrated_draft_change_list_v52_3 = (
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                draft_change_list_v51_3, 1, 2, self.EXP_ID)
+        )
+        self.assertIsNone(migrated_draft_change_list_v52_3)
+
     def test_convert_states_v50_dict_to_v51_dict(self):
         draft_change_list_v50 = [
             exp_domain.ExplorationChange({
