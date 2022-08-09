@@ -36,7 +36,7 @@ class ClassroomModelUnitTest(test_utils.GenericTestBase):
     """Test the ClassroomModel class."""
 
     def setUp(self) -> None:
-        super(ClassroomModelUnitTest, self).setUp()
+        super().setUp()
         self.classroom_model = classroom_models.ClassroomModel(
             id='id',
             name='math',
