@@ -210,14 +210,28 @@ class ValidateBlogPostModelDomainObjectsInstancesTests(
             thumbnail_filename='sample.svg',
             tags=['learners'])
 
-        blog_rights_model = blog_models.BlogPostRightsModel(
+        output = (
+            self.pipeline
+            | beam.Create([blog_model])
+            | beam.ParDo(
+                blog_validation.ValidateBlogPostModelDomainObjectsInstances())
+        )
+
+        self.assert_pcoll_equal(output, [])
+
+    def test_validation_type_for_domain_object_non_strict(self) -> None:
+        blog_model = blog_models.BlogPostModel(
             id='validblogid2',
-            editor_ids=['user'],
-            blog_post_is_published=True,
+            title='Sample Title',
+            content='<p>hello</p>,',
+            author_id='user',
+            url_fragment='url-fragment-1',
             created_on=self.YEAR_AGO,
-            last_updated=self.NOW)
-        blog_rights_model.update_timestamps()
-        blog_rights_model.put()
+            last_updated=self.NOW,
+            published_on=None,
+            thumbnail_filename=None,
+            tags=[])
+
         output = (
             self.pipeline
             | beam.Create([blog_model])
@@ -244,14 +258,28 @@ class ValidateBlogPostSummaryModelDomainObjectsInstancesTests(
             thumbnail_filename='sample.svg',
             tags=['learners'])
 
-        blog_rights_model = blog_models.BlogPostRightsModel(
-            id='validblogid4',
-            editor_ids=['user'],
-            blog_post_is_published=True,
+        output = (
+            self.pipeline
+            | beam.Create([blog_summary_model])
+            | beam.ParDo(
+                blog_validation.ValidateBlogSummaryModelDomainObjectsInstances()) # pylint: disable=line-too-long
+        )
+
+        self.assert_pcoll_equal(output, [])
+
+    def test_validation_type_for_domain_object_non_strict(self) -> None:
+        blog_summary_model = blog_models.BlogPostSummaryModel(
+            id='validblogid5',
+            title='Sample Title',
+            summary='<p>hello</p>,',
+            author_id='user',
+            url_fragment='url-fragment-1',
             created_on=self.YEAR_AGO,
-            last_updated=self.NOW)
-        blog_rights_model.update_timestamps()
-        blog_rights_model.put()
+            last_updated=self.NOW,
+            published_on=None,
+            thumbnail_filename=None,
+            tags=[])
+
         output = (
             self.pipeline
             | beam.Create([blog_summary_model])
