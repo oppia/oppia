@@ -1513,7 +1513,7 @@ class RestrictedImportChecker(checkers.BaseChecker):
     )
 
     def __init__(self, linter=None):
-        super(RestrictedImportChecker, self).__init__(linter=linter)
+        super().__init__(linter=linter)
         self._module_to_forbidden_imports = []
 
     def open(self):
@@ -2088,7 +2088,7 @@ class DisallowedFunctionsChecker(checkers.BaseChecker):
         ),)
 
     def __init__(self, linter=None):
-        super(DisallowedFunctionsChecker, self).__init__(linter=linter)
+        super().__init__(linter=linter)
         self.funcs_to_replace_str = {}
         self.funcs_to_remove_str = set()
         self.funcs_to_replace_regex = []
