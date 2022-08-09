@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for Schema Based Html Editor Component
  */
 
-import { FormsModule } from '@angular/forms';
+import { FormControl, FormsModule } from '@angular/forms';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, waitForAsync } from '@angular/core/testing';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
@@ -54,19 +54,16 @@ describe('Schema Based Html Editor Component', () => {
     component.registerOnTouched();
 
     expect(component).toBeDefined();
-    expect(component.validate(null)).toEqual({});
+    expect(component.validate(new FormControl(1))).toEqual({});
     expect(component.onChange).toEqual(mockFunction);
   }));
 
   it('should test the case when the input isn\'t valid', () => {
-    expect(component.validate(null)).toEqual({});
+    expect(component.validate(new FormControl(1))).toEqual({});
   });
 
   it('should write value', () => {
-    component.localValue = null;
-    component.writeValue(null);
-
-    expect(component.localValue).toEqual(null);
+    component.localValue = 'false';
 
     component.writeValue('true');
     expect(component.localValue).toEqual('true');

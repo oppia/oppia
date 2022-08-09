@@ -67,7 +67,7 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
 
     def setUp(self):
         """Before each individual test, create a dummy exploration."""
-        super(ReaderPermissionsTest, self).setUp()
+        super().setUp()
 
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
@@ -201,7 +201,7 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
 
     def setUp(self):
         """Before each individual test, initialize data."""
-        super(ExplorationPretestsUnitTest, self).setUp()
+        super().setUp()
 
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
@@ -292,7 +292,7 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
 
     def setUp(self):
         """Before each individual test, initialize data."""
-        super(QuestionsUnitTest, self).setUp()
+        super().setUp()
         self.signup(self.USER_EMAIL, self.USER_USERNAME)
         self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
 
@@ -428,7 +428,7 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
     EXP_ID = '0'
 
     def setUp(self):
-        super(RatingsIntegrationTests, self).setUp()
+        super().setUp()
         exp_services.load_demo(self.EXP_ID)
 
     def test_assign_and_read_ratings(self):
@@ -544,7 +544,7 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
     COL_ID = '0'
 
     def setUp(self):
-        super(RecommendationsHandlerTests, self).setUp()
+        super().setUp()
 
         # Register users.
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
@@ -989,7 +989,7 @@ class FlagExplorationHandlerTests(test_utils.EmailTestBase):
     REPORT_TEXT = 'AD'
 
     def setUp(self):
-        super(FlagExplorationHandlerTests, self).setUp()
+        super().setUp()
 
         # Register users.
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
@@ -1102,7 +1102,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
     USER_USERNAME = 'user'
 
     def setUp(self):
-        super(LearnerProgressTest, self).setUp()
+        super().setUp()
 
         self.signup(self.USER_EMAIL, self.USER_USERNAME)
         self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
@@ -1512,7 +1512,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
     """Tests for the handler that records playthroughs."""
 
     def setUp(self):
-        super(StorePlaythroughHandlerTest, self).setUp()
+        super().setUp()
         self.exp_id = '15'
 
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
@@ -1783,7 +1783,7 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
     """Tests for all the statistics event models recording handlers."""
 
     def setUp(self):
-        super(StatsEventHandlerTest, self).setUp()
+        super().setUp()
         self.exp_id = '15'
 
         self.login(self.VIEWER_EMAIL)
@@ -2053,7 +2053,7 @@ class AnswerSubmittedEventHandlerTest(test_utils.GenericTestBase):
 class StateHitEventHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(StateHitEventHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
     def test_hitting_new_state(self):
@@ -2160,7 +2160,7 @@ class StateHitEventHandlerTests(test_utils.GenericTestBase):
 class StateCompleteEventHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(StateCompleteEventHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
     def test_completing_a_state(self):
@@ -2226,7 +2226,7 @@ class StateCompleteEventHandlerTests(test_utils.GenericTestBase):
 class LeaveForRefresherExpEventHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(LeaveForRefresherExpEventHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
     def test_leaving_an_exploration(self):
@@ -2273,7 +2273,7 @@ class LeaveForRefresherExpEventHandlerTests(test_utils.GenericTestBase):
 class ExplorationStartEventHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(ExplorationStartEventHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
@@ -2438,7 +2438,7 @@ class ExplorationStartEventHandlerTests(test_utils.GenericTestBase):
 class ExplorationActualStartEventHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(ExplorationActualStartEventHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
     def test_actually_starting_a_state(self):
@@ -2503,7 +2503,7 @@ class ExplorationActualStartEventHandlerTests(test_utils.GenericTestBase):
 class SolutionHitEventHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(SolutionHitEventHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
     def test_viewing_solution(self):
@@ -2573,7 +2573,7 @@ class ExplorationEmbedPageTests(test_utils.GenericTestBase):
     EXP_ID = 'exp_id'
 
     def setUp(self):
-        super(ExplorationEmbedPageTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
@@ -3267,7 +3267,7 @@ class StateVersionHistoryHandlerUnitTests(test_utils.GenericTestBase):
     EXP_ID = '0'
 
     def setUp(self):
-        super(StateVersionHistoryHandlerUnitTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
@@ -3351,7 +3351,7 @@ class MetadataVersionHistoryHandlerUnitTests(test_utils.GenericTestBase):
     EXP_ID = '0'
 
     def setUp(self):
-        super(MetadataVersionHistoryHandlerUnitTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
