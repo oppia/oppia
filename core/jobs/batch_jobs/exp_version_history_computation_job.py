@@ -382,34 +382,46 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                 else:
                     old_states_dict = old_exploration.states
                     new_states_dict = new_exploration.states
-                    old_metadata_dict = exp_domain.ExplorationMetadata(
-                        old_exploration.title, old_exploration.category,
-                        old_exploration.objective,
-                        old_exploration.language_code,
-                        old_exploration.tags, old_exploration.blurb,
-                        old_exploration.author_notes,
-                        old_exploration.states_schema_version,
-                        old_exploration.init_state_name,
-                        old_exploration.param_specs or {},
-                        old_exploration.param_changes or [],
-                        old_exploration.auto_tts_enabled,
-                        old_exploration.correctness_feedback_enabled,
-                        old_exploration.edits_allowed
-                    ).to_dict()
-                    new_metadata_dict = exp_domain.ExplorationMetadata(
-                        new_exploration.title, new_exploration.category,
-                        new_exploration.objective,
-                        new_exploration.language_code,
-                        new_exploration.tags, new_exploration.blurb,
-                        new_exploration.author_notes,
-                        new_exploration.states_schema_version,
-                        new_exploration.init_state_name,
-                        new_exploration.param_specs or {},
-                        new_exploration.param_changes or [],
-                        new_exploration.auto_tts_enabled,
-                        new_exploration.correctness_feedback_enabled,
-                        new_exploration.edits_allowed
-                    ).to_dict()
+                    old_metadata_dict = {
+                        'title': old_exploration.title,
+                        'category': old_exploration.category,
+                        'objective': old_exploration.objective,
+                        'language_code': old_exploration.language_code,
+                        'tags': old_exploration.tags,
+                        'blurb': old_exploration.blurb,
+                        'author_notes': old_exploration.author_notes,
+                        'states_schema_version': (
+                            old_exploration.states_schema_version
+                        ),
+                        'init_state_name': old_exploration.init_state_name,
+                        'param_specs': old_exploration.param_specs,
+                        'param_changes': old_exploration.param_changes,
+                        'auto_tts_enabled': old_exploration.auto_tts_enabled,
+                        'correctness_feedback_enabled': (
+                            old_exploration.correctness_feedback_enabled
+                        ),
+                        'edits_allowed': old_exploration.edits_allowed
+                    }
+                    new_metadata_dict = {
+                        'title': new_exploration.title,
+                        'category': new_exploration.category,
+                        'objective': new_exploration.objective,
+                        'language_code': new_exploration.language_code,
+                        'tags': new_exploration.tags,
+                        'blurb': new_exploration.blurb,
+                        'author_notes': new_exploration.author_notes,
+                        'states_schema_version': (
+                            new_exploration.states_schema_version
+                        ),
+                        'init_state_name': new_exploration.init_state_name,
+                        'param_specs': new_exploration.param_specs,
+                        'param_changes': new_exploration.param_changes,
+                        'auto_tts_enabled': new_exploration.auto_tts_enabled,
+                        'correctness_feedback_enabled': (
+                            new_exploration.correctness_feedback_enabled
+                        ),
+                        'edits_allowed': new_exploration.edits_allowed
+                    }
 
                     old_vh_model = version_history_models[version - 2]
                     old_states_vh = {
@@ -987,34 +999,44 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
                 else:
                     old_states_dict = prev_exp.states
                     new_states_dict = curr_exp.states
-                    old_metadata_dict = exp_domain.ExplorationMetadata(
-                        prev_exp.title, prev_exp.category,
-                        prev_exp.objective,
-                        prev_exp.language_code,
-                        prev_exp.tags, prev_exp.blurb,
-                        prev_exp.author_notes,
-                        prev_exp.states_schema_version,
-                        prev_exp.init_state_name,
-                        prev_exp.param_specs or {},
-                        prev_exp.param_changes or [],
-                        prev_exp.auto_tts_enabled,
-                        prev_exp.correctness_feedback_enabled,
-                        prev_exp.edits_allowed
-                    ).to_dict()
-                    new_metadata_dict = exp_domain.ExplorationMetadata(
-                        curr_exp.title, curr_exp.category,
-                        curr_exp.objective,
-                        curr_exp.language_code,
-                        curr_exp.tags, curr_exp.blurb,
-                        curr_exp.author_notes,
-                        curr_exp.states_schema_version,
-                        curr_exp.init_state_name,
-                        curr_exp.param_specs or {},
-                        curr_exp.param_changes or [],
-                        curr_exp.auto_tts_enabled,
-                        curr_exp.correctness_feedback_enabled,
-                        curr_exp.edits_allowed
-                    ).to_dict()
+                    old_metadata_dict = {
+                        'title': prev_exp.title,
+                        'category': prev_exp.category,
+                        'objective': prev_exp.objective,
+                        'language_code': prev_exp.language_code,
+                        'tags': prev_exp.tags,
+                        'blurb': prev_exp.blurb,
+                        'author_notes': prev_exp.author_notes,
+                        'states_schema_version': prev_exp.states_schema_version,
+                        'init_state_name': prev_exp.init_state_name,
+                        'param_specs': prev_exp.param_specs,
+                        'param_changes': prev_exp.param_changes,
+                        'auto_tts_enabled': prev_exp.auto_tts_enabled,
+                        'correctness_feedback_enabled': (
+                            prev_exp.correctness_feedback_enabled
+                        ),
+                        'edits_allowed': prev_exp.edits_allowed
+                    }
+                    new_metadata_dict = {
+                        'title': curr_exp.title,
+                        'category': curr_exp.category,
+                        'objective': curr_exp.objective,
+                        'language_code': curr_exp.language_code,
+                        'tags': curr_exp.tags,
+                        'blurb': curr_exp.blurb,
+                        'author_notes': curr_exp.author_notes,
+                        'states_schema_version': (
+                            curr_exp.states_schema_version
+                        ),
+                        'init_state_name': curr_exp.init_state_name,
+                        'param_specs': curr_exp.param_specs,
+                        'param_changes': curr_exp.param_changes,
+                        'auto_tts_enabled': curr_exp.auto_tts_enabled,
+                        'correctness_feedback_enabled': (
+                            curr_exp.correctness_feedback_enabled
+                        ),
+                        'edits_allowed': curr_exp.edits_allowed
+                    }
                     expected_state_vh = (
                         exp_services.update_states_version_history(
                             copy.deepcopy(verified_state_vh[-1]),
