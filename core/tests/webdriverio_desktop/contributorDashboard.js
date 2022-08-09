@@ -214,10 +214,11 @@ describe('Contributor dashboard page', function() {
       GERMAN_LANGUAGE);
     await contributorDashboardPage.waitForOpportunitiesToLoad();
     await action.click('Opportunity button', opportunityActionButtonCss);
-    let images = await $$('.e2e-test-image');
+    let image = $('.e2e-test-image');
     await waitFor.visibilityOf(
-      images[0],
+      image,
       'Test image taking too long to appear.');
+    let images = await $$('.e2e-test-image');
     expect(images.length).toEqual(1);
 
     // Copy tool should copy image on pressing 'Done'.

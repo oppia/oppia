@@ -41,9 +41,9 @@ var expectInteractionDetailsToMatch = async function(
     '.e2e-test-multiple-choice-option-container');
   var optionsCount = optionElements.length;
   expect(optionsCount).toEqual(richTextInstructionsArray.length);
-  var promises = [];
+  var results = [];
   for (var i = 0; i < optionsCount; i++) {
-    promises.push(await optionElements[i].$(
+    results.push(await optionElements[i].$(
       '.e2e-test-multiple-choice-option').getText());
   }
   var rteInstructionArrayCopy = [...richTextInstructionsArray];

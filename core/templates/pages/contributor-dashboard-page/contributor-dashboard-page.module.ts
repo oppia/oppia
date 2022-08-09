@@ -48,6 +48,9 @@ import { TranslationModalComponent } from './modal-templates/translation-modal.c
 import { TranslationOpportunitiesComponent } from './translation-opportunities/translation-opportunities.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
+import { ContributionsAndReview } from './contributions-and-review/contributions-and-review.component';
+import { QuestionOpportunitiesComponent } from './question-opportunities/question-opportunities.component';
+import { ContributorDashboardPageComponent } from './contributor-dashboard-page.component';
 import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
 
 @NgModule({
@@ -75,7 +78,10 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
     TranslationOpportunitiesComponent,
     TranslationSuggestionReviewModalComponent,
     TranslationTopicSelectorComponent,
-    TranslationModalComponent
+    TranslationModalComponent,
+    ContributionsAndReview,
+    QuestionOpportunitiesComponent,
+    ContributorDashboardPageComponent
   ],
   entryComponents: [
     CkEditorCopyToolbarComponent,
@@ -87,7 +93,10 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
     TranslationOpportunitiesComponent,
     TranslationSuggestionReviewModalComponent,
     TranslationTopicSelectorComponent,
-    TranslationModalComponent
+    TranslationModalComponent,
+    ContributionsAndReview,
+    QuestionOpportunitiesComponent,
+    ContributorDashboardPageComponent
   ],
   providers: [
     {
