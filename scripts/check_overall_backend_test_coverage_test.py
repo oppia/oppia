@@ -127,7 +127,9 @@ class CheckOverallBackendTestCoverageTests(test_utils.GenericTestBase):
                 'env': self.env,
                 'check': False
             }])
-        swap_sys_exit = self.swap(sys, 'exit', lambda _: None)
+        swap_sys_exit = self.swap_with_checks(
+            sys, 'exit', lambda _: None,
+            expected_args=((1,),))
 
         with self.print_swap, swap_sys_exit, swap_subprocess_run:
             check_overall_backend_test_coverage.main()
