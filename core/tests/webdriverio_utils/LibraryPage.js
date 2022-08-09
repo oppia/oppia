@@ -169,27 +169,27 @@ var LibraryPage = function() {
       `.e2e-test-exp-summary-tile-title=${explorationName}`);
     await waitFor.visibilityOf(
       explorationCardElement, 'Unable to find exploration ' + explorationName);
+    var explorationCard = await allExplorationsTitled(explorationName)[0];
     // The Exploration summary card is masked by a dummy element. Therefore, a
     // Javascript click is used.
-    var explorationCard = await allExplorationsTitled(explorationName)[0];
     await action.click('Exploration Card', explorationCard, true);
     await waitFor.pageToFullyLoad();
   };
 
   this.getExplorationObjective = async function(name) {
     var elems = await _getExplorationElements(name);
-    var value = await action.getText(
+    var explorationObjective = await action.getText(
       'Exp Summary Tile', elems[0].$(expSummaryTileObjectiveLocator));
-    return value;
+    return explorationObjective;
   };
 
   this.expectExplorationRatingToEqual = async function(name, ratingValue) {
     var elems = await _getExplorationElements(name);
     await waitFor.visibilityOf(
       elems[0], 'Rating card takes too long to appear');
-    var value = await action.getText(
+    var explorationRatingValue = await action.getText(
       'Exp Summary Tile', elems[0].$(expSummaryTileRatingLocator));
-    expect(value).toBe(ratingValue);
+    expect(explorationRatingValue).toBe(ratingValue);
   };
 
   this.clickCreateActivity = async function() {

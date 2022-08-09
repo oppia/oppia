@@ -20,6 +20,7 @@
 var waitFor = require('./waitFor.js');
 
 var ClassroomPage = function() {
+  var topicSummaryTile = $('.e2e-test-topic-summary-tile');
   var topicSummaryTilesSelector = function() {
     return $$('.e2e-test-topic-summary-tile');
   };
@@ -33,7 +34,7 @@ var ClassroomPage = function() {
     var topicSummaryTiles = await topicSummaryTilesSelector();
     if (count > 0) {
       await waitFor.visibilityOf(
-        topicSummaryTiles[0], 'Topic summary tile is not visible');
+        topicSummaryTile, 'Topic summary tile is not visible');
       expect(topicSummaryTiles.length).toEqual(count);
     } else {
       expect(topicSummaryTiles.length).toEqual(0);

@@ -117,16 +117,6 @@ var ExplorationEditorPage = function() {
   this.getSettingsTab = function() {
     return new ExplorationEditorSettingsTab.ExplorationEditorSettingsTab();
   };
-  this.getStatsTab = function() {
-    return new ExplorationEditorStatsTab.ExplorationEditorStatsTab();
-  };
-  this.getTranslationTab = function() {
-    return new ExplorationEditorTranslationTab
-      .ExplorationEditorTranslationTab();
-  };
-  this.getPreviewTab = function() {
-    return new ExplorationPlayerPage.ExplorationPlayerPage();
-  };
 
   this.getStatsTab = function() {
     return new ExplorationEditorStatsTab.ExplorationEditorStatsTab();

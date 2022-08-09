@@ -28,6 +28,7 @@ var TopicsAndSkillsDashboardPage = function() {
     return $$('.e2e-test-assign-skill-to-topic-button');
   };
   var assignedTopicNameInputClass = '.e2e-test-unassign-topic';
+  var assignedTopicNamesInput = $('.e2e-test-unassign-topic');
   var confirmMoveButton = $('.e2e-test-confirm-move-button');
   var confirmSkillCreationButton = $('.e2e-test-confirm-skill-creation-button');
   var confirmSkillsMergeButton = $('.e2e-test-confirm-skill-selection-button');

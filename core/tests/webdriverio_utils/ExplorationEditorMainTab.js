@@ -815,7 +815,7 @@ var ExplorationEditorMainTab = function() {
   this.deleteState = async function(stateName) {
     await action.waitForAutosave();
     await general.scrollToTop();
-    var nodeElement = await explorationGraph.$(
+    var nodeStateElement = await explorationGraph.$(
       `.e2e-test-node=${stateName}`);
     await waitFor.visibilityOf(
       nodeStateElement,

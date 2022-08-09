@@ -47,6 +47,7 @@ var ExplorationEditorImprovementsTab = function() {
     );
     expect(await explorationHealth.getText()).toEqual('WARNING');
   };
+
   this.expectCriticalExploration = async function() {
     await waitFor.visibilityOf(
       explorationHealth,
