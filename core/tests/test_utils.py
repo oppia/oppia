@@ -2300,7 +2300,7 @@ title: Title
     @contextlib.contextmanager
     def login_context(
         self, email: str, is_super_admin: bool = False
-    ) -> Iterator[str]:
+    ) -> Iterator[Optional[str]]:
         """Log in with the given email under the context of a 'with' statement.
 
         Args:
@@ -2309,7 +2309,7 @@ title: Title
 
         Yields:
             str. The id of the user associated with the given email, who is now
-            'logged in'.
+            'logged in', or None if no user_id exists.
         """
         self.login(email, is_super_admin=is_super_admin)
         try:
@@ -2318,7 +2318,7 @@ title: Title
             self.logout()
 
     @contextlib.contextmanager
-    def super_admin_context(self) -> Iterator[str]:
+    def super_admin_context(self) -> Iterator[Optional[str]]:
         """Log in as a global admin under the context of a 'with' statement.
 
         Yields:
