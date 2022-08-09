@@ -95,7 +95,19 @@ export class OpportunitiesListComponent {
           this.opportunities = this.opportunities.filter((opportunity) => {
             return opportunityIds.indexOf(opportunity.id) < 0;
           });
-          this.gotoPage(this.activePageNumber);
+          const currentIndex = (
+            this.activePageNumber * this.OPPORTUNITIES_PAGE_SIZE);
+          if (currentIndex > this.opportunities.length) {
+            // The active page number is no longer valid. Navigate to the
+            // current last page.
+            const lastPage = Math.floor(
+              this.opportunities.length / this.OPPORTUNITIES_PAGE_SIZE) + 1;
+            this.gotoPage(lastPage);
+          } else {
+            // Navigate to the active page before opportunities were removed,
+            // i.e. when reviewers accept/reject suggestions.
+            this.gotoPage(this.activePageNumber);
+          }
         }));
   }
 
