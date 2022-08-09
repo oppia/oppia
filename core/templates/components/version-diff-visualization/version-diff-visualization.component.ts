@@ -34,10 +34,10 @@ interface NodesData {
 interface LegendGraph {
  nodes: object;
  links: {
-  source: string;
-  target: string;
-  linkProperty: string;
-}[];
+   source: string;
+   target: string;
+   linkProperty: string;
+   }[];
  finalStateIds: string[];
  initStateId: string;
 }
@@ -331,9 +331,7 @@ export class VersionDiffVisualizationComponent implements OnInit {
           });
         }
         _lastUsedStateType = stateProperty;
-        if (!this.legendGraph.hasOwnProperty('initStateId')) {
-          this.legendGraph.initStateId = stateProperty;
-        }
+        this.legendGraph.initStateId = stateProperty;
       }
     }
 

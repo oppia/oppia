@@ -512,7 +512,8 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
 
   summarizeDefaultOutcome(
       defaultOutcome: Outcome, interactionId: string,
-      answerGroupCount: number, shortenRule: boolean): string {
+      answerGroupCount: number, shortenRule: boolean
+  ): string {
     if (!defaultOutcome) {
       return '';
     }
