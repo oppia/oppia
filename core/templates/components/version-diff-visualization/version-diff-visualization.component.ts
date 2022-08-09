@@ -312,8 +312,10 @@ export class VersionDiffVisualizationComponent implements OnInit {
     // Generate the legend graph.
     this.legendGraph = {
       nodes: {},
-      links: []
-    } as LegendGraph;
+      links: [],
+      finalStateIds: [],
+      initStateId: null
+    };
 
     let _lastUsedStateType = null;
     for (let stateProperty in this._stateTypeUsed) {

@@ -192,7 +192,7 @@ describe('Contributions and review component', () => {
                 old_value: null,
                 content_html: 'Translation',
                 translation_html: 'Tradução',
-                skill_id: ''
+                skill_id: 'skill_id'
               },
               status: 'review'
             },
@@ -452,7 +452,7 @@ describe('Contributions and review component', () => {
                 old_value: null,
                 content_html: 'Translation',
                 translation_html: 'Tradução',
-                skill_id: ''
+                skill_id: 'skill_id'
               },
               status: 'review'
             },

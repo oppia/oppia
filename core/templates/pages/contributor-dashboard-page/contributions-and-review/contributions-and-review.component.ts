@@ -541,8 +541,9 @@ export class ContributionsAndReview
             if (userCanReviewQuestionSuggestions) {
               this.reviewTabs.push({
                 suggestionType: this.SUGGESTION_TYPE_QUESTION,
-                text: 'Review Questions'
-              } as TabDetails);
+                text: 'Review Questions',
+                enabled: false
+              });
               userReviewableSuggestionTypes.push(this.SUGGESTION_TYPE_QUESTION);
             }
             if (
@@ -550,8 +551,9 @@ export class ContributionsAndReview
                 .length > 0) {
               this.reviewTabs.push({
                 suggestionType: this.SUGGESTION_TYPE_TRANSLATE,
-                text: 'Review Translations'
-              } as TabDetails);
+                text: 'Review Translations',
+                enabled: false
+              });
               userReviewableSuggestionTypes.push(
                 this.SUGGESTION_TYPE_TRANSLATE);
             }

@@ -182,7 +182,8 @@ export class ExplorationWarningsService {
       return {
         source: link.target,
         target: link.source,
-      } as GraphLink;
+        linkProperty: null,
+      };
     });
   }
 

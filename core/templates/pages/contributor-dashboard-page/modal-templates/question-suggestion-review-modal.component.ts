@@ -24,7 +24,6 @@ import { MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
 import { Question, QuestionBackendDict, QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
 import { State } from 'domain/state/StateObjectFactory';
-import { SuggestionBackendDict } from 'domain/suggestion/suggestion.model';
 import { ThreadMessage } from 'domain/feedback_message/ThreadMessage.model';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { QuestionSuggestionEditorModalComponent } from './question-suggestion-editor-modal.component';
@@ -37,7 +36,7 @@ import { ThreadDataBackendApiService } from 'pages/exploration-editor-page/feedb
 
 interface QuestionSuggestionModalValue {
   suggestionId: string;
-  suggestion: SuggestionBackendDict;
+  suggestion: ActiveSuggestionDict;
   reviewable: boolean;
   question: Question;
 }
@@ -171,7 +170,7 @@ export class QuestionSuggestionReviewModalComponent
         this.editSuggestionEmitter.emit(
           {
             suggestionId: this.suggestionId,
-            suggestion: this.suggestion as SuggestionBackendDict,
+            suggestion: this.suggestion,
             reviewable: this.reviewable,
             question: this.question
           });
@@ -179,7 +178,7 @@ export class QuestionSuggestionReviewModalComponent
         this.contextService.resetImageSaveDestination();
         this.editSuggestionEmitter.emit({
           suggestionId: this.suggestionId,
-          suggestion: this.suggestion as SuggestionBackendDict,
+          suggestion: this.suggestion,
           reviewable: this.reviewable,
           question: undefined
         });

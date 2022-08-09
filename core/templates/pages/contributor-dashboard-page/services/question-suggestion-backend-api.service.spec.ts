@@ -85,7 +85,7 @@ describe('Question Suggestion Backend Api Service', () => {
     let failHandler = jasmine.createSpy('fail');
 
     qsbas.submitSuggestionAsync(
-      question as unknown as Question, associatedSkill, 1, [{
+      question as Question, associatedSkill, 1, [{
         filename: 'image',
         imageBlob: fakeImage()
       }])
