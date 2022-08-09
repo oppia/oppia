@@ -39,7 +39,7 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
     }
 
     def setUp(self):
-        super(EmailDashboardDataHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.SUBMITTER_EMAIL, self.SUBMITTER_USERNAME)
         self.submitter_id = self.get_user_id_from_email(
             self.SUBMITTER_EMAIL)
@@ -149,7 +149,7 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
     }
 
     def setUp(self):
-        super(EmailDashboardResultTests, self).setUp()
+        super().setUp()
         # User A has one created exploration.
         self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
         self.signup(feconf.SYSTEM_EMAIL_ADDRESS, 'systemUser')
