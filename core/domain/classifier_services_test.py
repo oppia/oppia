@@ -55,7 +55,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
     """
 
     def setUp(self) -> None:
-        super(ClassifierServicesTests, self).setUp()  # type: ignore[no-untyped-call]
+        super(ClassifierServicesTests, self).setUp()
         self._init_classify_inputs('16')
 
     def _init_classify_inputs(self, exploration_id: str) -> None:
@@ -314,7 +314,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
         # Test that Exception is raised if this method is called with version
         # number 1.
         exploration.version = 1
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'This method should not be called by exploration with '
                        'version number 1'):
             classifier_services.handle_non_retrainable_states(
@@ -366,7 +366,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
     def test_retrieval_of_classifier_training_jobs(self) -> None:
         """Test the get_classifier_training_job_by_id method."""
 
-        with self.assertRaisesRegex(Exception, (  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, (
             'Entity for class ClassifierTrainingJobModel with id fake_id '
             'not found')):
             classifier_services.get_classifier_training_job_by_id('fake_id')
@@ -394,7 +394,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
         self.assertEqual(classifier_training_job.training_data, [])
 
         classifier_data = (
-            self._get_classifier_data_from_classifier_training_job(  # type: ignore[no-untyped-call]
+            self._get_classifier_data_from_classifier_training_job(
                 classifier_training_job))
         self.assertEqual(
             json.loads(classifier_data.model_json), {})
@@ -418,7 +418,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             state_name, feconf.TRAINING_JOB_STATUS_NEW, {}, 1)
         self.assertTrue(job_id)
         classifier_services.delete_classifier_training_job(job_id)
-        with self.assertRaisesRegex(Exception, (  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, (
             'Entity for class ClassifierTrainingJobModel '
             'with id %s not found' % (
                 job_id))):
@@ -451,7 +451,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             feconf.TRAINING_JOB_STATUS_COMPLETE)
 
         # Test that invalid status changes cannot be made.
-        with self.assertRaisesRegex(Exception, (  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, (
             'The status change %s to %s is not valid.' % (
                 feconf.TRAINING_JOB_STATUS_COMPLETE,
                 feconf.TRAINING_JOB_STATUS_COMPLETE))):
@@ -484,7 +484,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             feconf.TRAINING_JOB_STATUS_PENDING)
 
         # Test that invalid status changes cannot be made.
-        with self.assertRaisesRegex(Exception, (  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, (
             'The status change %s to %s is not valid.' % (
                 feconf.TRAINING_JOB_STATUS_PENDING,
                 feconf.TRAINING_JOB_STATUS_PENDING))):
@@ -519,7 +519,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             feconf.TRAINING_JOB_STATUS_FAILED)
 
         # Test that invalid status changes cannot be made.
-        with self.assertRaisesRegex(Exception, (  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, (
             'The status change %s to %s is not valid.' % (
                 feconf.TRAINING_JOB_STATUS_FAILED,
                 feconf.TRAINING_JOB_STATUS_FAILED))):
@@ -571,7 +571,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
         classifier_training_job = (
             classifier_services.get_classifier_training_job_by_id(job_id))
         classifier_data = (
-            self._get_classifier_data_from_classifier_training_job(  # type: ignore[no-untyped-call]
+            self._get_classifier_data_from_classifier_training_job(
                 classifier_training_job))
         self.assertEqual(json.loads(classifier_data.model_json), {})
 
@@ -584,7 +584,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
         classifier_training_job = (
             classifier_services.get_classifier_training_job_by_id(job_id))
         classifier_data = (
-            self._get_classifier_data_from_classifier_training_job(  # type: ignore[no-untyped-call]
+            self._get_classifier_data_from_classifier_training_job(
                 classifier_training_job))
         self.assertDictEqual(
             json.loads(classifier_data.model_json),
@@ -630,7 +630,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
     def test_can_not_mark_training_jobs_complete_due_to_invalid_job_id(
         self
     ) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'The ClassifierTrainingJobModel corresponding to the '
             'job_id of the ClassifierTrainingJob does not exist.'):
             classifier_services.mark_training_job_complete('invalid_job_id')
@@ -638,7 +638,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
     def test_can_not_mark_training_jobs_failed_due_to_invalid_job_id(
         self
     ) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'The ClassifierTrainingJobModel corresponding to the '
             'job_id of the ClassifierTrainingJob does not exist.'):
             classifier_services.mark_training_jobs_failed(['invalid_job_id'])
@@ -646,13 +646,13 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
     def test_can_not_mark_training_jobs_pending_due_to_invalid_job_id(
         self
     ) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'The ClassifierTrainingJobModel corresponding to the '
             'job_id of the ClassifierTrainingJob does not exist.'):
             classifier_services.mark_training_job_pending('invalid_job_id')
 
     def test_can_not_store_classifier_data_due_to_invalid_job_id(self) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'The ClassifierTrainingJobModel corresponding to the '
             'job_id of the ClassifierTrainingJob does not exist.'):
             classifier_services.store_classifier_data('invalid_job_id', {})

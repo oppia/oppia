@@ -4272,9 +4272,14 @@ class ClassifierTestBase(GenericEmailTestBase):
         )
         return result
 
+    # TODO(#15451): Add stubs for protobuf once we have enough type info
+    # regarding protobuf's library. Because currently, the stubs of protobuf
+    # in typeshed is not fully type annotated yet and the main repository is
+    # also not type annotated yet, because of this MyPy is not able to fetch
+    # the return type of this method and assuming it as Any type.
     def _get_classifier_data_from_classifier_training_job(
         self, classifier_training_job: classifier_domain.ClassifierTrainingJob
-    ) -> object:
+    ) -> Any:
         """Retrieves classifier training job from GCS using metadata stored in
         classifier_training_job.
 

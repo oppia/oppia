@@ -67,10 +67,10 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
 
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.user_id_admin = (
-            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))  # type: ignore[no-untyped-call]
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])  # type: ignore[no-untyped-call]
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
-        self.skill = self.save_new_skill(  # type: ignore[no-untyped-call]
+        self.skill = self.save_new_skill(
             self.skill_id, self.USER_ID, description='Description',
             misconceptions=misconceptions,
             skill_contents=skill_contents,
@@ -81,7 +81,7 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
             state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
             state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>')
         )
-        self.save_new_skill(  # type: ignore[no-untyped-call]
+        self.save_new_skill(
             'skill_a', self.user_id_admin, description='Description A',
             misconceptions=[],
             skill_contents=skill_domain.SkillContents(
@@ -99,7 +99,7 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
                 })
             )
         )
-        self.save_new_skill(  # type: ignore[no-untyped-call]
+        self.save_new_skill(
             'skill_b', self.user_id_admin, description='Description B',
             misconceptions=[],
             skill_contents=skill_domain.SkillContents(
@@ -130,12 +130,12 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skills[1].description, 'Description B')
         self.assertEqual(skills[1].misconceptions, [])
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'No skill exists for ID skill_c'):
             skill_fetchers.get_multi_skills(['skill_a', 'skill_c'])
 
     def test_get_skill_by_id(self) -> None:
-        expected_skill = self.skill.to_dict()
+        expected_skill = self.skill.to_dict()  # type: ignore[no-untyped-call]
         skill = skill_fetchers.get_skill_by_id(self.skill_id)
         self.assertEqual(skill.to_dict(), expected_skill)  # type: ignore[no-untyped-call]
         self.assertEqual(
@@ -164,7 +164,7 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
         model.commit(
             self.user_id_admin, 'skill model created', commit_cmd_dicts)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Sorry, we can only process v1-v%d skill schemas at '
             'present.' % feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION):
@@ -210,7 +210,7 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
         model.commit(
             self.user_id_admin, 'skill model created', commit_cmd_dicts)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Sorry, we can only process v1-v%d misconception schemas at '
             'present.' % feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION):
@@ -256,7 +256,7 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
         model.commit(
             self.user_id_admin, 'skill model created', commit_cmd_dicts)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Sorry, we can only process v1-v%d rubric schemas at '
             'present.' % feconf.CURRENT_RUBRIC_SCHEMA_VERSION):
@@ -268,7 +268,7 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
         assert skill is not None
         self.assertEqual(
             skill.to_dict(),  # type: ignore[no-untyped-call]
-            self.skill.to_dict()
+            self.skill.to_dict()  # type: ignore[no-untyped-call]
         )
         self.assertEqual(
             skill_fetchers.get_skill_by_description('Does not exist'),

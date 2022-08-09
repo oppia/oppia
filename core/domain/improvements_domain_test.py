@@ -35,7 +35,7 @@ class TaskEntryTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super(TaskEntryTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL) # type: ignore[no-untyped-call]
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.exp_id = 'eid'
         self.save_new_valid_exploration(self.exp_id, self.owner_id)
         self.maxDiff = 0

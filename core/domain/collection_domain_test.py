@@ -49,19 +49,19 @@ title: A title
 class CollectionChangeTests(test_utils.GenericTestBase):
 
     def test_collection_change_object_with_missing_cmd(self) -> None:
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Missing cmd key in change dict'):
             collection_domain.CollectionChange({'invalid': 'data'})
 
     def test_collection_change_object_with_invalid_cmd(self) -> None:
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Command invalid is not allowed'):
             collection_domain.CollectionChange({'cmd': 'invalid'})
 
     def test_collection_change_object_with_missing_attribute_in_cmd(
         self
     ) -> None:
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'The following required attributes are missing: '
                 'exploration_id, new_value')):
@@ -72,7 +72,7 @@ class CollectionChangeTests(test_utils.GenericTestBase):
             })
 
     def test_collection_change_object_with_extra_attribute_in_cmd(self) -> None:
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'The following extra attributes are present: invalid')):
             collection_domain.CollectionChange({
@@ -87,7 +87,7 @@ class CollectionChangeTests(test_utils.GenericTestBase):
     def test_collection_change_object_with_invalid_collection_property(
         self
     ) -> None:
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'Value for property_name in cmd edit_collection_property: '
                 'invalid is not allowed')):
@@ -261,7 +261,7 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         self, expected_error_substring: str
     ) -> None:
         """Checks that the collection passes strict validation."""
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, expected_error_substring):
             self.collection.validate()
 
@@ -462,7 +462,7 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         collection.add_node('test_exp')
         self.assertEqual(len(collection.nodes), 1)
 
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             ValueError,
             'Exploration is already part of this collection: test_exp'
             ):
@@ -474,7 +474,7 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         collection.swap_nodes(0, 1)
         self.assertEqual(collection.nodes[0].exploration_id, 'another_exp')
         self.assertEqual(collection.nodes[1].exploration_id, 'test_exp')
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             ValueError,
             'Both indices point to the same collection node.'
             ):
@@ -483,7 +483,7 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         collection.delete_node('another_exp')
         self.assertEqual(len(collection.nodes), 1)
 
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             ValueError,
             'Exploration is not part of this collection: another_exp'
             ):
@@ -566,7 +566,7 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
             'collection_contents': {} # type: ignore[typeddict-item]
         }
 
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Collection is version .+ but current collection schema version '
             'is %d' % feconf.CURRENT_COLLECTION_SCHEMA_VERSION):
@@ -742,7 +742,7 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
         self.assertEqual(yaml_content_2, yaml_content)
 
         # Should not be able to create a collection from no YAML content.
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.InvalidInputException,
             'Please ensure that you are uploading a YAML text file, '
             'not a zip file. The YAML parser returned the following error: '
@@ -761,7 +761,7 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
 
         yaml_content = collection.to_yaml()
 
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Invalid YAML file: no schema version specified.'):
             collection_domain.Collection.from_yaml(
                 self.COLLECTION_ID, yaml_content)
@@ -773,7 +773,7 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
 
         yaml_content = collection.to_yaml()
 
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Sorry, we can only process v1 to .+ collection YAML files at '
             'present.'):
@@ -1033,19 +1033,19 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
 
     def test_validation_fails_with_unallowed_language_code(self) -> None:
         self.collection_summary.language_code = 'invalid'
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid language code: invalid'):
             self.collection_summary.validate()
 
     def test_validation_fails_with_empty_tag_in_tags(self) -> None:
         self.collection_summary.tags = ['', 'abc']
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Tags should be non-empty'):
             self.collection_summary.validate()
 
     def test_validation_fails_with_unallowed_characters_in_tag(self) -> None:
         self.collection_summary.tags = ['123', 'abc']
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'Tags should only contain lowercase '
                 'letters and spaces, received \'123\'')):
@@ -1053,21 +1053,21 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
 
     def test_validation_fails_with_whitespace_in_tag_start(self) -> None:
         self.collection_summary.tags = [' ab', 'abc']
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Tags should not start or end with whitespace, received \' ab\''):
             self.collection_summary.validate()
 
     def test_validation_fails_with_whitespace_in_tag_end(self) -> None:
         self.collection_summary.tags = ['ab ', 'abc']
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Tags should not start or end with whitespace, received \'ab \''):
             self.collection_summary.validate()
 
     def test_validation_fails_with_adjacent_whitespace_in_tag(self) -> None:
         self.collection_summary.tags = ['a   b', 'abc']
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, (
                 'Adjacent whitespace in tags should '
                 'be collapsed, received \'a   b\'')):
@@ -1075,7 +1075,7 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
 
     def test_validation_fails_with_duplicate_tags(self) -> None:
         self.collection_summary.tags = ['abc', 'abc', 'ab']
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected tags to be unique, but found duplicates'):
             self.collection_summary.validate()

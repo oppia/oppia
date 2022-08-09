@@ -41,24 +41,24 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
-        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)  # type: ignore[no-untyped-call]
-        self.editor_id = self.get_user_id_from_email(  # type: ignore[no-untyped-call]
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.editor_id = self.get_user_id_from_email(
             self.EDITOR_EMAIL)
 
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])  # type: ignore[no-untyped-call]
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
         self.admin = user_services.get_user_actions_info(self.admin_id)
         self.editor = user_services.get_user_actions_info(self.editor_id)
 
-        self.save_new_skill(  # type: ignore[no-untyped-call]
+        self.save_new_skill(
             'skill_1', self.admin_id, description='Skill Description 1')
-        self.save_new_skill(  # type: ignore[no-untyped-call]
+        self.save_new_skill(
             'skill_2', self.admin_id, description='Skill Description 2')
 
         self.question_id = question_services.get_new_question_id()  # type: ignore[no-untyped-call]
-        self.question = self.save_new_question(  # type: ignore[no-untyped-call]
+        self.question = self.save_new_question(
             self.question_id, self.editor_id,
-            self._create_valid_question_data('ABC'), ['skill_1'])  # type: ignore[no-untyped-call]
+            self._create_valid_question_data('ABC'), ['skill_1'])
 
     def test_get_questions_and_skill_descriptions_by_skill_ids(self) -> None:
         question_services.create_new_question_skill_link(  # type: ignore[no-untyped-call]
@@ -82,9 +82,9 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
 
     def test_get_questions_with_multi_skill_ids(self) -> None:
         question_id_1 = question_services.get_new_question_id()  # type: ignore[no-untyped-call]
-        question_1 = self.save_new_question(  # type: ignore[no-untyped-call]
+        question_1 = self.save_new_question(
             question_id_1, self.editor_id,
-            self._create_valid_question_data('ABC'), ['skill_1', 'skill_2'])  # type: ignore[no-untyped-call]
+            self._create_valid_question_data('ABC'), ['skill_1', 'skill_2'])
         question_services.create_new_question_skill_link(  # type: ignore[no-untyped-call]
             self.editor_id, question_id_1, 'skill_1', 0.3)
         question_services.create_new_question_skill_link(  # type: ignore[no-untyped-call]
@@ -102,9 +102,9 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
 
     def test_get_questions_by_ids(self) -> None:
         question_id_2 = question_services.get_new_question_id()  # type: ignore[no-untyped-call]
-        self.save_new_question(  # type: ignore[no-untyped-call]
+        self.save_new_question(
             question_id_2, self.editor_id,
-            self._create_valid_question_data('DEF'), ['skill_1'])  # type: ignore[no-untyped-call]
+            self._create_valid_question_data('DEF'), ['skill_1'])
         questions = question_fetchers.get_questions_by_ids(
             [self.question_id, 'invalid_question_id', question_id_2])
         self.assertEqual(len(questions), 3)
@@ -133,7 +133,7 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
         question_model = question_models.QuestionModel(
             id=question_id,
             question_state_data=(
-                self._create_valid_question_data('ABC').to_dict()),  # type: ignore[no-untyped-call]
+                self._create_valid_question_data('ABC').to_dict()),
             language_code='en',
             version=0,
             question_state_data_schema_version=0)
@@ -171,7 +171,7 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
         question_model = question_models.QuestionModel(
             id=question_id,
             question_state_data=(
-                self._create_valid_question_data('ABC').to_dict()),  # type: ignore[no-untyped-call]
+                self._create_valid_question_data('ABC').to_dict()),
             language_code='en',
             version=0,
             question_state_data_schema_version=48)

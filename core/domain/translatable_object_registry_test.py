@@ -46,7 +46,7 @@ class TranslatableObjectRegistryUnitTests(test_utils.GenericTestBase):
 
     def test_fake_class_is_not_gettable(self) -> None:
         """Tests that trying to retrieve a fake class raises an error."""
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             TypeError, 'not a valid translatable object class'):
             # TODO(#13059): After we fully type the codebase we plan to get
             # rid of the tests that intentionally test wrong inputs that we
@@ -59,7 +59,7 @@ class TranslatableObjectRegistryUnitTests(test_utils.GenericTestBase):
         registry.
         """
         assert getattr(objects, 'BaseObject')
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             TypeError, 'not a valid translatable object class'):
             # TODO(#13059): After we fully type the codebase we plan to get
             # rid of the tests that intentionally test wrong inputs that we
@@ -68,7 +68,7 @@ class TranslatableObjectRegistryUnitTests(test_utils.GenericTestBase):
                 'BaseObject')
 
         assert getattr(objects, 'BaseTranslatableObject')
-        with self.assertRaisesRegex( # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             TypeError, 'not a valid translatable object class'):
             # TODO(#13059): After we fully type the codebase we plan to get
             # rid of the tests that intentionally test wrong inputs that we

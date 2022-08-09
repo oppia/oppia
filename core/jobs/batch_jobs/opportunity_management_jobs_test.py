@@ -474,7 +474,7 @@ class GenerateExplorationOpportunitySummariesJobTests(
             init_state_name='state',
             states_schema_version=48,
             states={
-                'state': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
+                'state': state_domain.State.create_default_state(
                     'state', is_initial_state=True
                 ).to_dict()
             })
@@ -507,7 +507,7 @@ class GenerateExplorationOpportunitySummariesJobTests(
         self.assertEqual(opportunity_model.story_title, 'story title')
         self.assertEqual(opportunity_model.chapter_title, 'node title')
         self.assertEqual(opportunity_model.content_count, 1)
-        self.assertItemsEqual( # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             opportunity_model.incomplete_translation_language_codes,
             {l['id'] for l in constants.SUPPORTED_AUDIO_LANGUAGES} - {'cs'})
         self.assertEqual(opportunity_model.translation_counts, {})
@@ -559,10 +559,10 @@ class GenerateExplorationOpportunitySummariesJobTests(
             init_state_name='state1',
             states_schema_version=48,
             states={
-                'state1': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
+                'state1': state_domain.State.create_default_state(
                     'state1', is_initial_state=True
                 ).to_dict(),
-                'state2': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
+                'state2': state_domain.State.create_default_state(
                     'state2'
                 ).to_dict()
             })
@@ -592,7 +592,7 @@ class GenerateExplorationOpportunitySummariesJobTests(
         self.assertEqual(opportunity_model.story_title, 'story 2 title')
         self.assertEqual(opportunity_model.chapter_title, 'node 2 title')
         self.assertEqual(opportunity_model.content_count, 2)
-        self.assertItemsEqual( # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             opportunity_model.incomplete_translation_language_codes,
             {l['id'] for l in constants.SUPPORTED_AUDIO_LANGUAGES} - {'en'})
         self.assertEqual(opportunity_model.translation_counts, {})
@@ -672,7 +672,7 @@ class GenerateExplorationOpportunitySummariesJobTests(
         self.assertEqual(opportunity_model.story_title, 'story title')
         self.assertEqual(opportunity_model.chapter_title, 'node title')
         self.assertEqual(opportunity_model.content_count, 1)
-        self.assertItemsEqual(  # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             opportunity_model.incomplete_translation_language_codes,
             {l['id'] for l in constants.SUPPORTED_AUDIO_LANGUAGES} - {'cs'})
         self.assertEqual(opportunity_model.translation_counts, {})
@@ -814,10 +814,10 @@ class GenerateExplorationOpportunitySummariesJobTests(
             init_state_name='state1',
             states_schema_version=48,
             states={
-                'state1': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
+                'state1': state_domain.State.create_default_state(
                     'state1', is_initial_state=True
                 ).to_dict(),
-                'state2': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
+                'state2': state_domain.State.create_default_state(
                     'state2'
                 ).to_dict()
             })
@@ -849,7 +849,7 @@ class GenerateExplorationOpportunitySummariesJobTests(
         self.assertEqual(opportunity_model.story_title, 'story 2 title')
         self.assertEqual(opportunity_model.chapter_title, 'node 2 title')
         self.assertEqual(opportunity_model.content_count, 2)
-        self.assertItemsEqual( # type: ignore[no-untyped-call]
+        self.assertItemsEqual(
             opportunity_model.incomplete_translation_language_codes,
             {l['id'] for l in constants.SUPPORTED_AUDIO_LANGUAGES} - {'en'})
         self.assertEqual(opportunity_model.translation_counts, {})

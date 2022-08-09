@@ -47,12 +47,12 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super(ExplorationRetrievalTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
-        self.exploration_1 = self.save_new_default_exploration(  # type: ignore[no-untyped-call]
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.exploration_1 = self.save_new_default_exploration(
             self.EXP_1_ID, self.owner_id, title='Aa')
-        self.exploration_2 = self.save_new_default_exploration(  # type: ignore[no-untyped-call]
+        self.exploration_2 = self.save_new_default_exploration(
             self.EXP_2_ID, self.owner_id, title='Bb')
-        self.exploration_3 = self.save_new_default_exploration(  # type: ignore[no-untyped-call]
+        self.exploration_3 = self.save_new_default_exploration(
             self.EXP_3_ID, self.owner_id, title='Cc')
 
     def test_get_exploration_summaries_matching_ids(self) -> None:
@@ -134,7 +134,7 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
 
     def test_retrieval_of_explorations(self) -> None:
         """Test the get_exploration_by_id() method."""
-        with self.assertRaisesRegex(Exception, 'Entity .* not found'):  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(Exception, 'Entity .* not found'):
             exp_fetchers.get_exploration_by_id('fake_eid')
 
         retrieved_exploration = (
@@ -142,7 +142,7 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
         self.assertEqual(self.exploration_1.id, retrieved_exploration.id)
         self.assertEqual(self.exploration_1.title, retrieved_exploration.title)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Entity for class ExplorationModel with id fake_exploration'
             ' not found'):
@@ -151,7 +151,7 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
     def test_retrieval_of_multiple_exploration_versions_for_fake_exp_id(
         self
     ) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             ValueError, 'The given entity_id fake_exp_id is invalid'):
             (
                 exp_fetchers
@@ -171,7 +171,7 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
                 )
         )
         with self.swap(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 60):
-            with self.assertRaisesRegex(Exception, error_regex):  # type: ignore[no-untyped-call]
+            with self.assertRaisesRegex(Exception, error_regex):
                 (
                 exp_fetchers
                 .get_multiple_versioned_exp_interaction_ids_mapping_by_version(
@@ -228,7 +228,7 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
         exp_services.update_exploration(  # type: ignore[no-untyped-call]
             feconf.SYSTEM_COMMITTER_ID, self.EXP_1_ID, change_list, '')
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             ValueError,
             'Requested version number 4 cannot be higher than the current '
             'version number 3.'):
@@ -240,7 +240,7 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
         # TODO(#13059): After we fully type the codebase we plan to get
         # rid of the tests that intentionally test wrong inputs that we
         # can normally catch by typing.
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             ValueError,
             'At least one version number is invalid'):
             (
@@ -281,7 +281,7 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
 
         self.assertNotIn('doesnt_exist', result)
 
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'Couldn\'t find explorations with the following ids:\n'
             'doesnt_exist'):
@@ -367,8 +367,8 @@ class LoggedOutUserProgressTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super(LoggedOutUserProgressTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
-        self.exploration_1 = self.save_new_default_exploration(  # type: ignore[no-untyped-call]
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.exploration_1 = self.save_new_default_exploration(
             self.EXP_1_ID, self.owner_id, title='Aa')
 
     def test_get_logged_out_user_progress(self) -> None:
@@ -514,7 +514,7 @@ title: Old Title
 
         # Setup user who will own the test explorations.
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)  # type: ignore[no-untyped-call]
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
 
         # Create exploration that uses an old states schema version and ensure
         # it is properly converted.
@@ -570,7 +570,7 @@ title: Old Title
             feconf.EARLIEST_SUPPORTED_STATE_SCHEMA_VERSION,
             feconf.CURRENT_STATE_SCHEMA_VERSION)
             )
-            with self.assertRaisesRegex(Exception, error_regex):  # type: ignore[no-untyped-call]
+            with self.assertRaisesRegex(Exception, error_regex):
                 exp_fetchers.get_exploration_from_model(exploration_model)
 
     def test_migration_then_reversion_maintains_valid_exploration(self) -> None:

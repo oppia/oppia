@@ -39,7 +39,7 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
         """Test validation of param specs."""
 
         param_spec = param_domain.ParamSpec('Real')
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'is not among the supported object types'
         ):
             param_spec.validate()
@@ -58,7 +58,7 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
     def test_param_change_validation(self) -> None:
         """Test validation of parameter changes."""
         # Raise an error because the name is invalid.
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Only parameter names'
         ):
             param_domain.ParamChange(
@@ -68,7 +68,7 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
             ).validate()
 
         # Raise an error because generator ID is not string.
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected generator ID to be a string'
         ):
             # TODO(#13059): After we fully type the codebase we plan to get
@@ -81,7 +81,7 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
             ).validate()
 
         # Raise an error because no such generator type exists.
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid generator ID'
         ):
             param_domain.ParamChange(
@@ -91,7 +91,7 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
             ).validate()
 
         # Raise an error because customization_args is not a dict.
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, 'Expected a dict'
         ):
             # TODO(#13059): After we fully type the codebase we plan to get
@@ -100,7 +100,7 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
             param_domain.ParamChange('abc', 'Copier', ['a', 'b']).validate()  # type: ignore[arg-type]
 
         # Raise an error because the param_change name is not a string.
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected param_change name to be a string, received'
         ):
@@ -115,7 +115,7 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
 
         # Raise an error because the arg names in customization_args are not
         # strings.
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'Invalid parameter change customization_arg name:'):
             # TODO(#13059): After we fully type the codebase we plan to get
             # rid of the tests that intentionally test wrong inputs that we
