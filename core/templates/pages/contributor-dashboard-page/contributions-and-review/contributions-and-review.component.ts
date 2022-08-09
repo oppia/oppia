@@ -116,7 +116,12 @@ export class ContributionsAndReview
   activeDropdownTabChoice: string;
   reviewTabs: TabDetails[] = [];
   contributionTabs: TabDetails[] = [];
-  tabNameToOpportunityFetchFunction: object;
+  tabNameToOpportunityFetchFunction: {
+    [key: string]: {
+      [key: string]: Function;
+    };
+  };
+
   SUGGESTION_LABELS = {
     review: {
       text: 'Awaiting review',
