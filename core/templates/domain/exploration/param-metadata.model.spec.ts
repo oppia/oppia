@@ -19,7 +19,7 @@
 import { ParamMetadata } from 'domain/exploration/param-metadata.model';
 
 describe('ParameterMetadata model', () => {
-  let parameterMetadata: ParamMetadata = null;
+  let parameterMetadata: ParamMetadata;
 
   it('should have correct metadata for SET action', () => {
     parameterMetadata = ParamMetadata.createWithSetAction(
