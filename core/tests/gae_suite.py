@@ -111,7 +111,7 @@ def main(args: Optional[List[str]] = None) -> None:
     if 'google' in sys.modules:
         google_path = os.path.join(THIRD_PARTY_PYTHON_LIBS_DIR, 'google')
         google_module = sys.modules['google']
-        google_module.__path__ = [google_path, THIRD_PARTY_PYTHON_LIBS_DIR]
+        google_module.__path__ = [google_path, THIRD_PARTY_PYTHON_LIBS_DIR]  # type: ignore[no-untyped-call]
         google_module.__file__ = os.path.join(google_path, '__init__.py')
 
     suites = create_test_suites(
