@@ -53,9 +53,9 @@ jobs:
           VIDEO_RECORDING_IS_ENABLED: 0
       - name: Run Topic and Story Editor E2E Test
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
-        run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-build --skip-install --suite="topicAndStoryEditor" --prod_env
+        run: for run in {1..30}; do xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-build --skip-install --suite="topicAndStoryEditor" --prod_env; done
         env:
-          VIDEO_RECORDING_IS_ENABLED: 0
+          VIDEO_RECORDING_IS_ENABLED: 1
       - name: Run Topic and Story Editor File Upload E2E Test
         if: ${{ steps.check-risk.outputs.is-low-risk != 0 }}
         run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" python -m scripts.run_e2e_tests --skip-build --skip-install --suite="topicAndStoryEditorFileUploadFeatures" --prod_env
