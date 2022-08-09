@@ -93,8 +93,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/storage/storage_models_test.py',
     'core/tests/build_sources/extensions/CodeRepl.py',
     'core/tests/build_sources/extensions/DragAndDropSortInput.py',
-    'core/tests/build_sources/extensions/base.py',
-    'core/tests/build_sources/extensions/base_test.py',
     'core/tests/build_sources/extensions/models_test.py',
     'core/tests/gae_suite.py',
     'core/tests/gae_suite_test.py',
