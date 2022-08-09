@@ -82,7 +82,7 @@ class ConstantsTests(test_utils.GenericTestBase):
                 constants.constants.SKILL_DIFFICULTY_EASY,
                 constants.constants.SKILL_DIFFICULTY_MEDIUM,
                 constants.constants.SKILL_DIFFICULTY_HARD])
-        self.assertItemsEqual( 
+        self.assertItemsEqual(
             list(constants.constants.SKILL_DIFFICULTY_LABEL_TO_FLOAT.keys()),
             constants.constants.SKILL_DIFFICULTIES)
         self.assertEqual(
