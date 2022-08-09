@@ -76,8 +76,8 @@ class FeedbackThread:
         thread_id: str. The feedback thread ID.
         entity_type: str. The type of entity the feedback thread is linked to.
         entity_id: str. The id of the entity.
-        state_name: str. The name of the state associated with
-            the feedback thread and None, if no state is associated.
+        state_name: str|None. The name of the state associated with
+            the feedback thread or None, if no state is associated.
         original_author_id: str. The ID of the original author.
         status: str. The current status of the thread. Status should
             be one of core.storage.feedback.gae_models.STATUS_CHOICES.
