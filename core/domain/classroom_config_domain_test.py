@@ -43,7 +43,7 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
                 'topic_id_3': []
             }
         )
-        self.classroom_dict = {
+        self.classroom_dict: classroom_config_domain.ClassroomDict = {
             'classroom_id': 'classroom_id',
             'name': 'math',
             'url_fragment': 'math',
@@ -105,53 +105,64 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
     def test_to_dict_method(self) -> None:
         self.assertEqual(self.classroom.to_dict(), self.classroom_dict)
 
-    def test_incorrect_classroom_id_should_raise_exception(self):
-        self.classroom.classroom_id = 1
+    def test_incorrect_classroom_id_should_raise_exception(self) -> None:
+        self.classroom.classroom_id = 1 # type: ignore[assignment]
         error_msg = (
             'Expected ID of the classroom to be a string, received: 1.')
-        with self.assertRaisesRegex(utils.ValidationError, error_msg):
+        with self.assertRaisesRegex(# type: ignore[no-untyped-call]
+            utils.ValidationError, error_msg):
             self.classroom.validate()
 
-    def test_validate_incorrect_classroom_name_should_raise_exception(self):
-        self.classroom.name = 1
+    def test_validate_incorrect_classroom_name_should_raise_exception(
+        self
+    ) -> None:
+        self.classroom.name = 1 # type: ignore[assignment]
         error_msg = (
             'Expected name of the classroom to be a string, received: 1.')
-        with self.assertRaisesRegex(utils.ValidationError, error_msg):
+        with self.assertRaisesRegex(# type: ignore[no-untyped-call]
+            utils.ValidationError, error_msg):
             self.classroom.validate()
 
-    def test_classroom_url_fragment_should_raise_exception(self):
-        self.classroom.url_fragment = 1
+    def test_classroom_url_fragment_should_raise_exception(self) -> None:
+        self.classroom.url_fragment = 1 # type: ignore[assignment]
         error_msg = (
             'Expected url fragment of the classroom to be a string, received: '
-            '1.')
-        with self.assertRaisesRegex(utils.ValidationError, error_msg):
+            '1.'
+        )
+        with self.assertRaisesRegex(# type: ignore[no-untyped-call]
+            utils.ValidationError, error_msg):
             self.classroom.validate()
 
-    def test_incoorect_course_details_should_raise_exception(self):
-        self.classroom.course_details = 1
+    def test_incoorect_course_details_should_raise_exception(self) -> None:
+        self.classroom.course_details = 1 # type: ignore[assignment]
         error_msg = (
             'Expected course_details of the classroom to be a string, '
             'received: 1.'
         )
-        with self.assertRaisesRegex(utils.ValidationError, error_msg):
+        with self.assertRaisesRegex(# type: ignore[no-untyped-call]
+            utils.ValidationError, error_msg):
             self.classroom.validate()
 
-    def test_incorrect_topic_list_intro_should_raise_exception(self):
-        self.classroom.topic_list_intro = 1
+    def test_incorrect_topic_list_intro_should_raise_exception(self) -> None:
+        self.classroom.topic_list_intro = 1 # type: ignore[assignment]
         error_msg = (
             'Expected topic list intro of the classroom to be a string, '
             'received: 1.'
         )
-        with self.assertRaisesRegex(utils.ValidationError, error_msg):
+        with self.assertRaisesRegex(# type: ignore[no-untyped-call]
+            utils.ValidationError, error_msg):
             self.classroom.validate()
 
-    def test_incorrect_topic_dependency_dict_should_raise_exception(self):
-        self.classroom.topic_id_to_prerequisite_topic_ids = 1
+    def test_incorrect_topic_dependency_dict_should_raise_exception(
+        self
+    ) -> None:
+        self.classroom.topic_id_to_prerequisite_topic_ids = 1 # type: ignore[assignment]
         error_msg = (
             'Expected topic ID to prerequisite topic IDs of the classroom to '
             'be a string, received: 1.'
         )
-        with self.assertRaisesRegex(utils.ValidationError, error_msg):
+        with self.assertRaisesRegex(# type: ignore[no-untyped-call]
+            utils.ValidationError, error_msg):
             self.classroom.validate()
 
     def test_cycle_between_topic_id_and_prerequisites_should_raise_exception(
@@ -166,5 +177,6 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
             'The topic ID to prerequisite topic IDs should not contain any '
             'cycle.'
         )
-        with self.assertRaisesRegex(utils.ValidationError, error_msg):
+        with self.assertRaisesRegex(# type: ignore[no-untyped-call]
+            utils.ValidationError, error_msg):
             self.classroom.validate()
