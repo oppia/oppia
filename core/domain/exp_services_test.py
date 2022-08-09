@@ -7152,13 +7152,12 @@ title: Old Title
 
     def test_get_exploration_version_valid_info(self):
         # Valid exploration version.
-        info_dict = exp_services.get_exploration_version_valid_info(
+        info = exp_services.get_exploration_version_valid_info(
             self.NEW_EXP_ID, 0)
-        self.assertTrue(info_dict['valid'])
-        self.assertIsNone(info_dict['details'])
+        self.assertIsNone(info)
 
         # Invalid exploration version.
-        def _mock_exploration_validate_function():
+        def _mock_exploration_validate_function(*args, **kwargs):
             """Mocks exploration.validate()."""
             raise utils.ValidationError('Bad')
 
@@ -7166,10 +7165,9 @@ title: Old Title
             exp_domain.Exploration, 'validate',
             _mock_exploration_validate_function)
         with validate_swap:
-            info_dict = exp_services.get_exploration_version_valid_info(
+            info = exp_services.get_exploration_version_valid_info(
                 self.NEW_EXP_ID, 0)
-            self.assertFalse(info_dict['valid'])
-            self.assertRaisesRegex(utils.ValidationError, 'Bad')
+            self.assertEqual(info, 'Bad')
 
     def test_revert_exploration_after_publish(self):
         self.save_new_valid_exploration(

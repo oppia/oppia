@@ -727,8 +727,9 @@ class ExplorationCheckRevertValidHandler(EditorHandler):
     @acl_decorators.can_edit_exploration
     def get(self, exploration_id, version):
         """Handles GET requests."""
-        self.render_json(exp_services.get_exploration_version_valid_info(
-            exploration_id, version))
+        info = exp_services.get_exploration_version_valid_info(
+            exploration_id, version)
+        self.render_json({'valid': False if info else True, 'details': info})
 
 
 class ExplorationRevertHandler(EditorHandler):

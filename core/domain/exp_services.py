@@ -1734,9 +1734,8 @@ def get_exploration_version_valid_info(exploration_id, revert_to_version):
             is to be reverted.
 
     Returns:
-        dict{'valid': bool, 'details': Optional[str]}. If the revert_to_version
-        passes all backend validation checks, then 'details' is None.
-        Otherwise, 'details' stores the validation error as a string.
+        None if the revert_to_version passes all backend validation checks,
+        or the error string otherwise.
     """
     # Validate the previous version of the exploration.
     exploration = exp_fetchers.get_exploration_by_id(
@@ -1746,9 +1745,9 @@ def get_exploration_version_valid_info(exploration_id, revert_to_version):
         exploration.validate(
             exploration_rights.status == rights_domain.ACTIVITY_STATUS_PUBLIC)
     except Exception as ex:
-        return {'valid': False, 'details': str(ex)}
+        return str(ex)
 
-    return {'valid': True, 'details': None}
+    return None
 
 
 def revert_exploration(
@@ -1782,9 +1781,15 @@ def revert_exploration(
             'which is too old. Please reload the page and try again.'
             % (exploration_model.version, current_version))
 
-    # Assume revert_to_version passes all backend validation checks.
+    # Validate the previous version of the exploration before committing the
+    # change.
     exploration = exp_fetchers.get_exploration_by_id(
         exploration_id, version=revert_to_version)
+    exploration_rights = rights_manager.get_exploration_rights(exploration.id)
+    if exploration_rights.status != rights_domain.ACTIVITY_STATUS_PRIVATE:
+        exploration.validate(strict=True)
+    else:
+        exploration.validate()
 
     exp_models.ExplorationModel.revert(
         exploration_model, committer_id,
