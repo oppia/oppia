@@ -36,7 +36,7 @@ describe('Read only exploration backend API service', () => {
     exploration: {
       init_state_name: 'Introduction',
       param_changes: [],
-      param_specs: null,
+      param_specs: {},
       title: 'Exploration',
       language_code: 'en',
       correctness_feedback_enabled: true,
@@ -45,12 +45,33 @@ describe('Read only exploration backend API service', () => {
         Introduction: {
           param_changes: [],
           classifier_model_id: null,
-          recorded_voiceovers: null,
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {
+                en: {
+                  filename: 'test.mp3',
+                  file_size_bytes: 100,
+                  needs_update: false,
+                  duration_secs: 0.1
+                }
+              }
+            }
+          },
           solicit_answer_details: true,
           card_is_checkpoint: true,
-          written_translations: null,
+          written_translations: {
+            translations_mapping: {
+              content: {
+                en: {
+                  data_format: '',
+                  needs_update: false,
+                  translation: ''
+                }
+              }
+            }
+          },
           linked_skill_id: null,
-          next_content_id_index: null,
+          next_content_id_index: 0,
           content: {
             html: '',
             content_id: 'content'
@@ -203,7 +224,7 @@ describe('Read only exploration backend API service', () => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
 
-      roebas.loadExplorationAsync('0', null).then(successHandler, failHandler);
+      roebas.loadExplorationAsync('0', 0).then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne('/explorehandler/init/0');
       expect(req.request.method).toEqual('GET');
@@ -219,7 +240,7 @@ describe('Read only exploration backend API service', () => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
 
-      roebas.loadExplorationAsync('0', null).then(successHandler, failHandler);
+      roebas.loadExplorationAsync('0', 0).then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne('/explorehandler/init/0');
       expect(req.request.method).toEqual('GET');
@@ -285,8 +306,32 @@ describe('Read only exploration backend API service', () => {
     // Cache a exploration.
     roebas.cacheExploration('0', {
       can_edit: true,
-      exploration: null,
-      exploration_metadata: null,
+      exploration: {
+        init_state_name: 'state_name',
+        param_changes: [],
+        param_specs: {},
+        states: {},
+        title: '',
+        language_code: '',
+        objective: '',
+        correctness_feedback_enabled: false
+      },
+      exploration_metadata: {
+        title: '',
+        category: '',
+        objective: '',
+        language_code: 'en',
+        tags: [],
+        blurb: '',
+        author_notes: '',
+        states_schema_version: 50,
+        init_state_name: '',
+        param_specs: {},
+        param_changes: [],
+        auto_tts_enabled: false,
+        correctness_feedback_enabled: false,
+        edits_allowed: true
+      },
       exploration_id: '0',
       is_logged_in: true,
       session_id: 'sessionId',
@@ -314,8 +359,32 @@ describe('Read only exploration backend API service', () => {
 
     expect(successHandler).toHaveBeenCalledWith({
       can_edit: true,
-      exploration: null,
-      exploration_metadata: null,
+      exploration: {
+        init_state_name: 'state_name',
+        param_changes: [],
+        param_specs: {},
+        states: {},
+        title: '',
+        language_code: '',
+        objective: '',
+        correctness_feedback_enabled: false
+      },
+      exploration_metadata: {
+        title: '',
+        category: '',
+        objective: '',
+        language_code: 'en',
+        tags: [],
+        blurb: '',
+        author_notes: '',
+        states_schema_version: 50,
+        init_state_name: '',
+        param_specs: {},
+        param_changes: [],
+        auto_tts_enabled: false,
+        correctness_feedback_enabled: false,
+        edits_allowed: true
+      },
       exploration_id: '0',
       is_logged_in: true,
       session_id: 'sessionId',
@@ -340,8 +409,32 @@ describe('Read only exploration backend API service', () => {
 
     roebas.cacheExploration('0', {
       can_edit: true,
-      exploration: null,
-      exploration_metadata: null,
+      exploration: {
+        init_state_name: 'state_name',
+        param_changes: [],
+        param_specs: {},
+        states: {},
+        title: '',
+        language_code: '',
+        objective: '',
+        correctness_feedback_enabled: false
+      },
+      exploration_metadata: {
+        title: '',
+        category: '',
+        objective: '',
+        language_code: 'en',
+        tags: [],
+        blurb: '',
+        author_notes: '',
+        states_schema_version: 50,
+        init_state_name: '',
+        param_specs: {},
+        param_changes: [],
+        auto_tts_enabled: false,
+        correctness_feedback_enabled: false,
+        edits_allowed: true
+      },
       exploration_id: '0',
       is_logged_in: true,
       session_id: 'sessionId',

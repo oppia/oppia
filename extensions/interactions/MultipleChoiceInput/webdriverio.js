@@ -41,14 +41,13 @@ var expectInteractionDetailsToMatch = async function(
     '.e2e-test-multiple-choice-option-container');
   var optionsCount = optionElements.length;
   expect(optionsCount).toEqual(richTextInstructionsArray.length);
-  var promises = [];
+  var results = [];
   for (var i = 0; i < optionsCount; i++) {
-    promises.push(await (await optionElements[i]).$(
-      '.e2e-test-multiple-choice-option')).getText();
+    results.push(await optionElements[i].$(
+      '.e2e-test-multiple-choice-option').getText());
   }
   var rteInstructionArrayCopy = [...richTextInstructionsArray];
   rteInstructionArrayCopy.sort();
-  var results = await webdriverio.promise.all(promises);
   results.sort();
   expect(rteInstructionArrayCopy).toEqual(results);
 };
