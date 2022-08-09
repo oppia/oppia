@@ -55,7 +55,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
     """
 
     def setUp(self) -> None:
-        super().setUp()  # type: ignore[no-untyped-call]
+        super().setUp()
         self._init_classify_inputs('16')
 
     def _init_classify_inputs(self, exploration_id: str) -> None:

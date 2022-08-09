@@ -27,7 +27,7 @@ class FlagExplorationEmailEnqueueTaskTests(test_utils.EmailTestBase):
     """Test that flag-exploration-email-tasks works as expected."""
 
     def setUp(self) -> None:
-        super().setUp()  # type: ignore[no-untyped-call]
+        super().setUp()
 
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)

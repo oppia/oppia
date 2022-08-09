@@ -4005,9 +4005,9 @@ title: Title
 class LinterTestBase(GenericTestBase):
     """Base class for linter tests."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
-        self.linter_stdout = []
+        self.linter_stdout: List[str] = []
 
         def mock_print(*args: str) -> None:
             """Mock for print. Append the values to print to
@@ -4127,7 +4127,7 @@ class GenericEmailTestBase(GenericTestBase):
             self._send_email_to_recipients):
             super().run(result=result)
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self._wipe_emails_dict()
 
