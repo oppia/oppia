@@ -189,7 +189,9 @@ export class VersionDiffVisualizationComponent implements OnInit {
   //   deleted.
   showStateDiffModal(
       newStateName: string,
-      oldStateName: string, stateProperty: string): void {
+      oldStateName: string,
+      stateProperty: string
+  ): void {
     let modalRef: NgbModalRef = this.ngbModal.open(StateDiffModalComponent, {
       backdrop: true,
       windowClass: 'state-diff-modal',

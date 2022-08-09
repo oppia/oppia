@@ -116,7 +116,7 @@ export class TrainingDataService {
       this.responsesService.updateConfirmedUnclassifiedAnswers(
         confirmedUnclassifiedAnswers);
 
-      // TODO(13015): Remove use of unknown as a type.
+      // TODO(#13015): Remove use of unknown as a type.
       // unknown has been used here becuase
       // explorationStatesService.saveConfirmedUnclassifiedAnswers
       // wants variable of type AnswerGroup[] but
@@ -198,7 +198,7 @@ export class TrainingDataService {
     this.responsesService.updateConfirmedUnclassifiedAnswers(
       confirmedUnclassifiedAnswers);
 
-    // TODO(13015): Remove use of unknown as a type.
+    // TODO(#13015): Remove use of unknown as a type.
     // unknown has been used here becuase
     // explorationStatesService.saveConfirmedUnclassifiedAnswers
     // wants variable of type AnswerGroup[] but
@@ -223,7 +223,7 @@ export class TrainingDataService {
     let answerGroups = this.responsesService.getAnswerGroups();
     answerGroups[answerGroupIndex].trainingData = trainingData;
 
-    // TODO(13015): Remove use of unknown as a type.
+    // TODO(#13015): Remove use of unknown as a type.
     // unknown has been used here becuase
     // explorationStatesService.saveConfirmedUnclassifiedAnswers
     // wants variable of type AnswerGroup[] but

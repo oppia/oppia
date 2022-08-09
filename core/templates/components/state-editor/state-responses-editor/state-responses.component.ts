@@ -482,7 +482,8 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
 
   summarizeAnswerGroup(
       answerGroup: AnswerGroup, interactionId: string,
-      answerChoices: AnswerChoice[], shortenRule: boolean): string {
+      answerChoices: AnswerChoice[], shortenRule: boolean
+  ): string {
     let summary = '';
     let outcome = answerGroup.outcome;
     let hasFeedback = outcome.hasNonemptyFeedback();

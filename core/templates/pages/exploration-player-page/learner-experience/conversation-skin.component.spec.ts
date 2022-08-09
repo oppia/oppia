@@ -773,6 +773,9 @@ describe('Conversation skin component', () => {
     windowRef.nativeWindow.onresize(null);
 
     // Tick has been used here to handle flake in frontend.
+    // because the windowRef.nativeWindow.onresize function
+    // calls adjustPageHeight function where we have used setTimeout
+    // for 100 sec.
     tick(100);
   }));
 
@@ -863,6 +866,9 @@ describe('Conversation skin component', () => {
     windowRef.nativeWindow.onresize(null);
 
     // Tick has been used here to handle flake in frontend.
+    // because the windowRef.nativeWindow.onresize function
+    // calls adjustPageHeight function where we have used setTimeout
+    // for 100 sec.
     tick(100);
   }));
 

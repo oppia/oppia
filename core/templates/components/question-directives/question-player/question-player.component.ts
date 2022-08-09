@@ -206,7 +206,8 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
   }
 
   calculateMasteryDegrees(
-      questionStateData: {[key: string]: QuestionData}): void {
+      questionStateData: {[key: string]: QuestionData}
+  ): void {
     this.createMasteryPerSkillMapping();
 
     for (let question in questionStateData) {
