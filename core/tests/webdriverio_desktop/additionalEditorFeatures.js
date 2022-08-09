@@ -115,7 +115,7 @@ describe('Full exploration editor', function() {
     await explorationEditorMainTab.setStateName('card1');
     await explorationEditorMainTab.expectCurrentStateToBe('card1');
     await explorationEditorMainTab.setContent(
-      await forms.toRichText('card1 content'));
+      await forms.toRichText('card1 content'), true);
     await explorationEditorMainTab.setInteraction('TextInput');
     await (
       await explorationEditorMainTab.getResponseEditor('default')

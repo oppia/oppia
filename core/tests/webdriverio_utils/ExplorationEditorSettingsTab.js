@@ -34,9 +34,6 @@ var ExplorationEditorSettingsTab = function() {
   var explorationSummaryTile = $('.e2e-test-exploration-summary-tile');
   var explorationTitleInput = $('.e2e-test-exploration-title-input');
   var initialStateSelect = $('.e2e-test-initial-state-select');
-  var initialStateSelectOption = function(stateName) {
-    return initialStateSelect.$(`option=${stateName}`);
-  };
   var neutralElement = $('.e2e-test-settings-container');
 
   /*
@@ -74,15 +71,17 @@ var ExplorationEditorSettingsTab = function() {
   };
 
   this.expectAvailableFirstStatesToBe = async function(names) {
-    await waitFor.presenceOf(
+    await waitFor.visibilityOf(
       initialStateSelect, 'Initial state select takes too long to be visible.');
     var options = await initialStateSelect.$$('<option>')
       .map(async function(elem) {
         await waitFor.visibilityOf(
           elem,
           'option element taking too long to appear');
+        console.log(await elem.getText());
         return await elem.getText();
       });
+    await browser.debug();
     expect(options.sort()).toEqual(names.sort());
   };
 
@@ -112,8 +111,7 @@ var ExplorationEditorSettingsTab = function() {
     await action.waitForAutosave();
     await waitFor.presenceOf(
       initialStateSelect, 'Initial state select takes too long to be visible.');
-    await action.click(
-      'State name option', initialStateSelectOption(stateName));
+    await initialStateSelect.selectByVisibleText(stateName);
   };
 
   this.setLanguage = async function(language) {

@@ -699,6 +699,11 @@ def managed_webdriverio_server(
     if chrome_version is None:
         chrome_version = get_chrome_verison()
 
+    subprocess.check_call([
+        common.NODE_BIN_PATH, common.WEBDRIVER_MANAGER_BIN_PATH, 'update',
+        '--versions.chrome', chrome_version,
+    ])
+
     webdriverio_args = [
         common.NPX_BIN_PATH,
         # This flag ensures tests fail if the `waitFor()` calls time out.

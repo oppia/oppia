@@ -472,7 +472,7 @@ var ExplorationEditorMainTab = function() {
     await action.waitForAutosave();
     if (expectFadeIn) {
       await waitFor.fadeInToComplete(
-        fadeIn, 'Editor taking long to fade in');
+        fadeIn, 'Editor taking long to fade in', 5000);
     }
     await action.click('stateEditButton', stateEditButton);
     await waitFor.visibilityOf(
@@ -820,9 +820,13 @@ var ExplorationEditorMainTab = function() {
     await waitFor.visibilityOf(
       nodeStateElement,
       'State ' + stateName + ' takes too long to appear or does not exist');
-    var nodeElement = await explorationGraph.$$(
-      `.e2e-test-node=${stateName}`)[0];
-    var deleteNode = nodeElement.$(deleteNodeLocator);
+    // var nodeElement = await explorationGraph.$$(
+    //   `.e2e-test-node=${stateName}`)[0];
+    var deleteNode = await nodeStateElement.$(deleteNodeLocator);
+    console.log(nodeStateElement);
+    // console.log(nodeElement);
+    console.log(deleteNode);
+    await browser.debug()
     await action.click('Delete Node', deleteNode);
     await action.click('Confirm Delete State Button', confirmDeleteStateButton);
     await waitFor.invisibilityOf(
