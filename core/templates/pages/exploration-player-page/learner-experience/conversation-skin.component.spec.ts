@@ -772,10 +772,10 @@ describe('Conversation skin component', () => {
     componentInstance.ngOnInit();
     windowRef.nativeWindow.onresize(null);
 
-    // Tick has been used here to handle flake in frontend.
-    // because the windowRef.nativeWindow.onresize function
+    // Tick has been used here because
+    // the windowRef.nativeWindow.onresize function
     // calls adjustPageHeight function where we have used setTimeout
-    // for 100 sec.
+    // for 100 sec by making tick(100) we make sure setTimout code calls.
     tick(100);
   }));
 
@@ -865,10 +865,10 @@ describe('Conversation skin component', () => {
     componentInstance.ngOnInit();
     windowRef.nativeWindow.onresize(null);
 
-    // Tick has been used here to handle flake in frontend.
-    // because the windowRef.nativeWindow.onresize function
+    // Tick has been used here because
+    // the windowRef.nativeWindow.onresize function
     // calls adjustPageHeight function where we have used setTimeout
-    // for 100 sec.
+    // for 100 sec by making tick(100) we make sure setTimout code calls.
     tick(100);
   }));
 
