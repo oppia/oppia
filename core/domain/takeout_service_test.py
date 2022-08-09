@@ -1327,7 +1327,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 # contain get_field_name_mapping_to_takeout_keys attribute
                 # and get_field_name_mapping_to_takeout_keys(), so because
                 # of this MyPy throws an error. Thus to avoid the error, we
-                # used ignore here. 
+                # used ignore here.
                 self.assertIsNotNone(
                     model.get_field_name_mapping_to_takeout_keys)  # type: ignore[attr-defined]
                 exported_data = model.export_data(self.USER_ID_1)
