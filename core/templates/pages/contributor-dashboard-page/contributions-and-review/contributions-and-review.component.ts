@@ -39,17 +39,17 @@ import { ContributionOpportunitiesService } from '../services/contribution-oppor
 
 export interface Suggestion {
   change: {
-    skill_id?: string;
+    skill_id: string;
     content_html: string;
     translation_html: string | string[];
-    question_dict?: QuestionBackendDict;
-    skill_difficulty?: string[];
+    question_dict: QuestionBackendDict;
+    skill_difficulty: string[];
   };
   status: string;
   suggestion_type: string;
   target_id: string;
   suggestion_id: string;
-  author_name?: string;
+  author_name: string;
 }
 
 export interface ContributionsSummary {
@@ -91,7 +91,7 @@ export interface SuggestionDetails {
 export interface TabDetails {
   suggestionType: string;
   text: string;
-  enabled?: boolean;
+  enabled: boolean;
 }
 
 @Component({
@@ -542,7 +542,7 @@ export class ContributionsAndReview
               this.reviewTabs.push({
                 suggestionType: this.SUGGESTION_TYPE_QUESTION,
                 text: 'Review Questions'
-              });
+              } as TabDetails);
               userReviewableSuggestionTypes.push(this.SUGGESTION_TYPE_QUESTION);
             }
             if (
@@ -551,7 +551,7 @@ export class ContributionsAndReview
               this.reviewTabs.push({
                 suggestionType: this.SUGGESTION_TYPE_TRANSLATE,
                 text: 'Review Translations'
-              });
+              } as TabDetails);
               userReviewableSuggestionTypes.push(
                 this.SUGGESTION_TYPE_TRANSLATE);
             }

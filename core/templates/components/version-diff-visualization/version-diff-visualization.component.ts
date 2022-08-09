@@ -33,9 +33,13 @@ interface NodesData {
 
 interface LegendGraph {
  nodes: object;
- links: unknown[];
- finalStateIds?: string[];
- initStateId?: string;
+ links: {
+  source: string;
+  target: string;
+  linkProperty: string;
+}[];
+ finalStateIds: string[];
+ initStateId: string;
 }
 
 interface DiffNodeData {
@@ -185,7 +189,7 @@ export class VersionDiffVisualizationComponent implements OnInit {
   //   deleted.
   showStateDiffModal(
       newStateName: string,
-      oldStateName: string, stateProperty: unknown): void {
+      oldStateName: string, stateProperty: string): void {
     let modalRef: NgbModalRef = this.ngbModal.open(StateDiffModalComponent, {
       backdrop: true,
       windowClass: 'state-diff-modal',
@@ -309,7 +313,7 @@ export class VersionDiffVisualizationComponent implements OnInit {
     this.legendGraph = {
       nodes: {},
       links: []
-    };
+    } as LegendGraph;
 
     let _lastUsedStateType = null;
     for (let stateProperty in this._stateTypeUsed) {

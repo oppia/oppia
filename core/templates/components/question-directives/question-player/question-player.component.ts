@@ -58,7 +58,7 @@ interface MasteryChangePerQuestion {
 interface ScorePerSkill {
   score: number;
   total: number;
-  description?: string;
+  description: string;
 }
 
 interface ScorePerSkillMapping {

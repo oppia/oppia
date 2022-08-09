@@ -269,11 +269,13 @@ describe('Question Player Component', () => {
     component.scorePerSkillMapping = {
       skill1: {
         score: 5,
-        total: 8
+        total: 8,
+        description: ''
       },
       skill2: {
         score: 8,
-        total: 8
+        total: 8,
+        description: ''
       }
     };
 
@@ -319,11 +321,13 @@ describe('Question Player Component', () => {
     component.scorePerSkillMapping = {
       skill1: {
         score: 5,
-        total: 8
+        total: 8,
+        description: ''
       },
       skill2: {
         score: 8,
-        total: 8
+        total: 8,
+        description: ''
       }
     };
 
@@ -342,11 +346,13 @@ describe('Question Player Component', () => {
   it('should get score percentage to set score bar width', () => {
     expect(component.getScorePercentage({
       score: 5,
-      total: 10
+      total: 10,
+      description: ''
     })).toBe(50);
     expect(component.getScorePercentage({
       score: 3,
-      total: 10
+      total: 10,
+      description: ''
     })).toBe(30);
   });
 
@@ -458,7 +464,8 @@ describe('Question Player Component', () => {
   it('should get color for score based on score per skill', () => {
     let scorePerSkill = {
       score: 5,
-      total: 7
+      total: 7,
+      description: ''
     };
     component.questionPlayerConfig = {
       questionPlayerMode: {
@@ -491,7 +498,8 @@ describe('Question Player Component', () => {
   it('should get color for score bar based on score per skill', () => {
     let scorePerSkill = {
       score: 5,
-      total: 7
+      total: 7,
+      description: ''
     };
     component.questionPlayerConfig = {
       questionPlayerMode: {

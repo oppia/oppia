@@ -115,6 +115,12 @@ export class TrainingDataService {
     if (updatedConfirmedUnclassifiedAnswers) {
       this.responsesService.updateConfirmedUnclassifiedAnswers(
         confirmedUnclassifiedAnswers);
+
+      // TODO(13015): Remove use of unknown as a type.
+      // unknown has been used here becuase
+      // explorationStatesService.saveConfirmedUnclassifiedAnswers
+      // wants variable of type AnswerGroup[] but
+      // confirmedUnclassifiedAnswers is of InteractionAnswer[] type.
       this.explorationStatesService.saveConfirmedUnclassifiedAnswers(
         this.stateEditorService.getActiveStateName(),
         confirmedUnclassifiedAnswers as unknown as AnswerGroup[]);
@@ -191,6 +197,12 @@ export class TrainingDataService {
     confirmedUnclassifiedAnswers.push(answer);
     this.responsesService.updateConfirmedUnclassifiedAnswers(
       confirmedUnclassifiedAnswers);
+
+    // TODO(13015): Remove use of unknown as a type.
+    // unknown has been used here becuase
+    // explorationStatesService.saveConfirmedUnclassifiedAnswers
+    // wants variable of type AnswerGroup[] but
+    // confirmedUnclassifiedAnswers is of InteractionAnswer[] type.
     this.explorationStatesService.saveConfirmedUnclassifiedAnswers(
       this.stateEditorService.getActiveStateName(),
       confirmedUnclassifiedAnswers as unknown as AnswerGroup[]);
@@ -211,6 +223,11 @@ export class TrainingDataService {
     let answerGroups = this.responsesService.getAnswerGroups();
     answerGroups[answerGroupIndex].trainingData = trainingData;
 
+    // TODO(13015): Remove use of unknown as a type.
+    // unknown has been used here becuase
+    // explorationStatesService.saveConfirmedUnclassifiedAnswers
+    // wants variable of type AnswerGroup[] but
+    // confirmedUnclassifiedAnswers is of InteractionAnswer[] type.
     this.responsesService.updateAnswerGroup(answerGroupIndex, {
       trainingData: trainingData
     } as unknown as AnswerGroup, (newAnswerGroups) => {
