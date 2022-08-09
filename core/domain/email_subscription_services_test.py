@@ -48,7 +48,7 @@ class InformSubscribersTest(test_utils.EmailTestBase):
     USER_EMAIL_2: Final = 'user2@test.com'
 
     def setUp(self) -> None:
-        super(InformSubscribersTest, self).setUp()  # type: ignore[no-untyped-call]
+        super().setUp()  # type: ignore[no-untyped-call]
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.USER_EMAIL, self.USER_NAME)
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
