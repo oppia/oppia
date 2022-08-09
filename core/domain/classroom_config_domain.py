@@ -24,9 +24,21 @@
 
 from __future__ import annotations
 
-from typing import List
 from core import utils
 
+from typing import Dict, List
+from typing_extensions import TypedDict
+
+
+class ClassroomDict(TypedDict):
+    """Dict type for Classroom object."""
+
+    classroom_id: str
+    name: str
+    url_fragment: str
+    course_details: str
+    topic_list_intro: str
+    topic_id_to_prerequisite_topic_ids: Dict[str, List[str]]
 
 
 class Classroom:
@@ -34,7 +46,7 @@ class Classroom:
 
     def __init__(
         self,
-        id: str,
+        classroom_id: str,
         name: str,
         url_fragment: str,
         course_details: str,
@@ -44,7 +56,7 @@ class Classroom:
         """Constructs a Classroom domain object.
 
         Args:
-            id: str. The ID of the classroom.
+            classroom_id: str. The ID of the classroom.
             name: str. The name of the classroom.
             url_fragment: str. The url fragment of the classroom.
             course_details: str. Course details for the classroom.
@@ -53,7 +65,7 @@ class Classroom:
                 with topic ID as key and a list of prerequisite topic IDs as
                 value.
         """
-        self.id = id
+        self.classroom_id = classroom_id
         self.name = name
         self.url_fragment = url_fragment
         self.course_details = course_details
@@ -68,9 +80,12 @@ class Classroom:
         Args:
             classroom_dict: dict. The dict representation of the Classroom
                 object.
+
+        Returns:
+            Classroom. The classroom object instance.
         """
         return cls(
-            classroom_dict['id'],
+            classroom_dict['classroom_id'],
             classroom_dict['name'],
             classroom_dict['url_fragment'],
             classroom_dict['course_details'],
@@ -85,7 +100,7 @@ class Classroom:
             dict. A dict, mapping all fields of classroom instance.
         """
         return {
-            'id': self.id,
+            'classroom_id': self.classroom_id,
             'name': self.name,
             'url_fragment': self.url_fragment,
             'course_details': self.course_details,
@@ -97,10 +112,10 @@ class Classroom:
     def validate(self) -> None:
         """Validates various properties of the Classroom."""
 
-        if not isinstance(self.id, str):
+        if not isinstance(self.classroom_id, str):
             raise utils.ValidationError(
                 'Expected ID of the classroom to be a string, received: %s.'
-                % self.id)
+                % self.classroom_id)
         if not isinstance(self.name, str):
             raise utils.ValidationError(
                 'Expected name of the classroom to be a string, received: %s.'
@@ -135,4 +150,3 @@ class Classroom:
                 ancestor_topic_id = ancestors.pop()
                 ancestors.extend(
                     self.topic_id_to_prerequisite_topic_ids[ancestor_topic_id])
-

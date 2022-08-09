@@ -24,16 +24,15 @@
 
 from __future__ import annotations
 
-from core.domain import classroom_config_domain
 from core import utils
+from core.domain import classroom_config_domain
 from core.tests import test_utils
-from typing import List
 
 
 class ClassroomDomainTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(ClassroomDomainTests, self).setUp()
+        super().setUp()
         self.classroom = classroom_config_domain.Classroom(
             'classroom_id', 'math', 'math',
             'Curated math foundations course.',
@@ -45,7 +44,7 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
             }
         )
         self.classroom_dict = {
-            'id': 'classroom_id',
+            'classroom_id': 'classroom_id',
             'name': 'math',
             'url_fragment': 'math',
             'course_details': 'Curated math foundations course.',
@@ -58,7 +57,7 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
         }
 
     def test_that_domain_object_is_created_correctly(self) -> None:
-        self.assertEqual(self.classroom.id, 'classroom_id')
+        self.assertEqual(self.classroom.classroom_id, 'classroom_id')
         self.assertEqual(self.classroom.name, 'math')
         self.assertEqual(self.classroom.url_fragment, 'math')
         self.assertEqual(
@@ -83,7 +82,7 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
         classroom = classroom_config_domain.Classroom.from_dict(
             self.classroom_dict)
 
-        self.assertEqual(classroom.id, 'classroom_id')
+        self.assertEqual(classroom.classroom_id, 'classroom_id')
         self.assertEqual(classroom.name, 'math')
         self.assertEqual(classroom.url_fragment, 'math')
         self.assertEqual(
@@ -107,12 +106,11 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
         self.assertEqual(self.classroom.to_dict(), self.classroom_dict)
 
     def test_incorrect_classroom_id_should_raise_exception(self):
-        self.classroom.id = 1
+        self.classroom.classroom_id = 1
         error_msg = (
             'Expected ID of the classroom to be a string, received: 1.')
         with self.assertRaisesRegex(utils.ValidationError, error_msg):
             self.classroom.validate()
-
 
     def test_validate_incorrect_classroom_name_should_raise_exception(self):
         self.classroom.name = 1
