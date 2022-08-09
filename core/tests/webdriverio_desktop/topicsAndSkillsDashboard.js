@@ -128,7 +128,7 @@ describe('Topics and skills dashboard functionality', function() {
     await topicsAndSkillsDashboardPage.get();
     let topicsCount = await topicsAndSkillsDashboardPage.getTopicsCount();
     await topicsAndSkillsDashboardPage.filterTopicsByKeyword(
-      TOPIC_ALPHA + '\n' + ' ' + TOPIC_BETA);
+      TOPIC_ALPHA + '\n' + TOPIC_BETA);
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(2);
     await topicsAndSkillsDashboardPage.resetTopicFilters();
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(topicsCount);
