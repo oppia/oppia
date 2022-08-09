@@ -98,7 +98,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/tests/build_sources/extensions/models_test.py',
     'core/tests/gae_suite.py',
     'core/tests/gae_suite_test.py',
-    'core/tests/test_utils_test.py',
     'extensions/',
     'scripts/check_if_pr_is_low_risk.py',
     'scripts/check_if_pr_is_low_risk_test.py',

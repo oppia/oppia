@@ -1567,7 +1567,7 @@ class TestBase(unittest.TestCase):
 
     # We have ignored [override] here because the signature of this method
     # doesn't match with TestCase's assertRaises().
-    def assertRaises(self, *args: str, **kwargs: str) -> None:  # type: ignore[override]
+    def assertRaises(self, *args: Any, **kwargs: Any) -> None:  # type: ignore[override]
         raise NotImplementedError(
             'self.assertRaises should not be used in these tests. Please use '
             'self.assertRaisesRegex instead.')
@@ -2313,7 +2313,7 @@ title: Title
         """
         self.login(email, is_super_admin=is_super_admin)
         try:
-            yield self.get_user_id_from_email(email)
+            yield self.get_user_id_from_email(email, strict=False)
         finally:
             self.logout()
 
@@ -4065,7 +4065,9 @@ class EmailMessageMock:
         html_body: str,
         bcc: Optional[Sequence[str]] = None,
         reply_to: Optional[str] = None,
-        recipient_variables: Optional[Dict[str, Dict[str, str]]] = None
+        recipient_variables: Optional[
+            Dict[str, Dict[str, Union[str, int]]]
+        ] = None
     ) -> None:
         """Inits a mock email message with all the necessary data.
 
@@ -4142,7 +4144,9 @@ class GenericEmailTestBase(GenericTestBase):
         html_body: str,
         bcc: Optional[List[str]] = None,
         reply_to: Optional[str] = None,
-        recipient_variables: Optional[Dict[str, Dict[str, str]]] = None
+        recipient_variables: Optional[
+            Dict[str, Dict[str, Union[str, int]]]
+        ] = None
     ) -> bool:
         """Mocks sending an email to each email in recipient_emails.
 
@@ -4411,8 +4415,8 @@ class FailingFunction(FunctionWrapper):
     def __init__(
         self,
         f: Callable[..., Any],
-        exception: Exception,
-        num_tries_before_success: int
+        exception: Union[Type[BaseException], BaseException],
+        num_tries_before_success: Union[str, int]
     ) -> None:
         """Create a new Failing function.
 
@@ -4435,7 +4439,11 @@ class FailingFunction(FunctionWrapper):
             str(self._num_tries_before_success) == FailingFunction.INFINITY)
         self._times_called = 0
 
-        if not self._always_fail and self._num_tries_before_success < 0:
+        if (
+            not self._always_fail and
+            isinstance(self._num_tries_before_success, int) and
+            self._num_tries_before_success < 0
+        ):
             raise ValueError(
                 'num_tries_before_success should either be an '
                 'integer greater than or equal to 0, '
@@ -4451,7 +4459,7 @@ class FailingFunction(FunctionWrapper):
         """
         self._times_called += 1
         call_should_fail = (
-            self._always_fail or
-            self._num_tries_before_success >= self._times_called)
+            self._always_fail or isinstance(self._num_tries_before_success, int)
+            and self._num_tries_before_success >= self._times_called)
         if call_should_fail:
             raise self._exception
