@@ -1638,8 +1638,8 @@ class ContributorMilestoneEmailInfo:
 
 
 class ContributorStatsSummary:
-    """Encapsulates key information that is used to send to the frontend regarding
-    contributor stats.
+    """Encapsulates key information that is used to send to the frontend
+    regarding contributor stats.
 
     Attributes:
         contributor_user_id: str. The ID of the contributor.
