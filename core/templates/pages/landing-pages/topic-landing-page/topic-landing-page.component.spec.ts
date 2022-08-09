@@ -74,9 +74,9 @@ let component: TopicLandingPageComponent;
 let fixture: ComponentFixture<TopicLandingPageComponent>;
 
 describe('Topic Landing Page', () => {
-  let siteAnalyticsService = null;
+  let siteAnalyticsService: SiteAnalyticsService;
   let windowRef: MockWindowRef;
-  let pageTitleService = null;
+  let pageTitleService: PageTitleService;
   let translateService: TranslateService;
 
   beforeEach(async(() => {
