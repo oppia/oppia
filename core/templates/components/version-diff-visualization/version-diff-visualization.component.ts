@@ -33,13 +33,13 @@ interface NodesData {
 
 interface LegendGraph {
  nodes: object;
- links: {
-  source: string;
-  target: string;
-  linkProperty: string;
-}[];
- finalStateIds: string[];
- initStateId: string;
+  links: {
+    source: string;
+    target: string;
+    linkProperty: string;
+  }[];
+  finalStateIds: string[];
+  initStateId: string;
 }
 
 interface DiffNodeData {
