@@ -1734,8 +1734,8 @@ def get_exploration_version_valid_info(exploration_id, revert_to_version):
             is to be reverted.
 
     Returns:
-        None if the revert_to_version passes all backend validation checks,
-        or the error string otherwise.
+        Optional[str]. None if the revert_to_version passes all backend
+        validation checks, or the error string otherwise.
     """
     # Validate the previous version of the exploration.
     exploration = exp_fetchers.get_exploration_by_id(

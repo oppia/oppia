@@ -729,7 +729,7 @@ class ExplorationCheckRevertValidHandler(EditorHandler):
         """Handles GET requests."""
         info = exp_services.get_exploration_version_valid_info(
             exploration_id, version)
-        self.render_json({'valid': False if info else True, 'details': info})
+        self.render_json({'valid': not info, 'details': info})
 
 
 class ExplorationRevertHandler(EditorHandler):
