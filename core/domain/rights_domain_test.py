@@ -33,7 +33,7 @@ from typing import Sequence
 class ActivityRightsTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(ActivityRightsTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.owner = user_services.get_user_actions_info(self.owner_id)

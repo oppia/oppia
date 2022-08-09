@@ -84,7 +84,7 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         """Set up  models in datastore for use in testing."""
-        super(AppFeedbackReportModelTests, self).setUp()
+        super().setUp()
 
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)

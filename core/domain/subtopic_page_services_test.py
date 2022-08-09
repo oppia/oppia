@@ -53,7 +53,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
     skill_id_2 = 'skill_2'
 
     def setUp(self) -> None:
-        super(SubtopicPageServicesUnitTests, self).setUp()
+        super().setUp()
         self.signup(
             self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(

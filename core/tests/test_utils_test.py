@@ -177,8 +177,8 @@ class AuthServicesStubTests(test_utils.GenericTestBase):
 
     EMAIL: Final = 'user@test.com'
 
-    def setUp(self) -> None:
-        super(AuthServicesStubTests, self).setUp()
+    def setUp(self):
+        super().setUp()
         self.stub = test_utils.AuthServicesStub()
 
     def test_get_auth_claims_from_request(self) -> None:

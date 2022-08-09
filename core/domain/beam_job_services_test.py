@@ -58,7 +58,7 @@ class BeamJobServicesTests(test_utils.TestBase):
 class BeamJobRunServicesTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(BeamJobRunServicesTests, self).setUp()
+        super().setUp()
         self._id_iter = (str(i) for i in itertools.count())
 
     def create_beam_job_run_model(

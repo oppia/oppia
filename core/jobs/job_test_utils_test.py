@@ -86,7 +86,7 @@ class JobTestBaseTests(job_test_utils.JobTestBase):
 
     def tearDown(self) -> None:
         self.JOB_CLASS.reset_mock()
-        super(JobTestBaseTests, self).tearDown()
+        super().tearDown()
 
     def test_run_job(self) -> None:
         self.run_job()

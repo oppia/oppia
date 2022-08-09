@@ -33,7 +33,7 @@ class GcsFileSystemUnitTests(test_utils.GenericTestBase):
     """Tests for the GCS file system."""
 
     def setUp(self) -> None:
-        super(GcsFileSystemUnitTests, self).setUp()
+        super().setUp()
         self.USER_EMAIL = 'abc@example.com'
         self.signup(self.USER_EMAIL, 'username')
         self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
@@ -130,7 +130,7 @@ class DirectoryTraversalTests(test_utils.GenericTestBase):
     """Tests to check for the possibility of directory traversal."""
 
     def setUp(self) -> None:
-        super(DirectoryTraversalTests, self).setUp()
+        super().setUp()
         self.USER_EMAIL = 'abc@example.com'
         self.signup(self.USER_EMAIL, 'username')
         self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
@@ -164,7 +164,7 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
     USER = 'ADMIN'
 
     def setUp(self) -> None:
-        super(SaveOriginalAndCompressedVersionsOfImageTests, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.user_id_admin = (
@@ -297,7 +297,7 @@ class FileSystemClassifierDataTests(test_utils.GenericTestBase):
     """Unit tests for storing, reading and deleting classifier data."""
 
     def setUp(self) -> None:
-        super(FileSystemClassifierDataTests, self).setUp()
+        super().setUp()
         self.fs = fs_services.GcsFileSystem(
             feconf.ENTITY_TYPE_EXPLORATION, 'exp_id')
         self.classifier_data_proto = (

@@ -171,7 +171,7 @@ class BaseTranslatableObjectUnitTest(test_utils.GenericTestBase):
     """Test class for BaseTranslatableObject."""
 
     def setUp(self) -> None:
-        super(BaseTranslatableObjectUnitTest, self).setUp()
+        super().setUp()
         self.translatable_object1 = DummyTranslatableObjectWithTwoParams(
             'My name is jhon.', DummyTranslatableObjectWithSingleParam(
                 'My name is jack.'))
@@ -350,7 +350,7 @@ class MachineTranslationTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         """Setup for MachineTranslation domain object tests."""
-        super(MachineTranslationTests, self).setUp()
+        super().setUp()
         self._init_translation()
 
     def _init_translation(self) -> None:

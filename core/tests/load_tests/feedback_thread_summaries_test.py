@@ -43,8 +43,8 @@ class FeedbackThreadSummariesLoadTests(test_utils.GenericTestBase):
     USER_EMAIL: Final = 'user@example.com'
     USER_USERNAME: Final = 'user'
 
-    def setUp(self) -> None:
-        super(FeedbackThreadSummariesLoadTests, self).setUp()
+    def setUp(self):
+        super().setUp()
 
         self.signup(self.USER_EMAIL, self.USER_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)

@@ -31,7 +31,7 @@ class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
     THREAD_ID = 'exp0.thread0'
 
     def setUp(self) -> None:
-        super(FeedbackThreadDomainUnitTests, self).setUp()
+        super().setUp()
 
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
@@ -96,7 +96,7 @@ class FeedbackMessageDomainUnitTests(test_utils.GenericTestBase):
     FULL_MESSAGE_ID = THREAD_ID + '.' + MESSAGE_ID
 
     def setUp(self) -> None:
-        super(FeedbackMessageDomainUnitTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
@@ -136,7 +136,7 @@ class FeedbackAnalyticsDomainUnitTests(test_utils.GenericTestBase):
 class FeedbackMessageReferenceDomainTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(FeedbackMessageReferenceDomainTests, self).setUp()
+        super().setUp()
         self.exp_id = 'exp'
         self.message_id = 'message'
         self.thread_id = 'exp.thread'

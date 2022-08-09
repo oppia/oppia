@@ -31,7 +31,7 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
     """Tests for blog post domain objects."""
 
     def setUp(self) -> None:
-        super(BlogPostDomainUnitTests, self).setUp()
+        super().setUp()
         self.signup('a@example.com', 'A')
         self.user_id_a = self.get_user_id_from_email('a@example.com')
 
@@ -336,7 +336,7 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
 class BlogPostRightsDomainUnitTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(BlogPostRightsDomainUnitTests, self).setUp()
+        super().setUp()
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
 
@@ -365,7 +365,7 @@ class BlogPostRightsDomainUnitTests(test_utils.GenericTestBase):
 class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(BlogPostSummaryUnitTests, self).setUp()
+        super().setUp()
         self.signup('a@example.com', 'A')
         self.user_id_a = self.get_user_id_from_email('a@example.com')
         blog_post = blog_services.create_new_blog_post(self.user_id_a)

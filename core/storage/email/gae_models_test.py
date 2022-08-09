@@ -45,7 +45,7 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
     NONEXISTENT_USER_ID = 'id_x'
 
     def setUp(self) -> None:
-        super(SentEmailModelUnitTests, self).setUp()
+        super().setUp()
 
         def mock_generate_hash(
             unused_cls: email_models.SentEmailModel,

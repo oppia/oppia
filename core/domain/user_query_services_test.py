@@ -39,7 +39,7 @@ class UserQueryServicesTests(test_utils.GenericTestBase):
     USER_QUERY_2_ID = 'user_query_2_id'
 
     def setUp(self) -> None:
-        super(UserQueryServicesTests, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.admin_user_id = (
             self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))

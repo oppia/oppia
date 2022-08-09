@@ -30,7 +30,7 @@ class IssueRegistryUnitTests(test_utils.GenericTestBase):
     """Test for the issue registry."""
 
     def setUp(self) -> None:
-        super(IssueRegistryUnitTests, self).setUp()
+        super().setUp()
         self.issues_dict = {
             'EarlyQuit': EarlyQuit.EarlyQuit,
             'CyclicStateTransitions': (
@@ -42,7 +42,7 @@ class IssueRegistryUnitTests(test_utils.GenericTestBase):
 
     def tearDown(self) -> None:
         playthrough_issue_registry.Registry._issues = {} # pylint: disable=protected-access
-        super(IssueRegistryUnitTests, self).tearDown()
+        super().tearDown()
 
     def test_issue_registry(self) -> None:
         """Do some sanity checks on the issue registry."""

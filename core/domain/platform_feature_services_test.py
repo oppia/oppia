@@ -44,7 +44,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
     """Test for the platform feature services."""
 
     def setUp(self) -> None:
-        super(PlatformFeatureServiceTest, self).setUp()
+        super().setUp()
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.user_id = self.get_user_id_from_email(self.OWNER_EMAIL)
@@ -112,7 +112,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         feature_services.ALL_FEATURES_NAMES_SET = set(param_names)
 
     def tearDown(self) -> None:
-        super(PlatformFeatureServiceTest, self).tearDown()
+        super().tearDown()
         feature_services.ALL_FEATURES_LIST = self.original_feature_list
         feature_services.ALL_FEATURES_NAMES_SET = (
             self.original_feature_name_set)
