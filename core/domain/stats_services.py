@@ -22,13 +22,20 @@ import copy
 import datetime
 import itertools
 import logging
+from typing import List, Optional
 
 from core import feconf
 from core import utils
 from core.domain import exp_fetchers
 from core.domain import question_services
 from core.domain import stats_domain
+from core.domain import exp_domain
 from core.platform import models
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import stats_models
+    from mypy_imports import transaction_services
 
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 transaction_services = models.Registry.import_transaction_services()
@@ -42,7 +49,9 @@ transaction_services = models.Registry.import_transaction_services()
 # to that PR if you need to reinstate them.
 
 
-def _migrate_to_latest_issue_schema(exp_issue_dict):
+def _migrate_to_latest_issue_schema(
+    exp_issue_dict: stats_domain.ExplorationIssueDict
+) -> None:
     """Holds the responsibility of performing a step-by-step sequential update
     of an exploration issue dict based on its schema version. If the current
     issue schema version changes (stats_models.CURRENT_ISSUE_SCHEMA_VERSION), a
@@ -72,7 +81,9 @@ def _migrate_to_latest_issue_schema(exp_issue_dict):
         issue_schema_version += 1
 
 
-def _migrate_to_latest_action_schema(learner_action_dict):
+def _migrate_to_latest_action_schema(
+    learner_action_dict: stats_domain.LearnerActionDict
+) -> None:
     """Holds the responsibility of performing a step-by-step sequential update
     of an learner action dict based on its schema version. If the current action
     schema version changes (stats_models.CURRENT_ACTION_SCHEMA_VERSION), a new
@@ -102,7 +113,9 @@ def _migrate_to_latest_action_schema(learner_action_dict):
         action_schema_version += 1
 
 
-def get_exploration_stats(exp_id, exp_version):
+def get_exploration_stats(
+    exp_id: str, exp_version: int
+) -> stats_domain.ExplorationStats:
     """Retrieves the ExplorationStats domain instance.
 
     Args:
@@ -122,7 +135,10 @@ def get_exploration_stats(exp_id, exp_version):
 
 @transaction_services.run_in_transaction_wrapper
 def _update_stats_transactional(
-        exp_id, exp_version, aggregated_stats):
+    exp_id: str,
+    exp_version: int,
+    aggregated_stats: stats_domain.AggregatedStatsDict
+) -> None:
     """Updates ExplorationStatsModel according to the dict containing aggregated
     stats. The model GET and PUT must be done in a transaction to avoid loss of
     updates that come in rapid succession.
@@ -179,7 +195,11 @@ def _update_stats_transactional(
     save_stats_model(exp_stats)
 
 
-def update_stats(exp_id, exp_version, aggregated_stats):
+def update_stats(
+    exp_id: str,
+    exp_version: int,
+    aggregated_stats: stats_domain.AggregatedStatsDict
+) -> None:
     """Updates ExplorationStatsModel according to the dict containing aggregated
     stats.
 
@@ -193,7 +213,9 @@ def update_stats(exp_id, exp_version, aggregated_stats):
         exp_id, exp_version, aggregated_stats)
 
 
-def get_stats_for_new_exploration(exp_id, exp_version, state_names):
+def get_stats_for_new_exploration(
+    exp_id: str, exp_version: int, state_names: List[str]
+) -> stats_domain.ExplorationStats:
     """Creates ExplorationStatsModel for the freshly created exploration and
     sets all initial values to zero.
 
@@ -216,7 +238,12 @@ def get_stats_for_new_exploration(exp_id, exp_version, state_names):
 
 
 def get_stats_for_new_exp_version(
-        exp_id, exp_version, state_names, exp_versions_diff, revert_to_version):
+    exp_id: str,
+    exp_version: int,
+    state_names: List[str],
+    exp_versions_diff: exp_domain.ExplorationVersionsDiff,
+    revert_to_version: Optional[int]
+) -> stats_domain.ExplorationStats:
     """Retrieves the ExplorationStatsModel for the old exp_version and makes any
     required changes to the structure of the model. Then, a new
     ExplorationStatsModel is created for the new exp_version. Note: This
@@ -254,8 +281,12 @@ def get_stats_for_new_exp_version(
 
 
 def advance_version_of_exp_stats(
-        exp_version, exp_versions_diff, exp_stats,
-        reverted_exp_stats, revert_to_version):
+    exp_version: int,
+    exp_versions_diff: exp_domain.ExplorationVersionsDiff,
+    exp_stats: stats_domain.ExplorationStats,
+    reverted_exp_stats: Optional[stats_domain.ExplorationStats],
+    revert_to_version: Optional[int]
+) -> stats_domain.ExplorationStats:
     """Makes required changes to the structure of ExplorationStatsModel of an
     old exp_version and a new ExplorationStatsModel is created for the new
     exp_version. Note: This function does not save the newly created model, it
@@ -322,7 +353,10 @@ def advance_version_of_exp_stats(
 
 
 def assign_playthrough_to_corresponding_issue(
-        playthrough, exp_issues, issue_schema_version):
+    playthrough: stats_domain.Playthrough,
+    exp_issues: stats_domain.ExplorationIssues,
+    issue_schema_version: int
+) -> bool:
     """Stores the given playthrough as a new model into its corresponding
     exploration issue. When the corresponding exploration issue does not
     exist, a new one is created.
@@ -349,7 +383,10 @@ def assign_playthrough_to_corresponding_issue(
 
 
 def _get_corresponding_exp_issue(
-        playthrough, exp_issues, issue_schema_version):
+    playthrough: stats_domain.Playthrough,
+    exp_issues: stats_domain.ExplorationIssues,
+    issue_schema_version: int
+) -> stats_domain.ExplorationIssue:
     """Returns the unique exploration issue model expected to own the given
     playthrough. If it does not exist yet, then it will be created.
 
@@ -381,7 +418,9 @@ def _get_corresponding_exp_issue(
     return issue
 
 
-def create_exp_issues_for_new_exploration(exp_id, exp_version):
+def create_exp_issues_for_new_exploration(
+    exp_id: str, exp_version: int
+) -> None:
     """Creates the ExplorationIssuesModel instance for the exploration.
 
     Args:
@@ -392,7 +431,10 @@ def create_exp_issues_for_new_exploration(exp_id, exp_version):
 
 
 def update_exp_issues_for_new_exp_version(
-        exploration, exp_versions_diff, revert_to_version):
+    exploration: exp_domain.Exploration,
+    exp_versions_diff: exp_domain.ExplorationVersionsDiff,
+    revert_to_version: int
+) -> None:
     """Retrieves the ExplorationIssuesModel for the old exp_version and makes
     any required changes to the structure of the model.
 
@@ -471,6 +513,9 @@ def update_exp_issues_for_new_exp_version(
         if 'state_names' in exp_issue.issue_customization_args:
             state_names = (
                 exp_issue.issue_customization_args['state_names']['value'])
+            # Ruling out the possibility of any other type for mypy type
+            # checking.
+            assert isinstance(state_names, list)
 
             if any(name in deleted_state_names for name in state_names):
                 exp_issue.is_valid = False
@@ -496,7 +541,9 @@ def update_exp_issues_for_new_exp_version(
     create_exp_issues_model(exp_issues)
 
 
-def get_exp_issues(exp_id, exp_version):
+def get_exp_issues(
+    exp_id: str, exp_version: int
+) -> Optional[stats_domain.ExplorationIssues]:
     """Retrieves the ExplorationIssues domain object.
 
     Args:
@@ -515,7 +562,9 @@ def get_exp_issues(exp_id, exp_version):
     return exp_issues
 
 
-def get_playthrough_by_id(playthrough_id):
+def get_playthrough_by_id(
+    playthrough_id: str
+) -> Optional[stats_domain.Playthrough]:
     """Retrieves the Playthrough domain object.
 
     Args:
@@ -527,10 +576,15 @@ def get_playthrough_by_id(playthrough_id):
     """
     playthrough_model = (
         stats_models.PlaythroughModel.get(playthrough_id, strict=False))
-    return playthrough_model and get_playthrough_from_model(playthrough_model)
+    if playthrough_model is None:
+        return None
+    
+    return get_playthrough_from_model(playthrough_model)
 
 
-def get_exploration_stats_by_id(exp_id, exp_version):
+def get_exploration_stats_by_id(
+    exp_id: str, exp_version: int
+) -> Optional[stats_domain.ExplorationStats]:
     """Retrieves the ExplorationStats domain object.
 
     Args:
@@ -552,7 +606,9 @@ def get_exploration_stats_by_id(exp_id, exp_version):
     return exploration_stats
 
 
-def get_multiple_exploration_stats_by_version(exp_id, version_numbers):
+def get_multiple_exploration_stats_by_version(
+    exp_id: str, version_numbers: List[int]
+) -> List[Optional[stats_domain.ExplorationStats]]:
     """Returns a list of ExplorationStats domain objects corresponding to the
     specified versions.
 
@@ -575,7 +631,9 @@ def get_multiple_exploration_stats_by_version(exp_id, version_numbers):
     return exploration_stats
 
 
-def get_exp_issues_from_model(exp_issues_model):
+def get_exp_issues_from_model(
+    exp_issues_model: stats_models.ExplorationIssuesModel
+) -> stats_domain.ExplorationIssues:
     """Gets an ExplorationIssues domain object from an ExplorationIssuesModel
     instance.
 
@@ -597,7 +655,9 @@ def get_exp_issues_from_model(exp_issues_model):
         unresolved_issues)
 
 
-def get_exploration_stats_from_model(exploration_stats_model):
+def get_exploration_stats_from_model(
+    exploration_stats_model: stats_models.ExplorationStatsModel
+) -> stats_domain.ExplorationStats:
     """Gets an ExplorationStats domain object from an ExplorationStatsModel
     instance.
 
@@ -625,7 +685,9 @@ def get_exploration_stats_from_model(exploration_stats_model):
         new_state_stats_mapping)
 
 
-def get_playthrough_from_model(playthrough_model):
+def get_playthrough_from_model(
+    playthrough_model: stats_models.PlaythroughModel
+) -> stats_domain.Playthrough:
     """Gets a PlaythroughModel domain object from a PlaythroughModel instance.
 
     Args:
