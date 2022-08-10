@@ -888,7 +888,7 @@ class Question(translation_domain.BaseTranslatableObject):
                 'interaction']['answer_groups']
             for answer_group_dict in answer_group_dicts:
                 rule_type_to_inputs: Dict[
-                    str, Set[state_domain.AllowedRuleSpecInputTypes]
+                    str, Set[state_domain.AllowedInputValueTypes]
                 ] = collections.defaultdict(set)
                 for rule_spec_dict in answer_group_dict['rule_specs']:
                     rule_type = rule_spec_dict['rule_type']

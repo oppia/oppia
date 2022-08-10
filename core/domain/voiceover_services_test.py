@@ -66,7 +66,7 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
         self.STORY_ID = 'story'
         self.USER_ID = 'user'
         self.SKILL_ID = 'skill'
-        self.QUESTION_ID = question_services.get_new_question_id()  # type: ignore[no-untyped-call]
+        self.QUESTION_ID = question_services.get_new_question_id()
         explorations = [self.save_new_valid_exploration(
             '%s' % i,
             self.owner_id,
@@ -244,7 +244,7 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
             suggestion_models.STATUS_IN_REVIEW)
 
         opportunities, _, more = (
-            opportunity_services.get_voiceover_opportunities('en', None))  # type: ignore[no-untyped-call]
+            opportunity_services.get_voiceover_opportunities('en', None))
         self.assertEqual(len(opportunities), 1)
 
         voiceover_services.accept_voiceover_application(
@@ -260,7 +260,7 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
             suggestion_models.STATUS_ACCEPTED)
 
         opportunities, _, more = (
-            opportunity_services.get_voiceover_opportunities('en', None))  # type: ignore[no-untyped-call]
+            opportunity_services.get_voiceover_opportunities('en', None))
         self.assertEqual(len(opportunities), 0)
         self.assertFalse(more)
 
@@ -335,6 +335,38 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
                 user_voiceover_applications[0].voiceover_application_id,
                 self.applicant_id)
 
+    def test_raises_exception_if_no_exploration_opportunity_summary_exist(
+        self
+    ) -> None:
+        voiceover_services.create_new_voiceover_application(
+            feconf.ENTITY_TYPE_EXPLORATION, '0', 'en', '',
+            'audio_file.mp3', self.applicant_id)
+
+        user_voiceover_applications = (
+            voiceover_services.get_user_submitted_voiceover_applications(
+                self.applicant_id))
+
+        user_voiceover_applications = (
+            voiceover_services.get_user_submitted_voiceover_applications(
+                self.applicant_id))
+        exploration_opportunity_summary = {'0': None}
+
+        with self.swap_to_always_return(
+            opportunity_services,
+            'get_exploration_opportunity_summaries_by_ids',
+            exploration_opportunity_summary):
+            with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+                Exception, 'No exploration summary exists for'):
+                voiceover_services.accept_voiceover_application(
+                    user_voiceover_applications[0].voiceover_application_id,
+                    self.admin_id)
+
+            with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+                Exception, 'No exploration summary exists for'):
+                voiceover_services.reject_voiceover_application(
+                    user_voiceover_applications[0].voiceover_application_id,
+                    self.admin_id, 'Rejection message')
+
     def test_reject_voiceover_application(self) -> None:
         voiceover_services.create_new_voiceover_application(
             feconf.ENTITY_TYPE_EXPLORATION, '0', 'en', '',
@@ -349,7 +381,7 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
             suggestion_models.STATUS_IN_REVIEW)
 
         opportunities, _, _ = (
-            opportunity_services.get_voiceover_opportunities('en', None))  # type: ignore[no-untyped-call]
+            opportunity_services.get_voiceover_opportunities('en', None))
         self.assertEqual(len(opportunities), 1)
 
         voiceover_services.reject_voiceover_application(
@@ -365,7 +397,7 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
             suggestion_models.STATUS_REJECTED)
 
         opportunities, _, _ = (
-            opportunity_services.get_voiceover_opportunities('en', None))  # type: ignore[no-untyped-call]
+            opportunity_services.get_voiceover_opportunities('en', None))
         self.assertEqual(len(opportunities), 1)
 
     def test_author_rejects_own_voiceover_application_raise_exception(

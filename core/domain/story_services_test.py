@@ -673,6 +673,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 self.USER_ID, self.STORY_ID, change_list,
                 'Updated story outline.')
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_cannot_update_story_with_no_commit_message(self) -> None:
         change_list = [story_domain.StoryChange({
             'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
@@ -687,7 +690,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             Exception,
             'Expected a commit message but received none.'):
             story_services.update_story(
-                self.USER_ID, self.STORY_ID, change_list, None)
+                self.USER_ID, self.STORY_ID, change_list, None)  # type: ignore[arg-type]
 
     def test_update_story_acquired_skill_ids(self) -> None:
         story = story_fetchers.get_story_by_id(self.STORY_ID)

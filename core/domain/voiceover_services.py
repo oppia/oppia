@@ -213,6 +213,7 @@ def accept_voiceover_application(
 
     Raises:
         Exception. Reviewer ID is same as the author ID.
+        Exception. No exploration summary exists for the given target_id.
     """
     voiceover_application = get_voiceover_application_by_id(
         voiceover_application_id)
@@ -231,15 +232,23 @@ def accept_voiceover_application(
         rights_manager.assign_role_for_exploration(  # type: ignore[no-untyped-call]
             reviewer, voiceover_application.target_id,
             voiceover_application.author_id, rights_domain.ROLE_VOICE_ARTIST)
-        opportunity_services.update_exploration_voiceover_opportunities(  # type: ignore[no-untyped-call]
+        opportunity_services.update_exploration_voiceover_opportunities(
             voiceover_application.target_id,
             voiceover_application.language_code)
         opportunities = (
-            opportunity_services.get_exploration_opportunity_summaries_by_ids([  # type: ignore[no-untyped-call]
+            opportunity_services.get_exploration_opportunity_summaries_by_ids([
                 voiceover_application.target_id]))
+        exploration_opportunity_summary = opportunities[
+            voiceover_application.target_id
+        ]
+        if exploration_opportunity_summary is None:
+            raise Exception(
+                'No exploration summary exists for the given '
+                'voiceover_application\'s target_id.'
+            )
         email_manager.send_accepted_voiceover_application_email(
             voiceover_application.author_id,
-            opportunities[voiceover_application.target_id].chapter_title,
+            exploration_opportunity_summary.chapter_title,
             voiceover_application.language_code)
     # TODO(#7969): Add notification to the user's dashboard for the accepted
     # voiceover application.
@@ -278,6 +287,7 @@ def reject_voiceover_application(
 
     Raises:
         Exception. Reviewer ID is same as the author ID.
+        Exception. No exploration summary exists for the given target_id.
     """
     voiceover_application = get_voiceover_application_by_id(
         voiceover_application_id)
@@ -293,11 +303,19 @@ def reject_voiceover_application(
 
     if voiceover_application.target_type == feconf.ENTITY_TYPE_EXPLORATION:
         opportunities = (
-            opportunity_services.get_exploration_opportunity_summaries_by_ids([  # type: ignore[no-untyped-call]
+            opportunity_services.get_exploration_opportunity_summaries_by_ids([
                 voiceover_application.target_id]))
+        exploration_opportunity_summary = opportunities[
+            voiceover_application.target_id
+        ]
+        if exploration_opportunity_summary is None:
+            raise Exception(
+                'No exploration summary exists for the given '
+                'voiceover_application\'s target_id.'
+            )
         email_manager.send_rejected_voiceover_application_email(
             voiceover_application.author_id,
-            opportunities[voiceover_application.target_id].chapter_title,
+            exploration_opportunity_summary.chapter_title,
             voiceover_application.language_code, rejection_message)
     # TODO(#7969): Add notification to the user's dashboard for the accepted
     # voiceover application.

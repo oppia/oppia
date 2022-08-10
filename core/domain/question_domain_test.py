@@ -404,13 +404,10 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self._assert_question_domain_validation_error(
             'Expected all answer groups to have destination as None.')
 
-        # TODO(#13059): After we fully type the codebase we plan to get
-        # rid of the tests that intentionally test wrong inputs that we
-        # can normally catch by typing.
         state.interaction.answer_groups = [
             state_domain.AnswerGroup.from_dict({
                 'outcome': {
-                    'dest': None,  # type: ignore[typeddict-item]
+                    'dest': None,
                     'dest_if_really_stuck': 'pqr',
                     'feedback': {
                         'content_id': 'feedback_1',

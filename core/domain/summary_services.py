@@ -194,7 +194,7 @@ def get_learner_collection_dict_by_id(
     user: user_domain.UserActionsInfo,
     strict: bool = True,
     allow_invalid_explorations: bool = False,
-    version: Optional[str] = None
+    version: Optional[int] = None
 ) -> LearnerCollectionDict:
     """Gets a dictionary representation of a collection given by the provided
     collection ID. This dict includes user-specific playthrough information.
@@ -207,7 +207,7 @@ def get_learner_collection_dict_by_id(
             id exists in the datastore.
         allow_invalid_explorations: bool. Whether to also return explorations
             that are invalid, such as deleted/private explorations.
-        version: str or None. The version number of the collection to be
+        version: int or None. The version number of the collection to be
             retrieved. If it is None, the latest version will be retrieved.
 
     Returns:
@@ -220,10 +220,15 @@ def get_learner_collection_dict_by_id(
     Raises:
         ValidationError. If the collection retrieved using the given
             ID references non-existent explorations.
+        Exception. No collection exists for the given collection id.
     """
-    collection = collection_services.get_collection_by_id(  # type: ignore[no-untyped-call]
+    collection = collection_services.get_collection_by_id(
         collection_id, strict=strict, version=version)
 
+    if collection is None:
+        raise Exception(
+            'No collection exists for the given collection id.'
+        )
     exp_ids = collection.exploration_ids
     exp_summary_dicts = get_displayable_exp_summary_dicts_matching_ids(
         exp_ids, user=user)
@@ -238,7 +243,7 @@ def get_learner_collection_dict_by_id(
     completed_exp_ids = []
     if user.user_id:
         completed_exp_ids = (
-            collection_services.get_valid_completed_exploration_ids(  # type: ignore[no-untyped-call]
+            collection_services.get_valid_completed_exploration_ids(
                 user.user_id, collection))
         next_exploration_id = collection.get_next_exploration_id(
             completed_exp_ids)
@@ -249,9 +254,17 @@ def get_learner_collection_dict_by_id(
         next_exploration_id = collection.first_exploration_id
         completed_exp_ids = []
 
-    collection_dict: LearnerCollectionDict = collection.to_dict()
+    # Here, the return type of 'to_dict' method is CollectionDict but for
+    # implementation purpose we are assigning LearnerCollectionDict which
+    # is inherited from CollectionDict. So, due to the difference in types
+    # MyPY throws an error. Thus to avoid the error, we used ignore here.
+    collection_dict: LearnerCollectionDict = collection.to_dict()  # type: ignore[assignment]
+    # Here, expression has type List[CollectionNodeDict] but for implementation
+    # purpose we are assigning List[LearnerCollectionNodeDict]. So, due the
+    # difference in types MyPY throws an error. Thus to avoid the error, we
+    # used ignore here.
     collection_dict['nodes'] = [
-        node.to_dict() for node in collection.nodes]
+        node.to_dict() for node in collection.nodes]  # type: ignore[misc]
 
     collection_dict['playthrough_dict'] = {
         'next_exploration_id': next_exploration_id,
@@ -301,9 +314,14 @@ def get_displayable_collection_summary_dicts_matching_ids(
         These elements are returned in the same order as that given
         in collection_ids.
     """
-    collection_summaries = (
-        collection_services.get_collection_summaries_matching_ids(  # type: ignore[no-untyped-call]
+    collection_summaries_with_none = (
+        collection_services.get_collection_summaries_matching_ids(
             collection_ids))
+    collection_summaries = []
+    for collection_summary in collection_summaries_with_none:
+        # Ruling out the possibility of None for mypy type checking.
+        assert collection_summary is not None
+        collection_summaries.append(collection_summary)
     return _get_displayable_collection_summary_dicts(collection_summaries)
 
 
@@ -610,7 +628,7 @@ def get_library_groups(language_codes: List[str]) -> List[LibraryGroupDict]:
 
     collection_summaries = [
         summary for summary in
-        collection_services.get_collection_summaries_matching_ids(  # type: ignore[no-untyped-call]
+        collection_services.get_collection_summaries_matching_ids(
             all_collection_ids)
         if summary is not None]
     collection_summary_dicts = {
@@ -693,7 +711,7 @@ def require_activities_to_be_public(
     }, {
         'type': constants.ACTIVITY_TYPE_COLLECTION,
         'ids': collection_ids,
-        'summaries': collection_services.get_collection_summaries_matching_ids(  # type: ignore[no-untyped-call]
+        'summaries': collection_services.get_collection_summaries_matching_ids(
             collection_ids),
     }]
 

@@ -45,9 +45,9 @@ from core.domain import translatable_object_registry  # pylint: disable=invalid-
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
 
-# The `AllowedRuleSpecInputTypes` is union of allowed types that a
+# The `AllowedInputValueTypes` is union of allowed types that a
 # RuleSpec's inputs dictionary can accept for it's values.
-AllowedRuleSpecInputTypes = Union[
+AllowedInputValueTypes = Union[
     str,
     int,
     List[str],
@@ -627,7 +627,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
     def __init__(
         self,
         interaction_id: str,
-        customization_args: Dict[str, Dict[str, Any]],
+        customization_args: Dict[str, InteractionCustomizationArg],
         answer_groups: List[AnswerGroup],
         default_outcome: Outcome,
         confirmed_unclassified_answers: List[str],
@@ -1487,7 +1487,7 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
 class OutcomeDict(TypedDict):
     """Dictionary representing the Outcome object."""
 
-    dest: str
+    dest: Optional[str]
     dest_if_really_stuck: Optional[str]
     feedback: SubtitledHtmlDict
     labelled_as_correct: bool
@@ -2388,7 +2388,7 @@ class RuleSpecDict(TypedDict):
     """Dictionary representing the RuleSpec object."""
 
     rule_type: str
-    inputs: Dict[str, AllowedRuleSpecInputTypes]
+    inputs: Dict[str, AllowedInputValueTypes]
 
 
 class RuleSpec(translation_domain.BaseTranslatableObject):
@@ -2397,7 +2397,7 @@ class RuleSpec(translation_domain.BaseTranslatableObject):
     def __init__(
         self,
         rule_type: str,
-        inputs: Mapping[str, AllowedRuleSpecInputTypes]
+        inputs: Mapping[str, AllowedInputValueTypes]
     ) -> None:
         """Initializes a RuleSpec domain object.
 

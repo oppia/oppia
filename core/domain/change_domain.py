@@ -26,11 +26,12 @@ from core import utils
 from typing import Any, Dict, List, Mapping, Union, cast
 
 MYPY = False
-if MYPY:  # pragma: no cover
+if MYPY: # pragma: no cover
     # Modules imported under the `if MYPY` clause is imported only for
     # type checking purposes and they are not expected to be executed
     # at runtime.
     from core.domain import param_domain
+    from core.domain import platform_parameter_domain
     from core.domain import question_domain
     from core.domain import state_domain
 
@@ -50,10 +51,15 @@ if MYPY:  # pragma: no cover
         None,
         List[str],
         Dict[str, Any],
+        List[Dict[str, Any]],
         List[param_domain.ParamChangeDict],
         List[state_domain.AnswerGroupDict],
+        List[platform_parameter_domain.PlatformParameterRuleDict],
         question_domain.QuestionDict,
+        state_domain.AnswerGroupDict,
         state_domain.SubtitledHtmlDict,
+        state_domain.SolutionDict,
+        state_domain.StateDict,
         state_domain.OutcomeDict,
         state_domain.RecordedVoiceoversDict,
         # This Dict type is added to allow BaseChange to accept

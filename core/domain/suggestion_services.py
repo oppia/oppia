@@ -498,7 +498,7 @@ def accept_suggestion(
     suggestion.pre_accept_validate()
     html_string = ''.join(suggestion.get_all_html_content_strings())
     error_list = (
-        html_validation_service.  # type: ignore[no-untyped-call]
+        html_validation_service.
         validate_math_tags_in_html_with_attribute_math_content(
             html_string))
     if len(error_list) > 0:

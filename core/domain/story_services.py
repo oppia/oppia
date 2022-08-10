@@ -39,7 +39,7 @@ from core.domain import suggestion_services
 from core.domain import topic_fetchers
 from core.platform import models
 
-from typing import List, Optional, Sequence, Tuple
+from typing import List, Sequence, Tuple
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -585,7 +585,7 @@ def update_story(
     committer_id: str,
     story_id: str,
     change_list: List[story_domain.StoryChange],
-    commit_message: Optional[str]
+    commit_message: str
 ) -> None:
     """Updates a story. Commits changes.
 
@@ -598,7 +598,7 @@ def update_story(
         story_id: str. The story id.
         change_list: list(StoryChange). These changes are applied in sequence to
             produce the resulting story.
-        commit_message: str or None. A description of changes made to the
+        commit_message: str. A description of changes made to the
             story.
 
     Raises:
@@ -638,7 +638,7 @@ def update_story(
         story_is_published)
     create_story_summary(new_story.id)
     if story_is_published:
-        opportunity_services.update_exploration_opportunities(  # type: ignore[no-untyped-call]
+        opportunity_services.update_exploration_opportunities(
             old_story, new_story)
     suggestion_services.auto_reject_translation_suggestions_for_exp_ids(
         exp_ids_removed_from_story)
@@ -705,7 +705,7 @@ def delete_story(
     delete_story_summary(story_id)
 
     # Delete the opportunities available.
-    opportunity_services.delete_exp_opportunities_corresponding_to_story(  # type: ignore[no-untyped-call]
+    opportunity_services.delete_exp_opportunities_corresponding_to_story(
         story_id)
 
 

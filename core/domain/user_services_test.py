@@ -2702,7 +2702,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
             objective=self.COLLECTION_OBJECTIVE,
             exploration_id=self.EXP_ID)
 
-        collection_services.publish_collection_and_update_user_profiles(  # type: ignore[no-untyped-call]
+        collection_services.publish_collection_and_update_user_profiles(
             self.admin, self.COL_ID)
         exp_services.publish_exploration_and_update_user_profiles(  # type: ignore[no-untyped-call]
             self.admin, self.EXP_ID)
@@ -2717,7 +2717,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         rights_manager.release_ownership_of_collection(  # type: ignore[no-untyped-call]
             self.admin, self.COL_ID)
 
-        collection_services.update_collection(  # type: ignore[no-untyped-call]
+        collection_services.update_collection(
             self.editor_id, self.COL_ID, [{
                 'cmd': 'edit_collection_property',
                 'property_name': 'title',
@@ -2743,7 +2743,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
 
         # Test that commit to unpublished collection does not update
         # contribution time.
-        collection_services.update_collection(  # type: ignore[no-untyped-call]
+        collection_services.update_collection(
             self.admin_id, self.COL_ID, [{
                 'cmd': 'edit_collection_property',
                 'property_name': 'title',
@@ -2756,7 +2756,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         # have updated first contribution time.
         rights_manager.assign_role_for_collection(  # type: ignore[no-untyped-call]
             self.admin, self.COL_ID, self.editor_id, 'editor')
-        collection_services.update_collection(  # type: ignore[no-untyped-call]
+        collection_services.update_collection(
             self.editor_id, self.COL_ID, [{
                 'cmd': 'edit_collection_property',
                 'property_name': 'category',
@@ -2767,7 +2767,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
 
         # Test that after an collection is published, all contributors have
         # updated first contribution times.
-        collection_services.publish_collection_and_update_user_profiles(  # type: ignore[no-untyped-call]
+        collection_services.publish_collection_and_update_user_profiles(
             self.admin, self.COL_ID)
         self.assertIsNotNone(user_services.get_user_settings(
             self.admin_id).first_contribution_msec)
@@ -2784,7 +2784,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
             exploration_id=self.EXP_ID)
         rights_manager.assign_role_for_collection(  # type: ignore[no-untyped-call]
             self.admin, self.COL_ID, self.editor_id, 'editor')
-        collection_services.publish_collection_and_update_user_profiles(  # type: ignore[no-untyped-call]
+        collection_services.publish_collection_and_update_user_profiles(
             self.admin, self.COL_ID)
 
         # Test that contribution time is not given to an editor that has not
@@ -2802,7 +2802,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
             category=self.COLLECTION_CATEGORY,
             objective=self.COLLECTION_OBJECTIVE,
             exploration_id=self.EXP_ID)
-        collection_services.publish_collection_and_update_user_profiles(  # type: ignore[no-untyped-call]
+        collection_services.publish_collection_and_update_user_profiles(
             self.owner, self.COL_ID)
         rights_manager.unpublish_collection(self.owner, self.COL_ID)  # type: ignore[no-untyped-call]
 
@@ -2835,10 +2835,10 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.owner_id, end_state_name='End')
         init_state_name = exploration.init_state_name
-        event_services.StartExplorationEventHandler.record(  # type: ignore[no-untyped-call]
+        event_services.StartExplorationEventHandler.record(
             self.EXP_ID, 1, init_state_name, self.USER_SESSION_ID, {},
             feconf.PLAY_TYPE_NORMAL)
-        event_services.StatsEventsHandler.record(  # type: ignore[no-untyped-call]
+        event_services.StatsEventsHandler.record(
             self.EXP_ID, 1, {
                 'num_starts': 1,
                 'num_actual_starts': 0,
@@ -2857,7 +2857,7 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.owner_id, end_state_name='End')
         init_state_name = exploration.init_state_name
-        event_services.StartExplorationEventHandler.record(  # type: ignore[no-untyped-call]
+        event_services.StartExplorationEventHandler.record(
             self.EXP_ID, 1, init_state_name, self.USER_SESSION_ID, {},
             feconf.PLAY_TYPE_NORMAL)
         self.assertEqual(
@@ -2883,10 +2883,10 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.owner_id, end_state_name='End')
         init_state_name = exploration.init_state_name
-        event_services.StartExplorationEventHandler.record(  # type: ignore[no-untyped-call]
+        event_services.StartExplorationEventHandler.record(
             self.EXP_ID, 1, init_state_name, self.USER_SESSION_ID, {},
             feconf.PLAY_TYPE_NORMAL)
-        event_services.StatsEventsHandler.record(  # type: ignore[no-untyped-call]
+        event_services.StatsEventsHandler.record(
             self.EXP_ID, 1, {
                 'num_starts': 1,
                 'num_actual_starts': 0,
@@ -2966,10 +2966,10 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
             exploration = self.save_new_valid_exploration(
                 self.EXP_ID, self.owner_id, end_state_name='End')
             init_state_name = exploration.init_state_name
-            event_services.StartExplorationEventHandler.record(  # type: ignore[no-untyped-call]
+            event_services.StartExplorationEventHandler.record(
                 self.EXP_ID, 1, init_state_name, self.USER_SESSION_ID, {},
                 feconf.PLAY_TYPE_NORMAL)
-            event_services.StatsEventsHandler.record(  # type: ignore[no-untyped-call]
+            event_services.StatsEventsHandler.record(
                 self.EXP_ID, 1, {
                     'num_starts': 1,
                     'num_actual_starts': 0,

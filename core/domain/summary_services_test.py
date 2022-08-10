@@ -502,6 +502,14 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
             self.EXP_ID
         )
 
+    def test_raises_error_if_invalid_collection_id_provided(self) -> None:
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            Exception,
+            'No collection exists for the given collection id'):
+            summary_services.get_learner_collection_dict_by_id(
+                'Invalid_id', self.owner, strict=False
+            )
+
     def test_get_learner_dict_with_deleted_exp_fails_validation(self) -> None:
         self.save_new_valid_collection(
             self.COLLECTION_ID, self.owner_id, exploration_id=self.EXP_ID)
@@ -520,9 +528,9 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
     def test_get_learner_dict_when_referencing_inaccessible_explorations(
         self
     ) -> None:
-        self.save_new_default_collection(self.COLLECTION_ID, self.owner_id)  # type: ignore[no-untyped-call]
+        self.save_new_default_collection(self.COLLECTION_ID, self.owner_id)
         self.save_new_valid_exploration(self.EXP_ID, self.editor_id)
-        collection_services.update_collection(  # type: ignore[no-untyped-call]
+        collection_services.update_collection(
             self.owner_id, self.COLLECTION_ID, [{
                 'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
                 'exploration_id': self.EXP_ID
@@ -570,7 +578,7 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
         self.save_new_valid_collection(
             self.COLLECTION_ID, self.owner_id, exploration_id=self.EXP_ID)
         self.save_new_valid_exploration(self.EXP_ID_1, self.editor_id)
-        collection_services.update_collection(  # type: ignore[no-untyped-call]
+        collection_services.update_collection(
             self.owner_id, self.COLLECTION_ID, [{
                 'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
                 'exploration_id': self.EXP_ID_1
