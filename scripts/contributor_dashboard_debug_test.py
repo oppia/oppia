@@ -150,7 +150,8 @@ class ContributorDashboardDebugRequestsTests(test_utils.GenericTestBase):
     def test_get_csrf_token(self) -> None:
         with self.request_swap:
             csrf_token = self.contributor_dashboard_debug.get_csrf_token()
-        base.CsrfTokenManager.is_csrf_token_valid(None, csrf_token) # type: ignore
+        self.assertTrue(
+            base.CsrfTokenManager.is_csrf_token_valid(None, csrf_token)) # type: ignore
 
     def test_assign_admin_roles(self) -> None:
         email = 'user1@example.com'
