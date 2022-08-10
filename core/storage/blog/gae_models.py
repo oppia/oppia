@@ -76,7 +76,7 @@ class BlogPostModel(base_models.BaseModel):
     # post is a draft.
     thumbnail_filename = datastore_services.StringProperty(indexed=True)
     # Time when the blog post model was last published. Value will be None
-    # if the blog is not published.
+    # if the blog post is not currently published.
     published_on = (
         datastore_services.DateTimeProperty(indexed=True))
 
@@ -249,7 +249,7 @@ class BlogPostSummaryModel(base_models.BaseModel):
     # post is a draft.
     thumbnail_filename = datastore_services.StringProperty(indexed=True)
     # Time when the blog post model was last published. Value will be None
-    # if the blog post is not published.
+    # if the blog post is currently not published.
     published_on = (datastore_services.DateTimeProperty(indexed=True))
 
     @staticmethod
