@@ -24,10 +24,6 @@ jobs:
           ls /home/runner/work/oppia
           ls /home/runner/work/oppia/oppia
           echo $GITHUB_WORKSPACE
-      - name: Install python 2
-        run: |
-          sudo apt update
-          sudo apt install python2
       - uses: actions/setup-python@v2
         with:
           python-version: '3.7'
