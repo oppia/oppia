@@ -109,7 +109,7 @@ if MYPY:  # pragma: no cover
 
         exception: BaseException
 
-        # To avoid pylint's `More than one statement on a single line` error,
+        # To avoid pylint's 'More than one statement on a single line' error,
         # we splitted this function definition.
         def __enter__(
             self
@@ -167,7 +167,7 @@ class NewIndexDict(TypedDict):
 
 
 class ExistingIndexDict(TypedDict):
-    """Type for the dictionary that adds a document to the index."""
+    """Type for the dictionary that adds a document to the existing index."""
 
     _index: str
     _shards: Dict[str, int]
@@ -562,7 +562,7 @@ class ElasticSearchStub:
         }
 
     # Here Any type is used because argument 'body' can accept dictionaries
-    # containing different types of values like int, List[...]. nested
+    # that can possess different types of values like int, List[...]. nested
     # dictionary and other types too.
     def mock_search(
         self,
@@ -1188,7 +1188,7 @@ class TestBase(unittest.TestCase):
         """
         return '%s%s' % (self.UNICODE_TEST_STRING, suffix)
 
-    # Here, we used Any type because argument `item` can accept any kind of
+    # Here we used Any type because argument 'item' can accept any kind of
     # object to validate.
     def _assert_validation_error(
         self, item: Any, error_substring: str
@@ -1296,8 +1296,8 @@ class TestBase(unittest.TestCase):
             logger.removeHandler(list_stream_handler)
 
     # Here, we used Any type for arguments because 'obj' can accept any kind
-    # of object to replace the attribute and 'newvalue' can accept any type of
-    # value to replace with old value.
+    # of object on which attribute needs to be replaced and 'newvalue' can accept
+    # any type of value to replace it with the old value.
     @contextlib.contextmanager
     def swap(self, obj: Any, attr: str, newvalue: Any) -> Iterator[None]:
         """Swap an object's attribute value within the context of a 'with'
@@ -1333,8 +1333,8 @@ class TestBase(unittest.TestCase):
             setattr(obj, attr, original)
 
     # Here, we used Any type for arguments because 'obj' can accept any kind
-    # of object to replace the attribute and 'value' can accept any type of
-    # value to replace with old return value.
+    # of object on which attribute needs to be replaced and 'newvalue' can accept
+    # any type of value to replace it with the old value.
     @contextlib.contextmanager
     def swap_to_always_return(
         self, obj: Any, attr: str, value: Optional[Any] = None
@@ -1348,8 +1348,8 @@ class TestBase(unittest.TestCase):
         with self.swap(obj, attr, function_that_always_returns):
             yield
 
-    # Here, we used Any type for arguments because 'obj' can accept any kind
-    # of object to replace the attribute.
+    # Here, we used Any type for argument 'obj' because it can accept any kind
+    # of object on which attribute needs to be replaced.
     @contextlib.contextmanager
     def swap_to_always_raise(
         self,
@@ -1368,8 +1368,8 @@ class TestBase(unittest.TestCase):
             yield
 
     # Here, we used Any type for arguments because 'obj' can accept any kind
-    # of object to replace the attribute and 'returns' can accept any type of
-    # value to replace with old function's return value.
+    # of object on which attribute needs to be replaced and 'returns' can accept
+    # any type of value to replace it with the old function's return value.
     @contextlib.contextmanager
     def swap_with_call_counter(
         self,
@@ -1409,8 +1409,8 @@ class TestBase(unittest.TestCase):
         with self.swap(obj, attr, call_counter):
             yield call_counter
 
-    # Here, we used Any type for arguments because 'obj' can accept any kind
-    # of object to replace the attribute.
+    # Here, we used Any type for argument 'obj' because it can accept any kind
+    # of object on which attribute needs to be replaced.
     @contextlib.contextmanager
     def swap_with_checks(
         self,
@@ -1575,7 +1575,7 @@ class TestBase(unittest.TestCase):
     # We have ignored [override] here because the signature of this method
     # doesn't match with TestCase's assertRaisesRegex(). Also, arguments
     # args and kwargs are annotated with any type because these are the extra
-    # positional arguments with which 'assertRaisesRegex' can be called.
+    # positional arguments with which 'assertRaisesRegex' could be called.
     def assertRaisesRegex(  # type: ignore[override]
         self,
         expected_exception: Union[
@@ -2799,7 +2799,7 @@ title: Title
         url: str,
         params: str = '',
         expected_status_int: int = 200
-    ) -> Any:
+    ) -> Dict[str, Any]:
         """Delete object on the server using a JSON call."""
         if params:
             self.assertIsInstance(
@@ -2820,7 +2820,11 @@ title: Title
         # https://github.com/Pylons/webtest/blob/bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119
         self.assertEqual(json_response.status_int, expected_status_int)
 
-        return self._parse_json_response(json_response, expect_errors)
+        response: Dict[str, Any] = self._parse_json_response(
+            json_response,
+            expect_errors
+        )
+        return response
 
     def _send_post_request(
         self,
