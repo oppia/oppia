@@ -21,7 +21,6 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { ImageData } from 'domain/skill/skill-creation-backend-api.service';
 import { Question } from 'domain/question/QuestionObjectFactory';
-import { SkillDifficulty } from 'domain/skill/skill-difficulty.model';
 import { Skill } from 'domain/skill/SkillObjectFactory';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
 
@@ -37,7 +36,7 @@ export class QuestionSuggestionBackendApiService {
   async submitSuggestionAsync(
       question: Question,
       associatedSkill: Skill,
-      skillDifficulty: SkillDifficulty,
+      skillDifficulty: number,
       imagesData: ImageData[]
   ): Promise<Object> {
     let url: string = '/suggestionhandler/';

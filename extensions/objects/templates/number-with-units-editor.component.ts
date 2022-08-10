@@ -52,8 +52,8 @@ export class NumberWithUnitsEditorComponent implements OnInit {
     } else {
       const defaultNumberWithUnits =
         this.numberWithUnitsObjectFactory.fromDict(
-          this.value as NumberWithUnitsAnswer);
-      this.numberWithUnitsString = defaultNumberWithUnits?.toString();
+          this.value);
+      this.numberWithUnitsString = defaultNumberWithUnits.toString();
       this.valueChanged.emit(this.value);
     }
   }

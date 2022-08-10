@@ -37,6 +37,9 @@ export class TruncateInputBasedOnInteractionAnswerTypePipe
     let actualInputToTruncate = '';
     let inputUpdate;
 
+    // TODO(#15858): Update InteractionAnswer type and remove if block
+    // code in truncate-input-based-on-interaction-answer-type.pipe.ts file.
+
     // As input variable can be of 19 types and
     // there properties are also different
     // we need to fix all InteractionAnswer properties.

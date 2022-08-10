@@ -54,10 +54,13 @@ export class CodeStringEditorComponent implements OnInit {
   }
 
   private _checkForWarnings(): void {
-    if (this.value?.indexOf('\t') !== -1) {
-      this.warningText = 'Code may not contain tab characters.';
-      return;
+    if (this.value) {
+      if (this.value.indexOf('\t') !== -1) {
+        this.warningText = 'Code may not contain tab characters.';
+        return;
+      }
     }
+
     this.warningText = '';
   }
 

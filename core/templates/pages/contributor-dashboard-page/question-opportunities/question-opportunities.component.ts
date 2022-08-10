@@ -23,7 +23,6 @@ import constants from 'assets/constants';
 import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { QuestionUndoRedoService } from 'domain/editor/undo_redo/question-undo-redo.service';
 import { Skill } from 'domain/skill/SkillObjectFactory';
-import { SkillDifficulty } from 'domain/skill/skill-difficulty.model';
 import { SkillOpportunity } from 'domain/opportunity/skill-opportunity.model';
 import { QuestionsOpportunitiesSelectDifficultyModalComponent } from 'pages/topic-editor-page/modal-templates/questions-opportunities-select-difficulty-modal.component';
 import { QuestionSuggestionEditorModalComponent } from '../modal-templates/question-suggestion-editor-modal.component';
@@ -100,7 +99,7 @@ export class QuestionOpportunitiesComponent implements OnInit {
   }
 
   createQuestion(
-      skill: Skill, skillDifficulty: SkillDifficulty | string): void {
+      skill: Skill, skillDifficulty: number): void {
     const skillId = skill.getId();
     const question = (
       this.questionObjectFactory.createDefaultQuestion([skillId]));

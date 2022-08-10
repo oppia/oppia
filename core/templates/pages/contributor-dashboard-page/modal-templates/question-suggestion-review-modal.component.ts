@@ -24,7 +24,6 @@ import { MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
 import { Question, QuestionBackendDict, QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
 import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
 import { State } from 'domain/state/StateObjectFactory';
-import { SuggestionBackendDict } from 'domain/suggestion/suggestion.model';
 import { ThreadMessage } from 'domain/feedback_message/ThreadMessage.model';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { QuestionSuggestionEditorModalComponent } from './question-suggestion-editor-modal.component';
@@ -37,7 +36,7 @@ import { ThreadDataBackendApiService } from 'pages/exploration-editor-page/feedb
 
 interface QuestionSuggestionModalValue {
   suggestionId: string;
-  suggestion: SuggestionBackendDict;
+  suggestion: ActiveSuggestionDict;
   reviewable: boolean;
   question: Question;
 }
@@ -112,7 +111,7 @@ export class QuestionSuggestionReviewModalComponent
   skillDifficultyLabel: string;
   skillRubricExplanations: string | string[];
   suggestionIsRejected: boolean;
-  validationError: unknown;
+  validationError: string;
   allContributions!: Record<string, ActiveContributionDict>;
   suggestion!: ActiveSuggestionDict;
   question!: Question;
@@ -260,7 +259,7 @@ export class QuestionSuggestionReviewModalComponent
     this.refreshActiveContributionState();
   }
 
-  invertMap(originalMap: unknown): unknown {
+  invertMap(originalMap: Object): Object {
     return Object.keys(originalMap).reduce(
       (invertedMap, key) => {
         invertedMap[originalMap[key]] = key;
@@ -286,7 +285,7 @@ export class QuestionSuggestionReviewModalComponent
     return 'This rubric has not yet been specified.';
   }
 
-  _getThreadMessagesAsync(threadId: string): unknown {
+  _getThreadMessagesAsync(threadId: string): Promise<void | string[]> {
     return this.threadDataBackendApiService.fetchMessagesAsync(
       threadId).then((response) => {
       const threadMessageBackendDicts = response.messages;

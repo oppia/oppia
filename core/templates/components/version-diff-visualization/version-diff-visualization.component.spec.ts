@@ -163,7 +163,7 @@ describe('Version Diff Visualization Component', () => {
         target: 'Changed/renamed',
         linkProperty: 'hidden'
       }],
-      initStateId: 'Added',
+      initStateId: 'Changed/renamed',
       finalStateIds: ['Changed/renamed']
     });
   });

@@ -37,6 +37,7 @@ import { StateResponsesComponent } from './state-responses.component';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ParameterizeRuleDescriptionPipe } from 'filters/parameterize-rule-description.pipe';
 import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 
 @Pipe({ name: 'parameterizeRuleDescriptionPipe' })
 class MockParameterizeRuleDescriptionPipe {
@@ -598,13 +599,8 @@ describe('State Responses Component', () => {
     // This contains 2 AnswerChoice for ItemSelectionInput.
     let answerChoices = [
       {
-        value: [{
-          content_id: 'ca_choices_3',
-          html: '<p>Choice 1</p>'
-        }, {
-          content_id: 'ca_choices_4',
-          html: '<p>Choice 2</p>'
-        }]
+        val: new SubtitledHtml('<p>Choice 1</p>', 'ca_choices_3'),
+        label: ''
       }
     ];
     stateInteractionIdService.savedMemento = 'ItemSelectionInput';
@@ -615,7 +611,7 @@ describe('State Responses Component', () => {
     };
     spyOn(responsesService, 'getAnswerGroups').and.returnValue(answerGroups);
     spyOn(responsesService, 'getAnswerChoices').and.returnValue(
-      answerChoices as unknown as AnswerChoice[]);
+      answerChoices as AnswerChoice[]);
 
     expect(component.suppressDefaultAnswerGroupWarnings()).toBe(true);
   });
@@ -935,7 +931,7 @@ describe('State Responses Component', () => {
 
   it('should update active answer group for newly tagged misconception', () => {
     spyOn(responsesService, 'updateActiveAnswerGroup').and.callFake(
-      ({taggedSkillMisconceptionId}, callback) => {
+      (taggedSkillMisconceptionId, callback) => {
         callback(null);
       }
     );
@@ -989,7 +985,7 @@ describe('State Responses Component', () => {
 
   it('should update active answer group when answer rules are changed', () => {
     spyOn(responsesService, 'updateActiveAnswerGroup').and.callFake(
-      ({rules}, callback) => {
+      (rules, callback) => {
         callback(null);
       }
     );

@@ -69,7 +69,7 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
   ) { }
 
   showMarkAllAudioAsNeedingUpdateModalIfRequired(contentIds: string[]): void {
-    const state = this.question?.getStateData();
+    const state = this.question.getStateData();
     const recordedVoiceovers = state.recordedVoiceovers;
     const writtenTranslations = state.writtenTranslations;
 
@@ -133,7 +133,7 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
 
   saveNextContentIdIndex(displayedValue: number): void {
     this._updateQuestion(() => {
-      const stateData = this.question?.getStateData();
+      const stateData = this.question.getStateData();
       stateData.nextContentIdIndex = cloneDeep(displayedValue);
     });
   }
@@ -180,7 +180,7 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
     // Show the interaction when the text content is saved, even if no
     // content is entered.
     this._updateQuestion(() => {
-      const stateData = this.question?.getStateData();
+      const stateData = this.question.getStateData();
       stateData.content = cloneDeep(displayedValue);
       this.interactionIsShown = true;
     });
@@ -190,8 +190,10 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
     this.stateEditorService.setStateNames([]);
     this.stateEditorService.setCorrectnessFeedbackEnabled(true);
     this.stateEditorService.setInQuestionMode(true);
-    this.stateEditorService.setInapplicableSkillMisconceptionIds(
-      this.question?.getInapplicableSkillMisconceptionIds());
+    if (this.question) {
+      this.stateEditorService.setInapplicableSkillMisconceptionIds(
+        this.question.getInapplicableSkillMisconceptionIds());
+    }
     this.solutionValidityService.init(['question']);
     const stateData = this.questionStateData;
     stateData.interaction.defaultOutcome.setDestination(null);

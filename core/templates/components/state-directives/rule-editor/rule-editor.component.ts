@@ -40,6 +40,12 @@ interface Choice {
   val: string | number | SubtitledHtml;
 }
 
+export interface RuleDescriptionFragment {
+  type: string;
+  varName: string;
+  text: string;
+}
+
 @Component({
   selector: 'oppia-rule-editor',
   templateUrl: './rule-editor.component.html'
@@ -51,9 +57,9 @@ export class RuleEditorComponent
   @Output() onCancelRuleEdit = new EventEmitter<void>();
   @Output() onSaveRule = new EventEmitter<void>();
   @Input() rule: Rule;
-  @Input() modalId: unknown;
+  @Input() modalId: symbol;
 
-  ruleDescriptionFragments: unknown[];
+  ruleDescriptionFragments: RuleDescriptionFragment[];
   currentInteractionId: string;
   ruleDescriptionChoices: Choice[];
   isInvalid: boolean;

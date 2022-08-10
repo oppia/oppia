@@ -41,6 +41,7 @@ import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
 import { Hint } from 'domain/exploration/HintObjectFactory';
 import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
+import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
 
 @Component({
   selector: 'oppia-state-editor',
@@ -51,7 +52,9 @@ export class StateEditorComponent implements OnInit, OnDestroy {
   @Output() onSaveInapplicableSkillMisconceptionIds = (
     new EventEmitter<string[]>());
 
-  @Output() onSaveInteractionAnswerGroups = new EventEmitter<unknown>();
+  @Output() onSaveInteractionAnswerGroups = (
+    new EventEmitter<AnswerGroup[]>());
+
   @Output() onSaveInteractionCustomizationArgs = (
     new EventEmitter<InteractionCustomizationArgs>());
 
@@ -132,7 +135,7 @@ export class StateEditorComponent implements OnInit, OnDestroy {
     this.onSaveInteractionDefaultOutcome.emit($event);
   }
 
-  sendOnSaveInteractionAnswerGroups($event: string[]): void {
+  sendOnSaveInteractionAnswerGroups($event: AnswerGroup[]): void {
     this.onSaveInteractionAnswerGroups.emit($event);
   }
 
