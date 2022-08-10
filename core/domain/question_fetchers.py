@@ -134,7 +134,7 @@ def get_question_from_model(
             feconf.CURRENT_STATE_SCHEMA_VERSION):
         _migrate_state_schema(versioned_question_state)
 
-    return question_domain.Question(  # type: ignore[no-untyped-call]
+    return question_domain.Question(
         question_model.id,
         state_domain.State.from_dict(versioned_question_state['state']),
         versioned_question_state['state_schema_version'],
