@@ -74,8 +74,8 @@ class CheckBackendAssociatedTestFileTests(test_utils.GenericTestBase):
             '\033[1m{}\033[0m needs an associated backend test file.\n'
             .format(self.frontend_file), self.error_arr)
 
-    def test_checks_pass_when_a_backend_file_in_exclusion_list_lacks_associated_test_file(  # pylint: disable=line-too-long
-            self) -> None:
+    def test_pass_when_file_in_exclusion_list_lacks_associated_test(
+        self) -> None:
         (
             check_backend_associated_test_file.
                 FILES_WITHOUT_ASSOCIATED_TEST_FILES.append(self.backend_file))
@@ -101,7 +101,7 @@ class CheckBackendAssociatedTestFileTests(test_utils.GenericTestBase):
 
         self.assertIn(
             'Backend associated test file checks passed.', self.print_arr)
-        self.assertEqual(len(self.error_arr), 0)
+        self.assertEqual(self.error_arr, [])
         self.assertNotIn(
             '\033[1m{}\033[0m needs an associated backend test file.\n'
             .format(self.frontend_file), self.error_arr)
