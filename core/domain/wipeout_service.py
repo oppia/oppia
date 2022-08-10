@@ -206,12 +206,14 @@ def pre_delete_user(user_id: str) -> None:
     date_now = datetime.datetime.utcnow()
     date_before_which_username_should_be_saved = (
         date_now - PERIOD_AFTER_WHICH_USERNAME_CANNOT_BE_REUSED)
+    print(user_settings.created_on)
+    if user_settings.created_on is None:
+        raise Exception(
+            'No data available for when the user was created on.'
+        )
     normalized_long_term_username = (
         user_settings.normalized_username
-        if (
-           user_settings.created_on is not None and
-           user_settings.created_on < date_before_which_username_should_be_saved
-        )
+        if user_settings.created_on < date_before_which_username_should_be_saved
         else None
     )
     pending_deletion_requests.append(
@@ -746,12 +748,11 @@ def _collect_and_save_entity_ids_from_snapshots_and_commits(
         commit_log_models = list(commit_log_model_class.query(
             commit_log_model_class.user_id == user_id
         ).fetch())
-        # Here `commit_log_model_field_name` is never going to be a None
-        # value, because commit_log_model_field_name can only be None when
-        # commit_log_model_class is None and if commit_log_model_class is
-        # None, then this line of code is never going to be executed. So,
-        # to just narrow down type for type checking, we used assert here.
-        assert commit_log_model_field_name is not None
+        if commit_log_model_field_name is None:
+            raise Exception(
+                'Field name can only be None when commit log model class is '
+                'not provided.'
+            )
         commit_log_ids = set(
             getattr(model, commit_log_model_field_name)
             for model in commit_log_models)

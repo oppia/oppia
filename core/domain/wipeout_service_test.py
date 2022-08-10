@@ -597,6 +597,21 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
         top_rights_model = topic_models.TopicRightsModel.get_by_id('top_id')
         self.assertEqual(top_rights_model.manager_ids, [])
 
+    def test_raises_error_if_created_on_is_unavailable(self):
+        user_settings = user_services.get_user_settings(self.user_1_id)
+        user_settings.created_on = None
+
+        with self.swap_to_always_return(
+            user_services,
+            'get_user_settings',
+            user_settings
+        ):
+            with self.assertRaisesRegex(
+                Exception,
+                'No data available for when the user was created on.'
+            ):
+                wipeout_service.pre_delete_user(self.user_1_id)
+
 
 class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
     """Provides testing of the pre-deletion part of wipeout service."""
