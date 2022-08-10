@@ -45,7 +45,7 @@ auth_services = models.Registry.import_auth_services()
 class ContributorDashboardDebugRequestsTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(ContributorDashboardDebugRequestsTests, self).setUp()
+        super().setUp()
         self.firebase_sdk_stub = (
             firebase_auth_services_test.FirebaseAdminSdkStub())
         self.firebase_sdk_stub.install(self)
@@ -59,7 +59,7 @@ class ContributorDashboardDebugRequestsTests(test_utils.GenericTestBase):
 
     def tearDown(self) -> None:
         self.firebase_sdk_stub.uninstall()
-        super(ContributorDashboardDebugRequestsTests, self).tearDown()
+        super().tearDown()
 
     def mock_request(
         self,
