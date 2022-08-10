@@ -20,6 +20,7 @@ import { Component, forwardRef, Input, OnInit } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, ControlValueAccessor, Validator, AbstractControl, ValidationErrors } from '@angular/forms';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { IdGenerationService } from 'services/id-generation.service';
+import { Schema, SchemaDefaultValue } from 'services/schema-default-value.service';
 
 @Component({
   selector: 'schema-based-dict-editor',
@@ -40,26 +41,31 @@ import { IdGenerationService } from 'services/id-generation.service';
 
 export class SchemaBasedDictEditorComponent
 implements ControlValueAccessor, OnInit, Validator {
-  localValue: unknown;
-  @Input() disabled;
-  @Input() propertySchemas;
-  @Input() labelForFocusTarget;
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  localValue!: Record<string, SchemaDefaultValue>;
+  @Input() disabled!: boolean;
+  @Input() propertySchemas!: {name: string; schema: Schema}[];
+  @Input() labelForFocusTarget!: string;
   /**
    * Mapping of propertySchemaName to corresponding fieldIds.
    * Populated in ngOnInit.
    */
   fieldIds: Record<string, string> = {};
   JSON = JSON;
-  onChange: (val: unknown) => void = () => {};
+  onChange: (val: Record<string, SchemaDefaultValue>) => void = () => {};
   constructor(private idGenerationService: IdGenerationService) { }
 
   // Implemented as a part of ControlValueAccessor interface.
-  writeValue(value: unknown): void {
+  writeValue(value: Record<string, SchemaDefaultValue>): void {
     this.localValue = value;
   }
 
   // Implemented as a part of ControlValueAccessor interface.
-  registerOnChange(fn: (val: unknown) => void): void {
+  registerOnChange(
+      fn: (val: Record<string, SchemaDefaultValue>) => void
+  ): void {
     this.onChange = fn;
   }
 
@@ -86,12 +92,12 @@ implements ControlValueAccessor, OnInit, Validator {
     }
   }
 
-  updateValue(value: unknown, name: string): void {
+  updateValue(value: SchemaDefaultValue, name: string): void {
     this.localValue[name] = value;
     this.onChange(this.localValue);
   }
 
-  getSchema(index: number): unknown {
+  getSchema(index: number): Schema {
     return this.propertySchemas[index].schema;
   }
 

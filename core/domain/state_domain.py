@@ -45,6 +45,14 @@ from core.domain import translatable_object_registry  # pylint: disable=invalid-
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
 
+AllowedInputValueTypes = Union[
+    str,
+    int,
+    List[str],
+    List[List[str]],
+    Dict[str, Union[str, List[str]]]
+]
+
 
 class AnswerGroupDict(TypedDict):
     """Dictionary representing the AnswerGroup object."""
@@ -596,7 +604,7 @@ class InteractionInstanceDict(TypedDict):
     """Dictionary representing the InteractionInstance object."""
 
     id: str
-    customization_args: Dict[str, Dict[str, Any]]
+    customization_args: Dict[str, InteractionCustomizationArg]
     answer_groups: List[AnswerGroupDict]
     default_outcome: OutcomeDict
     confirmed_unclassified_answers: List[str]
@@ -1477,7 +1485,8 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
 class OutcomeDict(TypedDict):
     """Dictionary representing the Outcome object."""
 
-    dest: str
+    dest: Optional[str]
+    dest_if_really_stuck: Optional[str]
     feedback: SubtitledHtmlDict
     labelled_as_correct: bool
     param_changes: List[param_domain.ParamChangeDict]
@@ -2375,7 +2384,7 @@ class RuleSpecDict(TypedDict):
     """Dictionary representing the RuleSpec object."""
 
     rule_type: str
-    inputs: Mapping[str, Union[str, int, List[str], List[List[str]]]]
+    inputs: Mapping[str, AllowedInputValueTypes]
 
 
 class RuleSpec(translation_domain.BaseTranslatableObject):
@@ -2384,7 +2393,7 @@ class RuleSpec(translation_domain.BaseTranslatableObject):
     def __init__(
         self,
         rule_type: str,
-        inputs: Mapping[str, Union[str, int, List[str], List[List[str]]]]
+        inputs: Mapping[str, AllowedInputValueTypes]
     ) -> None:
         """Initializes a RuleSpec domain object.
 
