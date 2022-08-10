@@ -490,7 +490,7 @@ class DiagnosticTestSkillAssignmentHandlerTest(BaseSkillEditorControllerTests):
     """Tests for DiagnosticTestSkillAssignmentHandler."""
 
     def setUp(self) -> None:
-        super(DiagnosticTestSkillAssignmentHandlerTest, self).setUp()
+        super().setUp()
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.url = '%s/%s' % (
             feconf.DIAGNOSTIC_TEST_SKILL_ASSIGNMENT_HANDLER, 'skill_id_1')

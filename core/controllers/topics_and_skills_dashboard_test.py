@@ -1071,7 +1071,7 @@ class TopicIdToDiagnosticTestSkillIdsHandlerTests(
     """Tests TopicIdToDiagnosticTestSkillIdsHandler class."""
 
     def setUp(self) -> None:
-        super(TopicIdToDiagnosticTestSkillIdsHandlerTests, self).setUp()
+        super().setUp()
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.url = '%s/%s' % (
             feconf.TOPIC_ID_TO_DIAGNOSTIC_TEST_SKILL_IDS_HANDLER, 'topic_id')
