@@ -469,11 +469,11 @@ var ExplorationEditorMainTab = function() {
       postTutorialPopover, 'Post-tutorial popover does not disappear.');
     await action.waitForAutosave();
     if (expectFadeIn) {
-      // We use browser.sleep() here because waiting for the fade-in to complete
+      // We use browser.pause() here because waiting for the fade-in to complete
       // doesn't work for some reason. Also, since the fade-in is a client-side
       // animation, it should always happen in the same amount of time.
       // eslint-disable-next-line oppia/e2e-practices
-      await browser.sleep(5000);
+      await browser.pause(5000);
     }
     await action.click('stateEditButton', stateEditButton);
     await waitFor.visibilityOf(
