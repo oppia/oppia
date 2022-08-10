@@ -18,11 +18,6 @@ jobs:
         os: [ubuntu-22.04]
         shard: [1, 2, 3, 4]
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
-        with:
-          python-version: '2.7'
-          architecture: 'x64'
       - uses: actions/setup-python@v2
         with:
           python-version: '3.7'
@@ -66,11 +61,6 @@ jobs:
     needs: run_tests
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
-        with:
-          python-version: '2.7'
-          architecture: 'x64'
       - uses: actions/setup-python@v2
         with:
           python-version: '3.7'

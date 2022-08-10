@@ -10,6 +10,7 @@ runs:
       run: |
         sudo apt update
         sudo apt install python2
+      shell: bash
     - name: Check Yarn Cache
       run: |
         # Move outside repository root to ignore the configs in
