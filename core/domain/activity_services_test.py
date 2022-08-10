@@ -67,7 +67,7 @@ class ActivityServicesTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         """Publish two explorations and one collection."""
-        super(ActivityServicesTests, self).setUp()
+        super().setUp()
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL) # type: ignore[no-untyped-call]
@@ -142,7 +142,7 @@ class ActivityServicesTests(test_utils.GenericTestBase):
                 self._create_collection_reference(self.COL_ID_2)])
 
         # Deleting a featured activity removes it from the featured list.
-        collection_services.delete_collection(self.owner_id, self.COL_ID_2) # type: ignore[no-untyped-call]
+        collection_services.delete_collection(self.owner_id, self.COL_ID_2)
         self._compare_lists(
             activity_services.get_featured_activity_references(), [
                 self._create_exploration_reference(self.EXP_ID_0)])

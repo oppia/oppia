@@ -54,7 +54,7 @@ class SetupTests(test_utils.GenericTestBase):
     """Test the methods for setup script."""
 
     def setUp(self):
-        super(SetupTests, self).setUp()
+        super().setUp()
         self.check_function_calls = {
             'create_directory_is_called': False,
             'test_python_version_is_called': False,

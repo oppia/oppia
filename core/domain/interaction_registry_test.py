@@ -38,7 +38,7 @@ class InteractionDependencyTests(test_utils.GenericTestBase):
     """Tests for the calculation of dependencies for interactions."""
 
     def setUp(self) -> None:
-        super(InteractionDependencyTests, self).setUp()
+        super().setUp()
 
         # Register and login as an editor.
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)

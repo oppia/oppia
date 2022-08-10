@@ -48,7 +48,7 @@ class BlogPostModelTest(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         """Set up blog post models in datastore for use in testing."""
-        super(BlogPostModelTest, self).setUp()
+        super().setUp()
 
         self.blog_post_model = blog_models.BlogPostModel(
             id='blog_one',
@@ -183,7 +183,7 @@ class BlogPostSummaryModelTest(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         """Set up models in datastore for use in testing."""
-        super(BlogPostSummaryModelTest, self).setUp()
+        super().setUp()
 
         self.blog_post_summary_model_old = (
             blog_models.BlogPostSummaryModel(
@@ -271,7 +271,7 @@ class BlogPostRightsModelTest(test_utils.GenericTestBase):
     BLOG_POST_ID_OLD: Final = 'blog_post_old_id'
 
     def setUp(self) -> None:
-        super(BlogPostRightsModelTest, self).setUp()
+        super().setUp()
         self.blog_post_rights_model = blog_models.BlogPostRightsModel(
             id=self.BLOG_POST_ID_NEW,
             editor_ids=[self.USER_ID_NEW],

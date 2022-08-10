@@ -72,7 +72,7 @@ class LearnerGoalsTests(test_utils.GenericTestBase):
     )
 
     def setUp(self) -> None:
-        super(LearnerGoalsTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)

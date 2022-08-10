@@ -53,7 +53,7 @@ class BaseValueGenerator:
         return self.__class__.__name__
 
     @classmethod
-    def get_html_template(cls) -> bytes:
+    def get_html_template(cls) -> str:
         """Returns the HTML template for the class.
 
         Returns:

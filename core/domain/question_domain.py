@@ -36,7 +36,8 @@ from core.domain import translation_domain
 from extensions import domain
 
 from pylatexenc import latex2text
-from typing import TypedDict
+
+from typing import List, Optional, TypedDict
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
@@ -143,10 +144,17 @@ class Question(translation_domain.BaseTranslatableObject):
     """Domain object for a question."""
 
     def __init__(
-            self, question_id, question_state_data,
-            question_state_data_schema_version, language_code, version,
-            linked_skill_ids, inapplicable_skill_misconception_ids,
-            created_on=None, last_updated=None):
+        self,
+        question_id: str,
+        question_state_data: state_domain.State,
+        question_state_data_schema_version: int,
+        language_code: str,
+        version: int,
+        linked_skill_ids: List[str],
+        inapplicable_skill_misconception_ids: List[str],
+        created_on: Optional[datetime.datetime] = None,
+        last_updated: Optional[datetime.datetime] = None
+    ) -> None:
         """Constructs a Question domain object.
 
         Args:

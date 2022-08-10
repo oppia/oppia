@@ -1679,7 +1679,7 @@ class AnswerFrequencyList(AnswerCalculationOutput):
         """Initialize domain object for answer frequency list for a given list
         of AnswerOccurrence objects (default is empty list).
         """
-        super(AnswerFrequencyList, self).__init__(
+        super().__init__(
             CALC_OUTPUT_TYPE_ANSWER_FREQUENCY_LIST)
         self.answer_occurrences = (
             answer_occurrences if answer_occurrences else [])
@@ -1737,7 +1737,7 @@ class CategorizedAnswerFrequencyLists(AnswerCalculationOutput):
         """Initialize domain object for categorized answer frequency lists for
         a given dict (default is empty).
         """
-        super(CategorizedAnswerFrequencyLists, self).__init__(
+        super().__init__(
             CALC_OUTPUT_TYPE_CATEGORIZED_ANSWER_FREQUENCY_LISTS)
         self.categorized_answer_freq_lists = (
             categorized_answer_freq_lists

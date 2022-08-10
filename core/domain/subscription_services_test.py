@@ -56,7 +56,7 @@ class SubscriptionsTest(test_utils.GenericTestBase):
     OWNER2_USERNAME: Final = 'owner2'
 
     def setUp(self) -> None:
-        super(SubscriptionsTest, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
@@ -327,14 +327,14 @@ class SubscriptionsTest(test_utils.GenericTestBase):
     def test_creating_collection_results_in_subscription(self) -> None:
         self.assertEqual(
             self._get_collection_ids_subscribed_to(USER_ID), [])
-        self.save_new_default_collection(COLLECTION_ID, USER_ID)  # type: ignore[no-untyped-call]
+        self.save_new_default_collection(COLLECTION_ID, USER_ID)
         self.assertEqual(
             self._get_collection_ids_subscribed_to(USER_ID), [COLLECTION_ID])
 
     def test_adding_new_collection_owner_or_editor_role_results_in_subscription(
         self
     ) -> None:
-        self.save_new_default_collection(COLLECTION_ID, self.owner_id)  # type: ignore[no-untyped-call]
+        self.save_new_default_collection(COLLECTION_ID, self.owner_id)
 
         self.assertEqual(
             self._get_collection_ids_subscribed_to(self.owner_2_id), [])
@@ -357,7 +357,7 @@ class SubscriptionsTest(test_utils.GenericTestBase):
     def test_adding_new_collection_viewer_role_does_not_result_in_subscription(
         self
     ) -> None:
-        self.save_new_default_collection(COLLECTION_ID, self.owner_id)  # type: ignore[no-untyped-call]
+        self.save_new_default_collection(COLLECTION_ID, self.owner_id)
 
         self.assertEqual(
             self._get_collection_ids_subscribed_to(self.viewer_id), [])
@@ -368,12 +368,12 @@ class SubscriptionsTest(test_utils.GenericTestBase):
             self._get_collection_ids_subscribed_to(self.viewer_id), [])
 
     def test_deleting_collection_does_not_delete_subscription(self) -> None:
-        self.save_new_default_collection(COLLECTION_ID, self.owner_id)  # type: ignore[no-untyped-call]
+        self.save_new_default_collection(COLLECTION_ID, self.owner_id)
         self.assertEqual(
             self._get_collection_ids_subscribed_to(self.owner_id),
             [COLLECTION_ID])
 
-        collection_services.delete_collection(self.owner_id, COLLECTION_ID)  # type: ignore[no-untyped-call]
+        collection_services.delete_collection(self.owner_id, COLLECTION_ID)
 
         self.assertEqual(
             self._get_collection_ids_subscribed_to(self.owner_id),
@@ -382,7 +382,7 @@ class SubscriptionsTest(test_utils.GenericTestBase):
     def test_adding_exploration_to_collection_does_not_create_subscription(
         self
     ) -> None:
-        self.save_new_default_collection(COLLECTION_ID, self.owner_id)  # type: ignore[no-untyped-call]
+        self.save_new_default_collection(COLLECTION_ID, self.owner_id)
 
         # The author is subscribed to the collection but to no explorations.
         self.assertEqual(
@@ -397,7 +397,7 @@ class SubscriptionsTest(test_utils.GenericTestBase):
         # If the collection author adds the exploration to his/her collection,
         # the collection author should not be subscribed to the exploration nor
         # should the exploration author be subscribed to the collection.
-        collection_services.update_collection(  # type: ignore[no-untyped-call]
+        collection_services.update_collection(
             self.owner_id, COLLECTION_ID, [{
                 'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
                 'exploration_id': EXP_ID
@@ -418,7 +418,7 @@ class UserSubscriptionsTest(test_utils.GenericTestBase):
     OWNER2_USERNAME: Final = 'owner2'
 
     def setUp(self) -> None:
-        super(UserSubscriptionsTest, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.OWNER_2_EMAIL, self.OWNER2_USERNAME)
 

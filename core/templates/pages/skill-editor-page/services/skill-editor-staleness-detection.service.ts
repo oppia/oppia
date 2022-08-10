@@ -37,7 +37,10 @@ import constants from 'assets/constants';
 export class SkillEditorStalenessDetectionService {
   _staleTabEventEmitter = new EventEmitter<void>();
   _presenceOfUnsavedChangesEventEmitter = new EventEmitter<void>();
-  unsavedChangesWarningModalRef: NgbModalRef = null;
+  // This property is initialized using init method and we need to do
+  // non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  unsavedChangesWarningModalRef!: NgbModalRef;
 
   constructor(
     private ngbModal: NgbModal,
@@ -60,7 +63,8 @@ export class SkillEditorStalenessDetectionService {
 
   showStaleTabInfoModal(): void {
     const skill = this.skillEditorStateService.getSkill();
-    const skillEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo = (
+    // Return null if skill id is not present in the local storage.
+    const skillEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo | null = (
       this.localStorageService.getEntityEditorBrowserTabsInfo(
         EntityEditorBrowserTabsInfoDomainConstants
           .OPENED_SKILL_EDITOR_BROWSER_TABS, skill.getId()));

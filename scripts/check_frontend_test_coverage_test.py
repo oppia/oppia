@@ -31,7 +31,7 @@ from . import check_frontend_test_coverage
 
 class CheckFrontendCoverageTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
-        super(CheckFrontendCoverageTests, self).setUp()
+        super().setUp()
         self.lcov_items_list: Optional[str] = None
         self.check_function_calls = {
             'open_file_is_called': False,

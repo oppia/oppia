@@ -132,7 +132,7 @@ class BazModel(base_models.BaseModel):
 class AuditsExistingTests(test_utils.TestBase):
 
     def tearDown(self) -> None:
-        super(AuditsExistingTests, self).tearDown()
+        super().tearDown()
         MockAuditsExisting.clear()
 
     def test_has_no_do_fns_by_default(self) -> None:
@@ -231,7 +231,7 @@ class MockRelationshipsOf(validation_decorators.RelationshipsOf):
 class RelationshipsOfTests(test_utils.TestBase):
 
     def tearDown(self) -> None:
-        super(RelationshipsOfTests, self).tearDown()
+        super().tearDown()
         MockRelationshipsOf.clear()
 
     def get_property_of(

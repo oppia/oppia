@@ -45,7 +45,7 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
     EXP_3_ID: Final = 'exploration_3_id'
 
     def setUp(self) -> None:
-        super(ExplorationRetrievalTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
         self.exploration_1 = self.save_new_default_exploration(  # type: ignore[no-untyped-call]
@@ -365,7 +365,7 @@ class LoggedOutUserProgressTests(test_utils.GenericTestBase):
     EXP_1_ID = 'exploration_1_id'
 
     def setUp(self) -> None:
-        super(LoggedOutUserProgressTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
         self.exploration_1 = self.save_new_default_exploration(  # type: ignore[no-untyped-call]
@@ -510,7 +510,7 @@ title: Old Title
     ALBERT_NAME: Final = 'albert'
 
     def setUp(self) -> None:
-        super(ExplorationConversionPipelineTests, self).setUp()
+        super().setUp()
 
         # Setup user who will own the test explorations.
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)

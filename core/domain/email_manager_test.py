@@ -53,7 +53,7 @@ class FailedMLTest(test_utils.EmailTestBase):
     """
 
     def setUp(self) -> None:
-        super(FailedMLTest, self).setUp()  # type: ignore[no-untyped-call]
+        super().setUp()  # type: ignore[no-untyped-call]
         self.can_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS', True)
         self.can_send_feedback_email_ctx = self.swap(
@@ -167,7 +167,7 @@ class EmailRightsTest(test_utils.GenericTestBase):
     """Test that only certain users can send certain types of emails."""
 
     def setUp(self) -> None:
-        super(EmailRightsTest, self).setUp()
+        super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)  # type: ignore[no-untyped-call]
 
@@ -228,7 +228,7 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
     EXPLORATION_TITLE: Final = 'Title'
 
     def setUp(self) -> None:
-        super(ExplorationMembershipEmailTests, self).setUp()  # type: ignore[no-untyped-call]
+        super().setUp()  # type: ignore[no-untyped-call]
 
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)  # type: ignore[no-untyped-call]
@@ -574,7 +574,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
     """Test that signup-email sending functionality works as expected."""
 
     def setUp(self) -> None:
-        super(SignupEmailTests, self).setUp()  # type: ignore[no-untyped-call]
+        super().setUp()  # type: ignore[no-untyped-call]
 
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)  # type: ignore[no-untyped-call]
@@ -923,7 +923,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
     """Test that duplicate emails are not sent."""
 
     def setUp(self) -> None:
-        super(DuplicateEmailTests, self).setUp()  # type: ignore[no-untyped-call]
+        super().setUp()  # type: ignore[no-untyped-call]
 
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)  # type: ignore[no-untyped-call]
@@ -1284,7 +1284,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
 class FeedbackMessageBatchEmailTests(test_utils.EmailTestBase):
 
     def setUp(self) -> None:
-        super(FeedbackMessageBatchEmailTests, self).setUp()  # type: ignore[no-untyped-call]
+        super().setUp()  # type: ignore[no-untyped-call]
 
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)  # type: ignore[no-untyped-call]
@@ -1423,7 +1423,7 @@ class FeedbackMessageBatchEmailTests(test_utils.EmailTestBase):
 
 class SuggestionEmailTests(test_utils.EmailTestBase):
     def setUp(self) -> None:
-        super(SuggestionEmailTests, self).setUp()  # type: ignore[no-untyped-call]
+        super().setUp()  # type: ignore[no-untyped-call]
 
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)  # type: ignore[no-untyped-call]
@@ -1531,7 +1531,7 @@ class SuggestionEmailTests(test_utils.EmailTestBase):
 
 class SubscriptionEmailTests(test_utils.EmailTestBase):
     def setUp(self) -> None:
-        super(SubscriptionEmailTests, self).setUp()  # type: ignore[no-untyped-call]
+        super().setUp()  # type: ignore[no-untyped-call]
 
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)  # type: ignore[no-untyped-call]
@@ -1632,7 +1632,7 @@ class SubscriptionEmailTests(test_utils.EmailTestBase):
 
 class FeedbackMessageInstantEmailTests(test_utils.EmailTestBase):
     def setUp(self) -> None:
-        super(FeedbackMessageInstantEmailTests, self).setUp()  # type: ignore[no-untyped-call]
+        super().setUp()  # type: ignore[no-untyped-call]
 
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)  # type: ignore[no-untyped-call]
@@ -1742,7 +1742,7 @@ class FlagExplorationEmailTest(test_utils.EmailTestBase):
     """Test that emails are sent to moderators when explorations are flagged."""
 
     def setUp(self) -> None:
-        super(FlagExplorationEmailTest, self).setUp()  # type: ignore[no-untyped-call]
+        super().setUp()  # type: ignore[no-untyped-call]
 
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)  # type: ignore[no-untyped-call]
@@ -1864,7 +1864,7 @@ class OnboardingReviewerInstantEmailTests(test_utils.EmailTestBase):
     REVIEWER_EMAIL: Final = 'reviewer@example.com'
 
     def setUp(self) -> None:
-        super(OnboardingReviewerInstantEmailTests, self).setUp()  # type: ignore[no-untyped-call]
+        super().setUp()  # type: ignore[no-untyped-call]
         self.signup(self.REVIEWER_EMAIL, self.REVIEWER_USERNAME)
         self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)  # type: ignore[no-untyped-call]
         user_services.update_email_preferences(
@@ -1940,7 +1940,7 @@ class NotifyReviewerInstantEmailTests(test_utils.EmailTestBase):
     REVIEWER_EMAIL: Final = 'reviewer@example.com'
 
     def setUp(self) -> None:
-        super(NotifyReviewerInstantEmailTests, self).setUp()  # type: ignore[no-untyped-call]
+        super().setUp()  # type: ignore[no-untyped-call]
         self.signup(self.REVIEWER_EMAIL, self.REVIEWER_USERNAME)
         self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)  # type: ignore[no-untyped-call]
         user_services.update_email_preferences(
@@ -2154,7 +2154,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         self.logged_info.append(msg % args)
 
     def setUp(self) -> None:
-        super(NotifyContributionDashboardReviewersEmailTests, self).setUp()  # type: ignore[no-untyped-call]
+        super().setUp()  # type: ignore[no-untyped-call]
         self.signup(self.AUTHOR_EMAIL, self.AUTHOR_USERNAME)
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)  # type: ignore[no-untyped-call]
         self.signup(self.REVIEWER_1_EMAIL, self.REVIEWER_1_USERNAME)
@@ -3766,9 +3766,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
         self.logged_info.append(msg % args)
 
     def setUp(self) -> None:
-        super(  # type: ignore[no-untyped-call]
-            NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests,
-            self).setUp()
+        super().setUp() # type: ignore[no-untyped-call]
         self.signup(self.AUTHOR_EMAIL, self.AUTHOR_USERNAME)
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)  # type: ignore[no-untyped-call]
         self.signup(
@@ -4553,9 +4551,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         self.logged_info.append(msg % args)
 
     def setUp(self) -> None:
-        super(   # type: ignore[no-untyped-call]
-            NotifyAdminsContributorDashboardReviewersNeededTests,
-            self).setUp()
+        super().setUp() # type: ignore[no-untyped-call]
         self.signup(self.AUTHOR_EMAIL, 'author')
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)   # type: ignore[no-untyped-call]
         self.signup(
@@ -5173,7 +5169,7 @@ class QueryStatusNotificationEmailTests(test_utils.EmailTestBase):
     RECIPIENT_B_USERNAME: Final = 'userb'
 
     def setUp(self) -> None:
-        super(QueryStatusNotificationEmailTests, self).setUp()   # type: ignore[no-untyped-call]
+        super().setUp()   # type: ignore[no-untyped-call]
         self.signup(self.SUBMITTER_EMAIL, self.SUBMITTER_USERNAME)
         self.submitter_id = self.get_user_id_from_email(self.SUBMITTER_EMAIL)   # type: ignore[no-untyped-call]
         self.signup(self.SENDER_EMAIL, self.SENDER_USERNAME)
@@ -5370,7 +5366,7 @@ class VoiceoverApplicationEmailUnitTest(test_utils.EmailTestBase):
     APPLICANT_EMAIL: Final = 'applicant@example.com'
 
     def setUp(self) -> None:
-        super(VoiceoverApplicationEmailUnitTest, self).setUp()   # type: ignore[no-untyped-call]
+        super().setUp()   # type: ignore[no-untyped-call]
         self.signup(self.APPLICANT_EMAIL, self.APPLICANT_USERNAME)
         self.applicant_id = self.get_user_id_from_email(self.APPLICANT_EMAIL)   # type: ignore[no-untyped-call]
         user_services.update_email_preferences(
@@ -5515,7 +5511,7 @@ class AccountDeletionEmailUnitTest(test_utils.EmailTestBase):
     APPLICANT_EMAIL: Final = 'applicant@example.com'
 
     def setUp(self) -> None:
-        super(AccountDeletionEmailUnitTest, self).setUp()   # type: ignore[no-untyped-call]
+        super().setUp()   # type: ignore[no-untyped-call]
         self.signup(self.APPLICANT_EMAIL, self.APPLICANT_USERNAME)
         self.applicant_id = self.get_user_id_from_email(self.APPLICANT_EMAIL)   # type: ignore[no-untyped-call]
         self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
@@ -5611,7 +5607,7 @@ class BulkEmailsTests(test_utils.EmailTestBase):
     RECIPIENT_B_USERNAME: Final = 'userb'
 
     def setUp(self) -> None:
-        super(BulkEmailsTests, self).setUp()   # type: ignore[no-untyped-call]
+        super().setUp()   # type: ignore[no-untyped-call]
         # SENDER is authorised sender.
         # FAKE_SENDER is unauthorised sender.
         # A and B are recipients.
@@ -5805,7 +5801,7 @@ class ModeratorActionEmailsTests(test_utils.EmailTestBase):
     RECIPIENT_USERNAME: Final = 'usera'
 
     def setUp(self) -> None:
-        super(ModeratorActionEmailsTests, self).setUp()   # type: ignore[no-untyped-call]
+        super().setUp()   # type: ignore[no-untyped-call]
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)   # type: ignore[no-untyped-call]
         self.set_moderators([self.MODERATOR_USERNAME])   # type: ignore[no-untyped-call]
@@ -5875,7 +5871,7 @@ class ContributionReviewerEmailTest(test_utils.EmailTestBase):
     QUESTION_REVIEWER_EMAIL: Final = 'questionreviewer@example.com'
 
     def setUp(self) -> None:
-        super(ContributionReviewerEmailTest, self).setUp()   # type: ignore[no-untyped-call]
+        super().setUp()   # type: ignore[no-untyped-call]
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.TRANSLATION_REVIEWER_EMAIL, 'translator')
         self.signup(self.VOICEOVER_REVIEWER_EMAIL, 'voiceartist')
@@ -6258,7 +6254,7 @@ class NotMergeableChangesEmailUnitTest(test_utils.EmailTestBase):
     dummy_admin_address: str = 'admin@system.com'
 
     def setUp(self) -> None:
-        super(NotMergeableChangesEmailUnitTest, self).setUp()   # type: ignore[no-untyped-call]
+        super().setUp()   # type: ignore[no-untyped-call]
         self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
         self.admin_email_ctx = self.swap(
             feconf, 'ADMIN_EMAIL_ADDRESS', self.dummy_admin_address)

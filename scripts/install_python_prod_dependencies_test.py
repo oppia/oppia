@@ -90,7 +90,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         'invalid_git_requirements_test.txt')
 
     def setUp(self):
-        super(InstallBackendPythonLibsTests, self).setUp()
+        super().setUp()
         self.print_arr = []
 
         def mock_print(msg):
