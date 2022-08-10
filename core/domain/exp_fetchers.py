@@ -196,7 +196,7 @@ def get_exploration_from_model(
             feconf.CURRENT_STATE_SCHEMA_VERSION):
         _migrate_states_schema(versioned_exploration_states, init_state_name)
 
-    return exp_domain.Exploration(  # type: ignore[no-untyped-call]
+    return exp_domain.Exploration(
         exploration_model.id, exploration_model.title,
         exploration_model.category, exploration_model.objective,
         exploration_model.language_code, exploration_model.tags,

@@ -552,7 +552,11 @@ def is_story_published_and_present_in_topic(story):
 
 
 def update_story(
-        committer_id, story_id, change_list, commit_message):
+    committer_id: str,
+    story_id: str,
+    change_list: List[story_domain.StoryChange],
+    commit_message: str
+) -> None:
     """Updates a story. Commits changes.
 
     # NOTE: This function should not be called on its own. Access it
@@ -564,7 +568,7 @@ def update_story(
         story_id: str. The story id.
         change_list: list(StoryChange). These changes are applied in sequence to
             produce the resulting story.
-        commit_message: str or None. A description of changes made to the
+        commit_message: str. A description of changes made to the
             story.
 
     Raises:

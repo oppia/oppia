@@ -32,8 +32,10 @@ from extensions.rich_text_components import components
 import bs4
 import defusedxml.ElementTree
 
+from typing import Callable, Dict, Iterator, List, Tuple, Union
 
-def escape_html(unescaped_html_data):
+
+def escape_html(unescaped_html_data: str) -> str:
     """This functions escapes an unescaped HTML string.
 
     Args:
@@ -58,7 +60,7 @@ def escape_html(unescaped_html_data):
     return escaped_html_data
 
 
-def unescape_html(escaped_html_data):
+def unescape_html(escaped_html_data: str) -> str:
     """This function unescapes an escaped HTML string.
 
     Args:
@@ -83,7 +85,7 @@ def unescape_html(escaped_html_data):
     return unescaped_html_data
 
 
-def wrap_with_siblings(tag, p):
+def wrap_with_siblings(tag: bs4.element.Tag, p: bs4.element.Tag) -> None:
     """This function wraps a tag and its unwrapped sibling in p tag.
 
     Args:
@@ -125,16 +127,16 @@ def wrap_with_siblings(tag, p):
 
 
 # List of oppia noninteractive inline components.
-INLINE_COMPONENT_TAG_NAMES = (
+INLINE_COMPONENT_TAG_NAMES: List[str] = (
     rte_component_registry.Registry.get_inline_component_tag_names())
 
 # List of oppia noninteractive block components.
-BLOCK_COMPONENT_TAG_NAMES = (
+BLOCK_COMPONENT_TAG_NAMES: List[str] = (
     rte_component_registry.Registry.get_block_component_tag_names())
 
 # See https://perso.crans.org/besson/_static/python/lib/python2.7/encodings/cp1252.py # pylint: disable=line-too-long
 # Useful reading: https://www.regular-expressions.info/unicode8bit.html
-CHAR_MAPPINGS = [
+CHAR_MAPPINGS: List[Tuple[str, str]] = [
     (u'\u00a0', u'\xa0'),
     (u'\u00a1', u'\xa1'),
     (u'\u00a2', u'\xa2'),
@@ -439,7 +441,9 @@ CHAR_MAPPINGS = [
 ]
 
 
-def validate_rte_format(html_list, rte_format):
+def validate_rte_format(
+    html_list: List[str], rte_format: str
+) -> Dict[str, List[str]]:
     """This function checks if html strings in a given list are
     valid for given RTE format.
 
@@ -453,7 +457,7 @@ def validate_rte_format(html_list, rte_format):
     """
     # err_dict is a dictionary to store the invalid tags and the
     # invalid parent-child relations that we find.
-    err_dict = {}
+    err_dict: Dict[str, List[str]] = {}
 
     # All the invalid html strings will be stored in this.
     err_dict['strings'] = []
@@ -506,7 +510,9 @@ def validate_rte_format(html_list, rte_format):
     return err_dict
 
 
-def validate_soup_for_rte(soup, rte_format, err_dict):
+def validate_soup_for_rte(
+    soup: bs4.BeautifulSoup, rte_format: str, err_dict: Dict[str, List[str]]
+) -> bool:
     """Validate content in given soup for given RTE format.
 
     Args:
@@ -555,7 +561,7 @@ def validate_soup_for_rte(soup, rte_format, err_dict):
     return is_invalid
 
 
-def validate_customization_args(html_list):
+def validate_customization_args(html_list: List[str]) -> Dict[str, List[str]]:
     """Validates customization arguments of Rich Text Components in a list of
     html string.
 
@@ -592,7 +598,7 @@ def validate_customization_args(html_list):
     return err_dict
 
 
-def validate_customization_args_in_tag(tag):
+def validate_customization_args_in_tag(tag: bs4.element.Tag) -> Iterator[str]:
     """Validates customization arguments of Rich Text Components in a soup.
 
     Args:
@@ -613,7 +619,7 @@ def validate_customization_args_in_tag(tag):
         value_dict[attr] = json.loads(unescape_html(attrs[attr]))
 
     try:
-        component_types_to_component_classes[tag_name].validate(value_dict)
+        component_types_to_component_classes[tag_name].validate(value_dict)  # type: ignore[no-untyped-call]
         if tag_name == 'oppia-noninteractive-collapsible':
             content_html = value_dict['content-with-value']
             soup_for_collapsible = bs4.BeautifulSoup(
@@ -642,7 +648,8 @@ def validate_customization_args_in_tag(tag):
 
 
 def validate_svg_filenames_in_math_rich_text(
-        entity_type, entity_id, html_string):
+    entity_type: str, entity_id: str, html_string: str
+) -> List[str]:
     """Validates the SVG filenames for each math rich-text components and
     returns a list of all invalid math tags in the given HTML.
 
@@ -661,7 +668,7 @@ def validate_svg_filenames_in_math_rich_text(
             json.loads(unescape_html(
                 math_tag['math_content-with-value'])))
         svg_filename = (
-            objects.UnicodeString.normalize(math_content_dict['svg_filename']))
+            objects.UnicodeString.normalize(math_content_dict['svg_filename']))  # type: ignore[no-untyped-call]
         if svg_filename == '':
             error_list.append(str(math_tag))
         else:
@@ -672,7 +679,9 @@ def validate_svg_filenames_in_math_rich_text(
     return error_list
 
 
-def validate_math_content_attribute_in_html(html_string):
+def validate_math_content_attribute_in_html(
+    html_string: str
+) -> List[Dict[str, str]]:
     """Validates the format of SVG filenames for each math rich-text components
     and returns a list of all invalid math tags in the given HTML.
 
@@ -690,7 +699,7 @@ def validate_math_content_attribute_in_html(html_string):
             json.loads(unescape_html(
                 math_tag['math_content-with-value'])))
         try:
-            components.Math.validate({
+            components.Math.validate({  # type: ignore[no-untyped-call]
                 'math_content-with-value': math_content_dict
             })
         except utils.ValidationError as e:
@@ -701,12 +710,14 @@ def validate_math_content_attribute_in_html(html_string):
     return error_list
 
 
-def does_svg_tag_contains_xmlns_attribute(svg_string):
+def does_svg_tag_contains_xmlns_attribute(
+    svg_string: Union[str, bytes]
+) -> bool:
     """Checks whether the svg tag in the given svg string contains the xmlns
     attribute.
 
     Args:
-        svg_string: str. The SVG string.
+        svg_string: str|bytes. The SVG string.
 
     Returns:
         bool. Whether the svg tag in the given svg string contains the xmlns
@@ -724,11 +735,13 @@ def does_svg_tag_contains_xmlns_attribute(svg_string):
     )
 
 
-def get_invalid_svg_tags_and_attrs(svg_string):
+def get_invalid_svg_tags_and_attrs(
+    svg_string: Union[str, bytes]
+) -> Tuple[List[str], List[str]]:
     """Returns a set of all invalid tags and attributes for the provided SVG.
 
     Args:
-        svg_string: str. The SVG string.
+        svg_string: str|bytes. The SVG string.
 
     Returns:
         tuple(list(str), list(str)). A 2-tuple, the first element of which
@@ -760,7 +773,7 @@ def get_invalid_svg_tags_and_attrs(svg_string):
     return (invalid_elements, invalid_attrs)
 
 
-def check_for_svgdiagram_component_in_html(html_string):
+def check_for_svgdiagram_component_in_html(html_string: str) -> bool:
     """Checks for existence of SvgDiagram component tags inside an HTML string.
 
     Args:
@@ -774,7 +787,7 @@ def check_for_svgdiagram_component_in_html(html_string):
     return bool(svgdiagram_tags)
 
 
-def extract_svg_filenames_in_math_rte_components(html_string):
+def extract_svg_filenames_in_math_rte_components(html_string: str) -> List[str]:
     """Extracts the svg_filenames from all the math-rich text components in
     an HTML string.
 
@@ -794,12 +807,12 @@ def extract_svg_filenames_in_math_rte_components(html_string):
         svg_filename = math_content_dict['svg_filename']
         if svg_filename != '':
             normalized_svg_filename = (
-                objects.UnicodeString.normalize(svg_filename))
+                objects.UnicodeString.normalize(svg_filename))  # type: ignore[no-untyped-call]
             filenames.append(normalized_svg_filename)
     return filenames
 
 
-def add_math_content_to_math_rte_components(html_string):
+def add_math_content_to_math_rte_components(html_string: str) -> str:
     """Replaces the attribute raw_latex-with-value in all Math component tags
     with a new attribute math_content-with-value. The new attribute has an
     additional field for storing SVG filenames. The field for SVG filename will
@@ -836,7 +849,7 @@ def add_math_content_to_math_rte_components(html_string):
                 raw_latex = (
                     json.loads(unescape_html(math_tag['raw_latex-with-value'])))
                 normalized_raw_latex = (
-                    objects.UnicodeString.normalize(raw_latex))
+                    objects.UnicodeString.normalize(raw_latex))  # type: ignore[no-untyped-call]
             except Exception as e:
                 logging.exception(
                     'Invalid raw_latex string found in the math tag : %s' % (
@@ -851,7 +864,7 @@ def add_math_content_to_math_rte_components(html_string):
             # Normalize and validate the value before adding to the math
             # tag.
             normalized_math_content_dict = (
-                objects.MathExpressionContent.normalize(math_content_dict))
+                objects.MathExpressionContent.normalize(math_content_dict))  # type: ignore[no-untyped-call]
             # Add the new attribute math_expression_contents-with-value.
             math_tag['math_content-with-value'] = (
                 escape_html(
@@ -869,7 +882,7 @@ def add_math_content_to_math_rte_components(html_string):
     return str(soup).replace('<br/>', '<br>')
 
 
-def validate_math_tags_in_html(html_string):
+def validate_math_tags_in_html(html_string: str) -> List[str]:
     """Returns a list of all invalid math tags in the given HTML.
 
     Args:
@@ -889,7 +902,7 @@ def validate_math_tags_in_html(html_string):
                 # string.
                 raw_latex = (
                     json.loads(unescape_html(math_tag['raw_latex-with-value'])))
-                objects.UnicodeString.normalize(raw_latex)
+                objects.UnicodeString.normalize(raw_latex)  # type: ignore[no-untyped-call]
             except Exception:
                 error_list.append(math_tag)
         else:
@@ -897,7 +910,9 @@ def validate_math_tags_in_html(html_string):
     return error_list
 
 
-def validate_math_tags_in_html_with_attribute_math_content(html_string):
+def validate_math_tags_in_html_with_attribute_math_content(
+    html_string: str
+) -> List[str]:
     """Returns a list of all invalid new schema math tags in the given HTML.
     The old schema has the attribute raw_latex-with-value while the new schema
     has the attribute math-content-with-value which includes a field for storing
@@ -920,8 +935,8 @@ def validate_math_tags_in_html_with_attribute_math_content(html_string):
                         math_tag['math_content-with-value'])))
                 raw_latex = math_content_dict['raw_latex']
                 svg_filename = math_content_dict['svg_filename']
-                objects.UnicodeString.normalize(svg_filename)
-                objects.UnicodeString.normalize(raw_latex)
+                objects.UnicodeString.normalize(svg_filename)  # type: ignore[no-untyped-call]
+                objects.UnicodeString.normalize(raw_latex)  # type: ignore[no-untyped-call]
             except Exception:
                 error_list.append(math_tag)
         else:
@@ -929,7 +944,7 @@ def validate_math_tags_in_html_with_attribute_math_content(html_string):
     return error_list
 
 
-def is_parsable_as_xml(xml_string):
+def is_parsable_as_xml(xml_string: bytes) -> bool:
     """Checks if input string is parsable as XML.
 
     Args:
@@ -947,7 +962,9 @@ def is_parsable_as_xml(xml_string):
         return False
 
 
-def convert_svg_diagram_to_image_for_soup(soup_context):
+def convert_svg_diagram_to_image_for_soup(
+    soup_context: bs4.BeautifulSoup
+) -> str:
     """"Renames oppia-noninteractive-svgdiagram tag to
     oppia-noninteractive-image and changes corresponding attributes for a given
     soup context.
@@ -968,7 +985,7 @@ def convert_svg_diagram_to_image_for_soup(soup_context):
     return str(soup_context)
 
 
-def convert_svg_diagram_tags_to_image_tags(html_string):
+def convert_svg_diagram_tags_to_image_tags(html_string: str) -> str:
     """Renames all the oppia-noninteractive-svgdiagram on the server to
     oppia-noninteractive-image and changes corresponding attributes.
 
@@ -986,7 +1003,7 @@ def convert_svg_diagram_tags_to_image_tags(html_string):
     )
 
 
-def _replace_incorrectly_encoded_chars(soup_context):
+def _replace_incorrectly_encoded_chars(soup_context: bs4.BeautifulSoup) -> str:
     """Replaces incorrectly encoded character with the correct one in a given
     HTML string.
 
@@ -1007,7 +1024,7 @@ def _replace_incorrectly_encoded_chars(soup_context):
     return html_string
 
 
-def fix_incorrectly_encoded_chars(html_string):
+def fix_incorrectly_encoded_chars(html_string: str) -> str:
     """Replaces incorrectly encoded character with the correct one in a given
     HTML string.
 
@@ -1025,7 +1042,9 @@ def fix_incorrectly_encoded_chars(html_string):
     )
 
 
-def _process_string_with_components(html_string, conversion_fn):
+def _process_string_with_components(
+    html_string: str, conversion_fn: Callable[[bs4.BeautifulSoup], str]
+) -> str:
     """Executes the provided conversion function after parsing complex RTE
     components.
 

@@ -331,7 +331,7 @@ class GenerateExplorationOpportunitySummariesJob(base_jobs.JobBase):
             for story in stories:
                 for exp_id in story.story_contents.get_all_linked_exp_ids():
                     exploration_opportunity_summary_list.append(
-                        opportunity_services.create_exp_opportunity_summary( # type: ignore[no-untyped-call]
+                        opportunity_services.create_exp_opportunity_summary(
                             topic, story, exps_dict[exp_id]))
 
             exploration_opportunity_summary_model_list = []
