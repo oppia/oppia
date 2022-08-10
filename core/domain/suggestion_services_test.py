@@ -611,14 +611,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             utils.ValidationError, 'Expected score_category to be of the form '
                                    'score_type.score_sub_type, received '
                                    'invalid_score_category'):
-            with self.swap(
-                suggestion_registry.SuggestionEditStateContent,
-                'pre_accept_validate',
-                # The `edit_before_pre_accept_validate` method does not return
-                # anything but we are using this method inside `with` clause,
-                # so MyPy expecting a return value and throwing an error for
-                # the same. Thus to avoid the error, we used ignore here.
-                self.edit_before_pre_accept_validate(suggestion)):  # type: ignore[func-returns-value]
+                self.edit_before_pre_accept_validate(suggestion)
                 suggestion_services.accept_suggestion(
                     self.suggestion_id, self.reviewer_id,
                     self.COMMIT_MESSAGE, '')
