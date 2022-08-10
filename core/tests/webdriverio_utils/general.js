@@ -90,7 +90,7 @@ var checkForConsoleErrors = async function(
 };
 
 var isInDevMode = async function() {
-  return await browser.params.devMode === 'true';
+  return await browser.config.params.devMode === 'true';
 };
 
 var SERVER_URL_PREFIX = 'http://localhost:9001';

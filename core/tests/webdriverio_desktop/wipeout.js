@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,16 +16,14 @@
  * @fileoverview End-to-end tests for wipeout.
  */
 
-var general = require('../protractor_utils/general.js');
-var users = require('../protractor_utils/users.js');
-var waitFor = require('../protractor_utils/waitFor.js');
-var workflow = require('../protractor_utils/workflow.js');
+var general = require('../webdriverio_utils/general.js');
+var users = require('../webdriverio_utils/users.js');
+var waitFor = require('../webdriverio_utils/waitFor.js');
+var workflow = require('../webdriverio_utils/workflow.js');
 
-var DeleteAccountPage = require('../protractor_utils/DeleteAccountPage.js');
+var DeleteAccountPage = require('../webdriverio_utils/DeleteAccountPage.js');
 var ExplorationEditorPage = require(
-  '../protractor_utils/ExplorationEditorPage.js');
-var pendingAccountDeletionHeading =
-  element(by.css('.e2e-test-pending-account-deletion'));
+  '../webdriverio_utils/ExplorationEditorPage.js');
 
 describe('When account is deleted it', function() {
   var EXPLORATION_TITLE = 'Exploration';
@@ -55,10 +53,11 @@ describe('When account is deleted it', function() {
     await deleteAccountPage.requestAccountDeletion('userToDelete1');
 
     await users.login('user1@delete.com');
+    var pendingAccountDeletionHeading = $('.e2e-test-pending-account-deletion');
     await waitFor.visibilityOf(
       pendingAccountDeletionHeading,
       'Pending Account Deletion Page takes too long to appear');
-    expect(await browser.getCurrentUrl()).toEqual(
+    expect(await browser.getUrl()).toEqual(
       'http://localhost:9001/pending-account-deletion');
   });
 

@@ -407,7 +407,7 @@ var MultiSelectEditor = function(elem) {
     var filteredElementsCount = 0;
     for (var i = 0; i < texts.length; i++) {
       var filteredElement = elem.$(
-        `.e2e-test-search-bar-dropdown-menu span=${texts[i]}`);
+        '.e2e-test-search-bar-dropdown-menu').$(`span=${texts[i]}`);
       if (await filteredElement.isExisting()) {
         filteredElementsCount += 1;
         expect(await filteredElement.getAttribute('class')).toMatch(
@@ -439,6 +439,8 @@ var MultiSelectEditor = function(elem) {
     },
     expectCurrentSelectionToBe: async function(expectedCurrentSelection) {
       // Open the dropdown menu.
+      var searchBarDropdownToggleElement = elem.$(
+        '.e2e-test-search-bar-dropdown-toggle');
       await action.click(
         'Searchbar Dropdown Toggle Element',
         searchBarDropdownToggleElement);

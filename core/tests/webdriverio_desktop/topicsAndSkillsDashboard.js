@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,17 +16,17 @@
  * @fileoverview End-to-end tests for the topics and skills dashboard page.
  */
 
-var forms = require('../protractor_utils/forms.js');
-var general = require('../protractor_utils/general.js');
-var users = require('../protractor_utils/users.js');
+var forms = require('../webdriverio_utils/forms.js');
+var general = require('../webdriverio_utils/general.js');
+var users = require('../webdriverio_utils/users.js');
 
-var Constants = require('../protractor_utils/ProtractorConstants.js');
+var Constants = require('../webdriverio_utils/WebdriverioConstants.js');
 var ExplorationEditorPage = require(
-  '../protractor_utils/ExplorationEditorPage.js');
+  '../webdriverio_utils/ExplorationEditorPage.js');
 var TopicsAndSkillsDashboardPage = require(
-  '../protractor_utils/TopicsAndSkillsDashboardPage.js');
-var SkillEditorPage = require('../protractor_utils/SkillEditorPage.js');
-var TopicEditorPage = require('../protractor_utils/TopicEditorPage.js');
+  '../webdriverio_utils/TopicsAndSkillsDashboardPage.js');
+var SkillEditorPage = require('../webdriverio_utils/SkillEditorPage.js');
+var TopicEditorPage = require('../webdriverio_utils/TopicEditorPage.js');
 
 
 describe('Topics and skills dashboard functionality', function() {
@@ -97,6 +97,7 @@ describe('Topics and skills dashboard functionality', function() {
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.filterTopicsByKeyword(TOPIC_NAME);
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
+    await topicsAndSkillsDashboardPage.resetTopicFilters();
     await topicsAndSkillsDashboardPage.deleteTopicWithName(TOPIC_NAME);
     let topicsTableIsPresent = (
       await topicsAndSkillsDashboardPage.isTopicTablePresent());
@@ -126,8 +127,8 @@ describe('Topics and skills dashboard functionality', function() {
 
     await topicsAndSkillsDashboardPage.get();
     let topicsCount = await topicsAndSkillsDashboardPage.getTopicsCount();
-    await topicsAndSkillsDashboardPage.filterTopicsByKeyword(TOPIC_ALPHA);
-    await topicsAndSkillsDashboardPage.filterTopicsByKeyword(TOPIC_BETA);
+    await topicsAndSkillsDashboardPage.filterTopicsByKeyword(
+      TOPIC_ALPHA + '\n' + TOPIC_BETA);
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(2);
     await topicsAndSkillsDashboardPage.resetTopicFilters();
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(topicsCount);
@@ -190,7 +191,7 @@ describe('Topics and skills dashboard functionality', function() {
     await skillEditorPage.addRubricExplanationForDifficulty(
       'Easy', 'Second explanation for easy difficulty.');
     await skillEditorPage.saveOrPublishSkill('Edited rubrics');
-    var url = await browser.getCurrentUrl();
+    var url = await browser.getUrl();
     skillId = url.split('/')[4];
     await skillEditorPage.get(skillId);
 

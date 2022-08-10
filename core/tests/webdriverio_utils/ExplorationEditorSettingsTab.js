@@ -109,13 +109,11 @@ var ExplorationEditorSettingsTab = function() {
   };
 
   this.setFirstState = async function(stateName) {
-    await action.click('Neutral element', neutralElement);
     await action.waitForAutosave();
     await waitFor.presenceOf(
       initialStateSelect, 'Initial state select takes too long to be visible.');
     await action.click(
       'State name option', initialStateSelectOption(stateName));
-    await action.click('Neutral element', neutralElement);
   };
 
   this.setLanguage = async function(language) {

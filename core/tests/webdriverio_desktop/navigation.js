@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,41 +15,41 @@
 /**
  * @fileoverview End-to-end tests for general site navigation.
  */
-var action = require('../protractor_utils/action.js');
-var general = require('../protractor_utils/general.js');
-var users = require('../protractor_utils/users.js');
-var waitFor = require('../protractor_utils/waitFor.js');
-var GetStartedPage = require('../protractor_utils/GetStartedPage.js');
+var action = require('../webdriverio_utils/action.js');
+var general = require('../webdriverio_utils/general.js');
+var users = require('../webdriverio_utils/users.js');
+var waitFor = require('../webdriverio_utils/waitFor.js');
+var GetStartedPage = require('../webdriverio_utils/GetStartedPage.js');
 
 describe('Oppia landing pages tour', function() {
   it('should visit the Fractions landing page', async function() {
-    await browser.get('/fractions');
+    await browser.url('/fractions');
     await waitFor.pageToFullyLoad();
 
-    await browser.get('/learn/maths/fractions');
+    await browser.url('/learn/maths/fractions');
     await waitFor.pageToFullyLoad();
 
-    await browser.get('/math/fractions');
+    await browser.url('/math/fractions');
     await waitFor.pageToFullyLoad();
   });
 
   it('should visit the Partners landing page', async function() {
-    await browser.get('/partners');
+    await browser.url('/partners');
     await waitFor.pageToFullyLoad();
   });
 
   it('should visit the Nonprofits landing page', async function() {
-    await browser.get('/nonprofits');
+    await browser.url('/nonprofits');
     await waitFor.pageToFullyLoad();
   });
 
   it('should visit the Parents landing page', async function() {
-    await browser.get('/parents');
+    await browser.url('/parents');
     await waitFor.pageToFullyLoad();
   });
 
   it('should visit the Teachers landing page', async function() {
-    await browser.get('/teachers');
+    await browser.url('/teachers');
     await waitFor.pageToFullyLoad();
   });
 
@@ -92,28 +92,27 @@ describe('Meta Tags', function() {
 
 describe('DEV MODE Test', function() {
   it('should not show Dev Mode label in prod', async function() {
-    await browser.get('/');
+    await browser.url('/');
     await waitFor.pageToFullyLoad();
-    expect(await element(
-      by.css('.e2e-test-dev-mode')).isPresent())
-      .toBe(general.isInDevMode());
+    var devMode = await general.isInDevMode();
+    expect(await $('.e2e-test-dev-mode').isExisting())
+      .toBe(devMode);
   });
 });
 
 describe('Donation flow', function() {
-  var payPalButton = element(by.css('.e2e-test-paypal-donate-button'));
-  var creditCardButton = element(
-    by.css('.e2e-test-credit-card-donate-button'));
   it('should be able to donate via PayPal', async function() {
-    await browser.get('/donate');
+    await browser.url('/donate');
+    var payPalButton = $('.e2e-test-paypal-donate-button');
     await action.click('PayPal button', payPalButton);
-    expect(await browser.driver.getCurrentUrl()).toContain('www.paypal.com');
+    expect(await browser.getUrl()).toContain('www.paypal.com');
   });
 
   it('should be able to donate via credit card', async function() {
-    await browser.get('/donate');
+    await browser.url('/donate');
+    var creditCardButton = $('.e2e-test-credit-card-donate-button');
     await action.click('Credit Card button', creditCardButton);
-    expect(await browser.driver.getCurrentUrl()).toContain('www.paypal.com');
+    expect(await browser.getUrl()).toContain('www.paypal.com');
   });
 });
 
@@ -122,35 +121,34 @@ describe('Static Pages Tour', function() {
   it('should visit the Get started page', async function() {
     await getStartedPage.get();
     await waitFor.pageToFullyLoad();
-    expect(await element(
-      by.css('.e2e-test-get-started-page')).isPresent()).toBe(true);
+    expect(await $('.e2e-test-get-started-page').isExisting()).toBe(true);
   });
 
   it('should visit the Login page', async function() {
-    await browser.get('/login');
+    await browser.url('/login');
     await waitFor.pageToFullyLoad();
-    var loginPage = element(by.css('.e2e-test-login-page'));
+    var loginPage = $('.e2e-test-login-page');
     await waitFor.presenceOf(loginPage, 'Login page did not load');
   });
 
   it('should redirect away from the Login page when visited by logged-in user',
     async function() {
-      var loginPage = element(by.css('.e2e-test-login-page'));
+      var loginPage = $('.e2e-test-login-page');
       var learnerDashboardPage = (
-        element(by.css('.e2e-test-learner-dashboard-page')));
+        $('.e2e-test-learner-dashboard-page'));
 
       await users.createAndLoginUser('user@navigation.com', 'navigationUser');
 
       await waitFor.clientSideRedirection(async() => {
         // Login page will redirect user away if logged in.
-        await browser.get('/login');
+        await browser.url('/login');
 
         // Wait for first redirection (login page to splash page).
-        await browser.driver.wait(async() => {
-          var url = await browser.driver.getCurrentUrl();
+        await browser.waitUntil(async() => {
+          var url = await browser.getUrl();
           // Wait until the URL has changed to something that is not /login.
           return !(/login/.test(url));
-        }, 10000);
+        }, { timeout: 10000 });
       },
       (url) => {
         // Wait for second redirection (splash page to preferred dashboard
@@ -162,95 +160,88 @@ describe('Static Pages Tour', function() {
           learnerDashboardPage, 'Learner dashboard page did not load');
       });
 
-      expect(await loginPage.isPresent()).toBe(false);
+      expect(await loginPage.isExisting()).toBe(false);
 
       await users.logout();
-      await browser.get('/login');
+      await browser.url('/login');
       await waitFor.pageToFullyLoad();
       await waitFor.presenceOf(loginPage, 'Login page did not load');
     });
 
   it('should visit the Teach page', async function() {
-    await browser.get('/teach');
+    await browser.url('/teach');
     await waitFor.pageToFullyLoad();
-    expect(await element(
-      by.css('.e2e-test-teach-page')).isPresent()).toBe(true);
+    expect(await $('.e2e-test-teach-page').isExisting()).toBe(true);
   });
 
   it('should visit the Home page', async function() {
-    await browser.get('/');
+    await browser.url('/');
     await waitFor.pageToFullyLoad();
-    expect(await element(
-      by.css('.e2e-test-splash-page')).isPresent()).toBe(true);
+    var splashPage = $('.e2e-test-splash-page');
+    await waitFor.visibilityOf(
+      splashPage, 'Splash page takes too long to appear');
+    expect(await splashPage.isExisting()).toBe(true);
   });
 
   it('should visit the About page', async function() {
-    await browser.get('/about');
+    await browser.url('/about');
     await waitFor.pageToFullyLoad();
-    expect(await element(
-      by.css('.e2e-test-about-page')).isPresent()).toBe(true);
+    expect(await $('.e2e-test-about-page').isExisting()).toBe(true);
   });
 
   it('should visit the Contact page', async function() {
-    await browser.get('/contact');
+    await browser.url('/contact');
     await waitFor.pageToFullyLoad();
-    expect(await element(
-      by.css('.e2e-test-contact-page')).isPresent()).toBe(true);
+    expect(await $('.e2e-test-contact-page').isExisting()).toBe(true);
   });
 
   it('should visit the Donate page', async function() {
-    await browser.get('/donate');
+    await browser.url('/donate');
     await waitFor.pageToFullyLoad();
-    expect(await element(
-      by.css('.e2e-test-donate-page')).isPresent()).toBe(true);
+    expect(await $('.e2e-test-donate-page').isExisting()).toBe(true);
   });
 
   it('should visit the Partnerships page', async function() {
-    await browser.get('/partnerships');
+    await browser.url('/partnerships');
     await waitFor.pageToFullyLoad();
-    expect(await element(
-      by.css('.e2e-test-partnerships-page')).isPresent()).toBe(true);
+    expect(await $('.e2e-test-partnerships-page').isExisting()).toBe(true);
   });
 
   it('should visit the About the Oppia Foundation page', async function() {
-    await browser.get('/about-foundation');
+    await browser.url('/about-foundation');
     await waitFor.pageToFullyLoad();
-    expect(await element(
-      by.css('.e2e-test-about-foundation-page')).isPresent()).toBe(true);
+    expect(await $('.e2e-test-about-foundation-page').isExisting()).toBe(true);
   });
 
   it('should visit the Privacy page', async function() {
-    await browser.get('/privacy-policy');
+    await browser.url('/privacy-policy');
     await waitFor.pageToFullyLoad();
-    expect(await element(
-      by.css('.e2e-test-privacy-page')).isPresent()).toBe(true);
+    expect(await $('.e2e-test-privacy-page').isExisting()).toBe(true);
   });
 
   it('should visit the Terms page', async function() {
-    await browser.get('/terms');
+    await browser.url('/terms');
     await waitFor.pageToFullyLoad();
-    expect(await element(
-      by.css('.e2e-test-terms-page')).isPresent()).toBe(true);
+    expect(await $('.e2e-test-terms-page').isExisting()).toBe(true);
   });
 
   it('should visit the Thanks page', async function() {
-    await browser.get('/thanks');
+    await browser.url('/thanks');
     await waitFor.pageToFullyLoad();
-    expect(await element(
-      by.css('.e2e-test-thanks-page')).isPresent()).toBe(true);
+    expect(await $('.e2e-test-thanks-page').isExisting()).toBe(true);
   });
 
   it('should visit the Volunteer page', async function() {
-    await browser.get('/volunteer');
+    await browser.url('/volunteer');
     await waitFor.pageToFullyLoad();
     await waitFor.visibilityOf(
-      element(by.css('.e2e-test-volunteer-page')),
+      $('.e2e-test-volunteer-page'),
       'Volunteer page taking too long to appear');
   });
 
   it('should show the error page when an incorrect url is given',
     async function() {
-      await browser.get('/splashes');
+      await browser.url('/splashes');
       await waitFor.pageToFullyLoad();
       await general.expectErrorPage(404);
     });
