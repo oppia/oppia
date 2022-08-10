@@ -221,11 +221,11 @@ class MigrateExplorationJob(base_jobs.JobBase):
                 # Here, we are narrowing down the type from object to BaseModel.
                 assert isinstance(model, base_models.BaseModel)
                 models_to_put_values.append(model)
-            if opportunity_services.is_exploration_available_for_contribution( # type: ignore[no-untyped-call]
+            if opportunity_services.is_exploration_available_for_contribution(
                 migrated_exp.id
             ):
                 (
-                    opportunity_services # type: ignore[no-untyped-call]
+                    opportunity_services
                     .update_opportunity_with_updated_exploration(
                         migrated_exp.id))
         datastore_services.update_timestamps_multi(list(models_to_put_values))
@@ -266,7 +266,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
             exp_opp_summary_model = (
                 exp_id_to_exp_opp_summary_model[migrated_exp.id])
             exp_opp_summary = (
-                opportunity_services # type: ignore[no-untyped-call]
+                opportunity_services
                     .get_exploration_opportunity_summary_from_model(
                         exp_opp_summary_model))
             exp_opp_summary.content_count = content_count

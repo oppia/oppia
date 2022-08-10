@@ -196,7 +196,7 @@ class MigrateExplorationJobTests(
                 'new_value': self.NEW_EXP_ID
             })
         ]
-        story_services.update_story( # type: ignore[no-untyped-call]
+        story_services.update_story(
             feconf.SYSTEM_COMMITTER_ID, story_id, change_list,
             'Added node.')
 
@@ -245,9 +245,9 @@ class MigrateExplorationJobTests(
 
         updated_opp_model = (
             opportunity_models.ExplorationOpportunitySummaryModel.get(
-                self.NEW_EXP_ID, strict=False))
+                self.NEW_EXP_ID))
         updated_opp_summary = (
-              opportunity_services # type: ignore[no-untyped-call]
+              opportunity_services
                   .get_exploration_opportunity_summary_from_model(
                       updated_opp_model))
 
