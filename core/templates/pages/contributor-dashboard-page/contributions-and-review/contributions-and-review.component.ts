@@ -61,7 +61,7 @@ export interface ContributionsSummary {
   actionButtonTitle: string;
 }
 
-export interface OpportunitiesDicts {
+export interface Opportunity {
   id: string;
   heading: string;
   subheading: string;
@@ -71,7 +71,7 @@ export interface OpportunitiesDicts {
 }
 
 export interface GetOpportunitiesResponse {
-  opportunitiesDicts: OpportunitiesDicts[];
+  opportunitiesDicts: Opportunity[];
   more: boolean;
 }
 

@@ -20,7 +20,7 @@ import { ComponentFixture, fakeAsync, flush, TestBed, tick, waitForAsync } from 
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ExplorationOpportunitySummary } from 'domain/opportunity/exploration-opportunity-summary.model';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { ContributionDetails, ContributionsAndReview, OpportunitiesDicts, Suggestion, SuggestionDetails } from './contributions-and-review.component';
+import { ContributionDetails, ContributionsAndReview, Opportunity, Suggestion, SuggestionDetails } from './contributions-and-review.component';
 import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
 import { TranslationTopicService } from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
 import { MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFactory';
@@ -1089,13 +1089,13 @@ describe('Contributions and review component', () => {
               heading: 'Chapter 1',
               subheading: 'Topic 1 - Story 1',
               actionButtonTitle: 'Translations'
-            } as OpportunitiesDicts,
+            } as Opportunity,
             {
               id: '2',
               heading: 'Chapter 2',
               subheading: 'Topic 2 - Story 2',
               actionButtonTitle: 'Translations'
-            } as OpportunitiesDicts
+            } as Opportunity
           ]);
           expect(more).toEqual(false);
         });
