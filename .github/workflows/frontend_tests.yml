@@ -24,7 +24,7 @@ jobs:
           ls /home/runner/work/oppia
           ls /home/runner/work/oppia/oppia
           echo $GITHUB_WORKSPACE
-      - uses: actions/setup-python@v2
+      - uses: actions/setup-python@v4
         with:
           python-version: '2.7'
           architecture: 'x64'
