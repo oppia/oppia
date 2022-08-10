@@ -36,6 +36,8 @@ from core.domain import translation_domain
 from extensions import domain
 
 from pylatexenc import latex2text
+
+from typing import List, Optional
 from typing_extensions import TypedDict
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
@@ -143,10 +145,17 @@ class Question(translation_domain.BaseTranslatableObject):
     """Domain object for a question."""
 
     def __init__(
-            self, question_id, question_state_data,
-            question_state_data_schema_version, language_code, version,
-            linked_skill_ids, inapplicable_skill_misconception_ids,
-            created_on=None, last_updated=None):
+        self,
+        question_id: str,
+        question_state_data: state_domain.State,
+        question_state_data_schema_version: int,
+        language_code: str,
+        version: int,
+        linked_skill_ids: List[str],
+        inapplicable_skill_misconception_ids: List[str],
+        created_on: Optional[datetime.datetime] = None,
+        last_updated: Optional[datetime.datetime] = None
+    ) -> None:
         """Constructs a Question domain object.
 
         Args:
@@ -1234,13 +1243,13 @@ class Question(translation_domain.BaseTranslatableObject):
                 'interaction']['answer_groups'] = filtered_answer_groups
 
             # Renaming cust arg.
+        if question_state_dict[
+                'interaction']['id'] in exp_domain.ALGEBRAIC_MATH_INTERACTIONS:
             customization_args = question_state_dict[
                 'interaction']['customization_args']
-            customization_args['allowedVariables'] = []
-            if 'customOskLetters' in customization_args:
-                customization_args['allowedVariables'] = copy.deepcopy(
-                    customization_args['customOskLetters'])
-                del customization_args['customOskLetters']
+            customization_args['allowedVariables'] = copy.deepcopy(
+                customization_args['customOskLetters'])
+            del customization_args['customOskLetters']
 
         return question_state_dict
 

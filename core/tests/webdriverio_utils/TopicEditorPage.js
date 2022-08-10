@@ -42,6 +42,10 @@ var TopicEditorPage = function() {
   var newStoryUrlFragmentField = $('.e2e-test-new-story-url-fragment-field');
   var newSubtopicEditorElement = $('.e2e-test-new-subtopic-editor');
   var pageEditor = $('.e2e-test-edit-subtopic-page-contents');
+  var questionItem = $('.e2e-test-question-list-item');
+  var questionItemsSelector = function() {
+    return $$('.e2e-test-question-list-item');
+  };
   var questionsTabButton = $('.e2e-test-questions-tab-button');
   var saveQuestionButton = $('.e2e-test-save-question-button');
   var subtopicColumnsSelector = function() {
@@ -160,9 +164,9 @@ var TopicEditorPage = function() {
     await waitFor.visibilityOf(
       selectSkillDropdown, 'Select Skill dropdown takes too long to appear');
     await selectSkillDropdown.selectByVisibleText(skillDescription);
-    var questionItems = await $$('.e2e-test-question-list-item');
     await waitFor.visibilityOf(
-      questionItems[0], 'Question takes too long to appear');
+      questionItem, 'Question takes too long to appear');
+    var questionItems = await questionItemsSelector();
     expect(questionItems.length).toEqual(count);
   };
 
@@ -199,7 +203,7 @@ var TopicEditorPage = function() {
 
   this.changeSubtopicTitle = async function(title) {
     await action.clear('Subtopic Title field', subtopicTitleField);
-    await action.setValue('Subtopic Title field', subtopicTitleField, 'title');
+    await action.setValue('Subtopic Title field', subtopicTitleField, title);
   };
 
   this.changeSubtopicPageContents = async function(content) {
@@ -395,11 +399,11 @@ var TopicEditorPage = function() {
   };
 
   this.expectNumberOfStoriesToBe = async function(count) {
-    var storyListItems = await storyListItemsSelector();
     if (count) {
       await waitFor.visibilityOf(
         storyListTable, 'Story list table takes too long to appear.');
     }
+    var storyListItems = await storyListItemsSelector();
     expect(storyListItems.length).toEqual(count);
   };
 

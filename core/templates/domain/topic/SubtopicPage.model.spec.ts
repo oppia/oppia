@@ -19,6 +19,7 @@
 import { TestBed } from '@angular/core/testing';
 
 import { SubtopicPage } from 'domain/topic/subtopic-page.model';
+import { SubtopicPageContents } from './subtopic-page-contents.model';
 
 describe('Subtopic page Model', () => {
   beforeEach(() => {
@@ -31,9 +32,10 @@ describe('Subtopic page Model', () => {
     'subtopic id', () => {
     var subtopicPage = SubtopicPage.createDefault(
       'topic_id', 2);
+    let pageContents = subtopicPage.getPageContents() as SubtopicPageContents;
     expect(subtopicPage.getId()).toBe('topic_id-2');
     expect(subtopicPage.getTopicId()).toBe('topic_id');
-    expect(subtopicPage.getPageContents().getHtml()).toEqual('');
+    expect(pageContents.getHtml()).toEqual('');
     expect(subtopicPage.getLanguageCode()).toEqual('en');
   });
 
