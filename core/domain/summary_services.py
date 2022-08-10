@@ -319,8 +319,6 @@ def get_displayable_collection_summary_dicts_matching_ids(
             collection_ids))
     collection_summaries = []
     for collection_summary in collection_summaries_with_none:
-        # Ruling out the possibility of None for mypy type checking.
-        assert collection_summary is not None
         collection_summaries.append(collection_summary)
     return _get_displayable_collection_summary_dicts(collection_summaries)
 
@@ -543,7 +541,9 @@ def get_displayable_exp_summary_dicts(
 
 
 def _get_displayable_collection_summary_dicts(
-    collection_summaries: List[collection_domain.CollectionSummary]
+    collection_summaries: Sequence[
+        Optional[collection_domain.CollectionSummary]
+    ]
 ) -> List[DisplayableCollectionSummaryDict]:
     """Gets a summary of collections in human readable form.
 
