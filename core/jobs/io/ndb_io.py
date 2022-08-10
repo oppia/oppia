@@ -47,7 +47,7 @@ class GetModels(beam.PTransform): # type: ignore[misc]
             query: datastore_services.Query. The query used to fetch models.
             label: str|None. The label of the PTransform.
         """
-        super(GetModels, self).__init__(label=label)
+        super().__init__(label=label)
         self.query = query
 
     def expand(
