@@ -35,7 +35,7 @@ from core import schema_utils
 from core import utils
 from core.constants import constants
 from core.domain import change_domain
-from core.domain import exp_services
+# from core.domain.exp_services import get_all_exploration_summaries
 from core.domain import param_domain
 from core.domain import state_domain
 from core.domain import translation_domain
@@ -2321,17 +2321,18 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return states_dict
 
     @classmethod
-    def _convert_states_v51_dict_to_v52_dict(cls, states_dict, exp_lang_code):
+    def _convert_states_v51_dict_to_v52_dict(cls, states_dict):
         """
         """
-        explorations_summaries = exp_services.get_all_exploration_summaries()
-        exp_ids = [exp_id for exp_id in explorations_summaries.keys()]
+        # explorations_summaries = get_all_exploration_summaries()
+        # exp_ids = [exp_id for exp_id in explorations_summaries.keys()]
+        exp_ids = ['a', 'def', 'gh']
         # Update general state validations.
         states_dict = cls._update_general_state(states_dict)
 
         # Update general state interaction validations.
         states_dict = cls._update_general_state_interaction(
-            states_dict, exp_ids, exp_lang_code)
+            states_dict, exp_ids)
 
         # Update general state RTE validations.
         states_dict = cls._update_general_state_rte(states_dict)
@@ -2846,7 +2847,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
     @classmethod
     def _update_general_state_interaction(
-        cls, states_dict, exp_ids, exp_lang_code
+        cls, states_dict, exp_ids
     ):
         """
         """
@@ -2858,7 +2859,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     'customization_args']['buttonText']['value']['unicode_str']
                 if len(text_value) > 20:
                     # Do something
-                    if exp_lang_code == 'en':
+                    # if exp_lang_code == 'en':
                         state_dict['interaction']['customization_args'][
                             'buttonText']['value']['unicode_str'] = 'Continue'
 
@@ -2871,11 +2872,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 for recc_exp in recc_exp_ids:
                     if recc_exp in exp_ids:
                         valid_recc_exp_ids.append(recc_exp)
-                if len(valid_recc_exp_ids) > 0:
-                    recc_exp_ids = valid_recc_exp_ids
-                    state_dict['interaction'][
-                    'customization_args']['recommendedExplorationIds'][
-                        'value'] = valid_recc_exp_ids
+                recc_exp_ids = valid_recc_exp_ids
+                state_dict['interaction'][
+                'customization_args']['recommendedExplorationIds'][
+                    'value'] = valid_recc_exp_ids
 
                 # Should be at most 3 recommended explorations.
                 if len(recc_exp_ids) > 3:
@@ -3401,7 +3401,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         exploration_dict['schema_version'] = 57
 
         exploration_dict['states'] = cls._convert_states_v51_dict_to_v52_dict(
-            exploration_dict['states'], exploration_dict['language_code'])
+            exploration_dict['states'])
         exploration_dict['states_schema_version'] = 52
 
         return exploration_dict
