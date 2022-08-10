@@ -67,6 +67,22 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             '--max-old-space-size=4096'
         ]
 
+        class MockCompiler:
+            def wait(self) -> None:
+                pass
+        class MockCompilerContextManager():
+            def __init__(self):
+                pass
+            def __enter__(self):
+                return MockCompiler()
+            def __exit__(self, exc_type, exc_value, tb):
+                pass
+
+        self.swap_webpack_compiler = self.swap_with_checks(
+            servers, 'managed_webpack_compiler',
+            lambda: MockCompilerContextManager(),
+            expected_args=(), expected_kwargs=[])
+
     def test_run_lighthouse_puppeteer_script_successfully(self) -> None:
         class MockTask:
             returncode = 0
@@ -117,6 +133,57 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         self.assertIn(
             'Puppeteer script failed. More details can be found above.',
             self.print_arr)
+
+    def test_run_webpack_compilation_successfully(self) -> None:
+        swap_isdir = self.swap_with_checks(
+            os.path, 'isdir', lambda _: True, expected_kwargs=[])
+        
+        with self.print_swap, self.swap_webpack_compiler, swap_isdir:
+            run_lighthouse_tests.run_webpack_compilation()
+
+        self.assertNotIn(
+            'Failed to complete webpack compilation, exiting...',
+            self.print_arr)
+
+    def test_run_webpack_compilation_failed(self) -> None:
+        
+        swap_isdir = self.swap_with_checks(
+            os.path, 'isdir', lambda _: False, expected_kwargs=[])
+        
+        with self.print_swap, self.swap_webpack_compiler, swap_isdir:
+            with self.swap_sys_exit:
+                run_lighthouse_tests.run_webpack_compilation()
+
+        self.assertIn(
+            'Failed to complete webpack compilation, exiting...',
+            self.print_arr)
+
+    def test_subprocess_error_results_in_failed_webpack_compilation(
+        self) -> None:
+        class MockCompiler:
+            def wait(self) -> None:
+                raise subprocess.CalledProcessError(
+                    returncode=1, cmd='', output='Subprocess execution failed.')
+        class MockCompilerContextManager():
+            def __init__(self):
+                pass
+            def __enter__(self):
+                return MockCompiler()
+            def __exit__(self, exc_type, exc_value, tb):
+                pass
+
+        self.swap_webpack_compiler = self.swap_with_checks(
+            servers, 'managed_webpack_compiler',
+            lambda: MockCompilerContextManager(),
+            expected_args=(), expected_kwargs=[])
+        swap_isdir = self.swap_with_checks(
+            os.path, 'isdir', lambda _: False, expected_kwargs=[])
+        
+        with self.print_swap, self.swap_webpack_compiler, swap_isdir:
+            with self.swap_sys_exit:
+                run_lighthouse_tests.run_webpack_compilation()
+
+        self.assertIn('Subprocess execution failed.', self.print_arr)
 
     def test_run_lighthouse_checks_succesfully(self) -> None:
         class MockTask:
