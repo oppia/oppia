@@ -3479,3 +3479,301 @@ class ReviewableSuggestionEmailInfoUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             reviewable_suggestion_email_info.submission_datetime,
             self.submission_datetime)
+
+
+class TranslationReviewStatsUnitTests(test_utils.GenericTestBase):
+    """Tests for the TranslationReviewStats class."""
+
+    LANGUAGE_CODE = 'es'
+    CONTRIBUTOR_USER_ID = 'uid_01234567890123456789012345678912'
+    TOPIC_ID = 'topic_id'
+    REVIEWED_TRANSLATIONS_COUNT = 2
+    REVIEWED_TRANSLATION_WORD_COUNT = 100
+    ACCEPTED_TRANSLATIONS_COUNT = 1
+    ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT = 0
+    ACCEPTED_TRANSLATION_WORD_COUNT = 50
+    FIRST_CONTRIBUTION_DATE = datetime.date.fromtimestamp(1616173836)
+    LAST_CONTRIBUTION_DATE = datetime.date.fromtimestamp(1616173836)
+
+    def test_create_translation_review_stats(self):
+        expected_stats_dict = {
+            'language_code': self.LANGUAGE_CODE,
+            'contributor_user_id': self.CONTRIBUTOR_USER_ID,
+            'topic_id': self.TOPIC_ID,
+            'reviewed_translations_count': self.REVIEWED_TRANSLATIONS_COUNT,
+            'reviewed_translation_word_count': (
+                self.REVIEWED_TRANSLATION_WORD_COUNT),
+            'accepted_translations_count': self.ACCEPTED_TRANSLATIONS_COUNT,
+            'accepted_translations_with_reviewer_edits_count': (
+                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            'first_contribution_date': self.FIRST_CONTRIBUTION_DATE,
+            'last_contribution_date': self.LAST_CONTRIBUTION_DATE,
+        }
+
+        actual_stats = suggestion_registry.TranslationReviewStats(
+            self.LANGUAGE_CODE, self.CONTRIBUTOR_USER_ID,
+            self.TOPIC_ID, self.REVIEWED_TRANSLATIONS_COUNT,
+            self.REVIEWED_TRANSLATION_WORD_COUNT,
+            self.ACCEPTED_TRANSLATIONS_COUNT,
+            self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT,
+            self.FIRST_CONTRIBUTION_DATE, self.LAST_CONTRIBUTION_DATE
+        )
+
+        self.assertDictEqual(
+            actual_stats.to_dict(), expected_stats_dict)
+
+
+class QuestionContributionStatsUnitTests(test_utils.GenericTestBase):
+    """Tests for the QuestionContributionStats class."""
+
+    CONTRIBUTOR_USER_ID = 'uid_01234567890123456789012345678912'
+    TOPIC_ID = 'topic_id'
+    SUBMITTED_QUESTION_COUNT = 2
+    ACCEPTED_QUESTIONS_COUNT = 1
+    ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT = 0
+    FIRST_CONTRIBUTION_DATE = datetime.date.fromtimestamp(1616173836)
+    LAST_CONTRIBUTION_DATE = datetime.date.fromtimestamp(1616173836)
+
+    def test_create_question_contribution_stats(self):
+        expected_stats_dict = {
+            'contributor_user_id': self.CONTRIBUTOR_USER_ID,
+            'topic_id': self.TOPIC_ID,
+            'submitted_questions_count': (
+                self.SUBMITTED_QUESTION_COUNT),
+            'accepted_questions_count': (
+                self.ACCEPTED_QUESTIONS_COUNT),
+            'accepted_questions_without_reviewer_edits_count': (
+                self
+                .ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            'first_contribution_date': (
+                self.FIRST_CONTRIBUTION_DATE),
+            'last_contribution_date': (
+                self.LAST_CONTRIBUTION_DATE)
+        }
+
+        actual_stats = suggestion_registry.QuestionContributionStats(
+            self.CONTRIBUTOR_USER_ID, self.TOPIC_ID,
+            self.SUBMITTED_QUESTION_COUNT, self.ACCEPTED_QUESTIONS_COUNT,
+            self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT,
+            self.FIRST_CONTRIBUTION_DATE, self.LAST_CONTRIBUTION_DATE
+        )
+
+        self.assertDictEqual(
+            actual_stats.to_dict(), expected_stats_dict)
+
+
+class QuestionReviewStatsUnitTests(test_utils.GenericTestBase):
+    """Tests for the QuestionReviewStats class."""
+
+    CONTRIBUTOR_USER_ID = 'uid_01234567890123456789012345678912'
+    TOPIC_ID = 'topic_id'
+    REVIEWED_QUESTIONS_COUNT = 2
+    ACCEPTED_QUESTIONS_COUNT = 1
+    ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT = 0
+    FIRST_CONTRIBUTION_DATE = datetime.date.fromtimestamp(1616173836)
+    LAST_CONTRIBUTION_DATE = datetime.date.fromtimestamp(1616173836)
+
+    def test_create_question_review_stats(self):
+        expected_stats_dict = {
+            'contributor_user_id': self.CONTRIBUTOR_USER_ID,
+            'topic_id': self.TOPIC_ID,
+            'reviewed_questions_count': self.REVIEWED_QUESTIONS_COUNT,
+            'accepted_questions_count': (
+                self.ACCEPTED_QUESTIONS_COUNT),
+            'accepted_questions_with_reviewer_edits_count': (
+                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
+            'first_contribution_date': (
+                self.FIRST_CONTRIBUTION_DATE),
+            'last_contribution_date': self.LAST_CONTRIBUTION_DATE
+        }
+
+        actual_stats = suggestion_registry.QuestionReviewStats(
+            self.CONTRIBUTOR_USER_ID, self.TOPIC_ID,
+            self.REVIEWED_QUESTIONS_COUNT,
+            self.ACCEPTED_QUESTIONS_COUNT,
+            self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT,
+            self.FIRST_CONTRIBUTION_DATE, self.LAST_CONTRIBUTION_DATE
+        )
+
+        self.assertDictEqual(
+            actual_stats.to_dict(), expected_stats_dict)
+
+
+class ContributorMilestoneEmailInfoUnitTests(test_utils.GenericTestBase):
+    """Tests for the ContributorMilestoneEmailInfo class."""
+
+    CONTRIBUTOR_USER_ID = 'uid_01234567890123456789012345678912'
+    CONTRIBUTION_TYPE = 'translation'
+    CONTRIBUTION_SUB_TYPE = 'submission'
+    LANGUAGE_CODE = 'es'
+    CONTRIBUTIONS_COUNT = 1
+
+    def test_create_contribution_milestone_email_info(self):
+        actual_info = suggestion_registry.ContributorMilestoneEmailInfo(
+            self.CONTRIBUTOR_USER_ID, self.CONTRIBUTION_TYPE,
+            self.CONTRIBUTION_SUB_TYPE, self.LANGUAGE_CODE,
+            self.CONTRIBUTIONS_COUNT
+        )
+
+        self.assertEqual(
+            actual_info.contributor_user_id, self.CONTRIBUTOR_USER_ID
+        )
+        self.assertEqual(
+            actual_info.contribution_type, self.CONTRIBUTION_TYPE
+        )
+        self.assertEqual(
+            actual_info.contribution_sub_type, self.CONTRIBUTION_SUB_TYPE
+        )
+        self.assertEqual(
+            actual_info.language_code, self.LANGUAGE_CODE
+        )
+        self.assertEqual(
+            actual_info.contributions_count, self.CONTRIBUTIONS_COUNT
+        )
+
+
+class ContributorStatsSummaryUnitTests(test_utils.GenericTestBase):
+    """Tests for the ContributorStatsSummary class."""
+
+    LANGUAGE_CODE = 'es'
+    CONTRIBUTOR_USER_ID = 'user_01'
+    TOPIC_ID = 'topic_id'
+    SUBMITTED_TRANSLATIONS_COUNT = 2
+    SUBMITTED_TRANSLATION_WORD_COUNT = 100
+    REJECTED_TRANSLATIONS_COUNT = 0
+    REJECTED_TRANSLATION_WORD_COUNT = 0
+    # Timestamp dates in sec since epoch for Mar 19 2021 UTC.
+    CONTRIBUTION_DATES = [
+        datetime.date.fromtimestamp(1616173836),
+        datetime.date.fromtimestamp(1616173837)
+    ]
+    REVIEWED_TRANSLATIONS_COUNT = 2
+    REVIEWED_TRANSLATION_WORD_COUNT = 100
+    ACCEPTED_TRANSLATIONS_COUNT = 1
+    ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT = 0
+    ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT = 0
+    ACCEPTED_TRANSLATION_WORD_COUNT = 50
+    SUBMITTED_QUESTION_COUNT = 2
+    ACCEPTED_QUESTIONS_COUNT = 1
+    ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT = 0
+    REVIEWED_QUESTIONS_COUNT = 2
+    ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT = 0
+    FIRST_CONTRIBUTION_DATE = datetime.date.fromtimestamp(1616173836)
+    LAST_CONTRIBUTION_DATE = datetime.date.fromtimestamp(1616173836)
+
+    def test_create_contribution_stats_summary(self):
+        expected_translation_contribution_stats = {
+            'language_code': self.LANGUAGE_CODE,
+            'contributor_user_id': self.CONTRIBUTOR_USER_ID,
+            'topic_id': self.TOPIC_ID,
+            'submitted_translations_count': self.SUBMITTED_TRANSLATIONS_COUNT,
+            'submitted_translation_word_count': (
+                self.SUBMITTED_TRANSLATION_WORD_COUNT),
+            'accepted_translations_count': self.ACCEPTED_TRANSLATIONS_COUNT,
+            'accepted_translations_without_reviewer_edits_count': (
+                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            'accepted_translation_word_count': (
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            'rejected_translations_count': self.REJECTED_TRANSLATIONS_COUNT,
+            'rejected_translation_word_count': (
+                self.REJECTED_TRANSLATION_WORD_COUNT),
+            'contribution_dates': self.CONTRIBUTION_DATES
+        }
+        expected_translation_review_stats = {
+            'language_code': self.LANGUAGE_CODE,
+            'contributor_user_id': self.CONTRIBUTOR_USER_ID,
+            'topic_id': self.TOPIC_ID,
+            'reviewed_translations_count': self.REVIEWED_TRANSLATIONS_COUNT,
+            'reviewed_translation_word_count': (
+                self.REVIEWED_TRANSLATION_WORD_COUNT),
+            'accepted_translations_count': self.ACCEPTED_TRANSLATIONS_COUNT,
+            'accepted_translations_with_reviewer_edits_count': (
+                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            'first_contribution_date': self.FIRST_CONTRIBUTION_DATE,
+            'last_contribution_date': self.LAST_CONTRIBUTION_DATE,
+        }
+        expected_question_contribution_stats = {
+            'contributor_user_id': self.CONTRIBUTOR_USER_ID,
+            'topic_id': self.TOPIC_ID,
+            'submitted_questions_count': (
+                self.SUBMITTED_QUESTION_COUNT),
+            'accepted_questions_count': (
+                self.ACCEPTED_QUESTIONS_COUNT),
+            'accepted_questions_without_reviewer_edits_count': (
+                self
+                .ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            'first_contribution_date': (
+                self.FIRST_CONTRIBUTION_DATE),
+            'last_contribution_date': (
+                self.LAST_CONTRIBUTION_DATE)
+        }
+        expected_question_review_stats = {
+            'contributor_user_id': self.CONTRIBUTOR_USER_ID,
+            'topic_id': self.TOPIC_ID,
+            'reviewed_questions_count': self.REVIEWED_QUESTIONS_COUNT,
+            'accepted_questions_count': (
+                self.ACCEPTED_QUESTIONS_COUNT),
+            'accepted_questions_with_reviewer_edits_count': (
+                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
+            'first_contribution_date': (
+                self.FIRST_CONTRIBUTION_DATE),
+            'last_contribution_date': self.LAST_CONTRIBUTION_DATE
+        }
+        expected_contribution_summary = {
+            'contributor_user_id': self.CONTRIBUTOR_USER_ID,
+            'translation_contribution_stats': [
+                expected_translation_contribution_stats],
+            'question_contribution_stats': [
+                expected_question_contribution_stats],
+            'translation_review_stats': [expected_translation_review_stats],
+            'question_review_stats': [expected_question_review_stats]
+        }
+        translation_contribution_stats = (
+            suggestion_registry).TranslationContributionStats(
+                self.LANGUAGE_CODE,
+                self.CONTRIBUTOR_USER_ID,
+                self.TOPIC_ID,
+                self.SUBMITTED_TRANSLATIONS_COUNT,
+                self.SUBMITTED_TRANSLATION_WORD_COUNT,
+                self.ACCEPTED_TRANSLATIONS_COUNT,
+                (
+                    self
+                    .ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT
+                ),
+                self.ACCEPTED_TRANSLATION_WORD_COUNT,
+                self.REJECTED_TRANSLATIONS_COUNT,
+                self.REJECTED_TRANSLATION_WORD_COUNT,
+                self.CONTRIBUTION_DATES
+            )
+        translation_review_stats = suggestion_registry.TranslationReviewStats(
+            self.LANGUAGE_CODE, self.CONTRIBUTOR_USER_ID,
+            self.TOPIC_ID, self.REVIEWED_TRANSLATIONS_COUNT,
+            self.REVIEWED_TRANSLATION_WORD_COUNT,
+            self.ACCEPTED_TRANSLATIONS_COUNT,
+            self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT,
+            self.FIRST_CONTRIBUTION_DATE, self.LAST_CONTRIBUTION_DATE
+        )
+        question_contribution_stats = (
+            suggestion_registry).QuestionContributionStats(
+                self.CONTRIBUTOR_USER_ID, self.TOPIC_ID,
+                self.SUBMITTED_QUESTION_COUNT, self.ACCEPTED_QUESTIONS_COUNT,
+                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT,
+                self.FIRST_CONTRIBUTION_DATE, self.LAST_CONTRIBUTION_DATE
+            )
+        question_review_stats = suggestion_registry.QuestionReviewStats(
+            self.CONTRIBUTOR_USER_ID, self.TOPIC_ID,
+            self.REVIEWED_QUESTIONS_COUNT,
+            self.ACCEPTED_QUESTIONS_COUNT,
+            self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT,
+            self.FIRST_CONTRIBUTION_DATE, self.LAST_CONTRIBUTION_DATE
+        )
+
+        contribution_summary = suggestion_registry.ContributorStatsSummary(
+            self.CONTRIBUTOR_USER_ID,
+            [translation_contribution_stats], [question_contribution_stats],
+            [translation_review_stats], [question_review_stats]
+        )
+
+        self.assertDictEqual(
+            contribution_summary.to_dict(), expected_contribution_summary
+        )
