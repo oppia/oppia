@@ -290,7 +290,7 @@
           <strong>Managers</strong>
           <ul>
             <li ng-repeat="ownerName in $ctrl.ExplorationRightsService.ownerNames track by $index">
-              <div class="oppia-user-list-item">
+              <div class="oppia-user-list-item e2e-test-role-owner-name">
                 <span><[ownerName]></span>
                 <span ng-hide="!$ctrl.isRolesFormOpen || ownerName === $ctrl.loggedInUser" uib-tooltip="Remove user" type="button" class="material-icons oppia-delete-user-button" ng-click="$ctrl.removeRole(ownerName, 'Managers')">highlight_off
                 </span>
