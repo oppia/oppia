@@ -141,6 +141,7 @@ class VALID_MODEL_NAMES(enum.Enum): # pylint: disable=invalid-name
     beam_job = 'beam_job' # pylint: disable=invalid-name
     blog = 'blog' # pylint: disable=invalid-name
     classifier = 'classifier' # pylint: disable=invalid-name
+    classroom = 'classroom' # pylint: disable=invalid-name
     collection = 'collection' # pylint: disable=invalid-name
     config = 'config' # pylint: disable=invalid-name
     email = 'email' # pylint: disable=invalid-name
