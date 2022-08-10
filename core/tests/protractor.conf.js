@@ -40,22 +40,6 @@ var suites = {
       'protractor_desktop/adminTabFeatures.js'
     ],
 
-    blogDashboard: [
-      'protractor_desktop/blogDashboard.js'
-    ],
-
-    classroomPage: [
-      'protractor_desktop/classroomPage.js'
-    ],
-
-    classroomPageFileUploadFeatures: [
-      'protractor_desktop/classroomPageFileUploadFeatures.js'
-    ],
-
-    contributorDashboard: [
-      'protractor_desktop/contributorDashboard.js'
-    ],
-
     coreEditorAndPlayerFeatures: [
       'protractor_desktop/coreEditorAndPlayerFeatures.js'
     ],
@@ -104,10 +88,6 @@ var suites = {
       'protractor/libraryFlow.js'
     ],
 
-    navigation: [
-      'protractor_desktop/navigation.js'
-    ],
-
     playVoiceovers: [
       'protractor_desktop/playVoiceovers.js'
     ],
@@ -115,22 +95,6 @@ var suites = {
     publication: [
       'protractor_desktop/publicationAndLibrary.js'
     ],
-
-    topicAndStoryEditorFileUploadFeatures: [
-      'protractor_desktop/topicAndStoryEditorFileUploadFeatures.js'
-    ],
-
-    topicsAndSkillsDashboard: [
-      'protractor_desktop/topicsAndSkillsDashboard.js'
-    ],
-
-    skillEditor: [
-      'protractor_desktop/skillEditor.js'
-    ],
-
-    wipeout: [
-      'protractor_desktop/wipeout.js',
-    ]
   };
 
 // A reference configuration file.

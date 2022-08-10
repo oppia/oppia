@@ -86,7 +86,7 @@ ANDROID_APP_VERSION_CODE_STRING = str('2') # pylint: disable=disallowed-function
 class IncomingAndroidFeedbackReportHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(IncomingAndroidFeedbackReportHandlerTests, self).setUp()
+        super().setUp()
         self.payload = {
             'report': REPORT_JSON
         }

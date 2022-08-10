@@ -20,6 +20,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ChangeDetectorRef, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { ConceptCard } from 'domain/skill/ConceptCardObjectFactory';
+import { Misconception } from 'domain/skill/MisconceptionObjectFactory';
 import { SkillUpdateService } from 'domain/skill/skill-update.service';
 import { Skill } from 'domain/skill/SkillObjectFactory';
 import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
@@ -79,7 +80,7 @@ describe('Misconception Editor Component', () => {
       isMandatory(): boolean {
         return false;
       }
-    };
+    } as Misconception;
     component.ngOnInit();
   });
 
@@ -116,7 +117,7 @@ describe('Misconception Editor Component', () => {
 
   it('should save name when clicking on save button', () => {
     let updateNameSpy = spyOn(
-      skillUpdateService, 'updateMisconceptionName').and.returnValue(null);
+      skillUpdateService, 'updateMisconceptionName').and.returnValue();
     component.openNameEditor();
     // Setting new name.
     component.container.misconceptionName = 'newName';
@@ -128,7 +129,7 @@ describe('Misconception Editor Component', () => {
 
   it('should save notes when clicking on save button', () => {
     let updateNotesSpy = spyOn(
-      skillUpdateService, 'updateMisconceptionNotes').and.returnValue(null);
+      skillUpdateService, 'updateMisconceptionNotes').and.returnValue();
     component.openNotesEditor();
     // Setting new notes content.
     component.container.misconceptionNotes = 'newNotes';
@@ -140,7 +141,7 @@ describe('Misconception Editor Component', () => {
 
   it('should save feedback when clicking on save button', () => {
     let updateFeedbackSpy = spyOn(
-      skillUpdateService, 'updateMisconceptionFeedback').and.returnValue(null);
+      skillUpdateService, 'updateMisconceptionFeedback').and.returnValue();
     component.openFeedbackEditor();
     // Setting new feedback content.
     component.container.misconceptionFeedback = 'newFeedback';
@@ -190,7 +191,7 @@ describe('Misconception Editor Component', () => {
   it('should address the misconception\'s updates', () => {
     let updatesSpy = spyOn(
       skillUpdateService, 'updateMisconceptionMustBeAddressed')
-      .and.returnValue(null);
+      .and.returnValue();
     spyOn(component.onMisconceptionChange, 'emit').and.callThrough();
 
     component.updateMustBeAddressed();

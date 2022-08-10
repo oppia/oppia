@@ -33,7 +33,7 @@ class TaskEntryTests(test_utils.GenericTestBase):
     MOCK_DATE = datetime.datetime(2020, 6, 15, 9, 0, 0, 123456)
 
     def setUp(self) -> None:
-        super(TaskEntryTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL) # type: ignore[no-untyped-call]
         self.exp_id = 'eid'

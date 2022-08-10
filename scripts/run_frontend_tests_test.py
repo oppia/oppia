@@ -35,7 +35,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
     """Unit tests for scripts/run_frontend_tests.py."""
 
     def setUp(self) -> None:
-        super(RunFrontendTestsTests, self).setUp()
+        super().setUp()
 
         self.print_arr: list[str] = []
         def mock_print(msg: str, end: str = '\n') -> None:  # pylint: disable=unused-argument

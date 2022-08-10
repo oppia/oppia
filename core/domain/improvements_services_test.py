@@ -44,7 +44,7 @@ class ImprovementsServicesTestBase(test_utils.GenericTestBase):
     MOCK_DATE: Final = datetime.datetime(2020, 6, 15)
 
     def setUp(self) -> None:
-        super(ImprovementsServicesTestBase, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
         self.exp = self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
@@ -320,7 +320,7 @@ class FetchExplorationTaskHistoryPageTests(ImprovementsServicesTestBase):
     """Unit tests for the fetch_exploration_task_history_page function."""
 
     def setUp(self) -> None:
-        super(FetchExplorationTaskHistoryPageTests, self).setUp()
+        super().setUp()
         task_entries = []
         for i in range(1, 26):
             task_entry = self._new_resolved_task(
