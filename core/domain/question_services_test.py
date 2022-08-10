@@ -683,8 +683,9 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 self.assertItemsEqual(question.linked_skill_ids, ['skill_2'])  # type: ignore[no-untyped-call]
 
     def test_compute_summary_of_question(self) -> None:
+        question = question_services.get_question_by_id(self.question_id)
         question_summary = question_services.compute_summary_of_question(
-            self.question)
+            question)
 
         self.assertEqual(question_summary.id, self.question_id)
         self.assertEqual(
