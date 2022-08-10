@@ -1295,9 +1295,9 @@ class TranslationContributionStatsModel(base_models.BaseModel):
 
 
 class TranslationReviewStatsModel(base_models.BaseModel):
-    """Records the contributor dashboard translation review stats. There
-    is one instance of this model per (language_code, reviewer_user_id,
-    topic_id) tuple.
+    """Records the translation review stats. There is one instance of this model
+    per (language_code, reviewer_user_id, topic_id) tuple. Its IDs are in the
+    following structure: [language_code].[reviewer_user_id].[topic_id]
     """
 
     # We use the model id as a key in the Takeout dict.
@@ -1308,7 +1308,7 @@ class TranslationReviewStatsModel(base_models.BaseModel):
     language_code = datastore_services.StringProperty(
         required=True, indexed=True)
     # The user ID of the translation reviewer.
-    contributor_user_id = datastore_services.StringProperty(
+    reviewer_user_id = datastore_services.StringProperty(
         required=True, indexed=True)
     # The topic ID of the translation reviews.
     topic_id = datastore_services.StringProperty(required=True, indexed=True)
@@ -1336,27 +1336,27 @@ class TranslationReviewStatsModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls,
-            language_code: str,
-            contributor_user_id: str,
-            topic_id: str,
-            reviewed_translations_count: int,
-            reviewed_translation_word_count: int,
-            accepted_translations_count: int,
-            accepted_translations_with_reviewer_edits_count: int,
-            accepted_translation_word_count: int,
-            first_contribution_date: datetime.date,
-            last_contribution_date: datetime.date
+        cls,
+        language_code: str,
+        reviewer_user_id: str,
+        topic_id: str,
+        reviewed_translations_count: int,
+        reviewed_translation_word_count: int,
+        accepted_translations_count: int,
+        accepted_translations_with_reviewer_edits_count: int,
+        accepted_translation_word_count: int,
+        first_contribution_date: datetime.date,
+        last_contribution_date: datetime.date
     ) -> str:
         """Creates a new TranslationReviewStatsModel instance and returns
         its ID.
         """
         entity_id = cls.generate_id(
-            language_code, contributor_user_id, topic_id)
+            language_code, reviewer_user_id, topic_id)
         entity = cls(
             id=entity_id,
             language_code=language_code,
-            contributor_user_id=contributor_user_id,
+            reviewer_user_id=reviewer_user_id,
             topic_id=topic_id,
             reviewed_translations_count=reviewed_translations_count,
             reviewed_translation_word_count=reviewed_translation_word_count,
@@ -1372,31 +1372,34 @@ class TranslationReviewStatsModel(base_models.BaseModel):
 
     @staticmethod
     def generate_id(
-            language_code: str, contributor_user_id: str, topic_id: str
+            language_code: str, reviewer_user_id: str, topic_id: str
     ) -> str:
         """Generates a unique ID for a TranslationReviewStatsModel
         instance.
 
         Args:
             language_code: str. ISO 639-1 language code.
-            contributor_user_id: str. User ID.
+            reviewer_user_id: str. User ID.
             topic_id: str. Topic ID.
 
         Returns:
             str. An ID of the form:
 
-            [language_code].[contributor_user_id].[topic_id]
+            [language_code].[reviewer_user_id].[topic_id]
         """
         return (
-            '%s.%s.%s' % (language_code, contributor_user_id, topic_id)
+            '%s.%s.%s' % (language_code, reviewer_user_id, topic_id)
         )
 
+    # Since signature of "get" incompatible with supertype "BaseModel" and
+    # there are no safety issues, the following line is skipped from Mypy
+    # checks.
     @classmethod
     def get( # type: ignore[override]
-        cls, language_code: str, contributor_user_id: str, topic_id: str
+        cls, language_code: str, reviewer_user_id: str, topic_id: str
     ) -> Optional[TranslationReviewStatsModel]:
         """Gets the TranslationReviewStatsModel matching the supplied
-        language_code, contributor_user_id, topic_id.
+        language_code, reviewer_user_id, topic_id.
 
         Returns:
             TranslationReviewStatsModel|None. The matching
@@ -1404,7 +1407,7 @@ class TranslationReviewStatsModel(base_models.BaseModel):
             instance exists.
         """
         entity_id = cls.generate_id(
-            language_code, contributor_user_id, topic_id)
+            language_code, reviewer_user_id, topic_id)
         return cls.get_by_id(entity_id)
 
     @classmethod
@@ -1419,7 +1422,7 @@ class TranslationReviewStatsModel(base_models.BaseModel):
             TranslationReviewStatsModel.
         """
         return cls.get_all().filter(
-            cls.contributor_user_id == user_id
+            cls.reviewer_user_id == user_id
         ).fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
 
     @classmethod
@@ -1434,12 +1437,12 @@ class TranslationReviewStatsModel(base_models.BaseModel):
             bool. Whether any models refer to the given user ID.
         """
         return cls.query(
-            cls.contributor_user_id == user_id
+            cls.reviewer_user_id == user_id
         ).get(keys_only=True) is not None
 
     @classmethod
     def get_deletion_policy(cls) -> base_models.DELETION_POLICY:
-        """Model contains corresponding to a user: contributor_user_id."""
+        """Model contains corresponding to a user: reviewer_user_id."""
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
@@ -1457,7 +1460,7 @@ class TranslationReviewStatsModel(base_models.BaseModel):
             'language_code':
                 base_models.EXPORT_POLICY.EXPORTED,
             # User ID is not exported in order to keep internal ids private.
-            'contributor_user_id':
+            'reviewer_user_id':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'topic_id':
                 base_models.EXPORT_POLICY.EXPORTED,
@@ -1485,7 +1488,7 @@ class TranslationReviewStatsModel(base_models.BaseModel):
             user_id: str. The ID of the user whose data should be deleted.
         """
         datastore_services.delete_multi(
-            cls.query(cls.contributor_user_id == user_id).fetch(keys_only=True))
+            cls.query(cls.reviewer_user_id == user_id).fetch(keys_only=True))
 
     @classmethod
     def export_data(
@@ -1502,7 +1505,7 @@ class TranslationReviewStatsModel(base_models.BaseModel):
         """
         user_data = {}
         stats_models: Sequence[TranslationReviewStatsModel] = (
-            cls.get_all().filter(cls.contributor_user_id == user_id).fetch())
+            cls.get_all().filter(cls.reviewer_user_id == user_id).fetch())
         for model in stats_models:
             splitted_id = model.id.split('.')
             id_without_user_id = '%s.%s' % (splitted_id[0], splitted_id[2])
@@ -1528,9 +1531,9 @@ class TranslationReviewStatsModel(base_models.BaseModel):
 
 
 class QuestionContributionStatsModel(base_models.BaseModel):
-    """Records the contributor dashboard question contribution stats. There
-    is one instance of this model per (contributor_user_id,
-    topic_id) tuple.
+    """Records the question contribution stats. There is one instance of this
+    model per (contributor_user_id, topic_id) tuple. Its IDs are in the
+    following structure: [contributor_user_id].[topic_id]
     """
 
     # We use the model id as a key in the Takeout dict.
@@ -1557,14 +1560,14 @@ class QuestionContributionStatsModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls,
-            contributor_user_id: str,
-            topic_id: str,
-            submitted_questions_count: int,
-            accepted_questions_count: int,
-            accepted_questions_without_reviewer_edits_count: int,
-            first_contribution_date: datetime.date,
-            last_contribution_date: datetime.date
+        cls,
+        contributor_user_id: str,
+        topic_id: str,
+        submitted_questions_count: int,
+        accepted_questions_count: int,
+        accepted_questions_without_reviewer_edits_count: int,
+        first_contribution_date: datetime.date,
+        last_contribution_date: datetime.date
     ) -> str:
         """Creates a new QuestionContributionStatsModel instance and returns
         its ID.
@@ -1605,6 +1608,9 @@ class QuestionContributionStatsModel(base_models.BaseModel):
             '%s.%s' % (contributor_user_id, topic_id)
         )
 
+    # Since signature of "get" incompatible with supertype "BaseModel" and
+    # there are no safety issues, the following line is skipped from Mypy
+    # checks.
     @classmethod
     def get( # type: ignore[override]
         cls, contributor_user_id: str, topic_id: str
@@ -1731,16 +1737,16 @@ class QuestionContributionStatsModel(base_models.BaseModel):
 
 
 class QuestionReviewStatsModel(base_models.BaseModel):
-    """Records the contributor dashboard question review stats. There
-    is one instance of this model per (contributor_user_id,
-    topic_id) tuple.
+    """Records the question review stats. There is one instance of this model
+    per (reviewer_user_id, topic_id) tuple. Its IDs are in the following
+    structure: [reviewer_user_id].[topic_id]
     """
 
     # We use the model id as a key in the Takeout dict.
     ID_IS_USED_AS_TAKEOUT_KEY = True
 
     # The user ID of the question reviewer.
-    contributor_user_id = datastore_services.StringProperty(
+    reviewer_user_id = datastore_services.StringProperty(
         required=True, indexed=True)
     # The topic ID of the question.
     topic_id = datastore_services.StringProperty(required=True, indexed=True)
@@ -1760,23 +1766,23 @@ class QuestionReviewStatsModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls,
-            contributor_user_id: str,
-            topic_id: str,
-            reviewed_questions_count: int,
-            accepted_questions_count: int,
-            accepted_questions_with_reviewer_edits_count: int,
-            first_contribution_date: datetime.date,
-            last_contribution_date: datetime.date
+        cls,
+        reviewer_user_id: str,
+        topic_id: str,
+        reviewed_questions_count: int,
+        accepted_questions_count: int,
+        accepted_questions_with_reviewer_edits_count: int,
+        first_contribution_date: datetime.date,
+        last_contribution_date: datetime.date
     ) -> str:
         """Creates a new QuestionReviewStatsModel instance and returns
         its ID.
         """
         entity_id = cls.generate_id(
-            contributor_user_id, topic_id)
+            reviewer_user_id, topic_id)
         entity = cls(
             id=entity_id,
-            contributor_user_id=contributor_user_id,
+            reviewer_user_id=reviewer_user_id,
             topic_id=topic_id,
             reviewed_questions_count=reviewed_questions_count,
             accepted_questions_count=accepted_questions_count,
@@ -1790,30 +1796,33 @@ class QuestionReviewStatsModel(base_models.BaseModel):
 
     @staticmethod
     def generate_id(
-            contributor_user_id: str, topic_id: str
+            reviewer_user_id: str, topic_id: str
     ) -> str:
         """Generates a unique ID for a QuestionReviewStatsModel
         instance.
 
         Args:
-            contributor_user_id: str. User ID.
+            reviewer_user_id: str. User ID.
             topic_id: str. Topic ID.
 
         Returns:
             str. An ID of the form:
 
-            [contributor_user_id].[topic_id]
+            [reviewer_user_id].[topic_id]
         """
         return (
-            '%s.%s' % (contributor_user_id, topic_id)
+            '%s.%s' % (reviewer_user_id, topic_id)
         )
 
+    # Since signature of "get" incompatible with supertype "BaseModel" and
+    # there are no safety issues, the following line is skipped from Mypy
+    # checks.
     @classmethod
     def get( # type: ignore[override]
-        cls, contributor_user_id: str, topic_id: str
+        cls, reviewer_user_id: str, topic_id: str
     ) -> Optional[QuestionReviewStatsModel]:
         """Gets the QuestionReviewStatsModel matching the supplied
-        contributor_user_id, topic_id.
+        reviewer_user_id, topic_id.
 
         Returns:
             QuestionReviewStatsModel|None. The matching
@@ -1821,7 +1830,7 @@ class QuestionReviewStatsModel(base_models.BaseModel):
             instance exists.
         """
         entity_id = cls.generate_id(
-            contributor_user_id, topic_id)
+            reviewer_user_id, topic_id)
         return cls.get_by_id(entity_id)
 
     @classmethod
@@ -1836,7 +1845,7 @@ class QuestionReviewStatsModel(base_models.BaseModel):
             QuestionReviewStatsModel.
         """
         return cls.get_all().filter(
-            cls.contributor_user_id == user_id
+            cls.reviewer_user_id == user_id
         ).fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT)
 
     @classmethod
@@ -1851,12 +1860,12 @@ class QuestionReviewStatsModel(base_models.BaseModel):
             bool. Whether any models refer to the given user ID.
         """
         return cls.query(
-            cls.contributor_user_id == user_id
+            cls.reviewer_user_id == user_id
         ).get(keys_only=True) is not None
 
     @classmethod
     def get_deletion_policy(cls) -> base_models.DELETION_POLICY:
-        """Model contains corresponding to a user: contributor_user_id."""
+        """Model contains corresponding to a user: reviewer_user_id."""
         return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
@@ -1872,7 +1881,7 @@ class QuestionReviewStatsModel(base_models.BaseModel):
         """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
             # User ID is not exported in order to keep internal ids private.
-            'contributor_user_id':
+            'reviewer_user_id':
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'topic_id':
                 base_models.EXPORT_POLICY.EXPORTED,
@@ -1896,7 +1905,7 @@ class QuestionReviewStatsModel(base_models.BaseModel):
             user_id: str. The ID of the user whose data should be deleted.
         """
         datastore_services.delete_multi(
-            cls.query(cls.contributor_user_id == user_id).fetch(keys_only=True))
+            cls.query(cls.reviewer_user_id == user_id).fetch(keys_only=True))
 
     @classmethod
     def export_data(
@@ -1913,7 +1922,7 @@ class QuestionReviewStatsModel(base_models.BaseModel):
         """
         user_data = {}
         stats_models: Sequence[QuestionReviewStatsModel] = (
-            cls.get_all().filter(cls.contributor_user_id == user_id).fetch())
+            cls.get_all().filter(cls.reviewer_user_id == user_id).fetch())
         for model in stats_models:
             splitted_id = model.id.split('.')
             id_without_user_id = '%s' % (splitted_id[1])

@@ -1954,7 +1954,7 @@ class TranslationReviewStatsModelUnitTests(test_utils.GenericTestBase):
     """Tests the TranslationContributionStatsModel class."""
 
     LANGUAGE_CODE = 'es'
-    CONTRIBUTOR_USER_ID = 'uid_01234567890123456789012345678912'
+    REVIEWER_USER_ID = 'uid_01234567890123456789012345678912'
     TOPIC_ID = 'topic_id'
     REVIEWED_TRANSLATIONS_COUNT = 2
     REVIEWED_TRANSLATION_WORD_COUNT = 100
@@ -1967,7 +1967,7 @@ class TranslationReviewStatsModelUnitTests(test_utils.GenericTestBase):
     def test_get_returns_model_when_it_exists(self) -> None:
         suggestion_models.TranslationReviewStatsModel.create(
             language_code=self.LANGUAGE_CODE,
-            contributor_user_id=self.CONTRIBUTOR_USER_ID,
+            reviewer_user_id=self.REVIEWER_USER_ID,
             topic_id=self.TOPIC_ID,
             reviewed_translations_count=self.REVIEWED_TRANSLATIONS_COUNT,
             reviewed_translation_word_count=(
@@ -1983,7 +1983,7 @@ class TranslationReviewStatsModelUnitTests(test_utils.GenericTestBase):
 
         translation_review_stats_model = (
             suggestion_models.TranslationReviewStatsModel.get(
-                self.LANGUAGE_CODE, self.CONTRIBUTOR_USER_ID, self.TOPIC_ID
+                self.LANGUAGE_CODE, self.REVIEWER_USER_ID, self.TOPIC_ID
             )
         )
 
@@ -1994,8 +1994,8 @@ class TranslationReviewStatsModelUnitTests(test_utils.GenericTestBase):
             self.LANGUAGE_CODE
         )
         self.assertEqual(
-            translation_review_stats_model.contributor_user_id,
-            self.CONTRIBUTOR_USER_ID
+            translation_review_stats_model.reviewer_user_id,
+            self.REVIEWER_USER_ID
         )
         self.assertEqual(
             translation_review_stats_model.reviewed_translations_count,
@@ -2046,7 +2046,7 @@ class TranslationReviewStatsModelUnitTests(test_utils.GenericTestBase):
     def test_get_all_by_user_id(self) -> None:
         suggestion_models.TranslationReviewStatsModel.create(
             language_code=self.LANGUAGE_CODE,
-            contributor_user_id=self.CONTRIBUTOR_USER_ID,
+            reviewer_user_id=self.REVIEWER_USER_ID,
             topic_id=self.TOPIC_ID,
             reviewed_translations_count=self.REVIEWED_TRANSLATIONS_COUNT,
             reviewed_translation_word_count=(
@@ -2062,7 +2062,7 @@ class TranslationReviewStatsModelUnitTests(test_utils.GenericTestBase):
 
         translation_review_stats_models = (
             suggestion_models.TranslationReviewStatsModel.get_all_by_user_id(
-                self.CONTRIBUTOR_USER_ID
+                self.REVIEWER_USER_ID
             )
         )
 
@@ -2081,8 +2081,8 @@ class TranslationReviewStatsModelUnitTests(test_utils.GenericTestBase):
             self.LANGUAGE_CODE
         )
         self.assertEqual(
-            translation_review_stats_model.contributor_user_id,
-            self.CONTRIBUTOR_USER_ID
+            translation_review_stats_model.reviewer_user_id,
+            self.REVIEWER_USER_ID
         )
         self.assertEqual(
             translation_review_stats_model.reviewed_translations_count,
@@ -2125,7 +2125,7 @@ class TranslationReviewStatsModelUnitTests(test_utils.GenericTestBase):
     def test_apply_deletion_policy(self) -> None:
         suggestion_models.TranslationReviewStatsModel.create(
             language_code=self.LANGUAGE_CODE,
-            contributor_user_id=self.CONTRIBUTOR_USER_ID,
+            reviewer_user_id=self.REVIEWER_USER_ID,
             topic_id=self.TOPIC_ID,
             reviewed_translations_count=self.REVIEWED_TRANSLATIONS_COUNT,
             reviewed_translation_word_count=(
@@ -2140,16 +2140,16 @@ class TranslationReviewStatsModelUnitTests(test_utils.GenericTestBase):
         )
         self.assertTrue(
             suggestion_models.TranslationReviewStatsModel
-            .has_reference_to_user_id(self.CONTRIBUTOR_USER_ID))
+            .has_reference_to_user_id(self.REVIEWER_USER_ID))
 
         (
             suggestion_models.TranslationReviewStatsModel
-            .apply_deletion_policy(self.CONTRIBUTOR_USER_ID)
+            .apply_deletion_policy(self.REVIEWER_USER_ID)
         )
 
         self.assertFalse(
             suggestion_models.TranslationReviewStatsModel
-            .has_reference_to_user_id(self.CONTRIBUTOR_USER_ID))
+            .has_reference_to_user_id(self.REVIEWER_USER_ID))
 
     def test_export_data_trivial(self) -> None:
         user_data = (
@@ -2162,7 +2162,7 @@ class TranslationReviewStatsModelUnitTests(test_utils.GenericTestBase):
         # Seed translation stats data for two different topics.
         model_1_id = suggestion_models.TranslationReviewStatsModel.create(
             language_code=self.LANGUAGE_CODE,
-            contributor_user_id=self.CONTRIBUTOR_USER_ID,
+            reviewer_user_id=self.REVIEWER_USER_ID,
             topic_id=self.TOPIC_ID,
             reviewed_translations_count=self.REVIEWED_TRANSLATIONS_COUNT,
             reviewed_translation_word_count=(
@@ -2177,7 +2177,7 @@ class TranslationReviewStatsModelUnitTests(test_utils.GenericTestBase):
         )
         model_2_id = suggestion_models.TranslationReviewStatsModel.create(
             language_code=self.LANGUAGE_CODE,
-            contributor_user_id=self.CONTRIBUTOR_USER_ID,
+            reviewer_user_id=self.REVIEWER_USER_ID,
             topic_id=topic_id_2,
             reviewed_translations_count=self.REVIEWED_TRANSLATIONS_COUNT,
             reviewed_translation_word_count=(
@@ -2191,10 +2191,10 @@ class TranslationReviewStatsModelUnitTests(test_utils.GenericTestBase):
             last_contribution_date=self.LAST_CONTRIBUTION_DATE
         )
         model_1_id_without_user_id = model_1_id.replace(
-            '.%s.' % self.CONTRIBUTOR_USER_ID, '.'
+            '.%s.' % self.REVIEWER_USER_ID, '.'
         )
         model_2_id_without_user_id = model_2_id.replace(
-            '.%s.' % self.CONTRIBUTOR_USER_ID, '.'
+            '.%s.' % self.REVIEWER_USER_ID, '.'
         )
         expected_data = {
             model_1_id_without_user_id: {
@@ -2237,7 +2237,7 @@ class TranslationReviewStatsModelUnitTests(test_utils.GenericTestBase):
 
         user_data = (
             suggestion_models.TranslationReviewStatsModel
-            .export_data(self.CONTRIBUTOR_USER_ID))
+            .export_data(self.REVIEWER_USER_ID))
 
         self.assertEqual(expected_data, user_data)
 
@@ -2462,7 +2462,7 @@ class QuestionContributionStatsModelUnitTests(test_utils.GenericTestBase):
 class QuestionReviewStatsModelUnitTests(test_utils.GenericTestBase):
     """Tests the QuestionReviewStatsModel class."""
 
-    CONTRIBUTOR_USER_ID = 'uid_01234567890123456789012345678912'
+    REVIEWER_USER_ID = 'uid_01234567890123456789012345678912'
     TOPIC_ID = 'topic_id'
     REVIEWED_QUESTIONS_COUNT = 2
     ACCEPTED_QUESTIONS_COUNT = 1
@@ -2472,7 +2472,7 @@ class QuestionReviewStatsModelUnitTests(test_utils.GenericTestBase):
 
     def test_get_returns_model_when_it_exists(self) -> None:
         suggestion_models.QuestionReviewStatsModel.create(
-            contributor_user_id=self.CONTRIBUTOR_USER_ID,
+            reviewer_user_id=self.REVIEWER_USER_ID,
             topic_id=self.TOPIC_ID,
             reviewed_questions_count=self.REVIEWED_QUESTIONS_COUNT,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
@@ -2484,15 +2484,15 @@ class QuestionReviewStatsModelUnitTests(test_utils.GenericTestBase):
 
         question_review_stats_model = (
             suggestion_models.QuestionReviewStatsModel.get(
-                self.CONTRIBUTOR_USER_ID, self.TOPIC_ID
+                self.REVIEWER_USER_ID, self.TOPIC_ID
             )
         )
 
         # Ruling out the possibility of None for mypy type checking.
         assert question_review_stats_model is not None
         self.assertEqual(
-            question_review_stats_model.contributor_user_id,
-            self.CONTRIBUTOR_USER_ID
+            question_review_stats_model.reviewer_user_id,
+            self.REVIEWER_USER_ID
         )
         self.assertEqual(
             question_review_stats_model.reviewed_questions_count,
@@ -2520,7 +2520,7 @@ class QuestionReviewStatsModelUnitTests(test_utils.GenericTestBase):
 
     def test_get_all_by_user_id(self) -> None:
         suggestion_models.QuestionReviewStatsModel.create(
-            contributor_user_id=self.CONTRIBUTOR_USER_ID,
+            reviewer_user_id=self.REVIEWER_USER_ID,
             topic_id=self.TOPIC_ID,
             reviewed_questions_count=self.REVIEWED_QUESTIONS_COUNT,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
@@ -2532,7 +2532,7 @@ class QuestionReviewStatsModelUnitTests(test_utils.GenericTestBase):
 
         question_review_stats_models = (
             suggestion_models.QuestionReviewStatsModel.get_all_by_user_id(
-                self.CONTRIBUTOR_USER_ID
+                self.REVIEWER_USER_ID
             )
         )
 
@@ -2542,8 +2542,8 @@ class QuestionReviewStatsModelUnitTests(test_utils.GenericTestBase):
         question_review_stats_model = question_review_stats_models[0]
 
         self.assertEqual(
-            question_review_stats_model.contributor_user_id,
-            self.CONTRIBUTOR_USER_ID
+            question_review_stats_model.reviewer_user_id,
+            self.REVIEWER_USER_ID
         )
         self.assertEqual(
             question_review_stats_model.reviewed_questions_count,
@@ -2579,7 +2579,7 @@ class QuestionReviewStatsModelUnitTests(test_utils.GenericTestBase):
 
     def test_apply_deletion_policy(self) -> None:
         suggestion_models.QuestionReviewStatsModel.create(
-            contributor_user_id=self.CONTRIBUTOR_USER_ID,
+            reviewer_user_id=self.REVIEWER_USER_ID,
             topic_id=self.TOPIC_ID,
             reviewed_questions_count=self.REVIEWED_QUESTIONS_COUNT,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
@@ -2590,16 +2590,16 @@ class QuestionReviewStatsModelUnitTests(test_utils.GenericTestBase):
         )
         self.assertTrue(
             suggestion_models.QuestionReviewStatsModel
-            .has_reference_to_user_id(self.CONTRIBUTOR_USER_ID))
+            .has_reference_to_user_id(self.REVIEWER_USER_ID))
 
         (
             suggestion_models.QuestionReviewStatsModel
-            .apply_deletion_policy(self.CONTRIBUTOR_USER_ID)
+            .apply_deletion_policy(self.REVIEWER_USER_ID)
         )
 
         self.assertFalse(
             suggestion_models.QuestionReviewStatsModel
-            .has_reference_to_user_id(self.CONTRIBUTOR_USER_ID))
+            .has_reference_to_user_id(self.REVIEWER_USER_ID))
 
     def test_export_data_trivial(self) -> None:
         user_data = (
@@ -2611,7 +2611,7 @@ class QuestionReviewStatsModelUnitTests(test_utils.GenericTestBase):
         topic_id_2 = 'topic ID 2'
         # Seed question stats data for two different topics.
         suggestion_models.QuestionReviewStatsModel.create(
-            contributor_user_id=self.CONTRIBUTOR_USER_ID,
+            reviewer_user_id=self.REVIEWER_USER_ID,
             topic_id=self.TOPIC_ID,
             reviewed_questions_count=self.REVIEWED_QUESTIONS_COUNT,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
@@ -2621,7 +2621,7 @@ class QuestionReviewStatsModelUnitTests(test_utils.GenericTestBase):
             last_contribution_date=self.LAST_CONTRIBUTION_DATE
         )
         suggestion_models.QuestionReviewStatsModel.create(
-            contributor_user_id=self.CONTRIBUTOR_USER_ID,
+            reviewer_user_id=self.REVIEWER_USER_ID,
             topic_id=topic_id_2,
             reviewed_questions_count=self.REVIEWED_QUESTIONS_COUNT,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
@@ -2663,6 +2663,6 @@ class QuestionReviewStatsModelUnitTests(test_utils.GenericTestBase):
 
         user_data = (
             suggestion_models.QuestionReviewStatsModel
-            .export_data(self.CONTRIBUTOR_USER_ID))
+            .export_data(self.REVIEWER_USER_ID))
 
         self.assertEqual(expected_data, user_data)

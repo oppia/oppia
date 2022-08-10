@@ -436,8 +436,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         datetime.date.fromtimestamp(1616173836),
         datetime.date.fromtimestamp(1616173837)
     ]
-    FIRST_CONTRIBUTION_DATE = datetime.datetime(2021, 5, 20)
-    LAST_CONTRIBUTION_DATE = datetime.datetime(2022, 5, 20)
+    FIRST_CONTRIBUTION_DATE: Final = datetime.datetime(2021, 5, 20)
+    LAST_CONTRIBUTION_DATE: Final = datetime.datetime(2022, 5, 20)
 
     def set_up_non_trivial(self) -> None:
         """Set up all models for use in testing.
@@ -751,7 +751,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
 
         suggestion_models.TranslationReviewStatsModel.create(
             language_code=self.SUGGESTION_LANGUAGE_CODE,
-            contributor_user_id=self.USER_ID_1,
+            reviewer_user_id=self.USER_ID_1,
             topic_id=self.TOPIC_ID_1,
             reviewed_translations_count=self.REVIEWED_TRANSLATIONS_COUNT,
             reviewed_translation_word_count=(
@@ -777,7 +777,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         )
 
         suggestion_models.QuestionReviewStatsModel.create(
-            contributor_user_id=self.USER_ID_1,
+            reviewer_user_id=self.USER_ID_1,
             topic_id=self.TOPIC_ID_1,
             reviewed_questions_count=self.REVIEWED_QUESTIONS_COUNT,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,

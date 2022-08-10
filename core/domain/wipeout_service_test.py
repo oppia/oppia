@@ -3919,7 +3919,7 @@ class WipeoutServiceDeleteSuggestionModelsTests(test_utils.GenericTestBase):
         suggestion_models.TranslationReviewStatsModel(
             id=self.TRANSLATION_STATS_1_ID,
             language_code='cs',
-            contributor_user_id=self.user_1_id,
+            reviewer_user_id=self.user_1_id,
             topic_id='topic',
             reviewed_translations_count=1,
             reviewed_translation_word_count=1,
@@ -3945,7 +3945,7 @@ class WipeoutServiceDeleteSuggestionModelsTests(test_utils.GenericTestBase):
         ).put()
         suggestion_models.QuestionReviewStatsModel(
             id=self.QUESTION_STATS_1_ID,
-            contributor_user_id=self.user_1_id,
+            reviewer_user_id=self.user_1_id,
             topic_id='topic',
             reviewed_questions_count=1,
             accepted_questions_count=1,
