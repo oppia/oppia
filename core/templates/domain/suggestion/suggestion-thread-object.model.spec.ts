@@ -46,6 +46,7 @@ describe('SuggestionThreadObjectFactory', () => {
       status: 'accepted',
       author_name: 'author',
       change: {
+        skill_id: 'skill_id',
         state_name: 'state_1',
         new_value: { html: 'new suggestion content' },
         old_value: { html: 'old suggestion content' }

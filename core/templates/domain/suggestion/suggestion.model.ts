@@ -24,7 +24,7 @@ interface SuggestionChangeBackendDict {
   'state_name': string;
   'new_value': SuggestionChangeValue;
   'old_value': SuggestionChangeValue;
-  'skill_id'?: string;
+  'skill_id': string;
 }
 
 export interface SuggestionBackendDict {
