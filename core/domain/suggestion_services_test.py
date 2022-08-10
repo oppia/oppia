@@ -611,10 +611,10 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             utils.ValidationError, 'Expected score_category to be of the form '
                                    'score_type.score_sub_type, received '
                                    'invalid_score_category'):
-                self.edit_before_pre_accept_validate(suggestion)
-                suggestion_services.accept_suggestion(
-                    self.suggestion_id, self.reviewer_id,
-                    self.COMMIT_MESSAGE, '')
+            self.edit_before_pre_accept_validate(suggestion)
+            suggestion_services.accept_suggestion(
+                self.suggestion_id, self.reviewer_id,
+                self.COMMIT_MESSAGE, '')
 
     def test_accept_suggestion_no_commit_message_failure(self) -> None:
         self.mock_create_suggestion(self.target_id)
