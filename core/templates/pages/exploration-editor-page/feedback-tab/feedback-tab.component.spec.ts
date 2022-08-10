@@ -180,6 +180,7 @@ describe('Feedback Tab Component', function() {
         state_name: '',
         new_value: {html: ''},
         old_value: {html: ''},
+        skill_id: '',
       },
       last_updated_msecs: 0
     });
@@ -244,6 +245,7 @@ describe('Feedback Tab Component', function() {
           state_name: '',
           new_value: {html: ''},
           old_value: {html: ''},
+          skill_id: '',
         },
         last_updated_msecs: 0
       }));
@@ -295,6 +297,7 @@ describe('Feedback Tab Component', function() {
             state_name: '',
             new_value: {html: ''},
             old_value: {html: ''},
+            skill_id: '',
           },
           last_updated_msecs: 0
         }));
@@ -337,6 +340,7 @@ describe('Feedback Tab Component', function() {
         state_name: '',
         new_value: {html: ''},
         old_value: {html: ''},
+        skill_id: '',
       },
       last_updated_msecs: 0
     });
@@ -374,6 +378,7 @@ describe('Feedback Tab Component', function() {
         state_name: '',
         new_value: {html: ''},
         old_value: {html: ''},
+        skill_id: '',
       },
       last_updated_msecs: 0
     });
@@ -422,6 +427,7 @@ describe('Feedback Tab Component', function() {
           state_name: '',
           new_value: {html: ''},
           old_value: {html: ''},
+          skill_id: '',
         },
         last_updated_msecs: 0
       }));
@@ -458,6 +464,7 @@ describe('Feedback Tab Component', function() {
           state_name: '',
           new_value: {html: ''},
           old_value: {html: ''},
+          skill_id: '',
         },
         last_updated_msecs: 0
       }));
