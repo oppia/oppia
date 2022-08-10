@@ -46,7 +46,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
     STORY_ID_2 = 'story_id_2'
 
     def setUp(self) -> None:
-        super(LearnerGroupServicesUnitTests, self).setUp()
+        super().setUp()
         self.signup(
             self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email( # type: ignore[no-untyped-call]

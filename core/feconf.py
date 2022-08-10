@@ -52,6 +52,13 @@ class ValidCmdDict(TypedDict):
     deprecated_values: Dict[str, List[str]]
 
 
+class RteTypeTextAngularDict(TypedDict):
+    """Dict representing RTE_TYPE_TEXTANGULAR Dictionary."""
+
+    ALLOWED_PARENT_LIST: Dict[str, List[str]]
+    ALLOWED_TAG_LIST: List[str]
+
+
 # Supported object types for ParamSpec.
 SUPPORTED_OBJ_TYPES = {
     'UnicodeString',
@@ -139,6 +146,7 @@ class VALID_MODEL_NAMES(enum.Enum): # pylint: disable=invalid-name
     beam_job = 'beam_job' # pylint: disable=invalid-name
     blog = 'blog' # pylint: disable=invalid-name
     classifier = 'classifier' # pylint: disable=invalid-name
+    classroom = 'classroom' # pylint: disable=invalid-name
     collection = 'collection' # pylint: disable=invalid-name
     config = 'config' # pylint: disable=invalid-name
     email = 'email' # pylint: disable=invalid-name
@@ -1223,7 +1231,7 @@ RTE_FORMAT_TEXTANGULAR = 'text-angular'
 RTE_FORMAT_CKEDITOR = 'ck-editor'
 
 # RTE content specifications according to the type of the editor.
-RTE_CONTENT_SPEC = {
+RTE_CONTENT_SPEC: Dict[str, RteTypeTextAngularDict] = {
     'RTE_TYPE_TEXTANGULAR': {
         # Valid parent-child relation in TextAngular.
         'ALLOWED_PARENT_LIST': {

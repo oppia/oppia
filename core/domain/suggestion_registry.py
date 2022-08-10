@@ -346,7 +346,7 @@ class SuggestionEditStateContent(BaseSuggestion):
         """Initializes an object of type SuggestionEditStateContent
         corresponding to the SUGGESTION_TYPE_EDIT_STATE_CONTENT choice.
         """
-        super(SuggestionEditStateContent, self).__init__(
+        super().__init__(
             status, final_reviewer_id)
         self.suggestion_id = suggestion_id
         self.suggestion_type = (
@@ -371,7 +371,7 @@ class SuggestionEditStateContent(BaseSuggestion):
             ValidationError. One or more attributes of the
                 SuggestionEditStateContent object are invalid.
         """
-        super(SuggestionEditStateContent, self).validate()
+        super().validate()
 
         if not isinstance(self.change, exp_domain.ExplorationChange):
             raise utils.ValidationError(
@@ -534,7 +534,7 @@ class SuggestionTranslateContent(BaseSuggestion):
         """Initializes an object of type SuggestionTranslateContent
         corresponding to the SUGGESTION_TYPE_TRANSLATE_CONTENT choice.
         """
-        super(SuggestionTranslateContent, self).__init__(
+        super().__init__(
             status, final_reviewer_id)
         self.suggestion_id = suggestion_id
         self.suggestion_type = (
@@ -557,7 +557,7 @@ class SuggestionTranslateContent(BaseSuggestion):
             ValidationError. One or more attributes of the
                 SuggestionTranslateContent object are invalid.
         """
-        super(SuggestionTranslateContent, self).validate()
+        super().validate()
 
         if not isinstance(self.change, exp_domain.ExplorationChange):
             raise utils.ValidationError(
@@ -735,7 +735,7 @@ class SuggestionAddQuestion(BaseSuggestion):
         """Initializes an object of type SuggestionAddQuestion
         corresponding to the SUGGESTION_TYPE_ADD_QUESTION choice.
         """
-        super(SuggestionAddQuestion, self).__init__(status, final_reviewer_id)
+        super().__init__(status, final_reviewer_id)
         self.suggestion_id = suggestion_id
         self.suggestion_type = feconf.SUGGESTION_TYPE_ADD_QUESTION
         self.target_type = feconf.ENTITY_TYPE_SKILL
@@ -791,7 +791,7 @@ class SuggestionAddQuestion(BaseSuggestion):
             ValidationError. One or more attributes of the SuggestionAddQuestion
                 object are invalid.
         """
-        super(SuggestionAddQuestion, self).validate()
+        super().validate()
 
         if self.get_score_type() != suggestion_models.SCORE_TYPE_QUESTION:
             raise utils.ValidationError(
@@ -1481,8 +1481,213 @@ class TranslationContributionStats:
         }
 
 
+class TranslationReviewStats:
+    """Domain object for the TranslationReviewStatsModel."""
+
+    def __init__(
+            self, language_code, contributor_user_id, topic_id,
+            reviewed_translations_count, reviewed_translation_word_count,
+            accepted_translations_count,
+            accepted_translations_with_reviewer_edits_count,
+            first_contribution_date, last_contribution_date):
+        self.language_code = language_code
+        self.contributor_user_id = contributor_user_id
+        self.topic_id = topic_id
+        self.reviewed_translations_count = reviewed_translations_count
+        self.reviewed_translation_word_count = reviewed_translation_word_count
+        self.accepted_translations_count = accepted_translations_count
+        self.accepted_translations_with_reviewer_edits_count = (
+            accepted_translations_with_reviewer_edits_count
+        )
+        self.first_contribution_date = first_contribution_date
+        self.last_contribution_date = last_contribution_date
+
+    def to_dict(self):
+        """Returns a dict representation of a TranslationReviewStats
+        domain object.
+
+        Returns:
+            dict. A dict representation of a TranslationReviewStats
+            domain object.
+        """
+        return {
+            'language_code': self.language_code,
+            'contributor_user_id': self.contributor_user_id,
+            'topic_id': self.topic_id,
+            'reviewed_translations_count': self.reviewed_translations_count,
+            'reviewed_translation_word_count': (
+                self.reviewed_translation_word_count),
+            'accepted_translations_count': self.accepted_translations_count,
+            'accepted_translations_with_reviewer_edits_count': (
+                self.accepted_translations_with_reviewer_edits_count),
+            'first_contribution_date': self.first_contribution_date,
+            'last_contribution_date': self.last_contribution_date,
+        }
+
+
+class QuestionContributionStats:
+    """Domain object for the QuestionContributionStatsModel."""
+
+    def __init__(
+            self, contributor_user_id, topic_id,
+            submitted_questions_count,
+            accepted_questions_count,
+            accepted_questions_without_reviewer_edits_count,
+            first_contribution_date, last_contribution_date):
+        self.contributor_user_id = contributor_user_id
+        self.topic_id = topic_id
+        self.submitted_questions_count = submitted_questions_count
+        self.accepted_questions_count = accepted_questions_count
+        self.accepted_questions_without_reviewer_edits_count = (
+            accepted_questions_without_reviewer_edits_count
+        )
+        self.first_contribution_date = first_contribution_date
+        self.last_contribution_date = last_contribution_date
+
+    def to_dict(self):
+        """Returns a dict representation of a QuestionContributionStats
+        domain object.
+
+        Returns:
+            dict. A dict representation of a QuestionContributionStats
+            domain object.
+        """
+        return {
+            'contributor_user_id': self.contributor_user_id,
+            'topic_id': self.topic_id,
+            'submitted_questions_count': self.submitted_questions_count,
+            'accepted_questions_count': (
+                self.accepted_questions_count),
+            'accepted_questions_without_reviewer_edits_count': (
+                self.accepted_questions_without_reviewer_edits_count),
+            'first_contribution_date': (
+                self.first_contribution_date),
+            'last_contribution_date': self.last_contribution_date
+        }
+
+
+class QuestionReviewStats:
+    """Domain object for the QuestionReviewStatsModel."""
+
+    def __init__(
+            self, contributor_user_id, topic_id,
+            reviewed_questions_count,
+            accepted_questions_count,
+            accepted_questions_with_reviewer_edits_count,
+            first_contribution_date, last_contribution_date):
+        self.contributor_user_id = contributor_user_id
+        self.topic_id = topic_id
+        self.reviewed_questions_count = reviewed_questions_count
+        self.accepted_questions_count = accepted_questions_count
+        self.accepted_questions_with_reviewer_edits_count = (
+            accepted_questions_with_reviewer_edits_count
+        )
+        self.first_contribution_date = first_contribution_date
+        self.last_contribution_date = last_contribution_date
+
+    def to_dict(self):
+        """Returns a dict representation of a QuestionContributionStats
+        domain object.
+
+        Returns:
+            dict. A dict representation of a QuestionContributionStats
+            domain object.
+        """
+        return {
+            'contributor_user_id': self.contributor_user_id,
+            'topic_id': self.topic_id,
+            'reviewed_questions_count': self.reviewed_questions_count,
+            'accepted_questions_count': (
+                self.accepted_questions_count),
+            'accepted_questions_with_reviewer_edits_count': (
+                self.accepted_questions_with_reviewer_edits_count),
+            'first_contribution_date': (
+                self.first_contribution_date),
+            'last_contribution_date': self.last_contribution_date
+        }
+
+
+class ContributorMilestoneEmailInfo:
+    """Encapsulates key information that is used to create the email content for
+    notifying contributors about milestones they achieved.
+
+    Attributes:
+        contributor_user_id: str. The ID of the contributor.
+        language_code: str. The language code of the suggestion.
+        contribution_type: str. The type of the contribution i.e.
+            translation or question.
+        contribution_sub_type: str. The sub type of the contribution
+            i.e. submissions/acceptances/reviews/edits.
+        contributions_count: int. The number of contributions made to
+            reach the milestone.
+    """
+
+    def __init__(
+        self,
+        contributor_user_id: str,
+        contribution_type: str,
+        contribution_sub_type: str,
+        language_code: str,
+        contributions_count: int
+    ) -> None:
+        self.contributor_user_id = contributor_user_id
+        self.contribution_type = contribution_type
+        self.contribution_sub_type = contribution_sub_type
+        self.language_code = language_code
+        self.contributions_count = contributions_count
+
+
+class ContributorStatsSummary:
+    """Encapsulates key information that is used to send to the frontend
+    regarding contributor stats.
+
+    Attributes:
+        contributor_user_id: str. The ID of the contributor.
+        translation_contribution_stats: list(TranslationContributionStats). A
+            list of TranslationContributionStats corresponding to the user.
+        question_contribution_stats: list(QuestionContributionStats). A list of
+            QuestionContributionStats corresponding to the user.
+        translation_review_stats: list(TranslationReviewStats). A list of
+            TranslationReviewStats corresponding to the user.
+        question_review_stats: list(QuestionReviewStats). A list of
+            QuestionReviewStats  corresponding to the user.
+    """
+
+    def __init__(
+            self, contributor_user_id, translation_contribution_stats,
+            question_contribution_stats,
+            translation_review_stats,
+            question_review_stats):
+        self.contributor_user_id = contributor_user_id
+        self.translation_contribution_stats = translation_contribution_stats
+        self.question_contribution_stats = question_contribution_stats
+        self.translation_review_stats = translation_review_stats
+        self.question_review_stats = question_review_stats
+
+    def to_dict(self):
+        """Returns a dict representation of a ContributorStatsSummary
+        domain object.
+
+        Returns:
+            dict. A dict representation of a ContributorStatsSummary
+            domain object.
+        """
+        return {
+            'contributor_user_id': self.contributor_user_id,
+            'translation_contribution_stats': [
+                stats.to_dict() for stats in (
+                    self.translation_contribution_stats)],
+            'question_contribution_stats': [
+                stats.to_dict() for stats in self.question_contribution_stats],
+            'translation_review_stats': [
+                stats.to_dict() for stats in self.translation_review_stats],
+            'question_review_stats': [
+                stats.to_dict() for stats in self.question_review_stats]
+        }
+
+
 class ReviewableSuggestionEmailInfo:
-    """Stores key information that is used to create the email content for
+    """Encapsulates key information that is used to create the email content for
     notifying admins and reviewers that there are suggestions that need to be
     reviewed.
 
