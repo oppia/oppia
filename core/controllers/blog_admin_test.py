@@ -51,7 +51,7 @@ class BlogAdminRolesHandlerTest(test_utils.GenericTestBase):
 
     def setUp(self):
         """Complete the signup process for self.ADMIN_EMAIL."""
-        super(BlogAdminRolesHandlerTest, self).setUp()
+        super().setUp()
         self.signup(
             self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
 
@@ -127,7 +127,7 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
 
     def setUp(self):
         """Complete the signup process for self.ADMIN_EMAIL."""
-        super(BlogAdminHandlerTest, self).setUp()
+        super().setUp()
         self.signup(
             self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
 
