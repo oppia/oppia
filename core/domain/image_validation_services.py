@@ -56,10 +56,10 @@ def validate_image_and_filename(
         list(feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.keys()))
     # Ruling out the possibility of str for mypy type checking.
     assert isinstance(raw_image, bytes)
-    if html_validation_service.is_parsable_as_xml(raw_image):  # type: ignore[no-untyped-call]
+    if html_validation_service.is_parsable_as_xml(raw_image):
         file_format = 'svg'
         invalid_tags, invalid_attrs = (
-            html_validation_service.get_invalid_svg_tags_and_attrs(raw_image))  # type: ignore[no-untyped-call]
+            html_validation_service.get_invalid_svg_tags_and_attrs(raw_image))
         if invalid_tags or invalid_attrs:
             invalid_tags_message = (
                 'tags: %s' % invalid_tags if invalid_tags else '')
@@ -68,7 +68,7 @@ def validate_image_and_filename(
             raise utils.ValidationError(
                 'Unsupported tags/attributes found in the SVG:\n%s\n%s' % (
                     invalid_tags_message, invalid_attrs_message))
-        if not html_validation_service.does_svg_tag_contains_xmlns_attribute(  # type: ignore[no-untyped-call]
+        if not html_validation_service.does_svg_tag_contains_xmlns_attribute(
                 raw_image):
             raise utils.ValidationError(
                 'The svg tag does not contains the \'xmlns\' attribute.')

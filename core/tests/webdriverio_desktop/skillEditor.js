@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,16 +16,16 @@
  * @fileoverview End-to-end tests for the skill editor page.
  */
 
-var general = require('../protractor_utils/general.js');
-var users = require('../protractor_utils/users.js');
-var workflow = require('../protractor_utils/workflow.js');
+var general = require('../webdriverio_utils/general.js');
+var users = require('../webdriverio_utils/users.js');
+var workflow = require('../webdriverio_utils/workflow.js');
 
 var ExplorationEditorPage =
-  require('../protractor_utils/ExplorationEditorPage.js');
+  require('../webdriverio_utils/ExplorationEditorPage.js');
 var TopicsAndSkillsDashboardPage =
-  require('../protractor_utils/TopicsAndSkillsDashboardPage.js');
+  require('../webdriverio_utils/TopicsAndSkillsDashboardPage.js');
 var SkillEditorPage =
-  require('../protractor_utils/SkillEditorPage.js');
+  require('../webdriverio_utils/SkillEditorPage.js');
 
 describe('Skill Editor functionality', function() {
   var topicsAndSkillsDashboardPage = null;
@@ -45,7 +45,7 @@ describe('Skill Editor functionality', function() {
     var handle = await browser.getWindowHandle();
     await topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
       'Skill 1', 'Concept card explanation', false);
-    var url = await browser.getCurrentUrl();
+    var url = await browser.getUrl();
     skillId = url.split('/')[4];
     await general.closeCurrentTabAndSwitchTo(handle);
     await users.logout();
@@ -174,19 +174,19 @@ describe('Skill Editor functionality', function() {
       await topicsAndSkillsDashboardPage
         .createSkillWithDescriptionAndExplanation(
           'Skill 2', 'Concept card explanation', false);
-      await browser.switchTo().window(handle);
+      await browser.switchToWindow(handle);
       await topicsAndSkillsDashboardPage
         .navigateToSkillWithDescription('Skill 2');
 
-      var handles = await browser.getAllWindowHandles();
+      var handles = await browser.getWindowHandles();
 
       await skillEditorPage.changeSkillDescription('new description');
-      await browser.switchTo().window(handles[handles.length - 1]);
+      await browser.switchToWindow(handles[handles.length - 1]);
       await skillEditorPage.expectUnsavedChangesStatusInfoModalToBeVisible();
 
-      await browser.switchTo().window(handles[handles.length - 2]);
+      await browser.switchToWindow(handles[handles.length - 2]);
       await skillEditorPage.saveOrPublishSkill('Changed skill description.');
-      await browser.switchTo().window(handles[handles.length - 1]);
+      await browser.switchToWindow(handles[handles.length - 1]);
       await skillEditorPage.expectStaleTabInfoModalToBeVisible();
 
       await general.closeCurrentTabAndSwitchTo(handles[handles.length - 2]);
