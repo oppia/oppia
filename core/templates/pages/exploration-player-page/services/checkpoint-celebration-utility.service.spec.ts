@@ -27,7 +27,7 @@ import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 
 class MockTranslateService {
   onLangChange: EventEmitter<string> = new EventEmitter();
-  instant(key: string, interpolateParams?: Object): string {
+  instant(key: string, interpolateParams: Object | undefined): string {
     return key;
   }
 }
@@ -172,7 +172,7 @@ describe('Checkpoint celebration utility service', () => {
     spyOn(Math, 'random').and.returnValue(0.45);
 
     expect(checkpointCelebrationUtilityService.getRandomI18nKey(
-      'KEY_PREFIX', 10)).toEqual('KEY_PREFIX_5');
+      'KEY_PREFIX', 10, null)).toEqual('KEY_PREFIX_5');
   });
 
   it('should get the right kind of checkpoint message i18n key', () => {
