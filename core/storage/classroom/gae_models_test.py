@@ -122,7 +122,7 @@ class ClassroomModelUnitTest(test_utils.GenericTestBase):
         classroom_model_cls = classroom_models.ClassroomModel
 
         # Test create method.
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'A classroom with the given classroom ID already exists.'
         ):
@@ -141,7 +141,7 @@ class ClassroomModelUnitTest(test_utils.GenericTestBase):
                     )
 
         # Test generate_new_classroom_id method.
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception,
             'New classroom id generator is producing too many collisions.'
         ):
