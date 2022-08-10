@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,15 +17,15 @@
  * page.
  */
 
-var general = require('../protractor_utils/general.js');
-var users = require('../protractor_utils/users.js');
+var general = require('../webdriverio_utils/general.js');
+var users = require('../webdriverio_utils/users.js');
 
-var AdminPage = require('../protractor_utils/AdminPage.js');
-var ClassroomPage = require('../protractor_utils/ClassroomPage.js');
-var LibraryPage = require('../protractor_utils/LibraryPage.js');
+var AdminPage = require('../webdriverio_utils/AdminPage.js');
+var ClassroomPage = require('../webdriverio_utils/ClassroomPage.js');
+var LibraryPage = require('../webdriverio_utils/LibraryPage.js');
 var TopicsAndSkillsDashboardPage = require(
-  '../protractor_utils/TopicsAndSkillsDashboardPage.js');
-var TopicEditorPage = require('../protractor_utils/TopicEditorPage.js');
+  '../webdriverio_utils/TopicsAndSkillsDashboardPage.js');
+var TopicEditorPage = require('../webdriverio_utils/TopicEditorPage.js');
 
 describe('Classroom page functionality', function() {
   var adminPage = null;
@@ -60,7 +60,7 @@ describe('Classroom page functionality', function() {
       await topicEditorPage.updateMetaTagContent('topic meta tag');
       await topicEditorPage.updatePageTitleFragment('topic page title');
       await topicEditorPage.saveTopic('Added thumbnail.');
-      var url = await browser.getCurrentUrl();
+      var url = await browser.getUrl();
       var topicId = url.split('/')[4].slice(0, -1);
       await general.closeCurrentTabAndSwitchTo(handle);
       await adminPage.editConfigProperty(

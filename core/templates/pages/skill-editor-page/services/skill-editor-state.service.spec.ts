@@ -20,10 +20,11 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 
 import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
-import { SkillRights } from 'domain/skill/skill-rights.model';
+import { SkillRights, SkillRightsBackendDict } from 'domain/skill/skill-rights.model';
 import { SkillRightsBackendApiService } from 'domain/skill/skill-rights-backend-api.service';
 import { SkillUpdateService } from 'domain/skill/skill-update.service';
 import {
+  Skill,
   SkillBackendDict,
   SkillObjectFactory,
 } from 'domain/skill/SkillObjectFactory';
@@ -114,9 +115,9 @@ class FakeSkillBackendApiService {
     getAllQuestionsMerged: () => skillDict.all_questions_merged,
   };
 
-  newBackendSkillObject = null;
-  skillObject = null;
-  failure = null;
+  newBackendSkillObject: SkillBackendDict | null = null;
+  skillObject: Skill | null = null;
+  failure: string | null = null;
 
   async fetchSkillAsync() {
     return new Promise((resolve, reject) => {
@@ -165,7 +166,7 @@ class FakeSkillBackendApiService {
     });
   }
 
-  async doesSkillWithDescriptionExistAsync(description) {
+  async doesSkillWithDescriptionExistAsync(description: string) {
     return new Promise((resolve, reject) => {
       if (description) {
         resolve(true);
@@ -183,10 +184,12 @@ class FakeSkillRightsBackendApiService {
       can_edit_skill_description: true,
       getSkillId: () => 'skill_id_1',
       canEditSkillDescription: () => false,
-    },
+    } as SkillRightsBackendDict,
     failure: null,
     fetchSkillRightsAsync: null,
   };
+
+  backendSkillRightsObject!: SkillRightsBackendDict;
 
   async fetchSkillRightsAsync() {
     return new Promise((resolve, reject) => {
@@ -200,12 +203,12 @@ class FakeSkillRightsBackendApiService {
 }
 
 describe('Skill editor state service', () => {
-  let fakeSkillBackendApiService = null;
-  let fakeSkillRightsBackendApiService = null;
-  let skillEditorStateService: SkillEditorStateService = null;
-  let skillObjectFactory: SkillObjectFactory = null;
-  let skillRightsObject = null;
-  let skillUpdateService: SkillUpdateService = null;
+  let fakeSkillBackendApiService: FakeSkillBackendApiService;
+  let fakeSkillRightsBackendApiService: FakeSkillRightsBackendApiService;
+  let skillEditorStateService: SkillEditorStateService;
+  let skillObjectFactory: SkillObjectFactory;
+  let skillRightsObject: SkillRightsBackendDict;
+  let skillUpdateService: SkillUpdateService;
 
   beforeEach(() => {
     fakeSkillBackendApiService = new FakeSkillBackendApiService();
@@ -468,7 +471,7 @@ describe('Skill editor state service', () => {
       .and.callThrough();
     let successCb = jasmine.createSpy('success');
     skillEditorStateService.updateExistenceOfSkillDescription(
-      null, successCb);
+      '', successCb);
     tick();
 
     expect(successCb).not.toHaveBeenCalled();

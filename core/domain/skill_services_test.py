@@ -47,7 +47,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
     MISCONCEPTION_ID_2 = 2
 
     def setUp(self):
-        super(SkillServicesUnitTests, self).setUp()
+        super().setUp()
         example_1 = skill_domain.WorkedExample(
             state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
             state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>')
@@ -1427,7 +1427,7 @@ class SkillMasteryServicesUnitTests(test_utils.GenericTestBase):
     DEGREE_OF_MASTERY_2 = 0.5
 
     def setUp(self):
-        super(SkillMasteryServicesUnitTests, self).setUp()
+        super().setUp()
         self.SKILL_ID_1 = skill_services.get_new_skill_id()
         self.SKILL_ID_2 = skill_services.get_new_skill_id()
         self.SKILL_ID_3 = skill_services.get_new_skill_id()
