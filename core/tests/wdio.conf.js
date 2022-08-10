@@ -16,9 +16,6 @@ const drivers = {
   chrome: { version: chromeVersion },
 };
 
-var chromedriverPath =
-'./node_modules/webdriver-manager/selenium/chromedriver_' + chromeVersion;
-
 // If video recorder is not running the ffmpeg process will be null.
 var ffmpegProcess = null;
 // The absolute path where the recorded video of test will be stored.
@@ -34,6 +31,14 @@ var suites = {
 
   blogDashboard: [
     './core/tests/webdriverio_desktop/blogDashboard.js'
+  ],
+
+  classroomPage: [
+    './core/tests/webdriverio_desktop/classroomPage.js'
+  ],
+
+  classroomPageFileUploadFeatures: [
+    './core/tests/webdriverio_desktop/classroomPageFileUploadFeatures.js'
   ],
 
   collections: [
@@ -56,6 +61,10 @@ var suites = {
     './core/tests/webdriverio_desktop/learnerDashboard.js'
   ],
 
+  navigation: [
+    './core/tests/webdriverio_desktop/navigation.js'
+  ],
+
   preferences: [
     './core/tests/webdriverio_desktop/preferences.js'
   ],
@@ -68,8 +77,16 @@ var suites = {
     './core/tests/webdriverio/profileMenuFlow.js'
   ],
 
+  skillEditor: [
+    './core/tests/webdriverio_desktop/skillEditor.js'
+  ],
+
   subscriptions: [
     './core/tests/webdriverio/subscriptionsFlow.js'
+  ],
+
+  topicsAndSkillsDashboard: [
+    './core/tests/webdriverio_desktop/topicsAndSkillsDashboard.js'
   ],
 
   topicAndStoryEditor: [
@@ -87,6 +104,10 @@ var suites = {
   users: [
     './core/tests/webdriverio_desktop/userJourneys.js'
   ],
+
+  wipeout: [
+    './core/tests/webdriverio_desktop/wipeout.js'
+  ]
 };
 
 // A reference configuration file.
@@ -169,8 +190,8 @@ exports.config = {
   services: [
     ['selenium-standalone', {
       logPath: 'logs',
-      installArgs: { drivers }, // drivers to install
-      args: { drivers } // drivers to use
+      installArgs: { drivers },
+      args: { drivers }
     }]
   ],
 
