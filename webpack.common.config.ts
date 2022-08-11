@@ -520,8 +520,8 @@ module.exports = {
     // For statically inserted bundles we handle this logic in
     // core/templates/pages/footer_js_libs.html.
     new MiniCssExtractPlugin({
-      filename: '[name].css',
-      chunkFilename: '[id].css',
+      filename: '[name].[contenthash].css',
+      chunkFilename: '[id].[contenthash].css',
       ignoreOrder: false,
       insert: function(linkTag) {
         if (localStorage.getItem('direction') === 'rtl') {

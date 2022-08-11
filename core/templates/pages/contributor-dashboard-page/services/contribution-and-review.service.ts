@@ -263,7 +263,7 @@ export class ContributionAndReviewService {
   }
 
   async updateQuestionSuggestionAsync(
-      suggestionId: string, skillDifficulty: string,
+      suggestionId: string, skillDifficulty: number,
       questionStateData: StateBackendDict, imagesData: ImagesData[],
       onSuccess: (suggestionId: string) => void,
       onFailure: (suggestionId: string) => void

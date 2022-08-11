@@ -144,6 +144,10 @@ MATH_INTERACTION_TYPES = [
     TYPE_VALID_NUMERIC_EXPRESSION,
     TYPE_VALID_MATH_EQUATION
 ]
+ALGEBRAIC_MATH_INTERACTIONS = [
+    TYPE_VALID_ALGEBRAIC_EXPRESSION,
+    TYPE_VALID_MATH_EQUATION
+]
 MATH_INTERACTION_DEPRECATED_RULES = [
     'ContainsSomeOf', 'OmitsSomeOf', 'MatchesWithGeneralForm']
 
@@ -689,12 +693,27 @@ class Exploration(translation_domain.BaseTranslatableObject):
     """Domain object for an Oppia exploration."""
 
     def __init__(
-            self, exploration_id, title, category, objective,
-            language_code, tags, blurb, author_notes,
-            states_schema_version, init_state_name, states_dict,
-            param_specs_dict, param_changes_list, version,
-            auto_tts_enabled, correctness_feedback_enabled, edits_allowed,
-            created_on=None, last_updated=None):
+        self,
+        exploration_id: str,
+        title: str,
+        category: str,
+        objective: str,
+        language_code: str,
+        tags: List[str],
+        blurb: str,
+        author_notes: str,
+        states_schema_version: int,
+        init_state_name: str,
+        states_dict: Dict[str, state_domain.StateDict],
+        param_specs_dict: Dict[str, param_domain.ParamSpecDict],
+        param_changes_list: List[param_domain.ParamChangeDict],
+        version: int,
+        auto_tts_enabled: bool,
+        correctness_feedback_enabled: bool,
+        edits_allowed: bool,
+        created_on: Optional[datetime.datetime] = None,
+        last_updated: Optional[datetime.datetime] = None
+    ) -> None:
         """Initializes an Exploration domain object.
 
         Args:
@@ -2280,10 +2299,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     'interaction']['answer_groups'] = filtered_answer_groups
 
                 # Renaming cust arg.
-                customization_args = state_dict[
-                    'interaction']['customization_args']
-                customization_args['allowedVariables'] = []
-                if 'customOskLetters' in customization_args:
+                if state_dict[
+                        'interaction']['id'] in ALGEBRAIC_MATH_INTERACTIONS:
+                    customization_args = state_dict[
+                        'interaction']['customization_args']
                     customization_args['allowedVariables'] = copy.deepcopy(
                         customization_args['customOskLetters'])
                     del customization_args['customOskLetters']
