@@ -105,7 +105,7 @@ class TopicModelUnitTests(test_utils.GenericTestBase):
     def test_get_by_name(self) -> None:
         topic = topic_domain.Topic.create_default_topic(
             self.TOPIC_ID, self.TOPIC_NAME, 'name', 'description', 'fragm')
-        topic_services.save_new_topic(feconf.SYSTEM_COMMITTER_ID, topic) # type: ignore[no-untyped-call]
+        topic_services.save_new_topic(feconf.SYSTEM_COMMITTER_ID, topic)
         topic_model = topic_models.TopicModel.get_by_name(self.TOPIC_NAME)
         # Ruling out the possibility of None for mypy type checking.
         assert topic_model is not None
@@ -116,7 +116,7 @@ class TopicModelUnitTests(test_utils.GenericTestBase):
         topic = topic_domain.Topic.create_default_topic(
             self.TOPIC_ID, self.TOPIC_NAME, 'name-two', 'description',
             'fragm')
-        topic_services.save_new_topic(feconf.SYSTEM_COMMITTER_ID, topic) # type: ignore[no-untyped-call]
+        topic_services.save_new_topic(feconf.SYSTEM_COMMITTER_ID, topic)
         topic_model = topic_models.TopicModel.get_by_name(self.TOPIC_NAME)
         # Ruling out the possibility of None for mypy type checking.
         assert topic_model is not None

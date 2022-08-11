@@ -54,7 +54,7 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
         self.save_new_story(  # type: ignore[no-untyped-call]
             self.story_id, self.USER_ID, self.TOPIC_ID, url_fragment='story-one'
         )
-        topic_services.add_canonical_story(  # type: ignore[no-untyped-call]
+        topic_services.add_canonical_story(
             self.USER_ID, self.TOPIC_ID, self.story_id)
         changelist = [
             story_domain.StoryChange({

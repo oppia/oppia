@@ -27,7 +27,7 @@ from core.domain import subtopic_page_domain
 from core.domain import topic_fetchers
 from core.platform import models
 
-from typing import Dict, List, Optional, overload
+from typing import Dict, List, Optional, Sequence, overload
 from typing_extensions import Literal
 
 MYPY = False
@@ -247,8 +247,8 @@ def get_subtopic_page_contents_by_id(
 def save_subtopic_page(
     committer_id: str,
     subtopic_page: subtopic_page_domain.SubtopicPage,
-    commit_message: str,
-    change_list: List[change_domain.BaseChange]
+    commit_message: Optional[str],
+    change_list: Sequence[change_domain.BaseChange]
 ) -> None:
     """Validates a subtopic page and commits it to persistent storage. If
     successful, increments the version number of the incoming subtopic page
@@ -258,7 +258,8 @@ def save_subtopic_page(
         committer_id: str. ID of the given committer.
         subtopic_page: SubtopicPage. The subtopic page domain object to be
             saved.
-        commit_message: str. The commit message.
+        commit_message: str|None. The commit description message, for
+            unpublished topics, it may be equal to None.
         change_list: list(SubtopicPageChange). List of changes applied to a
             subtopic page.
 

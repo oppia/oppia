@@ -74,16 +74,16 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
                 'dummy-subtopic-url')]
         topic.next_subtopic_id = 2
         topic.skill_ids_for_diagnostic_test = ['skill_id_1']
-        topic_services.save_new_topic(self.admin_id, topic) # type: ignore[no-untyped-call]
+        topic_services.save_new_topic(self.admin_id, topic)
         self.save_new_story( # type: ignore[no-untyped-call]
             self.STORY_ID_0, self.admin_id, self.TOPIC_ID_0,
             'Story test 0')
-        topic_services.add_canonical_story( # type: ignore[no-untyped-call]
+        topic_services.add_canonical_story(
             self.admin_id, self.TOPIC_ID_0, self.STORY_ID_0)
 
         # Publish the topic and its stories.
-        topic_services.publish_topic(self.TOPIC_ID_0, self.admin_id) # type: ignore[no-untyped-call]
-        topic_services.publish_story( # type: ignore[no-untyped-call]
+        topic_services.publish_topic(self.TOPIC_ID_0, self.admin_id)
+        topic_services.publish_story(
             self.TOPIC_ID_0, self.STORY_ID_0, self.admin_id)
 
         # Create another topic.
@@ -100,16 +100,16 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
         topic.next_subtopic_id = 2
         topic.skill_ids_for_diagnostic_test = ['skill_id_1']
 
-        topic_services.save_new_topic(self.admin_id, topic) # type: ignore[no-untyped-call]
+        topic_services.save_new_topic(self.admin_id, topic)
         self.save_new_story( # type: ignore[no-untyped-call]
             self.STORY_ID_1, self.admin_id, self.TOPIC_ID_1,
             'Story test 1')
-        topic_services.add_canonical_story( # type: ignore[no-untyped-call]
+        topic_services.add_canonical_story(
             self.admin_id, self.TOPIC_ID_1, self.STORY_ID_1)
 
         # Publish the topic and its stories.
-        topic_services.publish_topic(self.TOPIC_ID_1, self.admin_id) # type: ignore[no-untyped-call]
-        topic_services.publish_story( # type: ignore[no-untyped-call]
+        topic_services.publish_topic(self.TOPIC_ID_1, self.admin_id)
+        topic_services.publish_story(
             self.TOPIC_ID_1, self.STORY_ID_1, self.admin_id)
 
     def test_create_learner_group(self) -> None:
