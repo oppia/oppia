@@ -54,4 +54,9 @@ jobs:
           webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
       - name: Checking Memory Usage
         if: ${{ always() }}
-        run: cat /sys/fs/cgroup/memory/memory.max_usage_in_bytes
+        run: |
+          sudo apt install tree
+          cd /sys/fs/
+          tree
+          cd -
+          cat /sys/fs/cgroup/memory/memory.max_usage_in_bytes

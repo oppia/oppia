@@ -104,8 +104,8 @@ jobs:
       - name: Checking Memory Usage
         if: ${{ always() }}
         run: |
-          ls /sys/
-          ls /sys/fs/
-          ls /sys/fs/cgroup/
-          ls /sys/fs/cgroup/memory/
+          sudo apt install tree
+          cd /sys/fs/
+          tree
+          cd -
           cat /sys/fs/cgroup/memory/memory.max_usage_in_bytes
