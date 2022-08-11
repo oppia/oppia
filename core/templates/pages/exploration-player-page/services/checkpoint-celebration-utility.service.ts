@@ -91,22 +91,11 @@ export class CheckpointCelebrationUtilityService {
     } else if (completedCheckpointCount === 2) {
       return this.getRandomI18nKey(
         messageI18nKeyPrefix, 3, CheckpointMessageTypes.SECOND);
-      // The below condition is a combination of two conditions:
-      // 1. Whether the current number of completed checkpoints is greater
-      // than or equal to half the total number of checkpoints (i.e. whether the
-      // learner has completed half the lesson).
-      // 2. Whether the number of checkpoints completed previously was less
-      // than half the total number of checkpoints (i.e. whether the learner
-      // completed less than half the lesson previously).
-      // If both conditions are true, the learner has just completed half
-      // the lesson.
-      //
-      // The second condition is required because, without it, the learner would
-      // get the 'MIDWAY' message not just for the middle checkpoint, but for
-      // all checkpoints after it as well, which is not what we want.
+      // The condition below evaluates to true when the learner has just
+      // completed the middle checkpoint and returns the midway message's
+      // i18n key.
     } else if (
-      completedCheckpointCount / totalCheckpointCount >= 0.5 &&
-      (completedCheckpointCount - 1) / totalCheckpointCount < 0.5
+      Math.ceil(totalCheckpointCount / 2) === completedCheckpointCount
     ) {
       return this.getRandomI18nKey(
         messageI18nKeyPrefix, 3, CheckpointMessageTypes.MIDWAY);
