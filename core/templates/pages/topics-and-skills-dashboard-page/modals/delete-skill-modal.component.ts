@@ -20,7 +20,7 @@ import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { AssignedSkill } from 'domain/skill/assigned-skill.model';
-import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+import { TopicsAndSkillsDashboardBackendApiService, TopicIdToDiagnosticTestSkillIdsResponse } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 
 @Component({
   selector: 'oppia-delete-skill-modal',
@@ -33,7 +33,7 @@ export class DeleteSkillModalComponent extends ConfirmOrCancelModal {
   skillId!: string;
   topicsAssignments!: AssignedSkill[];
   topicsAssignmentsAreFetched: boolean = false;
-  allowDeletionOfSkill: boolean = true;
+  skillCanBeDeleted: boolean = true;
   topicNamesNotEligibleForUnassignment: string[] = [];
 
   constructor(
@@ -53,24 +53,22 @@ export class DeleteSkillModalComponent extends ConfirmOrCancelModal {
     let topicIdsNotEligibleForUnassignment: string[] = [];
     this.topicsAndSkillsDashboardBackendApiService
       .fetchTopicIdToDiagnosticTestSkillIdsAsync(allTopicIds).then(
-        (dict) => {
-          for (let topicId in dict.topicIdToDiagnosticTestSkillIds) {
+        (responseDict: TopicIdToDiagnosticTestSkillIdsResponse) => {
+          for (let topicId in responseDict.topicIdToDiagnosticTestSkillIds) {
             let diagnosticTestSkillIds = (
-              dict.topicIdToDiagnosticTestSkillIds[topicId]);
+              responseDict.topicIdToDiagnosticTestSkillIds[topicId]);
             if (diagnosticTestSkillIds.length === 1 &&
                 diagnosticTestSkillIds.indexOf(this.skillId) !== -1) {
-              this.allowDeletionOfSkill = false;
+              this.skillCanBeDeleted = false;
               topicIdsNotEligibleForUnassignment.push(topicId);
             }
           }
-          topicAssignments.filter((topic) => {
+          for (let topic of topicAssignments) {
             if (topicIdsNotEligibleForUnassignment.indexOf(
-              topic.topicId) === -1) {
-              return true;
+              topic.topicId) !== -1) {
+              this.topicNamesNotEligibleForUnassignment.push(topic.topicName);
             }
-            this.topicNamesNotEligibleForUnassignment.push(topic.topicName);
-            return false;
-          });
+          }
           this.topicsAssignments = topicAssignments;
           this.topicsAssignmentsAreFetched = true;
         });
@@ -79,7 +77,8 @@ export class DeleteSkillModalComponent extends ConfirmOrCancelModal {
   fetchTopicAssignmentsForSkill(): void {
     this.topicsAndSkillsDashboardBackendApiService
       .fetchTopicAssignmentsForSkillAsync(
-        this.skillId).then((response: AssignedSkill[]) => {
+        this.skillId
+      ).then((response: AssignedSkill[]) => {
         this.fetchTopicIdToDiagnosticTestSkillIds(response);
       });
   }

@@ -354,8 +354,8 @@ class SkillDescriptionHandler(base.BaseHandler):
 
 
 class DiagnosticTestSkillAssignmentHandler(base.BaseHandler):
-    """A handler that returns a list of topic names in which the given skill
-    is assigned for the diagnostic test.
+    """A handler that returns a list of topic names for which the given skill
+    is assigned to that topic's diagnostic test.
     """
 
     URL_PATH_ARGS_SCHEMAS = {
@@ -373,13 +373,13 @@ class DiagnosticTestSkillAssignmentHandler(base.BaseHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_edit_skill
-    def get(self, skill_id) -> None:
-        """Returns a list of topic names in which the given skill is assigned
-        for the diagnostic test.
+    def get(self, skill_id: str) -> None:
+        """Returns a list of topic names for which the given skill is assigned
+        to that topic's diagnostic test.
         """
         self.values.update({
             'topic_names': (
                 skill_services
-                .get_topic_names_with_given_skill_as_diagnostic_test(skill_id))
+                .get_topic_names_with_given_skill_in_diagnostic_test(skill_id))
         })
         self.render_json(self.values)

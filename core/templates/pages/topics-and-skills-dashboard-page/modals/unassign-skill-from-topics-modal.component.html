@@ -6,8 +6,16 @@
 <div class="modal-body">
   <div *ngIf="topicNamesNotEligibleForUnassignment.length > 0">
     <div>
-      <p>This skill is used as the only diagnostic test skill in the following topics:</p>
-      <p>{{topicNamesNotEligibleForUnassignment.join(', ')}}</p>
+      <p>
+        This skill is used as the only diagnostic test skill in the following
+        <span *ngIf="topicNamesNotEligibleForUnassignment.length === 1">topic</span>
+        <span *ngIf="topicNamesNotEligibleForUnassignment.length > 1">topics</span>
+      </p>
+      <ul>
+        <li *ngFor="let topicName of topicNamesNotEligibleForUnassignment">
+          <a href="">{{ topicName }}</a>
+        </li>
+      </ul>
       <p>
         Please remove this skill from the diagnostic test of those topics first
         before unassigning it.
@@ -20,18 +28,18 @@
       Tick the eligible topics that you want this skill to be unassigned from.
     </div>
     <div *ngIf="topicsAssignmentsAreFetched && eligibleTopicNamesForUnassignment.length === 0">
-      This skill is not currently assigned to any topics.
+      This skill is not currently assigned to any topic.
     </div>
   </div>
   <div class="loading-spinner" *ngIf="!topicsAssignmentsAreFetched">
     <mat-spinner [diameter]="30"></mat-spinner>
   </div>
-  <div *ngFor="let topicNameToTopicsAssignment of topicNameToTopicsAssignments | keyvalue"
+  <div *ngFor="let eligibleTopicNameToTopicAssignment of eligibleTopicNameToTopicAssignments | keyvalue"
        class="e2e-test-unassign-topic-label">
     <input type="checkbox"
            class="topic-name e2e-test-unassign-topic"
-           (click)="selectedTopicToUnassign(topicNameToTopicsAssignment.key)">
-    {{topicNameToTopicsAssignment.key}}
+           (click)="selectedTopicToUnassign(eligibleTopicNameToTopicAssignment.key)">
+    {{ eligibleTopicNameToTopicAssignment.key }}
   </div>
 </div>
 <div class="modal-footer">

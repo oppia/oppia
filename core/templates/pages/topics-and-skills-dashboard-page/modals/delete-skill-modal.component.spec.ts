@@ -26,8 +26,8 @@ describe('Assign Skill to Topic Modal Component', () => {
   let fixture: ComponentFixture<DeleteSkillModalComponent>;
   let componentInstance: DeleteSkillModalComponent;
   let skillBackendDict: AssignedSkillBackendDict = {
-    topic_id: 'test_id',
-    topic_name: 'topic_name',
+    topic_id: 'topicId',
+    topic_name: 'topicName',
     topic_version: 1,
     subtopic_id: 2
   };
@@ -39,7 +39,7 @@ describe('Assign Skill to Topic Modal Component', () => {
   const testTopicIdToDiagnosticTestSkillIds:
     TopicIdToDiagnosticTestSkillIdsResponse = {
       topicIdToDiagnosticTestSkillIds: {
-        test_id: []
+        topicId: []
       }
     };
 
@@ -120,11 +120,11 @@ describe('Assign Skill to Topic Modal Component', () => {
       topicsAndSkillsDashboardBackendApiService,
       'fetchTopicIdToDiagnosticTestSkillIdsAsync'
     ).and.returnValue(Promise.resolve({
-      topicIdToDiagnosticTestSkillIds: {topic_id: []}
+      topicIdToDiagnosticTestSkillIds: {topicId: []}
     }));
     componentInstance.fetchTopicAssignmentsForSkill();
     tick(50);
-    expect(componentInstance.allowDeletionOfSkill).toBeTrue();
+    expect(componentInstance.skillCanBeDeleted).toBeTrue();
   }));
 
   it('should not allow skill deletion', fakeAsync(() => {
@@ -137,13 +137,13 @@ describe('Assign Skill to Topic Modal Component', () => {
       'fetchTopicIdToDiagnosticTestSkillIdsAsync'
     ).and.returnValue(Promise.resolve({
       topicIdToDiagnosticTestSkillIds: {
-        test_id: ['skill_id'],
-        test_id_2: []
+        topicId1: ['skill_id'],
+        topicId2: []
       }
     }));
 
     componentInstance.fetchTopicAssignmentsForSkill();
     tick(50);
-    expect(componentInstance.allowDeletionOfSkill).toBeFalse();
+    expect(componentInstance.skillCanBeDeleted).toBeFalse();
   }));
 });

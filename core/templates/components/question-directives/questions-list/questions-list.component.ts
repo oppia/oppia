@@ -291,7 +291,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
           let alertMessge = (
             'This skill is used as the only diagnostic test skill in the ' +
             'following topics: ' + topicNames.join(', ') + '. Please remove ' +
-            'this skill from the diagnostic test of those topics first'
+            'this skill from the diagnostic tests of those topics first.'
           );
           this.alertsService.addInfoMessage(alertMessge, 7000);
           questionDeletionIsAllowed = false;
@@ -300,7 +300,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     return questionDeletionIsAllowed;
   }
 
-  editQuestionSkillLinks(questionId: string, skillId: string): void {
+  removeQuestionSkillLinkAsync(questionId: string, skillId: string): void {
     this.editableQuestionBackendApiService.editQuestionSkillLinksAsync(
       questionId, [
         {
@@ -326,11 +326,11 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
 
       this.deletedQuestionIds.push(questionId);
       if (this.allSkillSummaries.length === 0) {
-        this.editQuestionSkillLinks(questionId, this.selectedSkillId);
+        this.removeQuestionSkillLinkAsync(questionId, this.selectedSkillId);
       } else {
-        this.allSkillSummaries.forEach((summary) => {
+        this.allSkillSummaries.find((summary) => {
           if (summary.getDescription() === skillDescription) {
-            this.editQuestionSkillLinks(questionId, summary.getId());
+            this.removeQuestionSkillLinkAsync(questionId, summary.getId());
           }
         });
       }

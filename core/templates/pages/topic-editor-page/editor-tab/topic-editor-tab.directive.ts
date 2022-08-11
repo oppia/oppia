@@ -139,13 +139,10 @@ angular.module('oppia').directive('topicEditorTab', [
                 $scope.topic.getAvailableSkillSummariesForDiagnosticTest());
 
               return availableSkillSummaries.filter(skillSummary => {
-                if (
+                return (
                   $scope.skillQuestionCountDict[skillSummary.getId()] >=
-                    MINIMUM_QUESTION_COUNT_FOR_A_DIAGNOSTIC_TEST_SKILL) {
-                  return true;
-                } else {
-                  return false;
-                }
+                  MINIMUM_QUESTION_COUNT_FOR_A_DIAGNOSTIC_TEST_SKILL
+                );
               });
             };
             $scope.availableSkillSummariesForDiagnosticTest = (
@@ -169,8 +166,8 @@ angular.module('oppia').directive('topicEditorTab', [
 
               $scope.selectedSkillSummariesForDiagnosticTest.push(skillToAdd);
               let j = -1;
-              for (let skill of
-                $scope.availableSkillSummariesForDiagnosticTest) {
+              for (
+                let skill of $scope.availableSkillSummariesForDiagnosticTest) {
                 j++;
                 if (skill.getId() === skillToAdd.getId()) {
                   $scope.availableSkillSummariesForDiagnosticTest.splice(j, 1);
@@ -181,13 +178,12 @@ angular.module('oppia').directive('topicEditorTab', [
                 $scope.topic,
                 cloneDeep($scope.selectedSkillSummariesForDiagnosticTest));
               $scope.diagnosticTestSkillsDropdownIsShown = false;
-              $scope.$applyAsync();
             };
 
             $scope.removeSkillFromDiagnosticTest = function(skillToRemove) {
               let j = -1;
-              for (let skill of
-                $scope.selectedSkillSummariesForDiagnosticTest) {
+              for (
+                let skill of $scope.selectedSkillSummariesForDiagnosticTest) {
                 j++;
                 if (skill.getId() === skillToRemove.getId()) {
                   $scope.selectedSkillSummariesForDiagnosticTest.splice(j, 1);
@@ -200,7 +196,6 @@ angular.module('oppia').directive('topicEditorTab', [
               TopicUpdateService.updateDiagnosticTestSkills(
                 $scope.topic,
                 cloneDeep($scope.selectedSkillSummariesForDiagnosticTest));
-              $scope.$applyAsync();
             };
 
             $scope.editableDescriptionIsEmpty = (

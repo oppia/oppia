@@ -110,7 +110,7 @@ describe('Unassing SKill Modal', () => {
   it('should close', () => {
     spyOn(ngbActiveModal, 'close');
     componentInstance.selectedTopicNames = ['Topic 1'];
-    componentInstance.topicNameToTopicsAssignments = {
+    componentInstance.eligibleTopicNameToTopicAssignments = {
       'Topic 1': {
         subtopicId: 0,
         topicVersion: 0,
@@ -139,7 +139,8 @@ describe('Unassing SKill Modal', () => {
       topicVersion: skillBackendDict1.topic_version,
       topicId: skillBackendDict1.topic_id
     };
-    expect(componentInstance.topicNameToTopicsAssignments).toEqual(assignments);
+    expect(componentInstance.eligibleTopicNameToTopicAssignments).toEqual(
+      assignments);
     expect(componentInstance.topicsAssignmentsAreFetched).toBeTrue();
   });
 });
