@@ -52,8 +52,7 @@ export class ImageUploadHelperService {
     // Convert base64/URLEncoded data component to raw binary data
     // held in a string.
     if (dataURI !== null) {
-      let byteString = this.svgSanitizerService.convertBase64ToUnicodeString(
-        dataURI.split(',')[1]);
+      let byteString = atob(dataURI.split(',')[1]);
 
       // Separate out the mime component.
       let mime = dataURI.split(',')[0].split(':')[1].split(';')[0];
