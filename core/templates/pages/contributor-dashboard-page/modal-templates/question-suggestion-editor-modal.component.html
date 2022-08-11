@@ -1,9 +1,9 @@
 <div class="oppia-question-suggestion-editor-modal">
   <div class="modal-header">
     <h3>{{skill.getDescription()}}</h3>
-    <button type="button" 
-            class="close oppia-close-button" 
-            (click)="cancel()" 
+    <button type="button"
+            class="close oppia-close-button"
+            (click)="cancel()"
             aria-label="Close">
       <span aria-hidden="true">&times;</span>
     </button>
@@ -55,7 +55,7 @@
       Go Back
     </button>
     <div class="oppia-buttons-right">
-      <button class="btn btn-secondary"
+      <button class="btn btn-secondary mr-2"
               (click)="cancel()">
         Cancel
       </button>
@@ -64,7 +64,7 @@
               class="btn btn-success e2e-test-save-question-button"
               (click)="done()"
               [disabled]="!isQuestionValid()">
-        {{ isEditing ? 'Update' : 'Submit' }} Question 
+        {{ isEditing ? 'Update' : 'Submit' }} Question
       </button>
     </div>
   </div>

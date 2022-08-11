@@ -61,37 +61,6 @@
   </div>
 </div>
 
-<div *ngIf="isEditable && feedbackEditorIsOpen">
-  <form role="form"
-        class="form-inline e2e-test-edit-outcome-feedback"
-        name="editOutcomeForm.editFeedbackForm">
-    <oppia-outcome-feedback-editor [outcome]="outcome">
-    </oppia-outcome-feedback-editor>
-  </form>
-
-  <div *ngIf="isFeedbackLengthExceeded()" class="oppia-length-validation-error">
-    The feedback length is too long. Please use at most 500 characters.
-  </div>
-
-  <div class="oppia-rule-save-cancel-buttons">
-    <div class="float-right">
-      <button type="button"
-              class="btn btn-secondary mr-2 mb-2"
-              (click)="cancelThisFeedbackEdit()">
-        Cancel
-      </button>
-      <button type="button"
-              class="btn btn-success e2e-test-save-outcome-feedback"
-              [disabled]="invalidStateAfterFeedbackSave() || isFeedbackLengthExceeded()"
-              (click)="saveThisFeedback(true)">
-        Save Feedback
-      </button>
-    </div>
-
-    <div class="oppia-clear"></div>
-  </div>
-</div>
-
 <br *ngIf="displayFeedback">
 
 <div *ngIf="!destinationEditorIsOpen && !isInQuestionMode()"

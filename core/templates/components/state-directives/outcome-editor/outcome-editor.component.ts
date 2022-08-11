@@ -27,7 +27,13 @@ import { Subscription } from 'rxjs';
 import { ExternalSaveService } from 'services/external-save.service';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { AddOutcomeModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-outcome-modal.component';
 
+
+interface AddOutcomeModalResponse {
+  outcome: Outcome;
+}
 @Component({
   selector: 'oppia-outcome-editor',
   templateUrl: './outcome-editor.component.html'
@@ -59,6 +65,7 @@ export class OutcomeEditorComponent implements OnInit {
     private externalSaveService: ExternalSaveService,
     private stateEditorService: StateEditorService,
     private stateInteractionIdService: StateInteractionIdService,
+    private ngbModal: NgbModal
   ) {}
 
   isInQuestionMode(): boolean {
@@ -102,11 +109,6 @@ export class OutcomeEditorComponent implements OnInit {
     }
   }
 
-  isFeedbackLengthExceeded(): boolean {
-    // TODO(#13764): Edit this check after appropriate limits are found.
-    return (this.outcome.feedback._html.length > 10000);
-  }
-
   isSelfLoop(outcome: Outcome): boolean {
     return Boolean (
       outcome &&
@@ -138,6 +140,21 @@ export class OutcomeEditorComponent implements OnInit {
   openFeedbackEditor(): void {
     if (this.isEditable) {
       this.feedbackEditorIsOpen = true;
+      const modalRef: NgbModalRef = this.ngbModal.open(
+        AddOutcomeModalComponent, {
+          backdrop: 'static',
+          windowClass: 'add-outcome-modal'
+        });
+      modalRef.componentInstance.outcome = this.outcome;
+      modalRef.result.then((result: AddOutcomeModalResponse): void => {
+        this.outcome = result.outcome;
+        this.saveThisFeedback(true);
+      }, () => {
+        this.cancelThisFeedbackEdit();
+        // Note to developers:
+        // This callback is triggered when the Cancel button is clicked.
+        // No further action is needed.
+      });
     }
   }
 

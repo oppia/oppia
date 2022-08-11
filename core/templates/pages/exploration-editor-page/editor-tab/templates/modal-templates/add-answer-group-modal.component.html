@@ -53,8 +53,8 @@
   </form>
 
   <div class="oppia-correctness-label-editor" *ngIf="isCorrectnessFeedbackEnabled() && !isCurrentInteractionLinear()">
-    <input class="e2e-test-editor-correctness-toggle mr-2" 
-           type="checkbox" 
+    <input class="e2e-test-editor-correctness-toggle mr-2"
+           type="checkbox"
            [(ngModel)]="tmpOutcome.labelledAsCorrect">
     <strong>The answers in this group are correct</strong>
   </div>

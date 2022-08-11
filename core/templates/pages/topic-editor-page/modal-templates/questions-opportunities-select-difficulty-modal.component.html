@@ -7,9 +7,9 @@
     <h3 class="oppia-modal-header" *ngIf="linkedSkillsWithDifficulty.length > 0">
       {{ skillWithDifficulty.getDescription() }}
     </h3>
-    <button type="button" 
-            class="close oppia-close-button-position" 
-            (click)="cancel()" 
+    <button type="button"
+            class="close oppia-close-button-position"
+            (click)="cancel()"
             aria-label="Close">
       <span aria-hidden="true">&times;</span>
     </button>
@@ -57,8 +57,8 @@
   }
   @media screen and (max-width: 500px) {
     .modal-header {
-      margin-bottom: -20px;
       border-bottom: 0;
+      margin-bottom: -20px;
     }
     .oppia-modal-header {
       font-size: 22px;
