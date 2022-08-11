@@ -19,9 +19,6 @@
     <h4 class="oppia-translation-modal-author-header">
       Submitted by {{ authorName }} in {{ languageDescription }} language
     </h4>
-    <h4 class="oppia-mobile-translation-modal-author-header">
-      Submitted by {{ authorName }}
-    </h4>
   </div>
 </div>
 
@@ -148,7 +145,8 @@
   <div [hidden]="reviewable || !reviewMessage"
        class="oppia-suggestion-review-message">
     <strong>Review message: </strong>
-    <div class="oppia-review-message">
+    <div class="oppia-review-message"
+         [ngClass]="{ 'oppia-border-class': reviewable }">
       {{ reviewMessage }}
     </div>
   </div>
@@ -205,8 +203,10 @@
   .oppia-mobile-translation-modal-author-header {
     display: none;
   }
-  .oppia-review-message {
+  .oppia-border-class {
     border: 1px solid #ccc;
+  }
+  .oppia-review-message {
     margin-top: 10px;
     min-height: 100px;
     padding: 10px;
@@ -386,9 +386,6 @@
       font-size: 16px;
       font-weight: normal;
       margin: 0;
-    }
-    .oppia-translation-modal-author-header {
-      display: none;
     }
     .oppia-mobile-translation-modal-author-header {
       display: block;
