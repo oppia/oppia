@@ -1893,8 +1893,10 @@ def can_resubmit_suggestion(handler):
             UnauthorizedUserException. The user does not have credentials to
                 edit this suggestion.
         """
-        suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
-        if not suggestion:
+        suggestion = suggestion_services.get_suggestion_by_id(
+            suggestion_id, strict=False
+        )
+        if suggestion is None:
             raise self.InvalidInputException(
                 'No suggestion found with given suggestion id')
 
@@ -3445,7 +3447,9 @@ def get_decorator_for_accepting_suggestion(decorator):
                     'Invalid format for suggestion_id.'
                     ' It must contain 3 parts separated by \'.\'')
 
-            suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+            suggestion = suggestion_services.get_suggestion_by_id(
+                suggestion_id, strict=False
+            )
 
             if suggestion is None:
                 raise self.PageNotFoundException
@@ -3718,7 +3722,9 @@ def can_update_suggestion(handler):
                 'Invalid format for suggestion_id.' +
                 ' It must contain 3 parts separated by \'.\'')
 
-        suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+        suggestion = suggestion_services.get_suggestion_by_id(
+            suggestion_id, strict=False
+        )
 
         if suggestion is None:
             raise self.PageNotFoundException

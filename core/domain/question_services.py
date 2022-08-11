@@ -57,7 +57,7 @@ def create_new_question(
         question: Question. Question domain object.
         commit_message: str. A description of changes made to the question.
     """
-    question.validate()  # type: ignore[no-untyped-call]
+    question.validate()
     model = question_models.QuestionModel(
         id=question.id,
         question_state_data=question.question_state_data.to_dict(),
@@ -391,7 +391,7 @@ def get_question_skill_link_from_model(
         link model.
     """
 
-    return question_domain.QuestionSkillLink(  # type: ignore[no-untyped-call]
+    return question_domain.QuestionSkillLink(
         question_skill_link_model.question_id,
         question_skill_link_model.skill_id, skill_description,
         question_skill_link_model.skill_difficulty)
@@ -573,7 +573,7 @@ def get_displayable_question_skill_link_details(
     for ind, skill_ids_list in enumerate(grouped_skill_ids):
         skills = skill_models.SkillModel.get_multi(skill_ids_list)
         merged_question_skill_links.append(
-            question_domain.MergedQuestionSkillLink(  # type: ignore[no-untyped-call]
+            question_domain.MergedQuestionSkillLink(
                 question_ids[ind], skill_ids_list,
                 [skill.description if skill else None for skill in skills],
                 grouped_difficulties[ind]))
@@ -631,7 +631,7 @@ def apply_change_list(
             if change.cmd == question_domain.CMD_UPDATE_QUESTION_PROPERTY:
                 if (change.property_name ==
                         question_domain.QUESTION_PROPERTY_LANGUAGE_CODE):
-                    question.update_language_code(change.new_value)  # type: ignore[no-untyped-call]
+                    question.update_language_code(change.new_value)
                 elif (change.property_name ==
                       question_domain.QUESTION_PROPERTY_QUESTION_STATE_DATA):
                     # Ruling out the possibility of any other type for mypy
@@ -693,7 +693,7 @@ def _save_question(
             'Unexpected error: received an invalid change list when trying to '
             'save question %s: %s' % (question.id, change_list))
 
-    question.validate()  # type: ignore[no-untyped-call]
+    question.validate()
     question_model = question_models.QuestionModel.get(question.id)
     question_model.question_state_data = question.question_state_data.to_dict()
     question_model.language_code = question.language_code
@@ -763,13 +763,19 @@ def compute_summary_of_question(
     """
     question_content = question.question_state_data.content.html
     answer_groups = question.question_state_data.interaction.answer_groups
-    misconception_ids = [
-        answer_group.to_dict()['tagged_skill_misconception_id']
-        for answer_group in answer_groups
-        if answer_group.to_dict()['tagged_skill_misconception_id']]
+    misconception_ids = []
+    for answer_group in answer_groups:
+        misconception_id = answer_group.to_dict()[
+            'tagged_skill_misconception_id'
+        ]
+        if misconception_id is not None:
+            misconception_ids.append(misconception_id)
     misconception_ids.extend(question.inapplicable_skill_misconception_ids)
     interaction_id = question.question_state_data.interaction.id
-    question_summary = question_domain.QuestionSummary(  # type: ignore[no-untyped-call]
+    # Ruling out the possibility of None for mypy type checking.
+    assert question.created_on is not None
+    assert question.last_updated is not None
+    question_summary = question_domain.QuestionSummary(
         question.id, question_content, misconception_ids, interaction_id,
         question.created_on, question.last_updated)
     return question_summary
@@ -812,7 +818,7 @@ def get_question_summary_from_model(
         QuestionSummary. The domain object corresponding to the given question
         summary model.
     """
-    return question_domain.QuestionSummary(  # type: ignore[no-untyped-call]
+    return question_domain.QuestionSummary(
         question_summary_model.id,
         question_summary_model.question_content,
         question_summary_model.misconception_ids,

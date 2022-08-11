@@ -1191,7 +1191,7 @@ class EntryPoint:
             raise utils.ValidationError(
                 'Exploration id should be a string, received: %r' % (
                     exploration_id))
-        expected_story_id = exp_services.get_story_id_linked_to_exploration( # type: ignore[no-untyped-call]
+        expected_story_id = exp_services.get_story_id_linked_to_exploration(
             exploration_id)
         if expected_story_id != story_id:
             raise utils.ValidationError(

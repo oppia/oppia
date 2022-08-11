@@ -187,7 +187,9 @@ class ThreadHandler(base.BaseHandler):
     @acl_decorators.can_view_feedback_thread
     def get(self, thread_id):
         suggestion_id = thread_id
-        suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+        suggestion = suggestion_services.get_suggestion_by_id(
+            suggestion_id, strict=False
+        )
 
         message_dicts = [
             message.to_dict() for message in feedback_services.get_messages(
@@ -210,7 +212,9 @@ class ThreadHandler(base.BaseHandler):
 
     @acl_decorators.can_comment_on_feedback_thread
     def post(self, thread_id):
-        suggestion = suggestion_services.get_suggestion_by_id(thread_id)
+        suggestion = suggestion_services.get_suggestion_by_id(
+            thread_id, strict=False
+        )
         text = self.normalized_payload.get('text')
         updated_status = self.normalized_payload.get('updated_status')
         updated_subject = self.normalized_payload.get('updated_subject')

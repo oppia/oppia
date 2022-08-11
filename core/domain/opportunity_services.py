@@ -551,7 +551,7 @@ def _build_exp_id_to_translation_suggestion_in_review_count(
     """
     exp_id_to_in_review_count: Dict[str, int] = collections.defaultdict(int)
     suggestions_in_review = (
-        suggestion_services  # type: ignore[no-untyped-call]
+        suggestion_services
         .get_translation_suggestions_in_review_by_exp_ids(
             exp_ids, language_code))
     for suggestion in suggestions_in_review:

@@ -234,6 +234,15 @@ def get_collection_by_id(
 ) -> Optional[collection_domain.Collection]: ...
 
 
+@overload
+def get_collection_by_id(
+    collection_id: str,
+    *,
+    strict: bool,
+    version: Optional[int] = None
+) -> Optional[collection_domain.Collection]: ...
+
+
 def get_collection_by_id(
     collection_id: str,
     strict: bool = True,

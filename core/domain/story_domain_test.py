@@ -232,7 +232,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         super().setUp()
         self.story_id = story_services.get_new_story_id()
         self.TOPIC_ID = utils.generate_random_string(12)
-        self.story = self.save_new_story(  # type: ignore[no-untyped-call]
+        self.story = self.save_new_story(
             self.story_id, self.USER_ID, self.TOPIC_ID,
             url_fragment='story-frag')
         self.story.add_node(self.NODE_ID_1, 'Node title')
@@ -389,7 +389,11 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
                 'invalid_id', 'invalid_thumbnail.svg')
 
     def test_story_description_validation(self) -> None:
-        self.story.description = 1
+
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
+        self.story.description = 1  # type: ignore[assignment]
         self._assert_validation_error(
             'Expected description to be a string, received 1')
 
@@ -506,16 +510,22 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.assertTrue(self.story.has_exploration('exp_id'))
         self.assertFalse(self.story.has_exploration('exp_id_2'))
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_title_validation(self) -> None:
-        self.story.title = 1
+        self.story.title = 1  # type: ignore[assignment]
         self._assert_validation_error('Title should be a string')
         self.story.title = (
             'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz')
         self._assert_validation_error(
             'Story title should be less than 39 chars')
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_thumbnail_filename_validation(self) -> None:
-        self.story.thumbnail_filename = []
+        self.story.thumbnail_filename = []  # type: ignore[assignment]
         self._assert_validation_error(
             'Expected thumbnail filename to be a string, received')
 
@@ -558,21 +568,30 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(self.story.thumbnail_filename, 'img.svg')
         self.assertEqual(self.story.thumbnail_size_in_bytes, len(raw_image))
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_notes_validation(self) -> None:
-        self.story.notes = 1
+        self.story.notes = 1  # type: ignore[assignment]
         self._assert_validation_error(
             'Expected notes to be a string, received 1')
 
     def test_language_code_validation(self) -> None:
-        self.story.language_code = 0
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
+        self.story.language_code = 0  # type: ignore[assignment]
         self._assert_validation_error(
             'Expected language code to be a string, received 0')
 
         self.story.language_code = 'xz'
         self._assert_validation_error('Invalid language code')
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_schema_version_validation(self) -> None:
-        self.story.story_contents_schema_version = 'schema_version'
+        self.story.story_contents_schema_version = 'schema_version'  # type: ignore[assignment]
         self._assert_validation_error(
             'Expected story contents schema version to be an integer, received '
             'schema_version')
@@ -591,9 +610,12 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.story.corresponding_topic_id = valid_topic_id
         self.story.validate()
 
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
         # Setting invalid topic id type.
         invalid_topic_id = 123
-        self.story.corresponding_topic_id = invalid_topic_id
+        self.story.corresponding_topic_id = invalid_topic_id  # type: ignore[assignment]
         self._assert_validation_error(
             'Expected corresponding_topic_id should be a string, received: %s' %
             (invalid_topic_id))
@@ -608,13 +630,20 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             story_domain.StoryNode.get_number_from_node_id('node_10'), 10)
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_node_outline_finalized_validation(self) -> None:
-        self.story.story_contents.nodes[0].outline_is_finalized = 'abs'
+        self.story.story_contents.nodes[0].outline_is_finalized = 'abs'  # type: ignore[assignment]
         self._assert_validation_error(
             'Expected outline_is_finalized to be a boolean')
 
     def test_node_title_validation(self) -> None:
-        self.story.story_contents.nodes[0].title = 1
+
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
+        self.story.story_contents.nodes[0].title = 1  # type: ignore[assignment]
         self._assert_validation_error(
             'Expected title to be a string, received 1')
 
@@ -624,7 +653,11 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'Chapter title should be less than 36 chars')
 
     def test_node_description_validation(self) -> None:
-        self.story.story_contents.nodes[0].description = 1
+
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
+        self.story.story_contents.nodes[0].description = 1  # type: ignore[assignment]
         self._assert_validation_error(
             'Expected description to be a string, received 1')
 
@@ -664,11 +697,18 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error('Invalid node_id: node_abc')
 
         self.story.story_contents.initial_node_id = 'node_1'
-        self.story.story_contents.nodes = {}
+
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
+        self.story.story_contents.nodes = {}  # type: ignore[assignment]
         self._assert_validation_error(
             'Expected nodes field to be a list, received {}')
 
-        self.story.story_contents.nodes = ['node_1']
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
+        self.story.story_contents.nodes = ['node_1']  # type: ignore[list-item]
         self._assert_validation_error(
             'Expected each node to be a StoryNode object, received node_1')
 
@@ -698,11 +738,18 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'skill_id', 'skill_id', 'skill_id_1']
         self._assert_validation_error(
             'Expected all acquired skills to be distinct.')
-        self.story.story_contents.nodes[0].acquired_skill_ids = [1]
+
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
+        self.story.story_contents.nodes[0].acquired_skill_ids = [1]  # type: ignore[list-item]
         self._assert_validation_error(
             'Expected each acquired skill id to be a string, received 1')
 
-        self.story.story_contents.nodes[0].acquired_skill_ids = 1
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
+        self.story.story_contents.nodes[0].acquired_skill_ids = 1  # type: ignore[assignment]
         self._assert_validation_error(
             'Expected acquired skill ids to be a list, received 1')
 
@@ -710,15 +757,26 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'skill_id', 'skill_id', 'skill_id_1']
         self._assert_validation_error(
             'Expected all prerequisite skills to be distinct.')
-        self.story.story_contents.nodes[0].prerequisite_skill_ids = [1]
+
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
+        self.story.story_contents.nodes[0].prerequisite_skill_ids = [1]  # type: ignore[list-item]
         self._assert_validation_error(
             'Expected each prerequisite skill id to be a string, received 1')
 
-        self.story.story_contents.nodes[0].prerequisite_skill_ids = 1
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
+        self.story.story_contents.nodes[0].prerequisite_skill_ids = 1  # type: ignore[assignment]
         self._assert_validation_error(
             'Expected prerequisite skill ids to be a list, received 1')
         self.story.story_contents.nodes[0].prerequisite_skill_ids = ['1']
-        self.story.story_contents.nodes[0].thumbnail_filename = []
+
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
+        self.story.story_contents.nodes[0].thumbnail_filename = []  # type: ignore[assignment]
         self._assert_validation_error(
             'Expected thumbnail filename to be a string, received')
 
@@ -1146,31 +1204,37 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         ]
         self.story.validate()
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_rearrange_node_in_story_fail_with_invalid_from_index_value(
         self
     ) -> None:
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'Expected from_index value to be a number, '
                        'received None'):
-            self.story.rearrange_node_in_story(None, 2)
+            self.story.rearrange_node_in_story(None, 2)  # type: ignore[arg-type]
 
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'Expected from_index value to be a number, '
                        'received a'):
-            self.story.rearrange_node_in_story('a', 2)
+            self.story.rearrange_node_in_story('a', 2)  # type: ignore[arg-type]
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_rearrange_node_in_story_fail_with_invalid_to_index_value(
         self
     ) -> None:
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'Expected to_index value to be a number, '
                        'received None'):
-            self.story.rearrange_node_in_story(1, None)
+            self.story.rearrange_node_in_story(1, None)  # type: ignore[arg-type]
 
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'Expected to_index value to be a number, '
                        'received a'):
-            self.story.rearrange_node_in_story(1, 'a')
+            self.story.rearrange_node_in_story(1, 'a')  # type: ignore[arg-type]
 
     def test_rearrange_canonical_story_fail_with_out_of_bound_indexes(
         self
@@ -1328,8 +1392,11 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             story_contents_from_dict.to_dict(), story_contents_dict)
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_validate_non_str_exploration_id(self) -> None:
-        self.story.story_contents.nodes[0].exploration_id = 1
+        self.story.story_contents.nodes[0].exploration_id = 1  # type: ignore[assignment]
         self._assert_validation_error(
             'Expected exploration ID to be a string')
 
@@ -1338,13 +1405,19 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Expected exploration ID to not be an empty string')
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_validate_non_str_outline(self) -> None:
-        self.story.story_contents.nodes[0].outline = 0
+        self.story.story_contents.nodes[0].outline = 0  # type: ignore[assignment]
         self._assert_validation_error(
             'Expected outline to be a string')
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_validate_non_list_destination_node_ids(self) -> None:
-        self.story.story_contents.nodes[0].destination_node_ids = 0
+        self.story.story_contents.nodes[0].destination_node_ids = 0  # type: ignore[assignment]
         self._assert_validation_error(
             'Expected destination node ids to be a list')
 
@@ -1354,8 +1427,11 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'The story node with ID %s points to itself.' % self.NODE_ID_1)
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_validate_non_str_node_id(self) -> None:
-        self.story.story_contents.nodes[0].destination_node_ids = [0]
+        self.story.story_contents.nodes[0].destination_node_ids = [0]  # type: ignore[list-item]
         self._assert_validation_error('Expected node ID to be a string')
 
     def test_validate_out_of_bounds_node_id(self) -> None:

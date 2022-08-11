@@ -64,6 +64,8 @@ from core.platform import models
 
 import deepdiff
 
+from typing import Optional
+
 datastore_services = models.Registry.import_datastore_services()
 (base_models, exp_models, feedback_models, user_models) = (
     models.Registry.import_models([
@@ -257,7 +259,7 @@ def get_recently_published_exp_summaries(limit):
         exp_models.ExpSummaryModel.get_recently_published(limit))
 
 
-def get_story_id_linked_to_exploration(exp_id):
+def get_story_id_linked_to_exploration(exp_id: str) -> Optional[str]:
     """Returns the ID of the story that the exploration is a part of, or None if
     the exploration is not part of a story.
 

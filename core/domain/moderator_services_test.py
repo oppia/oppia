@@ -41,7 +41,7 @@ class FlagExplorationEmailEnqueueTaskTests(test_utils.EmailTestBase):
 
         self.no_user = None
 
-        self.exploration = self.save_new_default_exploration(  # type: ignore[no-untyped-call]
+        self.exploration = self.save_new_default_exploration(
             'A', self.editor_id, title='Title')
         self.owner_ids = [self.editor_id]
 
