@@ -433,7 +433,7 @@
 	"I18N_LIBRARY_MAIN_HEADER": "কল্পনা করুন আপনি আজ কি শিখতে পারেন...",
 	"I18N_LIBRARY_N/A": "প্র/ন",
 	"I18N_LIBRARY_NO_EXPLORATIONS": "ওহো, দেখানোর জন্য কোন অন্বেষণ নেই।",
-	"I18N_LIBRARY_NO_EXPLORATION_FOR_QUERY": "ওহো, এটা দেখে মনে হচ্ছে আপনার অনুসন্ধান কোন অন্বেষণের সাথে মেলেনি।",
+	"I18N_LIBRARY_NO_EXPLORATION_FOR_QUERY": "ওহো, বোধহয় আপনার অনুসন্ধান কোন অন্বেষণের সাথে মেলেনি।",
 	"I18N_LIBRARY_NO_EXPLORATION_GROUPS": "প্রদর্শনের জন্য এখানে আর কোন অন্বেষণ উপলব্ধ নেই।",
 	"I18N_LIBRARY_NO_OBJECTIVE": "কোন উদ্দেশ্য নির্দিষ্ট করা হয়নি।",
 	"I18N_LIBRARY_N_CATEGORIES": "{categoriesCount, plural, =1{১টি বিষয়শ্রেণী} other{#টি বিষয়শ্রেণী}}",
