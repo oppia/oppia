@@ -139,14 +139,21 @@ class Classroom:
                     self.topic_id_to_prerequisite_topic_ids))
 
         cyclic_check_error = (
-            'The topic ID to prerequisite topic IDs should not contain any '
-            'cycle.')
+            'The topic ID to prerequisite topic IDs graph should not contain '
+            'any cycles.')
         for topic_id in self.topic_id_to_prerequisite_topic_ids:
             ancestors = self.topic_id_to_prerequisite_topic_ids[topic_id]
 
+            visited_topic_ids_for_current_node = []
             while len(ancestors) > 0:
                 if topic_id in ancestors:
                     raise utils.ValidationError(cyclic_check_error)
+
                 ancestor_topic_id = ancestors.pop()
-                ancestors.extend(
-                    self.topic_id_to_prerequisite_topic_ids[ancestor_topic_id])
+
+                if ancestor_topic_id not in visited_topic_ids_for_current_node:
+                    ancestors.extend(
+                        self.topic_id_to_prerequisite_topic_ids[
+                            ancestor_topic_id]
+                    )
+                    visited_topic_ids_for_current_node.append(ancestor_topic_id)

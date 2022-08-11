@@ -20,7 +20,7 @@
 # the exiting classroom domain test file should be deleted, until then both of
 # the files will exist simultaneously.
 
-"""Domain objects for Classroom."""
+"""Unit tests for classroom_config_domain.py."""
 
 from __future__ import annotations
 
@@ -105,7 +105,7 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
     def test_to_dict_method(self) -> None:
         self.assertEqual(self.classroom.to_dict(), self.classroom_dict)
 
-    def test_incorrect_classroom_id_should_raise_exception(self) -> None:
+    def test_invalid_classroom_id_should_raise_exception(self) -> None:
         self.classroom.classroom_id = 1 # type: ignore[assignment]
         error_msg = (
             'Expected ID of the classroom to be a string, received: 1.')
@@ -113,7 +113,7 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
             utils.ValidationError, error_msg):
             self.classroom.validate()
 
-    def test_validate_incorrect_classroom_name_should_raise_exception(
+    def test_invalid_classroom_name_should_raise_exception(
         self
     ) -> None:
         self.classroom.name = 1 # type: ignore[assignment]
@@ -123,7 +123,9 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
             utils.ValidationError, error_msg):
             self.classroom.validate()
 
-    def test_classroom_url_fragment_should_raise_exception(self) -> None:
+    def test_invalid_classroom_url_fragment_should_raise_exception(
+        self
+    ) -> None:
         self.classroom.url_fragment = 1 # type: ignore[assignment]
         error_msg = (
             'Expected url fragment of the classroom to be a string, received: '
@@ -133,7 +135,9 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
             utils.ValidationError, error_msg):
             self.classroom.validate()
 
-    def test_incoorect_course_details_should_raise_exception(self) -> None:
+    def test_invalid_course_details_should_raise_exception(
+        self
+    ) -> None:
         self.classroom.course_details = 1 # type: ignore[assignment]
         error_msg = (
             'Expected course_details of the classroom to be a string, '
@@ -143,7 +147,9 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
             utils.ValidationError, error_msg):
             self.classroom.validate()
 
-    def test_incorrect_topic_list_intro_should_raise_exception(self) -> None:
+    def test_invalid_topic_list_intro_should_raise_exception(
+        self
+    ) -> None:
         self.classroom.topic_list_intro = 1 # type: ignore[assignment]
         error_msg = (
             'Expected topic list intro of the classroom to be a string, '
@@ -153,7 +159,7 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
             utils.ValidationError, error_msg):
             self.classroom.validate()
 
-    def test_incorrect_topic_dependency_dict_should_raise_exception(
+    def test_invalid_topic_dependency_dict_should_raise_exception(
         self
     ) -> None:
         self.classroom.topic_id_to_prerequisite_topic_ids = 1 # type: ignore[assignment]
@@ -168,15 +174,51 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
     def test_cycle_between_topic_id_and_prerequisites_should_raise_exception(
         self
     ) -> None:
+        error_msg = (
+            'The topic ID to prerequisite topic IDs graph should not contain '
+            'any cycles.'
+        )
+
+        # Cyclic graph 1.
         self.classroom.topic_id_to_prerequisite_topic_ids = {
             'topic_id_1': ['topic_id_2', 'topic_id_3'],
             'topic_id_2': [],
             'topic_id_3': ['topic_id_1']
         }
-        error_msg = (
-            'The topic ID to prerequisite topic IDs should not contain any '
-            'cycle.'
-        )
         with self.assertRaisesRegex(# type: ignore[no-untyped-call]
             utils.ValidationError, error_msg):
             self.classroom.validate()
+
+        self.classroom.topic_id_to_prerequisite_topic_ids = {
+            'topic_id_1': ['topic_id_2', 'topic_id_3'],
+            'topic_id_2': [],
+            'topic_id_3': ['topic_id_1']
+        }
+
+        # Cyclic graph 2.
+        self.classroom.topic_id_to_prerequisite_topic_ids = {
+            'topic_id_1': ['topic_id_3'],
+            'topic_id_2': ['topic_id_1'],
+            'topic_id_3': ['topic_id_2']
+        }
+        with self.assertRaisesRegex(# type: ignore[no-untyped-call]
+            utils.ValidationError, error_msg):
+            self.classroom.validate()
+
+    def test_valid_topic_id_to_prerequisite_topic_ids_graph(self) -> None:
+        # Test valid graph 1.
+        self.classroom.topic_id_to_prerequisite_topic_ids = {
+            'topic_id_1': [],
+            'topic_id_2': ['topic_id_1'],
+            'topic_id_3': ['topic_id_2']
+        }
+        self.classroom.validate()
+
+        # Test valid graph 2.
+        self.classroom.topic_id_to_prerequisite_topic_ids = {
+            'topic_id_1': [],
+            'topic_id_2': ['topic_id_1', 'topic_id_4'],
+            'topic_id_3': ['topic_id_1', 'topic_id_2'],
+            'topic_id_4': []
+        }
+        self.classroom.validate()
