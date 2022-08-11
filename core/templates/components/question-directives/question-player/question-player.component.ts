@@ -22,7 +22,6 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { DomSanitizer } from '@angular/platform-browser';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Subscription } from 'rxjs';
-import { State } from 'domain/state/StateObjectFactory';
 import { SkillMasteryBackendApiService } from 'domain/skill/skill-mastery-backend-api.service';
 import { ExplorationPlayerStateService } from 'pages/exploration-player-page/services/exploration-player-state.service';
 import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
@@ -35,8 +34,11 @@ import { QuestionPlayerStateService } from './services/question-player-state.ser
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { ContextService } from 'services/context.service';
 
-interface QuestionData {
+export interface QuestionData {
   linkedSkillIds: string[];
+  viewedSolution: boolean;
+  answers: Answer[];
+  usedHints: string[];
 }
 
 interface ActionButton {
@@ -44,7 +46,7 @@ interface ActionButton {
   url: string;
 }
 
-interface Answer {
+export interface Answer {
   isCorrect: boolean;
   timestamp: number;
   taggedSkillMisconceptionId: string;
@@ -57,7 +59,7 @@ interface MasteryChangePerQuestion {
 interface ScorePerSkill {
   score: number;
   total: number;
-  description?: string;
+  description: string;
 }
 
 interface ScorePerSkillMapping {
@@ -114,7 +116,7 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
     private _sanitizer: DomSanitizer
   ) {}
 
-  calculateScores(questionStateData: State): void {
+  calculateScores(questionStateData: {[key: string]: QuestionData}): void {
     this.createScorePerSkillMapping();
     this.resultsLoaded = false;
     let totalQuestions = Object.keys(questionStateData).length;
@@ -205,7 +207,9 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
     }
   }
 
-  calculateMasteryDegrees(questionStateData: State): void {
+  calculateMasteryDegrees(
+      questionStateData: {[key: string]: QuestionData}
+  ): void {
     this.createMasteryPerSkillMapping();
 
     for (let question in questionStateData) {
