@@ -63,7 +63,7 @@
       <div class="oppia-suggestion-review-panel oppia-content"
            [ngClass]="isTranslationExpanded ? 'oppia-content-expanded' : 'oppia-content-collapsed'"
            #translationContainer>
-        <div>
+        <div dir="auto">
           <oppia-rte-output-display [rteString]="translationHtml"
                                     *ngIf="!startedEditing"
                                     #translationPanel>

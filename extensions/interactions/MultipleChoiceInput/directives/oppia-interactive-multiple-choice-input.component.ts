@@ -33,6 +33,8 @@ import { PlayerPositionService } from 'pages/exploration-player-page/services/pl
 import { PlayerTranscriptService } from 'pages/exploration-player-page/services/player-transcript.service';
 import { MultipleChoiceInputRulesService } from './multiple-choice-input-rules.service';
 
+import '../static/multiple_choice_input.css';
+
 @Component({
   selector: 'oppia-interactive-multiple-choice-input',
   templateUrl: './multiple-choice-input-interaction.component.html'

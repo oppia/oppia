@@ -389,6 +389,7 @@
 	"I18N_EXPLORATION_zW39GLG_BdN2_DESCRIPTION": "Description of the chapters displayed on story viewer page. Should be at most 100 characters.",
 	"I18N_EXPLORATION_zW39GLG_BdN2_TITLE": "Title of the chapters displayed on topic viewer and story viewer page. Should be at most 36 characters.",
 	"I18N_FACILITATOR_DASHBOARD_PAGE_TITLE": "Title of the Facilitator Dashboard page.",
+	"I18N_FEEDBACK_INSTRUCTION": "Message below the feedback input box.",
 	"I18N_FEEDBACK_MESSAGE_ANONYMOUS_AUTHOR": "The name of the author of a message in a feedback thread who wanted to stay anonymous.",
 	"I18N_FOOTER_ABOUT": "Text shown in the footer. - Link to the about page. See I18N_ABOUT_PAGE_TITLE\n{{Identical|About}}",
 	"I18N_FOOTER_ABOUT_ALL_CAPS": "Text shown in the footer. - Title of the about section. Must be in all capital letters for languages that use Latin, Cyrillic, and/or Greek scripts.",

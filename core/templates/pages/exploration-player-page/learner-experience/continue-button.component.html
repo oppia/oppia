@@ -5,8 +5,8 @@
         aria-label="Continue">
   <div *ngIf="!isLearnAgainButton">
     <span class="e2e-test-next-card-button">{{ 'I18N_PLAYER_CONTINUE_BUTTON' | translate | uppercase }}</span>
-    <i class="fas fa-arrow-right icon">
-    </i>
+    <i *ngIf="!isLanguageRTL()" class="fas fa-arrow-right icon"></i>
+    <i *ngIf="isLanguageRTL()" class="fas fa-arrow-left icon"></i>
   </div>
   <div *ngIf="isLearnAgainButton">
     <span class="e2e-test-next-card-button">{{ 'I18N_PLAYER_LEARN_AGAIN_BUTTON' | translate | uppercase }}</span>

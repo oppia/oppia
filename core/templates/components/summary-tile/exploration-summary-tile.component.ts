@@ -32,6 +32,8 @@ import { Subscription } from 'rxjs';
 import { HumanReadableContributorsSummary } from 'domain/summary/creator-exploration-summary.model';
 import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
 
+import './exploration-summary-tile.component.css';
+
 @Component({
   selector: 'oppia-exploration-summary-tile',
   templateUrl: './exploration-summary-tile.component.html',
