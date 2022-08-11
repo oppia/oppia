@@ -21,6 +21,7 @@ from __future__ import annotations
 from core.platform import models
 
 from typing import Dict
+from typing_extensions import Final
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -31,7 +32,7 @@ if MYPY: # pragma: no cover
 
 datastore_services = models.Registry.import_datastore_services()
 
-TOPIC_SIMILARITIES_ID = 'topics'
+TOPIC_SIMILARITIES_ID: Final = 'topics'
 
 
 class ExplorationRecommendationsModel(

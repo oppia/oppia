@@ -25,7 +25,7 @@ from core import utils
 from core.constants import constants
 from core.platform import models
 
-from typing_extensions import Literal, TypedDict
+from typing_extensions import Final, Literal, TypedDict
 
 from typing import ( # isort:skip
     Any,
@@ -66,22 +66,21 @@ if MYPY: # pragma: no cover
         Mapping[str, change_domain.AcceptableChangeDictTypes]
     ]
 
-
 transaction_services = models.Registry.import_transaction_services()
 datastore_services = models.Registry.import_datastore_services()
 
 # The delimiter used to separate the version number from the model instance
 # id. To get the instance id from a snapshot id, use Python's rfind()
 # method to find the location of this delimiter.
-VERSION_DELIMITER = '-'
+VERSION_DELIMITER: Final = '-'
 
 # Constant used when retrieving big number of models.
-FETCH_BATCH_SIZE = 1000
+FETCH_BATCH_SIZE: Final = 1000
 
 # Constants used for generating ids.
-MAX_RETRIES = 10
-RAND_RANGE = (1 << 30) - 1
-ID_LENGTH = 12
+MAX_RETRIES: Final = 10
+RAND_RANGE: Final = (1 << 30) - 1
+ID_LENGTH: Final = 12
 
 
 class SnapshotsMetadataDict(TypedDict):
@@ -157,7 +156,7 @@ class BaseModel(datastore_services.Model):
 
     # Specifies whether the model's id is used as a key in Takeout. By default,
     # the model's id is not used as the key for the Takeout dict.
-    ID_IS_USED_AS_TAKEOUT_KEY = False
+    ID_IS_USED_AS_TAKEOUT_KEY: bool = False
 
     # When this entity was first created. This value should only be modified by
     # the update_timestamps method.
@@ -294,6 +293,7 @@ class BaseModel(datastore_services.Model):
     def get(
         cls: Type[SELF_BASE_MODEL],
         entity_id: str,
+        *,
         strict: Literal[True]
     ) -> SELF_BASE_MODEL: ...
 
@@ -302,6 +302,7 @@ class BaseModel(datastore_services.Model):
     def get(
         cls: Type[SELF_BASE_MODEL],
         entity_id: str,
+        *,
         strict: Literal[False]
     ) -> Optional[SELF_BASE_MODEL]: ...
 
@@ -310,7 +311,8 @@ class BaseModel(datastore_services.Model):
     def get(
         cls: Type[SELF_BASE_MODEL],
         entity_id: str,
-        strict: bool = False
+        *,
+        strict: bool = ...
     ) -> Optional[SELF_BASE_MODEL]: ...
 
     @classmethod
@@ -348,9 +350,9 @@ class BaseModel(datastore_services.Model):
 
     @classmethod
     def get_multi(
-            cls: Type[SELF_BASE_MODEL],
-            entity_ids: Sequence[Optional[str]],
-            include_deleted: bool = False
+        cls: Type[SELF_BASE_MODEL],
+        entity_ids: Sequence[Optional[str]],
+        include_deleted: bool = False
     ) -> List[Optional[SELF_BASE_MODEL]]:
         """Gets list of entities by list of ids.
 
@@ -467,7 +469,7 @@ class BaseModel(datastore_services.Model):
 
     @classmethod
     def get_all(
-            cls: Type[SELF_BASE_MODEL], include_deleted: bool = False
+        cls: Type[SELF_BASE_MODEL], include_deleted: bool = False
     ) -> datastore_services.Query:
         """Gets iterable of all entities of this class.
 
@@ -512,10 +514,10 @@ class BaseModel(datastore_services.Model):
 
     @classmethod
     def _fetch_page_sorted_by_last_updated(
-            cls: Type[SELF_BASE_MODEL],
-            query: datastore_services.Query,
-            page_size: int,
-            urlsafe_start_cursor: Optional[str]
+        cls: Type[SELF_BASE_MODEL],
+        query: datastore_services.Query,
+        page_size: int,
+        urlsafe_start_cursor: Optional[str]
     ) -> Tuple[Sequence[SELF_BASE_MODEL], Optional[str], bool]:
         """Fetches a page of entities sorted by their last_updated attribute in
         descending order (newly updated first).
@@ -603,7 +605,7 @@ class BaseHumanMaintainedModel(BaseModel):
 
     @classmethod
     def put_multi_for_human(
-            cls, instances: List[SELF_BASE_HUMAN_MAINTAINED_MODEL]
+        cls, instances: List[SELF_BASE_HUMAN_MAINTAINED_MODEL]
     ) -> None:
         """Stores the given model instances on behalf of a human.
 
@@ -620,7 +622,7 @@ class BaseHumanMaintainedModel(BaseModel):
 
     @classmethod
     def put_multi_for_bot(
-            cls, instances: List[SELF_BASE_HUMAN_MAINTAINED_MODEL]
+        cls, instances: List[SELF_BASE_HUMAN_MAINTAINED_MODEL]
     ) -> None:
         """Stores the given model instances on behalf of a non-human.
 
@@ -707,15 +709,15 @@ class BaseCommitLogEntryModel(BaseModel):
 
     @classmethod
     def create(
-            cls: Type[SELF_BASE_COMMIT_LOG_ENTRY_MODEL],
-            entity_id: str,
-            version: int,
-            committer_id: str,
-            commit_type: str,
-            commit_message: Optional[str],
-            commit_cmds: AllowedCommitCmdsListType,
-            status: str,
-            community_owned: bool
+        cls: Type[SELF_BASE_COMMIT_LOG_ENTRY_MODEL],
+        entity_id: str,
+        version: int,
+        committer_id: str,
+        commit_type: str,
+        commit_message: Optional[str],
+        commit_cmds: AllowedCommitCmdsListType,
+        status: str,
+        community_owned: bool
     ) -> SELF_BASE_COMMIT_LOG_ENTRY_MODEL:
         """This method returns an instance of the CommitLogEntryModel for a
         construct with the common fields filled.
@@ -777,9 +779,9 @@ class BaseCommitLogEntryModel(BaseModel):
 
     @classmethod
     def get_all_commits(
-            cls: Type[SELF_BASE_COMMIT_LOG_ENTRY_MODEL],
-            page_size: int,
-            urlsafe_start_cursor: Optional[str]
+        cls: Type[SELF_BASE_COMMIT_LOG_ENTRY_MODEL],
+        page_size: int,
+        urlsafe_start_cursor: Optional[str]
     ) -> Tuple[Sequence[SELF_BASE_COMMIT_LOG_ENTRY_MODEL], Optional[str], bool]:
         """Fetches a list of all the commits sorted by their last updated
         attribute.
@@ -808,9 +810,9 @@ class BaseCommitLogEntryModel(BaseModel):
 
     @classmethod
     def get_commit(
-            cls: Type[SELF_BASE_COMMIT_LOG_ENTRY_MODEL],
-            target_entity_id: str,
-            version: int
+        cls: Type[SELF_BASE_COMMIT_LOG_ENTRY_MODEL],
+        target_entity_id: str,
+        version: int
     ) -> Optional[SELF_BASE_COMMIT_LOG_ENTRY_MODEL]:
         """Returns the commit corresponding to an instance id and
         version number.
@@ -855,12 +857,12 @@ class VersionedModel(BaseModel):
     # to log the commits it can be None.
     COMMIT_LOG_ENTRY_CLASS: Optional[Type[BaseCommitLogEntryModel]] = None
     # Whether reverting is allowed. Default is False.
-    ALLOW_REVERT = False
+    ALLOW_REVERT: bool = False
 
     # IMPORTANT: Subclasses should only overwrite things above this line.
 
     # A list containing the possible commit types.
-    COMMIT_TYPE_CHOICES = [
+    COMMIT_TYPE_CHOICES: List[str] = [
         feconf.COMMIT_TYPE_CREATE,
         feconf.COMMIT_TYPE_REVERT,
         feconf.COMMIT_TYPE_EDIT,
@@ -868,13 +870,13 @@ class VersionedModel(BaseModel):
     ]
     # The reserved prefix for keys that are automatically inserted into a
     # commit_cmd dict by this model.
-    _AUTOGENERATED_PREFIX = feconf.AUTOGENERATED_PREFIX
+    _AUTOGENERATED_PREFIX: Final = feconf.AUTOGENERATED_PREFIX
 
     # The command string for a revert commit.
-    CMD_REVERT_COMMIT = feconf.CMD_REVERT_COMMIT
+    CMD_REVERT_COMMIT: Final = feconf.CMD_REVERT_COMMIT
 
     # The command string for a delete commit.
-    CMD_DELETE_COMMIT = feconf.CMD_DELETE_COMMIT
+    CMD_DELETE_COMMIT: Final = feconf.CMD_DELETE_COMMIT
 
     # The current version number of this instance. In each PUT operation,
     # this number is incremented and a snapshot of the modified instance is
@@ -898,8 +900,8 @@ class VersionedModel(BaseModel):
     # TODO(#13523): Change 'snapshot_dict' to domain object/Typed Dict to
     # remove Any from type-annotation below.
     def _reconstitute(
-            self: SELF_VERSIONED_MODEL,
-            snapshot_dict: Dict[str, Any]
+        self: SELF_VERSIONED_MODEL,
+        snapshot_dict: Dict[str, Any]
     ) -> SELF_VERSIONED_MODEL:
         """Populates the model instance with the snapshot.
 
@@ -915,8 +917,8 @@ class VersionedModel(BaseModel):
         return self
 
     def _reconstitute_from_snapshot_id(
-            self: SELF_VERSIONED_MODEL,
-            snapshot_id: str
+        self: SELF_VERSIONED_MODEL,
+        snapshot_id: str
     ) -> SELF_VERSIONED_MODEL:
         """Gets a reconstituted instance of this model class, based on the given
         snapshot id.
@@ -1119,11 +1121,11 @@ class VersionedModel(BaseModel):
     # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
     @classmethod
     def delete_multi( # type: ignore[override]
-            cls,
-            entity_ids: List[str],
-            committer_id: str,
-            commit_message: str,
-            force_deletion: bool = False
+        cls,
+        entity_ids: List[str],
+        committer_id: str,
+        commit_message: str,
+        force_deletion: bool = False
     ) -> None:
         """Deletes the given cls instancies with the given entity_ids.
 
@@ -1377,6 +1379,7 @@ class VersionedModel(BaseModel):
         cls: Type[SELF_VERSIONED_MODEL],
         entity_id: str,
         version_number: int,
+        *,
         strict: Literal[True]
     ) -> SELF_VERSIONED_MODEL: ...
 
@@ -1386,6 +1389,7 @@ class VersionedModel(BaseModel):
         cls: Type[SELF_VERSIONED_MODEL],
         entity_id: str,
         version_number: int,
+        *,
         strict: Literal[False]
     ) -> Optional[SELF_VERSIONED_MODEL]: ...
 
@@ -1395,7 +1399,8 @@ class VersionedModel(BaseModel):
         cls: Type[SELF_VERSIONED_MODEL],
         entity_id: str,
         version_number: int,
-        strict: bool = False
+        *,
+        strict: bool = ...
     ) -> Optional[SELF_VERSIONED_MODEL]: ...
 
     @classmethod
@@ -1443,9 +1448,9 @@ class VersionedModel(BaseModel):
 
     @classmethod
     def get_multi_versions(
-            cls: Type[SELF_VERSIONED_MODEL],
-            entity_id: str,
-            version_numbers: List[int]
+        cls: Type[SELF_VERSIONED_MODEL],
+        entity_id: str,
+        version_numbers: List[int]
     ) -> List[SELF_VERSIONED_MODEL]:
         """Gets model instances for each version specified in version_numbers.
 
@@ -1509,6 +1514,7 @@ class VersionedModel(BaseModel):
     def get(
         cls: Type[SELF_VERSIONED_MODEL],
         entity_id: str,
+        *,
         strict: Literal[True],
         version: Optional[int] = None
     ) -> SELF_VERSIONED_MODEL: ...
@@ -1518,6 +1524,7 @@ class VersionedModel(BaseModel):
     def get(
         cls: Type[SELF_VERSIONED_MODEL],
         entity_id: str,
+        *,
         strict: Literal[False],
         version: Optional[int] = None
     ) -> Optional[SELF_VERSIONED_MODEL]: ...
@@ -1527,7 +1534,8 @@ class VersionedModel(BaseModel):
     def get(
         cls: Type[SELF_VERSIONED_MODEL],
         entity_id: str,
-        strict: bool = False,
+        *,
+        strict: bool = ...,
         version: Optional[int] = None
     ) -> Optional[SELF_VERSIONED_MODEL]: ...
 
@@ -1559,10 +1567,10 @@ class VersionedModel(BaseModel):
 
     @classmethod
     def get_snapshots_metadata(
-            cls,
-            model_instance_id: str,
-            version_numbers: List[int],
-            allow_deleted: bool = False
+        cls,
+        model_instance_id: str,
+        version_numbers: List[int],
+        allow_deleted: bool = False
     ) -> List[SnapshotsMetadataDict]:
         """Gets a list of dicts, each representing a model snapshot.
 
@@ -1657,7 +1665,7 @@ class BaseSnapshotMetadataModel(BaseModel):
     """
 
     # The ids of SnapshotMetadataModels are used as Takeout keys.
-    ID_IS_USED_AS_TAKEOUT_KEY = True
+    ID_IS_USED_AS_TAKEOUT_KEY: bool = True
 
     # The id of the user who committed this revision.
     committer_id = (
@@ -1722,12 +1730,12 @@ class BaseSnapshotMetadataModel(BaseModel):
     # remove Any from type-annotation below.
     @classmethod
     def create(
-            cls: Type[SELF_BASE_SNAPSHOT_METADATA_MODEL],
-            snapshot_id: str,
-            committer_id: str,
-            commit_type: str,
-            commit_message: Optional[str],
-            commit_cmds: Union[Dict[str, Any], List[Dict[str, Any]], None]
+        cls: Type[SELF_BASE_SNAPSHOT_METADATA_MODEL],
+        snapshot_id: str,
+        committer_id: str,
+        commit_type: str,
+        commit_message: Optional[str],
+        commit_cmds: AllowedCommitCmdsListType
     ) -> SELF_BASE_SNAPSHOT_METADATA_MODEL:
         """This method returns an instance of the BaseSnapshotMetadataModel for
         a construct with the common fields filled.
@@ -1825,9 +1833,9 @@ class BaseSnapshotContentModel(BaseModel):
     # remove Any from type-annotation below.
     @classmethod
     def create(
-            cls: Type[SELF_BASE_SNAPSHOT_CONTENT_MODEL],
-            snapshot_id: str,
-            content: Dict[str, Any]
+        cls: Type[SELF_BASE_SNAPSHOT_CONTENT_MODEL],
+        snapshot_id: str,
+        content: Dict[str, Any]
     ) -> SELF_BASE_SNAPSHOT_CONTENT_MODEL:
         """This method returns an instance of the BaseSnapshotContentModel for
         a construct with the common fields filled.
@@ -1869,5 +1877,5 @@ class BaseMapReduceBatchResultsModel(BaseModel):
     store its batch results should subclass this class.
     """
 
-    _use_cache = False
-    _use_memcache = False
+    _use_cache: bool = False
+    _use_memcache: bool = False

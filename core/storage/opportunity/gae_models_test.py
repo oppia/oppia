@@ -26,8 +26,9 @@ if MYPY: # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import opportunity_models
 
-(base_models, opportunity_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.opportunity])
+(base_models, opportunity_models) = models.Registry.import_models([
+    models.NAMES.base_model, models.NAMES.opportunity
+])
 
 
 class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):

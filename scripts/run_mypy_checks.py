@@ -76,7 +76,6 @@ NOT_FULLY_COVERED_FILES = [
     'core/domain/wipeout_service_test.py',
     'core/platform_feature_list.py',
     'core/platform_feature_list_test.py',
-    'core/storage/storage_models_test.py',
     'core/tests/build_sources/extensions/CodeRepl.py',
     'core/tests/build_sources/extensions/DragAndDropSortInput.py',
     'core/tests/build_sources/extensions/base.py',

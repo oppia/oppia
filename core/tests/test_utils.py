@@ -195,7 +195,7 @@ def get_storage_model_classes():
         (module,) = models.Registry.import_models([module_name])
         for member_name, member_obj in inspect.getmembers(module):
             if inspect.isclass(member_obj):
-                clazz = getattr(module, member_name)
+                clazz: base_models.BaseModel = getattr(module, member_name)
                 all_base_classes = [
                     base_class.__name__ for base_class in inspect.getmro(
                         clazz)]

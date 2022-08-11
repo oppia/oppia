@@ -33,8 +33,9 @@ if MYPY: # pragma: no cover
     from mypy_imports import base_models
     from mypy_imports import classifier_models
 
-(base_models, classifier_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.classifier])
+(base_models, classifier_models) = models.Registry.import_models([
+    models.NAMES.base_model, models.NAMES.classifier
+])
 
 
 class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
@@ -145,7 +146,7 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(offset, 2)
 
     def test_query_new_and_pending_training_jobs_with_non_zero_offset(
-            self
+        self
     ) -> None:
         with self.swap(
             classifier_models, 'NEW_AND_PENDING_TRAINING_JOBS_FETCH_LIMIT', 2):
