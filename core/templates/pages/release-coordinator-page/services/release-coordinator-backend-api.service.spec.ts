@@ -29,9 +29,9 @@ import { BeamJobRunResult } from 'domain/jobs/beam-job-run-result.model';
 describe('Release coordinator backend api service', () => {
   let rcbas: ReleaseCoordinatorBackendApiService;
   let httpTestingController: HttpTestingController;
-  let csrfService: CsrfTokenService = null;
-  let successHandler = null;
-  let failHandler = null;
+  let csrfService: CsrfTokenService;
+  let successHandler: jasmine.Spy<jasmine.Func>;
+  let failHandler: jasmine.Spy<jasmine.Func>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({

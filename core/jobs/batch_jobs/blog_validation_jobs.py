@@ -121,7 +121,7 @@ class GetModelsWithDuplicatePropertyValues(beam.PTransform):  # type: ignore[mis
     """Helper class to retrieve models with duplicate properties."""
 
     def __init__(self, property_name: str) -> None:
-        super(GetModelsWithDuplicatePropertyValues, self).__init__()
+        super().__init__()
         self.property_name = property_name
 
     def expand(

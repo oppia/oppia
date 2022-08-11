@@ -99,8 +99,7 @@ class LearnerDashboardTopicsAndStoriesProgressHandlerTests(
         'dummy-subtopic-zero')
 
     def setUp(self):
-        super(
-            LearnerDashboardTopicsAndStoriesProgressHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
@@ -498,8 +497,7 @@ class LearnerCompletedChaptersCountHandlerTests(test_utils.GenericTestBase):
         'dummy-subtopic-zero')
 
     def setUp(self):
-        super(
-            LearnerCompletedChaptersCountHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
@@ -621,7 +619,7 @@ class LearnerDashboardCollectionsProgressHandlerTests(
         'dummy-subtopic-zero')
 
     def setUp(self):
-        super(LearnerDashboardCollectionsProgressHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
@@ -741,7 +739,7 @@ class LearnerDashboardExplorationsProgressHandlerTests(
         'dummy-subtopic-zero')
 
     def setUp(self):
-        super(LearnerDashboardExplorationsProgressHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
@@ -832,7 +830,7 @@ class LearnerDashboardFeedbackUpdatesHandlerTests(test_utils.GenericTestBase):
     EXP_TITLE_1 = 'Exploration title 1'
 
     def setUp(self):
-        super(LearnerDashboardFeedbackUpdatesHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
@@ -941,7 +939,7 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
     EXP_ID_1 = '0'
 
     def setUp(self):
-        super(LearnerDashboardFeedbackThreadHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
 
         # Load exploration 0.
