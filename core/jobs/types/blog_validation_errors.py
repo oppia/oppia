@@ -60,7 +60,8 @@ class DuplicateBlogUrlError(base_validation_errors.BaseAuditError):
 
 
 class InconsistentLastUpdatedTimestampsError(
-    base_validation_errors.BaseAuditError):
+    base_validation_errors.BaseAuditError
+):
     """Error class for models with inconsistent timestamps."""
 
     def __init__(
@@ -68,7 +69,7 @@ class InconsistentLastUpdatedTimestampsError(
         model: Union[
             blog_models.BlogPostModel,
             blog_models.BlogPostSummaryModel
-         ]
+        ]
     ) -> None:
         message = 'created_on=%r is later than last_updated=%r' % (
             model.created_on, model.last_updated)
@@ -84,14 +85,16 @@ class InconsistentPublishLastUpdatedTimestampsError(
         model: Union[
             blog_models.BlogPostModel,
             blog_models.BlogPostSummaryModel
-            ]) -> None:
+        ]
+    ) -> None:
         message = 'published_on=%r is later than last_updated=%r' % (
             model.published_on, model.last_updated)
         super().__init__(message, model)
 
 
 class ModelMutatedDuringJobErrorForLastUpdated(
-    base_validation_errors.BaseAuditError):
+    base_validation_errors.BaseAuditError
+):
     """Error class for models mutated during a job."""
 
     def __init__(
@@ -99,8 +102,8 @@ class ModelMutatedDuringJobErrorForLastUpdated(
         model: Union[
             blog_models.BlogPostModel,
             blog_models.BlogPostSummaryModel
-            ]
-        ) -> None:
+        ]
+    ) -> None:
         message = (
             'last_updated=%r is later than the audit job\'s start time' % (
                 model.last_updated))
@@ -108,7 +111,8 @@ class ModelMutatedDuringJobErrorForLastUpdated(
 
 
 class ModelMutatedDuringJobErrorForPublishedOn(
-    base_validation_errors.BaseAuditError):
+    base_validation_errors.BaseAuditError
+):
     """Error class for models mutated during a job."""
 
     def __init__(
@@ -116,8 +120,8 @@ class ModelMutatedDuringJobErrorForPublishedOn(
         model: Union[
             blog_models.BlogPostModel,
             blog_models.BlogPostSummaryModel
-            ]
-        ) -> None:
+        ]
+    ) -> None:
         message = (
             'published_on=%r is later than the audit job\'s start time' % (
                 model.published_on))
