@@ -2976,6 +2976,14 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return html_list
 
 
+class ExplorationSummaryMetadataDict(TypedDict):
+    """Dictionary representing the meta data for exploration summary."""
+
+    id: str
+    title: str
+    objective: str
+
+
 class ExplorationSummary:
     """Domain object for an Oppia exploration summary."""
 
@@ -3221,7 +3229,7 @@ class ExplorationSummary:
                 'Expected contributors_summary to be dict, received %s' % (
                     self.contributors_summary))
 
-    def to_metadata_dict(self):
+    def to_metadata_dict(self) -> ExplorationSummaryMetadataDict:
         """Given an exploration summary, this method returns a dict containing
         id, title and objective of the exploration.
 
