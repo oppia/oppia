@@ -176,7 +176,7 @@ class MigrateExplorationJobTests(
         story = story_domain.Story.create_default_story(
             story_id, 'A story title', 'description', topic_id,
             'story-one')
-        story_services.save_new_story(feconf.SYSTEM_COMMITTER_ID, story) # type: ignore[no-untyped-call]
+        story_services.save_new_story(feconf.SYSTEM_COMMITTER_ID, story)
         topic_services.add_canonical_story( # type: ignore[no-untyped-call]
             feconf.SYSTEM_COMMITTER_ID, topic_id, story_id)
         topic_services.publish_story( # type: ignore[no-untyped-call]

@@ -82,7 +82,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
             exploration.validate() # type: ignore[no-untyped-call]
 
             with datastore_services.get_ndb_context():
-                if exp_services.get_story_id_linked_to_exploration( # type: ignore[no-untyped-call]
+                if exp_services.get_story_id_linked_to_exploration(
                         exp_id) is not None:
                     exp_services.validate_exploration_for_story( # type: ignore[no-untyped-call]
                         exploration, True)

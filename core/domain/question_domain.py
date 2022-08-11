@@ -1390,7 +1390,9 @@ class Question(translation_domain.BaseTranslatableObject):
         return question_state_dict
 
     @classmethod
-    def _convert_state_v51_dict_to_v52_dict(cls, question_state_dict):
+    def _convert_state_v51_dict_to_v52_dict(
+        cls, question_state_dict: state_domain.StateDict
+    ) -> state_domain.StateDict:
         """Converts from version 51 to 52. Version 52 fixes content IDs for
         translations and voiceovers in exploration but no action is required in
         question dicts.
