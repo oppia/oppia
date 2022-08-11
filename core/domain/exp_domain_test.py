@@ -571,7 +571,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         super().setUp()
         self.exploration = (
             exp_domain.Exploration.create_default_exploration('eid'))
-        self.new_state = state_domain.State.create_default_state(  # type: ignore[no-untyped-call]
+        self.new_state = state_domain.State.create_default_state(
             'Introduction', is_initial_state=True)
         self.set_interaction_for_state(self.new_state, 'TextInput')  # type: ignore[no-untyped-call]
         self.exploration.init_state_name = 'Introduction'
@@ -583,10 +583,10 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
             'TextInput')
         self.init_state = (
             self.exploration.states[self.exploration.init_state_name])
-        self.end_state = state_domain.State.create_default_state('End')  # type: ignore[no-untyped-call]
+        self.end_state = state_domain.State.create_default_state('End')
         self.set_interaction_for_state(self.end_state, 'EndExploration')  # type: ignore[no-untyped-call]
 
-        self.end_state.update_interaction_default_outcome(None)
+        self.end_state.update_interaction_default_outcome(None)  # type: ignore[no-untyped-call]
 
     def test_init_state_with_card_is_checkpoint_false_is_invalid(self) -> None:
         self.init_state.update_card_is_checkpoint(False)  # type: ignore[no-untyped-call]
@@ -605,12 +605,12 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
             self.exploration.init_state_name: self.new_state,
             'End': self.end_state
         }
-        self.end_state.update_card_is_checkpoint(True)
+        self.end_state.update_card_is_checkpoint(True)  # type: ignore[no-untyped-call]
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'Expected card_is_checkpoint of terminal state '
             'to be False but found it to be True'):
             self.exploration.validate(strict=True)
-        self.end_state.update_card_is_checkpoint(False)
+        self.end_state.update_card_is_checkpoint(False)  # type: ignore[no-untyped-call]
 
     def test_init_state_checkpoint_with_end_exp_interaction_is_valid(
         self
@@ -622,9 +622,9 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         self.exploration.objective = 'Objective'
         self.exploration.title = 'Title'
         self.exploration.category = 'Category'
-        self.end_state.update_card_is_checkpoint(True)
+        self.end_state.update_card_is_checkpoint(True)  # type: ignore[no-untyped-call]
         self.exploration.validate(strict=True)
-        self.end_state.update_card_is_checkpoint(False)
+        self.end_state.update_card_is_checkpoint(False)  # type: ignore[no-untyped-call]
 
     def test_checkpoint_count_with_count_outside_range_is_invalid(self) -> None:
         self.exploration.init_state_name = 'Introduction'
@@ -668,9 +668,9 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         #        │      End      │
         #        └───────────────┘.
 
-        second_state = state_domain.State.create_default_state('Second')  # type: ignore[no-untyped-call]
+        second_state = state_domain.State.create_default_state('Second')
         self.set_interaction_for_state(second_state, 'TextInput')  # type: ignore[no-untyped-call]
-        third_state = state_domain.State.create_default_state('Third')  # type: ignore[no-untyped-call]
+        third_state = state_domain.State.create_default_state('Third')
         self.set_interaction_for_state(third_state, 'TextInput')  # type: ignore[no-untyped-call]
 
         self.exploration.states = {
@@ -746,7 +746,7 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         ]
         self.init_state.update_interaction_answer_groups(  # type: ignore[no-untyped-call]
             init_state_answer_groups)
-        third_state.update_interaction_answer_groups(
+        third_state.update_interaction_answer_groups(  # type: ignore[no-untyped-call]
             third_state_answer_groups)
 
         # The exploration can be completed via third_state. Hence, making
@@ -797,15 +797,15 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
             )
         ]
 
-        second_state.update_interaction_answer_groups(
+        second_state.update_interaction_answer_groups(  # type: ignore[no-untyped-call]
             second_state_answer_groups)
 
         # Reset the answer group dicts of third_state.
-        third_state.update_interaction_answer_groups([])
+        third_state.update_interaction_answer_groups([])  # type: ignore[no-untyped-call]
 
         # As second_state is now connected to end_state and third_state has no
         # outcome, second_state has become non-bypassable.
-        second_state.update_card_is_checkpoint(True)
+        second_state.update_card_is_checkpoint(True)  # type: ignore[no-untyped-call]
         self.exploration.validate()
 
         # Reset the exploration.
@@ -833,13 +833,13 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         #                    │    End    │
         #                    └───────────┘.
 
-        a_state = state_domain.State.create_default_state('A')  # type: ignore[no-untyped-call]
+        a_state = state_domain.State.create_default_state('A')
         self.set_interaction_for_state(a_state, 'TextInput')  # type: ignore[no-untyped-call]
-        b_state = state_domain.State.create_default_state('B')  # type: ignore[no-untyped-call]
+        b_state = state_domain.State.create_default_state('B')
         self.set_interaction_for_state(b_state, 'TextInput')  # type: ignore[no-untyped-call]
-        c_state = state_domain.State.create_default_state('C')  # type: ignore[no-untyped-call]
+        c_state = state_domain.State.create_default_state('C')
         self.set_interaction_for_state(c_state, 'TextInput')  # type: ignore[no-untyped-call]
-        d_state = state_domain.State.create_default_state('D')  # type: ignore[no-untyped-call]
+        d_state = state_domain.State.create_default_state('D')
         self.set_interaction_for_state(d_state, 'TextInput')  # type: ignore[no-untyped-call]
 
         self.exploration.states = {
@@ -959,24 +959,24 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
 
         self.init_state.update_interaction_answer_groups(  # type: ignore[no-untyped-call]
             init_state_answer_groups)
-        a_state.update_interaction_answer_groups(
+        a_state.update_interaction_answer_groups(  # type: ignore[no-untyped-call]
             a_and_b_state_answer_groups)
-        b_state.update_interaction_answer_groups(
+        b_state.update_interaction_answer_groups(  # type: ignore[no-untyped-call]
             a_and_b_state_answer_groups)
-        c_state.update_interaction_answer_groups(
+        c_state.update_interaction_answer_groups(  # type: ignore[no-untyped-call]
             c_and_d_state_answer_groups)
-        d_state.update_interaction_answer_groups(
+        d_state.update_interaction_answer_groups(  # type: ignore[no-untyped-call]
             c_and_d_state_answer_groups)
 
         # As a user can complete the exploration by going through c_state,
         # d_state becomes bypassable. Hence, making d_state a checkpoint raises
         # validation error.
-        d_state.update_card_is_checkpoint(True)
+        d_state.update_card_is_checkpoint(True)  # type: ignore[no-untyped-call]
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'Cannot make D a checkpoint as it is bypassable'
             ):
             self.exploration.validate(strict=True)
-        d_state.update_card_is_checkpoint(False)
+        d_state.update_card_is_checkpoint(False)  # type: ignore[no-untyped-call]
 
         # Modifying the graph to make D non-bypassable.
         #                ┌────────────────┐
@@ -1020,10 +1020,10 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
                 None
             )
         ]
-        c_state.update_interaction_answer_groups(
+        c_state.update_interaction_answer_groups(  # type: ignore[no-untyped-call]
             c_state_answer_groups)
 
-        d_state.update_card_is_checkpoint(True)
+        d_state.update_card_is_checkpoint(True)  # type: ignore[no-untyped-call]
         self.exploration.validate()
 
         # Modifying the graph to add another EndExploration state.
@@ -1045,9 +1045,9 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         #                  │    End    │           │    End 2  │
         #                  └───────────┘           └───────────┘.
 
-        new_end_state = state_domain.State.create_default_state('End 2')  # type: ignore[no-untyped-call]
+        new_end_state = state_domain.State.create_default_state('End 2')
         self.set_interaction_for_state(new_end_state, 'EndExploration')  # type: ignore[no-untyped-call]
-        new_end_state.update_interaction_default_outcome(None)
+        new_end_state.update_interaction_default_outcome(None)  # type: ignore[no-untyped-call]
 
         self.exploration.states = {
             self.exploration.init_state_name: self.new_state,
@@ -1100,14 +1100,14 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
                 None
             )
         ]
-        c_state.update_interaction_answer_groups(
+        c_state.update_interaction_answer_groups(  # type: ignore[no-untyped-call]
             c_state_answer_groups)
 
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'Cannot make D a checkpoint as it is bypassable'
             ):
             self.exploration.validate(strict=True)
-        d_state.update_card_is_checkpoint(False)
+        d_state.update_card_is_checkpoint(False)  # type: ignore[no-untyped-call]
 
 
 class ExplorationDomainUnitTests(test_utils.GenericTestBase):
@@ -1140,13 +1140,13 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         # Note: If '/' ever becomes a valid state name, ensure that the rule
         # editor frontend tenplate is fixed -- it currently uses '/' as a
         # sentinel for an invalid state name.
-        bad_state = state_domain.State.create_default_state('/')  # type: ignore[no-untyped-call]
+        bad_state = state_domain.State.create_default_state('/')
         exploration.states = {'/': bad_state}
         self._assert_validation_error(  # type: ignore[no-untyped-call]
             exploration, 'Invalid character / in a state name')
 
-        new_state = state_domain.State.create_default_state('ABC')  # type: ignore[no-untyped-call]
-        second_state = state_domain.State.create_default_state('BCD')  # type: ignore[no-untyped-call]
+        new_state = state_domain.State.create_default_state('ABC')
+        second_state = state_domain.State.create_default_state('BCD')
         self.set_interaction_for_state(new_state, 'TextInput')  # type: ignore[no-untyped-call]
         self.set_interaction_for_state(second_state, 'TextInput')  # type: ignore[no-untyped-call]
 
@@ -1683,7 +1683,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         exploration.states = {
             exploration.init_state_name: (
-                state_domain.State.create_default_state(  # type: ignore[no-untyped-call]
+                state_domain.State.create_default_state(
                     exploration.init_state_name, is_initial_state=True))
         }
         self.set_interaction_for_state(  # type: ignore[no-untyped-call]
@@ -2286,7 +2286,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
     def test_cannot_create_demo_exp_with_invalid_param_changes(self) -> None:
         demo_exp = exp_domain.Exploration.create_default_exploration('0')
         demo_dict = demo_exp.to_dict()
-        new_state = state_domain.State.create_default_state('new_state_name')  # type: ignore[no-untyped-call]
+        new_state = state_domain.State.create_default_state('new_state_name')
         new_state.param_changes = [param_domain.ParamChange.from_dict({
             'customization_args': {
                 'list_of_values': ['1', '2'], 'parse_with_jinja': False

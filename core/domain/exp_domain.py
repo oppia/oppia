@@ -947,7 +947,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             Exploration. The Exploration domain object with default
             values.
         """
-        init_state_dict = state_domain.State.create_default_state(  # type: ignore[no-untyped-call]
+        init_state_dict = state_domain.State.create_default_state(
             init_state_name, is_initial_state=True).to_dict()
 
         states_dict = {
@@ -1846,7 +1846,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 raise ValueError('Duplicate state name %s' % state_name)
 
         for state_name in state_names:
-            self.states[state_name] = state_domain.State.create_default_state(  # type: ignore[no-untyped-call]
+            self.states[state_name] = state_domain.State.create_default_state(
                 state_name)
 
     def rename_state(self, old_state_name: str, new_state_name: str) -> None:
@@ -3082,7 +3082,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return html_list
 
 
-class ExplorationSummaryMetaDataDict(TypedDict):
+class ExplorationSummaryMetadataDict(TypedDict):
     """Dictionary representing the meta data for exploration summary."""
 
     id: str
@@ -3335,7 +3335,7 @@ class ExplorationSummary:
                 'Expected contributors_summary to be dict, received %s' % (
                     self.contributors_summary))
 
-    def to_metadata_dict(self) -> ExplorationSummaryMetaDataDict:
+    def to_metadata_dict(self) -> ExplorationSummaryMetadataDict:
         """Given an exploration summary, this method returns a dict containing
         id, title and objective of the exploration.
 

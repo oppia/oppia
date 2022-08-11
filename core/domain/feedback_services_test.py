@@ -124,8 +124,8 @@ class FeedbackServicesUnitTests(test_utils.EmailTestBase):
                 repeated_thread_ids, self.user_id, None, None, 'Hello')
 
     def test_delete_threads_for_multiple_entities(self) -> None:
-        self.save_new_default_exploration(self.EXP_1_ID, self.EXP_1_ID)  # type: ignore[no-untyped-call]
-        suggestion_services.create_suggestion(  # type: ignore[no-untyped-call]
+        self.save_new_default_exploration(self.EXP_1_ID, self.EXP_1_ID)
+        suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             self.EXP_1_ID,
@@ -184,8 +184,8 @@ class FeedbackDeletionUnitTests(test_utils.GenericTestBase):
         self.signup(self.USER_EMAIL, self.USER_USERNAME)
         self.user_id = self.get_user_id_from_email(self.USER_EMAIL)  # type: ignore[no-untyped-call]
 
-        self.save_new_default_exploration(self.EXP_1_ID, self.user_id)  # type: ignore[no-untyped-call]
-        suggestion_services.create_suggestion(  # type: ignore[no-untyped-call]
+        self.save_new_default_exploration(self.EXP_1_ID, self.user_id)
+        suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             self.EXP_1_ID,
@@ -204,7 +204,7 @@ class FeedbackDeletionUnitTests(test_utils.GenericTestBase):
         feedback_services.create_message(
             self.thread_1_id, self.user_id, None, None, 'some text')
 
-        self.save_new_default_exploration(self.EXP_2_ID, self.user_id)  # type: ignore[no-untyped-call]
+        self.save_new_default_exploration(self.EXP_2_ID, self.user_id)
         self.thread_2_id = feedback_services.create_thread(
             feconf.ENTITY_TYPE_EXPLORATION,
             self.EXP_2_ID,
@@ -411,8 +411,8 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         self.assertEqual(thread.num_total_threads, 1)
 
     def test_get_next_page_of_all_feedback_messages(self) -> None:
-        self.save_new_default_exploration(self.EXP_ID_1, self.EXP_ID_2)  # type: ignore[no-untyped-call]
-        suggestion_services.create_suggestion(  # type: ignore[no-untyped-call]
+        self.save_new_default_exploration(self.EXP_ID_1, self.EXP_ID_2)
+        suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             self.EXP_ID_1,
@@ -884,7 +884,7 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
         self.user_id_b = self.get_user_id_from_email('b@example.com')  # type: ignore[no-untyped-call]
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)  # type: ignore[no-untyped-call]
-        self.exploration = self.save_new_default_exploration(  # type: ignore[no-untyped-call]
+        self.exploration = self.save_new_default_exploration(
             'A', self.editor_id, title='Title')
         self.can_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS', True)
@@ -1244,7 +1244,7 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.EmailTestBase):
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)  # type: ignore[no-untyped-call]
 
-        self.exploration = self.save_new_default_exploration(  # type: ignore[no-untyped-call]
+        self.exploration = self.save_new_default_exploration(
             'A', self.editor_id, title='Title')
         self.can_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS', True)
@@ -1400,7 +1400,7 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)  # type: ignore[no-untyped-call]
 
-        self.exploration = self.save_new_default_exploration(  # type: ignore[no-untyped-call]
+        self.exploration = self.save_new_default_exploration(
             'A', self.editor_id, title='Title')
         self.can_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS', True)
