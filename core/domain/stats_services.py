@@ -581,7 +581,7 @@ def get_exp_issues(
 
 @overload
 def get_exp_issues(
-    exp_id: str, exp_version: int, strict: bool
+    exp_id: str, exp_version: int, *, strict: bool = ...
 ) -> Optional[stats_domain.ExplorationIssues]: ...
 
 
