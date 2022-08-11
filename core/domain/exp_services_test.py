@@ -7150,9 +7150,9 @@ title: Old Title
                 self.albert_id, self.NEW_EXP_ID, change_list,
                 'Changed recorded_voiceovers.')
 
-    def test_get_exploration_version_valid_info(self):
+    def test_get_exploration_validation_error(self):
         # Valid exploration version.
-        info = exp_services.get_exploration_version_valid_info(
+        info = exp_services.get_exploration_validation_error(
             self.NEW_EXP_ID, 0)
         self.assertIsNone(info)
 
@@ -7165,7 +7165,7 @@ title: Old Title
             exp_domain.Exploration, 'validate',
             _mock_exploration_validate_function)
         with validate_swap:
-            info = exp_services.get_exploration_version_valid_info(
+            info = exp_services.get_exploration_validation_error(
                 self.NEW_EXP_ID, 0)
             self.assertEqual(info, 'Bad')
 
