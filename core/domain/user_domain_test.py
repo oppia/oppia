@@ -74,7 +74,7 @@ class MockModifiableUserData(user_domain.ModifiableUserData):
         user_id: Optional[str]=None,
         fake_field: Optional[str]=None
     ) -> None:
-        super(MockModifiableUserData, self).__init__(
+        super().__init__(
             display_alias,
             pin,
             preferred_language_codes,
@@ -136,7 +136,7 @@ class MockModifiableUserData(user_domain.ModifiableUserData):
 class UserSettingsTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(UserSettingsTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
         self.owner = user_services.get_user_actions_info(self.owner_id)
@@ -504,7 +504,7 @@ class UserSettingsTests(test_utils.GenericTestBase):
 class UserContributionsTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(UserContributionsTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
         self.user_contributions = user_services.get_user_contributions(
@@ -1158,7 +1158,7 @@ class UserContributionProficiencyTests(test_utils.GenericTestBase):
     """Testing domain object for user contribution scoring model."""
 
     def setUp(self) -> None:
-        super(UserContributionProficiencyTests, self).setUp()
+        super().setUp()
         self.user_proficiency = user_domain.UserContributionProficiency(
             'user_id0', 'category0', 0, False)
 
@@ -1201,7 +1201,7 @@ class UserContributionRightsTests(test_utils.GenericTestBase):
     """Testing UserContributionRights domain object."""
 
     def setUp(self) -> None:
-        super(UserContributionRightsTests, self).setUp()
+        super().setUp()
         self.user_contribution_rights = user_domain.UserContributionRights(
             'user_id', ['hi'], [], True, False)
 

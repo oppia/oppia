@@ -43,7 +43,7 @@ class FeedbackServicesUnitTests(test_utils.EmailTestBase):
     EXP_1_ID = 'exp_1_id'
 
     def setUp(self):
-        super(FeedbackServicesUnitTests, self).setUp()
+        super().setUp()
         self.signup(self.USER_EMAIL, self.USER_USERNAME)
         self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
 
@@ -169,7 +169,7 @@ class FeedbackDeletionUnitTests(test_utils.GenericTestBase):
     EXP_2_ID = 'exp_2_id'
 
     def setUp(self):
-        super(FeedbackDeletionUnitTests, self).setUp()
+        super().setUp()
         self.signup(self.USER_EMAIL, self.USER_USERNAME)
         self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
 
@@ -290,7 +290,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
     USER_USERNAME = 'user'
 
     def setUp(self):
-        super(FeedbackThreadUnitTests, self).setUp()
+        super().setUp()
 
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.signup(self.USER_EMAIL, self.USER_USERNAME)
@@ -820,7 +820,7 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
     """Tests for feedback message emails."""
 
     def setUp(self):
-        super(FeedbackMessageEmailTests, self).setUp()
+        super().setUp()
         self.signup('a@example.com', 'A')
         self.user_id_a = self.get_user_id_from_email('a@example.com')
         self.signup('b@example.com', 'B')
@@ -1174,7 +1174,7 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
 class FeedbackMessageBatchEmailHandlerTests(test_utils.EmailTestBase):
 
     def setUp(self):
-        super(FeedbackMessageBatchEmailHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
@@ -1330,7 +1330,7 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.EmailTestBase):
 class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
 
     def setUp(self):
-        super(FeedbackMessageInstantEmailHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
