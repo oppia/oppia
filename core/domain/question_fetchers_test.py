@@ -61,7 +61,7 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
             self._create_valid_question_data('ABC'), ['skill_1'])
 
     def test_get_questions_and_skill_descriptions_by_skill_ids(self) -> None:
-        question_services.create_new_question_skill_link(  # type: ignore[no-untyped-call]
+        question_services.create_new_question_skill_link(
             self.editor_id, self.question_id, 'skill_1', 0.3)
 
         questions, _ = (
@@ -87,7 +87,7 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
             self._create_valid_question_data('ABC'), ['skill_1', 'skill_2'])
         question_services.create_new_question_skill_link(  # type: ignore[no-untyped-call]
             self.editor_id, question_id_1, 'skill_1', 0.3)
-        question_services.create_new_question_skill_link(  # type: ignore[no-untyped-call]
+        question_services.create_new_question_skill_link(
             self.editor_id, question_id_1, 'skill_2', 0.5)
 
         questions, _ = (
@@ -128,7 +128,7 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
         all_question_models = question_models.QuestionModel.get_all()
         self.assertEqual(all_question_models.count(), 0)
 
-        question_id = question_services.get_new_question_id()  # type: ignore[no-untyped-call]
+        question_id = question_services.get_new_question_id()
 
         question_model = question_models.QuestionModel(
             id=question_id,
@@ -166,7 +166,7 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
         all_question_models = question_models.QuestionModel.get_all()
         self.assertEqual(all_question_models.count(), 0)
 
-        question_id = question_services.get_new_question_id()  # type: ignore[no-untyped-call]
+        question_id = question_services.get_new_question_id()
 
         question_model = question_models.QuestionModel(
             id=question_id,

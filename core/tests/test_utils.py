@@ -2896,7 +2896,7 @@ title: Title
     def put_json(
         self,
         url: str,
-        payload: Dict[str, str],
+        payload: Mapping[str, Union[str, int]],
         csrf_token: Optional[str] = None,
         expected_status_int: int = 200
     ) -> Dict[str, Any]:

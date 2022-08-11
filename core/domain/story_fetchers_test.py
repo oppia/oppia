@@ -63,7 +63,7 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
                 'title': 'Title 1'
             })
         ]
-        story_services.update_story(  # type: ignore[no-untyped-call]
+        story_services.update_story(
             self.USER_ID, self.story_id, changelist,
             'Added node.')
         self.story = story_fetchers.get_story_by_id(self.story_id)
