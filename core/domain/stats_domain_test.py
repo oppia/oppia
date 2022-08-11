@@ -1201,6 +1201,8 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
 
         exp_issues_model = stats_models.ExplorationIssuesModel.get_model(
             'exp_id', 1)
+        # Ruling out the possibility of None for mypy type checking.
+        assert exp_issues_model is not None
 
         current_issue_schema_version_swap = self.swap(
             stats_models, 'CURRENT_ISSUE_SCHEMA_VERSION', 2)
@@ -1210,7 +1212,7 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
             self._dummy_convert_issue_v1_dict_to_v2_dict)
 
         with convert_issue_dict_swap, current_issue_schema_version_swap:
-            exp_issue_from_model = stats_services.get_exp_issues_from_model(  # type: ignore[no-untyped-call]
+            exp_issue_from_model = stats_services.get_exp_issues_from_model(
                 exp_issues_model)
 
         self.assertEqual(
@@ -1233,6 +1235,8 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
 
         exp_issues_model1 = stats_models.ExplorationIssuesModel.get_model(
             'exp_id_1', 1)
+        # Ruling out the possibility of None for mypy type checking.
+        assert exp_issues_model1 is not None
 
         current_issue_schema_version_swap = self.swap(
             stats_models, 'CURRENT_ISSUE_SCHEMA_VERSION', 2)
@@ -1242,7 +1246,7 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
             self._dummy_convert_issue_v1_dict_to_v2_dict)
 
         with convert_issue_dict_swap, current_issue_schema_version_swap:
-            exp_issue_from_model1 = stats_services.get_exp_issues_from_model(  # type: ignore[no-untyped-call]
+            exp_issue_from_model1 = stats_services.get_exp_issues_from_model(
                 exp_issues_model1)
 
         self.assertEqual(
@@ -1259,13 +1263,15 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
 
         exp_issues_model = stats_models.ExplorationIssuesModel.get_model(
             'exp_id', 1)
+        # Ruling out the possibility of None for mypy type checking.
+        assert exp_issues_model is not None
 
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception,
             'Sorry, we can only process v1-v%d and unversioned issue schemas at'
             ' present.' %
             stats_models.CURRENT_ISSUE_SCHEMA_VERSION):
-            stats_services.get_exp_issues_from_model(exp_issues_model)  # type: ignore[no-untyped-call]
+            stats_services.get_exp_issues_from_model(exp_issues_model)
 
     # TODO(#13528): Remove this test after the backend is fully
     # type-annotated. Here ignore[arg-type] is used to test
@@ -1279,13 +1285,15 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
 
         exp_issues_model = stats_models.ExplorationIssuesModel.get_model(
             'exp_id', 1)
+        # Ruling out the possibility of None for mypy type checking.
+        assert exp_issues_model is not None
 
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception,
             re.escape(
                 'unsupported operand type(s) for +=: \'NoneType\' '
                 'and \'int\'')):
-            stats_services.get_exp_issues_from_model(exp_issues_model)  # type: ignore[no-untyped-call]
+            stats_services.get_exp_issues_from_model(exp_issues_model)
 
     def test_actual_update_exp_issue_from_model_raises_error(self) -> None:
         exp_issue = stats_domain.ExplorationIssue('EarlyQuit', {}, [], 1, True)
@@ -1457,7 +1465,7 @@ class LearnerActionTests(test_utils.GenericTestBase):
             self._dummy_convert_action_v1_dict_to_v2_dict)
 
         with current_action_schema_version_swap, convert_action_dict_swap:
-            playthrough = stats_services.get_playthrough_from_model(  # type: ignore[no-untyped-call]
+            playthrough = stats_services.get_playthrough_from_model(
                 playthrough_model)
 
         self.assertEqual(
@@ -1491,7 +1499,7 @@ class LearnerActionTests(test_utils.GenericTestBase):
             self._dummy_convert_action_v1_dict_to_v2_dict)
 
         with current_action_schema_version_swap, convert_action_dict_swap:
-            playthrough1 = stats_services.get_playthrough_from_model(  # type: ignore[no-untyped-call]
+            playthrough1 = stats_services.get_playthrough_from_model(
                 playthrough_model_1)
 
         self.assertEqual(
@@ -1520,7 +1528,7 @@ class LearnerActionTests(test_utils.GenericTestBase):
             'Sorry, we can only process v1-v%d and unversioned action schemas'
             ' at present.' %
             stats_models.CURRENT_ISSUE_SCHEMA_VERSION):
-            stats_services.get_playthrough_from_model(  # type: ignore[no-untyped-call]
+            stats_services.get_playthrough_from_model(
                 playthrough_model)
 
     # TODO(#13528): Remove this test after the backend is fully
@@ -1548,7 +1556,7 @@ class LearnerActionTests(test_utils.GenericTestBase):
             re.escape(
                 'unsupported operand type(s) for +=: \'NoneType\' '
                 'and \'int\'')):
-            stats_services.get_playthrough_from_model(playthrough_model)  # type: ignore[no-untyped-call]
+            stats_services.get_playthrough_from_model(playthrough_model)
 
     def test_actual_update_learner_action_from_model_raises_error(self) -> None:
         learner_action = stats_domain.LearnerAction('ExplorationStart', {}, 1)

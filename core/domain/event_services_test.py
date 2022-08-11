@@ -464,9 +464,11 @@ class AnswerSubmissionEventHandlerTests(test_utils.GenericTestBase):
             normalized_answer='answer_submitted'
         )
 
-        state_answers = stats_services.get_state_answers(  # type: ignore[no-untyped-call]
+        state_answers = stats_services.get_state_answers(
             exp_id, exploration.version,
             exploration.init_state_name)
+        # Ruling out the possibility of None for mypy type checking.
+        assert state_answers is not None
 
         self.assertEqual(state_answers.get_submitted_answer_dict_list(), [{
             'answer': 'answer_submitted',

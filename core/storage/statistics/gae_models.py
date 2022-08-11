@@ -2168,16 +2168,16 @@ class StateAnswersModel(base_models.BaseModel):
         cls.update_timestamps_multi(entities_to_put)
         cls.put_multi(entities_to_put)
 
-    # TODO(#13523): Change 'new_submitted_answer' to TypedDict/Domain Object
-    # to remove Any used below.
     @classmethod
     def insert_submitted_answers(
-            cls,
-            exploration_id: str,
-            exploration_version: int,
-            state_name: str,
-            interaction_id: str,
-            new_submitted_answer_dict_list: List[Dict[str, Any]]
+        cls,
+        exploration_id: str,
+        exploration_version: int,
+        state_name: str,
+        interaction_id: str,
+        new_submitted_answer_dict_list: List[
+            stats_domain.SubmittedAnswerDict
+        ]
     ) -> None:
         """Given an exploration ID, version, state name, and interaction ID,
         attempt to insert a list of specified SubmittedAnswers into this model,

@@ -22,15 +22,17 @@ import copy
 import datetime
 import itertools
 import logging
-from typing import List, Optional
 
 from core import feconf
 from core import utils
+from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import question_services
 from core.domain import stats_domain
-from core.domain import exp_domain
 from core.platform import models
+
+from typing import List, Optional, overload
+from typing_extensions import Literal
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -241,7 +243,7 @@ def get_stats_for_new_exp_version(
     exp_id: str,
     exp_version: int,
     state_names: List[str],
-    exp_versions_diff: exp_domain.ExplorationVersionsDiff,
+    exp_versions_diff: Optional[exp_domain.ExplorationVersionsDiff],
     revert_to_version: Optional[int]
 ) -> stats_domain.ExplorationStats:
     """Retrieves the ExplorationStatsModel for the old exp_version and makes any
@@ -282,7 +284,7 @@ def get_stats_for_new_exp_version(
 
 def advance_version_of_exp_stats(
     exp_version: int,
-    exp_versions_diff: exp_domain.ExplorationVersionsDiff,
+    exp_versions_diff: Optional[exp_domain.ExplorationVersionsDiff],
     exp_stats: stats_domain.ExplorationStats,
     reverted_exp_stats: Optional[stats_domain.ExplorationStats],
     revert_to_version: Optional[int]
@@ -304,6 +306,10 @@ def advance_version_of_exp_stats(
 
     Returns:
         ExplorationStats. The newly created exploration stats object.
+
+    Raises:
+        Exception. ExplorationVersionsDiff cannot be be None when the change
+            is a revert.
     """
 
     # Handling reverts.
@@ -325,9 +331,14 @@ def advance_version_of_exp_stats(
 
     new_state_name_stats_mapping = {}
 
+    if exp_versions_diff is None:
+        raise Exception(
+            'ExplorationVersionsDiff cannot be None when the change is'
+            ' a revert.'
+        )
     # Handle unchanged states.
     unchanged_state_names = set(utils.compute_list_difference(
-        exp_stats.state_stats_mapping,
+        list(exp_stats.state_stats_mapping.keys()),
         exp_versions_diff.deleted_state_names +
         list(exp_versions_diff.new_to_old_state_names.values())))
     for state_name in unchanged_state_names:
@@ -433,7 +444,7 @@ def create_exp_issues_for_new_exploration(
 def update_exp_issues_for_new_exp_version(
     exploration: exp_domain.Exploration,
     exp_versions_diff: exp_domain.ExplorationVersionsDiff,
-    revert_to_version: int
+    revert_to_version: Optional[int]
 ) -> None:
     """Retrieves the ExplorationIssuesModel for the old exp_version and makes
     any required changes to the structure of the model.
@@ -445,7 +456,9 @@ def update_exp_issues_for_new_exp_version(
         revert_to_version: int|None. If the change is a revert, the version.
             Otherwise, None.
     """
-    exp_issues = get_exp_issues(exploration.id, exploration.version - 1)
+    exp_issues = get_exp_issues(
+        exploration.id, exploration.version - 1, strict=False
+    )
     if exp_issues is None:
         create_exp_issues_for_new_exploration(
             exploration.id, exploration.version - 1)
@@ -463,15 +476,22 @@ def update_exp_issues_for_new_exp_version(
 
     playthrough_ids = list(itertools.chain.from_iterable(
         issue.playthrough_ids for issue in exp_issues.unresolved_issues))
-    playthrough_models = (
+    playthrough_models_with_none = (
         stats_models.PlaythroughModel.get_multi(playthrough_ids))
+    playthrough_models = []
 
-    for playthrough_model in playthrough_models:
+    for playthrough_model in playthrough_models_with_none:
+        # Ruling out the possibility of None for mypy type checking.
+        assert playthrough_model is not None
+        playthrough_models.append(playthrough_model)
         playthrough = get_playthrough_from_model(playthrough_model)
 
         if 'state_names' in playthrough.issue_customization_args:
             state_names = (
                 playthrough.issue_customization_args['state_names']['value'])
+            # Ruling out the possibility of any other type for mypy type
+            # checking.
+            assert isinstance(state_names, list)
             playthrough.issue_customization_args['state_names']['value'] = [
                 state_name if state_name not in old_to_new_state_names else
                 old_to_new_state_names[state_name] for state_name in state_names
@@ -541,25 +561,58 @@ def update_exp_issues_for_new_exp_version(
     create_exp_issues_model(exp_issues)
 
 
+@overload
 def get_exp_issues(
     exp_id: str, exp_version: int
+) -> stats_domain.ExplorationIssues: ...
+
+
+@overload
+def get_exp_issues(
+    exp_id: str, exp_version: int, *, strict: Literal[True]
+) -> stats_domain.ExplorationIssues: ...
+
+
+@overload
+def get_exp_issues(
+    exp_id: str, exp_version: int, *, strict: Literal[False]
+) -> Optional[stats_domain.ExplorationIssues]: ...
+
+
+@overload
+def get_exp_issues(
+    exp_id: str, exp_version: int, strict: bool
+) -> Optional[stats_domain.ExplorationIssues]: ...
+
+
+def get_exp_issues(
+    exp_id: str, exp_version: int, strict: bool = True
 ) -> Optional[stats_domain.ExplorationIssues]:
     """Retrieves the ExplorationIssues domain object.
 
     Args:
         exp_id: str. ID of the exploration.
         exp_version: int. Version of the exploration.
+        strict: bool. Fails noisily if the model doesn't exist.
 
     Returns:
         ExplorationIssues|None. The domain object for exploration issues or None
         if the exp_id is invalid.
+
+    Raises:
+        Exception. No ExplorationIssues model found for the given exp_id.
     """
-    exp_issues = None
     exp_issues_model = stats_models.ExplorationIssuesModel.get_model(
         exp_id, exp_version)
-    if exp_issues_model is not None:
-        exp_issues = get_exp_issues_from_model(exp_issues_model)
-    return exp_issues
+    if exp_issues_model is None:
+        if not strict:
+            return None
+        raise Exception(
+            'No ExplorationIssues model found for the given exp_id: %s' %
+            exp_id
+        )
+
+    return get_exp_issues_from_model(exp_issues_model)
 
 
 def get_playthrough_by_id(
@@ -578,7 +631,7 @@ def get_playthrough_by_id(
         stats_models.PlaythroughModel.get(playthrough_id, strict=False))
     if playthrough_model is None:
         return None
-    
+
     return get_playthrough_from_model(playthrough_model)
 
 
@@ -706,7 +759,7 @@ def get_playthrough_from_model(
         playthrough_model.issue_customization_args, actions)
 
 
-def create_stats_model(exploration_stats):
+def create_stats_model(exploration_stats: stats_domain.ExplorationStats) -> str:
     """Creates an ExplorationStatsModel in datastore given an ExplorationStats
     domain object.
 
@@ -735,13 +788,18 @@ def create_stats_model(exploration_stats):
     return instance_id
 
 
-def save_stats_model(exploration_stats):
+def save_stats_model(
+    exploration_stats: stats_domain.ExplorationStats
+) -> None:
     """Updates the ExplorationStatsModel datastore instance with the passed
     ExplorationStats domain object.
 
     Args:
         exploration_stats: ExplorationStats. The exploration statistics domain
             object.
+
+    Raises:
+        Exception. No exploration stats model exists for the given exp_id.
     """
     new_state_stats_mapping = {
         state_name: exploration_stats.state_stats_mapping[state_name].to_dict()
@@ -750,6 +808,11 @@ def save_stats_model(exploration_stats):
 
     exploration_stats_model = stats_models.ExplorationStatsModel.get_model(
         exploration_stats.exp_id, exploration_stats.exp_version)
+
+    if exploration_stats_model is None:
+        raise Exception(
+            'No exploration stats model exists for the given exp_id.'
+        )
 
     exploration_stats_model.num_starts_v1 = exploration_stats.num_starts_v1
     exploration_stats_model.num_starts_v2 = exploration_stats.num_starts_v2
@@ -767,7 +830,7 @@ def save_stats_model(exploration_stats):
     exploration_stats_model.put()
 
 
-def create_exp_issues_model(exp_issues):
+def create_exp_issues_model(exp_issues: stats_domain.ExplorationIssues) -> None:
     """Creates a new ExplorationIssuesModel in the datastore.
 
     Args:
@@ -780,7 +843,7 @@ def create_exp_issues_model(exp_issues):
         exp_issues.exp_id, exp_issues.exp_version, unresolved_issues_dicts)
 
 
-def save_exp_issues_model(exp_issues):
+def save_exp_issues_model(exp_issues: stats_domain.ExplorationIssues) -> None:
     """Updates the ExplorationIssuesModel datastore instance with the passed
     ExplorationIssues domain object.
 
@@ -789,11 +852,15 @@ def save_exp_issues_model(exp_issues):
     """
 
     @transaction_services.run_in_transaction_wrapper
-    def _save_exp_issues_model_transactional():
+    def _save_exp_issues_model_transactional() -> None:
         """Implementation to be run in a transaction."""
 
         exp_issues_model = stats_models.ExplorationIssuesModel.get_model(
             exp_issues.exp_id, exp_issues.exp_version)
+        if exp_issues_model is None:
+            raise Exception(
+                'No ExplorationIssuesModel exists for the given exploration id.'
+            )
         exp_issues_model.exp_version = exp_issues.exp_version
         exp_issues_model.unresolved_issues = [
             issue.to_dict() for issue in exp_issues.unresolved_issues]
@@ -805,7 +872,9 @@ def save_exp_issues_model(exp_issues):
     _save_exp_issues_model_transactional()
 
 
-def get_exploration_stats_multi(exp_version_references):
+def get_exploration_stats_multi(
+    exp_version_references: List[exp_domain.ExpVersionReference]
+) -> List[stats_domain.ExplorationStats]:
     """Retrieves the exploration stats for the given explorations.
 
     Args:
@@ -834,7 +903,7 @@ def get_exploration_stats_multi(exp_version_references):
     return exploration_stats_list
 
 
-def delete_playthroughs_multi(playthrough_ids):
+def delete_playthroughs_multi(playthrough_ids: List[str]) -> None:
     """Deletes multiple playthrough instances.
 
     Args:
@@ -842,10 +911,17 @@ def delete_playthroughs_multi(playthrough_ids):
     """
 
     @transaction_services.run_in_transaction_wrapper
-    def _delete_playthroughs_multi_transactional():
+    def _delete_playthroughs_multi_transactional() -> None:
         """Implementation to be run in a transaction."""
-        stats_models.PlaythroughModel.delete_multi(
-            stats_models.PlaythroughModel.get_multi(playthrough_ids))
+        playthrough_models_with_none = stats_models.PlaythroughModel.get_multi(
+            playthrough_ids
+        )
+        playthrough_models = []
+        for playthrough_model in playthrough_models_with_none:
+            # Ruling out the possibility of None for mypy type checking.
+            assert playthrough_model is not None
+            playthrough_models.append(playthrough_model)
+        stats_models.PlaythroughModel.delete_multi(playthrough_models)
 
     # Run in transaction to help prevent data-races between concurrent
     # operations that may update the playthroughs being deleted.
@@ -853,8 +929,12 @@ def delete_playthroughs_multi(playthrough_ids):
 
 
 def record_answer(
-        exploration_id, exploration_version, state_name, interaction_id,
-        submitted_answer):
+    exploration_id: str,
+    exploration_version: int,
+    state_name: str,
+    interaction_id: str,
+    submitted_answer: stats_domain.SubmittedAnswer
+) -> None:
     """Record an answer by storing it to the corresponding StateAnswers entity.
 
     Args:
@@ -870,8 +950,12 @@ def record_answer(
 
 
 def record_answers(
-        exploration_id, exploration_version, state_name, interaction_id,
-        submitted_answer_list):
+    exploration_id: str,
+    exploration_version: int,
+    state_name: str,
+    interaction_id: str,
+    submitted_answer_list: List[stats_domain.SubmittedAnswer]
+) -> None:
     """Optimally record a group of answers using an already loaded exploration.
     The submitted_answer_list is a list of SubmittedAnswer domain objects.
 
@@ -895,7 +979,11 @@ def record_answers(
         state_answers.get_submitted_answer_dict_list())
 
 
-def get_state_answers(exploration_id, exploration_version, state_name):
+def get_state_answers(
+    exploration_id: str,
+    exploration_version: int,
+    state_name: str
+) -> Optional[stats_domain.StateAnswers]:
     """Returns a StateAnswers object containing all answers associated with the
     specified exploration state, or None if no such answers have yet been
     submitted.
@@ -927,7 +1015,11 @@ def get_state_answers(exploration_id, exploration_version, state_name):
         return None
 
 
-def get_sample_answers(exploration_id, exploration_version, state_name):
+def get_sample_answers(
+    exploration_id: str,
+    exploration_version: int,
+    state_name: str
+) -> List[Optional[str]]:
     """Fetches a list of sample answers that were submitted to the specified
     exploration state (at the given version of the exploration).
 
@@ -955,7 +1047,7 @@ def get_sample_answers(exploration_id, exploration_version, state_name):
         for submitted_answer_dict in sample_answers]
 
 
-def get_state_reference_for_exploration(exp_id, state_name):
+def get_state_reference_for_exploration(exp_id: str, state_name: str) -> str:
     """Returns the generated state reference for the given exploration id and
     state name.
 
@@ -967,7 +1059,7 @@ def get_state_reference_for_exploration(exp_id, state_name):
         str. The generated state reference.
     """
     exploration = exp_fetchers.get_exploration_by_id(exp_id)
-    if not exploration.has_state_name(state_name):
+    if not exploration.has_state_name(state_name):  # type: ignore[no-untyped-call]
         raise utils.InvalidInputException(
             'No state with the given state name was found in the '
             'exploration with id %s' % exp_id)
@@ -976,7 +1068,7 @@ def get_state_reference_for_exploration(exp_id, state_name):
         .get_state_reference_for_exploration(exp_id, state_name))
 
 
-def get_state_reference_for_question(question_id):
+def get_state_reference_for_question(question_id: str) -> str:
     """Returns the generated state reference for the given question id.
 
     Args:
@@ -995,7 +1087,9 @@ def get_state_reference_for_question(question_id):
         .get_state_reference_for_question(question_id))
 
 
-def get_learner_answer_details_from_model(learner_answer_details_model):
+def get_learner_answer_details_from_model(
+    learner_answer_details_model: stats_models.LearnerAnswerDetailsModel
+) -> Optional[stats_domain.LearnerAnswerDetails]:
     """Returns a LearnerAnswerDetails domain object given a
     LearnerAnswerDetailsModel loaded from the datastore.
 
@@ -1018,7 +1112,9 @@ def get_learner_answer_details_from_model(learner_answer_details_model):
         learner_answer_details_model.accumulated_answer_info_json_size_bytes)
 
 
-def get_learner_answer_details(entity_type, state_reference):
+def get_learner_answer_details(
+    entity_type: str, state_reference: str
+) -> Optional[stats_domain.LearnerAnswerDetails]:
     """Returns a LearnerAnswerDetails domain object, with given entity_type and
     state_name. This function checks in the datastore if the corresponding
     LearnerAnswerDetailsModel exists, if not then None is returned.
@@ -1032,8 +1128,8 @@ def get_learner_answer_details(entity_type, state_reference):
             'question_id'.
 
     Returns:
-        LearnerAnswerDetails. The learner answer domain object or None if the
-        model does not exist.
+        Optional[LearnerAnswerDetails]. The learner answer domain object or
+        None if the model does not exist.
     """
     learner_answer_details_model = (
         stats_models.LearnerAnswerDetailsModel.get_model_instance(
@@ -1045,7 +1141,9 @@ def get_learner_answer_details(entity_type, state_reference):
     return None
 
 
-def create_learner_answer_details_model_instance(learner_answer_details):
+def create_learner_answer_details_model_instance(
+    learner_answer_details: stats_domain.LearnerAnswerDetails
+) -> None:
     """Creates a new model instance from the given LearnerAnswerDetails domain
     object.
 
@@ -1063,7 +1161,10 @@ def create_learner_answer_details_model_instance(learner_answer_details):
 
 
 def save_learner_answer_details(
-        entity_type, state_reference, learner_answer_details):
+    entity_type: str,
+    state_reference: str,
+    learner_answer_details: stats_domain.LearnerAnswerDetails
+) -> None:
     """Saves the LearnerAnswerDetails domain object in the datatstore, if the
     model instance with the given entity_type and state_reference is found and
     if the instance id of the model doesn't matches with the generated instance
@@ -1105,7 +1206,12 @@ def save_learner_answer_details(
 
 
 def record_learner_answer_info(
-        entity_type, state_reference, interaction_id, answer, answer_details):
+    entity_type: str,
+    state_reference: str,
+    interaction_id: str,
+    answer: str,
+    answer_details: str
+) -> None:
     """Records the new learner answer info received from the learner in the
     model and then saves it.
 
@@ -1139,7 +1245,10 @@ def record_learner_answer_info(
 
 
 def delete_learner_answer_info(
-        entity_type, state_reference, learner_answer_info_id):
+    entity_type: str,
+    state_reference: str,
+    learner_answer_info_id: str
+) -> None:
     """Deletes the learner answer info in the model, and then saves it.
 
     Args:
@@ -1165,7 +1274,10 @@ def delete_learner_answer_info(
 
 
 def update_state_reference(
-        entity_type, old_state_reference, new_state_reference):
+    entity_type: str,
+    old_state_reference: str,
+    new_state_reference: str
+) -> None:
     """Updates the state_reference field of the LearnerAnswerDetails model
     instance with the new_state_reference received and then saves the instance
     in the datastore.
@@ -1190,7 +1302,8 @@ def update_state_reference(
 
 
 def delete_learner_answer_details_for_exploration_state(
-        exp_id, state_name):
+    exp_id: str, state_name: str
+) -> None:
     """Deletes the LearnerAnswerDetailsModel corresponding to the given
     exploration ID and state name.
 
@@ -1209,7 +1322,9 @@ def delete_learner_answer_details_for_exploration_state(
         learner_answer_details_model.delete()
 
 
-def delete_learner_answer_details_for_question_state(question_id):
+def delete_learner_answer_details_for_question_state(
+    question_id: str
+) -> None:
     """Deletes the LearnerAnswerDetailsModel for the given question ID.
 
     Args:
