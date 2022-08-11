@@ -988,7 +988,9 @@ class Playthrough:
         exp_id: str,
         exp_version: int,
         issue_type: str,
-        issue_customization_args: Dict[str, Dict[str, Union[str, int, List[str]]]],
+        issue_customization_args: Dict[
+            str, Dict[str, Union[str, int, List[str]]]
+        ],
         actions: List[LearnerAction]
     ):
         """Constructs a Playthrough domain object.
@@ -1106,7 +1108,9 @@ class ExplorationIssue:
     def __init__(
         self,
         issue_type: str,
-        issue_customization_args: Dict[str, Dict[str, Union[str, int, List[str]]]],
+        issue_customization_args: Dict[
+            str, Dict[str, Union[str, int, List[str]]]
+        ],
         playthrough_ids: List[str],
         schema_version: int,
         is_valid: bool
