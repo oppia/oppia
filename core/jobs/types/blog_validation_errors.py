@@ -24,7 +24,6 @@ from core.platform import models
 
 from typing import Union
 
-
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import blog_models
