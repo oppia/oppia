@@ -362,6 +362,7 @@ def export_states_to_yaml(exploration_id, version=None, width=80):
 # Repository SAVE and DELETE methods.
 def apply_change_list(exploration_id, change_list):
     """Applies a changelist to a pristine exploration and returns the result.
+
     Each entry in change_list is a dict that represents an ExplorationChange
     object.
 

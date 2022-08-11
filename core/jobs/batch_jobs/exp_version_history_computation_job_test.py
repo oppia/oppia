@@ -51,8 +51,8 @@ class ComputeExplorationVersionHistoryJobTests(
     EXP_ID_1 = 'exp_1'
     EXP_ID_2 = 'exp_2'
 
-    def setUp(self):
-        super(ComputeExplorationVersionHistoryJobTests, self).setUp()
+    def setUp(self) -> None:
+        super().setUp()
 
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
@@ -327,7 +327,7 @@ class ComputeExplorationVersionHistoryJobTests(
         for model in version_history_models:
             assert model is not None
 
-    def test_job_can_run_when_version_history_already_exists(self):
+    def test_job_can_run_when_version_history_already_exists(self) -> None:
         self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
         self.save_new_valid_exploration(self.EXP_ID_2, self.user_2_id)
         exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [
@@ -391,6 +391,96 @@ class ComputeExplorationVersionHistoryJobTests(
         for model in version_history_models:
             assert model is not None
 
+    def test_ignore_changes_in_deprecated_properties(self) -> None:
+        self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
+        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'A new state'
+            })
+        ], 'A commit messages.')
+        commit_log_model = exp_models.ExplorationCommitLogEntryModel.get(
+            exp_models.ExplorationCommitLogEntryModel.get_instance_id(
+                self.EXP_ID_1, 2
+            )
+        )
+        commit_log_model.commit_cmds.append({
+            'cmd': 'edit_state_property',
+            'state_name': 'A new state',
+            'property_name': 'fallbacks',
+            'new_value': 'foo',
+        })
+        commit_log_model.update_timestamps()
+        commit_log_model.put()
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult.as_stdout('ALL EXPS SUCCESS: 1'),
+            job_run_result.JobRunResult.as_stdout(
+                'EXPS FOR WHICH VERSION HISTORY CAN BE COMPUTED SUCCESS: 1'
+            ),
+            job_run_result.JobRunResult.as_stdout(
+                'EXPS FOR WHICH VERSION HISTORY CAN WAS COMPUTED SUCCESS: 1'
+            ),
+            job_run_result.JobRunResult.as_stdout(
+                'CREATED OR MODIFIED VERSION HISTORY MODELS SUCCESS: 2'
+            )
+        ])
+
+    def test_with_invalid_change_list(self) -> None:
+        self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
+        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'A new state'
+            })
+        ], 'A commit messages.')
+
+        # Corrupting the commit logs manually.
+        commit_log_model = exp_models.ExplorationCommitLogEntryModel.get(
+            exp_models.ExplorationCommitLogEntryModel.get_instance_id(
+                self.EXP_ID_1, 2
+            )
+        )
+        commit_log_model.commit_cmds.append({
+            'cmd': 'delete_state',
+            'state_name': 'Non existing state',
+        })
+        commit_log_model.update_timestamps()
+        commit_log_model.put()
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult.as_stdout('ALL EXPS SUCCESS: 1'),
+            job_run_result.JobRunResult.as_stdout(
+                'EXPS FOR WHICH VERSION HISTORY CAN BE COMPUTED SUCCESS: 1'
+            ),
+            job_run_result.JobRunResult.as_stdout(
+                'EXPS HAVING INVALID CHANGE LIST SUCCESS: 1'
+            ),
+            job_run_result.JobRunResult.as_stderr(
+                'Exploration %s has invalid change list' % (self.EXP_ID_1)
+            )
+        ])
+
+    def test_with_corrupted_snapshot_model(self) -> None:
+        self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
+
+        snapshot_class = exp_models.ExplorationSnapshotContentModel
+        snapshot_model = snapshot_class.get('%s%s%s' % (self.EXP_ID_1, '-', 1))
+        snapshot_model.content = None
+        snapshot_model.update_timestamps()
+        snapshot_model.put()
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult.as_stdout('ALL EXPS SUCCESS: 1'),
+            job_run_result.JobRunResult.as_stdout(
+                'EXPS FOR WHICH VERSION HISTORY CANNOT BE COMPUTED SUCCESS: 1'
+            ),
+            job_run_result.JobRunResult.as_stderr(
+                'Version history cannot be computed for exploration '
+                'with ID %s' % (self.EXP_ID_1)
+            )
+        ])
+
 
 class VerifyVersionHistoryModelsJobTests(
     test_utils.GenericTestBase, job_test_utils.JobTestBase
@@ -406,8 +496,8 @@ class VerifyVersionHistoryModelsJobTests(
     EXP_ID_1 = 'exp_1'
     EXP_ID_2 = 'exp_2'
 
-    def setUp(self):
-        super(VerifyVersionHistoryModelsJobTests, self).setUp()
+    def setUp(self) -> None:
+        super().setUp()
 
         self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
@@ -496,7 +586,9 @@ class VerifyVersionHistoryModelsJobTests(
             )
         ])
 
-    def test_with_valid_version_history_models_having_revert_commit(self):
+    def test_with_valid_version_history_models_having_revert_commit(
+        self
+    ) -> None:
         self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
         exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [
             exp_domain.ExplorationChange({
@@ -521,7 +613,9 @@ class VerifyVersionHistoryModelsJobTests(
             )
         ])
 
-    def test_with_invalid_version_history_models_having_revert_commit(self):
+    def test_with_invalid_version_history_models_having_revert_commit(
+        self
+    ) -> None:
         self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
         exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [
             exp_domain.ExplorationChange({
@@ -557,4 +651,88 @@ class VerifyVersionHistoryModelsJobTests(
                 'Version history for exploration with ID %s was not '
                 'created correctly' % (self.EXP_ID_1)
             )
+        ])
+
+    def test_with_corrupted_snapshot_model(self) -> None:
+        self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
+
+        snapshot_class = exp_models.ExplorationSnapshotContentModel
+        snapshot_model = snapshot_class.get('%s%s%s' % (self.EXP_ID_1, '-', 1))
+        snapshot_model.content = None
+        snapshot_model.update_timestamps()
+        snapshot_model.put()
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult.as_stdout(
+                'ALL EXPLORATIONS SUCCESS: 1'
+            )
+        ])
+
+    def test_ignore_changes_in_deprecated_properties(self) -> None:
+        self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
+        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'A new state'
+            })
+        ], 'A commit messages.')
+        commit_log_model = exp_models.ExplorationCommitLogEntryModel.get(
+            exp_models.ExplorationCommitLogEntryModel.get_instance_id(
+                self.EXP_ID_1, 2
+            )
+        )
+        commit_log_model.commit_cmds.append({
+            'cmd': 'edit_state_property',
+            'state_name': 'A new state',
+            'property_name': 'fallbacks',
+            'new_value': 'foo',
+        })
+        commit_log_model.update_timestamps()
+        commit_log_model.put()
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult.as_stdout(
+                'ALL EXPLORATIONS SUCCESS: 1'
+            ),
+            job_run_result.JobRunResult.as_stdout(
+                'VERIFIED EXPLORATIONS SUCCESS: 1'
+            )
+        ])
+
+
+class DeleteExplorationVersionHistoryModelsJobTest(
+    test_utils.GenericTestBase, job_test_utils.JobTestBase
+):
+    """Unit tests for DeleteExplorationVersionHistoryModelsJob."""
+
+    JOB_CLASS = (
+        exp_version_history_computation_job.
+            DeleteExplorationVersionHistoryModelsJob
+    )
+
+    USER_1_EMAIL = 'user1@example.com'
+    USER_1_USERNAME = 'user1'
+    EXP_ID_1 = 'exp_1'
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.USER_1_EMAIL, self.USER_1_USERNAME)
+        self.user_1_id = user_services.get_user_id_from_username(
+            self.USER_1_USERNAME
+        )
+
+    def test_with_no_vh_models(self) -> None:
+        self.assert_job_output_is_empty()
+
+    def test_with_vh_models(self) -> None:
+        self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
+        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'A new state'
+            })
+        ], 'A commit messages.')
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult.as_stdout('SUCCESS: 2')
         ])
