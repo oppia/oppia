@@ -313,13 +313,13 @@ def create_messages(
             if message_model.message_id == 0:
                 # New thread.
                 if thread_model.entity_type == feconf.ENTITY_TYPE_EXPLORATION:
-                    event_services.FeedbackThreadCreatedEventHandler.record(  # type: ignore[no-untyped-call]
+                    event_services.FeedbackThreadCreatedEventHandler.record(
                         thread_model.entity_id)
             else:
                 # Thread status changed.
                 if thread_model.entity_type == feconf.ENTITY_TYPE_EXPLORATION:
                     (
-                        event_services  # type: ignore[no-untyped-call]
+                        event_services
                         .FeedbackThreadStatusChangedEventHandler
                         .record(
                             thread_model.entity_id, thread_model.status,

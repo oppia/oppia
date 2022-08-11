@@ -34,7 +34,7 @@ from core.domain import param_domain
 from core.domain import translation_domain
 from extensions.objects.models import objects
 
-from typing import Any, Dict, List, Mapping, Optional, Sequence, Union
+from typing import Any, Dict, List, Mapping, Optional, Union
 from typing_extensions import TypedDict
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
@@ -45,12 +45,12 @@ from core.domain import translatable_object_registry  # pylint: disable=invalid-
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
 
-AllowedRuleSpecInputs = Union[
+AllowedInputValueTypes = Union[
     str,
     int,
     List[str],
     List[List[str]],
-    Dict[str, Sequence[str]]
+    Dict[str, Union[str, List[str]]]
 ]
 
 
@@ -625,7 +625,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
     def __init__(
         self,
         interaction_id: Optional[str],
-        customization_args: Dict[str, Dict[str, Any]],
+        customization_args: Dict[str, InteractionCustomizationArg],
         answer_groups: List[AnswerGroup],
         default_outcome: Outcome,
         confirmed_unclassified_answers: List[str],
@@ -1485,7 +1485,7 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
 class OutcomeDict(TypedDict):
     """Dictionary representing the Outcome object."""
 
-    dest: str
+    dest: Optional[str]
     dest_if_really_stuck: Optional[str]
     feedback: SubtitledHtmlDict
     labelled_as_correct: bool
@@ -2384,7 +2384,7 @@ class RuleSpecDict(TypedDict):
     """Dictionary representing the RuleSpec object."""
 
     rule_type: str
-    inputs: Dict[str, AllowedRuleSpecInputs]
+    inputs: Dict[str, AllowedInputValueTypes]
 
 
 class RuleSpec(translation_domain.BaseTranslatableObject):
@@ -2393,7 +2393,7 @@ class RuleSpec(translation_domain.BaseTranslatableObject):
     def __init__(
         self,
         rule_type: str,
-        inputs: Mapping[str, AllowedRuleSpecInputs]
+        inputs: Mapping[str, AllowedInputValueTypes]
     ) -> None:
         """Initializes a RuleSpec domain object.
 

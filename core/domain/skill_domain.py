@@ -1276,10 +1276,10 @@ class Skill:
             dict. The converted misconception_dict.
         """
         misconception_dict['notes'] = (
-            html_validation_service.add_math_content_to_math_rte_components(  # type: ignore[no-untyped-call]
+            html_validation_service.add_math_content_to_math_rte_components(
                 misconception_dict['notes']))
         misconception_dict['feedback'] = (
-            html_validation_service.add_math_content_to_math_rte_components(  # type: ignore[no-untyped-call]
+            html_validation_service.add_math_content_to_math_rte_components(
                 misconception_dict['feedback']))
         return misconception_dict
 
@@ -1298,10 +1298,10 @@ class Skill:
             dict. The converted misconception_dict.
         """
         misconception_dict['notes'] = (
-            html_validation_service.convert_svg_diagram_tags_to_image_tags(  # type: ignore[no-untyped-call]
+            html_validation_service.convert_svg_diagram_tags_to_image_tags(
                 misconception_dict['notes']))
         misconception_dict['feedback'] = (
-            html_validation_service.convert_svg_diagram_tags_to_image_tags(  # type: ignore[no-untyped-call]
+            html_validation_service.convert_svg_diagram_tags_to_image_tags(
                 misconception_dict['feedback']))
         return misconception_dict
 
@@ -1319,10 +1319,10 @@ class Skill:
             dict. The converted misconception_dict.
         """
         misconception_dict['notes'] = (
-            html_validation_service.fix_incorrectly_encoded_chars(  # type: ignore[no-untyped-call]
+            html_validation_service.fix_incorrectly_encoded_chars(
                 misconception_dict['notes']))
         misconception_dict['feedback'] = (
-            html_validation_service.fix_incorrectly_encoded_chars(  # type: ignore[no-untyped-call]
+            html_validation_service.fix_incorrectly_encoded_chars(
                 misconception_dict['feedback']))
         return misconception_dict
 
@@ -1365,7 +1365,7 @@ class Skill:
         for explanation_index, explanation in enumerate(
                 rubric_dict['explanations']):
             rubric_dict['explanations'][explanation_index] = (
-                html_validation_service.add_math_content_to_math_rte_components(  # type: ignore[no-untyped-call]
+                html_validation_service.add_math_content_to_math_rte_components(
                     explanation))
         return rubric_dict
 
@@ -1386,7 +1386,7 @@ class Skill:
         for explanation_index, explanation in enumerate(
                 rubric_dict['explanations']):
             rubric_dict['explanations'][explanation_index] = (
-                html_validation_service.convert_svg_diagram_tags_to_image_tags(  # type: ignore[no-untyped-call]
+                html_validation_service.convert_svg_diagram_tags_to_image_tags(
                     explanation))
         return rubric_dict
 
@@ -1406,7 +1406,7 @@ class Skill:
         for explanation_index, explanation in enumerate(
                 rubric_dict['explanations']):
             rubric_dict['explanations'][explanation_index] = (
-                html_validation_service.fix_incorrectly_encoded_chars(  # type: ignore[no-untyped-call]
+                html_validation_service.fix_incorrectly_encoded_chars(
                     explanation))
         return rubric_dict
 

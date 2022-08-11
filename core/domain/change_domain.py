@@ -50,10 +50,16 @@ if MYPY: # pragma: no cover
         List[str],
         List[Dict[str, Any]],
         Dict[str, Any],
-        state_domain.SubtitledHtmlDict,
         List[state_domain.AnswerGroupDict],
         List[platform_parameter_domain.PlatformParameterRuleDict],
+        state_domain.AnswerGroupDict,
+        state_domain.SubtitledHtmlDict,
+        state_domain.SolutionDict,
+        state_domain.StateDict,
         state_domain.RecordedVoiceoversDict,
+        # This Dict type is added to allow BaseChange to accept
+        # customization_args.
+        Dict[str, Dict[str, Any]]
     ]
 
 

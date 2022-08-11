@@ -374,7 +374,7 @@ class SubscriptionsTest(test_utils.GenericTestBase):
             self._get_collection_ids_subscribed_to(self.owner_id),
             [COLLECTION_ID])
 
-        collection_services.delete_collection(self.owner_id, COLLECTION_ID)  # type: ignore[no-untyped-call]
+        collection_services.delete_collection(self.owner_id, COLLECTION_ID)
 
         self.assertEqual(
             self._get_collection_ids_subscribed_to(self.owner_id),
@@ -398,7 +398,7 @@ class SubscriptionsTest(test_utils.GenericTestBase):
         # If the collection author adds the exploration to his/her collection,
         # the collection author should not be subscribed to the exploration nor
         # should the exploration author be subscribed to the collection.
-        collection_services.update_collection(  # type: ignore[no-untyped-call]
+        collection_services.update_collection(
             self.owner_id, COLLECTION_ID, [{
                 'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
                 'exploration_id': EXP_ID

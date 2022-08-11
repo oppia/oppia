@@ -389,6 +389,7 @@
     "I18N_EXPLORATION_zW39GLG_BdN2_DESCRIPTION": "As Matthew learns how to compare fractions in terms of size, an accident happens at the bakery, and Mr. Baker gets annoyed. Let's see what happened!",
     "I18N_EXPLORATION_zW39GLG_BdN2_TITLE": "Comparing Fractions",
     "I18N_FACILITATOR_DASHBOARD_PAGE_TITLE": "Facilitator Dashboard | Oppia",
+    "I18N_FEEDBACK_INSTRUCTION": "Feedback message should be at most <[count]> characters.",
     "I18N_FEEDBACK_MESSAGE_ANONYMOUS_AUTHOR": "Anonymous",
     "I18N_FOOTER_ABOUT": "About",
     "I18N_FOOTER_ABOUT_ALL_CAPS": "ABOUT OPPIA",

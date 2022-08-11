@@ -177,7 +177,7 @@ def _update_collection_summary(
             activity.
     """
     from core.domain import collection_services
-    collection_services.regenerate_collection_and_contributors_summaries(  # type: ignore[no-untyped-call]
+    collection_services.regenerate_collection_and_contributors_summaries(
         activity_rights.id)
 
 

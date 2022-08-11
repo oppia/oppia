@@ -195,7 +195,7 @@ class TopicModel(base_models.VersionedModel):
         self,
         committer_id: str,
         commit_type: str,
-        commit_message: str,
+        commit_message: Optional[str],
         commit_cmds: base_models.AllowedCommitCmdsListType,
         # We expect Mapping because we want to allow models that inherit
         # from BaseModel as the values, if we used Dict this wouldn't
@@ -211,7 +211,8 @@ class TopicModel(base_models.VersionedModel):
                 change.
             commit_type: str. The type of commit. Possible values are in
                 core.storage.base_models.COMMIT_TYPE_CHOICES.
-            commit_message: str. The commit description message.
+            commit_message: str|None. The commit description message, for
+                unpublished topics, it may be equal to None.
             commit_cmds: list(dict). A list of commands, describing changes
                 made in this model, which should give sufficient information to
                 reconstruct the commit. Each dict always contains:
@@ -515,7 +516,7 @@ class TopicRightsModel(base_models.VersionedModel):
         self,
         committer_id: str,
         commit_type: str,
-        commit_message: str,
+        commit_message: Optional[str],
         commit_cmds: base_models.AllowedCommitCmdsListType,
         # We expect Mapping because we want to allow models that inherit
         # from BaseModel as the values, if we used Dict this wouldn't
@@ -531,7 +532,8 @@ class TopicRightsModel(base_models.VersionedModel):
                 change.
             commit_type: str. The type of commit. Possible values are in
                 core.storage.base_models.COMMIT_TYPE_CHOICES.
-            commit_message: str. The commit description message.
+            commit_message: str|None. The commit description message, for
+                unpublished topic, it may be equal to None.
             commit_cmds: list(dict). A list of commands, describing changes
                 made in this model, which should give sufficient information to
                 reconstruct the commit. Each dict always contains:
@@ -582,11 +584,11 @@ class TopicRightsModel(base_models.VersionedModel):
                 if cmd['name'] == commit_cmd['cmd']
             )
             for user_id_attribute_name in user_id_attribute_names:
-                user_id_name_value = commit_cmd[user_id_attribute_name]
-                # Ruling out the possibility of any other type for mypy type
+                user_id_attribute = commit_cmd[user_id_attribute_name]
+                # Ruling out the possibility of Any other type for mypy type
                 # checking.
-                assert isinstance(user_id_name_value, str)
-                commit_cmds_user_ids.add(user_id_name_value)
+                assert isinstance(user_id_attribute, str)
+                commit_cmds_user_ids.add(user_id_attribute)
         snapshot_metadata_model.commit_cmds_user_ids = list(
             sorted(commit_cmds_user_ids))
 

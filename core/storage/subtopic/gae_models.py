@@ -123,7 +123,11 @@ class SubtopicPageModel(base_models.VersionedModel):
         """Model doesn't contain any data directly corresponding to a user."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
-    def compute_models_to_commit(
+    # We have ignored [override] here because the signature of this method
+    # doesn't match with VersionedModel.compute_models_to_commit(). Because
+    # argument `commit_message` of super class can accept Optional[str] but
+    # this method can only accept str.
+    def compute_models_to_commit(  # type: ignore[override]
         self,
         committer_id: str,
         commit_type: str,

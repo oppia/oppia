@@ -1047,7 +1047,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
     def test_owner_cannot_be_reassigned_as_owner(self) -> None:
         collection = collection_domain.Collection.create_default_collection(
             self.COLLECTION_ID)
-        collection_services.save_new_collection(self.user_id_a, collection)  # type: ignore[no-untyped-call]
+        collection_services.save_new_collection(self.user_id_a, collection)
 
         with self.assertRaisesRegex(Exception, 'This user already owns this'):  # type: ignore[no-untyped-call]
             rights_manager.assign_role_for_collection(
@@ -1057,7 +1057,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
     def test_editor_can_be_reassigned_as_owner(self) -> None:
         collection = collection_domain.Collection.create_default_collection(
             self.COLLECTION_ID)
-        collection_services.save_new_collection(self.user_id_a, collection)  # type: ignore[no-untyped-call]
+        collection_services.save_new_collection(self.user_id_a, collection)
 
         rights_manager.assign_role_for_collection(
             self.user_a, self.COLLECTION_ID, self.user_id_b,
@@ -1077,7 +1077,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
     def test_voiceartist_can_be_reassigned_as_owner(self) -> None:
         collection = collection_domain.Collection.create_default_collection(
             self.COLLECTION_ID)
-        collection_services.save_new_collection(self.user_id_a, collection)  # type: ignore[no-untyped-call]
+        collection_services.save_new_collection(self.user_id_a, collection)
 
         rights_manager.assign_role_for_collection(
             self.user_a, self.COLLECTION_ID, self.user_id_b,
@@ -1097,7 +1097,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
     def test_viewer_can_be_reassigned_as_owner(self) -> None:
         collection = collection_domain.Collection.create_default_collection(
             self.COLLECTION_ID)
-        collection_services.save_new_collection(self.user_id_a, collection)  # type: ignore[no-untyped-call]
+        collection_services.save_new_collection(self.user_id_a, collection)
 
         rights_manager.assign_role_for_collection(
             self.user_a, self.COLLECTION_ID, self.user_id_b,
@@ -1117,7 +1117,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
     def test_viewer_can_be_reassigned_as_editor(self) -> None:
         collection = collection_domain.Collection.create_default_collection(
             self.COLLECTION_ID)
-        collection_services.save_new_collection(self.user_id_a, collection)  # type: ignore[no-untyped-call]
+        collection_services.save_new_collection(self.user_id_a, collection)
 
         rights_manager.assign_role_for_collection(
             self.user_a, self.COLLECTION_ID, self.user_id_b,
@@ -1137,7 +1137,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
     def test_voiceartist_can_be_reassigned_as_editor(self) -> None:
         collection = collection_domain.Collection.create_default_collection(
             self.COLLECTION_ID)
-        collection_services.save_new_collection(self.user_id_a, collection)  # type: ignore[no-untyped-call]
+        collection_services.save_new_collection(self.user_id_a, collection)
 
         rights_manager.assign_role_for_collection(
             self.user_a, self.COLLECTION_ID, self.user_id_b,
@@ -1157,7 +1157,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
     def test_viewer_can_be_reassigned_as_voiceartist(self) -> None:
         collection = collection_domain.Collection.create_default_collection(
             self.COLLECTION_ID)
-        collection_services.save_new_collection(self.user_id_a, collection)  # type: ignore[no-untyped-call]
+        collection_services.save_new_collection(self.user_id_a, collection)
 
         rights_manager.assign_role_for_collection(
             self.user_a, self.COLLECTION_ID, self.user_id_b,
@@ -1177,7 +1177,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
     def test_editor_cannot_be_reassigned_as_editor(self) -> None:
         collection = collection_domain.Collection.create_default_collection(
             self.COLLECTION_ID)
-        collection_services.save_new_collection(self.user_id_a, collection)  # type: ignore[no-untyped-call]
+        collection_services.save_new_collection(self.user_id_a, collection)
 
         rights_manager.assign_role_for_collection(
             self.user_a, self.COLLECTION_ID, self.user_id_b,
@@ -1192,7 +1192,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
     def test_voice_artist_cannot_be_reassigned_as_voice_artist(self) -> None:
         collection = collection_domain.Collection.create_default_collection(
             self.COLLECTION_ID)
-        collection_services.save_new_collection(self.user_id_a, collection)  # type: ignore[no-untyped-call]
+        collection_services.save_new_collection(self.user_id_a, collection)
 
         rights_manager.assign_role_for_collection(
             self.user_a, self.COLLECTION_ID, self.user_id_b,
@@ -1207,7 +1207,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
     def test_viewer_cannot_be_reassigned_as_viewer(self) -> None:
         collection = collection_domain.Collection.create_default_collection(
             self.COLLECTION_ID)
-        collection_services.save_new_collection(self.user_id_a, collection)  # type: ignore[no-untyped-call]
+        collection_services.save_new_collection(self.user_id_a, collection)
 
         rights_manager.assign_role_for_collection(
             self.user_a, self.COLLECTION_ID, self.user_id_b,
@@ -1222,7 +1222,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
     def test_public_collection_cannot_be_assigned_role_viewer(self) -> None:
         collection = collection_domain.Collection.create_default_collection(
             self.COLLECTION_ID)
-        collection_services.save_new_collection(self.user_id_a, collection)  # type: ignore[no-untyped-call]
+        collection_services.save_new_collection(self.user_id_a, collection)
 
         rights_manager.publish_collection(self.user_a, self.COLLECTION_ID)
 

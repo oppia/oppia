@@ -27,6 +27,7 @@ from core.domain import exp_services
 from core.domain import state_domain
 from core.tests import test_utils
 
+from typing import Dict
 from typing_extensions import Final
 
 
@@ -466,6 +467,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             migrated_draft_change_list_v44_dict_list)
 
     def test_convert_states_v42_dict_to_v43_dict(self) -> None:
+        new_value: Dict[str, str] = {}
         draft_change_list_1_v42 = [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -483,7 +485,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': 'Intro',
                 'property_name': 'answer_groups',
-                'new_value': {}
+                'new_value': new_value
             })
         ]
         draft_change_list_2_v42 = [
@@ -529,6 +531,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             migrated_draft_change_list_2_v43_dict_list)
 
     def test_convert_states_v41_dict_to_v42_dict(self) -> None:
+        new_value: Dict[str, str] = {}
         draft_change_list_1_v41 = [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -546,7 +549,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': 'Intro',
                 'property_name': 'answer_groups',
-                'new_value': {}
+                'new_value': new_value
             })
         ]
         draft_change_list_2_v41 = [
@@ -592,6 +595,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             migrated_draft_change_list_2_v42_dict_list)
 
     def test_convert_states_v40_dict_to_v41_dict(self) -> None:
+        new_value: Dict[str, str] = {}
         draft_change_list_1_v40 = [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -609,7 +613,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': 'Intro',
                 'property_name': 'answer_groups',
-                'new_value': {}
+                'new_value': new_value
             })
         ]
         draft_change_list_2_v40 = [
@@ -655,6 +659,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             migrated_draft_change_list_2_v41_dict_list)
 
     def test_convert_states_v39_dict_to_v40_dict(self) -> None:
+        new_value: Dict[str, str] = {}
         draft_change_list_1_v39 = [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -672,7 +677,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': 'Intro',
                 'property_name': 'widget_customization_args',
-                'new_value': {}
+                'new_value': new_value
             })
         ]
         draft_change_list_2_v39 = [
@@ -876,6 +881,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             migrated_draft_change_list_v37_dict_list)
 
     def test_convert_states_v35_dict_to_v36_dict(self) -> None:
+        new_value: Dict[str, str] = {}
         draft_change_list_1_v35 = [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -893,7 +899,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': 'Intro',
                 'property_name': 'widget_customization_args',
-                'new_value': {}
+                'new_value': new_value
             })
         ]
         draft_change_list_2_v35 = [
@@ -1637,6 +1643,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                     }],
                     'outcome': {
                         'dest': 'Introduction',
+                        'dest_if_really_stuck': None,
                         'feedback': {
                             'content_id': 'feedback',
                             'html': '<p>Outcome for state1</p>'
@@ -1672,6 +1679,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                     }],
                     'outcome': {
                         'dest': 'Introduction',
+                        'dest_if_really_stuck': None,
                         'feedback': {
                             'content_id': 'feedback',
                             'html': '<p>Outcome for state1</p>'

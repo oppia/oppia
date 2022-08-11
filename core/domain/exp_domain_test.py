@@ -36,7 +36,7 @@ from core.domain import translation_domain
 from core.platform import models
 from core.tests import test_utils
 
-from typing import List
+from typing import Dict, List
 from typing_extensions import Final
 
 MYPY = False
@@ -6059,6 +6059,7 @@ class ExplorationChangesMergeabilityUnitTests(
         exp_services.update_exploration(  # type: ignore[no-untyped-call]
             self.owner_id, self.EXP_0_ID, change_list, 'Changed title.')
 
+        test_dict: Dict[str, str] = {}
         # Making changes to properties except content.
         change_list_2 = [exp_domain.ExplorationChange({
             'state_name': 'Introduction',
@@ -6070,7 +6071,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'state_name': 'Introduction',
             'cmd': 'edit_state_property',
             'property_name': 'widget_customization_args',
-            'new_value': {},
+            'new_value': test_dict,
             'old_value': {
                 'placeholder': {
                     'value': {
@@ -6106,7 +6107,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     }
                 }
             },
-            'old_value': {}
+            'old_value': test_dict
         })]
         exp_services.update_exploration(  # type: ignore[no-untyped-call]
             self.owner_id, self.EXP_0_ID, change_list_2, 'Changed Interaction.')
@@ -6300,6 +6301,7 @@ class ExplorationChangesMergeabilityUnitTests(
             self.owner_id, self.EXP_0_ID, change_list_2,
             'Changed Contents and Hint')
 
+        test_dict: Dict[str, str] = {}
         # Changes to the properties affected by or affecting
         # interaction id and in interaction_id itself.
         change_list_3 = [exp_domain.ExplorationChange({
@@ -6309,7 +6311,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'cmd': 'edit_state_property',
             'property_name': 'widget_id'
         }), exp_domain.ExplorationChange({
-            'new_value': {},
+            'new_value': test_dict,
             'state_name': 'Introduction',
             'old_value': {
                 'rows': {
@@ -6346,7 +6348,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 }
             },
             'state_name': 'Introduction',
-            'old_value': {},
+            'old_value': test_dict,
             'cmd': 'edit_state_property',
             'property_name': 'widget_customization_args'
         })]
@@ -6379,7 +6381,7 @@ class ExplorationChangesMergeabilityUnitTests(
         }), exp_domain.ExplorationChange({
             'state_name': 'End',
             'cmd': 'edit_state_property',
-            'new_value': {},
+            'new_value': test_dict,
             'old_value': {
                 'recommendedExplorationIds': {
                     'value': []
@@ -6460,6 +6462,7 @@ class ExplorationChangesMergeabilityUnitTests(
 
         rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
 
+        test_dict: Dict[str, str] = {}
         # Changes to the properties affected by or affecting
         # interaction id and in interaction_id itself.
         change_list_2 = [exp_domain.ExplorationChange({
@@ -6469,7 +6472,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'cmd': 'edit_state_property',
             'property_name': 'widget_id'
         }), exp_domain.ExplorationChange({
-            'new_value': {},
+            'new_value': test_dict,
             'state_name': 'Introduction',
             'old_value': {
                 'rows': {
@@ -6506,7 +6509,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 }
             },
             'state_name': 'Introduction',
-            'old_value': {},
+            'old_value': test_dict,
             'cmd': 'edit_state_property',
             'property_name': 'widget_customization_args'
         })]
@@ -6524,7 +6527,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'cmd': 'edit_state_property',
             'property_name': 'widget_id'
         }), exp_domain.ExplorationChange({
-            'new_value': {},
+            'new_value': test_dict,
             'state_name': 'Introduction',
             'old_value': {
                 'rows': {
@@ -6561,7 +6564,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 }
             },
             'state_name': 'Introduction',
-            'old_value': {},
+            'old_value': test_dict,
             'cmd': 'edit_state_property',
             'property_name': 'widget_customization_args'
         })]
@@ -6578,6 +6581,7 @@ class ExplorationChangesMergeabilityUnitTests(
 
         rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
 
+        test_dict: Dict[str, str] = {}
         # Changes in the properties which aren't affected by
         # customization args or doesn't affects customization_args.
         change_list = [exp_domain.ExplorationChange({
@@ -6723,7 +6727,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 }
             },
             'property_name': 'widget_customization_args',
-            'new_value': {},
+            'new_value': test_dict,
             'cmd': 'edit_state_property'
         }), exp_domain.ExplorationChange({
             'state_name': 'Intro-rename',
@@ -6834,7 +6838,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'state_name': 'End',
             'property_name': 'widget_customization_args',
             'cmd': 'edit_state_property',
-            'new_value': {}
+            'new_value': test_dict
         }), exp_domain.ExplorationChange({
             'old_value': 0,
             'state_name': 'End',
@@ -6848,7 +6852,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'cmd': 'edit_state_property',
             'new_value': 'ItemSelectionInput'
         }), exp_domain.ExplorationChange({
-            'old_value': {},
+            'old_value': test_dict,
             'state_name': 'End',
             'property_name': 'widget_customization_args',
             'cmd': 'edit_state_property',
@@ -6951,6 +6955,7 @@ class ExplorationChangesMergeabilityUnitTests(
 
         rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
 
+        test_dict: Dict[str, str] = {}
         # Changes in the properties which affected by or affecting
         # customization_args.
         change_list = [exp_domain.ExplorationChange({
@@ -7018,7 +7023,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 }
             },
             'property_name': 'widget_customization_args',
-            'new_value': {},
+            'new_value': test_dict,
             'cmd': 'edit_state_property'
         }), exp_domain.ExplorationChange({
             'state_name': 'Intro-rename',
@@ -7528,6 +7533,7 @@ class ExplorationChangesMergeabilityUnitTests(
             self.owner_id, self.EXP_1_ID, change_list_3,
             'Changed Answer Groups and Solutions in One State')
 
+        test_dict: Dict[str, str] = {}
         # Changes to the properties related to the answer_groups
         # in the second state to check for mergeability.
         change_list_5 = [exp_domain.ExplorationChange({
@@ -7545,7 +7551,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'state_name': 'End',
             'property_name': 'widget_customization_args',
             'cmd': 'edit_state_property',
-            'new_value': {}
+            'new_value': test_dict
         }), exp_domain.ExplorationChange({
             'old_value': 0,
             'state_name': 'End',
@@ -7559,7 +7565,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'cmd': 'edit_state_property',
             'new_value': 'ItemSelectionInput'
         }), exp_domain.ExplorationChange({
-            'old_value': {},
+            'old_value': test_dict,
             'state_name': 'End',
             'property_name': 'widget_customization_args',
             'cmd': 'edit_state_property',
@@ -8336,6 +8342,7 @@ class ExplorationChangesMergeabilityUnitTests(
             self.owner_id, self.EXP_1_ID, change_list_3,
             'Changed Answer Groups and Solutions in One State')
 
+        test_dict: Dict[str, str] = {}
         # Changes to the properties related to the solutions
         # in the second state to check for mergeability.
         change_list_4 = [exp_domain.ExplorationChange({
@@ -8350,7 +8357,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     'value': []
                 }
             },
-            'new_value': {},
+            'new_value': test_dict,
             'cmd': 'edit_state_property',
             'property_name': 'widget_customization_args',
             'state_name': 'End'
@@ -8807,6 +8814,7 @@ class ExplorationChangesMergeabilityUnitTests(
             self.owner_id, self.EXP_0_ID, change_list,
             'Added Hint and Solution in Introduction state')
 
+        test_dict: Dict[str, str] = {}
         # Changes to all state propeties other than the hints.
         change_list_2 = [exp_domain.ExplorationChange({
             'property_name': 'content',
@@ -8861,7 +8869,7 @@ class ExplorationChangesMergeabilityUnitTests(
                     'value': 1
                 }
             },
-            'new_value': {}
+            'new_value': test_dict
         }), exp_domain.ExplorationChange({
             'property_name': 'solution',
             'state_name': 'Introduction',
@@ -9239,6 +9247,7 @@ class ExplorationChangesMergeabilityUnitTests(
 
         rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
 
+        test_dict: Dict[str, str] = {}
         # Changes to all the properties of both states other than
         # exploration properties i.e. title, category, objective etc.
         # Also included rename states changes to check that
@@ -9282,7 +9291,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'old_value': 'TextInput'
         }), exp_domain.ExplorationChange({
             'state_name': 'Introduction',
-            'new_value': {},
+            'new_value': test_dict,
             'cmd': 'edit_state_property',
             'property_name': 'widget_customization_args',
             'old_value': {
@@ -10915,6 +10924,7 @@ class ExplorationChangesMergeabilityUnitTests(
 
         rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
 
+        test_dict: Dict[str, str] = {}
         # Changes to the various properties of the first and
         # second state.
         change_list = [exp_domain.ExplorationChange({
@@ -10937,7 +10947,7 @@ class ExplorationChangesMergeabilityUnitTests(
             },
             'cmd': 'edit_state_property',
             'property_name': 'widget_customization_args',
-            'new_value': {},
+            'new_value': test_dict,
             'state_name': 'Introduction'
         }), exp_domain.ExplorationChange({
             'old_value': None,
@@ -11179,7 +11189,7 @@ class ExplorationChangesMergeabilityUnitTests(
             'new_value': 'EndExploration',
             'state_name': 'End'
         }), exp_domain.ExplorationChange({
-            'old_value': {},
+            'old_value': test_dict,
             'cmd': 'edit_state_property',
             'property_name': 'widget_customization_args',
             'new_value': {
@@ -11226,6 +11236,7 @@ class ExplorationChangesMergeabilityUnitTests(
 
         rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
 
+        test_dict: Dict[str, str] = {}
         # Changes to the various properties of the first and
         # second state.
         change_list = [exp_domain.ExplorationChange({
@@ -11248,7 +11259,7 @@ class ExplorationChangesMergeabilityUnitTests(
             },
             'cmd': 'edit_state_property',
             'property_name': 'widget_customization_args',
-            'new_value': {},
+            'new_value': test_dict,
             'state_name': 'Introduction'
         }), exp_domain.ExplorationChange({
             'old_value': None,
@@ -11350,6 +11361,7 @@ class ExplorationChangesMergeabilityUnitTests(
 
             rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
 
+            test_dict: Dict[str, str] = {}
             # Changes to the various properties of the first and
             # second state.
             change_list = [exp_domain.ExplorationChange({
@@ -11372,7 +11384,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 },
                 'cmd': 'edit_state_property',
                 'property_name': 'widget_customization_args',
-                'new_value': {},
+                'new_value': test_dict,
                 'state_name': 'Introduction'
             }), exp_domain.ExplorationChange({
                 'old_value': None,
@@ -11591,7 +11603,7 @@ class ExplorationChangesMergeabilityUnitTests(
                 'new_value': 'EndExploration',
                 'state_name': 'End'
             }), exp_domain.ExplorationChange({
-                'old_value': {},
+                'old_value': test_dict,
                 'cmd': 'edit_state_property',
                 'property_name': 'widget_customization_args',
                 'new_value': {

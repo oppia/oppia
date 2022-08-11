@@ -1030,7 +1030,7 @@ class TestBase(unittest.TestCase):
         with self.assertRaisesRegex(utils.ValidationError, error_substring):
             item.validate()
 
-    def log_line(self, line):
+    def log_line(self, line: str) -> None:
         """Print the line with a prefix that can be identified by the script
         that calls the test.
         """
