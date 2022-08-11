@@ -22,6 +22,10 @@ jobs:
         with:
           python-version: '3.7'
           architecture: 'x64'
+      - name: Install python 2 for GAE
+        run: |
+          sudo apt update
+          sudo apt install python2 -y
       - uses: ./.github/actions/merge
       - name: Install Third Party Dependencies
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false

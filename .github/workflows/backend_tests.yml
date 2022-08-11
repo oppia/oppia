@@ -38,7 +38,7 @@ jobs:
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
       - name: Install packages for optimized coverage
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: sudo apt-get install -y python-dev gcc
+        run: sudo apt-get install -y python-dev-is-python3 gcc
       - name: Install coverage and configparser
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
         run: pip install coverage configparser
