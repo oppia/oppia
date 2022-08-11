@@ -97,9 +97,9 @@ class MigrateExplorationJob(base_jobs.JobBase):
     def _generate_exploration_changes(
         exp_id: str, exp_model: exp_models.ExplorationModel
     ) -> Iterable[Tuple[str, exp_domain.ExplorationChange]]:
-        """Generates exploration change objects. ExplorationChange object is
-        only generated when schema version is lower than the latest schema
-        version.
+        """Generates exploration change objects. The ExplorationChange object
+        is only generated when the exploration's states schema version is lower
+        than the latest schema version.
 
         Args:
             exp_id: str. The ID of the exploration.
@@ -164,8 +164,11 @@ class MigrateExplorationJob(base_jobs.JobBase):
         exp_rights = rights_manager.get_activity_rights_from_model( # type: ignore[no-untyped-call]
             exp_rights_model, constants.ACTIVITY_TYPE_EXPLORATION)
         exp_summary = exp_services.compute_summary_of_exploration( # type: ignore[no-untyped-call]
-            migrated_exp, exp_rights, exp_summary_model,
-            skip_exploration_model_last_updated=True)
+            migrated_exp,
+            exp_rights,
+            exp_fetchers.get_exploration_summary_from_model(exp_summary_model),
+            skip_exploration_model_last_updated=True
+        )
         exp_summary.version += 1
         updated_exp_summary_model: exp_models.ExpSummaryModel = (
             exp_services.populate_exp_summary_model_fields( # type: ignore[no-untyped-call]
@@ -337,6 +340,8 @@ class MigrateExplorationJob(base_jobs.JobBase):
             # detect that the value is passed through the pipe.
             | 'Add exploration keys' >> beam.WithKeys(  # pylint: disable=no-value-for-parameter
                 lambda exp_model: exp_model.id)
+            # TODO(#15871): This filter should be removed after the explorations
+            # are fixed and it is possible to migrate them.
             | 'Remove broken exploration' >> beam.Filter(
                 lambda id_and_exp: id_and_exp[0] not in (
                     'umPkwp0L1M0-', '670bU6d9JGBh'))
