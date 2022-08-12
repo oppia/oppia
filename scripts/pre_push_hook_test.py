@@ -37,7 +37,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
     """Test the methods for pre push hook script."""
 
     def setUp(self):
-        super(PrePushHookTests, self).setUp()
+        super().setUp()
         process = subprocess.Popen(
             ['echo', 'test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         def mock_popen(  # pylint: disable=unused-argument
