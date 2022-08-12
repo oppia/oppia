@@ -644,9 +644,9 @@ class ExplorationStatsModelUnitTests(test_utils.GenericTestBase):
             'exp_id2', 1, 0, 0, 0, 0, 0, 0, {})
 
         exp_version_reference_dicts = [
-            exp_domain.ExpVersionReference('exp_id1', 1), # type: ignore[no-untyped-call]
-            exp_domain.ExpVersionReference('exp_id1', 2), # type: ignore[no-untyped-call]
-            exp_domain.ExpVersionReference('exp_id2', 1)] # type: ignore[no-untyped-call]
+            exp_domain.ExpVersionReference('exp_id1', 1),
+            exp_domain.ExpVersionReference('exp_id1', 2),
+            exp_domain.ExpVersionReference('exp_id2', 1)]
 
         stat_models = stats_models.ExplorationStatsModel.get_multi_stats_models(
             exp_version_reference_dicts)

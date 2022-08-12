@@ -695,6 +695,18 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             question_summary.question_content,
             feconf.DEFAULT_INIT_STATE_CONTENT_STR)
 
+    def test_raises_error_while_computing_summary_if_interaction_id_is_none(
+        self
+    ) -> None:
+        question = question_services.get_question_by_id(self.question_id)
+        question.question_state_data.interaction.id = None
+
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            Exception,
+            'No interaction_id found for the given question.'
+        ):
+            question_services.compute_summary_of_question(question)
+
     def test_get_skills_of_question(self) -> None:
         # If the question id doesnt exist at all, it returns an empty list.
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
@@ -1060,7 +1072,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         skill_services.update_skill(  # type: ignore[no-untyped-call]
             self.editor_id, 'skillid12345',
             change_list, 'Delete misconceptions.')
-        self.process_and_flush_pending_tasks()  # type: ignore[no-untyped-call]
+        self.process_and_flush_pending_tasks()
         updated_question = question_services.get_question_by_id(
             self.question_id)
         updated_answer_groups = (
@@ -2921,6 +2933,8 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
 
         answer_group_object = question.question_state_data.interaction.answer_groups[0]
         solution = question.question_state_data.interaction.solution
+        # Ruling out the possibility of None for mypy type checking.
+        assert solution is not None
         rule_spec = answer_group_object.rule_specs[0]
         self.assertEqual(
             rule_spec.inputs['x'],
@@ -3047,6 +3061,8 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
 
         answer_group_object = question.question_state_data.interaction.answer_groups[0]
         solution = question.question_state_data.interaction.solution
+        # Ruling out the possibility of None for mypy type checking.
+        assert solution is not None
         self.assertEqual(
             answer_group_object.rule_specs[0].inputs['x'],
             [['ca_choices_2', 'ca_choices_3', 'invalid_content_id']])

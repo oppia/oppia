@@ -27,7 +27,7 @@ class FlagExplorationEmailEnqueueTaskTests(test_utils.EmailTestBase):
     """Test that flag-exploration-email-tasks works as expected."""
 
     def setUp(self) -> None:
-        super().setUp()  # type: ignore[no-untyped-call]
+        super().setUp()
 
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)  # type: ignore[no-untyped-call]
@@ -37,7 +37,7 @@ class FlagExplorationEmailEnqueueTaskTests(test_utils.EmailTestBase):
 
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)  # type: ignore[no-untyped-call]
-        self.set_moderators([self.MODERATOR_USERNAME])  # type: ignore[no-untyped-call]
+        self.set_moderators([self.MODERATOR_USERNAME])
 
         self.no_user = None
 
@@ -82,7 +82,7 @@ class FlagExplorationEmailEnqueueTaskTests(test_utils.EmailTestBase):
             moderator_services.enqueue_flag_exploration_email_task(
                 self.exploration.id, self.report_text, self.new_user_id)
 
-            self.process_and_flush_pending_tasks()  # type: ignore[no-untyped-call]
+            self.process_and_flush_pending_tasks()
 
             # Make sure correct email is sent.
             messages = self._get_sent_email_messages(self.MODERATOR_EMAIL)
