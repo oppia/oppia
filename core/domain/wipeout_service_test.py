@@ -941,7 +941,7 @@ class WipeoutServiceDeleteAppFeedbackReportModelsTests(
             Exception,
             'Field name can only be None when commit log model class'
         ):
-            wipeout_service._collect_and_save_entity_ids_from_snapshots_and_commits(
+            wipeout_service._collect_and_save_entity_ids_from_snapshots_and_commits(   # pylint: disable=line-too-long, protected-access
                 wipeout_service.get_pending_deletion_request(self.user_1_id),
                 models.NAMES.question,
                 [question_models.QuestionSnapshotMetadataModel],
