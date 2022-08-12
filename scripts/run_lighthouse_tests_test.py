@@ -45,6 +45,20 @@ LIGHTHOUSE_CONFIG_FILENAMES = {
 }
 
 
+class MockCompiler:
+    def wait(self) -> None:
+        pass
+
+
+class MockCompilerContextManager():
+    def __init__(self):
+        pass
+    def __enter__(self):
+        return MockCompiler()
+    def __exit__(self, *unused_args):
+        pass
+
+
 class RunLighthouseTestsTests(test_utils.GenericTestBase):
     """Unit tests for scripts/run_lighthouse_tests.py."""
 
@@ -67,21 +81,9 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             '--max-old-space-size=4096'
         ]
 
-        class MockCompiler:
-            def wait(self) -> None:
-                pass
-        class MockCompilerContextManager():
-            def __init__(self):
-                pass
-            def __enter__(self):
-                return MockCompiler()
-            def __exit__(self, exc_type, exc_value, tb):
-                pass
-
-        self.swap_webpack_compiler = self.swap_with_checks(
+        self.swap_webpack_compiler = self.swap(
             servers, 'managed_webpack_compiler',
-            lambda: MockCompilerContextManager(),
-            expected_args=(), expected_kwargs=[])
+            lambda: MockCompilerContextManager())
 
     def test_run_lighthouse_puppeteer_script_successfully(self) -> None:
         class MockTask:
@@ -160,21 +162,21 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
 
     def test_subprocess_error_results_in_failed_webpack_compilation(
         self) -> None:
-        class MockCompiler:
+        class MockFailedCompiler:
             def wait(self) -> None:
                 raise subprocess.CalledProcessError(
                     returncode=1, cmd='', output='Subprocess execution failed.')
-        class MockCompilerContextManager():
+        class MockFailedCompilerContextManager():
             def __init__(self):
                 pass
             def __enter__(self):
-                return MockCompiler()
-            def __exit__(self, exc_type, exc_value, tb):
+                return MockFailedCompiler()
+            def __exit__(self, *unused_args):
                 pass
 
         self.swap_webpack_compiler = self.swap_with_checks(
             servers, 'managed_webpack_compiler',
-            lambda: MockCompilerContextManager(),
+            lambda: MockFailedCompilerContextManager(),
             expected_args=(), expected_kwargs=[])
         swap_isdir = self.swap_with_checks(
             os.path, 'isdir', lambda _: False, expected_kwargs=[])
@@ -229,4 +231,91 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         self.assertIn(
             'Lighthouse checks failed. More details can be found above.',
             self.print_arr)
+
+    def test_run_lighthouse_tests_in_accessibility_mode(self) -> None:
+        swap_redis_server = self.swap(
+            servers, 'managed_redis_server',
+            lambda: MockCompilerContextManager())
+        swap_elasticsearch_dev_server = self.swap(
+            servers, 'managed_elasticsearch_dev_server',
+            lambda: MockCompilerContextManager())
+        swap_firebase_auth_emulator = self.swap(
+            servers, 'managed_firebase_auth_emulator',
+            lambda: MockCompilerContextManager())
+        swap_cloud_datastore_emulator = self.swap(
+            servers, 'managed_cloud_datastore_emulator',
+            lambda: MockCompilerContextManager())
+        swap_dev_appserver = self.swap(
+            servers, 'managed_dev_appserver',
+            lambda *unused_args, **unused_kwargs: MockCompilerContextManager())
+
+        class MockTask:
+            returncode = 0
+            def communicate(self) -> tuple[bytes, bytes]:   # pylint: disable=missing-docstring
+                return (
+                    b'Task output',
+                    b'No error.')
+        def mock_popen(*unused_args: Any, **unsued_kwargs: Any) -> MockTask:  # pylint: disable=unused-argument
+            return MockTask()
+        swap_popen = self.swap(
+            subprocess, 'Popen', mock_popen)
+        swap_isdir = self.swap(
+            os.path, 'isdir', lambda _: True)
+
+        with self.print_swap, self.swap_webpack_compiler, swap_isdir:
+            with swap_elasticsearch_dev_server, swap_dev_appserver, swap_popen:
+                with swap_redis_server, swap_cloud_datastore_emulator:
+                    with swap_firebase_auth_emulator:
+                        run_lighthouse_tests.main(
+                            args=['--mode', 'accessibility', '--shard', '1'])
+        
+        self.assertIn(
+            'Puppeteer script completed successfully.', self.print_arr)
+        self.assertIn(
+            'Lighthouse checks completed successfully.', self.print_arr)
+
+    def test_run_lighthouse_tests_in_performance_mode(self) -> None:
+        swap_redis_server = self.swap(
+            servers, 'managed_redis_server',
+            lambda: MockCompilerContextManager())
+        swap_elasticsearch_dev_server = self.swap(
+            servers, 'managed_elasticsearch_dev_server',
+            lambda: MockCompilerContextManager())
+        swap_firebase_auth_emulator = self.swap(
+            servers, 'managed_firebase_auth_emulator',
+            lambda: MockCompilerContextManager())
+        swap_cloud_datastore_emulator = self.swap(
+            servers, 'managed_cloud_datastore_emulator',
+            lambda: MockCompilerContextManager())
+        swap_dev_appserver = self.swap(
+            servers, 'managed_dev_appserver',
+            lambda *unused_args, **unused_kwargs: MockCompilerContextManager())
+        swap_build = self.swap_with_checks(
+            build, 'main', lambda args: None)
+
+        class MockTask:
+            returncode = 0
+            def communicate(self) -> tuple[bytes, bytes]:   # pylint: disable=missing-docstring
+                return (
+                    b'Task output',
+                    b'No error.')
+        def mock_popen(*unused_args: Any, **unsued_kwargs: Any) -> MockTask:  # pylint: disable=unused-argument
+            return MockTask()
+        swap_popen = self.swap(
+            subprocess, 'Popen', mock_popen)
+        swap_isdir = self.swap(
+            os.path, 'isdir', lambda _: True)
+
+        with self.print_swap, self.swap_webpack_compiler, swap_isdir:
+            with swap_elasticsearch_dev_server, swap_dev_appserver, swap_popen:
+                with swap_redis_server, swap_cloud_datastore_emulator:
+                    with swap_firebase_auth_emulator, swap_build:
+                        run_lighthouse_tests.main(
+                            args=['--mode', 'performance', '--shard', '1'])
+        
+        self.assertIn('Building files in production mode.', self.print_arr)
+        self.assertIn(
+            'Puppeteer script completed successfully.', self.print_arr)
+        self.assertIn(
+            'Lighthouse checks completed successfully.', self.print_arr)
         
