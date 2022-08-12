@@ -148,6 +148,7 @@ exports.config = {
     browserName: 'chrome',
     'goog:chromeOptions': {
       args: [
+        'headless',
         '--lang=en-EN',
         '--window-size=1285x1000',
         // These arguments let us simulate recording from a microphone.
@@ -199,9 +200,10 @@ exports.config = {
   // they don't add newcommands. Instead, they hook themselves up into
   // the test process.
   services: [
-    ['chromedriver', {
-      chromedriverCustomPath: chromedriverPath
-    }]],
+    ['selenium-standalone', {
+      logPath: 'logs',
+    }]
+  ],
 
   // Framework you want to run your specs with.
   // The following are supported: Mocha, Jasmine, and Cucumber
