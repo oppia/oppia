@@ -109,6 +109,9 @@ def handle_trainable_states(
     Args:
         exploration: Exploration. The Exploration domain object.
         state_names: list(str). List of state names.
+
+    Raises:
+        Exception. No classifier algorithm found for the given interaction id.
     """
     job_dicts_list = []
     exp_id = exploration.id
@@ -117,6 +120,10 @@ def handle_trainable_states(
         state = exploration.states[state_name]
         training_data = state.get_training_data()  # type: ignore[no-untyped-call]
         interaction_id = state.interaction.id
+        if interaction_id not in feconf.INTERACTION_CLASSIFIER_MAPPING:
+            raise Exception(
+                'No classifier algorithm found for %s interaction' % (
+                    interaction_id))
         algorithm_id = feconf.INTERACTION_CLASSIFIER_MAPPING[
             interaction_id]['algorithm_id']
         next_scheduled_check_time = datetime.datetime.utcnow()
@@ -567,6 +574,9 @@ def migrate_state_training_jobs(
             object containing exploration to training job id mapping. This
             mapping is used to figure out jobs that need to be re-submitted,
             added or removed.
+
+    Raises:
+        Exception. Interaction id does not exist for the state.
     """
     exp_id = state_training_jobs_mapping.exp_id
     exp_version = state_training_jobs_mapping.exp_version
@@ -576,6 +586,11 @@ def migrate_state_training_jobs(
         exp_id, version=exp_version)
     interaction_id = exploration.states[state_name].interaction.id
 
+    if interaction_id is None:
+        raise Exception(
+            'Interaction id does not exist for the state having state_name: %s'
+            % state_name
+        )
     algorithm_id = feconf.INTERACTION_CLASSIFIER_MAPPING[
         interaction_id]['algorithm_id']
     algorithm_version = feconf.INTERACTION_CLASSIFIER_MAPPING[

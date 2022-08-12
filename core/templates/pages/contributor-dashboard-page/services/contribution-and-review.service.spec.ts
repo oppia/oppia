@@ -538,7 +538,7 @@ describe('Contribution and review service', () => {
         .returnValue(Promise.resolve());
 
       cars.updateQuestionSuggestionAsync(
-        'pqr', 'easy', questionStateData,
+        'pqr', 2, questionStateData,
         imagesData, onSuccess, onFailure);
       tick();
 
@@ -554,7 +554,7 @@ describe('Contribution and review service', () => {
         .returnValue(Promise.reject());
 
       cars.updateQuestionSuggestionAsync(
-        'pqr', 'easy', questionStateData,
+        'pqr', 2, questionStateData,
         imagesData, onSuccess, onFailure);
       tick();
 
