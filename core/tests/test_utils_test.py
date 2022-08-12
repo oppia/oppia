@@ -33,7 +33,6 @@ from typing import Any, Callable, OrderedDict
 from typing_extensions import Final
 import webapp2
 
-exp_models, = models.Registry.import_models([models.NAMES.exploration])
 email_services = models.Registry.import_email_services()
 
 
@@ -160,17 +159,6 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
         wrapped = test_utils.FunctionWrapper(mock_lambda)
         self.assertEqual(wrapped('foobar'), 'foobarfoobar')
         self.assertEqual(data.get('value'), 'foobar')
-
-    def test_pre_call_hook_does_nothing(self) -> None:
-        function = lambda x: x ** 2
-        wrapped = test_utils.FunctionWrapper(function)
-
-        # Method `pre_call_hook` does not return any value but for testing
-        # purposes we are still comparing it's return value with None. Also,
-        # `pre_call_hook` can only accept Dict values but here we are providing
-        # string which causes MyPy to throw errors. Thus to avoid the errors,
-        # we used ignore here.
-        self.assertIsNone(wrapped.pre_call_hook('args'))  # type: ignore[func-returns-value, arg-type]
 
 
 class AuthServicesStubTests(test_utils.GenericTestBase):
@@ -648,18 +636,21 @@ class TestUtilsTests(test_utils.GenericTestBase):
     # can normally catch by typing.
     def test_mock_datetime_utcnow_fails_when_wrong_type_is_passed(self) -> None:
         with self.assertRaisesRegex(
-                Exception, 'mocked_now must be datetime, got: 123'):
+                Exception, 'mocked_now must be datetime, got: 123'
+            ):
             with self.mock_datetime_utcnow(123):  # type: ignore[arg-type]
                 pass
 
     def test_raises_error_if_no_mock_file_path_found(self) -> None:
         with self.assertRaisesRegex(
-                Exception, 'No file exists for the given file name'):
+                Exception, 'No file exists for the given file name'
+            ):
             test_utils.mock_load_template('invalid_path')
 
     def test_raises_error_if_no_user_name_exists_with_strict_true(self) -> None:
         with self.assertRaisesRegex(
-                Exception, 'No user_id found for the given email address'):
+                Exception, 'No user_id found for the given email address'
+            ):
             self.get_user_id_from_email(
                 'invalidemail@gmail.com'
             )

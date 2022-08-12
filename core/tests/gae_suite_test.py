@@ -30,7 +30,7 @@ class GaeSuiteTests(test_utils.GenericTestBase):
     def test_cannot_create_test_suites_with_invalid_test_target_format(
         self
     ) -> None:
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             Exception, 'The delimiter in test_target should be a dot (.)'):
             gae_suite.create_test_suites(test_target='core/controllers')
 
@@ -43,7 +43,7 @@ class GaeSuiteTests(test_utils.GenericTestBase):
     def test_cannot_add_directory_with_invalid_path(self) -> None:
         dir_to_add_swap = self.swap(
             common, 'DIRS_TO_ADD_TO_SYS_PATH', ['invalid_path'])
-        assert_raises_regexp_context_manager = self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'Directory invalid_path does not exist.')
         with assert_raises_regexp_context_manager, dir_to_add_swap:
             gae_suite.main(args=[])
@@ -60,7 +60,7 @@ class GaeSuiteTests(test_utils.GenericTestBase):
 
         create_test_suites_swap = self.swap(
             gae_suite, 'create_test_suites', _mock_create_test_suites)
-        assert_raises_regexp_context_manager = self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception,
             'Test suite failed: 1 tests run, 0 errors, 1 failures.')
 
@@ -78,7 +78,7 @@ class GaeSuiteTests(test_utils.GenericTestBase):
 
         create_test_suites_swap = self.swap(
             gae_suite, 'create_test_suites', _mock_create_test_suites)
-        assert_raises_regexp_context_manager = self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'Test suite failed: 1 tests run, 1 errors, 0 failures.')
 
         with create_test_suites_swap, assert_raises_regexp_context_manager:

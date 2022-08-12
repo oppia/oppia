@@ -950,8 +950,8 @@ class AuthServicesStub:
             [auth_models.UserAuthDetailsModel(
                 id=user_id, firebase_auth_id=auth_id)
              for auth_id, user_id in auth_id_user_id_pairs])
-        for _, u in auth_id_user_id_pairs:
-            self._external_user_id_associations.add(u)
+        external_user_ids: Set[str] = set([u for _, u in auth_id_user_id_pairs])
+        self._external_user_id_associations.update(external_user_ids)
         auth_id_user_id_pairs_with_deletion = {
             auth_id: AuthServicesStub.AuthUser(user_id)
             for auth_id, user_id in auth_id_user_id_pairs
@@ -2499,10 +2499,9 @@ title: Title
         if user_settings is None:
             if not strict:
                 return None
-            else:
-                raise Exception(
-                    'No user_id found for the given email address: %s' % email
-                )
+            raise Exception(
+                'No user_id found for the given email address: %s' % email
+            )
 
         return user_settings.user_id
 
