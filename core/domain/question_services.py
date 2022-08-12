@@ -760,6 +760,9 @@ def compute_summary_of_question(
 
     Returns:
         QuestionSummary. The computed summary for the given question.
+
+    Raises:
+        Exception. No interaction_id found for the given question.
     """
     question_content = question.question_state_data.content.html
     answer_groups = question.question_state_data.interaction.answer_groups
@@ -772,6 +775,10 @@ def compute_summary_of_question(
             misconception_ids.append(misconception_id)
     misconception_ids.extend(question.inapplicable_skill_misconception_ids)
     interaction_id = question.question_state_data.interaction.id
+    if interaction_id is None:
+        raise Exception(
+            'No interaction_id found for the given question.'
+        )
     # Ruling out the possibility of None for mypy type checking.
     assert question.created_on is not None
     assert question.last_updated is not None
@@ -828,7 +835,7 @@ def get_question_summary_from_model(
     )
 
 
-def get_interaction_id_for_question(question_id: str) -> str:
+def get_interaction_id_for_question(question_id: str) -> Optional[str]:
     """Returns the interaction id for the given question.
 
     Args:
