@@ -93,19 +93,19 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.question_id = question_services.get_new_question_id()
         self.question = self.save_new_question(  # type: ignore[no-untyped-call]
             self.question_id, self.editor_id,
-            self._create_valid_question_data('ABC'), ['skill_1'],  # type: ignore[no-untyped-call]
+            self._create_valid_question_data('ABC'), ['skill_1'],
             inapplicable_skill_misconception_ids=[
                 'skillid12345-1', 'skillid12345-2'])
 
         self.question_id_1 = question_services.get_new_question_id()
         self.question_1 = self.save_new_question(  # type: ignore[no-untyped-call]
             self.question_id_1, self.editor_id,
-            self._create_valid_question_data('ABC'), ['skill_2'])  # type: ignore[no-untyped-call]
+            self._create_valid_question_data('ABC'), ['skill_2'])
 
         self.question_id_2 = question_services.get_new_question_id()
         self.question_2 = self.save_new_question(  # type: ignore[no-untyped-call]
             self.question_id_2, self.editor_id,
-            self._create_valid_question_data('ABC'), ['skill_2'])  # type: ignore[no-untyped-call]
+            self._create_valid_question_data('ABC'), ['skill_2'])
 
     def test_get_question_by_id(self) -> None:
         question = question_services.get_question_by_id(self.question_id)
@@ -137,8 +137,8 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         questions.sort(key=sort_fn)
 
         self.assertEqual(len(questions), 2)
-        self.assertEqual(questions[0].to_dict(), self.question.to_dict())  # type: ignore[no-untyped-call]
-        self.assertEqual(questions[1].to_dict(), self.question_2.to_dict())  # type: ignore[no-untyped-call]
+        self.assertEqual(questions[0].to_dict(), self.question.to_dict())
+        self.assertEqual(questions[1].to_dict(), self.question_2.to_dict())
 
     def test_get_total_question_count_for_skill_ids(self) -> None:
         question_services.create_new_question_skill_link(
@@ -216,9 +216,9 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         questions.sort(key=sort_fn)
 
         self.assertEqual(len(questions), 3)
-        self.assertEqual(questions[0].to_dict(), self.question.to_dict())  # type: ignore[no-untyped-call]
-        self.assertEqual(questions[1].to_dict(), self.question_1.to_dict())  # type: ignore[no-untyped-call]
-        self.assertEqual(questions[2].to_dict(), self.question_2.to_dict())  # type: ignore[no-untyped-call]
+        self.assertEqual(questions[0].to_dict(), self.question.to_dict())
+        self.assertEqual(questions[1].to_dict(), self.question_1.to_dict())
+        self.assertEqual(questions[2].to_dict(), self.question_2.to_dict())
 
     def test_get_questions_by_skill_ids_raise_error_with_high_question_count(
         self
@@ -232,7 +232,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
     def test_create_multi_question_skill_links_for_question(self) -> None:
         self.question = self.save_new_question(  # type: ignore[no-untyped-call]
             self.question_id, self.editor_id,
-            self._create_valid_question_data('ABC'), ['skill_1'])  # type: ignore[no-untyped-call]
+            self._create_valid_question_data('ABC'), ['skill_1'])
 
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'Skill difficulties and skill ids should match. '
@@ -271,7 +271,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         question_id_2 = question_services.get_new_question_id()
         self.save_new_question(  # type: ignore[no-untyped-call]
             question_id_2, self.editor_id,
-            self._create_valid_question_data('ABC'), ['skill_1'])  # type: ignore[no-untyped-call]
+            self._create_valid_question_data('ABC'), ['skill_1'])
         skill_ids = [skill.id for skill in
                      question_services.get_skills_linked_to_question(
                          question_id_2)]
@@ -304,12 +304,12 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
         self.save_new_question(  # type: ignore[no-untyped-call]
             question_id_2, self.editor_id,
-            self._create_valid_question_data('ABC'), ['skill_1'])  # type: ignore[no-untyped-call]
+            self._create_valid_question_data('ABC'), ['skill_1'])
 
         question_id_3 = question_services.get_new_question_id()
         self.save_new_question(  # type: ignore[no-untyped-call]
             question_id_3, self.editor_id,
-            self._create_valid_question_data('ABC'), ['skill_2'])  # type: ignore[no-untyped-call]
+            self._create_valid_question_data('ABC'), ['skill_2'])
         question_services.create_new_question_skill_link(
             self.editor_id, self.question_id, 'skill_1', 0.5)
         question_services.create_new_question_skill_link(
@@ -390,7 +390,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         question_id = question_services.get_new_question_id()
         self.save_new_question(  # type: ignore[no-untyped-call]
             question_id, self.editor_id,
-            self._create_valid_question_data('ABC'), ['skill_1'])  # type: ignore[no-untyped-call]
+            self._create_valid_question_data('ABC'), ['skill_1'])
 
         question_services.create_new_question_skill_link(
             self.editor_id, question_id, 'skill_1', 0.5)
@@ -418,12 +418,12 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         question_id_2 = question_services.get_new_question_id()
         self.save_new_question(  # type: ignore[no-untyped-call]
             question_id_2, self.editor_id,
-            self._create_valid_question_data('ABC'), ['skill_1'])  # type: ignore[no-untyped-call]
+            self._create_valid_question_data('ABC'), ['skill_1'])
 
         question_id_3 = question_services.get_new_question_id()
         self.save_new_question(  # type: ignore[no-untyped-call]
             question_id_3, self.editor_id,
-            self._create_valid_question_data('ABC'), ['skill_2'])  # type: ignore[no-untyped-call]
+            self._create_valid_question_data('ABC'), ['skill_2'])
         # Setting skill difficulty for self.question_id.
         question_services.create_new_question_skill_link(
             self.editor_id, self.question_id, 'skill_1', 0.5)
@@ -516,7 +516,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 self.question_id, strict=False), None)
 
     def test_update_question(self) -> None:
-        new_question_data = self._create_valid_question_data('DEF')  # type: ignore[no-untyped-call]
+        new_question_data = self._create_valid_question_data('DEF')
         change_dict = {
             'cmd': 'update_question_property',
             'property_name': 'question_state_data',
@@ -535,7 +535,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.assertEqual(question.version, 2)
 
     def test_cannot_update_question_with_no_commit_message(self) -> None:
-        new_question_data = self._create_valid_question_data('DEF')  # type: ignore[no-untyped-call]
+        new_question_data = self._create_valid_question_data('DEF')
         change_dict = {
             'cmd': 'update_question_property',
             'property_name': 'question_state_data',
@@ -629,12 +629,12 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         question_id_2 = question_services.get_new_question_id()
         self.save_new_question(  # type: ignore[no-untyped-call]
             question_id_2, self.editor_id,
-            self._create_valid_question_data('ABC'), ['skill_1'])  # type: ignore[no-untyped-call]
+            self._create_valid_question_data('ABC'), ['skill_1'])
 
         question_id_3 = question_services.get_new_question_id()
         self.save_new_question(  # type: ignore[no-untyped-call]
             question_id_3, self.editor_id,
-            self._create_valid_question_data('ABC'), ['skill_2'])  # type: ignore[no-untyped-call]
+            self._create_valid_question_data('ABC'), ['skill_2'])
         question_services.create_new_question_skill_link(
             self.editor_id, self.question_id, 'skill_1', 0.5)
         question_services.create_new_question_skill_link(
@@ -686,8 +686,9 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 self.assertItemsEqual(question.linked_skill_ids, ['skill_2'])  # type: ignore[no-untyped-call]
 
     def test_compute_summary_of_question(self) -> None:
+        question = question_services.get_question_by_id(self.question_id)
         question_summary = question_services.compute_summary_of_question(
-            self.question)
+            question)
 
         self.assertEqual(question_summary.id, self.question_id)
         self.assertEqual(
@@ -704,12 +705,12 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         question_id_2 = question_services.get_new_question_id()
         self.save_new_question(  # type: ignore[no-untyped-call]
             question_id_2, self.editor_id,
-            self._create_valid_question_data('ABC'), ['skill_1'])  # type: ignore[no-untyped-call]
+            self._create_valid_question_data('ABC'), ['skill_1'])
 
         question_id_3 = question_services.get_new_question_id()
         self.save_new_question(  # type: ignore[no-untyped-call]
             question_id_3, self.editor_id,
-            self._create_valid_question_data('ABC'), ['skill_2'])  # type: ignore[no-untyped-call]
+            self._create_valid_question_data('ABC'), ['skill_2'])
         question_services.create_new_question_skill_link(
             self.editor_id, self.question_id, 'skill_1', 0.5)
         question_services.create_new_question_skill_link(
@@ -760,7 +761,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             misconceptions=misconceptions)
 
         self.question_id = question_services.get_new_question_id()
-        question_state_data = self._create_valid_question_data('state name')  # type: ignore[no-untyped-call]
+        question_state_data = self._create_valid_question_data('state name')
         question_state_data.interaction.answer_groups = [
             state_domain.AnswerGroup.from_dict({
                 'outcome': {
@@ -920,7 +921,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             misconceptions=misconceptions)
 
         self.question_id = question_services.get_new_question_id()
-        question_state_data = self._create_valid_question_data('state name')  # type: ignore[no-untyped-call]
+        question_state_data = self._create_valid_question_data('state name')
         question_state_data.interaction.answer_groups = [
             state_domain.AnswerGroup.from_dict({
                 'outcome': {

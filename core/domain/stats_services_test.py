@@ -1619,7 +1619,7 @@ class AnswerEventTests(test_utils.GenericTestBase):
     PARAMS: Dict[str, str] = {}
 
     def test_record_answer(self) -> None:
-        self.save_new_default_exploration('eid', 'fake@user.com')  # type: ignore[no-untyped-call]
+        self.save_new_default_exploration('eid', 'fake@user.com')
         exp = exp_fetchers.get_exploration_by_id('eid')
 
         first_state_name = exp.init_state_name
@@ -2374,7 +2374,7 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
     ) -> None:
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
-        exploration = self.save_new_default_exploration(  # type: ignore[no-untyped-call]
+        exploration = self.save_new_default_exploration(
             self.exp_id, owner_id)
         self.assertEqual(list(exploration.states.keys()), ['Introduction'])
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
@@ -2388,7 +2388,7 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
     ) -> None:
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
-        exploration = self.save_new_default_exploration(  # type: ignore[no-untyped-call]
+        exploration = self.save_new_default_exploration(
             self.exp_id, owner_id)
         self.assertEqual(list(exploration.states.keys()), ['Introduction'])
         state_reference = (
@@ -2414,7 +2414,7 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
         question_id = question_services.get_new_question_id()
         question = self.save_new_question(  # type: ignore[no-untyped-call]
             question_id, editor_id,
-            self._create_valid_question_data('ABC'), ['skill_1'])  # type: ignore[no-untyped-call]
+            self._create_valid_question_data('ABC'), ['skill_1'])
         self.assertNotEqual(question, None)
         state_reference = (
             stats_services.get_state_reference_for_question(question_id))

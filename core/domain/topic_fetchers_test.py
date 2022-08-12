@@ -74,8 +74,8 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
             additional_story_ids=[self.story_id_3],
             uncategorized_skill_ids=[self.skill_id_1, self.skill_id_2],
             subtopics=[], next_subtopic_id=1)
-        self.save_new_story(self.story_id_1, self.user_id, self.TOPIC_ID)  # type: ignore[no-untyped-call]
-        self.save_new_story(  # type: ignore[no-untyped-call]
+        self.save_new_story(self.story_id_1, self.user_id, self.TOPIC_ID)
+        self.save_new_story(
             self.story_id_3,
             self.user_id,
             self.TOPIC_ID,
@@ -146,7 +146,7 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
             self.assertIn(topic_key, topic_id_list)
 
     def test_get_canonical_story_dicts(self) -> None:
-        self.save_new_story(self.story_id_2, self.user_id, self.TOPIC_ID)  # type: ignore[no-untyped-call]
+        self.save_new_story(self.story_id_2, self.user_id, self.TOPIC_ID)
         topic_services.publish_story(
             self.TOPIC_ID, self.story_id_1, self.user_id_admin)
         topic_services.publish_story(

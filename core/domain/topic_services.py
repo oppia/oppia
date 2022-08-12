@@ -661,7 +661,7 @@ def publish_story(
                     'Story node with id %s does not contain an '
                     'exploration id.' % node.id)
             exploration_id_list.append(node.exploration_id)
-        story_services.validate_explorations_for_story(  # type: ignore[no-untyped-call]
+        story_services.validate_explorations_for_story(
             exploration_id_list, True)
 
     topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
@@ -734,7 +734,7 @@ def unpublish_story(
     # translation suggestions.
     exp_ids = story.story_contents.get_all_linked_exp_ids()
     opportunity_services.delete_exploration_opportunities(exp_ids)
-    suggestion_services.auto_reject_translation_suggestions_for_exp_ids(exp_ids)  # type: ignore[no-untyped-call]
+    suggestion_services.auto_reject_translation_suggestions_for_exp_ids(exp_ids)
 
 
 def delete_canonical_story(
@@ -853,7 +853,7 @@ def delete_topic(
         topic_model.canonical_story_references +
         topic_model.additional_story_references)
     for story_reference in all_story_references:
-        story_services.delete_story(  # type: ignore[no-untyped-call]
+        story_services.delete_story(
             committer_id, story_reference['story_id'],
             force_deletion=force_deletion)
     topic_model.delete(

@@ -79,15 +79,15 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             additional_story_ids=[self.story_id_3],
             uncategorized_skill_ids=[self.skill_id_1, self.skill_id_2],
             subtopics=[], next_subtopic_id=1)
-        self.save_new_story(self.story_id_1, self.user_id, self.TOPIC_ID)  # type: ignore[no-untyped-call]
-        self.save_new_story(  # type: ignore[no-untyped-call]
+        self.save_new_story(self.story_id_1, self.user_id, self.TOPIC_ID)
+        self.save_new_story(
             self.story_id_3,
             self.user_id,
             self.TOPIC_ID,
             title='Title 3',
             description='Description 3'
         )
-        self.save_new_story(  # type: ignore[no-untyped-call]
+        self.save_new_story(
             self.story_id_2,
             self.user_id,
             self.TOPIC_ID,
@@ -604,7 +604,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             topic_services.unpublish_story(
                 self.TOPIC_ID, 'invalid_story', self.user_id_admin)
 
-        self.save_new_story(  # type: ignore[no-untyped-call]
+        self.save_new_story(
             'story_10',
             self.user_id,
             self.TOPIC_ID,
@@ -622,7 +622,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 self.TOPIC_ID, 'story_10', self.user_id_admin)
 
         # Throw error if a story node doesn't have an exploration.
-        self.save_new_story(  # type: ignore[no-untyped-call]
+        self.save_new_story(
             'story_id_new',
             self.user_id,
             self.TOPIC_ID,
@@ -649,9 +649,9 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 self.TOPIC_ID, 'story_id_new', self.user_id_admin)
 
         # Throw error if exploration isn't published.
-        self.save_new_default_exploration(  # type: ignore[no-untyped-call]
+        self.save_new_default_exploration(
             'exp_id', self.user_id_admin, title='title')
-        self.publish_exploration(self.user_id_admin, 'exp_id')  # type: ignore[no-untyped-call]
+        self.publish_exploration(self.user_id_admin, 'exp_id')
 
         change_list = [story_domain.StoryChange({
             'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
@@ -1157,9 +1157,9 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         question = self.save_new_question(  # type: ignore[no-untyped-call]
             'question_id',
             self.user_id_admin,
-            self._create_valid_question_data('dest'),  # type: ignore[no-untyped-call]
+            self._create_valid_question_data('dest'),
             [self.skill_id_1])
-        suggestion = suggestion_services.create_suggestion(  # type: ignore[no-untyped-call]
+        suggestion = suggestion_services.create_suggestion(
             feconf.SUGGESTION_TYPE_ADD_QUESTION,
             feconf.ENTITY_TYPE_TOPIC,
             self.TOPIC_ID,
@@ -1175,7 +1175,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         )
 
         self.assertIsNotNone(
-            suggestion_services.get_suggestion_by_id(suggestion.suggestion_id))  # type: ignore[no-untyped-call]
+            suggestion_services.get_suggestion_by_id(suggestion.suggestion_id))
 
         topic_services.delete_topic(self.user_id_admin, self.TOPIC_ID)
         self.assertIsNone(
@@ -1186,7 +1186,10 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             subtopic_page_services.get_subtopic_page_by_id(
                 self.TOPIC_ID, 1, strict=False))
         self.assertIsNone(
-            suggestion_services.get_suggestion_by_id(suggestion.suggestion_id))  # type: ignore[no-untyped-call]
+            suggestion_services.get_suggestion_by_id(
+                suggestion.suggestion_id, strict=False
+            )
+        )
 
     def test_delete_subtopic_with_skill_ids(self) -> None:
         changelist = [topic_domain.TopicChange({

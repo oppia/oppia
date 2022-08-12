@@ -24,11 +24,13 @@ from core import feconf
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Any, Dict
+from typing import Dict, Mapping
 from typing_extensions import Final
 
 MYPY = False
 if MYPY: # pragma: no cover
+    # Here, change domain is imported only for type checking.
+    from core.domain import change_domain  # pylint: disable=invalid-import # isort:skip
     from mypy_imports import base_models
     from mypy_imports import suggestion_models
 
@@ -44,13 +46,12 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         suggestion_models.SCORE_TYPE_TRANSLATION +
         suggestion_models.SCORE_CATEGORY_DELIMITER + 'English')
 
-    topic_name: str = 'topic'
-    target_id: str = 'exp1'
-    target_version_at_submission: int = 1
-    # TODO(#13523): Use of Any here in the type annotation below will
-    # be removed when change_cmd will be changed to
-    # TypedDict/Domain Object.
-    change_cmd: Dict[str, Any] = {}
+    topic_name = 'topic'
+    target_id = 'exp1'
+    target_version_at_submission = 1
+    change_cmd: Mapping[
+        str, change_domain.AcceptableChangeDictTypes
+    ] = {}
     # Language code that would normally be derived from the change_cmd.
     translation_language_code = 'en'
     # Language code that would normally be derived from the question_dict in

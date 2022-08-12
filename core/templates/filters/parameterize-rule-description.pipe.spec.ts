@@ -153,7 +153,12 @@ describe('ParameterizeRuleDescriptionPipe', () => {
       f: {
         type: 'string',
         real: 5,
-        fraction: null,
+        fraction: {
+          isNegative: false,
+          wholeNumber: 2,
+          numerator: 3,
+          denominator: 5
+        },
         units: []
       }
     }, {
