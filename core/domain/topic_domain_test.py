@@ -1275,10 +1275,10 @@ class TopicSummaryTests(test_utils.GenericTestBase):
 
     def test_thumbnail_filename_or_thumbnail_bg_color_is_none(self) -> None:
         self.topic_summary.thumbnail_bg_color = '#C6DCDA'
-        self.topic_summary.thumbnail_filename = None  # type: ignore[assignment]
+        self.topic_summary.thumbnail_filename = None
         self._assert_validation_error(
             'Topic thumbnail image is not provided.')
-        self.topic_summary.thumbnail_bg_color = None  # type: ignore[assignment]
+        self.topic_summary.thumbnail_bg_color = None
         self.topic_summary.thumbnail_filename = 'test.svg'
         self._assert_validation_error(
             'Topic thumbnail background color is not specified.')

@@ -165,18 +165,6 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             'No data available for when the topic was last updated.'
         ):
             topic_services.compute_summary_of_topic(self.topic)
-        test_topic.thumbnail_filename = None
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
-            Exception,
-            'Topic does not have thumbnail filename.'
-        ):
-            topic_services.compute_summary_of_topic(self.topic)
-        test_topic.thumbnail_bg_color = None
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
-            Exception,
-            'Topic does not have thumbnail background color.'
-        ):
-            topic_services.compute_summary_of_topic(self.topic)
 
     def test_get_topic_from_model(self) -> None:
         topic_model = topic_models.TopicModel.get(self.TOPIC_ID)

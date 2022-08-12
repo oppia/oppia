@@ -935,8 +935,6 @@ def compute_summary_of_topic(
         TopicSummary. The computed summary for the given topic.
 
     Raises:
-        Exception. Topic does not have thumbnail background color.
-        Exception. Topic does not have thumbnail filename.
         Exception. No data available for when the topic was last updated.
     """
     canonical_story_count = 0
@@ -961,14 +959,6 @@ def compute_summary_of_topic(
     for subtopic in topic.subtopics:
         total_skill_count = total_skill_count + len(subtopic.skill_ids)
 
-    if topic.thumbnail_bg_color is None:
-        raise Exception(
-            'Topic does not have thumbnail background color.'
-        )
-    if topic.thumbnail_filename is None:
-        raise Exception(
-            'Topic does not have thumbnail filename.'
-        )
     if topic.created_on is None or topic.last_updated is None:
         raise Exception(
             'No data available for when the topic was last updated.'
