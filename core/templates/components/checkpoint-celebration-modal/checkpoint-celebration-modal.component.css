@@ -1,0 +1,173 @@
+.checkpoint-celebration-modal {
+  padding-left: 30px;
+}
+
+.checkpoint-celebration-modal .message-container {
+  display: flex;
+  flex-direction: column;
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  position: fixed;
+  left: 30px;
+  bottom: -100vh;
+  border: 1.5px solid #00645c;
+  width: 350px;
+  border-radius: 0 0 10px 10px;
+  box-shadow: 5px 5px 3px 5px #aaa;
+  background: #e0f2f1;
+  color: #000;
+  padding: 0;
+  transition-property: bottom;
+  transition-duration: 1.5s;
+}
+
+.checkpoint-celebration-modal .mascot-placeholder {
+  position: absolute;
+  top: -15px;
+  left: -15px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: #a52a2a;
+}
+
+.checkpoint-celebration-modal .timer {
+  margin: 0;
+  padding: 0;
+  stroke-dasharray: 10;
+  stroke-dashoffset: 0;
+  transition-property: stroke-dashoffset;
+  transition-duration: 10s;
+  transition-timing-function: linear;
+}
+
+.checkpoint-celebration-modal .transition-duration-class {
+  transition-duration: 0s;
+}
+
+.checkpoint-celebration-modal h2 {
+  text-align: center;
+  margin: 0 10% 0 10%;
+  border-bottom: 1.6px solid #00645c;
+}
+
+.checkpoint-celebration-modal .checkpoint-flag {
+  height: 100px;
+  margin: 0 auto;
+  animation-delay: 2.2s;
+  animation-duration: 1.4s;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+  opacity: 0;
+}
+
+.checkpoint-celebration-modal .flag-animation {
+  animation-name: flag-bounce;
+}
+
+@keyframes flag-bounce {
+  0%   { transform: scale(1,1) translateY(0); opacity: 0; }
+  10%  { transform: scale(1.05,.95) translateY(0); }
+  17%  { transform: scale(1.03, 0.97) translateY(-50px); }
+  50%  { transform: scale(0.90,1.1)  translateY(-60px); opacity: 1; }
+  60%  { transform: scale(01,1) translateY(2px); }
+  70%  { transform: scale(1.2,0.90) translateY(5px); }
+  80%  { transform: scale(1,1) translateY(0); }
+  100% { transform: scale(1,1) translateY(0); opacity: 1; }
+}
+
+.checkpoint-celebration-modal .progress-svg {
+  height: 12px;
+  width: 90%;
+  margin: 10px auto 10px auto;
+}
+
+.checkpoint-celebration-modal p {
+  font-family: "Roboto", Arial, sans-serif;
+  text-align: center;
+  font-weight: 600;
+  margin: 10px 10% 10px 10%;
+}
+
+.checkpoint-celebration-modal .progress-text {
+  margin: 0 auto 0 25px;
+  text-align: left;
+  font-size: 0.9em;
+  font-weight: 600;
+}
+
+.checkpoint-celebration-modal .button-row {
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.checkpoint-celebration-modal button.progress-info {
+  color: #e0f2f1;
+  background: transparent;
+  margin-left: 6px;
+  margin-bottom: 6px;
+  border-radius: 50%;
+  padding: 8px;
+  transition-property: background, color;
+  transition-duration: 0.2s;
+  border: none;
+}
+
+.checkpoint-celebration-modal button.modal-close-button {
+  background: transparent;
+  color: #00645c;
+  margin-right: 6px;
+  margin-bottom: 6px;
+  border-radius: 50%;
+  padding: 8px;
+  transition-property: background, color;
+  transition-duration: 0.2s;
+  border: none;
+}
+
+.checkpoint-celebration-modal .modal-close-button:hover {
+  background: #00645c;
+  color: #e0f2f1;
+}
+
+.checkpoint-celebration-modal .progress-info:hover {
+  background-color: #00645c;
+}
+
+.checkpoint-celebration-modal .progress-info-icon {
+  background: #00645c;
+  border-radius: 50%;
+  transition-property: background, color;
+  transition-duration: 0.2s;
+}
+
+.checkpoint-celebration-modal .progress-info:hover .progress-info-icon {
+  background: #e0f2f1;
+  color: #00645c;
+}
+
+.checkpoint-celebration-modal .modal-display-transition {
+  animation-name: modal-complete-transition-animation;
+  animation-duration: 14.29s;
+  animation-iteration-count: 1;
+  animation-timing-function: ease-in-out;
+}
+
+@keyframes modal-complete-transition-animation {
+  0% { bottom: -100vh; }
+  15% { bottom: 70px; }
+  85% { bottom: 70px; }
+  100% { bottom: -100vh; }
+}
+
+.checkpoint-celebration-modal .downward-transition {
+  animation-name: modal-downward-transition-animation;
+  animation-duration: 2.14s;
+  animation-iteration-count: 1;
+  animation-timing-function: ease-in;
+}
+
+@keyframes modal-downward-transition-animation {
+  0% { bottom: 70px; }
+  100% { bottom: -100vh; }
+}
