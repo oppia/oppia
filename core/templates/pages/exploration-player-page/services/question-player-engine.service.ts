@@ -168,6 +168,8 @@ export class QuestionPlayerEngineService {
 
   recordNewCardAdded(): void {
     this.currentIndex = this.nextIndex;
+    this.contextService.setCustomEntityContext(
+      AppConstants.ENTITY_TYPE.QUESTION, this.getCurrentQuestionId());
   }
 
   getCurrentIndex(): number {
@@ -307,11 +309,6 @@ export class QuestionPlayerEngineService {
 
       questionHtml = questionHtml + this.getRandomSuffix();
       nextInteractionHtml = nextInteractionHtml + this.getRandomSuffix();
-      if (!onSameCard) {
-        this.contextService.setCustomEntityContext(
-          AppConstants.ENTITY_TYPE.QUESTION,
-          this.questions[this.nextIndex].getId());
-      }
       nextCard = StateCard.createNewCard(
         'true', questionHtml, nextInteractionHtml,
         this.getNextStateData().interaction,
@@ -320,8 +317,6 @@ export class QuestionPlayerEngineService {
         this.getNextStateData().content.contentId,
         this.audioTranslationLanguageService
       );
-    } else if (!onSameCard) {
-      this.contextService.removeCustomEntityContext();
     }
     successCallback(
       nextCard, refreshInteraction, feedbackHtml,

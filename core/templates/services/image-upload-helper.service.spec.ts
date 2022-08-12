@@ -34,14 +34,14 @@ describe('imageUploadHelperService', () => {
   it('should convert image data to image file', () => {
     const imageFile = (
       imageUploadHelperService.convertImageDataToImageFile(
-        'data:image/png;base64,xyz'));
+        'data:image/png;base64,JUMzJTg3JTJD'));
     expect(imageFile instanceof Blob).toBe(true);
   });
 
   it('should return null for non-image data', function() {
     const imageFile = (
       imageUploadHelperService.convertImageDataToImageFile(
-        'data:text/plain;base64,xyz'));
+        'data:text/plain;base64,JUMzJTg3JTJD'));
     expect(imageFile).toEqual(null);
   });
 

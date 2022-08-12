@@ -164,6 +164,9 @@ describe('SvgEditor', () => {
     },
     getTrustedSvgResourceUrl: (data) => {
       return data;
+    },
+    convertBase64ToUnicodeString: (base64) => {
+      return decodeURIComponent(atob(base64));
     }
   };
 

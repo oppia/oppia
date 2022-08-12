@@ -25,7 +25,7 @@ import { ImageLocalStorageService } from './image-local-storage.service';
 describe('ImageLocalStorageService', () => {
   let alertsService: AlertsService;
   let imageLocalStorageService: ImageLocalStorageService;
-  let sampleImageData = 'data:image/png;base64,xyz';
+  let sampleImageData = 'data:image/png;base64,JUMzJTg3JTJD';
   let imageFilename = 'filename';
 
   beforeEach(() => {

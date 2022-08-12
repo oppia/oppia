@@ -312,8 +312,11 @@ export class SvgEditorComponent implements OnInit {
             svgDataUrl as string),
           unsafeUrl: svgDataUrl as string
         };
-        this.savedSvgDiagram = this._base64DecodeUnicode(
-          svgDataUrl.split(',')[1]);
+        this.savedSvgDiagram = (
+          this.svgSanitizerService.convertBase64ToUnicodeString(
+            svgDataUrl.split(',')[1]
+          )
+        );
       } else {
         this.svgFileFetcherBackendApiService.fetchSvg(
           this.data.savedSvgUrl as string
@@ -326,15 +329,6 @@ export class SvgEditorComponent implements OnInit {
     }
   }
 
-  private _base64DecodeUnicode(base64String: string) {
-    // Coverting base64 to unicode string. This technique converts bytestream
-    // to percent-encoding, to original string.
-    // See https://stackoverflow.com/a/30106551
-    return decodeURIComponent(atob(base64String).split('').map(char => {
-      return '%' + ('00' + char.charCodeAt(0).toString(16)).slice(-2);
-    }).join(''));
-  }
-
   postSvgToServer(
       dimensions: Dimensions,
       resampledFile: Blob
@@ -345,27 +339,16 @@ export class SvgEditorComponent implements OnInit {
 
   saveImageToLocalStorage(
       dimensions: Dimensions,
-      resampledFile: Blob
+      svgDataURI: string
   ): void {
     const filename = this.imageUploadHelperService.generateImageFilename(
       dimensions.height, dimensions.width, 'svg');
-    const reader = new FileReader();
-    reader.onload = () => {
-      const imageData = reader.result as string;
-      this.imageLocalStorageService.saveImage(filename, imageData);
-      const img = new Image();
-      img.onload = () => {
-        this.setSavedSvgFilename(filename, false);
-        const dimensions = (
-          this.imagePreloaderService.getDimensionsOfImage(filename));
-        this.svgContainerStyle = {
-          height: dimensions.height + 'px',
-          width: dimensions.width + 'px'
-        };
-      };
-      img.src = this.getTrustedResourceUrlForSvgFileName(filename).unsafeUrl;
+    this.imageLocalStorageService.saveImage(filename, svgDataURI);
+    this.setSavedSvgFilename(filename, false);
+    this.svgContainerStyle = {
+      height: dimensions.height + 'px',
+      width: dimensions.width + 'px'
     };
-    reader.readAsDataURL(resampledFile);
   }
 
   getSvgString(): string {
@@ -443,7 +426,7 @@ export class SvgEditorComponent implements OnInit {
         this.imageSaveDestination ===
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
       ) {
-        this.saveImageToLocalStorage(dimensions, resampledFile);
+        this.saveImageToLocalStorage(dimensions, svgDataURI);
         this.validityChange.emit({ empty: true });
       } else {
         this.loadingIndicatorIsShown = true;
@@ -1145,8 +1128,11 @@ export class SvgEditorComponent implements OnInit {
     } else {
       this.drawMode = this.DRAW_MODE_NONE;
       if (this.uploadedSvgDataUrl !== null) {
-        const svgString = this._base64DecodeUnicode(
-          this.uploadedSvgDataUrl.unsafeUrl.split(',')[1]);
+        const svgString = (
+          this.svgSanitizerService.convertBase64ToUnicodeString(
+            this.uploadedSvgDataUrl.unsafeUrl.split(',')[1]
+          )
+        );
         fabric.loadSVGFromString(svgString, (args) => this.loadSvgFile(args));
       }
       this.canvas.renderAll();
