@@ -22,7 +22,7 @@ from core import feconf
 from core.platform import models
 
 from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union
-from typing_extensions import Literal, Final
+from typing_extensions import Final, Literal
 
 MYPY = False
 if MYPY: # pragma: no cover
