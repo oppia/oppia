@@ -24,6 +24,15 @@ import { ComputeGraphService } from 'services/compute-graph.service';
 import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 
+enum CheckpointMessageTypes {
+  FIRST = 'FIRST',
+  SECOND = 'SECOND',
+  MIDWAY = 'MIDWAY',
+  TWO_REMAINING = 'TWO_REMAINING',
+  ONE_REMAINING = 'ONE_REMAINING',
+  GENERIC = 'GENERIC'
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -51,7 +60,9 @@ export class CheckpointCelebrationUtilityService {
   }
 
   getRandomI18nKey(
-      i18nKeyPrefix: string, availableKeyCount: number, messageKind?: string,
+      i18nKeyPrefix: string,
+      availableKeyCount: number,
+      messageKind: string | null,
   ): string {
     // 'randomValue' is being set to lie between 1 and availableKeyCount, the
     // total number of i18n keys available to choose from.
@@ -62,25 +73,41 @@ export class CheckpointCelebrationUtilityService {
     return i18nKeyPrefix + '_' + randomValue.toString();
   }
 
+  // This function fetches the i18n key for the checkpoint message.
+  // There are 6 different kinds of i18n keys available (enumerated in the
+  // 'CheckpointMessageTypes' enum above) for the checkpoint message, 3 of
+  // each kind for a total of 18.
+  // The kind of key is determined using the number of completed checkpoints and
+  // the total number of checkpoints.
+  // The function returns a random key from the 3 available ones for the
+  // correct type, using the 'getRandomI18nKey' method.
   getCheckpointMessageI18nKey(
       completedCheckpointCount: number, totalCheckpointCount: number
   ): string {
     const messageI18nKeyPrefix = 'I18N_CONGRATULATORY_CHECKPOINT_MESSAGE';
     if (completedCheckpointCount === 1) {
-      return this.getRandomI18nKey(messageI18nKeyPrefix, 3, 'A');
+      return this.getRandomI18nKey(
+        messageI18nKeyPrefix, 3, CheckpointMessageTypes.FIRST);
     } else if (completedCheckpointCount === 2) {
-      return this.getRandomI18nKey(messageI18nKeyPrefix, 3, 'B');
+      return this.getRandomI18nKey(
+        messageI18nKeyPrefix, 3, CheckpointMessageTypes.SECOND);
+      // The condition below evaluates to true when the learner has just
+      // completed the middle checkpoint and returns the midway message's
+      // i18n key.
     } else if (
-      completedCheckpointCount / totalCheckpointCount >= 0.5 &&
-      (completedCheckpointCount - 1) / totalCheckpointCount < 0.5
+      Math.ceil(totalCheckpointCount / 2) === completedCheckpointCount
     ) {
-      return this.getRandomI18nKey(messageI18nKeyPrefix, 3, 'C');
+      return this.getRandomI18nKey(
+        messageI18nKeyPrefix, 3, CheckpointMessageTypes.MIDWAY);
     } else if (totalCheckpointCount - completedCheckpointCount === 2) {
-      return this.getRandomI18nKey(messageI18nKeyPrefix, 3, 'D');
+      return this.getRandomI18nKey(
+        messageI18nKeyPrefix, 3, CheckpointMessageTypes.TWO_REMAINING);
     } else if (totalCheckpointCount - completedCheckpointCount === 1) {
-      return this.getRandomI18nKey(messageI18nKeyPrefix, 3, 'E');
+      return this.getRandomI18nKey(
+        messageI18nKeyPrefix, 3, CheckpointMessageTypes.ONE_REMAINING);
     } else {
-      return this.getRandomI18nKey(messageI18nKeyPrefix, 3, 'F');
+      return this.getRandomI18nKey(
+        messageI18nKeyPrefix, 3, CheckpointMessageTypes.GENERIC);
     }
   }
 
@@ -94,7 +121,9 @@ export class CheckpointCelebrationUtilityService {
 
   getCheckpointTitleI18nKey(): string {
     const titleI18nKeyPrefix = 'I18N_CONGRATULATORY_CHECKPOINT_TITLE';
-    return this.getRandomI18nKey(titleI18nKeyPrefix, 6);
+    // A null messageKind is passed to the function below because there
+    // is only one kind of title i18n keys.
+    return this.getRandomI18nKey(titleI18nKeyPrefix, 6, null);
   }
 
   getCheckpointTitle(): string {
