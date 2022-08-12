@@ -39,17 +39,17 @@ import { ContributionOpportunitiesService } from '../services/contribution-oppor
 
 export interface Suggestion {
   change: {
-    skill_id?: string;
+    skill_id: string;
     content_html: string;
     translation_html: string | string[];
-    question_dict?: QuestionBackendDict;
-    skill_difficulty?: string[];
+    question_dict: QuestionBackendDict;
+    skill_difficulty: string[];
   };
   status: string;
   suggestion_type: string;
   target_id: string;
   suggestion_id: string;
-  author_name?: string;
+  author_name: string;
 }
 
 export interface ContributionsSummary {
@@ -61,9 +61,18 @@ export interface ContributionsSummary {
   actionButtonTitle: string;
 }
 
+export interface Opportunity {
+  id: string;
+  heading: string;
+  subheading: string;
+  labelText: string;
+  labelColor: string;
+  actionButtonTitle: string;
+}
+
 export interface GetOpportunitiesResponse {
-  opportunitiesDicts: unknown;
-  more: unknown;
+  opportunitiesDicts: Opportunity[];
+  more: boolean;
 }
 
 export interface ContributionDetails {
@@ -82,7 +91,7 @@ export interface SuggestionDetails {
 export interface TabDetails {
   suggestionType: string;
   text: string;
-  enabled?: boolean;
+  enabled: boolean;
 }
 
 @Component({
@@ -107,7 +116,12 @@ export class ContributionsAndReview
   activeDropdownTabChoice: string;
   reviewTabs: TabDetails[] = [];
   contributionTabs: TabDetails[] = [];
-  tabNameToOpportunityFetchFunction: unknown;
+  tabNameToOpportunityFetchFunction: {
+    [key: string]: {
+      [key: string]: Function;
+    };
+  };
+
   SUGGESTION_LABELS = {
     review: {
       text: 'Awaiting review',
@@ -531,7 +545,8 @@ export class ContributionsAndReview
             if (userCanReviewQuestionSuggestions) {
               this.reviewTabs.push({
                 suggestionType: this.SUGGESTION_TYPE_QUESTION,
-                text: 'Review Questions'
+                text: 'Review Questions',
+                enabled: false
               });
               userReviewableSuggestionTypes.push(this.SUGGESTION_TYPE_QUESTION);
             }
@@ -540,7 +555,8 @@ export class ContributionsAndReview
                 .length > 0) {
               this.reviewTabs.push({
                 suggestionType: this.SUGGESTION_TYPE_TRANSLATE,
-                text: 'Review Translations'
+                text: 'Review Translations',
+                enabled: false
               });
               userReviewableSuggestionTypes.push(
                 this.SUGGESTION_TYPE_TRANSLATE);
