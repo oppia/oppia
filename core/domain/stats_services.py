@@ -500,6 +500,10 @@ def update_exp_issues_for_new_exp_version(
         if 'state_name' in playthrough.issue_customization_args:
             state_name = (
                 playthrough.issue_customization_args['state_name']['value'])
+            # Here, issue_customization_args can contain str, int and list
+            # values but fom the implementation we are sure that state_name
+            # is always going to be a str value. So that's why assert is used.
+            assert isinstance(state_name, str)
             playthrough.issue_customization_args['state_name']['value'] = (
                 state_name if state_name not in old_to_new_state_names else
                 old_to_new_state_names[state_name])
@@ -509,6 +513,10 @@ def update_exp_issues_for_new_exp_version(
 
             if 'state_name' in action_customization_args:
                 state_name = action_customization_args['state_name']['value']
+                # Here, issue_customization_args can contain str, int and list
+                # values but fom the implementation we are sure that state_name
+                # is always going to be a str value. So that's why assert is used.
+                assert isinstance(state_name, str)
                 action_customization_args['state_name']['value'] = (
                     state_name if state_name not in old_to_new_state_names else
                     old_to_new_state_names[state_name])
@@ -516,6 +524,11 @@ def update_exp_issues_for_new_exp_version(
             if 'dest_state_name' in action_customization_args:
                 dest_state_name = (
                     action_customization_args['dest_state_name']['value'])
+                # Here, issue_customization_args can contain str, int and
+                # list values but fom the implementation we are sure that
+                # dest_state_name is always going to be a str value. So
+                # that's why assert is used.
+                assert isinstance(dest_state_name, str)
                 action_customization_args['dest_state_name']['value'] = (
                     dest_state_name
                     if dest_state_name not in old_to_new_state_names else
@@ -550,6 +563,10 @@ def update_exp_issues_for_new_exp_version(
             state_name = (
                 exp_issue.issue_customization_args['state_name']['value'])
 
+            # Here, issue_customization_args can contain str, int and list
+            # values but fom the implementation we are sure that state_name
+            # is always going to be a str value. So that's why assert is used.
+            assert isinstance(state_name, str)
             if state_name in deleted_state_names:
                 exp_issue.is_valid = False
 
@@ -1059,7 +1076,7 @@ def get_state_reference_for_exploration(exp_id: str, state_name: str) -> str:
         str. The generated state reference.
     """
     exploration = exp_fetchers.get_exploration_by_id(exp_id)
-    if not exploration.has_state_name(state_name):  # type: ignore[no-untyped-call]
+    if not exploration.has_state_name(state_name):
         raise utils.InvalidInputException(
             'No state with the given state name was found in the '
             'exploration with id %s' % exp_id)

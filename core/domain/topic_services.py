@@ -860,7 +860,7 @@ def delete_topic(
         committer_id, feconf.COMMIT_MESSAGE_TOPIC_DELETED,
         force_deletion=force_deletion)
 
-    feedback_services.delete_threads_for_multiple_entities(  # type: ignore[no-untyped-call]
+    feedback_services.delete_threads_for_multiple_entities(
         feconf.ENTITY_TYPE_TOPIC, [topic_id])
 
     # This must come after the topic is retrieved. Otherwise the memcache

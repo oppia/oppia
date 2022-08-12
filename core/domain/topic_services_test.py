@@ -653,10 +653,10 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             self.user_id_admin, 'story_id_new', change_list,
             'Updated story node.')
 
-        self.set_moderators([self.CURRICULUM_ADMIN_USERNAME])  # type: ignore[no-untyped-call]
+        self.set_moderators([self.CURRICULUM_ADMIN_USERNAME])
         self.user_admin = user_services.get_user_actions_info(
             self.user_id_admin)
-        rights_manager.unpublish_exploration(self.user_admin, 'exp_id')  # type: ignore[no-untyped-call]
+        rights_manager.unpublish_exploration(self.user_admin, 'exp_id')
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'Exploration with ID exp_id is not public. Please '
             'publish explorations before adding them to a story.'):

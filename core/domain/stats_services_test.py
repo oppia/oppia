@@ -527,7 +527,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
 
         # Test addition of states.
-        exploration.add_states(['New state', 'New state 2'])  # type: ignore[no-untyped-call]
+        exploration.add_states(['New state', 'New state 2'])
         exploration.version += 1
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception,
@@ -555,7 +555,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
 
         # Test addition of states.
-        exploration.add_states(['New state', 'New state 2'])  # type: ignore[no-untyped-call]
+        exploration.add_states(['New state', 'New state 2'])
         exploration.version += 1
         change_list = [exp_domain.ExplorationChange({
             'cmd': 'add_state',
@@ -564,7 +564,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             'cmd': 'add_state',
             'state_name': 'New state 2'
         })]
-        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)  # type: ignore[no-untyped-call]
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         exploration_stats = stats_services.get_stats_for_new_exp_version(
             exploration.id,
             exploration.version,
@@ -596,14 +596,14 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             stats_domain.StateStats.create_default().to_dict())
 
         # Test renaming of states.
-        exploration.rename_state('New state 2', 'Renamed state')  # type: ignore[no-untyped-call]
+        exploration.rename_state('New state 2', 'Renamed state')
         exploration.version += 1
         change_list = [exp_domain.ExplorationChange({
             'cmd': 'rename_state',
             'old_state_name': 'New state 2',
             'new_state_name': 'Renamed state'
         })]
-        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)  # type: ignore[no-untyped-call]
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         exploration_stats = stats_services.get_stats_for_new_exp_version(
             exploration.id,
             exploration.version,
@@ -626,13 +626,13 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
                 'Home', 'End', 'Renamed state', 'New state']))
 
         # Test deletion of states.
-        exploration.delete_state('New state')  # type: ignore[no-untyped-call]
+        exploration.delete_state('New state')
         exploration.version += 1
         change_list = [exp_domain.ExplorationChange({
             'cmd': 'delete_state',
             'state_name': 'New state'
         })]
-        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)  # type: ignore[no-untyped-call]
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         exploration_stats = stats_services.get_stats_for_new_exp_version(
             exploration.id,
             exploration.version,
@@ -655,9 +655,9 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             set(['Home', 'Renamed state', 'End']))
 
         # Test addition, renaming and deletion of states.
-        exploration.add_states(['New state 2'])  # type: ignore[no-untyped-call]
-        exploration.rename_state('New state 2', 'Renamed state 2')  # type: ignore[no-untyped-call]
-        exploration.delete_state('Renamed state 2')  # type: ignore[no-untyped-call]
+        exploration.add_states(['New state 2'])
+        exploration.rename_state('New state 2', 'Renamed state 2')
+        exploration.delete_state('Renamed state 2')
         exploration.version += 1
         change_list = [exp_domain.ExplorationChange({
             'cmd': 'add_state',
@@ -670,7 +670,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             'cmd': 'delete_state',
             'state_name': 'Renamed state 2'
         })]
-        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)  # type: ignore[no-untyped-call]
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         exploration_stats = stats_services.get_stats_for_new_exp_version(
             exploration.id,
             exploration.version,
@@ -693,9 +693,9 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             set(['Home', 'End', 'Renamed state']))
 
         # Test addition and multiple renames.
-        exploration.add_states(['New state 2'])  # type: ignore[no-untyped-call]
-        exploration.rename_state('New state 2', 'New state 3')  # type: ignore[no-untyped-call]
-        exploration.rename_state('New state 3', 'New state 4')  # type: ignore[no-untyped-call]
+        exploration.add_states(['New state 2'])
+        exploration.rename_state('New state 2', 'New state 3')
+        exploration.rename_state('New state 3', 'New state 4')
         exploration.version += 1
         change_list = [exp_domain.ExplorationChange({
             'cmd': 'add_state',
@@ -709,7 +709,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             'old_state_name': 'New state 3',
             'new_state_name': 'New state 4'
         })]
-        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)  # type: ignore[no-untyped-call]
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         exploration_stats = stats_services.get_stats_for_new_exp_version(
             exploration.id,
             exploration.version,
@@ -751,9 +751,9 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         exploration_stats_model.put()
 
         # Test deletion, addition and rename.
-        exploration.delete_state('New state 4')  # type: ignore[no-untyped-call]
-        exploration.add_states(['New state'])  # type: ignore[no-untyped-call]
-        exploration.rename_state('New state', 'New state 4')  # type: ignore[no-untyped-call]
+        exploration.delete_state('New state 4')
+        exploration.add_states(['New state'])
+        exploration.rename_state('New state', 'New state 4')
         exploration.version += 1
         change_list = [exp_domain.ExplorationChange({
             'cmd': 'delete_state',
@@ -766,7 +766,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             'old_state_name': 'New state',
             'new_state_name': 'New state 4'
         })]
-        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)  # type: ignore[no-untyped-call]
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         exploration_stats = stats_services.get_stats_for_new_exp_version(
             exploration.id,
             exploration.version,
@@ -830,7 +830,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         self.assertEqual(exploration_stats_with_none.num_completions_v2, 0)
 
         # Test state name swaps.
-        exploration.add_states(['New state 5', 'New state 6'])  # type: ignore[no-untyped-call]
+        exploration.add_states(['New state 5', 'New state 6'])
         exploration.version += 1
         change_list = [exp_domain.ExplorationChange({
             'cmd': 'add_state',
@@ -839,7 +839,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             'cmd': 'add_state',
             'state_name': 'New state 6'
         })]
-        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)  # type: ignore[no-untyped-call]
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         exploration_stats = stats_services.get_stats_for_new_exp_version(
             exploration.id,
             exploration.version,
@@ -849,9 +849,9 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         )
         stats_services.create_stats_model(exploration_stats)
 
-        exploration.rename_state('New state 5', 'New state 7')  # type: ignore[no-untyped-call]
-        exploration.rename_state('New state 6', 'New state 5')  # type: ignore[no-untyped-call]
-        exploration.rename_state('New state 7', 'New state 6')  # type: ignore[no-untyped-call]
+        exploration.rename_state('New state 5', 'New state 7')
+        exploration.rename_state('New state 6', 'New state 5')
+        exploration.rename_state('New state 7', 'New state 6')
         exploration.version += 1
         change_list = [exp_domain.ExplorationChange({
             'cmd': 'rename_state',
@@ -866,7 +866,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             'old_state_name': 'New state 7',
             'new_state_name': 'New state 6'
         })]
-        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)  # type: ignore[no-untyped-call]
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         exploration_stats = stats_services.get_stats_for_new_exp_version(
             exploration.id,
             exploration.version,
@@ -1018,8 +1018,8 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         stats_models.ExplorationStatsModel.create(
             'exp_id2', 2, 10, 0, 0, 0, 0, 0, {})
         exp_version_references = [
-            exp_domain.ExpVersionReference(self.exp_id, self.exp_version),  # type: ignore[no-untyped-call]
-            exp_domain.ExpVersionReference('exp_id2', 2)]  # type: ignore[no-untyped-call]
+            exp_domain.ExpVersionReference(self.exp_id, self.exp_version),
+            exp_domain.ExpVersionReference('exp_id2', 2)]
 
         exp_stats_list = stats_services.get_exploration_stats_multi(
             exp_version_references)
@@ -1039,8 +1039,8 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
 
     def test_get_exploration_stats_multi_with_invalid_exp_id(self) -> None:
         exp_version_references = [
-            exp_domain.ExpVersionReference('exp_id_1', 1),  # type: ignore[no-untyped-call]
-            exp_domain.ExpVersionReference('exp_id_2', 2)]  # type: ignore[no-untyped-call]
+            exp_domain.ExpVersionReference('exp_id_1', 1),
+            exp_domain.ExpVersionReference('exp_id_2', 2)]
 
         exploration_stats_models = (
             stats_models.ExplorationStatsModel.get_multi_stats_models(
@@ -1070,7 +1070,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
 
         exp.version += 1
         stats_services.update_exp_issues_for_new_exp_version(
-            exp, exp_domain.ExplorationVersionsDiff([]), None)  # type: ignore[no-untyped-call]
+            exp, exp_domain.ExplorationVersionsDiff([]), None)
 
         exploration_issues_model = (
             stats_models.ExplorationIssuesModel.get('%s.%s' % ('exp_id', 1)))
