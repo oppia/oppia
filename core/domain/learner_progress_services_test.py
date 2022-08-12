@@ -86,7 +86,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
     USER_USERNAME: Final = 'user'
 
     def setUp(self) -> None:
-        super(LearnerProgressTests, self).setUp()
+        super().setUp()
 
         self.signup(self.USER_EMAIL, self.USER_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
@@ -177,7 +177,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             })]
         )
         topic_services.save_new_topic(self.owner_id, topic)  # type: ignore[no-untyped-call]
-        self.save_new_story(self.STORY_ID_0, self.owner_id, self.TOPIC_ID_0)  # type: ignore[no-untyped-call]
+        self.save_new_story(self.STORY_ID_0, self.owner_id, self.TOPIC_ID_0)
         topic_services.add_canonical_story(  # type: ignore[no-untyped-call]
             self.owner_id, self.TOPIC_ID_0, self.STORY_ID_0)
 
@@ -195,7 +195,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 'node_id': 'node_1'
             })
         ]
-        story_services.update_story(  # type: ignore[no-untyped-call]
+        story_services.update_story(
             self.owner_id, self.STORY_ID_0, changelist, 'Added node.')
 
         topic = topic_domain.Topic.create_default_topic(
@@ -222,7 +222,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             })]
         )
         topic_services.save_new_topic(self.owner_id, topic)  # type: ignore[no-untyped-call]
-        self.save_new_story(self.STORY_ID_1, self.owner_id, self.TOPIC_ID_1)  # type: ignore[no-untyped-call]
+        self.save_new_story(self.STORY_ID_1, self.owner_id, self.TOPIC_ID_1)
         topic_services.add_canonical_story(  # type: ignore[no-untyped-call]
             self.owner_id, self.TOPIC_ID_1, self.STORY_ID_1)
 
@@ -241,7 +241,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             })
         ]
 
-        story_services.update_story(  # type: ignore[no-untyped-call]
+        story_services.update_story(
             self.owner_id, self.STORY_ID_1, changelist, 'Added Node 1.')
 
         topic = topic_domain.Topic.create_default_topic(
@@ -268,7 +268,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             })]
         )
         topic_services.save_new_topic(self.owner_id, topic)  # type: ignore[no-untyped-call]
-        self.save_new_story(self.STORY_ID_2, self.owner_id, self.TOPIC_ID_2)  # type: ignore[no-untyped-call]
+        self.save_new_story(self.STORY_ID_2, self.owner_id, self.TOPIC_ID_2)
         topic_services.add_canonical_story(  # type: ignore[no-untyped-call]
             self.owner_id, self.TOPIC_ID_2, self.STORY_ID_2)
 
@@ -297,7 +297,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             })]
         )
         topic_services.save_new_topic(self.owner_id, topic)  # type: ignore[no-untyped-call]
-        self.save_new_story(self.STORY_ID_3, self.owner_id, self.TOPIC_ID_3)  # type: ignore[no-untyped-call]
+        self.save_new_story(self.STORY_ID_3, self.owner_id, self.TOPIC_ID_3)
         topic_services.add_canonical_story(  # type: ignore[no-untyped-call]
             self.owner_id, self.TOPIC_ID_3, self.STORY_ID_3)
 
@@ -1077,7 +1077,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
 
         # Unpublish EXP_ID_3 to change status to ACTIVITY_STATUS_PRIVATE.
         system_user = user_services.get_system_user()
-        rights_manager.unpublish_exploration(system_user, self.EXP_ID_3)  # type: ignore[no-untyped-call]
+        rights_manager.unpublish_exploration(system_user, self.EXP_ID_3)
         private_exploration = exp_fetchers.get_exploration_summary_by_id(
             self.EXP_ID_3)
         self.assertEqual(
@@ -1111,7 +1111,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
 
         # Unpublish EXP_ID_0 to change status to ACTIVITY_STATUS_PRIVATE.
         system_user = user_services.get_system_user()
-        rights_manager.unpublish_exploration(system_user, self.EXP_ID_0)  # type: ignore[no-untyped-call]
+        rights_manager.unpublish_exploration(system_user, self.EXP_ID_0)
         private_exploration = exp_fetchers.get_exploration_summary_by_id(
             self.EXP_ID_0)
         self.assertEqual(
@@ -1217,9 +1217,11 @@ class LearnerProgressTests(test_utils.GenericTestBase):
 
         # Unpublish COL_ID_3 to change status to ACTIVITY_STATUS_PRIVATE.
         system_user = user_services.get_system_user()
-        rights_manager.unpublish_collection(system_user, self.COL_ID_3)  # type: ignore[no-untyped-call]
-        private_collection = collection_services.get_collection_summary_by_id(  # type: ignore[no-untyped-call]
+        rights_manager.unpublish_collection(system_user, self.COL_ID_3)
+        private_collection = collection_services.get_collection_summary_by_id(
             self.COL_ID_3)
+        # Ruling out the possibility of None for mypy type checking.
+        assert private_collection is not None
         self.assertEqual(
             private_collection.status, constants.ACTIVITY_STATUS_PRIVATE)
 
@@ -1251,9 +1253,11 @@ class LearnerProgressTests(test_utils.GenericTestBase):
 
         # Unpublish COL_ID_0 to change status to ACTIVITY_STATUS_PRIVATE.
         system_user = user_services.get_system_user()
-        rights_manager.unpublish_collection(system_user, self.COL_ID_0)  # type: ignore[no-untyped-call]
-        private_collection = collection_services.get_collection_summary_by_id(  # type: ignore[no-untyped-call]
+        rights_manager.unpublish_collection(system_user, self.COL_ID_0)
+        private_collection = collection_services.get_collection_summary_by_id(
             self.COL_ID_0)
+        # Ruling out the possibility of None for mypy type checking.
+        assert private_collection is not None
         self.assertEqual(
             private_collection.status, constants.ACTIVITY_STATUS_PRIVATE)
 
@@ -1270,8 +1274,10 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.publish_collection(self.owner_id, self.COL_ID_0)
         learner_progress_services.mark_collection_as_completed(
             self.user_id, self.COL_ID_0)
-        public_collection = collection_services.get_collection_summary_by_id(  # type: ignore[no-untyped-call]
+        public_collection = collection_services.get_collection_summary_by_id(
             self.COL_ID_0)
+        # Ruling out the possibility of None for mypy type checking.
+        assert public_collection is not None
         self.assertEqual(
             public_collection.status, constants.ACTIVITY_STATUS_PUBLIC)
 
@@ -1288,11 +1294,11 @@ class LearnerProgressTests(test_utils.GenericTestBase):
 
     def test_unpublishing_completed_story_filters_it_out(self) -> None:
         # Add stories to the completed list.
-        story_services.record_completed_node_in_story_context(  # type: ignore[no-untyped-call]
+        story_services.record_completed_node_in_story_context(
             self.user_id, self.STORY_ID_0, 'node_1')
         learner_progress_services.mark_story_as_completed(
             self.user_id, self.STORY_ID_0)
-        story_services.record_completed_node_in_story_context(  # type: ignore[no-untyped-call]
+        story_services.record_completed_node_in_story_context(
             self.user_id, self.STORY_ID_1, 'node_1')
         learner_progress_services.mark_story_as_completed(
             self.user_id, self.STORY_ID_1)
@@ -1321,13 +1327,13 @@ class LearnerProgressTests(test_utils.GenericTestBase):
 
     def test_unpublishing_learnt_topic_filters_it_out(self) -> None:
         # Add topics to the learnt list.
-        story_services.record_completed_node_in_story_context(  # type: ignore[no-untyped-call]
+        story_services.record_completed_node_in_story_context(
             self.user_id, self.STORY_ID_0, 'node_1')
         learner_progress_services.mark_story_as_completed(
             self.user_id, self.STORY_ID_0)
         learner_progress_services.mark_topic_as_learnt(
             self.user_id, self.TOPIC_ID_0)
-        story_services.record_completed_node_in_story_context(  # type: ignore[no-untyped-call]
+        story_services.record_completed_node_in_story_context(
             self.user_id, self.STORY_ID_1, 'node_1')
         learner_progress_services.mark_story_as_completed(
             self.user_id, self.STORY_ID_1)
@@ -1360,11 +1366,11 @@ class LearnerProgressTests(test_utils.GenericTestBase):
 
     def test_deleting_a_story_filters_it_out_from_completed_list(self) -> None:
         # Add stories to the completed list.
-        story_services.record_completed_node_in_story_context(  # type: ignore[no-untyped-call]
+        story_services.record_completed_node_in_story_context(
             self.user_id, self.STORY_ID_0, 'node_1')
         learner_progress_services.mark_story_as_completed(
             self.user_id, self.STORY_ID_0)
-        story_services.record_completed_node_in_story_context(  # type: ignore[no-untyped-call]
+        story_services.record_completed_node_in_story_context(
             self.user_id, self.STORY_ID_1, 'node_1')
         learner_progress_services.mark_story_as_completed(
             self.user_id, self.STORY_ID_1)
@@ -1373,7 +1379,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 self.user_id), [self.STORY_ID_0, self.STORY_ID_1])
 
         # Delete STORY_ID_1.
-        story_services.delete_story(self.admin_id, self.STORY_ID_1)  # type: ignore[no-untyped-call]
+        story_services.delete_story(self.admin_id, self.STORY_ID_1)
 
         # Call get_topics_and_stories_progress to get filtered progress.
         user_activity = (
@@ -1392,13 +1398,13 @@ class LearnerProgressTests(test_utils.GenericTestBase):
 
     def test_deleting_a_topic_filters_it_out_from_learnt_list(self) -> None:
         # Add topics to the learnt list.
-        story_services.record_completed_node_in_story_context(  # type: ignore[no-untyped-call]
+        story_services.record_completed_node_in_story_context(
             self.user_id, self.STORY_ID_0, 'node_1')
         learner_progress_services.mark_story_as_completed(
             self.user_id, self.STORY_ID_0)
         learner_progress_services.mark_topic_as_learnt(
             self.user_id, self.TOPIC_ID_0)
-        story_services.record_completed_node_in_story_context(  # type: ignore[no-untyped-call]
+        story_services.record_completed_node_in_story_context(
             self.user_id, self.STORY_ID_1, 'node_1')
         learner_progress_services.mark_story_as_completed(
             self.user_id, self.STORY_ID_1)
@@ -1465,7 +1471,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
 
         # Unpublish EXP_ID_3 to change status to ACTIVITY_STATUS_PRIVATE.
         system_user = user_services.get_system_user()
-        rights_manager.unpublish_exploration(system_user, self.EXP_ID_3)  # type: ignore[no-untyped-call]
+        rights_manager.unpublish_exploration(system_user, self.EXP_ID_3)
         private_exploration = exp_fetchers.get_exploration_summary_by_id(
             self.EXP_ID_3)
         self.assertEqual(
@@ -1502,7 +1508,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
 
         # Unpublish EXP_ID_0 to change status to ACTIVITY_STATUS_PRIVATE.
         system_user = user_services.get_system_user()
-        rights_manager.unpublish_exploration(system_user, self.EXP_ID_0)  # type: ignore[no-untyped-call]
+        rights_manager.unpublish_exploration(system_user, self.EXP_ID_0)
         private_exploration = exp_fetchers.get_exploration_summary_by_id(
             self.EXP_ID_0)
         self.assertEqual(
@@ -1686,9 +1692,11 @@ class LearnerProgressTests(test_utils.GenericTestBase):
 
         # Unpublish COL_ID_3 to change status to ACTIVITY_STATUS_PRIVATE.
         system_user = user_services.get_system_user()
-        rights_manager.unpublish_collection(system_user, self.COL_ID_3)  # type: ignore[no-untyped-call]
-        private_collection = collection_services.get_collection_summary_by_id(  # type: ignore[no-untyped-call]
+        rights_manager.unpublish_collection(system_user, self.COL_ID_3)
+        private_collection = collection_services.get_collection_summary_by_id(
             self.COL_ID_3)
+        # Ruling out the possibility of None for mypy type checking.
+        assert private_collection is not None
         self.assertEqual(
             private_collection.status, constants.ACTIVITY_STATUS_PRIVATE)
 
@@ -1720,9 +1728,11 @@ class LearnerProgressTests(test_utils.GenericTestBase):
 
         # Unpublish COL_ID_0 to change status to ACTIVITY_STATUS_PRIVATE.
         system_user = user_services.get_system_user()
-        rights_manager.unpublish_collection(system_user, self.COL_ID_0)  # type: ignore[no-untyped-call]
-        private_collection = collection_services.get_collection_summary_by_id(  # type: ignore[no-untyped-call]
+        rights_manager.unpublish_collection(system_user, self.COL_ID_0)
+        private_collection = collection_services.get_collection_summary_by_id(
             self.COL_ID_0)
+        # Ruling out the possibility of None for mypy type checking.
+        assert private_collection is not None
         self.assertEqual(
             private_collection.status, constants.ACTIVITY_STATUS_PRIVATE)
 
@@ -1739,8 +1749,10 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.publish_collection(self.owner_id, self.COL_ID_0)
         learner_progress_services.mark_collection_as_incomplete(
             self.user_id, self.COL_ID_0)
-        public_collection = collection_services.get_collection_summary_by_id(  # type: ignore[no-untyped-call]
+        public_collection = collection_services.get_collection_summary_by_id(
             self.COL_ID_0)
+        # Ruling out the possibility of None for mypy type checking.
+        assert public_collection is not None
         self.assertEqual(
             public_collection.status, constants.ACTIVITY_STATUS_PUBLIC)
 
@@ -1847,7 +1859,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 self.user_id), [self.TOPIC_ID_0])
 
         # Complete the story in TOPIC_ID_0.
-        story_services.record_completed_node_in_story_context(  # type: ignore[no-untyped-call]
+        story_services.record_completed_node_in_story_context(
             self.user_id, self.STORY_ID_0, 'node_1')
         learner_progress_services.mark_story_as_completed(
             self.user_id, self.STORY_ID_0)
@@ -1905,7 +1917,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
 
         # Unpublish EXP_ID_1 to change status to ACTIVITY_STATUS_PRIVATE.
         system_user = user_services.get_system_user()
-        rights_manager.unpublish_exploration(system_user, self.EXP_ID_1)  # type: ignore[no-untyped-call]
+        rights_manager.unpublish_exploration(system_user, self.EXP_ID_1)
         private_exploration = exp_fetchers.get_exploration_summary_by_id(
             self.EXP_ID_1)
         self.assertEqual(
@@ -1935,7 +1947,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
 
         # Unpublish EXP_ID_0 to change status to ACTIVITY_STATUS_PRIVATE.
         system_user = user_services.get_system_user()
-        rights_manager.unpublish_exploration(system_user, self.EXP_ID_0)  # type: ignore[no-untyped-call]
+        rights_manager.unpublish_exploration(system_user, self.EXP_ID_0)
         private_exploration = exp_fetchers.get_exploration_summary_by_id(
             self.EXP_ID_0)
         self.assertEqual(
@@ -1982,9 +1994,11 @@ class LearnerProgressTests(test_utils.GenericTestBase):
 
         # Unpublish COL_ID_1 to change status to ACTIVITY_STATUS_PRIVATE.
         system_user = user_services.get_system_user()
-        rights_manager.unpublish_collection(system_user, self.COL_ID_1)  # type: ignore[no-untyped-call]
-        private_collection = collection_services.get_collection_summary_by_id(  # type: ignore[no-untyped-call]
+        rights_manager.unpublish_collection(system_user, self.COL_ID_1)
+        private_collection = collection_services.get_collection_summary_by_id(
             self.COL_ID_1)
+        # Ruling out the possibility of None for mypy type checking.
+        assert private_collection is not None
         self.assertEqual(
             private_collection.status, constants.ACTIVITY_STATUS_PRIVATE)
 
@@ -2012,9 +2026,11 @@ class LearnerProgressTests(test_utils.GenericTestBase):
 
         # Unpublish COL_ID_0 to change status to ACTIVITY_STATUS_PRIVATE.
         system_user = user_services.get_system_user()
-        rights_manager.unpublish_collection(system_user, self.COL_ID_0)  # type: ignore[no-untyped-call]
-        private_collection = collection_services.get_collection_summary_by_id(  # type: ignore[no-untyped-call]
+        rights_manager.unpublish_collection(system_user, self.COL_ID_0)
+        private_collection = collection_services.get_collection_summary_by_id(
             self.COL_ID_0)
+        # Ruling out the possibility of None for mypy type checking.
+        assert private_collection is not None
         self.assertEqual(
             private_collection.status, constants.ACTIVITY_STATUS_PRIVATE)
 
@@ -2031,8 +2047,10 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.publish_collection(self.owner_id, self.COL_ID_0)
         learner_progress_services.add_collection_to_learner_playlist(
             self.user_id, self.COL_ID_0)
-        public_collection = collection_services.get_collection_summary_by_id(  # type: ignore[no-untyped-call]
+        public_collection = collection_services.get_collection_summary_by_id(
             self.COL_ID_0)
+        # Ruling out the possibility of None for mypy type checking.
+        assert public_collection is not None
         self.assertEqual(
             public_collection.status, constants.ACTIVITY_STATUS_PUBLIC)
 
@@ -2134,7 +2152,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.user_id, self.EXP_ID_0)
         learner_progress_services.mark_collection_as_completed(
             self.user_id, self.COL_ID_0)
-        story_services.record_completed_node_in_story_context(  # type: ignore[no-untyped-call]
+        story_services.record_completed_node_in_story_context(
             self.user_id, self.STORY_ID_0, 'node_1')
         learner_progress_services.mark_story_as_completed(
             self.user_id, self.STORY_ID_0)
@@ -2244,7 +2262,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         # Delete an exploration in the playlist section.
         exp_services.delete_exploration(self.owner_id, self.EXP_ID_3)
         # Add an exploration to a collection that has already been completed.
-        collection_services.update_collection(  # type: ignore[no-untyped-call]
+        collection_services.update_collection(
             self.owner_id, self.COL_ID_0, [{
                 'cmd': collection_domain.CMD_ADD_COLLECTION_NODE,
                 'exploration_id': self.EXP_ID_2
@@ -2270,7 +2288,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         ]
 
         # Update the story.
-        story_services.update_story(  # type: ignore[no-untyped-call]
+        story_services.update_story(
             self.owner_id, self.STORY_ID_0, changelist, 'Added node.')
 
         # Get the progress of the user.
@@ -2329,11 +2347,11 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(partially_learnt_topic_summaries[1].name, 'topic')
 
         # Delete a collection in the completed section.
-        collection_services.delete_collection(self.owner_id, self.COL_ID_0)  # type: ignore[no-untyped-call]
+        collection_services.delete_collection(self.owner_id, self.COL_ID_0)
         # Delete a collection in the incomplete section.
-        collection_services.delete_collection(self.owner_id, self.COL_ID_1)  # type: ignore[no-untyped-call]
+        collection_services.delete_collection(self.owner_id, self.COL_ID_1)
         # Delete a collection in the playlist section.
-        collection_services.delete_collection(self.owner_id, self.COL_ID_3)  # type: ignore[no-untyped-call]
+        collection_services.delete_collection(self.owner_id, self.COL_ID_3)
 
         # Delete a topic from incomplete section.
         topic_services.delete_topic(self.admin_id, self.TOPIC_ID_0)  # type: ignore[no-untyped-call]

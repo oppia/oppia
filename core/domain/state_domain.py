@@ -1002,7 +1002,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
 
     @classmethod
     def create_default_interaction(
-        cls, default_dest_state_name: str
+        cls, default_dest_state_name: Optional[str]
     ) -> InteractionInstance:
         """Create a default InteractionInstance domain object:
             - customization_args: empty dictionary;
@@ -1012,7 +1012,8 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             - confirmed_unclassified_answers: empty list;
 
         Args:
-            default_dest_state_name: str. The default destination state.
+            default_dest_state_name: str|None. The default destination state, or
+                None if no default destination is provided.
 
         Returns:
             InteractionInstance. The corresponding InteractionInstance domain
@@ -1576,7 +1577,7 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
 class OutcomeDict(TypedDict):
     """Dictionary representing the Outcome object."""
 
-    dest: str
+    dest: Optional[str]
     dest_if_really_stuck: Optional[str]
     feedback: SubtitledHtmlDict
     labelled_as_correct: bool
@@ -1593,7 +1594,7 @@ class Outcome(translation_domain.BaseTranslatableObject):
 
     def __init__(
         self,
-        dest: str,
+        dest: Optional[str],
         dest_if_really_stuck: Optional[str],
         feedback: SubtitledHtml,
         labelled_as_correct: bool,
@@ -3783,11 +3784,13 @@ class State(translation_domain.BaseTranslatableObject):
         self._update_content_ids_in_assets(
             old_content_id_list, new_content_id_list)
 
-    def update_interaction_solution(self, solution: Solution) -> None:
+    def update_interaction_solution(
+        self, solution: Optional[Solution]
+    ) -> None:
         """Update the solution of interaction.
 
         Args:
-            solution: Solution. Object of class Solution.
+            solution: Solution|None. Object of class Solution.
 
         Raises:
             Exception. The 'solution' is not a domain object.
@@ -4063,12 +4066,15 @@ class State(translation_domain.BaseTranslatableObject):
 
     @classmethod
     def create_default_state(
-        cls, default_dest_state_name: str, is_initial_state: bool = False
+        cls,
+        default_dest_state_name: Optional[str],
+        is_initial_state: bool = False
     ) -> State:
         """Return a State domain object with default value.
 
         Args:
-            default_dest_state_name: str. The default destination state.
+            default_dest_state_name: str. The default destination state, or None
+                if no default destination state is defined.
             is_initial_state: bool. Whether this state represents the initial
                 state of an exploration.
 

@@ -46,7 +46,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
     """Test methods operating on states."""
 
     def setUp(self) -> None:
-        super(StateDomainUnitTests, self).setUp()
+        super().setUp()
         translation_dict = {
             'content_id_3': translation_domain.TranslatedContent(
                 'My name is Nikhil.', True)
@@ -61,7 +61,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         """Test the method for extracting all the HTML from a state having
         DragAndDropSortInput interaction.
         """
-        exploration = exp_domain.Exploration.create_default_exploration(  # type: ignore[no-untyped-call]
+        exploration = exp_domain.Exploration.create_default_exploration(
             'exp_id')
         exploration.add_states(['State1'])
         state = exploration.states['State1']
@@ -69,7 +69,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'content_id': 'content',
             'html': '<p>state content html</p>'
         }
-        state_customization_args_dict = {
+        state_customization_args_dict: Dict[
+            str, Dict[str, Union[List[Dict[str, str]], bool]]
+        ] = {
             'choices': {
                 'value': [
                     {
@@ -327,6 +329,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state.update_next_content_id_index(4)
         state.update_interaction_hints(state_hint_list)
 
+        # Ruling out the possibility of None for mypy type checking.
+        assert state.interaction.id is not None
         solution = state_domain.Solution.from_dict(
             state.interaction.id, state_solution_dict)
         state.update_interaction_solution(solution)
@@ -415,7 +419,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         TextInput interaction.
         """
 
-        exploration = exp_domain.Exploration.create_default_exploration(  # type: ignore[no-untyped-call]
+        exploration = exp_domain.Exploration.create_default_exploration(
             'exp_id')
         exploration.add_states(['State1'])
         state = exploration.states['State1']
@@ -465,7 +469,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'html': '<p>This is solution for state1</p>'
             }
         }
-        state_interaction_cust_args = {
+        state_interaction_cust_args: Dict[
+            str, Dict[str, Union[Dict[str, str], int]]
+        ] = {
             'placeholder': {
                 'value': {
                     'content_id': 'ca_placeholder_0',
@@ -484,6 +490,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             state_answer_group)
         state.update_interaction_default_outcome(state_default_outcome)
         state.update_interaction_hints(state_hint_list)
+        # Ruling out the possibility of None for mypy type checking.
+        assert state.interaction.id is not None
         solution = state_domain.Solution.from_dict(
             state.interaction.id, state_solution_dict)
         state.update_interaction_solution(solution)
@@ -507,7 +515,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         ItemSelectionInput interaction.
         """
 
-        exploration = exp_domain.Exploration.create_default_exploration(  # type: ignore[no-untyped-call]
+        exploration = exp_domain.Exploration.create_default_exploration(
             'exp_id')
         exploration.add_states(['State1'])
         state = exploration.states['State1']
@@ -516,7 +524,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'content_id': 'content',
             'html': '<p>state content html</p>'
         }
-        state_customization_args_dict = {
+        state_customization_args_dict: Dict[
+            str, Dict[str, Union[List[Dict[str, str]], int]]
+        ] = {
             'maxAllowableSelectionCount': {
                 'value': 1
             },
@@ -602,6 +612,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state.update_next_content_id_index(4)
         state.update_interaction_hints(state_hint_list)
 
+        # Ruling out the possibility of None for mypy type checking.
+        assert state.interaction.id is not None
         solution = state_domain.Solution.from_dict(
             state.interaction.id, state_solution_dict)
         state.update_interaction_solution(solution)
@@ -661,7 +673,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         when the rule_spec has invalid html format.
         """
 
-        exploration = exp_domain.Exploration.create_default_exploration(  # type: ignore[no-untyped-call]
+        exploration = exp_domain.Exploration.create_default_exploration(
             'exp_id')
         exploration.add_states(['State1'])
         state = exploration.states['State1']
@@ -727,11 +739,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         when a content_id is invalid (set to None).
         """
 
-        exploration = exp_domain.Exploration.create_default_exploration(  # type: ignore[no-untyped-call]
+        exploration = exp_domain.Exploration.create_default_exploration(
             'exp_id')
         exploration.add_states(['State1'])
         state = exploration.states['State1']
-        state_customization_args_dict = {
+        state_customization_args_dict: Dict[
+            str, Dict[str, Union[List[Dict[str, Optional[str]]], int]]
+        ] = {
             'maxAllowableSelectionCount': {
                 'value': 1
             },
@@ -764,7 +778,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         when the rule_spec has html but the input variable is invalid.
         """
 
-        exploration = exp_domain.Exploration.create_default_exploration(  # type: ignore[no-untyped-call]
+        exploration = exp_domain.Exploration.create_default_exploration(
             'exp_id')
         exploration.add_states(['State1'])
         state = exploration.states['State1']
@@ -783,7 +797,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             [],
             None
         )
-        state_customization_args_dict = {
+        state_customization_args_dict: Dict[
+            str, Dict[str, Union[List[Dict[str, str]], int]]
+        ] = {
             'maxAllowableSelectionCount': {
                 'value': 1
             },
@@ -843,7 +859,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         when the interaction has a solution but the answer_type for the
         corrent_answer is invalid.
         """
-        exploration = exp_domain.Exploration.create_default_exploration(  # type: ignore[no-untyped-call]
+        exploration = exp_domain.Exploration.create_default_exploration(
             'exp_id')
         exploration.add_states(['State1'])
         state = exploration.states['State1']
@@ -851,7 +867,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'content_id': 'content',
             'html': '<p>state content html</p>'
         }
-        state_customization_args_dict = {
+        state_customization_args_dict: Dict[
+            str, Dict[str, Union[List[Dict[str, str]], bool]]
+        ] = {
             'choices': {
                 'value': [
                     {
@@ -903,6 +921,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             state_customization_args_dict)
         state.update_next_content_id_index(4)
         state.update_interaction_hints(state_hint_list)
+        # Ruling out the possibility of None for mypy type checking.
+        assert state.interaction.id is not None
         solution = state_domain.Solution.from_dict(
             state.interaction.id, state_solution_dict)
         state.update_interaction_solution(solution)
@@ -935,7 +955,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         """Test the method for extracting all the HTML from a state
         when the state has no interaction.
         """
-        exploration = exp_domain.Exploration.create_default_exploration(  # type: ignore[no-untyped-call]
+        exploration = exp_domain.Exploration.create_default_exploration(
             'exp_id')
         exploration.add_states(['State1'])
         state = exploration.states['State1']
@@ -953,7 +973,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
     def test_export_state_to_dict(self) -> None:
         """Test exporting a state to a dict."""
-        exploration = exp_domain.Exploration.create_default_exploration(  # type: ignore[no-untyped-call]
+        exploration = exp_domain.Exploration.create_default_exploration(
             'exp_id')
         exploration.add_states(['New state'])
 
@@ -1053,7 +1073,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
     def test_get_content_html_with_correct_state_name_returns_html(
         self
     ) -> None:
-        exploration = exp_domain.Exploration.create_default_exploration('0')  # type: ignore[no-untyped-call]
+        exploration = exp_domain.Exploration.create_default_exploration('0')
 
         init_state = exploration.states[exploration.init_state_name]
         init_state.update_interaction_id('TextInput')
@@ -1074,7 +1094,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             init_state.get_content_html('hint_1'), '<p>Changed hint one</p>')
 
     def test_rte_content_validation_for_android(self) -> None:
-        exploration = exp_domain.Exploration.create_default_exploration('0')  # type: ignore[no-untyped-call]
+        exploration = exp_domain.Exploration.create_default_exploration('0')
 
         init_state = exploration.states[exploration.init_state_name]
         init_state.update_interaction_id('TextInput')
@@ -1091,12 +1111,16 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
         }
 
+        # Ruling out the possibility of None for mypy type checking.
+        assert init_state.interaction.id is not None
         solution = state_domain.Solution.from_dict(
             init_state.interaction.id, solution_dict
         )
         init_state.update_interaction_solution(solution)
         self.assertFalse(init_state.is_rte_content_supported_on_android())
         solution_dict['explanation']['html'] = ''
+        # Ruling out the possibility of None for mypy type checking.
+        assert init_state.interaction.id is not None
         init_state.update_interaction_solution(state_domain.Solution.from_dict(
             init_state.interaction.id, solution_dict))
         self.assertTrue(init_state.is_rte_content_supported_on_android())
@@ -1211,7 +1235,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         ) -> state_domain.State:
             """Creates an init state for interaction verification."""
             exploration = (
-                exp_domain.Exploration.create_default_exploration('0'))  # type: ignore[no-untyped-call]
+                exp_domain.Exploration.create_default_exploration('0'))
             state: state_domain.State = (
                 exploration.states[exploration.init_state_name]
             )
@@ -1278,7 +1302,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         _verify_all_interaction_ids_checked(self)
 
     def test_get_content_html_with_invalid_content_id_raise_error(self) -> None:
-        exploration = exp_domain.Exploration.create_default_exploration('0')  # type: ignore[no-untyped-call]
+        exploration = exp_domain.Exploration.create_default_exploration('0')
         init_state = exploration.states[exploration.init_state_name]
         init_state.update_interaction_id('TextInput')
         hints_list = [
@@ -1298,7 +1322,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
     def test_get_content_id_mapping_needing_translations_with_existing_translations(  # pylint: disable=line-too-long
         self
     ) -> None:
-        exploration = exp_domain.Exploration.create_default_exploration('0')  # type: ignore[no-untyped-call]
+        exploration = exp_domain.Exploration.create_default_exploration('0')
         init_state = exploration.states[exploration.init_state_name]
         init_state.update_content(
             state_domain.SubtitledHtml.from_dict({
@@ -1350,6 +1374,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
         }
 
+        # Ruling out the possibility of None for mypy type checking.
+        assert init_state.interaction.id is not None
         solution = state_domain.Solution.from_dict(
             init_state.interaction.id, solution_dict)
         init_state.update_interaction_solution(solution)
@@ -1404,7 +1430,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
     def test_get_content_id_mapping_needing_translations_with_interaction_translations(  # pylint: disable=line-too-long
         self
     ) -> None:
-        exploration = exp_domain.Exploration.create_default_exploration('0')  # type: ignore[no-untyped-call]
+        exploration = exp_domain.Exploration.create_default_exploration('0')
         init_state = exploration.states[exploration.init_state_name]
         init_state.update_content(
             state_domain.SubtitledHtml.from_dict({
@@ -1412,7 +1438,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'html': '<p>This is content</p>'
             }))
         init_state.update_interaction_id('TextInput')
-        state_interaction_cust_args = {
+        state_interaction_cust_args: Dict[
+            str, Dict[str, Union[Dict[str, str], int]]
+        ] = {
             'placeholder': {
                 'value': {
                     'content_id': 'ca_placeholder_0',
@@ -1468,6 +1496,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
         }
 
+        # Ruling out the possibility of None for mypy type checking.
+        assert init_state.interaction.id is not None
         solution = state_domain.Solution.from_dict(
             init_state.interaction.id, solution_dict)
         init_state.update_interaction_solution(solution)
@@ -1536,7 +1566,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
     def test_get_content_id_mapping_needing_translations_for_set_input_rule(
         self
     ) -> None:
-        exploration = exp_domain.Exploration.create_default_exploration('0')  # type: ignore[no-untyped-call]
+        exploration = exp_domain.Exploration.create_default_exploration('0')
         init_state = exploration.states[exploration.init_state_name]
         init_state.update_content(
             state_domain.SubtitledHtml.from_dict({
@@ -1589,7 +1619,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
     def test_get_content_id_mapping_needing_translations_does_not_return_numeric_content(  # pylint: disable=line-too-long
         self
     ) -> None:
-        exploration = exp_domain.Exploration.create_default_exploration('0')  # type: ignore[no-untyped-call]
+        exploration = exp_domain.Exploration.create_default_exploration('0')
         init_state = exploration.states[exploration.init_state_name]
         # Set the content.
         init_state.update_content(
@@ -1666,7 +1696,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'ca_choices_2' in content_id_mapping_needing_translations)
 
     def test_content_id_existance_checks_work_correctly(self) -> None:
-        exploration = exp_domain.Exploration.create_default_exploration('0')  # type: ignore[no-untyped-call]
+        exploration = exp_domain.Exploration.create_default_exploration('0')
         init_state = exploration.states[exploration.init_state_name]
 
         self.assertEqual(init_state.has_content_id('content'), True)
@@ -1676,7 +1706,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(init_state.has_content_id('content0'), False)
 
     def test_add_translation_works_correctly(self) -> None:
-        exploration = exp_domain.Exploration.create_default_exploration('0')  # type: ignore[no-untyped-call]
+        exploration = exp_domain.Exploration.create_default_exploration('0')
         init_state = exploration.states[exploration.init_state_name]
         init_state.update_content(
             state_domain.SubtitledHtml.from_dict({
@@ -1691,10 +1721,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(init_state.get_translation_counts(), {'hi': 1})
 
     def test_get_translation_counts_returns_correct_value(self) -> None:
-        # Here, `create_default_state` can only accept string values but for
-        # testing purposes we are providing None which causes MyPy to throw
-        # error. Thus to avoid the error, we used ignore here.
-        state = state_domain.State.create_default_state(None)  # type: ignore[arg-type]
+        state = state_domain.State.create_default_state(None)
         state.update_content(
             state_domain.SubtitledHtml.from_dict({
                 'content_id': 'content',
@@ -1737,7 +1764,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
     def test_state_operations(self) -> None:
         """Test adding, updating and checking existence of states."""
-        exploration = exp_domain.Exploration.create_default_exploration('eid')  # type: ignore[no-untyped-call]
+        exploration = exp_domain.Exploration.create_default_exploration('eid')
         self.assertNotIn('invalid_state_name', exploration.states)
 
         self.assertEqual(len(exploration.states), 1)
@@ -1783,8 +1810,17 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             exploration.rename_state('State 2', 'END')
 
         # Ensure the other states are connected to END.
+        # Ruling out the possibility of None for mypy type checking.
+        assert (
+            exploration.states['Renamed state'].interaction.default_outcome is
+            not None
+        )
         exploration.states[
             'Renamed state'].interaction.default_outcome.dest = 'State 2'
+        assert (
+            exploration.states['State 2'].interaction.default_outcome is
+            not None
+        )
         exploration.states['State 2'].interaction.default_outcome.dest = 'END'
 
         # Ensure the other states have interactions.
@@ -1828,14 +1864,17 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state.update_solicit_answer_details(True)
         self.assertEqual(state.solicit_answer_details, True)
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_update_solicit_answer_details_with_non_bool_fails(self) -> None:
         """Test updating solicit_answer_details with non bool value."""
-        exploration = exp_domain.Exploration.create_default_exploration('eid')  # type: ignore[no-untyped-call]
+        exploration = exp_domain.Exploration.create_default_exploration('eid')
         init_state = exploration.states[exploration.init_state_name]
         self.assertEqual(init_state.solicit_answer_details, False)
         with self.assertRaisesRegex(Exception, (  # type: ignore[no-untyped-call]
             'Expected solicit_answer_details to be a boolean, received')):
-            init_state.update_solicit_answer_details('abc')
+            init_state.update_solicit_answer_details('abc')  # type: ignore[arg-type]
         init_state = exploration.states[exploration.init_state_name]
         self.assertEqual(init_state.solicit_answer_details, False)
 
@@ -1853,14 +1892,17 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         state.update_card_is_checkpoint(True)
         self.assertEqual(state.card_is_checkpoint, True)
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_update_card_is_checkpoint_with_non_bool_fails(self) -> None:
         """Test updating card_is_checkpoint with non bool value."""
-        exploration = exp_domain.Exploration.create_default_exploration('eid')  # type: ignore[no-untyped-call]
+        exploration = exp_domain.Exploration.create_default_exploration('eid')
         init_state = exploration.states[exploration.init_state_name]
         self.assertEqual(init_state.card_is_checkpoint, True)
         with self.assertRaisesRegex(Exception, (  # type: ignore[no-untyped-call]
             'Expected card_is_checkpoint to be a boolean, received')):
-            init_state.update_card_is_checkpoint('abc')
+            init_state.update_card_is_checkpoint('abc')  # type: ignore[arg-type]
         init_state = exploration.states[exploration.init_state_name]
         self.assertEqual(init_state.card_is_checkpoint, True)
 
@@ -3769,7 +3811,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
     def test_hints_validation(self) -> None:
         """Test validation of state hints."""
-        exploration = exp_domain.Exploration.create_default_exploration('eid')  # type: ignore[no-untyped-call]
+        exploration = exp_domain.Exploration.create_default_exploration('eid')
         exploration.objective = 'Objective'
         init_state = exploration.states[exploration.init_state_name]
         self.set_interaction_for_state(init_state, 'TextInput')
@@ -3791,6 +3833,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
         }
 
+        # Ruling out the possibility of None for mypy type checking.
+        assert init_state.interaction.id is not None
         solution = state_domain.Solution.from_dict(
             init_state.interaction.id, solution_dict
         )
@@ -3828,7 +3872,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         """Test that update customization args throws an error when passed
         customization args with non-unique content ids.
         """
-        exploration = exp_domain.Exploration.create_default_exploration('eid')  # type: ignore[no-untyped-call]
+        exploration = exp_domain.Exploration.create_default_exploration('eid')
         init_state = exploration.states[exploration.init_state_name]
         self.set_interaction_for_state(init_state, 'MultipleChoiceInput')
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
@@ -3850,7 +3894,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
     def test_solution_validation(self) -> None:
         """Test validation of state solution."""
-        exploration = exp_domain.Exploration.create_default_exploration('eid')  # type: ignore[no-untyped-call]
+        exploration = exp_domain.Exploration.create_default_exploration('eid')
         exploration.objective = 'Objective'
         init_state = exploration.states[exploration.init_state_name]
         self.set_interaction_for_state(init_state, 'TextInput')
@@ -3874,6 +3918,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             }
         }
 
+        # Ruling out the possibility of None for mypy type checking.
+        assert init_state.interaction.id is not None
         # Object type of answer must match that of correct_answer.
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             AssertionError,
@@ -3897,7 +3943,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration.validate()
 
     def test_validate_state_unique_content_ids(self) -> None:
-        exploration = exp_domain.Exploration.create_default_exploration('eid')  # type: ignore[no-untyped-call]
+        exploration = exp_domain.Exploration.create_default_exploration('eid')
         init_state = exploration.states[exploration.init_state_name]
         init_state.update_interaction_id('MultipleChoiceInput')
         init_state.update_interaction_customization_args({
@@ -3914,15 +3960,19 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             utils.ValidationError,
             'Expected all content_ids to be unique, received'
         ):
+            value = init_state.interaction.customization_args['choices'].value
+            # Ruling out the possibility of any other type for mypy type
+            # checking.
+            assert isinstance(value, list)
             with self.swap(
-                init_state.interaction.customization_args['choices'].value[0],
+                value[0],
                 'content_id',
                 'content'
             ):
                 exploration.validate()
 
     def test_validate_state_content_id_indexes(self) -> None:
-        exploration = exp_domain.Exploration.create_default_exploration('eid')  # type: ignore[no-untyped-call]
+        exploration = exp_domain.Exploration.create_default_exploration('eid')
         init_state = exploration.states[exploration.init_state_name]
         init_state.update_interaction_id('MultipleChoiceInput')
         init_state.update_interaction_customization_args({
@@ -3945,7 +3995,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
     def test_validate_state_solicit_answer_details(self) -> None:
         """Test validation of solicit_answer_details."""
-        exploration = exp_domain.Exploration.create_default_exploration('eid')  # type: ignore[no-untyped-call]
+        exploration = exp_domain.Exploration.create_default_exploration('eid')
         init_state = exploration.states[exploration.init_state_name]
         self.assertEqual(init_state.solicit_answer_details, False)
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
@@ -3974,7 +4024,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
     def test_validate_state_linked_skill_id(self) -> None:
         """Test validation of linked_skill_id."""
-        exploration = exp_domain.Exploration.create_default_exploration('eid')  # type: ignore[no-untyped-call]
+        exploration = exp_domain.Exploration.create_default_exploration('eid')
         init_state = exploration.states[exploration.init_state_name]
         self.assertEqual(init_state.linked_skill_id, None)
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
@@ -3986,7 +4036,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
     def test_validate_state_card_is_checkpoint(self) -> None:
         """Test validation of card_is_checkpoint."""
-        exploration = exp_domain.Exploration.create_default_exploration('eid')  # type: ignore[no-untyped-call]
+        exploration = exp_domain.Exploration.create_default_exploration('eid')
         init_state = exploration.states[exploration.init_state_name]
         self.assertEqual(init_state.card_is_checkpoint, True)
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
@@ -4018,11 +4068,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 state_domain.SubtitledHtml('hint_1', '')
             )
         ]
+        # Ruling out the possibility of None for mypy type checking.
+        assert exploration.init_state.interaction.id is not None
         solution = state_domain.Solution.from_dict(
             exploration.init_state.interaction.id, solution_dict)
         exploration.init_state.update_interaction_hints(hints_list)
         exploration.init_state.update_interaction_solution(solution)
-        exploration.validate()  # type: ignore[no-untyped-call]
+        exploration.validate()
 
         solution_dict = {
             'answer_is_exclusive': 1,  # type: ignore[typeddict-item]
@@ -4037,15 +4089,18 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration.init_state.update_interaction_solution(solution)
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'Expected answer_is_exclusive to be bool, received 1'):
-            exploration.validate()  # type: ignore[no-untyped-call]
+            exploration.validate()
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_validate_non_list_param_changes(self) -> None:
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
-        exploration.init_state.param_changes = 0
+        exploration.init_state.param_changes = 0  # type: ignore[assignment]
 
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'Expected state param_changes to be a list, received 0'):
-            exploration.init_state.validate(None, True)
+            exploration.init_state.validate({}, True)
 
     def test_validate_duplicate_content_id_with_answer_group_feedback(
         self
@@ -4080,7 +4135,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'Found a duplicate content id feedback_1'):
-            exploration.init_state.validate(None, True)
+            exploration.init_state.validate({}, True)
 
     def test_validate_duplicate_content_id_with_answer_group_rules(
         self
@@ -4118,7 +4173,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'Found a duplicate content id rule_input_Contains'):
-            exploration.init_state.validate(None, True)
+            exploration.init_state.validate({}, True)
 
     def test_validate_duplicate_content_id_with_default_outcome(self) -> None:
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
@@ -4138,7 +4193,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'Found a duplicate content id default_outcome'):
-            exploration.init_state.validate(None, True)
+            exploration.init_state.validate({}, True)
 
     def test_validate_duplicate_content_id_with_hints(self) -> None:
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
@@ -4157,7 +4212,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'Found a duplicate content id hint_1'):
-            exploration.init_state.validate(None, True)
+            exploration.init_state.validate({}, True)
 
     def test_validate_duplicate_content_id_with_solution(self) -> None:
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
@@ -4174,6 +4229,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'html': '<p>hello_world is a string</p>'
             }
         }
+        # Ruling out the possibility of None for mypy type checking.
+        assert exploration.init_state.interaction.id is not None
         solution = state_domain.Solution.from_dict(
             exploration.init_state.interaction.id, solution_dict)
         exploration.init_state.update_interaction_solution(solution)
@@ -4185,8 +4242,11 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'Found a duplicate content id solution'):
-            exploration.init_state.validate(None, True)
+            exploration.init_state.validate({}, True)
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_cannot_convert_state_dict_to_yaml_with_invalid_state_dict(
         self
     ) -> None:
@@ -4201,7 +4261,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             )
 
             exploration.init_state.convert_state_dict_to_yaml(
-                'invalid_state_dict', 10)
+                'invalid_state_dict', 10)  # type: ignore[arg-type]
 
         self.assertEqual(len(captured_logs), 1)
         self.assertIn('Bad state dict: invalid_state_dict', captured_logs[0])
@@ -4389,6 +4449,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'The content_id hint_2 already exists in recorded_voiceovers'):
             exploration.init_state.update_interaction_hints(new_hints_list)
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_cannot_update_interaction_solution_with_non_dict_solution(
         self
     ) -> None:
@@ -4407,11 +4470,15 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'html': u'<p>hello_world is a string</p>'
             }
         }
+        # Ruling out the possibility of None for mypy type checking.
+        assert exploration.init_state.interaction.id is not None
         solution = state_domain.Solution.from_dict(
             exploration.init_state.interaction.id, solution_dict)
         exploration.init_state.update_interaction_hints(hints_list)
         exploration.init_state.update_interaction_solution(solution)
 
+        # Ruling out the possibility of None for mypy type checking.
+        assert exploration.init_state.interaction.solution is not None
         self.assertEqual(
             exploration.init_state.interaction.solution.to_dict(),
             solution_dict)
@@ -4419,8 +4486,11 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'Expected solution to be a Solution object,'
             'received test string'):
-            exploration.init_state.update_interaction_solution('test string')
+            exploration.init_state.update_interaction_solution('test string')  # type: ignore[arg-type]
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_update_interaction_solution_with_no_solution(self) -> None:
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
         hints_list = [
@@ -4436,6 +4506,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         self.assertIsNone(exploration.init_state.interaction.solution)
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_cannot_update_interaction_hints_with_non_list_hints(
         self
     ) -> None:
@@ -4443,8 +4516,11 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'Expected hints_list to be a list'):
-            exploration.init_state.update_interaction_hints({})
+            exploration.init_state.update_interaction_hints({})  # type: ignore[arg-type]
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_cannot_update_non_list_interaction_confirmed_unclassified_answers(
         self
     ) -> None:
@@ -4454,7 +4530,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             Exception, 'Expected confirmed_unclassified_answers to be a list'):
             (
                 exploration.init_state
-                .update_interaction_confirmed_unclassified_answers({}))
+                .update_interaction_confirmed_unclassified_answers({}))  # type: ignore[arg-type]
 
     def test_update_interaction_confirmed_unclassified_answers(self) -> None:
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
@@ -4488,13 +4564,16 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             exploration.init_state.interaction.confirmed_unclassified_answers,
             [state_answer_group])
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_cannot_update_non_list_interaction_answer_groups(self) -> None:
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
 
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'Expected interaction_answer_groups to be a list'):
             exploration.init_state.update_interaction_answer_groups(
-                'invalid_answer_groups')
+                'invalid_answer_groups')  # type: ignore[arg-type]
 
     # TODO(#13059): After we fully type the codebase we plan to get
     # rid of the tests that intentionally test wrong inputs that we
@@ -5576,7 +5655,7 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
 class VoiceoverDomainTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(VoiceoverDomainTests, self).setUp()
+        super().setUp()
         self.voiceover = state_domain.Voiceover('filename.mp3', 10, False, 15.0)
 
     # TODO(#13059): After we fully type the codebase we plan to get

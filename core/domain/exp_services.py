@@ -379,7 +379,7 @@ def export_to_zip_file(
     """
     exploration = exp_fetchers.get_exploration_by_id(
         exploration_id, version=version)
-    yaml_repr = exploration.to_yaml()  # type: ignore[no-untyped-call]
+    yaml_repr = exploration.to_yaml()
 
     temp_file = io.BytesIO()
     with zipfile.ZipFile(
@@ -391,7 +391,7 @@ def export_to_zip_file(
 
         fs = fs_services.GcsFileSystem(
             feconf.ENTITY_TYPE_EXPLORATION, exploration_id)
-        html_string_list = exploration.get_all_html_content_strings()  # type: ignore[no-untyped-call]
+        html_string_list = exploration.get_all_html_content_strings()
         image_filenames = (
             html_cleaner.get_image_filenames_from_html_strings(
                 html_string_list))
@@ -462,12 +462,12 @@ def apply_change_list(
         to_param_domain = param_domain.ParamChange.from_dict
         for change in change_list:
             if change.cmd == exp_domain.CMD_ADD_STATE:
-                exploration.add_states([change.state_name])  # type: ignore[no-untyped-call]
+                exploration.add_states([change.state_name])
             elif change.cmd == exp_domain.CMD_RENAME_STATE:
-                exploration.rename_state(  # type: ignore[no-untyped-call]
+                exploration.rename_state(
                     change.old_state_name, change.new_state_name)
             elif change.cmd == exp_domain.CMD_DELETE_STATE:
-                exploration.delete_state(change.state_name)  # type: ignore[no-untyped-call]
+                exploration.delete_state(change.state_name)
             elif change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
                 state: state_domain.State = exploration.states[
                     change.state_name]
@@ -642,21 +642,27 @@ def apply_change_list(
                 ].mark_written_translations_as_needing_update(change.content_id)
             elif change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY:
                 if change.property_name == 'title':
-                    exploration.update_title(change.new_value)  # type: ignore[no-untyped-call]
+                    exploration.update_title(change.new_value)
                 elif change.property_name == 'category':
-                    exploration.update_category(change.new_value)  # type: ignore[no-untyped-call]
+                    exploration.update_category(change.new_value)
                 elif change.property_name == 'objective':
-                    exploration.update_objective(change.new_value)  # type: ignore[no-untyped-call]
+                    exploration.update_objective(change.new_value)
                 elif change.property_name == 'language_code':
-                    exploration.update_language_code(change.new_value)  # type: ignore[no-untyped-call]
+                    exploration.update_language_code(change.new_value)
                 elif change.property_name == 'tags':
-                    exploration.update_tags(change.new_value)  # type: ignore[no-untyped-call]
+                    # Ruling out the possibility of any other type for mypy
+                    # type checking.
+                    assert isinstance(change.new_value, list)
+                    exploration.update_tags(change.new_value)
                 elif change.property_name == 'blurb':
-                    exploration.update_blurb(change.new_value)  # type: ignore[no-untyped-call]
+                    exploration.update_blurb(change.new_value)
                 elif change.property_name == 'author_notes':
-                    exploration.update_author_notes(change.new_value)  # type: ignore[no-untyped-call]
+                    exploration.update_author_notes(change.new_value)
                 elif change.property_name == 'param_specs':
-                    exploration.update_param_specs(change.new_value)  # type: ignore[no-untyped-call]
+                    # Ruling out the possibility of any other type for mypy
+                    # type checking.
+                    assert isinstance(change.new_value, dict)
+                    exploration.update_param_specs(change.new_value)
                 elif change.property_name == 'param_changes':
                     # Ruling out the possibility of any other type for mypy
                     # type checking.
@@ -664,11 +670,17 @@ def apply_change_list(
                     exploration.update_param_changes(list(
                         map(to_param_domain, change.new_value)))
                 elif change.property_name == 'init_state_name':
-                    exploration.update_init_state_name(change.new_value)  # type: ignore[no-untyped-call]
+                    exploration.update_init_state_name(change.new_value)
                 elif change.property_name == 'auto_tts_enabled':
-                    exploration.update_auto_tts_enabled(change.new_value)  # type: ignore[no-untyped-call]
+                    # Ruling out the possibility of any other type for mypy
+                    # type checking.
+                    assert isinstance(change.new_value, bool)
+                    exploration.update_auto_tts_enabled(change.new_value)
                 elif change.property_name == 'correctness_feedback_enabled':
-                    exploration.update_correctness_feedback_enabled(  # type: ignore[no-untyped-call]
+                    # Ruling out the possibility of any other type for mypy
+                    # type checking.
+                    assert isinstance(change.new_value, bool)
+                    exploration.update_correctness_feedback_enabled(
                         change.new_value)
             elif (change.cmd ==
                   exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION):
@@ -727,7 +739,7 @@ def update_states_version_history(
         states_version_history: dict(str, StateVersionHistory). The updated
         version history data of each state.
     """
-    exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)  # type: ignore[no-untyped-call]
+    exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
     prev_version = current_version - 1
     old_states_dict = copy.deepcopy({
         state_name: state.to_dict()
@@ -861,8 +873,8 @@ def update_metadata_version_history(
     Returns:
         MetadataVersionHistory. The updated metadata version history.
     """
-    old_metadata_dict = copy.deepcopy(old_metadata.to_dict())  # type: ignore[no-untyped-call]
-    new_metadata_dict = copy.deepcopy(new_metadata.to_dict())  # type: ignore[no-untyped-call]
+    old_metadata_dict = copy.deepcopy(old_metadata.to_dict())
+    new_metadata_dict = copy.deepcopy(new_metadata.to_dict())
     prev_version = current_version - 1
 
     metadata_was_changed = any(
@@ -938,7 +950,7 @@ def update_version_history(
 
     if version_history_model is not None:
         new_states = exploration.states
-        new_metadata = exploration.get_metadata()  # type: ignore[no-untyped-call]
+        new_metadata = exploration.get_metadata()
         states_version_history = {
             state_name: state_domain.StateVersionHistory.from_dict(
                 state_version_history_dict)
@@ -1009,11 +1021,11 @@ def _save_exploration(
         Exception. The versions of the given exploration and the currently
             stored exploration model do not match.
     """
-    exploration_rights = rights_manager.get_exploration_rights(exploration.id)  # type: ignore[no-untyped-call]
+    exploration_rights = rights_manager.get_exploration_rights(exploration.id)
     if exploration_rights.status != rights_domain.ACTIVITY_STATUS_PRIVATE:
-        exploration.validate(strict=True)  # type: ignore[no-untyped-call]
+        exploration.validate(strict=True)
     else:
-        exploration.validate()  # type: ignore[no-untyped-call]
+        exploration.validate()
 
     exploration_model = exp_models.ExplorationModel.get(exploration.id)
 
@@ -1031,7 +1043,7 @@ def _save_exploration(
 
     old_states = exp_fetchers.get_exploration_from_model(
         exploration_model).states
-    old_metadata = exp_fetchers.get_exploration_from_model(  # type: ignore[no-untyped-call]
+    old_metadata = exp_fetchers.get_exploration_from_model(
         exploration_model).get_metadata()
     exploration_model.category = exploration.category
     exploration_model.title = exploration.title
@@ -1061,7 +1073,7 @@ def _save_exploration(
 
     exploration.version += 1
 
-    exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)  # type: ignore[no-untyped-call]
+    exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
 
     # Update the version history data for each state and the exploration
     # metadata in the new version of the exploration.
@@ -1076,7 +1088,7 @@ def _save_exploration(
     stats_services.create_stats_model(new_exp_stats)  # type: ignore[no-untyped-call]
 
     if feconf.ENABLE_ML_CLASSIFIERS:
-        trainable_states_dict = exploration.get_trainable_states_dict(  # type: ignore[no-untyped-call]
+        trainable_states_dict = exploration.get_trainable_states_dict(
             old_states, exp_versions_diff)
         state_names_with_changed_answer_groups = trainable_states_dict[
             'state_names_with_changed_answer_groups']
@@ -1120,8 +1132,8 @@ def _create_exploration(
     """
     # This line is needed because otherwise a rights object will be created,
     # but the creation of an exploration object will fail.
-    exploration.validate()  # type: ignore[no-untyped-call]
-    rights_manager.create_new_exploration_rights(exploration.id, committer_id)  # type: ignore[no-untyped-call]
+    exploration.validate()
+    rights_manager.create_new_exploration_rights(exploration.id, committer_id)
 
     model = exp_models.ExplorationModel(
         id=exploration.id,
@@ -1281,15 +1293,15 @@ def delete_explorations(
     delete_exploration_summaries(exploration_ids)
     recommendations_services.delete_explorations_from_recommendations(
         exploration_ids)
-    opportunity_services.delete_exploration_opportunities(exploration_ids)  # type: ignore[no-untyped-call]
-    feedback_services.delete_exploration_feedback_analytics(exploration_ids)  # type: ignore[no-untyped-call]
+    opportunity_services.delete_exploration_opportunities(exploration_ids)
+    feedback_services.delete_exploration_feedback_analytics(exploration_ids)
 
     # Remove the explorations from the featured activity references, if
     # necessary.
     activity_services.remove_featured_activities(
         constants.ACTIVITY_TYPE_EXPLORATION, exploration_ids)
 
-    feedback_services.delete_threads_for_multiple_entities(  # type: ignore[no-untyped-call]
+    feedback_services.delete_threads_for_multiple_entities(
         feconf.ENTITY_TYPE_EXPLORATION, exploration_ids)
 
     # Remove from subscribers.
@@ -1468,7 +1480,7 @@ def publish_exploration_and_update_user_profiles(
             made the commit.
         exp_id: str. The id of the exploration to be published.
     """
-    rights_manager.publish_exploration(committer, exp_id)  # type: ignore[no-untyped-call]
+    rights_manager.publish_exploration(committer, exp_id)
     exp_title = exp_fetchers.get_exploration_by_id(exp_id).title
     email_subscription_services.inform_subscribers(
         committer.user_id, exp_id, exp_title)
@@ -1623,7 +1635,7 @@ def update_exploration(
             'Voice artist does not have permission to make some '
             'changes in the change list.')
 
-    is_public = rights_manager.is_exploration_public(exploration_id)  # type: ignore[no-untyped-call]
+    is_public = rights_manager.is_exploration_public(exploration_id)
     if is_public and not commit_message:
         raise ValueError(
             'Exploration is public so expected a commit message but '
@@ -1657,13 +1669,13 @@ def update_exploration(
     if committer_id != feconf.MIGRATION_BOT_USER_ID:
         user_services.add_edited_exploration_id(committer_id, exploration_id)
         user_services.record_user_edited_an_exploration(committer_id)
-        if not rights_manager.is_exploration_private(exploration_id):  # type: ignore[no-untyped-call]
+        if not rights_manager.is_exploration_private(exploration_id):
             user_services.update_first_contribution_msec_if_not_set(
                 committer_id, utils.get_current_time_in_millisecs())
 
-    if opportunity_services.is_exploration_available_for_contribution(  # type: ignore[no-untyped-call]
+    if opportunity_services.is_exploration_available_for_contribution(
             exploration_id):
-        opportunity_services.update_opportunity_with_updated_exploration(  # type: ignore[no-untyped-call]
+        opportunity_services.update_opportunity_with_updated_exploration(
             exploration_id)
 
 
@@ -1683,7 +1695,7 @@ def regenerate_exploration_summary_with_new_contributor(
         exploration_id, strict=False)
     if exploration is not None:
         exp_summary = _compute_summary_of_exploration(exploration)
-        exp_summary.add_contribution_by_user(contributor_id)  # type: ignore[no-untyped-call]
+        exp_summary.add_contribution_by_user(contributor_id)
         save_exploration_summary(exp_summary)
     else:
         logging.error('Could not find exploration with ID %s', exploration_id)
@@ -1943,11 +1955,11 @@ def revert_exploration(
     # change.
     exploration = exp_fetchers.get_exploration_by_id(
         exploration_id, version=revert_to_version)
-    exploration_rights = rights_manager.get_exploration_rights(exploration.id)  # type: ignore[no-untyped-call]
+    exploration_rights = rights_manager.get_exploration_rights(exploration.id)
     if exploration_rights.status != rights_domain.ACTIVITY_STATUS_PRIVATE:
-        exploration.validate(strict=True)  # type: ignore[no-untyped-call]
+        exploration.validate(strict=True)
     else:
-        exploration.validate()  # type: ignore[no-untyped-call]
+        exploration.validate()
 
     exp_models.ExplorationModel.revert(
         exploration_model, committer_id,
@@ -2043,7 +2055,7 @@ def save_new_exploration_from_yaml_and_assets(
             feconf.ENTITY_TYPE_EXPLORATION, exploration_id)
         fs.commit(asset_filename, asset_content)
 
-    exploration = exp_domain.Exploration.from_yaml(exploration_id, yaml_content)  # type: ignore[no-untyped-call]
+    exploration = exp_domain.Exploration.from_yaml(exploration_id, yaml_content)
 
     # Check whether audio translations should be stripped.
     if strip_voiceovers:
@@ -2072,7 +2084,7 @@ def delete_demo(exploration_id: str) -> None:
     Raises:
         Exception. The exploration id is invalid.
     """
-    if not exp_domain.Exploration.is_demo_exploration_id(exploration_id):  # type: ignore[no-untyped-call]
+    if not exp_domain.Exploration.is_demo_exploration_id(exploration_id):
         raise Exception('Invalid demo exploration id %s' % exploration_id)
 
     exploration = exp_fetchers.get_exploration_by_id(
@@ -2098,7 +2110,7 @@ def load_demo(exploration_id: str) -> None:
     Raises:
         Exception. The exploration id provided is invalid.
     """
-    if not exp_domain.Exploration.is_demo_exploration_id(exploration_id):  # type: ignore[no-untyped-call]
+    if not exp_domain.Exploration.is_demo_exploration_id(exploration_id):
         raise Exception('Invalid demo exploration id %s' % exploration_id)
 
     delete_demo(exploration_id)
@@ -2158,7 +2170,7 @@ def get_next_page_of_all_non_private_commits(
         exp_models.ExplorationCommitLogEntryModel.get_all_non_private_commits(
             page_size, urlsafe_start_cursor, max_age=max_age))
 
-    return ([exp_domain.ExplorationCommitLogEntry(  # type: ignore[no-untyped-call]
+    return ([exp_domain.ExplorationCommitLogEntry(
         entry.created_on, entry.last_updated, entry.user_id,
         entry.exploration_id, entry.commit_type, entry.commit_message,
         entry.commit_cmds, entry.version, entry.post_commit_status,
@@ -2187,7 +2199,7 @@ def get_image_filenames_from_exploration(
             assert isinstance(image_paths, dict)
             filenames.append(image_paths['imagePath'])
 
-    html_list = exploration.get_all_html_content_strings()  # type: ignore[no-untyped-call]
+    html_list = exploration.get_all_html_content_strings()
     filenames.extend(
         html_cleaner.get_image_filenames_from_html_strings(html_list))
     return filenames
@@ -2369,7 +2381,7 @@ def are_changes_mergeable(
         exp_id, version=change_list_version)
 
     changes_are_mergeable, send_email = (
-        exp_domain.ExplorationChangeMergeVerifier(  # type: ignore[no-untyped-call]
+        exp_domain.ExplorationChangeMergeVerifier(
             composite_change_list).is_change_list_mergeable(
                 change_list, exp_at_change_list_version,
                 current_exploration))
@@ -2450,7 +2462,7 @@ def get_user_exploration_data(
         'objective': exploration.objective,
         'param_changes': exploration.param_change_dicts,
         'param_specs': exploration.param_specs_dict,
-        'rights': rights_manager.get_exploration_rights(  # type: ignore[no-untyped-call]
+        'rights': rights_manager.get_exploration_rights(
             exploration_id).to_dict(),
         'show_state_editor_tutorial_on_load': False,
         'show_state_translation_tutorial_on_load': False,
@@ -2503,7 +2515,7 @@ def create_or_update_draft(
         return
 
     updated_exploration = apply_change_list(exp_id, change_list)
-    updated_exploration.validate(strict=False)  # type: ignore[no-untyped-call]
+    updated_exploration.validate(strict=False)
 
     if exp_user_data is None:
         exp_user_data = user_models.ExplorationUserDataModel.create(
@@ -2552,7 +2564,7 @@ def get_exp_with_draft_applied(
                     'Exploration and draft versions out of sync, trying '
                     'to upgrade draft version to match exploration\'s.')
                 new_draft_change_list = (
-                    draft_upgrade_services.try_upgrading_draft_to_exp_version(  # type: ignore[no-untyped-call]
+                    draft_upgrade_services.try_upgrading_draft_to_exp_version(
                         draft_change_list,
                         exp_user_data.draft_change_list_exp_version,
                         exploration.version, exploration.id))
@@ -2572,7 +2584,7 @@ def get_exp_with_draft_applied(
         for state in updated_exploration.states.values():
             html_string = ''.join(state.get_all_html_content_strings())
             error_list = (
-                html_validation_service.  # type: ignore[no-untyped-call]
+                html_validation_service.
                 validate_math_tags_in_html_with_attribute_math_content(
                     html_string))
             if len(error_list) > 0:
@@ -2617,7 +2629,7 @@ def get_interaction_id_for_state(exp_id: str, state_name: str) -> Optional[str]:
             the exploration.
     """
     exploration = exp_fetchers.get_exploration_by_id(exp_id)
-    if exploration.has_state_name(state_name):  # type: ignore[no-untyped-call]
+    if exploration.has_state_name(state_name):
         return exploration.get_interaction_id_by_state_name(state_name)
     raise Exception(
         'There exist no state in the exploration with the given state name.')

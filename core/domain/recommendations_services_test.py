@@ -248,7 +248,7 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         """Before each individual test, set up dummy explorations and users."""
-        super(RecommendationsServicesUnitTests, self).setUp()
+        super().setUp()
 
         for name, user in self.USER_DATA.items():
             self.signup(user['email'], name)
@@ -265,7 +265,7 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
             self.save_new_valid_exploration(
                 exp_id, exp['owner_id'], category=exp['category'])
             owner = user_services.get_user_actions_info(exp['owner_id'])
-            rights_manager.publish_exploration(owner, exp_id)  # type: ignore[no-untyped-call]
+            rights_manager.publish_exploration(owner, exp_id)
 
     def test_recommendation_categories_and_matrix_headers_match(self) -> None:
         topic_similarities_lines = (
@@ -291,7 +291,7 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
         )
 
         system_user = user_services.get_system_user()
-        rights_manager.unpublish_exploration(system_user, 'exp_id_2')  # type: ignore[no-untyped-call]
+        rights_manager.unpublish_exploration(system_user, 'exp_id_2')
         exp_summaries = exp_services.get_all_exploration_summaries()
         self.assertEqual(
             recommendations_services.get_item_similarity(

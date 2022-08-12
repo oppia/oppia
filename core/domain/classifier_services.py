@@ -592,7 +592,7 @@ def migrate_state_training_jobs(
             added or removed.
 
     Raises:
-        Exception. Interaction id does not exist for the given state.
+        Exception. Interaction id does not exist for the state.
     """
     exp_id = state_training_jobs_mapping.exp_id
     exp_version = state_training_jobs_mapping.exp_version

@@ -55,7 +55,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
     """
 
     def setUp(self) -> None:
-        super(ClassifierServicesTests, self).setUp()  # type: ignore[no-untyped-call]
+        super().setUp()
         self._init_classify_inputs('16')
 
     def _init_classify_inputs(self, exploration_id: str) -> None:
@@ -306,8 +306,10 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
         exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
         state_names = ['Home']
         exploration.states['Home'].interaction.id = 'Invalid_id'
-        with self.assertRaisesRegex(Exception, (  # type: ignore[no-untyped-call]
-            'No classifier algorithm found for Invalid_id interaction')):
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            Exception,
+            'No classifier algorithm found for Invalid_id interaction'
+        ):
             classifier_services.handle_trainable_states(
                 exploration, state_names)
 
@@ -321,7 +323,7 @@ class ClassifierServicesTests(test_utils.ClassifierTestBase):
             'old_state_name': 'Old home',
             'new_state_name': 'Home'
         })]
-        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)  # type: ignore[no-untyped-call]
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
 
         # Test that Exception is raised if this method is called with version
         # number 1.

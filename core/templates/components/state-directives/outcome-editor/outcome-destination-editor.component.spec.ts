@@ -95,11 +95,13 @@ describe('Outcome Destination Editor', () => {
       }, [
         {
           source: 'Introduction',
-          target: 'State1'
+          target: 'State1',
+          linkProperty: ''
         },
         {
           source: 'State1',
-          target: 'End'
+          target: 'End',
+          linkProperty: ''
         }
       ], 'Introduction', ['End']);
     spyOn(stateEditorService, 'getStateNames')
@@ -200,11 +202,13 @@ describe('Outcome Destination Editor', () => {
       }, [
         {
           source: 'Introduction',
-          target: 'State1'
+          target: 'State1',
+          linkProperty: ''
         },
         {
           source: 'State1',
-          target: 'End'
+          target: 'End',
+          linkProperty: ''
         }
       ], 'Introduction', ['End']);
     spyOnProperty(stateEditorService, 'onStateNamesChanged')

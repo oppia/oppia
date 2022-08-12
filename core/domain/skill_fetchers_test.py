@@ -42,7 +42,7 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
     MISCONCEPTION_ID_1: Final = 1
 
     def setUp(self) -> None:
-        super(SkillFetchersUnitTests, self).setUp()
+        super().setUp()
         example_1 = skill_domain.WorkedExample(
             state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
             state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>')
@@ -137,7 +137,7 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
     def test_get_skill_by_id(self) -> None:
         expected_skill = self.skill.to_dict()
         skill = skill_fetchers.get_skill_by_id(self.skill_id)
-        self.assertEqual(skill.to_dict(), expected_skill)  # type: ignore[no-untyped-call]
+        self.assertEqual(skill.to_dict(), expected_skill)
         self.assertEqual(
             skill_fetchers.get_skill_by_id('Does Not Exist', strict=False), None
         )
@@ -191,7 +191,7 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
             rubric_schema_version=3,
             skill_contents_schema_version=2,
             all_questions_merged=False,
-            skill_contents=skill_domain.SkillContents(  # type: ignore[no-untyped-call]
+            skill_contents=skill_domain.SkillContents(
                 state_domain.SubtitledHtml('1', '<p>Explanation</p>'),
                 [example_1],
                 state_domain.RecordedVoiceovers.from_dict({
@@ -237,7 +237,7 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
             rubric_schema_version=0,
             skill_contents_schema_version=2,
             all_questions_merged=False,
-            skill_contents=skill_domain.SkillContents(  # type: ignore[no-untyped-call]
+            skill_contents=skill_domain.SkillContents(
                 state_domain.SubtitledHtml('1', '<p>Explanation</p>'),
                 [example_1],
                 state_domain.RecordedVoiceovers.from_dict({
@@ -267,7 +267,7 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
         # Ruling out the possibility of None for mypy type checking.
         assert skill is not None
         self.assertEqual(
-            skill.to_dict(),  # type: ignore[no-untyped-call]
+            skill.to_dict(),
             self.skill.to_dict()
         )
         self.assertEqual(
@@ -314,7 +314,7 @@ class SkillFetchersUnitTests(test_utils.GenericTestBase):
             rubric_schema_version=2,
             skill_contents_schema_version=2,
             all_questions_merged=False,
-            skill_contents=skill_domain.SkillContents(  # type: ignore[no-untyped-call]
+            skill_contents=skill_domain.SkillContents(
                 state_domain.SubtitledHtml('1', '<p>Explanation</p>'),
                 [example_1],
                 state_domain.RecordedVoiceovers.from_dict({

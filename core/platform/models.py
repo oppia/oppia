@@ -118,6 +118,10 @@ class _Gae(Platform):
                 from core.storage.classifier import (
                     gae_models as classifier_models)
                 returned_models.append(classifier_models)
+            elif name == NAMES.classroom:
+                from core.storage.classroom import (
+                    gae_models as classroom_models)
+                returned_models.append(classroom_models)
             elif name == NAMES.collection:
                 from core.storage.collection import (
                     gae_models as collection_models)

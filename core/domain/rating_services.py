@@ -104,7 +104,7 @@ def assign_rating_to_exploration(
     if old_rating:
         exploration_summary.ratings[str(old_rating)] -= 1
 
-    event_services.RateExplorationEventHandler.record(  # type: ignore[no-untyped-call]
+    event_services.RateExplorationEventHandler.record(
         exploration_id, user_id, new_rating, old_rating)
 
     exploration_summary.scaled_average_rating = (

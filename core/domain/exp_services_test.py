@@ -26,6 +26,7 @@ import zipfile
 
 from core import feconf
 from core import utils
+from core.constants import constants
 from core.domain import classifier_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
@@ -48,7 +49,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Any, Dict, List, Optional, Sequence, Tuple, Type
+from typing import Any, Dict, List, Optional, Sequence, Tuple, Type, Union
 from typing_extensions import Final
 
 MYPY = False
@@ -103,7 +104,7 @@ class ExplorationServicesUnitTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         """Before each individual test, create a dummy exploration."""
-        super(ExplorationServicesUnitTests, self).setUp()
+        super().setUp()
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
@@ -129,6 +130,64 @@ class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
     """Test that classifier models are correctly mapped when an exploration
     is reverted.
     """
+
+    def test_raises_key_error_for_invalid_id(self) -> None:
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'tes_exp_id', title='some title', category='Algebra',
+            language_code=constants.DEFAULT_LANGUAGE_CODE
+        )
+        exploration.objective = 'An objective'
+        exploration.correctness_feedback_enabled = False
+        self.set_interaction_for_state(
+            exploration.states[exploration.init_state_name], 'NumericInput'
+        )
+        exp_services.save_new_exploration(self.owner_id, exploration)
+
+        interaction_answer_groups = [{
+            'rule_specs': [{
+                    'inputs': {
+                        'x': 60
+                    },
+                    'rule_type': 'IsLessThanOrEqualTo'
+            }],
+            'outcome': {
+                'dest': feconf.DEFAULT_INIT_STATE_NAME,
+                'dest_if_really_stuck': None,
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': '<p>Try again</p>'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': ['answer1', 'answer2', 'answer3'],
+            'tagged_skill_misconception_id': None
+        }]
+
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
+            'new_value': interaction_answer_groups
+        }), exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX),
+            'new_value': 4
+        })]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            Exception,
+            'No classifier algorithm found for NumericInput interaction'
+        ):
+            with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
+                with self.swap(feconf, 'MIN_TOTAL_TRAINING_EXAMPLES', 2):
+                    with self.swap(feconf, 'MIN_ASSIGNED_LABELS', 1):
+                        exp_services.update_exploration(
+                            self.owner_id, 'tes_exp_id', change_list, '')
 
     def test_reverting_an_exploration_maintains_classifier_models(self) -> None:
         """Test that when exploration is reverted to previous version
@@ -270,8 +329,8 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
     def test_get_interaction_id_for_state(self) -> None:
         self.save_new_default_exploration(self.EXP_0_ID, self.owner_id)
         exp = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-        self.assertEqual(exp.has_state_name('Introduction'), True)  # type: ignore[no-untyped-call]
-        self.assertEqual(exp.has_state_name('Fake state name'), False)  # type: ignore[no-untyped-call]
+        self.assertEqual(exp.has_state_name('Introduction'), True)
+        self.assertEqual(exp.has_state_name('Fake state name'), False)
         exp_services.update_exploration(
             self.owner_id,
             self.EXP_0_ID,
@@ -323,7 +382,7 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
     EXP_ID_7: Final = '7_en_languages_private_exploration_in_spanish'
 
     def setUp(self) -> None:
-        super(ExplorationSummaryQueriesUnitTests, self).setUp()
+        super().setUp()
 
         # Setup the explorations to fit into 2 different categoriers and 2
         # different language groups. Also, ensure 2 of them have similar
@@ -358,13 +417,13 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
 
         # Publish explorations 0-6. Private explorations should not show up in
         # a search query, even if they're indexed.
-        rights_manager.publish_exploration(self.owner, self.EXP_ID_0)  # type: ignore[no-untyped-call]
-        rights_manager.publish_exploration(self.owner, self.EXP_ID_1)  # type: ignore[no-untyped-call]
-        rights_manager.publish_exploration(self.owner, self.EXP_ID_2)  # type: ignore[no-untyped-call]
-        rights_manager.publish_exploration(self.owner, self.EXP_ID_3)  # type: ignore[no-untyped-call]
-        rights_manager.publish_exploration(self.owner, self.EXP_ID_4)  # type: ignore[no-untyped-call]
-        rights_manager.publish_exploration(self.owner, self.EXP_ID_5)  # type: ignore[no-untyped-call]
-        rights_manager.publish_exploration(self.owner, self.EXP_ID_6)  # type: ignore[no-untyped-call]
+        rights_manager.publish_exploration(self.owner, self.EXP_ID_0)
+        rights_manager.publish_exploration(self.owner, self.EXP_ID_1)
+        rights_manager.publish_exploration(self.owner, self.EXP_ID_2)
+        rights_manager.publish_exploration(self.owner, self.EXP_ID_3)
+        rights_manager.publish_exploration(self.owner, self.EXP_ID_4)
+        rights_manager.publish_exploration(self.owner, self.EXP_ID_5)
+        rights_manager.publish_exploration(self.owner, self.EXP_ID_6)
 
         # Add the explorations to the search index.
         exp_services.index_explorations_given_ids([
@@ -972,14 +1031,14 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
     def test_feedbacks_belonging_to_exploration_are_deleted(self) -> None:
         """Tests that feedbacks belonging to exploration are deleted."""
         self.save_new_default_exploration(self.EXP_0_ID, self.owner_id)
-        thread_1_id = feedback_services.create_thread(  # type: ignore[no-untyped-call]
+        thread_1_id = feedback_services.create_thread(
             feconf.ENTITY_TYPE_EXPLORATION,
             self.EXP_0_ID,
             self.owner_id,
             'subject',
             'text'
         )
-        thread_2_id = feedback_services.create_thread(  # type: ignore[no-untyped-call]
+        thread_2_id = feedback_services.create_thread(
             feconf.ENTITY_TYPE_EXPLORATION,
             self.EXP_0_ID,
             self.owner_id,
@@ -1031,12 +1090,12 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
     def test_no_errors_are_raised_when_creating_default_exploration(
         self
     ) -> None:
-        exploration = exp_domain.Exploration.create_default_exploration(  # type: ignore[no-untyped-call]
+        exploration = exp_domain.Exploration.create_default_exploration(
             self.EXP_0_ID)
         exp_services.save_new_exploration(self.owner_id, exploration)
 
     def test_that_default_exploration_fails_strict_validation(self) -> None:
-        exploration = exp_domain.Exploration.create_default_exploration(  # type: ignore[no-untyped-call]
+        exploration = exp_domain.Exploration.create_default_exploration(
             self.EXP_0_ID)
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
@@ -1197,7 +1256,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             exp_fetchers.get_exploration_summary_by_id(self.EXP_0_ID))
         contributer_ids = updated_summary.contributor_ids
         self.assertEqual(len(contributer_ids), 3)
-        self.assertFalse(updated_summary.is_private())  # type: ignore[no-untyped-call]
+        self.assertFalse(updated_summary.is_private())
         self.assertIn(self.owner_id, contributer_ids)
         self.assertIn(self.editor_id, contributer_ids)
         self.assertIn(self.voice_artist_id, contributer_ids)
@@ -1443,7 +1502,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
     def test_update_exploration_by_migration_bot(self) -> None:
         self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, end_state_name='end')
-        rights_manager.publish_exploration(self.owner, self.EXP_0_ID)  # type: ignore[no-untyped-call]
+        rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
 
         exp_services.update_exploration(
             feconf.MIGRATION_BOT_USER_ID, self.EXP_0_ID, [
@@ -1460,7 +1519,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             feconf.MIGRATION_BOT_USER_ID, [], [])
         self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, end_state_name='end')
-        rights_manager.publish_exploration(self.owner, self.EXP_0_ID)  # type: ignore[no-untyped-call]
+        rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
 
         migration_bot_contributions_model = (
             user_services.get_user_contributions(feconf.MIGRATION_BOT_USER_ID))
@@ -1483,7 +1542,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
     ) -> None:
         self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, end_state_name='end')
-        rights_manager.publish_exploration(self.owner, self.EXP_0_ID)  # type: ignore[no-untyped-call]
+        rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
 
         exp_services.update_exploration(
             feconf.MIGRATION_BOT_USER_ID, self.EXP_0_ID, [
@@ -1523,7 +1582,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
     def test_cannot_get_interaction_ids_mapping_by_version_with_invalid_handler(
         self
     ) -> None:
-        rights_manager.create_new_exploration_rights(  # type: ignore[no-untyped-call]
+        rights_manager.create_new_exploration_rights(
             'exp_id_1', self.owner_id)
 
         states_dict = {
@@ -1596,7 +1655,7 @@ class LoadingAndDeletionOfExplorationDemosTests(ExplorationServicesUnitTests):
 
             exp_services.load_demo(exp_id)
             exploration = exp_fetchers.get_exploration_by_id(exp_id)
-            exploration.validate(strict=True)  # type: ignore[no-untyped-call]
+            exploration.validate(strict=True)
 
             duration = datetime.datetime.utcnow() - start_time
             processing_time = duration.seconds + (duration.microseconds / 1E6)
@@ -1802,7 +1861,7 @@ title: Title
     HINT_AUDIO_FILE, SOLUTION_AUDIO_FILE)
 
     def setUp(self) -> None:
-        super(ExplorationYamlImportingTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
 
@@ -1810,7 +1869,7 @@ title: Title
         exp_services.save_new_exploration_from_yaml_and_assets(
             self.owner_id, self.SAMPLE_YAML_CONTENT, self.EXP_ID, [])
         exp = exp_fetchers.get_exploration_by_id(self.EXP_ID)
-        self.assertEqual(exp.to_yaml(), self.SAMPLE_YAML_CONTENT)  # type: ignore[no-untyped-call]
+        self.assertEqual(exp.to_yaml(), self.SAMPLE_YAML_CONTENT)
 
     def test_loading_recent_yaml_does_not_default_exp_title_category(
         self
@@ -2016,7 +2075,7 @@ title: Title
 class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
 
     def test_get_image_filenames_from_exploration(self) -> None:
-        exploration = exp_domain.Exploration.create_default_exploration(  # type: ignore[no-untyped-call]
+        exploration = exp_domain.Exploration.create_default_exploration(
             'eid', title='title', category='category')
         exploration.add_states(['state1', 'state2', 'state3'])
         state1 = exploration.states['state1']
@@ -2050,7 +2109,10 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
         self.set_interaction_for_state(state2, 'MultipleChoiceInput')
         self.set_interaction_for_state(state3, 'ItemSelectionInput')
 
-        customization_args_dict1 = {
+        customization_args_dict1: Dict[
+            str,
+            Dict[str, Union[bool, Dict[str, Union[str, List[Dict[str, Any]]]]]]
+        ] = {
             'highlightRegionsOnHover': {'value': True},
             'imageAndRegions': {
                 'value': {
@@ -2068,7 +2130,9 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                 }
             }
         }
-        customization_args_dict2 = {
+        customization_args_dict2: Dict[
+            str, Dict[str, Union[List[Dict[str, str]], bool]]
+        ] = {
             'choices': {'value': [{
                 'content_id': 'ca_choices_0',
                 'html': (
@@ -2090,7 +2154,9 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
             }]},
             'showChoicesInShuffledOrder': {'value': True}
         }
-        customization_args_dict3 = {
+        customization_args_dict3: Dict[
+            str, Dict[str, Union[List[Dict[str, str]], int]]
+        ] = {
             'choices': {'value': [{
                 'content_id': 'ca_choices_0',
                 'html': (
@@ -3047,7 +3113,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
     """Test updating a single state."""
 
     def setUp(self) -> None:
-        super(UpdateStateTests, self).setUp()
+        super().setUp()
         exploration = self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id)
 
@@ -3379,8 +3445,16 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             '')
 
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-        choices = exploration.init_state.interaction.customization_args[
+        # Ruling out the possibility of any other type for mypy type checking.
+        assert isinstance(
+            exploration.init_state.interaction.customization_args[
+            'choices'].value,
+            list
+        )
+        choices: List[state_domain.SubtitledHtml] = (
+            exploration.init_state.interaction.customization_args[
             'choices'].value
+        )
         self.assertEqual(choices[0].html, '<p>Option A</p>')
         self.assertEqual(choices[0].content_id, 'ca_choices_0')
         self.assertEqual(choices[1].html, '<p>Option B</p>')
@@ -3534,6 +3608,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         self.assertEqual(rule_specs[0].inputs, {'x': 0})
         self.assertEqual(outcome.feedback.html, '<p>Try again</p>')
         self.assertEqual(outcome.dest, self.init_state_name)
+        # Ruling out the possibility of None for mypy type checking.
+        assert init_interaction.default_outcome is not None
         self.assertEqual(init_interaction.default_outcome.dest, 'State 2')
 
         change_list = (
@@ -3700,7 +3776,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         """Test updating of content."""
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
 
-        self.assertEqual(exploration.get_translation_counts(), {})  # type: ignore[no-untyped-call]
+        self.assertEqual(exploration.get_translation_counts(), {})
 
         change_list = _get_change_list(
             self.init_state_name, 'content', {
@@ -3721,7 +3797,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
 
-        self.assertEqual(exploration.get_translation_counts(), {  # type: ignore[no-untyped-call]
+        self.assertEqual(exploration.get_translation_counts(), {
             'hi': 1
         })
 
@@ -3729,7 +3805,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         """Test updating of content."""
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
 
-        self.assertEqual(exploration.get_translation_counts(), {})  # type: ignore[no-untyped-call]
+        self.assertEqual(exploration.get_translation_counts(), {})
 
         change_list = _get_change_list(
             self.init_state_name, 'content', {
@@ -3751,7 +3827,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
 
-        self.assertEqual(exploration.get_translation_counts(), {  # type: ignore[no-untyped-call]
+        self.assertEqual(exploration.get_translation_counts(), {
             'hi': 1
         })
 
@@ -3794,10 +3870,15 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
         init_interaction = exploration.init_state.interaction
         customization_args = init_interaction.customization_args
+        # Ruling out the possibility of any other type for mypy type checking.
+        assert isinstance(
+            customization_args['placeholder'].value,
+            state_domain.SubtitledUnicode
+        )
         self.assertEqual(
             customization_args['placeholder'].value.unicode_str,
             'placeholder')
-        self.assertEqual(exploration.get_translation_counts(), {  # type: ignore[no-untyped-call]
+        self.assertEqual(exploration.get_translation_counts(), {
             'hi': 1,
             'bn': 1,
         })
@@ -3807,7 +3888,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         id as needing update.
         """
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-        self.assertEqual(exploration.get_translation_counts(), {})  # type: ignore[no-untyped-call]
+        self.assertEqual(exploration.get_translation_counts(), {})
         # Update the exploration with a content and add corresponding
         # translations in two languages.
         change_list = [
@@ -3845,7 +3926,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
 
         # Assert that there are translations in two languages.
-        self.assertEqual(exploration.get_translation_counts(), {  # type: ignore[no-untyped-call]
+        self.assertEqual(exploration.get_translation_counts(), {
             'hi': 1,
             'bn': 1
         })
@@ -3874,7 +3955,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         # Assert that there are no completed translations and check that the
         # needs_update property is set for the corresponding written
         # translations.
-        self.assertEqual(exploration.get_translation_counts(), {  # type: ignore[no-untyped-call]
+        self.assertEqual(exploration.get_translation_counts(), {
             'bn': 1
         })
         actual_written_translations = (
@@ -3951,7 +4032,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         # Assert that there are no completed translations and check that the
         # needs_update property is set for the corresponding written
         # translations in the final version.
-        self.assertEqual(exploration.get_translation_counts(), {  # type: ignore[no-untyped-call]
+        self.assertEqual(exploration.get_translation_counts(), {
             'bn': 1
         })
         actual_written_translations = (
@@ -3966,6 +4047,11 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         # Assert that final version has all the changes made above.
         init_interaction = exploration.init_state.interaction
         customization_args = init_interaction.customization_args
+        # Ruling out the possibility of any other type for mypy type checking.
+        assert isinstance(
+            customization_args['placeholder'].value,
+            state_domain.SubtitledUnicode
+        )
         self.assertEqual(
             customization_args['placeholder'].value.unicode_str,
             'placeholder')
@@ -3975,7 +4061,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         particular content id as needing update.
         """
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
-        self.assertEqual(exploration.get_translation_counts(), {})  # type: ignore[no-untyped-call]
+        self.assertEqual(exploration.get_translation_counts(), {})
         # Update the exploration with a content and add corresponding
         # translations in two languages.
         change_list = [
@@ -4013,7 +4099,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
 
         # Assert that there are translations in two languages.
-        self.assertEqual(exploration.get_translation_counts(), {  # type: ignore[no-untyped-call]
+        self.assertEqual(exploration.get_translation_counts(), {
             'hi': 1,
             'bn': 1
         })
@@ -4041,7 +4127,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         # Assert that there are no completed translations and check that the
         # needs_update property is set for the corresponding written
         # translations.
-        self.assertEqual(exploration.get_translation_counts(), {})  # type: ignore[no-untyped-call]
+        self.assertEqual(exploration.get_translation_counts(), {})
         actual_written_translations = (
             exploration.states[self.init_state_name].written_translations)
         hindi_written_translation = (
@@ -4124,7 +4210,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         # Assert that there are no completed translations and check that the
         # needs_update property is set for the corresponding written
         # translations in the final version.
-        self.assertEqual(exploration.get_translation_counts(), {})  # type: ignore[no-untyped-call]
+        self.assertEqual(exploration.get_translation_counts(), {})
         actual_written_translations = (
             exploration.states[self.init_state_name].written_translations)
         hindi_written_translation = (
@@ -4137,6 +4223,11 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         # Assert that final version has all the changes made above.
         init_interaction = exploration.init_state.interaction
         customization_args = init_interaction.customization_args
+        # Ruling out the possibility of any other type for mypy type checking.
+        assert isinstance(
+            customization_args['placeholder'].value,
+            state_domain.SubtitledUnicode
+        )
         self.assertEqual(
             customization_args['placeholder'].value.unicode_str,
             'placeholder')
@@ -4526,14 +4617,14 @@ class CommitMessageHandlingTests(ExplorationServicesUnitTests):
     """Test the handling of commit messages."""
 
     def setUp(self) -> None:
-        super(CommitMessageHandlingTests, self).setUp()
+        super().setUp()
         exploration = self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, end_state_name='End')
         self.init_state_name = exploration.init_state_name
 
     def test_record_commit_message(self) -> None:
         """Check published explorations record commit messages."""
-        rights_manager.publish_exploration(self.owner, self.EXP_0_ID)  # type: ignore[no-untyped-call]
+        rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
 
         exp_services.update_exploration(
             self.owner_id, self.EXP_0_ID, _get_change_list(
@@ -4548,7 +4639,7 @@ class CommitMessageHandlingTests(ExplorationServicesUnitTests):
 
     def test_demand_commit_message(self) -> None:
         """Check published explorations demand commit messages."""
-        rights_manager.publish_exploration(self.owner, self.EXP_0_ID)  # type: ignore[no-untyped-call]
+        rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
 
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             ValueError,
@@ -4635,7 +4726,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
 
         # Publish the exploration. This does not affect the exploration version
         # history.
-        rights_manager.publish_exploration(self.owner, self.EXP_0_ID)  # type: ignore[no-untyped-call]
+        rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
 
         snapshots_metadata = exp_services.get_exploration_snapshots_metadata(
             self.EXP_0_ID)
@@ -4811,7 +4902,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         # Perform an invalid action: delete a state that does not exist. This
         # should not create a new version.
         with self.assertRaisesRegex(ValueError, 'does not exist'):  # type: ignore[no-untyped-call]
-            exploration.delete_state('invalid_state_name')  # type: ignore[no-untyped-call]
+            exploration.delete_state('invalid_state_name')
 
         # Now delete the new state.
         change_list = [exp_domain.ExplorationChange({
@@ -5481,7 +5572,7 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
         - Bob tries to publish EXP_ID_2, and is denied access.
         - (8) Albert publishes EXP_ID_2.
         """
-        super(ExplorationCommitLogUnitTests, self).setUp()
+        super().setUp()
 
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.signup(self.BOB_EMAIL, self.BOB_NAME)
@@ -5532,9 +5623,9 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
             with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
                 Exception, 'This exploration cannot be published'
                 ):
-                rights_manager.publish_exploration(self.bob, self.EXP_ID_2)  # type: ignore[no-untyped-call]
+                rights_manager.publish_exploration(self.bob, self.EXP_ID_2)
 
-            rights_manager.publish_exploration(self.albert, self.EXP_ID_2)  # type: ignore[no-untyped-call]
+            rights_manager.publish_exploration(self.albert, self.EXP_ID_2)
 
         populate_datastore()
 
@@ -5554,7 +5645,7 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
         all_commits = (
             exp_services.get_next_page_of_all_non_private_commits()[0])
         self.assertEqual(len(all_commits), 1)
-        commit_dicts = [commit.to_dict() for commit in all_commits]  # type: ignore[no-untyped-call]
+        commit_dicts = [commit.to_dict() for commit in all_commits]
         self.assertDictContainsSubset(
             self.COMMIT_ALBERT_PUBLISH_EXP_2, commit_dicts[0])
 
@@ -5604,7 +5695,7 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
         # We're only publishing the first 4 explorations, so we're not
         # expecting the last exploration to be indexed.
         for i in range(4):
-            rights_manager.publish_exploration(  # type: ignore[no-untyped-call]
+            rights_manager.publish_exploration(
                 self.owner, expected_exp_ids[i])
 
         with add_docs_swap:
@@ -5652,7 +5743,7 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
                 exp_id, self.owner_id, title=exp_title, category=exp_category,
                 end_state_name='End')
 
-            rights_manager.publish_exploration(self.owner, exp_id)  # type: ignore[no-untyped-call]
+            rights_manager.publish_exploration(self.owner, exp_id)
             self.assertEqual(actual_docs, [initial_exp_doc])
             self.assertEqual(add_docs_counter.times_called, 2)
 
@@ -5764,7 +5855,7 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
     EXP_ID_2: Final = 'eid2'
 
     def setUp(self) -> None:
-        super(ExplorationSummaryTests, self).setUp()
+        super().setUp()
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.signup(self.BOB_EMAIL, self.BOB_NAME)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)  # type: ignore[no-untyped-call]
@@ -5783,10 +5874,10 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
             exp_summary, user_id=self.viewer_id))
 
         # Owner makes viewer a viewer and editor an editor.
-        rights_manager.assign_role_for_exploration(  # type: ignore[no-untyped-call]
+        rights_manager.assign_role_for_exploration(
             self.owner, self.EXP_0_ID, self.viewer_id,
             rights_domain.ROLE_VIEWER)
-        rights_manager.assign_role_for_exploration(  # type: ignore[no-untyped-call]
+        rights_manager.assign_role_for_exploration(
             self.owner, self.EXP_0_ID, self.editor_id,
             rights_domain.ROLE_EDITOR)
 
@@ -5970,7 +6061,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         - (9) Albert publishes EXP_ID_3.
         - (10) Albert deletes EXP_ID_3.
         """
-        super(ExplorationSummaryGetTests, self).setUp()
+        super().setUp()
 
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.signup(self.BOB_EMAIL, self.BOB_NAME)
@@ -6009,12 +6100,12 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'This exploration cannot be published'
             ):
-            rights_manager.publish_exploration(self.bob, self.EXP_ID_2)  # type: ignore[no-untyped-call]
+            rights_manager.publish_exploration(self.bob, self.EXP_ID_2)
 
-        rights_manager.publish_exploration(self.albert, self.EXP_ID_2)  # type: ignore[no-untyped-call]
+        rights_manager.publish_exploration(self.albert, self.EXP_ID_2)
 
         self.save_new_valid_exploration(self.EXP_ID_3, self.albert_id)
-        rights_manager.publish_exploration(self.albert, self.EXP_ID_3)  # type: ignore[no-untyped-call]
+        rights_manager.publish_exploration(self.albert, self.EXP_ID_3)
         exp_services.delete_exploration(self.albert_id, self.EXP_ID_3)
 
     def test_get_non_private_exploration_summaries(self) -> None:
@@ -6098,9 +6189,9 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         self.save_new_valid_exploration(self.EXP_0_ID, self.owner_id)
         self.save_new_valid_exploration(self.EXP_1_ID, self.owner_id)
         self.save_new_valid_exploration(self.EXP_2_ID, self.owner_id)
-        rights_manager.publish_exploration(self.owner, self.EXP_0_ID)  # type: ignore[no-untyped-call]
-        rights_manager.publish_exploration(self.owner, self.EXP_1_ID)  # type: ignore[no-untyped-call]
-        rights_manager.publish_exploration(self.owner, self.EXP_2_ID)  # type: ignore[no-untyped-call]
+        rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
+        rights_manager.publish_exploration(self.owner, self.EXP_1_ID)
+        rights_manager.publish_exploration(self.owner, self.EXP_2_ID)
         exploration_summaries = (
             exp_services.get_recently_published_exp_summaries(3)
         )
@@ -6126,7 +6217,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
             canonical_story_ids=[], additional_story_ids=[],
             uncategorized_skill_ids=['skill_4'], subtopics=[],
             next_subtopic_id=0)
-        self.save_new_story(story_id, self.albert_id, topic_id)  # type: ignore[no-untyped-call]
+        self.save_new_story(story_id, self.albert_id, topic_id)
         topic_services.add_canonical_story(self.albert_id, topic_id, story_id)  # type: ignore[no-untyped-call]
         change_list = [
             story_domain.StoryChange({
@@ -6143,7 +6234,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                 'new_value': self.EXP_ID_1
             })
         ]
-        story_services.update_story(  # type: ignore[no-untyped-call]
+        story_services.update_story(
             self.albert_id, story_id, change_list,
             'Added node.')
         self.assertEqual(
@@ -6295,7 +6386,7 @@ title: Old Title
     ALBERT_NAME = 'albert'
 
     def setUp(self) -> None:
-        super(ExplorationConversionPipelineTests, self).setUp()
+        super().setUp()
 
         # Setup user who will own the test explorations.
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
@@ -6304,7 +6395,7 @@ title: Old Title
         # Create standard exploration that should not be converted.
         new_exp = self.save_new_valid_exploration(
             self.NEW_EXP_ID, self.albert_id)
-        self._up_to_date_yaml = new_exp.to_yaml()  # type: ignore[no-untyped-call]
+        self._up_to_date_yaml = new_exp.to_yaml()
 
     def test_get_exploration_from_model_with_invalid_schema_version_raise_error(
         self
@@ -6318,7 +6409,7 @@ title: Old Title
             init_state_name=feconf.DEFAULT_INIT_STATE_NAME
         )
 
-        rights_manager.create_new_exploration_rights('exp_id', self.albert_id)  # type: ignore[no-untyped-call]
+        rights_manager.create_new_exploration_rights('exp_id', self.albert_id)
 
         exp_model.commit(
             self.albert_id, 'New exploration created', [{
@@ -6369,7 +6460,7 @@ title: Old Title
             canonical_story_ids=[], additional_story_ids=[],
             uncategorized_skill_ids=['skill_4'], subtopics=[],
             next_subtopic_id=0)
-        self.save_new_story(story_id, user_id, topic_id)  # type: ignore[no-untyped-call]
+        self.save_new_story(story_id, user_id, topic_id)
         topic_services.add_canonical_story(user_id, topic_id, story_id)  # type: ignore[no-untyped-call]
         change_list_story = [
             story_domain.StoryChange({
@@ -6386,7 +6477,7 @@ title: Old Title
                 'new_value': exp_id
             })
         ]
-        story_services.update_story(  # type: ignore[no-untyped-call]
+        story_services.update_story(
             user_id, story_id, change_list_story,
             'Added node.')
         change_list_exp = [exp_domain.ExplorationChange({
@@ -6394,7 +6485,7 @@ title: Old Title
             'property_name': 'title',
             'new_value': 'new title'
             })]
-        opportunity_services.add_new_exploration_opportunities(  # type: ignore[no-untyped-call]
+        opportunity_services.add_new_exploration_opportunities(
             story_id, [exp_id])
         exp_services.update_exploration(
             user_id, exp_id, change_list_exp, 'story linked')
@@ -7166,6 +7257,8 @@ title: Old Title
             })], 'Changed interaction_solutions.')
 
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
+        # Ruling out the possibility of None for mypy type checking.
+        assert exploration.init_state.interaction.solution is not None
         self.assertEqual(
             exploration.init_state.interaction.solution.to_dict(),
             solution)
@@ -7216,6 +7309,8 @@ title: Old Title
 
         # Assert that final version consists all the changes.
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
+        # Ruling out the possibility of None for mypy type checking.
+        assert exploration.init_state.interaction.solution is not None
         self.assertEqual(exploration.title, 'new title')
         self.assertEqual(
             exploration.init_state.interaction.solution.to_dict(),
@@ -7274,7 +7369,7 @@ title: Old Title
                     'new_value': 'New title'
             })], 'Changed title')
         user_actions_info = user_services.get_user_actions_info(self.albert_id)
-        rights_manager.publish_exploration(user_actions_info, self.EXP_0_ID)  # type: ignore[no-untyped-call]
+        rights_manager.publish_exploration(user_actions_info, self.EXP_0_ID)
         updated_exploration_model = exp_fetchers.get_exploration_by_id(
             self.EXP_0_ID)
         exp_services.revert_exploration(
@@ -7318,7 +7413,7 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
     NEW_CHANGELIST_DICT: Final = [NEW_CHANGELIST[0].to_dict()]
 
     def setUp(self) -> None:
-        super(EditorAutoSavingUnitTests, self).setUp()
+        super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)  # type: ignore[no-untyped-call]
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
@@ -7502,7 +7597,7 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
         self.save_new_valid_exploration(
             'exp_id', self.admin_id, title='title')
 
-        rights_manager.assign_role_for_exploration(  # type: ignore[no-untyped-call]
+        rights_manager.assign_role_for_exploration(
             self.admin, 'exp_id', self.editor_id, rights_domain.ROLE_EDITOR)
 
         exp_user_data = user_models.ExplorationUserDataModel.get(
@@ -7530,11 +7625,13 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
         """Test the method get_exp_with_draft_applied when the draft_changes
         have invalid math-tags in them.
         """
-        exploration = exp_domain.Exploration.create_default_exploration(  # type: ignore[no-untyped-call]
+        exploration = exp_domain.Exploration.create_default_exploration(
             'exp_id')
         exploration.add_states(['State1'])
         state = exploration.states['State1']
-        state_customization_args_dict = {
+        state_customization_args_dict: Dict[
+            str, Dict[str, Union[List[Dict[str, str]], int]]
+        ] = {
             'choices': {
                 'value': [
                     {
@@ -7625,7 +7722,7 @@ class ApplyDraftUnitTests(test_utils.GenericTestBase):
     DATETIME: Final = datetime.datetime.strptime('2016-02-16', '%Y-%m-%d')
 
     def setUp(self) -> None:
-        super(ApplyDraftUnitTests, self).setUp()
+        super().setUp()
         # Create explorations.
         exploration = self.save_new_valid_exploration(
             self.EXP_ID1, self.USER_ID)
@@ -7694,8 +7791,8 @@ class UpdateVersionHistoryUnitTests(ExplorationServicesUnitTests):
     """
 
     def setUp(self) -> None:
-        super(UpdateVersionHistoryUnitTests, self).setUp()
-        exploration = exp_domain.Exploration.create_default_exploration(  # type: ignore[no-untyped-call]
+        super().setUp()
+        exploration = exp_domain.Exploration.create_default_exploration(
             self.EXP_0_ID)
         exp_services.save_new_exploration(self.owner_id, exploration)
         self.exploration = exploration
@@ -8345,7 +8442,7 @@ title: Title
 """)
 
     def setUp(self) -> None:
-        super(LoggedOutUserProgressUpdateTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
 
@@ -8730,7 +8827,7 @@ title: Title
 """)
 
     def setUp(self) -> None:
-        super(SyncLoggedInAndLoggedOutProgressTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]

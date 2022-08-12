@@ -169,6 +169,9 @@ def pre_delete_user(user_id: str) -> None:
             corresponds to a profile user then only that profile is deleted.
             For a full user, all of its associated profile users are deleted
             too.
+
+    Raises:
+        Exception. No data available for when the user was created on.
     """
     pending_deletion_requests = []
     user_settings = user_services.get_user_settings(user_id, strict=True)
@@ -206,7 +209,6 @@ def pre_delete_user(user_id: str) -> None:
     date_now = datetime.datetime.utcnow()
     date_before_which_username_should_be_saved = (
         date_now - PERIOD_AFTER_WHICH_USERNAME_CANNOT_BE_REUSED)
-    print(user_settings.created_on)
     if user_settings.created_on is None:
         raise Exception(
             'No data available for when the user was created on.'
@@ -517,8 +519,8 @@ def remove_user_from_activities_with_associated_rights_models(
 
     explorations_to_be_deleted_ids = [
         exp_summary.id for exp_summary in subscribed_exploration_summaries if
-        exp_summary.is_private() and  # type: ignore[no-untyped-call]
-        exp_summary.is_solely_owned_by_user(user_id)  # type: ignore[no-untyped-call]
+        exp_summary.is_private() and
+        exp_summary.is_solely_owned_by_user(user_id)
     ]
     exp_services.delete_explorations(
         user_id, explorations_to_be_deleted_ids, force_deletion=True)
@@ -527,28 +529,28 @@ def remove_user_from_activities_with_associated_rights_models(
     # by the to-be-deleted user.
     explorations_to_release_ownership_ids = [
         exp_summary.id for exp_summary in subscribed_exploration_summaries if
-        not exp_summary.is_private() and  # type: ignore[no-untyped-call]
-        exp_summary.is_solely_owned_by_user(user_id) and  # type: ignore[no-untyped-call]
+        not exp_summary.is_private() and
+        exp_summary.is_solely_owned_by_user(user_id) and
         not exp_summary.community_owned
     ]
     for exp_id in explorations_to_release_ownership_ids:
-        rights_manager.release_ownership_of_exploration(  # type: ignore[no-untyped-call]
+        rights_manager.release_ownership_of_exploration(
             user_services.get_system_user(), exp_id)
 
     explorations_to_remove_user_from_ids = [
         exp_summary.id for exp_summary in subscribed_exploration_summaries if
-        not exp_summary.is_solely_owned_by_user(user_id) and  # type: ignore[no-untyped-call]
-        exp_summary.does_user_have_any_role(user_id)  # type: ignore[no-untyped-call]
+        not exp_summary.is_solely_owned_by_user(user_id) and
+        exp_summary.does_user_have_any_role(user_id)
     ]
     for exp_id in explorations_to_remove_user_from_ids:
-        rights_manager.deassign_role_for_exploration(  # type: ignore[no-untyped-call]
+        rights_manager.deassign_role_for_exploration(
             user_services.get_system_user(), exp_id, user_id)
 
     # To hard-delete explorations marked as deleted we are using the rights
     # model to retrieve the exploration as the summary model gets hard-deleted
     # while marking the exploration as deleted.
     explorations_rights = (
-        rights_manager.get_exploration_rights_where_user_is_owner(user_id))  # type: ignore[no-untyped-call]
+        rights_manager.get_exploration_rights_where_user_is_owner(user_id))
     explorations_to_be_deleted_ids = [
         exploration_rights.id for exploration_rights
         in explorations_rights if
@@ -559,7 +561,7 @@ def remove_user_from_activities_with_associated_rights_models(
         user_id, explorations_to_be_deleted_ids, force_deletion=True)
 
     subscribed_collection_summaries = (
-        collection_services.get_collection_summaries_where_user_has_role(  # type: ignore[no-untyped-call]
+        collection_services.get_collection_summaries_where_user_has_role(
             user_id))
 
     collections_to_be_deleted_ids = [
@@ -567,7 +569,7 @@ def remove_user_from_activities_with_associated_rights_models(
         col_summary.is_private() and
         col_summary.is_solely_owned_by_user(user_id)
     ]
-    collection_services.delete_collections(  # type: ignore[no-untyped-call]
+    collection_services.delete_collections(
         user_id, collections_to_be_deleted_ids, force_deletion=True)
 
     # Release ownership of collections that are public and are solely owned
@@ -579,7 +581,7 @@ def remove_user_from_activities_with_associated_rights_models(
         not col_summary.community_owned
     ]
     for col_id in collections_to_release_ownership_ids:
-        rights_manager.release_ownership_of_collection(  # type: ignore[no-untyped-call]
+        rights_manager.release_ownership_of_collection(
             user_services.get_system_user(), col_id)
 
     collections_to_remove_user_from_ids = [
@@ -588,20 +590,20 @@ def remove_user_from_activities_with_associated_rights_models(
         col_summary.does_user_have_any_role(user_id)
     ]
     for col_id in collections_to_remove_user_from_ids:
-        rights_manager.deassign_role_for_collection(  # type: ignore[no-untyped-call]
+        rights_manager.deassign_role_for_collection(
             user_services.get_system_user(), col_id, user_id)
 
     # To hard-delete collections marked as deleted we are using the rights
     # model to retrieve the collection as the summary model gets hard-deleted
     # while marking the collection as deleted.
     collection_rights = (
-        rights_manager.get_collection_rights_where_user_is_owner(user_id))  # type: ignore[no-untyped-call]
+        rights_manager.get_collection_rights_where_user_is_owner(user_id))
     collections_to_be_deleted_ids = [
         collection_rights.id for collection_rights in collection_rights if
         collection_rights.is_private() and
         collection_rights.is_solely_owned_by_user(user_id)
     ]
-    collection_services.delete_collections(  # type: ignore[no-untyped-call]
+    collection_services.delete_collections(
         user_id, collections_to_be_deleted_ids, force_deletion=True)
 
     topic_services.deassign_user_from_all_topics(  # type: ignore[no-untyped-call]
@@ -727,6 +729,10 @@ def _collect_and_save_entity_ids_from_snapshots_and_commits(
     Returns:
         (list(BaseSnapshotMetadataModel), list(BaseCommitLogEntryModel)).
         The tuple of snapshot metadata and commit log models.
+
+    Raises:
+        Exception. Field name can only be None when commit log model class is
+            not provided.
     """
     user_id = pending_deletion_request.user_id
 

@@ -1041,13 +1041,16 @@ def _get_filtered_completed_story_summaries(
             nonexistent_completed_story_ids.append(story_ids[index])
         else:
             story_id = story_summary.id
+            story = stories[index]
+            # Ruling out the possibility of None for mypy type checking.
+            assert story is not None
             if len(story_fetchers.get_completed_node_ids(
                     user_id, story_id)) != len(story_summary.node_titles):
                 remove_story_from_completed_list(user_id, story_id)
                 record_story_started(user_id, story_id)
                 completed_to_incomplete_story_summaries.append(story_summary)
-            elif not story_services.is_story_published_and_present_in_topic(  # type: ignore[no-untyped-call]
-                    stories[index]):
+            elif not story_services.is_story_published_and_present_in_topic(
+                    story):
                 nonexistent_completed_story_ids.append(story_ids[index])
             else:
                 filtered_completed_story_summaries.append(story_summary)
@@ -1207,11 +1210,11 @@ def _get_filtered_completed_collection_summaries(
     completed_to_incomplete_collections = []
     filtered_completed_collection_summaries = []
 
-    completed_collections = collection_services.get_multiple_collections_by_id(  # type: ignore[no-untyped-call]
+    completed_collections = collection_services.get_multiple_collections_by_id(
         collection_ids, strict=False)
 
     exploration_ids_completed_in_collections = (
-        collection_services.get_explorations_completed_in_collections(  # type: ignore[no-untyped-call]
+        collection_services.get_explorations_completed_in_collections(
             user_id, collection_ids))
 
     for index, collection_summary in enumerate(collection_summaries):
@@ -1686,7 +1689,7 @@ def get_displayable_story_summary_dicts(
             'description': story_summary.description,
             'url_fragment': story_summary.url_fragment,
             'story_is_published': (
-                story_services.is_story_published_and_present_in_topic(  # type: ignore[no-untyped-call]
+                story_services.is_story_published_and_present_in_topic(
                     story)),
             'completed_node_titles': [
                 node.title for node in (

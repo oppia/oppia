@@ -22,7 +22,7 @@ from core import feconf
 from core.constants import constants
 from core.platform import models
 
-from typing import Any, Dict, List, Mapping, Optional, Sequence, cast
+from typing import Dict, List, Mapping, Optional, Sequence, cast
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -191,14 +191,12 @@ class TopicModel(base_models.VersionedModel):
             'rights_model': TopicRightsModel.get_by_id(self.id)
         }
 
-    # TODO(#13523): Change 'commit_cmds' to TypedDict/Domain Object
-    # to remove Any used below.
     def compute_models_to_commit(
         self,
         committer_id: str,
         commit_type: str,
         commit_message: Optional[str],
-        commit_cmds: List[Dict[str, Any]],
+        commit_cmds: base_models.AllowedCommitCmdsListType,
         # We expect Mapping because we want to allow models that inherit
         # from BaseModel as the values, if we used Dict this wouldn't
         # be allowed.
@@ -514,14 +512,12 @@ class TopicRightsModel(base_models.VersionedModel):
         """
         return cls.query(cls.manager_ids == user_id).fetch()
 
-    # TODO(#13523): Change 'commit_cmds' to TypedDict/Domain Object
-    # to remove Any used below.
     def compute_models_to_commit(
         self,
         committer_id: str,
         commit_type: str,
         commit_message: Optional[str],
-        commit_cmds: List[Dict[str, Any]],
+        commit_cmds: base_models.AllowedCommitCmdsListType,
         # We expect Mapping because we want to allow models that inherit
         # from BaseModel as the values, if we used Dict this wouldn't
         # be allowed.
@@ -588,7 +584,11 @@ class TopicRightsModel(base_models.VersionedModel):
                 if cmd['name'] == commit_cmd['cmd']
             )
             for user_id_attribute_name in user_id_attribute_names:
-                commit_cmds_user_ids.add(commit_cmd[user_id_attribute_name])
+                user_id_attribute = commit_cmd[user_id_attribute_name]
+                # Ruling out the possibility of Any other type for mypy type
+                # checking.
+                assert isinstance(user_id_attribute, str)
+                commit_cmds_user_ids.add(user_id_attribute)
         snapshot_metadata_model.commit_cmds_user_ids = list(
             sorted(commit_cmds_user_ids))
 

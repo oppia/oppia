@@ -179,7 +179,10 @@ def get_file_contents(
 
     with open(
         filepath, mode, encoding=encoding) as f:
-        return f.read() # type: ignore[no-any-return]
+        file_contents = f.read()
+        # Ruling out the possibility of Any other type for mypy type checking.
+        assert isinstance(file_contents, (str, bytes))
+        return file_contents
 
 
 def get_exploration_components_from_dir(
@@ -516,8 +519,7 @@ class JSONEncoderForHTML(json.JSONEncoder):
         return ''.join(chunks) if self.ensure_ascii else u''.join(chunks)
 
     def iterencode(self, o: str, _one_shot: bool = False) -> Iterator[str]:
-        chunks = super(
-            JSONEncoderForHTML, self).iterencode(o, _one_shot=_one_shot)
+        chunks = super().iterencode(o, _one_shot=_one_shot)
         for chunk in chunks:
             yield chunk.replace('&', '\\u0026').replace(
                 '<', '\\u003c').replace('>', '\\u003e')

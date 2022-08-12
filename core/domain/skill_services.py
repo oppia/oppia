@@ -230,7 +230,7 @@ def _get_augmented_skill_summaries_in_batches(
             classroom_names = (
                 assigned_skill_ids[skill_summary.id]['classroom_names'])
 
-        augmented_skill_summary = skill_domain.AugmentedSkillSummary(  # type: ignore[no-untyped-call]
+        augmented_skill_summary = skill_domain.AugmentedSkillSummary(
             skill_summary.id,
             skill_summary.description,
             skill_summary.language_code,
@@ -437,7 +437,7 @@ def get_skill_summary_from_model(
         SkillSummary. The domain object corresponding to given skill summmary
         model.
     """
-    return skill_domain.SkillSummary(  # type: ignore[no-untyped-call]
+    return skill_domain.SkillSummary(
         skill_summary_model.id, skill_summary_model.description,
         skill_summary_model.language_code,
         skill_summary_model.version,
@@ -457,7 +457,7 @@ def get_image_filenames_from_skill(skill: skill_domain.Skill) -> List[str]:
     Returns:
         list(str). List containing the name of the image files in skill.
     """
-    html_list = skill.get_all_html_content_strings()  # type: ignore[no-untyped-call]
+    html_list = skill.get_all_html_content_strings()
     return html_cleaner.get_image_filenames_from_html_strings(html_list)
 
 
@@ -654,7 +654,7 @@ def _create_skill(
             rubric.to_dict()
             for rubric in skill.rubrics
         ],
-        skill_contents=skill.skill_contents.to_dict(),  # type: ignore[no-untyped-call]
+        skill_contents=skill.skill_contents.to_dict(),
         next_misconception_id=skill.next_misconception_id,
         misconceptions_schema_version=skill.misconceptions_schema_version,
         rubric_schema_version=skill.rubric_schema_version,
@@ -667,7 +667,7 @@ def _create_skill(
     model.commit(committer_id, commit_message, commit_cmd_dicts)
     skill.version += 1
     create_skill_summary(skill.id)
-    opportunity_services.create_skill_opportunity(  # type: ignore[no-untyped-call]
+    opportunity_services.create_skill_opportunity(
         skill.id,
         skill.description)
 
@@ -733,20 +733,23 @@ def apply_change_list(
                         raise Exception(
                             'The user does not have enough rights to edit the '
                             'skill description.')
-                    skill.update_description(change.new_value)  # type: ignore[no-untyped-call]
+                    skill.update_description(change.new_value)
                     (
-                        opportunity_services  # type: ignore[no-untyped-call]
+                        opportunity_services
                         .update_skill_opportunity_skill_description(
                             skill.id, change.new_value))
                 elif (change.property_name ==
                       skill_domain.SKILL_PROPERTY_LANGUAGE_CODE):
-                    skill.update_language_code(change.new_value)  # type: ignore[no-untyped-call]
+                    skill.update_language_code(change.new_value)
                 elif (change.property_name ==
                       skill_domain.SKILL_PROPERTY_SUPERSEDING_SKILL_ID):
-                    skill.update_superseding_skill_id(change.new_value)  # type: ignore[no-untyped-call]
+                    skill.update_superseding_skill_id(change.new_value)
                 elif (change.property_name ==
                       skill_domain.SKILL_PROPERTY_ALL_QUESTIONS_MERGED):
-                    skill.record_that_all_questions_are_merged(change.new_value)  # type: ignore[no-untyped-call]
+                    # Ruling out the possibility of any other type for mypy type
+                    # checking.
+                    assert isinstance(change.new_value, bool)
+                    skill.record_that_all_questions_are_merged(change.new_value)
             elif change.cmd == skill_domain.CMD_UPDATE_SKILL_CONTENTS_PROPERTY:
                 if (change.property_name ==
                         skill_domain.SKILL_CONTENTS_PROPERTY_EXPLANATION):
@@ -759,10 +762,13 @@ def apply_change_list(
                     skill.update_explanation(explanation)
                 elif (change.property_name ==
                       skill_domain.SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES):
-                    worked_examples_list = [
-                        skill_domain.WorkedExample.from_dict(worked_example)  # type: ignore[no-untyped-call]
-                        for worked_example in change.new_value]
-                    skill.update_worked_examples(worked_examples_list)  # type: ignore[no-untyped-call]
+                    worked_examples_list: List[skill_domain.WorkedExample] = []
+                    for worked_example in change.new_value:
+                        assert isinstance(worked_example, dict)
+                        worked_examples_list.append(
+                            skill_domain.WorkedExample.from_dict(worked_example)
+                        )
+                    skill.update_worked_examples(worked_examples_list)
             elif change.cmd == skill_domain.CMD_ADD_SKILL_MISCONCEPTION:
                 # Ruling out the possibility of any other type for mypy type
                 # checking.
@@ -771,31 +777,38 @@ def apply_change_list(
                     change.new_misconception_dict)
                 skill.add_misconception(misconception)
             elif change.cmd == skill_domain.CMD_DELETE_SKILL_MISCONCEPTION:
-                skill.delete_misconception(change.misconception_id)  # type: ignore[no-untyped-call]
+                assert isinstance(change.misconception_id, int)
+                skill.delete_misconception(change.misconception_id)
             elif change.cmd == skill_domain.CMD_ADD_PREREQUISITE_SKILL:
-                skill.add_prerequisite_skill(change.skill_id)  # type: ignore[no-untyped-call]
+                skill.add_prerequisite_skill(change.skill_id)
             elif change.cmd == skill_domain.CMD_DELETE_PREREQUISITE_SKILL:
-                skill.delete_prerequisite_skill(change.skill_id)  # type: ignore[no-untyped-call]
+                skill.delete_prerequisite_skill(change.skill_id)
             elif change.cmd == skill_domain.CMD_UPDATE_RUBRICS:
-                skill.update_rubric(  # type: ignore[no-untyped-call]
+                assert isinstance(change.explanations, list)
+                skill.update_rubric(
                     change.difficulty, change.explanations)
             elif (change.cmd ==
                   skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY):
                 if (change.property_name ==
                         skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_NAME):
-                    skill.update_misconception_name(  # type: ignore[no-untyped-call]
+                    assert isinstance(change.misconception_id, int)
+                    skill.update_misconception_name(
                         change.misconception_id, change.new_value)
                 elif (change.property_name ==
                       skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_NOTES):
-                    skill.update_misconception_notes(  # type: ignore[no-untyped-call]
+                    assert isinstance(change.misconception_id, int)
+                    skill.update_misconception_notes(
                         change.misconception_id, change.new_value)
                 elif (change.property_name ==
                       skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK):
-                    skill.update_misconception_feedback(  # type: ignore[no-untyped-call]
+                    assert isinstance(change.misconception_id, int)
+                    skill.update_misconception_feedback(
                         change.misconception_id, change.new_value)
                 elif (change.property_name ==
                       skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_MUST_BE_ADDRESSED): # pylint: disable=line-too-long
-                    skill.update_misconception_must_be_addressed(  # type: ignore[no-untyped-call]
+                    assert isinstance(change.misconception_id, int)
+                    assert isinstance(change.new_value, bool)
+                    skill.update_misconception_must_be_addressed(
                         change.misconception_id, change.new_value)
                 else:
                     raise Exception('Invalid change dict.')
@@ -844,7 +857,7 @@ def populate_skill_model_fields(
         skill.rubric_schema_version)
     skill_model.skill_contents_schema_version = (
         skill.skill_contents_schema_version)
-    skill_model.skill_contents = skill.skill_contents.to_dict()  # type: ignore[no-untyped-call]
+    skill_model.skill_contents = skill.skill_contents.to_dict()
     skill_model.misconceptions = [
         misconception.to_dict() for misconception in skill.misconceptions
     ]
@@ -940,11 +953,15 @@ def update_skill(
         for change in change_list
     )
     if misconception_is_deleted:
-        deleted_skill_misconception_ids = [
-            skill.generate_skill_misconception_id(change.misconception_id)  # type: ignore[no-untyped-call]
-            for change in change_list
-            if change.cmd == skill_domain.CMD_DELETE_SKILL_MISCONCEPTION
-        ]
+        deleted_skill_misconception_ids: List[str] = []
+        for change in change_list:
+            if change.cmd == skill_domain.CMD_DELETE_SKILL_MISCONCEPTION:
+                assert isinstance(change.misconception_id, int)
+                deleted_skill_misconception_ids.append(
+                    skill.generate_skill_misconception_id(
+                        change.misconception_id
+                    )
+                )
         taskqueue_services.defer(
             taskqueue_services.FUNCTION_ID_UNTAG_DELETED_MISCONCEPTIONS,
             taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS,
@@ -979,8 +996,8 @@ def delete_skill(
     # Delete the summary of the skill (regardless of whether
     # force_deletion is True or not).
     delete_skill_summary(skill_id)
-    opportunity_services.delete_skill_opportunity(skill_id)  # type: ignore[no-untyped-call]
-    suggestion_services.auto_reject_question_suggestions_for_skill_id(  # type: ignore[no-untyped-call]
+    opportunity_services.delete_skill_opportunity(skill_id)
+    suggestion_services.auto_reject_question_suggestions_for_skill_id(
         skill_id)
 
 
@@ -1014,7 +1031,10 @@ def compute_summary_of_skill(
     skill_model_worked_examples_count = len(
         skill.skill_contents.worked_examples)
 
-    skill_summary = skill_domain.SkillSummary(  # type: ignore[no-untyped-call]
+    # Ruling out the possibility of None for mypy type checking.
+    assert skill.created_on is not None
+    assert skill.last_updated is not None
+    skill_summary = skill_domain.SkillSummary(
         skill.id, skill.description, skill.language_code,
         skill.version, skill_model_misconception_count,
         skill_model_worked_examples_count,
@@ -1096,7 +1116,7 @@ def create_user_skill_mastery(
         degree_of_mastery: float. The degree of mastery of user in the skill.
     """
 
-    user_skill_mastery = skill_domain.UserSkillMastery(  # type: ignore[no-untyped-call]
+    user_skill_mastery = skill_domain.UserSkillMastery(
         user_id, skill_id, degree_of_mastery)
     save_user_skill_mastery(user_skill_mastery)
 
@@ -1358,14 +1378,14 @@ def get_categorized_skill_ids_and_descriptions(
     """
     topics = topic_fetchers.get_all_topics()
 
-    categorized_skills = skill_domain.CategorizedSkills()  # type: ignore[no-untyped-call]
+    categorized_skills = skill_domain.CategorizedSkills()
 
     skill_ids = []
 
     for topic in topics:
         subtopics = topic.subtopics
         subtopic_titles = [subtopic.title for subtopic in subtopics]
-        categorized_skills.add_topic(topic.name, subtopic_titles)  # type: ignore[no-untyped-call]
+        categorized_skills.add_topic(topic.name, subtopic_titles)
         for skill_id in topic.uncategorized_skill_ids:
             skill_ids.append(skill_id)
         for subtopic in subtopics:
@@ -1377,13 +1397,17 @@ def get_categorized_skill_ids_and_descriptions(
     for topic in topics:
         subtopics = topic.subtopics
         for skill_id in topic.uncategorized_skill_ids:
-            categorized_skills.add_uncategorized_skill(  # type: ignore[no-untyped-call]
+            description = skill_descriptions[skill_id]
+            assert description is not None
+            categorized_skills.add_uncategorized_skill(
                 topic.name, skill_id,
-                skill_descriptions[skill_id])
+                description)
         for subtopic in subtopics:
             for skill_id in subtopic.skill_ids:
-                categorized_skills.add_subtopic_skill(  # type: ignore[no-untyped-call]
+                description = skill_descriptions[skill_id]
+                assert description is not None
+                categorized_skills.add_subtopic_skill(
                     topic.name, subtopic.title,
-                    skill_id, skill_descriptions[skill_id])
+                    skill_id, description)
 
     return categorized_skills

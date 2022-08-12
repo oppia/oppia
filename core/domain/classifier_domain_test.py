@@ -35,7 +35,7 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
     """Test the ClassifierTrainingJob domain."""
 
     def setUp(self) -> None:
-        super(ClassifierTrainingJobDomainTests, self).setUp()
+        super().setUp()
 
         self.training_data: List[state_domain.TrainingDataDict] = [
             {
@@ -264,7 +264,7 @@ class StateTrainingJobsMappingDomainTests(test_utils.GenericTestBase):
     """Tests for the StateTrainingJobsMapping domain."""
 
     def setUp(self) -> None:
-        super(StateTrainingJobsMappingDomainTests, self).setUp()
+        super().setUp()
 
         self.mapping_dict: classifier_domain.StateTrainingJobsMappingDict = {
             'exp_id': 'exp_id1',
@@ -339,7 +339,7 @@ class OppiaMLAuthInfoDomainTests(unittest.TestCase):
     """Tests for the OppiaMLAuthInfo domain."""
 
     def setUp(self) -> None:
-        super(OppiaMLAuthInfoDomainTests, self).setUp()
+        super().setUp()
 
         self.oppia_ml_auth_info = classifier_domain.OppiaMLAuthInfo(
             'hello'.encode('utf-8'), 'world', '!')

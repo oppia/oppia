@@ -2669,10 +2669,20 @@ def get_checkpoints_in_order(
             ):
                 checkpoint_state_names.append(current_state_name)
             for answer_group in current_state.interaction.answer_groups:
+                # Here, we are asserting that destination is never going to be
+                # None becasue a None destination can never be a checkpoint of
+                # exploration.
+                assert answer_group.outcome.dest is not None
                 queue.append(answer_group.outcome.dest)
 
             # Add the default outcome destination in the queue.
             if current_state.interaction.default_outcome is not None:
+                # Here, we are asserting that destination is never going to be
+                # None becasue a None destination can never be a checkpoint of
+                # exploration.
+                assert (
+                    current_state.interaction.default_outcome.dest is not None
+                )
                 queue.append(current_state.interaction.default_outcome.dest)
 
     return checkpoint_state_names
