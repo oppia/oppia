@@ -612,6 +612,9 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.story.corresponding_topic_id = valid_topic_id
         self.story.validate()
 
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
         # Setting invalid topic id type.
         invalid_topic_id = 123
         self.story.corresponding_topic_id = invalid_topic_id  # type: ignore[assignment]

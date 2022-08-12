@@ -3279,7 +3279,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         state.
         """
         community_contribution_stats = (
-            suggestion_services.get_community_contribution_stats()  # type: ignore[no-untyped-call]
+            suggestion_services.get_community_contribution_stats()
         )
 
         self.assertEqual(
@@ -3314,7 +3314,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         user_services.allow_user_to_review_translation_in_language(
             self.reviewer_1_id, 'hi')
 
-        stats = suggestion_services.get_community_contribution_stats()  # type: ignore[no-untyped-call]
+        stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 0)
         self.assertEqual(stats.question_suggestion_count, 0)
         self.assertDictEqual(
@@ -3330,7 +3330,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         user_services.allow_user_to_review_translation_in_language(
             self.reviewer_1_id, 'en')
 
-        stats = suggestion_services.get_community_contribution_stats()  # type: ignore[no-untyped-call]
+        stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 0)
         self.assertEqual(stats.question_suggestion_count, 0)
         self.assertDictEqual(
@@ -3345,7 +3345,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         user_services.allow_user_to_review_translation_in_language(
             self.reviewer_1_id, 'hi')
         # Assert that the translation reviewer count increased by one.
-        stats = suggestion_services.get_community_contribution_stats()  # type: ignore[no-untyped-call]
+        stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 0)
         self.assertEqual(stats.question_suggestion_count, 0)
         self.assertDictEqual(
@@ -3358,7 +3358,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
 
         # Assert that the translation reviewer count did not change because the
         # reviewer already had the permissions.
-        stats = suggestion_services.get_community_contribution_stats()  # type: ignore[no-untyped-call]
+        stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 0)
         self.assertEqual(stats.question_suggestion_count, 0)
         self.assertDictEqual(
@@ -3372,7 +3372,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         user_services.allow_user_to_review_translation_in_language(
             self.reviewer_1_id, 'hi')
         # Assert that the translation reviewer count increased by one.
-        stats = suggestion_services.get_community_contribution_stats()  # type: ignore[no-untyped-call]
+        stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 0)
         self.assertEqual(stats.question_suggestion_count, 0)
         self.assertDictEqual(
@@ -3395,7 +3395,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         user_services.allow_user_to_review_translation_in_language(
             self.reviewer_1_id, 'en')
         # Assert that the translation reviewer count increased by one.
-        stats = suggestion_services.get_community_contribution_stats()  # type: ignore[no-untyped-call]
+        stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 0)
         self.assertEqual(stats.question_suggestion_count, 0)
         self.assertDictEqual(
@@ -3408,7 +3408,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
 
         # Assert that the translation reviewer count decreased by one after the
         # rights were removed.
-        stats = suggestion_services.get_community_contribution_stats()  # type: ignore[no-untyped-call]
+        stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 0)
         self.assertEqual(stats.question_suggestion_count, 0)
         self.assertDictEqual(
@@ -3424,7 +3424,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         user_services.allow_user_to_review_translation_in_language(
             self.reviewer_1_id, 'en')
         # Assert that the translation reviewer count increased by one.
-        stats = suggestion_services.get_community_contribution_stats()  # type: ignore[no-untyped-call]
+        stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 0)
         self.assertEqual(stats.question_suggestion_count, 0)
         self.assertDictEqual(
@@ -3443,7 +3443,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
     ) -> None:
         user_services.allow_user_to_review_question(self.reviewer_1_id)
 
-        stats = suggestion_services.get_community_contribution_stats()  # type: ignore[no-untyped-call]
+        stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 1)
         self.assertEqual(stats.question_suggestion_count, 0)
         self.assertDictEqual(stats.translation_reviewer_counts_by_lang_code, {})
@@ -3455,7 +3455,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
     ) -> None:
         user_services.allow_user_to_review_question(self.reviewer_1_id)
         # Assert that the question reviewer count increased by one.
-        stats = suggestion_services.get_community_contribution_stats()  # type: ignore[no-untyped-call]
+        stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 1)
         self.assertEqual(stats.question_suggestion_count, 0)
         self.assertDictEqual(stats.translation_reviewer_counts_by_lang_code, {})
@@ -3466,7 +3466,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
 
         # Assert that the question reviewer count did not change because the
         # reviewer already had the permissions.
-        stats = suggestion_services.get_community_contribution_stats()  # type: ignore[no-untyped-call]
+        stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 1)
         self.assertEqual(stats.question_suggestion_count, 0)
         self.assertDictEqual(stats.translation_reviewer_counts_by_lang_code, {})
@@ -3478,7 +3478,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
     ) -> None:
         user_services.allow_user_to_review_question(self.reviewer_1_id)
         # Assert that the question reviewer count increased by one.
-        stats = suggestion_services.get_community_contribution_stats()  # type: ignore[no-untyped-call]
+        stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 1)
         self.assertEqual(stats.question_suggestion_count, 0)
         self.assertDictEqual(stats.translation_reviewer_counts_by_lang_code, {})
@@ -3496,7 +3496,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
     ) -> None:
         user_services.allow_user_to_review_question(self.reviewer_1_id)
         # Assert that the question reviewer count increased by one.
-        stats = suggestion_services.get_community_contribution_stats()  # type: ignore[no-untyped-call]
+        stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 1)
         self.assertEqual(stats.question_suggestion_count, 0)
         self.assertDictEqual(stats.translation_reviewer_counts_by_lang_code, {})
@@ -3518,7 +3518,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             self.reviewer_1_id, 'en')
         user_services.allow_user_to_review_question(self.reviewer_1_id)
 
-        stats = suggestion_services.get_community_contribution_stats()  # type: ignore[no-untyped-call]
+        stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 1)
         self.assertEqual(stats.question_suggestion_count, 0)
         self.assertDictEqual(
@@ -3540,7 +3540,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             self.reviewer_2_id, 'fr')
         user_services.allow_user_to_review_question(self.reviewer_2_id)
 
-        stats = suggestion_services.get_community_contribution_stats()  # type: ignore[no-untyped-call]
+        stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 2)
         self.assertEqual(stats.question_suggestion_count, 0)
         self.assertDictEqual(
@@ -3559,7 +3559,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         user_services.allow_user_to_review_question(self.reviewer_1_id)
         # Assert that the counts were updated before the question rights are
         # removed.
-        stats = suggestion_services.get_community_contribution_stats()  # type: ignore[no-untyped-call]
+        stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 1)
         self.assertEqual(stats.question_suggestion_count, 0)
         self.assertDictEqual(
@@ -3569,7 +3569,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
 
         user_services.remove_question_review_rights(self.reviewer_1_id)
 
-        stats = suggestion_services.get_community_contribution_stats()  # type: ignore[no-untyped-call]
+        stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 0)
         self.assertEqual(stats.question_suggestion_count, 0)
         self.assertDictEqual(
@@ -3585,7 +3585,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         user_services.allow_user_to_review_question(self.reviewer_1_id)
         # Assert that the counts were updated before the translation rights are
         # removed.
-        stats = suggestion_services.get_community_contribution_stats()  # type: ignore[no-untyped-call]
+        stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 1)
         self.assertEqual(stats.question_suggestion_count, 0)
         self.assertDictEqual(
@@ -3597,7 +3597,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             self.reviewer_1_id, 'hi')
         self.process_and_flush_pending_tasks()
 
-        stats = suggestion_services.get_community_contribution_stats()  # type: ignore[no-untyped-call]
+        stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 1)
         self.assertEqual(stats.question_suggestion_count, 0)
         self.assertDictEqual(
@@ -3615,7 +3615,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         user_services.allow_user_to_review_question(self.reviewer_1_id)
         # Assert that the counts were updated before the contribution reviewer
         # is removed.
-        stats = suggestion_services.get_community_contribution_stats()  # type: ignore[no-untyped-call]
+        stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 1)
         self.assertEqual(stats.question_suggestion_count, 0)
         self.assertDictEqual(

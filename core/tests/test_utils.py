@@ -75,7 +75,7 @@ from proto_files import text_classifier_pb2
 import elasticsearch
 import requests_mock
 from typing import (
-    IO, Any, Callable, Dict, Iterable, Iterator, List, Mapping,
+    IO, Any, Callable, Collection, Dict, Iterable, Iterator, List, Mapping,
     Optional, OrderedDict, Pattern, Sequence, Set, Tuple, Type,
     Union, cast, overload
 )
@@ -1296,8 +1296,8 @@ class TestBase(unittest.TestCase):
             logger.removeHandler(list_stream_handler)
 
     # Here, we used Any type for arguments because 'obj' can accept any kind
-    # of object on which attribute needs to be replaced and 'newvalue' can accept
-    # any type of value to replace it with the old value.
+    # of object on which attribute needs to be replaced and 'newvalue' can
+    # accept any type of value to replace it with the old value.
     @contextlib.contextmanager
     def swap(self, obj: Any, attr: str, newvalue: Any) -> Iterator[None]:
         """Swap an object's attribute value within the context of a 'with'
@@ -1333,8 +1333,8 @@ class TestBase(unittest.TestCase):
             setattr(obj, attr, original)
 
     # Here, we used Any type for arguments because 'obj' can accept any kind
-    # of object on which attribute needs to be replaced and 'newvalue' can accept
-    # any type of value to replace it with the old value.
+    # of object on which attribute needs to be replaced and 'newvalue' can
+    # accept any type of value to replace it with the old value.
     @contextlib.contextmanager
     def swap_to_always_return(
         self, obj: Any, attr: str, value: Optional[Any] = None
@@ -3231,7 +3231,7 @@ title: Title
         collection = collection_domain.Collection.create_default_collection(
             collection_id, title=title, category=category, objective=objective,
             language_code=language_code)
-        collection_services.save_new_collection(owner_id, collection)  # type: ignore[no-untyped-call]
+        collection_services.save_new_collection(owner_id, collection)
         return collection
 
     def save_new_valid_collection(
@@ -3275,7 +3275,7 @@ title: Title
                 objective=objective, end_state_name=end_state_name)
         collection.add_node(exploration.id)
 
-        collection_services.save_new_collection(owner_id, collection)  # type: ignore[no-untyped-call]
+        collection_services.save_new_collection(owner_id, collection)
         return collection
 
     def publish_collection(self, owner_id: str, collection_id: str) -> None:
@@ -3314,12 +3314,12 @@ title: Title
             'url-fragment')
 
         story.language_code = 'en'
-        story_services.save_new_story(owner_id, story)  # type: ignore[no-untyped-call]
+        story_services.save_new_story(owner_id, story)
         topic_services.add_canonical_story(  # type: ignore[no-untyped-call]
             owner_id, topic_id, story.id)
         topic_services.publish_story(  # type: ignore[no-untyped-call]
             topic_id, story.id, admin_id)
-        story_services.update_story(  # type: ignore[no-untyped-call]
+        story_services.update_story(
             owner_id, story.id, [story_domain.StoryChange({
                 'cmd': 'add_story_node',
                 'node_id': 'node_1',
@@ -3375,7 +3375,7 @@ title: Title
         story.language_code = language_code
         story.url_fragment = url_fragment
         story.meta_tag_content = meta_tag_content
-        story_services.save_new_story(owner_id, story)  # type: ignore[no-untyped-call]
+        story_services.save_new_story(owner_id, story)
         return story
 
     def save_new_story_with_story_contents_schema_v1(
@@ -3521,7 +3521,7 @@ title: Title
         story_model.commit(
             owner_id, commit_message,
             [{'cmd': story_domain.CMD_CREATE_NEW, 'title': title}])
-        story_services.create_story_summary(story_id)  # type: ignore[no-untyped-call]
+        story_services.create_story_summary(story_id)
 
     def save_new_subtopic(
         self, subtopic_id: int, owner_id: str, topic_id: str
@@ -3745,11 +3745,11 @@ title: Title
         """
         # This needs to be done because default arguments can not be of list
         # type.
-        question = question_domain.Question(  # type: ignore[no-untyped-call]
+        question = question_domain.Question(
             question_id, question_state_data,
             feconf.CURRENT_STATE_SCHEMA_VERSION, language_code, 0,
             linked_skill_ids, inapplicable_skill_misconception_ids or [])
-        question_services.add_question(owner_id, question)  # type: ignore[no-untyped-call]
+        question_services.add_question(owner_id, question)
         return question
 
     def save_new_question_with_state_data_schema_v27(
@@ -3816,7 +3816,10 @@ title: Title
         score_category = (
             suggestion_models.SCORE_TYPE_QUESTION +
             suggestion_models.SCORE_CATEGORY_DELIMITER + skill_id)
-        change = {
+        change: Dict[
+            str,
+            Union[str, float, Dict[str, Union[Optional[Collection[str]], int]]]
+        ] = {
             'cmd': (
                 question_domain
                 .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),

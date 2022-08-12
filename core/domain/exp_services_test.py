@@ -84,7 +84,7 @@ class ExplorationServicesUnitTests(test_utils.GenericTestBase):
     EXP_1_ID = 'An_exploration_1_id'
     EXP_2_ID = 'An_exploration_2_id'
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Before each individual test, create a dummy exploration."""
         super().setUp()
 

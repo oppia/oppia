@@ -120,7 +120,7 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
     def test_get_latest_completed_node_ids(self) -> None:
         self.assertEqual(story_fetchers.get_latest_completed_node_ids(
             self.USER_ID, self.story_id), [])
-        story_services.record_completed_node_in_story_context(  # type: ignore[no-untyped-call]
+        story_services.record_completed_node_in_story_context(
             self.USER_ID, self.story_id, self.NODE_ID_1)
         self.assertEqual(
             story_fetchers.get_latest_completed_node_ids(
@@ -214,7 +214,7 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(user_stories_progress[0]['topic_name'], 'Topic')
 
-        story_services.record_completed_node_in_story_context( # type: ignore[no-untyped-call]
+        story_services.record_completed_node_in_story_context(
             self.USER_ID, self.story_id, self.NODE_ID_1)
 
         all_users_stories_progress = (
@@ -252,9 +252,9 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
             story_fetchers.get_completed_node_ids('randomID', 'someID'),
             []
         )
-        story_services.record_completed_node_in_story_context(  # type: ignore[no-untyped-call]
+        story_services.record_completed_node_in_story_context(
             self.USER_ID, self.story_id, self.NODE_ID_1)
-        story_services.record_completed_node_in_story_context(  # type: ignore[no-untyped-call]
+        story_services.record_completed_node_in_story_context(
             self.USER_ID, self.story_id, self.NODE_ID_2)
         self.assertEqual(
             story_fetchers.get_completed_node_ids(self.USER_ID, self.story_id),
@@ -274,9 +274,9 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
 
     def test_get_completed_nodes_in_story(self) -> None:
         story = story_fetchers.get_story_by_id(self.story_id)
-        story_services.record_completed_node_in_story_context(  # type: ignore[no-untyped-call]
+        story_services.record_completed_node_in_story_context(
             self.USER_ID, self.story_id, self.NODE_ID_1)
-        story_services.record_completed_node_in_story_context(  # type: ignore[no-untyped-call]
+        story_services.record_completed_node_in_story_context(
             self.USER_ID, self.story_id, self.NODE_ID_2)
         for ind, completed_node in enumerate(
                 story_fetchers.get_completed_nodes_in_story(

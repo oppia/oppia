@@ -24,7 +24,7 @@ from core import utils
 from core.constants import constants
 from core.platform import models
 
-from typing import Any, Dict, List, Mapping, Sequence
+from typing import Dict, List, Mapping, Sequence
 
 MYPY = False
 if MYPY: # pragma: no cover

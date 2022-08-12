@@ -55,7 +55,7 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
         self.save_new_skill(
             'skill_2', self.admin_id, description='Skill Description 2')
 
-        self.question_id = question_services.get_new_question_id()  # type: ignore[no-untyped-call]
+        self.question_id = question_services.get_new_question_id()
         self.question = self.save_new_question(
             self.question_id, self.editor_id,
             self._create_valid_question_data('ABC'), ['skill_1'])
@@ -72,7 +72,7 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
         assert questions[0] is not None
         self.assertEqual(len(questions), 1)
         self.assertEqual(
-            questions[0].to_dict(), self.question.to_dict())  # type: ignore[no-untyped-call]
+            questions[0].to_dict(), self.question.to_dict())
 
     def test_get_no_questions_with_no_skill_ids(self) -> None:
         questions, _ = (
@@ -81,11 +81,11 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(questions), 0)
 
     def test_get_questions_with_multi_skill_ids(self) -> None:
-        question_id_1 = question_services.get_new_question_id()  # type: ignore[no-untyped-call]
+        question_id_1 = question_services.get_new_question_id()
         question_1 = self.save_new_question(
             question_id_1, self.editor_id,
             self._create_valid_question_data('ABC'), ['skill_1', 'skill_2'])
-        question_services.create_new_question_skill_link(  # type: ignore[no-untyped-call]
+        question_services.create_new_question_skill_link(
             self.editor_id, question_id_1, 'skill_1', 0.3)
         question_services.create_new_question_skill_link(
             self.editor_id, question_id_1, 'skill_2', 0.5)
@@ -98,10 +98,10 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
         assert questions[0] is not None
         self.assertEqual(len(questions), 1)
         self.assertEqual(
-            questions[0].to_dict(), question_1.to_dict())  # type: ignore[no-untyped-call]
+            questions[0].to_dict(), question_1.to_dict())
 
     def test_get_questions_by_ids(self) -> None:
-        question_id_2 = question_services.get_new_question_id()  # type: ignore[no-untyped-call]
+        question_id_2 = question_services.get_new_question_id()
         self.save_new_question(
             question_id_2, self.editor_id,
             self._create_valid_question_data('DEF'), ['skill_1'])
