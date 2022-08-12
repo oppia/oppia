@@ -22,22 +22,50 @@ import copy
 
 from core import feconf
 from core import utils
-from core.domain import state_domain
 
 from typing import Any, Dict, List, Mapping, Union, cast
 
-# Union type defined from allowed types that a Dict can contain for its values.
-AcceptableChangeDictTypes = Union[
-    str,
-    bool,
-    int,
-    None,
-    List[str],
-    List[state_domain.AnswerGroupDict],
-    state_domain.RecordedVoiceoversDict,
-    # This Dict type is added to allow BaseChange to accept customization_args.
-    Dict[str, Dict[str, Any]]
-]
+MYPY = False
+if MYPY: # pragma: no cover
+    # Modules imported under the `if MYPY` clause is imported only for
+    # type checking purposes and they are not expected to be executed
+    # at runtime.
+    from core.domain import param_domain
+    from core.domain import platform_parameter_domain
+    from core.domain import question_domain
+    from core.domain import state_domain
+
+    # After importing modules under the `if MYPY` clause they are not
+    # executed at runtime. So, to avoid `attribute is not defined` error
+    # at runtime while importing the types from these modules, we defined
+    # `AcceptableChangeDictTypes` under the same `if` clause. So that
+    # `AcceptableChangeDictTypes` is not executed at runtime and do not
+    # give any error.
+    # Here, `AcceptableChangeDictTypes` is a union type defined from allowed
+    # types that a Dict can contain for its values.
+    AcceptableChangeDictTypes = Union[
+        str,
+        bool,
+        float,
+        int,
+        None,
+        List[str],
+        Dict[str, Any],
+        List[Dict[str, Any]],
+        List[param_domain.ParamChangeDict],
+        List[state_domain.AnswerGroupDict],
+        List[platform_parameter_domain.PlatformParameterRuleDict],
+        question_domain.QuestionDict,
+        state_domain.AnswerGroupDict,
+        state_domain.SubtitledHtmlDict,
+        state_domain.SolutionDict,
+        state_domain.StateDict,
+        state_domain.OutcomeDict,
+        state_domain.RecordedVoiceoversDict,
+        # This Dict type is added to allow BaseChange to accept
+        # customization_args.
+        Dict[str, Dict[str, Any]]
+    ]
 
 
 def validate_cmd(

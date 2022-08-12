@@ -306,7 +306,7 @@ describe('Question Suggestion Editor Modal Component', () => {
       });
     spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(true);
     component.question = question;
-    component.skillDifficulty = String(skillDifficulty);
+    component.skillDifficulty = skillDifficulty;
     component.isEditing = true;
 
     component.done();

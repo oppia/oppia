@@ -693,12 +693,27 @@ class Exploration(translation_domain.BaseTranslatableObject):
     """Domain object for an Oppia exploration."""
 
     def __init__(
-            self, exploration_id, title, category, objective,
-            language_code, tags, blurb, author_notes,
-            states_schema_version, init_state_name, states_dict,
-            param_specs_dict, param_changes_list, version,
-            auto_tts_enabled, correctness_feedback_enabled, edits_allowed,
-            created_on=None, last_updated=None):
+        self,
+        exploration_id: str,
+        title: str,
+        category: str,
+        objective: str,
+        language_code: str,
+        tags: List[str],
+        blurb: str,
+        author_notes: str,
+        states_schema_version: int,
+        init_state_name: str,
+        states_dict: Dict[str, state_domain.StateDict],
+        param_specs_dict: Dict[str, param_domain.ParamSpecDict],
+        param_changes_list: List[param_domain.ParamChangeDict],
+        version: int,
+        auto_tts_enabled: bool,
+        correctness_feedback_enabled: bool,
+        edits_allowed: bool,
+        created_on: Optional[datetime.datetime] = None,
+        last_updated: Optional[datetime.datetime] = None
+    ) -> None:
         """Initializes an Exploration domain object.
 
         Args:
@@ -2845,6 +2860,14 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return html_list
 
 
+class ExplorationSummaryMetadataDict(TypedDict):
+    """Dictionary representing the meta data for exploration summary."""
+
+    id: str
+    title: str
+    objective: str
+
+
 class ExplorationSummary:
     """Domain object for an Oppia exploration summary."""
 
@@ -3090,7 +3113,7 @@ class ExplorationSummary:
                 'Expected contributors_summary to be dict, received %s' % (
                     self.contributors_summary))
 
-    def to_metadata_dict(self):
+    def to_metadata_dict(self) -> ExplorationSummaryMetadataDict:
         """Given an exploration summary, this method returns a dict containing
         id, title and objective of the exploration.
 

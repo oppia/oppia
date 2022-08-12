@@ -27,7 +27,7 @@ class HtmlCleanerUnitTests(test_utils.GenericTestBase):
     """Test the HTML sanitizer."""
 
     def setUp(self) -> None:
-        super(HtmlCleanerUnitTests, self).setUp()
+        super().setUp()
         self.longMessage = True
 
     def test_whitelisted_tags(self) -> None:
