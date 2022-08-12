@@ -75,7 +75,7 @@ class CheckBackendAssociatedTestFileTests(test_utils.GenericTestBase):
             .format(self.frontend_file), self.error_arr)
 
     def test_pass_when_file_in_exclusion_list_lacks_associated_test(
-        self) -> None:
+            self) -> None:
         (
             check_backend_associated_test_file.
                 FILES_WITHOUT_ASSOCIATED_TEST_FILES.append(self.backend_file))
