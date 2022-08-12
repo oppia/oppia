@@ -196,7 +196,7 @@ var RichTextEditor = async function(elem) {
   // Set focus in the RTE.
   await waitFor.elementToBeClickable(
     rteElements.first(),
-    'First RTE element'
+    'First RTE element taking too long to become clickable.'
   );
   await (await rteElements.first()).click();
 
