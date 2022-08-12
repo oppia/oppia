@@ -169,7 +169,7 @@ def create_exp_opportunity_summary(
     # TODO(#13903): Find a way to reduce runtime of computing the complete
     # languages.
     complete_translation_language_list = (
-        exploration.get_languages_with_complete_translation())  # type: ignore[no-untyped-call]
+        exploration.get_languages_with_complete_translation())
     # TODO(#13912): Revisit voiceover language logic.
     language_codes_needing_voice_artists = set(
         complete_translation_language_list)
@@ -184,8 +184,8 @@ def create_exp_opportunity_summary(
         # exploration can be voiceovered in its own language.
         language_codes_needing_voice_artists.add(exploration.language_code)
 
-    content_count = exploration.get_content_count()  # type: ignore[no-untyped-call]
-    translation_counts = exploration.get_translation_counts()  # type: ignore[no-untyped-call]
+    content_count = exploration.get_content_count()
+    translation_counts = exploration.get_translation_counts()
 
     story_node = story.story_contents.get_node_with_corresponding_exp_id(
         exploration.id)
@@ -277,12 +277,12 @@ def update_opportunity_with_updated_exploration(exp_id: str) -> None:
             model.
     """
     updated_exploration = exp_fetchers.get_exploration_by_id(exp_id)
-    content_count = updated_exploration.get_content_count()  # type: ignore[no-untyped-call]
-    translation_counts = updated_exploration.get_translation_counts()  # type: ignore[no-untyped-call]
+    content_count = updated_exploration.get_content_count()
+    translation_counts = updated_exploration.get_translation_counts()
     # TODO(#13903): Find a way to reduce runtime of computing the complete
     # languages.
     complete_translation_language_list = (
-        updated_exploration.get_languages_with_complete_translation())  # type: ignore[no-untyped-call]
+        updated_exploration.get_languages_with_complete_translation())
     model = opportunity_models.ExplorationOpportunitySummaryModel.get(exp_id)
     exploration_opportunity_summary = (
         get_exploration_opportunity_summary_from_model(model))
@@ -551,7 +551,7 @@ def _build_exp_id_to_translation_suggestion_in_review_count(
     """
     exp_id_to_in_review_count: Dict[str, int] = collections.defaultdict(int)
     suggestions_in_review = (
-        suggestion_services  # type: ignore[no-untyped-call]
+        suggestion_services
         .get_translation_suggestions_in_review_by_exp_ids(
             exp_ids, language_code))
     for suggestion in suggestions_in_review:
