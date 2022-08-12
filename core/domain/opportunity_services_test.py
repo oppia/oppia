@@ -109,7 +109,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         ) for i in range(5)]
 
         for exp in explorations:
-            self.publish_exploration(self.owner_id, exp.id)  # type: ignore[no-untyped-call]
+            self.publish_exploration(self.owner_id, exp.id)
 
         topic = topic_domain.Topic.create_default_topic(
             self.TOPIC_ID, 'topic', 'abbrev', 'description', 'fragm')
@@ -140,7 +140,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         story = story_domain.Story.create_default_story(
             self.STORY_ID, 'A story', 'description', self.TOPIC_ID,
             'story-one')
-        story_services.save_new_story(self.owner_id, story)  # type: ignore[no-untyped-call]
+        story_services.save_new_story(self.owner_id, story)
         topic_services.add_canonical_story(  # type: ignore[no-untyped-call]
             self.owner_id, self.TOPIC_ID, self.STORY_ID)
         topic_services.publish_story(  # type: ignore[no-untyped-call]
@@ -164,14 +164,14 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             feedback_models.GeneralFeedbackThreadModel,
             'generate_new_thread_id',
             self.mock_generate_new_thread_id_for_suggestion):
-            suggestion_services.create_suggestion(  # type: ignore[no-untyped-call]
+            suggestion_services.create_suggestion(
                 feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
                 feconf.ENTITY_TYPE_EXPLORATION,
                 self.suggestion_target_id,
                 self.suggestion_target_version_at_submission, self.owner_id,
                 self.suggestion_change, 'test description')
 
-        suggestion = suggestion_services.get_suggestion_by_id(self.THREAD_ID)  # type: ignore[no-untyped-call]
+        suggestion = suggestion_services.get_suggestion_by_id(self.THREAD_ID)
 
         self.assertIsNotNone(suggestion)
         self.assertEqual(suggestion.status, suggestion_models.STATUS_IN_REVIEW)
@@ -275,7 +275,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                 'hi', 'topic', None))
         self.assertEqual(len(translation_opportunities), 1)
 
-        story_services.delete_story(self.owner_id, self.STORY_ID)  # type: ignore[no-untyped-call]
+        story_services.delete_story(self.owner_id, self.STORY_ID)
 
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities(
@@ -594,7 +594,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
     ) -> None:
         self.save_new_question(  # type: ignore[no-untyped-call]
             self.QUESTION_ID, self.USER_ID,
-            self._create_valid_question_data('ABC'), [self.SKILL_ID])  # type: ignore[no-untyped-call]
+            self._create_valid_question_data('ABC'), [self.SKILL_ID])
         question_services.create_new_question_skill_link(
             self.USER_ID, self.QUESTION_ID, self.SKILL_ID, 0.3)
 
@@ -727,7 +727,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         topic_services.unpublish_story(  # type: ignore[no-untyped-call]
             self.TOPIC_ID, self.STORY_ID, self.admin_id)
 
-        suggestion = suggestion_services.get_suggestion_by_id(self.THREAD_ID)  # type: ignore[no-untyped-call]
+        suggestion = suggestion_services.get_suggestion_by_id(self.THREAD_ID)
         self.assertEqual(suggestion.status, suggestion_models.STATUS_REJECTED)
 
     def test_add_question_increments_skill_opportunity_question_count(
@@ -738,7 +738,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
 
         self.save_new_question(  # type: ignore[no-untyped-call]
             self.QUESTION_ID, self.USER_ID,
-            self._create_valid_question_data('ABC'), [self.SKILL_ID])  # type: ignore[no-untyped-call]
+            self._create_valid_question_data('ABC'), [self.SKILL_ID])
 
         skill_opportunities, _, _ = (
             opportunity_services.get_skill_opportunities(None))
@@ -751,7 +751,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             self.SKILL_ID, 'description')
         self.save_new_question(  # type: ignore[no-untyped-call]
             self.QUESTION_ID, self.USER_ID,
-            self._create_valid_question_data('ABC'), [self.SKILL_ID])  # type: ignore[no-untyped-call]
+            self._create_valid_question_data('ABC'), [self.SKILL_ID])
 
         question_services.create_new_question_skill_link(
             self.USER_ID, self.QUESTION_ID, self.SKILL_ID, 0.3)
@@ -768,7 +768,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             self.SKILL_ID, 'description')
         self.save_new_question(  # type: ignore[no-untyped-call]
             self.QUESTION_ID, self.USER_ID,
-            self._create_valid_question_data('ABC'), ['skill_2'])  # type: ignore[no-untyped-call]
+            self._create_valid_question_data('ABC'), ['skill_2'])
 
         question_services.link_multiple_skills_for_question(
             self.USER_ID, self.QUESTION_ID, [self.SKILL_ID], [0.3])
@@ -783,7 +783,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             self.SKILL_ID, 'description')
         self.save_new_question(  # type: ignore[no-untyped-call]
             self.QUESTION_ID, self.USER_ID,
-            self._create_valid_question_data('ABC'), [self.SKILL_ID])  # type: ignore[no-untyped-call]
+            self._create_valid_question_data('ABC'), [self.SKILL_ID])
 
         question_services.delete_question(self.USER_ID, self.QUESTION_ID)
 
@@ -800,7 +800,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             self.SKILL_ID, 'description')
         self.save_new_question(  # type: ignore[no-untyped-call]
             self.QUESTION_ID, self.USER_ID,
-            self._create_valid_question_data('ABC'), ['skill_2'])  # type: ignore[no-untyped-call]
+            self._create_valid_question_data('ABC'), ['skill_2'])
         question_services.create_new_question_skill_link(
             self.USER_ID, self.QUESTION_ID, self.SKILL_ID, 0.3)
 
@@ -838,7 +838,7 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
         ) for i in range(5)]
 
         for exp in explorations:
-            self.publish_exploration(self.owner_id, exp.id)  # type: ignore[no-untyped-call]
+            self.publish_exploration(self.owner_id, exp.id)
 
         topic = topic_domain.Topic.create_default_topic(
             self.TOPIC_ID, 'topic', 'abbrev', 'description', 'fragm')
@@ -857,7 +857,7 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
         story = story_domain.Story.create_default_story(
             self.STORY_ID, 'A story', 'Description', self.TOPIC_ID,
             'story-two')
-        story_services.save_new_story(self.owner_id, story)  # type: ignore[no-untyped-call]
+        story_services.save_new_story(self.owner_id, story)
         topic_services.add_canonical_story(  # type: ignore[no-untyped-call]
             self.owner_id, self.TOPIC_ID, self.STORY_ID)
         topic_services.publish_story(  # type: ignore[no-untyped-call]
