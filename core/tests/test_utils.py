@@ -2538,7 +2538,11 @@ title: Title
         return response['token']
 
     def save_new_default_exploration(
-            self, exploration_id, owner_id, title='A title'):
+        self,
+        exploration_id: str,
+        owner_id: str,
+        title: str = 'A title'
+    ) -> exp_domain.Exploration:
         """Saves a new default exploration written by owner_id.
 
         Args:
@@ -2778,7 +2782,9 @@ title: Title
         exp_summary_model.update_timestamps()
         exp_summary_model.put()
 
-    def publish_exploration(self, owner_id, exploration_id):
+    def publish_exploration(
+        self, owner_id: str, exploration_id: str
+    ) -> None:
         """Publish the exploration with the given exploration_id.
 
         Args:
@@ -2909,10 +2915,17 @@ title: Title
             })], 'Changes.')
 
     def save_new_story(
-            self, story_id, owner_id, corresponding_topic_id,
-            title='Title', description='Description', notes='Notes',
-            language_code=constants.DEFAULT_LANGUAGE_CODE,
-            url_fragment='title', meta_tag_content='story meta tag content'):
+        self,
+        story_id: str,
+        owner_id: str,
+        corresponding_topic_id: str,
+        title: str = 'Title',
+        description: str = 'Description',
+        notes: str = 'Notes',
+        language_code: str = constants.DEFAULT_LANGUAGE_CODE,
+        url_fragment: str = 'title',
+        meta_tag_content: str = 'story meta tag content'
+    ) -> story_domain.Story:
         """Creates an Oppia Story and saves it.
 
         NOTE: Callers are responsible for ensuring that the
@@ -3463,7 +3476,9 @@ title: Title
             owner_id, 'New skill created.',
             [{'cmd': skill_domain.CMD_CREATE_NEW}])
 
-    def _create_valid_question_data(self, default_dest_state_name):
+    def _create_valid_question_data(
+        self, default_dest_state_name: str
+    ) -> state_domain.State:
         """Creates a valid question_data dict.
 
         Args:
