@@ -146,7 +146,7 @@
        class="oppia-suggestion-review-message">
     <strong>Review message: </strong>
     <div class="oppia-review-message"
-         [ngClass]="{ 'oppia-border-class': reviewable }">
+         [ngClass]="{ 'oppia-reviewable-message': reviewable }">
       {{ reviewMessage }}
     </div>
   </div>
@@ -200,7 +200,7 @@
 </div>
 
 <style>
-  .oppia-border-class {
+  .oppia-reviewable-message {
     border: 1px solid #ccc;
   }
   .oppia-review-message {
