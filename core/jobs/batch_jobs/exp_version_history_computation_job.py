@@ -368,7 +368,12 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                         revert_to_version <= 0 or
                         revert_to_version >= version
                     ):
-                        return (exp_id, [])
+                        return (
+                            exp_id, [],
+                            'Reverting to the version %d which is out of the '
+                            'range [1, %d]' % (revert_to_version, version - 1),
+                            version
+                        )
                     revert_to_vh_model = (
                         version_history_models[revert_to_version - 1]
                     )
@@ -464,8 +469,8 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                         )
                         new_vh_model.update_timestamps()
                         version_history_models[version - 1] = new_vh_model
-                    except Exception:
-                        return (exp_id, [])
+                    except Exception as e:
+                        return (exp_id, [], e, version)
 
             return (exp_id, version_history_models)
 
@@ -588,7 +593,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
             | 'Filter exps having invalid change list' >>
                 beam.Filter(lambda models: len(models[1]) == 0)
             | 'Extract the exp ids having invalid change list' >>
-                beam.Map(lambda models: models[0])
+                beam.Map(lambda models: (models[0], models[2], models[3]))
         )
 
         exps_for_which_version_history_was_computed = (
@@ -654,8 +659,9 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
         report_details_of_exps_having_invalid_change_list = (
             exps_having_invalid_change_list
             | 'Save info on explorations having invalid change list' >>
-                beam.Map(lambda exp_id: job_run_result.JobRunResult.as_stderr(
-                    'Exploration %s has invalid change list' % (exp_id)
+                beam.Map(lambda error: job_run_result.JobRunResult.as_stderr(
+                    'Exploration %s has invalid change list. '
+                    'Error: %s. Version: %s' % (error[0], error[1], error[2])
                 ))
         )
 

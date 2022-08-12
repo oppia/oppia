@@ -256,7 +256,8 @@ class ComputeExplorationVersionHistoryJobTests(
                 'EXPS HAVING INVALID CHANGE LIST SUCCESS: 1'
             ),
             job_run_result.JobRunResult.as_stderr(
-                'Exploration %s has invalid change list' % (self.EXP_ID_1)
+                'Exploration exp_1 has invalid change list. Error: Reverting '
+                'to the version 4 which is out of the range [1, 2]. Version: 3'
             )
         ])
 
@@ -443,7 +444,7 @@ class ComputeExplorationVersionHistoryJobTests(
         )
         commit_log_model.commit_cmds.append({
             'cmd': 'delete_state',
-            'state_name': 'Non existing state',
+            'state_name': 'Some other state',
         })
         commit_log_model.update_timestamps()
         commit_log_model.put()
@@ -457,7 +458,8 @@ class ComputeExplorationVersionHistoryJobTests(
                 'EXPS HAVING INVALID CHANGE LIST SUCCESS: 1'
             ),
             job_run_result.JobRunResult.as_stderr(
-                'Exploration %s has invalid change list' % (self.EXP_ID_1)
+                'Exploration exp_1 has invalid change list. '
+                'Error: \'Some other state\'. Version: 2'
             )
         ])
 
