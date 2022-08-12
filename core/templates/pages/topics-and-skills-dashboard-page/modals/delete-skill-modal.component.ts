@@ -20,7 +20,18 @@ import { Component } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import { AssignedSkill } from 'domain/skill/assigned-skill.model';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { TopicsAndSkillsDashboardBackendApiService, TopicIdToDiagnosticTestSkillIdsResponse } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+
+export interface TopicAssignmentsSummary {
+  subtopicId: number;
+  topicVersion: number;
+  topicId: string;
+}
+
+export interface TopicNameToTopicAssignments {
+  [key: string]: TopicAssignmentsSummary;
+}
 
 @Component({
   selector: 'oppia-delete-skill-modal',
@@ -31,6 +42,8 @@ export class DeleteSkillModalComponent extends ConfirmOrCancelModal {
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   skillId!: string;
+  nonEligibleTopicNameToTopicAssignments !: TopicNameToTopicAssignments;
+  nonEligibleTopicNames: string[] = [];
   topicsAssignments!: AssignedSkill[];
   topicsAssignmentsAreFetched: boolean = false;
   skillCanBeDeleted: boolean = true;
@@ -40,6 +53,7 @@ export class DeleteSkillModalComponent extends ConfirmOrCancelModal {
     private ngbActiveModal: NgbActiveModal,
     private topicsAndSkillsDashboardBackendApiService:
     TopicsAndSkillsDashboardBackendApiService,
+    private urlInterpolationService: UrlInterpolationService
   ) {
     super(ngbActiveModal);
   }
@@ -50,26 +64,35 @@ export class DeleteSkillModalComponent extends ConfirmOrCancelModal {
     for (let topic of topicAssignments) {
       allTopicIds.push(topic.topicId);
     }
-    let topicIdsNotEligibleForUnassignment: string[] = [];
+    this.nonEligibleTopicNameToTopicAssignments = {};
+    let nonEligibleTopicIds = [];
     this.topicsAndSkillsDashboardBackendApiService
       .fetchTopicIdToDiagnosticTestSkillIdsAsync(allTopicIds).then(
         (responseDict: TopicIdToDiagnosticTestSkillIdsResponse) => {
           for (let topicId in responseDict.topicIdToDiagnosticTestSkillIds) {
             let diagnosticTestSkillIds = (
               responseDict.topicIdToDiagnosticTestSkillIds[topicId]);
-            if (diagnosticTestSkillIds.length === 1 &&
-                diagnosticTestSkillIds.indexOf(this.skillId) !== -1) {
-              this.skillCanBeDeleted = false;
-              topicIdsNotEligibleForUnassignment.push(topicId);
+            if (
+              diagnosticTestSkillIds.length === 1 &&
+              diagnosticTestSkillIds.indexOf(this.skillId) !== -1
+            ) {
+              nonEligibleTopicIds.push(topicId);
             }
           }
+
           for (let topic of topicAssignments) {
-            if (topicIdsNotEligibleForUnassignment.indexOf(
-              topic.topicId) !== -1) {
-              this.topicNamesNotEligibleForUnassignment.push(topic.topicName);
+            if (nonEligibleTopicIds.indexOf(topic.topicId) !== -1) {
+              this.nonEligibleTopicNameToTopicAssignments[topic.topicName] = {
+                subtopicId: topic.subtopicId,
+                topicVersion: topic.topicVersion,
+                topicId: topic.topicId,
+              };
+              this.skillCanBeDeleted = false;
             }
           }
           this.topicsAssignments = topicAssignments;
+          this.nonEligibleTopicNames = Object.keys(
+            this.nonEligibleTopicNameToTopicAssignments);
           this.topicsAssignmentsAreFetched = true;
         });
   }
@@ -80,6 +103,15 @@ export class DeleteSkillModalComponent extends ConfirmOrCancelModal {
         this.skillId
       ).then((response: AssignedSkill[]) => {
         this.fetchTopicIdToDiagnosticTestSkillIds(response);
+      });
+  }
+
+  getTopicEditorUrl(topicAssignment: TopicAssignmentsSummary): string {
+    let topicId = topicAssignment.topicId;
+    const TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topic_id>#/';
+    return this.urlInterpolationService.interpolateUrl(
+      TOPIC_EDITOR_URL_TEMPLATE, {
+        topic_id: topicId
       });
   }
 

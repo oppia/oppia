@@ -16,17 +16,19 @@
   <div *ngIf="!skillCanBeDeleted">
     <p>
       This skill is used as the only diagnostic test skill in the following
-      <span *ngIf="topicNamesNotEligibleForUnassignment.length === 1">topic</span>
-      <span *ngIf="topicNamesNotEligibleForUnassignment.length > 1">topics</span>
+      <span *ngIf="nonEligibleTopicNames.length === 1">topic</span>
+      <span *ngIf="nonEligibleTopicNames.length > 1">topics</span>
     </p>
     <ul>
-      <li *ngFor="let topicName of topicNamesNotEligibleForUnassignment">
-        {{ topicName }}
+      <li *ngFor="let nonEligibleTopicNameToTopicAssignment of nonEligibleTopicNameToTopicAssignments | keyvalue">
+        <a [href]="getTopicEditorUrl(nonEligibleTopicNameToTopicAssignment.value)" target="_blank" rel="noopener">
+          {{ nonEligibleTopicNameToTopicAssignment.key }}
+        </a>
       </li>
     </ul>
     <p>
       Please remove this skill from the diagnostic tests of those topics first
-      before unassigning it.
+      before deleting it.
     </p>
   </div>
 </div>

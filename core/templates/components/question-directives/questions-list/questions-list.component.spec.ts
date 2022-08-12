@@ -858,7 +858,7 @@ describe('Questions List Component', () => {
         expect(alertsService.addInfoMessage).toHaveBeenCalledWith(
           'This skill is used as the only diagnostic test skill in the ' +
           'following topics: topic_name. Please remove this skill from the ' +
-          'diagnostic test of those topics first', 7000);
+          'diagnostic tests of those topics first.', 7000);
       }));
   });
 

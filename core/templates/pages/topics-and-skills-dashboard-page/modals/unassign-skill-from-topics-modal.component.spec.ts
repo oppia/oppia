@@ -20,13 +20,15 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AssignedSkillBackendDict, AssignedSkill } from 'domain/skill/assigned-skill.model';
 import { TopicsAndSkillsDashboardBackendApiService, TopicIdToDiagnosticTestSkillIdsResponse } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
-import { TopicNameToTopicAssignments, UnassignSkillFromTopicsModalComponent } from './unassign-skill-from-topics-modal.component';
+import { TopicNameToTopicAssignments, UnassignSkillFromTopicsModalComponent, TopicAssignmentsSummary } from './unassign-skill-from-topics-modal.component';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { MaterialModule } from 'modules/material.module';
 
 describe('Unassing SKill Modal', () => {
   let fixture: ComponentFixture<UnassignSkillFromTopicsModalComponent>;
   let componentInstance: UnassignSkillFromTopicsModalComponent;
   let ngbActiveModal: NgbActiveModal;
+  let urlInterpolationService: UrlInterpolationService;
   let skillBackendDict1: AssignedSkillBackendDict = {
     topic_id: 'test_id_1',
     topic_name: 'topic_name_1',
@@ -84,7 +86,8 @@ describe('Unassing SKill Modal', () => {
         {
           provide: TopicsAndSkillsDashboardBackendApiService,
           useClass: MockTopicsAndSkillsDashboardBackendApiService
-        }
+        },
+        UrlInterpolationService
       ]
     }).compileComponents();
   }));
@@ -95,6 +98,7 @@ describe('Unassing SKill Modal', () => {
     ngbActiveModal = TestBed.inject(NgbActiveModal);
     ngbActiveModal = (ngbActiveModal as unknown) as
       jasmine.SpyObj<NgbActiveModal>;
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
   });
 
   it('should create', () => {
@@ -142,5 +146,18 @@ describe('Unassing SKill Modal', () => {
     expect(componentInstance.eligibleTopicNameToTopicAssignments).toEqual(
       assignments);
     expect(componentInstance.topicsAssignmentsAreFetched).toBeTrue();
+  });
+
+  it('should get topic editor url', () => {
+    spyOn(urlInterpolationService, 'interpolateUrl').and
+      .returnValue('test_url');
+    let topicsAssignment: TopicAssignmentsSummary = {
+      subtopicId: 1,
+      topicVersion: 1,
+      topicId: 'topicID'
+    };
+    expect(
+      componentInstance.getTopicEditorUrl(topicsAssignment)).toEqual(
+      'test_url');
   });
 });

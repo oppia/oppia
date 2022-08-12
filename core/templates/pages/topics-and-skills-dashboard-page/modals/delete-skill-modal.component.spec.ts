@@ -20,13 +20,15 @@ import { ComponentFixture, fakeAsync, TestBed, waitForAsync, tick } from '@angul
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AssignedSkill, AssignedSkillBackendDict } from 'domain/skill/assigned-skill.model';
 import { TopicsAndSkillsDashboardBackendApiService, TopicIdToDiagnosticTestSkillIdsResponse } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
-import { DeleteSkillModalComponent } from './delete-skill-modal.component';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { DeleteSkillModalComponent, TopicAssignmentsSummary } from './delete-skill-modal.component';
 
 describe('Assign Skill to Topic Modal Component', () => {
   let fixture: ComponentFixture<DeleteSkillModalComponent>;
   let componentInstance: DeleteSkillModalComponent;
+  let urlInterpolationService: UrlInterpolationService;
   let skillBackendDict: AssignedSkillBackendDict = {
-    topic_id: 'topicId',
+    topic_id: 'topicId1',
     topic_name: 'topicName',
     topic_version: 1,
     subtopic_id: 2
@@ -72,7 +74,8 @@ describe('Assign Skill to Topic Modal Component', () => {
         {
           provide: TopicsAndSkillsDashboardBackendApiService,
           useClass: MockTopicsAndSkillsDashboardBackendApiService
-        }
+        },
+        UrlInterpolationService
       ]
     }).compileComponents();
   }));
@@ -82,6 +85,7 @@ describe('Assign Skill to Topic Modal Component', () => {
     componentInstance = fixture.componentInstance;
     componentInstance.topicsAssignments = [];
     componentInstance.skillId = '';
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
   });
 
   it('should create', () => {
@@ -120,7 +124,7 @@ describe('Assign Skill to Topic Modal Component', () => {
       topicsAndSkillsDashboardBackendApiService,
       'fetchTopicIdToDiagnosticTestSkillIdsAsync'
     ).and.returnValue(Promise.resolve({
-      topicIdToDiagnosticTestSkillIds: {topicId: []}
+      topicIdToDiagnosticTestSkillIds: {topicId1: []}
     }));
     componentInstance.fetchTopicAssignmentsForSkill();
     tick(50);
@@ -146,4 +150,17 @@ describe('Assign Skill to Topic Modal Component', () => {
     tick(50);
     expect(componentInstance.skillCanBeDeleted).toBeFalse();
   }));
+
+  it('should get topic editor url', () => {
+    spyOn(urlInterpolationService, 'interpolateUrl').and
+      .returnValue('test_url');
+    let topicsAssignment: TopicAssignmentsSummary = {
+      subtopicId: 1,
+      topicVersion: 1,
+      topicId: 'topicID'
+    };
+    expect(
+      componentInstance.getTopicEditorUrl(topicsAssignment)).toEqual(
+      'test_url');
+  });
 });
