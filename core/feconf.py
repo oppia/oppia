@@ -26,7 +26,7 @@ import os
 from core.constants import constants
 
 from typing import Callable, Dict, List, Union
-from typing_extensions import TypedDict
+from typing_extensions import Final, TypedDict
 
 CommandType = (
     Dict[str, Union[str, List[str], Dict[str, Union[str, List[str]]]]])
@@ -1571,9 +1571,9 @@ CUSTOMIZATION_ARG_WHICH_IDENTIFIES_ISSUE = {
 }
 
 # Constants defining various suggestion types.
-SUGGESTION_TYPE_EDIT_STATE_CONTENT = 'edit_exploration_state_content'
-SUGGESTION_TYPE_TRANSLATE_CONTENT = 'translate_content'
-SUGGESTION_TYPE_ADD_QUESTION = 'add_question'
+SUGGESTION_TYPE_EDIT_STATE_CONTENT: Final = 'edit_exploration_state_content'
+SUGGESTION_TYPE_TRANSLATE_CONTENT: Final = 'translate_content'
+SUGGESTION_TYPE_ADD_QUESTION: Final = 'add_question'
 
 # Suggestion fields that can be queried.
 ALLOWED_SUGGESTION_QUERY_FIELDS = [

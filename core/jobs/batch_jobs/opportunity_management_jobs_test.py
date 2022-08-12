@@ -474,7 +474,7 @@ class GenerateExplorationOpportunitySummariesJobTests(
             init_state_name='state',
             states_schema_version=48,
             states={
-                'state': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
+                'state': state_domain.State.create_default_state(
                     'state', is_initial_state=True
                 ).to_dict()
             })
@@ -559,10 +559,10 @@ class GenerateExplorationOpportunitySummariesJobTests(
             init_state_name='state1',
             states_schema_version=48,
             states={
-                'state1': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
+                'state1': state_domain.State.create_default_state(
                     'state1', is_initial_state=True
                 ).to_dict(),
-                'state2': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
+                'state2': state_domain.State.create_default_state(
                     'state2'
                 ).to_dict()
             })
@@ -814,10 +814,10 @@ class GenerateExplorationOpportunitySummariesJobTests(
             init_state_name='state1',
             states_schema_version=48,
             states={
-                'state1': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
+                'state1': state_domain.State.create_default_state(
                     'state1', is_initial_state=True
                 ).to_dict(),
-                'state2': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
+                'state2': state_domain.State.create_default_state(
                     'state2'
                 ).to_dict()
             })

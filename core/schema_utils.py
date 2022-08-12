@@ -583,11 +583,11 @@ class _Validators:
         if len(obj) == 0:
             return True
 
-        if not expression_parser.is_valid_expression(obj): # type: ignore[no-untyped-call]
+        if not expression_parser.is_valid_expression(obj):
             return False
 
         expression_contains_at_least_one_variable = (
-            expression_parser.contains_at_least_one_variable(obj)) # type: ignore[no-untyped-call]
+            expression_parser.contains_at_least_one_variable(obj))
         # This ensures that numeric expressions don't contain variables.
         return algebraic or not expression_contains_at_least_one_variable
 
@@ -645,9 +645,9 @@ class _Validators:
             return False
 
         lhs_contains_variable = (
-            expression_parser.contains_at_least_one_variable(lhs)) # type: ignore[no-untyped-call]
+            expression_parser.contains_at_least_one_variable(lhs))
         rhs_contains_variable = (
-            expression_parser.contains_at_least_one_variable(rhs)) # type: ignore[no-untyped-call]
+            expression_parser.contains_at_least_one_variable(rhs))
 
         if not lhs_contains_variable and not rhs_contains_variable:
             return False
