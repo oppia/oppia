@@ -70,8 +70,8 @@ export class UnassignSkillFromTopicsModalComponent
 
     this.eligibleTopicNameToTopicAssignments = {};
     this.nonEligibleTopicNameToTopicAssignments = {};
-    let eligibleTopicIds = [];
-    let nonEligibleTopicIds = [];
+    let eligibleTopicIds: string[] = [];
+    let nonEligibleTopicIds: string[] = [];
     this.topicsAndSkillsDashboardBackendApiService
       .fetchTopicIdToDiagnosticTestSkillIdsAsync(allTopicIds).then(
         (responseDict: TopicIdToDiagnosticTestSkillIdsResponse) => {
