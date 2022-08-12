@@ -1496,7 +1496,7 @@ class AppEngineTestBase(TestBase):
         with platform_taskqueue_services_swap:
             super().run(result=result)
 
-    def count_jobs_in_taskqueue(self, queue_name):
+    def count_jobs_in_taskqueue(self, queue_name: Optional[str]) -> int:
         """Returns the total number of tasks in a single queue if a queue name
         is specified or the entire taskqueue if no queue name is specified.
 
@@ -1511,7 +1511,9 @@ class AppEngineTestBase(TestBase):
         return self._platform_taskqueue_services_stub.count_jobs_in_taskqueue(
             queue_name=queue_name)
 
-    def process_and_flush_pending_tasks(self, queue_name=None):
+    def process_and_flush_pending_tasks(
+        self, queue_name: Optional[str] = None
+    ) -> None:
         """Executes all of the tasks in a single queue if a queue name is
         specified or all of the tasks in the taskqueue if no queue name is
         specified.
@@ -2129,7 +2131,7 @@ title: Title
                     'topic_id': topic_id
                 }, csrf_token=self.get_new_csrf_token())
 
-    def set_moderators(self, moderator_usernames):
+    def set_moderators(self, moderator_usernames: List[str]) -> None:
         """Sets role of given users as MODERATOR.
 
         Args:
@@ -2138,7 +2140,7 @@ title: Title
         for name in moderator_usernames:
             self.add_user_role(name, feconf.ROLE_ID_MODERATOR)
 
-    def set_voiceover_admin(self, voiceover_admin_username):
+    def set_voiceover_admin(self, voiceover_admin_username: List[str]) -> None:
         """Sets role of given users as VOICEOVER ADMIN.
 
         Args:
@@ -3638,7 +3640,7 @@ class GenericEmailTestBase(GenericTestBase):
             self._send_email_to_recipients):
             super().run(result=result)
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self._wipe_emails_dict()
 

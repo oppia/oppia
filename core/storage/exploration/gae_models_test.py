@@ -59,7 +59,7 @@ class ExplorationModelUnitTest(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
     def test_get_exploration_count(self) -> None:
-        exploration = exp_domain.Exploration.create_default_exploration( # type: ignore[no-untyped-call]
+        exploration = exp_domain.Exploration.create_default_exploration(
             'id', title='A Title',
             category='A Category', objective='An Objective')
         exp_services.save_new_exploration('id', exploration) # type: ignore[no-untyped-call]
@@ -73,7 +73,7 @@ class ExplorationModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(saved_exploration.objective, 'An Objective')
 
     def test_reconstitute(self) -> None:
-        exploration = exp_domain.Exploration.create_default_exploration( # type: ignore[no-untyped-call]
+        exploration = exp_domain.Exploration.create_default_exploration(
             'id', title='A Title',
             category='A Category', objective='An Objective')
         exp_services.save_new_exploration('id', exploration) # type: ignore[no-untyped-call]

@@ -222,8 +222,8 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
             user_voiceover_applications[0].status,
             suggestion_models.STATUS_ACCEPTED)
 
-        exploration_rights = rights_manager.get_exploration_rights('0')  # type: ignore[no-untyped-call]
-        can_voiceover = rights_manager.check_can_voiceover_activity(  # type: ignore[no-untyped-call]
+        exploration_rights = rights_manager.get_exploration_rights('0')
+        can_voiceover = rights_manager.check_can_voiceover_activity(
             self.applicant, exploration_rights)
 
         self.assertTrue(can_voiceover)

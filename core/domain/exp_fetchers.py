@@ -88,7 +88,7 @@ def _migrate_states_schema(
 
     while (states_schema_version <
            feconf.CURRENT_STATE_SCHEMA_VERSION):
-        exp_domain.Exploration.update_states_from_model(  # type: ignore[no-untyped-call]
+        exp_domain.Exploration.update_states_from_model(
             versioned_exploration_states,
             states_schema_version, init_state_name)
         states_schema_version += 1
@@ -150,7 +150,7 @@ def get_multiple_versioned_exp_interaction_ids_mapping_by_version(
             states_to_interaction_id_mapping[state_name] = (
                 exploration_model.states[state_name]['interaction']['id'])
         versioned_exp_interaction_ids_mapping.append(
-            exp_domain.VersionedExplorationInteractionIdsMapping(  # type: ignore[no-untyped-call]
+            exp_domain.VersionedExplorationInteractionIdsMapping(
                 exploration_model.version,
                 states_to_interaction_id_mapping))
 
@@ -577,7 +577,7 @@ def get_logged_out_user_progress(
     if logged_out_user_progress_model is None:
         return None
 
-    return exp_domain.TransientCheckpointUrl(  # type: ignore[no-untyped-call]
+    return exp_domain.TransientCheckpointUrl(
         logged_out_user_progress_model.exploration_id,
         logged_out_user_progress_model.furthest_reached_checkpoint_state_name,
         logged_out_user_progress_model.furthest_reached_checkpoint_exp_version,

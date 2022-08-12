@@ -229,7 +229,7 @@ def accept_voiceover_application(
     _save_voiceover_applications([voiceover_application])
 
     if voiceover_application.target_type == feconf.ENTITY_TYPE_EXPLORATION:
-        rights_manager.assign_role_for_exploration(  # type: ignore[no-untyped-call]
+        rights_manager.assign_role_for_exploration(
             reviewer, voiceover_application.target_id,
             voiceover_application.author_id, rights_domain.ROLE_VOICE_ARTIST)
         opportunity_services.update_exploration_voiceover_opportunities(

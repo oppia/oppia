@@ -24,8 +24,36 @@ from core import feconf
 from core import utils
 from core.domain import value_generators_domain
 
-from typing import Any, Dict, List, cast
+from typing import Any, Dict, List, Union, cast
 from typing_extensions import TypedDict
+
+
+class CustomizationArgsDict(TypedDict):
+    """Dictionary representing the customization_args argument."""
+
+    parse_with_jinja: bool
+
+
+class CustomizationArgsDictWithValue(CustomizationArgsDict):
+    """Dictionary representing the customization_args argument
+    containing value key.
+    """
+
+    value: str
+
+
+class CustomizationArgsDictWithValueList(CustomizationArgsDict):
+    """Dictionary representing the customization_args argument
+    containing list_of_values key.
+    """
+
+    list_of_values: List[str]
+
+
+AllowedCustomizationArgsDict = Union[
+    CustomizationArgsDictWithValue,
+    CustomizationArgsDictWithValueList
+]
 
 
 class ParamSpecDict(TypedDict):
@@ -83,20 +111,12 @@ class ParamSpec:
                 (self.obj_type, ', '.join(sorted(feconf.SUPPORTED_OBJ_TYPES))))
 
 
-class CustomizationArgsDict(TypedDict):
-    """Dictionary representing the customization_args argument."""
-
-    value: str
-    parse_with_jinja: bool
-    list_of_values: List[str]
-
-
 class ParamChangeDict(TypedDict):
     """Dictionary representing the ParamChange object."""
 
     name: str
     generator_id: str
-    customization_args: CustomizationArgsDict
+    customization_args: AllowedCustomizationArgsDict
 
 
 class ParamChange:
@@ -106,7 +126,7 @@ class ParamChange:
         self,
         name: str,
         generator_id: str,
-        customization_args: CustomizationArgsDict
+        customization_args: AllowedCustomizationArgsDict
     ) -> None:
         """Initialize a ParamChange object with the specified arguments.
 
@@ -150,7 +170,7 @@ class ParamChange:
             self._generator_id)()
 
     @property
-    def customization_args(self) -> CustomizationArgsDict:
+    def customization_args(self) -> AllowedCustomizationArgsDict:
         """A dict containing several arguments that determine the changing value
         of the parameter.
 

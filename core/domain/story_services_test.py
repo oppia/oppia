@@ -1575,7 +1575,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                     # CustomizationArgsDict, but for testing purposes here we
                     # are providing a empty dict which causes MyPy to throw
                     # missing keys error. Thus to avoid error, we used ignore.
-                    param_domain.ParamChange('param1', 'Copier', {}).to_dict()]  # type: ignore[typeddict-item]
+                    param_domain.ParamChange('param1', 'Copier', {}).to_dict()]  # type: ignore[arg-type]
             })],
             '')
         self.publish_exploration(self.user_id_a, 'exp_id_2')

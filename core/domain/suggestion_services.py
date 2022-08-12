@@ -160,7 +160,7 @@ def create_suggestion(
     """
     if description is None:
         description = DEFAULT_SUGGESTION_THREAD_SUBJECT
-    thread_id = feedback_services.create_thread(  # type: ignore[no-untyped-call]
+    thread_id = feedback_services.create_thread(
         target_type, target_id, author_id, description,
         DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE, has_suggestion=True)
 
@@ -183,7 +183,10 @@ def create_suggestion(
         # Ruling out the possibility of any other type for mypy type checking.
         assert isinstance(change['language_code'], str)
         language_code = change['language_code']
-        content_html = exploration.get_content_html(  # type: ignore[no-untyped-call]
+        # Ruling out the possibility of any other type for mypy type checking.
+        assert isinstance(change['state_name'], str)
+        assert isinstance(change['content_id'], str)
+        content_html = exploration.get_content_html(
             change['state_name'], change['content_id'])
         if content_html != change['content_html']:
             raise Exception(
@@ -525,7 +528,7 @@ def accept_suggestion(
     # suggestion is no longer in review.
     _update_suggestion_counts_in_community_contribution_stats([suggestion], -1)
 
-    feedback_services.create_message(  # type: ignore[no-untyped-call]
+    feedback_services.create_message(
         suggestion_id, reviewer_id, feedback_models.STATUS_CHOICES_FIXED,
         None, review_message, should_send_email=False)
 
@@ -621,7 +624,7 @@ def reject_suggestions(
     # review.
     _update_suggestion_counts_in_community_contribution_stats(suggestions, -1)
 
-    feedback_services.create_messages(  # type: ignore[no-untyped-call]
+    feedback_services.create_messages(
         suggestion_ids, reviewer_id, feedback_models.STATUS_CHOICES_IGNORED,
         None, review_message, should_send_email=False
     )
@@ -719,7 +722,7 @@ def resubmit_rejected_suggestion(
     # now back in review.
     _update_suggestion_counts_in_community_contribution_stats([suggestion], 1)
 
-    feedback_services.create_message(  # type: ignore[no-untyped-call]
+    feedback_services.create_message(
         suggestion_id, author_id, feedback_models.STATUS_CHOICES_OPEN,
         None, summary_message)
 

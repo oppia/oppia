@@ -470,7 +470,7 @@ class Question(translation_domain.BaseTranslatableObject):
                 for rule_spec in new_answer_group['rule_specs']:
                     rule_input = ltt.latex_to_text(rule_spec['inputs']['x'])
 
-                    rule_input = exp_domain.clean_math_expression(  # type: ignore[no-untyped-call]
+                    rule_input = exp_domain.clean_math_expression(
                         rule_input)
 
                     type_of_input = exp_domain.TYPE_INVALID_EXPRESSION
@@ -556,10 +556,10 @@ class Question(translation_domain.BaseTranslatableObject):
                 question_state_dict['interaction']['id'] = new_interaction_id
                 question_state_dict['interaction']['answer_groups'] = (
                     new_answer_groups)
-                if question_state_dict['interaction']['solution']:
+                if question_state_dict['interaction']['solution'] is not None:
                     correct_answer = question_state_dict['interaction'][
                         'solution']['correct_answer']['ascii']
-                    correct_answer = exp_domain.clean_math_expression(  # type: ignore[no-untyped-call]
+                    correct_answer = exp_domain.clean_math_expression(
                         correct_answer)
                     question_state_dict['interaction'][
                         'solution']['correct_answer'] = correct_answer
@@ -1533,6 +1533,10 @@ class Question(translation_domain.BaseTranslatableObject):
             raise utils.ValidationError(
                 'Expected the question to have at least one hint')
 
+        # Here, we are asserting that id is never going to be None, because
+        # None interactions are not allowed to contain questions, so if an
+        # interaction have questions then it definitely have interaction_id.
+        assert interaction.id is not None
         if (
                 (interaction.solution is None) and
                 (interaction_specs[interaction.id]['can_have_solution'])):

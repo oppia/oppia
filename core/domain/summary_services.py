@@ -271,7 +271,7 @@ def get_learner_collection_dict_by_id(
         'completed_exploration_ids': completed_exp_ids
     }
     collection_dict['version'] = collection.version
-    collection_is_public = rights_manager.is_collection_public(collection_id)  # type: ignore[no-untyped-call]
+    collection_is_public = rights_manager.is_collection_public(collection_id)
 
     # Insert an 'exploration' dict into each collection node, where the
     # dict includes meta information about the exploration (ID and title).
@@ -286,7 +286,7 @@ def get_learner_collection_dict_by_id(
                     'the exploration deleted or is it a private exploration '
                     'that you do not have edit access to?)'
                     % exploration_id)
-            if collection_is_public and rights_manager.is_exploration_private(  # type: ignore[no-untyped-call]
+            if collection_is_public and rights_manager.is_exploration_private(
                     exploration_id):
                 raise utils.ValidationError(
                     'Cannot reference a private exploration within a public '
@@ -380,7 +380,7 @@ def get_exploration_metadata_dicts(
     exploration_summaries = (
         exp_fetchers.get_exploration_summaries_matching_ids(exploration_ids))
     exploration_rights_objects = (
-        rights_manager.get_multiple_exploration_rights_by_ids(exploration_ids))  # type: ignore[no-untyped-call]
+        rights_manager.get_multiple_exploration_rights_by_ids(exploration_ids))
 
     filtered_exploration_summaries = []
     for (exploration_summary, exploration_rights) in (
@@ -391,7 +391,7 @@ def get_exploration_metadata_dicts(
                 if user.user_id is None:
                     continue
 
-                if not rights_manager.check_can_edit_activity(  # type: ignore[no-untyped-call]
+                if not rights_manager.check_can_edit_activity(
                         user, exploration_rights):
                     continue
 
@@ -444,7 +444,7 @@ def get_displayable_exp_summary_dicts_matching_ids(
     exploration_summaries = (
         exp_fetchers.get_exploration_summaries_matching_ids(exploration_ids))
     exploration_rights_objects = (
-        rights_manager.get_multiple_exploration_rights_by_ids(exploration_ids))  # type: ignore[no-untyped-call]
+        rights_manager.get_multiple_exploration_rights_by_ids(exploration_ids))
 
     filtered_exploration_summaries = []
     for (exploration_summary, exploration_rights) in (
@@ -454,7 +454,7 @@ def get_displayable_exp_summary_dicts_matching_ids(
                     rights_domain.ACTIVITY_STATUS_PRIVATE):
                 if user is None:
                     continue
-                if not rights_manager.check_can_edit_activity(  # type: ignore[no-untyped-call]
+                if not rights_manager.check_can_edit_activity(
                         user, exploration_rights):
                     continue
 
@@ -498,7 +498,7 @@ def get_displayable_exp_summary_dicts(
         }, ]
     """
     exp_version_references = [
-        exp_domain.ExpVersionReference(exp_summary.id, exp_summary.version)  # type: ignore[no-untyped-call]
+        exp_domain.ExpVersionReference(exp_summary.id, exp_summary.version)
         for exp_summary in exploration_summaries]
     exp_stats_list = stats_services.get_exploration_stats_multi(  # type: ignore[no-untyped-call]
         exp_version_references)

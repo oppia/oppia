@@ -48,6 +48,7 @@ if MYPY: # pragma: no cover
         bool,
         float,
         int,
+        float,
         None,
         List[str],
         Dict[str, Any],

@@ -362,7 +362,7 @@ class FeedbackThreadCreatedEventHandler(BaseEventHandler):
         """Perform in-request processing of recording new feedback thread
         creation events.
         """
-        feedback_services.handle_new_thread_created(exp_id)  # type: ignore[no-untyped-call]
+        feedback_services.handle_new_thread_created(exp_id)
 
 
 class FeedbackThreadStatusChangedEventHandler(BaseEventHandler):
@@ -380,7 +380,7 @@ class FeedbackThreadStatusChangedEventHandler(BaseEventHandler):
         """Perform in-request processing of recording reopening feedback
         thread events.
         """
-        feedback_services.handle_thread_status_changed(  # type: ignore[no-untyped-call]
+        feedback_services.handle_thread_status_changed(
             exp_id, old_status, new_status)
 
 

@@ -344,7 +344,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         # TODO(#13059): After we fully type the codebase we plan to get
         # rid of the tests that intentionally test wrong inputs that we
         # can normally catch by typing.
-        state.interaction.solution = None  # type: ignore[assignment]
+        state.interaction.solution = None
         self._assert_question_domain_validation_error(
             'Expected the question to have a solution')
         state.interaction.hints = []
@@ -976,6 +976,8 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                 'outcome']['feedback']['content_id'],
             'temp_id_3'
         )
+        # Ruling out the possibility of None for mypy type checking.
+        assert test_value['state']['interaction']['solution'] is not None
         self.assertNotIn(
             'ascii',
             test_value['state']['interaction']['solution']['correct_answer']

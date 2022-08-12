@@ -1022,7 +1022,7 @@ class SuggestionAddQuestion(BaseSuggestion):
             raise utils.ValidationError('Expected change to contain skill_id')
         self.validate()
 
-        skill_domain.Skill.require_valid_skill_id(self.change.skill_id)  # type: ignore[no-untyped-call]
+        skill_domain.Skill.require_valid_skill_id(self.change.skill_id)
         skill = skill_fetchers.get_skill_by_id(
             self.change.skill_id, strict=False)
         if skill is None:
