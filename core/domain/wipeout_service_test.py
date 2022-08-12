@@ -934,6 +934,21 @@ class WipeoutServiceDeleteAppFeedbackReportModelsTests(
             report_model.scrubbed_by, report_mappings[self.REPORT_ID_1])
         self.assertNotEqual(report_model.scrubbed_by, self.user_1_id)
 
+    def test_raises_error_when_field_name_is_not_provided_with_commit_model(
+        self
+    ) -> None:
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            Exception,
+            'Field name can only be None when commit log model class'
+        ):
+            wipeout_service._collect_and_save_entity_ids_from_snapshots_and_commits(
+                wipeout_service.get_pending_deletion_request(self.user_1_id),
+                models.NAMES.question,
+                [question_models.QuestionSnapshotMetadataModel],
+                question_models.QuestionCommitLogEntryModel,
+                None
+            )
+
     def test_same_pseudonym_used_for_same_user(self) -> None:
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_2_id))
