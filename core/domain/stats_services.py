@@ -515,7 +515,8 @@ def update_exp_issues_for_new_exp_version(
                 state_name = action_customization_args['state_name']['value']
                 # Here, issue_customization_args can contain str, int and list
                 # values but fom the implementation we are sure that state_name
-                # is always going to be a str value. So that's why assert is used.
+                # is always going to be a str value. So that's why assert is
+                # used here.
                 assert isinstance(state_name, str)
                 action_customization_args['state_name']['value'] = (
                     state_name if state_name not in old_to_new_state_names else
