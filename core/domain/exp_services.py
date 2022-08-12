@@ -1604,7 +1604,7 @@ def regenerate_exploration_and_contributors_summaries(exploration_id):
     exp_rights = rights_manager.get_exploration_rights(
         exploration_id, strict=False)
     exp_summary = exp_fetchers.get_exploration_summary_by_id(
-        exploration_id, strict=False)
+        exploration_id, strict=True)
     updated_exp_summary = compute_summary_of_exploration(
         exploration, exp_rights, exp_summary)
     updated_exp_summary.contributors_summary = (
@@ -1674,6 +1674,89 @@ def compute_summary_of_exploration(
         exploration_model_last_updated, first_published_msec)
 
     return updated_exp_summary
+
+
+def compute_summary_of_exploration2(
+    exploration,
+    exp_rights,
+    previous_ratings,
+    previous_exploration_model_last_updated,
+    previous_contributors_summary
+):
+    """"""
+    ratings = previous_ratings or feconf.get_empty_ratings()
+    scaled_average_rating = get_scaled_average_rating(ratings)
+
+    if previous_exploration_model_last_updated:
+        exploration_model_last_updated = (
+            previous_exploration_model_last_updated)
+    else:
+        exploration_model_last_updated = datetime.datetime.fromtimestamp(
+            get_last_updated_by_human_ms(exploration.id) / 1000.0)
+
+    contributors_summary = previous_contributors_summary or {}
+    contributor_ids = list(contributors_summary.keys())
+
+    return exp_domain.ExplorationSummary(
+        exploration.id, exploration.title, exploration.category,
+        exploration.objective, exploration.language_code,
+        exploration.tags, ratings, scaled_average_rating, exp_rights.status,
+        exp_rights.community_owned, exp_rights.owner_ids,
+        exp_rights.editor_ids, exp_rights.voice_artist_ids,
+        exp_rights.viewer_ids, contributor_ids, contributors_summary,
+        exploration.version, exploration.created_on,
+        exploration_model_last_updated, exp_rights.first_published_msec
+    )
+
+
+def update_summary_of_exploration(
+    exploration,
+    exp_rights,
+    exp_summary,
+    skip_exploration_model_last_updated=False
+):
+    """"""
+    scaled_average_rating = get_scaled_average_rating(exp_summary.ratings)
+
+    if skip_exploration_model_last_updated:
+        exploration_model_last_updated = (
+            exp_summary.exploration_model_last_updated)
+    else:
+        exploration_model_last_updated = datetime.datetime.fromtimestamp(
+            get_last_updated_by_human_ms(exploration.id) / 1000.0)
+
+    contributor_ids = list(exp_summary.contributors_summary.keys())
+
+    return exp_domain.ExplorationSummary(
+        exploration.id, exploration.title, exploration.category,
+        exploration.objective, exploration.language_code,
+        exploration.tags, exp_summary.ratings, scaled_average_rating, exp_rights.status,
+        exp_rights.community_owned, exp_rights.owner_ids,
+        exp_rights.editor_ids, exp_rights.voice_artist_ids,
+        exp_rights.viewer_ids, contributor_ids,
+        exp_summary.contributors_summary,
+        exploration.version, exploration.created_on,
+        exploration_model_last_updated, exp_rights.first_published_msec
+    )
+
+
+def generate_new_summary_of_exploration(exploration, exp_rights):
+    """"""
+    ratings = feconf.get_empty_ratings()
+    scaled_average_rating = get_scaled_average_rating(ratings)
+    exploration_model_last_updated = datetime.datetime.fromtimestamp(
+        get_last_updated_by_human_ms(exploration.id) / 1000.0)
+
+    return exp_domain.ExplorationSummary(
+        exploration.id, exploration.title, exploration.category,
+        exploration.objective, exploration.language_code,
+        exploration.tags, ratings, scaled_average_rating, exp_rights.status,
+        exp_rights.community_owned, exp_rights.owner_ids,
+        exp_rights.editor_ids, exp_rights.voice_artist_ids,
+        exp_rights.viewer_ids, [], {},
+        exploration.version, exploration.created_on,
+        exploration_model_last_updated, exp_rights.first_published_msec
+    )
 
 
 def compute_exploration_contributors_summary(exploration_id):
