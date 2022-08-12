@@ -24,6 +24,7 @@
 
 from __future__ import annotations
 
+import copy
 from core import utils
 
 from typing import Dict, List
@@ -142,8 +143,8 @@ class Classroom:
             'The topic ID to prerequisite topic IDs graph should not contain '
             'any cycles.')
         for topic_id in self.topic_id_to_prerequisite_topic_ids:
-            ancestors = self.topic_id_to_prerequisite_topic_ids[topic_id]
-
+            ancestors = copy.deepcopy(
+                self.topic_id_to_prerequisite_topic_ids[topic_id])
             visited_topic_ids_for_current_node = []
             while len(ancestors) > 0:
                 if topic_id in ancestors:
@@ -151,9 +152,11 @@ class Classroom:
 
                 ancestor_topic_id = ancestors.pop()
 
-                if ancestor_topic_id not in visited_topic_ids_for_current_node:
-                    ancestors.extend(
-                        self.topic_id_to_prerequisite_topic_ids[
-                            ancestor_topic_id]
-                    )
-                    visited_topic_ids_for_current_node.append(ancestor_topic_id)
+                if ancestor_topic_id in visited_topic_ids_for_current_node:
+                    continue
+
+                ancestors.extend(
+                    self.topic_id_to_prerequisite_topic_ids[
+                        ancestor_topic_id]
+                )
+                visited_topic_ids_for_current_node.append(ancestor_topic_id)

@@ -222,3 +222,21 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
             'topic_id_4': []
         }
         self.classroom.validate()
+
+        # Test valid graph 3.
+        self.classroom.topic_id_to_prerequisite_topic_ids = {}
+        self.classroom.validate()
+
+        # Test valid graph 4.
+        self.classroom.topic_id_to_prerequisite_topic_ids = {
+            'topic_id_1': []
+        }
+        self.classroom.validate()
+
+        # Test valid graph 5.
+        self.classroom.topic_id_to_prerequisite_topic_ids = {
+            'topic_id_1': [],
+            'topic_id_2': ['topic_id_1'],
+            'topic_id_3': ['topic_id_2', 'topic_id_1']
+        }
+        self.classroom.validate()
