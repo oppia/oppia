@@ -202,6 +202,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             draft_upgrade_services.try_upgrading_draft_to_exp_version(
                 draft_change_list_v51_1, 1, 2, self.EXP_ID)
         )
+        assert migrated_draft_change_list_v52_1 is not None
         self.assertEqual(
             [change.to_dict() for change in draft_change_list_v51_1],
             [change.to_dict() for change in migrated_draft_change_list_v52_1]

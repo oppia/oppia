@@ -63,7 +63,7 @@ class MigrateExplorationJobTests(
         self.assert_job_output_is_empty()
 
     def test_migrated_exp_is_not_migrated(self) -> None:
-        exploration = exp_domain.Exploration.create_default_exploration( # type: ignore[no-untyped-call]
+        exploration = exp_domain.Exploration.create_default_exploration(
             self.NEW_EXP_ID, title=self.EXP_TITLE, category='category')
         exp_services.save_new_exploration( # type: ignore[no-untyped-call]
             feconf.SYSTEM_COMMITTER_ID, exploration)
@@ -93,7 +93,7 @@ class MigrateExplorationJobTests(
             exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 55)
 
         with swap_states_schema_48, swap_exp_schema_55:
-            exploration = exp_domain.Exploration.create_default_exploration( # type: ignore[no-untyped-call]
+            exploration = exp_domain.Exploration.create_default_exploration(
                 self.NEW_EXP_ID, title=self.EXP_TITLE, category='Algorithms')
             exp_services.save_new_exploration( # type: ignore[no-untyped-call]
                 feconf.SYSTEM_COMMITTER_ID, exploration)
@@ -207,7 +207,7 @@ class MigrateExplorationJobTests(
             exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 53)
 
         with swap_states_schema_48, swap_exp_schema_53:
-            exploration = exp_domain.Exploration.create_default_exploration( # type: ignore[no-untyped-call]
+            exploration = exp_domain.Exploration.create_default_exploration(
                 self.NEW_EXP_ID, title=self.EXP_TITLE, category='Algorithms')
             exp_services.save_new_exploration( # type: ignore[no-untyped-call]
                 feconf.SYSTEM_COMMITTER_ID, exploration)

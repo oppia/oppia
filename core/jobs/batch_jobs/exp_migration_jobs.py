@@ -79,7 +79,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
         """
         try:
             exploration = exp_fetchers.get_exploration_from_model(exp_model)
-            exploration.validate() # type: ignore[no-untyped-call]
+            exploration.validate()
 
             with datastore_services.get_ndb_context():
                 if exp_services.get_story_id_linked_to_exploration(
@@ -161,7 +161,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
             ExpSummaryModel. The updated exploration summary model to put into
             the datastore.
         """
-        exp_rights = rights_manager.get_activity_rights_from_model( # type: ignore[no-untyped-call]
+        exp_rights = rights_manager.get_activity_rights_from_model(
             exp_rights_model, constants.ACTIVITY_TYPE_EXPLORATION)
         exp_summary = exp_services.update_exploration_summary( # type: ignore[no-untyped-call]
             migrated_exp,
@@ -261,10 +261,10 @@ class MigrateExplorationJob(base_jobs.JobBase):
             exp_id_to_exp_opp_summary_model is not None and
             exp_id in exp_id_to_exp_opp_summary_model
         ):
-            content_count = migrated_exp.get_content_count() # type: ignore[no-untyped-call]
-            translation_counts = migrated_exp.get_translation_counts() # type: ignore[no-untyped-call]
+            content_count = migrated_exp.get_content_count()
+            translation_counts = migrated_exp.get_translation_counts()
             complete_translation_language_list = (
-                migrated_exp.get_languages_with_complete_translation()) # type: ignore[no-untyped-call]
+                migrated_exp.get_languages_with_complete_translation())
 
             exp_opp_summary_model = (
                 exp_id_to_exp_opp_summary_model[migrated_exp.id])

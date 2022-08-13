@@ -2517,7 +2517,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return states_dict
 
     @classmethod
-    def _convert_states_v51_dict_to_v52_dict(cls, states_dict):
+    def _convert_states_v51_dict_to_v52_dict(
+        cls, states_dict: Dict[str, state_domain.StateDict]
+    ) -> Dict[str, state_domain.StateDict]:
         """Converts from version 51 to 52. Version 52 correctly updates
         the content IDs for translations and for voiceovers. In the 49 to 50
         conversion we removed some interaction rules and thus also some parts of
@@ -2543,9 +2545,13 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
                 for rule_spec in answer_group['rule_specs']:
                     for param_name, value in rule_spec['inputs'].items():
+                        interaction_id = interaction['id']
+                        # Ruling out the possibility of None for mypy type
+                        # checking.
+                        assert interaction_id is not None
                         param_type = (
-                            interaction_registry.Registry.get_interaction_by_id(
-                                interaction['id']
+                            interaction_registry.Registry.get_interaction_by_id( # type: ignore[no-untyped-call]
+                                interaction_id
                             ).get_rule_param_type(
                                 rule_spec['rule_type'], param_name
                             )
@@ -2554,7 +2560,14 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         if issubclass(
                             param_type, objects.BaseTranslatableObject
                         ):
-                            content_id_list.append(value['contentId'])
+                            # We can assume that the value will be a dict,
+                            # as the param_type is BaseTranslatableObject.
+                            assert isinstance(value, dict)
+                            content_id = value['contentId']
+                            # We can assume the contentId will be str,
+                            # as the param_type is BaseTranslatableObject.
+                            assert isinstance(content_id, str)
+                            content_id_list.append(content_id)
 
             default_outcome = interaction['default_outcome']
             if default_outcome:
@@ -2571,7 +2584,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
             if interaction['id'] is not None:
                 customisation_args = (
-                    state_domain.InteractionInstance
+                    state_domain.InteractionInstance # type: ignore[no-untyped-call]
                     .convert_customization_args_dict_to_customization_args(
                         interaction['id'],
                         interaction['customization_args'],
@@ -2586,18 +2599,18 @@ class Exploration(translation_domain.BaseTranslatableObject):
             translations_mapping = (
                 state_dict['written_translations']['translations_mapping'])
             new_translations_mapping = {}
-            for content_id, value in translations_mapping.items():
+            for content_id, translation_item in translations_mapping.items():
                 if content_id in content_id_list:
-                    new_translations_mapping[content_id] = value
+                    new_translations_mapping[content_id] = translation_item
             state_dict['written_translations']['translations_mapping'] = (
                 new_translations_mapping)
 
             voiceovers_mapping = (
                 state_dict['recorded_voiceovers']['voiceovers_mapping'])
             new_voiceovers_mapping = {}
-            for content_id, value in voiceovers_mapping.items():
+            for content_id, voiceover_item in voiceovers_mapping.items():
                 if content_id in content_id_list:
-                    new_voiceovers_mapping[content_id] = value
+                    new_voiceovers_mapping[content_id] = voiceover_item
             state_dict['recorded_voiceovers']['voiceovers_mapping'] = (
                 new_voiceovers_mapping)
 
@@ -2893,7 +2906,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return exploration_dict
 
     @classmethod
-    def _convert_v56_dict_to_v57_dict(cls, exploration_dict):
+    def _convert_v56_dict_to_v57_dict(
+        cls, exploration_dict: VersionedExplorationDict
+    ) -> VersionedExplorationDict:
         """Converts a v56 exploration dict into a v57 exploration dict.
         Version 57 correctly updates the content IDs for translations and
         for voiceovers.

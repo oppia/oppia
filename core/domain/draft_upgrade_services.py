@@ -243,7 +243,9 @@ class DraftUpgradeUtil:
         return draft_change_list
 
     @classmethod
-    def _convert_states_v51_dict_to_v52_dict(cls, draft_change_list):
+    def _convert_states_v51_dict_to_v52_dict(
+        cls, draft_change_list: List[exp_domain.ExplorationChange]
+    ) -> List[exp_domain.ExplorationChange]:
         """Converts from version 51 to 52. Version 52 fixes content IDs
         in translations and voiceovers (some content IDs are removed).
         We discard drafts that work with content IDs to make sure that they
