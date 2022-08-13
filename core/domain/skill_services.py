@@ -764,6 +764,8 @@ def apply_change_list(
                       skill_domain.SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES):
                     worked_examples_list: List[skill_domain.WorkedExample] = []
                     for worked_example in change.new_value:
+                        # Ruling out the possibility of any other type for mypy
+                        # type checking.
                         assert isinstance(worked_example, dict)
                         worked_examples_list.append(
                             skill_domain.WorkedExample.from_dict(worked_example)
@@ -777,6 +779,8 @@ def apply_change_list(
                     change.new_misconception_dict)
                 skill.add_misconception(misconception)
             elif change.cmd == skill_domain.CMD_DELETE_SKILL_MISCONCEPTION:
+                # Ruling out the possibility of any other type for mypy type
+                # checking.
                 assert isinstance(change.misconception_id, int)
                 skill.delete_misconception(change.misconception_id)
             elif change.cmd == skill_domain.CMD_ADD_PREREQUISITE_SKILL:
@@ -784,6 +788,8 @@ def apply_change_list(
             elif change.cmd == skill_domain.CMD_DELETE_PREREQUISITE_SKILL:
                 skill.delete_prerequisite_skill(change.skill_id)
             elif change.cmd == skill_domain.CMD_UPDATE_RUBRICS:
+                # Ruling out the possibility of any other type for mypy type
+                # checking.
                 assert isinstance(change.explanations, list)
                 skill.update_rubric(
                     change.difficulty, change.explanations)
@@ -791,21 +797,29 @@ def apply_change_list(
                   skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY):
                 if (change.property_name ==
                         skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_NAME):
+                    # Ruling out the possibility of any other type for mypy type
+                    # checking.
                     assert isinstance(change.misconception_id, int)
                     skill.update_misconception_name(
                         change.misconception_id, change.new_value)
                 elif (change.property_name ==
                       skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_NOTES):
+                    # Ruling out the possibility of any other type for mypy type
+                    # checking.
                     assert isinstance(change.misconception_id, int)
                     skill.update_misconception_notes(
                         change.misconception_id, change.new_value)
                 elif (change.property_name ==
                       skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK):
+                    # Ruling out the possibility of any other type for mypy type
+                    # checking.
                     assert isinstance(change.misconception_id, int)
                     skill.update_misconception_feedback(
                         change.misconception_id, change.new_value)
                 elif (change.property_name ==
                       skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_MUST_BE_ADDRESSED): # pylint: disable=line-too-long
+                    # Ruling out the possibility of any other type for mypy type
+                    # checking.
                     assert isinstance(change.misconception_id, int)
                     assert isinstance(change.new_value, bool)
                     skill.update_misconception_must_be_addressed(
@@ -956,6 +970,8 @@ def update_skill(
         deleted_skill_misconception_ids: List[str] = []
         for change in change_list:
             if change.cmd == skill_domain.CMD_DELETE_SKILL_MISCONCEPTION:
+                # Ruling out the possibility of any other type for mypy type
+                # checking.
                 assert isinstance(change.misconception_id, int)
                 deleted_skill_misconception_ids.append(
                     skill.generate_skill_misconception_id(
@@ -1398,6 +1414,7 @@ def get_categorized_skill_ids_and_descriptions(
         subtopics = topic.subtopics
         for skill_id in topic.uncategorized_skill_ids:
             description = skill_descriptions[skill_id]
+            # Ruling out the possibility of None for mypy type checking.
             assert description is not None
             categorized_skills.add_uncategorized_skill(
                 topic.name, skill_id,
@@ -1405,6 +1422,7 @@ def get_categorized_skill_ids_and_descriptions(
         for subtopic in subtopics:
             for skill_id in subtopic.skill_ids:
                 description = skill_descriptions[skill_id]
+                # Ruling out the possibility of None for mypy type checking.
                 assert description is not None
                 categorized_skills.add_subtopic_skill(
                     topic.name, subtopic.title,

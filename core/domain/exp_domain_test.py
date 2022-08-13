@@ -1355,6 +1355,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         outcome.dest = destination
 
         default_outcome = init_state.interaction.default_outcome
+        # Ruling out the possibility of None for mypy type checking.
         assert default_outcome is not None
 
         # TODO(#13059): After we fully type the codebase we plan to get

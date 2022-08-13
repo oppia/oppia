@@ -65,7 +65,6 @@ from core.domain import user_services
 from core.platform import models
 
 import deepdiff
-
 from typing import Dict, List, Optional, Sequence, Tuple, Type, Union
 from typing_extensions import Final, TypedDict
 

@@ -84,6 +84,6 @@ def get_default_object_values() -> Dict[str, Any]:
     default_object_values: Dict[str, Any] = json.loads(
         constants.get_package_file_contents(
             'extensions', feconf.OBJECT_DEFAULT_VALUES_EXTENSIONS_MODULE_PATH
-            )
         )
+    )
     return default_object_values

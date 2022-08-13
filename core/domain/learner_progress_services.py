@@ -1360,13 +1360,13 @@ def _get_filtered_partially_learnt_topic_summaries(
     """
     nonexistent_partially_learnt_topic_ids = []
     filtered_partially_learnt_topic_summaries = []
-    topic_rights_with_none = topic_fetchers.get_multi_topic_rights(topic_ids)
+    all_topic_rights = topic_fetchers.get_multi_topic_rights(topic_ids)
     for index, topic_summary in enumerate(topic_summaries):
         if topic_summary is None:
             nonexistent_partially_learnt_topic_ids.append(topic_ids[index])
         else:
             topic_id = topic_summary.id
-            topic_rights = topic_rights_with_none[index]
+            topic_rights = all_topic_rights[index]
             # Ruling out the possibility of None for mypy type checking.
             assert topic_rights is not None
             if not topic_rights.topic_is_published:
@@ -1460,7 +1460,7 @@ def _get_filtered_topics_to_learn_summaries(
     filtered_topics_to_learn_summaries = []
 
     completed_story_ids = get_all_completed_story_ids(user_id)
-    topic_rights_with_none = topic_fetchers.get_multi_topic_rights(topic_ids)
+    all_topic_rights = topic_fetchers.get_multi_topic_rights(topic_ids)
     topics = topic_fetchers.get_topics_by_ids(topic_ids)
 
     for index, topic_summary in enumerate(topic_summaries):
@@ -1475,7 +1475,7 @@ def _get_filtered_topics_to_learn_summaries(
             for story in topic.canonical_story_references:
                 story_ids_in_topic.append(story.story_id)
 
-            topic_rights = topic_rights_with_none[index]
+            topic_rights = all_topic_rights[index]
             # Ruling out the possibility of None for mypy type checking.
             assert topic_rights is not None
             if (set(story_ids_in_topic).issubset(
@@ -1609,10 +1609,10 @@ def _get_filtered_all_topic_summaries(
         objects of the topics in the edit goals.
     """
     filtered_all_topic_summaries = []
-    topic_rights_with_none = topic_fetchers.get_multi_topic_rights(topic_ids)
+    all_topic_rights = topic_fetchers.get_multi_topic_rights(topic_ids)
     for index, topic_summary in enumerate(topic_summaries):
         if topic_summary is not None:
-            topic_rights = topic_rights_with_none[index]
+            topic_rights = all_topic_rights[index]
             # Ruling out the possibility of None for mypy type checking.
             assert topic_rights is not None
             if topic_rights.topic_is_published:
@@ -1639,10 +1639,10 @@ def _get_filtered_untracked_topic_summaries(
         objects of the topics not tracked for the user.
     """
     filtered_untracked_topic_summaries = []
-    topic_rights_with_none = topic_fetchers.get_multi_topic_rights(topic_ids)
+    all_topic_rights = topic_fetchers.get_multi_topic_rights(topic_ids)
     for index, topic_summary in enumerate(topic_summaries):
         if topic_summary is not None:
-            topic_rights = topic_rights_with_none[index]
+            topic_rights = all_topic_rights[index]
             # Ruling out the possibility of None for mypy type checking.
             assert topic_rights is not None
             if topic_rights.topic_is_published:

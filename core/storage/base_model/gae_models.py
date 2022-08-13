@@ -57,7 +57,7 @@ SELF_BASE_SNAPSHOT_CONTENT_MODEL = TypeVar(  # pylint: disable=invalid-name
 
 MYPY = False
 if MYPY: # pragma: no cover
-    # Here, change domain is imported only for type checking.
+    # Here, 'change_domain' is imported only for type checking.
     from core.domain import change_domain  # pylint: disable=invalid-import # isort:skip
     from mypy_imports import datastore_services
     from mypy_imports import transaction_services

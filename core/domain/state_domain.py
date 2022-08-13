@@ -676,7 +676,7 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
             confirmed_unclassified_answers: list(*). List of answers which have
                 been confirmed to be associated with the default outcome.
             hints: list(Hint). List of hints for this interaction.
-            solution: Solution. A possible solution for the question asked
+            solution: Solution|None. A possible solution for the question asked
                 in this interaction, or None if no solution exists for the
                 interaction.
         """
