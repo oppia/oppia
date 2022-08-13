@@ -82,7 +82,7 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
   inapplicableSkillMisconceptionIds: string[];
   activeEditOption: boolean;
   misconceptionsBySkill: object;
-  answerGroups: AnswerGroup[];
+  answerGroups: AnswerGroup[] = [];
   defaultOutcome: Outcome;
   activeAnswerGroupIndex: number;
   SHOW_TRAINABLE_UNRESOLVED_ANSWERS: boolean;

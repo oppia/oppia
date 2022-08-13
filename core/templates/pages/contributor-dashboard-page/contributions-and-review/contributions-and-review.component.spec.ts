@@ -1247,8 +1247,14 @@ describe('Contributions and review component', () => {
               skill_id: 'string',
               content_html: 'string',
               translation_html: 'html',
-              question_dict: null,
-              skill_difficulty: null
+              question_dict: {
+                question_state_data: {
+                  content: {
+                    html: 'html'
+                  }
+                }
+              },
+              skill_difficulty: null,
             },
             target_id: 'string;,',
             suggestion_id: 'suggestion_id',
@@ -1358,7 +1364,13 @@ describe('Contributions and review component', () => {
             suggestion_id: 'id',
             status: 'review',
             change: {
-              question_dict: null
+              question_dict: {
+                question_state_data: {
+                  content: {
+                    html: 'html'
+                  }
+                }
+              }
             }
           } as Suggestion,
           details: {

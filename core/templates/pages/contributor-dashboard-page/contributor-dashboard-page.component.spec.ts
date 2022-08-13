@@ -163,7 +163,7 @@ describe('Contributor dashboard page', () => {
     it('should initialize $scope properties after controller is initialized' +
       ' and get data from backend', () => {
       expect(component.userIsLoggedIn).toBe(false);
-      expect(component.username).toBe(null);
+      expect(component.username).toBe('');
       expect(component.userCanReviewQuestions).toBe(false);
       expect(component.userIsReviewer).toBe(false);
       expect(component.profilePictureDataUrl).toBe(null);

@@ -136,7 +136,7 @@ export class ContributorDashboardPageComponent
 
   ngOnInit(): void {
     this.profilePictureDataUrl = null;
-    this.username = null;
+    this.username = '';
     this.userInfoIsLoading = true;
     this.userIsLoggedIn = false;
     this.userIsReviewer = false;

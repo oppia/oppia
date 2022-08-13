@@ -15,7 +15,7 @@
         </div>
       </div>
       <div class="state-response-container oppia-mobile-collapsible-card-content" *ngIf="responseCardIsShown">
-        <div *ngIf="answerGroups?.length > 0">
+        <div *ngIf="answerGroups && answerGroups.length > 0">
           <div cdkDropList
                (cdkDropListDropped)="drop($event)"
                class="nav oppia-option-list nav-stacked nav-pills"
@@ -26,7 +26,7 @@
                  [ngClass]="{'active': activeAnswerGroupIndex === index}"
                  class="oppia-sortable-rule-block oppia-prevent-selection">
 
-              <span class="oppia-rule-sort-handle" *ngIf="answerGroups?.length > 1" (mousedown)="changeActiveAnswerGroupIndex(-1)">
+              <span class="oppia-rule-sort-handle" *ngIf="answerGroups.length > 1" (mousedown)="changeActiveAnswerGroupIndex(-1)">
                 <span *ngIf="editabilityService.isEditable()" class="material-icons draggable-icon-indicator">drag_indicator</span>
               </span>
 
@@ -44,7 +44,7 @@
                                        [isActive]="index === activeAnswerGroupIndex"
                                        [outcome]="answerGroup.outcome"
                                        [defaultOutcome]="false"
-                                       [numRules]="answerGroup.rules?.length"
+                                       [numRules]="answerGroup.rules.length"
                                        [isResponse]="true"
                                        (delete)="deleteAnswerGroup($event)"
                                        (navigateToState)="navigateToState.emit($event)">
@@ -78,23 +78,23 @@
         </div>
         <div>
           <div class="nav oppia-option-list nav-stacked nav-pills" role="tablist">
-            <div class="option-list-default" [ngClass]="{'active': activeAnswerGroupIndex === answerGroups?.length}">
+            <div class="option-list-default" [ngClass]="{'active': activeAnswerGroupIndex === answerGroups.length}">
               <div class="oppia-rule-header-warning-placement"
                    *ngIf="isSelfLoopThatIsMarkedCorrect(defaultOutcome) || (isSelfLoopWithNoFeedback(defaultOutcome) && !suppressDefaultAnswerGroupWarnings())"
-                   (click)="changeActiveAnswerGroupIndex(answerGroups?.length)"
+                   (click)="changeActiveAnswerGroupIndex(answerGroups.length)"
                    ngbTooltip="{{getOutcomeTooltip(defaultOutcome)}}"
                    placement="bottom">
                 <div class="oppia-rule-header-warning-style" >
                   ⚠
                 </div>
               </div>
-              <a (click)="changeActiveAnswerGroupIndex(answerGroups?.length)"
+              <a (click)="changeActiveAnswerGroupIndex(answerGroups.length)"
                  class="oppia-sortable-rule-block oppia-rule-tab oppia-default-rule-tab e2e-test-default-response-tab"
-                 [ngClass]="{'oppia-rule-tab-active': activeAnswerGroupIndex == answerGroups?.length}">
+                 [ngClass]="{'oppia-rule-tab-active': activeAnswerGroupIndex == answerGroups.length}">
                 <oppia-response-header [index]="index"
                                        [isActive]="index === activeAnswerGroupIndex"
-                                       [summary]="summarizeDefaultOutcome(defaultOutcome, getCurrentInteractionId(), answerGroups?.length, false)"
-                                       [shortSummary]="summarizeDefaultOutcome(defaultOutcome, getCurrentInteractionId(), answerGroups?.length, true)"
+                                       [summary]="summarizeDefaultOutcome(defaultOutcome, getCurrentInteractionId(), answerGroups.length, false)"
+                                       [shortSummary]="summarizeDefaultOutcome(defaultOutcome, getCurrentInteractionId(), answerGroups.length, true)"
                                        [outcome]="defaultOutcome"
                                        [defaultOutcome]="true"
                                        (navigateToState)="navigateToState.emit($event)"
@@ -102,7 +102,7 @@
                 </oppia-response-header>
               </a>
 
-              <div *ngIf="activeAnswerGroupIndex === answerGroups?.length">
+              <div *ngIf="activeAnswerGroupIndex === (answerGroups && answerGroups.length)">
                 <div class="oppia-editor-card-section">
                   <div class="oppia-rule-body-container e2e-test-response-body-default">
                     <oppia-answer-group-editor class="e2e-test-response-body"
@@ -138,10 +138,10 @@
             <label for="label-target-solicit-answer-details-checkbox">Solicit Answer Details</label>
           </span>
         </div>
-        <div *ngIf="isInQuestionMode() && answerGroups?.length > 0 && (containsOptionalMisconceptions || getUnaddressedMisconceptionNames(misconceptionsBySkill)?.length)" class="misconception-parent-card">
+        <div *ngIf="isInQuestionMode() && answerGroups && answerGroups.length > 0 && (containsOptionalMisconceptions || getUnaddressedMisconceptionNames(misconceptionsBySkill).length)" class="misconception-parent-card">
           <h3>Misconceptions</h3>
           <small class="text-muted">The following must be addressed by tagging to an incorrect answer. If a misconception is not relevant to this question, mark it as "Not Applicable".</small>
-          <div class="pt-4" *ngIf="getUnaddressedMisconceptionNames(misconceptionsBySkill)?.length">
+          <div class="pt-4" *ngIf="getUnaddressedMisconceptionNames(misconceptionsBySkill).length">
             <h4 class="pl-3">Compulsory</h4>
             <p *ngFor="let misconceptionName of getUnaddressedMisconceptionNames(misconceptionsBySkill); let index = index" class="misconception-list-item">
               {{misconceptionName}}
