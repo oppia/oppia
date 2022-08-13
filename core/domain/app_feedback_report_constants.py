@@ -61,13 +61,12 @@ class ReportType(enum.Enum):
     CRASH = 'crash'
 
 
-
 class Category(enum.Enum):
     """Enum for categories."""
 
     FEATURE_SUGGESTION = 'feature_suggestion'
     LANGUAGE_SUGGESTION = 'language_suggestion'
-    OTHER_SUGGESTION = 'other_suggestion' 
+    OTHER_SUGGESTION = 'other_suggestion'
     LESSON_QUESTION_ISSUE = 'lesson_question_issue'
     LANGUAGE_GENERAL_ISSUE = 'language_general_issue'
     LANGUAGE_AUDIO_ISSUE = 'language_audio_issue'
@@ -82,7 +81,6 @@ class Category(enum.Enum):
     OTHER_CRASH = 'other_crash'
 
 
-
 class EntryPoint(enum.Enum):
     """Enum for entry points."""
 
@@ -90,7 +88,6 @@ class EntryPoint(enum.Enum):
     LESSON_PLAYER = 'lesson_player'
     REVISION_CARD = 'revision_card'
     CRASH = 'crash'
-
 
 
 class StatsParameterNames(enum.Enum):
