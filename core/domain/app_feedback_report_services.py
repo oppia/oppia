@@ -175,46 +175,46 @@ def _update_report_stats_model_in_transaction( # type: ignore[no-untyped-def]
         stats_dict = stats_model.daily_param_stats
 
         stats_dict[
-            stats_parameter_names.report_type.name] = (
+            stats_parameter_names.REPORT_TYPE.name] = (
             calculate_new_stats_count_for_parameter(
                 stats_dict[
-                    stats_parameter_names.report_type.name],
+                    stats_parameter_names.REPORT_TYPE.name],
                 report_type, delta))
         stats_dict[
-            stats_parameter_names.country_locale_code.name] = (
+            stats_parameter_names.COUNTRY_LOCALE_CODE.name] = (
             calculate_new_stats_count_for_parameter(
                 stats_dict[
-                    stats_parameter_names.country_locale_code.name],
+                    stats_parameter_names.COUNTRY_LOCALE_CODE.name],
                 country_locale_code, delta))
         stats_dict[
-            stats_parameter_names.entry_point_name.name] = (
+            stats_parameter_names.ENTRY_POINT_NAME.name] = (
             calculate_new_stats_count_for_parameter(
                 stats_dict[
-                    stats_parameter_names.entry_point_name.name],
+                    stats_parameter_names.ENTRY_POINT_NAME.name],
                 entry_point_name, delta))
         stats_dict[
-            stats_parameter_names.audio_language_code.name] = (
+            stats_parameter_names.AUDIO_LANGUAGE_CODE.name] = (
             calculate_new_stats_count_for_parameter(
                 stats_dict[
-                    stats_parameter_names.audio_language_code.name],
+                    stats_parameter_names.AUDIO_LANGUAGE_CODE.name],
                 audio_language_code, delta))
         stats_dict[
-            stats_parameter_names.text_language_code.name] = (
+            stats_parameter_names.TEXT_LANGUAGE_CODE.name] = (
             calculate_new_stats_count_for_parameter(
                 stats_dict[
-                    stats_parameter_names.text_language_code.name],
+                    stats_parameter_names.TEXT_LANGUAGE_CODE.name],
                 text_language_code, delta))
         stats_dict[
-            stats_parameter_names.android_sdk_version.name] = (
+            stats_parameter_names.ANDROID_SDK_VERSION.name] = (
             calculate_new_stats_count_for_parameter(
                 stats_dict[
-                    stats_parameter_names.android_sdk_version.name],
+                    stats_parameter_names.ANDROID_SDK_VERSION.name],
                 sdk_version, delta))
         stats_dict[
-            stats_parameter_names.version_name.name] = (
+            stats_parameter_names.VERSION_NAME.name] = (
             calculate_new_stats_count_for_parameter(
                 stats_dict[
-                    stats_parameter_names.version_name.name],
+                    stats_parameter_names.VERSION_NAME.name],
                 version_name, delta))
 
     stats_model.daily_param_stats = stats_dict
