@@ -216,46 +216,6 @@ var invisibilityOfSuccessToast = async function(errorMessage) {
   await invisibilityOf(toastSuccessElement, errorMessage);
 };
 
-/*
- * Wait for an element to fade in (have an opacity of 1). To make sure that we
- * aren't getting an opacity of 1 from before the animation, we wait for an
- * opacity of 1, wait for checkInterval milliseconds, and then wait for an
- * opacity of 1 again.
- *
- * @param {Object} element - The element fading in.
- * @param {string} errorMessage - An error message to report if the wait times
- *                                out.
- * @param {number} checkInterval - Number of milliseconds to wait between
- *                                 opacity checks. This should always be at
- *                                 least 1000 to make sure that both opacity
- *                                 checks cannot complete before the fade-out
- *                                 begins.
- */
-var fadeInToComplete = async function(element, errorMessage, checkInterval) {
-  await visibilityOf(element, 'Editor taking too long to appear');
-  await browser.waitUntil(async function() {
-    return (await element.getCSSProperty('opacity')).value === 1;
-  },
-  {
-    timeout: DEFAULT_WAIT_TIME_MSECS,
-    timeoutMsg: errorMessage
-  });
-  // Using browser.sleep is okay in this case because we are using it to check
-  // for UI stability, i.e. that the opacity is not changing. This can only
-  // flake if it takes more than checkInterval milliseconds for the fade-out to
-  // begin, which is very unlikely.
-  //
-  // eslint-disable-next-line oppia/e2e-practices
-  await browser.pause(checkInterval);
-  await browser.waitUntil(async function() {
-    return (await element.getCSSProperty('opacity')).value === 1;
-  },
-  {
-    timeout: DEFAULT_WAIT_TIME_MSECS,
-    timeoutMsg: errorMessage
-  });
-};
-
 var modalPopupToAppear = async function() {
   await visibilityOf(
     $('.modal-body'), 'Modal taking too long to appear.');
@@ -312,7 +272,6 @@ exports.invisibilityOfLoadingMessage = invisibilityOfLoadingMessage;
 exports.visibilityOfInfoToast = visibilityOfInfoToast;
 exports.visibilityOfSuccessToast = visibilityOfSuccessToast;
 exports.invisibilityOfSuccessToast = invisibilityOfSuccessToast;
-exports.fadeInToComplete = fadeInToComplete;
 exports.modalPopupToAppear = modalPopupToAppear;
 exports.fileToBeDownloaded = fileToBeDownloaded;
 exports.newTabToBeCreated = newTabToBeCreated;

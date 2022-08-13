@@ -78,10 +78,8 @@ var ExplorationEditorSettingsTab = function() {
         await waitFor.visibilityOf(
           elem,
           'option element taking too long to appear');
-        console.log(await elem.getText());
         return await elem.getText();
       });
-    await browser.debug();
     expect(options.sort()).toEqual(names.sort());
   };
 
