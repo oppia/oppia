@@ -33,6 +33,7 @@ from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import rights_manager
+from core.domain import state_domain
 from core.domain import suggestion_services
 from core.domain import user_domain
 from core.domain import user_services
@@ -2170,6 +2171,67 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(user_audit_model.committer_id, committer_id)
         self.assertEqual(user_audit_model.old_username, 'oldUsername')
         self.assertEqual(user_audit_model.new_username, 'newUsername')
+
+    def test_raises_error_if_none_destination_is_provided_for_checkpoint(
+        self
+    ) -> None:
+        state = state_domain.State.create_default_state('state_1')
+        state_answer_group: List[state_domain.AnswerGroup] = [
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    None, None, state_domain.SubtitledHtml(
+                        'feedback_1', '<p>state outcome html</p>'),
+                    False, [], None, None),
+                [
+                    state_domain.RuleSpec(
+                        'Equals', {
+                            'x': {
+                                'contentId': 'rule_input_1',
+                                'normalizedStrSet': ['Test rule spec.']
+                                }})
+                ],
+                [],
+                None
+            )
+        ]
+        state.update_interaction_id('TextInput')
+        state.update_interaction_answer_groups(state_answer_group)
+        states = {'Introduction': state}
+
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            Exception,
+            'None destination can never be a checkpoint in exploration.'
+        ):
+            user_services.get_checkpoints_in_order('Introduction', states)
+
+        state_answer_group = [
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'destination', None, state_domain.SubtitledHtml(
+                        'feedback_1', '<p>state outcome html</p>'),
+                    False, [], None, None),
+                [
+                    state_domain.RuleSpec(
+                        'Equals', {
+                            'x': {
+                                'contentId': 'rule_input_1',
+                                'normalizedStrSet': ['Test rule spec.']
+                                }})
+                ],
+                [],
+                None
+            )
+        ]
+        state.update_interaction_answer_groups(state_answer_group)
+        # Ruling out the possibility of None for mypy type checking.
+        assert state.interaction.default_outcome is not None
+        state.interaction.default_outcome.dest = None
+
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            Exception,
+            'None default destination can never be a checkpoint'
+        ):
+            user_services.get_checkpoints_in_order('Introduction', states)
 
 
 class UserCheckpointProgressUpdateTests(test_utils.GenericTestBase):
