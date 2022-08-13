@@ -1019,8 +1019,9 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
     ) -> None:
         story_models.StoryModel.delete_by_id(self.STORY_ID)
 
-        self.assertRaisesRegex(
-            Exception, 'Failed to regenerate opportunities',
-            lambda: (
-                opportunity_services.regenerate_opportunities_related_to_topic(
-                    self.TOPIC_ID)))
+        with self.assertRaisesRegex(
+            Exception, 'Failed to regenerate opportunities'
+        ):
+            opportunity_services.regenerate_opportunities_related_to_topic(
+                self.TOPIC_ID
+            )

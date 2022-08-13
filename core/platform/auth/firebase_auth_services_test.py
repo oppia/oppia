@@ -1175,10 +1175,12 @@ class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
             error=firebase_auth.RevokedSessionCookieError('uh-oh'))
 
         with always_raise_revoked_session_cookie_error:
-            self.assertRaisesRegex(
-                auth_domain.StaleAuthSessionError, 'revoked',
-                lambda: firebase_auth_services.get_auth_claims_from_request(
-                    self.create_request(session_cookie=cookie)))
+            with self.assertRaisesRegex(
+                auth_domain.StaleAuthSessionError, 'revoked'
+            ):
+                firebase_auth_services.get_auth_claims_from_request(
+                    self.create_request(session_cookie=cookie)
+                )
 
     def test_raises_user_disabled_error_when_user_is_disabled(self) -> None:
         cookie = firebase_auth.create_session_cookie(
@@ -1208,10 +1210,12 @@ class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
             error=firebase_exceptions.UnknownError('uh-oh'))
 
         with always_raise_unknown_error:
-            self.assertRaisesRegex(
-                auth_domain.InvalidAuthSessionError, 'uh-oh',
-                lambda: firebase_auth_services.get_auth_claims_from_request(
-                    self.create_request(session_cookie=cookie)))
+            with self.assertRaisesRegex(
+                auth_domain.InvalidAuthSessionError, 'uh-oh'
+            ):
+                firebase_auth_services.get_auth_claims_from_request(
+                    self.create_request(session_cookie=cookie)
+                )
 
 
 class GenericAssociationTests(FirebaseAuthServicesTestBase):

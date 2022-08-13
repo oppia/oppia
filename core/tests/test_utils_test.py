@@ -629,7 +629,8 @@ class TestUtilsTests(test_utils.GenericTestBase):
             'Please provide a sufficiently strong regexp string to '
             'validate that the correct error is being raised.'
         ):
-            self.assertRaisesRegex(Exception, '', mock_exception_func)
+            with self.assertRaisesRegex(Exception, ''):
+                mock_exception_func()
 
     # TODO(#13059): After we fully type the codebase we plan to get
     # rid of the tests that intentionally test wrong inputs that we

@@ -52,9 +52,10 @@ class JobMetaclassTests(test_utils.TestBase):
 
         self.assertEqual(MockJobMetaclass.get_all_jobs(), [])
         self.assertEqual(MockJobMetaclass.get_all_job_names(), [])
-        self.assertRaisesRegex(
-            ValueError, 'FooJobBase is not registered as a job',
-            lambda: MockJobMetaclass.get_job_class_by_name('FooJobBase'))
+        with self.assertRaisesRegex(
+            ValueError, 'FooJobBase is not registered as a job'
+        ):
+            MockJobMetaclass.get_job_class_by_name('FooJobBase')
 
     def test_puts_non_base_classes_in_registry(self) -> None:
         class FooJob(base_jobs.JobBase, metaclass=MockJobMetaclass):
@@ -95,7 +96,8 @@ class JobMetaclassTests(test_utils.TestBase):
 class JobBaseTests(job_test_utils.PipelinedTestBase):
 
     def test_run_raises_not_implemented_error(self) -> None:
-        self.assertRaisesRegex(
+        with self.assertRaisesRegex(
             NotImplementedError,
-            re.escape('Subclasses must implement the run() method'),
-            base_jobs.JobBase(self.pipeline).run)
+            re.escape('Subclasses must implement the run() method')
+        ):
+            base_jobs.JobBase(self.pipeline).run()

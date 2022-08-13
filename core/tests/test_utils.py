@@ -102,27 +102,6 @@ if MYPY:  # pragma: no cover
     from mypy_imports import suggestion_models
     from mypy_imports import topic_models
 
-    class _AssertRaisesContext():
-        """The stub class that represents the return type of assertRaisesRegex
-        method.
-        """
-
-        exception: BaseException
-
-        # To avoid pylint's 'More than one statement on a single line' error,
-        # we splitted this function definition.
-        def __enter__(
-            self
-        ) -> Any: ...
-
-        def __exit__(
-            self,
-            exc_type: Optional[type[BaseException]],
-            exc_value: Optional[BaseException],
-            tb: Optional[TracebackType]
-        ) -> bool: ...
-
-
 (
     auth_models, base_models, exp_models,
     feedback_models, question_models, skill_models,
@@ -1573,9 +1552,7 @@ class TestBase(unittest.TestCase):
             'self.assertRaisesRegex instead.')
 
     # We have ignored [override] here because the signature of this method
-    # doesn't match with TestCase's assertRaisesRegex(). Also, arguments
-    # args and kwargs are annotated with any type because these are the extra
-    # positional arguments with which 'assertRaisesRegex' could be called.
+    # doesn't match with TestCase's assertRaisesRegex().
     def assertRaisesRegex(  # type: ignore[override]
         self,
         expected_exception: Union[
@@ -1583,9 +1560,7 @@ class TestBase(unittest.TestCase):
             Tuple[Type[BaseException], ...]
         ],
         expected_regex: Union[str, Pattern[str]],
-        *args: Any,
-        **kwargs: Any
-    ) -> _AssertRaisesContext:
+    ) -> unittest.case._AssertRaisesContext[BaseException]:
         """Asserts that the message in a raised exception matches a regex.
         This is a wrapper around assertRaisesRegex in unittest that enforces
         strong regex.
@@ -1609,13 +1584,8 @@ class TestBase(unittest.TestCase):
                 'Please provide a sufficiently strong regexp string to '
                 'validate that the correct error is being raised.')
 
-        # In this method we are providing *args and **kwargs which matches with
-        # the assertRaisesRegex's overload that returns Any type, but to return
-        # a narrower type we defined our own `_AssertRaisesContext` class and
-        # used it as a return type which causes MyPy to throw an error. Thus to
-        # avoid the error, we used ignore here.
-        return super().assertRaisesRegex(  # type: ignore[no-any-return]
-            expected_exception, expected_regex, *args, **kwargs)
+        return super().assertRaisesRegex(
+            expected_exception, expected_regex)
 
     # Here we used Mapping[str, Any] because, in Oppia codebase TypedDict is
     # used to define strict dictionaries and those strict dictionaries are not

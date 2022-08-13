@@ -129,10 +129,14 @@ class GetModelKindTests(test_utils.TestBase):
         self.assertEqual(
             job_utils.get_model_kind(base_models.BaseModel), 'BaseModel')
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_get_from_bad_value(self) -> None:
-        self.assertRaisesRegex(
-            TypeError, 'not a model type or instance',
-            lambda: job_utils.get_model_kind(123)) # type: ignore[arg-type]
+        with self.assertRaisesRegex(
+            TypeError, 'not a model type or instance'
+        ):
+            job_utils.get_model_kind(123) # type: ignore[arg-type]
 
 
 class GetModelPropertyTests(test_utils.TestBase):

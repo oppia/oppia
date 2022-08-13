@@ -45,10 +45,11 @@ class BeamJobRunModelTest(test_utils.GenericTestBase):
             utils, 'convert_to_hash', value=model.id)
 
         with collision_context:
-            self.assertRaisesRegex(
+            with self.assertRaisesRegex(
                 RuntimeError,
-                r'Failed to generate a unique ID after \d+ attempts',
-                beam_job_models.BeamJobRunModel.get_new_id)
+                r'Failed to generate a unique ID after \d+ attempts'
+            ):
+                beam_job_models.BeamJobRunModel.get_new_id()
 
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
@@ -88,10 +89,11 @@ class BeamJobRunResultModelTest(test_utils.GenericTestBase):
             utils, 'convert_to_hash', value=model.id)
 
         with collision_context:
-            self.assertRaisesRegex(
+            with self.assertRaisesRegex(
                 RuntimeError,
-                r'Failed to generate a unique ID after \d+ attempts',
-                beam_job_models.BeamJobRunResultModel.get_new_id)
+                r'Failed to generate a unique ID after \d+ attempts'
+            ):
+                beam_job_models.BeamJobRunResultModel.get_new_id()
 
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(

@@ -57,9 +57,10 @@ class PipelinedTestBaseTests(job_test_utils.PipelinedTestBase):
 
         self.assert_pcoll_empty(output)
 
-        self.assertRaisesRegex(
-            RuntimeError, 'must be run in the pipeline context',
-            lambda: self.assert_pcoll_empty(output))
+        with self.assertRaisesRegex(
+            RuntimeError, 'must be run in the pipeline context'
+        ):
+            self.assert_pcoll_empty(output)
 
     def test_assert_pcoll_equal_raises_runtime_error_when_called_twice(
         self
@@ -69,9 +70,10 @@ class PipelinedTestBaseTests(job_test_utils.PipelinedTestBase):
 
         self.assert_pcoll_equal(output, [123])
 
-        self.assertRaisesRegex(
-            RuntimeError, 'must be run in the pipeline context',
-            lambda: self.assert_pcoll_equal(output, [123]))
+        with self.assertRaisesRegex(
+            RuntimeError, 'must be run in the pipeline context'
+        ):
+            self.assert_pcoll_equal(output, [123])
 
     def test_create_model_sets_date_properties(self) -> None:
         model = self.create_model(base_models.BaseModel)

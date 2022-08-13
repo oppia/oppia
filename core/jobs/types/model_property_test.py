@@ -229,9 +229,10 @@ class ModelPropertyTests(test_utils.TestBase):
     ) -> None:
         model = RepeatedValueModel(values=['123', '456', '789'])
 
-        self.assertRaisesRegex(
-            TypeError, 'not an instance of SubclassOfBaseModel',
-            lambda: list(self.ndb_property.yield_value_from_model(model)))
+        with self.assertRaisesRegex(
+            TypeError, 'not an instance of SubclassOfBaseModel'
+        ):
+            list(self.ndb_property.yield_value_from_model(model))
 
     def test_pickle_id_property(self) -> None:
         pickle_value = pickle.loads(pickle.dumps(self.id_property))

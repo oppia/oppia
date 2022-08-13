@@ -782,9 +782,10 @@ class UtilsTests(test_utils.GenericTestBase):
     ) -> None:
         image_data_url = urllib.parse.quote(base64.b64encode(b'test123'))
 
-        self.assertRaisesRegex(
-            Exception, 'The given string does not represent a PNG data URL.',
-            lambda: utils.convert_png_data_url_to_binary(image_data_url))
+        with self.assertRaisesRegex(
+            Exception, 'The given string does not represent a PNG data URL.'
+        ):
+            utils.convert_png_data_url_to_binary(image_data_url)
 
     def test_quoted_string(self) -> None:
         self.assertEqual(utils.quoted('a"b\'c'), '"a\\"b\'c"')
