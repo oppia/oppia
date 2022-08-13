@@ -34,8 +34,10 @@ from core.domain import param_domain
 from core.domain import translation_domain
 from extensions.objects.models import objects
 
-from typing import Any, Callable, Dict, List, Mapping, Optional, Tuple, Union
-from typing_extensions import Final, TypedDict
+from typing import (
+    Any, Callable, Dict, List, Mapping, Optional, Tuple, Union, overload
+)
+from typing_extensions import Final, Literal, TypedDict
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import interaction_registry  # pylint: disable=invalid-import-from # isort:skip
@@ -1261,6 +1263,16 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
         traversing the customization argument schema, and converting
         SubtitledUnicode to unicode and SubtitledHtml to html where appropriate.
         """
+        @overload
+        def convert_content_to_dict(
+            ca_value: SubtitledHtml, unused_schema_obj_type: str
+        ) -> SubtitledHtmlDict: ...
+
+        @overload
+        def convert_content_to_dict(
+            ca_value: SubtitledUnicode, unused_schema_obj_type: str
+        ) -> SubtitledUnicodeDict: ...
+
         def convert_content_to_dict(
             ca_value: Union[SubtitledHtml, SubtitledUnicode],
             unused_schema_obj_type: str
@@ -1310,6 +1322,18 @@ class InteractionCustomizationArg(translation_domain.BaseTranslatableObject):
             InteractionCustomizationArg. The customization argument domain
             object.
         """
+        @overload
+        def convert_content_to_domain_obj(
+            ca_value: Dict[str, str],
+            schema_obj_type: Literal['SubtitledUnicode']
+        ) -> SubtitledUnicode: ...
+
+        @overload
+        def convert_content_to_domain_obj(
+            ca_value: Dict[str, str],
+            schema_obj_type: Literal['SubtitledHtml']
+        ) -> SubtitledHtml: ...
+
         def convert_content_to_domain_obj(
             ca_value: Dict[str, str], schema_obj_type: str
         ) -> Union[SubtitledHtml, SubtitledUnicode]:
@@ -3029,11 +3053,10 @@ class TranslatableItem:
 
 AcceptableConversionFnType = Union[
     Callable[[SubtitledHtml, str], SubtitledHtml],
-    Callable[
-        [Union[SubtitledHtml, SubtitledUnicode], str],
-        Union[SubtitledHtmlDict, SubtitledUnicodeDict]
-    ],
-    Callable[[Dict[str, str], str], Union[SubtitledHtml, SubtitledUnicode]],
+    Callable[[SubtitledHtml, str], SubtitledHtmlDict],
+    Callable[[SubtitledUnicode, str], SubtitledUnicodeDict],
+    Callable[[Dict[str, str], Literal['SubtitledUnicode']], SubtitledUnicode],
+    Callable[[Dict[str, str], Literal['SubtitledHtml']], SubtitledHtml],
     Callable[[SubtitledHtml, str], List[str]]
 ]
 

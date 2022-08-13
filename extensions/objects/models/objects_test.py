@@ -900,7 +900,9 @@ class SchemaValidityTests(test_utils.GenericTestBase):
             NotImplementedError,
             re.escape(
                 'The get_schema() method is missing from the derived class. It '
-                'should be implemented in the derived class.')):
+                'should be implemented in the derived class.'
+            )
+        ):
             objects.BaseObject.get_schema()
 
 
