@@ -771,6 +771,11 @@ describe('Conversation skin component', () => {
 
     componentInstance.ngOnInit();
     windowRef.nativeWindow.onresize(null);
+
+    // Tick has been used here because
+    // the windowRef.nativeWindow.onresize function
+    // calls adjustPageHeight function where we have used setTimeout
+    // for 100 sec by making tick(100) we make sure setTimout code calls.
     tick(100);
   }));
 
@@ -859,6 +864,11 @@ describe('Conversation skin component', () => {
 
     componentInstance.ngOnInit();
     windowRef.nativeWindow.onresize(null);
+
+    // Tick has been used here because
+    // the windowRef.nativeWindow.onresize function
+    // calls adjustPageHeight function where we have used setTimeout
+    // for 100 sec by making tick(100) we make sure setTimout code calls.
     tick(100);
   }));
 
@@ -1077,6 +1087,7 @@ describe('Conversation skin component', () => {
     });
     componentInstance.questionPlayerConfig = {};
     spyOn(explorationPlayerStateService.onPlayerStateChange, 'emit');
+    spyOn(playerPositionService.onLoadedMostRecentCheckpoint, 'emit');
     spyOn(focusManagerService, 'setFocusIfOnDesktop');
     spyOn(loaderService, 'hideLoadingScreen');
     spyOn(urlService, 'getPidFromUrl').and.returnValue(null);

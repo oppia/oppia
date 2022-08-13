@@ -23,7 +23,7 @@ import { PythonProgramTokenizer } from 'classifiers/python-program.tokenizer';
 
 describe('Python program tokenizer', () => {
   describe('Test python program tokenizer', () => {
-    let tokenizer: PythonProgramTokenizer = null;
+    let tokenizer: PythonProgramTokenizer;
     beforeEach(() => {
       TestBed.configureTestingModule({
         providers: [LoggerService, PythonProgramTokenizer]

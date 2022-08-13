@@ -44,7 +44,7 @@ class TrainedClassifierHandlerTests(test_utils.ClassifierTestBase):
     """Test the handler for storing job result of training job."""
 
     def setUp(self):
-        super(TrainedClassifierHandlerTests, self).setUp()
+        super().setUp()
 
         self.exp_id = 'exp_id1'
         self.title = 'Testing Classifier storing'
@@ -518,7 +518,7 @@ class NextJobHandlerTest(test_utils.GenericTestBase):
     """Test the handler for fetching next training job."""
 
     def setUp(self):
-        super(NextJobHandlerTest, self).setUp()
+        super().setUp()
 
         self.exp_id = 'exp_id1'
         self.title = 'Testing Classifier storing'
