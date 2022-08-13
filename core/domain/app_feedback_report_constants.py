@@ -62,48 +62,48 @@ class ReportType(enum.Enum):
 
 
 
-class Category(enum.Enum): 
+class Category(enum.Enum):
     """Enum for categories."""
 
-    FEATURE_SUGGESTION = 'feature_suggestion' 
-    LANGUAGE_SUGGESTION = 'language_suggestion' 
+    FEATURE_SUGGESTION = 'feature_suggestion'
+    LANGUAGE_SUGGESTION = 'language_suggestion'
     OTHER_SUGGESTION = 'other_suggestion' 
-    LESSON_QUESTION_ISSUE = 'lesson_question_issue' 
-    LANGUAGE_GENERAL_ISSUE = 'language_general_issue' 
-    LANGUAGE_AUDIO_ISSUE = 'language_audio_issue' 
-    LANGUAGE_TEXT_ISSUE = 'language_text_issue' 
-    TOPICS_ISSUE = 'topics_issue' 
-    PROFILE_ISSUE = 'profile_issue' 
-    OTHER_ISSUE = 'other_issue' 
-    LESSON_PLAYER_CRASH = 'lesson_player_crash' 
-    PRACTICE_QUESTIONS_CRASH = 'practice_questions_crash' 
-    OPTIONS_PAGE_CRASH = 'options_page_crash' 
-    PROFILE_PAGE_CRASH = 'profile_page_crash' 
-    OTHER_CRASH = 'other_crash' 
+    LESSON_QUESTION_ISSUE = 'lesson_question_issue'
+    LANGUAGE_GENERAL_ISSUE = 'language_general_issue'
+    LANGUAGE_AUDIO_ISSUE = 'language_audio_issue'
+    LANGUAGE_TEXT_ISSUE = 'language_text_issue'
+    TOPICS_ISSUE = 'topics_issue'
+    PROFILE_ISSUE = 'profile_issue'
+    OTHER_ISSUE = 'other_issue'
+    LESSON_PLAYER_CRASH = 'lesson_player_crash'
+    PRACTICE_QUESTIONS_CRASH = 'practice_questions_crash'
+    OPTIONS_PAGE_CRASH = 'options_page_crash'
+    PROFILE_PAGE_CRASH = 'profile_page_crash'
+    OTHER_CRASH = 'other_crash'
 
 
 
-class EntryPoint(enum.Enum): 
+class EntryPoint(enum.Enum):
     """Enum for entry points."""
 
-    NAVIGATION_DRAWER = 'navigation_drawer' 
-    LESSON_PLAYER = 'lesson_player' 
-    REVISION_CARD = 'revision_card' 
-    CRASH = 'crash' 
+    NAVIGATION_DRAWER = 'navigation_drawer'
+    LESSON_PLAYER = 'lesson_player'
+    REVISION_CARD = 'revision_card'
+    CRASH = 'crash'
 
 
 
-class StatsParameterNames(enum.Enum): 
+class StatsParameterNames(enum.Enum):
     """Enum for stats parameter names."""
 
-    PLATFORM = 'platform' 
-    REPORT_TYPE = 'report_type' 
-    COUNTRY_LOCALE_CODE = 'country_locale_code' 
-    ENTRY_POINT_NAME = 'entry_point_name' 
-    TEXT_LANGUAGE_CODE = 'text_language_code' 
-    AUDIO_LANGUAGE_CODE = 'audio_language_code' 
-    ANDROID_SDK_VERSION = 'android_sdk_version' 
-    VERSION_NAME = 'version_name' 
+    PLATFORM = 'platform'
+    REPORT_TYPE = 'report_type'
+    COUNTRY_LOCALE_CODE = 'country_locale_code'
+    ENTRY_POINT_NAME = 'entry_point_name'
+    TEXT_LANGUAGE_CODE = 'text_language_code'
+    AUDIO_LANGUAGE_CODE = 'audio_language_code'
+    ANDROID_SDK_VERSION = 'android_sdk_version'
+    VERSION_NAME = 'version_name'
 
 
 class AndroidTextSize(enum.Enum):
