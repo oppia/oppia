@@ -33,6 +33,7 @@ md-checkbox.item-selection-input-checkbox .md-label {
   background: none;
   border: none;
   color: #0d48a1;
+  direction: ltr;
   margin: 0;
   padding-left: 0;
   text-align: left;
@@ -60,14 +61,28 @@ md-checkbox.item-selection-input-checkbox .md-label {
   background: none;
   border: none;
   color: #0d48a1;
+  direction: ltr;
   text-align: left;
-  /* This is needed so that images stay bounded by the container in Firefox. */
-  width: 100%;
 }
 
-.multiple-choice-radio-button-container,
+.multiple-choice-radio-button-container {
+  display: table-cell;
+}
+
 .multiple-choice-content-container {
   display: table-cell;
+  padding-left: 12px;
+  padding-right: 12px;
+  vertical-align: top;
+}
+
+.multiple-choice-outer-radio-button {
+  border: 2px solid #0d48a1;
+  border-radius: 50%;
+  display: inline-block;
+  height: 16px;
+  margin-bottom: -1px;
+  width: 16px;
 }
 
 .multiple-choice-option.selected .multiple-choice-inner-radio-button {
