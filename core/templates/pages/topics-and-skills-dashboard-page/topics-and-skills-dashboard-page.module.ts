@@ -43,7 +43,7 @@ import { TopicsAndSkillsDashboardPageComponent } from './topics-and-skills-dashb
 import { FormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
-import { MaterialModule } from 'modules/material.module';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { CreateNewTopicModalComponent } from './modals/create-new-topic-modal.component';
 import { ToastrModule } from 'ngx-toastr';
@@ -62,7 +62,7 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
     SharedComponentsModule,
     DynamicContentModule,
     FormsModule,
-    MaterialModule,
+    MatProgressSpinnerModule,
     ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [

@@ -19,7 +19,10 @@
 import { EventEmitter } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
-import { MaterialModule } from 'modules/material.module';
+import { MatCardModule } from '@angular/material/card';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatRadioModule } from '@angular/material/radio';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { MergeSkillModalComponent } from 'components/skill-selector/merge-skill-modal.component';
 import { SkillSelectorComponent } from 'components/skill-selector/skill-selector.component';
@@ -244,7 +247,10 @@ describe('Skills List Component', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
-        MaterialModule,
+        MatCardModule,
+        MatCheckboxModule,
+        MatRadioModule,
+        MatProgressSpinnerModule,
         FormsModule
       ],
       declarations: [

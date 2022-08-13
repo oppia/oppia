@@ -22,28 +22,28 @@ import { AssignedSkillBackendDict, AssignedSkill } from 'domain/skill/assigned-s
 import { TopicsAndSkillsDashboardBackendApiService, TopicIdToDiagnosticTestSkillIdsResponse } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { TopicNameToTopicAssignments, UnassignSkillFromTopicsModalComponent, TopicAssignmentsSummary } from './unassign-skill-from-topics-modal.component';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { MaterialModule } from 'modules/material.module';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
-describe('Unassing SKill Modal', () => {
+describe('Skill unassignment modal', () => {
   let fixture: ComponentFixture<UnassignSkillFromTopicsModalComponent>;
   let componentInstance: UnassignSkillFromTopicsModalComponent;
   let ngbActiveModal: NgbActiveModal;
   let urlInterpolationService: UrlInterpolationService;
-  let skillBackendDict1: AssignedSkillBackendDict = {
+  let skillBackendDictForAddition: AssignedSkillBackendDict = {
     topic_id: 'test_id_1',
-    topic_name: 'topic_name_1',
+    topic_name: 'Addition',
     topic_version: 1,
     subtopic_id: 2
   };
-  let skillBackendDict2: AssignedSkillBackendDict = {
+  let skillBackendDictForFractions: AssignedSkillBackendDict = {
     topic_id: 'test_id_2',
-    topic_name: 'topic_name_2',
+    topic_name: 'Fractions',
     topic_version: 1,
     subtopic_id: 2
   };
   const testSkills: AssignedSkill[] = [
-    AssignedSkill.createFromBackendDict(skillBackendDict1),
-    AssignedSkill.createFromBackendDict(skillBackendDict2)
+    AssignedSkill.createFromBackendDict(skillBackendDictForAddition),
+    AssignedSkill.createFromBackendDict(skillBackendDictForFractions)
   ];
 
   const testTopicIdToDiagnosticTestSkillIds:
@@ -76,7 +76,7 @@ describe('Unassing SKill Modal', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
-        MaterialModule
+        MatProgressSpinnerModule
       ],
       declarations: [
         UnassignSkillFromTopicsModalComponent
@@ -138,10 +138,10 @@ describe('Unassing SKill Modal', () => {
     componentInstance.skillId = 'skill_id';
     componentInstance.fetchTopicAssignmentsForSkill();
     let assignments: TopicNameToTopicAssignments = {};
-    assignments[skillBackendDict1.topic_name] = {
-      subtopicId: skillBackendDict1.subtopic_id,
-      topicVersion: skillBackendDict1.topic_version,
-      topicId: skillBackendDict1.topic_id
+    assignments[skillBackendDictForAddition.topic_name] = {
+      subtopicId: skillBackendDictForAddition.subtopic_id,
+      topicVersion: skillBackendDictForAddition.topic_version,
+      topicId: skillBackendDictForAddition.topic_id
     };
     expect(componentInstance.eligibleTopicNameToTopicAssignments).toEqual(
       assignments);
