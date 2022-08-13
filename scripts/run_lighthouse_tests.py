@@ -182,13 +182,9 @@ def main(args=None):
     if parsed_args.mode == LIGHTHOUSE_MODE_ACCESSIBILITY:
         lighthouse_mode = LIGHTHOUSE_MODE_ACCESSIBILITY
         server_mode = SERVER_MODE_DEV
-    elif parsed_args.mode == LIGHTHOUSE_MODE_PERFORMANCE:
+    else:
         lighthouse_mode = LIGHTHOUSE_MODE_PERFORMANCE
         server_mode = SERVER_MODE_PROD
-    else:
-        raise Exception(
-            'Invalid parameter passed in: \'%s\', please choose'
-            'from \'accessibility\' or \'performance\'' % parsed_args.mode)
 
     if lighthouse_mode == LIGHTHOUSE_MODE_PERFORMANCE:
         print('Building files in production mode.')

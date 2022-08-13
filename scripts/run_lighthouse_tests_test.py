@@ -84,6 +84,21 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         self.swap_webpack_compiler = self.swap(
             servers, 'managed_webpack_compiler',
             lambda: MockCompilerContextManager())
+        self.swap_redis_server = self.swap(
+            servers, 'managed_redis_server',
+            lambda: MockCompilerContextManager())
+        self.swap_elasticsearch_dev_server = self.swap(
+            servers, 'managed_elasticsearch_dev_server',
+            lambda: MockCompilerContextManager())
+        self.swap_firebase_auth_emulator = self.swap(
+            servers, 'managed_firebase_auth_emulator',
+            lambda: MockCompilerContextManager())
+        self.swap_cloud_datastore_emulator = self.swap(
+            servers, 'managed_cloud_datastore_emulator',
+            lambda: MockCompilerContextManager())
+        self.swap_dev_appserver = self.swap(
+            servers, 'managed_dev_appserver',
+            lambda *unused_args, **unused_kwargs: MockCompilerContextManager())
 
     def test_run_lighthouse_puppeteer_script_successfully(self) -> None:
         class MockTask:
@@ -233,22 +248,6 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             self.print_arr)
 
     def test_run_lighthouse_tests_in_accessibility_mode(self) -> None:
-        swap_redis_server = self.swap(
-            servers, 'managed_redis_server',
-            lambda: MockCompilerContextManager())
-        swap_elasticsearch_dev_server = self.swap(
-            servers, 'managed_elasticsearch_dev_server',
-            lambda: MockCompilerContextManager())
-        swap_firebase_auth_emulator = self.swap(
-            servers, 'managed_firebase_auth_emulator',
-            lambda: MockCompilerContextManager())
-        swap_cloud_datastore_emulator = self.swap(
-            servers, 'managed_cloud_datastore_emulator',
-            lambda: MockCompilerContextManager())
-        swap_dev_appserver = self.swap(
-            servers, 'managed_dev_appserver',
-            lambda *unused_args, **unused_kwargs: MockCompilerContextManager())
-
         class MockTask:
             returncode = 0
             def communicate(self) -> tuple[bytes, bytes]:   # pylint: disable=missing-docstring
@@ -263,9 +262,9 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             os.path, 'isdir', lambda _: True)
 
         with self.print_swap, self.swap_webpack_compiler, swap_isdir:
-            with swap_elasticsearch_dev_server, swap_dev_appserver, swap_popen:
-                with swap_redis_server, swap_cloud_datastore_emulator:
-                    with swap_firebase_auth_emulator:
+            with self.swap_elasticsearch_dev_server, self.swap_dev_appserver, swap_popen:
+                with self.swap_redis_server, self.swap_cloud_datastore_emulator:
+                    with self.swap_firebase_auth_emulator:
                         run_lighthouse_tests.main(
                             args=['--mode', 'accessibility', '--shard', '1'])
         
@@ -275,21 +274,6 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             'Lighthouse checks completed successfully.', self.print_arr)
 
     def test_run_lighthouse_tests_in_performance_mode(self) -> None:
-        swap_redis_server = self.swap(
-            servers, 'managed_redis_server',
-            lambda: MockCompilerContextManager())
-        swap_elasticsearch_dev_server = self.swap(
-            servers, 'managed_elasticsearch_dev_server',
-            lambda: MockCompilerContextManager())
-        swap_firebase_auth_emulator = self.swap(
-            servers, 'managed_firebase_auth_emulator',
-            lambda: MockCompilerContextManager())
-        swap_cloud_datastore_emulator = self.swap(
-            servers, 'managed_cloud_datastore_emulator',
-            lambda: MockCompilerContextManager())
-        swap_dev_appserver = self.swap(
-            servers, 'managed_dev_appserver',
-            lambda *unused_args, **unused_kwargs: MockCompilerContextManager())
         swap_build = self.swap_with_checks(
             build, 'main', lambda args: None)
 
@@ -307,9 +291,9 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             os.path, 'isdir', lambda _: True)
 
         with self.print_swap, self.swap_webpack_compiler, swap_isdir:
-            with swap_elasticsearch_dev_server, swap_dev_appserver, swap_popen:
-                with swap_redis_server, swap_cloud_datastore_emulator:
-                    with swap_firebase_auth_emulator, swap_build:
+            with self.swap_elasticsearch_dev_server, self.swap_dev_appserver, swap_popen:
+                with self.swap_redis_server, self.swap_cloud_datastore_emulator:
+                    with self.swap_firebase_auth_emulator, swap_build:
                         run_lighthouse_tests.main(
                             args=['--mode', 'performance', '--shard', '1'])
         
@@ -318,4 +302,3 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             'Puppeteer script completed successfully.', self.print_arr)
         self.assertIn(
             'Lighthouse checks completed successfully.', self.print_arr)
-        
