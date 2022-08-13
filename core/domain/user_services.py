@@ -2654,6 +2654,10 @@ def get_checkpoints_in_order(
     Returns:
         list(str). List of all checkpoints of the exploration in sequential
         order.
+
+    Raises:
+        Exception. None destination can never be a checkpoint.
+        Exception. None default destination can never be a checkpoint.
     """
     queue = [init_state_name]
     checkpoint_state_names = []

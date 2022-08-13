@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 from core.domain import exp_domain
+from core.domain import exp_fetchers
 from core.domain import recommendations_services
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
@@ -61,16 +62,18 @@ class ComputeExplorationRecommendationsJob(base_jobs.JobBase):
             the Elastic Search.
         """
 
-        exp_summary_models = (
+        exp_summary_objects = (
             self.pipeline
             | 'Get all non-deleted models' >> (
                 ndb_io.GetModels(exp_models.ExpSummaryModel.get_all()))
+            | 'Convert ExpSummaryModels to domain objects' >> beam.Map(
+                exp_fetchers.get_exploration_summary_from_model)
         )
 
-        exp_summary_iter = beam.pvalue.AsIter(exp_summary_models)
+        exp_summary_iter = beam.pvalue.AsIter(exp_summary_objects)
 
         exp_recommendations_models = (
-            exp_summary_models
+            exp_summary_objects
             | 'Compute similarity' >> beam.ParDo(
                 ComputeSimilarity(), exp_summary_iter)
             | 'Group similarities per exploration ID' >> beam.GroupByKey()
