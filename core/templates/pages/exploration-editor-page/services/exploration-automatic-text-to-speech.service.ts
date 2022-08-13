@@ -43,8 +43,8 @@ export class ExplorationAutomaticTextToSpeechService
     return (typeof value === 'boolean');
   }
 
-  isAutomaticTextToSpeechEnabled(): unknown {
-    return this.savedMemento;
+  isAutomaticTextToSpeechEnabled(): boolean {
+    return (this.savedMemento as boolean);
   }
 
   toggleAutomaticTextToSpeech(): void {

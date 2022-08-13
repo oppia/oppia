@@ -96,7 +96,7 @@ export class ExplorationMetadataModalComponent
   add(event: MatChipInputEvent): void {
     const value = (event.value || '').trim();
 
-    // Add our fruit.
+    // Add our explorationTags.
     if (value) {
       this.explorationTags.push(value.toLowerCase());
     }
@@ -107,8 +107,8 @@ export class ExplorationMetadataModalComponent
     this.explorationTagsService.displayed = this.explorationTags;
   }
 
-  remove(fruit: string): void {
-    const index = this.explorationTags.indexOf(fruit);
+  remove(explorationTags: string): void {
+    const index = this.explorationTags.indexOf(explorationTags);
 
     if (index >= 0) {
       this.explorationTags.splice(index, 1);

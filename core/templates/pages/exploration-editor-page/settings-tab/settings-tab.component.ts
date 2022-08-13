@@ -13,674 +13,729 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the exploration settings tab.
+ * @fileoverview Component for the exploration settings tab.
  */
 
+import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { MatChipInputEvent } from '@angular/material/chips';
+import { COMMA, ENTER } from '@angular/cdk/keycodes';
+import { NgbModalRef, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Subscription } from 'rxjs';
 import { DeleteExplorationModalComponent } from './templates/delete-exploration-modal.component';
 import { RemoveRoleConfirmationModalComponent } from './templates/remove-role-confirmation-modal.component';
 import { ModeratorUnpublishExplorationModalComponent } from './templates/moderator-unpublish-exploration-modal.component';
 import { ReassignRoleConfirmationModalComponent } from './templates/reassign-role-confirmation-modal.component';
 import { TransferExplorationOwnershipModalComponent } from './templates/transfer-exploration-ownership-modal.component';
-import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { Subscription } from 'rxjs';
 import { PreviewSummaryTileModalComponent } from './templates/preview-summary-tile-modal.component';
+import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
+import { AlertsService } from 'services/alerts.service';
+import { ContextService } from 'services/context.service';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { EditabilityService } from 'services/editability.service';
+import { ExplorationFeaturesService } from 'services/exploration-features.service';
+import { UserService } from 'services/user.service';
+import { ChangeListService } from '../services/change-list.service';
+import { ExplorationAutomaticTextToSpeechService } from '../services/exploration-automatic-text-to-speech.service';
+import { ExplorationCategoryService } from '../services/exploration-category.service';
+import { ExplorationCorrectnessFeedbackService } from '../services/exploration-correctness-feedback.service';
+import { ExplorationDataService } from '../services/exploration-data.service';
+import { ExplorationEditsAllowedBackendApiService } from '../services/exploration-edits-allowed-backend-api.service';
+import { ExplorationInitStateNameService } from '../services/exploration-init-state-name.service';
+import { ExplorationLanguageCodeService } from '../services/exploration-language-code.service';
+import { ExplorationObjectiveService } from '../services/exploration-objective.service';
+import { ExplorationParamChangesService } from '../services/exploration-param-changes.service';
+import { ExplorationParamSpecsService } from '../services/exploration-param-specs.service';
+import { ExplorationRightsService } from '../services/exploration-rights.service';
+import { ExplorationStatesService } from '../services/exploration-states.service';
+import { ExplorationTagsService } from '../services/exploration-tags.service';
+import { ExplorationTitleService } from '../services/exploration-title.service';
+import { ExplorationWarningsService } from '../services/exploration-warnings.service';
+import { RouterService } from '../services/router.service';
+import { SettingTabBackendApiService, SettingTabResponse } from '../services/setting-tab-backend-api.service';
+import { UserEmailPreferencesService } from '../services/user-email-preferences.service';
+import { UserExplorationPermissionsService } from '../services/user-exploration-permissions.service';
+import { ExplorationEditorPageConstants } from '../exploration-editor-page.constants';
+import { AppConstants } from 'app.constants';
 
-require(
-  'components/common-layout-directives/common-elements/' +
-  'confirm-or-cancel-modal.controller.ts');
-require(
-  'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
-require(
-  'pages/exploration-editor-page/exploration-title-editor/' +
-  'exploration-title-editor.component.ts');
-require(
-  'pages/exploration-editor-page/exploration-objective-editor/' +
-  'exploration-objective-editor.component.ts');
-require(
-  'pages/exploration-editor-page/param-changes-editor/' +
-  'param-changes-editor.component.ts');
-require('domain/exploration/editable-exploration-backend-api.service.ts');
-require('domain/utilities/url-interpolation.service.ts');
-require('pages/exploration-editor-page/services/change-list.service.ts');
-require(
-  'pages/exploration-editor-page/services/' +
-  'exploration-automatic-text-to-speech.service.ts');
-require(
-  'pages/exploration-editor-page/services/exploration-category.service.ts');
-require(
-  'pages/exploration-editor-page/services/' +
-  'exploration-correctness-feedback.service.ts');
-require(
-  'pages/exploration-editor-page/services/' +
-  'exploration-edits-allowed-backend-api.service.ts');
-require('pages/exploration-editor-page/services/exploration-data.service.ts');
-require('pages/exploration-editor-page/exploration-editor-page.component.ts');
-require(
-  'pages/exploration-editor-page/services/' +
-  'exploration-init-state-name.service.ts');
-require(
-  'pages/exploration-editor-page/services/' +
-  'exploration-language-code.service.ts');
-require(
-  'pages/exploration-editor-page/services/exploration-objective.service.ts');
-require(
-  'pages/exploration-editor-page/services/' +
-  'exploration-param-changes.service.ts');
-require(
-  'pages/exploration-editor-page/services/exploration-param-specs.service.ts');
-require('pages/exploration-editor-page/services/exploration-rights.service.ts');
-require('pages/exploration-editor-page/services/exploration-states.service.ts');
-require('pages/exploration-editor-page/services/exploration-tags.service.ts');
-require('pages/exploration-editor-page/services/exploration-title.service.ts');
-require(
-  'pages/exploration-editor-page/services/exploration-warnings.service.ts');
-require(
-  'pages/exploration-editor-page/services/user-email-preferences.service.ts');
-require(
-  'pages/exploration-editor-page/services/' +
-  'user-exploration-permissions.service.ts');
-require('services/alerts.service.ts');
-require('services/editability.service.ts');
-require('services/exploration-features.service.ts');
-require('services/contextual/window-dimensions.service.ts');
-require('services/context.service');
-require('pages/exploration-editor-page/services/router.service.ts');
-require(
-  'pages/exploration-editor-page/services/' +
-  'setting-tab-backend-api.service.ts'
-);
-require(
-  'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
-require('services/ngb-modal.service.ts');
+@Component({
+  selector: 'oppia-settings-tab',
+  templateUrl: './settings-tab.component.html'
+})
+export class SettingsTabComponent
+  implements OnInit, OnDestroy {
+  @Input() currentUserIsCurriculumAdmin: boolean;
+  @Input() currentUserIsModerator: boolean;
+  readonly separatorKeysCodes = [ENTER, COMMA] as const;
 
-angular.module('oppia').component('settingsTab', {
-  bindings: {
-    currentUserIsCurriculumAdmin: '=',
-    currentUserIsModerator: '='
-  },
-  template: require('./settings-tab.component.html'),
-  controller: [
-    '$rootScope', 'AlertsService', 'ChangeListService',
-    'ContextService', 'EditabilityService',
-    'EditableExplorationBackendApiService',
-    'ExplorationAutomaticTextToSpeechService',
-    'ExplorationCategoryService', 'ExplorationCorrectnessFeedbackService',
-    'ExplorationDataService', 'ExplorationEditsAllowedBackendApiService',
-    'ExplorationFeaturesService',
-    'ExplorationInitStateNameService', 'ExplorationLanguageCodeService',
-    'ExplorationObjectiveService', 'ExplorationParamChangesService',
-    'ExplorationParamSpecsService', 'ExplorationRightsService',
-    'ExplorationStatesService', 'ExplorationTagsService',
-    'ExplorationTitleService', 'ExplorationWarningsService',
-    'NgbModal', 'RouterService', 'SettingTabBackendApiService',
-    'UserEmailPreferencesService',
-    'UserExplorationPermissionsService', 'UserService',
-    'WindowDimensionsService', 'WindowRef',
-    'ALL_CATEGORIES', 'EXPLORATION_TITLE_INPUT_FOCUS_LABEL', 'TAG_REGEX',
-    function(
-        $rootScope, AlertsService, ChangeListService,
-        ContextService, EditabilityService,
-        EditableExplorationBackendApiService,
-        ExplorationAutomaticTextToSpeechService,
-        ExplorationCategoryService, ExplorationCorrectnessFeedbackService,
-        ExplorationDataService, ExplorationEditsAllowedBackendApiService,
-        ExplorationFeaturesService,
-        ExplorationInitStateNameService, ExplorationLanguageCodeService,
-        ExplorationObjectiveService, ExplorationParamChangesService,
-        ExplorationParamSpecsService, ExplorationRightsService,
-        ExplorationStatesService, ExplorationTagsService,
-        ExplorationTitleService, ExplorationWarningsService,
-        NgbModal, RouterService, SettingTabBackendApiService,
-        UserEmailPreferencesService,
-        UserExplorationPermissionsService, UserService,
-        WindowDimensionsService, WindowRef,
-        ALL_CATEGORIES, EXPLORATION_TITLE_INPUT_FOCUS_LABEL, TAG_REGEX) {
-      var ctrl = this;
-      var CREATOR_DASHBOARD_PAGE_URL = '/creator-dashboard';
-      var EXPLORE_PAGE_PREFIX = '/explore/';
+  CREATOR_DASHBOARD_PAGE_URL: string = '/creator-dashboard';
+  EXPLORE_PAGE_PREFIX: string = '/explore/';
+  directiveSubscriptions = new Subscription();
+  explorationIsLinkedToStory: boolean = false;
+  isSuperAdmin: boolean = false;
+  rolesSaveButtonEnabled: boolean;
+  errorMessage: string;
+  isRolesFormOpen: boolean;
+  newMemberUsername: string;
+  newMemberRole;
+  isVoiceoverFormOpen: boolean;
+  newVoiceArtistUsername: string;
+  hasPageLoaded: boolean;
+  basicSettingIsShown: boolean;
+  advancedFeaturesIsShown: boolean;
+  rolesCardIsShown: boolean;
+  permissionsCardIsShown: boolean;
+  feedbackCardIsShown: boolean;
+  controlsCardIsShown: boolean;
+  EXPLORATION_TITLE_INPUT_FOCUS_LABEL: string;
+  ROLES = [{
+    name: 'Manager (can edit permissions)',
+    value: 'owner'
+  }, {
+    name: 'Collaborator (can make changes)',
+    value: 'editor'
+  }, {
+    name: 'Playtester (can give feedback)',
+    value: 'viewer'
+  }];
 
-      ctrl.directiveSubscriptions = new Subscription();
-      ctrl.explorationIsLinkedToStory = false;
-      ctrl.isSuperAdmin = false;
+  CATEGORY_LIST_FOR_SELECT2: {
+    id: string;
+    text: string;
+  } [];
 
-      ctrl.getExplorePageUrl = function() {
-        return (
-          WindowRef.nativeWindow.location.protocol + '//' +
-          WindowRef.nativeWindow.location.host +
-          EXPLORE_PAGE_PREFIX + ctrl.explorationId);
-      };
+  stateNames: string[];
+  formStyle: string;
+  canDelete: boolean;
+  canModifyRoles: boolean;
+  canReleaseOwnership: boolean;
+  canUnpublish: boolean;
+  canManageVoiceArtist: boolean;
+  explorationId: string;
+  loggedInUser: string;
+  TAG_REGEX: string;
+  addOnBlur: boolean = true;
 
-      var reassignRole = function(username, newRole, oldRole) {
-        AlertsService.clearWarnings();
-        const modalRef: NgbModalRef = NgbModal
-          .open(ReassignRoleConfirmationModalComponent, {
-            backdrop: true,
-          });
-        modalRef.componentInstance.username = username;
-        modalRef.componentInstance.newRole = newRole;
-        modalRef.componentInstance.oldRole = oldRole;
+  constructor(
+    private alertsService: AlertsService,
+    private changeListService: ChangeListService,
+    private changeDetectorRef: ChangeDetectorRef,
+    private contextService: ContextService,
+    private editabilityService: EditabilityService,
+    private editableExplorationBackendApiService:
+      EditableExplorationBackendApiService,
+    private explorationAutomaticTextToSpeechService:
+      ExplorationAutomaticTextToSpeechService,
+    private explorationCategoryService: ExplorationCategoryService,
+    private explorationCorrectnessFeedbackService:
+      ExplorationCorrectnessFeedbackService,
+    private explorationDataService: ExplorationDataService,
+    private explorationEditsAllowedBackendApiService:
+      ExplorationEditsAllowedBackendApiService,
+    private explorationFeaturesService: ExplorationFeaturesService,
+    private explorationInitStateNameService: ExplorationInitStateNameService,
+    private explorationLanguageCodeService: ExplorationLanguageCodeService,
+    private explorationObjectiveService: ExplorationObjectiveService,
+    private explorationParamChangesService: ExplorationParamChangesService,
+    private explorationParamSpecsService: ExplorationParamSpecsService,
+    private explorationRightsService: ExplorationRightsService,
+    private explorationStatesService: ExplorationStatesService,
+    private explorationTagsService: ExplorationTagsService,
+    private explorationTitleService: ExplorationTitleService,
+    private explorationWarningsService: ExplorationWarningsService,
+    private ngbModal: NgbModal,
+    private routerService: RouterService,
+    private settingTabBackendApiService: SettingTabBackendApiService,
+    private userEmailPreferencesService: UserEmailPreferencesService,
+    private userExplorationPermissionsService:
+      UserExplorationPermissionsService,
+    private userService: UserService,
+    private windowDimensionsService: WindowDimensionsService,
+    private windowRef: WindowRef,
+  ) {}
 
-        modalRef.result.then(function() {
-          ExplorationRightsService.saveRoleChanges(
-            username, newRole).then(() => {
-            $rootScope.$applyAsync();
-          });
-          ctrl.closeRolesForm();
-        }, () => {
-          // Note to developers:
-          // This callback is triggered when the Cancel button is
-          // clicked. No further action is needed.
-        });
-      };
+  filteredChoices = [];
+  newCategory: {
+    id: string;
+    text: string;
+  };
 
-      ctrl.refreshSettingsTab = function() {
-        // Ensure that ExplorationStatesService has been initialized before
-        // getting the state names from it. Otherwise, navigating to the
-        // settings tab directly (by entering a URL that ends with
-        // /settings) results in a console error.
+  explorationTags: string[] = [];
 
-        ctrl.hasPageLoaded = false;
-        ExplorationDataService.getDataAsync().then(function() {
-          if (ExplorationStatesService.isInitialized()) {
-            var categoryIsInSelect2 = ctrl.CATEGORY_LIST_FOR_SELECT2.some(
-              function(categoryItem) {
-                return (
-                  categoryItem.id ===
-                      ExplorationCategoryService.savedMemento);
-              }
-            );
-            // If the current category is not in the dropdown, add it
-            // as the first option.
-            if (!categoryIsInSelect2 &&
-                ExplorationCategoryService.savedMemento) {
-              ctrl.CATEGORY_LIST_FOR_SELECT2.unshift({
-                id: ExplorationCategoryService.savedMemento,
-                text: ExplorationCategoryService.savedMemento
-              });
-            }
+  add(event: MatChipInputEvent): void {
+    const value = (event.value || '').trim();
 
-            ctrl.stateNames = ExplorationStatesService.getStateNames();
-            ctrl.explorationIsLinkedToStory = (
-              ContextService.isExplorationLinkedToStory());
-          }
-          ctrl.hasPageLoaded = true;
-          // TODO(#8521): Remove the use of $rootScope.$apply()
-          // once the controller is migrated to angular.
-          $rootScope.$applyAsync();
-        });
-        // TODO(#8521): Remove the use of $rootScope.$apply()
-        // once the controller is migrated to angular.
-        $rootScope.$applyAsync();
-      };
-
-      ctrl.saveExplorationTitle = function() {
-        ExplorationTitleService.saveDisplayedValue();
-        if (!ctrl.isTitlePresent()) {
-          ctrl.rolesSaveButtonEnabled = false;
-          ctrl.errorMessage = (
-            'Please provide a title before inviting.');
-          return;
-        } else {
-          ctrl.rolesSaveButtonEnabled = true;
-          ctrl.errorMessage = ('');
-          return;
-        }
-      };
-
-      ctrl.saveExplorationCategory = function() {
-        ExplorationCategoryService.saveDisplayedValue();
-      };
-
-      ctrl.saveExplorationObjective = function() {
-        ExplorationObjectiveService.saveDisplayedValue();
-      };
-
-      ctrl.saveExplorationLanguageCode = function() {
-        ExplorationLanguageCodeService.saveDisplayedValue();
-      };
-
-      ctrl.saveExplorationTags = function() {
-        ExplorationTagsService.saveDisplayedValue();
-      };
-
-      ctrl.saveExplorationInitStateName = function() {
-        var newInitStateName = ExplorationInitStateNameService.displayed;
-
-        if (!ExplorationStatesService.getState(newInitStateName)) {
-          AlertsService.addWarning(
-            'Invalid initial state name: ' + newInitStateName);
-          ExplorationInitStateNameService.restoreFromMemento();
-          return;
-        }
-
-        ExplorationInitStateNameService.saveDisplayedValue();
-
-        ExplorationStatesService.onRefreshGraph.emit();
-      };
-
-      ctrl.postSaveParamChangesHook = function() {
-        ExplorationWarningsService.updateWarnings();
-      };
-
-      // Methods for enabling advanced features.
-      ctrl.areParametersEnabled = function() {
-        return ExplorationFeaturesService.areParametersEnabled();
-      };
-
-      ctrl.areParametersUsed = function() {
-        if (ctrl.hasPageLoaded) {
-          return (ExplorationDataService.data.param_changes.length > 0);
-        }
-      };
-
-      ctrl.enableParameters = function() {
-        ExplorationFeaturesService.enableParameters();
-      };
-
-      ctrl.isAutomaticTextToSpeechEnabled = function() {
-        return ExplorationAutomaticTextToSpeechService
-          .isAutomaticTextToSpeechEnabled();
-      };
-      ctrl.toggleAutomaticTextToSpeech = function() {
-        return ExplorationAutomaticTextToSpeechService
-          .toggleAutomaticTextToSpeech();
-      };
-
-      ctrl.isCorrectnessFeedbackEnabled = function() {
-        return ExplorationCorrectnessFeedbackService.isEnabled();
-      };
-      ctrl.toggleCorrectnessFeedback = function() {
-        ExplorationCorrectnessFeedbackService.toggleCorrectnessFeedback();
-      };
-
-      ctrl.isExplorationEditable = function() {
-        return ExplorationDataService.data?.edits_allowed || false;
-      };
-
-      ctrl.enableEdits = function() {
-        ExplorationEditsAllowedBackendApiService.setEditsAllowed(
-          true, ExplorationDataService.explorationId,
-          () => {
-            EditabilityService.lockExploration(false);
-            ExplorationDataService.data.edits_allowed = true;
-            $rootScope.$applyAsync();
-          });
-      };
-
-      ctrl.disableEdits = function() {
-        ExplorationEditsAllowedBackendApiService.setEditsAllowed(
-          false, ExplorationDataService.explorationId,
-          () => {
-            EditabilityService.lockExploration(true);
-            ExplorationDataService.data.edits_allowed = false;
-            $rootScope.$applyAsync();
-          });
-      };
-
-      // Methods for rights management.
-      ctrl.openEditRolesForm = function() {
-        ctrl.isRolesFormOpen = true;
-        ctrl.newMemberUsername = '';
-        ctrl.newMemberRole = ctrl.ROLES[0];
-      };
-
-      ctrl.openVoiceoverRolesForm = () => {
-        ctrl.isVoiceoverFormOpen = true;
-        ctrl.newVoiceArtistUsername = '';
-      };
-
-      ctrl.closeEditRolesForm = function() {
-        ctrl.newMemberUsername = '';
-        ctrl.newMemberRole = ctrl.ROLES[0];
-        ctrl.closeRolesForm();
-      };
-
-      ctrl.closeVoiceoverForm = () => {
-        ctrl.newVoiceArtistUsername = '';
-        ctrl.isVoiceoverFormOpen = false;
-      };
-
-      ctrl.editRole = function(newMemberUsername, newMemberRole) {
-        if (!ExplorationRightsService.checkUserAlreadyHasRoles(
-          newMemberUsername)) {
-          ExplorationRightsService.saveRoleChanges(
-            newMemberUsername, newMemberRole).then(() => {
-            $rootScope.$applyAsync();
-          });
-          ctrl.closeRolesForm();
-          return;
-        }
-        let oldRole = ExplorationRightsService.getOldRole(
-          newMemberUsername);
-        reassignRole(newMemberUsername, newMemberRole, oldRole);
-      };
-
-      ctrl.removeRole = function(memberUsername, memberRole) {
-        AlertsService.clearWarnings();
-        const modalRef = NgbModal
-          .open(RemoveRoleConfirmationModalComponent, {
-            backdrop: true,
-          });
-        modalRef.componentInstance.username = memberUsername;
-        modalRef.componentInstance.role = memberRole;
-
-        modalRef.result.then(function() {
-          ExplorationRightsService.removeRoleAsync(
-            memberUsername).then(() => {
-            $rootScope.$applyAsync();
-          });
-          ctrl.closeRolesForm();
-        }, () => {
-          // Note to developers:
-          // This callback is triggered when the Cancel button is
-          // clicked. No further action is needed.
-        });
-      };
-
-      ctrl.editVoiseArtist = function(newVoiceArtistUsername) {
-        ExplorationRightsService.assignVoiceArtistRoleAsync(
-          newVoiceArtistUsername).then(() => {
-          $rootScope.$applyAsync();
-        });
-        ctrl.closeVoiceoverForm();
-        return;
-      };
-
-      ctrl.removeVoiceArtist = function(voiceArtistUsername) {
-        AlertsService.clearWarnings();
-
-        const modalRef = NgbModal
-          .open(RemoveRoleConfirmationModalComponent, {
-            backdrop: true,
-          });
-        modalRef.componentInstance.username = voiceArtistUsername;
-        modalRef.componentInstance.role = 'voice artist';
-        modalRef.result.then(function() {
-          ExplorationRightsService.removeVoiceArtistRoleAsync(
-            voiceArtistUsername).then(() => {
-            $rootScope.$applyAsync();
-          });
-          ctrl.closeVoiceoverForm();
-        }, () => {
-          // Note to developers:
-          // This callback is triggered when the Cancel button is
-          // clicked. No further action is needed.
-        });
-      };
-
-      ctrl.toggleViewabilityIfPrivate = function() {
-        ExplorationRightsService.setViewability(
-          !ExplorationRightsService.viewableIfPrivate());
-      };
-
-      ctrl._successCallback = () => {
-        // TODO(#8521): Remove the use of $rootScope.$apply()
-        // once the controller is migrated to angular.
-        $rootScope.$applyAsync();
-      };
-
-      // Methods for muting notifications.
-      ctrl.muteFeedbackNotifications = function() {
-        UserEmailPreferencesService.setFeedbackNotificationPreferences(
-          true, ctrl._successCallback);
-      };
-      ctrl.muteSuggestionNotifications = function() {
-        UserEmailPreferencesService.setSuggestionNotificationPreferences(
-          true,
-          ctrl._successCallback
-        );
-      };
-
-      ctrl.unmuteFeedbackNotifications = function() {
-        UserEmailPreferencesService.setFeedbackNotificationPreferences(
-          false,
-          ctrl._successCallback
-        );
-      };
-      ctrl.unmuteSuggestionNotifications = function() {
-        UserEmailPreferencesService.setSuggestionNotificationPreferences(
-          false, ctrl._successCallback);
-      };
-
-      // Methods relating to control buttons.
-      ctrl.previewSummaryTile = function() {
-        AlertsService.clearWarnings();
-        NgbModal.open(PreviewSummaryTileModalComponent, {
-          backdrop: true,
-        }).result.then(function() {}, function() {
-          AlertsService.clearWarnings();
-        });
-      };
-
-      ctrl.showTransferExplorationOwnershipModal = function() {
-        AlertsService.clearWarnings();
-        NgbModal.open(TransferExplorationOwnershipModalComponent, {
-          backdrop: true,
-        }).result.then(function() {
-          ExplorationRightsService.makeCommunityOwned().then(() => {
-            $rootScope.$applyAsync();
-          });
-        }, function() {
-          AlertsService.clearWarnings();
-        });
-      };
-
-      ctrl.deleteExploration = function() {
-        AlertsService.clearWarnings();
-
-        NgbModal.open(DeleteExplorationModalComponent, {
-          backdrop: true,
-        }).result.then(function() {
-          EditableExplorationBackendApiService.deleteExplorationAsync(
-            ctrl.explorationId).then(function() {
-            WindowRef.nativeWindow.location = CREATOR_DASHBOARD_PAGE_URL;
-          });
-        }, function() {
-          AlertsService.clearWarnings();
-        });
-      };
-
-      ctrl.unpublishExplorationAsModerator = function() {
-        AlertsService.clearWarnings();
-
-        var moderatorEmailDraftUrl = '/moderatorhandler/email_draft';
-
-        SettingTabBackendApiService
-          .getData(moderatorEmailDraftUrl).then(function(response) {
-            // If the draft email body is empty, email functionality will not
-            // be exposed to the mdoerator.
-            var draftEmailBody = response.draft_email_body;
-
-            const modalRef = NgbModal
-              .open(ModeratorUnpublishExplorationModalComponent, {
-                backdrop: true,
-              });
-            modalRef.componentInstance.draftEmailBody = draftEmailBody;
-
-            modalRef.result.then(function(emailBody) {
-              ExplorationRightsService.saveModeratorChangeToBackendAsync(
-                emailBody).then(function() {
-                UserExplorationPermissionsService.fetchPermissionsAsync()
-                  .then(function(permissions) {
-                    ctrl.canUnpublish = permissions.canUnpublish;
-                    ctrl.canReleaseOwnership = permissions.canReleaseOwnership;
-                    // TODO(#8521): Remove the use of $rootScope.$apply()
-                    // once the controller is migrated to angular.
-                    $rootScope.$applyAsync();
-                  });
-              });
-            }, function() {
-              AlertsService.clearWarnings();
-            });
-          });
-      };
-
-      ctrl.isExplorationLockedForEditing = function() {
-        return ChangeListService.isExplorationLockedForEditing();
-      };
-
-      ctrl.closeRolesForm = function() {
-        ctrl.errorMessage = '';
-        ctrl.rolesSaveButtonEnabled = true;
-        ctrl.isRolesFormOpen = false;
-      };
-
-      ctrl.isTitlePresent = function() {
-        return ExplorationTitleService.savedMemento.length > 0;
-      };
-
-      ctrl.onRolesFormUsernameBlur = function() {
-        ctrl.rolesSaveButtonEnabled = true;
-        ctrl.errorMessage = '';
-
-        if (ctrl.newMemberUsername === ctrl.loggedInUser) {
-          ctrl.rolesSaveButtonEnabled = false;
-          ctrl.errorMessage = (
-            'Users are not allowed to assign other roles to themselves.');
-          return;
-        }
-        if (ExplorationRightsService.checkUserAlreadyHasRoles(
-          ctrl.newMemberUsername)) {
-          var oldRole = ExplorationRightsService.getOldRole(
-            ctrl.newMemberUsername);
-          if (oldRole === ctrl.newMemberRole.value) {
-            ctrl.rolesSaveButtonEnabled = false;
-            ctrl.errorMessage = `User is already ${oldRole}.`;
-            return;
-          }
-        }
-      };
-
-      ctrl.toggleCards = function(card) {
-        if (!WindowDimensionsService.isWindowNarrow()) {
-          return;
-        }
-        if (card === 'settings') {
-          ctrl.basicSettingIsShown = !ctrl.basicSettingIsShown;
-        } else if (card === 'advanced_features') {
-          ctrl.advancedFeaturesIsShown = !ctrl.advancedFeaturesIsShown;
-        } else if (card === 'roles') {
-          ctrl.rolesCardIsShown = !ctrl.rolesCardIsShown;
-        } else if (card === 'permissions') {
-          ctrl.permissionsCardIsShown = !ctrl.permissionsCardIsShown;
-        } else if (card === 'feedback') {
-          ctrl.feedbackCardIsShown = !ctrl.feedbackCardIsShown;
-        } else if (card === 'controls') {
-          ctrl.controlsCardIsShown = !ctrl.controlsCardIsShown;
-        }
-      };
-
-      ctrl.$onInit = function() {
-        ctrl.directiveSubscriptions.add(
-          RouterService.onRefreshSettingsTab.subscribe(
-            () => {
-              // TODO(#15473): Remove this delay after this has been
-              // migrated to Angular 2+.
-              setTimeout(()=>{
-                ctrl.refreshSettingsTab();
-              }, 500);
-            }
-          )
-        );
-        ctrl.directiveSubscriptions.add(
-          UserExplorationPermissionsService.onUserExplorationPermissionsFetched
-            .subscribe(
-              () => {
-                UserExplorationPermissionsService.getPermissionsAsync()
-                  .then(function(permissions) {
-                    ctrl.canUnpublish = permissions.canUnpublish;
-                    ctrl.canReleaseOwnership = permissions.canReleaseOwnership;
-                    // TODO(#8521): Remove the use of $rootScope.$apply()
-                    // once the controller is migrated to angular.
-                    $rootScope.$applyAsync();
-                  });
-              }
-            )
-        );
-        ctrl.EXPLORATION_TITLE_INPUT_FOCUS_LABEL = (
-          EXPLORATION_TITLE_INPUT_FOCUS_LABEL);
-        ctrl.EditabilityService = EditabilityService;
-        ctrl.CATEGORY_LIST_FOR_SELECT2 = [];
-        for (var i = 0; i < ALL_CATEGORIES.length; i++) {
-          ctrl.CATEGORY_LIST_FOR_SELECT2.push({
-            id: ALL_CATEGORIES[i],
-            text: ALL_CATEGORIES[i]
-          });
-        }
-        ctrl.isRolesFormOpen = false;
-        ctrl.isVoiceoverFormOpen = false;
-        ctrl.rolesSaveButtonEnabled = false;
-        ctrl.errorMessage = '';
-        ctrl.basicSettingIsShown = !WindowDimensionsService.isWindowNarrow();
-        ctrl.advancedFeaturesIsShown = (
-          !WindowDimensionsService.isWindowNarrow());
-        ctrl.rolesCardIsShown = !WindowDimensionsService.isWindowNarrow();
-        ctrl.permissionsCardIsShown = !WindowDimensionsService.isWindowNarrow();
-        ctrl.feedbackCardIsShown = !WindowDimensionsService.isWindowNarrow();
-        ctrl.controlsCardIsShown = !WindowDimensionsService.isWindowNarrow();
-
-        ctrl.TAG_REGEX = TAG_REGEX;
-        ctrl.canDelete = false;
-        ctrl.canModifyRoles = false;
-        ctrl.canReleaseOwnership = false;
-        ctrl.canUnpublish = false;
-        ctrl.canManageVoiceArtist = false;
-        ctrl.explorationId = ExplorationDataService.explorationId;
-        ctrl.loggedInUser = null;
-        UserService.getUserInfoAsync().then(function(userInfo) {
-          ctrl.loggedInUser = userInfo.getUsername();
-          ctrl.isSuperAdmin = userInfo.isSuperAdmin();
-        });
-
-        UserExplorationPermissionsService.getPermissionsAsync()
-          .then(function(permissions) {
-            ctrl.canDelete = permissions.canDelete;
-            ctrl.canModifyRoles = permissions.canModifyRoles;
-            ctrl.canReleaseOwnership = permissions.canReleaseOwnership;
-            ctrl.canUnpublish = permissions.canUnpublish;
-            ctrl.canManageVoiceArtist = permissions.canManageVoiceArtist;
-          });
-
-        ctrl.explorationTitleService = ExplorationTitleService;
-        ctrl.explorationCategoryService = ExplorationCategoryService;
-        ctrl.explorationObjectiveService = ExplorationObjectiveService;
-        ctrl.explorationLanguageCodeService = (
-          ExplorationLanguageCodeService);
-        ctrl.explorationTagsService = ExplorationTagsService;
-        ctrl.ExplorationRightsService = ExplorationRightsService;
-        ctrl.explorationInitStateNameService = (
-          ExplorationInitStateNameService);
-        ctrl.explorationParamSpecsService = ExplorationParamSpecsService;
-        ctrl.explorationParamChangesService = (
-          ExplorationParamChangesService);
-        ctrl.UserEmailPreferencesService = UserEmailPreferencesService;
-
-        // TODO(#15473): Remove this delay after this
-        // has been migrated to Angular 2+.
-        setTimeout(()=>{
-          ctrl.refreshSettingsTab();
-        }, 500);
-
-        ctrl.ROLES = [{
-          name: 'Manager (can edit permissions)',
-          value: 'owner'
-        }, {
-          name: 'Collaborator (can make changes)',
-          value: 'editor'
-        }, {
-          name: 'Playtester (can give feedback)',
-          value: 'viewer'
-        }];
-
-        ctrl.formStyle = JSON.stringify({
-          display: 'table-cell',
-          width: '16.66666667%',
-          'vertical-align': 'top'
-        });
-      };
-      ctrl.$onDestroy = function() {
-        ctrl.directiveSubscriptions.unsubscribe();
-      };
+    // Add our explorationTags.
+    if (value) {
+      this.explorationTags.push(value.toLowerCase());
     }
-  ]
-});
+
+    // Clear the input value.
+    event.input.value = '';
+
+    this.explorationTagsService.displayed = this.explorationTags;
+
+    this.saveExplorationTags();
+  }
+
+  remove(explorationTags: string): void {
+    const index = this.explorationTags.indexOf(explorationTags);
+
+    if (index >= 0) {
+      this.explorationTags.splice(index, 1);
+    }
+
+    this.explorationTagsService.displayed = this.explorationTags;
+
+    this.saveExplorationTags();
+  }
+
+  updateCategoryListWithUserData(): void {
+    if (this.newCategory) {
+      this.CATEGORY_LIST_FOR_SELECT2.push(this.newCategory);
+    }
+
+    setTimeout(() => {
+      this.saveExplorationCategory();
+    });
+  }
+
+  filterChoices(searchTerm: string): void {
+    this.newCategory = {
+      id: searchTerm,
+      text: searchTerm
+    };
+
+    this.filteredChoices = this.CATEGORY_LIST_FOR_SELECT2.filter(
+      value => value.text.toLowerCase().indexOf(searchTerm.toLowerCase()) > -1);
+
+    this.filteredChoices.push(this.newCategory);
+
+    if (searchTerm === '') {
+      this.filteredChoices = this.CATEGORY_LIST_FOR_SELECT2;
+    }
+  }
+
+  refreshSettingsTab(): void {
+    // Ensure that ExplorationStatesService has been initialized before
+    // getting the state names from it. Otherwise, navigating to the
+    // settings tab directly (by entering a URL that ends with
+    // /settings) results in a console error.
+
+    this.hasPageLoaded = false;
+    this.explorationDataService.getDataAsync(() => {}).then(() => {
+      if (this.explorationStatesService.isInitialized()) {
+        var categoryIsInSelect2 = this.CATEGORY_LIST_FOR_SELECT2.some(
+          (categoryItem) => {
+            return (
+              categoryItem.id ===
+                  this.explorationCategoryService.savedMemento);
+          }
+        );
+        // If the current category is not in the dropdown, add it
+        // as the first option.
+        if (!categoryIsInSelect2 &&
+            this.explorationCategoryService.savedMemento) {
+          this.CATEGORY_LIST_FOR_SELECT2.unshift({
+            id: this.explorationCategoryService.savedMemento as string,
+            text: this.explorationCategoryService.savedMemento as string
+          });
+        }
+
+        this.stateNames = this.explorationStatesService.getStateNames();
+        this.explorationIsLinkedToStory = (
+          this.contextService.isExplorationLinkedToStory());
+      }
+      this.hasPageLoaded = true;
+    });
+  }
+
+  saveExplorationTitle(): void {
+    this.explorationTitleService.saveDisplayedValue();
+    if (!this.isTitlePresent()) {
+      this.rolesSaveButtonEnabled = false;
+      this.errorMessage = (
+        'Please provide a title before inviting.');
+      return;
+    } else {
+      this.rolesSaveButtonEnabled = true;
+      this.errorMessage = ('');
+      return;
+    }
+  }
+
+  saveExplorationCategory(): void {
+    this.explorationCategoryService.saveDisplayedValue();
+  }
+
+  saveExplorationObjective(): void {
+    this.explorationObjectiveService.saveDisplayedValue();
+  }
+
+  saveExplorationLanguageCode(): void {
+    this.explorationLanguageCodeService.saveDisplayedValue();
+  }
+
+  saveExplorationTags(): void {
+    console.error('called');
+    console.error(this.explorationTagsService.displayed);
+
+    setTimeout(() => {
+      this.explorationTagsService.saveDisplayedValue();
+    });
+  }
+
+  saveExplorationInitStateName(): void {
+    var newInitStateName = this.explorationInitStateNameService.displayed;
+
+    if (!this.explorationStatesService.getState(newInitStateName as string)) {
+      this.alertsService.addWarning(
+        'Invalid initial state name: ' + newInitStateName);
+      this.explorationInitStateNameService.restoreFromMemento();
+      return;
+    }
+
+    this.explorationInitStateNameService.saveDisplayedValue();
+
+    this.explorationStatesService.onRefreshGraph.emit();
+  }
+
+  postSaveParamChangesHook(): void {
+    this.explorationWarningsService.updateWarnings();
+  }
+
+  // Methods for enabling advanced features.
+  areParametersEnabled(): boolean {
+    return this.explorationFeaturesService.areParametersEnabled();
+  }
+
+  areParametersUsed(): boolean {
+    if (this.hasPageLoaded) {
+      return (this.explorationDataService.data.param_changes.length > 0);
+    }
+  }
+
+  enableParameters(): void {
+    this.explorationFeaturesService.enableParameters();
+  }
+
+  isAutomaticTextToSpeechEnabled(): boolean {
+    return this.explorationAutomaticTextToSpeechService
+      .isAutomaticTextToSpeechEnabled();
+  }
+
+  toggleAutomaticTextToSpeech(): void {
+    return this.explorationAutomaticTextToSpeechService
+      .toggleAutomaticTextToSpeech();
+  }
+
+  isCorrectnessFeedbackEnabled(): boolean {
+    return (this.explorationCorrectnessFeedbackService.isEnabled() as boolean);
+  }
+
+  toggleCorrectnessFeedback(): void {
+    this.explorationCorrectnessFeedbackService.toggleCorrectnessFeedback();
+  }
+
+  isExplorationEditable(): boolean {
+    return (
+      this.explorationDataService.data &&
+      this.explorationDataService.data.edits_allowed) || false;
+  }
+
+  enableEdits(): void {
+    this.explorationEditsAllowedBackendApiService.setEditsAllowed(
+      true, this.explorationDataService.explorationId,
+      () => {
+        this.editabilityService.lockExploration(false);
+        this.explorationDataService.data.edits_allowed = true;
+      });
+  }
+
+  disableEdits(): void {
+    this.explorationEditsAllowedBackendApiService.setEditsAllowed(
+      false, this.explorationDataService.explorationId,
+      () => {
+        this.editabilityService.lockExploration(true);
+        this.explorationDataService.data.edits_allowed = false;
+      });
+  }
+
+  // Methods for rights management.
+  openEditRolesForm(): void {
+    this.isRolesFormOpen = true;
+    this.newMemberUsername = '';
+    this.newMemberRole = this.ROLES[0];
+  }
+
+  openVoiceoverRolesForm(): void {
+    this.isVoiceoverFormOpen = true;
+    this.newVoiceArtistUsername = '';
+  }
+
+  closeEditRolesForm(): void {
+    this.newMemberUsername = '';
+    this.newMemberRole = this.ROLES[0];
+    this.closeRolesForm();
+  }
+
+  closeVoiceoverForm(): void {
+    this.newVoiceArtistUsername = '';
+    this.isVoiceoverFormOpen = false;
+  }
+
+  editRole(newMemberUsername: string, newMemberRole: string): void {
+    if (!this.explorationRightsService.checkUserAlreadyHasRoles(
+      newMemberUsername)) {
+      this.explorationRightsService.saveRoleChanges(
+        newMemberUsername, newMemberRole);
+
+      this.closeRolesForm();
+      return;
+    }
+
+    let oldRole = this.explorationRightsService.getOldRole(
+      newMemberUsername);
+
+    this.reassignRole(newMemberUsername, newMemberRole, oldRole);
+  }
+
+  toggleCards(card: string): void {
+    if (!this.windowDimensionsService.isWindowNarrow()) {
+      return;
+    }
+
+    if (card === 'settings') {
+      this.basicSettingIsShown = !this.basicSettingIsShown;
+    } else if (card === 'advanced_features') {
+      this.advancedFeaturesIsShown = !this.advancedFeaturesIsShown;
+    } else if (card === 'roles') {
+      this.rolesCardIsShown = !this.rolesCardIsShown;
+    } else if (card === 'permissions') {
+      this.permissionsCardIsShown = !this.permissionsCardIsShown;
+    } else if (card === 'feedback') {
+      this.feedbackCardIsShown = !this.feedbackCardIsShown;
+    } else if (card === 'controls') {
+      this.controlsCardIsShown = !this.controlsCardIsShown;
+    }
+  }
+
+  removeRole(memberUsername: string, memberRole: string): void {
+    this.alertsService.clearWarnings();
+
+    const modalRef = this.ngbModal
+      .open(RemoveRoleConfirmationModalComponent, {
+        backdrop: true,
+      });
+
+    modalRef.componentInstance.username = memberUsername;
+    modalRef.componentInstance.role = memberRole;
+
+    modalRef.result.then(() => {
+      this.explorationRightsService.removeRoleAsync(
+        memberUsername);
+      this.closeRolesForm();
+    }, () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is
+      // clicked. No further action is needed.
+    });
+  }
+
+  editVoiseArtist(newVoiceArtistUsername: string): void {
+    this.explorationRightsService.assignVoiceArtistRoleAsync(
+      newVoiceArtistUsername);
+    this.closeVoiceoverForm();
+    return;
+  }
+
+  removeVoiceArtist(voiceArtistUsername: string): void {
+    this.alertsService.clearWarnings();
+
+    const modalRef = this.ngbModal
+      .open(RemoveRoleConfirmationModalComponent, {
+        backdrop: true,
+      });
+    modalRef.componentInstance.username = voiceArtistUsername;
+    modalRef.componentInstance.role = 'voice artist';
+    modalRef.result.then(() => {
+      this.explorationRightsService.removeVoiceArtistRoleAsync(
+        voiceArtistUsername);
+      this.closeVoiceoverForm();
+    }, () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is
+      // clicked. No further action is needed.
+    });
+  }
+
+  toggleViewabilityIfPrivate(): void {
+    this.explorationRightsService.setViewability(
+      !this.explorationRightsService.viewableIfPrivate());
+  }
+
+  // Methods for muting notifications.
+  muteFeedbackNotifications(): void {
+    this.userEmailPreferencesService.setFeedbackNotificationPreferences(
+      true, () => {});
+  }
+
+  muteSuggestionNotifications(): void {
+    this.userEmailPreferencesService.setSuggestionNotificationPreferences(
+      true,
+      () => {}
+    );
+  }
+
+  unmuteFeedbackNotifications(): void {
+    this.userEmailPreferencesService.setFeedbackNotificationPreferences(
+      false,
+      () => {}
+    );
+  }
+
+  unmuteSuggestionNotifications(): void {
+    this.userEmailPreferencesService.setSuggestionNotificationPreferences(
+      false, () => {});
+  }
+
+  // Methods relating to control buttons.
+  previewSummaryTile(): void {
+    this.alertsService.clearWarnings();
+    this.ngbModal.open(PreviewSummaryTileModalComponent, {
+      backdrop: true,
+    }).result.then(() => {}, () => {
+      this.alertsService.clearWarnings();
+    });
+  }
+
+  showTransferExplorationOwnershipModal(): void {
+    this.alertsService.clearWarnings();
+    this.ngbModal.open(TransferExplorationOwnershipModalComponent, {
+      backdrop: true,
+    }).result.then(() => {
+      this.explorationRightsService.makeCommunityOwned();
+    }, () => {
+      this.alertsService.clearWarnings();
+    });
+  }
+
+  deleteExploration(): void {
+    this.alertsService.clearWarnings();
+
+    this.ngbModal.open(DeleteExplorationModalComponent, {
+      backdrop: true,
+    }).result.then(() => {
+      this.editableExplorationBackendApiService.deleteExplorationAsync(
+        this.explorationId).then(() => {
+        this.windowRef.nativeWindow.location = this.CREATOR_DASHBOARD_PAGE_URL;
+      });
+    }, () => {
+      this.alertsService.clearWarnings();
+    });
+  }
+
+  unpublishExplorationAsModerator(): void {
+    this.alertsService.clearWarnings();
+
+    var moderatorEmailDraftUrl = '/moderatorhandler/email_draft';
+
+    this.settingTabBackendApiService
+      .getData(moderatorEmailDraftUrl).then(
+        (response: SettingTabResponse) => {
+          // If the draft email body is empty, email functionality will not
+          // be exposed to the mdoerator.
+          const draftEmailBody = response.draft_email_body;
+
+          const modalRef = this.ngbModal
+            .open(ModeratorUnpublishExplorationModalComponent, {
+              backdrop: true,
+            });
+
+          modalRef.componentInstance.draftEmailBody = draftEmailBody;
+
+          modalRef.result.then((emailBody) => {
+            this.explorationRightsService.saveModeratorChangeToBackendAsync(
+              emailBody).then(() => {
+              this.userExplorationPermissionsService.fetchPermissionsAsync()
+                .then((permissions) => {
+                  this.canUnpublish = permissions.canUnpublish;
+                  this.canReleaseOwnership = permissions.canReleaseOwnership;
+                });
+            });
+          }, () => {
+            this.alertsService.clearWarnings();
+          });
+        });
+  }
+
+  isExplorationLockedForEditing(): boolean {
+    return this.changeListService.isExplorationLockedForEditing();
+  }
+
+  closeRolesForm(): void {
+    this.errorMessage = '';
+    this.rolesSaveButtonEnabled = true;
+    this.isRolesFormOpen = false;
+  }
+
+  isTitlePresent(): boolean {
+    return (this.explorationTitleService.savedMemento as string).length > 0;
+  }
+
+  onRolesFormUsernameBlur(): void {
+    this.rolesSaveButtonEnabled = true;
+    this.errorMessage = '';
+
+    if (this.newMemberUsername === this.loggedInUser) {
+      this.rolesSaveButtonEnabled = false;
+      this.errorMessage = (
+        'Users are not allowed to assign other roles to themselves.');
+      return;
+    }
+    if (this.explorationRightsService.checkUserAlreadyHasRoles(
+      this.newMemberUsername)) {
+      var oldRole = this.explorationRightsService.getOldRole(
+        this.newMemberUsername);
+      if (oldRole === this.newMemberRole.value) {
+        this.rolesSaveButtonEnabled = false;
+        this.errorMessage = `User is already ${oldRole}.`;
+        return;
+      }
+    }
+  }
+
+  getExplorePageUrl(): string {
+    return (
+      this.windowRef.nativeWindow.location.protocol + '//' +
+      this.windowRef.nativeWindow.location.host +
+      this.EXPLORE_PAGE_PREFIX + this.explorationId);
+  }
+
+  reassignRole(
+      username: string,
+      newRole: string,
+      oldRole: string
+  ): void {
+    this.alertsService.clearWarnings();
+    const modalRef: NgbModalRef = this.ngbModal
+      .open(ReassignRoleConfirmationModalComponent, {
+        backdrop: true,
+      });
+    modalRef.componentInstance.username = username;
+    modalRef.componentInstance.newRole = newRole;
+    modalRef.componentInstance.oldRole = oldRole;
+
+    modalRef.result.then(() => {
+      this.explorationRightsService.saveRoleChanges(
+        username, newRole);
+      this.closeRolesForm();
+    }, () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is
+      // clicked. No further action is needed.
+    });
+  }
+
+  ngOnInit(): void {
+    this.directiveSubscriptions.add(
+      this.routerService.onRefreshSettingsTab.subscribe(
+        () => {
+          // TODO(#15473): Remove this delay after this has been
+          // migrated to Angular 2+.
+          setTimeout(()=>{
+            this.refreshSettingsTab();
+          }, 500);
+        }
+      )
+    );
+
+    this.directiveSubscriptions.add(
+      this.userExplorationPermissionsService.onUserExplorationPermissionsFetched
+        .subscribe(
+          () => {
+            this.userExplorationPermissionsService.getPermissionsAsync()
+              .then((permissions) => {
+                this.canUnpublish = permissions.canUnpublish;
+                this.canReleaseOwnership = permissions.canReleaseOwnership;
+              });
+          }
+        )
+    );
+
+    this.EXPLORATION_TITLE_INPUT_FOCUS_LABEL = (
+      ExplorationEditorPageConstants.EXPLORATION_TITLE_INPUT_FOCUS_LABEL);
+
+    this.CATEGORY_LIST_FOR_SELECT2 = [];
+
+    for (var i = 0; i < AppConstants.ALL_CATEGORIES.length; i++) {
+      this.CATEGORY_LIST_FOR_SELECT2.push({
+        id: AppConstants.ALL_CATEGORIES[i],
+        text: AppConstants.ALL_CATEGORIES[i]
+      });
+    }
+    this.isRolesFormOpen = false;
+    this.isVoiceoverFormOpen = false;
+    this.rolesSaveButtonEnabled = false;
+    this.errorMessage = '';
+    this.basicSettingIsShown = !this.windowDimensionsService.isWindowNarrow();
+    this.advancedFeaturesIsShown = (
+      !this.windowDimensionsService.isWindowNarrow());
+    this.rolesCardIsShown = !this.windowDimensionsService.isWindowNarrow();
+    this.permissionsCardIsShown = (
+      !this.windowDimensionsService.isWindowNarrow());
+    this.feedbackCardIsShown = !this.windowDimensionsService.isWindowNarrow();
+    this.controlsCardIsShown = !this.windowDimensionsService.isWindowNarrow();
+
+    this.TAG_REGEX = AppConstants.TAG_REGEX;
+    this.canDelete = false;
+    this.canModifyRoles = false;
+    this.canReleaseOwnership = false;
+    this.canUnpublish = false;
+    this.canManageVoiceArtist = false;
+    this.explorationId = this.explorationDataService.explorationId;
+    this.loggedInUser = null;
+
+    this.userService.getUserInfoAsync().then((userInfo) => {
+      this.loggedInUser = userInfo.getUsername();
+      this.isSuperAdmin = userInfo.isSuperAdmin();
+    });
+
+    this.userExplorationPermissionsService.getPermissionsAsync()
+      .then((permissions) => {
+        this.canDelete = permissions.canDelete;
+        this.canModifyRoles = permissions.canModifyRoles;
+        this.canReleaseOwnership = permissions.canReleaseOwnership;
+        this.canUnpublish = permissions.canUnpublish;
+        this.canManageVoiceArtist = permissions.canManageVoiceArtist;
+      });
+
+    this.formStyle = JSON.stringify({
+      display: 'table-cell',
+      width: '16.66666667%',
+      'vertical-align': 'top'
+    });
+
+    this.filteredChoices = this.CATEGORY_LIST_FOR_SELECT2;
+    setTimeout(() => {
+      this.explorationTags = (
+        this.explorationTagsService.displayed as string[]);
+
+      if (!this.explorationTags) {
+        this.explorationTags = [];
+      }
+
+      this.changeDetectorRef.detectChanges();
+    }, 500);
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
+  }
+}
+
+angular.module('oppia').directive('oppiaSettingsTab',
+  downgradeComponent({
+    component: SettingsTabComponent
+  }) as angular.IDirectiveFactory);
