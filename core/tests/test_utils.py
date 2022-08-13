@@ -32,7 +32,6 @@ import os
 import random
 import re
 import string
-from types import TracebackType
 import unittest
 
 from core import feconf
@@ -1570,8 +1569,6 @@ class TestBase(unittest.TestCase):
                 to be raised.
             expected_regex: re.Pattern|str. Regex expected to be found in
                 error message.
-            *args: list(*). Function to be called and extra positional args.
-            **kwargs: dict(str, Any). Extra kwargs.
 
         Returns:
             bool. Whether the code raised exception in the expected format.
