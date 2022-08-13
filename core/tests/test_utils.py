@@ -3971,9 +3971,9 @@ title: Title
         })
         state.update_next_content_id_index(2)  # type: ignore[no-untyped-call]
         state.interaction.default_outcome.labelled_as_correct = True
-        # Here, dest can only accept string values but for implementation
-        # purposes we are providing None which causes MyPy to throw an error.
-        # Thus to avoid the error, we used ignore here.
+        # Here, dest can only accept string values but here we are providing
+        # None which causes MyPy to throw an error. Thus to avoid the error,
+        # we used ignore here.
         state.interaction.default_outcome.dest = None  # type: ignore[assignment]
         return state
 
