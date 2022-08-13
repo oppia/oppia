@@ -29,7 +29,7 @@ from core.domain import stats_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Any, Dict, List, Union
+from typing import Any, Dict
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -1141,9 +1141,9 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
             })
 
     def test_from_dict(self) -> None:
-        expected_customization_args: Dict[
-            str, Dict[str, Union[int, str, List[str]]]
-        ] = {
+        expected_customization_args: (
+            stats_domain.IssuesCustomizationArgsDictType
+        ) = {
             'time_spent_in_exp_in_msecs': {
                 'value': 0
             },
@@ -1355,9 +1355,9 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
 
     def test_comparison_between_exploration_issues_returns_correctly(
         self) -> None:
-        expected_customization_args: Dict[
-            str, Dict[str, Union[str, int, List[str]]]
-        ] = {
+        expected_customization_args: (
+            stats_domain.IssuesCustomizationArgsDictType
+        ) = {
             'time_spent_in_exp_in_msecs': {
                 'value': 0
             },
