@@ -141,7 +141,7 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
                 })
 
     def test_get_collection_from_model(self) -> None:
-        rights_manager.create_new_collection_rights(  # type: ignore[no-untyped-call]
+        rights_manager.create_new_collection_rights(
             'collection_id', self.owner_id)
 
         collection_model = collection_models.CollectionModel(
@@ -217,7 +217,7 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
     def test_get_collection_from_model_with_invalid_schema_version_raises_error(
         self
     ) -> None:
-        rights_manager.create_new_collection_rights(  # type: ignore[no-untyped-call]
+        rights_manager.create_new_collection_rights(
             'collection_id', self.owner_id)
 
         collection_model = collection_models.CollectionModel(
@@ -339,7 +339,7 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
                 }], 'changed objective')
 
     def test_get_multiple_collections_from_model_by_id(self) -> None:
-        rights_manager.create_new_collection_rights(  # type: ignore[no-untyped-call]
+        rights_manager.create_new_collection_rights(
             'collection_id_1', self.owner_id)
 
         collection_model = collection_models.CollectionModel(
@@ -360,7 +360,7 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
                 'category': 'category 1',
             }])
 
-        rights_manager.create_new_collection_rights(  # type: ignore[no-untyped-call]
+        rights_manager.create_new_collection_rights(
             'collection_id_2', self.owner_id)
 
         collection_model = collection_models.CollectionModel(
@@ -711,11 +711,11 @@ class CollectionSummaryQueriesUnitTests(CollectionServicesUnitTests):
 
         # Publish collections 0-4. Private collections should not show up in
         # a search query, even if they're indexed.
-        rights_manager.publish_collection(self.owner, self.COL_ID_0)  # type: ignore[no-untyped-call]
-        rights_manager.publish_collection(self.owner, self.COL_ID_1)  # type: ignore[no-untyped-call]
-        rights_manager.publish_collection(self.owner, self.COL_ID_2)  # type: ignore[no-untyped-call]
-        rights_manager.publish_collection(self.owner, self.COL_ID_3)  # type: ignore[no-untyped-call]
-        rights_manager.publish_collection(self.owner, self.COL_ID_4)  # type: ignore[no-untyped-call]
+        rights_manager.publish_collection(self.owner, self.COL_ID_0)
+        rights_manager.publish_collection(self.owner, self.COL_ID_1)
+        rights_manager.publish_collection(self.owner, self.COL_ID_2)
+        rights_manager.publish_collection(self.owner, self.COL_ID_3)
+        rights_manager.publish_collection(self.owner, self.COL_ID_4)
 
         # Add the collections to the search index.
         collection_services.index_collections_given_ids([
@@ -1278,8 +1278,8 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
         exp_id = 'exp_id'
         self.save_new_valid_collection(
             self.COLLECTION_0_ID, self.owner_id, exploration_id=exp_id)
-        rights_manager.publish_exploration(self.owner, exp_id)  # type: ignore[no-untyped-call]
-        rights_manager.publish_collection(self.owner, self.COLLECTION_0_ID)  # type: ignore[no-untyped-call]
+        rights_manager.publish_exploration(self.owner, exp_id)
+        rights_manager.publish_collection(self.owner, self.COLLECTION_0_ID)
 
         # This should not give an error.
         collection_services.update_collection(
@@ -1298,8 +1298,8 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
         exp_id = 'exp_id'
         self.save_new_valid_collection(
             self.COLLECTION_0_ID, self.owner_id, exploration_id=exp_id)
-        rights_manager.publish_exploration(self.owner, exp_id)  # type: ignore[no-untyped-call]
-        rights_manager.publish_collection(self.owner, self.COLLECTION_0_ID)  # type: ignore[no-untyped-call]
+        rights_manager.publish_exploration(self.owner, exp_id)
+        rights_manager.publish_collection(self.owner, self.COLLECTION_0_ID)
 
         # This should not give an error.
         collection_services.update_collection(
@@ -1416,11 +1416,11 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
 
         private_exp_id = 'private_exp_id0'
         self.save_new_valid_exploration(private_exp_id, self.owner_id)
-        rights_manager.publish_collection(self.owner, self.COLLECTION_0_ID)  # type: ignore[no-untyped-call]
+        rights_manager.publish_collection(self.owner, self.COLLECTION_0_ID)
 
         self.assertTrue(
-            rights_manager.is_collection_public(self.COLLECTION_0_ID))  # type: ignore[no-untyped-call]
-        self.assertTrue(rights_manager.is_exploration_private(private_exp_id))  # type: ignore[no-untyped-call]
+            rights_manager.is_collection_public(self.COLLECTION_0_ID))
+        self.assertTrue(rights_manager.is_exploration_private(private_exp_id))
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Cannot reference a private exploration within a public '
@@ -1441,12 +1441,12 @@ class UpdateCollectionNodeTests(CollectionServicesUnitTests):
         private_exp_id = 'private_exp_id0'
         self.save_new_valid_exploration(public_exp_id, self.owner_id)
         self.save_new_valid_exploration(private_exp_id, self.owner_id)
-        rights_manager.publish_exploration(self.owner, public_exp_id)  # type: ignore[no-untyped-call]
+        rights_manager.publish_exploration(self.owner, public_exp_id)
 
         self.assertTrue(
-            rights_manager.is_collection_private(self.COLLECTION_0_ID))  # type: ignore[no-untyped-call]
-        self.assertTrue(rights_manager.is_exploration_public(public_exp_id))  # type: ignore[no-untyped-call]
-        self.assertTrue(rights_manager.is_exploration_private(private_exp_id))  # type: ignore[no-untyped-call]
+            rights_manager.is_collection_private(self.COLLECTION_0_ID))
+        self.assertTrue(rights_manager.is_exploration_public(public_exp_id))
+        self.assertTrue(rights_manager.is_exploration_private(private_exp_id))
 
         # No exception should be raised for either insertion.
         collection_services.update_collection(
@@ -1625,8 +1625,8 @@ class CommitMessageHandlingTests(CollectionServicesUnitTests):
 
     def test_record_commit_message(self) -> None:
         """Check published collections record commit messages."""
-        rights_manager.publish_collection(self.owner, self.COLLECTION_0_ID)  # type: ignore[no-untyped-call]
-        rights_manager.publish_exploration(self.owner, self.EXP_ID)  # type: ignore[no-untyped-call]
+        rights_manager.publish_collection(self.owner, self.COLLECTION_0_ID)
+        rights_manager.publish_exploration(self.owner, self.EXP_ID)
 
         collection_services.update_collection(
             self.owner_id, self.COLLECTION_0_ID, _get_collection_change_list(
@@ -1640,7 +1640,7 @@ class CommitMessageHandlingTests(CollectionServicesUnitTests):
 
     def test_demand_commit_message(self) -> None:
         """Check published collections demand commit messages."""
-        rights_manager.publish_collection(self.owner, self.COLLECTION_0_ID)  # type: ignore[no-untyped-call]
+        rights_manager.publish_collection(self.owner, self.COLLECTION_0_ID)
 
         with self.assertRaisesRegex(
             ValueError,
@@ -1706,8 +1706,8 @@ class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
 
         # Publish the collection and any explorations contained within it. This
         # does not affect the collection version history.
-        rights_manager.publish_collection(self.owner, self.COLLECTION_0_ID)  # type: ignore[no-untyped-call]
-        rights_manager.publish_exploration(self.owner, exp_id)  # type: ignore[no-untyped-call]
+        rights_manager.publish_collection(self.owner, self.COLLECTION_0_ID)
+        rights_manager.publish_exploration(self.owner, exp_id)
 
         snapshots_metadata = (
             collection_services.get_collection_snapshots_metadata(
@@ -1936,7 +1936,7 @@ class CollectionSearchTests(CollectionServicesUnitTests):
         # We're only publishing the first 4 collections, so we're not
         # expecting the last collection to be indexed.
         for ind in range(4):
-            rights_manager.publish_collection(  # type: ignore[no-untyped-call]
+            rights_manager.publish_collection(
                 self.owner, expected_collection_ids[ind])
 
         with add_docs_swap:
@@ -1979,10 +1979,10 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
             user_id=self.viewer_id))
 
         # Owner makes viewer a viewer and editor an editor.
-        rights_manager.assign_role_for_collection(  # type: ignore[no-untyped-call]
+        rights_manager.assign_role_for_collection(
             self.owner, self.COLLECTION_0_ID, self.viewer_id,
             rights_domain.ROLE_VIEWER)
-        rights_manager.assign_role_for_collection(  # type: ignore[no-untyped-call]
+        rights_manager.assign_role_for_collection(
             self.owner, self.COLLECTION_0_ID, self.editor_id,
             rights_domain.ROLE_EDITOR)
 
@@ -2013,10 +2013,10 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
             self.bob_id, self.COLLECTION_0_ID, changelist_cmds,
             'Changed title to Bob title.')
         # Albert adds an owner and an editor.
-        rights_manager.assign_role_for_collection(  # type: ignore[no-untyped-call]
+        rights_manager.assign_role_for_collection(
             albert, self.COLLECTION_0_ID, self.viewer_id,
             rights_domain.ROLE_VIEWER)
-        rights_manager.assign_role_for_collection(  # type: ignore[no-untyped-call]
+        rights_manager.assign_role_for_collection(
             albert, self.COLLECTION_0_ID, self.editor_id,
             rights_domain.ROLE_EDITOR)
         # Verify that only Albert and Bob are listed as contributors for the

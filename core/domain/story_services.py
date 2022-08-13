@@ -378,7 +378,7 @@ def validate_explorations_for_story(
         exp_fetchers.get_multiple_explorations_by_id(exp_ids, strict=False))
 
     exp_rights = (
-        rights_manager.get_multiple_exploration_rights_by_ids(exp_ids))  # type: ignore[no-untyped-call]
+        rights_manager.get_multiple_exploration_rights_by_ids(exp_ids))
 
     exp_rights_dict = {}
 

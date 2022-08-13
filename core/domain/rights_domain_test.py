@@ -21,7 +21,6 @@ from __future__ import annotations
 import logging
 
 from core import utils
-from core.constants import constants
 from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import user_services
@@ -43,8 +42,8 @@ class ActivityRightsTests(test_utils.GenericTestBase):
 
         self.exp_id = 'exp_id'
         self.save_new_valid_exploration(self.exp_id, self.owner_id)
-        rights_manager.publish_exploration(self.owner, self.exp_id) # type: ignore[no-untyped-call]
-        self.activity_rights = rights_manager.get_exploration_rights( # type: ignore[no-untyped-call]
+        rights_manager.publish_exploration(self.owner, self.exp_id)
+        self.activity_rights = rights_manager.get_exploration_rights(
             self.exp_id)
 
     def test_validate_community_owned_explorations(self) -> None:
@@ -110,70 +109,55 @@ class ActivityRightsTests(test_utils.GenericTestBase):
             Exception, 'A user cannot be both a voice artist and a viewer.'):
             self.activity_rights.validate()
 
-    def test_update_activity_first_published_msec(self) -> None:
-        rights_manager.update_activity_first_published_msec( # type: ignore[no-untyped-call]
-            constants.ACTIVITY_TYPE_EXPLORATION, self.exp_id, 0.0)
-
-        activity_rights = rights_manager.get_exploration_rights(self.exp_id) # type: ignore[no-untyped-call]
-        self.assertEqual(activity_rights.first_published_msec, 0.0)
-
-    def test_cannot_update_activity_first_published_msec_for_invalid_activity(
-        self
-    ) -> None:
-        with self.assertRaisesRegex(
-            Exception, 'Cannot get activity rights for unknown activity type'):
-            rights_manager.update_activity_first_published_msec( # type: ignore[no-untyped-call]
-                'invalid_activity', 'activity_id', 0.0)
-
     def test_check_cannot_access_activity_with_no_activity_rights(self) -> None:
-        self.assertFalse(rights_manager.check_can_access_activity( # type: ignore[no-untyped-call]
+        self.assertFalse(rights_manager.check_can_access_activity(
             self.owner, None))
 
     def test_check_cannot_edit_activity_with_no_activity_rights(self) -> None:
-        self.assertFalse(rights_manager.check_can_edit_activity( # type: ignore[no-untyped-call]
+        self.assertFalse(rights_manager.check_can_edit_activity(
             self.owner, None))
 
     def test_check_cannot_voiceover_activity_with_no_activity_rights(
         self
     ) -> None:
-        self.assertFalse(rights_manager.check_can_voiceover_activity( # type: ignore[no-untyped-call]
+        self.assertFalse(rights_manager.check_can_voiceover_activity(
             self.owner, None))
 
     def test_cannot_save_activity_with_no_activity_rights(self) -> None:
-        self.assertFalse(rights_manager.check_can_save_activity( # type: ignore[no-untyped-call]
+        self.assertFalse(rights_manager.check_can_save_activity(
             self.owner, None))
 
     def test_check_cannot_delete_activity_with_no_activity_rights(self) -> None:
-        self.assertFalse(rights_manager.check_can_delete_activity( # type: ignore[no-untyped-call]
+        self.assertFalse(rights_manager.check_can_delete_activity(
             self.owner, None))
 
     def test_check_cannot_modify_activity_roles_with_no_activity_rights(
         self
     ) -> None:
-        self.assertFalse(rights_manager.check_can_modify_core_activity_roles( # type: ignore[no-untyped-call]
+        self.assertFalse(rights_manager.check_can_modify_core_activity_roles(
             self.owner, None))
 
     def test_check_cannot_release_ownership_with_no_activity_rights(
         self
     ) -> None:
-        self.assertFalse(rights_manager.check_can_release_ownership( # type: ignore[no-untyped-call]
+        self.assertFalse(rights_manager.check_can_release_ownership(
             self.owner, None))
 
     def test_check_cannnot_publish_activity_with_no_activity_rights(
         self
     ) -> None:
-        self.assertFalse(rights_manager.check_can_publish_activity( # type: ignore[no-untyped-call]
+        self.assertFalse(rights_manager.check_can_publish_activity(
             self.owner, None))
 
     def test_check_cannot_publish_activity_with_cloned_from(self) -> None:
-        self.activity_rights.cloned_from = True
-        self.assertFalse(rights_manager.check_can_publish_activity( # type: ignore[no-untyped-call]
+        self.activity_rights.cloned_from = 'abcdefg'
+        self.assertFalse(rights_manager.check_can_publish_activity(
             self.owner, self.activity_rights))
 
     def test_check_cannot_unpublish_activity_with_no_activity_rights(
         self
     ) -> None:
-        self.assertFalse(rights_manager.check_can_unpublish_activity( # type: ignore[no-untyped-call]
+        self.assertFalse(rights_manager.check_can_unpublish_activity(
             self.owner, None))
 
     def test_cannot_release_ownership_of_exploration_with_insufficient_rights(
@@ -191,7 +175,7 @@ class ActivityRightsTests(test_utils.GenericTestBase):
             Exception, 'The ownership of this exploration cannot be released.')
 
         with logging_swap, assert_raises_regexp_context_manager:
-            rights_manager.release_ownership_of_exploration( # type: ignore[no-untyped-call]
+            rights_manager.release_ownership_of_exploration(
                 self.viewer, self.exp_id)
 
         self.assertEqual(len(observed_log_messages), 1)

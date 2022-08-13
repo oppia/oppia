@@ -321,13 +321,13 @@ class FeedbackThreadCreatedEventHandlerTests(test_utils.GenericTestBase):
         exp_id = 'exp_id'
 
         event_services.FeedbackThreadCreatedEventHandler.record(exp_id)
-        thread = feedback_services.get_thread_analytics(exp_id)  # type: ignore[no-untyped-call]
+        thread = feedback_services.get_thread_analytics(exp_id)
         self.assertEqual(thread.id, exp_id)
         self.assertEqual(thread.num_open_threads, 1)
         self.assertEqual(thread.num_total_threads, 1)
 
         event_services.FeedbackThreadCreatedEventHandler.record(exp_id)
-        thread = feedback_services.get_thread_analytics(exp_id)  # type: ignore[no-untyped-call]
+        thread = feedback_services.get_thread_analytics(exp_id)
         self.assertEqual(thread.id, exp_id)
         self.assertEqual(thread.num_open_threads, 2)
         self.assertEqual(thread.num_total_threads, 2)
@@ -343,7 +343,7 @@ class FeedbackThreadStatusChangedEventHandlerTests(test_utils.GenericTestBase):
         event_services.FeedbackThreadStatusChangedEventHandler.record(
             exp_id, '', feedback_models.STATUS_CHOICES_OPEN)
 
-        thread = feedback_services.get_thread_analytics(exp_id)  # type: ignore[no-untyped-call]
+        thread = feedback_services.get_thread_analytics(exp_id)
         self.assertEqual(thread.id, exp_id)
         self.assertEqual(thread.num_open_threads, 1)
 
@@ -351,7 +351,7 @@ class FeedbackThreadStatusChangedEventHandlerTests(test_utils.GenericTestBase):
         event_services.FeedbackThreadStatusChangedEventHandler.record(
             exp_id, feedback_models.STATUS_CHOICES_OPEN, '')
 
-        thread = feedback_services.get_thread_analytics(exp_id)  # type: ignore[no-untyped-call]
+        thread = feedback_services.get_thread_analytics(exp_id)
         self.assertEqual(thread.id, exp_id)
         self.assertEqual(thread.num_open_threads, 0)
 

@@ -493,7 +493,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             suggestion.final_reviewer_id, self.reviewer_id)
 
-        thread_messages = feedback_services.get_messages(self.THREAD_ID)  # type: ignore[no-untyped-call]
+        thread_messages = feedback_services.get_messages(self.THREAD_ID)
         last_message = thread_messages[len(thread_messages) - 1]
         self.assertEqual(
             last_message.text, 'review message')
@@ -647,7 +647,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             suggestion.final_reviewer_id, self.reviewer_id)
 
-        thread_messages = feedback_services.get_messages(self.THREAD_ID)  # type: ignore[no-untyped-call]
+        thread_messages = feedback_services.get_messages(self.THREAD_ID)
         last_message = thread_messages[len(thread_messages) - 1]
         self.assertEqual(last_message.text, 'reject review message')
 
@@ -675,7 +675,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             self.assertEqual(
                 suggestion.final_reviewer_id, self.reviewer_id)
             # Assert that the messages were updated.
-            thread_messages = feedback_services.get_messages(suggestion_id)  # type: ignore[no-untyped-call]
+            thread_messages = feedback_services.get_messages(suggestion_id)
             last_message = thread_messages[len(thread_messages) - 1]
             self.assertEqual(
                 last_message.text, 'reject review message')
@@ -1945,8 +1945,8 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             self.editor_id, exploration.id,
             [content_change, recorded_voiceovers_change], '')
 
-        rights_manager.publish_exploration(self.editor, self.EXP_ID)  # type: ignore[no-untyped-call]
-        rights_manager.assign_role_for_exploration(  # type: ignore[no-untyped-call]
+        rights_manager.publish_exploration(self.editor, self.EXP_ID)
+        rights_manager.assign_role_for_exploration(
             self.editor, self.EXP_ID, self.owner_id,
             rights_domain.ROLE_EDITOR)
 
@@ -2100,7 +2100,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             suggestion_id, self.reviewer_id, 'Reject message')
 
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
-        thread_messages = feedback_services.get_messages(self.THREAD_ID)  # type: ignore[no-untyped-call]
+        thread_messages = feedback_services.get_messages(self.THREAD_ID)
         last_message = thread_messages[len(thread_messages) - 1]
         self.assertEqual(
             last_message.text, 'Reject message')
@@ -2128,7 +2128,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             'Accept message')
 
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
-        thread_messages = feedback_services.get_messages(self.THREAD_ID)  # type: ignore[no-untyped-call]
+        thread_messages = feedback_services.get_messages(self.THREAD_ID)
         last_message = thread_messages[len(thread_messages) - 1]
         self.assertEqual(
             last_message.text, 'Accept message')

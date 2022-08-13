@@ -125,12 +125,12 @@ class ExplorationDisplayableSummariesTest(
         with self.assertRaisesRegex(
             Exception, 'This exploration cannot be published'
             ):
-            rights_manager.publish_exploration(self.bob, self.EXP_ID_2)  # type: ignore[no-untyped-call]
+            rights_manager.publish_exploration(self.bob, self.EXP_ID_2)
 
-        rights_manager.publish_exploration(self.albert, self.EXP_ID_2)  # type: ignore[no-untyped-call]
+        rights_manager.publish_exploration(self.albert, self.EXP_ID_2)
 
         self.save_new_valid_exploration(self.EXP_ID_3, self.albert_id)
-        rights_manager.publish_exploration(self.albert, self.EXP_ID_3)  # type: ignore[no-untyped-call]
+        rights_manager.publish_exploration(self.albert, self.EXP_ID_3)
         exp_services.delete_exploration(self.albert_id, self.EXP_ID_3)  # type: ignore[no-untyped-call]
         self.signup(self.USER_C_EMAIL, self.USER_C_NAME)
         self.signup(self.USER_D_EMAIL, self.USER_D_NAME)
@@ -244,7 +244,7 @@ class ExplorationDisplayableSummariesTest(
 
         # However, if Albert is granted editor access to Bob's exploration,
         # then Albert has access to the corresponding summary.
-        rights_manager.assign_role_for_exploration(  # type: ignore[no-untyped-call]
+        rights_manager.assign_role_for_exploration(
             self.bob, self.EXP_ID_5, self.albert_id,
             rights_domain.ROLE_EDITOR)
 
@@ -359,8 +359,8 @@ class FeaturedExplorationDisplayableSummariesTest(
             self.EXP_ID_1, self.albert_id, language_code=self.LANGUAGE_CODE_ES)
         self.save_new_valid_exploration(self.EXP_ID_2, self.albert_id)
 
-        rights_manager.publish_exploration(self.albert, self.EXP_ID_1)  # type: ignore[no-untyped-call]
-        rights_manager.publish_exploration(self.albert, self.EXP_ID_2)  # type: ignore[no-untyped-call]
+        rights_manager.publish_exploration(self.albert, self.EXP_ID_1)
+        rights_manager.publish_exploration(self.albert, self.EXP_ID_2)
 
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
@@ -468,8 +468,8 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
         collection_id_1 = self.COLLECTION_ID + '_1'
         self.save_new_valid_collection(self.COLLECTION_ID, self.owner_id)
         self.save_new_valid_collection(collection_id_1, self.owner_id)
-        rights_manager.publish_collection(self.owner, self.COLLECTION_ID)  # type: ignore[no-untyped-call]
-        rights_manager.publish_collection(self.owner, collection_id_1)  # type: ignore[no-untyped-call]
+        rights_manager.publish_collection(self.owner, self.COLLECTION_ID)
+        rights_manager.publish_collection(self.owner, collection_id_1)
         collection_id_list = [collection_id_1, self.COLLECTION_ID]
         collection_summaries = (
             summary_services.
@@ -483,8 +483,8 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
         self.save_new_valid_collection(
             self.COLLECTION_ID, self.owner_id, exploration_id=self.EXP_ID)
-        rights_manager.publish_exploration(self.owner, self.EXP_ID)  # type: ignore[no-untyped-call]
-        rights_manager.publish_collection(self.owner, self.COLLECTION_ID)  # type: ignore[no-untyped-call]
+        rights_manager.publish_exploration(self.owner, self.EXP_ID)
+        rights_manager.publish_collection(self.owner, self.COLLECTION_ID)
         # Here, get_user_actions_info method can only accept string values but
         # for testing purposes here we are providing None which causes MyPy to
         # throw an error. Thus to avoid the error, we used ignore here.
@@ -537,7 +537,7 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
             }], 'Added another creator\'s private exploration')
 
         # A collection cannot access someone else's private exploration.
-        rights_manager.publish_collection(self.owner, self.COLLECTION_ID)  # type: ignore[no-untyped-call]
+        rights_manager.publish_collection(self.owner, self.COLLECTION_ID)
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected collection to only reference valid explorations, but '
@@ -546,7 +546,7 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
                 self.COLLECTION_ID, self.owner)
 
         # After the exploration is published, the dict can now be created.
-        rights_manager.publish_exploration(self.editor, self.EXP_ID)  # type: ignore[no-untyped-call]
+        rights_manager.publish_exploration(self.editor, self.EXP_ID)
         summary_services.get_learner_collection_dict_by_id(
             self.COLLECTION_ID, self.owner)
 
@@ -560,7 +560,7 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
             self.COLLECTION_ID, self.owner)
 
         # A public collection referencing a private exploration is bad, however.
-        rights_manager.publish_collection(self.owner, self.COLLECTION_ID)  # type: ignore[no-untyped-call]
+        rights_manager.publish_collection(self.owner, self.COLLECTION_ID)
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Cannot reference a private exploration within a public '
@@ -570,7 +570,7 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
 
         # After the exploration is published, the learner dict can be crated
         # again.
-        rights_manager.publish_exploration(self.owner, self.EXP_ID)  # type: ignore[no-untyped-call]
+        rights_manager.publish_exploration(self.owner, self.EXP_ID)
         summary_services.get_learner_collection_dict_by_id(
             self.COLLECTION_ID, self.owner)
 
@@ -584,7 +584,7 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
                 'exploration_id': self.EXP_ID_1
             }], 'Added another creator\'s private exploration')
 
-        rights_manager.publish_collection(self.owner, self.COLLECTION_ID)  # type: ignore[no-untyped-call]
+        rights_manager.publish_collection(self.owner, self.COLLECTION_ID)
 
         collection_dict = summary_services.get_learner_collection_dict_by_id(
             self.COLLECTION_ID, self.owner,
@@ -673,15 +673,15 @@ class TopRatedExplorationDisplayableSummariesTest(
         self.save_new_valid_exploration(self.EXP_ID_8, self.albert_id)
         self.save_new_valid_exploration(self.EXP_ID_9, self.albert_id)
 
-        rights_manager.publish_exploration(self.albert, self.EXP_ID_1)  # type: ignore[no-untyped-call]
-        rights_manager.publish_exploration(self.albert, self.EXP_ID_2)  # type: ignore[no-untyped-call]
-        rights_manager.publish_exploration(self.albert, self.EXP_ID_3)  # type: ignore[no-untyped-call]
-        rights_manager.publish_exploration(self.albert, self.EXP_ID_4)  # type: ignore[no-untyped-call]
-        rights_manager.publish_exploration(self.albert, self.EXP_ID_5)  # type: ignore[no-untyped-call]
-        rights_manager.publish_exploration(self.albert, self.EXP_ID_6)  # type: ignore[no-untyped-call]
-        rights_manager.publish_exploration(self.albert, self.EXP_ID_7)  # type: ignore[no-untyped-call]
-        rights_manager.publish_exploration(self.albert, self.EXP_ID_8)  # type: ignore[no-untyped-call]
-        rights_manager.publish_exploration(self.albert, self.EXP_ID_9)  # type: ignore[no-untyped-call]
+        rights_manager.publish_exploration(self.albert, self.EXP_ID_1)
+        rights_manager.publish_exploration(self.albert, self.EXP_ID_2)
+        rights_manager.publish_exploration(self.albert, self.EXP_ID_3)
+        rights_manager.publish_exploration(self.albert, self.EXP_ID_4)
+        rights_manager.publish_exploration(self.albert, self.EXP_ID_5)
+        rights_manager.publish_exploration(self.albert, self.EXP_ID_6)
+        rights_manager.publish_exploration(self.albert, self.EXP_ID_7)
+        rights_manager.publish_exploration(self.albert, self.EXP_ID_8)
+        rights_manager.publish_exploration(self.albert, self.EXP_ID_9)
 
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
@@ -825,9 +825,9 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
             self.EXP_ID_3, self.albert_id,
             end_state_name='End')
 
-        rights_manager.publish_exploration(self.albert, self.EXP_ID_2)  # type: ignore[no-untyped-call]
-        rights_manager.publish_exploration(self.albert, self.EXP_ID_1)  # type: ignore[no-untyped-call]
-        rights_manager.publish_exploration(self.albert, self.EXP_ID_3)  # type: ignore[no-untyped-call]
+        rights_manager.publish_exploration(self.albert, self.EXP_ID_2)
+        rights_manager.publish_exploration(self.albert, self.EXP_ID_1)
+        rights_manager.publish_exploration(self.albert, self.EXP_ID_3)
 
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
@@ -954,8 +954,8 @@ class ActivityReferenceAccessCheckerTests(test_utils.GenericTestBase):
         self.save_new_valid_collection(
             self.COL_ID_2, self.owner_id, exploration_id=self.EXP_ID_0)
 
-        rights_manager.publish_exploration(self.owner, self.EXP_ID_0)  # type: ignore[no-untyped-call]
-        rights_manager.publish_collection(self.owner, self.COL_ID_2)  # type: ignore[no-untyped-call]
+        rights_manager.publish_exploration(self.owner, self.EXP_ID_0)
+        rights_manager.publish_collection(self.owner, self.COL_ID_2)
 
         # There are no validation errors.
         summary_services.require_activities_to_be_public([
@@ -1018,10 +1018,10 @@ class CollectionNodeMetadataDictsTest(
             title='Exploration 5 Albert title',
             objective='An objective 5')
 
-        rights_manager.publish_exploration(self.albert, self.EXP_ID1)  # type: ignore[no-untyped-call]
-        rights_manager.publish_exploration(self.albert, self.EXP_ID2)  # type: ignore[no-untyped-call]
-        rights_manager.publish_exploration(self.albert, self.EXP_ID3)  # type: ignore[no-untyped-call]
-        rights_manager.publish_exploration(self.bob, self.EXP_ID4)  # type: ignore[no-untyped-call]
+        rights_manager.publish_exploration(self.albert, self.EXP_ID1)
+        rights_manager.publish_exploration(self.albert, self.EXP_ID2)
+        rights_manager.publish_exploration(self.albert, self.EXP_ID3)
+        rights_manager.publish_exploration(self.bob, self.EXP_ID4)
 
         exp_services.index_explorations_given_ids([  # type: ignore[no-untyped-call]
             self.EXP_ID1, self.EXP_ID2, self.EXP_ID3,

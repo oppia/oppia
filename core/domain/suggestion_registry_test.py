@@ -1534,7 +1534,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
     def test_accept_suggestion_adds_translation_in_exploration(self) -> None:
         self.save_new_default_exploration('exp1', self.author_id)
         exploration = exp_fetchers.get_exploration_by_id('exp1')
-        self.assertEqual(exploration.get_translation_counts(), {})  # type: ignore[no-untyped-call]
+        self.assertEqual(exploration.get_translation_counts(), {})
         suggestion = suggestion_registry.SuggestionTranslateContent(
             self.suggestion_dict['suggestion_id'],
             self.suggestion_dict['target_id'],
@@ -1548,7 +1548,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             'Accepted suggestion by translator: Add translation change.')
 
         exploration = exp_fetchers.get_exploration_by_id('exp1')
-        self.assertEqual(exploration.get_translation_counts(), {  # type: ignore[no-untyped-call]
+        self.assertEqual(exploration.get_translation_counts(), {
             'hi': 1
         })
 
@@ -1557,7 +1557,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
     ) -> None:
         self.save_new_default_exploration('exp1', self.author_id)
         exploration = exp_fetchers.get_exploration_by_id('exp1')
-        self.assertEqual(exploration.get_translation_counts(), {})  # type: ignore[no-untyped-call]
+        self.assertEqual(exploration.get_translation_counts(), {})
         suggestion = suggestion_registry.SuggestionTranslateContent(
             self.suggestion_dict['suggestion_id'],
             self.suggestion_dict['target_id'],
@@ -1580,7 +1580,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             'Accepted suggestion by translator: Add translation change.')
 
         exploration = exp_fetchers.get_exploration_by_id('exp1')
-        self.assertEqual(exploration.get_translation_counts(), {  # type: ignore[no-untyped-call]
+        self.assertEqual(exploration.get_translation_counts(), {
             'hi': 1
         })
 
@@ -1590,7 +1590,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         self.save_new_default_exploration('exp1', self.author_id)
 
         exploration = exp_fetchers.get_exploration_by_id('exp1')
-        self.assertEqual(exploration.get_translation_counts(), {})  # type: ignore[no-untyped-call]
+        self.assertEqual(exploration.get_translation_counts(), {})
 
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionTranslateContent(
@@ -1607,7 +1607,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
 
         exploration = exp_fetchers.get_exploration_by_id('exp1')
 
-        self.assertEqual(exploration.get_translation_counts(), {  # type: ignore[no-untyped-call]
+        self.assertEqual(exploration.get_translation_counts(), {
             'hi': 1
         })
 
@@ -2735,7 +2735,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
                         }
                     }
                 ],
-                'id': 'ImageClickInput', 'solution': None  # type: ignore[typeddict-item]
+                'id': 'ImageClickInput', 'solution': None
             },
             'param_changes': [],
             'recorded_voiceovers': {

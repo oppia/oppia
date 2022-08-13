@@ -950,7 +950,7 @@ class AuthServicesStub:
             [auth_models.UserAuthDetailsModel(
                 id=user_id, firebase_auth_id=auth_id)
              for auth_id, user_id in auth_id_user_id_pairs])
-        external_user_ids: Set[str] = set([u for _, u in auth_id_user_id_pairs])
+        external_user_ids: Set[str] = {u for _, u in auth_id_user_id_pairs}
         self._external_user_id_associations.update(external_user_ids)
         auth_id_user_id_pairs_with_deletion = {
             auth_id: AuthServicesStub.AuthUser(user_id)
@@ -3063,7 +3063,7 @@ title: Title
 
         # If an end state name is provided, add terminal node with that name.
         if end_state_name is not None:
-            exploration.add_states([end_state_name])  # type: ignore[no-untyped-call]
+            exploration.add_states([end_state_name])
             end_state = exploration.states[end_state_name]
             self.set_interaction_for_state(end_state, 'EndExploration')
             end_state.update_interaction_default_outcome(None)  # type: ignore[no-untyped-call]
@@ -3127,7 +3127,7 @@ title: Title
             category=category, objective=objective, language_code=language_code)
 
         exploration.correctness_feedback_enabled = correctness_feedback_enabled
-        exploration.add_states(state_names[1:])  # type: ignore[no-untyped-call]
+        exploration.add_states(state_names[1:])
         for from_state_name, dest_state_name in (
                 zip(state_names[:-1], state_names[1:])):
             from_state = exploration.states[from_state_name]
@@ -3174,7 +3174,7 @@ title: Title
             author_notes='', states_schema_version=version,
             init_state_name=feconf.DEFAULT_INIT_STATE_NAME, states=states_dict,
             param_specs={}, param_changes=[])
-        rights_manager.create_new_exploration_rights(exp_id, user_id)  # type: ignore[no-untyped-call]
+        rights_manager.create_new_exploration_rights(exp_id, user_id)
 
         commit_message = 'New exploration created with title \'title\'.'
         exp_model.commit(user_id, commit_message, [{
@@ -3203,7 +3203,7 @@ title: Title
             exploration_id: str. The ID of the new exploration.
         """
         committer = user_services.get_user_actions_info(owner_id)
-        rights_manager.publish_exploration(committer, exploration_id)  # type: ignore[no-untyped-call]
+        rights_manager.publish_exploration(committer, exploration_id)
 
     def save_new_default_collection(
         self,
@@ -3285,7 +3285,7 @@ title: Title
             collection_id: str. ID of the collection to be published.
         """
         committer = user_services.get_user_actions_info(owner_id)
-        rights_manager.publish_collection(committer, collection_id)  # type: ignore[no-untyped-call]
+        rights_manager.publish_collection(committer, collection_id)
 
     def create_story_for_translation_opportunity(
         self,
@@ -3986,6 +3986,9 @@ title: Title
             state_domain.Hint(
                 state_domain.SubtitledHtml('hint_1', '<p>This is a hint.</p>')),
         ]
+        # Ruling out the possibility of None for mypy type checking, because
+        # we above we are already updating the value of interaction_id.
+        assert state.interaction.id is not None
         solution = state_domain.Solution.from_dict(
             state.interaction.id, solution_dict)
         state.update_interaction_solution(solution)  # type: ignore[no-untyped-call]

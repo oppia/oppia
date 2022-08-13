@@ -23,8 +23,6 @@ from core import utils
 from core.domain import feedback_domain
 from core.tests import test_utils
 
-from typing import Dict
-
 
 class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
     EXP_ID = 'exp0'
@@ -91,9 +89,9 @@ class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
 
 class FeedbackMessageDomainUnitTests(test_utils.GenericTestBase):
     EXP_ID = 'exp0'
-    MESSAGE_ID = 'message0'
+    MESSAGE_ID = 0
     THREAD_ID = 'exploration.exp0.thread0'
-    FULL_MESSAGE_ID = THREAD_ID + '.' + MESSAGE_ID
+    FULL_MESSAGE_ID = THREAD_ID + '.' + str(MESSAGE_ID)
 
     def setUp(self) -> None:
         super().setUp()
@@ -138,11 +136,13 @@ class FeedbackMessageReferenceDomainTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.exp_id = 'exp'
-        self.message_id = 'message'
+        self.message_id = 10
         self.thread_id = 'exp.thread'
 
     def test_to_dict(self) -> None:
-        expected_feedback_message_reference: Dict[str, str] = {
+        expected_feedback_message_reference: (
+            feedback_domain.FeedbackMessageReferenceDict
+        ) = {
             'entity_type': feconf.ENTITY_TYPE_EXPLORATION,
             'entity_id': self.exp_id,
             'thread_id': self.thread_id,

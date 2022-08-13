@@ -26,14 +26,23 @@ from core import feconf
 from core.domain import feedback_services
 from core.tests import test_utils
 
-from typing_extensions import Final
+from typing_extensions import Final, TypedDict
+
+
+class ExpectedThreadDict(TypedDict):
+    """Type for the EXPECTED_THREAD_DICT dictionary."""
+
+    status: str
+    summary: None
+    original_author_username: None
+    subject: str
 
 
 class FeedbackThreadSummariesLoadTests(test_utils.GenericTestBase):
 
     EXP_ID_1: Final = 'eid1'
 
-    EXPECTED_THREAD_DICT: Final = {
+    EXPECTED_THREAD_DICT: ExpectedThreadDict = {
         'status': u'open',
         'summary': None,
         'original_author_username': None,
@@ -62,11 +71,11 @@ class FeedbackThreadSummariesLoadTests(test_utils.GenericTestBase):
         # longer on Travis, the constant has been set to 1.7s.
         # Create 100 threads.
         for _ in range(100):
-            feedback_services.create_thread(  # type: ignore[no-untyped-call]
+            feedback_services.create_thread(
                 feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID_1,
                 self.user_id, self.EXPECTED_THREAD_DICT['subject'],
                 'not used here')
-        threadlist = feedback_services.get_all_threads(  # type: ignore[no-untyped-call]
+        threadlist = feedback_services.get_all_threads(
             feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID_1, False)
 
         thread_ids = []
@@ -74,11 +83,11 @@ class FeedbackThreadSummariesLoadTests(test_utils.GenericTestBase):
             thread_ids.append(thread.id)
             # Create 5 messages in each thread.
             for _ in range(5):
-                feedback_services.create_message(  # type: ignore[no-untyped-call]
+                feedback_services.create_message(
                     thread.id, self.user_id, None, None, 'editor message')
 
         start = time.time()
         # Fetch the summaries of all the threads.
-        feedback_services.get_exp_thread_summaries(self.user_id, thread_ids)  # type: ignore[no-untyped-call]
+        feedback_services.get_exp_thread_summaries(self.user_id, thread_ids)
         elapsed_time = time.time() - start
         self.assertLessEqual(elapsed_time, 1.7)
