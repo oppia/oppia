@@ -27,7 +27,7 @@ var ExplorationEditorSettingsTab = function() {
    * Interactive elements
    */
   var explorationCategoryInput = element(
-    by.css('.e2e-test-exploration-category-input'));
+    by.css('.e2e-test-exploration-category'));
   var explorationLanguageInput = element(
     by.css('.e2e-test-exploration-language-select'));
   var explorationObjectiveInput = element(
@@ -88,7 +88,10 @@ var ExplorationEditorSettingsTab = function() {
   this.expectAvailableFirstStatesToBe = async function(names) {
     await waitFor.presenceOf(
       initialStateSelect, 'Initial state select takes too long to be visible.');
-    var options = await initialStateSelect.all(by.tagName('option'))
+    await action.click('State Dropdown element', initialStateSelect, true);
+
+    var options = await initialStateSelect.all(
+      by.css('.e2e-test-initial-state-select-element'))
       .map(async function(elem) {
         await waitFor.visibilityOf(
           elem,
@@ -116,7 +119,8 @@ var ExplorationEditorSettingsTab = function() {
     await waitFor.presenceOf(
       explorationCategoryInput, 'Category input takes too long to be visible.');
     await (
-      await forms.AutocompleteDropdownEditor(explorationCategoryInput)
+      await forms.AutocompleteDropdownEditorMigratedInAngular(
+        explorationCategoryInput)
     ).setValue(category);
   };
 
@@ -135,9 +139,13 @@ var ExplorationEditorSettingsTab = function() {
     await action.waitForAutosave();
     await waitFor.presenceOf(
       explorationLanguageInput, 'Language input takes too long to be visible.');
-    var languageButton = explorationLanguageInput.element(
-      by.cssContainingText('option', language));
-    await action.click('Language button', languageButton);
+
+    await action.click(
+      'Exploration Language', explorationLanguageInput, true);
+
+    var languageButton = element.all(by.cssContainingText(
+      '.e2e-test-exploration-language-selector-choice', language)).first();
+    await action.click('Language button', languageButton, true);
     await action.click('Neutral element', neutralElement);
   };
 

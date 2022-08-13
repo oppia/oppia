@@ -192,13 +192,12 @@ export class SettingsTabComponent
   }
 
   updateCategoryListWithUserData(): void {
-    if (this.newCategory) {
+    if (this.newCategory && this.newCategory.id === '') {
       this.CATEGORY_LIST_FOR_SELECT2.push(this.newCategory);
+      this.explorationCategoryService.displayed = this.newCategory.id;
     }
 
-    setTimeout(() => {
-      this.saveExplorationCategory();
-    });
+    this.explorationCategoryService.saveDisplayedValue();
   }
 
   filterChoices(searchTerm: string): void {
@@ -265,10 +264,6 @@ export class SettingsTabComponent
     }
   }
 
-  saveExplorationCategory(): void {
-    this.explorationCategoryService.saveDisplayedValue();
-  }
-
   saveExplorationObjective(): void {
     this.explorationObjectiveService.saveDisplayedValue();
   }
@@ -278,9 +273,6 @@ export class SettingsTabComponent
   }
 
   saveExplorationTags(): void {
-    console.error('called');
-    console.error(this.explorationTagsService.displayed);
-
     setTimeout(() => {
       this.explorationTagsService.saveDisplayedValue();
     });

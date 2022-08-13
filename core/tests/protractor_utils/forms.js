@@ -353,13 +353,14 @@ var AutocompleteDropdownEditor = function(elem) {
 
 var AutocompleteDropdownEditorMigratedInAngular = function(elem) {
   var containerLocator = by.css('.e2e-test-exploration-category-dropdown');
-  var dropdownElement = element(by.css('.select2-dropdown'));
   var searchInputLocator = by.css(
     '.e2e-test-exploration-new-category-add');
+  var categorySelectorChoice = by.css(
+    '.e2e-test-exploration-category-selector-choice');
 
   return {
     setValue: async function(text) {
-      await action.click('Container Element', element(containerLocator));
+      await action.click('Container Element', elem.element(containerLocator));
       await action.waitForAutosave();
       // NOTE: the input field is top-level in the DOM, and is outside the
       // context of 'elem'. The 'select2-dropdown' id is assigned to the input
@@ -370,14 +371,18 @@ var AutocompleteDropdownEditorMigratedInAngular = function(elem) {
         element(searchInputLocator),
         text);
 
-      await action.sendKeys(
-        'Dropdown Element',
-        element(searchInputLocator),
-        protractor.Key.ENTER);
+      var searchInputLocatorText = element.all(by.cssContainingText(
+        '.e2e-test-exploration-category-selector-choice', text)).first();
+
+      await action.click(
+        'Dropdown Element Select',
+        searchInputLocatorText,
+        true);
     },
     expectOptionsToBe: async function(expectedOptions) {
       await action.click('Container Element', elem.element(containerLocator));
-      var actualOptions = await dropdownElement.all(by.tagName('li')).map(
+
+      var actualOptions = await element.all(categorySelectorChoice).map(
         async function(optionElem) {
           return await action.getText('Option Elem', optionElem);
         }
@@ -386,8 +391,8 @@ var AutocompleteDropdownEditorMigratedInAngular = function(elem) {
       // Re-close the dropdown.
       await action.sendKeys(
         'Dropdown Element',
-        dropdownElement.element(searchInputLocator),
-        '\n');
+        element(searchInputLocator),
+        protractor.Key.ENTER);
     }
   };
 };

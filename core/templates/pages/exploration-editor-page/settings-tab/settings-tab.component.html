@@ -34,10 +34,10 @@
               <div>
                 <div *ngIf="hasPageLoaded">
                   <p>
-                    <mat-form-field appearance="fill">
+                    <mat-form-field class="e2e-test-exploration-category" appearance="fill">
                       <mat-label for="explorationCategory" class="d-block">Add a category (Choose or type new)</mat-label>
-                      <mat-select [(ngModel)]="explorationCategoryService.displayed" class="e2e-test-exploration-category-input-dropdown">
-                        <mat-option class="e2e-test-exploration-category-input">
+                      <mat-select [(ngModel)]="explorationCategoryService.displayed" class="e2e-test-exploration-category-dropdown">
+                        <mat-option class="e2e-test-exploration-new-category-add">
                           <ngx-mat-select-search ngModel
                                                  (ngModelChange)="filterChoices($event)"
                                                  (keydown.enter)="updateCategoryListWithUserData()"
@@ -46,6 +46,7 @@
                         </mat-option>
                         <mat-option (click)="updateCategoryListWithUserData()"
                                     *ngFor="let option of filteredChoices"
+                                    class="e2e-test-exploration-category-selector-choice"
                                     [value]="option.id">
                           {{ option.text }}
                         </mat-option>
@@ -63,7 +64,7 @@
                     <mat-option *ngFor="let value of explorationLanguageCodeService.getSupportedContentLanguages()"
                                 [value]="value.code"
                                 (click)="saveExplorationLanguageCode()"
-                                class="e2e-test-exploration-language-select">
+                                class="e2e-test-exploration-language-selector-choice">
                       {{value.description}}
                     </mat-option>
                   </mat-select>
@@ -86,7 +87,7 @@
                       <mat-option *ngFor="let stateNames of stateNames"
                                   [value]="stateNames"
                                   (click)="saveExplorationInitStateName()"
-                                  class="e2e-test-initial-state-select">
+                                  class="e2e-test-initial-state-select-element">
                         {{stateNames}}
                       </mat-option>
                     </mat-select>

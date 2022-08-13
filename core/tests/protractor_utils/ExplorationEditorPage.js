@@ -56,7 +56,7 @@ var ExplorationEditorPage = function() {
     '.e2e-test-exploration-objective-input-modal'));
   var expInput = element(by.css('.e2e-test-chip-list-tags'));
   var expCategoryDropdownElement = element(
-    by.css('.e2e-test-exploration-category-dropdown'));
+    by.css('.e2e-test-exploration-category-metadata-modal'));
   var expLanguageSelectorElement = element(
     by.css('.e2e-test-exploration-language-select'));
   var expLanguageSelectorElementModal = element(
@@ -197,7 +197,7 @@ var ExplorationEditorPage = function() {
       '.e2e-test-exploration-language-select-lan', language)).first();
 
     await action.click(
-      'Multiple Choice Answer Option: ',
+      'Language input Choice takes too long to be visible. ',
       LanguageChoiceOptionElement, true);
 
 

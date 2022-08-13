@@ -17,7 +17,7 @@
                                       [formStyle]="{'font-weight': 'normal'}">
   </oppia-exploration-objective-editor>
   <p *ngIf="requireCategoryToBeSpecified">
-    <mat-form-field appearance="fill">
+    <mat-form-field class="e2e-test-exploration-category-metadata-modal" appearance="fill">
       <mat-label>Add a category: How would you categorize your exploration?</mat-label>
       <mat-select [(ngModel)]="explorationCategoryService.displayed" class="e2e-test-exploration-category-dropdown">
         <mat-option class="e2e-test-exploration-new-category-add">
@@ -29,6 +29,7 @@
         </mat-option>
         <mat-option (click)="updateCategoryListWithUserData()"
                     *ngFor="let option of filteredChoices"
+                    class="e2e-test-exploration-category-selector-choice"
                     [value]="option.id">
           {{ option.text }}
         </mat-option>
