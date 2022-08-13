@@ -16,94 +16,109 @@
  * @fileoverview Unit tests for Version diff visualization component.
  */
 
-import { TestBed } from '@angular/core/testing';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { VersionDiffVisualizationComponent } from './version-diff-visualization.component';
 
-describe('VersionDiffVisualizationComponent', () => {
-  let ctrl = null;
-  let $scope = null;
-  let $rootScope = null;
-  let ngbModal: NgbModal = null;
+class MockNgbModal {
+  open() {
+    return {
+      result: Promise.resolve()
+    };
+  }
+}
 
-  beforeEach(angular.mock.module('oppia'));
+describe('Version Diff Visualization Component', () => {
+  let component: VersionDiffVisualizationComponent;
+  let fixture: ComponentFixture<VersionDiffVisualizationComponent>;
+  let ngbModal: NgbModal;
 
-  beforeEach(angular.mock.inject(($injector, $componentController) => {
-    $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      declarations: [
+        VersionDiffVisualizationComponent
+      ],
+      providers: [
+        {
+          provide: NgbModal,
+          useClass: MockNgbModal
+        }
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
+  }));
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(VersionDiffVisualizationComponent);
+    component = fixture.componentInstance;
 
     ngbModal = TestBed.inject(NgbModal);
 
-    ctrl = $componentController('versionDiffVisualization', {
-      $scope: $scope,
-      NgbModal: ngbModal
-    }, {
-      getDiffData: () => {
-        return {
-          v1InitStateId: 'A',
-          v2InitStateId: 'B',
-          links: [],
-          finalStateIds: ['C', 'D'],
-          nodes: {
-            1: {
-              newestStateName: 'A',
-              stateProperty: 'changed',
-              originalStateName: 'A'
-            },
-            2: {
-              newestStateName: 'B',
-              stateProperty: 'added',
-              originalStateName: 'A'
-            },
-            3: {
-              newestStateName: 'C',
-              stateProperty: 'deleted',
-              originalStateName: 'B'
-            },
-            4: {
-              newestStateName: 'D',
-              stateProperty: 'unchanged',
-              originalStateName: 'B'
-            },
-            5: {
-              newestStateName: 'E',
-              stateProperty: 'changed',
-              originalStateName: 'B'
-            },
-            6: {
-              newestStateName: 'F',
-              stateProperty: 'unchanged',
-              originalStateName: 'F'
-            },
-          },
-          v2States: {
-            C: {},
-            D: {}
-          },
-          v1States: {
-            A: {},
-            B: {}
-          }
-        };
+    component.diffData = {
+      v1InitStateId: 'A',
+      v2InitStateId: 'B',
+      links: [],
+      finalStateIds: ['C', 'D'],
+      nodes: {
+        1: {
+          newestStateName: 'A',
+          stateProperty: 'changed',
+          originalStateName: 'A'
+        },
+        2: {
+          newestStateName: 'B',
+          stateProperty: 'added',
+          originalStateName: 'A'
+        },
+        3: {
+          newestStateName: 'C',
+          stateProperty: 'deleted',
+          originalStateName: 'B'
+        },
+        4: {
+          newestStateName: 'D',
+          stateProperty: 'unchanged',
+          originalStateName: 'B'
+        },
+        5: {
+          newestStateName: 'E',
+          stateProperty: 'changed',
+          originalStateName: 'B'
+        },
+        6: {
+          newestStateName: 'F',
+          stateProperty: 'unchanged',
+          originalStateName: 'F'
+        },
       },
-      getEarlierVersionHeader: () => {},
-      getLaterVersionHeader: () => {}
-    });
-  }));
+      v2States: {
+        C: {},
+        D: {}
+      },
+      v1States: {
+        A: {},
+        B: {}
+      }
+    };
+  });
 
   it('should set component properties on initialization', () => {
-    expect(ctrl.diffGraphSecondaryLabels).toEqual(undefined);
-    expect(ctrl.diffGraphNodeColors).toEqual(undefined);
-    expect(ctrl.v1InitStateId).toEqual(undefined);
-    expect(ctrl.diffGraphData).toEqual(undefined);
-    expect(ctrl.legendGraph).toEqual(undefined);
+    expect(component.diffGraphSecondaryLabels).toEqual(undefined);
+    expect(component.diffGraphNodeColors).toEqual(undefined);
+    expect(component.v1InitStateId).toEqual(undefined);
+    expect(component.diffGraphData).toEqual(undefined);
+    expect(component.legendGraph).toEqual(undefined);
 
-    ctrl.$onInit();
+    component.ngOnInit();
 
-    expect(ctrl.diffGraphSecondaryLabels).toEqual({
+    expect(component.diffGraphSecondaryLabels).toEqual({
       4: '(was: B)',
       5: '(was: B)'
     });
-    expect(ctrl.diffGraphNodeColors).toEqual({
+    expect(component.diffGraphNodeColors).toEqual({
       1: '#1E90FF',
       2: '#4EA24E',
       3: '#DC143C',
@@ -111,14 +126,14 @@ describe('VersionDiffVisualizationComponent', () => {
       5: '#1E90FF',
       6: 'beige'
     });
-    expect(ctrl.v1InitStateId).toEqual('A');
-    expect(ctrl.diffGraphData).toEqual(
+    expect(component.v1InitStateId).toEqual('A');
+    expect(component.diffGraphData).toEqual(
       {
         nodes: { 1: 'A', 2: 'B', 3: 'B', 4: 'D', 5: 'E', 6: 'F' },
         links: [], initStateId: 'B', finalStateIds: ['C', 'D']
       }
     );
-    expect(ctrl.legendGraph).toEqual({
+    expect(component.legendGraph).toEqual({
       nodes: {
         Added: 'Added',
         Deleted: 'Deleted',
@@ -148,13 +163,13 @@ describe('VersionDiffVisualizationComponent', () => {
         target: 'Changed/renamed',
         linkProperty: 'hidden'
       }],
-      initStateId: 'Added',
+      initStateId: 'Changed/renamed',
       finalStateIds: ['Changed/renamed']
     });
   });
 
   it('should throw error if state property is invalid', () => {
-    spyOn(ctrl, 'getDiffData').and.returnValue(
+    component.diffData = (
       {
         nodes: {
           1: {
@@ -162,11 +177,17 @@ describe('VersionDiffVisualizationComponent', () => {
             stateProperty: 'invalid',
             originalStateName: 'A'
           }
-        }
+        },
+        v2States: null,
+        v1States: null,
+        finalStateIds: null,
+        v2InitStateId: null,
+        links: null,
+        v1InitStateId: null,
       }
     );
 
-    expect(() => ctrl.$onInit()).toThrowError('Invalid state property.');
+    expect(() => component.ngOnInit()).toThrowError('Invalid state property.');
   });
 
   it('should open state diff modal when user clicks on a state in' +
@@ -191,16 +212,15 @@ describe('VersionDiffVisualizationComponent', () => {
       }) as NgbModalRef;
     });
 
-    ctrl.$onInit();
-    ctrl.onClickStateInDiffGraph(2);
-    $scope.$apply();
+    component.ngOnInit();
+    component.onClickStateInDiffGraph('2');
 
     expect(spyObj).toHaveBeenCalled();
   });
 
   it('should open state diff modal and return old and new states when' +
     ' when user clicks on a state in difference graph', () => {
-    spyOn(ctrl, 'getDiffData').and.returnValue(
+    component.diffData = (
       {
         nodes: {
           1: {
@@ -216,7 +236,11 @@ describe('VersionDiffVisualizationComponent', () => {
         v1States: {
           A: {},
           B: {}
-        }
+        },
+        finalStateIds: null,
+        v2InitStateId: null,
+        links: null,
+        v1InitStateId: null,
       }
     );
 
@@ -240,9 +264,8 @@ describe('VersionDiffVisualizationComponent', () => {
       }) as NgbModalRef;
     });
 
-    ctrl.$onInit();
-    ctrl.onClickStateInDiffGraph(1);
-    $scope.$apply();
+    component.ngOnInit();
+    component.onClickStateInDiffGraph('1');
 
     expect(spyObj).toHaveBeenCalled();
   });
@@ -255,9 +278,8 @@ describe('VersionDiffVisualizationComponent', () => {
       }) as NgbModalRef;
     });
 
-    ctrl.$onInit();
-    ctrl.onClickStateInDiffGraph(2);
-    $scope.$apply();
+    component.ngOnInit();
+    component.onClickStateInDiffGraph('2');
 
     expect(spyObj).toHaveBeenCalled();
   });

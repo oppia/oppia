@@ -37,7 +37,9 @@ from core.platform import models
 import apache_beam as beam
 
 import result
-from typing import Dict, Iterable, Optional, Tuple, Union
+
+from typing import Dict, Iterable, Iterator, List, Optional, Set, Tuple, Union
+from typing_extensions import TypedDict
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -45,10 +47,20 @@ if MYPY: # pragma: no cover
     from mypy_imports import opportunity_models
     from mypy_imports import suggestion_models
 
-(opportunity_models, suggestion_models) = models.Registry.import_models(
-    [models.NAMES.opportunity, models.NAMES.suggestion])
+(opportunity_models, suggestion_models) = models.Registry.import_models([
+    models.NAMES.opportunity, models.NAMES.suggestion
+])
 
 datastore_services = models.Registry.import_datastore_services()
+
+
+class TranslationContributionsStatsDict(TypedDict):
+    """Type for the translation contributions stats dictionary."""
+
+    suggestion_status: str
+    edited_by_reviewer: bool
+    content_word_count: int
+    last_updated_date: datetime.date
 
 
 class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
@@ -146,7 +158,9 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
     def _generate_stats(
         suggestions: Iterable[suggestion_registry.SuggestionTranslateContent],
         opportunity: Optional[opportunity_domain.ExplorationOpportunitySummary]
-    ) -> Tuple[str, result.Result[Dict[str, Union[bool, int, str]], str]]:
+    ) -> Iterator[
+        Tuple[str, result.Result[Dict[str, Union[bool, int, str]], str]]
+    ]:
         """Generates translation contribution stats for each suggestion.
 
         Args:
@@ -182,11 +196,11 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                 # we can easily count words.
                 if (
                         change.cmd == exp_domain.CMD_ADD_WRITTEN_TRANSLATION and
-                        state_domain.WrittenTranslation.is_data_format_list(
+                        state_domain.WrittenTranslation.is_data_format_list(  # type: ignore[no-untyped-call]
                             change.data_format
                         )
                 ):
-                    content_items = change.content_html
+                    content_items: Union[str, List[str]] = change.content_html
                 else:
                     content_items = [change.content_html]
 
@@ -194,7 +208,7 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
                 for item in content_items:
                     # Count the number of words in the original content,
                     # ignoring any HTML tags and attributes.
-                    content_plain_text = html_cleaner.strip_html_tags(item) # type: ignore[no-untyped-call,attr-defined]
+                    content_plain_text = html_cleaner.strip_html_tags(item)
                     content_word_count += len(content_plain_text.split())
 
                 translation_contribution_stats_dict = {
@@ -255,6 +269,10 @@ class GenerateTranslationContributionStatsJob(base_jobs.JobBase):
             return translation_contributions_stats_model
 
 
+# TODO(#15613): Due to incomplete typing of apache_beam library and absences of
+# stubs in Typeshed, MyPy assuming CombineFn class is of type Any. Thus to
+# avoid MyPy's error (Class cannot subclass 'CombineFn' (has type 'Any')),
+# we added an ignore here.
 class CombineStats(beam.CombineFn):  # type: ignore[misc]
     """CombineFn for combining the stats."""
 
@@ -266,7 +284,7 @@ class CombineStats(beam.CombineFn):  # type: ignore[misc]
     def add_input(
         self,
         accumulator: suggestion_registry.TranslationContributionStats,
-        translation: Dict[str, Union[bool, int, str]]
+        translation: TranslationContributionsStatsDict
     ) -> suggestion_registry.TranslationContributionStats:
         is_accepted = (
             translation['suggestion_status'] ==
@@ -281,7 +299,7 @@ class CombineStats(beam.CombineFn):  # type: ignore[misc]
         word_count = translation['content_word_count']
         suggestion_date = datetime.datetime.strptime(
             str(translation['last_updated_date']), '%Y-%m-%d').date()
-        return suggestion_registry.TranslationContributionStats( # type: ignore[no-untyped-call]
+        return suggestion_registry.TranslationContributionStats(
             accumulator.language_code,
             accumulator.contributor_user_id,
             accumulator.topic_id,
@@ -308,7 +326,13 @@ class CombineStats(beam.CombineFn):  # type: ignore[misc]
         self,
         accumulators: Iterable[suggestion_registry.TranslationContributionStats]
     ) -> suggestion_registry.TranslationContributionStats:
-        return suggestion_registry.TranslationContributionStats( # type: ignore[no-untyped-call]
+        contribution_dates: Set[datetime.date] = set()
+        all_contribution_dates = [
+            acc.contribution_dates for acc in accumulators
+        ]
+        contribution_dates = contribution_dates.union(*all_contribution_dates)
+
+        return suggestion_registry.TranslationContributionStats(
             list(accumulators)[0].language_code,
             list(accumulators)[0].contributor_user_id,
             list(accumulators)[0].topic_id,
@@ -322,7 +346,7 @@ class CombineStats(beam.CombineFn):  # type: ignore[misc]
             sum(acc.accepted_translation_word_count for acc in accumulators),
             sum(acc.rejected_translations_count for acc in accumulators),
             sum(acc.rejected_translation_word_count for acc in accumulators),
-            set().union(*[acc.contribution_dates for acc in accumulators])
+            contribution_dates
         )
 
     def extract_output(

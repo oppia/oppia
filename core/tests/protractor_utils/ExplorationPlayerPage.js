@@ -136,6 +136,8 @@ var ExplorationPlayerPage = function() {
     let textArea = element(by.tagName('textarea'));
     await action.sendKeys('Text Area', textArea, 'Reporting this exploration');
     await action.click('Submit Button', submitButton);
+    await waitFor.visibilityOf(
+      flaggedSuccessElement, 'Successfully-flagged modal not showing up.');
     let afterSubmitText = await flaggedSuccessElement.getText();
     expect(afterSubmitText).toMatch(
       'Your report has been forwarded to the moderators for review.');
@@ -269,6 +271,8 @@ var ExplorationPlayerPage = function() {
       ratingValue) {
     await waitFor.elementToBeClickable(explorationInfoIcon);
     await action.click('Exploration Info Icon', explorationInfoIcon);
+    await waitFor.visibilityOf(
+      infoCardRating, 'Rating takes too long to appear');
     var value = await infoCardRating.getText();
     expect(value).toBe(ratingValue);
   };

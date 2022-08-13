@@ -41,6 +41,7 @@ export class PlayerPositionService {
     new EventEmitter<HelpCardEventResponse>();
 
   private _newCardOpenedEventEmitter = new EventEmitter<StateCard>();
+  private _loadedMostRecentCheckpointEmitter = new EventEmitter<void>();
 
   // The following property is initialized using the class methods.
   // and we need to do non-null assertion. For more information, see
@@ -122,6 +123,10 @@ export class PlayerPositionService {
 
   get onNewCardOpened(): EventEmitter<StateCard> {
     return this._newCardOpenedEventEmitter;
+  }
+
+  get onLoadedMostRecentCheckpoint(): EventEmitter<void> {
+    return this._loadedMostRecentCheckpointEmitter;
   }
 
   changeCurrentQuestion(index: number): void {

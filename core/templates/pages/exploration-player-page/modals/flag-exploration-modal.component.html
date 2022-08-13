@@ -12,6 +12,7 @@
       <label>
         <input type="radio" value="ad" [(ngModel)]="flag"
                [ngModelOptions]="{standalone: true}"
+               class="e2e-test-report-exploration-radio-button"
                (change)="showFlagMessageTextarea(flag)">
         {{ 'I18N_PLAYER_REPORT_MODAL_BODY_AD' | translate }}
       </label>
@@ -20,6 +21,7 @@
       <label>
         <input type="radio" value="poor_experience" [(ngModel)]="flag"
                [ngModelOptions]="{standalone: true}"
+               class="e2e-test-report-exploration-radio-button"
                (change)="showFlagMessageTextarea(flag)">
         {{ 'I18N_PLAYER_REPORT_MODAL_BODY_POOR_EXPERIENCE' | translate }}
       </label>
@@ -28,6 +30,7 @@
       <label>
         <input type="radio" value="other" [(ngModel)]="flag"
                [ngModelOptions]="{standalone: true}"
+               class="e2e-test-report-exploration-radio-button"
                (change)="showFlagMessageTextarea(flag)">
         {{ 'I18N_PLAYER_REPORT_MODAL_BODY_OTHER' | translate }}
       </label>
@@ -35,7 +38,7 @@
         {{ 'I18N_PLAYER_REPORT_MODAL_BODY_ADDITIONAL_DETAILS' | translate }}
         <textarea rows="3" cols="50"
                   [(ngModel)]="flagMessage" [ngModelOptions]="{standalone: true}"
-                  class="form-control" oppiaFocusOn="flagMessageTextarea">
+                  class="form-control e2e-test-report-exploration-text-area" oppiaFocusOn="flagMessageTextarea">
         </textarea>
       </p>
     </div>

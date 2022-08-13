@@ -21,10 +21,12 @@ import datetime
 from core import feconf
 from core.platform import models
 
-from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
+from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
+    # Here, change domain is imported only for type checking.
+    from core.domain import change_domain  # pylint: disable=invalid-import # isort:skip
     from mypy_imports import base_models
     from mypy_imports import datastore_services
 
@@ -210,8 +212,6 @@ class GeneralSuggestionModel(base_models.BaseModel):
             cls.author_id == user_id, cls.final_reviewer_id == user_id
         )).get(keys_only=True) is not None
 
-    # TODO(#13523): Change 'change_cmd' to TypedDict/Domain Object
-    # to remove Any used below.
     @classmethod
     def create(
             cls,
@@ -221,8 +221,10 @@ class GeneralSuggestionModel(base_models.BaseModel):
             target_version_at_submission: int,
             status: str,
             author_id: str,
-            final_reviewer_id: str,
-            change_cmd: Dict[str, Any],
+            final_reviewer_id: Optional[str],
+            change_cmd: Mapping[
+                str, change_domain.AcceptableChangeDictTypes
+            ],
             score_category: str,
             thread_id: str,
             language_code: Optional[str]
@@ -237,8 +239,9 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 entity at the time of creation of the suggestion.
             status: str. The status of the suggestion.
             author_id: str. The ID of the user who submitted the suggestion.
-            final_reviewer_id: str. The ID of the reviewer who has
-                accepted/rejected the suggestion.
+            final_reviewer_id: str|None. The ID of the reviewer who has
+                accepted/rejected the suggestion, or None if no reviewer is
+                assigned.
             change_cmd: dict. The actual content of the suggestion.
             score_category: str. The scoring category for the suggestion.
             thread_id: str. The ID of the feedback thread linked to the
@@ -510,7 +513,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
     @classmethod
     def get_in_review_translation_suggestions_with_exp_ids_by_offset(
         cls,
-        limit: int,
+        limit: Optional[int],
         offset: int,
         user_id: str,
         language_codes: List[str],
@@ -521,7 +524,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
         given exploration IDs.
 
         Args:
-            limit: int. Maximum number of entities to be returned.
+            limit: int|None. Maximum number of entities to be returned. If None,
+                returns all matching entities.
             offset: int. Number of results to skip from the beginning of all
                 results matching the query.
             user_id: str. The id of the user trying to make this query.
@@ -550,6 +554,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
         results: Sequence[GeneralSuggestionModel] = (
             suggestion_query.fetch(limit, offset=offset)
+            if limit is not None
+            else suggestion_query.fetch(offset=offset)
         )
         next_offset = offset + len(results)
 
