@@ -441,18 +441,6 @@ describe('Exploration editor tab component', function() {
     expect(stateEditorService.interaction.id).toBe(newInteractionId);
   });
 
-  it('should save state next content id index', function() {
-    stateEditorService.setActiveStateName('First State');
-    expect(
-      explorationStatesService.getState('First State').nextContentIdIndex
-    ).toEqual(0);
-
-    ctrl.saveNextContentIdIndex(2);
-    expect(
-      explorationStatesService.getState('First State').nextContentIdIndex
-    ).toBe(2);
-  });
-
   it('should save linked skill id', function() {
     stateEditorService.setActiveStateName('First State');
     expect(

@@ -547,15 +547,6 @@ describe('ExplorationFooterComponent', () => {
               }
             },
             solicit_answer_details: false,
-            written_translations: {
-              translations_mapping: {
-                ca_placeholder_0: {},
-                feedback_1: {},
-                rule_input_2: {},
-                content: {},
-                default_outcome: {}
-              }
-            },
             interaction: {
               solution: null,
               confirmed_unclassified_answers: [],
@@ -633,11 +624,6 @@ describe('ExplorationFooterComponent', () => {
               }
             },
             solicit_answer_details: false,
-            written_translations: {
-              translations_mapping: {
-                content: {}
-              }
-            },
             interaction: {
               solution: null,
               confirmed_unclassified_answers: [],
@@ -652,7 +638,6 @@ describe('ExplorationFooterComponent', () => {
               default_outcome: null
             },
             param_changes: [],
-            next_content_id_index: 0,
             card_is_checkpoint: false,
             linked_skill_id: null,
             content: {
@@ -672,15 +657,6 @@ describe('ExplorationFooterComponent', () => {
               }
             },
             solicit_answer_details: false,
-            written_translations: {
-              translations_mapping: {
-                ca_placeholder_0: {},
-                feedback_1: {},
-                rule_input_2: {},
-                content: {},
-                default_outcome: {}
-              }
-            },
             interaction: {
               solution: null,
               confirmed_unclassified_answers: [],
@@ -742,7 +718,6 @@ describe('ExplorationFooterComponent', () => {
               }
             },
             param_changes: [],
-            next_content_id_index: 3,
             card_is_checkpoint: true,
             linked_skill_id: null,
             content: {
@@ -850,7 +825,6 @@ describe('ExplorationFooterComponent', () => {
       'State A', '<p>Content</p>', '<interaction></interaction>',
       null,
       RecordedVoiceovers.createEmpty(),
-      writtenTranslationsObjectFactory.createEmpty(),
       'content', audioTranslationLanguageService);
     spyOn(playerTranscriptService, 'getCard').and.returnValue(card);
     spyOn(explorationEngineService, 'getStateFromStateName')

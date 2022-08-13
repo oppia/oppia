@@ -797,8 +797,11 @@ describe('Interaction object factory', () => {
         }]
       }
     };
-
-    expect(Interaction.getCustomizationArgContentIds(ca)).toEqual(
+    let contentIds = Interaction.getCustomizationArgContents(ca).map(
+      (content) => {
+      return content.contentId;
+      });
+    expect(contentIds).toEqual(
       ['ca_dummyCustArg_content_0', 'ca_dummyCustArg_content_1']);
   });
 

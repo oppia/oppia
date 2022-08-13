@@ -215,11 +215,13 @@ export class Interaction extends BaseTranslatableObject {
       }
     };
 
-    Object.values(customizationArgs).forEach(
-      caValue => {
-        traverseValueAndRetrieveContentIdsFromSubtitled(caValue.value);
-      }
-    );
+    if(customizationArgs) {
+      Object.values(customizationArgs).forEach(
+        caValue => {
+          traverseValueAndRetrieveContentIdsFromSubtitled(caValue.value);
+        }
+      );
+    }
 
     return contents;
   }

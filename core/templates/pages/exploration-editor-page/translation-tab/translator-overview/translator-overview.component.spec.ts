@@ -31,6 +31,7 @@ import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { ReadOnlyExplorationBackendApiService } from
   'domain/exploration/read-only-exploration-backend-api.service';
+import { ContextService } from 'services/context.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
@@ -53,6 +54,7 @@ describe('Translator Overview component', function() {
   var $scope = null;
   var explorationLanguageCodeService = null;
   var languageUtilService = null;
+  let contextService = null;
   var stateEditorService = null;
   var translationLanguageService = null;
   var translationStatusService = null;
@@ -81,6 +83,7 @@ describe('Translator Overview component', function() {
 
     languageUtilService = TestBed.get(LanguageUtilService);
     focusManagerService = TestBed.get(FocusManagerService);
+    contextService = TestBed.get(ContextService);
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -148,6 +151,7 @@ describe('Translator Overview component', function() {
 
   it('should show tab mode switcher when language code is different' +
     ' from exploration\'s language code', function() {
+    spyOn(contextService, 'isExplorationLinkedToStory').and.returnValue(true);
     expect($scope.canShowTabModeSwitcher()).toBe(true);
   });
 

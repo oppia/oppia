@@ -39,13 +39,13 @@ angular.module('oppia').component('translatorOverview', {
   template: require('./translator-overview.component.html'),
   controller: [
     '$scope', '$window', 'ContextService', 'ExplorationLanguageCodeService',
-    'FocusManagerService', 'LanguageUtilService',
+    'FocusManagerService', 'GraphDataService', 'LanguageUtilService',
     'RouterService', 'StateEditorService', 'TranslationLanguageService',
     'TranslationStatusService', 'TranslationTabActiveModeService',
     'DEFAULT_AUDIO_LANGUAGE',
     function(
         $scope, $window, ContextService, ExplorationLanguageCodeService,
-        FocusManagerService, LanguageUtilService,
+      FocusManagerService, GraphDataService, LanguageUtilService,
         RouterService, StateEditorService, TranslationLanguageService,
         TranslationStatusService, TranslationTabActiveModeService,
         DEFAULT_AUDIO_LANGUAGE) {

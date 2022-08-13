@@ -17,11 +17,12 @@
  */
 
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import { SubtitledUnicode } from 'domain/exploration/SubtitledUnicodeObjectFactory';
 import { TranslatedContent } from 'domain/exploration/TranslatedContentObjectFactory';
 import { EntityTranslation } from 'domain/translation/EntityTranslationObjectFactory';
 
 export class BaseTranslatableObject {
-  _translatableFields: SubtitledHtml[];
+  _translatableFields: (SubtitledUnicode | SubtitledHtml)[];
   _translatableObjects: BaseTranslatableObject[] | null[];
 
   constructor() {

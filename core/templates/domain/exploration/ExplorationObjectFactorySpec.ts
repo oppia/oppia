@@ -311,20 +311,4 @@ describe('Exploration object factory', () => {
     expect(exploration.getAuthorRecommendedExpIds('second state'))
       .toEqual([]);
   });
-
-  it('should correctly get displayable written translation language codes',
-    () => {
-      expect(
-        exploration.getDisplayableWrittenTranslationLanguageCodes()
-      ).toEqual([]);
-
-      const firstState = exploration.getState('first state');
-
-      firstState.interaction.id = null;
-      firstState.writtenTranslations.addWrittenTranslation(
-        'content', 'fr', 'html', '<p>translation</p>');
-      expect(
-        exploration.getDisplayableWrittenTranslationLanguageCodes()
-      ).toEqual(['fr']);
-    });
 });

@@ -30,6 +30,7 @@ import { AlertsService } from 'services/alerts.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { EditabilityService } from 'services/editability.service';
 import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
+import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { StateEditorService } from '../state-editor-properties-services/state-editor.service';
 import { StateHintsService } from '../state-editor-properties-services/state-hints.service';
 import { StateInteractionIdService } from '../state-editor-properties-services/state-interaction-id.service';
@@ -43,6 +44,7 @@ describe('State Solution Editor Component', () => {
   let convertToPlainTextPipe: ConvertToPlainTextPipe;
   let editabilityService: EditabilityService;
   let explorationHtmlFormatterService: ExplorationHtmlFormatterService;
+  var generateContentIdService: GenerateContentIdService;
   let ngbModal: NgbModal;
   let solutionValidityService: SolutionValidityService;
   let solutionVerificationService: SolutionVerificationService;
@@ -96,6 +98,8 @@ describe('State Solution Editor Component', () => {
     alertsService = TestBed.inject(AlertsService);
     solutionVerificationService = TestBed.inject(SolutionVerificationService);
     solutionObjectFactory = TestBed.inject(SolutionObjectFactory);
+    generateContentIdService = TestBed.inject(GenerateContentIdService);
+    generateContentIdService.init(() => 0, () => { });
 
     solution = solutionObjectFactory.createFromBackendDict({
       answer_is_exclusive: false,
