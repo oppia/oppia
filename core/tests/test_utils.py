@@ -31,7 +31,6 @@ import logging
 import os
 import random
 import re
-from sre_parse import State
 import string
 import unittest
 
