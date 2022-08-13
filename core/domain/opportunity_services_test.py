@@ -29,6 +29,7 @@ from core.domain import opportunity_services
 from core.domain import question_services
 from core.domain import skill_domain
 from core.domain import skill_services
+from core.domain import state_domain
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import subtopic_page_domain
@@ -41,10 +42,24 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
+from typing import Dict, List, Union
+
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import feedback_models
+    from mypy_imports import opportunity_models
+    from mypy_imports import story_models
+    from mypy_imports import suggestion_models
+
 (
-    feedback_models, opportunity_models, story_models, suggestion_models
+    feedback_models,
+    opportunity_models,
+    story_models,
+    suggestion_models
 ) = models.Registry.import_models([
-    models.NAMES.feedback, models.NAMES.opportunity, models.NAMES.story,
+    models.NAMES.feedback,
+    models.NAMES.opportunity,
+    models.NAMES.story,
     models.NAMES.suggestion
 ])
 
@@ -52,9 +67,9 @@ from core.tests import test_utils
 class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
     """Test the opportunity services module."""
 
-    suggestion_target_id = '0'
-    suggestion_target_version_at_submission = 1
-    suggestion_change = {
+    suggestion_target_id: str = '0'
+    suggestion_target_version_at_submission: int = 1
+    suggestion_change: Dict[str, str] = {
         'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
         'state_name': 'Introduction',
         'content_id': 'content_0',
@@ -64,15 +79,15 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         'data_format': 'html'
     }
 
-    def setUp(self):
-        super(OpportunityServicesIntegrationTest, self).setUp()
+    def setUp(self) -> None:
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
-        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)  # type: ignore[no-untyped-call]
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
 
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])  # type: ignore[no-untyped-call]
         self.admin = user_services.get_user_actions_info(self.admin_id)
 
         self.TOPIC_ID = 'topic'
@@ -120,24 +135,29 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                 'url_fragment': 'dummy-fragment'
             })]
         )
-        topic_services.save_new_topic(self.owner_id, topic)
-        topic_services.publish_topic(self.TOPIC_ID, self.admin_id)
+        topic_services.save_new_topic(self.owner_id, topic)  # type: ignore[no-untyped-call]
+        topic_services.publish_topic(self.TOPIC_ID, self.admin_id)  # type: ignore[no-untyped-call]
 
         story = story_domain.Story.create_default_story(
             self.STORY_ID, 'A story', 'description', self.TOPIC_ID,
             'story-one')
         story_services.save_new_story(self.owner_id, story)
-        topic_services.add_canonical_story(
+        topic_services.add_canonical_story(  # type: ignore[no-untyped-call]
             self.owner_id, self.TOPIC_ID, self.STORY_ID)
-        topic_services.publish_story(
+        topic_services.publish_story(  # type: ignore[no-untyped-call]
             self.TOPIC_ID, self.STORY_ID, self.admin_id)
 
     def mock_generate_new_thread_id_for_suggestion(
-            self, unused_entity_type, unused_entity_id):
+        self,
+        unused_entity_type: feedback_models.GeneralFeedbackThreadModel,
+        unused_entity_id: str
+    ) -> str:
         """Mock generate_new_thread_id function when creating suggestions."""
         return self.THREAD_ID
 
-    def create_translation_suggestion_for_exploration_0_and_verify(self):
+    def create_translation_suggestion_for_exploration_0_and_verify(
+        self
+    ) -> None:
         """Creates a translation suggestion for exploration 0 and performs basic
         assertions.
         """
@@ -157,7 +177,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.assertIsNotNone(suggestion)
         self.assertEqual(suggestion.status, suggestion_models.STATUS_IN_REVIEW)
 
-    def add_exploration_0_to_story(self):
+    def add_exploration_0_to_story(self) -> None:
         """Adds exploration 0 as a node to the test story."""
         story_services.update_story(
             self.owner_id, self.STORY_ID, [story_domain.StoryChange({
@@ -172,7 +192,9 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                 'new_value': '0'
             })], 'Changes.')
 
-    def test_new_opportunity_with_adding_exploration_in_story_node(self):
+    def test_new_opportunity_with_adding_exploration_in_story_node(
+        self
+    ) -> None:
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities(
                 'hi', 'topic', None))
@@ -189,7 +211,8 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(opportunity.story_title, 'A story')
 
     def test_get_translation_opportunities_with_translations_in_review(
-        self):
+        self
+    ) -> None:
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities(
                 'hi', 'topic', None))
@@ -207,7 +230,9 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             opportunity.translation_in_review_counts,
             {'hi': 1})
 
-    def test_get_translation_opportunities_with_no_translations_in_review(self):
+    def test_get_translation_opportunities_with_no_translations_in_review(
+        self
+    ) -> None:
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities(
                 'hi', 'topic', None))
@@ -223,7 +248,8 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(opportunity.translation_in_review_counts, {})
 
     def test_opportunity_get_deleted_with_removing_exploration_from_story_node(
-            self):
+        self
+    ) -> None:
         self.add_exploration_0_to_story()
 
         translation_opportunities, _, _ = (
@@ -242,7 +268,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                 'hi', 'topic', None))
         self.assertEqual(len(translation_opportunities), 0)
 
-    def test_opportunity_get_deleted_with_deleting_story(self):
+    def test_opportunity_get_deleted_with_deleting_story(self) -> None:
         self.add_exploration_0_to_story()
 
         translation_opportunities, _, _ = (
@@ -257,7 +283,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                 'hi', 'topic', None))
         self.assertEqual(len(translation_opportunities), 0)
 
-    def test_opportunity_get_deleted_with_deleting_topic(self):
+    def test_opportunity_get_deleted_with_deleting_topic(self) -> None:
         self.add_exploration_0_to_story()
 
         translation_opportunities, _, _ = (
@@ -265,14 +291,14 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                 'hi', 'topic', None))
         self.assertEqual(len(translation_opportunities), 1)
 
-        topic_services.delete_topic(self.owner_id, self.TOPIC_ID)
+        topic_services.delete_topic(self.owner_id, self.TOPIC_ID)  # type: ignore[no-untyped-call]
 
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities(
                 'hi', 'topic', None))
         self.assertEqual(len(translation_opportunities), 0)
 
-    def test_opportunities_updates_with_updating_topic_name(self):
+    def test_opportunities_updates_with_updating_topic_name(self) -> None:
         self.add_exploration_0_to_story()
 
         translation_opportunities, _, _ = (
@@ -284,7 +310,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(opportunity.story_title, 'A story')
         self.assertEqual(opportunity.topic_name, 'topic')
 
-        topic_services.update_topic_and_subtopic_pages(
+        topic_services.update_topic_and_subtopic_pages(  # type: ignore[no-untyped-call]
             self.owner_id, self.TOPIC_ID, [topic_domain.TopicChange({
                 'cmd': 'update_topic_property',
                 'property_name': 'name',
@@ -301,7 +327,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(opportunity.story_title, 'A story')
         self.assertEqual(opportunity.topic_name, 'A new topic')
 
-    def test_opportunities_updates_with_updating_story_title(self):
+    def test_opportunities_updates_with_updating_story_title(self) -> None:
         self.add_exploration_0_to_story()
 
         translation_opportunities, _, _ = (
@@ -328,7 +354,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         opportunity = translation_opportunities[0]
         self.assertEqual(opportunity.story_title, 'A new story')
 
-    def test_opportunity_updates_with_updating_story_node_title(self):
+    def test_opportunity_updates_with_updating_story_node_title(self) -> None:
         self.add_exploration_0_to_story()
 
         translation_opportunities, _, _ = (
@@ -356,7 +382,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         opportunity = translation_opportunities[0]
         self.assertEqual(opportunity.chapter_title, 'A new Node1')
 
-    def test_opportunity_updates_with_updating_exploration(self):
+    def test_opportunity_updates_with_updating_exploration(self) -> None:
         self.add_exploration_0_to_story()
 
         translation_opportunities, _, _ = (
@@ -365,7 +391,12 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(len(translation_opportunities), 1)
         self.assertEqual(translation_opportunities[0].content_count, 2)
 
-        answer_group_dict = {
+        answer_group_dict_inputs_value: Dict[str, Union[str, List[str]]] = {
+            'contentId': 'rule_input_4',
+            'normalizedStrSet': ['Test']
+        }
+
+        answer_group_dict: state_domain.AnswerGroupDict = {
             'outcome': {
                 'dest': 'Introduction',
                 'dest_if_really_stuck': None,
@@ -380,10 +411,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': {
-                        'contentId': 'rule_input_4',
-                        'normalizedStrSet': ['Test']
-                    }
+                    'x': answer_group_dict_inputs_value
                 },
                 'rule_type': 'Contains'
             }],
@@ -399,7 +427,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             },
         })
 
-        solution_dict = {
+        solution_dict: state_domain.SolutionDict = {
             'answer_is_exclusive': False,
             'correct_answer': 'helloworld!',
             'explanation': {
@@ -407,7 +435,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                 'html': '<p>hello_world is a string</p>'
             },
         }
-        exp_services.update_exploration(
+        exp_services.update_exploration(  # type: ignore[no-untyped-call]
             self.owner_id, '0', [
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -458,7 +486,8 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(translation_opportunities[0].content_count, 6)
 
     def test_completing_translation_removes_language_from_incomplete_language_codes( # pylint: disable=line-too-long
-            self):
+        self
+    ) -> None:
         story_services.update_story(
             self.owner_id, self.STORY_ID, [story_domain.StoryChange({
                 'cmd': 'add_story_node',
@@ -476,15 +505,17 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                 'hi', 'topic', None))
         self.assertEqual(len(translation_opportunities), 1)
 
+        change_list_solution_dict: state_domain.SubtitledHtmlDict = {
+            'html': '<p><strong>Test content</strong></p>',
+            'content_id': 'content_0',
+        }
+
         change_list = [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': 'Introduction',
                 'property_name': 'content',
-                'new_value': {
-                    'html': '<p><strong>Test content</strong></p>',
-                    'content_id': 'content_0',
-                }
+                'new_value': change_list_solution_dict
             }),
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
@@ -499,10 +530,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'state_name': 'End State',
                 'property_name': 'content',
-                'new_value': {
-                    'html': '<p><strong>Test content</strong></p>',
-                    'content_id': 'content_0',
-                }
+                'new_value': change_list_solution_dict
             }),
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
@@ -514,7 +542,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                 'data_format': 'html'
             }),
         ]
-        exp_services.update_exploration(
+        exp_services.update_exploration(  # type: ignore[no-untyped-call]
             self.owner_id, '0', change_list, 'commit message')
 
         # get_translation_opportunities should no longer return the opportunity
@@ -532,7 +560,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             'content_id': 'content_0',
             'language_code': 'hi'
         })]
-        exp_services.update_exploration(
+        exp_services.update_exploration(  # type: ignore[no-untyped-call]
             self.owner_id, '0', translation_needs_update_change_list,
             'commit message')
         translation_opportunities, _, _ = (
@@ -540,12 +568,12 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                 'hi', 'topic', None))
         self.assertEqual(len(translation_opportunities), 1)
 
-    def test_create_new_skill_creates_new_skill_opportunity(self):
+    def test_create_new_skill_creates_new_skill_opportunity(self) -> None:
         skill_opportunities, _, _ = (
             opportunity_services.get_skill_opportunities(None))
         self.assertEqual(len(skill_opportunities), 0)
 
-        self.save_new_skill(
+        self.save_new_skill(  # type: ignore[no-untyped-call]
             self.SKILL_ID, self.USER_ID, description='skill_description')
 
         skill_opportunities, _, _ = (
@@ -555,9 +583,11 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(opportunity.id, self.SKILL_ID)
         self.assertEqual(opportunity.skill_description, 'skill_description')
 
-    def test_create_skill_opportunity_counts_existing_linked_questions(self):
+    def test_create_skill_opportunity_counts_existing_linked_questions(
+        self
+    ) -> None:
         content_id_generator = translation_domain.ContentIdGenerator()
-        self.save_new_question(
+        self.save_new_question(  # type: ignore[no-untyped-call]
             self.QUESTION_ID, self.USER_ID,
             self._create_valid_question_data('ABC', content_id_generator),
             [self.SKILL_ID],
@@ -577,18 +607,19 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(opportunity.question_count, 1)
 
     def test_create_skill_opportunity_for_existing_opportunity_raises_exception(
-            self):
+        self
+    ) -> None:
         opportunity_services.create_skill_opportunity(
             self.SKILL_ID, 'description')
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception,
             'SkillOpportunity corresponding to skill ID %s already exists.'
             % self.SKILL_ID):
             opportunity_services.create_skill_opportunity(
                 self.SKILL_ID, 'description')
 
-    def test_update_skill_description_updates_skill_opportunity(self):
-        self.save_new_skill(
+    def test_update_skill_description_updates_skill_opportunity(self) -> None:
+        self.save_new_skill(  # type: ignore[no-untyped-call]
             self.SKILL_ID, self.USER_ID, description='skill_description')
         changelist = [
             skill_domain.SkillChange({
@@ -600,7 +631,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             })
         ]
 
-        skill_services.update_skill(
+        skill_services.update_skill(  # type: ignore[no-untyped-call]
             self.admin_id, self.SKILL_ID, changelist,
             'Updated misconception name.')
 
@@ -610,7 +641,9 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(opportunity.id, self.SKILL_ID)
         self.assertEqual(opportunity.skill_description, 'new_description')
 
-    def test_update_skill_opportunity_skill_description_invalid_skill_id(self):
+    def test_update_skill_opportunity_skill_description_invalid_skill_id(
+        self
+    ) -> None:
         opportunity_services.update_skill_opportunity_skill_description(
             'bad_skill_id', 'bad_description')
 
@@ -618,30 +651,30 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             opportunity_services.get_skill_opportunities(None))
         self.assertEqual(len(skill_opportunities), 0)
 
-    def test_delete_skill_deletes_skill_opportunity(self):
-        self.save_new_skill(
+    def test_delete_skill_deletes_skill_opportunity(self) -> None:
+        self.save_new_skill(  # type: ignore[no-untyped-call]
             self.SKILL_ID, self.USER_ID, description='skill_description')
         skill_opportunities, _, _ = (
             opportunity_services.get_skill_opportunities(None))
         self.assertEqual(len(skill_opportunities), 1)
 
-        skill_services.delete_skill(self.USER_ID, self.SKILL_ID)
+        skill_services.delete_skill(self.USER_ID, self.SKILL_ID)  # type: ignore[no-untyped-call]
 
         skill_opportunities, _, _ = (
             opportunity_services.get_skill_opportunities(None))
         self.assertEqual(len(skill_opportunities), 0)
 
-    def test_publish_story_creates_exploration_opportunity(self):
+    def test_publish_story_creates_exploration_opportunity(self) -> None:
         self.add_exploration_0_to_story()
         # Story is already published, so unpublish first.
-        topic_services.unpublish_story(
+        topic_services.unpublish_story(  # type: ignore[no-untyped-call]
             self.TOPIC_ID, self.STORY_ID, self.admin_id)
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities(
                 'hi', 'topic', None))
         self.assertEqual(len(translation_opportunities), 0)
 
-        topic_services.publish_story(
+        topic_services.publish_story(  # type: ignore[no-untyped-call]
             self.TOPIC_ID, self.STORY_ID, self.admin_id)
 
         translation_opportunities, _, _ = (
@@ -650,32 +683,33 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(len(translation_opportunities), 1)
 
     def test_publish_story_creates_exploration_opportunity_if_topic_is_not_published( # pylint: disable=line-too-long
-            self):
+        self
+    ) -> None:
         self.add_exploration_0_to_story()
         # Story and topic are already published, so unpublish first.
-        topic_services.unpublish_story(
+        topic_services.unpublish_story(  # type: ignore[no-untyped-call]
             self.TOPIC_ID, self.STORY_ID, self.admin_id)
-        topic_services.unpublish_topic(self.TOPIC_ID, self.admin_id)
+        topic_services.unpublish_topic(self.TOPIC_ID, self.admin_id)  # type: ignore[no-untyped-call]
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities(
                 'hi', 'topic', None))
         self.assertEqual(len(translation_opportunities), 0)
 
-        topic_services.publish_story(
+        topic_services.publish_story(  # type: ignore[no-untyped-call]
             self.TOPIC_ID, self.STORY_ID, self.admin_id)
 
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities('hi', 'topic', None))
         self.assertEqual(len(translation_opportunities), 1)
 
-    def test_unpublish_story_deletes_exploration_opportunity(self):
+    def test_unpublish_story_deletes_exploration_opportunity(self) -> None:
         self.add_exploration_0_to_story()
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities(
                 'hi', 'topic', None))
         self.assertEqual(len(translation_opportunities), 1)
 
-        topic_services.unpublish_story(
+        topic_services.unpublish_story(  # type: ignore[no-untyped-call]
             self.TOPIC_ID, self.STORY_ID, self.admin_id)
 
         translation_opportunities, _, _ = (
@@ -683,21 +717,23 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                 'hi', 'topic', None))
         self.assertEqual(len(translation_opportunities), 0)
 
-    def test_unpublish_story_rejects_translation_suggestions(self):
+    def test_unpublish_story_rejects_translation_suggestions(self) -> None:
         self.add_exploration_0_to_story()
         self.create_translation_suggestion_for_exploration_0_and_verify()
 
-        topic_services.unpublish_story(
+        topic_services.unpublish_story(  # type: ignore[no-untyped-call]
             self.TOPIC_ID, self.STORY_ID, self.admin_id)
 
         suggestion = suggestion_services.get_suggestion_by_id(self.THREAD_ID)
         self.assertEqual(suggestion.status, suggestion_models.STATUS_REJECTED)
 
-    def test_add_question_increments_skill_opportunity_question_count(self):
+    def test_add_question_increments_skill_opportunity_question_count(
+        self
+    ) -> None:
         opportunity_services.create_skill_opportunity(
             self.SKILL_ID, 'description')
         content_id_generator = translation_domain.ContentIdGenerator()
-        self.save_new_question(
+        self.save_new_question(  # type: ignore[no-untyped-call]
             self.QUESTION_ID, self.USER_ID,
             self._create_valid_question_data('ABC', content_id_generator),
             [self.SKILL_ID],
@@ -709,11 +745,11 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(len(skill_opportunities), 1)
         self.assertEqual(opportunity.question_count, 1)
 
-    def test_create_question_skill_link_increments_question_count(self):
+    def test_create_question_skill_link_increments_question_count(self) -> None:
         opportunity_services.create_skill_opportunity(
             self.SKILL_ID, 'description')
         content_id_generator = translation_domain.ContentIdGenerator()
-        self.save_new_question(
+        self.save_new_question(  # type: ignore[no-untyped-call]
             self.QUESTION_ID, self.USER_ID,
             self._create_valid_question_data('ABC', content_id_generator),
             [self.SKILL_ID],
@@ -727,11 +763,13 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         opportunity = skill_opportunities[0]
         self.assertEqual(opportunity.question_count, 1)
 
-    def test_link_multiple_skills_for_question_increments_question_count(self):
+    def test_link_multiple_skills_for_question_increments_question_count(
+        self
+    ) -> None:
         opportunity_services.create_skill_opportunity(
             self.SKILL_ID, 'description')
         content_id_generator = translation_domain.ContentIdGenerator()
-        self.save_new_question(
+        self.save_new_question(  # type: ignore[no-untyped-call]
             self.QUESTION_ID, self.USER_ID,
             self._create_valid_question_data('ABC', content_id_generator),
             ['skill_2'],
@@ -745,11 +783,11 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         opportunity = skill_opportunities[0]
         self.assertEqual(opportunity.question_count, 1)
 
-    def test_delete_question_decrements_question_count(self):
+    def test_delete_question_decrements_question_count(self) -> None:
         opportunity_services.create_skill_opportunity(
             self.SKILL_ID, 'description')
         content_id_generator = translation_domain.ContentIdGenerator()
-        self.save_new_question(
+        self.save_new_question(  # type: ignore[no-untyped-call]
             self.QUESTION_ID, self.USER_ID,
             self._create_valid_question_data('ABC', content_id_generator),
             [self.SKILL_ID],
@@ -763,11 +801,13 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(len(skill_opportunities), 1)
         self.assertEqual(opportunity.question_count, 0)
 
-    def test_delete_question_skill_link_decrements_question_count(self):
+    def test_delete_question_skill_link_decrements_question_count(
+        self
+    ) -> None:
         opportunity_services.create_skill_opportunity(
             self.SKILL_ID, 'description')
         content_id_generator = translation_domain.ContentIdGenerator()
-        self.save_new_question(
+        self.save_new_question(  # type: ignore[no-untyped-call]
             self.QUESTION_ID, self.USER_ID,
             self._create_valid_question_data('ABC', content_id_generator),
             ['skill_2'],
@@ -787,15 +827,15 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
 class OpportunityServicesUnitTest(test_utils.GenericTestBase):
     """Test the opportunity services methods."""
 
-    def setUp(self):
-        super(OpportunityServicesUnitTest, self).setUp()
+    def setUp(self) -> None:
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
-        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)  # type: ignore[no-untyped-call]
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
 
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])  # type: ignore[no-untyped-call]
 
         self.TOPIC_ID = 'topic'
         self.STORY_ID = 'story'
@@ -822,16 +862,16 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
                 'dummy-subtopic-url')]
         topic.next_subtopic_id = 2
         topic.skill_ids_for_diagnostic_test = ['skill_id_1']
-        topic_services.save_new_topic(self.owner_id, topic)
-        topic_services.publish_topic(self.TOPIC_ID, self.admin_id)
+        topic_services.save_new_topic(self.owner_id, topic)  # type: ignore[no-untyped-call]
+        topic_services.publish_topic(self.TOPIC_ID, self.admin_id)  # type: ignore[no-untyped-call]
 
         story = story_domain.Story.create_default_story(
             self.STORY_ID, 'A story', 'Description', self.TOPIC_ID,
             'story-two')
         story_services.save_new_story(self.owner_id, story)
-        topic_services.add_canonical_story(
+        topic_services.add_canonical_story(  # type: ignore[no-untyped-call]
             self.owner_id, self.TOPIC_ID, self.STORY_ID)
-        topic_services.publish_story(
+        topic_services.publish_story(  # type: ignore[no-untyped-call]
             self.TOPIC_ID, self.STORY_ID, self.admin_id)
 
         story_services.update_story(
@@ -847,7 +887,7 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
                 'new_value': '0'
             })], 'Changes.')
 
-    def test_get_exploration_opportunity_summaries_by_ids(self):
+    def test_get_exploration_opportunity_summaries_by_ids(self) -> None:
         output = (
             opportunity_services.get_exploration_opportunity_summaries_by_ids(
                 []))
@@ -858,13 +898,16 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
             opportunity_services.get_exploration_opportunity_summaries_by_ids(
                 ['0']))
 
+        opportunities_first_value = opportunities['0']
+        # Ruling out the possibility of None for mypy type checking.
+        assert opportunities_first_value is not None
         self.assertEqual(len(opportunities), 1)
         self.assertIsInstance(
-            opportunities['0'],
+            opportunities_first_value,
             opportunity_domain.ExplorationOpportunitySummary)
-        self.assertEqual(opportunities['0'].id, '0')
+        self.assertEqual(opportunities_first_value.id, '0')
 
-    def test_get_exploration_opportunity_summaries_by_no_topic_id(self):
+    def test_get_exploration_opportunity_summaries_by_no_topic_id(self) -> None:
         opportunity_summaries = (
             opportunity_services
                 .get_exploration_opportunity_summaries_by_topic_id(
@@ -872,7 +915,9 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
 
         self.assertEqual(opportunity_summaries, [])
 
-    def test_get_exploration_opportunity_summaries_by_valid_topic_id(self):
+    def test_get_exploration_opportunity_summaries_by_valid_topic_id(
+        self
+    ) -> None:
         opportunity_summaries = (
             opportunity_services
                 .get_exploration_opportunity_summaries_by_topic_id(
@@ -884,7 +929,9 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
             opportunity_domain.ExplorationOpportunitySummary)
         self.assertEqual(opportunity_summaries[0].topic_id, 'topic')
 
-    def test_get_exploration_opportunity_summaries_by_ids_for_invalid_id(self):
+    def test_get_exploration_opportunity_summaries_by_ids_for_invalid_id(
+        self
+    ) -> None:
         opportunities = (
             opportunity_services.get_exploration_opportunity_summaries_by_ids(
                 ['badID']))
@@ -893,10 +940,11 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
         self.assertEqual(opportunities['badID'], None)
 
     def test_get_exploration_opportunity_summary_from_model_populates_new_lang(
-            self):
+        self
+    ) -> None:
         observed_log_messages = []
 
-        def _mock_logging_function(msg, *args):
+        def _mock_logging_function(msg: str, *args: str) -> None:
             """Mocks logging.info()."""
             observed_log_messages.append(msg % args)
 
@@ -907,6 +955,8 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
 
         opportunity = opportunities['0']
 
+        # Ruling out the possibility of None for mypy type checking.
+        assert opportunity is not None
         self.assertFalse(
             'new_lang' in opportunity.incomplete_translation_language_codes)
 
@@ -927,6 +977,8 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
 
             opportunity = opportunities['0']
 
+            # Ruling out the possibility of None for mypy type checking.
+            assert opportunity is not None
             self.assertTrue(
                 'new_lang' in opportunity.incomplete_translation_language_codes)
             self.assertEqual(len(observed_log_messages), 1)
@@ -937,7 +989,8 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
             )
 
     def test_delete_exp_opportunities_corresponding_to_story_when_story_deleted(
-            self):
+        self
+    ) -> None:
         opportunity_models.ExplorationOpportunitySummaryModel(
             id='exp_1',
             topic_id='topic_id',
@@ -972,10 +1025,12 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
             )
         )
 
-    def test_regenerate_opportunities_related_to_topic_when_story_deleted(self):
+    def test_regenerate_opportunities_related_to_topic_when_story_deleted(
+        self
+    ) -> None:
         story_models.StoryModel.delete_by_id(self.STORY_ID)
 
-        self.assertRaisesRegex(
+        self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'Failed to regenerate opportunities',
             lambda: (
                 opportunity_services.regenerate_opportunities_related_to_topic(

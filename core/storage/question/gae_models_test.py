@@ -81,7 +81,7 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
 
     def test_create_question_empty_skill_id_list(self) -> None:
         state = state_domain.State.create_default_state(
-            'ABC', 'content_0', 'default_outcome_1') # type: ignore[no-untyped-call]
+            'ABC', 'content_0', 'default_outcome_1')
         question_state_data = state.to_dict()
         language_code = 'en'
         version = 1
@@ -95,7 +95,7 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
 
     def test_create_question_with_skill_ids(self) -> None:
         state = state_domain.State.create_default_state(
-            'ABC', 'content_0', 'default_outcome_1') # type: ignore[no-untyped-call]
+            'ABC', 'content_0', 'default_outcome_1')
         question_state_data = state.to_dict()
         linked_skill_ids = ['skill_id1', 'skill_id2']
         language_code = 'en'
@@ -114,7 +114,7 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
             self
     ) -> None:
         state = state_domain.State.create_default_state(
-            'ABC', 'content_0', 'default_outcome_1') # type: ignore[no-untyped-call]
+            'ABC', 'content_0', 'default_outcome_1')
         question_state_data = state.to_dict()
         linked_skill_ids = ['skill_id1', 'skill_id2']
         inapplicable_skill_misconception_ids = ['skill_id-1', 'skill_id-2']
@@ -131,7 +131,7 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
     def test_put_multi_questions(self) -> None:
         content_id_generator = translation_domain.ContentIdGenerator()
         question_state_data = self._create_valid_question_data(
-            'ABC', content_id_generator) # type: ignore[no-untyped-call]
+            'ABC', content_id_generator)
         linked_skill_ids = ['skill_id1', 'skill_id2']
         self.save_new_question( # type: ignore[no-untyped-call]
             'question_id1', 'owner_id',
@@ -170,7 +170,7 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
 
     def test_raise_exception_by_mocking_collision(self) -> None:
         state = state_domain.State.create_default_state(
-            'ABC', 'content_0', 'default_outcome_1') # type: ignore[no-untyped-call]
+            'ABC', 'content_0', 'default_outcome_1')
         question_state_data = state.to_dict()
         language_code = 'en'
         version = 1

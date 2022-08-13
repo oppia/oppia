@@ -37,7 +37,7 @@ class BaseTopicsAndSkillsDashboardTests(test_utils.GenericTestBase):
 
     def setUp(self):
         """Completes the sign-up process for the various users."""
-        super(BaseTopicsAndSkillsDashboardTests, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.TOPIC_MANAGER_EMAIL, self.TOPIC_MANAGER_USERNAME)
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
@@ -622,7 +622,7 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
 class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
     def setUp(self):
-        super(NewTopicHandlerTests, self).setUp()
+        super().setUp()
         self.url = feconf.NEW_TOPIC_URL
 
     def test_topic_creation(self):
@@ -696,7 +696,7 @@ class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
 class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
     def setUp(self):
-        super(NewSkillHandlerTests, self).setUp()
+        super().setUp()
         self.url = feconf.NEW_SKILL_URL
         with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
@@ -989,7 +989,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
 class MergeSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
     def setUp(self):
-        super(MergeSkillHandlerTests, self).setUp()
+        super().setUp()
         self.url = feconf.MERGE_SKILLS_URL
 
         self.question_id = question_services.get_new_question_id()

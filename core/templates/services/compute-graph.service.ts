@@ -25,6 +25,7 @@ import { States } from 'domain/exploration/StatesObjectFactory';
 export interface GraphLink {
   source: string;
   target: string;
+  linkProperty: string | null;
 }
 
 export interface GraphNodes {
@@ -44,7 +45,7 @@ export interface GraphData {
 export class ComputeGraphService {
   _computeGraphData(initStateId: string, states: States): GraphData {
     let nodes: Record<string, string> = {};
-    let links: { source: string; target: string }[] = [];
+    let links: GraphLink[] = [];
     let finalStateIds = states.getFinalStateNames();
 
     states.getStateNames().forEach(function(stateName) {
@@ -56,6 +57,7 @@ export class ComputeGraphService {
           links.push({
             source: stateName,
             target: groups[h].outcome.dest,
+            linkProperty: null
           });
         }
 
@@ -63,6 +65,7 @@ export class ComputeGraphService {
           links.push({
             source: stateName,
             target: interaction.defaultOutcome.dest,
+            linkProperty: null
           });
         }
       }

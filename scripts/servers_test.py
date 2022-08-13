@@ -46,14 +46,14 @@ class ManagedProcessTests(test_utils.TestBase):
         collections.namedtuple('POPEN_CALL', ['program_args', 'kwargs']))
 
     def setUp(self):
-        super(ManagedProcessTests, self).setUp()
+        super().setUp()
         self.exit_stack = contextlib.ExitStack()
 
     def tearDown(self):
         try:
             self.exit_stack.close()
         finally:
-            super(ManagedProcessTests, self).tearDown()
+            super().tearDown()
 
     @contextlib.contextmanager
     def swap_popen(self, unresponsive=False, num_children=0, outputs=()):
@@ -220,7 +220,7 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertEqual(
             popen_calls, [self.POPEN_CALL(['a', '1'], {'shell': False})])
 
-    def test_reports_killed_processes_as_warnings(self):
+    def test_killing_process_raises_exception(self):
         self.exit_stack.enter_context(self.swap_popen(
             unresponsive=True))
         logs = self.exit_stack.enter_context(self.capture_logging())
@@ -231,6 +231,21 @@ class ManagedProcessTests(test_utils.TestBase):
                 Exception,
                 'Process .* exited unexpectedly with exit code 1'):
             self.exit_stack.close()
+
+        self.assert_proc_was_managed_as_expected(
+            logs, proc.pid,
+            manager_should_have_sent_terminate_signal=True,
+            manager_should_have_sent_kill_signal=True)
+
+    def test_killing_process_raises_no_exception_if_disabled(self):
+        self.exit_stack.enter_context(self.swap_popen(
+            unresponsive=True))
+        logs = self.exit_stack.enter_context(self.capture_logging())
+
+        proc = self.exit_stack.enter_context(servers.managed_process(
+            ['a'], timeout_secs=10, raise_on_nonzero_exit=False))
+        # Should not raise an exception.
+        self.exit_stack.close()
 
         self.assert_proc_was_managed_as_expected(
             logs, proc.pid,

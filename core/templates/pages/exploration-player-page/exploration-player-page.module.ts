@@ -39,7 +39,6 @@ import { LearnerLocalNavComponent } from './layout-directives/learner-local-nav.
 import { FlagExplorationModalComponent } from './modals/flag-exploration-modal.component';
 import { ExplorationSuccessfullyFlaggedModalComponent } from './modals/exploration-successfully-flagged-modal.component';
 import { LearnerViewInfoComponent } from './layout-directives/learner-view-info.component';
-import { InformationCardModalComponent } from './templates/information-card-modal.component';
 import { MaterialModule } from 'modules/material.module';
 import { RefresherExplorationConfirmationModal } from './modals/refresher-exploration-confirmation-modal.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -71,8 +70,8 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
     TranslationsFetchingMessageModalComponent,
     ExplorationPlayerPageComponent,
     ExplorationSuccessfullyFlaggedModalComponent,
-    InformationCardModalComponent,
     LessonInformationCardModalComponent,
+    ProgressReminderModalComponent,
     FlagExplorationModalComponent,
     LearnerLocalNavComponent,
     LearnerViewInfoComponent,
@@ -83,8 +82,8 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
     TranslationsFetchingMessageModalComponent,
     ExplorationPlayerPageComponent,
     ExplorationSuccessfullyFlaggedModalComponent,
-    InformationCardModalComponent,
     LessonInformationCardModalComponent,
+    ProgressReminderModalComponent,
     FlagExplorationModalComponent,
     LearnerLocalNavComponent,
     LearnerViewInfoComponent,
@@ -122,6 +121,7 @@ import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { downgradeModule } from '@angular/upgrade/static';
 import { ExplorationPlayerPageComponent } from './exploration-player-page.component';
 import { LessonInformationCardModalComponent } from './templates/lesson-information-card-modal.component';
+import { ProgressReminderModalComponent } from './templates/progress-reminder-modal.component';
 
 const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);

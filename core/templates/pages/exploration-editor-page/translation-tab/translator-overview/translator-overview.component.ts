@@ -95,6 +95,10 @@ angular.module('oppia').component('translatorOverview', {
         }
         refreshDirectiveScope();
         TranslationStatusService.refresh();
+
+        setTimeout(() => {
+          GraphDataService.recompute();
+        });
       };
 
       $scope.getTranslationProgressStyle = function() {

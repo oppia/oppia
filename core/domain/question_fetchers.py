@@ -138,7 +138,7 @@ def get_question_from_model(
     if next_content_id_index is not None:
         question_model.next_content_id_index = next_content_id_index
 
-    return question_domain.Question(  # type: ignore[no-untyped-call]
+    return question_domain.Question(
         question_model.id,
         state_domain.State.from_dict(versioned_question_state['state']),
         versioned_question_state['state_schema_version'],
@@ -181,7 +181,7 @@ def _migrate_state_schema(
 
     next_content_id_index = None
     while state_schema_version < feconf.CURRENT_STATE_SCHEMA_VERSION:
-        if state_schema_version == 50:
+        if state_schema_version == 51:
             # State conversion function from 50 to 51 removes
             # next_content_id_index from the state level, hence this "if" case
             # populates the next_content_id_index from the old state, which will

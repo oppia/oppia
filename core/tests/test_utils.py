@@ -31,6 +31,7 @@ import logging
 import os
 import random
 import re
+from sre_parse import State
 import string
 import unittest
 
@@ -1010,7 +1011,7 @@ class TestBase(unittest.TestCase):
         """
 
         with datastore_services.get_ndb_context(namespace=self.namespace):
-            super(TestBase, self).run(result=result)
+            super().run(result=result)
 
     def _get_unicode_test_string(self, suffix):
         """Returns a string that contains unicode characters and ends with the
@@ -1031,7 +1032,7 @@ class TestBase(unittest.TestCase):
         with self.assertRaisesRegex(utils.ValidationError, error_substring):
             item.validate()
 
-    def log_line(self, line):
+    def log_line(self, line: str) -> None:
         """Print the line with a prefix that can be identified by the script
         that calls the test.
         """
@@ -1353,7 +1354,7 @@ class TestBase(unittest.TestCase):
                 'Please provide a sufficiently strong regexp string to '
                 'validate that the correct error is being raised.')
 
-        return super(TestBase, self).assertRaisesRegex(
+        return super().assertRaisesRegex(
             expected_exception, expected_regex, *args, **kwargs)
 
     # Here we used Mapping[str, Any] because, in Oppia codebase TypedDict is
@@ -1382,7 +1383,7 @@ class TestBase(unittest.TestCase):
         Raises:
             AssertionError. When dictionaries doesn't match.
         """
-        super(TestBase, self).assertDictEqual(dict_one, dict_two, msg=msg)
+        super().assertDictEqual(dict_one, dict_two, msg=msg)
 
     def assertItemsEqual(self, *args, **kwargs):  # pylint: disable=invalid-name
         """Compares unordered sequences if they contain the same elements,
@@ -1458,14 +1459,14 @@ class AppEngineTestBase(TestBase):
     DEFAULT_VERSION_HOSTNAME = '%s:%s' % (HTTP_HOST, SERVER_PORT)
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
-        super(AppEngineTestBase, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         # Defined outside of setUp() because we access it from methods, but can
         # only install it during the run() method. Defining it in __init__
         # satisfies pylint's attribute-defined-outside-init warning.
         self._platform_taskqueue_services_stub = TaskqueueServicesStub(self)
 
     def setUp(self) -> None:
-        super(AppEngineTestBase, self).setUp()
+        super().setUp()
         # Initialize namespace for the storage emulator.
         storage_services.CLIENT.namespace = self.id()
         # Set up apps for testing.
@@ -1475,7 +1476,7 @@ class AppEngineTestBase(TestBase):
         datastore_services.delete_multi(
             datastore_services.query_everything().iter(keys_only=True))
         storage_services.CLIENT.reset()
-        super(AppEngineTestBase, self).tearDown()
+        super().tearDown()
 
     def run(self, result=None):
         """Run the test, collecting the result into the specified TestResult.
@@ -1495,9 +1496,9 @@ class AppEngineTestBase(TestBase):
             platform_taskqueue_services, 'create_http_task',
             self._platform_taskqueue_services_stub.create_http_task)
         with platform_taskqueue_services_swap:
-            super(AppEngineTestBase, self).run(result=result)
+            super().run(result=result)
 
-    def count_jobs_in_taskqueue(self, queue_name):
+    def count_jobs_in_taskqueue(self, queue_name: Optional[str]) -> int:
         """Returns the total number of tasks in a single queue if a queue name
         is specified or the entire taskqueue if no queue name is specified.
 
@@ -1512,7 +1513,9 @@ class AppEngineTestBase(TestBase):
         return self._platform_taskqueue_services_stub.count_jobs_in_taskqueue(
             queue_name=queue_name)
 
-    def process_and_flush_pending_tasks(self, queue_name=None):
+    def process_and_flush_pending_tasks(
+        self, queue_name: Optional[str] = None
+    ) -> None:
         """Executes all of the tasks in a single queue if a queue name is
         specified or all of the tasks in the taskqueue if no queue name is
         specified.
@@ -1930,11 +1933,10 @@ title: Title
                 memory_cache_services, 'delete_multi',
                 memory_cache_services_stub.delete_multi))
 
-            super(GenericTestBase, self).run(result=result)
+            super().run(result=result)
 
     def setUp(self) -> None:
-        super(GenericTestBase, self).setUp()
-        self.maxDiff = None
+        super().setUp()
         if self.AUTO_CREATE_DEFAULT_SUPERADMIN_USER:
             self.signup_superadmin_user()
 
@@ -2122,7 +2124,7 @@ title: Title
                     'topic_id': topic_id
                 }, csrf_token=self.get_new_csrf_token())
 
-    def set_moderators(self, moderator_usernames):
+    def set_moderators(self, moderator_usernames: List[str]) -> None:
         """Sets role of given users as MODERATOR.
 
         Args:
@@ -2131,7 +2133,7 @@ title: Title
         for name in moderator_usernames:
             self.add_user_role(name, feconf.ROLE_ID_MODERATOR)
 
-    def set_voiceover_admin(self, voiceover_admin_username):
+    def set_voiceover_admin(self, voiceover_admin_username: List[str]) -> None:
         """Sets role of given users as VOICEOVER ADMIN.
 
         Args:
@@ -2531,7 +2533,11 @@ title: Title
         return response['token']
 
     def save_new_default_exploration(
-            self, exploration_id, owner_id, title='A title'):
+        self,
+        exploration_id: str,
+        owner_id: str,
+        title: str = 'A title'
+    ) -> exp_domain.Exploration:
         """Saves a new default exploration written by owner_id.
 
         Args:
@@ -2756,9 +2762,14 @@ title: Title
         rights_manager.publish_exploration(committer, exploration_id)
 
     def save_new_default_collection(
-            self, collection_id, owner_id, title='A title',
-            category='A category', objective='An objective',
-            language_code=constants.DEFAULT_LANGUAGE_CODE):
+        self,
+        collection_id: str,
+        owner_id: str,
+        title: str = 'A title',
+        category: str = 'A category',
+        objective: str = 'An objective',
+        language_code: str = constants.DEFAULT_LANGUAGE_CODE
+    ) -> collection_domain.Collection:
         """Saves a new default collection written by owner_id.
 
         Args:
@@ -2871,10 +2882,17 @@ title: Title
             })], 'Changes.')
 
     def save_new_story(
-            self, story_id, owner_id, corresponding_topic_id,
-            title='Title', description='Description', notes='Notes',
-            language_code=constants.DEFAULT_LANGUAGE_CODE,
-            url_fragment='title', meta_tag_content='story meta tag content'):
+        self,
+        story_id: str,
+        owner_id: str,
+        corresponding_topic_id: str,
+        title: str = 'Title',
+        description: str = 'Description',
+        notes: str = 'Notes',
+        language_code: str = constants.DEFAULT_LANGUAGE_CODE,
+        url_fragment: str = 'title',
+        meta_tag_content: str = 'story meta tag content'
+    ) -> story_domain.Story:
         """Creates an Oppia Story and saves it.
 
         NOTE: Callers are responsible for ensuring that the
@@ -3428,10 +3446,10 @@ title: Title
             [{'cmd': skill_domain.CMD_CREATE_NEW}])
 
     def _create_valid_question_data(
-            self,
-            default_dest_state_name,
-            content_id_generator
-        ):
+        self,
+        default_dest_state_name: str,
+        content_id_generator: translation_domain.ContentIdGenerator
+    ) -> state_domain.State:
         """Creates a valid question_data dict.
 
         Args:
@@ -3488,7 +3506,7 @@ class LinterTestBase(GenericTestBase):
     """Base class for linter tests."""
 
     def setUp(self):
-        super(LinterTestBase, self).setUp()
+        super().setUp()
         self.linter_stdout = []
 
         def mock_print(*args):
@@ -3599,10 +3617,10 @@ class GenericEmailTestBase(GenericTestBase):
         with self.swap(
             email_services, 'send_email_to_recipients',
             self._send_email_to_recipients):
-            super(EmailTestBase, self).run(result=result)
+            super().run(result=result)
 
-    def setUp(self):
-        super(GenericEmailTestBase, self).setUp()
+    def setUp(self) -> None:
+        super().setUp()
         self._wipe_emails_dict()
 
     def _wipe_emails_dict(self):
@@ -3833,7 +3851,7 @@ class CallCounter(FunctionWrapper):
         """Counts the number of times the given function has been called. See
         FunctionWrapper for arguments.
         """
-        super(CallCounter, self).__init__(f)
+        super().__init__(f)
         self._times_called = 0
 
     @property
@@ -3879,7 +3897,7 @@ class FailingFunction(FunctionWrapper):
             ValueError. The number of times to raise an exception before a call
                 succeeds should be a non-negative interger or INFINITY.
         """
-        super(FailingFunction, self).__init__(f)
+        super().__init__(f)
         self._exception = exception
         self._num_tries_before_success = num_tries_before_success
         self._always_fail = (

@@ -38,7 +38,7 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
     """Tests for question fetchers."""
 
     def setUp(self) -> None:
-        super(QuestionFetchersUnitTests, self).setUp()
+        super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
@@ -56,16 +56,16 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
         self.save_new_skill(  # type: ignore[no-untyped-call]
             'skill_2', self.admin_id, description='Skill Description 2')
 
-        self.question_id = question_services.get_new_question_id() # type: ignore[no-untyped-call]
+        self.question_id = question_services.get_new_question_id()
         self.content_id_generator = translation_domain.ContentIdGenerator()
         self.question = self.save_new_question( # type: ignore[no-untyped-call]
             self.question_id, self.editor_id,
-            self._create_valid_question_data('ABC', self.content_id_generator), # type: ignore[no-untyped-call]
+            self._create_valid_question_data('ABC', self.content_id_generator),
             ['skill_1'],
             self.content_id_generator.next_content_id_index)
 
     def test_get_questions_and_skill_descriptions_by_skill_ids(self) -> None:
-        question_services.create_new_question_skill_link(  # type: ignore[no-untyped-call]
+        question_services.create_new_question_skill_link(
             self.editor_id, self.question_id, 'skill_1', 0.3)
 
         questions, _ = (
@@ -76,7 +76,7 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
         assert questions[0] is not None
         self.assertEqual(len(questions), 1)
         self.assertEqual(
-            questions[0].to_dict(), self.question.to_dict())  # type: ignore[no-untyped-call]
+            questions[0].to_dict(), self.question.to_dict())
 
     def test_get_no_questions_with_no_skill_ids(self) -> None:
         questions, _ = (
@@ -84,17 +84,17 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
                 1, [], 0))
         self.assertEqual(len(questions), 0)
 
-    def test_get_questions_with_multi_skill_ids(self):
-        question_id_1 = question_services.get_new_question_id() # type: ignore[no-untyped-call]
-        content_id_generator = translation_domain.ContentIdGenerator() # type: ignore[no-untyped-call]
-        question_1 = self.save_new_question( # type: ignore[no-untyped-call]
+    def test_get_questions_with_multi_skill_ids(self) -> None:
+        question_id_1 = question_services.get_new_question_id()
+        content_id_generator = translation_domain.ContentIdGenerator()
+        question_1 = self.save_new_question(  # type: ignore[no-untyped-call]
             question_id_1, self.editor_id,
-            self._create_valid_question_data('ABC', content_id_generator), # type: ignore[no-untyped-call]
+            self._create_valid_question_data('ABC', content_id_generator),
             ['skill_1', 'skill_2'],
             content_id_generator.next_content_id_index)
-        question_services.create_new_question_skill_link( # type: ignore[no-untyped-call]
+        question_services.create_new_question_skill_link(
             self.editor_id, question_id_1, 'skill_1', 0.3)
-        question_services.create_new_question_skill_link(  # type: ignore[no-untyped-call]
+        question_services.create_new_question_skill_link(
             self.editor_id, question_id_1, 'skill_2', 0.5)
 
         questions, _ = (
@@ -105,14 +105,14 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
         assert questions[0] is not None
         self.assertEqual(len(questions), 1)
         self.assertEqual(
-            questions[0].to_dict(), question_1.to_dict())  # type: ignore[no-untyped-call]
+            questions[0].to_dict(), question_1.to_dict())
 
-    def test_get_questions_by_ids(self):
-        question_id_2 = question_services.get_new_question_id() # type: ignore[no-untyped-call]
+    def test_get_questions_by_ids(self) -> None:
+        question_id_2 = question_services.get_new_question_id()
         content_id_generator = translation_domain.ContentIdGenerator()
-        self.save_new_question( # type: ignore[no-untyped-call]
+        self.save_new_question(  # type: ignore[no-untyped-call]
             question_id_2, self.editor_id,
-            self._create_valid_question_data('DEF', content_id_generator), # type: ignore[no-untyped-call]
+            self._create_valid_question_data('DEF', content_id_generator),
             ['skill_1'],
             content_id_generator.next_content_id_index)
         questions = question_fetchers.get_questions_by_ids(
@@ -138,12 +138,12 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
         all_question_models = question_models.QuestionModel.get_all()
         self.assertEqual(all_question_models.count(), 0)
 
-        question_id = question_services.get_new_question_id() # type: ignore[no-untyped-call]
+        question_id = question_services.get_new_question_id()
         content_id_generator = translation_domain.ContentIdGenerator()
-        question_model = question_models.QuestionModel( # type: ignore[no-untyped-call]
+        question_model = question_models.QuestionModel(
             id=question_id,
             question_state_data=(
-                self._create_valid_question_data( # type: ignore[no-untyped-call]
+                self._create_valid_question_data(
                     'ABC', content_id_generator).to_dict()),
             language_code='en',
             version=0,
@@ -178,12 +178,12 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
         all_question_models = question_models.QuestionModel.get_all()
         self.assertEqual(all_question_models.count(), 0)
 
-        question_id = question_services.get_new_question_id() # type: ignore[no-untyped-call]
+        question_id = question_services.get_new_question_id()
         content_id_generator = translation_domain.ContentIdGenerator()
         question_model = question_models.QuestionModel(
             id=question_id,
             question_state_data=(
-                self._create_valid_question_data( # type: ignore[no-untyped-call]
+                self._create_valid_question_data(
                     'ABC', content_id_generator).to_dict()),
             language_code='en',
             version=0,

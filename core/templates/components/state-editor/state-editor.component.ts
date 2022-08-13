@@ -39,23 +39,21 @@ import { Solution } from 'domain/exploration/SolutionObjectFactory';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
 import { Hint } from 'domain/exploration/HintObjectFactory';
+import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
+import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
 
 @Component({
   selector: 'oppia-state-editor',
   templateUrl: './state-editor.component.html'
 })
 export class StateEditorComponent implements OnInit, OnDestroy {
-  @Input() addState: (value: string) => void;
-  @Input() explorationIsLinkedToStory: boolean;
-  @Input() interactionIsShown: boolean = true;
-  @Input() stateContentSaveButtonPlaceholder: string;
-  @Input() stateContentPlaceholder: string;
-
   @Output() onSaveHints = new EventEmitter<Hint[]>();
   @Output() onSaveInapplicableSkillMisconceptionIds = (
     new EventEmitter<string[]>());
 
-  @Output() onSaveInteractionAnswerGroups = new EventEmitter<unknown>();
+  @Output() onSaveInteractionAnswerGroups = (
+    new EventEmitter<AnswerGroup[]>());
+
   @Output() onSaveInteractionCustomizationArgs = (
     new EventEmitter<InteractionCustomizationArgs>());
 
@@ -72,16 +70,28 @@ export class StateEditorComponent implements OnInit, OnDestroy {
   @Output() showMarkAllAudioAsNeedingUpdateModalIfRequired = (
     new EventEmitter<string[]>());
 
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  @Input() addState!: (value: string) => void;
+  @Input() explorationIsLinkedToStory!: boolean;
+  @Input() interactionIsShown!: boolean;
+  @Input() stateContentSaveButtonPlaceholder!: string;
+  @Input() stateContentPlaceholder!: string;
+
+
+  oppiaBlackImgUrl!: string;
+  // State name is null if their is no state selected or have no active state.
+  // This is the case when the user is creating a new state.
+  stateName!: string | null;
+  stateData!: State;
   directiveSubscriptions = new Subscription();
-  oppiaBlackImgUrl: string;
-  currentStateIsTerminal: boolean;
-  conceptCardIsShown: boolean;
-  windowIsNarrow: boolean;
-  interactionIdIsSet: boolean;
-  servicesInitialized: boolean;
-  stateName: string | null;
-  stateData: State;
-  currentInteractionCanHaveSolution: boolean;
+  currentStateIsTerminal: boolean = false;
+  windowIsNarrow: boolean = false;
+  interactionIdIsSet: boolean = false;
+  servicesInitialized: boolean = false;
+  currentInteractionCanHaveSolution: boolean = false;
+  conceptCardIsShown: boolean = true;
 
   constructor(
     private stateCardIsCheckpointService: StateCardIsCheckpointService,
@@ -123,7 +133,7 @@ export class StateEditorComponent implements OnInit, OnDestroy {
     this.onSaveInteractionDefaultOutcome.emit($event);
   }
 
-  sendOnSaveInteractionAnswerGroups($event: string[]): void {
+  sendOnSaveInteractionAnswerGroups($event: AnswerGroup[]): void {
     this.onSaveInteractionAnswerGroups.emit($event);
   }
 
@@ -163,10 +173,11 @@ export class StateEditorComponent implements OnInit, OnDestroy {
     this.interactionIdIsSet = Boolean(newInteractionId);
     this.currentInteractionCanHaveSolution = Boolean(
       this.interactionIdIsSet &&
-      INTERACTION_SPECS[newInteractionId].can_have_solution);
+      INTERACTION_SPECS[
+        newInteractionId as InteractionSpecsKey].can_have_solution);
     this.currentStateIsTerminal = Boolean(
       this.interactionIdIsSet && INTERACTION_SPECS[
-        newInteractionId].is_terminal);
+        newInteractionId as InteractionSpecsKey].is_terminal);
   }
 
   reinitializeEditor(): void {
@@ -181,7 +192,6 @@ export class StateEditorComponent implements OnInit, OnDestroy {
     this.oppiaBlackImgUrl = this.urlInterpolationService.getStaticImageUrl(
       '/avatar/oppia_avatar_100px.svg');
     this.currentStateIsTerminal = false;
-    this.conceptCardIsShown = true;
     this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
     this.interactionIdIsSet = false;
     this.servicesInitialized = false;

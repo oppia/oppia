@@ -67,7 +67,7 @@ class OpenAccessDecoratorTests(test_utils.GenericTestBase):
             return self.render_json({'success': True})
 
     def setUp(self):
-        super(OpenAccessDecoratorTests, self).setUp()
+        super().setUp()
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock', self.MockHandler)],
@@ -111,7 +111,7 @@ class IsSourceMailChimpDecoratorTests(test_utils.GenericTestBase):
             return self.render_json({'secret': secret})
 
     def setUp(self):
-        super(IsSourceMailChimpDecoratorTests, self).setUp()
+        super().setUp()
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock_secret_page/<secret>', self.MockHandler)],
             debug=feconf.DEBUG,
@@ -186,7 +186,7 @@ class ViewSkillsDecoratorTests(test_utils.GenericTestBase):
             return self.render_json({'selected_skill_ids': selected_skill_ids})
 
     def setUp(self):
-        super(ViewSkillsDecoratorTests, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
@@ -251,7 +251,7 @@ class DownloadExplorationDecoratorTests(test_utils.GenericTestBase):
             return self.render_json({'exploration_id': exploration_id})
 
     def setUp(self):
-        super(DownloadExplorationDecoratorTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.signup(self.user_email, self.username)
@@ -378,7 +378,7 @@ class ViewExplorationStatsDecoratorTests(test_utils.GenericTestBase):
             return self.render_json({'exploration_id': exploration_id})
 
     def setUp(self):
-        super(ViewExplorationStatsDecoratorTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.signup(self.user_email, self.username)
@@ -497,7 +497,7 @@ class RequireUserIdElseRedirectToHomepageTests(test_utils.GenericTestBase):
             self.redirect('/access_page')
 
     def setUp(self):
-        super(RequireUserIdElseRedirectToHomepageTests, self).setUp()
+        super().setUp()
         self.signup(self.user_email, self.username)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/', self.MockHandler)],
@@ -543,7 +543,7 @@ class PlayExplorationDecoratorTests(test_utils.GenericTestBase):
             return self.render_json({'exploration_id': exploration_id})
 
     def setUp(self):
-        super(PlayExplorationDecoratorTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.signup(self.user_email, self.username)
@@ -630,7 +630,7 @@ class PlayCollectionDecoratorTests(test_utils.GenericTestBase):
             return self.render_json({'collection_id': collection_id})
 
     def setUp(self):
-        super(PlayCollectionDecoratorTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.signup(self.user_email, self.username)
@@ -724,7 +724,7 @@ class EditCollectionDecoratorTests(test_utils.GenericTestBase):
             return self.render_json({'collection_id': collection_id})
 
     def setUp(self):
-        super(EditCollectionDecoratorTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
@@ -848,7 +848,7 @@ class ClassroomExistDecoratorTests(test_utils.GenericTestBase):
             self.render_json('oppia-root.mainpage.html')
 
     def setUp(self):
-        super(ClassroomExistDecoratorTests, self).setUp()
+        super().setUp()
         self.signup(
             self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
@@ -907,7 +907,7 @@ class CreateExplorationDecoratorTests(test_utils.GenericTestBase):
             self.render_json({'success': True})
 
     def setUp(self):
-        super(CreateExplorationDecoratorTests, self).setUp()
+        super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.user_email, self.username)
         self.mark_user_banned(self.username)
@@ -957,7 +957,7 @@ class CreateCollectionDecoratorTests(test_utils.GenericTestBase):
             self.render_json({'success': True})
 
     def setUp(self):
-        super(CreateCollectionDecoratorTests, self).setUp()
+        super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.user_email, self.username)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
@@ -1009,7 +1009,7 @@ class AccessCreatorDashboardTests(test_utils.GenericTestBase):
             self.render_json({'success': True})
 
     def setUp(self):
-        super(AccessCreatorDashboardTests, self).setUp()
+        super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.user_email, self.username)
         self.mark_user_banned(self.username)
@@ -1062,7 +1062,7 @@ class CommentOnFeedbackThreadTests(test_utils.GenericTestBase):
             self.render_json({'thread_id': thread_id})
 
     def setUp(self):
-        super(CommentOnFeedbackThreadTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
@@ -1183,7 +1183,7 @@ class CreateFeedbackThreadTests(test_utils.GenericTestBase):
             self.render_json({'exploration_id': exploration_id})
 
     def setUp(self):
-        super(CreateFeedbackThreadTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
@@ -1272,7 +1272,7 @@ class ViewFeedbackThreadTests(test_utils.GenericTestBase):
             self.render_json({'thread_id': thread_id})
 
     def setUp(self):
-        super(ViewFeedbackThreadTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
@@ -1391,7 +1391,7 @@ class ManageEmailDashboardTests(test_utils.GenericTestBase):
             return self.render_json({'query_id': query_id})
 
     def setUp(self):
-        super(ManageEmailDashboardTests, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.set_moderators([self.MODERATOR_USERNAME])
@@ -1450,7 +1450,7 @@ class RateExplorationTests(test_utils.GenericTestBase):
             self.render_json({'exploration_id': exploration_id})
 
     def setUp(self):
-        super(RateExplorationTests, self).setUp()
+        super().setUp()
         self.signup(self.user_email, self.username)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/<exploration_id>', self.MockHandler)],
@@ -1486,7 +1486,7 @@ class AccessModeratorPageTests(test_utils.GenericTestBase):
             return self.render_json({'success': 1})
 
     def setUp(self):
-        super(AccessModeratorPageTests, self).setUp()
+        super().setUp()
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.signup(self.user_email, self.username)
         self.set_moderators([self.MODERATOR_USERNAME])
@@ -1538,7 +1538,7 @@ class FlagExplorationTests(test_utils.GenericTestBase):
             self.render_json({'exploration_id': exploration_id})
 
     def setUp(self):
-        super(FlagExplorationTests, self).setUp()
+        super().setUp()
         self.signup(self.user_email, self.username)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/<exploration_id>', self.MockHandler)],
@@ -1574,7 +1574,7 @@ class SubscriptionToUsersTests(test_utils.GenericTestBase):
             self.render_json({'success': True})
 
     def setUp(self):
-        super(SubscriptionToUsersTests, self).setUp()
+        super().setUp()
         self.signup(self.user_email, self.username)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/', self.MockHandler)],
@@ -1609,7 +1609,7 @@ class SendModeratorEmailsTests(test_utils.GenericTestBase):
             return self.render_json({'success': 1})
 
     def setUp(self):
-        super(SendModeratorEmailsTests, self).setUp()
+        super().setUp()
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.signup(self.user_email, self.username)
         self.set_moderators([self.MODERATOR_USERNAME])
@@ -1654,7 +1654,7 @@ class CanAccessReleaseCoordinatorPageDecoratorTests(test_utils.GenericTestBase):
             return self.render_json({'success': 1})
 
     def setUp(self):
-        super(CanAccessReleaseCoordinatorPageDecoratorTests, self).setUp()
+        super().setUp()
         self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.user_email, self.username)
 
@@ -1731,7 +1731,7 @@ class CanAccessBlogAdminPageDecoratorTests(test_utils.GenericTestBase):
             return self.render_json({'success': 1})
 
     def setUp(self):
-        super(CanAccessBlogAdminPageDecoratorTests, self).setUp()
+        super().setUp()
         self.signup(self.user_email, self.username)
         self.signup(self.BLOG_EDITOR_EMAIL, self.BLOG_EDITOR_USERNAME)
         self.signup(self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
@@ -1805,7 +1805,7 @@ class CanManageBlogPostEditorsDecoratorTests(test_utils.GenericTestBase):
             return self.render_json({'success': 1})
 
     def setUp(self):
-        super(CanManageBlogPostEditorsDecoratorTests, self).setUp()
+        super().setUp()
         self.signup(self.user_email, self.username)
         self.signup(self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
         self.signup(self.BLOG_EDITOR_EMAIL, self.BLOG_EDITOR_USERNAME)
@@ -1880,7 +1880,7 @@ class CanAccessBlogDashboardDecoratorTests(test_utils.GenericTestBase):
             return self.render_json({'success': 1})
 
     def setUp(self):
-        super(CanAccessBlogDashboardDecoratorTests, self).setUp()
+        super().setUp()
         self.signup(self.user_email, self.username)
 
         self.signup(self.BLOG_EDITOR_EMAIL, self.BLOG_EDITOR_USERNAME)
@@ -1961,7 +1961,7 @@ class CanDeleteBlogPostTests(test_utils.GenericTestBase):
             self.render_json({'blog_id': blog_post_id})
 
     def setUp(self):
-        super(CanDeleteBlogPostTests, self).setUp()
+        super().setUp()
         self.signup(self.user_email, self.username)
 
         self.signup(self.BLOG_EDITOR_EMAIL, self.BLOG_EDITOR_USERNAME)
@@ -2062,7 +2062,7 @@ class CanEditBlogPostTests(test_utils.GenericTestBase):
             self.render_json({'blog_id': blog_post_id})
 
     def setUp(self):
-        super(CanEditBlogPostTests, self).setUp()
+        super().setUp()
         self.signup(
             self.BLOG_EDITOR_EMAIL, self.BLOG_EDITOR_USERNAME)
         self.signup(self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
@@ -2156,7 +2156,7 @@ class CanRunAnyJobDecoratorTests(test_utils.GenericTestBase):
             return self.render_json({'success': 1})
 
     def setUp(self):
-        super(CanRunAnyJobDecoratorTests, self).setUp()
+        super().setUp()
         self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.user_email, self.username)
 
@@ -2228,7 +2228,7 @@ class CanManageMemcacheDecoratorTests(test_utils.GenericTestBase):
             return self.render_json({'success': 1})
 
     def setUp(self):
-        super(CanManageMemcacheDecoratorTests, self).setUp()
+        super().setUp()
         self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.user_email, self.username)
 
@@ -2315,7 +2315,7 @@ class CanManageContributorsRoleDecoratorTests(test_utils.GenericTestBase):
             return self.render_json({'success': 1})
 
     def setUp(self):
-        super(CanManageContributorsRoleDecoratorTests, self).setUp()
+        super().setUp()
         self.signup(self.user_email, self.username)
 
         self.signup(
@@ -2430,7 +2430,7 @@ class DeleteAnyUserTests(test_utils.GenericTestBase):
             return self.render_json({'success': 1})
 
     def setUp(self):
-        super(DeleteAnyUserTests, self).setUp()
+        super().setUp()
         self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.user_email, self.username)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
@@ -2485,7 +2485,7 @@ class VoiceoverExplorationTests(test_utils.GenericTestBase):
             self.render_json({'exploration_id': exploration_id})
 
     def setUp(self):
-        super(VoiceoverExplorationTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
@@ -2655,7 +2655,7 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
             })
 
     def setUp(self):
-        super(VoiceArtistManagementTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
@@ -2859,7 +2859,7 @@ class EditExplorationTests(test_utils.GenericTestBase):
             self.render_json({'exploration_id': exploration_id})
 
     def setUp(self):
-        super(EditExplorationTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
@@ -2957,7 +2957,7 @@ class ManageOwnAccountTests(test_utils.GenericTestBase):
             return self.render_json({'success': 1})
 
     def setUp(self):
-        super(ManageOwnAccountTests, self).setUp()
+        super().setUp()
         self.signup(self.banned_user_email, self.banned_user)
         self.signup(self.user_email, self.username)
         self.mark_user_banned(self.banned_user)
@@ -3004,7 +3004,7 @@ class AccessAdminPageTests(test_utils.GenericTestBase):
             return self.render_json({'success': 1})
 
     def setUp(self):
-        super(AccessAdminPageTests, self).setUp()
+        super().setUp()
         self.signup(self.banned_user_email, self.banned_user)
         self.signup(self.user_email, self.username)
         self.mark_user_banned(self.banned_user)
@@ -3060,7 +3060,7 @@ class AccessContributorDashboardAdminPageTests(test_utils.GenericTestBase):
             return self.render_json({'success': 1})
 
     def setUp(self):
-        super(AccessContributorDashboardAdminPageTests, self).setUp()
+        super().setUp()
         self.signup(self.banned_user_email, self.banned_user)
         self.signup(self.user_email, self.username)
         self.mark_user_banned(self.banned_user)
@@ -3122,7 +3122,7 @@ class UploadExplorationTests(test_utils.GenericTestBase):
             return self.render_json({})
 
     def setUp(self):
-        super(UploadExplorationTests, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
@@ -3177,7 +3177,7 @@ class DeleteExplorationTests(test_utils.GenericTestBase):
             self.render_json({'exploration_id': exploration_id})
 
     def setUp(self):
-        super(DeleteExplorationTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.set_moderators([self.MODERATOR_USERNAME])
@@ -3267,7 +3267,7 @@ class SuggestChangesToExplorationTests(test_utils.GenericTestBase):
             self.render_json({'exploration_id': exploration_id})
 
     def setUp(self):
-        super(SuggestChangesToExplorationTests, self).setUp()
+        super().setUp()
         self.signup(self.user_email, self.username)
         self.signup(self.banned_user_email, self.banned_username)
         self.mark_user_banned(self.banned_username)
@@ -3310,7 +3310,7 @@ class SuggestChangesDecoratorsTests(test_utils.GenericTestBase):
             self.render_json({})
 
     def setUp(self):
-        super(SuggestChangesDecoratorsTests, self).setUp()
+        super().setUp()
         self.signup(self.user_email, self.username)
         self.signup(self.banned_user_email, self.banned_username)
         self.mark_user_banned(self.banned_username)
@@ -3368,7 +3368,7 @@ class ResubmitSuggestionDecoratorsTests(test_utils.GenericTestBase):
             self.render_json({'suggestion_id': suggestion_id})
 
     def setUp(self):
-        super(ResubmitSuggestionDecoratorsTests, self).setUp()
+        super().setUp()
         self.signup(self.author_email, self.author_username)
         self.signup(self.user_email, self.username)
         self.signup(self.owner_email, self.owner_username)
@@ -3482,7 +3482,7 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
             })
 
     def setUp(self):
-        super(DecoratorForAcceptingSuggestionTests, self).setUp()
+        super().setUp()
         self.signup(self.AUTHOR_EMAIL, self.AUTHOR_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
@@ -3647,7 +3647,7 @@ class ViewReviewableSuggestionsTests(test_utils.GenericTestBase):
             })
 
     def setUp(self):
-        super(ViewReviewableSuggestionsTests, self).setUp()
+        super().setUp()
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.signup(
             self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
@@ -3738,7 +3738,7 @@ class PublishExplorationTests(test_utils.GenericTestBase):
             self.render_json({'exploration_id': exploration_id})
 
     def setUp(self):
-        super(PublishExplorationTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
@@ -3821,7 +3821,7 @@ class ModifyExplorationRolesTests(test_utils.GenericTestBase):
             self.render_json({'exploration_id': exploration_id})
 
     def setUp(self):
-        super(ModifyExplorationRolesTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
@@ -3911,7 +3911,7 @@ class CollectionPublishStatusTests(test_utils.GenericTestBase):
             return self.render_json({'collection_id': collection_id})
 
     def setUp(self):
-        super(CollectionPublishStatusTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
@@ -4020,7 +4020,7 @@ class AccessLearnerDashboardDecoratorTests(test_utils.GenericTestBase):
             return self.render_json({'success': True})
 
     def setUp(self):
-        super(AccessLearnerDashboardDecoratorTests, self).setUp()
+        super().setUp()
         self.signup(self.user_email, self.user)
         self.signup(self.banned_user_email, self.banned_user)
         self.mark_user_banned(self.banned_user)
@@ -4069,7 +4069,7 @@ class AccessLearnerGroupsDecoratorTests(test_utils.GenericTestBase):
             return self.render_json({'success': True})
 
     def setUp(self):
-        super(AccessLearnerGroupsDecoratorTests, self).setUp()
+        super().setUp()
         self.signup(self.user_email, self.user)
         self.signup(self.banned_user_email, self.banned_user)
         self.mark_user_banned(self.banned_user)
@@ -4125,7 +4125,7 @@ class EditTopicDecoratorTests(test_utils.GenericTestBase):
             self.render_json({'topic_id': topic_id})
 
     def setUp(self):
-        super(EditTopicDecoratorTests, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.manager_email, self.manager_username)
         self.signup(self.viewer_email, self.viewer_username)
@@ -4202,7 +4202,7 @@ class DeleteTopicDecoratorTests(test_utils.GenericTestBase):
             self.render_json({'topic_id': topic_id})
 
     def setUp(self):
-        super(DeleteTopicDecoratorTests, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.viewer_email, self.viewer_username)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
@@ -4277,7 +4277,7 @@ class ViewAnyTopicEditorDecoratorTests(test_utils.GenericTestBase):
             self.render_json({'topic_id': topic_id})
 
     def setUp(self):
-        super(ViewAnyTopicEditorDecoratorTests, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.viewer_email, self.viewer_username)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
@@ -4356,7 +4356,7 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
             self.render_json({'story_id': story_id})
 
     def setUp(self):
-        super(EditStoryDecoratorTests, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
@@ -4463,7 +4463,7 @@ class DeleteStoryDecoratorTests(test_utils.GenericTestBase):
             self.render_json({'story_id': story_id})
 
     def setUp(self):
-        super(DeleteStoryDecoratorTests, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
@@ -4554,7 +4554,7 @@ class AccessTopicsAndSkillsDashboardDecoratorTests(test_utils.GenericTestBase):
             self.render_json({'success': True})
 
     def setUp(self):
-        super(AccessTopicsAndSkillsDashboardDecoratorTests, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.manager_email, self.manager_username)
         self.signup(self.viewer_email, self.viewer_username)
@@ -4632,7 +4632,7 @@ class AddStoryToTopicTests(test_utils.GenericTestBase):
             self.render_json({'topic_id': topic_id})
 
     def setUp(self):
-        super(AddStoryToTopicTests, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.manager_email, self.manager_username)
         self.signup(self.viewer_email, self.viewer_username)
@@ -4761,7 +4761,7 @@ class StoryViewerTests(test_utils.GenericTestBase):
             self.render_template('oppia-root.mainpage.html')
 
     def setUp(self):
-        super(StoryViewerTests, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
@@ -4949,7 +4949,7 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
             self.render_template('subtopic-viewer-page.mainpage.html')
 
     def setUp(self):
-        super(SubtopicViewerTests, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
@@ -5137,7 +5137,7 @@ class TopicViewerTests(test_utils.GenericTestBase):
             self.render_template('topic-viewer-page.mainpage.html')
 
     def setUp(self):
-        super(TopicViewerTests, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
@@ -5241,7 +5241,7 @@ class CreateSkillTests(test_utils.GenericTestBase):
             self.render_json({})
 
     def setUp(self):
-        super(CreateSkillTests, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
@@ -5304,7 +5304,7 @@ class ManageQuestionSkillStatusTests(test_utils.GenericTestBase):
             self.render_json({'skill_id': skill_id})
 
     def setUp(self):
-        super(ManageQuestionSkillStatusTests, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.viewer_email, self.viewer_username)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
@@ -5371,7 +5371,7 @@ class CreateTopicTests(test_utils.GenericTestBase):
             self.render_json({})
 
     def setUp(self):
-        super(CreateTopicTests, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.banned_user_email, self.banned_user)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
@@ -5430,7 +5430,7 @@ class ManageRightsForTopicTests(test_utils.GenericTestBase):
             self.render_json({'topic_id': topic_id})
 
     def setUp(self):
-        super(ManageRightsForTopicTests, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.banned_user_email, self.banned_user)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
@@ -5494,7 +5494,7 @@ class ChangeTopicPublicationStatusTests(test_utils.GenericTestBase):
             })
 
     def setUp(self):
-        super(ChangeTopicPublicationStatusTests, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.banned_user_email, self.banned_user)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
@@ -5562,7 +5562,7 @@ class PerformTasksInTaskqueueTests(test_utils.GenericTestBase):
             self.render_json({})
 
     def setUp(self):
-        super(PerformTasksInTaskqueueTests, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.viewer_email, self.viewer_username)
 
@@ -5612,7 +5612,7 @@ class PerformCronTaskTests(test_utils.GenericTestBase):
             self.render_json({})
 
     def setUp(self):
-        super(PerformCronTaskTests, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.signup(self.viewer_email, self.viewer_username)
@@ -5669,7 +5669,7 @@ class EditSkillDecoratorTests(test_utils.GenericTestBase):
             self.render_json({'skill_id': skill_id})
 
     def setUp(self):
-        super(EditSkillDecoratorTests, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.manager_email, self.manager_username)
         self.signup(self.viewer_email, self.viewer_username)
@@ -5739,7 +5739,7 @@ class DeleteSkillDecoratorTests(test_utils.GenericTestBase):
             self.render_json({'success': True})
 
     def setUp(self):
-        super(DeleteSkillDecoratorTests, self).setUp()
+        super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.viewer_email, self.viewer_username)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
@@ -5795,7 +5795,7 @@ class EditQuestionDecoratorTests(test_utils.GenericTestBase):
             self.render_json({'question_id': question_id})
 
     def setUp(self):
-        super(EditQuestionDecoratorTests, self).setUp()
+        super().setUp()
 
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
@@ -5889,7 +5889,7 @@ class ViewQuestionEditorDecoratorTests(test_utils.GenericTestBase):
             self.render_json({'question_id': question_id})
 
     def setUp(self):
-        super(ViewQuestionEditorDecoratorTests, self).setUp()
+        super().setUp()
 
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
@@ -5993,7 +5993,7 @@ class DeleteQuestionDecoratorTests(test_utils.GenericTestBase):
             self.render_json({'question_id': question_id})
 
     def setUp(self):
-        super(DeleteQuestionDecoratorTests, self).setUp()
+        super().setUp()
 
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.user_a_email, self.user_a)
@@ -6073,7 +6073,7 @@ class PlayQuestionDecoratorTests(test_utils.GenericTestBase):
             self.render_json({'question_id': question_id})
 
     def setUp(self):
-        super(PlayQuestionDecoratorTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
@@ -6125,7 +6125,7 @@ class PlayEntityDecoratorTests(test_utils.GenericTestBase):
                 {'entity_type': entity_type, 'entity_id': entity_id})
 
     def setUp(self):
-        super(PlayEntityDecoratorTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.user_email, self.username)
@@ -6230,7 +6230,7 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
                 {'entity_type': entity_type, 'entity_id': entity_id})
 
     def setUp(self):
-        super(EditEntityDecoratorTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
@@ -6434,7 +6434,7 @@ class SaveExplorationTests(test_utils.GenericTestBase):
             self.render_json({'exploration_id': exploration_id})
 
     def setUp(self):
-        super(SaveExplorationTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
@@ -6583,7 +6583,7 @@ class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
             self.render_json({'job_id': 'new_job'})
 
     def setUp(self):
-        super(OppiaMLAccessDecoratorTest, self).setUp()
+        super().setUp()
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/ml/nextjobhandler', self.MockHandler)],
             debug=feconf.DEBUG,
@@ -6686,7 +6686,7 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
             self.render_json({'suggestion_id': suggestion_id})
 
     def setUp(self):
-        super(DecoratorForUpdatingSuggestionTests, self).setUp()
+        super().setUp()
         self.signup(self.author_email, self.author_username)
         self.signup(self.user_email, self.username)
         self.signup(self.curriculum_admin_email, self.curriculum_admin_username)
@@ -6964,7 +6964,7 @@ class OppiaAndroidDecoratorTest(test_utils.GenericTestBase):
     ANDROID_APP_VERSION_CODE = '2'
 
     def setUp(self):
-        super(OppiaAndroidDecoratorTest, self).setUp()
+        super().setUp()
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route(
                 '/appfeedbackreporthandler/incoming_android_report',

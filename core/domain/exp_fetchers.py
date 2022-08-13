@@ -164,7 +164,7 @@ def get_multiple_versioned_exp_interaction_ids_mapping_by_version(
             states_to_interaction_id_mapping[state_name] = (
                 exploration_model.states[state_name]['interaction']['id'])
         versioned_exp_interaction_ids_mapping.append(
-            exp_domain.VersionedExplorationInteractionIdsMapping(  # type: ignore[no-untyped-call]
+            exp_domain.VersionedExplorationInteractionIdsMapping(
                 exploration_model.version,
                 states_to_interaction_id_mapping))
 
@@ -215,7 +215,7 @@ def get_exploration_from_model(
         exploration_model.next_content_id_index = next_content_id_index
 
 
-    return exp_domain.Exploration(  # type: ignore[no-untyped-call]
+    return exp_domain.Exploration(
         exploration_model.id, exploration_model.title,
         exploration_model.category, exploration_model.objective,
         exploration_model.language_code, exploration_model.tags,
@@ -597,7 +597,7 @@ def get_logged_out_user_progress(
     if logged_out_user_progress_model is None:
         return None
 
-    return exp_domain.TransientCheckpointUrl(  # type: ignore[no-untyped-call]
+    return exp_domain.TransientCheckpointUrl(
         logged_out_user_progress_model.exploration_id,
         logged_out_user_progress_model.furthest_reached_checkpoint_state_name,
         logged_out_user_progress_model.furthest_reached_checkpoint_exp_version,

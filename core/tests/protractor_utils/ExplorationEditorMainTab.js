@@ -90,8 +90,6 @@ var ExplorationEditorMainTab = function() {
   var stateNameInput = element(
     by.css('.e2e-test-state-name-input'));
   var ruleDetails = element(by.css('.e2e-test-rule-details'));
-  var stateContentEditorLocator = by.css(
-    '.e2e-test-state-content-editor');
   var addOrUpdateSolutionModal = element(
     by.css('.e2e-test-add-or-update-solution-modal'));
   var answerDescriptionFragment = element.all(
@@ -527,11 +525,7 @@ var ExplorationEditorMainTab = function() {
     await action.click('stateEditButton', stateEditButton);
     await waitFor.visibilityOf(
       stateEditorTag, 'State editor tag not showing up');
-    var stateContentEditor = stateEditorTag.element(stateContentEditorLocator);
-    await waitFor.visibilityOf(
-      stateContentEditor,
-      'stateContentEditor taking too long to appear to set content');
-    var richTextEditor = await forms.RichTextEditor(stateContentEditor);
+    var richTextEditor = await forms.RichTextEditor(stateEditorTag);
     await richTextEditor.clear();
     await richTextInstructions(richTextEditor);
     await action.click('Save State Content Button', saveStateContentButton);

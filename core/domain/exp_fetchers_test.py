@@ -46,17 +46,17 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
     EXP_3_ID: Final = 'exploration_3_id'
 
     def setUp(self) -> None:
-        super(ExplorationRetrievalTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
-        self.exploration_1 = self.save_new_default_exploration(  # type: ignore[no-untyped-call]
+        self.exploration_1 = self.save_new_default_exploration(
             self.EXP_1_ID, self.owner_id, title='Aa')
         self.content_id_generator_1 = translation_domain.ContentIdGenerator(
             self.exploration_1.next_content_id_index
         )
         self.exploration_2 = self.save_new_default_exploration(
             self.EXP_2_ID, self.owner_id, title='Bb')
-        self.exploration_3 = self.save_new_default_exploration(  # type: ignore[no-untyped-call]
+        self.exploration_3 = self.save_new_default_exploration(
             self.EXP_3_ID, self.owner_id, title='Cc')
 
     def test_get_exploration_summaries_matching_ids(self) -> None:
@@ -418,10 +418,10 @@ class LoggedOutUserProgressTests(test_utils.GenericTestBase):
     EXP_1_ID = 'exploration_1_id'
 
     def setUp(self) -> None:
-        super(LoggedOutUserProgressTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
-        self.exploration_1 = self.save_new_default_exploration(  # type: ignore[no-untyped-call]
+        self.exploration_1 = self.save_new_default_exploration(
             self.EXP_1_ID, self.owner_id, title='Aa')
 
     def test_get_logged_out_user_progress(self) -> None:
@@ -563,7 +563,7 @@ title: Old Title
     ALBERT_NAME: Final = 'albert'
 
     def setUp(self) -> None:
-        super(ExplorationConversionPipelineTests, self).setUp()
+        super().setUp()
 
         # Setup user who will own the test explorations.
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
@@ -583,7 +583,7 @@ title: Old Title
         # Create standard exploration that should not be converted.
         new_exp = self.save_new_valid_exploration(
             self.NEW_EXP_ID, self.albert_id)
-        self._up_to_date_yaml = new_exp.to_yaml()  # type: ignore[no-untyped-call]
+        self._up_to_date_yaml = new_exp.to_yaml()
 
         # Clear the cache to prevent fetches of old data under the previous
         # state schema version scheme.
@@ -598,14 +598,14 @@ title: Old Title
         self.assertEqual(
             exploration.states_schema_version,
             feconf.CURRENT_STATE_SCHEMA_VERSION)
-        self.assertEqual(exploration.to_yaml(), self.UPGRADED_EXP_YAML)  # type: ignore[no-untyped-call]
+        self.assertEqual(exploration.to_yaml(), self.UPGRADED_EXP_YAML)
 
     def test_does_not_convert_up_to_date_exploration(self) -> None:
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(
             exploration.states_schema_version,
             feconf.CURRENT_STATE_SCHEMA_VERSION)
-        self.assertEqual(exploration.to_yaml(), self._up_to_date_yaml)  # type: ignore[no-untyped-call]
+        self.assertEqual(exploration.to_yaml(), self._up_to_date_yaml)
 
     def test_migration_with_invalid_state_schema(self) -> None:
         self.save_new_valid_exploration('fake_eid', self.albert_id)
@@ -763,7 +763,7 @@ title: Old Title
             feconf.CURRENT_STATE_SCHEMA_VERSION)
 
         # The exploration should be valid after conversion.
-        exploration.validate(strict=True)  # type: ignore[no-untyped-call]
+        exploration.validate(strict=True)
 
         # Version 5 is a reversion to version 1.
         exp_services.revert_exploration('committer_id_v4', exp_id, 4, 1)  # type: ignore[no-untyped-call]
@@ -781,10 +781,10 @@ title: Old Title
         # The reversion after migration should still be an up-to-date
         # exploration. exp_fetchers.get_exploration_by_id will automatically
         # keep it up-to-date.
-        self.assertEqual(exploration.to_yaml(), self.UPGRADED_EXP_YAML)  # type: ignore[no-untyped-call]
+        self.assertEqual(exploration.to_yaml(), self.UPGRADED_EXP_YAML)
 
         # The exploration should be valid after reversion.
-        exploration.validate(strict=True)  # type: ignore[no-untyped-call]
+        exploration.validate(strict=True)
 
         snapshots_metadata = exp_services.get_exploration_snapshots_metadata(  # type: ignore[no-untyped-call]
             exp_id)
@@ -836,5 +836,5 @@ title: Old Title
             exploration_model, run_conversion=False)
 
         # This exploration should be both up-to-date and valid.
-        self.assertEqual(exploration.to_yaml(), self.UPGRADED_EXP_YAML)  # type: ignore[no-untyped-call]
-        exploration.validate()  # type: ignore[no-untyped-call]
+        self.assertEqual(exploration.to_yaml(), self.UPGRADED_EXP_YAML)
+        exploration.validate()

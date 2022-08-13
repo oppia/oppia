@@ -25,7 +25,8 @@ var TopicViewerPage = function() {
   var practiceTabLink = $('.e2e-test-practice-tab-link');
   var revisionTabLink = $('.e2e-test-revision-tab-link');
   var startPracticeButton = $('.e2e-test-practice-start-button');
-  var storySummaryTitleListElement = function() {
+  var storySummaryTitleListElement = $('.e2e-test-story-summary-title');
+  var storySummaryTitleListSelector = function() {
     return $$('.e2e-test-story-summary-title');
   };
   var topicDescription = $('.e2e-test-topic-description');
@@ -49,13 +50,14 @@ var TopicViewerPage = function() {
   };
 
   this.expectStoryCountToBe = async function(count) {
-    var storySummaryTitleList = await storySummaryTitleListElement();
+    var storySummaryTitleList = await storySummaryTitleListSelector();
     if (count === 0) {
       expect(storySummaryTitleList.length).toEqual(0);
     } else {
       await waitFor.visibilityOf(
-        storySummaryTitleList[0],
+        storySummaryTitleListElement,
         'Story summary tiles take too long to be visible.');
+      var storySummaryTitleList = await storySummaryTitleListSelector();
       expect(storySummaryTitleList.length).toEqual(count);
     }
   };

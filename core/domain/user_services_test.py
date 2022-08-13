@@ -76,7 +76,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
     """Test the user services methods."""
 
     def setUp(self) -> None:
-        super(UserServicesUnitTests, self).setUp()
+        super().setUp()
         user_data_dict: user_domain.RawUserDataDict = {
             'schema_version': 1,
             'display_alias': 'display_alias',
@@ -2340,7 +2340,7 @@ title: Title
 """)
 
     def setUp(self) -> None:
-        super(UserCheckpointProgressUpdateTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
@@ -2555,7 +2555,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
     COLLECTION_OBJECTIVE: Final = 'objective'
 
     def setUp(self) -> None:
-        super(UpdateContributionMsecTests, self).setUp()
+        super().setUp()
 
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)  # type: ignore[no-untyped-call]
@@ -2586,7 +2586,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
             self.admin_id).first_contribution_msec)
 
         # Test editor of published exploration has updated contribution time.
-        rights_manager.release_ownership_of_exploration(  # type: ignore[no-untyped-call]
+        rights_manager.release_ownership_of_exploration(
             self.admin, self.EXP_ID)
 
         exp_services.update_exploration(  # type: ignore[no-untyped-call]
@@ -2652,7 +2652,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
 
         # Test that another user who commits to unpublished exploration does not
         # have updated first contribution time.
-        rights_manager.assign_role_for_exploration(  # type: ignore[no-untyped-call]
+        rights_manager.assign_role_for_exploration(
             self.admin, self.EXP_ID, self.editor_id, 'editor')
         exp_services.update_exploration(  # type: ignore[no-untyped-call]
             self.editor_id, self.EXP_ID, [exp_domain.ExplorationChange({
@@ -2677,7 +2677,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
     ) -> None:
         self.save_new_valid_exploration(
             self.EXP_ID, self.admin_id, end_state_name='End')
-        rights_manager.assign_role_for_exploration(  # type: ignore[no-untyped-call]
+        rights_manager.assign_role_for_exploration(
             self.admin, self.EXP_ID, self.editor_id, 'editor')
         exp_services.publish_exploration_and_update_user_profiles(  # type: ignore[no-untyped-call]
             self.admin, self.EXP_ID)
@@ -2695,7 +2695,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
 
         exp_services.publish_exploration_and_update_user_profiles(  # type: ignore[no-untyped-call]
             self.owner, self.EXP_ID)
-        rights_manager.unpublish_exploration(self.owner, self.EXP_ID)  # type: ignore[no-untyped-call]
+        rights_manager.unpublish_exploration(self.owner, self.EXP_ID)
 
         # Test that contribution time is not eliminated if exploration is
         # unpublished.
@@ -2709,7 +2709,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
             objective=self.COLLECTION_OBJECTIVE,
             exploration_id=self.EXP_ID)
 
-        collection_services.publish_collection_and_update_user_profiles(  # type: ignore[no-untyped-call]
+        collection_services.publish_collection_and_update_user_profiles(
             self.admin, self.COL_ID)
         exp_services.publish_exploration_and_update_user_profiles(  # type: ignore[no-untyped-call]
             self.admin, self.EXP_ID)
@@ -2721,10 +2721,10 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
 
         # Test editor of published collection has updated
         # first contribution time.
-        rights_manager.release_ownership_of_collection(  # type: ignore[no-untyped-call]
+        rights_manager.release_ownership_of_collection(
             self.admin, self.COL_ID)
 
-        collection_services.update_collection(  # type: ignore[no-untyped-call]
+        collection_services.update_collection(
             self.editor_id, self.COL_ID, [{
                 'cmd': 'edit_collection_property',
                 'property_name': 'title',
@@ -2750,7 +2750,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
 
         # Test that commit to unpublished collection does not update
         # contribution time.
-        collection_services.update_collection(  # type: ignore[no-untyped-call]
+        collection_services.update_collection(
             self.admin_id, self.COL_ID, [{
                 'cmd': 'edit_collection_property',
                 'property_name': 'title',
@@ -2761,9 +2761,9 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
 
         # Test that another user who commits to unpublished collection does not
         # have updated first contribution time.
-        rights_manager.assign_role_for_collection(  # type: ignore[no-untyped-call]
+        rights_manager.assign_role_for_collection(
             self.admin, self.COL_ID, self.editor_id, 'editor')
-        collection_services.update_collection(  # type: ignore[no-untyped-call]
+        collection_services.update_collection(
             self.editor_id, self.COL_ID, [{
                 'cmd': 'edit_collection_property',
                 'property_name': 'category',
@@ -2774,7 +2774,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
 
         # Test that after an collection is published, all contributors have
         # updated first contribution times.
-        collection_services.publish_collection_and_update_user_profiles(  # type: ignore[no-untyped-call]
+        collection_services.publish_collection_and_update_user_profiles(
             self.admin, self.COL_ID)
         self.assertIsNotNone(user_services.get_user_settings(
             self.admin_id).first_contribution_msec)
@@ -2789,9 +2789,9 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
             category=self.COLLECTION_CATEGORY,
             objective=self.COLLECTION_OBJECTIVE,
             exploration_id=self.EXP_ID)
-        rights_manager.assign_role_for_collection(  # type: ignore[no-untyped-call]
+        rights_manager.assign_role_for_collection(
             self.admin, self.COL_ID, self.editor_id, 'editor')
-        collection_services.publish_collection_and_update_user_profiles(  # type: ignore[no-untyped-call]
+        collection_services.publish_collection_and_update_user_profiles(
             self.admin, self.COL_ID)
 
         # Test that contribution time is not given to an editor that has not
@@ -2809,9 +2809,9 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
             category=self.COLLECTION_CATEGORY,
             objective=self.COLLECTION_OBJECTIVE,
             exploration_id=self.EXP_ID)
-        collection_services.publish_collection_and_update_user_profiles(  # type: ignore[no-untyped-call]
+        collection_services.publish_collection_and_update_user_profiles(
             self.owner, self.COL_ID)
-        rights_manager.unpublish_collection(self.owner, self.COL_ID)  # type: ignore[no-untyped-call]
+        rights_manager.unpublish_collection(self.owner, self.COL_ID)
 
         # Test that first contribution msec is not eliminated if collection is
         # unpublished.
@@ -2831,7 +2831,7 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
     CURRENT_DATE_AS_STRING: Final = user_services.get_current_date_as_string()
 
     def setUp(self) -> None:
-        super(UserDashboardStatsTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
 
@@ -2842,10 +2842,10 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.owner_id, end_state_name='End')
         init_state_name = exploration.init_state_name
-        event_services.StartExplorationEventHandler.record(  # type: ignore[no-untyped-call]
+        event_services.StartExplorationEventHandler.record(
             self.EXP_ID, 1, init_state_name, self.USER_SESSION_ID, {},
             feconf.PLAY_TYPE_NORMAL)
-        event_services.StatsEventsHandler.record(  # type: ignore[no-untyped-call]
+        event_services.StatsEventsHandler.record(
             self.EXP_ID, 1, {
                 'num_starts': 1,
                 'num_actual_starts': 0,
@@ -2864,7 +2864,7 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.owner_id, end_state_name='End')
         init_state_name = exploration.init_state_name
-        event_services.StartExplorationEventHandler.record(  # type: ignore[no-untyped-call]
+        event_services.StartExplorationEventHandler.record(
             self.EXP_ID, 1, init_state_name, self.USER_SESSION_ID, {},
             feconf.PLAY_TYPE_NORMAL)
         self.assertEqual(
@@ -2890,10 +2890,10 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.owner_id, end_state_name='End')
         init_state_name = exploration.init_state_name
-        event_services.StartExplorationEventHandler.record(  # type: ignore[no-untyped-call]
+        event_services.StartExplorationEventHandler.record(
             self.EXP_ID, 1, init_state_name, self.USER_SESSION_ID, {},
             feconf.PLAY_TYPE_NORMAL)
-        event_services.StatsEventsHandler.record(  # type: ignore[no-untyped-call]
+        event_services.StatsEventsHandler.record(
             self.EXP_ID, 1, {
                 'num_starts': 1,
                 'num_actual_starts': 0,
@@ -2906,7 +2906,7 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
         self.assertEqual(
             user_services.get_last_week_dashboard_stats(self.owner_id), None)
 
-        self.process_and_flush_pending_tasks()  # type: ignore[no-untyped-call]
+        self.process_and_flush_pending_tasks()
 
         self.assertEqual(
             user_services.get_weekly_dashboard_stats(self.owner_id), [])
@@ -2973,10 +2973,10 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
             exploration = self.save_new_valid_exploration(
                 self.EXP_ID, self.owner_id, end_state_name='End')
             init_state_name = exploration.init_state_name
-            event_services.StartExplorationEventHandler.record(  # type: ignore[no-untyped-call]
+            event_services.StartExplorationEventHandler.record(
                 self.EXP_ID, 1, init_state_name, self.USER_SESSION_ID, {},
                 feconf.PLAY_TYPE_NORMAL)
-            event_services.StatsEventsHandler.record(  # type: ignore[no-untyped-call]
+            event_services.StatsEventsHandler.record(
                 self.EXP_ID, 1, {
                     'num_starts': 1,
                     'num_actual_starts': 0,
@@ -3021,7 +3021,7 @@ class SubjectInterestsUnitTests(test_utils.GenericTestBase):
     """Test the update_subject_interests method."""
 
     def setUp(self) -> None:
-        super(SubjectInterestsUnitTests, self).setUp()
+        super().setUp()
         self.auth_id = 'someUser'
         self.username = 'username'
         self.user_email = 'user@example.com'
@@ -3082,7 +3082,7 @@ class LastLoginIntegrationTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         """Create exploration with two versions."""
-        super(LastLoginIntegrationTests, self).setUp()
+        super().setUp()
 
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)  # type: ignore[no-untyped-call]
@@ -3151,7 +3151,7 @@ class LastExplorationEditedIntegrationTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         """Create users for creating and editing exploration."""
-        super(LastExplorationEditedIntegrationTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
@@ -3227,7 +3227,7 @@ class LastExplorationCreatedIntegrationTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         """Create user for creating exploration."""
-        super(LastExplorationCreatedIntegrationTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
 
@@ -3286,7 +3286,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         state.
         """
         community_contribution_stats = (
-            suggestion_services.get_community_contribution_stats()  # type: ignore[no-untyped-call]
+            suggestion_services.get_community_contribution_stats()
         )
 
         self.assertEqual(
@@ -3305,8 +3305,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             community_contribution_stats.question_suggestion_count, 0)
 
     def setUp(self) -> None:
-        super(
-            CommunityContributionStatsUnitTests, self).setUp()
+        super().setUp()
 
         self.signup(self.REVIEWER_1_EMAIL, 'reviewer1')
         self.reviewer_1_id = self.get_user_id_from_email(  # type: ignore[no-untyped-call]
@@ -3322,7 +3321,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         user_services.allow_user_to_review_translation_in_language(
             self.reviewer_1_id, 'hi')
 
-        stats = suggestion_services.get_community_contribution_stats()  # type: ignore[no-untyped-call]
+        stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 0)
         self.assertEqual(stats.question_suggestion_count, 0)
         self.assertDictEqual(
@@ -3338,7 +3337,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         user_services.allow_user_to_review_translation_in_language(
             self.reviewer_1_id, 'en')
 
-        stats = suggestion_services.get_community_contribution_stats()  # type: ignore[no-untyped-call]
+        stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 0)
         self.assertEqual(stats.question_suggestion_count, 0)
         self.assertDictEqual(
@@ -3353,7 +3352,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         user_services.allow_user_to_review_translation_in_language(
             self.reviewer_1_id, 'hi')
         # Assert that the translation reviewer count increased by one.
-        stats = suggestion_services.get_community_contribution_stats()  # type: ignore[no-untyped-call]
+        stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 0)
         self.assertEqual(stats.question_suggestion_count, 0)
         self.assertDictEqual(
@@ -3366,7 +3365,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
 
         # Assert that the translation reviewer count did not change because the
         # reviewer already had the permissions.
-        stats = suggestion_services.get_community_contribution_stats()  # type: ignore[no-untyped-call]
+        stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 0)
         self.assertEqual(stats.question_suggestion_count, 0)
         self.assertDictEqual(
@@ -3380,7 +3379,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         user_services.allow_user_to_review_translation_in_language(
             self.reviewer_1_id, 'hi')
         # Assert that the translation reviewer count increased by one.
-        stats = suggestion_services.get_community_contribution_stats()  # type: ignore[no-untyped-call]
+        stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 0)
         self.assertEqual(stats.question_suggestion_count, 0)
         self.assertDictEqual(
@@ -3403,7 +3402,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         user_services.allow_user_to_review_translation_in_language(
             self.reviewer_1_id, 'en')
         # Assert that the translation reviewer count increased by one.
-        stats = suggestion_services.get_community_contribution_stats()  # type: ignore[no-untyped-call]
+        stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 0)
         self.assertEqual(stats.question_suggestion_count, 0)
         self.assertDictEqual(
@@ -3416,7 +3415,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
 
         # Assert that the translation reviewer count decreased by one after the
         # rights were removed.
-        stats = suggestion_services.get_community_contribution_stats()  # type: ignore[no-untyped-call]
+        stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 0)
         self.assertEqual(stats.question_suggestion_count, 0)
         self.assertDictEqual(
@@ -3432,7 +3431,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         user_services.allow_user_to_review_translation_in_language(
             self.reviewer_1_id, 'en')
         # Assert that the translation reviewer count increased by one.
-        stats = suggestion_services.get_community_contribution_stats()  # type: ignore[no-untyped-call]
+        stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 0)
         self.assertEqual(stats.question_suggestion_count, 0)
         self.assertDictEqual(
@@ -3451,7 +3450,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
     ) -> None:
         user_services.allow_user_to_review_question(self.reviewer_1_id)
 
-        stats = suggestion_services.get_community_contribution_stats()  # type: ignore[no-untyped-call]
+        stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 1)
         self.assertEqual(stats.question_suggestion_count, 0)
         self.assertDictEqual(stats.translation_reviewer_counts_by_lang_code, {})
@@ -3463,7 +3462,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
     ) -> None:
         user_services.allow_user_to_review_question(self.reviewer_1_id)
         # Assert that the question reviewer count increased by one.
-        stats = suggestion_services.get_community_contribution_stats()  # type: ignore[no-untyped-call]
+        stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 1)
         self.assertEqual(stats.question_suggestion_count, 0)
         self.assertDictEqual(stats.translation_reviewer_counts_by_lang_code, {})
@@ -3474,7 +3473,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
 
         # Assert that the question reviewer count did not change because the
         # reviewer already had the permissions.
-        stats = suggestion_services.get_community_contribution_stats()  # type: ignore[no-untyped-call]
+        stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 1)
         self.assertEqual(stats.question_suggestion_count, 0)
         self.assertDictEqual(stats.translation_reviewer_counts_by_lang_code, {})
@@ -3486,7 +3485,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
     ) -> None:
         user_services.allow_user_to_review_question(self.reviewer_1_id)
         # Assert that the question reviewer count increased by one.
-        stats = suggestion_services.get_community_contribution_stats()  # type: ignore[no-untyped-call]
+        stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 1)
         self.assertEqual(stats.question_suggestion_count, 0)
         self.assertDictEqual(stats.translation_reviewer_counts_by_lang_code, {})
@@ -3504,7 +3503,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
     ) -> None:
         user_services.allow_user_to_review_question(self.reviewer_1_id)
         # Assert that the question reviewer count increased by one.
-        stats = suggestion_services.get_community_contribution_stats()  # type: ignore[no-untyped-call]
+        stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 1)
         self.assertEqual(stats.question_suggestion_count, 0)
         self.assertDictEqual(stats.translation_reviewer_counts_by_lang_code, {})
@@ -3526,7 +3525,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             self.reviewer_1_id, 'en')
         user_services.allow_user_to_review_question(self.reviewer_1_id)
 
-        stats = suggestion_services.get_community_contribution_stats()  # type: ignore[no-untyped-call]
+        stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 1)
         self.assertEqual(stats.question_suggestion_count, 0)
         self.assertDictEqual(
@@ -3548,7 +3547,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             self.reviewer_2_id, 'fr')
         user_services.allow_user_to_review_question(self.reviewer_2_id)
 
-        stats = suggestion_services.get_community_contribution_stats()  # type: ignore[no-untyped-call]
+        stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 2)
         self.assertEqual(stats.question_suggestion_count, 0)
         self.assertDictEqual(
@@ -3567,7 +3566,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         user_services.allow_user_to_review_question(self.reviewer_1_id)
         # Assert that the counts were updated before the question rights are
         # removed.
-        stats = suggestion_services.get_community_contribution_stats()  # type: ignore[no-untyped-call]
+        stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 1)
         self.assertEqual(stats.question_suggestion_count, 0)
         self.assertDictEqual(
@@ -3577,7 +3576,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
 
         user_services.remove_question_review_rights(self.reviewer_1_id)
 
-        stats = suggestion_services.get_community_contribution_stats()  # type: ignore[no-untyped-call]
+        stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 0)
         self.assertEqual(stats.question_suggestion_count, 0)
         self.assertDictEqual(
@@ -3593,7 +3592,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         user_services.allow_user_to_review_question(self.reviewer_1_id)
         # Assert that the counts were updated before the translation rights are
         # removed.
-        stats = suggestion_services.get_community_contribution_stats()  # type: ignore[no-untyped-call]
+        stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 1)
         self.assertEqual(stats.question_suggestion_count, 0)
         self.assertDictEqual(
@@ -3603,9 +3602,9 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
 
         user_services.remove_translation_review_rights_in_language(
             self.reviewer_1_id, 'hi')
-        self.process_and_flush_pending_tasks()  # type: ignore[no-untyped-call]
+        self.process_and_flush_pending_tasks()
 
-        stats = suggestion_services.get_community_contribution_stats()  # type: ignore[no-untyped-call]
+        stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 1)
         self.assertEqual(stats.question_suggestion_count, 0)
         self.assertDictEqual(
@@ -3623,7 +3622,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         user_services.allow_user_to_review_question(self.reviewer_1_id)
         # Assert that the counts were updated before the contribution reviewer
         # is removed.
-        stats = suggestion_services.get_community_contribution_stats()  # type: ignore[no-untyped-call]
+        stats = suggestion_services.get_community_contribution_stats()
         self.assertEqual(stats.question_reviewer_count, 1)
         self.assertEqual(stats.question_suggestion_count, 0)
         self.assertDictEqual(
@@ -3674,7 +3673,7 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
     QUESTION_SUBMITTER_USERNAME: Final = 'questionsubmitter'
 
     def setUp(self) -> None:
-        super(UserContributionReviewRightsTests, self).setUp()
+        super().setUp()
         self.signup(self.TRANSLATOR_EMAIL, self.TRANSLATOR_USERNAME)
         self.translator_id = self.get_user_id_from_email(self.TRANSLATOR_EMAIL)  # type: ignore[no-untyped-call]
 

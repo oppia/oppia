@@ -19,6 +19,9 @@
     <h4 class="oppia-translation-modal-author-header">
       Submitted by {{ authorName }} in {{ languageDescription }} language
     </h4>
+    <h4 class="oppia-mobile-translation-modal-author-header">
+      Submitted by {{ authorName }}
+    </h4>
   </div>
 </div>
 
@@ -60,7 +63,7 @@
       <div class="oppia-suggestion-review-panel oppia-content"
            [ngClass]="isTranslationExpanded ? 'oppia-content-expanded' : 'oppia-content-collapsed'"
            #translationContainer>
-        <div>
+        <div dir="auto">
           <oppia-rte-output-display [rteString]="translationHtml"
                                     *ngIf="!startedEditing"
                                     #translationPanel>
@@ -199,6 +202,9 @@
 </div>
 
 <style>
+  .oppia-mobile-translation-modal-author-header {
+    display: none;
+  }
   .oppia-review-message {
     border: 1px solid #ccc;
     margin-top: 10px;
@@ -224,20 +230,20 @@
     background-color: transparent;
     border: none;
     box-sizing: border-box;
-    color: #009688;
+    color: #000;
     font-size: 18px;
     font-weight: bold;
     min-height: 40px;
     min-width: 100px;
     text-align: center;
   }
-
   .oppia-pagination-button:hover {
-    border: 2px solid #009688;
+    border: 2px solid #000;
     border-radius: 5px;
   }
   .oppia-pagination-button[disabled] {
-    color: #a9e5df;
+    color: #000;
+    opacity: 0.239;
   }
   .oppia-pagination-button[disabled]:hover {
     border: none;
@@ -383,6 +389,10 @@
     }
     .oppia-translation-modal-author-header {
       display: none;
+    }
+    .oppia-mobile-translation-modal-author-header {
+      display: block;
+      font-size: 14px;
     }
     .oppia-translation-modal-subheading {
       display: none;

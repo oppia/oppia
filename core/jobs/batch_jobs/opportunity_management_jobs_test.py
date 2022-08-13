@@ -474,7 +474,7 @@ class GenerateExplorationOpportunitySummariesJobTests(
             init_state_name='state',
             states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
             states={
-                'state': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
+                'state': state_domain.State.create_default_state(
                     'state',  'content_0', 'default_outcome_1',
                     is_initial_state=True
                 ).to_dict()
@@ -563,11 +563,11 @@ class GenerateExplorationOpportunitySummariesJobTests(
             init_state_name='state1',
             states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
             states={
-                'state1': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
+                'state1': state_domain.State.create_default_state(
                     'state1',  'content_0', 'default_outcome_1',
                     is_initial_state=True
                 ).to_dict(),
-                'state2': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
+                'state2': state_domain.State.create_default_state(
                     'state2', 'content_2', 'default_outcome_3',
                 ).to_dict()
             },
@@ -823,11 +823,11 @@ class GenerateExplorationOpportunitySummariesJobTests(
             init_state_name='state1',
             states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
             states={
-                'state1': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
+                'state1': state_domain.State.create_default_state(
                     'state1',  'content_0', 'default_outcome_1',
                     is_initial_state=True
                 ).to_dict(),
-                'state2': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
+                'state2': state_domain.State.create_default_state(
                     'state2', 'content_2', 'default_outcome_3',
                 ).to_dict()
             },

@@ -36,7 +36,9 @@ from core.domain import translation_domain
 from extensions import domain
 
 from pylatexenc import latex2text
-from typing_extensions import TypedDict
+
+from typing import Any, Dict, List, Optional, Set
+from typing_extensions import Final, TypedDict
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
@@ -47,26 +49,27 @@ from core.domain import interaction_registry  # pylint: disable=invalid-import-f
 
 # Do not modify the values of these constants. This is to preserve backwards
 # compatibility with previous change dicts.
-QUESTION_PROPERTY_LANGUAGE_CODE = 'language_code'
-QUESTION_PROPERTY_QUESTION_STATE_DATA = 'question_state_data'
-QUESTION_PROPERTY_LINKED_SKILL_IDS = 'linked_skill_ids'
-QUESTION_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS = (
+QUESTION_PROPERTY_LANGUAGE_CODE: Final = 'language_code'
+QUESTION_PROPERTY_QUESTION_STATE_DATA: Final = 'question_state_data'
+QUESTION_PROPERTY_LINKED_SKILL_IDS: Final = 'linked_skill_ids'
+QUESTION_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS: Final = (
     'inapplicable_skill_misconception_ids')
 QUESTION_PROPERTY_NEXT_CONTENT_ID_INDEX = 'next_content_id_index'
 
 # This takes additional 'property_name' and 'new_value' parameters and,
 # optionally, 'old_value'.
-CMD_UPDATE_QUESTION_PROPERTY = 'update_question_property'
-CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION = 'create_new_fully_specified_question'
-CMD_MIGRATE_STATE_SCHEMA_TO_LATEST_VERSION = (
+CMD_UPDATE_QUESTION_PROPERTY: Final = 'update_question_property'
+CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION: Final = (
+    'create_new_fully_specified_question')
+CMD_MIGRATE_STATE_SCHEMA_TO_LATEST_VERSION: Final = (
     'migrate_state_schema_to_latest_version')
 
 # The following commands are deprecated, as these functionalities will be
 # handled by a QuestionSkillLink class in the future.
-CMD_ADD_QUESTION_SKILL = 'add_question_skill'
-CMD_REMOVE_QUESTION_SKILL = 'remove_question_skill'
+CMD_ADD_QUESTION_SKILL: Final = 'add_question_skill'
+CMD_REMOVE_QUESTION_SKILL: Final = 'remove_question_skill'
 
-CMD_CREATE_NEW = 'create_new'
+CMD_CREATE_NEW: Final = 'create_new'
 
 
 class QuestionChange(change_domain.BaseChange):
@@ -84,34 +87,41 @@ class QuestionChange(change_domain.BaseChange):
 
     # The allowed list of question properties which can be used in
     # update_question_property command.
-    QUESTION_PROPERTIES = (
+    QUESTION_PROPERTIES: List[str] = [
         QUESTION_PROPERTY_QUESTION_STATE_DATA,
         QUESTION_PROPERTY_LANGUAGE_CODE,
         QUESTION_PROPERTY_LINKED_SKILL_IDS,
         QUESTION_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS,
-        QUESTION_PROPERTY_NEXT_CONTENT_ID_INDEX)
+        QUESTION_PROPERTY_NEXT_CONTENT_ID_INDEX]
 
-    ALLOWED_COMMANDS = [{
+    ALLOWED_COMMANDS: List[feconf.ValidCmdDict] = [{
         'name': CMD_CREATE_NEW,
         'required_attribute_names': [],
         'optional_attribute_names': [],
-        'user_id_attribute_names': []
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
     }, {
         'name': CMD_UPDATE_QUESTION_PROPERTY,
         'required_attribute_names': ['property_name', 'new_value', 'old_value'],
         'optional_attribute_names': [],
         'user_id_attribute_names': [],
-        'allowed_values': {'property_name': QUESTION_PROPERTIES}
+        'allowed_values': {'property_name': QUESTION_PROPERTIES},
+        'deprecated_values': {}
     }, {
         'name': CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
         'required_attribute_names': ['question_dict', 'skill_id'],
         'optional_attribute_names': ['topic_name'],
-        'user_id_attribute_names': []
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
     }, {
         'name': CMD_MIGRATE_STATE_SCHEMA_TO_LATEST_VERSION,
         'required_attribute_names': ['from_version', 'to_version'],
         'optional_attribute_names': [],
-        'user_id_attribute_names': []
+        'user_id_attribute_names': [],
+        'allowed_values': {},
+        'deprecated_values': {}
     }]
 
 
@@ -129,9 +139,23 @@ class QuestionSuggestionChange(change_domain.BaseChange):
             'required_attribute_names': [
                 'question_dict', 'skill_id', 'skill_difficulty'],
             'optional_attribute_names': [],
-            'user_id_attribute_names': []
+            'user_id_attribute_names': [],
+            'allowed_values': {},
+            'deprecated_values': {}
         }
     ]
+
+
+class QuestionDict(TypedDict):
+    """Dictionary representing the Question domain object."""
+
+    id: str
+    question_state_data: state_domain.StateDict
+    question_state_data_schema_version: int
+    language_code: str
+    version: int
+    linked_skill_ids: List[str]
+    inapplicable_skill_misconception_ids: List[str]
 
 
 class VersionedQuestionStateDict(TypedDict):
@@ -145,10 +169,18 @@ class Question(translation_domain.BaseTranslatableObject):
     """Domain object for a question."""
 
     def __init__(
-            self, question_id, question_state_data,
-            question_state_data_schema_version, language_code, version,
-            linked_skill_ids, inapplicable_skill_misconception_ids,
-            next_content_id_index, created_on=None, last_updated=None):
+        self,
+        question_id: str,
+        question_state_data: state_domain.State,
+        question_state_data_schema_version: int,
+        language_code: str,
+        version: int,
+        linked_skill_ids: List[str],
+        inapplicable_skill_misconception_ids: List[str],
+        next_content_id_index: int,
+        created_on: Optional[datetime.datetime] = None,
+        last_updated: Optional[datetime.datetime] = None
+    ) -> None:
         """Constructs a Question domain object.
 
         Args:
@@ -202,7 +234,7 @@ class Question(translation_domain.BaseTranslatableObject):
             self.question_state_data)
         return translatable_contents_collection
 
-    def to_dict(self):
+    def to_dict(self) -> QuestionDict:
         """Returns a dict representing this Question domain object.
 
         Returns:
@@ -222,7 +254,8 @@ class Question(translation_domain.BaseTranslatableObject):
         }
 
     @classmethod
-    def create_default_question_state(cls, content_id_generator):
+    def create_default_question_state(
+            cls, content_id_generator) -> state_domain.State:
         """Return a State domain object with default value for being used as
         question state data.
 
@@ -238,7 +271,9 @@ class Question(translation_domain.BaseTranslatableObject):
             is_initial_state=True)
 
     @classmethod
-    def _convert_state_v27_dict_to_v28_dict(cls, question_state_dict):
+    def _convert_state_v27_dict_to_v28_dict(
+        cls, question_state_dict: state_domain.StateDict
+    ) -> state_domain.StateDict:
         """Converts from version 27 to 28. Version 28 replaces
         content_ids_to_audio_translations with recorded_voiceovers.
 
@@ -249,14 +284,22 @@ class Question(translation_domain.BaseTranslatableObject):
         Returns:
             dict. The converted question_state_dict.
         """
+        # In _convert_* functions, we allow less strict typing because here
+        # we are working with previous versions of the domain object and in
+        # previous versions of the domain object there are some fields that are
+        # discontinued in the latest domain object. So, while accessing these
+        # discontinued fields MyPy throws an error. Thus to avoid the error,
+        # we used ignore here.
         question_state_dict['recorded_voiceovers'] = {
             'voiceovers_mapping': (
-                question_state_dict.pop('content_ids_to_audio_translations'))
+                question_state_dict.pop('content_ids_to_audio_translations'))  # type: ignore[misc]
         }
         return question_state_dict
 
     @classmethod
-    def _convert_state_v28_dict_to_v29_dict(cls, question_state_dict):
+    def _convert_state_v28_dict_to_v29_dict(
+        cls, question_state_dict: state_domain.StateDict
+    ) -> state_domain.StateDict:
         """Converts from version 28 to 29. Version 29 adds
         solicit_answer_details boolean variable to the state, which
         allows the creator to ask for answer details from the learner
@@ -273,7 +316,9 @@ class Question(translation_domain.BaseTranslatableObject):
         return question_state_dict
 
     @classmethod
-    def _convert_state_v29_dict_to_v30_dict(cls, question_state_dict):
+    def _convert_state_v29_dict_to_v30_dict(
+        cls, question_state_dict: state_domain.StateDict
+    ) -> state_domain.StateDict:
         """Converts from version 29 to 30. Version 30 replaces
         tagged_misconception_id with tagged_skill_misconception_id, which
         is default to None.
@@ -289,12 +334,20 @@ class Question(translation_domain.BaseTranslatableObject):
         answer_groups = question_state_dict['interaction']['answer_groups']
         for answer_group in answer_groups:
             answer_group['tagged_skill_misconception_id'] = None
-            del answer_group['tagged_misconception_id']
+            # In _convert_* functions, we allow less strict typing because here
+            # we are working with previous versions of the domain object and in
+            # previous versions of the domain object there are some fields that
+            # are discontinued in the latest domain object. So, while accessing
+            # these discontinued fields MyPy throws an error. Thus to avoid the
+            # error, we used ignore here.
+            del answer_group['tagged_misconception_id']  # type: ignore[misc]
 
         return question_state_dict
 
     @classmethod
-    def _convert_state_v30_dict_to_v31_dict(cls, question_state_dict):
+    def _convert_state_v30_dict_to_v31_dict(
+        cls, question_state_dict: state_domain.StateDict
+    ) -> state_domain.StateDict:
         """Converts from version 30 to 31. Version 31 updates the
         Voiceover model to have an initialized duration_secs attribute of 0.0.
 
@@ -320,7 +373,9 @@ class Question(translation_domain.BaseTranslatableObject):
         return question_state_dict
 
     @classmethod
-    def _convert_state_v31_dict_to_v32_dict(cls, question_state_dict):
+    def _convert_state_v31_dict_to_v32_dict(
+        cls, question_state_dict: state_domain.StateDict
+    ) -> state_domain.StateDict:
         """Converts from version 31 to 32. Version 32 adds a new
         customization arg to SetInput interaction which allows
         creators to add custom text to the "Add" button.
@@ -345,7 +400,9 @@ class Question(translation_domain.BaseTranslatableObject):
         return question_state_dict
 
     @classmethod
-    def _convert_state_v32_dict_to_v33_dict(cls, question_state_dict):
+    def _convert_state_v32_dict_to_v33_dict(
+        cls, question_state_dict: state_domain.StateDict
+    ) -> state_domain.StateDict:
         """Converts from version 32 to 33. Version 33 adds a new
         customization arg to MultipleChoiceInput Interaction which allows
         answer choices to be shuffled.
@@ -370,7 +427,9 @@ class Question(translation_domain.BaseTranslatableObject):
         return question_state_dict
 
     @classmethod
-    def _convert_state_v33_dict_to_v34_dict(cls, question_state_dict):
+    def _convert_state_v33_dict_to_v34_dict(
+        cls, question_state_dict: state_domain.StateDict
+    ) -> state_domain.StateDict:
         """Converts from version 33 to 34. Version 34 adds a new
         attribute for math components. The new attribute has an additional field
         to for storing SVG filenames.
@@ -383,7 +442,7 @@ class Question(translation_domain.BaseTranslatableObject):
         Returns:
             dict. The converted question_state_dict.
         """
-        question_state_dict = state_domain.State.convert_html_fields_in_state(
+        question_state_dict = state_domain.State.convert_html_fields_in_state(  # type: ignore[no-untyped-call]
             question_state_dict,
             html_validation_service.add_math_content_to_math_rte_components,
             state_uses_old_interaction_cust_args_schema=True,
@@ -391,7 +450,9 @@ class Question(translation_domain.BaseTranslatableObject):
         return question_state_dict
 
     @classmethod
-    def _convert_state_v34_dict_to_v35_dict(cls, question_state_dict):
+    def _convert_state_v34_dict_to_v35_dict(
+        cls, question_state_dict: state_domain.StateDict
+    ) -> state_domain.StateDict:
         """Converts from version 34 to 35. Version 35 upgrades all explorations
         that use the MathExpressionInput interaction to use one of
         AlgebraicExpressionInput, NumericExpressionInput, or MathEquationInput
@@ -507,7 +568,7 @@ class Question(translation_domain.BaseTranslatableObject):
                 question_state_dict['interaction']['id'] = new_interaction_id
                 question_state_dict['interaction']['answer_groups'] = (
                     new_answer_groups)
-                if question_state_dict['interaction']['solution']:
+                if question_state_dict['interaction']['solution'] is not None:
                     correct_answer = question_state_dict['interaction'][
                         'solution']['correct_answer']['ascii']
                     correct_answer = exp_domain.clean_math_expression(
@@ -518,7 +579,9 @@ class Question(translation_domain.BaseTranslatableObject):
         return question_state_dict
 
     @classmethod
-    def _convert_state_v35_dict_to_v36_dict(cls, question_state_dict):
+    def _convert_state_v35_dict_to_v36_dict(
+        cls, question_state_dict: state_domain.StateDict
+    ) -> state_domain.StateDict:
         """Converts from version 35 to 36. Version 35 adds translation support
         for interaction customization arguments. This migration converts
         customization arguments whose schemas have been changed from unicode to
@@ -557,10 +620,17 @@ class Question(translation_domain.BaseTranslatableObject):
             for lang_code in translations_mapping[content_id]:
                 translations_mapping[
                     content_id][lang_code]['data_format'] = 'html'
+                # In _convert_* functions, we allow less strict typing
+                # because here we are working with previous versions of
+                # the domain object and in previous versions of the domain
+                # object there are some fields (eg. html) that are discontinued
+                # in the latest domain object. So, while accessing these
+                # discontinued fields MyPy throws an error. Thus to avoid
+                # the error, we used ignore here.
                 translations_mapping[
                     content_id][lang_code]['translation'] = (
-                        translations_mapping[content_id][lang_code]['html'])
-                del translations_mapping[content_id][lang_code]['html']
+                        translations_mapping[content_id][lang_code]['html'])  # type: ignore[misc]
+                del translations_mapping[content_id][lang_code]['html']  # type: ignore[misc]
 
         interaction_id = question_state_dict['interaction']['id']
         if interaction_id is None:
@@ -576,7 +646,7 @@ class Question(translation_domain.BaseTranslatableObject):
 
             new_content_ids = []
 
-            def __init__(self, next_content_id_index):
+            def __init__(self, next_content_id_index: int) -> None:
                 """Initializes a ContentIdCounter object.
 
                 Args:
@@ -584,7 +654,7 @@ class Question(translation_domain.BaseTranslatableObject):
                 """
                 self.next_content_id_index = next_content_id_index
 
-            def generate_content_id(self, content_id_prefix):
+            def generate_content_id(self, content_id_prefix: str) -> str:
                 """Generate a new content_id from the prefix provided and
                 the next content id index.
 
@@ -614,7 +684,7 @@ class Question(translation_domain.BaseTranslatableObject):
         # interaction_specs.json to ensure that this migration remains
         # stable even when interaction_specs.json is changed.
         ca_specs = [
-            domain.CustomizationArgSpec(
+            domain.CustomizationArgSpec(  # type: ignore[no-untyped-call]
                 ca_spec_dict['name'],
                 ca_spec_dict['description'],
                 ca_spec_dict['schema'],
@@ -706,7 +776,9 @@ class Question(translation_domain.BaseTranslatableObject):
         return question_state_dict
 
     @classmethod
-    def _convert_state_v36_dict_to_v37_dict(cls, question_state_dict):
+    def _convert_state_v36_dict_to_v37_dict(
+        cls, question_state_dict: state_domain.StateDict
+    ) -> state_domain.StateDict:
         """Converts from version 36 to 37. Version 37 changes all rules with
         type CaseSensitiveEquals to Equals.
 
@@ -729,7 +801,9 @@ class Question(translation_domain.BaseTranslatableObject):
         return question_state_dict
 
     @classmethod
-    def _convert_state_v37_dict_to_v38_dict(cls, question_state_dict):
+    def _convert_state_v37_dict_to_v38_dict(
+        cls, question_state_dict: state_domain.StateDict
+    ) -> state_domain.StateDict:
         """Converts from version 37 to 38. Version 38 adds a customization arg
         for the Math interactions that allows creators to specify the letters
         that would be displayed to the learner.
@@ -749,6 +823,9 @@ class Question(translation_domain.BaseTranslatableObject):
                     'interaction']['answer_groups']:
                 for rule_spec in group['rule_specs']:
                     rule_input = rule_spec['inputs']['x']
+                    # Ruling out the possibility of any other type for mypy
+                    # type checking.
+                    assert isinstance(rule_input, str)
                     for variable in expression_parser.get_variables(
                             rule_input):
                         # Replacing greek letter names with greek symbols.
@@ -769,7 +846,9 @@ class Question(translation_domain.BaseTranslatableObject):
         return question_state_dict
 
     @classmethod
-    def _convert_state_v38_dict_to_v39_dict(cls, question_state_dict):
+    def _convert_state_v38_dict_to_v39_dict(
+        cls, question_state_dict: state_domain.StateDict
+    ) -> state_domain.StateDict:
         """Converts from version 38 to 39. Version 39 adds a new
         customization arg to NumericExpressionInput interaction which allows
         creators to modify the placeholder text.
@@ -802,7 +881,9 @@ class Question(translation_domain.BaseTranslatableObject):
         return question_state_dict
 
     @classmethod
-    def _convert_state_v39_dict_to_v40_dict(cls, question_state_dict):
+    def _convert_state_v39_dict_to_v40_dict(
+        cls, question_state_dict: state_domain.StateDict
+    ) -> state_domain.StateDict:
         """Converts from version 39 to 40. Version 40 converts TextInput rule
         inputs from NormalizedString to SetOfNormalizedString.
 
@@ -818,20 +899,31 @@ class Question(translation_domain.BaseTranslatableObject):
             answer_group_dicts = question_state_dict[
                 'interaction']['answer_groups']
             for answer_group_dict in answer_group_dicts:
-                rule_type_to_inputs = collections.defaultdict(set)
+                rule_type_to_inputs: Dict[
+                    str, Set[state_domain.AllowedInputValueTypes]
+                ] = collections.defaultdict(set)
                 for rule_spec_dict in answer_group_dict['rule_specs']:
                     rule_type = rule_spec_dict['rule_type']
                     rule_inputs = rule_spec_dict['inputs']['x']
                     rule_type_to_inputs[rule_type].add(rule_inputs)
+                # In _convert_* functions, we allow less strict typing because
+                # here we are working with previous versions of the domain
+                # object and in previous versions of the domain object there are
+                # some fields whose type does not match with the latest domain
+                # object's types. So, while assigning these fields according to
+                # the previous version MyPy throws an error. Thus to avoid the
+                # error, we used ignore here.
                 answer_group_dict['rule_specs'] = [{
                     'rule_type': rule_type,
-                    'inputs': {'x': list(rule_type_to_inputs[rule_type])}
+                    'inputs': {'x': list(rule_type_to_inputs[rule_type])}  # type: ignore[dict-item]
                 } for rule_type in rule_type_to_inputs]
 
         return question_state_dict
 
     @classmethod
-    def _convert_state_v40_dict_to_v41_dict(cls, question_state_dict):
+    def _convert_state_v40_dict_to_v41_dict(
+        cls, question_state_dict: state_domain.StateDict
+    ) -> state_domain.StateDict:
         """Converts from version 40 to 41. Version 41 adds
         TranslatableSetOfUnicodeString and TranslatableSetOfNormalizedString
         objects to RuleSpec domain objects to allow for translations.
@@ -850,16 +942,16 @@ class Question(translation_domain.BaseTranslatableObject):
             function to generate new content_ids.
             """
 
-            def __init__(self, next_content_id_index):
+            def __init__(self, next_content_id_index: int) -> None:
                 """Initializes a ContentIdCounter object.
 
                 Args:
                     next_content_id_index: int. The next content id index.
                 """
-                self.new_content_ids = []
+                self.new_content_ids: List[str] = []
                 self.next_content_id_index = next_content_id_index
 
-            def generate_content_id(self, content_id_prefix):
+            def generate_content_id(self, content_id_prefix: str) -> str:
                 """Generate a new content_id from the prefix provided and
                 the next content id index.
 
@@ -889,17 +981,22 @@ class Question(translation_domain.BaseTranslatableObject):
                 for rule_spec_dict in answer_group_dict['rule_specs']:
                     content_id = content_id_counter.generate_content_id(
                         'rule_input_')
+                    # The expected type for `rule_spec_dict['inputs']['x']`
+                    # is AllowedRuleSpecInputTypes but here we are providing
+                    # Dict[str, AllowedRuleSpecInputTypes] values which causes
+                    # MyPy to throw `incompatible type` error. Thus to avoid
+                    # the error, we used ignore here.
+                    # Convert to TranslatableSetOfNormalizedString.
                     if interaction_id == 'TextInput':
-                        # Convert to TranslatableSetOfNormalizedString.
                         rule_spec_dict['inputs']['x'] = {
                             'contentId': content_id,
-                            'normalizedStrSet': rule_spec_dict['inputs']['x']
+                            'normalizedStrSet': rule_spec_dict['inputs']['x']  # type: ignore[dict-item]
                         }
                     elif interaction_id == 'SetInput':
                         # Convert to TranslatableSetOfUnicodeString.
                         rule_spec_dict['inputs']['x'] = {
                             'contentId': content_id,
-                            'unicodeStrSet': rule_spec_dict['inputs']['x']
+                            'unicodeStrSet': rule_spec_dict['inputs']['x']  # type: ignore[dict-item]
                         }
             question_state_dict['next_content_id_index'] = (
                 content_id_counter.next_content_id_index)
@@ -914,7 +1011,9 @@ class Question(translation_domain.BaseTranslatableObject):
         return question_state_dict
 
     @classmethod
-    def _convert_state_v41_dict_to_v42_dict(cls, question_state_dict):
+    def _convert_state_v41_dict_to_v42_dict(
+        cls, question_state_dict: state_domain.StateDict
+    ) -> state_domain.StateDict:
         """Converts from version 41 to 42. Version 42 changes rule input types
         for DragAndDropSortInput and ItemSelectionInput interactions to better
         support translations. Specifically, the rule inputs will store content
@@ -931,7 +1030,11 @@ class Question(translation_domain.BaseTranslatableObject):
             dict. The converted question_state_dict.
         """
 
-        def migrate_rule_inputs_and_answers(new_type, value, choices):
+        def migrate_rule_inputs_and_answers(
+            new_type: str,
+            value: Any,
+            choices: List[state_domain.SubtitledHtmlDict]
+        ) -> Any:
             """Migrates SetOfHtmlString to SetOfTranslatableHtmlContentIds,
             ListOfSetsOfHtmlStrings to ListOfSetsOfTranslatableHtmlContentIds,
             and DragAndDropHtmlString to TranslatableHtmlContentId. These
@@ -949,7 +1052,7 @@ class Question(translation_domain.BaseTranslatableObject):
                 *. The migrated rule input.
             """
 
-            def extract_content_id_from_choices(html):
+            def extract_content_id_from_choices(html: str) -> str:
                 """Given a html, find its associated content id in choices,
                 which is a list of subtitled html dicts.
 
@@ -1064,7 +1167,9 @@ class Question(translation_domain.BaseTranslatableObject):
         return question_state_dict
 
     @classmethod
-    def _convert_state_v42_dict_to_v43_dict(cls, question_state_dict):
+    def _convert_state_v42_dict_to_v43_dict(
+        cls, question_state_dict: state_domain.StateDict
+    ) -> state_domain.StateDict:
         """Converts from version 42 to 43. Version 43 adds a new customization
         arg to NumericExpressionInput, AlgebraicExpressionInput, and
         MathEquationInput. The customization arg will allow creators to choose
@@ -1093,7 +1198,9 @@ class Question(translation_domain.BaseTranslatableObject):
         return question_state_dict
 
     @classmethod
-    def _convert_state_v43_dict_to_v44_dict(cls, question_state_dict):
+    def _convert_state_v43_dict_to_v44_dict(
+        cls, question_state_dict: state_domain.StateDict
+    ) -> state_domain.StateDict:
         """Converts from version 43 to version 44. Version 44 adds
         card_is_checkpoint boolean to the state, which allows creators to
         mark a state as a checkpoint for the learners.
@@ -1109,7 +1216,9 @@ class Question(translation_domain.BaseTranslatableObject):
         return question_state_dict
 
     @classmethod
-    def _convert_state_v44_dict_to_v45_dict(cls, question_state_dict):
+    def _convert_state_v44_dict_to_v45_dict(
+        cls, question_state_dict: state_domain.StateDict
+    ) -> state_domain.StateDict:
         """Converts from version 44 to 45. Version 45 contains
         linked skil id.
 
@@ -1127,7 +1236,9 @@ class Question(translation_domain.BaseTranslatableObject):
         return question_state_dict
 
     @classmethod
-    def _convert_state_v45_dict_to_v46_dict(cls, question_state_dict):
+    def _convert_state_v45_dict_to_v46_dict(
+        cls, question_state_dict: state_domain.StateDict
+    ) -> state_domain.StateDict:
         """Converts from version 45 to 46. Version 46 ensures that the written
         translations in a state containing unicode content do not contain HTML
         tags and the data_format is unicode. This does not affect questions, so
@@ -1145,7 +1256,9 @@ class Question(translation_domain.BaseTranslatableObject):
         return question_state_dict
 
     @classmethod
-    def _convert_state_v46_dict_to_v47_dict(cls, question_state_dict):
+    def _convert_state_v46_dict_to_v47_dict(
+        cls, question_state_dict: state_domain.StateDict
+    ) -> state_domain.StateDict:
         """Converts from version 46 to 47. Version 52 deprecates
         oppia-noninteractive-svgdiagram tag and converts existing occurences of
         it to oppia-noninteractive-image tag.
@@ -1159,14 +1272,16 @@ class Question(translation_domain.BaseTranslatableObject):
             dict. The converted states_dict.
         """
 
-        state_domain.State.convert_html_fields_in_state(
+        state_domain.State.convert_html_fields_in_state(  # type: ignore[no-untyped-call]
             question_state_dict,
             html_validation_service.convert_svg_diagram_tags_to_image_tags,
             state_schema_version=46)
         return question_state_dict
 
     @classmethod
-    def _convert_state_v47_dict_to_v48_dict(cls, question_state_dict):
+    def _convert_state_v47_dict_to_v48_dict(
+        cls, question_state_dict: state_domain.StateDict
+    ) -> state_domain.StateDict:
         """Converts draft change list from state version 47 to 48. Version 48
         fixes encoding issues in HTML fields.
 
@@ -1179,14 +1294,16 @@ class Question(translation_domain.BaseTranslatableObject):
             dict. The converted states_dict.
         """
 
-        state_domain.State.convert_html_fields_in_state(
+        state_domain.State.convert_html_fields_in_state(  # type: ignore[no-untyped-call]
             question_state_dict,
             html_validation_service.fix_incorrectly_encoded_chars,
             state_schema_version=48)
         return question_state_dict
 
     @classmethod
-    def _convert_state_v48_dict_to_v49_dict(cls, question_state_dict):
+    def _convert_state_v48_dict_to_v49_dict(
+        cls, question_state_dict: state_domain.StateDict
+    ) -> state_domain.StateDict:
         """Converts from version 48 to 49. Version 49 adds
         requireNonnegativeInput customization arg to NumericInput
         interaction which allows creators to set input range greater than
@@ -1211,7 +1328,9 @@ class Question(translation_domain.BaseTranslatableObject):
         return question_state_dict
 
     @classmethod
-    def _convert_state_v49_dict_to_v50_dict(cls, question_state_dict):
+    def _convert_state_v49_dict_to_v50_dict(
+        cls, question_state_dict: state_domain.StateDict
+    ) -> state_domain.StateDict:
         """Converts from version 49 to 50. Version 50 removes rules from
         explorations that use one of the following rules:
         [ContainsSomeOf, OmitsSomeOf, MatchesWithGeneralForm]. It also renames
@@ -1245,18 +1364,20 @@ class Question(translation_domain.BaseTranslatableObject):
                 'interaction']['answer_groups'] = filtered_answer_groups
 
             # Renaming cust arg.
+        if question_state_dict[
+                'interaction']['id'] in exp_domain.ALGEBRAIC_MATH_INTERACTIONS:
             customization_args = question_state_dict[
                 'interaction']['customization_args']
-            customization_args['allowedVariables'] = []
-            if 'customOskLetters' in customization_args:
-                customization_args['allowedVariables'] = copy.deepcopy(
-                    customization_args['customOskLetters'])
-                del customization_args['customOskLetters']
+            customization_args['allowedVariables'] = copy.deepcopy(
+                customization_args['customOskLetters'])
+            del customization_args['customOskLetters']
 
         return question_state_dict
 
     @classmethod
-    def _convert_state_v50_dict_to_v51_dict(cls, question_state_dict):
+    def _convert_state_v50_dict_to_v51_dict(
+        cls, question_state_dict: state_domain.StateDict
+    ) -> state_domain.StateDict:
         """Converts from version 50 to 51. Version 51 adds a new
         dest_if_really_stuck field to Outcome class to redirect learners
         to a state for strengthening concepts when they get really stuck.
@@ -1299,7 +1420,10 @@ class Question(translation_domain.BaseTranslatableObject):
 
     @classmethod
     def update_state_from_model(
-            cls, versioned_question_state, current_state_schema_version):
+        cls,
+        versioned_question_state: VersionedQuestionStateDict,
+        current_state_schema_version: int
+    ) -> None:
         """Converts the state object contained in the given
         versioned_question_state dict from current_state_schema_version to
         current_state_schema_version + 1.
@@ -1330,7 +1454,7 @@ class Question(translation_domain.BaseTranslatableObject):
         versioned_question_state['state'] = conversion_fn(
             versioned_question_state['state'])
 
-    def partial_validate(self):
+    def partial_validate(self) -> None:
         """Validates the Question domain object, but doesn't require the
         object to contain an ID and a version. To be used to validate the
         question before it is finalized.
@@ -1444,15 +1568,19 @@ class Question(translation_domain.BaseTranslatableObject):
             raise utils.ValidationError(
                 'Expected the question to have at least one hint')
 
+        # Here, we are asserting that id is never going to be None, because
+        # None interactions are not allowed to contain questions, so if an
+        # interaction have questions then it definitely have interaction_id.
+        assert interaction.id is not None
         if (
                 (interaction.solution is None) and
                 (interaction_specs[interaction.id]['can_have_solution'])):
             raise utils.ValidationError(
                 'Expected the question to have a solution'
             )
-        self.question_state_data.validate({}, False)
+        self.question_state_data.validate({}, False)  # type: ignore[no-untyped-call]
 
-    def validate(self):
+    def validate(self) -> None:
         """Validates the Question domain object before it is saved."""
 
         if not isinstance(self.id, str):
@@ -1467,7 +1595,7 @@ class Question(translation_domain.BaseTranslatableObject):
         self.partial_validate()
 
     @classmethod
-    def from_dict(cls, question_dict):
+    def from_dict(cls, question_dict: QuestionDict) -> Question:
         """Returns a Question domain object from dict.
 
         Returns:
@@ -1485,7 +1613,9 @@ class Question(translation_domain.BaseTranslatableObject):
         return question
 
     @classmethod
-    def create_default_question(cls, question_id, skill_ids):
+    def create_default_question(
+        cls, question_id: str, skill_ids: List[str]
+    ) -> Question:
         """Returns a Question domain object with default values.
 
         Args:
@@ -1505,7 +1635,7 @@ class Question(translation_domain.BaseTranslatableObject):
             constants.DEFAULT_LANGUAGE_CODE, 0, skill_ids, [],
             content_id_generator.next_content_id_index)
 
-    def update_language_code(self, language_code):
+    def update_language_code(self, language_code: str) -> None:
         """Updates the language code of the question.
 
         Args:
@@ -1514,7 +1644,7 @@ class Question(translation_domain.BaseTranslatableObject):
         """
         self.language_code = language_code
 
-    def update_linked_skill_ids(self, linked_skill_ids):
+    def update_linked_skill_ids(self, linked_skill_ids: List[str]) -> None:
         """Updates the linked skill ids of the question.
 
         Args:
@@ -1523,7 +1653,8 @@ class Question(translation_domain.BaseTranslatableObject):
         self.linked_skill_ids = list(set(linked_skill_ids))
 
     def update_inapplicable_skill_misconception_ids(
-            self, inapplicable_skill_misconception_ids):
+        self, inapplicable_skill_misconception_ids: List[str]
+    ) -> None:
         """Updates the optional misconception ids marked as not applicable
         to the question.
 
@@ -1535,11 +1666,15 @@ class Question(translation_domain.BaseTranslatableObject):
         self.inapplicable_skill_misconception_ids = list(
             set(inapplicable_skill_misconception_ids))
 
-    def update_next_content_id_index(self, next_content_id_index):
+    def update_next_content_id_index(
+        self, next_content_id_index: int
+    ) -> None:
         """Updates the next content id index for the question."""
         self.next_content_id_index = next_content_id_index
 
-    def update_question_state_data(self, question_state_data):
+    def update_question_state_data(
+        self, question_state_data: state_domain.State
+    ) -> None:
         """Updates the question data of the question.
 
         Args:
@@ -1549,20 +1684,36 @@ class Question(translation_domain.BaseTranslatableObject):
         self.question_state_data = question_state_data
 
 
+class QuestionSummaryDict(TypedDict):
+    """Dictionary representing the QuestionSummary domain object."""
+
+    id: str
+    question_content: str
+    interaction_id: str
+    last_updated_msec: float
+    created_on_msec: float
+    misconception_ids: List[str]
+
+
 class QuestionSummary:
     """Domain object for Question Summary."""
 
     def __init__(
-            self, question_id, question_content, misconception_ids,
-            interaction_id, question_model_created_on=None,
-            question_model_last_updated=None):
+        self,
+        question_id: str,
+        question_content: str,
+        misconception_ids: List[str],
+        interaction_id: str,
+        question_model_created_on: datetime.datetime,
+        question_model_last_updated: datetime.datetime
+    ) -> None:
         """Constructs a Question Summary domain object.
 
         Args:
             question_id: str. The ID of the question.
             question_content: str. The static HTML of the question shown to
                 the learner.
-            misconception_ids: str. The misconception ids addressed in
+            misconception_ids: list(str). The misconception ids addressed in
                 the question. This includes tagged misconceptions ids as well
                 as inapplicable misconception ids in the question.
             interaction_id: str. The ID of the interaction.
@@ -1578,12 +1729,13 @@ class QuestionSummary:
         self.created_on = question_model_created_on
         self.last_updated = question_model_last_updated
 
-    def to_dict(self):
+    def to_dict(self) -> QuestionSummaryDict:
         """Returns a dictionary representation of this domain object.
 
         Returns:
             dict. A dict representing this QuestionSummary object.
         """
+
         return {
             'id': self.id,
             'question_content': self.question_content,
@@ -1593,7 +1745,7 @@ class QuestionSummary:
             'misconception_ids': self.misconception_ids
         }
 
-    def validate(self):
+    def validate(self) -> None:
         """Validates the Question summary domain object before it is saved.
 
         Raises:
@@ -1632,6 +1784,15 @@ class QuestionSummary:
                 'strings, received %s' % self.misconception_ids)
 
 
+class QuestionSkillLinkDict(TypedDict):
+    """Dictionary representing the QuestionSkillLink domain object."""
+
+    question_id: str
+    skill_id: str
+    skill_description: str
+    skill_difficulty: float
+
+
 class QuestionSkillLink:
     """Domain object for Question Skill Link.
 
@@ -1644,7 +1805,12 @@ class QuestionSkillLink:
     """
 
     def __init__(
-            self, question_id, skill_id, skill_description, skill_difficulty):
+        self,
+        question_id: str,
+        skill_id: str,
+        skill_description: str,
+        skill_difficulty: float
+    ) -> None:
         """Constructs a Question Skill Link domain object.
 
         Args:
@@ -1658,7 +1824,7 @@ class QuestionSkillLink:
         self.skill_description = skill_description
         self.skill_difficulty = skill_difficulty
 
-    def to_dict(self):
+    def to_dict(self) -> QuestionSkillLinkDict:
         """Returns a dictionary representation of this domain object.
 
         Returns:
@@ -1670,6 +1836,15 @@ class QuestionSkillLink:
             'skill_description': self.skill_description,
             'skill_difficulty': self.skill_difficulty,
         }
+
+
+class MergedQuestionSkillLinkDict(TypedDict):
+    """Dictionary representing the MergedQuestionSkillLink domain object."""
+
+    question_id: str
+    skill_ids: List[str]
+    skill_descriptions: List[str]
+    skill_difficulties: List[float]
 
 
 class MergedQuestionSkillLink:
@@ -1686,8 +1861,12 @@ class MergedQuestionSkillLink:
     """
 
     def __init__(
-            self, question_id, skill_ids, skill_descriptions,
-            skill_difficulties):
+        self,
+        question_id: str,
+        skill_ids: List[str],
+        skill_descriptions: List[str],
+        skill_difficulties: List[float]
+    ) -> None:
         """Constructs a Merged Question Skill Link domain object.
 
         Args:
@@ -1703,7 +1882,7 @@ class MergedQuestionSkillLink:
         self.skill_descriptions = skill_descriptions
         self.skill_difficulties = skill_difficulties
 
-    def to_dict(self):
+    def to_dict(self) -> MergedQuestionSkillLinkDict:
         """Returns a dictionary representation of this domain object.
 
         Returns:

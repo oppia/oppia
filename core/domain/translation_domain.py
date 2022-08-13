@@ -839,7 +839,7 @@ class WrittenTranslations:
             if not set(self.translations_mapping.keys()) == (
                     set(expected_content_id_list)):
                 raise utils.ValidationError(
-                    'Expected written_translations to match the listed '
+                    'Expected state written_translations to match the listed '
                     'content ids %s, found %s' % (
                         expected_content_id_list,
                         list(self.translations_mapping.keys()))
@@ -880,7 +880,9 @@ class WrittenTranslations:
         """
         return list(sorted(self.translations_mapping.keys()))
 
-    def get_translated_content(self, content_id, language_code):
+    def get_translated_content(
+        self, content_id: str, language_code: str
+    ) -> str:
         """Returns the translated content for the given content_id in the given
         language.
 
@@ -997,7 +999,6 @@ class WrittenTranslations:
                             conversion_fn(translation_dict['html']))
 
         return written_translations_dict
-
 
 class ContentIdGenerator:
     """Class to generate the content-id for a translatable content based on the

@@ -60,19 +60,19 @@ class FindMathExplorationsWithRulesJobTests(job_test_utils.JobTestBase):
             init_state_name='state',
             states_schema_version=48,
             states={
-                'init_state': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
+                'init_state': state_domain.State.create_default_state(
                     'state', 'content_0', 'default_outcome_1',
                     is_initial_state=True
                 ).to_dict(),
-                'alg_state': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
+                'alg_state': state_domain.State.create_default_state(
                     'state', 'content_2', 'default_outcome_3',
                     is_initial_state=True
                 ).to_dict(),
-                'eq_state': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
+                'eq_state': state_domain.State.create_default_state(
                     'state', 'content_4', 'default_outcome_5',
                     is_initial_state=True
                 ).to_dict(),
-                'end_state': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
+                'end_state': state_domain.State.create_default_state(
                     'state', 'content_6', 'default_outcome_7',
                     is_initial_state=True
                 ).to_dict(),
@@ -121,15 +121,15 @@ class FindMathExplorationsWithRulesJobTests(job_test_utils.JobTestBase):
             init_state_name='state',
             states_schema_version=48,
             states={
-                'init_state': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
+                'init_state': state_domain.State.create_default_state(
                     'state', 'content_0', 'default_outcome_1',
                     is_initial_state=True
                 ).to_dict(),
-                'num_state': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
+                'num_state': state_domain.State.create_default_state(
                     'state', 'content_2', 'default_outcome_3',
                     is_initial_state=True
                 ).to_dict(),
-                'end_state': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
+                'end_state': state_domain.State.create_default_state(
                     'state', 'content_4', 'default_outcome_5',
                     is_initial_state=True
                 ).to_dict()

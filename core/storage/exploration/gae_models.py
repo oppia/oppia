@@ -294,14 +294,12 @@ class ExplorationModel(base_models.VersionedModel):
             'rights_model': ExplorationRightsModel.get_by_id(self.id)
         }
 
-    # TODO(#13523): Change 'commit_cmds' to TypedDict/Domain Object
-    # to remove Any used below.
     def compute_models_to_commit(
         self,
         committer_id: str,
         commit_type: str,
-        commit_message: str,
-        commit_cmds: List[Dict[str, Any]],
+        commit_message: Optional[str],
+        commit_cmds: base_models.AllowedCommitCmdsListType,
         # We expect Mapping because we want to allow models that inherit
         # from BaseModel as the values, if we used Dict this wouldn't
         # be allowed.
@@ -316,7 +314,8 @@ class ExplorationModel(base_models.VersionedModel):
                 change.
             commit_type: str. The type of commit. Possible values are in
                 core.storage.base_models.COMMIT_TYPE_CHOICES.
-            commit_message: str. The commit description message.
+            commit_message: str|None. The commit description message or None for
+                unpublished explorations.
             commit_cmds: list(dict). A list of commands, describing changes
                 made in this model, which should give sufficient information to
                 reconstruct the commit. Each dict always contains:
@@ -765,14 +764,12 @@ class ExplorationRightsModel(base_models.VersionedModel):
             **ExplorationRightsModel.convert_to_valid_dict(snapshot_dict))
         return self
 
-    # TODO(#13523): Change 'commit_cmds' to TypedDict/Domain Object
-    # to remove Any used below.
     def compute_models_to_commit(
         self,
         committer_id: str,
         commit_type: str,
-        commit_message: str,
-        commit_cmds: List[Dict[str, Any]],
+        commit_message: Optional[str],
+        commit_cmds: base_models.AllowedCommitCmdsListType,
         # We expect Mapping because we want to allow models that inherit
         # from BaseModel as the values, if we used Dict this wouldn't
         # be allowed.
@@ -787,7 +784,8 @@ class ExplorationRightsModel(base_models.VersionedModel):
                 change.
             commit_type: str. The type of commit. Possible values are in
                 core.storage.base_models.COMMIT_TYPE_CHOICES.
-            commit_message: str. The commit description message.
+            commit_message: str|None. The commit description message or None for
+                unpublished explorations.
             commit_cmds: list(dict). A list of commands, describing changes
                 made in this model, should give sufficient information to
                 reconstruct the commit. Each dict always contains:
@@ -824,7 +822,11 @@ class ExplorationRightsModel(base_models.VersionedModel):
                 if cmd['name'] == commit_cmd['cmd']
             )
             for user_id_attribute_name in user_id_attribute_names:
-                commit_cmds_user_ids.add(commit_cmd[user_id_attribute_name])
+                user_id_name_value = commit_cmd[user_id_attribute_name]
+                # Ruling out the possibility of any other type for mypy type
+                # checking.
+                assert isinstance(user_id_name_value, str)
+                commit_cmds_user_ids.add(user_id_name_value)
         snapshot_metadata_model.commit_cmds_user_ids = list(
             sorted(commit_cmds_user_ids))
 
