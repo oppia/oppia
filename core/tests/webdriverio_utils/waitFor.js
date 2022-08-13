@@ -199,7 +199,7 @@ var numberOfElementsToBe = async function(
   },
   {
     timeout: DEFAULT_WAIT_TIME_MSECS,
-    timeoutMsg: `Number of ${elementName} is greater than ${number}\n` +
+    timeoutMsg: `Number of ${elementName} is not equal to ${number}\n` +
     new Error().stack + '\n'
   });
 };
