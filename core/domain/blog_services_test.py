@@ -20,14 +20,18 @@ from __future__ import annotations
 
 import datetime
 import logging
-from core import feconf, utils
+import math
 
+from core import feconf
+from core import utils
 from core.domain import blog_domain
+from core.domain import blog_post_search_services
 from core.domain import blog_services
 from core.domain import user_services
-from core.domain import blog_post_search_services
 from core.platform import models
 from core.tests import test_utils
+
+from typing import Any, Dict, List
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -37,8 +41,8 @@ if MYPY: # pragma: no cover
 
 blog_post_search_services = models.Registry.import_search_services()
 
+
 class BlogServicesUnitTests(test_utils.GenericTestBase):
-    """Tests for blog services."""
 
     def setUp(self) -> None:
         super().setUp()
@@ -540,7 +544,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
             blog_services.update_blog_models_author_and_published_on_date(
                 'invalid_blog_id', self.user_id_b, '01/12/2000')
 
-    def test_index_blog_post_summaries_given_ids(self):
+    def test_index_blog_post_summaries_given_ids(self) -> None:
         all_blog_post_ids = []
         for i in range(5):
             blog_post = blog_services.create_new_blog_post(self.user_id_a)
@@ -558,24 +562,28 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         all_blog_post_tags = [
             'tag0', 'tag1', 'tag2', 'tag3', 'tag4',
         ]
+        expected_blog_post_tags = all_blog_post_tags[:-1]
 
-        def mock_add_documents_to_index(docs, index):
+        def mock_add_documents_to_index(
+            docs: List[Dict[str, Any]], index: int
+        ) -> List[str]:
             self.assertEqual(index, blog_services.SEARCH_INDEX_BLOG_POSTS)
             ids = [doc['id'] for doc in docs]
             titles = [doc['title'] for doc in docs]
             tags = [doc['tags'] for doc in docs]
             self.assertEqual(set(ids), set(expected_blog_post_ids))
             self.assertEqual(set(titles), set(expected_blog_post_titles))
+            self.assertEqual(set(tags), set(expected_blog_post_tags))
             return ids
 
-        add_docs_counter = test_utils.CallCounter(mock_add_documents_to_index)
+        add_docs_counter = test_utils.CallCounter(mock_add_documents_to_index) # type: ignore[no-untyped-call]
         add_docs_swap = self.swap(
             blog_post_search_services,
             'add_documents_to_index',
             add_docs_counter)
 
         for i in range(5):
-            change_dict = blog_services.BlogPostChangeDict = {
+            change_dict: blog_services.BlogPostChangeDict = {
                 'title': all_blog_post_titles[i],
                 'thumbnail_filename': all_blog_post_thumbnails[i],
                 'content': '<p>Hello Blog Post +</p>' + str(i),
@@ -596,19 +604,19 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(add_docs_counter.times_called, 1)
 
-    def test_updated_blog_post_is_added_correctly_to_index(self):
+    def test_updated_blog_post_is_added_correctly_to_index(self) -> None:
         blog_post = blog_services.create_new_blog_post(self.user_id_a)
         old_blog_post_title = 'title 0'
         old_blog_post_tag = ['tag0']
-        old_blog_post_change_dict = blog_services.BlogPostChangeDict = {
+        old_blog_post_change_dict: blog_services.BlogPostChangeDict = {
             'title': old_blog_post_title,
-            'thumbnail_filename':'thumbnail.svg',
+            'thumbnail_filename': 'thumbnail.svg',
             'content': '<p>Hello Blog Post</p>',
             'tags': old_blog_post_tag
         }
         new_blog_post_title = 'title 1'
         new_blog_post_tags = ['tag1', 'tag2']
-        new_blog_post_change_dict = blog_services.BlogPostChangeDict = {
+        new_blog_post_change_dict: blog_services.BlogPostChangeDict = {
             'title': new_blog_post_title,
             'thumbnail_filename': 'changed_thumb.svg',
             'content': '<p>Hello Blog Post</p>',
@@ -616,11 +624,13 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         }
         actual_docs = []
 
-        def mock_add_documents_to_index(docs, index):
+        def mock_add_documents_to_index(
+            docs: List[Dict[str, Any]], index: int
+        ) -> None:
             self.assertEqual(index, blog_services.SEARCH_INDEX_BLOG_POSTS)
             actual_docs.extend(docs)
 
-        add_docs_counter = test_utils.CallCounter(mock_add_documents_to_index)
+        add_docs_counter = test_utils.CallCounter(mock_add_documents_to_index) # type: ignore[no-untyped-call]
         add_docs_swap = self.swap(
             blog_post_search_services,
             'add_documents_to_index',
@@ -635,10 +645,16 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
             blog_services.publish_blog_post(blog_post.id)
             old_blog_post_summary = blog_services.get_blog_post_summary_by_id(
                 blog_post.id)
+            if old_blog_post_summary.published_on:
+                rank = math.floor(
+                    utils.get_time_in_millisecs(
+                        old_blog_post_summary.published_on))
+            else:
+                rank = 0
             initial_blog_post_doc = {
                 'id': blog_post.id,
                 'author_username': 'A',
-                'rank': utils.get_time_in_millisecs(old_blog_post_summary.published_on),
+                'rank': rank,
                 'tags': old_blog_post_tag,
                 'title': old_blog_post_title
             }
@@ -653,11 +669,16 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
             blog_services.publish_blog_post(blog_post.id)
             new_blog_post_summary = blog_services.get_blog_post_summary_by_id(
                 blog_post.id)
+            if new_blog_post_summary.published_on:
+                rank = math.floor(
+                    utils.get_time_in_millisecs(
+                        new_blog_post_summary.published_on))
+            else:
+                rank = 0
             updated_blog_post_doc = {
                 'id': blog_post.id,
                 'author_username': 'A',
-                'rank': utils.get_time_in_millisecs(
-                    new_blog_post_summary.published_on),
+                'rank': rank,
                 'tags': new_blog_post_tags,
                 'title': new_blog_post_title
             }
@@ -666,12 +687,13 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
             self.assertEqual(actual_docs, [updated_blog_post_doc])
             self.assertEqual(add_docs_counter.times_called, 2)
 
+
 class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
     """Tests blog post summary query methods which operate on BlogPostSummary
     objects.
     """
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
@@ -682,12 +704,12 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
         # Also, ensure 2 of them have similar titles and are written by 2
         # different authors.
         self.ids_of_blog_posts_by_user_A = []
-        for i in range(3):
+        for _ in range(3):
             blog_post = blog_services.create_new_blog_post(self.user_id_a)
             self.ids_of_blog_posts_by_user_A.append(blog_post.id)
 
         self.ids_of_blog_posts_by_user_B = []
-        for i in range(4):
+        for _ in range(4):
             blog_post = blog_services.create_new_blog_post(self.user_id_b)
             self.ids_of_blog_posts_by_user_B.append(blog_post.id)
 
@@ -695,7 +717,7 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
             self.ids_of_blog_posts_by_user_A + self.ids_of_blog_posts_by_user_B
         )
 
-        change_dict_1 = blog_services.BlogPostChangeDict = {
+        change_dict_1: blog_services.BlogPostChangeDict = {
             'title': 'Welcome to Oppia',
             'thumbnail_filename': 'thumbnail.svg',
             'content': 'Hello Blog Authors',
@@ -704,7 +726,7 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
         blog_services.update_blog_post(
             self.ids_of_blog_posts_by_user_A[0], change_dict_1)
 
-        change_dict_2 = blog_services.BlogPostChangeDict = {
+        change_dict_2: blog_services.BlogPostChangeDict = {
             'title': 'Welcome',
             'thumbnail_filename': 'thumbnail.svg',
             'content': 'Hello Blog Authors',
@@ -713,7 +735,7 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
         blog_services.update_blog_post(
             self.ids_of_blog_posts_by_user_A[1], change_dict_2)
 
-        change_dict_3 = blog_services.BlogPostChangeDict = {
+        change_dict_3: blog_services.BlogPostChangeDict = {
             'title': 'Intro to Mathematics in Oppia',
             'thumbnail_filename': 'thumbnail.svg',
             'content': 'Hello Blog Authors',
@@ -722,7 +744,7 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
         blog_services.update_blog_post(
             self.ids_of_blog_posts_by_user_A[2], change_dict_3)
 
-        change_dict_4 = blog_services.BlogPostChangeDict = {
+        change_dict_4: blog_services.BlogPostChangeDict = {
             'title': 'New Lessons in Mathematics',
             'thumbnail_filename': 'thumbnail.svg',
             'content': 'Hello Blog',
@@ -730,7 +752,7 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
         }
         blog_services.update_blog_post(
             self.ids_of_blog_posts_by_user_B[0], change_dict_4)
-        change_dict_5 = blog_services.BlogPostChangeDict = {
+        change_dict_5: blog_services.BlogPostChangeDict = {
             'title': 'Basic English Lessons',
             'thumbnail_filename': 'thumbnail.svg',
             'content': 'Authors in Oppia',
@@ -739,7 +761,7 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
         blog_services.update_blog_post(
             self.ids_of_blog_posts_by_user_B[1], change_dict_5)
 
-        change_dict_6 = blog_services.BlogPostChangeDict = {
+        change_dict_6: blog_services.BlogPostChangeDict = {
             'title': 'Basic',
             'thumbnail_filename': 'thumbnail.svg',
             'content': 'Basic Subject Lessons',
@@ -748,7 +770,7 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
         blog_services.update_blog_post(
             self.ids_of_blog_posts_by_user_B[2], change_dict_6)
 
-        change_dict_7 = blog_services.BlogPostChangeDict = {
+        change_dict_7: blog_services.BlogPostChangeDict = {
             'title': 'Basic Learning',
             'thumbnail_filename': 'thumbnail.svg',
             'content': 'Basic Subject Lessons',
@@ -760,14 +782,14 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
         # Publishing blog post 0-6. Draft blog post summaries should not show up
         # in a search query, even if they're indexed. Publishing a blog post
         # indexes the blog post summary.
-        for id in self.all_blog_post_ids[:6]:
-            blog_services.publish_blog_post(id)
+        for blog_id in self.all_blog_post_ids[:6]:
+            blog_services.publish_blog_post(blog_id)
 
         # Add blog post 7 to the search index without publishing.
         blog_services.index_blog_post_summaries_given_ids(
             [self.all_blog_post_ids[6]])
 
-    def test_get_blog_post_summaries_with_no_query(self):
+    def test_get_blog_post_summaries_with_no_query(self) -> None:
         # An empty query should return all published blog posts.
         (blog_post_ids, search_offset) = (
             blog_services.get_blog_post_ids_matching_query('', []))
@@ -777,11 +799,11 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
         )
         self.assertIsNone(search_offset)
 
-    def test_get_blog_post_summaries_with_deleted_blog_post(self):
+    def test_get_blog_post_summaries_with_deleted_blog_post(self) -> None:
         # Ensure deleted blog posts do not show up in search results. Deleting
         # first 3 blog posts.
-        for id in self.all_blog_post_ids[:3]:
-            blog_services.delete_blog_post(id)
+        for blog_id in self.all_blog_post_ids[:3]:
+            blog_services.delete_blog_post(blog_id)
 
         blog_post_ids = (
             blog_services.get_blog_post_ids_matching_query('', []))[0]
@@ -791,15 +813,15 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
         )
 
         # Deleting remaining published blog posts.
-        for id in self.all_blog_post_ids[3:6]:
-            blog_services.delete_blog_post(id)
+        for blog_id in self.all_blog_post_ids[3:6]:
+            blog_services.delete_blog_post(blog_id)
         # If no published blog posts are loaded, a blank query should not get
         # any blog post.
         self.assertEqual(
             blog_services.get_blog_post_ids_matching_query('', []),
             ([], None))
 
-    def test_search_blog_post_summaries(self):
+    def test_search_blog_post_summaries(self) -> None:
 
         # Search for blog posts containing 'Oppia'.
         blog_post_ids, _ = blog_services.get_blog_post_ids_matching_query(
@@ -823,8 +845,9 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
             ])
         )
 
-
-    def test_blog_post_summaries_pagination_in_filled_search_results(self):
+    def test_blog_post_summaries_pagination_in_filled_search_results(
+        self
+    ) -> None:
         # Ensure the maximum number of blog posts that can fit on the search
         # results page is maintained by the summaries function.
         with self.swap(
@@ -865,11 +888,12 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
                 sorted(self.all_blog_post_ids[:6])
             )
 
-    def test_get_blog_post_ids_matching_query_with_stale_blgo_post_ids(
-            self):
+    def test_get_blog_post_ids_matching_query_with_stale_blog_post_ids(
+            self
+    ) -> None:
         observed_log_messages = []
 
-        def _mock_logging_function(msg, *args):
+        def _mock_logging_function(msg: str, *args: str) -> None:
             """Mocks logging.error()."""
             observed_log_messages.append(msg % args)
 
@@ -878,7 +902,9 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
             feconf, 'MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE', 5)
         max_iterations_swap = self.swap(blog_services, 'MAX_ITERATIONS', 1)
 
-        def _mock_delete_documents_from_index(unused_doc_ids, unused_index):
+        def _mock_delete_documents_from_index(
+        unused_doc_ids: List[str], unused_index: int
+        ) -> None:
             """Mocks delete_documents_from_index() so that the blog post is
             not deleted from the document on deleting the blog post. This is
             required to fetch stale blog post ids.

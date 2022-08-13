@@ -356,7 +356,6 @@ def blog_post_summaries_search(
         query_definition['query']['bool']['filter'].append(
             {'term': {'tags': tags}}
         )
-        print(query_definition)
 
     # Fetch (size + 1) results in order to decide whether a "next
     # page" offset needs to be returned.

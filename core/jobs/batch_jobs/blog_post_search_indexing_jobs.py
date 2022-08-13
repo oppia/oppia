@@ -19,8 +19,8 @@
 from __future__ import annotations
 
 from core.domain import blog_domain
-from core.domain import blog_services
 from core.domain import blog_post_search_services
+from core.domain import blog_services
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms

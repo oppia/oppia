@@ -25,9 +25,9 @@ from core import feconf
 from core import utils
 from core.constants import constants
 from core.domain import blog_domain
+from core.domain import blog_post_search_services
 from core.domain import html_cleaner
 from core.domain import role_services
-from core.domain import blog_post_search_services
 from core.domain import user_domain
 from core.platform import models
 
@@ -46,6 +46,7 @@ MAX_ITERATIONS = 10
 
 # Name for the blog post search index.
 SEARCH_INDEX_BLOG_POSTS = blog_post_search_services.SEARCH_INDEX_BLOG_POSTS
+
 
 class BlogPostChangeDict(TypedDict):
     """Dictionary representing the change_dict for BlogPost domain object."""
@@ -216,7 +217,7 @@ def get_blog_post_summary_models_by_ids(
 
     Args:
         blog_post_ids: List[str]. The list of blog post IDs for which blog post
-        summaries are to be fetched.
+            summaries are to be fetched.
 
     Returns:
         List[BlogPostSummary]. The list of blog post summary domain object
@@ -828,24 +829,24 @@ def update_blog_models_author_and_published_on_date(
     save_blog_post_rights(blog_post_rights)
 
 
-def index_blog_post_summaries_given_ids(blog_post_ids: list[str]):
+def index_blog_post_summaries_given_ids(blog_post_ids: list[str]) -> None:
     """Indexes the blog post summaries corresponding to the given blog post ids.
 
     Args:
         blog_post_ids: list(str). List of ids of the blog post summaries to be
-        indexed.
+            indexed.
     """
     blog_post_summaries = get_blog_post_summary_models_by_ids(blog_post_ids)
-    print(blog.deleted for blog in blog_post_summaries)
     if len(blog_post_summaries):
         blog_post_search_services.index_blog_post_summaries([
             blog_post_summary for blog_post_summary in blog_post_summaries
-            if blog_post_summary is not None])
+            if blog_post_summary is not None
+        ])
 
 
 def get_blog_post_ids_matching_query(
-    query_string: str, tags: list[str], offset=None
-) -> Tuple[list[str], int] :
+    query_string: str, tags: list[str], offset: int | None =None
+) -> Tuple[list[str], int | None]:
     """Returns a list with all blog post ids matching the given search query
     string, as well as a search offset for future fetches.
 
@@ -876,8 +877,8 @@ def get_blog_post_ids_matching_query(
                 not occur, an error will be logged.)
             search_offset: int. Search offset for future fetches.
     """
-    returned_blog_post_ids = []
-    search_offset = offset
+    returned_blog_post_ids: list[str] = []
+    search_offset: int | None = offset
 
     for _ in range(MAX_ITERATIONS):
         remaining_to_fetch = (

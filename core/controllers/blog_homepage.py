@@ -15,10 +15,12 @@
 """Controllers for the blog homepage."""
 
 from __future__ import annotations
+
 import logging
 import string
 
-from core import feconf, utils
+from core import feconf
+from core import utils
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import blog_services

@@ -29,7 +29,8 @@ from core.domain import question_domain
 from core.domain import suggestion_services
 from core.domain import taskqueue_services
 from core.domain import user_services
-from core.jobs.batch_jobs import blog_post_search_indexing_jobs, exp_recommendation_computation_jobs
+from core.jobs.batch_jobs import blog_post_search_indexing_jobs
+from core.jobs.batch_jobs import exp_recommendation_computation_jobs
 from core.jobs.batch_jobs import exp_search_indexing_jobs
 from core.jobs.batch_jobs import suggestion_stats_computation_jobs
 from core.jobs.batch_jobs import user_stats_computation_jobs

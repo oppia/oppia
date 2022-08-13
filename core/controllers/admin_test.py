@@ -23,8 +23,8 @@ import logging
 from core import feconf
 from core import utils
 from core.constants import constants
-from core.domain import blog_services
 from core.domain import blog_post_search_services
+from core.domain import blog_services
 from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import config_services
@@ -1839,10 +1839,10 @@ class ClearSearchIndexTest(test_utils.GenericTestBase):
         self.assertEqual(result_collections, ['0'])
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        self.user_id_a = self.get_user_id_from_email(
+        user_id_a = self.get_user_id_from_email(
             self.CURRICULUM_ADMIN_EMAIL
         )  # type: ignore[no-untyped-call]
-        blog_post = blog_services.create_new_blog_post(self.user_id_a)
+        blog_post = blog_services.create_new_blog_post(user_id_a)
         change_dict = blog_services.BlogPostChangeDict = {
             'title': 'Welcome to Oppia',
             'thumbnail_filename': 'thumbnail.svg',

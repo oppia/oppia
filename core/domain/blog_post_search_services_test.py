@@ -18,22 +18,17 @@
 
 from __future__ import annotations
 
-from core.domain import collection_services
-from core.domain import blog_services
 from core.domain import blog_post_search_services
-from core.domain import user_services
+from core.domain import blog_services
 from core.platform import models
 from core.tests import test_utils
 
 from typing import List, Optional, Tuple
-from typing_extensions import Final
 
 blog_search_services = models.Registry.import_search_services()
 
 
 class BlogPostSearchServicesUnitTests(test_utils.GenericTestBase):
-    """Test the blog post search services module."""
-
 
     def setUp(self) -> None:
         super().setUp()
@@ -110,10 +105,12 @@ class BlogPostSearchServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(result, doc_ids)
 
     def test_clear_blog_post_search_index(self) -> None:
-        result = blog_post_search_services.search_blog_post_summaries('title', [], 2)[0]
+        result = blog_post_search_services.search_blog_post_summaries(
+            'title', [], 2)[0]
         self.assertEqual(result, [self.blog_post_a_id, self.blog_post_b_id])
         blog_post_search_services.clear_blog_post_summaries_search_index()
-        result = blog_post_search_services.search_blog_post_summaries('title', [], 2)[0]
+        result = blog_post_search_services.search_blog_post_summaries(
+            'title', [], 2)[0]
         self.assertEqual(result, [])
 
     def test_delete_blog_posts_from_search_index(self) -> None:

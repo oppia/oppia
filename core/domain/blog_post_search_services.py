@@ -17,15 +17,16 @@
 """Commands for operating on the search status of blog post summaries."""
 
 from __future__ import annotations
-from core import utils
 
+import math
+
+from core import utils
 from core.domain import blog_domain
 from core.domain import user_services
 from core.platform import models
 
 from typing import List, Optional, Tuple, cast
 from typing_extensions import Final, TypedDict
-
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -36,6 +37,7 @@ platform_search_services = models.Registry.import_search_services()
 # Name for the blog post search index.
 SEARCH_INDEX_BLOG_POSTS: Final = 'blog-posts'
 
+
 class BlogPostSummaryDomainSearchDict(TypedDict):
     """Dictionary representing the search dictionary of a blog post summary
     domain object.
@@ -44,7 +46,7 @@ class BlogPostSummaryDomainSearchDict(TypedDict):
     id: str
     title: str
     tags: List[str]
-    author_username: str
+    author_username: str | None
     rank: int
 
 
@@ -85,13 +87,17 @@ def _blog_post_summary_to_search_dict(
     """
     author_settings = (
         user_services.get_user_settings(blog_post_summary.author_id))
-
+    if blog_post_summary.published_on:
+        rank = math.floor(
+            utils.get_time_in_millisecs(blog_post_summary.published_on))
+    else:
+        rank = 0
     doc: BlogPostSummaryDomainSearchDict = {
         'id': blog_post_summary.id,
         'title': blog_post_summary.title,
         'tags': blog_post_summary.tags,
         'author_username': author_settings.username,
-        'rank': utils.get_time_in_millisecs(blog_post_summary.published_on)
+        'rank': rank
     }
 
     return doc
@@ -167,7 +173,7 @@ def delete_blog_post_summary_from_search_index(blog_post_id: str) -> None:
 
     Args:
         blog_post_id: str. Blog post id whose document are to be deleted from
-        the search index.
+            the search index.
     """
     # The argument type of delete_documents_from_index() is List[str],
     # therefore, we provide [blog_post_id] as argument.

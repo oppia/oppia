@@ -17,12 +17,13 @@
 """Unit tests for jobs.batch_jobs.blog_post_search_indexing_jobs."""
 
 from __future__ import annotations
-from core import feconf
-from core import utils
+
 import datetime
 
-from core.constants import constants
-from core.domain import blog_post_search_services, user_services
+from core import utils
+
+
+from core.domain import blog_post_search_services
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import blog_post_search_indexing_jobs
 from core.jobs.types import job_run_result
@@ -31,12 +32,11 @@ from core.platform import models
 from typing import Dict, List, Tuple, Type, Union
 from typing_extensions import Final
 
-
 MYPY = False
 if MYPY:
     from mypy_imports import blog_models
-    from mypy_imports import user_models
     from mypy_imports import search_services as platform_search_services
+    from mypy_imports import user_models
 
 (blog_models, user_models) = models.Registry.import_models([
     models.NAMES.blog, models.NAMES.user])
@@ -73,16 +73,12 @@ class IndexBlogPostSummariesInSearchJobTests(job_test_utils.JobTestBase):
         )
         blog_summary.update_timestamps()
 
-
         user_settings_model = self.create_model(
             user_models.UserSettingsModel,
             id=self.USER_ID_1, email='a@a.com', username=self.USERNAME)
         user_settings_model.update_timestamps()
 
         self.put_multi([user_settings_model, blog_summary])
-
-        user_id_1 = user_services.get_user_settings(self.USER_ID_1).email
-        print(user_id_1)
 
         add_docs_to_index_swap = self.swap_with_checks(
             platform_search_services,
@@ -120,7 +116,7 @@ class IndexBlogPostSummariesInSearchJobTests(job_test_utils.JobTestBase):
                 url_fragment='sample-url-fragment',
                 tags=['tag1', 'tag2'],
                 thumbnail_filename='xyzabc',
-                published_on = date_time_now,
+                published_on=date_time_now,
             )
             blog_summary.update_timestamps()
             blog_summary.put()
@@ -130,7 +126,6 @@ class IndexBlogPostSummariesInSearchJobTests(job_test_utils.JobTestBase):
             id=self.USER_ID_1, email='a@a.com', username=self.USERNAME)
         user_settings_model.update_timestamps()
         user_settings_model.put()
-
 
         add_docs_to_index_swap = self.swap_with_checks(
             platform_search_services,
