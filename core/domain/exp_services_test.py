@@ -613,7 +613,7 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
             'ExplorationSummaryModel cannot be None, when '
             'skip_exploration_model_last_updated is set to True'
             'for exploration ID %s' % exploration.id):
-            exp_services.compute_summary_of_exploration(
+            exp_services.update_exploration_summary(
                 exploration, exp_rights, None, True)
 
 

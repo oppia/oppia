@@ -631,7 +631,7 @@ def populate_exp_summary_model_fields(exp_summary_model, exp_summary):
     Args:
         exp_summary_model: ExpSummaryModel|None. The model to populate.
             If None, we create a new model instead.
-        exp_summary: ExplorationSummary. THe exploration domain object which
+        exp_summary: ExplorationSummary. The exploration domain object which
             should be used to populate the model.
 
     Returns:
@@ -1584,8 +1584,12 @@ def regenerate_exploration_summary_with_new_contributor(
     exp_summary = exp_fetchers.get_exploration_summary_by_id(
         exploration_id, strict=False)
     if exploration is not None:
-        updated_exp_summary = compute_summary_of_exploration(
-            exploration, exp_rights, exp_summary)
+        if exp_summary is None:
+            updated_exp_summary = generate_new_exploration_summary(
+                exploration, exp_rights)
+        else:
+            updated_exp_summary = update_exploration_summary(
+                exploration, exp_rights, exp_summary)
         updated_exp_summary.add_contribution_by_user(contributor_id)
         save_exploration_summary(updated_exp_summary)
     else:
@@ -1602,120 +1606,41 @@ def regenerate_exploration_and_contributors_summaries(exploration_id):
     """
     exploration = exp_fetchers.get_exploration_by_id(exploration_id)
     exp_rights = rights_manager.get_exploration_rights(
-        exploration_id, strict=False)
+        exploration_id, strict=True)
     exp_summary = exp_fetchers.get_exploration_summary_by_id(
         exploration_id, strict=True)
-    updated_exp_summary = compute_summary_of_exploration(
+    updated_exp_summary = update_exploration_summary(
         exploration, exp_rights, exp_summary)
     updated_exp_summary.contributors_summary = (
         compute_exploration_contributors_summary(updated_exp_summary.id))
     save_exploration_summary(updated_exp_summary)
 
 
-def compute_summary_of_exploration(
+def update_exploration_summary(
     exploration,
     exp_rights,
     exp_summary,
     skip_exploration_model_last_updated=False
 ):
-    """Create an ExplorationSummary domain object for a given Exploration
-    domain object and return it.
+    """Updates an exploration summary domain object from a given exploration
+    and its rights.
 
     Args:
         exploration: Exploration. The exploration whose summary is to be
             computed.
         exp_rights: ActivityRights. The exploration rights model, used
             to compute summary.
-        exp_summary: ExplorationSummary|None. The exploration summary
-            model whose summary needs to be recomputed. If None, we generate
-            a new exploration summary model instead.
-        skip_exploration_model_last_updated: bool. This flag is used to
-            update exploration_model_last_updated, only when required.
+        exp_summary: ExplorationSummary. The exploration summary
+            model whose summary needs to be recomputed.
+        skip_exploration_model_last_updated: bool. Whether the update of
+            exploration_model_last_updated should be skipped.
+            The exploration_model_last_updated is computed from the last human
+            update of the exploration. This can be skipped  in cases where we
+            know that there was no human exploration update.
 
     Returns:
         ExplorationSummary. The resulting exploration summary domain object.
-
-    Raises:
-        Exception. ExplorationSummaryModel cannot be None and
-            skip_exploration_model_last_updated cannot be set to True
-            at the same time.
     """
-    if exp_summary is not None:
-        ratings = exp_summary.ratings or feconf.get_empty_ratings()
-        scaled_average_rating = get_scaled_average_rating(ratings)
-        exploration_model_last_updated = (
-            exp_summary.exploration_model_last_updated)
-    else:
-        if skip_exploration_model_last_updated:
-            raise Exception(
-                'ExplorationSummaryModel cannot be None, when '
-                'skip_exploration_model_last_updated is set to True'
-                'for exploration ID %s' % exploration.id)
-        ratings = feconf.get_empty_ratings()
-        scaled_average_rating = feconf.EMPTY_SCALED_AVERAGE_RATING
-
-    if not skip_exploration_model_last_updated:
-        exploration_model_last_updated = datetime.datetime.fromtimestamp(
-            get_last_updated_by_human_ms(exploration.id) / 1000.0)
-
-    contributors_summary = (
-        exp_summary.contributors_summary if exp_summary else {})
-    contributor_ids = list(contributors_summary.keys())
-    exploration_model_created_on = exploration.created_on
-    first_published_msec = exp_rights.first_published_msec
-    updated_exp_summary = exp_domain.ExplorationSummary(
-        exploration.id, exploration.title, exploration.category,
-        exploration.objective, exploration.language_code,
-        exploration.tags, ratings, scaled_average_rating, exp_rights.status,
-        exp_rights.community_owned, exp_rights.owner_ids,
-        exp_rights.editor_ids, exp_rights.voice_artist_ids,
-        exp_rights.viewer_ids, contributor_ids, contributors_summary,
-        exploration.version, exploration_model_created_on,
-        exploration_model_last_updated, first_published_msec)
-
-    return updated_exp_summary
-
-
-def compute_summary_of_exploration2(
-    exploration,
-    exp_rights,
-    previous_ratings,
-    previous_exploration_model_last_updated,
-    previous_contributors_summary
-):
-    """"""
-    ratings = previous_ratings or feconf.get_empty_ratings()
-    scaled_average_rating = get_scaled_average_rating(ratings)
-
-    if previous_exploration_model_last_updated:
-        exploration_model_last_updated = (
-            previous_exploration_model_last_updated)
-    else:
-        exploration_model_last_updated = datetime.datetime.fromtimestamp(
-            get_last_updated_by_human_ms(exploration.id) / 1000.0)
-
-    contributors_summary = previous_contributors_summary or {}
-    contributor_ids = list(contributors_summary.keys())
-
-    return exp_domain.ExplorationSummary(
-        exploration.id, exploration.title, exploration.category,
-        exploration.objective, exploration.language_code,
-        exploration.tags, ratings, scaled_average_rating, exp_rights.status,
-        exp_rights.community_owned, exp_rights.owner_ids,
-        exp_rights.editor_ids, exp_rights.voice_artist_ids,
-        exp_rights.viewer_ids, contributor_ids, contributors_summary,
-        exploration.version, exploration.created_on,
-        exploration_model_last_updated, exp_rights.first_published_msec
-    )
-
-
-def update_summary_of_exploration(
-    exploration,
-    exp_rights,
-    exp_summary,
-    skip_exploration_model_last_updated=False
-):
-    """"""
     scaled_average_rating = get_scaled_average_rating(exp_summary.ratings)
 
     if skip_exploration_model_last_updated:
@@ -1729,19 +1654,29 @@ def update_summary_of_exploration(
 
     return exp_domain.ExplorationSummary(
         exploration.id, exploration.title, exploration.category,
-        exploration.objective, exploration.language_code,
-        exploration.tags, exp_summary.ratings, scaled_average_rating, exp_rights.status,
-        exp_rights.community_owned, exp_rights.owner_ids,
-        exp_rights.editor_ids, exp_rights.voice_artist_ids,
-        exp_rights.viewer_ids, contributor_ids,
-        exp_summary.contributors_summary,
-        exploration.version, exploration.created_on,
-        exploration_model_last_updated, exp_rights.first_published_msec
+        exploration.objective, exploration.language_code, exploration.tags,
+        exp_summary.ratings, scaled_average_rating, exp_rights.status,
+        exp_rights.community_owned, exp_rights.owner_ids, exp_rights.editor_ids,
+        exp_rights.voice_artist_ids, exp_rights.viewer_ids, contributor_ids,
+        exp_summary.contributors_summary, exploration.version,
+        exploration.created_on, exploration_model_last_updated,
+        exp_rights.first_published_msec
     )
 
 
-def generate_new_summary_of_exploration(exploration, exp_rights):
-    """"""
+def generate_new_exploration_summary(exploration, exp_rights):
+    """Generates a new exploration summary domain object from a given
+    exploration and its rights.
+
+    Args:
+        exploration: Exploration. The exploration whose summary is to be
+            computed.
+        exp_rights: ActivityRights. The exploration rights model, used
+            to compute summary.
+
+    Returns:
+        ExplorationSummary. The resulting exploration summary domain object.
+    """
     ratings = feconf.get_empty_ratings()
     scaled_average_rating = get_scaled_average_rating(ratings)
     exploration_model_last_updated = datetime.datetime.fromtimestamp(
@@ -1749,11 +1684,10 @@ def generate_new_summary_of_exploration(exploration, exp_rights):
 
     return exp_domain.ExplorationSummary(
         exploration.id, exploration.title, exploration.category,
-        exploration.objective, exploration.language_code,
-        exploration.tags, ratings, scaled_average_rating, exp_rights.status,
-        exp_rights.community_owned, exp_rights.owner_ids,
-        exp_rights.editor_ids, exp_rights.voice_artist_ids,
-        exp_rights.viewer_ids, [], {},
+        exploration.objective, exploration.language_code, exploration.tags,
+        ratings, scaled_average_rating, exp_rights.status,
+        exp_rights.community_owned, exp_rights.owner_ids, exp_rights.editor_ids,
+        exp_rights.voice_artist_ids, exp_rights.viewer_ids, [], {},
         exploration.version, exploration.created_on,
         exploration_model_last_updated, exp_rights.first_published_msec
     )

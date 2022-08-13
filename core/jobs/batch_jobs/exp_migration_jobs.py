@@ -163,7 +163,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
         """
         exp_rights = rights_manager.get_activity_rights_from_model( # type: ignore[no-untyped-call]
             exp_rights_model, constants.ACTIVITY_TYPE_EXPLORATION)
-        exp_summary = exp_services.compute_summary_of_exploration( # type: ignore[no-untyped-call]
+        exp_summary = exp_services.update_exploration_summary( # type: ignore[no-untyped-call]
             migrated_exp,
             exp_rights,
             exp_fetchers.get_exploration_summary_from_model(exp_summary_model),
