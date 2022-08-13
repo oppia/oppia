@@ -745,6 +745,10 @@ MAX_NUMBER_OF_SKILL_IDS = 20
 # homepage.
 MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE = 10
 
+# The maximum number of blog post cards to be visible on each page in blog
+# search results homepage.
+MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE = 10
+
 # The maximum number of blog post cards to be visible on each page in author
 # specific blog post page.
 MAX_NUM_CARDS_TO_DISPLAY_ON_AUTHOR_SPECIFIC_BLOG_POST_PAGE = 12

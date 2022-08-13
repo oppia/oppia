@@ -24,6 +24,7 @@ from core import feconf
 from core import utils
 from core.constants import constants
 from core.domain import blog_services
+from core.domain import blog_post_search_services
 from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import config_services
@@ -1838,6 +1839,19 @@ class ClearSearchIndexTest(test_utils.GenericTestBase):
         self.assertEqual(result_collections, ['0'])
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        self.user_id_a = self.get_user_id_from_email(
+            self.CURRICULUM_ADMIN_EMAIL
+        )  # type: ignore[no-untyped-call]
+        blog_post = blog_services.create_new_blog_post(self.user_id_a)
+        change_dict = blog_services.BlogPostChangeDict = {
+            'title': 'Welcome to Oppia',
+            'thumbnail_filename': 'thumbnail.svg',
+            'content': 'Hello Blog Authors',
+            'tags': ['Math', 'Science']
+        }
+        blog_services.update_blog_post(blog_post.id, change_dict)
+        blog_services.publish_blog_post(blog_post.id)
+
         csrf_token = self.get_new_csrf_token()
         generated_exps_response = self.post_json(
             '/adminhandler', {
@@ -1851,6 +1865,11 @@ class ClearSearchIndexTest(test_utils.GenericTestBase):
         result_collections = search_services.search_collections(
             'Welcome', [], [], 2)[0]
         self.assertEqual(result_collections, [])
+        result_blog_posts = (
+            blog_post_search_services.search_blog_post_summaries(
+            'Welcome', [], 2)[0]
+        )
+        self.assertEqual(result_blog_posts, [])
 
 
 class SendDummyMailTest(test_utils.GenericTestBase):
