@@ -561,24 +561,30 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
     def test_invalid_publish_and_unpublish_story(self) -> None:
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
-            Exception, 'A topic with the given ID doesn\'t exist'):
+            Exception,
+            'Entity for class TopicModel with id invalid_topic not found'
+        ):
             topic_services.publish_story(
                 'invalid_topic', 'story_id_new', self.user_id_admin)
 
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
-            Exception, 'A topic with the given ID doesn\'t exist'):
+            Exception,
+            'A topic with the given ID doesn\'t exist'
+        ):
             topic_services.unpublish_story(
                 'invalid_topic', 'story_id_new', self.user_id_admin)
 
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
-            Exception, 'The user does not have enough rights to publish the '
-            'story.'):
+            Exception,
+            'The user does not have enough rights to publish the story.'
+        ):
             topic_services.publish_story(
                 self.TOPIC_ID, self.story_id_3, self.user_id_b)
 
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
-            Exception, 'The user does not have enough rights to unpublish the '
-            'story.'):
+            Exception,
+            'The user does not have enough rights to unpublish the story.'
+        ):
             topic_services.unpublish_story(
                 self.TOPIC_ID, self.story_id_3, self.user_id_b)
 
