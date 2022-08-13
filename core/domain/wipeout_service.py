@@ -913,7 +913,6 @@ def _pseudonymize_activity_models_without_associated_rights_models(
         for metadata_model in metadata_models:
             metadata_model.committer_id = pseudonymized_id
             metadata_model.update_timestamps()
-        datastore_services.put_multi(metadata_models)
 
         commit_log_models = [
             model for model in activity_related_models
@@ -921,7 +920,12 @@ def _pseudonymize_activity_models_without_associated_rights_models(
         for commit_log_model in commit_log_models:
             commit_log_model.user_id = pseudonymized_id
             commit_log_model.update_timestamps()
-        datastore_services.put_multi(commit_log_models)
+        # According to MyPy list is a invariant type and because of this
+        # the addition of two different types of lists is prohibited, but
+        # for the implementation purposes here we are adding different types
+        # of lists which causes MyPy to throw an `Unsupported operand types`
+        # error. Thus to avoid the error, we used ignore here.
+        datastore_services.put_multi(metadata_models + commit_log_models)  # type: ignore[operator]
 
     activity_ids_to_pids = (
         pending_deletion_request.pseudonymizable_entity_mappings[
@@ -1075,9 +1079,6 @@ def _pseudonymize_activity_models_with_associated_rights_models(
             if user_id == rights_snapshot_metadata_model.committer_id:
                 rights_snapshot_metadata_model.committer_id = pseudonymized_id
             rights_snapshot_metadata_model.update_timestamps()
-        datastore_services.put_multi(
-            snapshot_metadata_models + rights_snapshot_metadata_models
-        )
 
         rights_snapshot_content_models = [
             model for model in activity_related_models
@@ -1091,7 +1092,6 @@ def _pseudonymize_activity_models_with_associated_rights_models(
                 ]
             rights_snapshot_content_model.content = model_dict
             rights_snapshot_content_model.update_timestamps()
-        datastore_services.put_multi(rights_snapshot_content_models)
 
         commit_log_models = [
             model for model in activity_related_models
@@ -1099,7 +1099,17 @@ def _pseudonymize_activity_models_with_associated_rights_models(
         for commit_log_model in commit_log_models:
             commit_log_model.user_id = pseudonymized_id
             commit_log_model.update_timestamps()
-        datastore_services.put_multi(commit_log_models)
+        # According to MyPy list is a invariant type and because of this
+        # the addition of two different types of lists is prohibited, but
+        # for the implementation purposes here we are adding different types
+        # of lists which causes MyPy to throw an `Unsupported operand types`
+        # error. Thus to avoid the error, we used ignore here.
+        datastore_services.put_multi(
+            snapshot_metadata_models +
+            rights_snapshot_metadata_models +
+            rights_snapshot_content_models +  # type: ignore[operator]
+            commit_log_models  # type: ignore[operator]
+        )
 
     activity_ids_to_pids = (
         pending_deletion_request.pseudonymizable_entity_mappings[
@@ -1119,11 +1129,15 @@ def _pseudonymize_activity_models_with_associated_rights_models(
             )
         )
 
-        activity_related_models: List[Optional[base_models.BaseModel]] = [
+        activity_related_models: List[base_models.BaseModel] = [
             model for model in commit_log_models
             if getattr(model, commit_log_model_field_name) == activity_id
         ]
         for snapshot_content_model in activity_related_snapshot_content_models:
+            # Here, we assert that snapshot_content_model is never going to
+            # be a None value, because above we are fetching snapshot_models
+            # only for those ids that belong to already existing models.
+            assert snapshot_content_model is not None
             activity_related_models.append(snapshot_content_model)
         for metadata_model in activity_related_snapshot_metadata_models:
             activity_related_models.append(metadata_model)
@@ -1333,7 +1347,6 @@ def _pseudonymize_feedback_models(
                 feedback_thread_model.last_nonempty_message_author_id = (
                     pseudonymized_id)
             feedback_thread_model.update_timestamps()
-        datastore_services.put_multi(feedback_thread_models)
 
         feedback_message_models = [
             model for model in feedback_related_models
@@ -1341,7 +1354,6 @@ def _pseudonymize_feedback_models(
         for feedback_message_model in feedback_message_models:
             feedback_message_model.author_id = pseudonymized_id
             feedback_message_model.update_timestamps()
-        datastore_services.put_multi(feedback_message_models)
 
         general_suggestion_models = [
             model for model in feedback_related_models
@@ -1352,7 +1364,15 @@ def _pseudonymize_feedback_models(
             if general_suggestion_model.final_reviewer_id == user_id:
                 general_suggestion_model.final_reviewer_id = pseudonymized_id
             general_suggestion_model.update_timestamps()
-        datastore_services.put_multi(general_suggestion_models)
+        # According to MyPy list is a invariant type and because of this
+        # the addition of two different types of lists is prohibited, but
+        # for the implementation purposes here we are adding different types
+        # of lists which causes MyPy to throw an `Unsupported operand types`
+        # error. Thus to avoid the error, we used ignore here.
+        datastore_services.put_multi(
+            feedback_thread_models +
+            feedback_message_models +  # type: ignore[operator]
+            general_suggestion_models)  # type: ignore[operator]
 
     feedback_ids_to_pids = (
         pending_deletion_request.pseudonymizable_entity_mappings[
@@ -1514,7 +1534,6 @@ def _pseudonymize_blog_post_models(
             if blog_post_model.author_id == user_id:
                 blog_post_model.author_id = pseudonymized_id
             blog_post_model.update_timestamps()
-        datastore_services.put_multi(blog_post_models_list)
 
         blog_post_summary_models_list = [
             model for model in blog_posts_related_models
@@ -1523,7 +1542,13 @@ def _pseudonymize_blog_post_models(
             if blog_post_summary.author_id == user_id:
                 blog_post_summary.author_id = pseudonymized_id
             blog_post_summary.update_timestamps()
-        datastore_services.put_multi(blog_post_summary_models_list)
+        # According to MyPy list is a invariant type and because of this
+        # the addition of two different types of lists is prohibited, but
+        # for the implementation purposes here we are adding different types
+        # of lists which causes MyPy to throw an `Unsupported operand types`
+        # error. Thus to avoid the error, we used ignore here.
+        datastore_services.put_multi(
+            blog_post_models_list + blog_post_summary_models_list)  # type: ignore[operator]
 
     blog_post_ids_to_pids = (
         pending_deletion_request.pseudonymizable_entity_mappings[
