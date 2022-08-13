@@ -664,9 +664,7 @@ def publish_story(
         story_services.validate_explorations_for_story(
             exploration_id_list, True)
 
-    topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
-    if topic is None:
-        raise Exception('A topic with the given ID doesn\'t exist')
+    topic = topic_fetchers.get_topic_by_id(topic_id, strict=True)
     user = user_services.get_user_actions_info(committer_id)
     if role_services.ACTION_CHANGE_STORY_STATUS not in user.actions:
         raise Exception(
