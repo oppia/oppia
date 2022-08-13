@@ -149,12 +149,14 @@ var LibraryPage = function() {
     await waitFor.visibilityOf(
       allCollectionSummaryTile,
       'Library Page does not have any collections');
-    var collectionCard = await allCollectionsTitled(collectionName)[0];
+    var collectionCardElement = $(
+      `.e2e-test-collection-summary-tile-title=${collectionName}`);
     await waitFor.visibilityOf(
-      collectionCard,
+      collectionCardElement,
       'Unable to find collection ' + collectionName);
     // The Collection summary card is masked by a dummy element. Therefore, a
     // Javascript click is used.
+    var collectionCard = await allCollectionsTitled(collectionName)[0];
     await action.click('Collection Card', collectionCard, true);
     await waitFor.pageToFullyLoad();
   };

@@ -12,8 +12,9 @@ var args = process.argv;
 // eslint-disable-next-line eqeqeq
 var chromeVersion = (args[0] == 'DEBUG=true') ? args[6] : args[5];
 
-var chromedriverPath =
-'./node_modules/webdriver-manager/selenium/chromedriver_' + chromeVersion;
+const drivers = {
+  chrome: { version: chromeVersion },
+};
 
 // If video recorder is not running the ffmpeg process will be null.
 var ffmpegProcess = null;
@@ -202,6 +203,8 @@ exports.config = {
   services: [
     ['selenium-standalone', {
       logPath: 'logs',
+      installArgs: { drivers },
+      args: { drivers }
     }]
   ],
 
