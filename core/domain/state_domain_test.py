@@ -1165,7 +1165,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'value="&amp;quot;htt://link.com&amp'
                     ';quot;"></oppia-noninteractive-link></p>')
             }))
-        self.assertTrue(init_state.is_rte_content_supported_on_android())
+        self.assertFalse(init_state.is_rte_content_supported_on_android())
         init_state.update_content(
             state_domain.SubtitledHtml.from_dict({
                 'content_id': 'content',
