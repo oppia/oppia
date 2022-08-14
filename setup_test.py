@@ -51,6 +51,6 @@ class SetupTests(test_utils.GenericTestBase):
                 'packages': setuptools.find_packages(),
                 'include_package_data': True,
             }])
-        
+
         with swap_setup:
-            import setup # pylint: disable=unused-import
+            import setup # isort:skip pylint: disable=unused-import
