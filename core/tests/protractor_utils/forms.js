@@ -327,7 +327,8 @@ var AutocompleteDropdownEditor = function(elem) {
 
   return {
     setValue: async function(text) {
-      await action.click('Container Element', elem.element(containerLocator));
+      await action.click(
+        'Container Element', elem.element(containerLocator), true);
       await action.waitForAutosave();
       // NOTE: the input field is top-level in the DOM, and is outside the
       // context of 'elem'. The 'select2-dropdown' id is assigned to the input
@@ -347,7 +348,8 @@ var AutocompleteDropdownEditor = function(elem) {
         true);
     },
     expectOptionsToBe: async function(expectedOptions) {
-      await action.click('Container Element', elem.element(containerLocator));
+      await action.click(
+        'Container Element', elem.element(containerLocator), true);
 
       var actualOptions = await element.all(categorySelectorChoice).map(
         async function(optionElem) {
