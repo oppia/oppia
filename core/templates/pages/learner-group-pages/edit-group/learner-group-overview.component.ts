@@ -35,9 +35,9 @@ import './learner-group-overview.component.css';
   templateUrl: './learner-group-overview.component.html'
 })
 export class LearnerGroupOverviewComponent implements OnInit {
-  @Input() learnerGroup: LearnerGroupData;
+  @Input() learnerGroup!: LearnerGroupData;
   studentsProgress!: LearnerGroupUserProgress[];
-  activeTab: string;
+  activeTab!: string;
   EDIT_OVERVIEW_SECTIONS_I18N_IDS = (
     LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_OVERVIEW_SECTIONS
   );

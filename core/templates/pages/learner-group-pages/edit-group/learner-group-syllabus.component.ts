@@ -38,7 +38,7 @@ import './learner-group-syllabus.component.css';
   templateUrl: './learner-group-syllabus.component.html'
 })
 export class LearnerGroupSyllabusComponent implements OnInit {
-  @Input() learnerGroup: LearnerGroupData;
+  @Input() learnerGroup!: LearnerGroupData;
   subtopicSummaries!: LearnerGroupSubtopicSummary[];
   storySummaries!: StorySummary[];
   displayOrderOfSyllabusItems: string[] = [];
@@ -67,31 +67,29 @@ export class LearnerGroupSyllabusComponent implements OnInit {
   }
 
   setDisplayOrderOfSyllabusItems(): void {
-    let topicNameToSyllabusMap = {};
+    let topicNameToSyllabusMap: Record<string, string[]> = {};
 
     this.storySummaries.map((summary, index) => {
-      let topicName = summary.getTopicName();
-      if (topicNameToSyllabusMap.hasOwnProperty(topicName)) {
+      const topicName = summary.getTopicName();
+      if (topicName && topicNameToSyllabusMap.hasOwnProperty(topicName)) {
         topicNameToSyllabusMap[topicName].push(`story-${index}`);
-      } else {
+      } else if (topicName) {
         topicNameToSyllabusMap[topicName] = [`story-${index}`];
       }
     });
 
     this.subtopicSummaries.map((summary, index) => {
-      let topicName = summary.parentTopicName;
-      if (topicNameToSyllabusMap.hasOwnProperty(topicName)) {
+      const topicName = summary.parentTopicName;
+      if (topicName && topicNameToSyllabusMap.hasOwnProperty(topicName)) {
         topicNameToSyllabusMap[topicName].push(`subtopic-${index}`);
-      } else {
+      } else if (topicName) {
         topicNameToSyllabusMap[topicName] = [`subtopic-${index}`];
       }
     });
 
-    this.displayOrderOfSyllabusItems = (
-      Object.keys(topicNameToSyllabusMap).reduce((arr, key) => {
-        return arr.concat(topicNameToSyllabusMap[key]);
-      }, [])
-    );
+    Object.values(topicNameToSyllabusMap).forEach(syllabus => {
+      this.displayOrderOfSyllabusItems.push(...syllabus);
+    });
   }
 
   isDisplayedItemStory(item: string): boolean {

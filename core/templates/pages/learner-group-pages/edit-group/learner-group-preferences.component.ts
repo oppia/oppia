@@ -36,18 +36,16 @@ import './learner-group-preferences.component.css';
   templateUrl: './learner-group-preferences.component.html'
 })
 export class LearnerGroupPreferencesComponent implements OnInit {
-  @Input() learnerGroup: LearnerGroupData;
-  activeTab: string;
-  EDIT_PREFERENCES_SECTIONS_I18N_IDS = (
-    LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_PREFERENCES_SECTIONS
-  );
-
+  @Input() learnerGroup!: LearnerGroupData;
+  activeTab!: string;
   newLearnerGroupTitle!: string;
   newLearnerGroupDescription!: string;
   readOnlyMode = true;
   invitedStudentsInfo!: LearnerGroupUserInfo[];
-  currentStudentsInfo: LearnerGroupUserInfo[];
+  currentStudentsInfo!: LearnerGroupUserInfo[];
   invitedStudents: string[] = [];
+  EDIT_PREFERENCES_SECTIONS_I18N_IDS = (
+    LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_PREFERENCES_SECTIONS);
 
   constructor(
     private ngbModal: NgbModal,

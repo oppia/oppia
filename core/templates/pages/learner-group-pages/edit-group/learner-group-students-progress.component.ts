@@ -32,13 +32,13 @@ import './learner-group-students-progress.component.css';
   templateUrl: './learner-group-students-progress.component.html'
 })
 export class LearnerGroupStudentsProgressComponent implements OnInit {
-  @Input() learnerGroup: LearnerGroupData;
+  @Input() learnerGroup!: LearnerGroupData;
   studentsProgress!: LearnerGroupUserProgress[];
   studentSpecificProgressViewIsActive = false;
   specificStudentProgress!: LearnerGroupUserProgress;
   searchUsernameQuery: string = '';
-  matchingUsersProgress: LearnerGroupUserProgress[];
-  storiesChaptersProgress: ChapterProgressSummary[];
+  matchingUsersProgress!: LearnerGroupUserProgress[];
+  storiesChaptersProgress!: ChapterProgressSummary[];
 
   constructor(
     private learnerGroupSyllabusBackendApiService:

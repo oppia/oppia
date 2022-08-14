@@ -35,7 +35,7 @@ import './learner-group-student-specific-progress.component.css';
 export class LearnerGroupStudentSpecificProgressComponent {
   @Input() studentProgress!: LearnerGroupUserProgress;
   @Input() storiesChaptersProgress!: ChapterProgressSummary[];
-  activeTab: string;
+  activeTab!: string;
   topicNames: string[] = [];
   storyIds: string[] = [];
   latestChapterProgressIndex = 0;
