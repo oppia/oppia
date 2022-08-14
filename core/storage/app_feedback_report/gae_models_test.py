@@ -25,7 +25,7 @@ from core import utils
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Any, List
+from typing import List
 from typing_extensions import Final
 
 MYPY = False

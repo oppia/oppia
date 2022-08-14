@@ -664,7 +664,7 @@ def get_exploration_stats_by_id(
 
     Returns:
         ExplorationStats|None. The domain object for exploration statistics, or
-            None if no ExplorationStatsModel exists for the given id.
+        None if no ExplorationStatsModel exists for the given id.
 
     Raises:
         Exception. Entity for class ExplorationStatsModel with id not found.
