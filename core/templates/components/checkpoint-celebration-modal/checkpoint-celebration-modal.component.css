@@ -74,24 +74,11 @@
   100% { transform: scale(1,1) translateY(0); opacity: 1; }
 }
 
-.checkpoint-celebration-modal .progress-svg {
-  height: 12px;
-  width: 90%;
-  margin: 10px auto 10px auto;
-}
-
 .checkpoint-celebration-modal p {
   font-family: "Roboto", Arial, sans-serif;
   text-align: center;
-  font-weight: 600;
+  font-weight: 400;
   margin: 10px 10% 10px 10%;
-}
-
-.checkpoint-celebration-modal .progress-text {
-  margin: 0 auto 0 25px;
-  text-align: left;
-  font-size: 0.9em;
-  font-weight: 600;
 }
 
 .checkpoint-celebration-modal .button-row {
