@@ -1,7 +1,7 @@
 <div class="oppia-settings-container">
   <mat-card class="oppia-editor-card oppia-settings-card-container oppia-basic-settings-card oppia-mobile-collapsible-card">
     <div class="oppia-basic-settings-header oppia-mobile-collapsible-card-header" (click)="toggleCards('settings')">
-      <h3>Basic Settings</h3>
+      <h3 class="e2e-test-settings-container">Basic Settings</h3>
       <i class="fa fa-caret-down"
          *ngIf="!basicSettingIsShown"
          aria-hidden="true">
@@ -12,7 +12,7 @@
       </i>
     </div>
 
-    <div class="oppia-mobile-collapsible-card-content e2e-test-settings-container" *ngIf="basicSettingIsShown">
+    <div class="oppia-mobile-collapsible-card-content" *ngIf="basicSettingIsShown">
       <div class="col-lg-12 col-md-12 col-sm-12">
         <div *ngIf="editabilityService.isEditable()">
           <div role="form" class="form-horizontal">
