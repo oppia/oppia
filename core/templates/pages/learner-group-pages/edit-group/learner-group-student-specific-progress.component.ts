@@ -36,13 +36,12 @@ export class LearnerGroupStudentSpecificProgressComponent {
   @Input() studentProgress!: LearnerGroupUserProgress;
   @Input() storiesChaptersProgress!: ChapterProgressSummary[];
   activeTab: string;
-  EDIT_OVERVIEW_SECTIONS_I18N_IDS = (
-    LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_OVERVIEW_SECTIONS
-  );
   topicNames: string[] = [];
   storyIds: string[] = [];
   latestChapterProgressIndex = 0;
   cummulativeStoryChaptersCount: number[] = [];
+  EDIT_OVERVIEW_SECTIONS_I18N_IDS = (
+    LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_OVERVIEW_SECTIONS);
 
   constructor(
     private learnerGroupSyllabusBackendApiService:
@@ -130,7 +129,7 @@ export class LearnerGroupStudentSpecificProgressComponent {
       storyIndex: number, chapterIndex: number
   ): number {
     const checkpointsProgress = this.getAllCheckpointsOfChapter(
-      storyIndex, chapterIndex)
+      storyIndex, chapterIndex);
     const completedCheckpoints = checkpointsProgress.filter(
       checkpointProgress => checkpointProgress === 1
     ).length;
@@ -144,7 +143,7 @@ export class LearnerGroupStudentSpecificProgressComponent {
       storyIndex: number, chapterIndex: number
   ): number {
     const checkpointsProgress = this.getAllCheckpointsOfChapter(
-      storyIndex, chapterIndex)
+      storyIndex, chapterIndex);
     return checkpointsProgress.filter(
       checkpointProgress => (
         checkpointProgress === 1 || checkpointProgress === 2

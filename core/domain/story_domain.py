@@ -1876,10 +1876,10 @@ class LearnerGroupSyllabusStorySummaryDict(StorySummaryDict):
 
 
 class StoryChapterProgressSummaryDict(TypedDict):
-    """Dictionary representation of a StorySummary object for learner
-    groups syllabus.
+    """Dictionary representation of a StoryChapterProgressSummary object for
+    learner groups syllabus.
     """
 
     exploration_id: str
-    completed_checkpoints_count: int
+    visited_checkpoints_count: int
     total_checkpoints_count: int

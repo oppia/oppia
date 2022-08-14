@@ -38,12 +38,11 @@ from typing_extensions import Literal
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import exp_models
     from mypy_imports import story_models
     from mypy_imports import user_models
 
-(story_models, user_models, exp_models) = models.Registry.import_models(
-    [models.NAMES.story, models.NAMES.user, models.NAMES.exploration])
+(story_models, user_models) = models.Registry.import_models(
+    [models.NAMES.story, models.NAMES.user])
 
 
 def _migrate_story_contents_to_latest_schema(
@@ -470,7 +469,8 @@ def get_user_progress_in_story_chapters(
         user_models.ExplorationUserDataModel.get_multi(
             [user_id], exp_ids))
 
-    all_chapters_progress = []
+    all_chapters_progress: List[
+        story_domain.StoryChapterProgressSummaryDict] = []
     for i, exp_id in enumerate(exp_ids):
         exploration = exp_id_to_exp_map[exp_id]
         all_checkpoints = user_services.get_checkpoints_in_order(

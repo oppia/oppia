@@ -112,7 +112,9 @@ export class LearnerGroupStudentsProgressComponent implements OnInit {
     this.studentSpecificProgressViewIsActive = false;
   }
 
-  updateStudentSpecificProgress(studentProgress: LearnerGroupUserProgress): void {
+  updateStudentSpecificProgress(
+      studentProgress: LearnerGroupUserProgress
+  ): void {
     this.specificStudentProgress = studentProgress;
     let syllabusStoryIds: string[] = [];
     studentProgress.storiesProgress.forEach(storyProgress => {
@@ -143,7 +145,7 @@ export class LearnerGroupStudentsProgressComponent implements OnInit {
    * @param {String} menuName - name of menu, on which
    * open/close action to be performed (category,language).
    */
-   openSubmenu(evt: KeyboardEvent, menuName: string): void {
+  openSubmenu(evt: KeyboardEvent, menuName: string): void {
     this.navigationService.openSubmenu(evt, menuName);
   }
 }

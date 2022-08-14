@@ -103,8 +103,8 @@
 
 .student-specific-progress-view-selectors .students-dropdown-toggle {
   align-items: center;
-  background: #FFFFFF;
-  border: 1px solid #27635C;
+  background: #fff;
+  border: 1px solid #27635c;
   border-radius: 4px;
   display: flex;
   min-width: 200px;
@@ -125,8 +125,8 @@
   font-size: 16px;
   gap: 15px;
   height: 26px;
-  padding: 1px;
   min-width: 180px;
+  padding: 1px;
 }
 
 .student-specific-progress-view-selectors .back-to-all-students-progress-button {

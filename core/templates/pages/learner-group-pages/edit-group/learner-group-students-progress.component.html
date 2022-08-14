@@ -2,11 +2,11 @@
   <div class="search-bar-label">Search By Username</div>
   <div>
     <input class="search-bar-input"
-          type="text"
-          [(ngModel)]="searchUsernameQuery"
-          (keyup)="getSearchUsernameResults()"
-          placeholder="Search Learner"
-      >
+           type="text"
+           [(ngModel)]="searchUsernameQuery"
+           (keyup)="getSearchUsernameResults()"
+           placeholder="Search Learner"
+    >
   </div>
   <div *ngFor="let studentProgress of matchingUsersProgress; let idx = index">
     <div *ngIf="studentProgress.isProgressSharingTurnedOn" class="student-progress-summary">
@@ -20,7 +20,9 @@
         </div>
       </div>
       <div class="student-progress-summary-info">
-        <span class="warning">Struggling with {{getStrugglingSubtopicsCountOfStudent(idx)}} skills <span class="divider">| </span></span>
+        <span class="warning">Struggling with {{getStrugglingSubtopicsCountOfStudent(idx)}} skills
+          <span class="divider"> | </span>
+        </span>
         <span>Completed {{getCompletedStoriesCountByStudent(idx)}} stories</span>
       </div>
     </div>
@@ -61,14 +63,14 @@
         <div class="student-progress-selection-dropdown">
           <div ngbDropdown class="search-bar-float-left oppia-search-bar-type-selector dropdown" autoClose="outside">
             <button ngbDropdownToggle
-                (click)="openSubmenu($event, 'student')"
-                type="button"
-                class="btn dropdown-toggle students-dropdown-toggle"
-                title="progress">
-                <div class="student-info">
-                  <img [src]="getProfileImageDataUrl(specificStudentProgress.profilePictureDataUrl)">
-                  <div>{{specificStudentProgress.username}}</div>
-                </div>
+                    (click)="openSubmenu($event, 'student')"
+                    type="button"
+                    class="btn dropdown-toggle students-dropdown-toggle"
+                    title="progress">
+              <div class="student-info">
+                <img [src]="getProfileImageDataUrl(specificStudentProgress.profilePictureDataUrl)">
+                <div>{{specificStudentProgress.username}}</div>
+              </div>
             </button>
             <ul ngbDropdownMenu
                 class="students-dropdown-menu dropdown-menu"

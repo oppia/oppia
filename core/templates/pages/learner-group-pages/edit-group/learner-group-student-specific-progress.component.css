@@ -45,6 +45,12 @@
   padding: 30px;
 }
 
+.oppia-learner-group-student-specific-progress .tab-description {
+  color: #00645c;
+  font-size: 18px;
+  font-weight: 500;
+}
+
 .oppia-learner-group-student-specific-progress .overview-tab-sections-header {
   border-bottom: 1px solid #e6e6e6;
   display: flex;
@@ -116,12 +122,6 @@
   height: 46px;
   padding: 10px;
   width: max-content;
-}
-
-.oppia-learner-group-student-specific-progress .tab-description {
-  color: #00645c;
-  font-size: 18px;
-  font-weight: 500;
 }
 
 .oppia-learner-group-student-specific-progress .progress-dropdown {
