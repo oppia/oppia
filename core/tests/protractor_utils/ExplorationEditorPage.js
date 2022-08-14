@@ -70,7 +70,7 @@ var ExplorationEditorPage = function() {
   var sharePublishModalElement = element(
     by.css('.e2e-test-share-publish-modal'));
   var selectionRenderedElement = element(
-    by.css('.select2-selection__rendered'));
+    by.css('.e2e-test-exploration-category-dropdown'));
   var promptModalElement = element(
     by.css('.e2e-test-save-prompt-modal'));
   var explorationSaveModalElement = element(
@@ -241,7 +241,7 @@ var ExplorationEditorPage = function() {
       'Selection Rendered Element', selectionRenderedElement);
     var explorationLanguage = await action.getText(
       'Exploration Language Selector Element',
-      expLanguageSelectorElement.$('option:checked'));
+      expLanguageSelectorElement);
     await waitFor.visibilityOf(
       expTitle, 'Exploration Goal taking too long to appear');
     expect(await expTitle.getAttribute('value')).toMatch(title);

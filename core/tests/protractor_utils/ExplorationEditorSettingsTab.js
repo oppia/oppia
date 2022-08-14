@@ -113,7 +113,7 @@ var ExplorationEditorSettingsTab = function() {
       closePreviewSummaryButton);
     await waitFor.invisibilityOf(
       explorationSummaryTile, 'Summary Tile takes too long to disappear');
-    await action.click('Neutral element', neutralElement);
+    await action.click('Neutral element', neutralElement, true);
   };
 
   this.setCategory = async function(category) {
@@ -138,7 +138,7 @@ var ExplorationEditorSettingsTab = function() {
   };
 
   this.setLanguage = async function(language) {
-    await action.click('Neutral element', neutralElement);
+    await action.click('Neutral element', neutralElement, true);
     await action.waitForAutosave();
     await waitFor.presenceOf(
       explorationLanguageInput, 'Language input takes too long to be visible.');
@@ -149,7 +149,7 @@ var ExplorationEditorSettingsTab = function() {
     var languageButton = element.all(by.cssContainingText(
       '.e2e-test-exploration-language-selector-choice', language)).first();
     await action.click('Language button', languageButton, true);
-    await action.click('Neutral element', neutralElement);
+    await action.click('Neutral element', neutralElement, true);
   };
 
   this.setObjective = async function(objective) {
@@ -191,6 +191,7 @@ var ExplorationEditorSettingsTab = function() {
       explorationLanguageInput, 'Language input takes too long to be visible.');
     expect(await explorationLanguageInput.$('option:checked').getText()).
       toEqual(language);
+    await action.click('Neutral element', neutralElement, true);
   };
 
   this.expectObjectiveToBe = async function(objective) {

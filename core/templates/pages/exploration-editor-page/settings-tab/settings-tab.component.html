@@ -354,7 +354,7 @@
         <div *ngIf="canModifyRoles" [hidden]="!(isRolesFormOpen)">
           <strong>Add or Change Role</strong>
           <div class="form-group">
-            <form ng-submit="editRole(newMemberUsername, newMemberRole.value)">
+            <form>
               <label for="newMemberUsername">Username of invited user</label>
               <div>
                 <mat-form-field class="example-full-width" appearance="fill">
@@ -370,7 +370,7 @@
                     <mat-option *ngFor="let item of ROLES"
                                 [value]="item"
                                 (blur)="onRolesFormUsernameBlur()"
-                                class="e2e-test-exploration-language-select-lan">
+                                class="e2e-test-role-list">
                       {{ item.name }}
                     </mat-option>
                   </mat-select>
@@ -380,7 +380,7 @@
                 </span>
               </div>
 
-              <input type="submit" class="btn btn-secondary e2e-test-save-role" value="Save" [disabled]="!rolesSaveButtonEnabled || !newMemberUsername">
+              <button type="submit" (click)="editRole(newMemberUsername, newMemberRole.value)" class="btn btn-secondary e2e-test-save-role" [disabled]="!rolesSaveButtonEnabled || !newMemberUsername">Save</button>
               <button type="button" class="btn btn-secondary" (click)="closeEditRolesForm()" [hidden]="!(isRolesFormOpen)">
                 Cancel
               </button>
@@ -432,16 +432,16 @@
 
         <div *ngIf="canManageVoiceArtist" [hidden]="!(isVoiceoverFormOpen)">
           <div class="form-group">
-            <form ng-submit="editVoiseArtist(newVoicAartistUsername)">
+            <form>
               <div>
                 <label>Add new voice artsit: </label>
                 <input id="newVoicAartistUsername"
                        class="form-control e2e-test-new-voice-artist-username"
-                       ng-model="newVoicAartistUsername"
+                       [(ngModel)]="newVoicAartistUsername"
                        placeholder="Voice artist username"
                        type="text">
               </div>
-              <input type="submit" class="btn btn-secondary e2e-test-add-voice-artist-role-button" value="Save">
+              <button (click)="editVoiseArtist(newVoicAartistUsername)" class="btn btn-secondary e2e-test-add-voice-artist-role-button" value="Save">Save</button>
               <button type="button"
                       class="btn btn-secondary"
                       (click)="closeVoiceoverForm()">

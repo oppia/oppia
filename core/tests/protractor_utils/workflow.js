@@ -232,8 +232,11 @@ var _addExplorationRole = async function(roleName, username) {
     'Username input',
     element(by.css('.e2e-test-role-username')),
     username);
-  await action.select(
-    'Role select', element(by.css('.e2e-test-role-select')), roleName);
+
+  await action.click(
+    'Open role Dropdown', element(by.css('.e2e-test-role-select')));
+  await action.click('Role select', element(
+    by.cssContainingText('.e2e-test-role-list', roleName)));
   await action.click(
     'Save role', element(by.css('.e2e-test-save-role')));
 };
