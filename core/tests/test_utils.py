@@ -1496,7 +1496,7 @@ class AppEngineTestBase(TestBase):
         with platform_taskqueue_services_swap:
             super().run(result=result)
 
-    def count_jobs_in_taskqueue(self, queue_name):
+    def count_jobs_in_taskqueue(self, queue_name: Optional[str]) -> int:
         """Returns the total number of tasks in a single queue if a queue name
         is specified or the entire taskqueue if no queue name is specified.
 
@@ -1511,7 +1511,9 @@ class AppEngineTestBase(TestBase):
         return self._platform_taskqueue_services_stub.count_jobs_in_taskqueue(
             queue_name=queue_name)
 
-    def process_and_flush_pending_tasks(self, queue_name=None):
+    def process_and_flush_pending_tasks(
+        self, queue_name: Optional[str] = None
+    ) -> None:
         """Executes all of the tasks in a single queue if a queue name is
         specified or all of the tasks in the taskqueue if no queue name is
         specified.
@@ -2129,7 +2131,7 @@ title: Title
                     'topic_id': topic_id
                 }, csrf_token=self.get_new_csrf_token())
 
-    def set_moderators(self, moderator_usernames):
+    def set_moderators(self, moderator_usernames: List[str]) -> None:
         """Sets role of given users as MODERATOR.
 
         Args:
@@ -2138,7 +2140,7 @@ title: Title
         for name in moderator_usernames:
             self.add_user_role(name, feconf.ROLE_ID_MODERATOR)
 
-    def set_voiceover_admin(self, voiceover_admin_username):
+    def set_voiceover_admin(self, voiceover_admin_username: List[str]) -> None:
         """Sets role of given users as VOICEOVER ADMIN.
 
         Args:
@@ -2538,7 +2540,11 @@ title: Title
         return response['token']
 
     def save_new_default_exploration(
-            self, exploration_id, owner_id, title='A title'):
+        self,
+        exploration_id: str,
+        owner_id: str,
+        title: str = 'A title'
+    ) -> exp_domain.Exploration:
         """Saves a new default exploration written by owner_id.
 
         Args:
@@ -2778,7 +2784,9 @@ title: Title
         exp_summary_model.update_timestamps()
         exp_summary_model.put()
 
-    def publish_exploration(self, owner_id, exploration_id):
+    def publish_exploration(
+        self, owner_id: str, exploration_id: str
+    ) -> None:
         """Publish the exploration with the given exploration_id.
 
         Args:
@@ -2909,10 +2917,17 @@ title: Title
             })], 'Changes.')
 
     def save_new_story(
-            self, story_id, owner_id, corresponding_topic_id,
-            title='Title', description='Description', notes='Notes',
-            language_code=constants.DEFAULT_LANGUAGE_CODE,
-            url_fragment='title', meta_tag_content='story meta tag content'):
+        self,
+        story_id: str,
+        owner_id: str,
+        corresponding_topic_id: str,
+        title: str = 'Title',
+        description: str = 'Description',
+        notes: str = 'Notes',
+        language_code: str = constants.DEFAULT_LANGUAGE_CODE,
+        url_fragment: str = 'title',
+        meta_tag_content: str = 'story meta tag content'
+    ) -> story_domain.Story:
         """Creates an Oppia Story and saves it.
 
         NOTE: Callers are responsible for ensuring that the
@@ -3463,7 +3478,9 @@ title: Title
             owner_id, 'New skill created.',
             [{'cmd': skill_domain.CMD_CREATE_NEW}])
 
-    def _create_valid_question_data(self, default_dest_state_name):
+    def _create_valid_question_data(
+        self, default_dest_state_name: str
+    ) -> state_domain.State:
         """Creates a valid question_data dict.
 
         Args:
@@ -3623,7 +3640,7 @@ class GenericEmailTestBase(GenericTestBase):
             self._send_email_to_recipients):
             super().run(result=result)
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self._wipe_emails_dict()
 

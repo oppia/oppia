@@ -1235,6 +1235,13 @@ class VersioningIntegrationTest(BaseEditorControllerTests):
                 feconf.EDITOR_URL_PREFIX, feconf.DISABLED_EXPLORATION_IDS[0]),
             expected_status_int=404)
 
+    def test_check_revert_valid(self):
+        """Test if an old exploration version is valid."""
+        reader_dict = self.get_json(
+            '/createhandler/check_revert_valid/%s/%s' % (self.EXP_ID, 1))
+        self.assertTrue(reader_dict['valid'])
+        self.assertIsNone(reader_dict['details'])
+
     def test_reverting_to_old_exploration(self):
         """Test reverting to old exploration versions."""
         # Open editor page.
