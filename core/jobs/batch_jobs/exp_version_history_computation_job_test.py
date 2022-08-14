@@ -70,8 +70,9 @@ class ComputeExplorationVersionHistoryJobTests(
     def test_creates_version_history_for_single_exp_with_valid_changes(
         self
     ) -> None:
+        assert self.user_1_id is not None
         self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
-        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [
+        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [ # type: ignore[no-untyped-call]
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
                 'state_name': 'A new state'
@@ -124,15 +125,18 @@ class ComputeExplorationVersionHistoryJobTests(
     def test_create_version_history_for_exp_with_revert_commit(
         self
     ) -> None:
+        assert self.user_1_id is not None
         self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
-        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [
+        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [ # type: ignore[no-untyped-call]
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
                 'state_name': 'A new state'
             })
         ], 'A commit message.')
-        exp_services.revert_exploration(self.user_1_id, self.EXP_ID_1, 2, 1)
-        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [
+        exp_services.revert_exploration( # type: ignore[no-untyped-call]
+            self.user_1_id, self.EXP_ID_1, 2, 1
+        )
+        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [ # type: ignore[no-untyped-call]
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
                 'state_name': 'Another new state'
@@ -197,14 +201,17 @@ class ComputeExplorationVersionHistoryJobTests(
     def test_no_model_is_created_for_exp_with_invalid_revert_version(
         self
     ) -> None:
+        assert self.user_1_id is not None
         self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
-        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [
+        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [ # type: ignore[no-untyped-call]
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
                 'state_name': 'A new state'
             })
         ], 'A commit message.')
-        exp_services.revert_exploration(self.user_1_id, self.EXP_ID_1, 2, 1)
+        exp_services.revert_exploration( # type: ignore[no-untyped-call]
+            self.user_1_id, self.EXP_ID_1, 2, 1
+        )
         version_history_keys = [
             datastore_services.Key(
                 exp_models.ExplorationVersionHistoryModel,
@@ -270,9 +277,11 @@ class ComputeExplorationVersionHistoryJobTests(
     def test_creates_version_history_for_multiple_exps_with_valid_changes(
         self
     ) -> None:
+        assert self.user_1_id is not None
+        assert self.user_2_id is not None
         self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
         self.save_new_valid_exploration(self.EXP_ID_2, self.user_2_id)
-        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [
+        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [ # type: ignore[no-untyped-call]
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
                 'state_name': 'A new state'
@@ -329,15 +338,19 @@ class ComputeExplorationVersionHistoryJobTests(
             assert model is not None
 
     def test_job_can_run_when_version_history_already_exists(self) -> None:
+        assert self.user_1_id is not None
+        assert self.user_2_id is not None
         self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
         self.save_new_valid_exploration(self.EXP_ID_2, self.user_2_id)
-        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [
+        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [ # type: ignore[no-untyped-call]
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
                 'state_name': 'A new state'
             })
         ], 'A commit messages.')
-        exp_services.revert_exploration(self.user_1_id, self.EXP_ID_1, 2, 1)
+        exp_services.revert_exploration( # type: ignore[no-untyped-call]
+            self.user_1_id, self.EXP_ID_1, 2, 1
+        )
         version_history_keys = [
             datastore_services.Key(
                 exp_models.ExplorationVersionHistoryModel,
@@ -393,8 +406,9 @@ class ComputeExplorationVersionHistoryJobTests(
             assert model is not None
 
     def test_ignore_changes_in_deprecated_properties(self) -> None:
+        assert self.user_1_id is not None
         self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
-        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [
+        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [ # type: ignore[no-untyped-call]
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
                 'state_name': 'A new state'
@@ -428,8 +442,9 @@ class ComputeExplorationVersionHistoryJobTests(
         ])
 
     def test_with_invalid_change_list(self) -> None:
+        assert self.user_1_id is not None
         self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
-        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [
+        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [ # type: ignore[no-untyped-call]
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
                 'state_name': 'A new state'
@@ -464,6 +479,7 @@ class ComputeExplorationVersionHistoryJobTests(
         ])
 
     def test_with_corrupted_snapshot_model(self) -> None:
+        assert self.user_1_id is not None
         self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
 
         snapshot_class = exp_models.ExplorationSnapshotContentModel
@@ -515,15 +531,17 @@ class VerifyVersionHistoryModelsJobTests(
         self.assert_job_output_is_empty()
 
     def test_with_valid_version_history_models(self) -> None:
+        assert self.user_1_id is not None
+        assert self.user_2_id is not None
         self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
         self.save_new_valid_exploration(self.EXP_ID_2, self.user_2_id)
-        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [
+        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [ # type: ignore[no-untyped-call]
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
                 'state_name': 'A new state'
             })
         ], 'A commit messages.')
-        exp_services.update_exploration(self.user_2_id, self.EXP_ID_2, [
+        exp_services.update_exploration(self.user_2_id, self.EXP_ID_2, [ # type: ignore[no-untyped-call]
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
                 'state_name': 'A new state'
@@ -540,9 +558,11 @@ class VerifyVersionHistoryModelsJobTests(
         ])
 
     def test_with_invalid_version_history_models(self) -> None:
+        assert self.user_1_id is not None
+        assert self.user_2_id is not None
         self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
         self.save_new_valid_exploration(self.EXP_ID_2, self.user_2_id)
-        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [
+        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [ # type: ignore[no-untyped-call]
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
                 'state_name': 'A new state'
@@ -591,15 +611,18 @@ class VerifyVersionHistoryModelsJobTests(
     def test_with_valid_version_history_models_having_revert_commit(
         self
     ) -> None:
+        assert self.user_1_id is not None
         self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
-        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [
+        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [ # type: ignore[no-untyped-call]
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
                 'state_name': 'A new state'
             })
         ], 'A commit message.')
-        exp_services.revert_exploration(self.user_1_id, self.EXP_ID_1, 2, 1)
-        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [
+        exp_services.revert_exploration( # type: ignore[no-untyped-call]
+            self.user_1_id, self.EXP_ID_1, 2, 1
+        )
+        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [ # type: ignore[no-untyped-call]
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
                 'state_name': 'Another new state'
@@ -618,15 +641,18 @@ class VerifyVersionHistoryModelsJobTests(
     def test_with_invalid_version_history_models_having_revert_commit(
         self
     ) -> None:
+        assert self.user_1_id is not None
         self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
-        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [
+        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [ # type: ignore[no-untyped-call]
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
                 'state_name': 'A new state'
             })
         ], 'A commit message.')
-        exp_services.revert_exploration(self.user_1_id, self.EXP_ID_1, 2, 1)
-        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [
+        exp_services.revert_exploration( # type: ignore[no-untyped-call]
+            self.user_1_id, self.EXP_ID_1, 2, 1
+        )
+        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [ # type: ignore[no-untyped-call]
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
                 'state_name': 'Another new state'
@@ -656,6 +682,7 @@ class VerifyVersionHistoryModelsJobTests(
         ])
 
     def test_with_corrupted_snapshot_model(self) -> None:
+        assert self.user_1_id is not None
         self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
 
         snapshot_class = exp_models.ExplorationSnapshotContentModel
@@ -671,8 +698,9 @@ class VerifyVersionHistoryModelsJobTests(
         ])
 
     def test_ignore_changes_in_deprecated_properties(self) -> None:
+        assert self.user_1_id is not None
         self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
-        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [
+        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [ # type: ignore[no-untyped-call]
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
                 'state_name': 'A new state'
@@ -727,8 +755,9 @@ class DeleteExplorationVersionHistoryModelsJobTest(
         self.assert_job_output_is_empty()
 
     def test_with_vh_models(self) -> None:
+        assert self.user_1_id is not None
         self.save_new_valid_exploration(self.EXP_ID_1, self.user_1_id)
-        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [
+        exp_services.update_exploration(self.user_1_id, self.EXP_ID_1, [ # type: ignore[no-untyped-call]
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
                 'state_name': 'A new state'

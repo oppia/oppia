@@ -136,13 +136,15 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
         """
         exp_vlatest = model_group['exp_models_vlatest'][0]
 
-        all_explorations: List[exp_models.ExplorationModel] = (
+        all_explorations: List[Optional[exp_models.ExplorationModel]] = (
             [None] * exp_vlatest.version
         )
         for exp_model in model_group['all_exp_models']:
             all_explorations[exp_model.version - 1] = exp_model
 
-        commit_log_models: List[exp_models.ExplorationCommitLogEntryModel] = (
+        commit_log_models: List[Optional[
+            exp_models.ExplorationCommitLogEntryModel
+        ]] = (
             [None] * exp_vlatest.version
         )
         for commit_log in model_group['commit_log_models']:
@@ -153,9 +155,10 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
             exp_models.ExplorationVersionHistoryModel
         ]] = [None] * exp_vlatest.version
         for version_history in model_group['version_history_models']:
-            version_history_models[version_history.exploration_version - 1] = (
-                version_history
-            )
+            if version_history is not None:
+                version_history_models[
+                    version_history.exploration_version - 1
+                ] = version_history
 
         return {
             'exp_vlatest': exp_vlatest,
@@ -445,24 +448,24 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
 
                     try:
                         new_states_vh = (
-                            exp_services.update_states_version_history(
+                            exp_services.update_states_version_history( # type: ignore[no-untyped-call]
                                 old_states_vh, change_list, old_states_dict,
                                 new_states_dict, version, committer_id
                             )
                         )
                         new_metadata_vh = (
-                            exp_services.update_metadata_version_history(
+                            exp_services.update_metadata_version_history( # type: ignore[no-untyped-call]
                                 old_metadata_vh, change_list, old_metadata_dict,
                                 new_metadata_dict, version, committer_id
                             )
                         )
                         new_committer_ids = (
-                            exp_services.get_updated_committer_ids(
+                            exp_services.get_updated_committer_ids( # type: ignore[no-untyped-call]
                                 new_states_vh,
                                 new_metadata_vh.last_edited_committer_id
                             )
                         )
-                        new_vh_model = self.get_updated_version_history_model(
+                        new_vh_model = self.get_updated_version_history_model( # type: ignore[no-untyped-call]
                             version_history_models[version - 1],
                             exp_id, version, committer_id,
                             new_states_vh, new_metadata_vh, new_committer_ids
