@@ -600,22 +600,6 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
         )
         self.assertEqual(len(exp_ids), 4)
 
-    def test_compute_summary_of_exploration_raises_exception(self):
-        # Ensure that compute_summary_of_exploration raises exception when
-        # ExplorationSummaryModel is None and
-        # skip_exploration_model_last_updated is true.
-        exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID_0)
-        exp_rights = rights_manager.get_exploration_rights(
-            self.EXP_ID_0, strict=False)
-
-        with self.assertRaisesRegex(
-            Exception,
-            'ExplorationSummaryModel cannot be None, when '
-            'skip_exploration_model_last_updated is set to True'
-            'for exploration ID %s' % exploration.id):
-            exp_services.update_exploration_summary(
-                exploration, exp_rights, None, True)
-
 
 class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
     """Test creation and deletion methods."""
