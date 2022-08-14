@@ -1572,7 +1572,7 @@ class PlaythroughModel(base_models.BaseModel):
         exp_id: str,
         exp_version: int,
         issue_type: str,
-        issue_customization_args: Dict[str, Any],
+        issue_customization_args: stats_domain.IssuesCustomizationArgsDictType,
         actions: List[stats_domain.LearnerActionDict]
     ) -> str:
         """Creates a PlaythroughModel instance and writes it to the

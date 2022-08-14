@@ -347,7 +347,7 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
 
     def _mock_query_filters_returns_empy_list(
         self, projection: bool, distinct: bool  # pylint: disable=unused-argument
-    ) -> List[Any]:
+    ) -> List[str]:
         """Mock the model query to test for an invalid filter field. Named
         parameters 'projection' and 'distinct' are required to mock the
         query function.

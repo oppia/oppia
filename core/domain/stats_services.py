@@ -663,7 +663,8 @@ def get_exploration_stats_by_id(
         exp_version: int. Version of the exploration.
 
     Returns:
-        ExplorationStats. The domain object for exploration statistics.
+        ExplorationStats|None. The domain object for exploration statistics, or
+            None if no ExplorationStatsModel exists for the given id.
 
     Raises:
         Exception. Entity for class ExplorationStatsModel with id not found.

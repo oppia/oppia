@@ -438,23 +438,27 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         )
         stats_services.create_stats_model(exploration_stats)
 
-        exploration_stats_with_none = (
+        exploration_stats_domain_object = (
             stats_services.get_exploration_stats_by_id(
                 exploration.id, exploration.version
             )
         )
         # Ruling out the possibility of None for mypy type checking.
-        assert exploration_stats_with_none is not None
-        self.assertEqual(exploration_stats_with_none.exp_id, exp_id)
-        self.assertEqual(exploration_stats_with_none.exp_version, 1)
-        self.assertEqual(exploration_stats_with_none.num_starts_v1, 0)
-        self.assertEqual(exploration_stats_with_none.num_starts_v2, 0)
-        self.assertEqual(exploration_stats_with_none.num_actual_starts_v1, 0)
-        self.assertEqual(exploration_stats_with_none.num_actual_starts_v2, 0)
-        self.assertEqual(exploration_stats_with_none.num_completions_v1, 0)
-        self.assertEqual(exploration_stats_with_none.num_completions_v2, 0)
+        assert exploration_stats_domain_object is not None
+        self.assertEqual(exploration_stats_domain_object.exp_id, exp_id)
+        self.assertEqual(exploration_stats_domain_object.exp_version, 1)
+        self.assertEqual(exploration_stats_domain_object.num_starts_v1, 0)
+        self.assertEqual(exploration_stats_domain_object.num_starts_v2, 0)
         self.assertEqual(
-            list(exploration_stats_with_none.state_stats_mapping.keys()),
+            exploration_stats_domain_object.num_actual_starts_v1, 0
+        )
+        self.assertEqual(
+            exploration_stats_domain_object.num_actual_starts_v2, 0
+        )
+        self.assertEqual(exploration_stats_domain_object.num_completions_v1, 0)
+        self.assertEqual(exploration_stats_domain_object.num_completions_v2, 0)
+        self.assertEqual(
+            list(exploration_stats_domain_object.state_stats_mapping.keys()),
             ['Home', 'End']
         )
 
@@ -514,7 +518,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         self.assertEqual(new_stats.exp_version, 1)
         self.assertEqual(new_stats.state_stats_mapping, {})
 
-    def test_raises_error_when_both_exp_dif_and_revert_are_none(self) -> None:
+    def test_raises_error_when_both_exp_diff_and_revert_are_none(self) -> None:
         # Create exploration object in datastore.
         exp_id = 'exp_id'
         test_exp_filepath = os.path.join(
@@ -814,20 +818,22 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         )
         stats_services.create_stats_model(exploration_stats)
 
-        exploration_stats_with_none = (
+        exploration_stats_domain_object = (
             stats_services.get_exploration_stats_by_id(
                 exploration.id, exploration.version
             )
         )
         # Ruling out the possibility of None for mypy type checking.
-        assert exploration_stats_with_none is not None
-        self.assertEqual(exploration_stats_with_none.exp_version, 8)
+        assert exploration_stats_domain_object is not None
+        self.assertEqual(exploration_stats_domain_object.exp_version, 8)
         self.assertEqual(
-            set(exploration_stats_with_none.state_stats_mapping.keys()),
+            set(exploration_stats_domain_object.state_stats_mapping.keys()),
             set(['Home', 'Renamed state', 'End']))
 
-        self.assertEqual(exploration_stats_with_none.num_actual_starts_v2, 0)
-        self.assertEqual(exploration_stats_with_none.num_completions_v2, 0)
+        self.assertEqual(
+            exploration_stats_domain_object.num_actual_starts_v2, 0
+        )
+        self.assertEqual(exploration_stats_domain_object.num_completions_v2, 0)
 
         # Test state name swaps.
         exploration.add_states(['New state 5', 'New state 6'])
