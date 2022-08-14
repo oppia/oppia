@@ -42,8 +42,8 @@ import certifi
 import yaml
 
 from typing import ( # isort:skip
-    IO, Any, BinaryIO, Callable, Dict, Iterable, Iterator, List, Optional,
-    TextIO, Tuple, TypeVar, Union, overload)
+    IO, Any, BinaryIO, Callable, Dict, Iterable, Iterator, List, Mapping,
+    Optional, TextIO, Tuple, TypeVar, Union, overload)
 from typing_extensions import Literal # isort:skip
 
 
@@ -303,7 +303,9 @@ def dict_from_yaml(yaml_str: str) -> Dict[str, Any]:
         raise InvalidInputException(e) from e
 
 
-def yaml_from_dict(dictionary: Dict[str, Any], width: int = 80) -> str:
+# Here, Mapping is used so that both Dict and TypedDict types of values
+# are accepted by yaml_from_dict() method.
+def yaml_from_dict(dictionary: Mapping[str, Any], width: int = 80) -> str:
     """Gets the YAML representation of a dict.
 
     Args:

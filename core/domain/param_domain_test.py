@@ -29,10 +29,11 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
     """Tests for parameter domain objects."""
 
     def setUp(self) -> None:
-        self.sample_customization_args: param_domain.CustomizationArgsDict = {
+        self.sample_customization_args: (
+            param_domain.CustomizationArgsDictWithValue
+        ) = {
             'value': '5',
             'parse_with_jinja': True,
-            'list_of_values': []
         }
 
     def test_param_spec_validation(self) -> None:
@@ -120,7 +121,10 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
             # TODO(#13059): After we fully type the codebase we plan to get
             # rid of the tests that intentionally test wrong inputs that we
             # can normally catch by typing.
-            param_domain.ParamChange('abc', 'Copier', {1: '1'}).validate()  # type: ignore[misc]
+            customization_args_dict = {1: '1'}
+            param_domain.ParamChange(
+                'abc', 'Copier', customization_args_dict  # type: ignore[arg-type]
+            ).validate()
 
     def test_param_spec_to_dict(self) -> None:
         sample_dict = {
@@ -138,18 +142,14 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
 
     def test_param_change_class(self) -> None:
         """Test the ParamChange class."""
-        # The argument `customization_args` of ParamChange() can only accept
-        # values of type CustomizationArgsDict, but for testing purposes here
-        # we are providing dictionary that only contain `value` key. Thus to
-        # avoid MyPy's missing keys error, we added an ignore here.
         param_change = param_domain.ParamChange(
-            'abc', 'Copier', {'value': '3'})   # type: ignore[typeddict-item]
+            'abc', 'Copier', {'value': '3', 'parse_with_jinja': True})
         self.assertEqual(param_change.name, 'abc')
         self.assertEqual(param_change.generator.id, 'Copier')
         self.assertEqual(param_change.to_dict(), {
             'name': 'abc',
             'generator_id': 'Copier',
-            'customization_args': {'value': '3'}
+            'customization_args': {'value': '3', 'parse_with_jinja': True}
         })
         self.assertEqual(param_change.get_value({}), '3')
 
