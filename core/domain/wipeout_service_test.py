@@ -4125,7 +4125,7 @@ class WipeoutServiceDeleteSuggestionModelsTests(test_utils.GenericTestBase):
             suggestion_models.TranslationContributionStatsModel.get_by_id(
                 self.TRANSLATION_STATS_1_ID))
 
-    def test_translation_review_stats_are_deleted(self):
+    def test_translation_review_stats_are_deleted(self) -> None:
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
 
@@ -4133,7 +4133,7 @@ class WipeoutServiceDeleteSuggestionModelsTests(test_utils.GenericTestBase):
             suggestion_models.TranslationReviewStatsModel.get_by_id(
                 self.TRANSLATION_STATS_1_ID))
 
-    def test_question_contribution_stats_are_deleted(self):
+    def test_question_contribution_stats_are_deleted(self) -> None:
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
 
@@ -4141,7 +4141,7 @@ class WipeoutServiceDeleteSuggestionModelsTests(test_utils.GenericTestBase):
             suggestion_models.QuestionContributionStatsModel.get_by_id(
                 self.QUESTION_STATS_1_ID))
 
-    def test_question_review_stats_are_deleted(self):
+    def test_question_review_stats_are_deleted(self) -> None:
         wipeout_service.delete_user(
             wipeout_service.get_pending_deletion_request(self.user_1_id))
 
