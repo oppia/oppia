@@ -39,9 +39,11 @@ describe('Embedding', function() {
   var createCountingExploration = async function() {
     // Intro.
     await explorationEditorMainTab.setStateName('Intro');
-    await explorationEditorMainTab.setContent(await forms.toRichText(
-      'Given three balls of different colors. How many ways are there ' +
-      'to arrange them in a straight line?')
+    await explorationEditorMainTab.setContent(
+      await forms.toRichText(
+        'Given three balls of different colors. How many ways are there ' +
+        'to arrange them in a straight line?'),
+      true,
     );
     await explorationEditorMainTab.setInteraction('NumericInput');
     await explorationEditorMainTab.addResponse(

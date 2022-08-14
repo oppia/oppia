@@ -49,7 +49,7 @@ describe('Voiceover player', function() {
     await workflow.createExploration(true);
     await explorationEditorMainTab.setStateName('First');
     await explorationEditorMainTab.setContent(await forms.toRichText(
-      'This is the first card.'));
+      'This is the first card.'), true);
     await explorationEditorMainTab.setInteraction('EndExploration');
     await explorationEditorPage.navigateToTranslationTab();
     await explorationEditorTranslationTab.exitTutorial();

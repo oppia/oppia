@@ -120,7 +120,7 @@ describe('Full exploration editor', function() {
     await workflow.createExploration(true);
     await explorationEditorMainTab.setStateName('card 1');
     await explorationEditorMainTab.setContent(
-      await forms.toRichText('this is card 1'));
+      await forms.toRichText('this is card 1'), true);
     await explorationEditorMainTab.setInteraction('Continue');
     await (
       await explorationEditorMainTab.getResponseEditor('default')
@@ -217,7 +217,7 @@ describe('Full exploration editor', function() {
       await workflow.createExploration(true);
       await explorationEditorMainTab.setStateName('card 1');
       await explorationEditorMainTab.setContent(
-        await forms.toRichText('this is card 1'));
+        await forms.toRichText('this is card 1'), true);
       await explorationEditorMainTab.setInteraction('NumericInput');
       await explorationEditorMainTab.addResponse(
         'NumericInput', null, 'final card', true, 'Equals', 21);
@@ -281,7 +281,7 @@ describe('Full exploration editor', function() {
     await workflow.createExploration(true);
     await explorationEditorMainTab.setStateName('Introduction');
     await explorationEditorMainTab.setContent(
-      await forms.toRichText('What language is Oppia?'));
+      await forms.toRichText('What language is Oppia?'), true);
     await explorationEditorMainTab.setInteraction('TextInput');
     await explorationEditorMainTab.addResponse(
       'TextInput', await forms.toRichText('Good job'),

@@ -55,7 +55,6 @@ var ExplorationEditorMainTab = function() {
   };
   var feedbackBubble = element(by.css('.e2e-test-feedback-bubble'));
   var feedbackEditor = element(by.css('.e2e-test-open-feedback-editor'));
-  var fadeIn = element(by.css('.e2e-test-editor-cards-container'));
   var interaction = element(by.css('.e2e-test-interaction'));
   var interactionEditor = element(
     by.css('.e2e-test-interaction-editor'));
@@ -504,8 +503,11 @@ var ExplorationEditorMainTab = function() {
       postTutorialPopover, 'Post-tutorial popover does not disappear.');
     await action.waitForAutosave();
     if (expectFadeIn) {
-      await waitFor.fadeInToComplete(
-        fadeIn, 'Editor taking long to fade in');
+      // We use browser.sleep() here because waiting for the fade-in to complete
+      // doesn't work for some reason. Also, since the fade-in is a client-side
+      // animation, it should always happen in the same amount of time.
+      // eslint-disable-next-line oppia/e2e-practices
+      await browser.sleep(5000);
     }
     await action.click('stateEditButton', stateEditButton);
     await waitFor.visibilityOf(

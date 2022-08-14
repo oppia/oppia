@@ -53,7 +53,7 @@ describe('Exploration translation and voiceover tab', function() {
 
     await explorationEditorMainTab.setStateName('first');
     await explorationEditorMainTab.setContent(await forms.toRichText(
-      'This is first card.'));
+      'This is first card.'), true);
     await explorationEditorMainTab.setInteraction('NumericInput');
     await explorationEditorMainTab.addResponse(
       'NumericInput', await forms.toRichText('This is feedback1.'),

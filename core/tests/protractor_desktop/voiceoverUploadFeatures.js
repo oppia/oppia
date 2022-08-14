@@ -50,7 +50,8 @@ describe('Voiceover upload features', function() {
 
     await explorationEditorMainTab.setStateName('Uploading translation file');
     await explorationEditorMainTab.setContent(await forms.toRichText(
-      'This is the first card.'
+      'This is the first card.',
+      true,
     ));
     await explorationEditorMainTab.setInteraction('EndExploration');
 

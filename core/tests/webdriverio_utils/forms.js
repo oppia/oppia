@@ -189,7 +189,10 @@ var RichTextEditor = async function(elem) {
   var closeRteComponentButtonLocator = (
     '.e2e-test-close-rich-text-component-editor');
   // Set focus in the RTE.
-  await waitFor.elementToBeClickable(rteElements[0]);
+  await waitFor.elementToBeClickable(
+    rteElements[0],
+    'First RTE element taking too long to become clickable.'
+  );
   await rteElements[0].click();
 
   var _appendContentText = async function(text) {
