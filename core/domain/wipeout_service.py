@@ -700,6 +700,9 @@ def _delete_models(user_id: str, module_name: models.NAMES) -> None:
             model_class.apply_deletion_policy(user_id)
 
 
+# The type of argument 'commit_log_model_class' is Optional[...], because
+# for config_model classes we do not have commit_log_model classes so we
+# pass None to this argument.
 def _collect_and_save_entity_ids_from_snapshots_and_commits(
     pending_deletion_request: wipeout_domain.PendingDeletionRequest,
     activity_category: models.NAMES,
