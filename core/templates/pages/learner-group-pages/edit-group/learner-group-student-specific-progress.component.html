@@ -45,7 +45,7 @@
                           <div class="subtopic-title">{{subtopicProgress.subtopicTitle}}</div>
                           <div class="subtopic-progress">
                             <div *ngIf="!subtopicProgress.subtopicMastery">
-                              &#8212; Not started yet &#8212;
+                              &#8212; {{'I18N_LEARNER_GROUP_SYLLABUS_ITEM_NOT_STARTED_YET' | translate}} &#8212;
                             </div>
                             <div *ngIf="subtopicProgress.subtopicMastery" class="subtopic-progress-bar">
                               <div class="subtopic-progress-bar-fill" [ngStyle]="{'width': (subtopicProgress.subtopicMastery*100) + '%'}"></div>
@@ -105,7 +105,7 @@
                         </div>
                       </div>
                       <div *ngIf="getVisitedCheckpointsCount(storyIndex, idx) === 0" class="chapter-not-started">
-                        &#8212; Not started yet &#8212;
+                        &#8212; {{'I18N_LEARNER_GROUP_SYLLABUS_ITEM_NOT_STARTED_YET' | translate}} &#8212;
                       </div>
                     </div>
                   </div>

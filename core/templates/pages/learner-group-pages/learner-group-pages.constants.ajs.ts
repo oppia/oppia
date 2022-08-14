@@ -35,3 +35,11 @@ angular.module('oppia').constant(
 angular.module('oppia').constant(
   'EDIT_LEARNER_GROUP_TABS',
   LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_TABS);
+
+angular.module('oppia').constant(
+  'EDIT_LEARNER_GROUP_PREFERENCES_SECTIONS',
+  LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_PREFERENCES_SECTIONS);
+
+angular.module('oppia').constant(
+  'EDIT_LEARNER_GROUP_OVERVIEW_SECTIONS',
+  LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_OVERVIEW_SECTIONS);

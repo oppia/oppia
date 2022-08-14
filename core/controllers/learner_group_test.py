@@ -784,7 +784,7 @@ class EditLearnerGroupPageTests(test_utils.GenericTestBase):
     STUDENT_ID = 'student_user_1'
 
     def setUp(self):
-        super(EditLearnerGroupPageTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.FACILITATOR_ID = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
@@ -836,7 +836,7 @@ class LearnerGroupStudentInvitationHandlerTests(test_utils.GenericTestBase):
     """
 
     def setUp(self):
-        super(LearnerGroupStudentInvitationHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.FACILITATOR_ID = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
@@ -896,7 +896,7 @@ class LearnerGroupStudentsInfoHandlerTests(test_utils.GenericTestBase):
     STUDENT_USERNAME = 'somestudent'
 
     def setUp(self):
-        super(LearnerGroupStudentsInfoHandlerTests, self).setUp()
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.FACILITATOR_ID = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)

@@ -2,15 +2,15 @@
   <div class="learner-group-summary-card">
     <div class="students-info">
       <div class="students-count">{{learnerGroup.studentUsernames.length}}</div>
-      <div>Students</div>
+      <div>{{'I18N_LEARNER_GROUP_STUDENTS_SECTION' | translate}}</div>
     </div>
     <div class="assigned-skills-info">
       <div class="assigned-skills-count">{{learnerGroup.subtopicPageIds.length}}</div>
-      <div>Assigned Skills</div>
+      <div>{{'I18N_LEARNER_GROUP_ASSIGNED_SKILLS' | translate}}</div>
     </div>
     <div class="assigned-stories-info">
       <div class="assigned-stories-count">{{learnerGroup.storyIds.length}}</div>
-      <div>Assigned Stories</div>
+      <div>{{'I18N_LEARNER_GROUP_ASSIGNED_STORIES' | translate}}</div>
     </div>
   </div>
 
@@ -30,7 +30,7 @@
       </div>
       <div class="skill-analysis-tab overview-tab-sections-subtab" *ngIf="isTabActive(EDIT_OVERVIEW_SECTIONS_I18N_IDS.SKILLS_ANALYSIS)">
         <div class="tab-description">
-          This section shows the common skills which the learners of this group are struggling with.
+          <span translate="I18N_LEARNER_GROUP_SKILLS_SECTION_PROGRESS_DESCRIPTION"></span>
           <div *ngIf="studentsProgress">
             <div *ngFor="let subtopicSummary of studentsProgress[0].subtopicsProgress">
               <div class="progress-summary">
@@ -55,7 +55,7 @@
         </div>
       </div>
       <div class="stories-progress-tab overview-tab-sections-subtab" *ngIf="isTabActive(EDIT_OVERVIEW_SECTIONS_I18N_IDS.PROGRESS_IN_STORIES)">
-        This section shows the common stories which the learners of this group have completed.
+        <span translate="I18N_LEARNER_GROUP_STORIES_SECTION_PROGRESS_DESCRIPTION"></span>
         <div *ngIf="studentsProgress">
           <div *ngFor="let storySummary of studentsProgress[0].storiesProgress">
             <div class="progress-summary">

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the learner group overview.
+ * @fileoverview Component for the learner group student specific progress.
  */
 
 import { Component, Input } from '@angular/core';

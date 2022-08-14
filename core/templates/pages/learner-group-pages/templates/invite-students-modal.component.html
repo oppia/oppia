@@ -5,7 +5,7 @@
   </oppia-invite-students>
 </div>
 <div class="modal-footer">
-  <button class="btn btn-primary" (click)="cancel()">Cancel</button>
+  <button class="btn btn-primary" (click)="cancel()" [innerHTML]="'I18N_MODAL_CANCEL_BUTTON' | translate"></button>
   <button class="btn btn-primary send-invitation-button" [disabled]="invitedStudents.length === 0" (click)="confirm()">Send Invitation</button>
 </div>
 

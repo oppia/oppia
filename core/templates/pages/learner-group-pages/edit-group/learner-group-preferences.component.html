@@ -32,18 +32,18 @@
       <button class="btn btn-primary group-details-edit-button"
               *ngIf="isReadOnlyModeActive()"
               (click)="toggleReadOnlyMode()">
-        <span>Edit</span>
+        <span translate="I18N_PLAYER_EDIT_TOOLTIP"></span>
       </button>
       <button class="btn btn-primary group-details-save-button"
               *ngIf="!isReadOnlyModeActive()"
               (click)="saveLearnerGroupInfo()">
-        <span>Done</span>
+        <span translate="I18N_ADD_NEW_SYLLABUS_DONE_BUTTON_TEXT"></span>
       </button>
     </div>
     <div *ngIf="isTabActive(EDIT_PREFERENCES_SECTIONS_I18N_IDS.GROUP_STUDENTS)" class="edit-learner-group-students-section">
       <button class="btn btn-primary add-new-learner-button"
               (click)="openInviteStudentsModal()">
-        + <span>New Learner</span>
+        + <span translate="I18N_LEARNER_GROUP_ADD_NEW_LEARNER"></span>
       </button>
       <div class="current-group-students" *ngIf="learnerGroup">
         <span class="group-students-title">Current Group Students({{learnerGroup.studentUsernames.length}})</span>
@@ -62,7 +62,7 @@
           </div>
         </div>
         <div *ngIf="currentStudentsInfo.length === 0" class="no-students-text">
-          No students have joined the group yet.
+          {{'I18N_LEARNER_GROUP_NO_STUDENTS_HAVE_JOINED' | translate}}
         </div>
       </div>
       <div class="invited-group-students" *ngIf="learnerGroup">
@@ -78,12 +78,12 @@
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="12" viewBox="0 0 16 12" fill="none">
                 <path d="M14.3158 1V5H3.22526L6.24 1.41L5.05263 0L0 6L5.05263 12L6.24 10.58L3.22526 7H16V1H14.3158Z" fill="#00609C"/>
               </svg>
-              <span>Withdraw</span>
+              <span translate="I18N_LEARNER_GROUP_WITHDRAW_INVITE"></span>
             </div>
           </div>
         </div>
         <div *ngIf="invitedStudentsInfo.length === 0" class="no-students-text">
-          No students have been invited to the group yet.
+          {{'I18N_LEARNER_GROUP_NO_STUDENTS_INVITED' | translate}}
         </div>
       </div>
     </div>

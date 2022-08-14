@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for Delete exploration modal.
+ * @fileoverview Component for Remove Item modal.
  */
 
 import { Component } from '@angular/core';
