@@ -51,7 +51,7 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
     EXPLORATION_ID_5 = '5'
 
     # DragAndDrop Interaction.
-    EXP_1_STATE_1 = state_domain.State.create_default_state( # type: ignore[no-untyped-call] # type: ignore[no-untyped-call]
+    EXP_1_STATE_1 = state_domain.State.create_default_state(
         'EXP_1_STATE_1', is_initial_state=False).to_dict()
     EXP_1_STATE_1['interaction'] = {
       'id': 'DragAndDropSortInput',
@@ -121,7 +121,7 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
           {
             'rule_type': 'IsEqualToOrdering',
             'inputs': {
-              'x': []
+              'x': [] # type: ignore[dict-item]
             }
           }
         ],
@@ -189,11 +189,11 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
       },
       'confirmed_unclassified_answers': [],
       'hints': [],
-      'solution': None
+      'solution': None # type: ignore[typeddict-item]
     }
 
     # Continue Interaction.
-    EXP_2_STATE_1 = state_domain.State.create_default_state( # type: ignore[no-untyped-call] # type: ignore[no-untyped-call]
+    EXP_2_STATE_1 = state_domain.State.create_default_state(
         'EXP_2_STATE_1', is_initial_state=False).to_dict()
     EXP_2_STATE_1['interaction'] = {
       'id': 'Continue',
@@ -245,11 +245,11 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
       },
       'confirmed_unclassified_answers': [],
       'hints': [],
-      'solution': None
+      'solution': None # type: ignore[typeddict-item]
     }
 
     # Itemselection interaction.
-    EXP_3_STATE_1 = state_domain.State.create_default_state( # type: ignore[no-untyped-call]
+    EXP_3_STATE_1 = state_domain.State.create_default_state(
         'EXP_3_STATE_1', is_initial_state=False).to_dict()
     EXP_3_STATE_1['interaction'] = {
       'id': 'ItemSelectionInput',
@@ -323,11 +323,11 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
       },
       'confirmed_unclassified_answers': [],
       'hints': [],
-      'solution': None
+      'solution': None # type: ignore[typeddict-item]
     }
 
     # NumericInput interaction.
-    EXP_4_STATE_1 = state_domain.State.create_default_state( # type: ignore[no-untyped-call]
+    EXP_4_STATE_1 = state_domain.State.create_default_state(
         'EXP_4_STATE_1', is_initial_state=True).to_dict()
     EXP_4_STATE_1['interaction'] = {
       'id': 'NumericInput',
@@ -407,11 +407,11 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
           }
         }
       ],
-      'solution': None
+      'solution': None # type: ignore[typeddict-item]
     }
 
     # Image tag.
-    EXP_5_STATE_1 = state_domain.State.create_default_state( # type: ignore[no-untyped-call]
+    EXP_5_STATE_1 = state_domain.State.create_default_state(
         'EXP_5_STATE_1', is_initial_state=False).to_dict()
     EXP_5_STATE_1['content']['html'] = (
       '<p>dffddfdffdfd</p>\n\n<p>&nbsp;</p>\n<oppia-noninteractive-image>'
@@ -565,7 +565,7 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
         self.assert_job_output_is([
           job_run_result.JobRunResult.as_stderr(
             f'The id of exp is 2, created on {self.YEAR_AGO_DATE}, '
-            f'and the invalid continue interaction language codes are [\'en\']'
+            f'and the invalid continue interaction language code is en'
           )
         ])
 

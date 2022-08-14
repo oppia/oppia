@@ -50,7 +50,10 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
     """
 
     @staticmethod
-    def _filter_invalid_drag_ans_group(answer_group, multi_item_value):
+    def _filter_invalid_drag_ans_group(
+        answer_group: state_domain.AnswerGroup,
+        multi_item_value: bool
+    ) -> bool:
         """Helper function to check if the answer group is valid or not.
         It will check if the number of invalid rules are equal to the
         number of rules present inside the answer group, which is if
@@ -79,26 +82,25 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                 ):
                     invalid_rules.append(rule_spec)
 
-            if multi_item_value:
-                continue
-            for ele in rule_spec.inputs['x']:
+            if not multi_item_value:
+                for ele in rule_spec.inputs['x']:
+                    if (
+                        len(ele) > 1
+                    ):
+                        invalid_rules.append(rule_spec)
+
                 if (
-                    len(ele) > 1
+                    rule_spec.rule_type ==
+                    'IsEqualToOrderingWithOneItemAtIncorrectPosition'
                 ):
                     invalid_rules.append(rule_spec)
-
-            if (
-                rule_spec.rule_type ==
-                'IsEqualToOrderingWithOneItemAtIncorrectPosition'
-            ):
-                invalid_rules.append(rule_spec)
 
         return len(invalid_rules) == len(answer_group.rule_specs)
 
     @staticmethod
     def invalid_drag_drop_interactions(
         states_dict: Dict[str, state_domain.State]
-    ) -> List[Dict[str, str]]:
+    ) -> List[Dict[str, object]]:
         """DragAndDropInput interaction contains some invalid rules
         which we plan to remove. Need to check if all the rules inside
         the answer group is invalid and after removing it should not
@@ -154,10 +156,9 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
         return invalid_states
 
     @staticmethod
-    def continue_interac_text_value_language(
-        states_dict: Dict[str, state_domain.State],
-        exp_lang_code: str
-    ) -> List[str]:
+    def filter_invalid_continue_interaction_exps(
+        states_dict: Dict[str, state_domain.State]
+    ) -> bool:
         """Continue interaction having text value should not exceed 20,
         if it does we plan to set the default value. This function returns
         the language codes of the errored states
@@ -167,9 +168,8 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
             exp_lang_code: str. The language code of the exploration.
 
         Returns:
-            errored_language_codes: List[str]. The list of language codes.
+            bool. Returns True if the exploration is invalid.
         """
-        errored_language_codes = []
 
         for state in states_dict.values():
             if state.interaction.id != 'Continue':
@@ -178,17 +178,14 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                 state.interaction.customization_args
                 ['buttonText'].value.unicode_str
             )
-            if (
-                len(text_value) > 20 and
-                exp_lang_code not in errored_language_codes
-            ):
-                errored_language_codes.append(exp_lang_code)
-        return errored_language_codes
+            if len(text_value) > 20:
+                return True
+        return False
 
     @staticmethod
     def item_selec_equals_value_between_min_max_value(
         states_dict: Dict[str, state_domain.State]
-    ) -> List[Dict[str, str]]:
+    ) -> List[Dict[str, object]]:
         """ItemSelection interaction having rule type `Equals` should
         have value between the minimum allowed selection and maximum
         allowed selection if it is not we need to remove the rule
@@ -216,27 +213,28 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                 state.interaction.customization_args
                 ['maxAllowableSelectionCount'].value)
             for ans_group_idx, answer_group in enumerate(answer_groups):
-                if answer_group.outcome.dest == state_name:
-                    continue
-                invalid_rules = []
-                for rule_spec in answer_group.rule_specs:
-                    if rule_spec.rule_type == 'Equals':
-                        if (
-                            len(rule_spec.inputs['x']) < min_value or
-                            len(rule_spec.inputs['x']) > max_value
-                        ):
-                            invalid_rules.append(rule_spec)
-                if len(invalid_rules) == len(answer_group.rule_specs):
-                    states_with_errored_values.append(
-                        {
-                            'state_name': state_name,
-                            'ans_group': ans_group_idx
-                        }
-                    )
+                if not answer_group.outcome.dest == state_name:
+                    invalid_rules = []
+                    for rule_spec in answer_group.rule_specs:
+                        if rule_spec.rule_type == 'Equals':
+                            if (
+                                len(rule_spec.inputs['x']) < min_value or
+                                len(rule_spec.inputs['x']) > max_value
+                            ):
+                                invalid_rules.append(rule_spec)
+                    if len(invalid_rules) == len(answer_group.rule_specs):
+                        states_with_errored_values.append(
+                            {
+                                'state_name': state_name,
+                                'ans_group': ans_group_idx
+                            }
+                        )
         return states_with_errored_values
 
     @staticmethod
-    def _filter_invalid_numeric_ans_group(answer_group):
+    def _filter_invalid_numeric_ans_group(
+        answer_group: state_domain.AnswerGroup
+    ) -> bool:
         """Helper function to check if the answer group is valid or not.
         It will check if the number of invalid rules are equal to the
         number of rules present inside the answer group, which is if
@@ -288,7 +286,7 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
     @staticmethod
     def numeric_input_invalid_values(
         states_dict: Dict[str, state_domain.State]
-    ) -> List[str]:
+    ) -> List[Dict[str, object]]:
         """NumericInput interaction contains some invalid rules
         which we plan to remove. Need to check if all the rules inside
         the answer group is invalid and after removing it should not
@@ -301,8 +299,8 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
             states_dict: dict[str, state_domain.State]. The state dictionary.
 
         Returns:
-            invalid_states: List[Dict[str, str]]. List of invalid states with
-            the invalid answer groups.
+            invalid_states: List[Dict[str, object]]. List of invalid states
+            with the invalid answer groups.
         """
         invalid_states = []
         for state_name, state in states_dict.items():
@@ -313,17 +311,17 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
             valid_dest_ans_group_count = 0
             invalid_ans_groups = []
             for ans_group_idx, answer_group in enumerate(answer_groups):
-                if answer_group.outcome.dest == state_name:
-                    continue
-                valid_dest_ans_group_count += 1
-                can_delete_ans_group = (
-                    ExpAuditRuleChecksJob._filter_invalid_numeric_ans_group(
-                        answer_group)
-                )
+                if not answer_group.outcome.dest == state_name:
+                    valid_dest_ans_group_count += 1
+                    can_delete_ans_group = (
+                        ExpAuditRuleChecksJob.
+                        _filter_invalid_numeric_ans_group(
+                            answer_group)
+                    )
 
-                if can_delete_ans_group:
-                    invalid_ans_group_count += 1
-                    invalid_ans_groups.append(ans_group_idx)
+                    if can_delete_ans_group:
+                        invalid_ans_group_count += 1
+                        invalid_ans_groups.append(ans_group_idx)
 
             if (
                 invalid_ans_group_count == valid_dest_ans_group_count and
@@ -524,15 +522,13 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
         # Continue Text should be non-empty and have a max-length of 20.
         filter_invalid_continue_text_values = (
             all_explorations
-            | 'Get continue text language code values' >> beam.Map(
-                lambda exp: (
-                    exp.id, self.continue_interac_text_value_language(
-                        exp.states, exp.language_code),
-                    exp.created_on.date()
-                )
+            | 'Filter invalid continue interaction explorations'
+            >> beam.Filter(
+                lambda exp: self.filter_invalid_continue_interaction_exps(
+                    exp.states)
             )
-            | 'Remove empty values of continue interaction' >> beam.Filter(
-                lambda exp: len(exp[1]) > 0
+            | 'Map exp id, language code and created on date' >> beam.Map(
+                lambda exp: (exp.id, exp.language_code, exp.created_on.date())
             )
         )
 
@@ -543,8 +539,8 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                     job_run_result.JobRunResult.as_stderr(
                        f'The id of exp is {exp_id}, '
                        f'created on {exp_created_on}, and the '
-                       f'invalid continue interaction language codes '
-                       f'are {cont_lang}'
+                       f'invalid continue interaction language code '
+                       f'is {cont_lang}'
                     )
                 )
             )
