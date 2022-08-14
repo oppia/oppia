@@ -191,6 +191,19 @@ var urlRedirection = async function(url) {
     });
 };
 
+var numberOfElementsToBe = async function(
+    elementSelector, elementName, number) {
+  await browser.waitUntil(async function() {
+    var element = await $$(elementSelector);
+    return element.length === number;
+  },
+  {
+    timeout: DEFAULT_WAIT_TIME_MSECS,
+    timeoutMsg: `Number of ${elementName} is not equal to ${number}\n` +
+    new Error().stack + '\n'
+  });
+};
+
 var visibilityOfInfoToast = async function(errorMessage) {
   var toastInfoElement = $('.toast-info');
   await visibilityOf(toastInfoElement, errorMessage);
@@ -276,4 +289,5 @@ exports.modalPopupToAppear = modalPopupToAppear;
 exports.fileToBeDownloaded = fileToBeDownloaded;
 exports.newTabToBeCreated = newTabToBeCreated;
 exports.urlRedirection = urlRedirection;
+exports.numberOfElementsToBe = numberOfElementsToBe;
 exports.clientSideRedirection = clientSideRedirection;
