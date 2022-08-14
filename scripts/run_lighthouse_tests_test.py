@@ -16,14 +16,11 @@
 
 from __future__ import annotations
 
-import argparse
 import builtins
-import contextlib
 import os
 import subprocess
 import sys
 
-from core.constants import constants
 from core.tests import test_utils
 from scripts import build
 from scripts import common
@@ -274,9 +271,6 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             'Lighthouse checks completed successfully.', self.print_arr)
 
     def test_run_lighthouse_tests_in_performance_mode(self) -> None:
-        swap_build = self.swap_with_checks(
-            build, 'main', lambda args: None)
-
         class MockTask:
             returncode = 0
             def communicate(self) -> tuple[bytes, bytes]:   # pylint: disable=missing-docstring
@@ -289,6 +283,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             subprocess, 'Popen', mock_popen)
         swap_isdir = self.swap(
             os.path, 'isdir', lambda _: True)
+        swap_build = self.swap(build, 'main', lambda args: None)
 
         with self.print_swap, self.swap_webpack_compiler, swap_isdir:
             with self.swap_elasticsearch_dev_server, self.swap_dev_appserver, swap_popen:
