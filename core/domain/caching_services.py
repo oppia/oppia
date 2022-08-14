@@ -30,7 +30,7 @@ from core.domain import topic_domain
 from core.platform import models
 
 from typing import (
-        Any, Callable, Dict, Final, List, Literal, TypedDict, cast, overload)
+        Any, Callable, Dict, Final, List, Literal, TypedDict, overload)
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -141,15 +141,10 @@ DESERIALIZATION_FUNCTIONS: DeserializationFunctionsDict = {
 }
 
 
-# Since we mapped this Dict with `SerializationFunctionsDict`. So, here
-# every 'x' in value belongs to some object, like CACHE_NAMESPACE_COLLECTION's
-# x is a collection object. When we call serialize method on it, Mypy expects
-# it to be a typed call. So, to remove un-typed-call error ignore statement
-# is placed temporarily. Untill all classes are typed.
 SERIALIZATION_FUNCTIONS: SerializationFunctionsDict = {
     CACHE_NAMESPACE_COLLECTION: lambda x: x.serialize(),
-    CACHE_NAMESPACE_EXPLORATION: lambda x: cast(str, x.serialize()), # type: ignore[no-untyped-call]
-    CACHE_NAMESPACE_SKILL: lambda x: cast(str, x.serialize()), # type: ignore[no-untyped-call]
+    CACHE_NAMESPACE_EXPLORATION: lambda x: x.serialize(),
+    CACHE_NAMESPACE_SKILL: lambda x: x.serialize(),
     CACHE_NAMESPACE_STORY: lambda x: x.serialize(),
     CACHE_NAMESPACE_TOPIC: lambda x: x.serialize(),
     CACHE_NAMESPACE_PLATFORM_PARAMETER: lambda x: x.serialize(),

@@ -28,11 +28,13 @@ from core.domain import state_domain
 from core.domain import translation_domain
 from core.tests import test_utils
 
+from typing import Dict, List, Union
+
 
 class QuestionChangeTest(test_utils.GenericTestBase):
     """Test for Question Change object."""
 
-    def test_to_dict(self):
+    def test_to_dict(self) -> None:
         """Test to verify to_dict method of the Question Change object."""
         expected_object_dict = {
             'cmd': 'update_question_property',
@@ -53,7 +55,7 @@ class QuestionChangeTest(test_utils.GenericTestBase):
 
         self.assertEqual(expected_object_dict, observed_object.to_dict())
 
-    def test_change_dict_without_cmd(self):
+    def test_change_dict_without_cmd(self) -> None:
         """Test to verify __init__ method of the Question Change object
         when change_dict is without cmd key.
         """
@@ -65,7 +67,7 @@ class QuestionChangeTest(test_utils.GenericTestBase):
         ):
             question_domain.QuestionChange(change_dict)
 
-    def test_change_dict_with_wrong_cmd(self):
+    def test_change_dict_with_wrong_cmd(self) -> None:
         """Test to verify __init__ method of the Question Change object
         when change_dict is with wrong cmd value.
         """
@@ -77,7 +79,7 @@ class QuestionChangeTest(test_utils.GenericTestBase):
         ):
             question_domain.QuestionChange(change_dict)
 
-    def test_change_dict_with_missing_attributes_in_cmd(self):
+    def test_change_dict_with_missing_attributes_in_cmd(self) -> None:
         """Test to verify __init__ method of the Question Change object
         when change_dict is with missing attributes in cmd.
         """
@@ -93,7 +95,7 @@ class QuestionChangeTest(test_utils.GenericTestBase):
         ):
             question_domain.QuestionChange(change_dict)
 
-    def test_change_dict_with_extra_attributes_in_cmd(self):
+    def test_change_dict_with_extra_attributes_in_cmd(self) -> None:
         """Test to verify __init__ method of the Question Change object
         when change_dict is with extra attributes in cmd.
         """
@@ -105,7 +107,7 @@ class QuestionChangeTest(test_utils.GenericTestBase):
         ):
             question_domain.QuestionChange(change_dict)
 
-    def test_update_question_property_with_wrong_property_name(self):
+    def test_update_question_property_with_wrong_property_name(self) -> None:
         """Test to verify __init__ method of the Question Change object
         when cmd is update_question_property and wrong property_name is given.
         """
@@ -123,7 +125,7 @@ class QuestionChangeTest(test_utils.GenericTestBase):
         ):
             question_domain.QuestionChange(change_dict)
 
-    def test_create_new(self):
+    def test_create_new(self) -> None:
         """Test to verify __init__ method of the Question Change object
         when cmd is create_new.
         """
@@ -136,7 +138,7 @@ class QuestionChangeTest(test_utils.GenericTestBase):
 
         self.assertEqual('create_new', observed_object.cmd)
 
-    def test_update_question_property(self):
+    def test_update_question_property(self) -> None:
         """Test to verify __init__ method of the Question Change object
         when cmd is update_question_property.
         """
@@ -155,13 +157,14 @@ class QuestionChangeTest(test_utils.GenericTestBase):
         self.assertEqual('new_value', observed_object.new_value)
         self.assertEqual('old_value', observed_object.old_value)
 
-    def test_create_new_fully_specified_question(self):
+    def test_create_new_fully_specified_question(self) -> None:
         """Test to verify __init__ method of the Question Change object
         when cmd is create_new_fully_specified_question.
         """
-        change_dict = {
+        test_question_dict: Dict[str, str] = {}
+        change_dict: Dict[str, Union[str, Dict[str, str]]] = {
             'cmd': 'create_new_fully_specified_question',
-            'question_dict': {},
+            'question_dict': test_question_dict,
             'skill_id': '10',
         }
         observed_object = question_domain.QuestionChange(
@@ -173,11 +176,11 @@ class QuestionChangeTest(test_utils.GenericTestBase):
         self.assertEqual('10', observed_object.skill_id)
         self.assertEqual({}, observed_object.question_dict)
 
-    def test_migrate_state_schema_to_latest_version(self):
+    def test_migrate_state_schema_to_latest_version(self) -> None:
         """Test to verify __init__ method of the Question Change object
         when cmd is migrate_state_schema_to_latest_version.
         """
-        change_dict = {
+        change_dict: Dict[str, Union[str, int]] = {
             'cmd': 'migrate_state_schema_to_latest_version',
             'from_version': 0,
             'to_version': 10,
@@ -195,7 +198,7 @@ class QuestionChangeTest(test_utils.GenericTestBase):
 class QuestionSuggestionChangeTest(test_utils.GenericTestBase):
     """Test for QuestionSuggestionChange object."""
 
-    def test_to_dict(self):
+    def test_to_dict(self) -> None:
         """Test to verify to_dict method of the Question Change object."""
         expected_object_dict = {
             'cmd': 'create_new_fully_specified_question',
@@ -216,7 +219,7 @@ class QuestionSuggestionChangeTest(test_utils.GenericTestBase):
 
         self.assertEqual(expected_object_dict, observed_object.to_dict())
 
-    def test_change_dict_without_cmd(self):
+    def test_change_dict_without_cmd(self) -> None:
         """Test to verify __init__ method of the QuestionSuggestionChange
         object when change_dict is without cmd key.
         """
@@ -228,7 +231,7 @@ class QuestionSuggestionChangeTest(test_utils.GenericTestBase):
         ):
             question_domain.QuestionSuggestionChange(change_dict)
 
-    def test_change_dict_with_wrong_cmd(self):
+    def test_change_dict_with_wrong_cmd(self) -> None:
         """Test to verify __init__ method of the QuestionSuggestionChange object
         when change_dict is with wrong cmd value.
         """
@@ -240,7 +243,7 @@ class QuestionSuggestionChangeTest(test_utils.GenericTestBase):
         ):
             question_domain.QuestionSuggestionChange(change_dict)
 
-    def test_change_dict_with_missing_attributes_in_cmd(self):
+    def test_change_dict_with_missing_attributes_in_cmd(self) -> None:
         """Test to verify __init__ method of the QuestionSuggestionChange object
         when change_dict is with missing attributes in cmd.
         """
@@ -255,7 +258,7 @@ class QuestionSuggestionChangeTest(test_utils.GenericTestBase):
         ):
             question_domain.QuestionSuggestionChange(change_dict)
 
-    def test_change_dict_with_extra_attributes_in_cmd(self):
+    def test_change_dict_with_extra_attributes_in_cmd(self) -> None:
         """Test to verify __init__ method of the QuestionSuggestionChange object
         when change_dict is with extra attributes in cmd.
         """
@@ -273,11 +276,11 @@ class QuestionSuggestionChangeTest(test_utils.GenericTestBase):
         ):
             question_domain.QuestionSuggestionChange(change_dict)
 
-    def test_create_new_fully_specified_question(self):
+    def test_create_new_fully_specified_question(self) -> None:
         """Test to verify __init__ method of the QuestionSuggestionChange object
         when cmd is create_new_fully_specified_question.
         """
-        change_dict = {
+        change_dict: Dict[str, Union[str, Dict[str, str]]] = {
             'cmd': 'create_new_fully_specified_question',
             'question_dict': {},
             'skill_id': '10',
@@ -296,7 +299,7 @@ class QuestionSuggestionChangeTest(test_utils.GenericTestBase):
 class QuestionDomainTest(test_utils.GenericTestBase):
     """Tests for Question domain object."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Before each individual test, create a question."""
         super().setUp()
         question_state_data = self._create_valid_question_data('ABC')
@@ -312,13 +315,13 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             'exp_id', feconf.TranslatableEntityType.EXPLORATION, 1, 'en',
             translation_dict)
 
-    def test_to_and_from_dict(self):
+    def test_to_and_from_dict(self) -> None:
         """Test to verify to_dict and from_dict methods
         of Question domain object.
         """
         default_question_state_data = (
             question_domain.Question.create_default_question_state())
-        question_dict = {
+        question_dict: question_domain.QuestionDict = {
             'id': 'col1.random',
             'question_state_data': default_question_state_data.to_dict(),
             'question_state_data_schema_version': (
@@ -332,42 +335,56 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         observed_object = question_domain.Question.from_dict(question_dict)
         self.assertEqual(question_dict, observed_object.to_dict())
 
-    def _assert_validation_error(self, expected_error_substring):
+    def _assert_question_domain_validation_error(
+        self, expected_error_substring: str
+    ) -> None:
         """Checks that the skill passes strict validation."""
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, expected_error_substring
         ):
             self.question.validate()
 
-    def test_strict_validation(self):
+    def test_strict_validation(self) -> None:
         """Test to verify validate method of Question domain object with
         strict as True.
         """
         state = self.question.question_state_data
+
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
         state.interaction.solution = None
-        self._assert_validation_error(
+        self._assert_question_domain_validation_error(
             'Expected the question to have a solution')
         state.interaction.hints = []
-        self._assert_validation_error(
+        self._assert_question_domain_validation_error(
             'Expected the question to have at least one hint')
         state.interaction.default_outcome.dest = 'abc'
-        self._assert_validation_error(
+        self._assert_question_domain_validation_error(
             'Expected all answer groups to have destination as None.')
-        state.interaction.default_outcome.dest = None
+
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
+        state.interaction.default_outcome.dest = None  # type: ignore[assignment]
         state.interaction.default_outcome.dest_if_really_stuck = 'pqr'
-        self._assert_validation_error(
+        self._assert_question_domain_validation_error(
             'Expected all answer groups to have destination for the '
             'stuck learner as None.')
         state.interaction.default_outcome.labelled_as_correct = False
-        self._assert_validation_error(
+        self._assert_question_domain_validation_error(
             'Expected at least one answer group to have a correct answer')
 
-    def test_strict_validation_for_answer_groups(self):
+    def test_strict_validation_for_answer_groups(self) -> None:
         """Test to verify validate method of Question domain object with
         strict as True for interaction with answer group.
         """
         state = self.question.question_state_data
         state.interaction.default_outcome.labelled_as_correct = False
+        rule_spec_input_test_dict: Dict[str, Union[str, List[str]]] = {
+            'contentId': 'rule_input_4',
+            'normalizedStrSet': ['Test']
+        }
         state.interaction.answer_groups = [
             state_domain.AnswerGroup.from_dict({
                 'outcome': {
@@ -384,10 +401,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                 },
                 'rule_specs': [{
                     'inputs': {
-                        'x': {
-                            'contentId': 'rule_input_4',
-                            'normalizedStrSet': ['Test']
-                        }
+                        'x': rule_spec_input_test_dict
                     },
                     'rule_type': 'Contains'
                 }],
@@ -396,7 +410,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             })
         ]
 
-        self._assert_validation_error(
+        self._assert_question_domain_validation_error(
             'Expected all answer groups to have destination as None.')
 
         state.interaction.answer_groups = [
@@ -415,10 +429,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                 },
                 'rule_specs': [{
                     'inputs': {
-                        'x': {
-                            'contentId': 'rule_input_4',
-                            'normalizedStrSet': ['Test']
-                        }
+                        'x': rule_spec_input_test_dict
                     },
                     'rule_type': 'Contains'
                 }],
@@ -427,112 +438,152 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             })
         ]
 
-        self._assert_validation_error(
+        self._assert_question_domain_validation_error(
             'Expected all answer groups to have destination for the '
             'stuck learner as None.')
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_validate_invalid_list_of_inapplicable_skill_misconception_ids(
-            self):
+        self
+    ) -> None:
         """Test to verify that the validation fails when
         inapplicable_skill_misconception_ids value is an invalid list.
         """
-        self.question.inapplicable_skill_misconception_ids = ['Test', 1]
-        self._assert_validation_error(
+        self.question.inapplicable_skill_misconception_ids = ['Test', 1]  # type: ignore[list-item]
+        self._assert_question_domain_validation_error(
             re.escape(
                 'Expected inapplicable_skill_misconception_ids to be a list of '
                 'strings, received [\'Test\', 1]'))
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_validate_invalid_type_of_inapplicable_skill_misconception_ids(
-            self):
+        self
+    ) -> None:
         """Test to verify that the validation fails when
         inapplicable_skill_misconception_ids value is an invalid type.
         """
-        self.question.inapplicable_skill_misconception_ids = 123
-        self._assert_validation_error(
+        self.question.inapplicable_skill_misconception_ids = 123  # type: ignore[assignment]
+        self._assert_question_domain_validation_error(
             'Expected inapplicable_skill_misconception_ids to be a list of '
             'strings, received 123')
 
     def test_validate_invalid_format_of_inapplicable_skill_misconception_ids(
-            self):
+        self
+    ) -> None:
         """Test to verify that the validation fails when
         inapplicable_skill_misconception_ids value is an invalid format i.e.
         it is not of the form <skill-id>-<misconception-id>.
         """
         self.question.inapplicable_skill_misconception_ids = ['abc', 'def']
-        self._assert_validation_error(
+        self._assert_question_domain_validation_error(
             re.escape(
                 'Expected inapplicable_skill_misconception_ids to be a list '
                 'of strings of the format <skill_id>-<misconception_id>, '
                 'received [\'abc\', \'def\']'))
 
     def test_validate_duplicate_inapplicable_skill_misconception_ids_list(
-            self):
+        self
+    ) -> None:
         """Test to verify that the validation fails when
         inapplicable_skill_misconception_ids list is has duplicate values.
         """
         self.question.inapplicable_skill_misconception_ids = [
             'skillid12345-1', 'skillid12345-1']
-        self._assert_validation_error(
+        self._assert_question_domain_validation_error(
             'inapplicable_skill_misconception_ids has duplicate values')
 
-    def test_strict_validation_passes(self):
+    def test_strict_validation_passes(self) -> None:
         """Test to verify validate method of a finalized Question domain object
         with correct input.
         """
         self.question.validate()
 
-    def test_not_strict_validation(self):
+    def test_not_strict_validation(self) -> None:
         """Test to verify validate method of Question domain object with
         strict as False.
         """
         self.question.language_code = 'abc'
-        self._assert_validation_error('Invalid language code')
+        self._assert_question_domain_validation_error('Invalid language code')
 
-        self.question.question_state_data = 'State data'
-        self._assert_validation_error(
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
+        self.question.question_state_data = 'State data'  # type: ignore[assignment]
+        self._assert_question_domain_validation_error(
             'Expected question state data to be a State object')
 
-        self.question.question_state_data_schema_version = 'abc'
-        self._assert_validation_error(
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
+        self.question.question_state_data_schema_version = 'abc'  # type: ignore[assignment]
+        self._assert_question_domain_validation_error(
             'Expected schema version to be an integer')
 
         self.question.question_state_data_schema_version = 45
-        self._assert_validation_error(
+        self._assert_question_domain_validation_error(
             'Expected question state schema version to be %s, received '
                 '%s' % (
                     feconf.CURRENT_STATE_SCHEMA_VERSION,
                     self.question.question_state_data_schema_version))
 
-        self.question.linked_skill_ids = 'Test'
-        self._assert_validation_error(
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
+        self.question.linked_skill_ids = 'Test'  # type: ignore[assignment]
+        self._assert_question_domain_validation_error(
             'Expected linked_skill_ids to be a list of strings')
 
-        self.question.linked_skill_ids = None
-        self._assert_validation_error(
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
+        self.question.linked_skill_ids = None  # type: ignore[assignment]
+        self._assert_question_domain_validation_error(
             'inked_skill_ids is either null or an empty list')
 
         self.question.linked_skill_ids = []
-        self._assert_validation_error(
+        self._assert_question_domain_validation_error(
             'linked_skill_ids is either null or an empty list')
 
-        self.question.linked_skill_ids = ['Test', 1]
-        self._assert_validation_error(
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
+        self.question.linked_skill_ids = ['Test', 1]  # type: ignore[list-item]
+        self._assert_question_domain_validation_error(
             'Expected linked_skill_ids to be a list of strings')
 
         self.question.linked_skill_ids = ['skill1', 'skill1']
-        self._assert_validation_error(
+        self._assert_question_domain_validation_error(
             'linked_skill_ids has duplicate skill ids')
 
-        self.question.language_code = 1
-        self._assert_validation_error('Expected language_code to be a string')
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
+        self.question.language_code = 1  # type: ignore[assignment]
+        self._assert_question_domain_validation_error(
+            'Expected language_code to be a string'
+        )
 
-        self.question.version = 'abc'
-        self._assert_validation_error('Expected version to be an integer')
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
+        self.question.version = 'abc'  # type: ignore[assignment]
+        self._assert_question_domain_validation_error(
+            'Expected version to be an integer'
+        )
 
-        self.question.id = 123
-        self._assert_validation_error('Expected ID to be a string')
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
+        self.question.id = 123  # type: ignore[assignment]
+        self._assert_question_domain_validation_error(
+            'Expected ID to be a string'
+        )
 
-    def test_create_default_question(self):
+    def test_create_default_question(self) -> None:
         """Test to verify create_default_question method of the Question domain
         object.
         """
@@ -550,7 +601,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self.assertEqual(question.version, 0)
         self.assertEqual(question.linked_skill_ids, skill_ids)
 
-    def test_update_language_code(self):
+    def test_update_language_code(self) -> None:
         """Test to verify update_language_code method of the Question domain
         object.
         """
@@ -558,7 +609,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
         self.assertEqual('pl', self.question.language_code)
 
-    def test_update_linked_skill_ids(self):
+    def test_update_linked_skill_ids(self) -> None:
         """Test to verify update_linked_skill_ids method of the Question domain
         object.
         """
@@ -566,7 +617,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
         self.assertEqual(['skill_id1'], self.question.linked_skill_ids)
 
-    def test_update_inapplicable_skill_misconception_ids(self):
+    def test_update_inapplicable_skill_misconception_ids(self) -> None:
         """Test to verify update_inapplicable_skill_misconception_ids method
         of the Question domain object.
         """
@@ -579,7 +630,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             ['skillid-misconceptionid'],
             self.question.inapplicable_skill_misconception_ids)
 
-    def test_update_question_state_data(self):
+    def test_update_question_state_data(self) -> None:
         """Test to verify update_question_state_data method of the Question
         domain object.
         """
@@ -592,18 +643,25 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             self.question.question_state_data.to_dict()
         )
 
-    def test_question_state_dict_conversion_from_v27_to_v28(self):
+    def test_question_state_dict_conversion_from_v27_to_v28(self) -> None:
         question_data = (
             question_domain.Question.create_default_question_state().to_dict())
 
         test_data = question_data['recorded_voiceovers']
-        question_data['content_ids_to_audio_translations'] = (
+        # Here we are defining an older version dictionary of state which
+        # contains `content_ids_to_audio_translations` key, but question_data
+        # is of type StateDict ( latest version dictionary for state ) and
+        # StateDict do not contain `content_ids_to_audio_translations` key,
+        # due to this MyPy throws an `TypedDict "StateDict" has no key` error.
+        # Thus to avoid the error, we used ignore here.
+        question_data['content_ids_to_audio_translations'] = (  # type: ignore[misc]
             test_data['voiceovers_mapping'])
 
+        # MyPy doesn't allow key deletion from TypedDict, thus we add an ignore.
         # Removing 'recorded_voiceovers' from question_data.
-        del question_data['recorded_voiceovers']
+        del question_data['recorded_voiceovers']  # type: ignore[misc]
 
-        test_value = {
+        test_value: question_domain.VersionedQuestionStateDict = {
             'state': question_data,
             'state_schema_version': 27
         }
@@ -618,14 +676,15 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self.assertEqual(
             test_value['state']['recorded_voiceovers'], test_data)
 
-    def test_question_state_dict_conversion_from_v28_to_v29(self):
+    def test_question_state_dict_conversion_from_v28_to_v29(self) -> None:
         question_data = (
             question_domain.Question.create_default_question_state().to_dict())
 
+        # MyPy doesn't allow key deletion from TypedDict, thus we add an ignore.
         # Removing 'solicit_answer_details' from question_data.
-        del question_data['solicit_answer_details']
+        del question_data['solicit_answer_details']  # type: ignore[misc]
 
-        test_value = {
+        test_value: question_domain.VersionedQuestionStateDict = {
             'state': question_data,
             'state_schema_version': 28
         }
@@ -640,17 +699,23 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self.assertEqual(
             test_value['state']['solicit_answer_details'], False)
 
-    def test_question_state_dict_conversion_from_v29_to_v30(self):
+    def test_question_state_dict_conversion_from_v29_to_v30(self) -> None:
         question_data = (
             question_domain.Question.create_default_question_state().to_dict())
 
+        # Here, the expected type for `answer_groups` key is AnswerGroupDict but
+        # for testing purposes we are providing a dictionary which contains
+        # `tagged_misconception_id` key and this `tagged_misconception_id` key
+        # is not defined in AnswerGroupDict. So, due to this MyPy throws an
+        # `Extra key 'tagged_misconception_id' for TypedDict "AnswerGroupDict"`
+        # error. Thus to avoid the error, we used ignore here.
         question_data['interaction']['answer_groups'] = [
-            {
+            {  # type: ignore[typeddict-item]
                 'tagged_misconception_id': 1
             }
         ]
 
-        test_value = {
+        test_value: question_domain.VersionedQuestionStateDict = {
             'state': question_data,
             'state_schema_version': 29
         }
@@ -675,17 +740,22 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self.assertIsNone(test_value['state']['interaction'][
             'answer_groups'][0]['tagged_skill_misconception_id'])
 
-    def test_question_state_dict_conversion_from_v30_to_v31(self):
+    def test_question_state_dict_conversion_from_v30_to_v31(self) -> None:
         question_data = (
             question_domain.Question.create_default_question_state().to_dict())
 
+        # For testing purposes here we are defining an empty VoiceoverDict,
+        # Because here we are checking when this dict passes throw conversion
+        # functions, keys are populated automatically or not. So, due to the
+        # absence of keys MyPy throws an `Missing key` error. Thus to avoid
+        # the error, we used ignore here.
         question_data['recorded_voiceovers']['voiceovers_mapping'] = {
             'content': {
-                'audio_metadata': {}
+                'audio_metadata': {}  # type: ignore[typeddict-item]
             }
         }
 
-        test_value = {
+        test_value: question_domain.VersionedQuestionStateDict = {
             'state': question_data,
             'state_schema_version': 30
         }
@@ -711,13 +781,13 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             0.0
         )
 
-    def test_question_state_dict_conversion_from_v31_to_v32(self):
+    def test_question_state_dict_conversion_from_v31_to_v32(self) -> None:
         question_data = (
             question_domain.Question.create_default_question_state().to_dict())
 
         question_data['interaction']['id'] = 'SetInput'
 
-        test_value = {
+        test_value: question_domain.VersionedQuestionStateDict = {
             'state': question_data,
             'state_schema_version': 31
         }
@@ -738,13 +808,13 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             }
         )
 
-    def test_question_state_dict_conversion_from_v32_to_v33(self):
+    def test_question_state_dict_conversion_from_v32_to_v33(self) -> None:
         question_data = (
             question_domain.Question.create_default_question_state().to_dict())
 
         question_data['interaction']['id'] = 'MultipleChoiceInput'
 
-        test_value = {
+        test_value: question_domain.VersionedQuestionStateDict = {
             'state': question_data,
             'state_schema_version': 32
         }
@@ -765,7 +835,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             }
         )
 
-    def test_question_state_dict_conversion_from_v33_to_v34(self):
+    def test_question_state_dict_conversion_from_v33_to_v34(self) -> None:
         question_data = (
             question_domain.Question.create_default_question_state().to_dict())
 
@@ -773,7 +843,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         question_data['interaction']['default_outcome'][
             'feedback']['html'] = '<br/>'
 
-        test_value = {
+        test_value: question_domain.VersionedQuestionStateDict = {
             'state': question_data,
             'state_schema_version': 33
         }
@@ -798,8 +868,8 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             '<br>'
         )
 
-    def test_question_state_dict_conversion_from_v34_to_v35(self):
-        question_data = (
+    def test_question_state_dict_conversion_from_v34_to_v35(self) -> None:
+        question_data: state_domain.StateDict = (
             question_domain.Question.create_default_question_state().to_dict())
 
         question_data['interaction']['id'] = 'MathExpressionInput'
@@ -813,8 +883,13 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                 'html': '<p>This is a solution.</p>'
             }
         }
+        # Here, we are defining AnswerGroupDict and while defining
+        # AnswerGroupDict MyPy expects that all keys are defined, but for
+        # testing purposes here we are defining only rule_specs and outcome
+        # key which causes MyPy to throw `Missing keys' error. Thus to avoid
+        # the error, we used ignore here.
         question_data['interaction']['answer_groups'] = [
-            {
+            {  # type: ignore[typeddict-item]
                 'rule_specs': [{
                     'inputs': {
                         'x': '1',
@@ -828,7 +903,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                     }
                 },
             },
-            {
+            {  # type: ignore[typeddict-item]
                 'rule_specs': [{
                     'inputs': {
                         'x': 'x+1',
@@ -842,7 +917,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                     }
                 },
             },
-            {
+            {  # type: ignore[typeddict-item]
                 'rule_specs': [{
                     'inputs': {
                         'x': 'x=1',
@@ -856,7 +931,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                     }
                 },
             },
-            {
+            {  # type: ignore[typeddict-item]
                 'rule_specs': [],
                 'outcome': {
                     'feedback': {
@@ -872,7 +947,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             'temp_id': {}, 'temp_id_2': {}, 'temp_id_3': {}, 'temp_id_4': {}
         }
 
-        test_value = {
+        test_value: question_domain.VersionedQuestionStateDict = {
             'state': question_data,
             'state_schema_version': 34
         }
@@ -910,6 +985,8 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                 'outcome']['feedback']['content_id'],
             'temp_id_3'
         )
+        # Ruling out the possibility of None for mypy type checking.
+        assert test_value['state']['interaction']['solution'] is not None
         self.assertNotIn(
             'ascii',
             test_value['state']['interaction']['solution']['correct_answer']
@@ -927,8 +1004,13 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                 'html': '<p>This is a solution.</p>'
             }
         }
+        # Here, we are defining AnswerGroupDict and while defining
+        # AnswerGroupDict MyPy expects that all keys are defined, but for
+        # testing purposes here we are defining only rule_specs and outcome
+        # key which causes MyPy to throw `Missing keys' error. Thus to avoid
+        # the error, we used ignore here.
         test_value['state']['interaction']['answer_groups'] = [
-            {
+            {  # type: ignore[typeddict-item]
                 'rule_specs': [{
                     'inputs': {
                         'x': 'x+1',
@@ -981,8 +1063,13 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                 'html': '<p>This is a solution.</p>'
             }
         }
+        # Here, we are defining AnswerGroupDict and while defining
+        # AnswerGroupDict MyPy expects that all keys are defined, but for
+        # testing purposes here we are defining only rule_specs and outcome
+        # key which causes MyPy to throw `Missing keys' error. Thus to avoid
+        # the error, we used ignore here.
         test_value['state']['interaction']['answer_groups'] = [
-            {
+            {  # type: ignore[typeddict-item]
                 'rule_specs': [{
                     'inputs': {
                         'x': '1',
@@ -1023,24 +1110,31 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             'MatchesExactlyWith'
         )
 
-    def test_question_state_dict_conversion_from_v35_to_v36(self):
-        question_data = (
+    def test_question_state_dict_conversion_from_v35_to_v36(self) -> None:
+        question_data: state_domain.StateDict = (
             question_domain.Question.create_default_question_state().to_dict())
 
+        # Here we are defining WrittenTranslationDict and WrittenTranslationDict
+        # do not accept 'html' key, because the latest version of
+        # WrittenTranslation does not have any `html` attribute, but for testing
+        # purposes here we are defining an older version of WrittenTranslation
+        # for which we have to provide `html` key. So, due to this MyPy throws
+        # an `Extra key 'html' for TypedDict` error. Thus to avoid the error,
+        # we used ignore here.
         question_data['written_translations']['translations_mapping'] = {
             'temp_id_1': {
-                'en': {
+                'en': {  # type: ignore[typeddict-item]
                     'html': 'html_body_1'
                 }
             },
             'temp_id_2': {
-                'en': {
+                'en': {  # type: ignore[typeddict-item]
                     'html': 'html_body_2'
                 }
             }
         }
 
-        test_value = {
+        test_value: question_domain.VersionedQuestionStateDict = {
             'state': question_data,
             'state_schema_version': 35
         }
@@ -1069,14 +1163,22 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         test_value['state']['interaction']['customization_args'] = {
             'initial_code': {}
         }
+
+        # Here we are defining WrittenTranslationDict and WrittenTranslationDict
+        # do not accept 'html' key, because the latest version of
+        # WrittenTranslation does not have any `html` attribute, but for testing
+        # purposes here we are defining an older version of WrittenTranslation
+        # for which we have to provide `html` key. So, due to this MyPy throws
+        # an `Extra key 'html' for TypedDict` error. Thus to avoid the error,
+        # we used ignore here.
         test_value['state']['written_translations']['translations_mapping'] = {
             'temp_id_1': {
-                'en': {
+                'en': {  # type: ignore[typeddict-item]
                     'html': 'html_body_1'
                 }
             },
             'temp_id_2': {
-                'en': {
+                'en': {  # type: ignore[typeddict-item]
                     'html': 'html_body_2'
                 }
             }
@@ -1110,14 +1212,22 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                 'value': 'temp_value_1'
             }
         }
+
+        # Here we are defining WrittenTranslationDict and WrittenTranslationDict
+        # do not accept 'html' key, because the latest version of
+        # WrittenTranslation does not have any `html` attribute, but for testing
+        # purposes here we are defining an older version of WrittenTranslation
+        # for which we have to provide `html` key. So, Due to this MyPy throwing
+        # an `Extra key 'html' for TypedDict` error. Thus to avoid the error,
+        # we used ignore here.
         test_value['state']['written_translations']['translations_mapping'] = {
             'temp_id_1': {
-                'en': {
+                'en': {  # type: ignore[typeddict-item]
                     'html': 'html_body_1'
                 }
             },
             'temp_id_2': {
-                'en': {
+                'en': {  # type: ignore[typeddict-item]
                     'html': 'html_body_2'
                 }
             }
@@ -1139,14 +1249,22 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                 'value': 'value_1'
             }
         }
+
+        # Here we are defining WrittenTranslationDict and WrittenTranslationDict
+        # do not accept 'html' key, because the latest version of
+        # WrittenTranslation does not have any `html` attribute, but for testing
+        # purposes here we are defining an older version of WrittenTranslation
+        # for which we have to provide `html` key. So, due to this MyPy throwing
+        # an `Extra key 'html' for TypedDict` error. Thus to avoid the error,
+        # we used ignore here.
         test_value['state']['written_translations']['translations_mapping'] = {
             'temp_id_1': {
-                'en': {
+                'en': {  # type: ignore[typeddict-item]
                     'html': 'html_body_1'
                 }
             },
             'temp_id_2': {
-                'en': {
+                'en': {  # type: ignore[typeddict-item]
                     'html': 'html_body_2'
                 }
             }
@@ -1204,14 +1322,22 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         # Testing with interaction id 'ItemSelectionInput'.
         test_value['state']['interaction']['id'] = 'ItemSelectionInput'
         test_value['state']['interaction']['customization_args'] = {}
+
+        # Here we are defining WrittenTranslationDict and WrittenTranslationDict
+        # do not accept 'html' key, because the latest version of
+        # WrittenTranslation does not have any `html` attribute, but for testing
+        # purposes here we are defining an older version of WrittenTranslation
+        # for which we have to provide `html` key. So, due to this MyPy throwing
+        # an `Extra key 'html' for TypedDict` error. Thus to avoid the error,
+        # we used ignore here.
         test_value['state']['written_translations']['translations_mapping'] = {
             'temp_id_1': {
-                'en': {
+                'en': {  # type: ignore[typeddict-item]
                     'html': 'html_body_1'
                 }
             },
             'temp_id_2': {
-                'en': {
+                'en': {  # type: ignore[typeddict-item]
                     'html': 'html_body_2'
                 }
             }
@@ -1257,18 +1383,33 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             }
         )
 
-    def test_question_state_dict_conversion_from_v36_to_v37(self):
+    def test_question_state_dict_conversion_from_v36_to_v37(self) -> None:
         question_data = (
             question_domain.Question.create_default_question_state().to_dict())
 
         question_data['interaction']['id'] = 'TextInput'
         question_data['interaction']['answer_groups'] = [{
             'rule_specs': [{
-                'rule_type': 'CaseSensitiveEquals'
-            }]
+                'rule_type': 'CaseSensitiveEquals',
+                'inputs': {'x': ''}
+            }],
+            'outcome': {
+                'dest': 'abc',
+                'dest_if_really_stuck': None,
+                'feedback': {
+                    'content_id': 'feedback_2',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': True,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
         }]
 
-        test_value = {
+        test_value: question_domain.VersionedQuestionStateDict = {
             'state': question_data,
             'state_schema_version': 36
         }
@@ -1283,7 +1424,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             'Equals'
         )
 
-    def test_question_state_dict_conversion_from_v37_to_v38(self):
+    def test_question_state_dict_conversion_from_v37_to_v38(self) -> None:
         question_data = (
             question_domain.Question.create_default_question_state().to_dict())
 
@@ -1292,12 +1433,27 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             'rule_specs': [{
                 'inputs': {
                     'x': 'variable=pi'
-                }
-            }]
+                },
+                'rule_type': ''
+            }],
+            'outcome': {
+                'dest': 'abc',
+                'dest_if_really_stuck': None,
+                'feedback': {
+                    'content_id': 'feedback_2',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': True,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
         }]
         question_data['interaction']['customization_args'] = {}
 
-        test_value = {
+        test_value: question_domain.VersionedQuestionStateDict = {
             'state': question_data,
             'state_schema_version': 37
         }
@@ -1315,7 +1471,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             }
         )
 
-    def test_question_state_dict_conversion_from_v38_to_v39(self):
+    def test_question_state_dict_conversion_from_v38_to_v39(self) -> None:
         question_data = (
             question_domain.Question.create_default_question_state().to_dict())
 
@@ -1324,7 +1480,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         question_data['recorded_voiceovers']['voiceovers_mapping'] = {}
         question_data['written_translations']['translations_mapping'] = {}
 
-        test_value = {
+        test_value: question_domain.VersionedQuestionStateDict = {
             'state': question_data,
             'state_schema_version': 38
         }
@@ -1354,7 +1510,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             {'ca_placeholder_0': {}}
         )
 
-    def test_question_state_dict_conversion_from_v39_to_v40(self):
+    def test_question_state_dict_conversion_from_v39_to_v40(self) -> None:
         question_data = (
             question_domain.Question.create_default_question_state().to_dict())
 
@@ -1365,10 +1521,24 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                     'x': 'variable=pi'
                 },
                 'rule_type': 'standard'
-            }]
+            }],
+            'outcome': {
+                'dest': 'abc',
+                'dest_if_really_stuck': None,
+                'feedback': {
+                    'content_id': 'feedback_2',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': True,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
         }]
 
-        test_value = {
+        test_value: question_domain.VersionedQuestionStateDict = {
             'state': question_data,
             'state_schema_version': 39
         }
@@ -1386,8 +1556,8 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             }
         )
 
-    def test_question_state_dict_conversion_from_v40_to_v41(self):
-        question_data = (
+    def test_question_state_dict_conversion_from_v40_to_v41(self) -> None:
+        question_data: state_domain.StateDict = (
             question_domain.Question.create_default_question_state().to_dict())
 
         question_data['interaction']['id'] = 'TextInput'
@@ -1397,13 +1567,27 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                 'inputs': {
                     'x': 'text'
                 },
-            }]
+            }],
+            'outcome': {
+                'dest': 'abc',
+                'dest_if_really_stuck': None,
+                'feedback': {
+                    'content_id': 'feedback_2',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': True,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
         }]
         question_data['next_content_id_index'] = 0
         question_data['recorded_voiceovers']['voiceovers_mapping'] = {}
         question_data['written_translations']['translations_mapping'] = {}
 
-        test_value = {
+        test_value: question_domain.VersionedQuestionStateDict = {
             'state': question_data,
             'state_schema_version': 40
         }
@@ -1437,8 +1621,22 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                 'rule_type': 'standard',
                 'inputs': {
                     'x': 'text'
+                }
+            }],
+            'outcome': {
+                'dest': 'abc',
+                'dest_if_really_stuck': None,
+                'feedback': {
+                    'content_id': 'feedback_2',
+                    'html': '<p>Feedback</p>'
                 },
-            }]
+                'labelled_as_correct': True,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
         }]
         test_value['state']['next_content_id_index'] = 0
         test_value['state']['recorded_voiceovers']['voiceovers_mapping'] = {}
@@ -1467,14 +1665,20 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             {'rule_input_0': {}}
         )
 
-    def test_question_state_dict_conversion_from_v41_to_v42(self):
+    def test_question_state_dict_conversion_from_v41_to_v42(self) -> None:
         question_data = (
             question_domain.Question.create_default_question_state().to_dict())
+        test_solution_dict: state_domain.SolutionDict = {
+            'correct_answer': ['correct_value'],
+            'explanation': {
+                'content_id': 'feedback_2',
+                'html': '<p>Feedback</p>'
+            },
+            'answer_is_exclusive': False
+        }
 
         question_data['interaction']['id'] = 'ItemSelectionInput'
-        question_data['interaction']['solution'] = {
-            'correct_answer': ['correct_value']
-        }
+        question_data['interaction']['solution'] = test_solution_dict
         question_data['interaction']['customization_args'] = {
             'choices': {
                 'value': [
@@ -1490,10 +1694,24 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                     'x': ['correct_value'],
                 },
                 'rule_type': 'IsEqualToOrdering'
-            }]
+            }],
+            'outcome': {
+                'dest': 'abc',
+                'dest_if_really_stuck': None,
+                'feedback': {
+                    'content_id': 'feedback_2',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': True,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
         }]
 
-        test_value = {
+        test_value: question_domain.VersionedQuestionStateDict = {
             'state': question_data,
             'state_schema_version': 41
         }
@@ -1509,14 +1727,12 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
         self.assertEqual(
             test_value['state']['interaction']['solution'],
-            {'correct_answer': ['content_id_1']}
+            test_solution_dict
         )
 
         # Testing with invalid 'x' input.
         test_value['state']['interaction']['id'] = 'ItemSelectionInput'
-        test_value['state']['interaction']['solution'] = {
-            'correct_answer': ['correct_value']
-        }
+        test_value['state']['interaction']['solution'] = test_solution_dict
         test_value['state']['interaction']['customization_args'] = {
             'choices': {
                 'value': [
@@ -1530,7 +1746,21 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                     'x': ['invalid_value'],
                 },
                 'rule_type': 'IsEqualToOrdering'
-            }]
+            }],
+            'outcome': {
+                'dest': 'abc',
+                'dest_if_really_stuck': None,
+                'feedback': {
+                    'content_id': 'feedback_2',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': True,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
         }]
         test_value['state_schema_version'] = 41
 
@@ -1545,14 +1775,12 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
         self.assertEqual(
             test_value['state']['interaction']['solution'],
-            {'correct_answer': ['content_id_1']}
+            test_solution_dict
         )
 
         # Testing with interaction id 'DragAndDropSortInput'.
         test_value['state']['interaction']['id'] = 'DragAndDropSortInput'
-        test_value['state']['interaction']['solution'] = {
-            'correct_answer': [['correct_value']]
-        }
+        test_value['state']['interaction']['solution'] = test_solution_dict
         test_value['state']['interaction']['customization_args'] = {
             'choices': {
                 'value': [
@@ -1583,7 +1811,21 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                     },
                     'rule_type': 'HasElementXBeforeElementY'
                 }
-            ]
+            ],
+            'outcome': {
+                'dest': 'abc',
+                'dest_if_really_stuck': None,
+                'feedback': {
+                    'content_id': 'feedback_2',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': True,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_skill_misconception_id': None
         }]
         test_value['state_schema_version'] = 41
 
@@ -1612,21 +1854,35 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                         },
                         'rule_type': 'HasElementXBeforeElementY'
                     }
-                ]
+                ],
+                'outcome': {
+                    'dest': 'abc',
+                    'dest_if_really_stuck': None,
+                    'feedback': {
+                        'content_id': 'feedback_2',
+                        'html': '<p>Feedback</p>'
+                    },
+                    'labelled_as_correct': True,
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None
+                },
+                'training_data': [],
+                'tagged_skill_misconception_id': None
             }
         )
         self.assertEqual(
             test_value['state']['interaction']['solution'],
-            {'correct_answer': [['content_id_1']]}
+            test_solution_dict
         )
 
-    def test_question_state_dict_conversion_from_v42_to_v43(self):
+    def test_question_state_dict_conversion_from_v42_to_v43(self) -> None:
         question_data = (
             question_domain.Question.create_default_question_state().to_dict())
 
         question_data['interaction']['id'] = 'NumericExpressionInput'
 
-        test_value = {
+        test_value: question_domain.VersionedQuestionStateDict = {
             'state': question_data,
             'state_schema_version': 42
         }
@@ -1649,12 +1905,14 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             }
         )
 
-    def test_question_state_dict_conversion_from_v43_to_v44(self):
+    def test_question_state_dict_conversion_from_v43_to_v44(self) -> None:
         question_data = (
             question_domain.Question.create_default_question_state().to_dict())
-        del question_data['card_is_checkpoint']
 
-        test_value = {
+        # MyPy doesn't allow key deletion from TypedDict, thus we add an ignore.
+        del question_data['card_is_checkpoint']  # type: ignore[misc]
+
+        test_value: question_domain.VersionedQuestionStateDict = {
             'state': question_data,
             'state_schema_version': 43
         }
@@ -1667,12 +1925,14 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self.assertEqual(test_value['state_schema_version'], 44)
         self.assertEqual(test_value['state']['card_is_checkpoint'], False)
 
-    def test_question_state_dict_conversion_from_v44_to_v45(self):
+    def test_question_state_dict_conversion_from_v44_to_v45(self) -> None:
         question_data = (
             question_domain.Question.create_default_question_state().to_dict())
-        del question_data['linked_skill_id']
 
-        test_value = {
+        # MyPy doesn't allow key deletion from TypedDict, thus we add an ignore.
+        del question_data['linked_skill_id']  # type: ignore[misc]
+
+        test_value: question_domain.VersionedQuestionStateDict = {
             'state': question_data,
             'state_schema_version': 44
         }
@@ -1685,11 +1945,11 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self.assertEqual(test_value['state_schema_version'], 45)
         self.assertIsNone(test_value['state']['linked_skill_id'])
 
-    def test_question_state_dict_conversion_from_v45_to_v46(self):
+    def test_question_state_dict_conversion_from_v45_to_v46(self) -> None:
         question_data = (
             question_domain.Question.create_default_question_state().to_dict())
 
-        test_value = {
+        test_value: question_domain.VersionedQuestionStateDict = {
             'state': question_data,
             'state_schema_version': 45
         }
@@ -1702,7 +1962,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self.assertEqual(test_value['state_schema_version'], 46)
         self.assertEqual(test_value['state'], initial_json)
 
-    def test_question_state_dict_conversion_from_v46_to_v47(self):
+    def test_question_state_dict_conversion_from_v46_to_v47(self) -> None:
         question_data = (
             question_domain.Question.create_default_question_state().to_dict())
 
@@ -1712,7 +1972,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             '</oppia-noninteractive-svgdiagram>'
         )
 
-        test_value = {
+        test_value: question_domain.VersionedQuestionStateDict = {
             'state': question_data,
             'state_schema_version': 46
         }
@@ -1729,13 +1989,13 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             '</oppia-noninteractive-image>'
         )
 
-    def test_question_state_dict_conversion_from_v47_to_v48(self):
+    def test_question_state_dict_conversion_from_v47_to_v48(self) -> None:
         question_data = (
             question_domain.Question.create_default_question_state().to_dict())
 
         question_data['content']['html'] = '&nbsp;'
 
-        test_value = {
+        test_value: question_domain.VersionedQuestionStateDict = {
             'state': question_data,
             'state_schema_version': 47
         }
@@ -1746,13 +2006,13 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self.assertEqual(test_value['state_schema_version'], 48)
         self.assertEqual(test_value['state']['content']['html'], ' ')
 
-    def test_question_state_dict_conversion_from_v48_to_v49(self):
+    def test_question_state_dict_conversion_from_v48_to_v49(self) -> None:
         question_data = (
             question_domain.Question.create_default_question_state().to_dict())
 
         question_data['interaction']['id'] = 'NumericInput'
 
-        test_value = {
+        test_value: question_domain.VersionedQuestionStateDict = {
             'state': question_data,
             'state_schema_version': 48
         }
@@ -1775,7 +2035,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             }
         )
 
-    def test_question_state_dict_conversion_from_v49_to_v50(self):
+    def test_question_state_dict_conversion_from_v49_to_v50(self) -> None:
         question_data = (
             question_domain.Question.create_default_question_state().to_dict())
 
@@ -1785,9 +2045,11 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                 'value': ['a', 'b', 'c']
             }
         }
+        inputs_variable_test_dict: List[str] = []
         question_data['interaction']['answer_groups'] = [{
             'outcome': {
                 'dest': 'abc',
+                'dest_if_really_stuck': None,
                 'feedback': {
                     'content_id': 'feedback_2',
                     'html': '<p>Feedback</p>'
@@ -1805,7 +2067,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             }, {
                 'inputs': {
                     'x': 'a - b',
-                    'y': []
+                    'y': inputs_variable_test_dict
                 },
                 'rule_type': 'MatchesExactlyWith'
             }],
@@ -1813,16 +2075,13 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             'tagged_skill_misconception_id': None
         }]
 
-        test_value = {
+        test_value: question_domain.VersionedQuestionStateDict = {
             'state': question_data,
             'state_schema_version': 49
         }
-
         question_domain.Question.update_state_from_model(
             test_value, test_value['state_schema_version'])
-
         self.assertEqual(test_value['state_schema_version'], 50)
-
         rule_specs = test_value[
             'state']['interaction']['answer_groups'][0]['rule_specs']
         self.assertEqual(len(rule_specs), 1)
@@ -1835,7 +2094,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             }
         )
 
-    def test_get_all_translatable_content_for_question(self):
+    def test_get_all_translatable_content_for_question(self) -> None:
         """Get all translatable fields from exploration."""
         translatable_contents = [
             translatable_content.content_value
@@ -1844,7 +2103,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                 self.dummy_entity_translations)
         ]
 
-        self.assertItemsEqual(
+        self.assertItemsEqual(  # type: ignore[no-untyped-call]
             translatable_contents,
             [
                 'Enter text here',
@@ -1852,12 +2111,17 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                 '<p>This is a solution.</p>'
             ])
 
-    def test_question_state_dict_conversion_from_v50_to_v51(self):
+    def test_question_state_dict_conversion_from_v50_to_v51(self) -> None:
         question_data = (
             question_domain.Question.create_default_question_state().to_dict())
 
+        # Here, we are defining AnswerGroupDict and while defining
+        # AnswerGroupDict MyPy expects that all keys are defined, but for
+        # testing purposes here we are defining only outcome key which
+        # causes MyPy to throw `Missing keys' error. Thus to avoid the
+        # error, we used ignore here.
         question_data['interaction']['answer_groups'] = [
-            {
+            {  # type: ignore[typeddict-item]
                 'outcome': {
                     'feedback': {
                         'content_id': 'content_id'
@@ -1866,7 +2130,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             }
         ]
 
-        test_value = {
+        test_value: question_domain.VersionedQuestionStateDict = {
             'state': question_data,
             'state_schema_version': 50
         }
@@ -1889,7 +2153,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 class QuestionSummaryTest(test_utils.GenericTestBase):
     """Test for Question Summary object."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.fake_date_created = datetime.datetime(
             2018, 11, 17, 20, 2, 45, 0)
@@ -1904,7 +2168,7 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
             misconception_ids=['skill1-1', 'skill2-2']
         )
 
-    def test_to_dict(self):
+    def test_to_dict(self) -> None:
         """Test to verify to_dict method of the Question Summary
         object.
         """
@@ -1921,61 +2185,82 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
 
         self.assertEqual(expected_object_dict, self.observed_object.to_dict())
 
-    def test_validation_with_valid_properties(self):
+    def test_validation_with_valid_properties(self) -> None:
         self.observed_object.validate()
 
-    def test_validation_with_invalid_id(self):
-        self.observed_object.id = 1
-        with self.assertRaisesRegex(
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
+    def test_validation_with_invalid_id(self) -> None:
+        self.observed_object.id = 1  # type: ignore[assignment]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'Expected id to be a string, received 1'):
             self.observed_object.validate()
 
-    def test_validation_with_invalid_interaction_id(self):
-        self.observed_object.interaction_id = 1
-        with self.assertRaisesRegex(
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
+    def test_validation_with_invalid_interaction_id(self) -> None:
+        self.observed_object.interaction_id = 1  # type: ignore[assignment]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected interaction id to be a string, received 1'):
             self.observed_object.validate()
 
-    def test_validation_with_invalid_question_content(self):
-        self.observed_object.question_content = 1
-        with self.assertRaisesRegex(
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
+    def test_validation_with_invalid_question_content(self) -> None:
+        self.observed_object.question_content = 1  # type: ignore[assignment]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected question content to be a string, received 1'):
             self.observed_object.validate()
 
-    def test_validation_with_invalid_created_on(self):
-        self.observed_object.created_on = 1
-        with self.assertRaisesRegex(
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
+    def test_validation_with_invalid_created_on(self) -> None:
+        self.observed_object.created_on = 1  # type: ignore[assignment]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected created on to be a datetime, received 1'):
             self.observed_object.validate()
 
-    def test_validation_with_invalid_last_updated(self):
-        self.observed_object.last_updated = 1
-        with self.assertRaisesRegex(
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
+    def test_validation_with_invalid_last_updated(self) -> None:
+        self.observed_object.last_updated = 1  # type: ignore[assignment]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected last updated to be a datetime, received 1'):
             self.observed_object.validate()
 
-    def test_validate_invalid_list_of_misconception_ids(self):
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
+    def test_validate_invalid_list_of_misconception_ids(self) -> None:
         """Test to verify that the validation fails when
         misconception_ids value is an invalid list.
         """
-        self.observed_object.misconception_ids = ['Test', 1]
-        with self.assertRaisesRegex(
+        self.observed_object.misconception_ids = ['Test', 1]  # type: ignore[list-item]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             re.escape(
                 'Expected misconception ids to be a list of strings, '
                 'received [\'Test\', 1]')):
             self.observed_object.validate()
 
-    def test_validate_invalid_type_of_misconception_ids(self):
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
+    def test_validate_invalid_type_of_misconception_ids(self) -> None:
         """Test to verify that the validation fails when
         misconception_ids value is an invalid type.
         """
-        self.observed_object.misconception_ids = 123
-        with self.assertRaisesRegex(
+        self.observed_object.misconception_ids = 123  # type: ignore[assignment]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected misconception ids to be a list of strings, '
             'received 123'):
@@ -1985,7 +2270,7 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
 class QuestionSkillLinkDomainTest(test_utils.GenericTestBase):
     """Test for Question Skill Link Domain object."""
 
-    def test_to_dict(self):
+    def test_to_dict(self) -> None:
         """Test to verify to_dict method of the Question Skill Link Domain
         object.
         """
@@ -2003,7 +2288,7 @@ class QuestionSkillLinkDomainTest(test_utils.GenericTestBase):
 class MergedQuestionSkillLinkDomainTest(test_utils.GenericTestBase):
     """Test for Merged Question Skill Link Domain object."""
 
-    def test_to_dict(self):
+    def test_to_dict(self) -> None:
         """Test to verify to_dict method of the Merged Question Skill Link
         Domain object.
         """

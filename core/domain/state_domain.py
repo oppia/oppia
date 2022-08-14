@@ -44,6 +44,8 @@ from core.domain import translatable_object_registry  # pylint: disable=invalid-
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
 
+# The `AllowedInputValueTypes` is union of allowed types that a
+# RuleSpec's inputs dictionary can accept for it's values.
 AllowedInputValueTypes = Union[
     str,
     int,
@@ -602,13 +604,13 @@ class Solution(translation_domain.BaseTranslatableObject):
 class InteractionInstanceDict(TypedDict):
     """Dictionary representing the InteractionInstance object."""
 
-    id: str
-    customization_args: Dict[str, InteractionCustomizationArg]
+    id: Optional[str]
+    customization_args: Dict[str, Dict[str, Any]]
     answer_groups: List[AnswerGroupDict]
     default_outcome: OutcomeDict
     confirmed_unclassified_answers: List[str]
     hints: List[HintDict]
-    solution: SolutionDict
+    solution: Optional[SolutionDict]
 
 
 class InteractionInstance(translation_domain.BaseTranslatableObject):
@@ -623,13 +625,13 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
     # of values, we used Any here.
     def __init__(
         self,
-        interaction_id: str,
+        interaction_id: Optional[str],
         customization_args: Dict[str, InteractionCustomizationArg],
         answer_groups: List[AnswerGroup],
         default_outcome: Outcome,
         confirmed_unclassified_answers: List[str],
         hints: List[Hint],
-        solution: Solution
+        solution: Optional[Solution]
     ) -> None:
         """Initializes a InteractionInstance domain object.
 
@@ -2091,7 +2093,9 @@ class WrittenTranslations:
         """
         return list(sorted(self.translations_mapping.keys()))
 
-    def get_translated_content(self, content_id, language_code):
+    def get_translated_content(
+        self, content_id: str, language_code: str
+    ) -> str:
         """Returns the translated content for the given content_id in the given
         language.
 
@@ -2383,7 +2387,7 @@ class RuleSpecDict(TypedDict):
     """Dictionary representing the RuleSpec object."""
 
     rule_type: str
-    inputs: Mapping[str, AllowedInputValueTypes]
+    inputs: Dict[str, AllowedInputValueTypes]
 
 
 class RuleSpec(translation_domain.BaseTranslatableObject):
@@ -3059,7 +3063,7 @@ class State(translation_domain.BaseTranslatableObject):
                     'Expected linked_skill_id to be a str, '
                     'received %s.' % self.linked_skill_id)
 
-    def get_content_html(self, content_id):
+    def get_content_html(self, content_id: str) -> str:
         """Returns the content belongs to a given content id of the object.
 
         Args:
@@ -3826,11 +3830,15 @@ class State(translation_domain.BaseTranslatableObject):
 
     @classmethod
     def create_default_state(
-            cls, default_dest_state_name, is_initial_state=False):
+        cls,
+        default_dest_state_name: Optional[str],
+        is_initial_state: bool = False
+    ) -> State:
         """Return a State domain object with default value.
 
         Args:
-            default_dest_state_name: str. The default destination state.
+            default_dest_state_name: str. The default destination state, or None
+                if no default destination state is defined.
             is_initial_state: bool. Whether this state represents the initial
                 state of an exploration.
 
@@ -3995,7 +4003,7 @@ class State(translation_domain.BaseTranslatableObject):
 
         return state_dict
 
-    def get_all_html_content_strings(self):
+    def get_all_html_content_strings(self) -> List[str]:
         """Get all html content strings in the state.
 
         Returns:

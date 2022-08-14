@@ -1198,14 +1198,14 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         )
         feedback_thread_model.put()
 
-        thread_id = feedback_services.create_thread(  # type: ignore[no-untyped-call]
+        thread_id = feedback_services.create_thread(
             self.THREAD_ENTITY_TYPE,
             self.THREAD_ENTITY_ID,
             self.USER_ID_1,
             self.THREAD_SUBJECT,
             self.MESSAGE_TEXT
         )
-        feedback_services.create_message(  # type: ignore[no-untyped-call]
+        feedback_services.create_message(
             thread_id,
             self.USER_ID_1,
             self.THREAD_STATUS,
@@ -1263,14 +1263,14 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         )
         feedback_thread_model.put()
 
-        thread_id = feedback_services.create_thread(  # type: ignore[no-untyped-call]
+        thread_id = feedback_services.create_thread(
             self.THREAD_ENTITY_TYPE,
             self.THREAD_ENTITY_ID,
             self.USER_ID_1,
             self.THREAD_SUBJECT,
             self.MESSAGE_TEXT
         )
-        feedback_services.create_message(  # type: ignore[no-untyped-call]
+        feedback_services.create_message(
             thread_id,
             self.USER_ID_1,
             self.THREAD_STATUS,
@@ -1446,14 +1446,14 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_story_progress_data = {
             self.STORY_ID_1: self.COMPLETED_NODE_IDS_1
         }
-        thread_id = feedback_services.create_thread(  # type: ignore[no-untyped-call]
+        thread_id = feedback_services.create_thread(
             self.THREAD_ENTITY_TYPE,
             self.THREAD_ENTITY_ID,
             self.USER_ID_1,
             self.THREAD_SUBJECT,
             self.MESSAGE_TEXT
         )
-        feedback_services.create_message(  # type: ignore[no-untyped-call]
+        feedback_services.create_message(
             thread_id,
             self.USER_ID_1,
             self.THREAD_STATUS,

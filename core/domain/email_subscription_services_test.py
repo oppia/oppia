@@ -47,7 +47,7 @@ class InformSubscribersTest(test_utils.EmailTestBase):
     USER_EMAIL_2: Final = 'user2@test.com'
 
     def setUp(self) -> None:
-        super().setUp()  # type: ignore[no-untyped-call]
+        super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.USER_EMAIL, self.USER_NAME)
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
@@ -58,7 +58,7 @@ class InformSubscribersTest(test_utils.EmailTestBase):
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)  # type: ignore[no-untyped-call]
         self.user_id_2 = self.get_user_id_from_email(self.USER_EMAIL_2)  # type: ignore[no-untyped-call]
 
-        self.exploration = self.save_new_default_exploration(  # type: ignore[no-untyped-call]
+        self.exploration = self.save_new_default_exploration(
             'A', self.editor_id, title='Title')
 
         self.can_send_emails_ctx = self.swap(

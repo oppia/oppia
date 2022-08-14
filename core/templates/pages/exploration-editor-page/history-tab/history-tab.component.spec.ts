@@ -29,6 +29,8 @@ import { ParamChangesObjectFactory } from
   'domain/exploration/ParamChangesObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
+import { CheckRevertService } from
+  'pages/exploration-editor-page/history-tab/services/check-revert.service';
 import { VersionTreeService } from
   'pages/exploration-editor-page/history-tab/services/version-tree.service';
 import { WrittenTranslationObjectFactory } from
@@ -110,6 +112,7 @@ describe('History tab component', function() {
       'ParamChangesObjectFactory', TestBed.get(ParamChangesObjectFactory));
     $provide.value('RuleObjectFactory', TestBed.get(RuleObjectFactory));
     $provide.value('UnitsObjectFactory', TestBed.get(UnitsObjectFactory));
+    $provide.value('CheckRevertService', TestBed.get(CheckRevertService));
     $provide.value('VersionTreeService', TestBed.get(VersionTreeService));
     $provide.value(
       'WrittenTranslationObjectFactory',
@@ -302,7 +305,7 @@ describe('History tab component', function() {
       '/createhandler/download/exp1?v=1', '&output_format=zip');
   });
 
-  it('should open revert exploration modal', () => {
+  it('should open check revert exploration modal', () => {
     spyOn(ngbModal, 'open').and.returnValue(
       {
         componentInstance: new MockNgbModalRef(),
@@ -310,10 +313,54 @@ describe('History tab component', function() {
       } as NgbModalRef
     );
 
-    ctrl.showRevertExplorationModal();
+    ctrl.showCheckRevertExplorationModal(1);
 
     expect(ngbModal.open).toHaveBeenCalled();
   });
+
+  it('should not open revert exploration model when exploration is invalid',
+    fakeAsync(() => {
+      spyOn(ngbModal, 'open').and.returnValue(
+        {
+          componentInstance: new MockNgbModalRef(),
+          result: Promise.resolve(1),
+          close: () => {}
+        } as NgbModalRef
+      );
+      spyOn(ctrl, 'showRevertExplorationModal');
+      const historyBackendCall = spyOn(
+        historyTabBackendApiService, 'getCheckRevertValidData'
+      ).and.returnValue(Promise.resolve({valid: false, details: 'details'}));
+
+      ctrl.showCheckRevertExplorationModal(1);
+      tick();
+      $rootScope.$apply();
+
+      expect(historyBackendCall).toHaveBeenCalled();
+      expect(ctrl.showRevertExplorationModal).not.toHaveBeenCalled();
+    }));
+
+  it('should open revert exploration modal when exploration is valid',
+    fakeAsync(() => {
+      spyOn(ngbModal, 'open').and.returnValue(
+        {
+          componentInstance: new MockNgbModalRef(),
+          result: Promise.resolve(1),
+          close: () => {}
+        } as NgbModalRef
+      );
+      spyOn(ctrl, 'showRevertExplorationModal');
+      const historyBackendCall = spyOn(
+        historyTabBackendApiService, 'getCheckRevertValidData'
+      ).and.returnValue(Promise.resolve({valid: true, details: null}));
+
+      ctrl.showCheckRevertExplorationModal(1);
+      tick();
+      $rootScope.$apply();
+
+      expect(historyBackendCall).toHaveBeenCalled();
+      expect(ctrl.showRevertExplorationModal).toHaveBeenCalled();
+    }));
 
   it('should reload page when closing revert exploration modal',
     fakeAsync(() => {

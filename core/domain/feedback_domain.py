@@ -28,7 +28,7 @@ class FeedbackThreadDict(TypedDict):
 
     last_updated_msecs: float
     original_author_id: str
-    state_name: str
+    state_name: Optional[str]
     status: str
     subject: str
     summary: str
@@ -45,7 +45,7 @@ class FeedbackMessageDict(TypedDict):
     created_on_msecs: float
     entity_type: str
     entity_id: str
-    message_id: str
+    message_id: int
     text: str
     updated_status: str
     updated_subject: str
@@ -62,7 +62,7 @@ class FeedbackThreadSummaryDict(TypedDict):
     last_message_is_read: bool
     second_last_message_is_read: bool
     author_last_message: str
-    author_second_last_message: str
+    author_second_last_message: Optional[str]
     exploration_title: str
     exploration_id: str
     thread_id: str
@@ -75,8 +75,8 @@ class FeedbackThread:
         thread_id: str. The feedback thread ID.
         entity_type: str. The type of entity the feedback thread is linked to.
         entity_id: str. The id of the entity.
-        state_name: str. The name of the state associated with
-            the feedback thread.
+        state_name: str|None. The name of the state associated with
+            the feedback thread or None, if no state is associated.
         original_author_id: str. The ID of the original author.
         status: str. The current status of the thread. Status should
             be one of core.storage.feedback.gae_models.STATUS_CHOICES.
@@ -102,7 +102,7 @@ class FeedbackThread:
         thread_id: str,
         entity_type: str,
         entity_id: str,
-        state_name: str,
+        state_name: Optional[str],
         original_author_id: str,
         status: str,
         subject: str,
@@ -187,7 +187,7 @@ class FeedbackMessage:
         full_message_id: str. The ID of the feedback message.
         thread_id: str. The ID of the feedback thread containing this
             message.
-        message_id: str. The ID of the feedback thread message.
+        message_id: int. The ID of the feedback thread message.
         author_id: str. The ID of the message's author.
         updated_status: str. The new status of the feedback thread.
         updated_subject: str. The new feedback thread subject.
@@ -203,7 +203,7 @@ class FeedbackMessage:
         self,
         full_message_id: str,
         thread_id: str,
-        message_id: str,
+        message_id: int,
         author_id: str,
         updated_status: str,
         updated_subject: str,
@@ -317,6 +317,15 @@ class FeedbackAnalytics:
         }
 
 
+class FeedbackMessageReferenceDict(TypedDict):
+    """Dict for FeedbackMessageReference object."""
+
+    entity_type: str
+    entity_id: str
+    thread_id: str
+    message_id: int
+
+
 class FeedbackMessageReference:
     """Domain object for feedback message references.
 
@@ -324,7 +333,7 @@ class FeedbackMessageReference:
         entity_type: str. The type of entity the feedback thread is linked to.
         entity_id: str. The id of the entity.
         thread_id: str. The ID of the feedback thread.
-        message_id: str. The ID of the feedback thread message.
+        message_id: int. The ID of the feedback thread message.
     """
 
     def __init__(
@@ -332,7 +341,7 @@ class FeedbackMessageReference:
         entity_type: str,
         entity_id: str,
         thread_id: str,
-        message_id: str
+        message_id: int
     ) -> None:
         """Initializes FeedbackMessageReference object."""
         self.entity_type = entity_type
@@ -340,7 +349,7 @@ class FeedbackMessageReference:
         self.thread_id = thread_id
         self.message_id = message_id
 
-    def to_dict(self) -> Dict[str, str]:
+    def to_dict(self) -> FeedbackMessageReferenceDict:
         """Returns dict representation of the FeedbackMessageReference object.
 
         Returns:
@@ -369,7 +378,7 @@ class FeedbackThreadSummary:
             read by the user,
         author_last_message: str. The name of the author of the last message.
         author_second_last_message: str. The name of the author of the second
-            last message.
+            last message and None if no second-to-last message exists.
         exploration_title: str. The title of the exploration to which
             exploration belongs.
         exploration_id: str. The id of the exploration associated to the thread.
@@ -386,7 +395,7 @@ class FeedbackThreadSummary:
         last_message_is_read: bool,
         second_last_message_is_read: bool,
         author_last_message: str,
-        author_second_last_message: str,
+        author_second_last_message: Optional[str],
         exploration_title: str,
         exploration_id: str,
         thread_id: str

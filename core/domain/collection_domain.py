@@ -510,10 +510,7 @@ class Collection:
         # MyPy doesn't allow key deletion from TypedDict, thus we add an ignore.
         del collection_dict['id'] # type: ignore[misc]
 
-        # The utils.yaml_from_dict() is a general function which accepts
-        # only Dict[str, Any], but here collection_dict is typed with type
-        # CollectionDict.
-        return utils.yaml_from_dict(collection_dict) # type: ignore[arg-type]
+        return utils.yaml_from_dict(collection_dict)
 
     @classmethod
     def _convert_v1_dict_to_v2_dict(
