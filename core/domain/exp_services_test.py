@@ -1494,12 +1494,120 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             exploration, False)
         self.assertEqual(len(errors), 1)
         self.assertEqual(errors[0], error_string)
-        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, error_string):
             exp_services.validate_exploration_for_story(
                 exploration, True)
 
-    def test_update_exploration_by_migration_bot(self) -> None:
+    def test_validation_fail_for_state_classifier_model(self):
+        exploration = self.save_new_valid_exploration(
+            self.EXP_0_ID, self.owner_id, correctness_feedback_enabled=True,
+            category='Algebra')
+        exploration.states[
+            feconf.DEFAULT_INIT_STATE_NAME].classifier_model_id = '2'
+        error_string = (
+            'Explorations in a story are not expected to contain '
+            'classifier models. State %s of exploration with ID %s '
+            'contains classifier models.' % (
+                feconf.DEFAULT_INIT_STATE_NAME, exploration.id
+            ))
+        errors = exp_services.validate_exploration_for_story(
+            exploration, False)
+        self.assertEqual(len(errors), 1)
+        self.assertEqual(errors[0], error_string)
+        with self.assertRaisesRegex(
+            utils.ValidationError, error_string):
+            exp_services.validate_exploration_for_story(
+                exploration, True)
+
+    def test_validation_fail_for_answer_groups(self):
+        exploration = self.save_new_valid_exploration(
+            self.EXP_0_ID, self.owner_id, correctness_feedback_enabled=True,
+            category='Algebra')
+        exploration.states[
+            feconf.DEFAULT_INIT_STATE_NAME
+        ].interaction.answer_groups = [state_domain.AnswerGroup(
+            state_domain.Outcome(
+                'state 1', None, state_domain.SubtitledHtml(
+                    'feedback_1', '<p>state outcome html</p>'),
+                False, [], None, None),
+            [
+                state_domain.RuleSpec(
+                    'Equals', {
+                        'x': {
+                            'contentId': 'rule_input_Equals',
+                            'normalizedStrSet': ['Test']
+                        }
+                    }
+                )
+            ],
+            [{
+                'answer_group_index': 1,
+                'answers': [
+                    'cheerful',
+                    'merry',
+                    'ecstatic',
+                    'glad',
+                    'overjoyed',
+                    'pleased',
+                    'thrilled',
+                    'smile'
+                ]
+            }],
+            None
+        )]
+        error_string = (
+            'Explorations in a story are not expected to contain '
+            'training data for any answer group. State %s of '
+            'exploration with ID %s contains training data in one of '
+            'its answer groups.' % (
+                feconf.DEFAULT_INIT_STATE_NAME, exploration.id
+            )
+        )
+        errors = exp_services.validate_exploration_for_story(
+            exploration, False)
+        self.assertEqual(len(errors), 1)
+        self.assertEqual(errors[0], error_string)
+        with self.assertRaisesRegex(
+            utils.ValidationError, error_string):
+            exp_services.validate_exploration_for_story(
+                exploration, True)
+
+    def test_validation_fail_for_default_outcome(self):
+        exploration = self.save_new_valid_exploration(
+            self.EXP_0_ID, self.owner_id, correctness_feedback_enabled=True,
+            category='Algebra')
+        exploration.states[
+            feconf.DEFAULT_INIT_STATE_NAME
+        ].interaction.default_outcome = (
+            state_domain.Outcome(
+                'state 1', None, state_domain.SubtitledHtml(
+                    'default_outcome', '<p>Default outcome for state 4</p>'
+                ), False, [param_domain.ParamChange(
+                    'ParamChange', 'RandomSelector', {
+                        'list_of_values': ['3', '4'],
+                        'parse_with_jinja': True
+                    }
+                )], None, None
+            )
+        )
+        error_string = (
+            'Explorations in a story are not expected to contain '
+            'parameter values. State %s of exploration with ID %s '
+            'contains parameter values in its default outcome.' % (
+                feconf.DEFAULT_INIT_STATE_NAME, exploration.id
+            )
+        )
+        errors = exp_services.validate_exploration_for_story(
+            exploration, False)
+        self.assertEqual(len(errors), 1)
+        self.assertEqual(errors[0], error_string)
+        with self.assertRaisesRegex(
+            utils.ValidationError, error_string):
+            exp_services.validate_exploration_for_story(
+                exploration, True)
+
+    def test_update_exploration_by_migration_bot(self):
         self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, end_state_name='end')
         rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
@@ -7356,7 +7464,26 @@ title: Old Title
                 self.albert_id, self.NEW_EXP_ID, change_list,
                 'Changed recorded_voiceovers.')
 
-    def test_revert_exploration_after_publish(self) -> None:
+    def test_get_exploration_validation_error(self):
+        # Valid exploration version.
+        info = exp_services.get_exploration_validation_error(
+            self.NEW_EXP_ID, 0)
+        self.assertIsNone(info)
+
+        # Invalid exploration version.
+        def _mock_exploration_validate_function(*args, **kwargs):
+            """Mocks exploration.validate()."""
+            raise utils.ValidationError('Bad')
+
+        validate_swap = self.swap(
+            exp_domain.Exploration, 'validate',
+            _mock_exploration_validate_function)
+        with validate_swap:
+            info = exp_services.get_exploration_validation_error(
+                self.NEW_EXP_ID, 0)
+            self.assertEqual(info, 'Bad')
+
+    def test_revert_exploration_after_publish(self):
         self.save_new_valid_exploration(
             self.EXP_0_ID, self.albert_id,
             end_state_name='EndState')
