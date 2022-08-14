@@ -113,7 +113,7 @@ var ExplorationEditorSettingsTab = function() {
       closePreviewSummaryButton);
     await waitFor.invisibilityOf(
       explorationSummaryTile, 'Summary Tile takes too long to disappear');
-    await action.click('Neutral element', neutralElement);
+    await action.click('Neutral element', neutralElement, true);
   };
 
   this.setCategory = async function(category) {
@@ -156,7 +156,7 @@ var ExplorationEditorSettingsTab = function() {
       'Exploration Objective input', explorationObjectiveInput);
     await action.sendKeys(
       'Exploration Objective input', explorationObjectiveInput, objective);
-    await action.click('Neutral element', neutralElement);
+    await action.click('Neutral element', neutralElement, true);
   };
 
   this.setTitle = async function(title) {
