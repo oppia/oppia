@@ -149,7 +149,7 @@ var ExplorationEditorSettingsTab = function() {
 
     var languageButton = element.all(by.cssContainingText(
       '.e2e-test-exploration-language-selector-choice', language)).first();
-    await action.click('Language button', languageButton);
+    await action.click('Language button', languageButton, true);
     await action.click('Neutral element', neutralElement);
   };
 
