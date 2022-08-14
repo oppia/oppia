@@ -192,7 +192,7 @@ export class SettingsTabComponent
   }
 
   updateCategoryListWithUserData(): void {
-    if (this.newCategory && this.newCategory.id === '') {
+    if (this.newCategory) {
       this.CATEGORY_LIST_FOR_SELECT2.push(this.newCategory);
       this.explorationCategoryService.displayed = this.newCategory.id;
     }
