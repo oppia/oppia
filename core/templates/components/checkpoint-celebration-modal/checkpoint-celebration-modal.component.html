@@ -1,11 +1,15 @@
 <div class="checkpoint-celebration-modal">
   <div class="message-container"
        [ngClass]="{'modal-display-transition': messageModalIsShown && !messageModalIsDismissed, 'downward-transition': messageModalIsDismissed && !messageModalIsShown}">
-    <div class="mascot-placeholder"></div>
+    <div class="mascot-placeholder">
+      <img [src]="oppiaAvatarImageUrl" alt="Oppia Mascot"/>
+    </div>
     <svg viewBox="0 0 10 0.6" class="timer-svg">
       <polyline class="timer" stroke="#00645c" stroke-width="0.5" points="0,0 10,0" />
     </svg>
-    <h2>AWESOME!</h2>
+    <h2>
+      {{ translatedCurrentCheckpointMessageTitle }}
+    </h2>
 
     <svg class="checkpoint-flag"
          [ngClass]="{'flag-animation': messageModalIsShown || messageModalIsDismissed}"
@@ -47,13 +51,26 @@
     </svg>
     
     <p>
-      You just completed a checkpoint. Keep it up!
+      {{ translatedCurrentCheckpointMessage }}
     </p>
-    <svg class="progress-svg" viewBox="0 0 10 0.4">
-      <polyline class="learner-progress" stroke="#BDDAEF" stroke-width="0.4" points="0.2,0.2 9.8,0.2" stroke-linecap="round" />
-      <polyline class="progress-bar" stroke="#0D48A1" stroke-width="0.4" points="0.2,0.2 4,0.2" stroke-linecap="round" />
-    </svg>
-    <p class="progress-text">Progress: 2/5 checkpoints</p>
+    <div class="progress-bar-container"
+         [ngClass]="{'single-checkpoint-bar': totalNumberOfCheckpoints === 1, 'multiple-checkpoints-bar': totalNumberOfCheckpoints > 1, 'reverse-checkpoint-order': isLanguageRTL()}">
+      <div class="progress-bar" [ngClass]="{'reverse-checkpoint-order': isLanguageRTL()}">
+        <div class="completed-progress-bar"
+             [style.width.%]="getCompletedProgressBarWidth() ? getCompletedProgressBarWidth() : 0"></div>
+      </div>
+      <div *ngFor="let checkpointNode of checkpointStatusArrayPlaceholder; index as idx"
+           class="checkpoint-node"
+           [style.transition-delay.s]="checkpointNodeFadeInDelays[idx]"
+           [ngClass]="{
+            'completed-checkpoint-node': checkpointStatusArray[idx] === 'completed',
+            'in-progress-checkpoint-node': checkpointStatusArray[idx] === 'in-progress',
+            'incomplete-checkpoint-node': checkpointStatusArray[idx] === 'incomplete',
+            'hidden-checkpoint-node': !checkpointNodesAreVisible
+          }">
+        {{ idx + 1 }}
+      </div>
+    </div>
     <div class="button-row">
       <button class="progress-info">
         <i class="material-icons progress-info-icon">&#xE88E;</i>

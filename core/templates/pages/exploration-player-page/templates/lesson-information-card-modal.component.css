@@ -37,6 +37,7 @@
 .oppia-close-popover-button {
   outline: none;
   padding: 0;
+  position: absolute;
   right: 0;
   top: 0;
 }
