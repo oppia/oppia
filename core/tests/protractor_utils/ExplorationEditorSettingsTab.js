@@ -138,7 +138,7 @@ var ExplorationEditorSettingsTab = function() {
   };
 
   this.setLanguage = async function(language) {
-    await action.click('Neutral element', neutralElement, true);
+    await action.click('Neutral element', neutralElement);
     await action.waitForAutosave();
     await waitFor.presenceOf(
       explorationLanguageInput, 'Language input takes too long to be visible.');
@@ -149,7 +149,7 @@ var ExplorationEditorSettingsTab = function() {
     var languageButton = element.all(by.cssContainingText(
       '.e2e-test-exploration-language-selector-choice', language)).first();
     await action.click('Language button', languageButton, true);
-    await action.click('Neutral element', neutralElement, true);
+    await action.click('Neutral element', neutralElement);
   };
 
   this.setObjective = async function(objective) {
