@@ -7317,6 +7317,25 @@ title: Old Title
                 self.albert_id, self.NEW_EXP_ID, change_list,
                 'Changed recorded_voiceovers.')
 
+    def test_get_exploration_validation_error(self):
+        # Valid exploration version.
+        info = exp_services.get_exploration_validation_error(
+            self.NEW_EXP_ID, 0)
+        self.assertIsNone(info)
+
+        # Invalid exploration version.
+        def _mock_exploration_validate_function(*args, **kwargs):
+            """Mocks exploration.validate()."""
+            raise utils.ValidationError('Bad')
+
+        validate_swap = self.swap(
+            exp_domain.Exploration, 'validate',
+            _mock_exploration_validate_function)
+        with validate_swap:
+            info = exp_services.get_exploration_validation_error(
+                self.NEW_EXP_ID, 0)
+            self.assertEqual(info, 'Bad')
+
     def test_revert_exploration_after_publish(self):
         self.save_new_valid_exploration(
             self.EXP_0_ID, self.albert_id,
