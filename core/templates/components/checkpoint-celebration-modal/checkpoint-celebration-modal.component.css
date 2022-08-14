@@ -29,18 +29,13 @@
   border-radius: 50%;
 }
 
-.checkpoint-celebration-modal .timer {
+.checkpoint-celebration-modal .checkpoint-celebration-modal-timer {
   margin: 0;
   padding: 0;
   stroke-dasharray: 10;
   stroke-dashoffset: 0;
   transition-property: stroke-dashoffset;
-  transition-duration: 10s;
   transition-timing-function: linear;
-}
-
-.checkpoint-celebration-modal .transition-duration-class {
-  transition-duration: 0s;
 }
 
 .checkpoint-celebration-modal h2 {

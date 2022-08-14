@@ -191,6 +191,7 @@ export class CheckpointCelebrationModalComponent implements OnInit, OnDestroy {
   }
 
   triggerMessage(): void {
+    this.resetTimer();
     this.messageModalIsShown = true;
     this.autoMessageDismissalTimeout = setTimeout(() => {
       this.messageModalIsShown = false;
@@ -206,6 +207,30 @@ export class CheckpointCelebrationModalComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       this.messageModalIsDismissed = false;
     }, MESSAGE_MODAL_APPROX_TRIGGER_AND_DISMISSAL_DURATION_MS);
+  }
+
+  resetTimer(): void {
+    const checkpointTimer = document.querySelector(
+      '.checkpoint-celebration-modal-timer') as SVGPolylineElement;
+    // This function is meant to reset the timer SVG to its initial position,
+    // i.e. completely filled. This needs to happen instantly, as opposed to the
+    // depleting of the timer which happens over a 12 second (approx.) period.
+    // Hence we set the transition duration to 0s, reset the stroke-dashoffset
+    // to 0, and then set the transition duration back to 12s before changing
+    // the stroke-dashoffset to 10, which begins the normal depleting of the
+    // timer.
+    // However, changing the transition duration to 0s isn't immediately
+    // picked up by the browser and so the timer can still be seen animating up
+    // to its initial position.
+    // To force the browser to pick up this change, we need to trigger a reflow.
+    // The clientHeight property is one of the properties that causes a
+    // reflow.
+    checkpointTimer.style.transitionDuration = '0s';
+    checkpointTimer.style.strokeDashoffset = '0';
+    checkpointTimer.clientHeight;
+    checkpointTimer.style.transitionDuration = '12.14s';
+    checkpointTimer.clientHeight;
+    checkpointTimer.style.strokeDashoffset = '10';
   }
 
   isLanguageRTL(): boolean {
