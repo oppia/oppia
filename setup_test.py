@@ -17,7 +17,7 @@
 from __future__ import annotations
 
 from core.tests import test_utils
-import setup
+import sys
 
 import pkg_resources
 import setuptools
@@ -53,5 +53,14 @@ class SetupTests(test_utils.GenericTestBase):
                 'include_package_data': True,
             }])
 
-        with swap_setup:
+        dummy_path = sys.path
+        dummy_path2 = []
+        for path in dummy_path:
+            if 'google-cloud-sdk' not in path:
+                dummy_path2.append(path)
+
+        swap_path = self.swap(sys, 'path', dummy_path2)
+        
+        with swap_setup, swap_path:
+            import setup
             setup.main()
