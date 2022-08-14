@@ -382,7 +382,7 @@ var ExplorationEditorPage = function() {
   this.navigateToMainTab = async function() {
     await action.waitForAutosave();
     await action.click('Main tab button', navigateToMainTabButton);
-    await action.click('Neutral element', neutralElement);
+    await action.click('Neutral element', neutralElement, true);
     await waitFor.pageToFullyLoad();
   };
 
