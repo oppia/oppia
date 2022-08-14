@@ -416,7 +416,8 @@ describe('Topics and Skills Dashboard backend API service', () => {
         topicIds).then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
-      'topic_id_to_diagnostic_test_skill_ids_handler/topicID1'
+      'topic_id_to_diagnostic_test_skill_ids_handler/' +
+      '?comma_separated_topic_ids=topicID1'
     );
     expect(req.request.method).toEqual('GET');
 
@@ -444,7 +445,8 @@ describe('Topics and Skills Dashboard backend API service', () => {
         topicIds).then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
-      'topic_id_to_diagnostic_test_skill_ids_handler/topicID1'
+      'topic_id_to_diagnostic_test_skill_ids_handler/?' +
+      'comma_separated_topic_ids=topicID1'
     );
     expect(req.request.method).toEqual('GET');
 

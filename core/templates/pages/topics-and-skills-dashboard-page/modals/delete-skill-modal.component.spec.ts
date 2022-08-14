@@ -22,6 +22,7 @@ import { AssignedSkill, AssignedSkillBackendDict } from 'domain/skill/assigned-s
 import { TopicsAndSkillsDashboardBackendApiService, TopicIdToDiagnosticTestSkillIdsResponse } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { DeleteSkillModalComponent, TopicAssignmentsSummary } from './delete-skill-modal.component';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 describe('Assign Skill to Topic Modal Component', () => {
   let fixture: ComponentFixture<DeleteSkillModalComponent>;
@@ -66,6 +67,9 @@ describe('Assign Skill to Topic Modal Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
+      imports: [
+        MatProgressSpinnerModule
+      ],
       declarations: [
         DeleteSkillModalComponent
       ],
