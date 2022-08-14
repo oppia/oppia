@@ -42,7 +42,7 @@ import certifi
 import yaml
 
 from typing import ( # isort:skip
-    IO, Any, BinaryIO, Callable, Dict, Iterable, Iterator, List, Mapping, 
+    IO, Any, BinaryIO, Callable, Dict, Iterable, Iterator, List, Mapping,
     Literal, Optional, TextIO, Tuple, TypeVar, Union, overload)
 
 

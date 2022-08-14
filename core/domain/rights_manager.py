@@ -32,7 +32,8 @@ from core.domain import user_domain
 from core.domain import user_services
 from core.platform import models
 
-from typing import Dict, List, Literal, Mapping, Optional, Sequence, Union, overload
+from typing import (
+        Dict, List, Literal, Mapping, Optional, Sequence, Union, overload)
 
 MYPY = False
 if MYPY: # pragma: no cover
