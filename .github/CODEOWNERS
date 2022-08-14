@@ -468,7 +468,7 @@
 /core/templates/pages/learner-group-pages/ @oppia/lace-frontend-reviewers
 
 # Beam jobs
-/setup.py @oppia/data-and-stability-reviewers
+/setup*.py @oppia/data-and-stability-reviewers
 /MANIFEST.in @oppia/data-and-stability-reviewers
 /core/jobs/ @oppia/data-and-stability-reviewers
 /core/jobs/transforms @oppia/data-and-stability-reviewers

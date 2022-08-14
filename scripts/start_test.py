@@ -78,7 +78,7 @@ class SetupTests(test_utils.GenericTestBase):
         self.swap_create_server = self.swap(
             servers, 'create_managed_web_browser',
             lambda _: MockCompilerContextManager())
-    
+
     def test_start_servers_successfully(self) -> None:
         with self.swap_install_third_party_libs:
             from scripts import start
