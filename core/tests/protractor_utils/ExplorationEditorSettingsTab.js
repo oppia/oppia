@@ -113,10 +113,11 @@ var ExplorationEditorSettingsTab = function() {
       closePreviewSummaryButton);
     await waitFor.invisibilityOf(
       explorationSummaryTile, 'Summary Tile takes too long to disappear');
-    await action.click('Neutral element', neutralElement, true);
+    await action.click('Neutral element', neutralElement);
   };
 
   this.setCategory = async function(category) {
+    await action.click('Neutral element', neutralElement);
     await waitFor.presenceOf(
       explorationCategoryInput, 'Category input takes too long to be visible.');
     await (
@@ -126,7 +127,7 @@ var ExplorationEditorSettingsTab = function() {
   };
 
   this.setFirstState = async function(stateName) {
-    await action.click('Neutral element', neutralElement, true);
+    await action.click('Neutral element', neutralElement);
     await action.waitForAutosave();
     await waitFor.presenceOf(
       initialStateSelect, 'Initial state select takes too long to be visible.');
@@ -144,11 +145,11 @@ var ExplorationEditorSettingsTab = function() {
       explorationLanguageInput, 'Language input takes too long to be visible.');
 
     await action.click(
-      'Exploration Language', explorationLanguageInput, true);
+      'Exploration Language', explorationLanguageInput);
 
     var languageButton = element.all(by.cssContainingText(
       '.e2e-test-exploration-language-selector-choice', language)).first();
-    await action.click('Language button', languageButton, true);
+    await action.click('Language button', languageButton);
     await action.click('Neutral element', neutralElement);
   };
 
@@ -191,7 +192,7 @@ var ExplorationEditorSettingsTab = function() {
       explorationLanguageInput, 'Language input takes too long to be visible.');
     expect(await explorationLanguageInput.$('option:checked').getText()).
       toEqual(language);
-    await action.click('Neutral element', neutralElement, true);
+    await action.click('Neutral element', neutralElement);
   };
 
   this.expectObjectiveToBe = async function(objective) {
