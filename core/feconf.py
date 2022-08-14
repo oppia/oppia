@@ -26,7 +26,7 @@ import os
 from core.constants import constants
 
 from typing import Callable, Dict, List, Union
-from typing_extensions import TypedDict
+from typing_extensions import Final, TypedDict
 
 CommandType = (
     Dict[str, Union[str, List[str], Dict[str, Union[str, List[str]]]]])
@@ -50,6 +50,13 @@ class ValidCmdDict(TypedDict):
     user_id_attribute_names: List[str]
     allowed_values: Dict[str, List[str]]
     deprecated_values: Dict[str, List[str]]
+
+
+class RteTypeTextAngularDict(TypedDict):
+    """Dict representing RTE_TYPE_TEXTANGULAR Dictionary."""
+
+    ALLOWED_PARENT_LIST: Dict[str, List[str]]
+    ALLOWED_TAG_LIST: List[str]
 
 
 # Supported object types for ParamSpec.
@@ -141,6 +148,7 @@ class VALID_MODEL_NAMES(enum.Enum): # pylint: disable=invalid-name
     beam_job = 'beam_job' # pylint: disable=invalid-name
     blog = 'blog' # pylint: disable=invalid-name
     classifier = 'classifier' # pylint: disable=invalid-name
+    classroom = 'classroom' # pylint: disable=invalid-name
     collection = 'collection' # pylint: disable=invalid-name
     config = 'config' # pylint: disable=invalid-name
     email = 'email' # pylint: disable=invalid-name
@@ -1226,7 +1234,7 @@ RTE_FORMAT_TEXTANGULAR = 'text-angular'
 RTE_FORMAT_CKEDITOR = 'ck-editor'
 
 # RTE content specifications according to the type of the editor.
-RTE_CONTENT_SPEC = {
+RTE_CONTENT_SPEC: Dict[str, RteTypeTextAngularDict] = {
     'RTE_TYPE_TEXTANGULAR': {
         # Valid parent-child relation in TextAngular.
         'ALLOWED_PARENT_LIST': {
@@ -1560,9 +1568,9 @@ CUSTOMIZATION_ARG_WHICH_IDENTIFIES_ISSUE = {
 }
 
 # Constants defining various suggestion types.
-SUGGESTION_TYPE_EDIT_STATE_CONTENT = 'edit_exploration_state_content'
-SUGGESTION_TYPE_TRANSLATE_CONTENT = 'translate_content'
-SUGGESTION_TYPE_ADD_QUESTION = 'add_question'
+SUGGESTION_TYPE_EDIT_STATE_CONTENT: Final = 'edit_exploration_state_content'
+SUGGESTION_TYPE_TRANSLATE_CONTENT: Final = 'translate_content'
+SUGGESTION_TYPE_ADD_QUESTION: Final = 'add_question'
 
 # Suggestion fields that can be queried.
 ALLOWED_SUGGESTION_QUERY_FIELDS = [

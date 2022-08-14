@@ -29,7 +29,7 @@ class RecentCommitsHandlerUnitTests(test_utils.GenericTestBase):
     """Test the RecentCommitsHandler class."""
 
     def setUp(self):
-        super(RecentCommitsHandlerUnitTests, self).setUp()
+        super().setUp()
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.set_moderators([self.MODERATOR_USERNAME])
 

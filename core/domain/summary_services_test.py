@@ -35,33 +35,35 @@ from core.domain import summary_services
 from core.domain import user_services
 from core.tests import test_utils
 
+from typing_extensions import Final
+
 
 class ExplorationDisplayableSummariesTest(
         exp_services_test.ExplorationServicesUnitTests):
     """Test functions for getting displayable exploration summary dicts."""
 
-    ALBERT_EMAIL = 'albert@example.com'
-    BOB_EMAIL = 'bob@example.com'
-    ALBERT_NAME = 'albert'
-    BOB_NAME = 'bob'
+    ALBERT_EMAIL: Final = 'albert@example.com'
+    BOB_EMAIL: Final = 'bob@example.com'
+    ALBERT_NAME: Final = 'albert'
+    BOB_NAME: Final = 'bob'
 
-    USER_C_NAME = 'c'
-    USER_D_NAME = 'd'
-    USER_C_EMAIL = 'c@example.com'
-    USER_D_EMAIL = 'd@example.com'
+    USER_C_NAME: Final = 'c'
+    USER_D_NAME: Final = 'd'
+    USER_C_EMAIL: Final = 'c@example.com'
+    USER_D_EMAIL: Final = 'd@example.com'
 
-    USER_C_PROFILE_PICTURE = 'c_profile_picture'
+    USER_C_PROFILE_PICTURE: Final = 'c_profile_picture'
 
-    EXP_ID_1 = 'eid1'
-    EXP_ID_2 = 'eid2'
-    EXP_ID_3 = 'eid3'
-    EXP_ID_4 = 'eid4'
-    EXP_ID_5 = 'eid5'
+    EXP_ID_1: Final = 'eid1'
+    EXP_ID_2: Final = 'eid2'
+    EXP_ID_3: Final = 'eid3'
+    EXP_ID_4: Final = 'eid4'
+    EXP_ID_5: Final = 'eid5'
 
-    EXPECTED_VERSION_1 = 4
-    EXPECTED_VERSION_2 = 2
+    EXPECTED_VERSION_1: Final = 4
+    EXPECTED_VERSION_2: Final = 2
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Populate the database of explorations and their summaries.
 
         The sequence of events is:
@@ -82,20 +84,20 @@ class ExplorationDisplayableSummariesTest(
         - (3) User_4 edits the title of EXP_ID_4.
         """
 
-        super(ExplorationDisplayableSummariesTest, self).setUp()
+        super().setUp()
 
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.signup(self.BOB_EMAIL, self.BOB_NAME)
 
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)  # type: ignore[no-untyped-call]
+        self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)  # type: ignore[no-untyped-call]
 
         self.albert = user_services.get_user_actions_info(self.albert_id)
         self.bob = user_services.get_user_actions_info(self.bob_id)
 
         self.save_new_valid_exploration(self.EXP_ID_1, self.albert_id)
 
-        exp_services.update_exploration(
+        exp_services.update_exploration(  # type: ignore[no-untyped-call]
             self.bob_id, self.EXP_ID_1, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'title',
@@ -104,23 +106,23 @@ class ExplorationDisplayableSummariesTest(
 
         self.save_new_valid_exploration(self.EXP_ID_2, self.albert_id)
 
-        exp_services.update_exploration(
+        exp_services.update_exploration(  # type: ignore[no-untyped-call]
             self.albert_id, self.EXP_ID_1, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'title',
                 'new_value': 'Exploration 1 Albert title'
             })], 'Changed title to Albert1 title.')
 
-        exp_services.update_exploration(
+        exp_services.update_exploration(  # type: ignore[no-untyped-call]
             self.albert_id, self.EXP_ID_2, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'title',
                 'new_value': 'Exploration 2 Albert title'
             })], 'Changed title to Albert2 title.')
 
-        exp_services.revert_exploration(self.bob_id, self.EXP_ID_1, 3, 2)
+        exp_services.revert_exploration(self.bob_id, self.EXP_ID_1, 3, 2)  # type: ignore[no-untyped-call]
 
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception, 'This exploration cannot be published'
             ):
             rights_manager.publish_exploration(self.bob, self.EXP_ID_2)
@@ -129,23 +131,23 @@ class ExplorationDisplayableSummariesTest(
 
         self.save_new_valid_exploration(self.EXP_ID_3, self.albert_id)
         rights_manager.publish_exploration(self.albert, self.EXP_ID_3)
-        exp_services.delete_exploration(self.albert_id, self.EXP_ID_3)
+        exp_services.delete_exploration(self.albert_id, self.EXP_ID_3)  # type: ignore[no-untyped-call]
         self.signup(self.USER_C_EMAIL, self.USER_C_NAME)
         self.signup(self.USER_D_EMAIL, self.USER_D_NAME)
-        self.user_c_id = self.get_user_id_from_email(self.USER_C_EMAIL)
-        self.user_d_id = self.get_user_id_from_email(self.USER_D_EMAIL)
+        self.user_c_id = self.get_user_id_from_email(self.USER_C_EMAIL)  # type: ignore[no-untyped-call]
+        self.user_d_id = self.get_user_id_from_email(self.USER_D_EMAIL)  # type: ignore[no-untyped-call]
         user_services.update_profile_picture_data_url(
             self.user_c_id, self.USER_C_PROFILE_PICTURE)
 
         self.save_new_valid_exploration(self.EXP_ID_4, self.user_c_id)
-        exp_services.update_exploration(
+        exp_services.update_exploration(  # type: ignore[no-untyped-call]
             self.user_d_id, self.EXP_ID_4, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'title',
                 'new_value': 'Exploration updated title'
             })], 'Changed title once.')
 
-        exp_services.update_exploration(
+        exp_services.update_exploration(  # type: ignore[no-untyped-call]
             self.user_d_id, self.EXP_ID_4, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'title',
@@ -154,7 +156,7 @@ class ExplorationDisplayableSummariesTest(
 
         self.save_new_valid_exploration(self.EXP_ID_5, self.bob_id)
 
-    def test_get_human_readable_contributors_summary(self):
+    def test_get_human_readable_contributors_summary(self) -> None:
         contributors_summary = {self.albert_id: 10, self.bob_id: 13}
         self.assertEqual({
             self.ALBERT_NAME: {
@@ -177,7 +179,9 @@ class ExplorationDisplayableSummariesTest(
         }, summary_services.get_human_readable_contributors_summary(
             contributors_summary))
 
-    def test_get_human_readable_contributors_summary_with_deleted_user(self):
+    def test_get_human_readable_contributors_summary_with_deleted_user(
+        self
+    ) -> None:
         contributors_summary = {self.albert_id: 10}
         user_services.mark_user_for_deletion(self.albert_id)
         self.assertEqual(
@@ -187,7 +191,7 @@ class ExplorationDisplayableSummariesTest(
             )
         )
 
-    def test_get_displayable_exp_summary_dicts_matching_ids(self):
+    def test_get_displayable_exp_summary_dicts_matching_ids(self) -> None:
         # A list of exp_id's are passed in:
         # EXP_ID_1 -- private exploration owned by Albert.
         # EXP_ID_2 -- pubished exploration owned by Albert.
@@ -217,13 +221,16 @@ class ExplorationDisplayableSummariesTest(
             expected_summary, displayable_summaries[0])
 
     def test_get_displayable_exp_summary_dicts_matching_ids_with_invalid_exp_id(
-            self):
+        self
+    ) -> None:
         displayable_summaries = (
             summary_services.get_displayable_exp_summary_dicts_matching_ids(
                 ['invalid_exp_id']))
         self.assertEqual(displayable_summaries, [])
 
-    def test_get_public_and_filtered_private_summary_dicts_for_creator(self):
+    def test_get_public_and_filtered_private_summary_dicts_for_creator(
+        self
+    ) -> None:
         # If a new exploration is created by another user (Bob) and not public,
         # then Albert cannot see it when querying for explorations.
         displayable_summaries = (
@@ -260,7 +267,7 @@ class ExplorationDisplayableSummariesTest(
 class LibraryGroupsTest(exp_services_test.ExplorationServicesUnitTests):
     """Test functions for getting summary dicts for library groups."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Populate the database of explorations and their summaries.
 
         The sequence of events is:
@@ -270,18 +277,18 @@ class LibraryGroupsTest(exp_services_test.ExplorationServicesUnitTests):
         - (4) Admin logs out.
         """
 
-        super(LibraryGroupsTest, self).setUp()
+        super().setUp()
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        csrf_token = self.get_new_csrf_token()
+        csrf_token = self.get_new_csrf_token()  # type: ignore[no-untyped-call]
 
-        self.post_json(
+        self.post_json(  # type: ignore[no-untyped-call]
             '/adminhandler', {
                 'action': 'reload_exploration',
                 'exploration_id': '2'
             }, csrf_token=csrf_token)
         self.logout()
 
-    def test_get_library_groups(self):
+    def test_get_library_groups(self) -> None:
         """The exploration with id '2' is an exploration in the Mathematics
         category. The call to get_library_groups() should return the
         exploration as part of the Mathematics & Statistics group.
@@ -322,14 +329,14 @@ class FeaturedExplorationDisplayableSummariesTest(
     summary dicts.
     """
 
-    ALBERT_NAME = 'albert'
-    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME: Final = 'albert'
+    ALBERT_EMAIL: Final = 'albert@example.com'
 
-    EXP_ID_1 = 'eid1'
-    EXP_ID_2 = 'eid2'
-    LANGUAGE_CODE_ES = 'es'
+    EXP_ID_1: Final = 'eid1'
+    EXP_ID_2: Final = 'eid2'
+    LANGUAGE_CODE_ES: Final = 'es'
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Populate the database of explorations and their summaries.
 
         The sequence of events is:
@@ -340,12 +347,12 @@ class FeaturedExplorationDisplayableSummariesTest(
         - (5) Admin user is set up.
         """
 
-        super(FeaturedExplorationDisplayableSummariesTest, self).setUp()
+        super().setUp()
 
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
-        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)  # type: ignore[no-untyped-call]
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)  # type: ignore[no-untyped-call]
         self.albert = user_services.get_user_actions_info(self.albert_id)
 
         self.save_new_valid_exploration(
@@ -355,9 +362,9 @@ class FeaturedExplorationDisplayableSummariesTest(
         rights_manager.publish_exploration(self.albert, self.EXP_ID_1)
         rights_manager.publish_exploration(self.albert, self.EXP_ID_2)
 
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])  # type: ignore[no-untyped-call]
 
-    def test_for_featured_explorations(self):
+    def test_for_featured_explorations(self) -> None:
         """Note that both EXP_ID_1 and EXP_ID_2 are public. However, only
         EXP_ID_2 is featured, so the call to get_featured_explorations() should
         only return [EXP_ID_2].
@@ -386,7 +393,7 @@ class FeaturedExplorationDisplayableSummariesTest(
             'objective': 'An objective'
         }, featured_activity_summaries[0])
 
-    def test_language_code_filter(self):
+    def test_language_code_filter(self) -> None:
         """Note that both EXP_ID_1 is in Spanish and EXP_ID_2 is in English."""
         activity_services.update_featured_activity_references([
             activity_domain.ActivityReference(
@@ -439,23 +446,25 @@ class FeaturedExplorationDisplayableSummariesTest(
 class CollectionLearnerDictTests(test_utils.GenericTestBase):
     """Test get_learner_collection_dict_by_id."""
 
-    EXP_ID = 'exploration_id'
-    EXP_ID_1 = 'exp_id1'
-    COLLECTION_ID = 'A_collection_id'
+    EXP_ID: Final = 'exploration_id'
+    EXP_ID_1: Final = 'exp_id1'
+    COLLECTION_ID: Final = 'A_collection_id'
 
-    def setUp(self):
-        super(CollectionLearnerDictTests, self).setUp()
+    def setUp(self) -> None:
+        super().setUp()
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
 
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)  # type: ignore[no-untyped-call]
 
         self.owner = user_services.get_user_actions_info(self.owner_id)
         self.editor = user_services.get_user_actions_info(self.editor_id)
 
-    def test_get_displayable_collection_summary_dicts_matching_ids(self):
+    def test_get_displayable_collection_summary_dicts_matching_ids(
+        self
+    ) -> None:
         collection_id_1 = self.COLLECTION_ID + '_1'
         self.save_new_valid_collection(self.COLLECTION_ID, self.owner_id)
         self.save_new_valid_collection(collection_id_1, self.owner_id)
@@ -470,13 +479,16 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
         for collection_summary in collection_summaries:
             self.assertIn(collection_summary['id'], collection_id_list)
 
-    def test_get_learner_collection_dict_by_id_without_user_id(self):
+    def test_get_learner_collection_dict_by_id_without_user_id(self) -> None:
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
         self.save_new_valid_collection(
             self.COLLECTION_ID, self.owner_id, exploration_id=self.EXP_ID)
         rights_manager.publish_exploration(self.owner, self.EXP_ID)
         rights_manager.publish_collection(self.owner, self.COLLECTION_ID)
-        mock_user = user_services.get_user_actions_info(None)
+        # Here, get_user_actions_info method can only accept string values but
+        # for testing purposes here we are providing None which causes MyPy to
+        # throw an error. Thus to avoid the error, we used ignore here.
+        mock_user = user_services.get_user_actions_info(None)  # type: ignore[arg-type]
         collection_dict = (
             summary_services.get_learner_collection_dict_by_id(
                 self.COLLECTION_ID, mock_user)
@@ -490,22 +502,32 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
             self.EXP_ID
         )
 
-    def test_get_learner_dict_with_deleted_exp_fails_validation(self):
+    def test_raises_error_if_invalid_collection_id_provided(self) -> None:
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            Exception,
+            'No collection exists for the given collection id'):
+            summary_services.get_learner_collection_dict_by_id(
+                'Invalid_id', self.owner, strict=False
+            )
+
+    def test_get_learner_dict_with_deleted_exp_fails_validation(self) -> None:
         self.save_new_valid_collection(
             self.COLLECTION_ID, self.owner_id, exploration_id=self.EXP_ID)
         summary_services.get_learner_collection_dict_by_id(
             self.COLLECTION_ID, self.owner)
 
-        exp_services.delete_exploration(self.owner_id, self.EXP_ID)
+        exp_services.delete_exploration(self.owner_id, self.EXP_ID)  # type: ignore[no-untyped-call]
 
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected collection to only reference valid explorations, but '
             'found an exploration with ID: exploration_id'):
             summary_services.get_learner_collection_dict_by_id(
                 self.COLLECTION_ID, self.owner)
 
-    def test_get_learner_dict_when_referencing_inaccessible_explorations(self):
+    def test_get_learner_dict_when_referencing_inaccessible_explorations(
+        self
+    ) -> None:
         self.save_new_default_collection(self.COLLECTION_ID, self.owner_id)
         self.save_new_valid_exploration(self.EXP_ID, self.editor_id)
         collection_services.update_collection(
@@ -516,7 +538,7 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
 
         # A collection cannot access someone else's private exploration.
         rights_manager.publish_collection(self.owner, self.COLLECTION_ID)
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected collection to only reference valid explorations, but '
             'found an exploration with ID: exploration_id'):
@@ -528,7 +550,7 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
         summary_services.get_learner_collection_dict_by_id(
             self.COLLECTION_ID, self.owner)
 
-    def test_get_learner_dict_with_private_exp_fails_validation(self):
+    def test_get_learner_dict_with_private_exp_fails_validation(self) -> None:
         self.save_new_valid_collection(
             self.COLLECTION_ID, self.owner_id, exploration_id=self.EXP_ID)
 
@@ -539,7 +561,7 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
 
         # A public collection referencing a private exploration is bad, however.
         rights_manager.publish_collection(self.owner, self.COLLECTION_ID)
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Cannot reference a private exploration within a public '
             'collection, exploration ID: exploration_id'):
@@ -552,7 +574,7 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
         summary_services.get_learner_collection_dict_by_id(
             self.COLLECTION_ID, self.owner)
 
-    def test_get_learner_dict_with_allowed_private_exps(self):
+    def test_get_learner_dict_with_allowed_private_exps(self) -> None:
         self.save_new_valid_collection(
             self.COLLECTION_ID, self.owner_id, exploration_id=self.EXP_ID)
         self.save_new_valid_exploration(self.EXP_ID_1, self.editor_id)
@@ -572,9 +594,10 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
         # collection since invalid explorations are being allowed, but the
         # private exploration of another author will not.
         collection_node_dicts = collection_dict['nodes']
+        exploration_summary = collection_node_dicts[0]['exploration_summary']
+        assert exploration_summary is not None
         self.assertEqual(
-            collection_node_dicts[0]['exploration_summary']['id'],
-            self.EXP_ID)
+            exploration_summary['id'], self.EXP_ID)
         self.assertIsNone(collection_node_dicts[1]['exploration_summary'])
 
 
@@ -584,24 +607,24 @@ class TopRatedExplorationDisplayableSummariesTest(
     summary dicts.
     """
 
-    ALBERT_EMAIL = 'albert@example.com'
-    ALICE_EMAIL = 'alice@example.com'
-    BOB_EMAIL = 'bob@example.com'
-    ALBERT_NAME = 'albert'
-    ALICE_NAME = 'alice'
-    BOB_NAME = 'bob'
+    ALBERT_EMAIL: Final = 'albert@example.com'
+    ALICE_EMAIL: Final = 'alice@example.com'
+    BOB_EMAIL: Final = 'bob@example.com'
+    ALBERT_NAME: Final = 'albert'
+    ALICE_NAME: Final = 'alice'
+    BOB_NAME: Final = 'bob'
 
-    EXP_ID_1 = 'eid1'
-    EXP_ID_2 = 'eid2'
-    EXP_ID_3 = 'eid3'
-    EXP_ID_4 = 'eid4'
-    EXP_ID_5 = 'eid5'
-    EXP_ID_6 = 'eid6'
-    EXP_ID_7 = 'eid7'
-    EXP_ID_8 = 'eid8'
-    EXP_ID_9 = 'eid9'
+    EXP_ID_1: Final = 'eid1'
+    EXP_ID_2: Final = 'eid2'
+    EXP_ID_3: Final = 'eid3'
+    EXP_ID_4: Final = 'eid4'
+    EXP_ID_5: Final = 'eid5'
+    EXP_ID_6: Final = 'eid6'
+    EXP_ID_7: Final = 'eid7'
+    EXP_ID_8: Final = 'eid8'
+    EXP_ID_9: Final = 'eid9'
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Populate the database of explorations and their summaries.
 
         The sequence of events is:
@@ -626,17 +649,17 @@ class TopRatedExplorationDisplayableSummariesTest(
         - (19) Admin user is set up.
         """
 
-        super(TopRatedExplorationDisplayableSummariesTest, self).setUp()
+        super().setUp()
 
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.signup(self.ALICE_EMAIL, self.ALICE_NAME)
         self.signup(self.BOB_EMAIL, self.BOB_NAME)
 
-        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.alice_id = self.get_user_id_from_email(self.ALICE_EMAIL)
-        self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)  # type: ignore[no-untyped-call]
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)  # type: ignore[no-untyped-call]
+        self.alice_id = self.get_user_id_from_email(self.ALICE_EMAIL)  # type: ignore[no-untyped-call]
+        self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)  # type: ignore[no-untyped-call]
 
         self.albert = user_services.get_user_actions_info(self.albert_id)
 
@@ -660,9 +683,9 @@ class TopRatedExplorationDisplayableSummariesTest(
         rights_manager.publish_exploration(self.albert, self.EXP_ID_8)
         rights_manager.publish_exploration(self.albert, self.EXP_ID_9)
 
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])  # type: ignore[no-untyped-call]
 
-    def test_at_most_eight_top_rated_explorations(self):
+    def test_at_most_eight_top_rated_explorations(self) -> None:
         """Note that at most 8 explorations should be returned."""
         rating_services.assign_rating_to_exploration(
             self.bob_id, self.EXP_ID_2, 5)
@@ -722,7 +745,7 @@ class TopRatedExplorationDisplayableSummariesTest(
 
         self.assertEqual(expected_ordering, actual_ordering)
 
-    def test_only_explorations_with_ratings_are_returned(self):
+    def test_only_explorations_with_ratings_are_returned(self) -> None:
         """Note that only explorations with ratings will be included."""
 
         rating_services.assign_rating_to_exploration(
@@ -764,14 +787,14 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
     summary dicts.
     """
 
-    ALBERT_NAME = 'albert'
-    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME: Final = 'albert'
+    ALBERT_EMAIL: Final = 'albert@example.com'
 
-    EXP_ID_1 = 'eid1'
-    EXP_ID_2 = 'eid2'
-    EXP_ID_3 = 'eid3'
+    EXP_ID_1: Final = 'eid1'
+    EXP_ID_2: Final = 'eid2'
+    EXP_ID_3: Final = 'eid3'
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Populate the database of explorations and their summaries.
 
         The sequence of events is:
@@ -784,13 +807,12 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
         - (7) Admin user is set up.
         """
 
-        super(
-            RecentlyPublishedExplorationDisplayableSummariesTest, self).setUp()
+        super().setUp()
 
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
-        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)  # type: ignore[no-untyped-call]
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)  # type: ignore[no-untyped-call]
         self.albert = user_services.get_user_actions_info(self.albert_id)
 
         self.save_new_valid_exploration(
@@ -807,9 +829,9 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
         rights_manager.publish_exploration(self.albert, self.EXP_ID_1)
         rights_manager.publish_exploration(self.albert, self.EXP_ID_3)
 
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])  # type: ignore[no-untyped-call]
 
-    def test_for_recently_published_explorations(self):
+    def test_for_recently_published_explorations(self) -> None:
         """Tests for recently published explorations."""
 
         self.process_and_flush_pending_tasks()
@@ -868,7 +890,7 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
 
         # Test that editing an exploration does not change its
         # 'recently-published' status.
-        exp_services.update_exploration(
+        exp_services.update_exploration(  # type: ignore[no-untyped-call]
             self.albert_id, self.EXP_ID_1, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'title',
@@ -888,42 +910,46 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
 class ActivityReferenceAccessCheckerTests(test_utils.GenericTestBase):
     """Tests for requiring that activity references are public."""
 
-    EXP_ID_0 = 'exp_id_0'
-    EXP_ID_1 = 'exp_id_1'
-    COL_ID_2 = 'col_id_2'
+    EXP_ID_0: Final = 'exp_id_0'
+    EXP_ID_1: Final = 'exp_id_1'
+    COL_ID_2: Final = 'col_id_2'
 
-    def setUp(self):
-        super(ActivityReferenceAccessCheckerTests, self).setUp()
+    def setUp(self) -> None:
+        super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
         self.owner = user_services.get_user_actions_info(self.owner_id)
 
-    def test_requiring_nonexistent_activities_be_public_raises_exception(self):
-        with self.assertRaisesRegex(Exception, 'non-existent exploration'):
+    def test_requiring_nonexistent_activities_be_public_raises_exception(
+        self
+    ) -> None:
+        with self.assertRaisesRegex(Exception, 'non-existent exploration'):  # type: ignore[no-untyped-call]
             summary_services.require_activities_to_be_public([
                 activity_domain.ActivityReference(
                     constants.ACTIVITY_TYPE_EXPLORATION, 'fake')])
-        with self.assertRaisesRegex(Exception, 'non-existent collection'):
+        with self.assertRaisesRegex(Exception, 'non-existent collection'):  # type: ignore[no-untyped-call]
             summary_services.require_activities_to_be_public([
                 activity_domain.ActivityReference(
                     constants.ACTIVITY_TYPE_COLLECTION, 'fake')])
 
-    def test_requiring_private_activities_to_be_public_raises_exception(self):
+    def test_requiring_private_activities_to_be_public_raises_exception(
+        self
+    ) -> None:
         self.save_new_valid_exploration(self.EXP_ID_0, self.owner_id)
         self.save_new_valid_exploration(self.EXP_ID_1, self.owner_id)
         self.save_new_valid_collection(
             self.COL_ID_2, self.owner_id, exploration_id=self.EXP_ID_0)
 
-        with self.assertRaisesRegex(Exception, 'private exploration'):
+        with self.assertRaisesRegex(Exception, 'private exploration'):  # type: ignore[no-untyped-call]
             summary_services.require_activities_to_be_public([
                 activity_domain.ActivityReference(
                     constants.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID_0)])
-        with self.assertRaisesRegex(Exception, 'private collection'):
+        with self.assertRaisesRegex(Exception, 'private collection'):  # type: ignore[no-untyped-call]
             summary_services.require_activities_to_be_public([
                 activity_domain.ActivityReference(
                     constants.ACTIVITY_TYPE_COLLECTION, self.COL_ID_2)])
 
-    def test_requiring_public_activities_to_be_public_succeeds(self):
+    def test_requiring_public_activities_to_be_public_succeeds(self) -> None:
         self.save_new_valid_exploration(self.EXP_ID_0, self.owner_id)
         self.save_new_valid_collection(
             self.COL_ID_2, self.owner_id, exploration_id=self.EXP_ID_0)
@@ -943,26 +969,26 @@ class CollectionNodeMetadataDictsTest(
         exp_services_test.ExplorationServicesUnitTests):
     """Test functions for getting collection node metadata dicts."""
 
-    ALBERT_EMAIL = 'albert@example.com'
-    ALBERT_NAME = 'albert'
+    ALBERT_EMAIL: Final = 'albert@example.com'
+    ALBERT_NAME: Final = 'albert'
 
-    BOB_EMAIL = 'bob@example.com'
-    BOB_NAME = 'bob'
+    BOB_EMAIL: Final = 'bob@example.com'
+    BOB_NAME: Final = 'bob'
 
-    EXP_ID1 = 'eid1'
-    EXP_ID2 = 'eid2'
-    EXP_ID3 = 'eid3'
-    EXP_ID4 = 'eid4'
-    EXP_ID5 = 'eid5'
-    INVALID_EXP_ID = 'invalid_exp_id'
+    EXP_ID1: Final = 'eid1'
+    EXP_ID2: Final = 'eid2'
+    EXP_ID3: Final = 'eid3'
+    EXP_ID4: Final = 'eid4'
+    EXP_ID5: Final = 'eid5'
+    INVALID_EXP_ID: Final = 'invalid_exp_id'
 
-    def setUp(self):
-        super(CollectionNodeMetadataDictsTest, self).setUp()
+    def setUp(self) -> None:
+        super().setUp()
 
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.signup(self.BOB_EMAIL, self.BOB_NAME)
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)  # type: ignore[no-untyped-call]
+        self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)  # type: ignore[no-untyped-call]
 
         self.albert = user_services.get_user_actions_info(self.albert_id)
         self.bob = user_services.get_user_actions_info(self.bob_id)
@@ -997,11 +1023,11 @@ class CollectionNodeMetadataDictsTest(
         rights_manager.publish_exploration(self.albert, self.EXP_ID3)
         rights_manager.publish_exploration(self.bob, self.EXP_ID4)
 
-        exp_services.index_explorations_given_ids([
+        exp_services.index_explorations_given_ids([  # type: ignore[no-untyped-call]
             self.EXP_ID1, self.EXP_ID2, self.EXP_ID3,
             self.EXP_ID4])
 
-    def test_get_exploration_metadata_dicts(self):
+    def test_get_exploration_metadata_dicts(self) -> None:
         metadata_dicts = (summary_services.get_exploration_metadata_dicts(
             [self.EXP_ID1, self.EXP_ID2, self.EXP_ID3], self.albert))
 
@@ -1020,13 +1046,15 @@ class CollectionNodeMetadataDictsTest(
         }]
         self.assertEqual(expected_metadata_dicts, metadata_dicts)
 
-    def test_get_exploration_metadata_dicts_with_invalid_exploration_id(self):
+    def test_get_exploration_metadata_dicts_with_invalid_exploration_id(
+        self
+    ) -> None:
         metadata_dicts = (summary_services.get_exploration_metadata_dicts(
             ['invalid_exp_id'], self.albert))
 
         self.assertEqual(metadata_dicts, [])
 
-    def test_private_exps_of_another_user_are_not_returned(self):
+    def test_private_exps_of_another_user_are_not_returned(self) -> None:
         metadata_dicts = (summary_services.get_exploration_metadata_dicts(
             [self.EXP_ID5, self.EXP_ID4], self.bob))
 
@@ -1037,7 +1065,7 @@ class CollectionNodeMetadataDictsTest(
         }]
         self.assertEqual(expected_metadata_dicts, metadata_dicts)
 
-    def test_public_exps_of_another_user_are_returned(self):
+    def test_public_exps_of_another_user_are_returned(self) -> None:
         metadata_dicts = (summary_services.get_exploration_metadata_dicts(
             [self.EXP_ID2, self.EXP_ID3, self.EXP_ID4], self.bob))
 
@@ -1056,8 +1084,8 @@ class CollectionNodeMetadataDictsTest(
         }]
         self.assertEqual(expected_metadata_dicts, metadata_dicts)
 
-    def test_deleted_exps_are_not_returned(self):
-        exp_services.delete_exploration(self.albert_id, self.EXP_ID2)
+    def test_deleted_exps_are_not_returned(self) -> None:
+        exp_services.delete_exploration(self.albert_id, self.EXP_ID2)  # type: ignore[no-untyped-call]
 
         metadata_dicts = (summary_services.get_exploration_metadata_dicts(
             [self.EXP_ID2, self.EXP_ID3, self.EXP_ID4], self.bob))
@@ -1073,7 +1101,7 @@ class CollectionNodeMetadataDictsTest(
         }]
         self.assertEqual(expected_metadata_dicts, metadata_dicts)
 
-    def test_exp_metadata_dicts_matching_query(self):
+    def test_exp_metadata_dicts_matching_query(self) -> None:
         metadata_dicts, _ = (
             summary_services.get_exp_metadata_dicts_matching_query(
                 'Exploration 1', None, self.albert))
@@ -1085,7 +1113,7 @@ class CollectionNodeMetadataDictsTest(
         }]
         self.assertEqual(expected_metadata_dicts, metadata_dicts)
 
-    def test_invalid_exp_ids(self):
+    def test_invalid_exp_ids(self) -> None:
         metadata_dicts = (summary_services.get_exploration_metadata_dicts(
             [self.EXP_ID3, self.INVALID_EXP_ID], self.albert))
 
@@ -1096,8 +1124,8 @@ class CollectionNodeMetadataDictsTest(
         }]
         self.assertEqual(expected_metadata_dicts, metadata_dicts)
 
-    def test_guest_can_fetch_public_exploration_metadata_dicts(self):
-        new_guest_user = user_services.get_user_actions_info(None)
+    def test_guest_can_fetch_public_exploration_metadata_dicts(self) -> None:
+        new_guest_user = user_services.get_user_actions_info('mock_user')
         metadata_dicts = summary_services.get_exploration_metadata_dicts(
             [self.EXP_ID3, self.EXP_ID4], new_guest_user)
 
@@ -1113,8 +1141,13 @@ class CollectionNodeMetadataDictsTest(
 
         self.assertEqual(metadata_dicts, expected_metadata_dicts)
 
-    def test_guest_cannot_fetch_private_exploration_metadata_dicts(self):
-        new_guest_user = user_services.get_user_actions_info(None)
+    def test_guest_cannot_fetch_private_exploration_metadata_dicts(
+        self
+    ) -> None:
+        # Here, get_user_actions_info method can only accept string values but
+        # for testing purposes here we are providing None which causes MyPy to
+        # throw an error. Thus to avoid the error, we used ignore here.
+        new_guest_user = user_services.get_user_actions_info(None)  # type: ignore[arg-type]
         self.save_new_valid_exploration('exp_id', self.albert_id)
         metadata_dicts = summary_services.get_exploration_metadata_dicts(
             ['exp_id'], new_guest_user)

@@ -18,7 +18,8 @@
 
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { FormsModule } from '@angular/forms';
+import { FormControl, FormsModule } from '@angular/forms';
+import { SchemaDefaultValue } from 'services/schema-default-value.service';
 import { SchemaBasedEditorComponent } from './schema-based-editor.component';
 
 describe('Schema based editor component', function() {
@@ -52,14 +53,14 @@ describe('Schema based editor component', function() {
   });
 
   it('should set component properties on initialization', fakeAsync(() => {
-    let mockFunction = function(value: number) {
+    let mockFunction = function(value: SchemaDefaultValue) {
       return value;
     };
     component.registerOnChange(mockFunction);
     component.registerOnTouched();
 
     expect(component).toBeDefined();
-    expect(component.validate(null)).toEqual(null);
+    expect(component.validate(new FormControl(1))).toEqual(null);
     expect(component.onChange).toEqual(mockFunction);
     expect(component.onChange(19)).toEqual(19);
   }));

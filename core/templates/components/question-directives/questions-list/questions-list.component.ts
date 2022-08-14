@@ -22,6 +22,7 @@ import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { Subscription } from 'rxjs';
 import { AlertsService } from 'services/alerts.service';
 import { AppConstants } from 'app.constants';
+import cloneDeep from 'lodash/cloneDeep';
 import { QuestionSummary } from 'domain/question/question-summary-object.model';
 import { QuestionSummaryForOneSkill } from 'domain/question/question-summary-for-one-skill-object.model';
 import { QuestionUndoRedoService } from 'domain/editor/undo_redo/question-undo-redo.service';
@@ -76,7 +77,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
   editorIsOpen: boolean;
   isSkillDifficultyChanged: boolean;
   linkedSkillsWithDifficulty: SkillDifficulty[];
-  misconceptionIdsForSelectedSkill: unknown[];
+  misconceptionIdsForSelectedSkill: number[];
   misconceptionsBySkill: MisconceptionSkillMap;
   newQuestionIsBeingCreated: boolean;
   newQuestionSkillDifficulties: number[] | number;
@@ -117,7 +118,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     this.question =
       this.questionObjectFactory.createDefaultQuestion(skillIds);
     this.questionId = this.question.getId();
-    this.questionStateData = this.question?.getStateData();
+    this.questionStateData = this.question.getStateData();
     this.questionIsBeingUpdated = false;
     this.newQuestionIsBeingCreated = true;
   }
@@ -249,9 +250,9 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
                 skillDict.id, skillDict.description));
           });
         }
-        this.question = angular.copy(response.questionObject);
+        this.question = cloneDeep(response.questionObject);
         this.questionId = this.question.getId();
-        this.questionStateData = this.question?.getStateData();
+        this.questionStateData = this.question.getStateData();
         this.questionIsBeingUpdated = true;
         this.newQuestionIsBeingCreated = false;
         this.openQuestionEditor();
@@ -366,7 +367,11 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
   }
 
   showSolutionCheckpoint(): boolean {
-    const interactionId = this.question?.getStateData().interaction.id;
+    if (!this.question) {
+      return false;
+    }
+
+    const interactionId = this.question.getStateData().interaction.id;
     return (
       interactionId && INTERACTION_SPECS[
         interactionId].can_have_solution);
@@ -480,7 +485,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
       this.editableQuestionBackendApiService.createQuestionAsync(
         this.newQuestionSkillIds, (
           this.newQuestionSkillDifficulties as number[]),
-        (this.question.toBackendDict(true) as unknown as Question), imagesData
+        (this.question.toBackendDict(true)), imagesData
       ).then((response) => {
         if (this.skillLinkageModificationsArray &&
             this.skillLinkageModificationsArray.length > 0) {
@@ -505,7 +510,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
           this.editableQuestionBackendApiService.updateQuestionAsync(
             this.questionId, String(this.question.getVersion()), commitMessage,
             this.questionUndoRedoService
-              .getCommittableChangeList() as unknown as string[]).then(
+              .getCommittableChangeList()).then(
             () => {
               this.questionUndoRedoService.clearChanges();
               this.editorIsOpen = false;

@@ -308,10 +308,13 @@ describe('Question Editor Component', () => {
         content_id: 'content_1'
       }));
 
-    component.saveStateContent('New content' as unknown as SubtitledHtml);
+    component.saveStateContent(
+      new SubtitledHtml('New content', 'New content')
+    );
 
     expect(component.interactionIsShown).toBe(true);
-    expect(component.questionStateData.content).toBe('New content');
+    expect(component.questionStateData.content).toEqual(
+      new SubtitledHtml('New content', 'New content'));
   });
 
   it('should save interaction ID when interaction is saved', () => {
@@ -356,10 +359,11 @@ describe('Question Editor Component', () => {
   it('should set interaction solution when interaction is saved', () => {
     spyOn(stateEditorService, 'setInteractionSolution');
 
-    component.saveSolution('Solution' as unknown as Solution);
+    let solution = new Solution(null, null, null, null);
+    component.saveSolution(solution);
 
     expect(stateEditorService.setInteractionSolution)
-      .toHaveBeenCalledWith('Solution');
+      .toHaveBeenCalledWith(solution);
   });
 
   it('should save hints when interaction is saved', () => {

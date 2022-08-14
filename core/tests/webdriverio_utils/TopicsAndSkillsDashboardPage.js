@@ -24,9 +24,12 @@ var general = require('../webdriverio_utils/general.js');
 
 var TopicsAndSkillsDashboardPage = function() {
   var assignSkillToTopicButton = $('.e2e-test-assign-skill-to-topic-button');
+  var assignSkillToTopicButtonLocator =
+    '.e2e-test-assign-skill-to-topic-button';
   var assignSkillToTopicButtonsSelector = function() {
     return $$('.e2e-test-assign-skill-to-topic-button');
   };
+  var assignedTopicNameInputClass = '.e2e-test-unassign-topic';
   var assignedTopicNamesInput = $('.e2e-test-unassign-topic');
   var confirmMoveButton = $('.e2e-test-confirm-move-button');
   var confirmSkillCreationButton = $('.e2e-test-confirm-skill-creation-button');
@@ -134,7 +137,7 @@ var TopicsAndSkillsDashboardPage = function() {
     await action.click(
       'Merge skill button', mergeSkillsButton);
 
-    var skill = $(`.e2e-test-skills-list-item=${newSkillName}`);
+    var skill = $(`.e2e-test-skills-list-item*=${newSkillName}`);
     await action.click('Skill radio button', skill);
     await action.click(
       'Confirm Skills Merge button', confirmSkillsMergeButton);
@@ -174,8 +177,9 @@ var TopicsAndSkillsDashboardPage = function() {
     await waitFor.visibilityOf(
       assignSkillToTopicButton,
       'Assign skill to topic buttons taking too long to appear');
+    await waitFor.numberOfElementsToBe(
+      assignSkillToTopicButtonLocator, 'assignSkillToTopicButtons', 1);
     var assignSkillToTopicButtons = await assignSkillToTopicButtonsSelector();
-    expect(assignSkillToTopicButtons.length).toEqual(1);
     await action.click(
       'Assign skill to topic button', assignSkillToTopicButtons[0]);
 
@@ -230,7 +234,7 @@ var TopicsAndSkillsDashboardPage = function() {
     await waitFor.visibilityOf(
       topicNameFieldElement, 'Topic Editor is taking too long to appear.');
     if (shouldCloseTopicEditor) {
-      await browser.closewindow();
+      await browser.closeWindow();
       await browser.switchToWindow(parentHandle);
       await waitFor.invisibilityOf(
         confirmTopicCreationButton,
@@ -276,7 +280,7 @@ var TopicsAndSkillsDashboardPage = function() {
     await this.waitForTopicsToLoad();
     await this.filterTopicsByKeyword(topicName);
     var topicEditOptions = await topicEditOptionsSelector();
-    expect(await topicEditOptions.length).toEqual(1);
+    expect(topicEditOptions.length).toEqual(1);
     await action.click(
       'Topic edit option', topicEditOptions[0]);
     await action.click('Delete topic button', deleteTopicButton);
