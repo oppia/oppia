@@ -18,11 +18,12 @@ from __future__ import annotations
 
 import pkg_resources
 import setuptools
+from core.tests import test_utils
 from scripts import common # isort:skip pylint: disable=unused-import
 # Since feconf imports typing_extensions, it should be
 # imported after common is imported.
 from core import feconf # isort:skip
-from core.tests import test_utils
+
 
 class SetupTests(test_utils.GenericTestBase):
     """Unit tests for setup.py."""
@@ -31,9 +32,10 @@ class SetupTests(test_utils.GenericTestBase):
         with open('requirements.txt', encoding='utf-8') as requirements_txt: # pylint: disable=replace-disallowed-function-calls
             # The 'parse_requirements' returns a list of 'Requirement' objects.
             # We need to transform these to strings using the str() function.
-            REQUIRED_PACKAGES = [
+            required_packages = [
                 str(requirement)  # pylint: disable=replace-disallowed-function-calls
-                for requirement in pkg_resources.parse_requirements(requirements_txt)
+                for requirement in pkg_resources.parse_requirements(
+                    requirements_txt)
             ]
 
         swap_setup = self.swap_with_checks(
@@ -43,10 +45,7 @@ class SetupTests(test_utils.GenericTestBase):
                 'name': 'oppia-beam-job',
                 'version': feconf.OPPIA_VERSION,
                 'description': 'Oppia Apache Beam package',
-                'install_requires': REQUIRED_PACKAGES,
+                'install_requires': required_packages,
                 'packages': setuptools.find_packages(),
                 'include_package_data': True,
             }])
-        
-        with swap_setup:
-            import setup

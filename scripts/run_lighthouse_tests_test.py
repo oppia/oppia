@@ -43,15 +43,17 @@ LIGHTHOUSE_CONFIG_FILENAMES = {
 
 
 class MockCompiler:
-    def wait(self) -> None:
+    def wait(self) -> None: # pylint: disable=missing-docstring
         pass
 
 
 class MockCompilerContextManager():
     def __init__(self):
         pass
+
     def __enter__(self):
         return MockCompiler()
+
     def __exit__(self, *unused_args):
         pass
 
@@ -71,28 +73,27 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         puppeteer_path = (
             os.path.join('core', 'tests', 'puppeteer', 'lighthouse_setup.js'))
         self.puppeteer_bash_command = [common.NODE_BIN_PATH, puppeteer_path]
-        lhci_path = os.path.join('node_modules', '@lhci', 'cli', 'src', 'cli.js')
+        lhci_path = os.path.join(
+            'node_modules', '@lhci', 'cli', 'src', 'cli.js')
         self.lighthouse_check_bash_command = [
             common.NODE_BIN_PATH, lhci_path, 'autorun',
-            '--config=%s' % LIGHTHOUSE_CONFIG_FILENAMES[LIGHTHOUSE_MODE_PERFORMANCE]['1'],
+            '--config=%s' % (
+                LIGHTHOUSE_CONFIG_FILENAMES[LIGHTHOUSE_MODE_PERFORMANCE]['1']),
             '--max-old-space-size=4096'
         ]
 
+        def mock_context_manager() -> MockCompilerContextManager:
+            return MockCompilerContextManager()
         self.swap_webpack_compiler = self.swap(
-            servers, 'managed_webpack_compiler',
-            lambda: MockCompilerContextManager())
+            servers, 'managed_webpack_compiler', mock_context_manager)
         self.swap_redis_server = self.swap(
-            servers, 'managed_redis_server',
-            lambda: MockCompilerContextManager())
+            servers, 'managed_redis_server', mock_context_manager)
         self.swap_elasticsearch_dev_server = self.swap(
-            servers, 'managed_elasticsearch_dev_server',
-            lambda: MockCompilerContextManager())
+            servers, 'managed_elasticsearch_dev_server', mock_context_manager)
         self.swap_firebase_auth_emulator = self.swap(
-            servers, 'managed_firebase_auth_emulator',
-            lambda: MockCompilerContextManager())
+            servers, 'managed_firebase_auth_emulator', mock_context_manager)
         self.swap_cloud_datastore_emulator = self.swap(
-            servers, 'managed_cloud_datastore_emulator',
-            lambda: MockCompilerContextManager())
+            servers, 'managed_cloud_datastore_emulator', mock_context_manager)
         self.swap_dev_appserver = self.swap(
             servers, 'managed_dev_appserver',
             lambda *unused_args, **unused_kwargs: MockCompilerContextManager())
@@ -151,7 +152,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
     def test_run_webpack_compilation_successfully(self) -> None:
         swap_isdir = self.swap_with_checks(
             os.path, 'isdir', lambda _: True, expected_kwargs=[])
-        
+
         with self.print_swap, self.swap_webpack_compiler, swap_isdir:
             run_lighthouse_tests.run_webpack_compilation()
 
@@ -160,10 +161,9 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             self.print_arr)
 
     def test_run_webpack_compilation_failed(self) -> None:
-        
         swap_isdir = self.swap_with_checks(
             os.path, 'isdir', lambda _: False, expected_kwargs=[])
-        
+
         with self.print_swap, self.swap_webpack_compiler, swap_isdir:
             with self.swap_sys_exit:
                 run_lighthouse_tests.run_webpack_compilation()
@@ -175,7 +175,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
     def test_subprocess_error_results_in_failed_webpack_compilation(
         self) -> None:
         class MockFailedCompiler:
-            def wait(self) -> None:
+            def wait(self) -> None: # pylint: disable=missing-docstring
                 raise subprocess.CalledProcessError(
                     returncode=1, cmd='', output='Subprocess execution failed.')
         class MockFailedCompilerContextManager():
@@ -186,13 +186,14 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             def __exit__(self, *unused_args):
                 pass
 
+        def mock_failed_context_manager() -> MockFailedCompilerContextManager:
+            return MockFailedCompilerContextManager()
         self.swap_webpack_compiler = self.swap_with_checks(
-            servers, 'managed_webpack_compiler',
-            lambda: MockFailedCompilerContextManager(),
+            servers, 'managed_webpack_compiler', mock_failed_context_manager,
             expected_args=(), expected_kwargs=[])
         swap_isdir = self.swap_with_checks(
             os.path, 'isdir', lambda _: False, expected_kwargs=[])
-        
+
         with self.print_swap, self.swap_webpack_compiler, swap_isdir:
             with self.swap_sys_exit:
                 run_lighthouse_tests.run_webpack_compilation()
@@ -259,12 +260,12 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             os.path, 'isdir', lambda _: True)
 
         with self.print_swap, self.swap_webpack_compiler, swap_isdir:
-            with self.swap_elasticsearch_dev_server, self.swap_dev_appserver, swap_popen:
+            with self.swap_elasticsearch_dev_server, self.swap_dev_appserver:
                 with self.swap_redis_server, self.swap_cloud_datastore_emulator:
-                    with self.swap_firebase_auth_emulator:
+                    with self.swap_firebase_auth_emulator, swap_popen:
                         run_lighthouse_tests.main(
                             args=['--mode', 'accessibility', '--shard', '1'])
-        
+
         self.assertIn(
             'Puppeteer script completed successfully.', self.print_arr)
         self.assertIn(
@@ -286,12 +287,13 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         swap_build = self.swap(build, 'main', lambda args: None)
 
         with self.print_swap, self.swap_webpack_compiler, swap_isdir:
-            with self.swap_elasticsearch_dev_server, self.swap_dev_appserver, swap_popen:
+            with self.swap_elasticsearch_dev_server, self.swap_dev_appserver:
                 with self.swap_redis_server, self.swap_cloud_datastore_emulator:
                     with self.swap_firebase_auth_emulator, swap_build:
-                        run_lighthouse_tests.main(
-                            args=['--mode', 'performance', '--shard', '1'])
-        
+                        with swap_popen:
+                            run_lighthouse_tests.main(
+                                args=['--mode', 'performance', '--shard', '1'])
+
         self.assertIn('Building files in production mode.', self.print_arr)
         self.assertIn(
             'Puppeteer script completed successfully.', self.print_arr)

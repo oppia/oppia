@@ -27,15 +27,17 @@ PORT_NUMBER_FOR_GAE_SERVER = 8181
 
 
 class MockCompiler:
-    def wait(self) -> None:
+    def wait(self) -> None: # pylint: disable=missing-docstring
         pass
 
 
 class MockCompilerContextManager():
     def __init__(self):
         pass
+
     def __enter__(self):
         return MockCompiler()
+
     def __exit__(self, *unused_args):
         pass
 
@@ -49,7 +51,8 @@ class SetupTests(test_utils.GenericTestBase):
         self.print_arr: list[str] = []
         def mock_print(msg: str) -> None:
             self.print_arr.append(msg)
-
+        def mock_context_manager() -> MockCompilerContextManager:
+            return MockCompilerContextManager()
         self.swap_print = self.swap(
             common, 'print_each_string_after_two_new_lines', mock_print)
         self.swap_install_third_party_libs = self.swap(
@@ -60,11 +63,9 @@ class SetupTests(test_utils.GenericTestBase):
             servers, 'managed_webpack_compiler',
             lambda **unused_kwargs: MockCompilerContextManager())
         self.swap_redis_server = self.swap(
-            servers, 'managed_redis_server',
-            lambda: MockCompilerContextManager())
+            servers, 'managed_redis_server', mock_context_manager)
         self.swap_elasticsearch_dev_server = self.swap(
-            servers, 'managed_elasticsearch_dev_server',
-            lambda: MockCompilerContextManager())
+            servers, 'managed_elasticsearch_dev_server', mock_context_manager)
         self.swap_firebase_auth_emulator = self.swap(
             servers, 'managed_firebase_auth_emulator',
             lambda **unused_kwargs: MockCompilerContextManager())
@@ -90,14 +91,14 @@ class SetupTests(test_utils.GenericTestBase):
                     with self.swap_extend_index_yaml, swap_build:
                         with self.swap_create_server, self.swap_print:
                             start.main(args=[])
-        
+
         self.assertIn(
             ['INFORMATION',
             'Local development server is ready! Opening a default web '
             'browser window pointing to it: '
             'http://localhost:%s/' % PORT_NUMBER_FOR_GAE_SERVER],
             self.print_arr)
-    
+
     def test_start_servers_successfully_in_production_mode(self) -> None:
         with self.swap_install_third_party_libs:
             from scripts import start
@@ -110,14 +111,14 @@ class SetupTests(test_utils.GenericTestBase):
                     with self.swap_extend_index_yaml, swap_build:
                         with self.swap_create_server, self.swap_print:
                             start.main(args=['--prod_env'])
-        
+
         self.assertIn(
             ['INFORMATION',
             'Local development server is ready! Opening a default web '
             'browser window pointing to it: '
             'http://localhost:%s/' % PORT_NUMBER_FOR_GAE_SERVER],
             self.print_arr)
-    
+
     def test_start_servers_successfully_in_maintenance_mode(self) -> None:
         with self.swap_install_third_party_libs:
             from scripts import start
@@ -133,15 +134,15 @@ class SetupTests(test_utils.GenericTestBase):
                         with self.swap_create_server, self.swap_print:
                             start.main(
                                 args=['--maintenance_mode', '--source_maps'])
-        
+
         self.assertIn(
             ['INFORMATION',
             'Local development server is ready! Opening a default web '
             'browser window pointing to it: '
             'http://localhost:%s/' % PORT_NUMBER_FOR_GAE_SERVER],
             self.print_arr)
-    
-    def test_could_not_start_new_server_when_port_is_already_in_use(self) -> None:
+
+    def test_could_not_start_new_server_when_port_is_in_use(self) -> None:
         with self.swap_install_third_party_libs:
             from scripts import start
         swap_build = self.swap_with_checks(
@@ -163,7 +164,7 @@ class SetupTests(test_utils.GenericTestBase):
             'Could not start new server. There is already an existing server '
             'running at port %s.' % PORT_NUMBER_FOR_GAE_SERVER],
             self.print_arr)
-        
+
         self.assertIn([
             'INFORMATION',
             'Local development server is ready! You can access it by '
