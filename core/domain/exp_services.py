@@ -1961,7 +1961,9 @@ def revert_version_history(
         new_version_history_model.put()
 
 
-def get_exploration_validation_error(exploration_id, revert_to_version):
+def get_exploration_validation_error(
+    exploration_id: str, revert_to_version: int
+) -> Optional[str]:
     """Tests whether an exploration can be reverted to the given version
     number. Does not commit any changes.
 

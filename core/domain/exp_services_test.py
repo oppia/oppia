@@ -1494,12 +1494,12 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             exploration, False)
         self.assertEqual(len(errors), 1)
         self.assertEqual(errors[0], error_string)
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, error_string):
             exp_services.validate_exploration_for_story(
                 exploration, True)
 
-    def test_validation_fail_for_state_classifier_model(self):
+    def test_validation_fail_for_state_classifier_model(self) -> None:
         exploration = self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, correctness_feedback_enabled=True,
             category='Algebra')
@@ -1515,12 +1515,12 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             exploration, False)
         self.assertEqual(len(errors), 1)
         self.assertEqual(errors[0], error_string)
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, error_string):
             exp_services.validate_exploration_for_story(
                 exploration, True)
 
-    def test_validation_fail_for_answer_groups(self):
+    def test_validation_fail_for_answer_groups(self) -> None:
         exploration = self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, correctness_feedback_enabled=True,
             category='Algebra')
@@ -1541,19 +1541,16 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                     }
                 )
             ],
-            [{
-                'answer_group_index': 1,
-                'answers': [
-                    'cheerful',
-                    'merry',
-                    'ecstatic',
-                    'glad',
-                    'overjoyed',
-                    'pleased',
-                    'thrilled',
-                    'smile'
-                ]
-            }],
+            [
+                'cheerful',
+                'merry',
+                'ecstatic',
+                'glad',
+                'overjoyed',
+                'pleased',
+                'thrilled',
+                'smile'
+            ],
             None
         )]
         error_string = (
@@ -1568,12 +1565,12 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             exploration, False)
         self.assertEqual(len(errors), 1)
         self.assertEqual(errors[0], error_string)
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, error_string):
             exp_services.validate_exploration_for_story(
                 exploration, True)
 
-    def test_validation_fail_for_default_outcome(self):
+    def test_validation_fail_for_default_outcome(self) -> None:
         exploration = self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, correctness_feedback_enabled=True,
             category='Algebra')
@@ -1602,12 +1599,12 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             exploration, False)
         self.assertEqual(len(errors), 1)
         self.assertEqual(errors[0], error_string)
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, error_string):
             exp_services.validate_exploration_for_story(
                 exploration, True)
 
-    def test_update_exploration_by_migration_bot(self):
+    def test_update_exploration_by_migration_bot(self) -> None:
         self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, end_state_name='end')
         rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
@@ -7464,14 +7461,16 @@ title: Old Title
                 self.albert_id, self.NEW_EXP_ID, change_list,
                 'Changed recorded_voiceovers.')
 
-    def test_get_exploration_validation_error(self):
+    def test_get_exploration_validation_error(self) -> None:
         # Valid exploration version.
         info = exp_services.get_exploration_validation_error(
             self.NEW_EXP_ID, 0)
         self.assertIsNone(info)
 
         # Invalid exploration version.
-        def _mock_exploration_validate_function(*args, **kwargs):
+        def _mock_exploration_validate_function(
+            *args: str, **kwargs: str
+        ) -> None:
             """Mocks exploration.validate()."""
             raise utils.ValidationError('Bad')
 
@@ -7483,7 +7482,7 @@ title: Old Title
                 self.NEW_EXP_ID, 0)
             self.assertEqual(info, 'Bad')
 
-    def test_revert_exploration_after_publish(self):
+    def test_revert_exploration_after_publish(self) -> None:
         self.save_new_valid_exploration(
             self.EXP_0_ID, self.albert_id,
             end_state_name='EndState')
