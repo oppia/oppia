@@ -16,7 +16,7 @@
  * @fileoverview Component for the outcome editor.
  */
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import cloneDeep from 'lodash/cloneDeep';
 import { AppConstants } from 'app.constants';
@@ -27,7 +27,7 @@ import { Subscription } from 'rxjs';
 import { ExternalSaveService } from 'services/external-save.service';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AddOutcomeModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-outcome-modal.component';
 
 
@@ -65,7 +65,8 @@ export class OutcomeEditorComponent implements OnInit {
     private externalSaveService: ExternalSaveService,
     private stateEditorService: StateEditorService,
     private stateInteractionIdService: StateInteractionIdService,
-    private ngbModal: NgbModal
+    private ngbModal: NgbModal,
+    private changeDetectorRef: ChangeDetectorRef
   ) {}
 
   isInQuestionMode(): boolean {
@@ -139,18 +140,17 @@ export class OutcomeEditorComponent implements OnInit {
 
   openFeedbackEditor(): void {
     if (this.isEditable) {
-      this.feedbackEditorIsOpen = true;
-      const modalRef: NgbModalRef = this.ngbModal.open(
-        AddOutcomeModalComponent, {
-          backdrop: 'static',
-          windowClass: 'add-outcome-modal'
-        });
-      modalRef.componentInstance.outcome = this.outcome;
+      let modalRef = this.ngbModal.open(AddOutcomeModalComponent, {
+        backdrop: 'static',
+      });
+
+      let currentOutcome = cloneDeep(this.outcome);
+      modalRef.componentInstance.outcome = currentOutcome;
+
       modalRef.result.then((result: AddOutcomeModalResponse): void => {
         this.outcome = result.outcome;
         this.saveThisFeedback(true);
       }, () => {
-        this.cancelThisFeedbackEdit();
         // Note to developers:
         // This callback is triggered when the Cancel button is clicked.
         // No further action is needed.

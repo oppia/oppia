@@ -16,11 +16,22 @@
  * @fileoverview Unit tests for AddOutcomeModalComponent.
  */
 
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { AddOutcomeModalComponent } from './add-outcome-modal.component';
+
+class MockActiveModal {
+  close(): void {
+    return;
+  }
+
+  dismiss(): void {
+    return;
+  }
+}
 
 describe('Add Outcome Modal Component', () => {
   let component: AddOutcomeModalComponent;
@@ -32,6 +43,13 @@ describe('Add Outcome Modal Component', () => {
       declarations: [
         AddOutcomeModalComponent
       ],
+      providers: [
+        {
+          provide: NgbActiveModal,
+          useClass: MockActiveModal
+        },
+      ],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 

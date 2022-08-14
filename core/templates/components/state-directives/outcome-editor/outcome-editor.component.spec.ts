@@ -18,11 +18,13 @@
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, waitForAsync } from '@angular/core/testing';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import { Outcome, OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import { AddOutcomeModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-outcome-modal.component';
 import { ExternalSaveService } from 'services/external-save.service';
 import { OutcomeEditorComponent } from './outcome-editor.component';
 
@@ -30,15 +32,19 @@ describe('Outcome Editor Component', () => {
   let component: OutcomeEditorComponent;
   let fixture: ComponentFixture<OutcomeEditorComponent>;
   let externalSaveService: ExternalSaveService;
-  let outcomeObjectFactory: OutcomeObjectFactory;
   let stateEditorService: StateEditorService;
   let stateInteractionIdService: StateInteractionIdService;
+  let ngbModal: NgbModal;
+  let outcomeObjectFactory: OutcomeObjectFactory;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [
+        HttpClientTestingModule,
+      ],
       declarations: [
-        OutcomeEditorComponent
+        OutcomeEditorComponent,
+        AddOutcomeModalComponent
       ],
       providers: [
         ExternalSaveService,
@@ -56,6 +62,7 @@ describe('Outcome Editor Component', () => {
     outcomeObjectFactory = TestBed.inject(OutcomeObjectFactory);
     stateEditorService = TestBed.inject(StateEditorService);
     stateInteractionIdService = TestBed.inject(StateInteractionIdService);
+    ngbModal = TestBed.inject(NgbModal);
 
     spyOn(stateEditorService, 'isExplorationWhitelisted').and.returnValue(true);
   });
@@ -296,14 +303,35 @@ describe('Outcome Editor Component', () => {
     expect(component.invalidStateAfterDestinationSave()).toBeTrue();
   });
 
-  it('should open feedback editor if it is editable', () => {
-    component.feedbackEditorIsOpen = false;
-    component.isEditable = true;
+  it('should open feedback editor if it is editable', fakeAsync(() => {
+    const outcome = new Outcome(
+      'Introduction',
+      null,
+      new SubtitledHtml('<p> Previous HTML string </p>', 'Id'),
+      true,
+      [],
+      null,
+      null,
+    );
 
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: {
+        outcome: outcome
+      },
+      result: Promise.resolve({
+        outcome: outcome
+      })
+    } as NgbModalRef);
+
+    spyOn(component, 'saveThisFeedback').and.callFake(()=>{
+      component.feedbackEditorIsOpen = false;
+    });
+
+    component.isEditable = true;
     component.openFeedbackEditor();
 
-    expect(component.feedbackEditorIsOpen).toBeTrue();
-  });
+    expect(ngbModal.open).toHaveBeenCalled();
+  }));
 
   it('should open destination editor if it is editable', () => {
     component.destinationEditorIsOpen = false;

@@ -16,7 +16,7 @@
  * @fileoverview Component for add outcome modal.
  */
 
-import { Component } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import cloneDeep from 'lodash/cloneDeep';
 import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
@@ -26,14 +26,17 @@ import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
   selector: 'oppia-add-outcome-modal',
   templateUrl: './add-outcome-modal.component.html'
 })
-export class AddOutcomeModalComponent extends ConfirmOrCancelModal {
-  outcome!: Outcome;
+export class AddOutcomeModalComponent extends ConfirmOrCancelModal
+implements OnInit {
+  @Input() outcome!: Outcome;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
   ) {
     super(ngbActiveModal);
   }
+
+  ngOnInit(): void { }
 
   isFeedbackLengthExceeded(): boolean {
     // TODO(#13764): Edit this check after appropriate limits are found.
