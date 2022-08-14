@@ -23,6 +23,7 @@ should therefore be independent of the specific storage models used.
 
 from __future__ import annotations
 
+import bs4
 import collections
 import copy
 import datetime
@@ -2516,18 +2517,34 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return states_dict
 
     @classmethod
-    def _convert_states_v51_dict_to_v52_dict(cls, states_dict):
+    def _convert_states_v51_dict_to_v52_dict(
+        cls, states_dict: Dict[str, state_domain.StateDict],
+        language_code: str
+    ) -> Dict[str, state_domain.StateDict]:
+        """Converts from version 51 to 52. Version 52 handles all the
+        errored data of the following -
+            - Explorarion states
+            - Exploration interaction
+            - Exploration RTE
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
         """
-        """
-        # explorations_summaries = get_all_exploration_summaries()
-        # exp_ids = [exp_id for exp_id in explorations_summaries.keys()]
-        exp_ids = ['a', 'def', 'gh']
+        exploration_rights = exp_models.ExplorationRightsModel.get_all(
+            include_deleted=False)
+        exp_ids = [exp['id'] for exp in exploration_rights]
+
         # Update general state validations.
         states_dict = cls._update_general_state(states_dict)
 
         # Update general state interaction validations.
         states_dict = cls._update_general_state_interaction(
-            states_dict, exp_ids)
+            states_dict, exp_ids, language_code)
 
         # Update general state RTE validations.
         states_dict = cls._update_general_state_rte(states_dict)
@@ -2535,8 +2552,23 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return states_dict
 
     @classmethod
-    def _update_general_state(cls, states_dict):
-        """
+    def _update_general_state(
+        cls, states_dict: Dict[str, state_domain.StateDict]
+    ) -> Dict[str, state_domain.StateDict]:
+        """Handles errored data for the general exploration state, performs the
+        following -
+            - If destination is `try again` and the value of labeled_as_correct
+            is True, replaces it with False
+            - If refresher_exploration_id is not None for lesson, marks it as
+            None
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
         """
         for state_name, state_dict in states_dict.items():
             answer_groups = state_dict['interaction']['answer_groups']
@@ -2549,7 +2581,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     answer_group['outcome']['labelled_as_correct'] = False
 
                 # refresher_exploration_id be None for all lessons.
-
                 if (
                     answer_group['outcome']['refresher_exploration_id'] is
                     not None
@@ -2568,8 +2599,21 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return states_dict
 
     @classmethod
-    def _choices_should_be_unique_and_non_empty(cls, choices):
-        """
+    def _choices_should_be_unique_and_non_empty(
+        cls, choices: List[str]
+    ) -> List[str]:
+        """Handles choices present in the ItemSelectionInput or
+        in MultipleChoiceInput interactions, implements the following -
+            - If only one choice is empty then simply removes it
+            - If multiple choices are empty replace them with `Choice 1` ,
+            `Choice 2` etc
+            - If choices are duplicate, removes the later choice
+
+        Args:
+            choices: List[str]. A list of choices.
+
+        Returns:
+            choices_to_save: List[str]. The list of valid choices.
         """
         empty_choices = []
         seen_choices = []
@@ -2578,14 +2622,17 @@ class Exploration(translation_domain.BaseTranslatableObject):
             if choice['html'].strip() in ('<p></p>', ''):
                 empty_choices.append(choice)
 
+        # Only one choice is empty.
         if len(empty_choices) == 1:
             choices.remove(empty_choices[0])
+        # Multiple choices are empty.
         else:
             for idx, empty_choice in enumerate(empty_choices):
                 empty_choice['html'] = (
                     '<p>' + 'Choice ' + str(idx+1) + '</p>'
                 )
 
+        # Duplicate choices.
         for choice in choices:
             if choice['html'] not in seen_choices:
                 seen_choices.append(choice['html'])
@@ -2594,8 +2641,18 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return choices_to_save
 
     @classmethod
-    def _item_selec_no_ans_group_should_be_same(cls, answer_groups):
-        """
+    def _item_selec_no_ans_group_should_be_same(
+        cls, answer_groups: state_domain.AnswerGroup
+    ) -> state_domain.AnswerGroup:
+        """No answer group should be same in ItemSelectionInput interaction,
+        Specefically checks for `Equals` rule spec if there are similar
+        rules then removes the later one
+
+        Args:
+            answer_groups: state_domain.AnswerGroup. The answer group.
+
+        Returns:
+            state_domain.AnswerGroup. The modified answer group.
         """
         equals_rule_values = []
         equals_rule_to_remove = []
@@ -2617,8 +2674,19 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return answer_groups
 
     @classmethod
-    def _equals_should_come_before_idx_rule(cls, answer_groups):
-        """
+    def _equals_should_come_before_idx_rule(
+        cls, answer_groups: state_domain.AnswerGroup
+    ) -> state_domain.AnswerGroup:
+        """Inside DragAndDrop interaction the `Equals` rule should always come
+        before `HasElementXAtPositionY` otherwise the rule will never going to
+        match, this helper functions simply removes the `Equals` rules as it
+        will never going to match
+
+        Args:
+            answer_groups: state_domain.AnswerGroup. The answer group.
+
+        Returns:
+            state_domain.AnswerGroup. The modified answer group.
         """
         ele_x_at_y_rules = []
         rules_to_remove = []
@@ -2661,8 +2729,19 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return answer_groups
 
     @classmethod
-    def _equals_should_come_before_misplace_by_one_rule(cls, answer_groups):
-        """
+    def _equals_should_come_before_misplace_by_one_rule(
+        cls, answer_groups: state_domain.AnswerGroup
+    ) -> state_domain.AnswerGroup:
+        """Inside DragAndDrop interaction the `Equals` rule should always come
+        before `IsEqualToOrderingWithOneItemAtIncorrectPosition` otherwise the
+        rule will never going to match, this helper functions simply removes
+        the `Equals` rules as it will never going to match
+
+        Args:
+            answer_groups: state_domain.AnswerGroup. The answer group.
+
+        Returns:
+            state_domain.AnswerGroup. The modified answer group.
         """
         equal_ordering_one_at_incorec_posn = []
         rules_to_remove = []
@@ -2794,8 +2873,20 @@ class Exploration(translation_domain.BaseTranslatableObject):
         )
 
     @classmethod
-    def _numeric_ans_group_should_not_be_subset(cls, answer_groups):
-        """
+    def _numeric_ans_group_should_not_be_subset(
+        cls, answer_groups: state_domain.AnswerGroup
+    ) -> state_domain.AnswerGroup:
+        """An answer group should not be a subset of another answer group in
+        NumericInput interaction otherwise the later answer group will be
+        redundant and will never be matched. Simply the invalid rule will be
+        removed and if only one rule is present then the complete answer group
+        is removed
+
+        Args:
+            answer_groups: state_domain.AnswerGroup. The answer group.
+
+        Returns:
+            state_domain.AnswerGroup. The modified answer group.
         """
         lower_infinity = float('-inf')
         upper_infinity = float('inf')
@@ -2916,7 +3007,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return answer_groups
 
     @classmethod
-    def _get_rule_value_f(cls, rule_spec):
+    def _get_rule_value_f(cls, rule_spec: state_domain.RuleSpec) -> float:
         """Return rule values from the rule_spec
 
         Args:
@@ -2939,8 +3030,21 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return rule_value_f
 
     @classmethod
-    def _fraction_rules_should_not_match_prev_rule(cls, answer_groups):
-        """
+    def _fraction_rules_should_not_match_prev_rule(
+        cls, answer_groups: state_domain.AnswerGroup
+    ) -> state_domain.AnswerGroup:
+        """Helper function for FractionInput interaction where rule should
+        not match previous rules solution or should not be
+        in the range of previous rules solution otherwise the later answer
+        group will be redundant and will never be matched. Simply the invalid
+        rule will be removed and if only one rule is present then the complete
+        answer group is removed
+
+        Args:
+            answer_groups: state_domain.AnswerGroup. The answer group.
+
+        Returns:
+            state_domain.AnswerGroup. The modified answer group.
         """
         lower_infinity = float('-inf')
         upper_infinity = float('inf')
@@ -3038,13 +3142,33 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 ranges.append(range_var)
                 matched_denominator_list.append(matched_denominator)
 
+        for invalid_rule in invalid_rules:
+            for answer_group in answer_groups:
+                for rule_spec in answer_group['rule_specs']:
+                    if rule_spec == invalid_rule:
+                        answer_group['rule_specs'].remove(rule_spec)
+
+                if len(answer_group['rule_specs']) == 0:
+                    answer_groups.remove(answer_group)
+
         return answer_groups
 
     @classmethod
     def _update_general_state_interaction(
-        cls, states_dict, exp_ids
-    ):
-        """
+        cls, states_dict: Dict[str, state_domain.StateDict],
+        exp_ids: List[str], language_code: str
+    ) -> Dict[str, state_domain.StateDict]:
+        """Handles all the invalid general state interaction
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+            exp_ids: List[str]. The list of the exploration ids.
+            language_code: str. The language code of the exploration.
+
+        Returns:
+            dict. The converted state dictionary.
         """
         for state_dict in states_dict.values():
         # Continue Interaction.
@@ -3053,8 +3177,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 text_value = state_dict['interaction'][
                     'customization_args']['buttonText']['value']['unicode_str']
                 if len(text_value) > 20:
-                    # Do something
-                    # if exp_lang_code == 'en':
+                    if language_code == 'en':
                         state_dict['interaction']['customization_args'][
                             'buttonText']['value']['unicode_str'] = 'Continue'
 
@@ -3309,7 +3432,107 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
     @classmethod
     def _update_general_state_rte(cls, states_dict):
-        pass
+        """Handles all the invalid RTE tags, performs the following
+            - `oppia-noninteractive-image`
+                - If `alt-with-value` attribute not in the image tag,
+                introduces the attribute and assign empty value
+                - If `filepath-with-value` attribute not in image tag,
+                removes the tag
+            - `oppia-noninteractive-math`
+                - If `math_content-with-value` attribute not in math tag,
+                removes the tag
+                - If `raw_latex` is not present or empty or None, removes
+                the tag
+            - `oppia-noninteractive-skillreview`
+                - If `text-with-value` attribute is not present or empty or
+                None, removes the tag
+            - `oppia-noninteractive-video`
+                - If `start-with-value` or `end-with-value` is not present,
+                introduce them to the tag and assign 0 to them
+                - If `autoplay-with-value` is not present or is not boolean,
+                introduce it to the tag and assign `false` to them
+                - If `video_id-with-value` is not present, removes the tag
+            - `oppia-noninteractive-link`
+                - If `text-with-value` or `url-with-value` is not present,
+                removes the tag
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        html = states_dict['content']['html']
+        soup = bs4.BeautifulSoup(html, 'html.parser')
+
+        for tag in soup:
+            if tag == 'oppia-noninteractive-image':
+                if 'alt-with-value' not in tag:
+                    tag['alt-with-value'] = '&quot;&quot;'
+
+                if 'filepath-with-value' not in tag:
+                    tag.decompose()
+
+            elif tag == 'oppia-noninteractive-math':
+                if 'math_content-with-value' not in tag:
+                    tag.decompose()
+                else:
+                    if 'raw_latex' not in tag['math_content-with-value']:
+                        tag.decompose()
+                    elif tag['math_content-with-value']['raw_latex'] is None:
+                        tag.decompose()
+                    elif tag['math_content-with-value'][
+                        'raw_latex'].strip() == '':
+                        tag.decompose()
+
+            elif tag == 'oppia-noninteractive-skillreview':
+                if 'text-with-value' not in tag:
+                    tag.decompose()
+                elif tag['text-with-value'] is None:
+                    tag.decompose()
+                elif tag['text-with-value'].strip() == '':
+                    tag.decompose()
+
+            elif tag == 'oppia-noninteractive-video':
+                if 'start-with-value' not in tag:
+                    tag['start-with-value'] = '0'
+
+                if 'end-with-value' not in tag:
+                    tag['end-with-value'] = '0'
+
+                if 'autoplay-with-value' not in tag:
+                    tag['autoplay-with-value'] = 'false'
+
+                if 'autoplay-with-value' in tag:
+                    if tag['autoplay-with-value'] not in ('true', 'false'):
+                        tag['autoplay-with-value'] = 'false'
+
+                if 'video_id-with-value' not in tag:
+                    tag.decompose()
+
+                if 'video_id-with-value' in tag:
+                    if tag['video_id-with-value'] is None:
+                        tag.decompose()
+                    elif tag['video_id-with-value'].strip() == '':
+                        tag.decompose()
+
+            elif tag == 'oppia-noninteractive-link':
+                if (
+                    'text-with-value' not in tag or
+                    'url-with-value' not in tag
+                ):
+                    tag.decompose()
+
+                elif tag['text-with-value'].strip() == '':
+                    tag.decompose()
+
+        html_ele_list = soup.prettify().split('\n')
+        html_ele_list = [ele.strip() for ele in html_ele_list]
+        states_dict['content']['html'] = ','.join(
+            html_ele_list).replace(',', '')
+
         return states_dict
 
     @classmethod
@@ -3619,7 +3842,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         exploration_dict['schema_version'] = 57
 
         exploration_dict['states'] = cls._convert_states_v51_dict_to_v52_dict(
-            exploration_dict['states'])
+            exploration_dict['states'], exploration_dict['language_code'])
         exploration_dict['states_schema_version'] = 52
 
         return exploration_dict
