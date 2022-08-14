@@ -184,7 +184,7 @@ describe('Full exploration editor', function() {
     await browser.refresh();
     await explorationEditorMainTab.setContent(async function(richTextEditor) {
       await richTextEditor.appendItalicText('Welcome');
-    });
+    }, true);
     await explorationEditorMainTab.expectContentToMatch(
       async function(richTextChecker) {
         await richTextChecker.readItalicText('Welcome');
@@ -304,7 +304,7 @@ describe('Full exploration editor', function() {
       await libraryPage.findExploration('Testing multiple rules');
       await libraryPage.playExploration('Testing multiple rules');
       var explorationId = await general.getExplorationIdFromPlayer();
-      await browser.get(
+      await browser.url(
         general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE + explorationId);
       await explorationEditorMainTab.exitTutorial();
       // Verify nothing can change with this user.
@@ -410,7 +410,7 @@ describe('Full exploration editor', function() {
       // Add a content change and does not save the draft.
       await explorationEditorMainTab.setContent(async function(richTextEditor) {
         await richTextEditor.appendPlainText('How are you feeling?');
-      });
+      }, true);
       await action.waitForAutosave();
       await users.logout();
 

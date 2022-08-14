@@ -818,7 +818,7 @@ var ExplorationEditorMainTab = function() {
     await action.waitForAutosave();
     await general.scrollToTop();
     var nodeStateElement = await explorationGraph.$(
-      `.e2e-test-node=${stateName}`);
+      `.e2e-test-node*=${stateName}`);
     await waitFor.visibilityOf(
       nodeStateElement,
       'State ' + stateName + ' takes too long to appear or does not exist');
@@ -886,7 +886,9 @@ var ExplorationEditorMainTab = function() {
 
     // Wait for state name container to completely disappear
     // and re-appear again.
-    await waitFor.visibilityOf(
+    // eslint-disable-next-line oppia/e2e-practices
+    await browser.pause(2000);
+    await waitFor.presenceOf(
       stateNameContainer, 'State Name Container takes too long to appear');
     await waitFor.textToBePresentInElement(
       stateNameContainer, name,

@@ -34,6 +34,7 @@ var ExplorationEditorSettingsTab = function() {
   var explorationSummaryTile = $('.e2e-test-exploration-summary-tile');
   var explorationTitleInput = $('.e2e-test-exploration-title-input');
   var initialStateSelect = $('.e2e-test-initial-state-select');
+  var initialStateSelector = '.e2e-test-initial-state-select';
   var neutralElement = $('.e2e-test-settings-container');
 
   /*
@@ -72,7 +73,10 @@ var ExplorationEditorSettingsTab = function() {
 
   this.expectAvailableFirstStatesToBe = async function(names) {
     await waitFor.visibilityOf(
-      initialStateSelect, 'Initial state select takes too long to be visible.');
+      initialStateSelect,
+      'Initial state select takes too long to be visible.');
+    await waitFor.numberOfChainedElementsToBe(
+      initialStateSelector, '<option>', 'Options', 3);
     var options = await initialStateSelect.$$('<option>')
       .map(async function(elem) {
         await waitFor.visibilityOf(

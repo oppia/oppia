@@ -63,7 +63,7 @@ describe('Full exploration editor', function() {
       // Add a content change and does not save the draft.
       await explorationEditorMainTab.setContent(async function(richTextEditor) {
         await richTextEditor.appendPlainText('How are you feeling?');
-      });
+      }, true);
       await action.waitForAutosave();
       await users.logout();
 
@@ -74,7 +74,7 @@ describe('Full exploration editor', function() {
       await general.openEditor(explorationId, true);
       await explorationEditorMainTab.setContent(async function(richTextEditor) {
         await richTextEditor.appendPlainText('You must be feeling great?');
-      });
+      }, true);
       await explorationEditorPage.saveChanges();
       await users.logout();
 
@@ -119,7 +119,7 @@ describe('Full exploration editor', function() {
       // Add a content change and does not save the draft.
       await explorationEditorMainTab.setContent(async function(richTextEditor) {
         await richTextEditor.appendPlainText('How are you feeling?');
-      });
+      }, true);
       await action.waitForAutosave();
       await users.logout();
 
@@ -130,7 +130,7 @@ describe('Full exploration editor', function() {
       await general.openEditor(explorationId, true);
       await explorationEditorMainTab.setContent(async function(richTextEditor) {
         await richTextEditor.appendPlainText('You must be feeling great?');
-      });
+      }, true);
       await explorationEditorPage.saveChanges();
       await users.logout();
 
@@ -165,7 +165,7 @@ describe('Full exploration editor', function() {
       await explorationEditorPage.navigateToMainTab();
       await explorationEditorMainTab.setContent(async function(richTextEditor) {
         await richTextEditor.appendPlainText('Content 1');
-      });
+      }, true);
       await action.waitForAutosave();
       await explorationEditorMainTab.setContent(async function(richTextEditor) {
         await richTextEditor.appendPlainText('Content 2');
@@ -393,7 +393,7 @@ describe('Full exploration editor', function() {
       // Add a content change and does not save the draft.
       await explorationEditorMainTab.setContent(async function(richTextEditor) {
         await richTextEditor.appendPlainText('How are you feeling?');
-      });
+      }, true);
       await action.waitForAutosave();
 
       // Check that the save changes button is enabled when online.
