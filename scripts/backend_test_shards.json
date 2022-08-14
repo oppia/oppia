@@ -51,7 +51,8 @@
         "core.controllers.voice_artist_test",
         "core.jobs.batch_jobs.skill_migration_jobs_test",
         "core.jobs.batch_jobs.story_migration_jobs_test",
-        "core.jobs.batch_jobs.email_deletion_jobs_test"
+        "core.jobs.batch_jobs.email_deletion_jobs_test",
+        "core.jobs.batch_jobs.blog_post_search_indexing_jobs_test"
     ],
     "2": [
         "core.domain.rights_manager_test",
@@ -87,6 +88,7 @@
         "core.domain.beam_job_services_test",
         "core.domain.blog_domain_test",
         "core.domain.blog_services_test",
+        "core.domain.blog_post_services_test",
         "core.controllers.blog_admin_test",
         "core.controllers.blog_dashboard_test",
         "core.controllers.blog_homepage_test",
