@@ -11,10 +11,24 @@ var args = process.argv;
 // is passed as 7th argument else it is passed as 6th argument.
 // eslint-disable-next-line eqeqeq
 var chromeVersion = (args[0] == 'DEBUG=true') ? args[6] : args[5];
-
+var service = null;
 const drivers = {
   chrome: { version: chromeVersion },
 };
+var chromedriverPath =
+  './node_modules/webdriver-manager/selenium/chromedriver_' + chromeVersion;
+
+if (process.env.GITHUB_ACTIONS) {
+  service = ['selenium-standalone', {
+    logPath: 'logs',
+    installArgs: { drivers },
+    args: { drivers }
+  }];
+} else {
+  service = ['chromedriver', {
+    chromedriverCustomPath: chromedriverPath
+  }];
+}
 
 // If video recorder is not running the ffmpeg process will be null.
 var ffmpegProcess = null;
@@ -149,7 +163,6 @@ exports.config = {
     browserName: 'chrome',
     'goog:chromeOptions': {
       args: [
-        'headless',
         '--lang=en-EN',
         '--window-size=1285x1000',
         // These arguments let us simulate recording from a microphone.
@@ -200,13 +213,7 @@ exports.config = {
   // They enhance your test setup with almost no effort. Unlike plugins,
   // they don't add newcommands. Instead, they hook themselves up into
   // the test process.
-  services: [
-    ['selenium-standalone', {
-      logPath: 'logs',
-      installArgs: { drivers },
-      args: { drivers }
-    }]
-  ],
+  services: [service],
 
   // Framework you want to run your specs with.
   // The following are supported: Mocha, Jasmine, and Cucumber
