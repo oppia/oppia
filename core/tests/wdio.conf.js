@@ -55,6 +55,10 @@ var suites = {
     './core/tests/webdriverio_desktop/additionalPlayerFeatures.js'
   ],
 
+  adminPage: [
+    './core/tests/webdriverio_desktop/adminTabFeatures.js'
+  ],
+
   blogDashboard: [
     './core/tests/webdriverio_desktop/blogDashboard.js'
   ],

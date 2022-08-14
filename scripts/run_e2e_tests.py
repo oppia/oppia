@@ -103,6 +103,7 @@ SUITES_MIGRATED_TO_WEBDRIVERIO = [
     'additionalEditorFeatures',
     'additionalEditorFeaturesModals',
     'additionalPlayerFeatures',
+    'adminPage',
     'blogDashboard',
     'classroomPage',
     'classroomPageFileUploadFeatures',
@@ -127,7 +128,6 @@ SUITES_MIGRATED_TO_WEBDRIVERIO = [
 
 SUITES_STILL_IN_PROTRACTOR = [
     'accessibility',
-    'adminPage',
     'coreEditorAndPlayerFeatures',
     'embedding',
     'explorationImprovementsTab',
