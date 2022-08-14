@@ -351,7 +351,7 @@ URLS = [
         r'%s/<skill_id>' % feconf.DIAGNOSTIC_TEST_SKILL_ASSIGNMENT_HANDLER,
         skill_editor.DiagnosticTestSkillAssignmentHandler),
     get_redirect_route(
-        r'%s/<comma_separated_topic_ids>' %
+        r'%s/' %
         feconf.TOPIC_ID_TO_DIAGNOSTIC_TEST_SKILL_IDS_HANDLER,
         topics_and_skills_dashboard.TopicIdToDiagnosticTestSkillIdsHandler),
     get_redirect_route(

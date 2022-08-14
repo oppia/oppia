@@ -136,7 +136,6 @@ export class UnassignSkillFromTopicsModalComponent
   }
 
   selectedTopicToUnassign(topicName: string): void {
-    alert(topicName);
     let index: number = this.selectedTopicNames.indexOf(topicName);
     if (index !== -1) {
       this.selectedTopicNames.splice(index, 1);

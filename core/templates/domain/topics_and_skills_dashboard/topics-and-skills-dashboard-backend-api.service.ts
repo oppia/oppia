@@ -243,8 +243,8 @@ export class TopicsAndSkillsDashboardBackendApiService {
       errorCallback: (reason: string) => void
   ): void {
     const topicIdToSkillIdsUrl = this.urlInterpolationService.interpolateUrl(
-      'topic_id_to_diagnostic_test_skill_ids_handler/' +
-        '<comma_separated_topic_ids>', {
+      'topic_id_to_diagnostic_test_skill_ids_handler' +
+        '/?comma_separated_topic_ids=<comma_separated_topic_ids>', {
         comma_separated_topic_ids: topicIds.join(',')
       });
     this.http.get<FetchTopicIdToDiagnosticTestSkillIdsBackendResponse>(

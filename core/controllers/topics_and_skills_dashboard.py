@@ -499,9 +499,37 @@ class TopicIdToDiagnosticTestSkillIdsHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.can_access_topics_and_skills_dashboard
-    def get(self, comma_separated_topic_ids):
+    def normalize_comma_separated_topic_ids(self, comma_separated_topic_ids):
+        """Normalizes a comma seperated topic IDs into a list of topic IDs.
+
+        Args:
+            comma_separated_topic_ids: str. Comma seperated topic IDs.
+
+        Returns:
+            list(str). A list of topic IDs.
+        """
         topic_ids = comma_separated_topic_ids.split(',')
+        empty_string = ''
+        if empty_string in topic_ids:
+            topic_ids.remove(empty_string)
+        return topic_ids
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'comma_separated_topic_ids': {
+                'schema': {
+                    'type': 'object_dict',
+                    'validation_method': normalize_comma_separated_topic_ids
+                }
+            }
+        }
+    }
+
+    @acl_decorators.can_access_topics_and_skills_dashboard
+    def get(self):
+        topic_ids = self.normalized_request.get(
+            'comma_separated_topic_ids')
         self.values.update({
             'topic_id_to_diagnostic_test_skill_ids': (
                 topic_services.get_topic_id_to_diagnostic_test_skill_ids(
