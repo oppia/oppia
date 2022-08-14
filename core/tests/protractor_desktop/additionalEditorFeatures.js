@@ -34,7 +34,7 @@ var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
 var lostChangesModal = element(by.css('.e2e-test-lost-changes-modal'));
 
-describe('Full exploration editor', function() {
+fdescribe('Full exploration editor', function() {
   var explorationPlayerPage = null;
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
@@ -111,7 +111,7 @@ describe('Full exploration editor', function() {
       await users.logout();
     });
 
-  it('should handle discarding changes, navigation, deleting states, ' +
+  fit('should handle discarding changes, navigation, deleting states, ' +
       'changing the first state, displaying content, deleting responses and ' +
       'switching to preview mode', async function() {
     await users.createUser('user5@editorAndPlayer.com', 'user5EditorAndPlayer');

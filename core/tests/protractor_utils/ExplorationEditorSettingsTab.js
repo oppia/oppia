@@ -40,9 +40,12 @@ var ExplorationEditorSettingsTab = function() {
     by.css('.e2e-test-exploration-title-input'));
   var initialStateSelect = element(
     by.css('.e2e-test-initial-state-select'));
+  var initialStateSelectAllOptions = element.all(
+    by.css('.e2e-test-initial-state-select-element'));
   var initialStateSelectOption = function(stateName) {
-    return initialStateSelect.element(
-      by.cssContainingText('option', stateName));
+    return element(
+      by.cssContainingText(
+        '.e2e-test-initial-state-select-element', stateName));
   };
   var neutralElement = element(by.css('.e2e-test-settings-container'));
 
@@ -90,14 +93,12 @@ var ExplorationEditorSettingsTab = function() {
       initialStateSelect, 'Initial state select takes too long to be visible.');
     await action.click('State Dropdown element', initialStateSelect, true);
 
-    var options = await initialStateSelect.all(
-      by.css('.e2e-test-initial-state-select-element'))
-      .map(async function(elem) {
-        await waitFor.visibilityOf(
-          elem,
-          'option element taking too long to appear');
-        return await elem.getText();
-      });
+    var options = await initialStateSelectAllOptions.map(async function(elem) {
+      await waitFor.visibilityOf(
+        elem,
+        'option element taking too long to appear');
+      return await elem.getText();
+    });
     expect(options.sort()).toEqual(names.sort());
   };
 
@@ -119,18 +120,20 @@ var ExplorationEditorSettingsTab = function() {
     await waitFor.presenceOf(
       explorationCategoryInput, 'Category input takes too long to be visible.');
     await (
-      await forms.AutocompleteDropdownEditorMigratedInAngular(
+      await forms.AutocompleteDropdownEditor(
         explorationCategoryInput)
     ).setValue(category);
   };
 
   this.setFirstState = async function(stateName) {
-    await action.click('Neutral element', neutralElement);
+    await action.click('Neutral element', neutralElement, true);
     await action.waitForAutosave();
     await waitFor.presenceOf(
       initialStateSelect, 'Initial state select takes too long to be visible.');
+    await action.click('State Dropdown element', initialStateSelect, true);
+
     await action.click(
-      'State name option', initialStateSelectOption(stateName));
+      'State name option', initialStateSelectOption(stateName), true);
     await action.click('Neutral element', neutralElement);
   };
 

@@ -317,9 +317,12 @@ var UnicodeEditor = function(elem) {
 };
 
 var AutocompleteDropdownEditor = function(elem) {
-  var containerLocator = '.select2-container';
-  var searchInputLocator = '.select2-search input';
-  var dropdownElement = '.select2-dropdown';
+  var containerLocator = '.e2e-test-exploration-category-dropdown';
+  var searchInputLocator = (
+    '.e2e-test-exploration-new-category-add');
+  var categorySelectorChoice = (
+    '.e2e-test-exploration-category-selector-choice');
+
   return {
     setValue: async function(text) {
       await action.click('Container Element', elem.$(containerLocator));
@@ -329,12 +332,20 @@ var AutocompleteDropdownEditor = function(elem) {
       // field when it is 'activated', i.e. when the dropdown is clicked.
       await action.setValue(
         'Dropdown Element',
-        $(dropdownElement).$(searchInputLocator),
-        text + '\n');
+        $(searchInputLocator),
+        text);
+
+      var searchInputLocatorText = await $$(
+        `.e2e-test-exploration-category-selector-choice=${{text}}`).first();
+
+      await action.click(
+        'Dropdown Element Select',
+        searchInputLocatorText,
+        true);
     },
     expectOptionsToBe: async function(expectedOptions) {
       await action.click('Container Element', await elem.$(containerLocator));
-      var actualOptions = await dropdownElement.$$('<li>').map(
+      var actualOptions = await $$(categorySelectorChoice).map(
         async function(optionElem) {
           return await action.getText('Option Elem', optionElem);
         }
@@ -343,7 +354,7 @@ var AutocompleteDropdownEditor = function(elem) {
       // Re-close the dropdown.
       await action.setValue(
         'Dropdown Element',
-        $(dropdownElement).$(searchInputLocator),
+        $(searchInputLocator),
         '\n');
     }
   };

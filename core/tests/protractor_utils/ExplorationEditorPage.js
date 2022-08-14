@@ -182,7 +182,7 @@ var ExplorationEditorPage = function() {
       expCategoryDropdownElement,
       'Category input takes too long to be visible.');
     await (
-      await forms.AutocompleteDropdownEditorMigratedInAngular(
+      await forms.AutocompleteDropdownEditor(
         expCategoryDropdownElement)
     ).setValue(category);
     await action.click(

@@ -26,7 +26,7 @@ var ExplorationEditorSettingsTab = function() {
   /*
    * Interactive elements
    */
-  var explorationCategoryInput = $('.e2e-test-exploration-category-input');
+  var explorationCategoryInput = $('.e2e-test-exploration-category');
   var explorationLanguageInput = $('.e2e-test-exploration-language-select');
   var explorationObjectiveInput = $('.e2e-test-exploration-objective-input');
   var explorationObjectiveWarning = $(
@@ -76,13 +76,17 @@ var ExplorationEditorSettingsTab = function() {
   this.expectAvailableFirstStatesToBe = async function(names) {
     await waitFor.presenceOf(
       initialStateSelect, 'Initial state select takes too long to be visible.');
-    var options = await initialStateSelect.$$('<option>')
+    await action.click('State Dropdown element', initialStateSelect, true);
+
+    var options = await initialStateSelect.$$(
+      '.e2e-test-initial-state-select-element')
       .map(async function(elem) {
         await waitFor.visibilityOf(
           elem,
           'option element taking too long to appear');
         return await elem.getText();
       });
+
     expect(options.sort()).toEqual(names.sort());
   };
 
@@ -119,7 +123,11 @@ var ExplorationEditorSettingsTab = function() {
   this.setLanguage = async function(language) {
     await waitFor.presenceOf(
       explorationLanguageInput, 'Language input takes too long to be visible.');
-    await explorationLanguageInput.selectByVisibleText(language);
+    await action.click(
+      'Exploration Language', explorationLanguageInput, true);
+
+    await $('.e2e-test-exploration-language-selector-choice')
+      .selectByVisibleText(language);
   };
 
   this.setObjective = async function(objective) {
