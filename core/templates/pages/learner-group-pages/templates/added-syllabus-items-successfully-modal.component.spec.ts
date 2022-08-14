@@ -14,13 +14,16 @@
 
 
 /**
- * @fileoverview Unit tests for the delete exploration modal component.
+ * @fileoverview Unit tests for the added syllabus successfully items modal
+ * component.
  */
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
+import { ComponentFixture, waitForAsync, TestBed } from
+  '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { RemoveItemModalComponent } from './remove-item-modal.component';
+import { AddedSyllabusItemsSuccessfullyModalComponent } from
+  './added-syllabus-items-successfully-modal.component';
 
 class MockActiveModal {
   close(): void {
@@ -33,13 +36,13 @@ class MockActiveModal {
 }
 
 describe('Delete Exploration Modal Component', function() {
-  let component: RemoveItemModalComponent;
-  let fixture: ComponentFixture<RemoveItemModalComponent>;
+  let component: AddedSyllabusItemsSuccessfullyModalComponent;
+  let fixture: ComponentFixture<AddedSyllabusItemsSuccessfullyModalComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
-        RemoveItemModalComponent
+        AddedSyllabusItemsSuccessfullyModalComponent
       ],
       providers: [{
         provide: NgbActiveModal,
@@ -50,7 +53,9 @@ describe('Delete Exploration Modal Component', function() {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(RemoveItemModalComponent);
+    fixture = TestBed.createComponent(
+      AddedSyllabusItemsSuccessfullyModalComponent
+    );
     component = fixture.componentInstance;
 
     TestBed.inject(NgbActiveModal);

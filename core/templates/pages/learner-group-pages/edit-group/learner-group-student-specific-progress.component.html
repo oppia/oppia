@@ -15,14 +15,102 @@
       </div>
       <div class="skill-analysis-tab overview-tab-sections-subtab" *ngIf="isTabActive(EDIT_OVERVIEW_SECTIONS_I18N_IDS.SKILLS_ANALYSIS)">
         <div class="tab-description">
-          This section shows the common skills which the learners of this group are struggling with.
-          <div *ngIf="studentProgress">
+          <span>{{studentProgress.username}}'s Progress in Assigned Skills</span>
+          <div *ngIf="studentProgress" class="all-subtopics-progress">
+            <div *ngFor="let topicName of topicNames" class="progress-dropdown">
+              <mat-accordion>
+                <mat-expansion-panel hideToggle>
+                  <mat-expansion-panel-header>
+                    <mat-panel-title>
+                      <div class="story-info-summary-container">
+                        <span class="subtopic-title">{{topicName}} <span *ngIf="getStrugglingWithSubtopicsCount(topicName) > 0" class="warning-pill">{{getStrugglingWithSubtopicsCount(topicName)}}</span></span>
+                        <div class="drop-icon">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17" fill="none">
+                            <path d="M15.1414 8.06956L8.07031 15.1406" stroke="#333333" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M0.999244 8.06956L8.07031 15.1406" stroke="#333333" stroke-width="2" stroke-linecap="round"/>
+                          </svg>
+                        </div>
+                      </div>
+                    </mat-panel-title>
+                  </mat-expansion-panel-header>
+                    <div *ngFor="let subtopicProgress of studentProgress.subtopicsProgress; let idx = index;">
+                      <div *ngIf="subtopicProgress.parentTopicName === topicName">
+                        <div class="subtopic-progress-card">
+                          <div *ngIf="subtopicProgress.subtopicMastery && subtopicProgress.subtopicMastery < 0.6" class="struggling-with-subtopic">
+                            <span [innerHTML]="'I18N_STRUGGLING_WITH_SKILL' | translate: { username: studentProgress.username }"></span>
+                          </div>
+                          <div class="subtopic-progress-info">
+                            <div class="subtopic-title">{{subtopicProgress.subtopicTitle}}</div>
+                            <div class="subtopic-progress">
+                              <div *ngIf="!subtopicProgress.subtopicMastery">
+                                &#8212; Not started yet &#8212;
+                              </div>
+                              <div *ngIf="subtopicProgress.subtopicMastery" class="subtopic-progress-bar">
+                                <div class="subtopic-progress-bar-fill" [ngStyle]="{'width': (subtopicProgress.subtopicMastery*100) + '%'}"></div>
+                              </div>
+                              <span *ngIf="subtopicProgress.subtopicMastery">
+                                <span *ngIf="subtopicProgress.subtopicMastery === 1" translate="I18N_SKILL_LEVEL_PROFICIENT"></span>
+                                <span *ngIf="subtopicProgress.subtopicMastery < 0.6" translate="I18N_SKILL_LEVEL_NEEDS_WORK"></span>
+                                <span *ngIf="subtopicProgress.subtopicMastery >= 0.6 && subtopicProgress.subtopicMastery < 0.8" translate="I18N_SKILL_LEVEL_BEGINNER"></span>
+                                <span *ngIf="subtopicProgress.subtopicMastery >= 0.8 && subtopicProgress.subtopicMastery < 1" translate="I18N_SKILL_LEVEL_INTERMIDIATE"></span>
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                </mat-expansion-panel>
+              </mat-accordion>
+            </div>
           </div>
         </div>
       </div>
       <div class="stories-progress-tab overview-tab-sections-subtab" *ngIf="isTabActive(EDIT_OVERVIEW_SECTIONS_I18N_IDS.PROGRESS_IN_STORIES)">
-        This section shows the common stories which the learners of this group have completed.
-        <div *ngIf="studentProgress">
+        <span class="tab-description">{{studentProgress.username}}'s Progress in Assigned Stories</span>
+        <div *ngIf="studentProgress" class="all-stories-progress">
+          <div *ngFor="let storyProgress of studentProgress.storiesProgress; let storyIndex = index" class="progress-dropdown story-progress-dropdown">
+            <mat-accordion>
+              <mat-expansion-panel hideToggle>
+                <mat-expansion-panel-header>
+                  <mat-panel-title>
+                    <div class="story-info-summary-container">
+                      <div class="story-info-summary">
+                        <div class="story-title">{{storyProgress.getTitle()}}</div>
+                        <div class="chapters-count-pill">{{storyProgress.getNodeTitles().length}} lessons</div>
+                      </div>
+                      <div class="drop-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17" fill="none">
+                          <path d="M15.1414 8.06956L8.07031 15.1406" stroke="#333333" stroke-width="2" stroke-linecap="round"/>
+                          <path d="M0.999244 8.06956L8.07031 15.1406" stroke="#333333" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                      </div>
+                    </div>
+                  </mat-panel-title>
+                </mat-expansion-panel-header>
+                  <div *ngFor="let chapterName of storyProgress.getNodeTitles(); let idx = index;">
+                    <div class="story-chapter-progress">
+                      <div class="chapter-title">
+                        <span>Lesson {{idx+1}}: {{chapterName}}</span>
+                      </div>
+                      <div class="chapter-progress-container" *ngIf="storiesChaptersProgress">
+                        <div class="chapter-progress" *ngIf="getVisitedCheckpointsCount(storyIndex, idx) > 0">
+                          <div class="chapter-progress-bar"></div>
+                          <div class="completed-progress-bar" [style.width.%]="getCompletedProgressBarWidth(storyIndex, idx)"></div>
+                          <div *ngFor="let checkpoint of getAllCheckpointsOfChapter(storyIndex, idx); let checkpointIdx = index;" class="checkpoints-progress-node-container">
+                            <div class="checkpoints-progress-node" *ngIf="checkpoint == 0" title="Checkpoint Not Started">{{checkpointIdx + 1}}</div>
+                            <div class="checkpoints-progress-node completed-checkpoint" *ngIf="checkpoint == 1" title="Checkpoint Completed">{{checkpointIdx + 1}}</div>
+                            <div class="checkpoints-progress-node in-progress-checkpoint" *ngIf="checkpoint == 2" title="Checkpoint In Progress">{{checkpointIdx + 1}}</div>
+                          </div>
+                        </div>
+                        <div *ngIf="getVisitedCheckpointsCount(storyIndex, idx) === 0" class="chapter-not-started">
+                          &#8212; Not started yet &#8212;
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+              </mat-expansion-panel>
+            </mat-accordion>
+          </div>
         </div>
       </div>
     </div>

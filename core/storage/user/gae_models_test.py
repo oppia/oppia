@@ -1773,7 +1773,7 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
 
     def test_get_multiple_exploration_model_success(self) -> None:
         retrieved_object = user_models.ExplorationUserDataModel.get_multi(
-            [self.USER_1_ID, self.USER_2_ID], self.EXP_ID_ONE)
+            [self.USER_1_ID, self.USER_2_ID], [self.EXP_ID_ONE])
         # Mypy Type checking for None.
         assert retrieved_object[0] is not None
         assert retrieved_object[1] is not None

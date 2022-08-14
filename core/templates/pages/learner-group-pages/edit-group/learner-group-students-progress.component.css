@@ -75,6 +75,7 @@
   align-self: center;
   background: #27635c;
   color: #fff;
+  cursor: pointer;
   display: flex;
   font-size: 16px;
   font-weight: 500;
@@ -82,8 +83,53 @@
   padding: 12px 24px;
 }
 
-.oppia-learner-group-students-progress .permissions-message {
+.oppia-learner-group-students-progress .gray-message {
   align-self: center;
   color: #757575;
   font-size: 14px;
+}
+
+.oppia-learner-group-students-progress .divider {
+  color: #757575;
+}
+
+.student-specific-progress-view-selectors {
+  display: flex;
+  justify-content: space-between;
+  margin: 40px auto;
+  text-align: left;
+  width: 80%;
+}
+
+.student-specific-progress-view-selectors .students-dropdown-toggle {
+  align-items: center;
+  background: #FFFFFF;
+  border: 1px solid #27635C;
+  border-radius: 4px;
+  display: flex;
+  min-width: 200px;
+}
+
+.student-specific-progress-view-selectors .students-dropdown-menu {
+  min-width: 218px;
+}
+
+.student-info img {
+  border-radius: 50%;
+}
+
+.student-specific-progress-view-selectors .student-info {
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  font-size: 16px;
+  gap: 15px;
+  height: 26px;
+  padding: 1px;
+  min-width: 180px;
+}
+
+.student-specific-progress-view-selectors .back-to-all-students-progress-button {
+  cursor: pointer;
+  font-weight: 500;
 }

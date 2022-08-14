@@ -981,7 +981,10 @@ URLS = [
         r'/learner_group_student_invitation_handler/<learner_group_id>',
         learner_group.LearnerGroupStudentInvitationHandler),
     get_redirect_route(
-        r'/edit-learner-group/<group_id>', learner_group.EditLearnerGroupPage)
+        r'/edit-learner-group/<group_id>', learner_group.EditLearnerGroupPage),
+    get_redirect_route(
+        r'/user_progress_in_stories_chapters_handler/<username>',
+        learner_group.StudentStoriesChaptersProgressHandler)
 ]
 
 # Adding redirects for topic landing pages.

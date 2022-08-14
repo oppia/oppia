@@ -1881,7 +1881,7 @@ def get_users_email_preferences_for_exploration(
     """
     exploration_user_models = (
         user_models.ExplorationUserDataModel.get_multi(
-            user_ids, exploration_id))
+            user_ids, [exploration_id]))
     result = []
 
     for exploration_user_model in exploration_user_models:

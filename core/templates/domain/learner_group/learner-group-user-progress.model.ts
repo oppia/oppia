@@ -22,6 +22,40 @@ import { LearnerGroupSubtopicSummary, LearnerGroupSubtopicSummaryBackendDict }
  * user progress domain objects.
  */
 
+export interface ChapterProgressSummaryBackendDict {
+  total_checkpoints_count: number;
+  visited_checkpoints_count: number;
+}
+
+export class ChapterProgressSummary {
+  _totalCheckpointsCount: number;
+  _visitedCheckpointsCount: number;
+
+  constructor(
+      totalCheckpointsCount: number,
+      visitedCheckpointsCount: number
+  ) {
+    this._totalCheckpointsCount = totalCheckpointsCount;
+    this._visitedCheckpointsCount = visitedCheckpointsCount;
+  }
+
+  get totalCheckpoints(): number {
+    return this._totalCheckpointsCount;
+  }
+
+  get visitedCheckpoints(): number {
+    return this._visitedCheckpointsCount;
+  }
+
+  static createFromBackendDict(
+      chapterProgressSummaryBackendDict: ChapterProgressSummaryBackendDict
+  ): ChapterProgressSummary {
+    return new ChapterProgressSummary(
+      chapterProgressSummaryBackendDict.total_checkpoints_count,
+      chapterProgressSummaryBackendDict.visited_checkpoints_count);
+  }
+}
+
 export interface LearnerGroupUserProgressBackendDict {
   username: string ;
   progress_sharing_is_turned_on: boolean;
@@ -42,7 +76,7 @@ export class LearnerGroupUserProgress {
       progressSharingIsTurnedOn: boolean,
       profilePictureDataUrl: string,
       storiesProgress: StorySummary[],
-      subtopicsProgress: LearnerGroupSubtopicSummary[]
+      subtopicsProgress: LearnerGroupSubtopicSummary[],
   ) {
     this._username = username;
     this._progressSharingIsTurnedOn = progressSharingIsTurnedOn;

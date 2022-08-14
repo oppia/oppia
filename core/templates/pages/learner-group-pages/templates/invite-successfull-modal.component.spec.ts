@@ -20,7 +20,7 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { RemoveItemModalComponent } from './remove-item-modal.component';
+import { InviteSuccessfullModalComponent } from './invite-successfull-modal.component';
 
 class MockActiveModal {
   close(): void {
@@ -32,14 +32,14 @@ class MockActiveModal {
   }
 }
 
-describe('Delete Exploration Modal Component', function() {
-  let component: RemoveItemModalComponent;
-  let fixture: ComponentFixture<RemoveItemModalComponent>;
+describe('Invite Successfull Modal Component', function() {
+  let component: InviteSuccessfullModalComponent;
+  let fixture: ComponentFixture<InviteSuccessfullModalComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
-        RemoveItemModalComponent
+        InviteSuccessfullModalComponent
       ],
       providers: [{
         provide: NgbActiveModal,
@@ -50,7 +50,7 @@ describe('Delete Exploration Modal Component', function() {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(RemoveItemModalComponent);
+    fixture = TestBed.createComponent(InviteSuccessfullModalComponent);
     component = fixture.componentInstance;
 
     TestBed.inject(NgbActiveModal);

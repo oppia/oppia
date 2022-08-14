@@ -791,3 +791,42 @@ class LearnerGroupStudentInvitationHandler(base.BaseHandler):
             'subtopic_page_ids': learner_group.subtopic_page_ids,
             'story_ids': learner_group.story_ids
         })
+
+
+class StudentStoriesChaptersProgressHandler(base.BaseHandler):
+    """Handles fetching progress of a user in all chapters of given stories"""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'username': {
+            'schema': {
+                'type': 'basestring',
+            },
+            'default_value': ''
+        }
+    }
+
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'story_ids': {
+                'schema': {
+                    'type': 'custom',
+                    'obj_type': 'JsonEncodedInString'
+                }
+            }
+        }
+    }
+
+    @acl_decorators.can_access_learner_groups
+    def get(self, username):
+        """Handles GET requests."""
+
+        story_ids = self.normalized_request.get('story_ids')
+        user_id = user_services.get_user_id_from_username(username)
+
+        stories_chapters_progress = (
+            story_fetchers.get_user_progress_in_story_chapters(
+                user_id, story_ids))
+
+        self.render_json(stories_chapters_progress)

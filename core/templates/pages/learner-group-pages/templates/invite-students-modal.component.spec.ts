@@ -14,7 +14,7 @@
 
 
 /**
- * @fileoverview Unit tests for the delete exploration modal component.
+ * @fileoverview Unit tests for the invite students modal component.
  */
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';

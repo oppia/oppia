@@ -19,8 +19,10 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { LearnerGroupSyllabusBackendApiService } from 'domain/learner_group/learner-group-syllabus-backend-api.service';
-import { LearnerGroupUserProgress } from 'domain/learner_group/learner-group-user-progress.model';
+import { ChapterProgressSummary, LearnerGroupUserProgress } from 'domain/learner_group/learner-group-user-progress.model';
 import { LearnerGroupData } from 'domain/learner_group/learner-group.model';
+import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
+import { NavigationService } from 'services/navigation.service';
 
 import './learner-group-students-progress.component.css';
 
@@ -32,10 +34,18 @@ import './learner-group-students-progress.component.css';
 export class LearnerGroupStudentsProgressComponent implements OnInit {
   @Input() learnerGroup: LearnerGroupData;
   studentsProgress!: LearnerGroupUserProgress[];
+  studentSpecificProgressViewIsActive = false;
+  specificStudentProgress!: LearnerGroupUserProgress;
+  searchUsernameQuery: string = '';
+  matchingUsersProgress: LearnerGroupUserProgress[];
+  storiesChaptersProgress: ChapterProgressSummary[];
 
   constructor(
     private learnerGroupSyllabusBackendApiService:
-      LearnerGroupSyllabusBackendApiService
+      LearnerGroupSyllabusBackendApiService,
+    private navigationService: NavigationService,
+    private storyViewerBackendApiService: StoryViewerBackendApiService
+
   ) {}
 
   ngOnInit(): void {
@@ -45,6 +55,7 @@ export class LearnerGroupStudentsProgressComponent implements OnInit {
           this.learnerGroup.id, this.learnerGroup.studentUsernames
         ).then(studentsProgress => {
           this.studentsProgress = studentsProgress;
+          this.matchingUsersProgress = this.studentsProgress;
         });
     }
   }
@@ -56,7 +67,7 @@ export class LearnerGroupStudentsProgressComponent implements OnInit {
 
   getCompletedStoriesCountByStudent(index: number): number {
     let completedStoriesCount = 0;
-    const storiesProgress = this.studentsProgress[index].storiesProgress;
+    const storiesProgress = this.matchingUsersProgress[index].storiesProgress;
     storiesProgress.forEach(storyProgress => {
       if (
         storyProgress.getCompletedNodeTitles().length ===
@@ -70,7 +81,8 @@ export class LearnerGroupStudentsProgressComponent implements OnInit {
 
   getStrugglingSubtopicsCountOfStudent(index: number): number {
     let strugglingSubtopicsCount = 0;
-    const subtopicsProgress = this.studentsProgress[index].subtopicsProgress;
+    const subtopicsProgress = (
+      this.matchingUsersProgress[index].subtopicsProgress);
     subtopicsProgress.forEach(subtopicProgress => {
       if (subtopicProgress.subtopicMastery &&
         subtopicProgress.subtopicMastery < 0.6
@@ -83,6 +95,56 @@ export class LearnerGroupStudentsProgressComponent implements OnInit {
 
   getProfileImageDataUrl(dataUrl: string): string {
     return decodeURIComponent(dataUrl);
+  }
+
+  activateStudentSpecificView(
+      studentProgress: LearnerGroupUserProgress
+  ): void {
+    this.studentSpecificProgressViewIsActive = true;
+    this.specificStudentProgress = studentProgress;
+  }
+
+  isStudentSpecificViewActive(): boolean {
+    return this.studentSpecificProgressViewIsActive;
+  }
+
+  disableStudentSpecificView(): void {
+    this.studentSpecificProgressViewIsActive = false;
+  }
+
+  updateStudentSpecificProgress(studentProgress: LearnerGroupUserProgress): void {
+    this.specificStudentProgress = studentProgress;
+    let syllabusStoryIds: string[] = [];
+    studentProgress.storiesProgress.forEach(storyProgress => {
+      syllabusStoryIds.push(storyProgress.getId());
+    });
+
+    this.storyViewerBackendApiService.fetchProgressInStoriesChapters(
+      studentProgress.username, syllabusStoryIds
+    ).then(storiesChaptersProgress => {
+      this.storiesChaptersProgress = storiesChaptersProgress;
+    });
+  }
+
+  getSearchUsernameResults(): LearnerGroupUserProgress[] {
+    if (this.searchUsernameQuery === '') {
+      this.matchingUsersProgress = this.studentsProgress;
+    }
+    this.matchingUsersProgress = this.studentsProgress.filter(
+      studentProgress => studentProgress.username.toLowerCase().includes(
+        this.searchUsernameQuery.toLocaleLowerCase())
+    );
+    return this.matchingUsersProgress;
+  }
+
+  /**
+   * Opens the submenu.
+   * @param {KeyboardEvent} evt
+   * @param {String} menuName - name of menu, on which
+   * open/close action to be performed (category,language).
+   */
+   openSubmenu(evt: KeyboardEvent, menuName: string): void {
+    this.navigationService.openSubmenu(evt, menuName);
   }
 }
 

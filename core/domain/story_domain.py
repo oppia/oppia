@@ -1873,3 +1873,13 @@ class LearnerGroupSyllabusStorySummaryDict(StorySummaryDict):
     all_node_dicts: List[StoryNodeDict]
     topic_name: str
     topic_url_fragment: str
+
+
+class StoryChapterProgressSummaryDict(TypedDict):
+    """Dictionary representation of a StorySummary object for learner
+    groups syllabus.
+    """
+
+    exploration_id: str
+    completed_checkpoints_count: int
+    total_checkpoints_count: int

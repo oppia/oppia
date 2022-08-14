@@ -27,8 +27,10 @@ import itertools
 
 from core import feconf
 from core.domain import caching_services
+from core.domain import exp_fetchers
 from core.domain import story_domain
 from core.domain import topic_fetchers
+from core.domain import user_services
 from core.platform import models
 
 from typing import Dict, List, Optional, overload
@@ -36,11 +38,12 @@ from typing_extensions import Literal
 
 MYPY = False
 if MYPY: # pragma: no cover
+    from mypy_imports import exp_models
     from mypy_imports import story_models
     from mypy_imports import user_models
 
-(story_models, user_models) = models.Registry.import_models(
-    [models.NAMES.story, models.NAMES.user])
+(story_models, user_models, exp_models) = models.Registry.import_models(
+    [models.NAMES.story, models.NAMES.user, models.NAMES.exploration])
 
 
 def _migrate_story_contents_to_latest_schema(
@@ -439,6 +442,55 @@ def get_completed_nodes_in_story(
             completed_nodes.append(node)
 
     return completed_nodes
+
+
+def get_user_progress_in_story_chapters(
+    user_id: str, story_ids: List[str]
+) -> List[story_domain.StoryChapterProgressSummaryDict]:
+    """Returns the progress of multiple users in multiple chapters.
+
+    Args:
+        user_id: str. The user id of the user.
+        story_ids: list(str). The ids of the stories.
+
+    Returns:
+        list(StoryChapterProgressSummaryDict). The list of the progress
+        summaries of the user corresponding to all stories chapters.
+    """
+    all_valid_story_nodes: List[story_domain.StoryNode] = []
+    for story in get_stories_by_ids(story_ids):
+        if story:
+            all_valid_story_nodes.extend(story.story_contents.nodes)
+    exp_ids = [
+        node.exploration_id for node in all_valid_story_nodes
+        if node.exploration_id
+    ]
+    exp_id_to_exp_map = exp_fetchers.get_multiple_explorations_by_id(exp_ids)
+    exp_user_data_models = (
+        user_models.ExplorationUserDataModel.get_multi(
+            [user_id], exp_ids))
+
+    all_chapters_progress = []
+    for i, exp_id in enumerate(exp_ids):
+        exploration = exp_id_to_exp_map[exp_id]
+        all_checkpoints = user_services.get_checkpoints_in_order(
+            exploration.init_state_name,
+            exploration.states)
+        model = exp_user_data_models[i]
+        visited_checkpoints = 0
+        if model is not None:
+            most_recently_visited_checkpoint = (
+                model.most_recently_reached_checkpoint_state_name)
+            if most_recently_visited_checkpoint is not None:
+                visited_checkpoints = all_checkpoints.index(
+                    most_recently_visited_checkpoint) + 1
+        all_chapters_progress.append({
+            'exploration_id': exp_id,
+            'visited_checkpoints_count': visited_checkpoints,
+            'total_checkpoints_count': len(all_checkpoints)
+        })
+
+    return all_chapters_progress
 
 
 def get_multi_users_progress_in_stories(
