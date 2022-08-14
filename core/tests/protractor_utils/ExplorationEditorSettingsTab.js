@@ -144,20 +144,13 @@ var ExplorationEditorSettingsTab = function() {
     await waitFor.presenceOf(
       explorationLanguageInput, 'Language input takes too long to be visible.');
 
-    await action.click(
-      'Exploration Language', explorationLanguageInput);
+    await action.matSelect(
+      'Exploration Language', explorationLanguageInput, language);
 
-    var languageButton = element.all(by.cssContainingText(
-      '.e2e-test-exploration-language-selector-choice', language)).first();
+    // var languageButton = element.all(by.cssContainingText(
+    //   '.mat-option-text', language)).first();
 
-    await waitFor.visibilityOf(
-      element(by.css('.mat-option-text')), 'Language button');
-
-    await action.click('Language button', languageButton, true);
-
-    await waitFor.invisibilityOf(
-      element(by.css('.mat-option-text')), 'Language button');
-
+    // await action.click('Language button', languageButton);
     await action.click('Neutral element', neutralElement);
   };
 
