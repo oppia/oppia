@@ -50,7 +50,6 @@ export class UnassignSkillFromTopicsModalComponent
   selectedTopicNames: string[] = [];
   selectedTopics: TopicAssignmentsSummary[] = [];
   eligibleTopicNamesForUnassignment: string[] = [];
-  topicNamesNotEligibleForUnassignment: string[] = [];
 
   constructor(
     private ngbActiveModal: NgbActiveModal,

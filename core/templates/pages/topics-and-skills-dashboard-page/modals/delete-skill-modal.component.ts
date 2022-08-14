@@ -47,7 +47,6 @@ export class DeleteSkillModalComponent extends ConfirmOrCancelModal {
   topicsAssignments!: AssignedSkill[];
   topicsAssignmentsAreFetched: boolean = false;
   skillCanBeDeleted: boolean = true;
-  topicNamesNotEligibleForUnassignment: string[] = [];
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
