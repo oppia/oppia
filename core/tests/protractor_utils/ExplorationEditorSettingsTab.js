@@ -91,7 +91,7 @@ var ExplorationEditorSettingsTab = function() {
   this.expectAvailableFirstStatesToBe = async function(names) {
     await waitFor.presenceOf(
       initialStateSelect, 'Initial state select takes too long to be visible.');
-    await action.click('State Dropdown element', initialStateSelect, true);
+    await action.click('State Dropdown element', initialStateSelect);
 
     var options = await initialStateSelectAllOptions.map(async function(elem) {
       await waitFor.visibilityOf(
@@ -127,7 +127,7 @@ var ExplorationEditorSettingsTab = function() {
   };
 
   this.setFirstState = async function(stateName) {
-    await action.click('Neutral element', neutralElement);
+    await action.click('Neutral element', neutralElement, true);
     await action.waitForAutosave();
     await waitFor.presenceOf(
       initialStateSelect, 'Initial state select takes too long to be visible.');
@@ -146,11 +146,6 @@ var ExplorationEditorSettingsTab = function() {
 
     await action.matSelect(
       'Exploration Language', explorationLanguageInput, language);
-
-    // var languageButton = element.all(by.cssContainingText(
-    //   '.mat-option-text', language)).first();
-
-    // await action.click('Language button', languageButton);
     await action.click('Neutral element', neutralElement);
   };
 

@@ -83,7 +83,7 @@
                 <div>
                   <mat-form-field  id="explorationInitStateName" appearance="fill">
                     <mat-label for="explorationInitStateName" class="d-block">Name of first card</mat-label>
-                    <mat-select class="e2e-test-initial-state-select" [(ngModel)]="explorationInitStateNameService.displayed" name="language">
+                    <mat-select class="e2e-test-initial-state-select" [(value)]="explorationInitStateNameService.displayed" name="language">
                       <mat-option *ngFor="let stateNames of stateNames"
                                   [value]="stateNames"
                                   (click)="saveExplorationInitStateName()"
