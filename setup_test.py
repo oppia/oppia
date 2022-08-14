@@ -17,9 +17,9 @@
 from __future__ import annotations
 
 from core.tests import test_utils
+import setup
 
 import pkg_resources
-import setup
 import setuptools
 
 from scripts import common # isort:skip pylint: disable=unused-import
