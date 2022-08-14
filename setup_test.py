@@ -19,6 +19,7 @@ from __future__ import annotations
 from core.tests import test_utils
 
 import pkg_resources
+import setup
 import setuptools
 
 from scripts import common # isort:skip pylint: disable=unused-import
@@ -53,4 +54,4 @@ class SetupTests(test_utils.GenericTestBase):
             }])
 
         with swap_setup:
-            import setup # isort:skip pylint: disable=unused-import
+            setup.main()
