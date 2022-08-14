@@ -101,3 +101,86 @@ class DefaultClassroomRedirectPage(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         self.redirect('/learn/%s' % constants.DEFAULT_CLASSROOM_URL_FRAGMENT)
+
+
+class ClassroomAdminPageHandler(base.BaseHandler):
+    """Renders the classroom admin page."""
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
+    @acl_decorators.can_access_admin_page
+    def get(self):
+        """Handles GET requests."""
+
+        self.render_template('classroom-admin-page.mainpage.html')
+
+
+class ClassroomAdminDataHandler(base.BaseHandler):
+    """Fetches relevant data for the classroom admin page."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
+    @acl_decorators.can_access_admin_page
+    def get(self):
+        """Handles GET requests."""
+        classroom_id_to_classroom_name = (
+            classroom_conifg_services.get_classroom_id_to_classroom_name_dict())
+
+        self.values.update({
+            'classroom_id_to_classroom_name': classroom_id_to_classroom_name
+        })
+        self.render_json(self.values)
+
+
+class NewClassroomHandler(base.BaseHandler):
+    """Creates a new classroom using the default properties."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {}
+    }
+
+    @acl_decorators.can_access_admin_page
+    def get(self):
+        """Handles GET requests."""
+        new_classroom_dict = (
+            classroom_conifg_services.create_new_default_classroom())
+        self.values.update({
+            'classroom': new_classroom_dict
+        })
+        self.render_json(self.values)
+
+
+class EditClassroomDataHandler(base.BaseHandler):
+    """Edits classroom data."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'classroom_id': {
+            'schema': {}
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {},
+        'PUT': {},
+        "DELETE": {}
+    }
+
+    @acl_decorators.can_access_admin_page
+    def get(self):
+        pass
+
+    @acl_decorators.can_access_admin_page
+    def put(self):
+        pass
+
+    @acl_decorators.can_access_admin_page
+    def delete(self):
+        pass
