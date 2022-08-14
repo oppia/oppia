@@ -1132,7 +1132,7 @@ class TranslationContributionStatsModel(base_models.BaseModel):
 
     @staticmethod
     def generate_id(
-            language_code: str, contributor_user_id: str, topic_id: str
+        language_code: str, contributor_user_id: str, topic_id: str
     ) -> str:
         """Generates a unique ID for a TranslationContributionStatsModel
         instance.
@@ -1372,7 +1372,7 @@ class TranslationReviewStatsModel(base_models.BaseModel):
 
     @staticmethod
     def generate_id(
-            language_code: str, reviewer_user_id: str, topic_id: str
+        language_code: str, reviewer_user_id: str, topic_id: str
     ) -> str:
         """Generates a unique ID for a TranslationReviewStatsModel
         instance.
@@ -1590,7 +1590,7 @@ class QuestionContributionStatsModel(base_models.BaseModel):
 
     @staticmethod
     def generate_id(
-            contributor_user_id: str, topic_id: str
+        contributor_user_id: str, topic_id: str
     ) -> str:
         """Generates a unique ID for a QuestionContributionStatsModel
         instance.
@@ -1796,7 +1796,7 @@ class QuestionReviewStatsModel(base_models.BaseModel):
 
     @staticmethod
     def generate_id(
-            reviewer_user_id: str, topic_id: str
+        reviewer_user_id: str, topic_id: str
     ) -> str:
         """Generates a unique ID for a QuestionReviewStatsModel
         instance.
