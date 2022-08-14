@@ -176,7 +176,7 @@ def get_skill_from_model(
             feconf.CURRENT_RUBRIC_SCHEMA_VERSION):
         _migrate_rubrics_to_latest_schema(versioned_rubrics)
 
-    return skill_domain.Skill(  # type: ignore[no-untyped-call]
+    return skill_domain.Skill(
         skill_model.id, skill_model.description,
         [
             skill_domain.Misconception.from_dict(misconception)
@@ -239,7 +239,7 @@ def _migrate_skill_contents_to_latest_schema(
 
     while (skill_contents_schema_version <
            feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION):
-        skill_domain.Skill.update_skill_contents_from_model(  # type: ignore[no-untyped-call]
+        skill_domain.Skill.update_skill_contents_from_model(
             versioned_skill_contents, skill_contents_schema_version)
         skill_contents_schema_version += 1
 
@@ -273,7 +273,7 @@ def _migrate_misconceptions_to_latest_schema(
 
     while (misconception_schema_version <
            feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION):
-        skill_domain.Skill.update_misconceptions_from_model(  # type: ignore[no-untyped-call]
+        skill_domain.Skill.update_misconceptions_from_model(
             versioned_misconceptions, misconception_schema_version)
         misconception_schema_version += 1
 
@@ -306,6 +306,6 @@ def _migrate_rubrics_to_latest_schema(
 
     while (rubric_schema_version <
            feconf.CURRENT_RUBRIC_SCHEMA_VERSION):
-        skill_domain.Skill.update_rubrics_from_model(  # type: ignore[no-untyped-call]
+        skill_domain.Skill.update_rubrics_from_model(
             versioned_rubrics, rubric_schema_version)
         rubric_schema_version += 1

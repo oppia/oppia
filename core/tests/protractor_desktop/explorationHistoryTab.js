@@ -75,7 +75,7 @@ describe('Exploration history', function() {
     // state.
     await explorationEditorMainTab.setStateName('first');
     explorationEditorMainTab.setContent(await forms.toRichText(
-      'enter 6 to continue'));
+      'enter 6 to continue'), true);
     await explorationEditorMainTab.setInteraction('NumericInput', false);
     await explorationEditorMainTab.addResponse(
       'NumericInput', null, 'second', true, 'Equals', 6);
