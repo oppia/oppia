@@ -58,6 +58,22 @@ describe('History Tab Backend Api Service', () => {
     })
   );
 
+  it('should get check revert valid data when getCheckRevertValidData called',
+    fakeAsync(() => {
+      const url = 'url';
+      service.getCheckRevertValidData(url).then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(url);
+      expect(req.request.method).toEqual('GET');
+      req.flush([]);
+
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
+
   it('should post history data when postData called',
     fakeAsync(() => {
       let data = {

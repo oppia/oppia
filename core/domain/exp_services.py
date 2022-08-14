@@ -1770,6 +1770,33 @@ def revert_version_history(
         new_version_history_model.put()
 
 
+def get_exploration_validation_error(exploration_id, revert_to_version):
+    """Tests whether an exploration can be reverted to the given version
+    number. Does not commit any changes.
+
+    Args:
+        exploration_id: str. The id of the exploration to be reverted to the
+            current version.
+        revert_to_version: int. The version to which the given exploration
+            is to be reverted.
+
+    Returns:
+        Optional[str]. None if the revert_to_version passes all backend
+        validation checks, or the error string otherwise.
+    """
+    # Validate the previous version of the exploration.
+    exploration = exp_fetchers.get_exploration_by_id(
+        exploration_id, version=revert_to_version)
+    exploration_rights = rights_manager.get_exploration_rights(exploration.id)
+    try:
+        exploration.validate(
+            exploration_rights.status == rights_domain.ACTIVITY_STATUS_PUBLIC)
+    except Exception as ex:
+        return str(ex)
+
+    return None
+
+
 def revert_exploration(
         committer_id, exploration_id, current_version, revert_to_version):
     """Reverts an exploration to the given version number. Commits changes.
