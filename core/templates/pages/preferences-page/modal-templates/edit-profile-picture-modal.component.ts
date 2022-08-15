@@ -85,10 +85,12 @@ export class EditProfilePictureModalComponent extends ConfirmOrCancelModal {
         attrs: []
       };
       let imageData = (e.target as FileReader).result as string;
-      this.invalidTagsAndAttributes = this.svgSanitizerService
-        .getInvalidSvgTagsAndAttrsFromDataUri(imageData);
-      this.uploadedImage = this.svgSanitizerService.getTrustedSvgResourceUrl(
-        imageData);
+      if (this.svgSanitizerService.isBase64Svg(imageData)) {
+        this.invalidTagsAndAttributes = this.svgSanitizerService
+          .getInvalidSvgTagsAndAttrsFromDataUri(imageData);
+        this.uploadedImage = this.svgSanitizerService.getTrustedSvgResourceUrl(
+          imageData);
+      }
       if (!this.uploadedImage) {
         this.uploadedImage = decodeURIComponent(
           (e.target as FileReader).result as string);
