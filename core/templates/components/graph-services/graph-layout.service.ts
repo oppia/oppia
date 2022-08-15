@@ -105,7 +105,6 @@ export class StateGraphLayoutService {
   getIndentationLevels(
       adjacencyLists: GraphAdjacencyLists, trunkNodeIds: string[]): number[] {
     var indentationLevels: number[] = [];
-    console.log(adjacencyLists);
     // Recursively find and indent the longest shortcut for the segment of
     // nodes ranging from trunkNodeIds[startInd] to trunkNodeIds[endInd]
     // (inclusive). It's possible that this shortcut starts from a trunk
