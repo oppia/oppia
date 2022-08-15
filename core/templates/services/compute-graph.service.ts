@@ -26,6 +26,7 @@ export interface GraphLink {
   source: string;
   target: string;
   linkProperty?: string;
+  connectsDestIfStuck?: boolean;
 }
 
 export interface GraphNodes {
@@ -45,7 +46,7 @@ export interface GraphData {
 export class ComputeGraphService {
   _computeGraphData(initStateId: string, states: States): GraphData {
     let nodes: Record<string, string> = {};
-    let links: { source: string; target: string }[] = [];
+    let links: { source: string; target: string ; connectsDestIfStuck: boolean }[] = [];
     let finalStateIds = states.getFinalStateNames();
 
     states.getStateNames().forEach(function(stateName) {
@@ -57,14 +58,30 @@ export class ComputeGraphService {
           links.push({
             source: stateName,
             target: groups[h].outcome.dest,
+            connectsDestIfStuck: false
           });
+          if(groups[h].outcome.destIfReallyStuck) {
+            links.push({
+              source: stateName,
+              target: groups[h].outcome.destIfReallyStuck,
+              connectsDestIfStuck: true
+            });
+          }
         }
 
         if (interaction.defaultOutcome) {
           links.push({
             source: stateName,
             target: interaction.defaultOutcome.dest,
+            connectsDestIfStuck: false
           });
+          if (interaction.defaultOutcome.destIfReallyStuck) {
+            links.push({
+              source: stateName,
+              target: interaction.defaultOutcome.destIfReallyStuck,
+              connectsDestIfStuck: true
+            });
+          }
         }
       }
     });

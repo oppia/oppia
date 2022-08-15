@@ -98,10 +98,16 @@ export class States {
         if (groups[i].outcome.dest === deleteStateName) {
           groups[i].outcome.dest = otherStateName;
         }
+        if (groups[i].outcome.destIfReallyStuck === deleteStateName) {
+          groups[i].outcome.destIfReallyStuck = null;
+        }
       }
       if (interaction.defaultOutcome) {
         if (interaction.defaultOutcome.dest === deleteStateName) {
           interaction.defaultOutcome.dest = otherStateName;
+        }
+        if (interaction.defaultOutcome.destIfReallyStuck === deleteStateName) {
+          interaction.defaultOutcome.destIfReallyStuck = null;
         }
       }
     }
