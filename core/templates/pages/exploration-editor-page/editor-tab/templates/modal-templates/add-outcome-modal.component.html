@@ -17,11 +17,11 @@
 </div>
 
 <div class="modal-footer">
-  <button class="btn btn-secondary e2e-test-cancel-hint"
+  <button class="btn btn-secondary e2e-test-cancel-outcome"
           (click)="cancel()">
     Cancel
   </button>
-  <button class="btn btn-success e2e-test-save-hint"
+  <button class="btn btn-success e2e-test-save-outcome-feedback"
           (click)="save()"
           [disabled]="!this.outcome || this.isFeedbackLengthExceeded()">
     Save Response
