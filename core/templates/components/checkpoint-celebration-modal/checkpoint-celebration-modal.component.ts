@@ -26,6 +26,7 @@ import { ReadOnlyExplorationBackendApiService, ReadOnlyExplorationBackendDict } 
 import { CheckpointCelebrationUtilityService } from 'pages/exploration-player-page/services/checkpoint-celebration-utility.service';
 import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
 import { StateCard } from 'domain/state_card/state-card.model';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 
 import './checkpoint-celebration-modal.component.css';
 
@@ -59,6 +60,9 @@ export class CheckpointCelebrationModalComponent implements OnInit, OnDestroy {
   checkpointNodesAreVisible: boolean = false;
   messageModalIsShown: boolean = false;
   messageModalIsDismissed: boolean = false;
+  miniMessageTooltipIsShown: boolean = false;
+  miniMessageTooltipIsDismissed: boolean = false;
+  shouldDisplayFullScaleMessage: boolean = true;
   autoMessageDismissalTimeout: NodeJS.Timeout | undefined;
   oppiaAvatarImageUrl: string;
 
@@ -70,7 +74,8 @@ export class CheckpointCelebrationModalComponent implements OnInit, OnDestroy {
       CheckpointCelebrationUtilityService,
     private playerPositionService: PlayerPositionService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
-    private urlInterpolationService: UrlInterpolationService
+    private urlInterpolationService: UrlInterpolationService,
+    private windowDimensionsService: WindowDimensionsService
   ) {}
 
   ngOnInit(): void {
@@ -98,6 +103,9 @@ export class CheckpointCelebrationModalComponent implements OnInit, OnDestroy {
       this.currentStateName = this.exploration.init_state_name;
       this.subscribeToCardChangeEmitter();
     });
+    this.shouldDisplayFullScaleMessage = (
+      this.windowDimensionsService.getWidth() > 1370);
+    this.subscribeToWindowResizeEmitter();
   }
 
   ngOnDestroy(): void {
@@ -108,6 +116,13 @@ export class CheckpointCelebrationModalComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.add(
       this.playerPositionService.onNewCardOpened.subscribe(
         (nextStateCard: StateCard) => {
+          if (this.miniMessageTooltipIsShown) {
+            this.dismissMiniMessage();
+            setTimeout(() => {
+              this.checkIfCheckpointMessageIsToBeTriggered(
+                nextStateCard.getStateName());
+            }, MESSAGE_MODAL_APPROX_TRIGGER_AND_DISMISSAL_DURATION_MS);
+          }
           if (this.messageModalIsShown) {
             this.dismissMessage();
             setTimeout(() => {
@@ -118,6 +133,17 @@ export class CheckpointCelebrationModalComponent implements OnInit, OnDestroy {
             this.checkIfCheckpointMessageIsToBeTriggered(
               nextStateCard.getStateName());
           }
+        }
+      )
+    );
+  }
+
+  subscribeToWindowResizeEmitter(): void {
+    this.directiveSubscriptions.add(
+      this.windowDimensionsService.getResizeEvent().subscribe(
+        () => {
+          this.shouldDisplayFullScaleMessage = (
+            this.windowDimensionsService.getWidth() > 1370);
         }
       )
     );
@@ -149,7 +175,11 @@ export class CheckpointCelebrationModalComponent implements OnInit, OnDestroy {
     this.currentCheckpointPosition = checkpointPos;
     this.generateCheckpointStatusArray();
 
-    this.triggerMessage();
+    if (this.shouldDisplayFullScaleMessage) {
+      this.triggerStandardMessage();
+    } else {
+      this.triggerMiniMessage();
+    }
   }
 
   generateCheckpointStatusArray(): void {
@@ -190,12 +220,19 @@ export class CheckpointCelebrationModalComponent implements OnInit, OnDestroy {
     }
   }
 
-  triggerMessage(): void {
+  triggerStandardMessage(): void {
     this.resetTimer();
     this.messageModalIsShown = true;
     this.autoMessageDismissalTimeout = setTimeout(() => {
       this.messageModalIsShown = false;
       this.checkpointNodesAreVisible = false;
+    }, MESSAGE_MODAL_APPROX_COMPLETE_ANIMATION_DURATION_MS);
+  }
+
+  triggerMiniMessage(): void {
+    this.miniMessageTooltipIsShown = true;
+    setTimeout(() => {
+      this.miniMessageTooltipIsShown = false;
     }, MESSAGE_MODAL_APPROX_COMPLETE_ANIMATION_DURATION_MS);
   }
 
@@ -209,7 +246,18 @@ export class CheckpointCelebrationModalComponent implements OnInit, OnDestroy {
     }, MESSAGE_MODAL_APPROX_TRIGGER_AND_DISMISSAL_DURATION_MS);
   }
 
+  dismissMiniMessage(): void {
+    this.miniMessageTooltipIsShown = false;
+    this.miniMessageTooltipIsDismissed = true;
+    setTimeout(() => {
+      this.miniMessageTooltipIsDismissed = false;
+    }, MESSAGE_MODAL_APPROX_TRIGGER_AND_DISMISSAL_DURATION_MS);
+  }
+
   resetTimer(): void {
+    if (!this.shouldDisplayFullScaleMessage) {
+      return;
+    }
     const checkpointTimer = document.querySelector(
       '.checkpoint-celebration-modal-timer') as SVGPolylineElement;
     // This function is meant to reset the timer SVG to its initial position,

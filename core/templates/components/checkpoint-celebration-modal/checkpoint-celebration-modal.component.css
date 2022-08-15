@@ -1,8 +1,4 @@
-.checkpoint-celebration-modal {
-  padding-left: 30px;
-}
-
-.checkpoint-celebration-modal .message-container {
+.checkpoint-celebration-modal .standard-message-container {
   display: flex;
   flex-direction: column;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
@@ -17,10 +13,9 @@
   color: #000;
   padding: 0;
   transition-property: bottom;
-  transition-duration: 1.5s;
 }
 
-.checkpoint-celebration-modal .mascot-placeholder {
+.checkpoint-celebration-modal .standard-message-container .mascot-placeholder {
   position: absolute;
   top: -15px;
   left: -15px;
@@ -29,7 +24,7 @@
   border-radius: 50%;
 }
 
-.checkpoint-celebration-modal .checkpoint-celebration-modal-timer {
+.checkpoint-celebration-modal .standard-message-container .checkpoint-celebration-modal-timer {
   margin: 0;
   padding: 0;
   stroke-dasharray: 10;
@@ -38,13 +33,13 @@
   transition-timing-function: linear;
 }
 
-.checkpoint-celebration-modal h2 {
+.checkpoint-celebration-modal .standard-message-container h2 {
   text-align: center;
   margin: 0 10% 0 10%;
   border-bottom: 1.6px solid #00645c;
 }
 
-.checkpoint-celebration-modal .checkpoint-flag {
+.checkpoint-celebration-modal .standard-message-container .checkpoint-flag {
   height: 100px;
   margin: 0 auto;
   animation-delay: 2.2s;
@@ -54,7 +49,7 @@
   opacity: 0;
 }
 
-.checkpoint-celebration-modal .flag-animation {
+.checkpoint-celebration-modal .standard-message-container .flag-animation {
   animation-name: flag-bounce;
 }
 
@@ -69,20 +64,20 @@
   100% { transform: scale(1,1) translateY(0); opacity: 1; }
 }
 
-.checkpoint-celebration-modal p {
+.checkpoint-celebration-modal .standard-message-container p {
   font-family: "Roboto", Arial, sans-serif;
   text-align: center;
   font-weight: 400;
   margin: 10px 10% 10px 10%;
 }
 
-.checkpoint-celebration-modal .button-row {
+.checkpoint-celebration-modal .standard-message-container .button-row {
   margin-top: 10px;
   display: flex;
   justify-content: space-between;
 }
 
-.checkpoint-celebration-modal button.progress-info {
+.checkpoint-celebration-modal .standard-message-container button.progress-info {
   color: #e0f2f1;
   background: transparent;
   margin-left: 6px;
@@ -94,7 +89,7 @@
   border: none;
 }
 
-.checkpoint-celebration-modal button.modal-close-button {
+.checkpoint-celebration-modal .standard-message-container button.modal-close-button {
   background: transparent;
   color: #00645c;
   margin-right: 6px;
@@ -106,28 +101,28 @@
   border: none;
 }
 
-.checkpoint-celebration-modal .modal-close-button:hover {
+.checkpoint-celebration-modal .standard-message-container .modal-close-button:hover {
   background: #00645c;
   color: #e0f2f1;
 }
 
-.checkpoint-celebration-modal .progress-info:hover {
+.checkpoint-celebration-modal .standard-message-container .progress-info:hover {
   background-color: #00645c;
 }
 
-.checkpoint-celebration-modal .progress-info-icon {
+.checkpoint-celebration-modal .standard-message-container .progress-info-icon {
   background: #00645c;
   border-radius: 50%;
   transition-property: background, color;
   transition-duration: 0.2s;
 }
 
-.checkpoint-celebration-modal .progress-info:hover .progress-info-icon {
+.checkpoint-celebration-modal .standard-message-container .progress-info:hover .progress-info-icon {
   background: #e0f2f1;
   color: #00645c;
 }
 
-.checkpoint-celebration-modal .modal-display-transition {
+.checkpoint-celebration-modal .standard-message-container.modal-display-transition {
   animation-name: modal-complete-transition-animation;
   animation-duration: 14.29s;
   animation-iteration-count: 1;
@@ -141,7 +136,7 @@
   100% { bottom: -100vh; }
 }
 
-.checkpoint-celebration-modal .downward-transition {
+.checkpoint-celebration-modal .standard-message-container.downward-transition {
   animation-name: modal-downward-transition-animation;
   animation-duration: 2.14s;
   animation-iteration-count: 1;
@@ -153,7 +148,7 @@
   100% { bottom: -100vh; }
 }
 
-.checkpoint-celebration-modal .progress-bar-container {
+.checkpoint-celebration-modal .standard-message-container .progress-bar-container {
   align-items: center;
   display: flex;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
@@ -162,19 +157,19 @@
   width: 90%;
 }
 
-.checkpoint-celebration-modal .single-checkpoint-bar {
+.checkpoint-celebration-modal .standard-message-container .single-checkpoint-bar {
   justify-content: center;
 }
 
-.checkpoint-celebration-modal .multiple-checkpoints-bar {
+.checkpoint-celebration-modal .standard-message-container .multiple-checkpoints-bar {
   justify-content: space-between;
 }
 
-.checkpoint-celebration-modal .reverse-checkpoint-order {
+.checkpoint-celebration-modal .standard-message-container .reverse-checkpoint-order {
   flex-direction: row-reverse;
 }
 
-.checkpoint-celebration-modal .progress-bar {
+.checkpoint-celebration-modal .standard-message-container .progress-bar {
   background-color: #bbb;
   border-radius: 5px;
   display: flex;
@@ -185,7 +180,7 @@
   width: 92%;
 }
 
-.checkpoint-celebration-modal .completed-progress-bar {
+.checkpoint-celebration-modal .standard-message-container .completed-progress-bar {
   background-color: #00645c;
   border-radius: 5px;
   height: 100%;
@@ -195,13 +190,13 @@
   transition-duration: 3s;
 }
 
-.checkpoint-celebration-modal .progress-bar-container .checkpoint-node {
+.checkpoint-celebration-modal .standard-message-container .progress-bar-container .checkpoint-node {
   transition-property: opacity;
   transition-delay: 2.2s;
   transition-duration: 0.3s;
 }
 
-.checkpoint-celebration-modal .completed-checkpoint-node {
+.checkpoint-celebration-modal .standard-message-container .completed-checkpoint-node {
   background-color: #00645c;
   border-radius: 50%;
   color: #fff;
@@ -213,7 +208,7 @@
   z-index: 0;
 }
 
-.checkpoint-celebration-modal .in-progress-checkpoint-node {
+.checkpoint-celebration-modal .standard-message-container .in-progress-checkpoint-node {
   align-items: flex-start;
   background-color: #e0f2f1;
   border: 3.5px solid #00645c;
@@ -228,7 +223,7 @@
   z-index: 0;
 }
 
-.checkpoint-celebration-modal .incomplete-checkpoint-node {
+.checkpoint-celebration-modal .standard-message-container .incomplete-checkpoint-node {
   align-items: flex-end;
   background-color: #e0f2f1;
   border: 3.5px solid #bbb;
@@ -243,6 +238,78 @@
   z-index: 0;
 }
 
-.checkpoint-celebration-modal .hidden-checkpoint-node {
+.checkpoint-celebration-modal .standard-message-container .hidden-checkpoint-node {
   opacity: 0;
+}
+
+.checkpoint-celebration-modal .minified-message-container {
+  background-color: #aed2e9;
+  border: 5px solid #2d4a9d;
+  height: 65px;
+  display: flex;
+  justify-content: center;
+  width: 160px;
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  position: fixed;
+  left: 30px;
+  bottom: -7vh;
+  transition-property: bottom, opacity;
+  opacity: 0;
+}
+
+.checkpoint-celebration-modal .minified-message-container.tooltip-display-transition {
+  animation-name: tooltip-complete-transition-animation;
+  animation-duration: 6s;
+  animation-iteration-count: 1;
+  animation-timing-function: ease-in-out;
+}
+
+@keyframes tooltip-complete-transition-animation {
+  0% { bottom: -7vh; opacity: 0; }
+  25% { bottom: 70px; opacity: 1; }
+  75% { bottom: 70px; opacity: 1; }
+  100% { bottom: -7vh; opacity: 0; }
+}
+
+.checkpoint-celebration-modal .minified-message-container.tooltip-dismissal-transition {
+  animation-name: tooltip-dismissal-transition-animation;
+  animation-duration: 1.5s;
+  animation-iteration-count: 1;
+  animation-timing-function: ease-in-out;
+}
+
+@keyframes tooltip-dismissal-transition-animation {
+  0% { bottom: 70px; opacity: 1; }
+  100% { bottom: -7vh; opacity: 0; }
+}
+
+.checkpoint-celebration-modal .minified-message-container p {
+  font-size: 45px;
+  font-weight: 800;
+}
+
+.checkpoint-celebration-modal .minified-message-container .checkpoint-flag {
+  width: 60px;
+  transform: scaleY(0.9);
+  height: 100%;
+}
+
+.checkpoint-celebration-modal .minified-message-container::after,
+.checkpoint-celebration-modal .minified-message-container::before {
+  border: solid transparent;
+  content: " ";
+  left: 92.5%;
+  position: absolute;
+  top: 100%;
+}
+
+.checkpoint-celebration-modal .minified-message-container::after {
+  border-left: 2px solid transparent;
+  border-right: 15px solid transparent;
+}
+
+.checkpoint-celebration-modal .minified-message-container::before {
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-top: 25px solid #2d4a9d;
 }
