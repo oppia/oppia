@@ -637,6 +637,9 @@ URLS = [
         r'/createhandler/state_yaml/<exploration_id>',
         editor.StateYamlHandler),
     get_redirect_route(
+        r'/createhandler/check_revert_valid/<exploration_id>/<version>',
+        editor.ExplorationCheckRevertValidHandler),
+    get_redirect_route(
         r'/createhandler/revert/<exploration_id>',
         editor.ExplorationRevertHandler),
     get_redirect_route(
