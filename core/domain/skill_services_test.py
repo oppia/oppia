@@ -45,6 +45,15 @@ if MYPY: # pragma: no cover
     models.NAMES.skill, models.NAMES.question
 ])
 
+SuggestionChangeDictType = Dict[
+    str,
+    Union[
+        str,
+        Dict[str, Union[state_domain.StateDict, int, str, List[str]]],
+        float
+    ]
+]
+
 
 class SkillServicesUnitTests(test_utils.GenericTestBase):
     """Test the skill services module."""
@@ -904,14 +913,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 self.SKILL_ID, strict=False), None)
 
     def test_delete_skill_model_with_linked_suggestion(self) -> None:
-        suggestion_change: Dict[
-            str,
-            Union[
-                str,
-                Dict[str, Union[state_domain.StateDict, int, str, List[str]]],
-                float
-            ]
-        ] = {
+        suggestion_change: SuggestionChangeDictType = {
             'cmd': (
                 question_domain
                 .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),

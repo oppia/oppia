@@ -1021,11 +1021,8 @@ def _save_exploration(
             stored exploration model do not match.
     """
     exploration_rights = rights_manager.get_exploration_rights(exploration.id)
-    exploration.validate(
-        strict=(
-            exploration_rights.status != rights_domain.ACTIVITY_STATUS_PRIVATE
-        )
-    )
+    status = exploration_rights.status != rights_domain.ACTIVITY_STATUS_PRIVATE
+    exploration.validate(strict=status)
 
     exploration_model = exp_models.ExplorationModel.get(exploration.id)
 
@@ -2030,11 +2027,8 @@ def revert_exploration(
     exploration = exp_fetchers.get_exploration_by_id(
         exploration_id, version=revert_to_version)
     exploration_rights = rights_manager.get_exploration_rights(exploration.id)
-    exploration.validate(
-        strict=(
-            exploration_rights.status != rights_domain.ACTIVITY_STATUS_PRIVATE
-        )
-    )
+    status = exploration_rights.status != rights_domain.ACTIVITY_STATUS_PRIVATE
+    exploration.validate(strict=status)
 
     exp_models.ExplorationModel.revert(
         exploration_model, committer_id,
