@@ -324,7 +324,7 @@ var UnicodeEditor = function(elem) {
 var AutocompleteDropdownEditor = function(elem) {
   var containerLocator = by.css('.e2e-test-exploration-category-dropdown');
   var searchInputLocator = by.css(
-    '.e2e-test-exploration-new-category-add');
+    '.mat-select-search-input.mat-input-element');
   var categorySelectorChoice = by.css(
     '.e2e-test-exploration-category-selector-choice');
 
@@ -344,6 +344,7 @@ var AutocompleteDropdownEditor = function(elem) {
 
       var searchInputLocatorText = element.all(by.cssContainingText(
         '.e2e-test-exploration-category-selector-choice', text)).first();
+
 
       await action.click(
         'Dropdown Element Select',

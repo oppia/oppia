@@ -85,7 +85,7 @@ var ExplorationEditorSettingsTab = function() {
     await action.waitForAutosave();
     await action.click(
       'Disable Correctness Feedback Button', disableCorrectnessFeedbackButton);
-    await action.click('Neutral element', neutralElement);
+    await action.click('Neutral element', neutralElement, true);
   };
 
   this.expectAvailableFirstStatesToBe = async function(names) {

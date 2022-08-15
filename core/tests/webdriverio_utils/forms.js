@@ -321,7 +321,7 @@ var UnicodeEditor = function(elem) {
 
 var AutocompleteDropdownEditor = function(elem) {
   var containerLocator = '.e2e-test-exploration-category-dropdown';
-  var searchInputLocator = '.e2e-test-exploration-new-category-add';
+  var searchInputLocator = '.mat-select-search-input.mat-input-element';
   var categorySelectorChoice = '.e2e-test-exploration-category-selector-choice';
 
   return {
@@ -335,8 +335,8 @@ var AutocompleteDropdownEditor = function(elem) {
         return $(`.e2e-test-exploration-category-selector-choice=${text}`);
       };
 
-      // The browser.keys is used to add text in search box.
-      await browser.keys(text);
+      await action.setValue(
+        'Dropdown Element Search', $(searchInputLocator), text);
       await action.click(
         'Dropdown Element Select',
         searchInputLocatorText(text)
