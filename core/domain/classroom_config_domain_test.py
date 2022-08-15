@@ -109,7 +109,7 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
         self.classroom.classroom_id = 1 # type: ignore[assignment]
         error_msg = (
             'Expected ID of the classroom to be a string, received: 1.')
-        with self.assertRaisesRegex(# type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, error_msg):
             self.classroom.validate()
 
@@ -119,7 +119,7 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
         self.classroom.name = 1 # type: ignore[assignment]
         error_msg = (
             'Expected name of the classroom to be a string, received: 1.')
-        with self.assertRaisesRegex(# type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, error_msg):
             self.classroom.validate()
 
@@ -131,7 +131,7 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
             'Expected url fragment of the classroom to be a string, received: '
             '1.'
         )
-        with self.assertRaisesRegex(# type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, error_msg):
             self.classroom.validate()
 
@@ -143,7 +143,7 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
             'Expected course_details of the classroom to be a string, '
             'received: 1.'
         )
-        with self.assertRaisesRegex(# type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, error_msg):
             self.classroom.validate()
 
@@ -155,7 +155,7 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
             'Expected topic list intro of the classroom to be a string, '
             'received: 1.'
         )
-        with self.assertRaisesRegex(# type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, error_msg):
             self.classroom.validate()
 
@@ -167,7 +167,7 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
             'Expected topic ID to prerequisite topic IDs of the classroom to '
             'be a string, received: 1.'
         )
-        with self.assertRaisesRegex(# type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, error_msg):
             self.classroom.validate()
 
@@ -185,7 +185,7 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
             'topic_id_2': [],
             'topic_id_3': ['topic_id_1']
         }
-        with self.assertRaisesRegex(# type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, error_msg):
             self.classroom.validate()
 
@@ -201,7 +201,7 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
             'topic_id_2': ['topic_id_1'],
             'topic_id_3': ['topic_id_2']
         }
-        with self.assertRaisesRegex(# type: ignore[no-untyped-call]
+        with self.assertRaisesRegex(
             utils.ValidationError, error_msg):
             self.classroom.validate()
 

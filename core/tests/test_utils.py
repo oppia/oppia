@@ -32,6 +32,7 @@ import os
 import random
 import re
 import string
+from types import TracebackType
 import unittest
 
 from core import feconf
@@ -76,7 +77,7 @@ import requests_mock
 from typing import (
     IO, Any, Callable, Collection, Dict, Iterable, Iterator, List, Mapping,
     Optional, OrderedDict, Pattern, Sequence, Set, Tuple, Type,
-    Union, cast, overload
+    Union, overload
 )
 from typing_extensions import Final, Literal, TypedDict
 import webapp2
@@ -180,7 +181,7 @@ class SearchDocumentDict(TypedDict):
     timed_out: bool
     _shards: Dict[str, int]
     took: int
-    hits: Dict[str, Any]
+    hits: Dict[str, List[ResultDocumentDict]]
     total: Dict[str, Union[str, int]]
     max_score: float
 
@@ -942,13 +943,14 @@ class TaskqueueServicesStub:
     layer, namely the platform.taskqueue taskqueue services API.
     """
 
-    def __init__(self, test_base: GenericTestBase) -> None:
+    def __init__(self, test_base: TestBase) -> None:
         """Initializes a taskqueue services stub that replaces the API
         functionality of core.platform.taskqueue.
 
         Args:
             test_base: GenericTestBase. The current test base.
         """
+        assert isinstance(test_base, GenericTestBase)
         self._test_base = test_base
         self._client = cloud_tasks_emulator.Emulator(
             task_handler=self._task_handler, automatic_task_handling=False)
@@ -1244,10 +1246,12 @@ class TestBase(unittest.TestCase):
         """
         captured_logs: List[str] = []
 
-        class ListStream:
+        class ListStream(IO[str]):
             """Stream-like object that appends writes to the captured logs."""
 
-            def write(self, msg: str) -> None:
+            # We have ignored [override] here because the signature of this
+            # method doesn't match with IO's write().
+            def write(self, msg: str) -> None:  # type: ignore[override]
                 """Appends stripped messages to captured logs."""
                 captured_logs.append(msg.strip())
 
@@ -1255,13 +1259,84 @@ class TestBase(unittest.TestCase):
                 """Does nothing."""
                 pass
 
+            # Here, class ListStream inherits from IO and making an instance
+            # below but due to the absence of some methods MyPy throws an error
+            # that 'Cannot instantiate abstract class 'ListStream' with abstract
+            # attributes'. So, to suppress the error, we defined all the methods
+            # that was present in super class.
+            @property
+            def mode(self) -> str:
+                pass
+
+            @property
+            def name(self) -> str:
+                pass
+
+            def close(self) -> None:
+                pass
+
+            @property
+            def closed(self) -> bool:
+                pass
+
+            def fileno(self) -> int:
+                pass
+
+            def isatty(self) -> bool:
+                pass
+
+            def read(self, n: int = -1) -> str:
+                pass
+
+            def readable(self) -> bool:
+                pass
+
+            def readline(self, limit: int = -1) -> str:
+                pass
+
+            def readlines(self, hint: int = -1) -> List[str]:
+                pass
+
+            def seek(self, offset: int, whence: int = 0) -> int:
+                pass
+
+            def seekable(self) -> bool:
+                pass
+
+            def tell(self) -> int:
+                pass
+
+            def truncate(self, size: Optional[int] = None) -> int:
+                pass
+
+            def writable(self) -> bool:
+                pass
+
+            def writelines(self, lines: Iterable[str]) -> None:
+                pass
+
+            def __enter__(self) -> IO[str]:
+                pass
+
+            def __exit__(
+                self,
+                type: Optional[Type[BaseException]], # pylint: disable=redefined-builtin
+                value: Optional[BaseException],
+                traceback: Optional[TracebackType]
+            ) -> None:
+                pass
+
+            def __iter__(self) -> Iterator[str]:
+                pass
+
+            def __next__(self) -> str:
+                pass
+
         # The class StreamHandler can only accept IO[str] type objects, but for
         # implementation purposes we are providing custom class ('ListStream').
         # So, because of this MyPy throws an error. Thus to the suppress the
         # error, we used cast here.
-        list_stream_handler = logging.StreamHandler(
-            stream=cast(IO[str], ListStream())
-        )
+        list_stream_handler = logging.StreamHandler(ListStream())
 
         logger = logging.getLogger()
         old_level = logger.level
@@ -1705,9 +1780,7 @@ class AppEngineTestBase(TestBase):
         # we are providing super class (AppEngineTestBase) which causes MyPy to
         # throw `incompatible argument type` error. Thus to avoid the error, we
         # used cast here.
-        self._platform_taskqueue_services_stub = TaskqueueServicesStub(
-            cast(GenericTestBase, self)
-        )
+        self._platform_taskqueue_services_stub = TaskqueueServicesStub(self)
 
     def setUp(self) -> None:
         super().setUp()
