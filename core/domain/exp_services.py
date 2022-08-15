@@ -1680,8 +1680,9 @@ def update_exploration_summary(
         skip_exploration_model_last_updated: bool. Whether the update of
             exploration_model_last_updated should be skipped.
             The exploration_model_last_updated is computed from the last human
-            update of the exploration. This can be skipped  in cases where we
-            know that there was no human exploration update.
+            update of the exploration. The update for this value should
+            be skipped when we know that the current workflow isn't
+            due to a human-initiated update.
 
     Returns:
         ExplorationSummary. The resulting exploration summary domain object.
@@ -1692,6 +1693,9 @@ def update_exploration_summary(
         exploration_model_last_updated = (
             exp_summary.exploration_model_last_updated)
     else:
+        # TODO(#15895): Revisit this after we have validations for the model to
+        # see whether exploration_model_last_updated and
+        # ExplorationModel.last_updated are in sync or not.
         exploration_model_last_updated = datetime.datetime.fromtimestamp(
             get_last_updated_by_human_ms(exploration.id) / 1000.0)
 
