@@ -15,7 +15,6 @@
 """Controllers for the questions list in topic editors and skill editors."""
 
 from __future__ import annotations
-from msilib import schema
 
 from core import feconf
 from core import utils
