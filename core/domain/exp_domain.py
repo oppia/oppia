@@ -2600,8 +2600,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
     @classmethod
     def _choices_should_be_unique_and_non_empty(
-        cls, choices: List[str]
-    ) -> List[str]:
+        cls, choices: List[str],
+        answer_groups: List[state_domain.AnswerGroup]
+    ) -> Tuple(Any):
         """Handles choices present in the ItemSelectionInput or
         in MultipleChoiceInput interactions, implements the following -
             - If only one choice is empty then simply removes it
@@ -2618,12 +2619,14 @@ class Exploration(translation_domain.BaseTranslatableObject):
         empty_choices = []
         seen_choices = []
         choices_to_save = []
+        invalid_choices_index = []
         for choice in choices:
             if choice['html'].strip() in ('<p></p>', ''):
                 empty_choices.append(choice)
 
         # Only one choice is empty.
         if len(empty_choices) == 1:
+            invalid_choices_index.append(choices.index(empty_choices[0]))
             choices.remove(empty_choices[0])
         # Multiple choices are empty.
         else:
@@ -2637,8 +2640,20 @@ class Exploration(translation_domain.BaseTranslatableObject):
             if choice['html'] not in seen_choices:
                 seen_choices.append(choice['html'])
                 choices_to_save.append(choice)
+            else:
+                invalid_choices_index.append(choices.index(choice))
 
-        return choices_to_save
+        # Remove rules whose choice has been deleted.
+        for answer_group in answer_groups:
+            invalid_rules = []
+            for rule_spec in answer_group['rule_specs']:
+                if rule_spec['rule_type'] == 'Equals':
+                    if rule_spec['inputs']['x'] in invalid_choices_index:
+                        invalid_rules.append(rule_spec)
+            for invalid_rule in invalid_rules:
+                answer_group['rule_specs'].remove(invalid_rule)
+
+        return (choices_to_save, answer_groups)
 
     @classmethod
     def _item_selec_no_ans_group_should_be_same(
@@ -3264,9 +3279,12 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         'choices']['value']
                 )
 
+                choices, answer_groups = (
+                    cls._choices_should_be_unique_and_non_empty(
+                        choices, answer_groups)
+                )
                 state_dict['interaction']['customization_args']['choices'][
-                    'value'] = cls._choices_should_be_unique_and_non_empty(
-                        choices)
+                    'value'] = choices
 
                 state_dict['interaction']['answer_groups'] = answer_groups
 
