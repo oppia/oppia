@@ -136,7 +136,7 @@ export class ContributorDashboardPageComponent
 
   ngOnInit(): void {
     this.profilePictureDataUrl = null;
-    this.username = null;
+    this.username = '';
     this.userInfoIsLoading = true;
     this.userIsLoggedIn = false;
     this.userIsReviewer = false;
@@ -208,6 +208,7 @@ export class ContributorDashboardPageComponent
 
     this.activeTabName = 'myContributionTab';
 
+    // TODO(#13015): Remove use of unknown as a type.
     this.tabsDetails = {
       ...ContributorDashboardConstants.CONTRIBUTOR_DASHBOARD_TABS_DETAILS
     } as unknown as ContributorDashboardTabsDetails;

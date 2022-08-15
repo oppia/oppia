@@ -28,7 +28,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 class MockNgbModalRef {
-  componentInstance: {
+  componentInstance!: {
     body: 'xyz';
   };
 }

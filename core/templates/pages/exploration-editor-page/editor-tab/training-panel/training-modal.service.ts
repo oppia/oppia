@@ -26,9 +26,9 @@ import { TrainingModalComponent } from './training-modal.component';
 import { InteractionAnswer } from 'interactions/answer-defs';
 
 interface FinishTrainingResult {
-  answer: InteractionAnswer | null;
-  interactionId: string | null;
-  answerIndex: number | null;
+  answer: InteractionAnswer;
+  interactionId: string;
+  answerIndex: number;
 }
 
 @Injectable({

@@ -88,6 +88,9 @@ describe('Schema based float editor component', function() {
   });
 
   it('should set component properties on initialization', fakeAsync(() => {
+    component.uiConfig = {
+      checkRequireNonnegativeInput: true,
+    };
     component.ngOnInit();
     tick(50);
 
@@ -97,11 +100,12 @@ describe('Schema based float editor component', function() {
     expect(component.errorStringI18nKey).toBe(null);
     expect(component.localValue).toBe(0.0);
     expect(component.localStringValue).toBe('');
-    expect(component.checkRequireNonnegativeInputValue).toBe(false);
+    expect(component.checkRequireNonnegativeInputValue).toBe(true);
     expect(component.labelForErrorFocusTarget).toBe('FocusLabel');
+    expect(component.minValue).toBe(0);
 
     tick();
-    let mockFunction = function(value: number) {};
+    let mockFunction = function(value: number | null) {};
     component.registerOnChange(mockFunction);
     component.writeValue(2);
     component.registerOnTouched(null);
@@ -130,6 +134,11 @@ describe('Schema based float editor component', function() {
   it('should get minimum and maximum values', () => {
     expect(component.getMinValue()).toBe(1.1);
     expect(component.getMaxValue()).toBe(3.5);
+
+    component.validators = [];
+
+    expect(component.getMinValue()).toBeNull();
+    expect(component.getMaxValue()).toBeNull();
   });
 
   it('should register that the user is typing on keypress', fakeAsync(() => {
@@ -190,7 +199,7 @@ describe('Schema based float editor component', function() {
   }));
 
   it('should validate value', () => {
-    component.uiConfig = null;
+    component.uiConfig = {checkRequireNonnegativeInput: false};
 
     expect(component.validate(new FormControl(null)))
       .toEqual({error: 'invalid'});
