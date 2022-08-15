@@ -47,10 +47,11 @@ class BlogPostModelDataDict(TypedDict):
 
 
 class BlogPostModel(base_models.BaseModel):
-    """Model to store blog post data.
+    """Model to store blog post data. Functionality to allow authors to revert
+    back to earlier versions is not being built in as we do not want to maintain
+    commit history for blog post models. All models are therefore not versioned.
 
-    The id of instances of this class is in the form of random hash of
-    12 chars.
+    The id of instances of this class is in the form of random hash of 12 chars.
     """
 
     # We use the model id as a key in the Takeout dict.
@@ -75,7 +76,7 @@ class BlogPostModel(base_models.BaseModel):
     # post is a draft.
     thumbnail_filename = datastore_services.StringProperty(indexed=True)
     # Time when the blog post model was last published. Value will be None
-    # if the blog has never been published.
+    # if the blog post is not currently published.
     published_on = (
         datastore_services.DateTimeProperty(indexed=True))
 
@@ -248,7 +249,7 @@ class BlogPostSummaryModel(base_models.BaseModel):
     # post is a draft.
     thumbnail_filename = datastore_services.StringProperty(indexed=True)
     # Time when the blog post model was last published. Value will be None
-    # if the blog post has never been published.
+    # if the blog post is currently not published.
     published_on = (datastore_services.DateTimeProperty(indexed=True))
 
     @staticmethod

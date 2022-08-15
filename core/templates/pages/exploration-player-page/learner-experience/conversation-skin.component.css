@@ -129,15 +129,6 @@ oppia-conversation-skin .oppia-button-icon {
   color: #fff;
 }
 
-.oppia-exploration-checkpoints-message .toast-top-center {
-  top: 24px;
-}
-
-.oppia-exploration-checkpoints-message .checkpoints-toast-info {
-  background-color: #337ab7;
-  width: 330px;
-}
-
 @media screen and (max-width: 959px) {
   .conversation-skin-cards-container {
     display: block;

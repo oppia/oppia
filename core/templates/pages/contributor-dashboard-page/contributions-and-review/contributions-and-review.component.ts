@@ -39,17 +39,17 @@ import { ContributionOpportunitiesService } from '../services/contribution-oppor
 
 export interface Suggestion {
   change: {
-    skill_id?: string;
+    skill_id: string;
     content_html: string;
     translation_html: string | string[];
-    question_dict?: QuestionBackendDict;
-    skill_difficulty?: string[];
+    question_dict: QuestionBackendDict;
+    skill_difficulty: string[];
   };
   status: string;
   suggestion_type: string;
   target_id: string;
   suggestion_id: string;
-  author_name?: string;
+  author_name: string;
 }
 
 export interface ContributionsSummary {
@@ -61,9 +61,18 @@ export interface ContributionsSummary {
   actionButtonTitle: string;
 }
 
+export interface Opportunity {
+  id: string;
+  heading: string;
+  subheading: string;
+  labelText: string;
+  labelColor: string;
+  actionButtonTitle: string;
+}
+
 export interface GetOpportunitiesResponse {
-  opportunitiesDicts: unknown;
-  more: unknown;
+  opportunitiesDicts: Opportunity[];
+  more: boolean;
 }
 
 export interface ContributionDetails {
@@ -82,7 +91,7 @@ export interface SuggestionDetails {
 export interface TabDetails {
   suggestionType: string;
   text: string;
-  enabled?: boolean;
+  enabled: boolean;
 }
 
 @Component({
@@ -90,7 +99,7 @@ export interface TabDetails {
   templateUrl: './contributions-and-review.component.html'
 })
 export class ContributionsAndReview
-  implements OnInit, OnDestroy {
+   implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
 
   SUGGESTION_TYPE_QUESTION: string;
@@ -107,7 +116,12 @@ export class ContributionsAndReview
   activeDropdownTabChoice: string;
   reviewTabs: TabDetails[] = [];
   contributionTabs: TabDetails[] = [];
-  tabNameToOpportunityFetchFunction: unknown;
+  tabNameToOpportunityFetchFunction: {
+    [key: string]: {
+      [key: string]: Function;
+    };
+  };
+
   SUGGESTION_LABELS = {
     review: {
       text: 'Awaiting review',
@@ -154,7 +168,7 @@ export class ContributionsAndReview
       const requiredData = {
         id: suggestion.suggestion_id,
         heading: this.formatRtePreviewPipe.transform(
-          suggestion.change.question_dict?.question_state_data.content.html),
+          suggestion.change.question_dict.question_state_data.content.html),
         subheading: subheading,
         labelText: this.SUGGESTION_LABELS[suggestion.status].text,
         labelColor: this.SUGGESTION_LABELS[suggestion.status].color,
@@ -218,18 +232,15 @@ export class ContributionsAndReview
 
   _showQuestionSuggestionModal(
       suggestion: Suggestion,
-      contributionDetails: ContributionDetails, reviewable: boolean,
-      misconceptionsBySkill: MisconceptionSkillMap, question: Question): void {
+      suggestionIdToContribution: Record<string, ActiveContributionDict>,
+      reviewable: boolean,
+      question: Question,
+      misconceptionsBySkill: MisconceptionSkillMap): void {
     const targetId = suggestion.target_id;
     const suggestionId = suggestion.suggestion_id;
-    const authorName = suggestion.author_name;
-    const questionHeader = contributionDetails.skill_description;
     const updatedQuestion = (
       question || this.questionObjectFactory.createFromBackendDict(
         suggestion.change.question_dict));
-    const contentHtml = updatedQuestion.getStateData().content.html;
-    const skillRubrics = contributionDetails.skill_rubrics;
-    const skillDifficulty = suggestion.change.skill_difficulty;
 
     const modalRef = this.ngbModal.open(
       QuestionSuggestionReviewModalComponent, {
@@ -237,15 +248,12 @@ export class ContributionsAndReview
         size: 'lg',
       });
 
-    modalRef.componentInstance.authorName = authorName;
-    modalRef.componentInstance.contentHtml = contentHtml;
     modalRef.componentInstance.reviewable = reviewable;
     modalRef.componentInstance.question = updatedQuestion;
-    modalRef.componentInstance.questionHeader = questionHeader;
-    modalRef.componentInstance.suggestion = cloneDeep(suggestion);
-    modalRef.componentInstance.skillRubrics = skillRubrics;
     modalRef.componentInstance.suggestionId = suggestionId;
-    modalRef.componentInstance.skillDifficulty = skillDifficulty;
+    modalRef.componentInstance.suggestionIdToContribution = (
+      suggestionIdToContribution
+    );
     modalRef.componentInstance.misconceptionsBySkill = (
       misconceptionsBySkill);
 
@@ -253,8 +261,7 @@ export class ContributionsAndReview
       this.openQuestionSuggestionModal(
         value.suggestionId,
         value.suggestion,
-        value.reviewable,
-        value.question);
+        value.reviewable);
     });
 
     modalRef.result.then((result) => {
@@ -271,10 +278,10 @@ export class ContributionsAndReview
       suggestionIdToContribution: Record<string, ActiveContributionDict>,
       initialSuggestionId: string, reviewable: boolean): void {
     const details = (
-      this.contributions[initialSuggestionId].details as ContributionDetails);
+       this.contributions[initialSuggestionId].details as ContributionDetails);
     const subheading = (
       details.topic_name + ' / ' + details.story_title +
-      ' / ' + details.chapter_title);
+       ' / ' + details.chapter_title);
 
     const modalRef: NgbModalRef = this.ngbModal.open(
       TranslationSuggestionReviewModalComponent, {
@@ -320,7 +327,11 @@ export class ContributionsAndReview
       suggestion: Suggestion,
       reviewable: boolean,
       question = undefined): void {
-    const contributionDetails = this.contributions[suggestionId].details;
+    const suggestionIdToContribution = {};
+    for (let suggestionId in this.contributions) {
+      var contribution = this.contributions[suggestionId];
+      suggestionIdToContribution[suggestionId] = contribution;
+    }
     const skillId = suggestion.change.skill_id;
 
     this.contextService.setCustomEntityContext(
@@ -331,8 +342,9 @@ export class ContributionsAndReview
       const skill = skillDict.skill;
       misconceptionsBySkill[skill.getId()] = skill.getMisconceptions();
       this._showQuestionSuggestionModal(
-        suggestion, contributionDetails as ContributionDetails, reviewable,
-        misconceptionsBySkill, question);
+        suggestion, suggestionIdToContribution, reviewable,
+        question,
+        misconceptionsBySkill);
     });
   }
 
@@ -534,7 +546,8 @@ export class ContributionsAndReview
             if (userCanReviewQuestionSuggestions) {
               this.reviewTabs.push({
                 suggestionType: this.SUGGESTION_TYPE_QUESTION,
-                text: 'Review Questions'
+                text: 'Review Questions',
+                enabled: false
               });
               userReviewableSuggestionTypes.push(this.SUGGESTION_TYPE_QUESTION);
             }
@@ -543,7 +556,8 @@ export class ContributionsAndReview
                 .length > 0) {
               this.reviewTabs.push({
                 suggestionType: this.SUGGESTION_TYPE_TRANSLATE,
-                text: 'Review Translations'
+                text: 'Review Translations',
+                enabled: false
               });
               userReviewableSuggestionTypes.push(
                 this.SUGGESTION_TYPE_TRANSLATE);

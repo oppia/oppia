@@ -13,6 +13,7 @@
         "core.controllers.payload_validator_test",
         "core.controllers.domain_objects_validator_test",
         "core.controllers.classroom_test",
+        "core.domain.classroom_config_domain_test",
         "extensions.rich_text_components.components_test",
         "core.controllers.topic_editor_test",
         "core.controllers.platform_feature_test",
@@ -152,7 +153,8 @@
         "extensions.issues.MultipleIncorrectSubmissions.MultipleIncorrectSubmissions_test",
         "extensions.issues.CyclicStateTransitions.CyclicStateTransitions_test",
         "extensions.issues.EarlyQuit.EarlyQuit_test",
-        "extensions.visualizations.models_test"
+        "extensions.visualizations.models_test",
+        "scripts.check_overall_backend_test_coverage_test"
     ],
     "3": [
         "core.controllers.incoming_app_feedback_report_test",
@@ -287,6 +289,7 @@
         "core.storage.classifier.gae_models_test",
         "core.domain.user_query_domain_test",
         "core.storage.blog.gae_models_test",
+        "core.storage.classroom.gae_models_test",
         "core.controllers.access_validators_test",
         "main_test",
         "core.platform.taskqueue.cloud_taskqueue_services_test",

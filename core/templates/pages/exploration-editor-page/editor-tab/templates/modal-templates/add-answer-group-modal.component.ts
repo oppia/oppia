@@ -16,7 +16,7 @@
  * @fileoverview Component for add answer group modal.
  */
 
-import { EventBusGroup, EventBusService } from 'app-events/event-bus.service';
+import { EventBusGroup, EventBusService, Newable } from 'app-events/event-bus.service';
 import { ObjectFormValidityChangeEvent } from 'app-events/app-events';
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
@@ -35,6 +35,7 @@ import { Outcome, OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectF
 import { AppConstants } from 'app.constants';
 import { EditabilityService } from 'services/editability.service';
 import cloneDeep from 'lodash/cloneDeep';
+import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
 
  interface TaggedMisconception {
    skillId: string;
@@ -53,19 +54,26 @@ import cloneDeep from 'lodash/cloneDeep';
 export class AddAnswerGroupModalComponent
    extends ConfirmOrCancelModal implements OnInit, OnDestroy {
    @Output() addState = new EventEmitter();
-   @Input() currentInteractionId: string;
-   @Input() stateName: string | null;
+   // These properties are initialized using Angular lifecycle hooks
+   // and we need to do non-null assertion. For more information, see
+   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+   @Input() currentInteractionId!: string;
+   @Input() stateName!: string;
 
-   isEditable: boolean;
-   eventBusGroup: EventBusGroup;
-   feedbackEditorIsOpen: boolean;
-   tmpRule: Rule;
-   tmpOutcome: Outcome;
-   tmpTaggedSkillMisconceptionId: string | null;
-   addAnswerGroupForm: object;
-   questionModeEnabled: boolean;
-   isInvalid: boolean;
+   eventBusGroup!: EventBusGroup;
+   tmpRule!: Rule;
+   tmpOutcome!: Outcome;
+   // Below property(temporary value) is null until the user clicks on the 'Add'
+   // button in the answer group modal to add a new answer group. This is to
+   // prevent the user from adding an answer group without having selected an
+   // answer group type.
+   tmpTaggedSkillMisconceptionId!: string | null;
+   addAnswerGroupForm!: object;
    modalId = Symbol();
+   isEditable: boolean = false;
+   feedbackEditorIsOpen: boolean = false;
+   questionModeEnabled: boolean = false;
+   isInvalid: boolean = false;
    validation: boolean = false;
    destIfStuckFeatEnabled: boolean =
      AppConstants.DEST_IF_REALLY_STUCK_FEAT_ENABLED;
@@ -116,8 +124,9 @@ export class AddAnswerGroupModalComponent
    // This returns false if the current interaction ID is null.
    isCurrentInteractionLinear(): boolean {
      return (
-       this.currentInteractionId &&
-       INTERACTION_SPECS[this.currentInteractionId].is_linear);
+       Boolean(this.currentInteractionId) &&
+       INTERACTION_SPECS[
+         this.currentInteractionId as InteractionSpecsKey].is_linear);
    }
 
    isFeedbackLengthExceeded(tmpOutcome: Outcome): boolean {
@@ -158,7 +167,7 @@ export class AddAnswerGroupModalComponent
 
    ngOnInit(): void {
      this.eventBusGroup.on(
-       ObjectFormValidityChangeEvent,
+       ObjectFormValidityChangeEvent as Newable<ObjectFormValidityChangeEvent>,
        event => {
          if (event.message.modalId === this.modalId) {
            this.isInvalid = event.message.value;

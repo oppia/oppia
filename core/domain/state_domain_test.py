@@ -43,7 +43,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
     """Test methods operating on states."""
 
     def setUp(self):
-        super(StateDomainUnitTests, self).setUp()
+        super().setUp()
         translation_dict = {
             'content_id_3': translation_domain.TranslatedContent(
                 'My name is Nikhil.', True)
@@ -1165,7 +1165,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'value="&amp;quot;htt://link.com&amp'
                     ';quot;"></oppia-noninteractive-link></p>')
             }))
-        self.assertTrue(init_state.is_rte_content_supported_on_android())
+        self.assertFalse(init_state.is_rte_content_supported_on_android())
         init_state.update_content(
             state_domain.SubtitledHtml.from_dict({
                 'content_id': 'content',
@@ -5290,7 +5290,7 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
 class VoiceoverDomainTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(VoiceoverDomainTests, self).setUp()
+        super().setUp()
         self.voiceover = state_domain.Voiceover('filename.mp3', 10, False, 15.0)
 
     def test_validate_non_str_filename(self):

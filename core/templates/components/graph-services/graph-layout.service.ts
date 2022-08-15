@@ -61,10 +61,10 @@ export interface NodeData {
   id: string;
   label: string;
   reachableFromEnd: boolean;
-  style?: string;
-  secondaryLabel?: string;
-  nodeClass?: string;
-  canDelete?: boolean;
+  style: string;
+  secondaryLabel: string;
+  nodeClass: string;
+  canDelete: boolean;
 }
 
 export interface NodeDataDict {

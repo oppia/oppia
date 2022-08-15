@@ -17,7 +17,7 @@
  */
 
 import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormControl, FormsModule } from '@angular/forms';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { TranslateFakeLoader, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
 import { StateCustomizationArgsService } from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
@@ -95,7 +95,10 @@ describe('Schema Based Unicode Editor', () => {
     component.ngOnInit();
 
     component.registerOnTouched(null);
-    component.registerOnChange(null);
+    let mockFunction = function(value: string) {
+      return value;
+    };
+    component.registerOnChange(mockFunction);
     component.onChange = (val: string) => {
       return;
     };
@@ -131,14 +134,11 @@ describe('Schema Based Unicode Editor', () => {
     }));
 
   it('should get empty object on validating', () => {
-    expect(component.validate(null)).toEqual({});
+    expect(component.validate(new FormControl(1))).toEqual({});
   });
 
   it('should write value', () => {
-    component.localValue = null;
-    component.writeValue(null);
-
-    expect(component.localValue).toEqual(null);
+    component.localValue = 'test1';
 
     component.writeValue('test');
     expect(component.localValue).toEqual('test');
