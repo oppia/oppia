@@ -218,7 +218,7 @@ class SubscriptionsTest(test_utils.GenericTestBase):
     def test_posting_to_feedback_thread_results_in_subscription(self) -> None:
         # The viewer posts a message to the thread.
         message_text = 'text'
-        feedback_services.create_thread(  # type: ignore[no-untyped-call]
+        feedback_services.create_thread(
             feconf.ENTITY_TYPE_EXPLORATION, 'exp_id',
             self.viewer_id, 'subject', message_text)
 
@@ -228,12 +228,12 @@ class SubscriptionsTest(test_utils.GenericTestBase):
         thread_id = thread_ids_subscribed_to[0]
 
         self.assertEqual(
-            feedback_services.get_messages(thread_id)[0].text,  # type: ignore[no-untyped-call]
+            feedback_services.get_messages(thread_id)[0].text,
             message_text)
 
         # The editor posts a follow-up message to the thread.
         new_message_text = 'new text'
-        feedback_services.create_message(  # type: ignore[no-untyped-call]
+        feedback_services.create_message(
             thread_id, self.editor_id, '', '', new_message_text)
 
         # The viewer and editor are now both subscribed to the thread.
@@ -246,26 +246,26 @@ class SubscriptionsTest(test_utils.GenericTestBase):
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(USER_ID), [])
         exp_services.save_new_exploration(  # type: ignore[no-untyped-call]
-            USER_ID, exp_domain.Exploration.create_default_exploration(EXP_ID))  # type: ignore[no-untyped-call]
+            USER_ID, exp_domain.Exploration.create_default_exploration(EXP_ID))
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(USER_ID), [EXP_ID])
 
     def test_adding_new_exploration_owner_or_editor_role_results_in_subscription(  # pylint: disable=line-too-long
         self
     ) -> None:
-        exploration = exp_domain.Exploration.create_default_exploration(EXP_ID)  # type: ignore[no-untyped-call]
+        exploration = exp_domain.Exploration.create_default_exploration(EXP_ID)
         exp_services.save_new_exploration(self.owner_id, exploration)  # type: ignore[no-untyped-call]
 
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(self.owner_2_id), [])
-        rights_manager.assign_role_for_exploration(  # type: ignore[no-untyped-call]
+        rights_manager.assign_role_for_exploration(
             self.owner, EXP_ID, self.owner_2_id, rights_domain.ROLE_OWNER)
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(self.owner_2_id), [EXP_ID])
 
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(self.editor_id), [])
-        rights_manager.assign_role_for_exploration(  # type: ignore[no-untyped-call]
+        rights_manager.assign_role_for_exploration(
             self.owner, EXP_ID, self.editor_id, rights_domain.ROLE_EDITOR)
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(self.editor_id), [EXP_ID])
@@ -273,18 +273,18 @@ class SubscriptionsTest(test_utils.GenericTestBase):
     def test_adding_new_exploration_viewer_role_does_not_result_in_subscription(
         self
     ) -> None:
-        exploration = exp_domain.Exploration.create_default_exploration(EXP_ID)  # type: ignore[no-untyped-call]
+        exploration = exp_domain.Exploration.create_default_exploration(EXP_ID)
         exp_services.save_new_exploration(self.owner_id, exploration)  # type: ignore[no-untyped-call]
 
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(self.viewer_id), [])
-        rights_manager.assign_role_for_exploration(  # type: ignore[no-untyped-call]
+        rights_manager.assign_role_for_exploration(
             self.owner, EXP_ID, self.viewer_id, rights_domain.ROLE_VIEWER)
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(self.viewer_id), [])
 
     def test_deleting_exploration_does_not_delete_subscription(self) -> None:
-        exploration = exp_domain.Exploration.create_default_exploration(EXP_ID)  # type: ignore[no-untyped-call]
+        exploration = exp_domain.Exploration.create_default_exploration(EXP_ID)
         exp_services.save_new_exploration(self.owner_id, exploration)  # type: ignore[no-untyped-call]
         self.assertEqual(
             self._get_exploration_ids_subscribed_to(self.owner_id), [EXP_ID])
@@ -339,7 +339,7 @@ class SubscriptionsTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             self._get_collection_ids_subscribed_to(self.owner_2_id), [])
-        rights_manager.assign_role_for_collection(  # type: ignore[no-untyped-call]
+        rights_manager.assign_role_for_collection(
             self.owner, COLLECTION_ID, self.owner_2_id,
             rights_domain.ROLE_OWNER)
         self.assertEqual(
@@ -348,7 +348,7 @@ class SubscriptionsTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             self._get_collection_ids_subscribed_to(self.editor_id), [])
-        rights_manager.assign_role_for_collection(  # type: ignore[no-untyped-call]
+        rights_manager.assign_role_for_collection(
             self.owner, COLLECTION_ID, self.editor_id,
             rights_domain.ROLE_EDITOR)
         self.assertEqual(
@@ -362,7 +362,7 @@ class SubscriptionsTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             self._get_collection_ids_subscribed_to(self.viewer_id), [])
-        rights_manager.assign_role_for_collection(  # type: ignore[no-untyped-call]
+        rights_manager.assign_role_for_collection(
             self.owner, COLLECTION_ID, self.viewer_id,
             rights_domain.ROLE_VIEWER)
         self.assertEqual(
