@@ -84,9 +84,7 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
 
             if not multi_item_value:
                 for ele in rule_spec.inputs['x']:
-                    if (
-                        len(ele) > 1
-                    ):
+                    if len(ele) > 1:
                         invalid_rules.append(rule_spec)
 
                 if (
