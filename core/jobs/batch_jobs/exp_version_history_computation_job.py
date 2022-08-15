@@ -85,7 +85,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
         commit_log_models = model_group['commit_log_models']
 
         model_group_is_valid = len(exp_models_vlatest) == 1
-        if model_group_is_valid:
+        if model_group_is_valid: # pragma: no cover
             exp_model_vlatest = exp_models_vlatest[0]
 
             commit_log_flags: List[bool] = [False] * exp_model_vlatest.version
@@ -155,7 +155,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
             exp_models.ExplorationVersionHistoryModel
         ]] = [None] * exp_vlatest.version
         for version_history in model_group['version_history_models']:
-            if version_history is not None:
+            if version_history is not None: # pragma: no cover
                 version_history_models[
                     version_history.exploration_version - 1
                 ] = version_history
@@ -752,7 +752,7 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
         version_history_models = model_group['version_history_models']
 
         model_group_is_valid = len(exp_models_vlatest) == 1
-        if model_group_is_valid:
+        if model_group_is_valid: # pragma: no cover
             exp_model_vlatest = exp_models_vlatest[0]
 
             commit_log_flags: List[bool] = [False] * exp_model_vlatest.version
@@ -833,7 +833,7 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
             [None] * exp_vlatest.version
         )
         for commit_log in model_group['commit_log_models']:
-            if commit_log.version is not None:
+            if commit_log.version is not None: # pragma: no cover
                 commit_log_models[commit_log.version - 1] = commit_log
 
         version_history_models: List[Optional[
