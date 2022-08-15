@@ -17,7 +17,7 @@
  * checkpoint celebration feature.
  */
 
-import { Injectable } from '@angular/core';
+import { Injectable, EventEmitter } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 
 import { ComputeGraphService } from 'services/compute-graph.service';
@@ -37,6 +37,7 @@ enum CheckpointMessageTypes {
   providedIn: 'root'
 })
 export class CheckpointCelebrationUtilityService {
+  private _openLessonInformationModalEmitter = new EventEmitter<void>();
   constructor(
     private computeGraphService: ComputeGraphService,
     private statesObjectFactory: StatesObjectFactory,
@@ -129,5 +130,13 @@ export class CheckpointCelebrationUtilityService {
   getCheckpointTitle(): string {
     const titleI18nKey = this.getCheckpointTitleI18nKey();
     return this.translateService.instant(titleI18nKey);
+  }
+
+  getOpenLessonInformationModalEmitter(): EventEmitter<void> {
+    return this._openLessonInformationModalEmitter;
+  }
+
+  openLessonInformationModal(): void {
+    this._openLessonInformationModalEmitter.emit();
   }
 }

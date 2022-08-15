@@ -281,6 +281,10 @@ export class CheckpointCelebrationModalComponent implements OnInit, OnDestroy {
     checkpointTimer.style.strokeDashoffset = '10';
   }
 
+  openLessonInfoModal(): void {
+    this.checkpointCelebrationUtilityService.openLessonInformationModal();
+  }
+
   isLanguageRTL(): boolean {
     return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
