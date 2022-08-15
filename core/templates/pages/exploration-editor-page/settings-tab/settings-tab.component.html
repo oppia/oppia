@@ -369,8 +369,7 @@
                   <mat-select class="e2e-test-role-select" [(ngModel)]="newMemberRole" name="newMemberRole">
                     <mat-option *ngFor="let item of ROLES"
                                 [value]="item"
-                                (blur)="onRolesFormUsernameBlur()"
-                                class="e2e-test-role-list">
+                                (blur)="onRolesFormUsernameBlur()">
                       {{ item.name }}
                     </mat-option>
                   </mat-select>
