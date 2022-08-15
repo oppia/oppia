@@ -445,7 +445,7 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
             {
               'rule_type': 'ContainsAtLeastOneOf',
               'inputs': {
-                'x': []
+                'x': [] # type: ignore[dict-item]
               }
             },
             {
@@ -538,7 +538,7 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
             {
               'rule_type': 'ContainsAtLeastOneOf',
               'inputs': {
-                'x': []
+                'x': [] # type: ignore[dict-item]
               }
             },
             {
