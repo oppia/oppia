@@ -320,7 +320,7 @@ var ExplorationEditorMainTab = function() {
         await action.waitForAutosave();
         // Begin editing feedback.
         await action.click(
-          'openOutcomeFeedBackEditor', openOutcomeFeedBackEditor, true);
+          'openOutcomeFeedBackEditor', openOutcomeFeedBackEditor);
 
         // Set feedback contents.
         await _setOutcomeFeedback(richTextInstructions);
