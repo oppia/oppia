@@ -127,6 +127,18 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skill_summary.misconception_count, 1)
         self.assertEqual(skill_summary.worked_examples_count, 1)
 
+    def test_raises_error_when_the_skill_provided_with_no_created_on_data(
+        self
+    ) -> None:
+        skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
+        skill.created_on = None
+
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            Exception,
+            'No data available for when the skill was last_updated'
+        ):
+            skill_services.compute_summary_of_skill(skill)
+
     def test_get_image_filenames_from_skill(self) -> None:
         explanation_html = (
             'Explanation with image: <oppia-noninteractive-image '

@@ -119,6 +119,17 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(story_summary.thumbnail_bg_color, None)
         self.assertEqual(story_summary.thumbnail_filename, None)
 
+    def test_raises_error_when_the_story_provided_with_no_created_on_data(
+        self
+    ) -> None:
+        self.story.created_on = None
+
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            Exception,
+            'No data available for when the story was last_updated'
+        ):
+            story_services.compute_summary_of_story(self.story)
+
     def test_get_new_story_id(self) -> None:
         new_story_id = story_services.get_new_story_id()
 

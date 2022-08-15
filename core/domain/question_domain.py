@@ -1503,7 +1503,9 @@ class Question(translation_domain.BaseTranslatableObject):
             if answer_group.outcome.dest_if_really_stuck is not None:
                 dest_if_stuck_is_specified = True
 
-        # Ruling out the possibility of None for mypy type checking.
+        # Ruling out the possibility of None for mypy type checking, because
+        # while creating the default_question_state we are providing default
+        # outcome.
         assert interaction.default_outcome is not None
         if interaction.default_outcome.labelled_as_correct:
             at_least_one_correct_answer = True

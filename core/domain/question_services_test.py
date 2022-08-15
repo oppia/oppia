@@ -704,6 +704,19 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         ):
             question_services.compute_summary_of_question(question)
 
+    def test_raises_error_when_the_question_provided_with_no_created_on_data(
+        self
+    ) -> None:
+
+        question = question_services.get_question_by_id(self.question_id)
+        question.created_on = None
+
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            Exception,
+            'No data available for when the question was last_updated'
+        ):
+            question_services.compute_summary_of_question(question)
+
     def test_get_skills_of_question(self) -> None:
         # If the question id doesnt exist at all, it returns an empty list.
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]

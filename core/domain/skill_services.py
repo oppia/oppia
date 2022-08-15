@@ -1042,14 +1042,18 @@ def compute_summary_of_skill(
 
     Returns:
         SkillSummary. The computed summary for the given skill.
+
+    Raises:
+        Exception. No data available for when the skill was last_updated on.
     """
     skill_model_misconception_count = len(skill.misconceptions)
     skill_model_worked_examples_count = len(
         skill.skill_contents.worked_examples)
 
-    # Ruling out the possibility of None for mypy type checking.
-    assert skill.created_on is not None
-    assert skill.last_updated is not None
+    if skill.created_on is None or skill.last_updated is None:
+        raise Exception(
+            'No data available for when the skill was last_updated on.'
+        )
     skill_summary = skill_domain.SkillSummary(
         skill.id, skill.description, skill.language_code,
         skill.version, skill_model_misconception_count,

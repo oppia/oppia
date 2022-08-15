@@ -1463,7 +1463,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         for outcome in all_outcomes:
                             dest_state = outcome.dest
                             # Ruling out the possibility of None for mypy type
-                            # checking.
+                            # checking, because in explorations every outcome
+                            # has destination.
                             assert dest_state is not None
                             if self.states[dest_state].interaction.is_terminal:
                                 excluded_state_is_bypassable = True

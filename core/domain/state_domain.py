@@ -4096,8 +4096,8 @@ class State(translation_domain.BaseTranslatableObject):
         """Return a State domain object with default value.
 
         Args:
-            default_dest_state_name: str. The default destination state, or None
-                if no default destination state is defined.
+            default_dest_state_name: str|None. The default destination state, or
+                None if no default destination state is defined.
             is_initial_state: bool. Whether this state represents the initial
                 state of an exploration.
 

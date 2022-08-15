@@ -1042,7 +1042,9 @@ def _get_filtered_completed_story_summaries(
         else:
             story_id = story_summary.id
             story = stories[index]
-            # Ruling out the possibility of None for mypy type checking.
+            # Ruling out the possibility of None for mypy type checking, because
+            # here story_ids points to the completed stories and story can only
+            # be completed if it exists.
             assert story is not None
             if len(story_fetchers.get_completed_node_ids(
                     user_id, story_id)) != len(story_summary.node_titles):
