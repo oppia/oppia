@@ -2616,6 +2616,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         Returns:
             choices_to_save: List[str]. The list of valid choices.
         """
+        # Misbehaving when after removing invalid choices and the choices count becomes below 4.
         empty_choices = []
         seen_choices = []
         choices_to_remove = []
