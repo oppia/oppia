@@ -13,6 +13,7 @@
         "core.controllers.payload_validator_test",
         "core.controllers.domain_objects_validator_test",
         "core.controllers.classroom_test",
+        "core.domain.classroom_config_domain_test",
         "extensions.rich_text_components.components_test",
         "core.controllers.topic_editor_test",
         "core.controllers.platform_feature_test",

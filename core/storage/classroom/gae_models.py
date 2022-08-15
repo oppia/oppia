@@ -20,7 +20,6 @@ from __future__ import annotations
 
 from core import utils
 from core.platform import models
-import core.storage.base_model.gae_models as base_models
 
 from typing import Dict, List, Optional
 
@@ -30,6 +29,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import datastore_services
 
 datastore_services = models.Registry.import_datastore_services()
+(base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 
 class ClassroomModel(base_models.BaseModel):
@@ -157,7 +157,9 @@ class ClassroomModel(base_models.BaseModel):
         """
         return ClassroomModel.query(
             datastore_services.all_of(
-                cls.url_fragment == url_fragment, cls.deleted == False) # pylint: disable=singleton-comparison
+                cls.url_fragment == url_fragment,
+                cls.deleted == False # pylint: disable=singleton-comparison
+            )
         ).get()
 
     @classmethod
@@ -173,5 +175,7 @@ class ClassroomModel(base_models.BaseModel):
         """
         return ClassroomModel.query(
             datastore_services.all_of(
-                cls.name == classroom_name, cls.deleted == False) # pylint: disable=singleton-comparison
+                cls.name == classroom_name,
+                cls.deleted == False  # pylint: disable=singleton-comparison
+            )
         ).get()
