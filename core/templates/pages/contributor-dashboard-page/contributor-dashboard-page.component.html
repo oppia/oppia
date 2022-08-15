@@ -37,7 +37,7 @@
               </div>
               <div class="oppia-contributor-username-and-review-rights-container">
                 <div class="oppia-short-contributor-username-container"
-                     *ngIf="userIsLoggedIn || username?.length <= 8"
+                     *ngIf="userIsLoggedIn || username.length <= 8"
                      [attr.data-tab-name]="'username'">
                   <lazy-loading [hidden]="!userInfoIsLoading"></lazy-loading>
                   <span class="e2e-test-username"
@@ -46,7 +46,7 @@
                   </span>
                 </div>
                 <div class="oppia-long-contributor-username-container"
-                     *ngIf="userIsLoggedIn && username?.length > 8"
+                     *ngIf="userIsLoggedIn && username.length > 8"
                      [attr.data-tab-name]="'username'">
                   <lazy-loading [hidden]="!userInfoIsLoading"></lazy-loading>
                   <span class="e2e-test-username"
