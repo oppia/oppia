@@ -20,6 +20,7 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
+import { SvgSanitizerService } from './svg-sanitizer.service';
 
 import constants from 'assets/constants';
 
@@ -27,7 +28,10 @@ import constants from 'assets/constants';
   providedIn: 'root'
 })
 export class ImageUploadHelperService {
-  constructor(private assetsBackendApiService: AssetsBackendApiService) {}
+  constructor(
+    private assetsBackendApiService: AssetsBackendApiService,
+    private svgSanitizerService: SvgSanitizerService
+  ) {}
 
   private _generateDateTimeStringForFilename(): string {
     let date = new Date();
