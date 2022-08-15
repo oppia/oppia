@@ -318,10 +318,8 @@ var UnicodeEditor = function(elem) {
 
 var AutocompleteDropdownEditor = function(elem) {
   var containerLocator = '.e2e-test-exploration-category-dropdown';
-  var searchInputLocator = (
-    '.e2e-test-exploration-new-category-add');
-  var categorySelectorChoice = (
-    '.e2e-test-exploration-category-selector-choice');
+  var searchInputLocator = '.e2e-test-exploration-new-category-add';
+  var categorySelectorChoice = '.e2e-test-exploration-category-selector-choice';
 
   return {
     setValue: async function(text) {
@@ -330,21 +328,20 @@ var AutocompleteDropdownEditor = function(elem) {
       // NOTE: the input field is top-level in the DOM, and is outside the
       // context of 'elem'. The 'select2-dropdown' id is assigned to the input
       // field when it is 'activated', i.e. when the dropdown is clicked.
-      await action.setValue(
-        'Dropdown Element',
-        $(searchInputLocator),
-        text);
+      var searchInputLocatorText = function(text) {
+        return $(`.e2e-test-exploration-category-selector-choice=${text}`);
+      };
 
-      var searchInputLocatorText = await $$(
-        `.e2e-test-exploration-category-selector-choice=${{text}}`).first();
-
+      // The browser.keys is used to add text in search box.
+      await browser.keys(text);
       await action.click(
         'Dropdown Element Select',
-        searchInputLocatorText,
-        true);
+        searchInputLocatorText(text)
+      );
     },
     expectOptionsToBe: async function(expectedOptions) {
-      await action.click('Container Element', await elem.$(containerLocator));
+      await action.click(
+        'Container Element', await elem.$(containerLocator), true);
       var actualOptions = await $$(categorySelectorChoice).map(
         async function(optionElem) {
           return await action.getText('Option Elem', optionElem);
