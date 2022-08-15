@@ -138,8 +138,8 @@ class ClassroomAdminDataHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class NewClassroomHandler(base.BaseHandler):
-    """Creates a new classroom using the default properties."""
+class NewClassroomIdHandler(base.BaseHandler):
+    """Creates a new classroom ID."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {}
@@ -150,10 +150,8 @@ class NewClassroomHandler(base.BaseHandler):
     @acl_decorators.can_access_admin_page
     def get(self):
         """Handles GET requests."""
-        new_classroom_dict = (
-            classroom_conifg_services.create_new_default_classroom())
         self.values.update({
-            'classroom': new_classroom_dict
+            'classroom_id': classroom_conifg_services.get_new_classroom_id()
         })
         self.render_json(self.values)
 
@@ -169,18 +167,36 @@ class EditClassroomDataHandler(base.BaseHandler):
     }
     HANDLER_ARGS_SCHEMAS = {
         'GET': {},
-        'PUT': {},
+        'PUT': {
+            'classroom_dict': {
+                'schema': {}
+            }
+        },
         "DELETE": {}
     }
 
     @acl_decorators.can_access_admin_page
-    def get(self):
-        pass
+    def get(self, classroom_id):
+        """Handles GET requests."""
+        classroom = classroom_conifg_services.get_classroom_by_id(classroom_id)
+        self.values.update({
+            'classroom': classroom.to_dict()
+        })
+        self.render_json(self.values)
+
 
     @acl_decorators.can_access_admin_page
-    def put(self):
-        pass
+    def put(self, _):
+        """Updates properties of a given classroom."""
+        classroom = self.normalized_payload('classroom_dict')
+        classroom_conifg_services.update_classroom_properties(classroom)
+        self.render_json(self.values)
 
     @acl_decorators.can_access_admin_page
-    def delete(self):
-        pass
+    def delete(self, classroom_id):
+        """Deletes classroom from the classroom admin page."""
+        classroom_conifg_services.delete_classroom(classroom_id)
+        log_info_string = '(%s) %s deleted classroom %s' % (
+            self.roles, self.user_id, classroom_id)
+        logging.info(log_info_string)
+        self.render_json(self.values)
