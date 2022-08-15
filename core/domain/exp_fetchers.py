@@ -51,7 +51,7 @@ datastore_services = models.Registry.import_datastore_services()
 
 def _migrate_states_schema(
     versioned_exploration_states: exp_domain.VersionedExplorationStatesDict,
-    init_state_name: str
+    init_state_name: str, language_code: str
 ) -> None:
     """Holds the responsibility of performing a step-by-step, sequential update
     of an exploration states structure based on the schema version of the input
@@ -90,7 +90,7 @@ def _migrate_states_schema(
            feconf.CURRENT_STATE_SCHEMA_VERSION):
         exp_domain.Exploration.update_states_from_model(
             versioned_exploration_states,
-            states_schema_version, init_state_name)
+            states_schema_version, init_state_name, language_code)
         states_schema_version += 1
 
 
@@ -189,12 +189,14 @@ def get_exploration_from_model(
         'states': copy.deepcopy(exploration_model.states)
     }
     init_state_name = exploration_model.init_state_name
+    language_code = exploration_model.language_code
 
     # If the exploration uses the latest states schema version, no conversion
     # is necessary.
     if (run_conversion and exploration_model.states_schema_version !=
             feconf.CURRENT_STATE_SCHEMA_VERSION):
-        _migrate_states_schema(versioned_exploration_states, init_state_name)
+        _migrate_states_schema(
+            versioned_exploration_states, init_state_name, language_code)
 
     return exp_domain.Exploration(
         exploration_model.id, exploration_model.title,

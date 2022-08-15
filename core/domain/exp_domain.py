@@ -2537,7 +2537,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """
         exploration_rights = exp_models.ExplorationRightsModel.get_all(
             include_deleted=False)
-        exp_ids = [exp['id'] for exp in exploration_rights]
+        exp_ids = [exp.id for exp in exploration_rights]
 
         # Update general state validations.
         states_dict = cls._update_general_state(states_dict)
@@ -3544,7 +3544,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
         cls,
         versioned_exploration_states: VersionedExplorationStatesDict,
         current_states_schema_version: int,
-        init_state_name: str
+        init_state_name: str,
+        language_code: str
     ) -> None:
         """Converts the states blob contained in the given
         versioned_exploration_states dict from current_states_schema_version to
@@ -3573,7 +3574,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 versioned_exploration_states['states'], init_state_name)
         else:
             versioned_exploration_states['states'] = conversion_fn(
-                versioned_exploration_states['states'])
+                versioned_exploration_states['states'], language_code
+            )
 
     # The current version of the exploration YAML schema. If any backward-
     # incompatible changes are made to the exploration schema in the YAML
