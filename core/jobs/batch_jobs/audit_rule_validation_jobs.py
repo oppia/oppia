@@ -62,7 +62,7 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
         Args:
             answer_group: state_domain.AnswerGroup. The answer group.
             multi_item_value: bool. If multiple items at same place are
-                allowed or not
+                allowed or not.
 
         Returns:
             bool. Returns True if number of invalid rules are equal to the
@@ -111,7 +111,6 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
 
         Args:
             states_dict: dict[str, state_domain.State]. The state dictionary.
-            exp_lang_code: str. The language code of the exploration.
 
         Returns:
             invalid_states: List[Dict[str, str]]. List of invalid states with
@@ -149,7 +148,7 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                 invalid_states.append(
                     {
                         'state_name': state_name,
-                        "ans_group_idx": invalid_ans_groups
+                        'ans_group_idx': invalid_ans_groups
                     }
                 )
 
@@ -165,12 +164,11 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
 
         Args:
             states_dict: dict[str, state_domain.State]. The state dictionary.
-            exp_lang_code: str. The language code of the exploration.
 
         Returns:
-            bool. Returns True if the exploration is invalid.
+            invalid_found: bool. Returns True if the exploration is invalid.
         """
-
+        invalid_found = False
         for state in states_dict.values():
             if state.interaction.id != 'Continue':
                 continue
@@ -179,8 +177,8 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                 ['buttonText'].value.unicode_str
             )
             if len(text_value) > 20:
-                return True
-        return False
+                invalid_found = True
+        return invalid_found
 
     @staticmethod
     def item_selec_equals_value_between_min_max_value(
@@ -242,8 +240,6 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
 
         Args:
             answer_group: state_domain.AnswerGroup. The answer group.
-            multi_item_value: bool. If multiple items at same place are
-                allowed or not
 
         Returns:
             bool. Returns True if number of invalid rules are equal to the
@@ -331,7 +327,7 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                 invalid_states.append(
                     {
                         'state_name': state_name,
-                        "ans_group_idx": invalid_ans_groups
+                        'ans_group_idx': invalid_ans_groups
                     }
                 )
 

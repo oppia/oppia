@@ -189,7 +189,76 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
       },
       'confirmed_unclassified_answers': [],
       'hints': [],
-      'solution': None # type: ignore[typeddict-item]
+      'solution': None
+    }
+
+    EXP_1_STATE_2 = state_domain.State.create_default_state(
+        'EXP_1_STATE_2', is_initial_state=False).to_dict()
+    EXP_1_STATE_2['interaction'] = {
+      'id': 'DragAndDropSortInput',
+      'customization_args': {
+      'choices': {
+        'value': [
+          {
+            'content_id': 'ca_choices_68',
+            'html': '<p>1</p>'
+          },
+          {
+            'content_id': 'ca_choices_69',
+            'html': '<p>2</p>'
+          },
+          {
+            'content_id': 'ca_choices_70',
+            'html': '<p>3</p>'
+          }
+        ]
+      },
+      'allowMultipleItemsInSamePosition': {
+        'value': True
+      }
+    },
+      'answer_groups': [
+      {
+        'rule_specs': [
+          {
+            'rule_type': 'HasElementXBeforeElementY',
+            'inputs': {
+              'x': 'ca_choices_68',
+              'y': 'ca_choices_69'
+            }
+          }
+        ],
+        'outcome': {
+          'dest': 'A valid state',
+          'feedback': {
+            'content_id': 'feedback_72',
+            'html': '<p>dvds</p>'
+          },
+          'labelled_as_correct': False,
+          'param_changes': [],
+          'refresher_exploration_id': None,
+          'missing_prerequisite_skill_id': None,
+          'dest_if_really_stuck': None
+        },
+        'training_data': [],
+        'tagged_skill_misconception_id': None
+      }
+    ],
+      'default_outcome': {
+        'dest': 'EXP_1_STATE_1',
+        'feedback': {
+          'content_id': 'default_outcome',
+          'html': '<p>sd</p>'
+        },
+        'labelled_as_correct': False,
+        'param_changes': [],
+        'refresher_exploration_id': None,
+        'missing_prerequisite_skill_id': None,
+        'dest_if_really_stuck': None
+      },
+      'confirmed_unclassified_answers': [],
+      'hints': [],
+      'solution': None
     }
 
     # Continue Interaction.
@@ -245,7 +314,62 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
       },
       'confirmed_unclassified_answers': [],
       'hints': [],
-      'solution': None # type: ignore[typeddict-item]
+      'solution': None
+    }
+
+    EXP_2_STATE_2 = state_domain.State.create_default_state(
+        'EXP_2_STATE_2', is_initial_state=False).to_dict()
+    EXP_2_STATE_2['interaction'] = {
+      'id': 'Continue',
+      'customization_args': {
+        'buttonText': {
+          'value': {
+            'content_id': 'ca_buttonText_0',
+            'unicode_str': 'Continue'
+          }
+        }
+      },
+      'answer_groups': [
+        {
+          'rule_specs': [
+            {
+              'rule_type': 'Equals',
+              'inputs': {
+                'x': 0
+              }
+            }
+          ],
+          'outcome': {
+            'dest': 'EXP_2_STATE_2',
+            'feedback': {
+              'content_id': 'feedback_4',
+              'html': '<p>good</p>'
+            },
+            'labelled_as_correct': False,
+            'param_changes': [],
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None,
+            'dest_if_really_stuck': None
+          },
+          'training_data': [],
+          'tagged_skill_misconception_id': None
+        }
+      ],
+      'default_outcome': {
+        'dest': 'EXP_2_STATE_2',
+        'feedback': {
+          'content_id': 'default_outcome',
+          'html': '<p>try</p>'
+        },
+        'labelled_as_correct': False,
+        'param_changes': [],
+        'refresher_exploration_id': None,
+        'missing_prerequisite_skill_id': None,
+        'dest_if_really_stuck': None
+      },
+      'confirmed_unclassified_answers': [],
+      'hints': [],
+      'solution': None
     }
 
     # Itemselection interaction.
@@ -307,6 +431,48 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
           },
           'training_data': [],
           'tagged_skill_misconception_id': None
+        },
+        {
+          'rule_specs': [
+            {
+              'rule_type': 'Equals',
+              'inputs': {
+                'x': [
+                  'ca_choices_59'
+                ]
+              }
+            },
+            {
+              'rule_type': 'ContainsAtLeastOneOf',
+              'inputs': {
+                'x': []
+              }
+            },
+            {
+              'rule_type': 'Equals',
+              'inputs': {
+                'x': [
+                  'ca_choices_59',
+                  'ca_choices_60',
+                  'ca_choices_61'
+                ]
+              }
+            }
+          ],
+          'outcome': {
+            'dest': 'EXP_3_STATE_1',
+            'feedback': {
+              'content_id': 'feedback_63',
+              'html': '<p>df</p>'
+            },
+            'labelled_as_correct': False,
+            'param_changes': [],
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None,
+            'dest_if_really_stuck': None
+          },
+          'training_data': [],
+          'tagged_skill_misconception_id': None
         }
       ],
       'default_outcome': {
@@ -323,7 +489,100 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
       },
       'confirmed_unclassified_answers': [],
       'hints': [],
-      'solution': None # type: ignore[typeddict-item]
+      'solution': None
+    }
+
+    EXP_3_STATE_2 = state_domain.State.create_default_state(
+        'EXP_3_STATE_2', is_initial_state=False).to_dict()
+    EXP_3_STATE_2['interaction'] = {
+      'id': 'ItemSelectionInput',
+      'customization_args': {
+        'minAllowableSelectionCount': {
+          'value': 3
+        },
+        'maxAllowableSelectionCount': {
+          'value': 5
+        },
+        'choices': {
+          'value': [
+            {
+              'content_id': 'ca_choices_59',
+              'html': '<p>1</p>'
+            },
+            {
+              'content_id': 'ca_choices_60',
+              'html': '<p>2</p>'
+            },
+            {
+              'content_id': 'ca_choices_61',
+              'html': '<p>3</p>'
+            },
+            {
+              'content_id': 'ca_choices_62',
+              'html': '<p>4</p>'
+            }
+          ]
+        }
+      },
+      'answer_groups': [
+        {
+          'rule_specs': [
+            {
+              'rule_type': 'Equals',
+              'inputs': {
+                'x': [
+                  'ca_choices_59'
+                ]
+              }
+            },
+            {
+              'rule_type': 'ContainsAtLeastOneOf',
+              'inputs': {
+                'x': []
+              }
+            },
+            {
+              'rule_type': 'Equals',
+              'inputs': {
+                'x': [
+                  'ca_choices_59',
+                  'ca_choices_60',
+                  'ca_choices_61'
+                ]
+              }
+            }
+          ],
+          'outcome': {
+            'dest': 'A valid state',
+            'feedback': {
+              'content_id': 'feedback_63',
+              'html': '<p>df</p>'
+            },
+            'labelled_as_correct': False,
+            'param_changes': [],
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None,
+            'dest_if_really_stuck': None
+          },
+          'training_data': [],
+          'tagged_skill_misconception_id': None
+        }
+      ],
+      'default_outcome': {
+        'dest': 'EXP_3_STATE_1',
+        'feedback': {
+          'content_id': 'default_outcome',
+          'html': '<p>sd</p>'
+        },
+        'labelled_as_correct': False,
+        'param_changes': [],
+        'refresher_exploration_id': None,
+        'missing_prerequisite_skill_id': None,
+        'dest_if_really_stuck': None
+      },
+      'confirmed_unclassified_answers': [],
+      'hints': [],
+      'solution': None
     }
 
     # NumericInput interaction.
@@ -384,6 +643,30 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
           },
           'training_data': [],
           'tagged_skill_misconception_id': None
+        },
+        {
+          'rule_specs': [
+            {
+              'rule_type': 'IsLessThanOrEqualTo',
+              'inputs': {
+                'x': 4
+              }
+            }
+          ],
+          'outcome': {
+            'dest': 'EXP_4_STATE_1',
+            'feedback': {
+              'content_id': 'feedback_4',
+              'html': '<p>good</p>'
+            },
+            'labelled_as_correct': False,
+            'param_changes': [],
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None,
+            'dest_if_really_stuck': None
+          },
+          'training_data': [],
+          'tagged_skill_misconception_id': None
         }
       ],
       'default_outcome': {
@@ -407,7 +690,114 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
           }
         }
       ],
-      'solution': None # type: ignore[typeddict-item]
+      'solution': None
+    }
+
+    EXP_4_STATE_2 = state_domain.State.create_default_state(
+        'EXP_4_STATE_2', is_initial_state=True).to_dict()
+    EXP_4_STATE_2['interaction'] = {
+      'id': 'NumericInput',
+      'customization_args': {
+        'requireNonnegativeInput': {
+          'value': False
+        }
+      },
+      'answer_groups': [
+        {
+          'rule_specs': [
+            {
+              'rule_type': 'IsLessThanOrEqualTo',
+              'inputs': {
+                'x': 'Not a number'
+              }
+            },
+            {
+              'rule_type': 'IsGreaterThanOrEqualTo',
+              'inputs': {
+                'x': 'Not a number'
+              }
+            },
+            {
+              'rule_type': 'IsLessThan',
+              'inputs': {
+                'x': 'Not a number'
+              }
+            },
+            {
+              'rule_type': 'IsGreaterThan',
+              'inputs': {
+                'x': 'Not a number'
+              }
+            },
+            {
+              'rule_type': 'Equals',
+              'inputs': {
+                'x': 'Not a number'
+              }
+            }
+          ],
+          'outcome': {
+            'dest': 'Valid state',
+            'feedback': {
+              'content_id': 'feedback_4',
+              'html': '<p>good</p>'
+            },
+            'labelled_as_correct': False,
+            'param_changes': [],
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None,
+            'dest_if_really_stuck': None
+          },
+          'training_data': [],
+          'tagged_skill_misconception_id': None
+        },
+        {
+          'rule_specs': [
+            {
+              'rule_type': 'IsLessThanOrEqualTo',
+              'inputs': {
+                'x': 4
+              }
+            }
+          ],
+          'outcome': {
+            'dest': 'Valid',
+            'feedback': {
+              'content_id': 'feedback_4',
+              'html': '<p>good</p>'
+            },
+            'labelled_as_correct': False,
+            'param_changes': [],
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None,
+            'dest_if_really_stuck': None
+          },
+          'training_data': [],
+          'tagged_skill_misconception_id': None
+        }
+      ],
+      'default_outcome': {
+        'dest': 'EXP_4_STATE_2',
+        'feedback': {
+          'content_id': 'default_outcome',
+          'html': '<p>try</p>'
+        },
+        'labelled_as_correct': False,
+        'param_changes': [],
+        'refresher_exploration_id': None,
+        'missing_prerequisite_skill_id': None,
+        'dest_if_really_stuck': None
+      },
+      'confirmed_unclassified_answers': [],
+      'hints': [
+        {
+          'hint_content': {
+            'content_id': 'hint_1',
+            'html': '<p>c</p>'
+          }
+        }
+      ],
+      'solution': None
     }
 
     # Image tag.
@@ -427,6 +817,12 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
       'raw_latex&amp;quot;:&amp;quot;abcde&amp;quot;}\"></oppia-'
       'noninteractive-math>'
       '<oppia-noninteractive-math></oppia-noninteractive-math>'
+      '<oppia-noninteractive-image alt-with-value=\"&amp;quot;'
+      'aaaaaaaaaaaaaaaaaaaa&amp;quot;\" caption-with-value='
+      '\"&amp;quot;&amp;quot;\" filepath-with-value=\"&amp;quot;'
+      'img_2_0xmbq9hwfz_height_276_width_490.svg&amp;quot;\">'
+      '</oppia-noninteractive-image><oppia-noninteractive-image>'
+      '</oppia-noninteractive-image>'
     )
 
     TODAY_DATE = datetime.datetime.utcnow()
@@ -452,7 +848,8 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
             auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
             correctness_feedback_enabled=False,
             states={
-              'EXP_1_STATE_1': self.EXP_1_STATE_1
+              'EXP_1_STATE_1': self.EXP_1_STATE_1,
+              'EXP_1_STATE_2': self.EXP_1_STATE_2
             }
         )
 
@@ -474,6 +871,7 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
             correctness_feedback_enabled=False,
             states={
               'EXP_2_STATE_1': self.EXP_2_STATE_1,
+              'EXP_2_STATE_2': self.EXP_2_STATE_2
             }
         )
 
@@ -495,6 +893,7 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
             correctness_feedback_enabled=False,
             states={
               'EXP_3_STATE_1': self.EXP_3_STATE_1,
+              'EXP_3_STATE_2': self.EXP_3_STATE_2
             }
         )
 
@@ -515,7 +914,8 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
             auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
             correctness_feedback_enabled=False,
             states={
-              'EXP_4_STATE_1': self.EXP_4_STATE_1
+              'EXP_4_STATE_1': self.EXP_4_STATE_1,
+              'EXP_4_STATE_2': self.EXP_4_STATE_2
             }
         )
 
@@ -556,6 +956,8 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
         )
 
         self.mock_function_for_exp_fetcher()
+
+        self.mock_convert_to_model_pair()
 
     def test_run_with_no_models(self) -> None:
         self.assert_job_output_is([])
@@ -639,4 +1041,18 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
 
         self.assertEqual(
           model, None
+        )
+
+    def mock_convert_to_model_pair(self) -> None:
+        temp_tuple = (
+          [self.exp_1, self.exp_2],
+          [self.opportunity_model, self.opportunity_model]
+        )
+        model = (
+            audit_rule_validation_jobs.ExpAuditRuleChecksJob.
+            convert_into_model_pair(temp_tuple)
+        )
+
+        self.assertEqual(
+          model, (None, None)
         )
