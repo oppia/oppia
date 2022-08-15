@@ -2618,7 +2618,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """
         empty_choices = []
         seen_choices = []
-        choices_to_save = []
+        choices_to_remove = []
         invalid_choices_index = []
         for choice in choices:
             if choice['html'].strip() in ('<p></p>', ''):
@@ -2639,9 +2639,12 @@ class Exploration(translation_domain.BaseTranslatableObject):
         for choice in choices:
             if choice['html'] not in seen_choices:
                 seen_choices.append(choice['html'])
-                choices_to_save.append(choice)
             else:
+                choices_to_remove.append(choice)
                 invalid_choices_index.append(choices.index(choice))
+
+        for choice_to_remove in choices_to_remove:
+            choices.remove(choice_to_remove)
 
         # Remove rules whose choice has been deleted.
         for answer_group in answer_groups:
@@ -2653,7 +2656,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             for invalid_rule in invalid_rules:
                 answer_group['rule_specs'].remove(invalid_rule)
 
-        return (choices_to_save, answer_groups)
+        return (choices, answer_groups)
 
     @classmethod
     def _item_selec_no_ans_group_should_be_same(
