@@ -2656,6 +2656,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         invalid_rules.append(rule_spec)
             for invalid_rule in invalid_rules:
                 answer_group['rule_specs'].remove(invalid_rule)
+            # Removal of answer group if it is valid check.
 
         return (choices, answer_groups)
 
@@ -3260,10 +3261,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
         # MultipleChoiceInput Interaction.
             if state_dict['interaction']['id'] == 'MultipleChoiceInput':
                 selected_equals_choices = []
-                unwanted_rule = []
                 answer_groups = state_dict['interaction']['answer_groups']
                 # No answer choice should appear in more than one answer group.
                 for answer_group in answer_groups:
+                    unwanted_rule = []
                     for rule_spec in answer_group['rule_specs']:
                         if rule_spec['rule_type'] == 'Equals':
                             if (
@@ -3274,8 +3275,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
                             else:
                                 selected_equals_choices.append(
                                     rule_spec['inputs']['x'])
-                for ele in unwanted_rule:
-                    answer_group['rule_specs'].remove(ele)
+                    for ele in unwanted_rule:
+                        answer_group['rule_specs'].remove(ele)
+                    # Removal of answer group if it is empty check, investigation part.
+                    if len(answer_group['rule_specs']) == 0:
+                        answer_groups.remove(answer_group)
 
                 # Answer choices should be non-empty and unique.
                 choices = (
