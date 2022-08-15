@@ -64,6 +64,8 @@ from core.platform import models
 
 import deepdiff
 
+from typing import Optional
+
 datastore_services = models.Registry.import_datastore_services()
 (base_models, exp_models, feedback_models, user_models) = (
     models.Registry.import_models([
@@ -257,7 +259,7 @@ def get_recently_published_exp_summaries(limit):
         exp_models.ExpSummaryModel.get_recently_published(limit))
 
 
-def get_story_id_linked_to_exploration(exp_id):
+def get_story_id_linked_to_exploration(exp_id: str) -> Optional[str]:
     """Returns the ID of the story that the exploration is a part of, or None if
     the exploration is not part of a story.
 
@@ -1343,6 +1345,13 @@ def validate_exploration_for_story(exp, strict):
         ValidationError. Invalid interaction in exploration.
         ValidationError. RTE content in state of exploration with ID is not
             supported on mobile.
+        ValidationError. Expected no exploration to have classifier models.
+        ValidationError. Expected no exploration to contain training data in
+            any answer group.
+        ValidationError. Expected no exploration to have parameter values in
+            the default outcome of any state interaction.
+        ValidationError. Expected no exploration to have video tags.
+        ValidationError. Expected no exploration to have link tags.
     """
     validation_error_messages = []
     if (
@@ -1416,6 +1425,44 @@ def validate_exploration_for_story(exp, strict):
                 if strict:
                     raise utils.ValidationError(error_string)
                 validation_error_messages.append(error_string)
+
+        if state.classifier_model_id is not None:
+            error_string = (
+                'Explorations in a story are not expected to contain '
+                'classifier models. State %s of exploration with ID %s '
+                'contains classifier models.' % (state_name, exp.id))
+            if strict:
+                raise utils.ValidationError(error_string)
+            validation_error_messages.append(error_string)
+
+        for answer_group in state.interaction.answer_groups:
+            if len(answer_group.training_data) > 0:
+                error_string = (
+                    'Explorations in a story are not expected to contain '
+                    'training data for any answer group. State %s of '
+                    'exploration with ID %s contains training data in one of '
+                    'its answer groups.' % (state_name, exp.id)
+                )
+                if strict:
+                    raise utils.ValidationError(error_string)
+                validation_error_messages.append(error_string)
+                break
+
+        if (
+            state.interaction.default_outcome is not None and
+            len(state.interaction.default_outcome.param_changes) > 0
+        ):
+            error_string = (
+                'Explorations in a story are not expected to contain '
+                'parameter values. State %s of exploration with ID %s '
+                'contains parameter values in its default outcome.' % (
+                    state_name, exp.id
+                )
+            )
+            if strict:
+                raise utils.ValidationError(error_string)
+            validation_error_messages.append(error_string)
+
     return validation_error_messages
 
 
@@ -1721,6 +1768,33 @@ def revert_version_history(
         )
         new_version_history_model.update_timestamps()
         new_version_history_model.put()
+
+
+def get_exploration_validation_error(exploration_id, revert_to_version):
+    """Tests whether an exploration can be reverted to the given version
+    number. Does not commit any changes.
+
+    Args:
+        exploration_id: str. The id of the exploration to be reverted to the
+            current version.
+        revert_to_version: int. The version to which the given exploration
+            is to be reverted.
+
+    Returns:
+        Optional[str]. None if the revert_to_version passes all backend
+        validation checks, or the error string otherwise.
+    """
+    # Validate the previous version of the exploration.
+    exploration = exp_fetchers.get_exploration_by_id(
+        exploration_id, version=revert_to_version)
+    exploration_rights = rights_manager.get_exploration_rights(exploration.id)
+    try:
+        exploration.validate(
+            exploration_rights.status == rights_domain.ACTIVITY_STATUS_PUBLIC)
+    except Exception as ex:
+        return str(ex)
+
+    return None
 
 
 def revert_exploration(

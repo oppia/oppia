@@ -24,6 +24,7 @@ import datetime
 from core import feconf
 from core import utils
 from core.constants import constants
+from core.domain import change_domain
 from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_fetchers
@@ -38,7 +39,34 @@ from core.domain import state_domain
 from core.domain import user_services
 from core.platform import models
 
+from typing import (
+    Any, Callable, Dict, List, Mapping, Optional, Sequence, Set, Type, Union
+)
+from typing_extensions import TypedDict
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import suggestion_models
+
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
+
+
+class BaseSuggestionDict(TypedDict):
+    """Dictionary representing the BaseSuggestion object."""
+
+    suggestion_id: str
+    suggestion_type: str
+    target_type: str
+    target_id: str
+    target_version_at_submission: int
+    status: str
+    author_name: str
+    final_reviewer_id: Optional[str]
+    change: Dict[str, change_domain.AcceptableChangeDictTypes]
+    score_category: str
+    language_code: str
+    last_updated: float
+    edited_by_reviewer: bool
 
 
 class BaseSuggestion:
@@ -67,12 +95,33 @@ class BaseSuggestion:
             reviewer.
     """
 
-    def __init__(self, status, final_reviewer_id):
+    # Here, we explicitly defined all the attributes that are used in
+    # BaseSuggestion because in `to_dict`, `get_score_type` and other
+    # methods too we are accessing these attributes but due to the lack
+    # of definition in main implementation the types of these attributes
+    # are not available which causes MyPy to throw undefined attribute
+    # error for all attributes that are used in BaseSuggestion. Thus to
+    # provide type-info to MyPy about these attributes, we defined them
+    # as class variables.
+    suggestion_id: str
+    suggestion_type: str
+    target_type: str
+    target_id: str
+    target_version_at_submission: int
+    author_id: str
+    change: change_domain.BaseChange
+    score_category: str
+    last_updated: datetime.datetime
+    language_code: str
+    edited_by_reviewer: bool
+    image_context: str
+
+    def __init__(self, status: str, final_reviewer_id: Optional[str]) -> None:
         """Initializes a Suggestion object."""
         self.status = status
         self.final_reviewer_id = final_reviewer_id
 
-    def to_dict(self):
+    def to_dict(self) -> BaseSuggestionDict:
         """Returns a dict representation of a suggestion object.
 
         Returns:
@@ -94,7 +143,7 @@ class BaseSuggestion:
             'edited_by_reviewer': self.edited_by_reviewer
         }
 
-    def get_score_type(self):
+    def get_score_type(self) -> str:
         """Returns the first part of the score category. The first part refers
         to the the type of scoring. The value of this part will be among
         suggestion_models.SCORE_TYPE_CHOICES.
@@ -105,7 +154,7 @@ class BaseSuggestion:
         return self.score_category.split(
             suggestion_models.SCORE_CATEGORY_DELIMITER)[0]
 
-    def get_author_name(self):
+    def get_author_name(self) -> str:
         """Returns the author's username.
 
         Returns:
@@ -113,7 +162,7 @@ class BaseSuggestion:
         """
         return user_services.get_username(self.author_id)
 
-    def get_score_sub_type(self):
+    def get_score_sub_type(self) -> str:
         """Returns the second part of the score category. The second part refers
         to the specific area where the author needs to be scored. This can be
         the category of the exploration, the language of the suggestion, or the
@@ -125,19 +174,19 @@ class BaseSuggestion:
         return self.score_category.split(
             suggestion_models.SCORE_CATEGORY_DELIMITER)[1]
 
-    def set_suggestion_status_to_accepted(self):
+    def set_suggestion_status_to_accepted(self) -> None:
         """Sets the status of the suggestion to accepted."""
         self.status = suggestion_models.STATUS_ACCEPTED
 
-    def set_suggestion_status_to_in_review(self):
+    def set_suggestion_status_to_in_review(self) -> None:
         """Sets the status of the suggestion to in review."""
         self.status = suggestion_models.STATUS_IN_REVIEW
 
-    def set_suggestion_status_to_rejected(self):
+    def set_suggestion_status_to_rejected(self) -> None:
         """Sets the status of the suggestion to rejected."""
         self.status = suggestion_models.STATUS_REJECTED
 
-    def set_final_reviewer_id(self, reviewer_id):
+    def set_final_reviewer_id(self, reviewer_id: str) -> None:
         """Sets the final reviewer id of the suggestion to be reviewer_id.
 
         Args:
@@ -145,7 +194,7 @@ class BaseSuggestion:
         """
         self.final_reviewer_id = reviewer_id
 
-    def validate(self):
+    def validate(self) -> None:
         """Validates the BaseSuggestion object. Each subclass must implement
         this function.
 
@@ -235,14 +284,16 @@ class BaseSuggestion:
                 'Expected the first part of score_category to be among allowed'
                 ' choices, received %s' % self.get_score_type())
 
-    def accept(self):
+    def accept(self, commit_msg: str) -> None:
         """Accepts the suggestion. Each subclass must implement this
         function.
         """
         raise NotImplementedError(
             'Subclasses of BaseSuggestion should implement accept.')
 
-    def get_change_list_for_accepting_suggestion(self):
+    def get_change_list_for_accepting_suggestion(
+        self
+    ) -> Sequence[change_domain.BaseChange]:
         """Before accepting the suggestion, a change_list needs to be generated
         from the change. Each subclass must implement this function.
         """
@@ -250,7 +301,7 @@ class BaseSuggestion:
             'Subclasses of BaseSuggestion should implement '
             'get_change_list_for_accepting_suggestion.')
 
-    def pre_accept_validate(self):
+    def pre_accept_validate(self) -> None:
         """Performs referential validation. This function needs to be called
         before accepting the suggestion.
         """
@@ -258,13 +309,13 @@ class BaseSuggestion:
             'Subclasses of BaseSuggestion should implement '
             'pre_accept_validate.')
 
-    def populate_old_value_of_change(self):
+    def populate_old_value_of_change(self) -> None:
         """Populates the old_value field of the change."""
         raise NotImplementedError(
             'Subclasses of BaseSuggestion should implement '
             'populate_old_value_of_change.')
 
-    def pre_update_validate(self, change):
+    def pre_update_validate(self, change: Any) -> None:
         """Performs the pre update validation. This function needs to be called
         before updating the suggestion.
         """
@@ -272,13 +323,13 @@ class BaseSuggestion:
             'Subclasses of BaseSuggestion should implement '
             'pre_update_validate.')
 
-    def get_all_html_content_strings(self):
+    def get_all_html_content_strings(self) -> List[str]:
         """Gets all html content strings used in this suggestion."""
         raise NotImplementedError(
             'Subclasses of BaseSuggestion should implement '
             'get_all_html_content_strings.')
 
-    def get_target_entity_html_strings(self):
+    def get_target_entity_html_strings(self) -> List[str]:
         """Gets all html content strings from target entity used in the
         suggestion.
         """
@@ -286,7 +337,7 @@ class BaseSuggestion:
             'Subclasses of BaseSuggestion should implement '
             'get_target_entity_html_strings.')
 
-    def get_new_image_filenames_added_in_suggestion(self):
+    def get_new_image_filenames_added_in_suggestion(self) -> List[str]:
         """Returns the list of newly added image filenames in the suggestion.
 
         Returns:
@@ -306,7 +357,7 @@ class BaseSuggestion:
 
         return new_image_filenames
 
-    def _copy_new_images_to_target_entity_storage(self):
+    def _copy_new_images_to_target_entity_storage(self) -> None:
         """Copy newly added images in suggestion to the target entity
         storage.
         """
@@ -315,7 +366,9 @@ class BaseSuggestion:
             self.image_context, self.target_id, self.target_type,
             self.target_id, new_image_filenames)
 
-    def convert_html_in_suggestion_change(self, conversion_fn):
+    def convert_html_in_suggestion_change(
+        self, conversion_fn: Callable[[str], str]
+    ) -> None:
         """Checks for HTML fields in a suggestion change and converts it
         according to the conversion function.
         """
@@ -324,7 +377,7 @@ class BaseSuggestion:
             'convert_html_in_suggestion_change.')
 
     @property
-    def is_handled(self):
+    def is_handled(self) -> bool:
         """Returns if the suggestion has either been accepted or rejected.
 
         Returns:
@@ -339,10 +392,19 @@ class SuggestionEditStateContent(BaseSuggestion):
     """
 
     def __init__(
-            self, suggestion_id, target_id, target_version_at_submission,
-            status, author_id, final_reviewer_id,
-            change, score_category, language_code, edited_by_reviewer,
-            last_updated=None):
+        self,
+        suggestion_id: str,
+        target_id: str,
+        target_version_at_submission: int,
+        status: str,
+        author_id: str,
+        final_reviewer_id: Optional[str],
+        change: Mapping[str, change_domain.AcceptableChangeDictTypes],
+        score_category: str,
+        language_code: Optional[str],
+        edited_by_reviewer: bool,
+        last_updated: Optional[datetime.datetime] = None
+    ) -> None:
         """Initializes an object of type SuggestionEditStateContent
         corresponding to the SUGGESTION_TYPE_EDIT_STATE_CONTENT choice.
         """
@@ -355,16 +417,31 @@ class SuggestionEditStateContent(BaseSuggestion):
         self.target_id = target_id
         self.target_version_at_submission = target_version_at_submission
         self.author_id = author_id
-        self.change = exp_domain.ExplorationChange(change)
+        self.change: exp_domain.ExplorationChange = (
+            exp_domain.ExplorationChange(change)
+        )
         self.score_category = score_category
-        self.language_code = language_code
-        self.last_updated = last_updated
+        # In BaseSuggestion, language_code is defined with only string type
+        # but here language_code is of Optional[str] type because language_code
+        # can accept None values as well. So, due to this conflict in types
+        # MyPy throws an `Incompatible types in assignment` error. Thus to
+        # avoid the error, we used ignore here.
+        self.language_code = language_code  # type: ignore[assignment]
+        # In BaseSuggestion, last_updated is defined with only datetime type
+        # but here last_updated is of Optional[datetime] type because
+        # last_updated can accept None values as well. So, due to this conflict
+        # in types MyPy throws an `Incompatible types in assignment` error.
+        # Thus to avoid the error, we used ignore here.
+        self.last_updated = last_updated  # type: ignore[assignment]
         self.edited_by_reviewer = edited_by_reviewer
-        # Currently, we don't allow adding images in the "edit state content"
-        # suggestion, so the image_context is None.
-        self.image_context = None
+        # In BaseSuggestion, image_context is defined as string type attribute
+        # but currently, we don't allow adding images in the "edit state
+        # content" suggestion, so the image_context is None here and due to
+        # None MyPy throws an `Incompatible types in assignment` error.
+        # Thus to avoid the error, we used ignore here.
+        self.image_context = None  # type: ignore[assignment]
 
-    def validate(self):
+    def validate(self) -> None:
         """Validates a suggestion object of type SuggestionEditStateContent.
 
         Raises:
@@ -404,7 +481,7 @@ class SuggestionEditStateContent(BaseSuggestion):
                 'Expected language_code to be None, received %s' % (
                     self.language_code))
 
-    def pre_accept_validate(self):
+    def pre_accept_validate(self) -> None:
         """Performs referential validation. This function needs to be called
         before accepting the suggestion.
         """
@@ -415,7 +492,9 @@ class SuggestionEditStateContent(BaseSuggestion):
                 'Expected %s to be a valid state name' %
                 self.change.state_name)
 
-    def get_change_list_for_accepting_suggestion(self):
+    def get_change_list_for_accepting_suggestion(
+        self
+    ) -> List[exp_domain.ExplorationChange]:
         """Gets a complete change for the suggestion.
 
         Returns:
@@ -427,12 +506,19 @@ class SuggestionEditStateContent(BaseSuggestion):
         old_content = (
             exploration.states[self.change.state_name].content.to_dict())
 
-        change.old_value = old_content
+        # Here, change is of type ExplorationChange and all attributes
+        # on ExplorationChange are created dynamically except cmd, so because
+        # of this MyPy is unable to recognize `old_value` as an attribute
+        # of change and throws an `"ExplorationChange" has no attribute
+        # "old_value"` error. Thus to avoid the error, we used ignore here.
+        change.old_value = old_content  # type: ignore[attr-defined]
+        # Ruling out the possibility of any other type for mypy type checking.
+        assert isinstance(change.new_value, dict)
         change.new_value['content_id'] = old_content['content_id']
 
         return [change]
 
-    def populate_old_value_of_change(self):
+    def populate_old_value_of_change(self) -> None:
         """Populates old value of the change."""
         exploration = exp_fetchers.get_exploration_by_id(self.target_id)
         if self.change.state_name not in exploration.states:
@@ -443,20 +529,25 @@ class SuggestionEditStateContent(BaseSuggestion):
             old_content = (
                 exploration.states[self.change.state_name].content.to_dict())
 
-        self.change.old_value = old_content
+        # Here, change is of type ExplorationChange and all attributes
+        # on ExplorationChange are created dynamically except cmd, so because
+        # of this MyPy is unable to recognize `old_value` as an attribute
+        # of change and throws an `"ExplorationChange" has no attribute
+        # "old_value"` error. Thus to avoid the error, we used ignore here.
+        self.change.old_value = old_content  # type: ignore[attr-defined]
 
-    def accept(self, commit_message):
+    def accept(self, commit_message: str) -> None:
         """Accepts the suggestion.
 
         Args:
             commit_message: str. The commit message.
         """
         change_list = self.get_change_list_for_accepting_suggestion()
-        exp_services.update_exploration(
+        exp_services.update_exploration(  # type: ignore[no-untyped-call]
             self.final_reviewer_id, self.target_id, change_list,
             commit_message, is_suggestion=True)
 
-    def pre_update_validate(self, change):
+    def pre_update_validate(self, change: exp_domain.ExplorationChange) -> None:
         """Performs the pre update validation. This function needs to be called
         before updating the suggestion.
 
@@ -478,22 +569,27 @@ class SuggestionEditStateContent(BaseSuggestion):
             raise utils.ValidationError(
                 'The new change state_name must be equal to %s' %
                 self.change.state_name)
+        # Ruling out the possibility of any other type for mypy type checking.
+        assert isinstance(self.change.new_value, dict)
         if self.change.new_value['html'] == change.new_value['html']:
             raise utils.ValidationError(
                 'The new html must not match the old html')
 
-    def get_all_html_content_strings(self):
+    def get_all_html_content_strings(self) -> List[str]:
         """Gets all html content strings used in this suggestion.
 
         Returns:
             list(str). The list of html content strings.
         """
+        # Ruling out the possibility of any other type for mypy type checking.
+        assert isinstance(self.change.new_value, dict)
         html_string_list = [self.change.new_value['html']]
         if self.change.old_value is not None:
+            assert isinstance(self.change.old_value, dict)
             html_string_list.append(self.change.old_value['html'])
         return html_string_list
 
-    def get_target_entity_html_strings(self):
+    def get_target_entity_html_strings(self) -> List[str]:
         """Gets all html content strings from target entity used in the
         suggestion.
 
@@ -502,11 +598,16 @@ class SuggestionEditStateContent(BaseSuggestion):
             in the suggestion.
         """
         if self.change.old_value is not None:
+            # Ruling out the possibility of any other type for mypy type
+            # checking.
+            assert isinstance(self.change.old_value, dict)
             return [self.change.old_value['html']]
 
         return []
 
-    def convert_html_in_suggestion_change(self, conversion_fn):
+    def convert_html_in_suggestion_change(
+        self, conversion_fn: Callable[[str], str]
+    ) -> None:
         """Checks for HTML fields in a suggestion change and converts it
         according to the conversion function.
 
@@ -515,8 +616,12 @@ class SuggestionEditStateContent(BaseSuggestion):
                 HTML.
         """
         if self.change.old_value is not None:
+            # Ruling out the possibility of any other type for mypy type
+            # checking.
+            assert isinstance(self.change.old_value, dict)
             self.change.old_value['html'] = (
                 conversion_fn(self.change.old_value['html']))
+        assert isinstance(self.change.new_value, dict)
         self.change.new_value['html'] = (
             conversion_fn(self.change.new_value['html']))
 
@@ -527,10 +632,19 @@ class SuggestionTranslateContent(BaseSuggestion):
     """
 
     def __init__(
-            self, suggestion_id, target_id, target_version_at_submission,
-            status, author_id, final_reviewer_id,
-            change, score_category, language_code, edited_by_reviewer,
-            last_updated=None):
+        self,
+        suggestion_id: str,
+        target_id: str,
+        target_version_at_submission: int,
+        status: str,
+        author_id: str,
+        final_reviewer_id: Optional[str],
+        change: Mapping[str, change_domain.AcceptableChangeDictTypes],
+        score_category: str,
+        language_code: str,
+        edited_by_reviewer: bool,
+        last_updated: Optional[datetime.datetime] = None
+    ) -> None:
         """Initializes an object of type SuggestionTranslateContent
         corresponding to the SUGGESTION_TYPE_TRANSLATE_CONTENT choice.
         """
@@ -543,14 +657,21 @@ class SuggestionTranslateContent(BaseSuggestion):
         self.target_id = target_id
         self.target_version_at_submission = target_version_at_submission
         self.author_id = author_id
-        self.change = exp_domain.ExplorationChange(change)
+        self.change: exp_domain.ExplorationChange = (
+            exp_domain.ExplorationChange(change)
+        )
         self.score_category = score_category
         self.language_code = language_code
-        self.last_updated = last_updated
+        # In BaseSuggestion, last_updated is defined with only datetime type
+        # but here last_updated is of Optional[datetime] type, because here
+        # last_updated can accept None values as well. So, due to this conflict
+        # in types MyPy throws an `Incompatible types in assignment` error.
+        # Thus to avoid the error, we used ignore here.
+        self.last_updated = last_updated  # type: ignore[assignment]
         self.edited_by_reviewer = edited_by_reviewer
         self.image_context = feconf.IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS
 
-    def validate(self):
+    def validate(self) -> None:
         """Validates a suggestion object of type SuggestionTranslateContent.
 
         Raises:
@@ -601,7 +722,7 @@ class SuggestionTranslateContent(BaseSuggestion):
                 'Expected language_code to be %s, received %s' % (
                     self.change.language_code, self.language_code))
 
-    def pre_update_validate(self, change):
+    def pre_update_validate(self, change: exp_domain.ExplorationChange) -> None:
         """Performs the pre update validation. This function needs to be called
         before updating the suggestion.
 
@@ -628,7 +749,7 @@ class SuggestionTranslateContent(BaseSuggestion):
                 'The language code must be equal to %s' %
                 self.change.language_code)
 
-    def pre_accept_validate(self):
+    def pre_accept_validate(self) -> None:
         """Performs referential validation. This function needs to be called
         before accepting the suggestion.
         """
@@ -638,7 +759,7 @@ class SuggestionTranslateContent(BaseSuggestion):
             raise utils.ValidationError(
                 'Expected %s to be a valid state name' % self.change.state_name)
 
-    def accept(self, commit_message):
+    def accept(self, commit_message: str) -> None:
         """Accepts the suggestion.
 
         Args:
@@ -648,20 +769,20 @@ class SuggestionTranslateContent(BaseSuggestion):
         # the HTML strings for images.
         if (
                 hasattr(self.change, 'data_format') and
-                state_domain.WrittenTranslation.is_data_format_list(
+                state_domain.WrittenTranslation.is_data_format_list(  # type: ignore[no-untyped-call]
                     self.change.data_format)
         ):
-            exp_services.update_exploration(
+            exp_services.update_exploration(  # type: ignore[no-untyped-call]
                 self.final_reviewer_id, self.target_id, [self.change],
                 commit_message, is_suggestion=True)
             return
 
         self._copy_new_images_to_target_entity_storage()
-        exp_services.update_exploration(
+        exp_services.update_exploration(  # type: ignore[no-untyped-call]
             self.final_reviewer_id, self.target_id, [self.change],
             commit_message, is_suggestion=True)
 
-    def get_all_html_content_strings(self):
+    def get_all_html_content_strings(self) -> List[str]:
         """Gets all html content strings used in this suggestion.
 
         Returns:
@@ -678,7 +799,7 @@ class SuggestionTranslateContent(BaseSuggestion):
             content_strings.append(self.change.content_html)
         return content_strings
 
-    def get_target_entity_html_strings(self):
+    def get_target_entity_html_strings(self) -> List[str]:
         """Gets all html content strings from target entity used in the
         suggestion.
 
@@ -688,7 +809,9 @@ class SuggestionTranslateContent(BaseSuggestion):
         """
         return [self.change.content_html]
 
-    def convert_html_in_suggestion_change(self, conversion_fn):
+    def convert_html_in_suggestion_change(
+        self, conversion_fn: Callable[[str], str]
+    ) -> None:
         """Checks for HTML fields in a suggestion change and converts it
         according to the conversion function.
 
@@ -696,9 +819,15 @@ class SuggestionTranslateContent(BaseSuggestion):
             conversion_fn: function. The function to be used for converting the
                 HTML.
         """
-        self.change.content_html = (
+        # Here, change is of type ExplorationChange and all attributes
+        # on ExplorationChange are created dynamically except cmd, so due
+        # this MyPy is unable to recognize `content_html` and `translation_html`
+        # as an attribute of change and throwing `"ExplorationChange" has no
+        # attribute "content_html"` error. Thus to avoid the error, we used
+        # ignore here.
+        self.change.content_html = (  # type: ignore[attr-defined]
             conversion_fn(self.change.content_html))
-        self.change.translation_html = (
+        self.change.translation_html = (  # type: ignore[attr-defined]
             conversion_fn(self.change.translation_html))
 
 
@@ -728,10 +857,19 @@ class SuggestionAddQuestion(BaseSuggestion):
     """
 
     def __init__(
-            self, suggestion_id, target_id, target_version_at_submission,
-            status, author_id, final_reviewer_id,
-            change, score_category, language_code, edited_by_reviewer,
-            last_updated=None):
+        self,
+        suggestion_id: str,
+        target_id: str,
+        target_version_at_submission: int,
+        status: str,
+        author_id: str,
+        final_reviewer_id: Optional[str],
+        change: Mapping[str, change_domain.AcceptableChangeDictTypes],
+        score_category: str,
+        language_code: str,
+        edited_by_reviewer: bool,
+        last_updated: Optional[datetime.datetime] = None
+    ) -> None:
         """Initializes an object of type SuggestionAddQuestion
         corresponding to the SUGGESTION_TYPE_ADD_QUESTION choice.
         """
@@ -742,15 +880,22 @@ class SuggestionAddQuestion(BaseSuggestion):
         self.target_id = target_id
         self.target_version_at_submission = target_version_at_submission
         self.author_id = author_id
-        self.change = question_domain.QuestionSuggestionChange(change)
+        self.change: question_domain.QuestionSuggestionChange = (
+            question_domain.QuestionSuggestionChange(change)
+        )
         self.score_category = score_category
         self.language_code = language_code
-        self.last_updated = last_updated
+        # In BaseSuggestion, last_updated is defined with only datetime type
+        # but here last_updated is of Optional[datetime] type, because here
+        # last_updated can accept None values as well. So, due to this conflict
+        # in types MyPy throws an `Incompatible types in assignment` error.
+        # Thus to avoid the error, we used ignore here.
+        self.last_updated = last_updated  # type: ignore[assignment]
         self.image_context = feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS
         self._update_change_to_latest_state_schema_version()
         self.edited_by_reviewer = edited_by_reviewer
 
-    def _update_change_to_latest_state_schema_version(self):
+    def _update_change_to_latest_state_schema_version(self) -> None:
         """Holds the responsibility of performing a step-by-step, sequential
         update of the state structure inside the change_cmd based on the schema
         version of the current state dictionary.
@@ -759,12 +904,16 @@ class SuggestionAddQuestion(BaseSuggestion):
             Exception. The state_schema_version of suggestion cannot be
                 processed.
         """
-        state_schema_version = self.change.question_dict[
+        # Ruling out the possibility of any other type for mypy type checking.
+        assert isinstance(self.change.question_dict, dict)
+        question_dict: question_domain.QuestionDict = self.change.question_dict
+
+        state_schema_version = question_dict[
             'question_state_data_schema_version']
 
         versioned_question_state = {
             'state': copy.deepcopy(
-                self.change.question_dict['question_state_data'])
+                question_dict['question_state_data'])
         }
 
         if not (25 <= state_schema_version
@@ -784,7 +933,7 @@ class SuggestionAddQuestion(BaseSuggestion):
         self.change.question_dict['question_state_data_schema_version'] = (
             state_schema_version)
 
-    def validate(self):
+    def validate(self) -> None:
         """Validates a suggestion object of type SuggestionAddQuestion.
 
         Raises:
@@ -818,16 +967,20 @@ class SuggestionAddQuestion(BaseSuggestion):
             raise utils.ValidationError(
                 'Expected change to contain question_dict')
 
+        # Ruling out the possibility of any other type for mypy type checking.
+        assert isinstance(self.change.question_dict, dict)
+        question_dict: question_domain.QuestionDict = self.change.question_dict
+
         if self.language_code != constants.DEFAULT_LANGUAGE_CODE:
             raise utils.ValidationError(
                 'Expected language_code to be %s, received %s' % (
                     constants.DEFAULT_LANGUAGE_CODE, self.language_code))
 
-        if self.language_code != self.change.question_dict['language_code']:
+        if self.language_code != question_dict['language_code']:
             raise utils.ValidationError(
                 'Expected question language_code(%s) to be same as suggestion '
                 'language_code(%s)' % (
-                    self.change.question_dict['language_code'],
+                    question_dict['language_code'],
                     self.language_code))
 
         if not self.change.skill_difficulty:
@@ -842,14 +995,16 @@ class SuggestionAddQuestion(BaseSuggestion):
                 % (skill_difficulties, self._get_skill_difficulty()))
 
         question = question_domain.Question(
-            None, state_domain.State.from_dict(
-                self.change.question_dict['question_state_data']),
-            self.change.question_dict['question_state_data_schema_version'],
-            self.change.question_dict['language_code'], None,
-            self.change.question_dict['linked_skill_ids'],
-            self.change.question_dict['inapplicable_skill_misconception_ids'])
+            None,
+            state_domain.State.from_dict(
+                question_dict['question_state_data']
+            ),
+            question_dict['question_state_data_schema_version'],
+            question_dict['language_code'], None,
+            question_dict['linked_skill_ids'],
+            question_dict['inapplicable_skill_misconception_ids'])
         question_state_data_schema_version = (
-            self.change.question_dict['question_state_data_schema_version'])
+            question_dict['question_state_data_schema_version'])
         if question_state_data_schema_version != (
                 feconf.CURRENT_STATE_SCHEMA_VERSION):
             raise utils.ValidationError(
@@ -859,7 +1014,7 @@ class SuggestionAddQuestion(BaseSuggestion):
                     question_state_data_schema_version))
         question.partial_validate()
 
-    def pre_accept_validate(self):
+    def pre_accept_validate(self) -> None:
         """Performs referential validation. This function needs to be called
         before accepting the suggestion.
         """
@@ -874,10 +1029,12 @@ class SuggestionAddQuestion(BaseSuggestion):
             raise utils.ValidationError(
                 'The skill with the given id doesn\'t exist.')
 
-    def get_change_list_for_accepting_suggestion(self):
+    # We have ignored [override] here because the signature of this method
+    # doesn't match with BaseSuggestion's method.
+    def get_change_list_for_accepting_suggestion(self) -> None:  # type: ignore[override]
         pass
 
-    def accept(self, unused_commit_message):
+    def accept(self, unused_commit_message: str) -> None:
         """Accepts the suggestion.
 
         Args:
@@ -885,7 +1042,9 @@ class SuggestionAddQuestion(BaseSuggestion):
                 consistency with the existing suggestions. As a default commit
                 message is used in the add_question function, the arg is unused.
         """
-        question_dict = self.change.question_dict
+        # Ruling out the possibility of any other type for mypy type checking.
+        assert isinstance(self.change.question_dict, dict)
+        question_dict: question_domain.QuestionDict = self.change.question_dict
         question_dict['version'] = 1
         question_dict['id'] = (
             question_services.get_new_question_id())
@@ -921,11 +1080,17 @@ class SuggestionAddQuestion(BaseSuggestion):
             self.author_id, question_dict['id'], self.change.skill_id,
             self._get_skill_difficulty())
 
-    def populate_old_value_of_change(self):
+    def populate_old_value_of_change(self) -> None:
         """Populates old value of the change."""
         pass
 
-    def pre_update_validate(self, change):
+    def pre_update_validate(
+        self,
+        change: Union[
+            question_domain.QuestionChange,
+            question_domain.QuestionSuggestionChange
+        ]
+    ) -> None:
         """Performs the pre update validation. This functions need to be called
         before updating the suggestion.
 
@@ -950,29 +1115,37 @@ class SuggestionAddQuestion(BaseSuggestion):
                 'At least one of the new skill_difficulty or question_dict '
                 'should be changed.')
 
-    def _get_skill_difficulty(self):
+    def _get_skill_difficulty(self) -> float:
         """Returns the suggestion's skill difficulty."""
-        return self.change.skill_difficulty
+        # Ruling out the possibility of any other type for mypy type checking.
+        assert isinstance(self.change.skill_difficulty, float)
+        skill_difficulty = self.change.skill_difficulty
+        return skill_difficulty
 
-    def get_all_html_content_strings(self):
+    def get_all_html_content_strings(self) -> List[str]:
         """Gets all html content strings used in this suggestion.
 
         Returns:
             list(str). The list of html content strings.
         """
+        # Ruling out the possibility of any other type for mypy type checking.
+        assert isinstance(self.change.question_dict, dict)
+        question_dict: question_domain.QuestionDict = self.change.question_dict
         state_object = (
             state_domain.State.from_dict(
-                self.change.question_dict['question_state_data']))
+                question_dict['question_state_data']))
         html_string_list = state_object.get_all_html_content_strings()
         return html_string_list
 
-    def get_target_entity_html_strings(self):
+    def get_target_entity_html_strings(self) -> List[str]:
         """Gets all html content strings from target entity used in the
         suggestion.
         """
         return []
 
-    def convert_html_in_suggestion_change(self, conversion_fn):
+    def convert_html_in_suggestion_change(
+        self, conversion_fn: Callable[[str], str]
+    ) -> None:
         """Checks for HTML fields in the suggestion change and converts it
         according to the conversion function.
 
@@ -980,29 +1153,66 @@ class SuggestionAddQuestion(BaseSuggestion):
             conversion_fn: function. The function to be used for converting the
                 HTML.
         """
-        self.change.question_dict['question_state_data'] = (
+        # Ruling out the possibility of any other type for mypy type checking.
+        assert isinstance(self.change.question_dict, dict)
+        question_dict: question_domain.QuestionDict = self.change.question_dict
+        question_dict['question_state_data'] = (
             state_domain.State.convert_html_fields_in_state(
-                self.change.question_dict['question_state_data'],
+                question_dict['question_state_data'],
                 conversion_fn,
                 state_uses_old_interaction_cust_args_schema=(
-                    self.change.question_dict[
+                    question_dict[
                         'question_state_data_schema_version'] < 38),
                 state_uses_old_rule_template_schema=(
-                    self.change.question_dict[
+                    question_dict[
                         'question_state_data_schema_version'] < 45)
             )
         )
 
 
+class BaseVoiceoverApplicationDict(TypedDict):
+    """Dictionary representing the BaseVoiceoverApplication object."""
+
+    voiceover_application_id: str
+    target_type: str
+    target_id: str
+    status: str
+    author_name: str
+    final_reviewer_name: Optional[str]
+    language_code: str
+    filename: str
+    content: str
+    rejection_message: Optional[str]
+
+
 class BaseVoiceoverApplication:
     """Base class for a voiceover application."""
 
-    def __init__(self):
+    # Here, we explicitly defined all the attributes that are used in
+    # BaseVoiceoverApplication because in `to_dict`, `get_author_name`
+    # and other methods too we are accessing these attributes but due
+    # to the lack of definition in main implementation the types of
+    # these attributes are not available which causes MyPy to throw
+    # undefined attribute error for all attributes that are used in
+    # BaseVoiceoverApplication. Thus to provide the type-info to MyPy
+    # about these attributes, we defined them as class variables.
+    voiceover_application_id: str
+    target_type: str
+    target_id: str
+    status: str
+    author_id: str
+    final_reviewer_id: Optional[str]
+    language_code: str
+    filename: str
+    content: str
+    rejection_message: Optional[str]
+
+    def __init__(self) -> None:
         """Initializes a GeneralVoiceoverApplication object."""
         raise NotImplementedError(
             'Subclasses of BaseVoiceoverApplication should implement __init__.')
 
-    def to_dict(self):
+    def to_dict(self) -> BaseVoiceoverApplicationDict:
         """Returns a dict representation of a voiceover application object.
 
         Returns:
@@ -1023,7 +1233,7 @@ class BaseVoiceoverApplication:
             'rejection_message': self.rejection_message
         }
 
-    def get_author_name(self):
+    def get_author_name(self) -> str:
         """Returns the author's username.
 
         Returns:
@@ -1031,15 +1241,20 @@ class BaseVoiceoverApplication:
         """
         return user_services.get_username(self.author_id)
 
-    def get_final_reviewer_name(self):
+    def get_final_reviewer_name(self) -> str:
         """Returns the reviewer's username.
 
         Returns:
             str. The username of the reviewer of the voiceover application.
         """
+        # In `to_dict` method we are calling this method only when
+        # final_reviewer_id exists. So, here final_reviewer_id is
+        # never going to None and to just narrow down the type from
+        # Optional[str] to str, we used assertion here.
+        assert self.final_reviewer_id is not None
         return user_services.get_username(self.final_reviewer_id)
 
-    def validate(self):
+    def validate(self) -> None:
         """Validates the BaseVoiceoverApplication object.
 
         Raises:
@@ -1107,14 +1322,14 @@ class BaseVoiceoverApplication:
                 'Expected content to be a string, received %s' % type(
                     self.content))
 
-    def accept(self):
+    def accept(self, reviewer_id: str) -> None:
         """Accepts the voiceover application. Each subclass must implement this
         function.
         """
         raise NotImplementedError(
             'Subclasses of BaseVoiceoverApplication should implement accept.')
 
-    def reject(self):
+    def reject(self, reviewer_id: str, rejection_message: str) -> None:
         """Rejects the voiceover application. Each subclass must implement this
         function.
         """
@@ -1122,7 +1337,7 @@ class BaseVoiceoverApplication:
             'Subclasses of BaseVoiceoverApplication should implement reject.')
 
     @property
-    def is_handled(self):
+    def is_handled(self) -> bool:
         """Returns true if the voiceover application has either been accepted or
         rejected.
 
@@ -1136,9 +1351,17 @@ class ExplorationVoiceoverApplication(BaseVoiceoverApplication):
     """Domain object for a voiceover application for exploration."""
 
     def __init__( # pylint: disable=super-init-not-called
-            self, voiceover_application_id, target_id, status, author_id,
-            final_reviewer_id, language_code, filename, content,
-            rejection_message):
+        self,
+        voiceover_application_id: str,
+        target_id: str,
+        status: str,
+        author_id: str,
+        final_reviewer_id: Optional[str],
+        language_code: str,
+        filename: str,
+        content: str,
+        rejection_message: Optional[str]
+    ) -> None:
         """Initializes a ExplorationVoiceoverApplication domain object.
 
         Args:
@@ -1153,8 +1376,9 @@ class ExplorationVoiceoverApplication(BaseVoiceoverApplication):
             filename: str. The filename of the voiceover audio.
             content: str. The html content which is voiceover in the
                 application.
-            rejection_message: str. The plain text message submitted by the
-                reviewer while rejecting the application.
+            rejection_message: str|None. The plain text message submitted by the
+                reviewer while rejecting the application or None, if status is
+                accepted.
         """
         self.voiceover_application_id = voiceover_application_id
         self.target_type = feconf.ENTITY_TYPE_EXPLORATION
@@ -1167,7 +1391,7 @@ class ExplorationVoiceoverApplication(BaseVoiceoverApplication):
         self.content = content
         self.rejection_message = rejection_message
 
-    def accept(self, reviewer_id):
+    def accept(self, reviewer_id: str) -> None:
         """Accepts the voiceover application and updates the final_reviewer_id.
 
         Args:
@@ -1177,7 +1401,7 @@ class ExplorationVoiceoverApplication(BaseVoiceoverApplication):
         self.status = suggestion_models.STATUS_ACCEPTED
         self.validate()
 
-    def reject(self, reviewer_id, rejection_message):
+    def reject(self, reviewer_id: str, rejection_message: str) -> None:
         """Rejects the voiceover application, updates the final_reviewer_id and
         adds rejection message.
 
@@ -1192,12 +1416,21 @@ class ExplorationVoiceoverApplication(BaseVoiceoverApplication):
         self.validate()
 
 
-VOICEOVER_APPLICATION_TARGET_TYPE_TO_DOMAIN_CLASSES = {
+VOICEOVER_APPLICATION_TARGET_TYPE_TO_DOMAIN_CLASSES: Dict[
+    str, Type[ExplorationVoiceoverApplication]
+] = {
     feconf.ENTITY_TYPE_EXPLORATION: (
         ExplorationVoiceoverApplication)
 }
 
-SUGGESTION_TYPES_TO_DOMAIN_CLASSES = {
+SUGGESTION_TYPES_TO_DOMAIN_CLASSES: Dict[
+    str,
+    Union[
+        Type[SuggestionEditStateContent],
+        Type[SuggestionTranslateContent],
+        Type[SuggestionAddQuestion]
+    ]
+] = {
     feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT: (
         SuggestionEditStateContent),
     feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT: (
@@ -1227,9 +1460,12 @@ class CommunityContributionStats:
     """
 
     def __init__(
-            self, translation_reviewer_counts_by_lang_code,
-            translation_suggestion_counts_by_lang_code,
-            question_reviewer_count, question_suggestion_count):
+        self,
+        translation_reviewer_counts_by_lang_code: Dict[str, int],
+        translation_suggestion_counts_by_lang_code: Dict[str, int],
+        question_reviewer_count: int,
+        question_suggestion_count: int
+    ) -> None:
         self.translation_reviewer_counts_by_lang_code = (
             translation_reviewer_counts_by_lang_code
         )
@@ -1239,7 +1475,7 @@ class CommunityContributionStats:
         self.question_reviewer_count = question_reviewer_count
         self.question_suggestion_count = question_suggestion_count
 
-    def validate(self):
+    def validate(self) -> None:
         """Validates the CommunityContributionStats object.
 
         Raises:
@@ -1311,7 +1547,8 @@ class CommunityContributionStats:
             )
 
     def set_translation_reviewer_count_for_language_code(
-            self, language_code, count):
+        self, language_code: str, count: int
+    ) -> None:
         """Sets the translation reviewer count to be count, for the given
         language code.
 
@@ -1324,7 +1561,8 @@ class CommunityContributionStats:
         self.translation_reviewer_counts_by_lang_code[language_code] = count
 
     def set_translation_suggestion_count_for_language_code(
-            self, language_code, count):
+        self, language_code: str, count: int
+    ) -> None:
         """Sets the translation suggestion count to be count, for the language
         code given.
 
@@ -1335,7 +1573,9 @@ class CommunityContributionStats:
         """
         self.translation_suggestion_counts_by_lang_code[language_code] = count
 
-    def are_translation_reviewers_needed_for_lang_code(self, lang_code):
+    def are_translation_reviewers_needed_for_lang_code(
+        self, lang_code: str
+    ) -> bool:
         """Returns whether or not more reviewers are needed to review
         translation suggestions in the given language code. Translation
         suggestions in a given language need more reviewers if the number of
@@ -1361,12 +1601,12 @@ class CommunityContributionStats:
             self.translation_reviewer_counts_by_lang_code[lang_code])
         number_of_suggestions = (
             self.translation_suggestion_counts_by_lang_code[lang_code])
-        return (
+        return bool(
             number_of_suggestions > (
                 config_domain.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.value * (
                     number_of_reviewers)))
 
-    def get_translation_language_codes_that_need_reviewers(self):
+    def get_translation_language_codes_that_need_reviewers(self) -> Set[str]:
         """Returns the language codes where more reviewers are needed to review
         translations in those language codes. Translation suggestions in a
         given language need more reviewers if the number of translation
@@ -1385,7 +1625,7 @@ class CommunityContributionStats:
                 language_codes_that_need_reviewers.add(language_code)
         return language_codes_that_need_reviewers
 
-    def are_question_reviewers_needed(self):
+    def are_question_reviewers_needed(self) -> bool:
         """Returns whether or not more reviewers are needed to review question
         suggestions. Question suggestions need more reviewers if the number of
         question suggestions divided by the number of question reviewers is
@@ -1401,22 +1641,45 @@ class CommunityContributionStats:
         if self.question_reviewer_count == 0:
             return True
 
-        return (
+        return bool(
             self.question_suggestion_count > (
                 config_domain.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.value * (
                     self.question_reviewer_count)))
+
+
+class TranslationContributionStatsDict(TypedDict):
+    """Dictionary representing the TranslationContributionStats object."""
+
+    language_code: Optional[str]
+    contributor_user_id: Optional[str]
+    topic_id: Optional[str]
+    submitted_translations_count: int
+    submitted_translation_word_count: int
+    accepted_translations_count: int
+    accepted_translations_without_reviewer_edits_count: int
+    accepted_translation_word_count: int
+    rejected_translations_count: int
+    rejected_translation_word_count: int
+    contribution_dates: Set[datetime.date]
 
 
 class TranslationContributionStats:
     """Domain object for the TranslationContributionStatsModel."""
 
     def __init__(
-            self, language_code, contributor_user_id, topic_id,
-            submitted_translations_count, submitted_translation_word_count,
-            accepted_translations_count,
-            accepted_translations_without_reviewer_edits_count,
-            accepted_translation_word_count, rejected_translations_count,
-            rejected_translation_word_count, contribution_dates):
+        self,
+        language_code: Optional[str],
+        contributor_user_id: Optional[str],
+        topic_id: Optional[str],
+        submitted_translations_count: int,
+        submitted_translation_word_count: int,
+        accepted_translations_count: int,
+        accepted_translations_without_reviewer_edits_count: int,
+        accepted_translation_word_count: int,
+        rejected_translations_count: int,
+        rejected_translation_word_count: int,
+        contribution_dates: Set[datetime.date]
+    ) -> None:
         self.language_code = language_code
         self.contributor_user_id = contributor_user_id
         self.topic_id = topic_id
@@ -1433,7 +1696,10 @@ class TranslationContributionStats:
 
     @classmethod
     def create_default(
-        cls, language_code=None, contributor_user_id=None, topic_id=None
+        cls,
+        language_code: Optional[str] = None,
+        contributor_user_id: Optional[str] = None,
+        topic_id: Optional[str] = None
     ) -> TranslationContributionStats:
         """Create default translation contribution stats.
 
@@ -1454,7 +1720,7 @@ class TranslationContributionStats:
             0, 0, 0, 0, 0, 0, 0, set()
         )
 
-    def to_dict(self):
+    def to_dict(self) -> TranslationContributionStatsDict:
         """Returns a dict representation of a TranslationContributionStats
         domain object.
 
@@ -1481,15 +1747,35 @@ class TranslationContributionStats:
         }
 
 
+class TranslationReviewStatsDict(TypedDict):
+    """Dictionary representing the TranslationReviewStats object."""
+
+    language_code: str
+    contributor_user_id: str
+    topic_id: str
+    reviewed_translations_count: int
+    reviewed_translation_word_count: int
+    accepted_translations_count: int
+    accepted_translations_with_reviewer_edits_count: int
+    first_contribution_date: datetime.date
+    last_contribution_date: datetime.date
+
+
 class TranslationReviewStats:
     """Domain object for the TranslationReviewStatsModel."""
 
     def __init__(
-            self, language_code, contributor_user_id, topic_id,
-            reviewed_translations_count, reviewed_translation_word_count,
-            accepted_translations_count,
-            accepted_translations_with_reviewer_edits_count,
-            first_contribution_date, last_contribution_date):
+        self,
+        language_code: str,
+        contributor_user_id: str,
+        topic_id: str,
+        reviewed_translations_count: int,
+        reviewed_translation_word_count: int,
+        accepted_translations_count: int,
+        accepted_translations_with_reviewer_edits_count: int,
+        first_contribution_date: datetime.date,
+        last_contribution_date: datetime.date
+    ) -> None:
         self.language_code = language_code
         self.contributor_user_id = contributor_user_id
         self.topic_id = topic_id
@@ -1502,7 +1788,7 @@ class TranslationReviewStats:
         self.first_contribution_date = first_contribution_date
         self.last_contribution_date = last_contribution_date
 
-    def to_dict(self):
+    def to_dict(self) -> TranslationReviewStatsDict:
         """Returns a dict representation of a TranslationReviewStats
         domain object.
 
@@ -1525,15 +1811,31 @@ class TranslationReviewStats:
         }
 
 
+class QuestionContributionStatsDict(TypedDict):
+    """Dictionary representing the QuestionContributionStats object."""
+
+    contributor_user_id: str
+    topic_id: str
+    submitted_questions_count: int
+    accepted_questions_count: int
+    accepted_questions_without_reviewer_edits_count: int
+    first_contribution_date: datetime.date
+    last_contribution_date: datetime.date
+
+
 class QuestionContributionStats:
     """Domain object for the QuestionContributionStatsModel."""
 
     def __init__(
-            self, contributor_user_id, topic_id,
-            submitted_questions_count,
-            accepted_questions_count,
-            accepted_questions_without_reviewer_edits_count,
-            first_contribution_date, last_contribution_date):
+        self,
+        contributor_user_id: str,
+        topic_id: str,
+        submitted_questions_count: int,
+        accepted_questions_count: int,
+        accepted_questions_without_reviewer_edits_count: int,
+        first_contribution_date: datetime.date,
+        last_contribution_date: datetime.date
+    ) -> None:
         self.contributor_user_id = contributor_user_id
         self.topic_id = topic_id
         self.submitted_questions_count = submitted_questions_count
@@ -1544,7 +1846,7 @@ class QuestionContributionStats:
         self.first_contribution_date = first_contribution_date
         self.last_contribution_date = last_contribution_date
 
-    def to_dict(self):
+    def to_dict(self) -> QuestionContributionStatsDict:
         """Returns a dict representation of a QuestionContributionStats
         domain object.
 
@@ -1566,15 +1868,31 @@ class QuestionContributionStats:
         }
 
 
+class QuestionReviewStatsDict(TypedDict):
+    """Dictionary representing the QuestionReviewStats object."""
+
+    contributor_user_id: str
+    topic_id: str
+    reviewed_questions_count: int
+    accepted_questions_count: int
+    accepted_questions_with_reviewer_edits_count: int
+    first_contribution_date: datetime.date
+    last_contribution_date: datetime.date
+
+
 class QuestionReviewStats:
     """Domain object for the QuestionReviewStatsModel."""
 
     def __init__(
-            self, contributor_user_id, topic_id,
-            reviewed_questions_count,
-            accepted_questions_count,
-            accepted_questions_with_reviewer_edits_count,
-            first_contribution_date, last_contribution_date):
+        self,
+        contributor_user_id: str,
+        topic_id: str,
+        reviewed_questions_count: int,
+        accepted_questions_count: int,
+        accepted_questions_with_reviewer_edits_count: int,
+        first_contribution_date: datetime.date,
+        last_contribution_date: datetime.date
+    ) -> None:
         self.contributor_user_id = contributor_user_id
         self.topic_id = topic_id
         self.reviewed_questions_count = reviewed_questions_count
@@ -1585,7 +1903,7 @@ class QuestionReviewStats:
         self.first_contribution_date = first_contribution_date
         self.last_contribution_date = last_contribution_date
 
-    def to_dict(self):
+    def to_dict(self) -> QuestionReviewStatsDict:
         """Returns a dict representation of a QuestionContributionStats
         domain object.
 
@@ -1637,6 +1955,16 @@ class ContributorMilestoneEmailInfo:
         self.contributions_count = contributions_count
 
 
+class ContributorStatsSummaryDict(TypedDict):
+    """Dictionary representing the ContributorStatsSummary object."""
+
+    contributor_user_id: str
+    translation_contribution_stats: List[TranslationContributionStatsDict]
+    question_contribution_stats: List[QuestionContributionStatsDict]
+    translation_review_stats: List[TranslationReviewStatsDict]
+    question_review_stats: List[QuestionReviewStatsDict]
+
+
 class ContributorStatsSummary:
     """Encapsulates key information that is used to send to the frontend
     regarding contributor stats.
@@ -1654,17 +1982,20 @@ class ContributorStatsSummary:
     """
 
     def __init__(
-            self, contributor_user_id, translation_contribution_stats,
-            question_contribution_stats,
-            translation_review_stats,
-            question_review_stats):
+        self,
+        contributor_user_id: str,
+        translation_contribution_stats: List[TranslationContributionStats],
+        question_contribution_stats: List[QuestionContributionStats],
+        translation_review_stats: List[TranslationReviewStats],
+        question_review_stats: List[QuestionReviewStats]
+    ) -> None:
         self.contributor_user_id = contributor_user_id
         self.translation_contribution_stats = translation_contribution_stats
         self.question_contribution_stats = question_contribution_stats
         self.translation_review_stats = translation_review_stats
         self.question_review_stats = question_review_stats
 
-    def to_dict(self):
+    def to_dict(self) -> ContributorStatsSummaryDict:
         """Returns a dict representation of a ContributorStatsSummary
         domain object.
 

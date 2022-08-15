@@ -56,7 +56,9 @@ import { EditabilityService } from 'services/editability.service';
 export class StateResponsesComponent implements OnInit, OnDestroy {
   @Input() addState: (value: string) => void;
   @Output() onResponsesInitialized = new EventEmitter<void>();
-  @Output() onSaveInteractionAnswerGroups = new EventEmitter<unknown>();
+  @Output() onSaveInteractionAnswerGroups = (
+    new EventEmitter<AnswerGroup[] | AnswerGroup>());
+
   @Output() onSaveInteractionDefaultOutcome = new EventEmitter<Outcome>();
   @Output() onSaveNextContentIdIndex = new EventEmitter<number>();
   @Output() onSaveSolicitAnswerDetails = new EventEmitter<boolean>();
@@ -73,7 +75,7 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
   inapplicableSkillMisconceptionIds: string[];
   activeEditOption: boolean;
   misconceptionsBySkill: object;
-  answerGroups: AnswerGroup[];
+  answerGroups: AnswerGroup[] = [];
   defaultOutcome: Outcome;
   activeAnswerGroupIndex: number;
   SHOW_TRAINABLE_UNRESOLVED_ANSWERS: boolean;
@@ -401,7 +403,7 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
   saveActiveAnswerGroupFeedback(updatedOutcome: Outcome): void {
     this.responsesService.updateActiveAnswerGroup({
       feedback: updatedOutcome.feedback
-    } as unknown as AnswerGroup, (newAnswerGroups) => {
+    }, (newAnswerGroups) => {
       this.onSaveInteractionAnswerGroups.emit(newAnswerGroups);
       this.refreshWarnings.emit();
     });
@@ -413,7 +415,7 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
       refresherExplorationId: updatedOutcome.refresherExplorationId,
       missingPrerequisiteSkillId:
         updatedOutcome.missingPrerequisiteSkillId
-    } as unknown as AnswerGroup, (newAnswerGroups) => {
+    }, (newAnswerGroups) => {
       this.onSaveInteractionAnswerGroups.emit(newAnswerGroups);
       this.refreshWarnings.emit();
     });
@@ -423,7 +425,7 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
       updatedOutcome: Outcome): void {
     this.responsesService.updateActiveAnswerGroup({
       labelledAsCorrect: updatedOutcome.labelledAsCorrect
-    } as unknown as AnswerGroup, (newAnswerGroups) => {
+    }, (newAnswerGroups) => {
       this.onSaveInteractionAnswerGroups.emit(newAnswerGroups);
       this.refreshWarnings.emit();
     });
@@ -473,7 +475,8 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
 
   summarizeAnswerGroup(
       answerGroup: AnswerGroup, interactionId: string,
-      answerChoices: AnswerChoice[], shortenRule: unknown): string {
+      answerChoices: AnswerChoice[], shortenRule: boolean
+  ): string {
     let summary = '';
     let outcome = answerGroup.outcome;
     let hasFeedback = outcome.hasNonemptyFeedback();
@@ -502,7 +505,8 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
 
   summarizeDefaultOutcome(
       defaultOutcome: Outcome, interactionId: string,
-      answerGroupCount: number, shortenRule: unknown): string {
+      answerGroupCount: number, shortenRule: boolean
+  ): string {
     if (!defaultOutcome) {
       return '';
     }
@@ -541,7 +545,7 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     this.responseCardIsShown = !this.responseCardIsShown;
   }
 
-  getUnaddressedMisconceptionNames(): unknown[] {
+  getUnaddressedMisconceptionNames(): string[] {
     let answerGroups = this.responsesService.getAnswerGroups();
     let taggedSkillMisconceptionIds = {};
     for (let i = 0; i < answerGroups.length; i++) {

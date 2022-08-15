@@ -144,10 +144,10 @@
         </div>
 
         <strong>The answers falling under this group are
-          <span *ngIf="outcome && outcome?.labelledAsCorrect" class="oppia-correct-text">
+          <span *ngIf="outcome && outcome.labelledAsCorrect" class="oppia-correct-text">
             correct
           </span>
-          <span *ngIf="outcome && !outcome?.labelledAsCorrect" class="oppia-incorrect-text">
+          <span *ngIf="outcome && !outcome.labelledAsCorrect" class="oppia-incorrect-text">
             incorrect
           </span>
         </strong>
