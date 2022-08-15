@@ -67,7 +67,7 @@ class RelationshipsOfTests(test_utils.TestBase):
             ['UserSettingsModel'])
 
 
-class ValidateModelPublishTimeFieldTests(job_test_utils.PipelinedTestBase):
+class ValidateBlogModelTimeFieldTests(job_test_utils.PipelinedTestBase):
 
     def test_reports_model_created_on_timestamp_relationship_error(
         self
@@ -85,12 +85,12 @@ class ValidateModelPublishTimeFieldTests(job_test_utils.PipelinedTestBase):
         output = (
             self.pipeline
             | beam.Create([invalid_timestamp])
-            | beam.ParDo(blog_validation.ValidateModelPublishTimestamps())
+            | beam.ParDo(blog_validation.ValidateBlogModelTimestamps())
         )
 
         self.assert_pcoll_equal(
             output, [
-                blog_validation_errors.InconsistentPublishTimestampsError(
+                blog_validation_errors.InconsistentLastUpdatedTimestampsError(
                     invalid_timestamp),
             ]
         )
@@ -111,7 +111,7 @@ class ValidateModelPublishTimeFieldTests(job_test_utils.PipelinedTestBase):
         output = (
             self.pipeline
             | beam.Create([invalid_timestamp])
-            | beam.ParDo(blog_validation.ValidateModelPublishTimestamps())
+            | beam.ParDo(blog_validation.ValidateBlogModelTimestamps())
         )
 
         self.assert_pcoll_equal(
@@ -129,38 +129,66 @@ class ValidateModelPublishTimeFieldTests(job_test_utils.PipelinedTestBase):
             content='<p>hello</p>,',
             author_id='user',
             url_fragment='url-fragment-1',
-            created_on=self.NOW,
+            created_on=self.YEAR_AGO,
             last_updated=self.NOW,
             published_on=None)
 
         output = (
             self.pipeline
             | beam.Create([valid_timestamp])
-            | beam.ParDo(blog_validation.ValidateModelPublishTimestamps())
+            | beam.ParDo(blog_validation.ValidateBlogModelTimestamps())
         )
 
         self.assert_pcoll_equal(output, [])
 
-    def test_process_reports_model_mutated_during_job_error(self) -> None:
+    def test_process_reports_model_mutated_during_job_error_for_published_on(
+        self) -> None:
         invalid_timestamp = blog_models.BlogPostModel(
             id='124',
             title='Sample Title',
             content='<p>hello</p>,',
             author_id='user',
             url_fragment='url-fragment-1',
-            created_on=self.NOW,
-            last_updated=self.YEAR_LATER,
+            created_on=self.YEAR_AGO,
+            last_updated=self.NOW,
             published_on=self.YEAR_LATER)
 
         output = (
             self.pipeline
             | beam.Create([invalid_timestamp])
-            | beam.ParDo(blog_validation.ValidateModelPublishTimestamps())
+            | beam.ParDo(blog_validation.ValidateBlogModelTimestamps())
         )
 
         self.assert_pcoll_equal(
             output, [
-                blog_validation_errors.ModelMutatedDuringJobError(
+                blog_validation_errors.ModelMutatedDuringJobErrorForPublishedOn(
+                    invalid_timestamp),
+                blog_validation_errors.InconsistentPublishLastUpdatedTimestampsError( # pylint: disable=line-too-long
+                    invalid_timestamp),
+            ]
+        )
+
+    def test_process_reports_model_mutated_during_job_error_for_last_updated(
+        self) -> None:
+        invalid_timestamp = blog_models.BlogPostModel(
+            id='124',
+            title='Sample Title',
+            content='<p>hello</p>,',
+            author_id='user',
+            url_fragment='url-fragment-1',
+            created_on=self.YEAR_AGO,
+            last_updated=self.YEAR_LATER,
+            published_on=self.YEAR_AGO)
+
+        output = (
+            self.pipeline
+            | beam.Create([invalid_timestamp])
+            | beam.ParDo(blog_validation.ValidateBlogModelTimestamps())
+        )
+
+        self.assert_pcoll_equal(
+            output, [
+                blog_validation_errors.ModelMutatedDuringJobErrorForLastUpdated(
                     invalid_timestamp),
             ]
         )
@@ -182,14 +210,28 @@ class ValidateBlogPostModelDomainObjectsInstancesTests(
             thumbnail_filename='sample.svg',
             tags=['learners'])
 
-        blog_rights_model = blog_models.BlogPostRightsModel(
+        output = (
+            self.pipeline
+            | beam.Create([blog_model])
+            | beam.ParDo(
+                blog_validation.ValidateBlogPostModelDomainObjectsInstances())
+        )
+
+        self.assert_pcoll_equal(output, [])
+
+    def test_validation_type_for_domain_object_non_strict(self) -> None:
+        blog_model = blog_models.BlogPostModel(
             id='validblogid2',
-            editor_ids=['user'],
-            blog_post_is_published=True,
+            title='Sample Title',
+            content='<p>hello</p>,',
+            author_id='user',
+            url_fragment='url-fragment-1',
             created_on=self.YEAR_AGO,
-            last_updated=self.NOW)
-        blog_rights_model.update_timestamps()
-        blog_rights_model.put()
+            last_updated=self.NOW,
+            published_on=None,
+            thumbnail_filename=None,
+            tags=[])
+
         output = (
             self.pipeline
             | beam.Create([blog_model])
@@ -216,14 +258,28 @@ class ValidateBlogPostSummaryModelDomainObjectsInstancesTests(
             thumbnail_filename='sample.svg',
             tags=['learners'])
 
-        blog_rights_model = blog_models.BlogPostRightsModel(
-            id='validblogid4',
-            editor_ids=['user'],
-            blog_post_is_published=True,
+        output = (
+            self.pipeline
+            | beam.Create([blog_summary_model])
+            | beam.ParDo(
+                blog_validation.ValidateBlogSummaryModelDomainObjectsInstances()) # pylint: disable=line-too-long
+        )
+
+        self.assert_pcoll_equal(output, [])
+
+    def test_validation_type_for_domain_object_non_strict(self) -> None:
+        blog_summary_model = blog_models.BlogPostSummaryModel(
+            id='validblogid5',
+            title='Sample Title',
+            summary='<p>hello</p>,',
+            author_id='user',
+            url_fragment='url-fragment-1',
             created_on=self.YEAR_AGO,
-            last_updated=self.NOW)
-        blog_rights_model.update_timestamps()
-        blog_rights_model.put()
+            last_updated=self.NOW,
+            published_on=None,
+            thumbnail_filename=None,
+            tags=[])
+
         output = (
             self.pipeline
             | beam.Create([blog_summary_model])

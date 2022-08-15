@@ -157,17 +157,17 @@ class BlogPost:
                 raise utils.ValidationError(
                     'Expected Thumbnail filename should be a string,'
                     ' received %s' % self.thumbnail_filename)
+
             self.require_valid_thumbnail_filename(
                 self.thumbnail_filename, strict=strict)
+
+            self.require_valid_url_fragment(self.url_fragment)
+            if not self.content:
+                raise utils.ValidationError('Content can not be empty')
 
         if not isinstance(self.content, str):
             raise utils.ValidationError(
                 'Expected contents to be a string, received: %s' % self.content)
-
-        if strict:
-            self.require_valid_url_fragment(self.url_fragment)
-            if not self.content:
-                raise utils.ValidationError('Content can not be empty')
 
     @classmethod
     def require_valid_tags(cls, tags: List[str], strict: bool) -> None:
@@ -476,17 +476,18 @@ class BlogPostSummary:
                     'Expected thumbnail filename to be a string, received: %s.'
                     % self.thumbnail_filename
                 )
+
             self.require_valid_thumbnail_filename(
                 self.thumbnail_filename, strict=strict)
+
+            self.require_valid_url_fragment(self.url_fragment)
+
+            if not self.summary:
+                raise utils.ValidationError('Summary can not be empty')
 
         if not isinstance(self.summary, str):
             raise utils.ValidationError(
                 'Expected summary to be a string, received: %s' % self.summary)
-
-        if strict:
-            self.require_valid_url_fragment(self.url_fragment)
-            if not self.summary:
-                raise utils.ValidationError('Summary can not be empty')
 
     @classmethod
     def require_valid_url_fragment(cls, url_fragment: str) -> None:
