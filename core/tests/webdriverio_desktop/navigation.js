@@ -249,8 +249,8 @@ describe('Static Pages Tour', function() {
 });
 
 describe('Error reporting', function() {
-  it('should report a client error to the backend', async () => {
-    const preferencesPage = new PreferencesPage.PreferencesPage();
+  it('should report a client error to the backend', async() => {
+    let preferencesPage = new PreferencesPage.PreferencesPage();
     await users.createUser('lorem@preferences.com', 'loremPreferences');
     await users.login('lorem@preferences.com');
     await preferencesPage.get();
@@ -259,11 +259,12 @@ describe('Error reporting', function() {
     await browser.setupInterceptor();
     // Expect that the frontend error is sent to the backend handler.
     await browser.expectRequest('POST', '/frontend_errors', 200);
-    const createrDashboardRadio = $('.e2e-test-creator-dashboard-radio');
+    let createrDashboardRadio = $('.e2e-test-creator-dashboard-radio');
     await action.click(
       'Creator Dashboard radio', createrDashboardRadio);
-    // Add a 1 second delay to ensure that request gets triggered.
+    // Add a 1 second delay to ensure that expected request gets triggered.
+    // eslint-disable-next-line oppia/e2e-practices
     await browser.pause(1000);
     await browser.assertExpectedRequestsOnly();
   });
-})
+});
