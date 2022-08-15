@@ -226,6 +226,7 @@ import { SolutionValidityService } from 'pages/exploration-editor-page/editor-ta
 import { SolutionVerificationService } from 'pages/exploration-editor-page/editor-tab/services/solution-verification.service';
 import { ThreadDataBackendApiService } from 'pages/exploration-editor-page/feedback-tab/services/thread-data-backend-api.service';
 import { ThreadStatusDisplayService } from 'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
+import { CheckRevertService } from 'pages/exploration-editor-page/history-tab/services/check-revert.service';
 import { VersionTreeService } from 'pages/exploration-editor-page/history-tab/services/version-tree.service';
 import { AngularNameService } from 'pages/exploration-editor-page/services/angular-name.service';
 import { EditorFirstTimeEventsService } from 'pages/exploration-editor-page/services/editor-first-time-events.service';
@@ -864,6 +865,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['ValidatorsService', ValidatorsService],
   ['VersionedExplorationCachingService', VersionedExplorationCachingService],
   ['VersionHistoryBackendApiService', VersionHistoryBackendApiService],
+  ['CheckRevertService', CheckRevertService],
   ['VersionTreeService', VersionTreeService],
   ['WindowDimensionsService', WindowDimensionsService],
   ['WindowRef', WindowRef],
