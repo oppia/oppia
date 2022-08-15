@@ -100,6 +100,7 @@ _PARSER.add_argument(
 
 
 SUITES_MIGRATED_TO_WEBDRIVERIO = [
+    'accessibility',
     'additionalEditorFeatures',
     'additionalEditorFeaturesModals',
     'additionalPlayerFeatures',
@@ -127,7 +128,6 @@ SUITES_MIGRATED_TO_WEBDRIVERIO = [
 ]
 
 SUITES_STILL_IN_PROTRACTOR = [
-    'accessibility',
     'coreEditorAndPlayerFeatures',
     'embedding',
     'explorationImprovementsTab',

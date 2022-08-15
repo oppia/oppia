@@ -43,6 +43,10 @@ var suites = {
     './core/tests/webdriverio_desktop/**/*.js',
   ],
 
+  accessibility: [
+    './core/tests/webdriverio/accessibility.js'
+  ],
+
   additionalEditorFeatures: [
     './core/tests/webdriverio_desktop/additionalEditorFeatures.js'
   ],
