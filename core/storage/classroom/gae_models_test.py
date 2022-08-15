@@ -138,7 +138,7 @@ class ClassroomModelUnitTest(test_utils.GenericTestBase):
                     'classroom_id', 'math', 'math',
                     'Curated math foundations course.',
                     'Start from the basic math.', {}
-                    )
+                )
 
         # Test generate_new_classroom_id method.
         with self.assertRaisesRegex(
