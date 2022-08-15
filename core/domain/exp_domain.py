@@ -23,7 +23,6 @@ should therefore be independent of the specific storage models used.
 
 from __future__ import annotations
 
-import bs4
 import collections
 import copy
 import datetime
@@ -36,11 +35,11 @@ from core import schema_utils
 from core import utils
 from core.constants import constants
 from core.domain import change_domain
-# from core.domain.exp_services import get_all_exploration_summaries
 from core.domain import param_domain
 from core.domain import state_domain
 from core.domain import translation_domain
 
+import bs4
 from typing import (
     Any, Callable, Dict, List, Mapping, Optional, Sequence,
     Set, Tuple, cast
@@ -2531,6 +2530,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             states_dict: dict. A dict where each key-value pair represents,
                 respectively, a state name and a dict used to initialize a
                 State domain object.
+            language_code: str. The language code of the exploration.
 
         Returns:
             dict. The converted states_dict.
@@ -2642,17 +2642,17 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
     @classmethod
     def _item_selec_no_ans_group_should_be_same(
-        cls, answer_groups: state_domain.AnswerGroup
-    ) -> state_domain.AnswerGroup:
+        cls, answer_groups: List[state_domain.AnswerGroup]
+    ) -> List[state_domain.AnswerGroup]:
         """No answer group should be same in ItemSelectionInput interaction,
         Specefically checks for `Equals` rule spec if there are similar
         rules then removes the later one
 
         Args:
-            answer_groups: state_domain.AnswerGroup. The answer group.
+            answer_groups: List[state_domain.AnswerGroup]. The answer group.
 
         Returns:
-            state_domain.AnswerGroup. The modified answer group.
+            List[state_domain.AnswerGroup]. The modified answer group.
         """
         equals_rule_values = []
         equals_rule_to_remove = []
@@ -2675,18 +2675,18 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
     @classmethod
     def _equals_should_come_before_idx_rule(
-        cls, answer_groups: state_domain.AnswerGroup
-    ) -> state_domain.AnswerGroup:
+        cls, answer_groups: List[state_domain.AnswerGroup]
+    ) -> List[state_domain.AnswerGroup]:
         """Inside DragAndDrop interaction the `Equals` rule should always come
         before `HasElementXAtPositionY` otherwise the rule will never going to
         match, this helper functions simply removes the `Equals` rules as it
         will never going to match
 
         Args:
-            answer_groups: state_domain.AnswerGroup. The answer group.
+            answer_groups: List[state_domain.AnswerGroup]. The answer group.
 
         Returns:
-            state_domain.AnswerGroup. The modified answer group.
+            List[state_domain.AnswerGroup]. The modified answer group.
         """
         ele_x_at_y_rules = []
         rules_to_remove = []
@@ -2730,18 +2730,18 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
     @classmethod
     def _equals_should_come_before_misplace_by_one_rule(
-        cls, answer_groups: state_domain.AnswerGroup
-    ) -> state_domain.AnswerGroup:
+        cls, answer_groups: List[state_domain.AnswerGroup]
+    ) -> List[state_domain.AnswerGroup]:
         """Inside DragAndDrop interaction the `Equals` rule should always come
         before `IsEqualToOrderingWithOneItemAtIncorrectPosition` otherwise the
         rule will never going to match, this helper functions simply removes
         the `Equals` rules as it will never going to match
 
         Args:
-            answer_groups: state_domain.AnswerGroup. The answer group.
+            answer_groups: List[state_domain.AnswerGroup]. The answer group.
 
         Returns:
-            state_domain.AnswerGroup. The modified answer group.
+            List[state_domain.AnswerGroup]. The modified answer group.
         """
         equal_ordering_one_at_incorec_posn = []
         rules_to_remove = []
@@ -2874,8 +2874,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
     @classmethod
     def _numeric_ans_group_should_not_be_subset(
-        cls, answer_groups: state_domain.AnswerGroup
-    ) -> state_domain.AnswerGroup:
+        cls, answer_groups: List[state_domain.AnswerGroup]
+    ) -> List[state_domain.AnswerGroup]:
         """An answer group should not be a subset of another answer group in
         NumericInput interaction otherwise the later answer group will be
         redundant and will never be matched. Simply the invalid rule will be
@@ -2883,10 +2883,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
         is removed
 
         Args:
-            answer_groups: state_domain.AnswerGroup. The answer group.
+            answer_groups: List[state_domain.AnswerGroup]. The answer group.
 
         Returns:
-            state_domain.AnswerGroup. The modified answer group.
+            List[state_domain.AnswerGroup]. The modified answer group.
         """
         lower_infinity = float('-inf')
         upper_infinity = float('inf')
@@ -3031,8 +3031,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
     @classmethod
     def _fraction_rules_should_not_match_prev_rule(
-        cls, answer_groups: state_domain.AnswerGroup
-    ) -> state_domain.AnswerGroup:
+        cls, answer_groups: List[state_domain.AnswerGroup]
+    ) -> List[state_domain.AnswerGroup]:
         """Helper function for FractionInput interaction where rule should
         not match previous rules solution or should not be
         in the range of previous rules solution otherwise the later answer
@@ -3041,10 +3041,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
         answer group is removed
 
         Args:
-            answer_groups: state_domain.AnswerGroup. The answer group.
+            answer_groups: List[state_domain.AnswerGroup]. The answer group.
 
         Returns:
-            state_domain.AnswerGroup. The modified answer group.
+            List[state_domain.AnswerGroup]. The modified answer group.
         """
         lower_infinity = float('-inf')
         upper_infinity = float('inf')
@@ -3431,7 +3431,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return states_dict
 
     @classmethod
-    def _update_general_state_rte(cls, states_dict):
+    def _update_general_state_rte(
+        cls, states_dict: Dict[str, state_domain.StateDict]
+    ) -> Dict[str, state_domain.StateDict]:
         """Handles all the invalid RTE tags, performs the following
             - `oppia-noninteractive-image`
                 - If `alt-with-value` attribute not in the image tag,
@@ -3464,74 +3466,76 @@ class Exploration(translation_domain.BaseTranslatableObject):
         Returns:
             dict. The converted states_dict.
         """
-        html = states_dict['content']['html']
-        soup = bs4.BeautifulSoup(html, 'html.parser')
+        for state in states_dict.values():
+            html = state['content']['html']
+            soup = bs4.BeautifulSoup(html, 'html.parser')
 
-        for tag in soup:
-            if tag == 'oppia-noninteractive-image':
-                if 'alt-with-value' not in tag:
-                    tag['alt-with-value'] = '&quot;&quot;'
+            for tag in soup:
+                if tag == 'oppia-noninteractive-image':
+                    if 'alt-with-value' not in tag:
+                        tag['alt-with-value'] = '&quot;&quot;'
 
-                if 'filepath-with-value' not in tag:
-                    tag.decompose()
-
-            elif tag == 'oppia-noninteractive-math':
-                if 'math_content-with-value' not in tag:
-                    tag.decompose()
-                else:
-                    if 'raw_latex' not in tag['math_content-with-value']:
-                        tag.decompose()
-                    elif tag['math_content-with-value']['raw_latex'] is None:
-                        tag.decompose()
-                    elif tag['math_content-with-value'][
-                        'raw_latex'].strip() == '':
+                    if 'filepath-with-value' not in tag:
                         tag.decompose()
 
-            elif tag == 'oppia-noninteractive-skillreview':
-                if 'text-with-value' not in tag:
-                    tag.decompose()
-                elif tag['text-with-value'] is None:
-                    tag.decompose()
-                elif tag['text-with-value'].strip() == '':
-                    tag.decompose()
+                elif tag == 'oppia-noninteractive-math':
+                    if 'math_content-with-value' not in tag:
+                        tag.decompose()
+                    else:
+                        if 'raw_latex' not in tag['math_content-with-value']:
+                            tag.decompose()
+                        elif tag['math_content-with-value'][
+                            'raw_latex'] is None:
+                            tag.decompose()
+                        elif tag['math_content-with-value'][
+                            'raw_latex'].strip() == '':
+                            tag.decompose()
 
-            elif tag == 'oppia-noninteractive-video':
-                if 'start-with-value' not in tag:
-                    tag['start-with-value'] = '0'
+                elif tag == 'oppia-noninteractive-skillreview':
+                    if 'text-with-value' not in tag:
+                        tag.decompose()
+                    elif tag['text-with-value'] is None:
+                        tag.decompose()
+                    elif tag['text-with-value'].strip() == '':
+                        tag.decompose()
 
-                if 'end-with-value' not in tag:
-                    tag['end-with-value'] = '0'
+                elif tag == 'oppia-noninteractive-video':
+                    if 'start-with-value' not in tag:
+                        tag['start-with-value'] = '0'
 
-                if 'autoplay-with-value' not in tag:
-                    tag['autoplay-with-value'] = 'false'
+                    if 'end-with-value' not in tag:
+                        tag['end-with-value'] = '0'
 
-                if 'autoplay-with-value' in tag:
-                    if tag['autoplay-with-value'] not in ('true', 'false'):
+                    if 'autoplay-with-value' not in tag:
                         tag['autoplay-with-value'] = 'false'
 
-                if 'video_id-with-value' not in tag:
-                    tag.decompose()
+                    if 'autoplay-with-value' in tag:
+                        if tag['autoplay-with-value'] not in ('true', 'false'):
+                            tag['autoplay-with-value'] = 'false'
 
-                if 'video_id-with-value' in tag:
-                    if tag['video_id-with-value'] is None:
-                        tag.decompose()
-                    elif tag['video_id-with-value'].strip() == '':
+                    if 'video_id-with-value' not in tag:
                         tag.decompose()
 
-            elif tag == 'oppia-noninteractive-link':
-                if (
-                    'text-with-value' not in tag or
-                    'url-with-value' not in tag
-                ):
-                    tag.decompose()
+                    if 'video_id-with-value' in tag:
+                        if tag['video_id-with-value'] is None:
+                            tag.decompose()
+                        elif tag['video_id-with-value'].strip() == '':
+                            tag.decompose()
 
-                elif tag['text-with-value'].strip() == '':
-                    tag.decompose()
+                elif tag == 'oppia-noninteractive-link':
+                    if (
+                        'text-with-value' not in tag or
+                        'url-with-value' not in tag
+                    ):
+                        tag.decompose()
 
-        html_ele_list = soup.prettify().split('\n')
-        html_ele_list = [ele.strip() for ele in html_ele_list]
-        states_dict['content']['html'] = ','.join(
-            html_ele_list).replace(',', '')
+                    elif tag['text-with-value'].strip() == '':
+                        tag.decompose()
+
+            html_ele_list = soup.prettify().split('\n')
+            html_ele_list = [ele.strip() for ele in html_ele_list]
+            state['content']['html'] = ','.join(
+                html_ele_list).replace(',', '')
 
         return states_dict
 
@@ -3825,11 +3829,13 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return exploration_dict
 
     @classmethod
-    def _convert_v56_dict_to_v57_dict(cls, exploration_dict):
+    def _convert_v56_dict_to_v57_dict(
+        cls, exploration_dict: VersionedExplorationDict
+    ) -> VersionedExplorationDict:
         """Converts a v56 exploration dict into a v57 exploration dict.
-        Version 57 adds few exploration validation checks which are categorized
-        as General State validation, General Interaction validation
-        and General RTE validation.
+        Version 57 corrects exploration validation errors which are categorized
+        as General State Validation, General Interaction Validation
+        and General RTE Validation.
 
         Args:
             exploration_dict: dict. The dict representation of an exploration
