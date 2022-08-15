@@ -269,7 +269,7 @@ describe('State Skill Editor Component', () => {
 
   it('should throw error on call getSkillEditorUrl when there is no skill' +
     'is selected', () => {
-    stateLinkedSkillIdService.displayed = undefined;
+    stateLinkedSkillIdService.displayed = null;
     expect(() => {
       componentInstance.getSkillEditorUrl();
     }).toThrowError('Expected a skill id to be displayed');
