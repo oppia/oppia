@@ -17,24 +17,231 @@
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
+import { ComponentFixture, waitForAsync, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { EventEmitter } from '@angular/core';
 import { CheckpointCelebrationModalComponent } from './checkpoint-celebration-modal.component';
 import { CheckpointCelebrationUtilityService } from 'pages/exploration-player-page/services/checkpoint-celebration-utility.service';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
+import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
+import { ContextService } from 'services/context.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { StateCard } from 'domain/state_card/state-card.model';
+import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
+import { InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
+import { WrittenTranslationsObjectFactory } from 'domain/exploration/WrittenTranslationsObjectFactory';
+import { AudioTranslationLanguageService } from 'pages/exploration-player-page/services/audio-translation-language.service';
+import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
 
 class MockCheckpointCelebrationUtilityService {
   isOnCheckpointedState = false;
+  openLessonInformationModalEmitter = new EventEmitter<void>();
+
+  getStateListForCheckpointMessages(
+      statesbackendDict: StateObjectsBackendDict, initStateName: string
+  ): string[] {
+    return [];
+  }
+
+  getCheckpointMessage(
+      completedCheckpointCount: number, totalCheckpointCount: number
+  ): string {
+    return '';
+  }
+
+  getCheckpointTitle(): string {
+    return '';
+  }
+
+  setIsOnCheckpointedState(isOnCheckpointedState: boolean) {
+    this.isOnCheckpointedState = isOnCheckpointedState;
+  }
+
+  getIsOnCheckpointedState(): boolean {
+    return this.isOnCheckpointedState;
+  }
+
+  openLessonInformationModal() {
+    this.openLessonInformationModalEmitter.emit();
+  }
 }
 
-describe('Placeholder test', function() {
+const dummyExplorationBackendDict = {
+  init_state_name: 'Introduction',
+  param_changes: [],
+  param_specs: {},
+  states: {
+    Introduction: {
+      classifier_model_id: null,
+      content: {
+        content_id: 'content',
+        html: ''
+      },
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          content: {},
+          default_outcome: {}
+        }
+      },
+      interaction: {
+        answer_groups: [],
+        confirmed_unclassified_answers: [],
+        customization_args: {
+          buttonText: {
+            value: 'Continue'
+          }
+        },
+        default_outcome: {
+          dest: 'End State',
+          dest_if_really_stuck: null,
+          feedback: {
+            content_id: 'default_outcome',
+            html: ''
+          },
+          param_changes: [],
+          labelled_as_correct: true,
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null
+        },
+        hints: [],
+        solution: null,
+        id: 'Continue'
+      },
+      linked_skill_id: null,
+      next_content_id_index: 0,
+      param_changes: [],
+      solicit_answer_details: false,
+      written_translations: {
+        translations_mapping: {
+          content: {},
+          default_outcome: {}
+        }
+      },
+      card_is_checkpoint: true
+    },
+    'End State': {
+      classifier_model_id: null,
+      content: {
+        content_id: 'content',
+        html: ''
+      },
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          content: {},
+          default_outcome: {}
+        }
+      },
+      interaction: {
+        answer_groups: [],
+        confirmed_unclassified_answers: [],
+        customization_args: {
+          recommendedExplorationIds: {
+            value: []
+          }
+        },
+        default_outcome: null,
+        hints: [],
+        solution: null,
+        id: 'EndExploration'
+      },
+      linked_skill_id: null,
+      next_content_id_index: 0,
+      param_changes: [],
+      solicit_answer_details: false,
+      written_translations: {
+        translations_mapping: {
+          content: {},
+          default_outcome: {}
+        }
+      },
+      card_is_checkpoint: false
+    }
+  },
+  title: 'Dummy Title',
+  language_code: 'en',
+  objective: 'Dummy Objective',
+  correctness_feedback_enabled: true
+};
+
+const dummyExplorationMetadata = {
+  title: 'Dummy Title',
+  category: 'Dummy Category',
+  objective: 'Dummy Objective',
+  language_code: 'en',
+  tags: [],
+  blurb: 'Dummy Blurb',
+  author_notes: 'Dummy Author Notes',
+  states_schema_version: 50,
+  init_state_name: 'Introduction',
+  param_specs: {},
+  param_changes: [],
+  auto_tts_enabled: false,
+  correctness_feedback_enabled: true,
+  edits_allowed: true,
+};
+
+const dummyExplorationBackendResponse = {
+  can_edit: true,
+  exploration: dummyExplorationBackendDict,
+  exploration_metadata: dummyExplorationMetadata,
+  exploration_id: '0',
+  is_logged_in: true,
+  session_id: 'dummy_session_id',
+  version: 1,
+  preferred_audio_language_code: 'en',
+  preferred_language_codes: ['en'],
+  auto_tts_enabled: false,
+  correctness_feedback_enabled: true,
+  record_playthrough_probability: 1.0,
+  draft_change_list_id: 1,
+  has_viewed_lesson_info_modal_once: false,
+  furthest_reached_checkpoint_exp_version: 0,
+  furthest_reached_checkpoint_state_name: '',
+  most_recently_reached_checkpoint_state_name: 'Introduction',
+  most_recently_reached_checkpoint_exp_version: 0,
+};
+
+describe('Checkpoint celebration modal component', function() {
   let component: CheckpointCelebrationModalComponent;
   let fixture: ComponentFixture<CheckpointCelebrationModalComponent>;
+  let checkpointCelebrationUtilityService:
+    CheckpointCelebrationUtilityService;
+  let readOnlyExplorationBackendApiService:
+    ReadOnlyExplorationBackendApiService;
+  let contextService: ContextService;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
+  let playerPositionService: PlayerPositionService;
+  let windowDimensionsService: WindowDimensionsService;
+  let urlInterpolationService: UrlInterpolationService;
+  let interactionObjectFactory: InteractionObjectFactory;
+  let writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory;
+  let audioTranslationLanguageService: AudioTranslationLanguageService;
+  let dummyStateCard: StateCard;
+  let mockResizeEmitter: EventEmitter<void>;
+
 
   beforeEach(waitForAsync(() => {
+    mockResizeEmitter = new EventEmitter();
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [CheckpointCelebrationModalComponent, MockTranslatePipe],
+      declarations: [CheckpointCelebrationModalComponent],
       providers: [
+        ReadOnlyExplorationBackendApiService,
+        ContextService,
+        I18nLanguageCodeService,
+        PlayerPositionService,
+        UrlInterpolationService,
+        InteractionObjectFactory,
+        WrittenTranslationsObjectFactory,
+        AudioTranslationLanguageService,
+        {
+          provide: WindowDimensionsService,
+          useValue: {
+            getWidth: () => 1369,
+            getResizeEvent: () => mockResizeEmitter,
+          }
+        },
         {
           provide: CheckpointCelebrationUtilityService,
           useClass: MockCheckpointCelebrationUtilityService
@@ -44,11 +251,281 @@ describe('Placeholder test', function() {
   }));
 
   beforeEach(() => {
+    checkpointCelebrationUtilityService = TestBed.inject(
+      CheckpointCelebrationUtilityService);
+    readOnlyExplorationBackendApiService = TestBed.inject(
+      ReadOnlyExplorationBackendApiService);
+    contextService = TestBed.inject(ContextService);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+    playerPositionService = TestBed.inject(PlayerPositionService);
+    windowDimensionsService = TestBed.inject(WindowDimensionsService);
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
+    interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
+    writtenTranslationsObjectFactory = TestBed.inject(
+      WrittenTranslationsObjectFactory);
+    audioTranslationLanguageService = TestBed.inject(
+      AudioTranslationLanguageService);
     fixture = TestBed.createComponent(CheckpointCelebrationModalComponent);
     component = fixture.componentInstance;
+
+    dummyStateCard = StateCard.createNewCard(
+      'State 2', '<p>Content</p>', '<interaction></interaction>',
+      interactionObjectFactory.createFromBackendDict({
+        id: 'TextInput',
+        answer_groups: [
+          {
+            outcome: {
+              dest: 'State',
+              dest_if_really_stuck: null,
+              feedback: {
+                html: '',
+                content_id: 'This is a new feedback text',
+              },
+              refresher_exploration_id: 'test',
+              missing_prerequisite_skill_id: 'test_skill_id',
+              labelled_as_correct: true,
+              param_changes: [],
+            },
+            rule_specs: [],
+            training_data: [],
+            tagged_skill_misconception_id: '',
+          },
+        ],
+        default_outcome: {
+          dest: 'Hola',
+          dest_if_really_stuck: null,
+          feedback: {
+            content_id: '',
+            html: '',
+          },
+          labelled_as_correct: true,
+          param_changes: [],
+          refresher_exploration_id: 'test',
+          missing_prerequisite_skill_id: 'test_skill_id',
+        },
+        confirmed_unclassified_answers: [],
+        customization_args: {
+          rows: {
+            value: true,
+          },
+          placeholder: {
+            value: 1,
+          }
+        },
+        hints: [],
+        solution: {
+          answer_is_exclusive: true,
+          correct_answer: 'test_answer',
+          explanation: {
+            content_id: '2',
+            html: 'test_explanation1',
+          },
+        }
+      }),
+      RecordedVoiceovers.createEmpty(),
+      writtenTranslationsObjectFactory.createEmpty(),
+      'content', audioTranslationLanguageService);
   });
 
-  it('should check if component is initialized', () => {
-    expect(component).toBeDefined();
+  it('should initialize the component', fakeAsync(() => {
+    spyOn(contextService, 'getExplorationId').and.returnValue('expId');
+    spyOn(urlInterpolationService, 'getStaticImageUrl').and.returnValue(
+      'dummyStaticImageUrl');
+    spyOn(readOnlyExplorationBackendApiService, 'fetchExplorationAsync')
+      .and.returnValue(Promise.resolve(dummyExplorationBackendResponse));
+    spyOn(
+      checkpointCelebrationUtilityService, 'getStateListForCheckpointMessages')
+      .and.returnValue(['Introduction', 'End State']);
+    spyOn(component, 'subscribeToCardChangeEmitter');
+    spyOn(component, 'subscribeToWindowResizeEmitter');
+    spyOn(component, 'setFadeInDelaysForCheckpointNodes');
+    spyOn(windowDimensionsService, 'getWidth').and.callThrough();
+
+    expect(component.shouldDisplayFullScaleMessage).toBe(true);
+
+    component.ngOnInit();
+    tick();
+
+    expect(component.explorationId).toEqual('expId');
+    expect(component.oppiaAvatarImageUrl).toEqual('dummyStaticImageUrl');
+    expect(readOnlyExplorationBackendApiService.fetchExplorationAsync)
+      .toHaveBeenCalledWith('expId', null);
+    expect(component.hasViewedLessonInfoOnce).toEqual(false);
+    expect(component.mostRecentlyReachedCheckpointStateName).toEqual(
+      'Introduction');
+    expect(component.orderedCheckpointList).toEqual(
+      ['Introduction', 'End State']);
+    expect(
+      checkpointCelebrationUtilityService.getStateListForCheckpointMessages)
+      .toHaveBeenCalled();
+    expect(component.totalNumberOfCheckpoints).toEqual(2);
+    expect(component.checkpointStatusArray.length).toEqual(2);
+    expect(component.setFadeInDelaysForCheckpointNodes).toHaveBeenCalled();
+    expect(component.currentStateName).toEqual('Introduction');
+    expect(component.subscribeToCardChangeEmitter).toHaveBeenCalled();
+    expect(windowDimensionsService.getWidth).toHaveBeenCalled();
+    expect(component.shouldDisplayFullScaleMessage).toEqual(false);
+    expect(component.subscribeToWindowResizeEmitter).toHaveBeenCalled();
+  }));
+
+  it('should unsubscribe upon component destruction', () => {
+    spyOn(component.directiveSubscriptions, 'unsubscribe');
+
+    component.ngOnDestroy();
+
+    expect(component.directiveSubscriptions.unsubscribe).toHaveBeenCalled();
+  });
+
+  it('should execute callback when newCard emitter emits', fakeAsync(() => {
+    spyOn(playerPositionService.onNewCardOpened, 'subscribe').and.callThrough();
+    spyOn(checkpointCelebrationUtilityService, 'setIsOnCheckpointedState');
+    spyOn(component, 'dismissMessage');
+    spyOn(component, 'dismissMiniMessage');
+    spyOn(component, 'checkIfCheckpointMessageIsToBeTriggered');
+    component.miniMessageTooltipIsShown = true;
+    component.messageModalIsShown = false;
+    component.subscribeToCardChangeEmitter();
+
+    playerPositionService.onNewCardOpened.emit(dummyStateCard);
+    tick();
+
+    expect(checkpointCelebrationUtilityService.setIsOnCheckpointedState)
+      .toHaveBeenCalledWith(false);
+    expect(component.dismissMiniMessage).toHaveBeenCalled();
+    tick(2300);
+    expect(component.checkIfCheckpointMessageIsToBeTriggered)
+      .toHaveBeenCalled();
+
+    component.miniMessageTooltipIsShown = false;
+    component.messageModalIsShown = true;
+
+    playerPositionService.onNewCardOpened.emit(dummyStateCard);
+    tick();
+
+    expect(component.dismissMessage).toHaveBeenCalled();
+    tick(2300);
+    expect(component.checkIfCheckpointMessageIsToBeTriggered)
+      .toHaveBeenCalledTimes(2);
+
+    component.miniMessageTooltipIsShown = false;
+    component.messageModalIsShown = false;
+
+    playerPositionService.onNewCardOpened.emit(dummyStateCard);
+    tick();
+
+    expect(component.checkIfCheckpointMessageIsToBeTriggered)
+      .toHaveBeenCalledTimes(3);
+  }));
+
+  it('should execute callback when window resize emitter emits',
+    () => {
+      expect(component.shouldDisplayFullScaleMessage).toEqual(true);
+
+      component.subscribeToWindowResizeEmitter();
+      mockResizeEmitter.emit();
+
+      expect(component.shouldDisplayFullScaleMessage).toEqual(false);
+    });
+
+  it('should check if checkpoint message is to be triggered', () => {
+    component.orderedCheckpointList = [
+      'Introduction',
+      'MostRecentlyReachedCheckpointStateName',
+      'NewStateName',
+      'EndState'
+    ];
+    spyOn(checkpointCelebrationUtilityService, 'getCheckpointMessage')
+      .and.returnValue('test_checkpoint_message');
+    spyOn(checkpointCelebrationUtilityService, 'getCheckpointTitle')
+      .and.returnValue('test_checkpoint_title');
+    spyOn(component, 'generateCheckpointStatusArray');
+    spyOn(checkpointCelebrationUtilityService, 'setIsOnCheckpointedState');
+    spyOn(component, 'triggerStandardMessage');
+    spyOn(component, 'triggerMiniMessage');
+    component.currentStateName = 'Introduction';
+    component.mostRecentlyReachedCheckpointStateName = (
+      'MostRecentlyReachedCheckpointStateName');
+
+    component.checkIfCheckpointMessageIsToBeTriggered('Introduction');
+    component.checkIfCheckpointMessageIsToBeTriggered(
+      'MostRecentlyReachedCheckpointStateName');
+
+    expect(checkpointCelebrationUtilityService.getCheckpointMessage)
+      .not.toHaveBeenCalled();
+
+    component.checkIfCheckpointMessageIsToBeTriggered('NonCheckpointStateName');
+
+    expect(checkpointCelebrationUtilityService.getCheckpointMessage)
+      .not.toHaveBeenCalled();
+
+    component.currentStateName = 'Introduction';
+    component.hasViewedLessonInfoOnce = false;
+
+    component.checkIfCheckpointMessageIsToBeTriggered('NewStateName');
+
+    expect(checkpointCelebrationUtilityService.getCheckpointMessage)
+      .not.toHaveBeenCalled();
+    expect(component.hasViewedLessonInfoOnce).toEqual(true);
+
+    component.currentStateName = 'Introduction';
+    component.hasViewedLessonInfoOnce = true;
+    component.shouldDisplayFullScaleMessage = true;
+
+    component.checkIfCheckpointMessageIsToBeTriggered('NewStateName');
+
+    expect(checkpointCelebrationUtilityService.getCheckpointMessage)
+      .toHaveBeenCalled();
+    expect(component.translatedCurrentCheckpointMessage).toEqual(
+      'test_checkpoint_message');
+    expect(component.translatedCurrentCheckpointMessageTitle).toEqual(
+      'test_checkpoint_title');
+    expect(component.generateCheckpointStatusArray).toHaveBeenCalled();
+    expect(component.triggerStandardMessage).toHaveBeenCalled();
+
+    component.currentStateName = 'Introduction';
+    component.hasViewedLessonInfoOnce = true;
+    component.shouldDisplayFullScaleMessage = false;
+    component.translatedCurrentCheckpointMessage = null;
+    component.translatedCurrentCheckpointMessageTitle = null;
+
+    component.checkIfCheckpointMessageIsToBeTriggered('NewStateName');
+
+    expect(checkpointCelebrationUtilityService.getCheckpointMessage)
+      .toHaveBeenCalledTimes(2);
+    expect(component.translatedCurrentCheckpointMessage).toEqual(
+      'test_checkpoint_message');
+    expect(component.translatedCurrentCheckpointMessageTitle).toEqual(
+      'test_checkpoint_title');
+    expect(component.generateCheckpointStatusArray).toHaveBeenCalledTimes(2);
+    expect(component.triggerMiniMessage).toHaveBeenCalled();
+  });
+
+  it('should generate checkpoint status array', () => {});
+
+  it('should get completed progress bar width', () => {});
+
+  it('should set fade-in delays for checkpoint nodes', () => {});
+
+  it('should trigger standard message', () => {});
+
+  it('should trigger mini message', () => {});
+
+  it('should dismiss message', () => {});
+
+  it('should dismiss mini message', () => {});
+
+  it('should reset timer', () => {});
+
+  it('should open lesson info modal', () => {});
+
+  it('should determine if current language is RTL', () => {
+    const isLanguageRTLSpy = spyOn(
+      i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(true);
+
+    expect(component.isLanguageRTL()).toBe(true);
+
+    isLanguageRTLSpy.and.returnValue(false);
+
+    expect(component.isLanguageRTL()).toBe(false);
   });
 });

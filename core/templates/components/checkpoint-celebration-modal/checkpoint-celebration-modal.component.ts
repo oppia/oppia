@@ -124,8 +124,7 @@ export class CheckpointCelebrationModalComponent implements OnInit, OnDestroy {
               this.checkIfCheckpointMessageIsToBeTriggered(
                 nextStateCard.getStateName());
             }, MESSAGE_MODAL_APPROX_TRIGGER_AND_DISMISSAL_DURATION_MS);
-          }
-          if (this.messageModalIsShown) {
+          } else if (this.messageModalIsShown) {
             this.dismissMessage();
             setTimeout(() => {
               this.checkIfCheckpointMessageIsToBeTriggered(
