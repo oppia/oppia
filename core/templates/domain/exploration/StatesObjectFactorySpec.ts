@@ -302,7 +302,7 @@ describe('States Object Factory', () => {
           }],
           default_outcome: {
             dest: 'second state',
-            dest_if_really_stuck: null,
+            dest_if_really_stuck: 'second state',
             feedback: {
               content_id: 'default_outcome',
               html: ''

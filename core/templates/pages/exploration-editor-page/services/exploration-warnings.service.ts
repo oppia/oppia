@@ -62,7 +62,7 @@ interface _verifyParametersResult {
 interface _getReversedLinksResult {
   source: string;
   target: string;
-  linkProperty: string;
+  linkProperty: string | null;
   connectsDestIfStuck: boolean;
 }
 

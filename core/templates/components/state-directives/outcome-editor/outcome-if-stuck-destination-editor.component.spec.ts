@@ -269,6 +269,17 @@ describe('Outcome Destination If Stuck Editor', () => {
     expect(component.isCreatingNewState()).toBeFalse();
   });
 
+  it('should update outcomeNewStateName', () => {
+    component.outcomeNewStateName = 'Introduction';
+
+    expect(component.outcomeNewStateName).toBe('Introduction');
+    spyOn(component, 'isCreatingNewState').and.returnValue(true);
+
+    component.updateChanges('New State');
+
+    expect(component.outcomeNewStateName).toBe('New State');
+  });
+
   it('should emit changes on destination selector change', () => {
     component.outcome = new Outcome(
       'Introduction',

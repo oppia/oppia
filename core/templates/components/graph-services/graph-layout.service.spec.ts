@@ -775,12 +775,14 @@ describe('Graph Layout Service', () => {
       links.push({
         source: 'State0',
         target: stateName,
-        linkProperty: ''
+        linkProperty: '',
+        connectsDestIfStuck: false
       });
       links.push({
         source: stateName,
         target: 'End',
-        linkProperty: ''
+        linkProperty: '',
+        connectsDestIfStuck: false
       });
     }
 
