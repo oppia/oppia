@@ -2370,6 +2370,546 @@ class SingleCharAndNewlineAtEOFCheckerTests(unittest.TestCase):
             temp_file.close()
 
 
+class TypeIgnoreCommentCheckerTests(unittest.TestCase):
+
+    def setUp(self):
+        super().setUp()
+        self.checker_test_object = testutils.CheckerTestCase()
+        self.checker_test_object.CHECKER_CLASS = (
+            pylint_extensions.TypeIgnoreCommentChecker)
+        self.checker_test_object.setup_method()
+
+    def test_type_ignore_used_without_comment_raises_error(self):
+        node_function_with_type_ignore_only = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test'
+        )
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                suggestion.change.new_value = (  # type: ignore[attr-defined]
+                    new_content
+                ) #@
+                """
+            )
+        node_function_with_type_ignore_only.file = filename
+
+        self.checker_test_object.checker.process_tokens(
+           pylint_utils.tokenize_module(node_function_with_type_ignore_only)
+        )
+        message = testutils.Message(
+            msg_id='mypy-ignore-used',
+            line=2
+        )
+        with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+
+    def test_extra_type_ignore_comment_used_in_a_module_raises_error(self):
+        node_function_with_extra_comment = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test'
+        )
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                # Here we used MyPy ignore because attributes on BaseChange
+                # class are defined dynamically.
+                suggestion.change.new_value = (  # type: ignore[attr-defined]
+                    new_content
+                )
+
+                # Here we used MyPy ignore because currently this function is
+                # not type annotated and because of this MyPy is not able to
+                # fetch argument's type.
+                func_only_accept_str('hi') #@
+                """
+            )
+        node_function_with_extra_comment.file = filename
+
+        self.checker_test_object.checker.process_tokens(
+           pylint_utils.tokenize_module(node_function_with_extra_comment)
+        )
+        message = testutils.Message(
+            msg_id='redundant-type-comment',
+            line=8
+        )
+        with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+
+    def test_type_ignores_with_comments_should_not_raises_error(self):
+        node_function = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test'
+        )
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                # Here we used MyPy ignore because attributes on BaseChange
+                # class are defined dynamically.
+                suggestion.change.new_value = (  # type: ignore[attr-defined]
+                    new_content
+                )
+
+                # Here we used MyPy ignore because this function is can only
+                # str values but here we are providing integer which causes
+                # MyPy to throw an error. Thus to avoid the error, we used
+                # ignore here.
+                func_only_accept_str(1234)  # type: ignore[arg-type] #@
+                """
+            )
+        node_function.file = filename
+
+        self.checker_test_object.checker.process_tokens(
+           pylint_utils.tokenize_module(node_function)
+        )
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+    def test_untyped_call_type_ignores_should_not_raise_error(self):
+        node_function = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test'
+        )
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                # Here we used MyPy ignore because attributes on BaseChange
+                # class are defined dynamically.
+                suggestion.change.new_value = (  # type: ignore[attr-defined]
+                    new_content
+                )
+
+                func_only_accept_str(1234)  # type: ignore[no-untyped-call] #@
+                """
+            )
+        node_function.file = filename
+
+        self.checker_test_object.checker.process_tokens(
+           pylint_utils.tokenize_module(node_function)
+        )
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+
+class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
+
+    def setUp(self):
+        super().setUp()
+        self.checker_test_object = testutils.CheckerTestCase()
+        self.checker_test_object.CHECKER_CLASS = (
+            pylint_extensions.ExceptionalTypesCommentChecker)
+        self.checker_test_object.setup_method()
+
+    def test_raises_error_if_exceptional_types_are_used_without_comment(self):
+        # Checking for Any type.
+        node_with_any_type = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test'
+        )
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                schema_dict: Dict[str, Any] = {
+                    'key': 'value'
+                } #@
+                """
+            )
+        node_with_any_type.file = filename
+
+        self.checker_test_object.checker.process_tokens(
+           pylint_utils.tokenize_module(node_with_any_type)
+        )
+        message = testutils.Message(
+            msg_id='any-type-used',
+            line=2
+        )
+        with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+
+        # Checking for object class.
+        node_with_object_type = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test'
+        )
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                func(proto_buff_stuff: object) #@
+                """
+            )
+        node_with_object_type.file = filename
+
+        self.checker_test_object.checker.process_tokens(
+           pylint_utils.tokenize_module(node_with_object_type)
+        )
+        message = testutils.Message(
+            msg_id='object-class-used',
+            line=2
+        )
+        with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+
+        # Checking for cast method.
+        node_with_cast_method = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test'
+        )
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                func(cast(str, change.new_value)) #@
+                """
+            )
+        node_with_cast_method.file = filename
+
+        self.checker_test_object.checker.process_tokens(
+           pylint_utils.tokenize_module(node_with_cast_method)
+        )
+        message = testutils.Message(
+            msg_id='cast-func-used',
+            line=2
+        )
+        with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+
+    def test_raises_error_if_exceptional_types_are_occurred_combined_in_module(
+        self
+    ):
+        node_with_combined_types = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test'
+        )
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                schema_dict: Dict[str, Any] = {
+                    'key': 'value'
+                }
+
+                def func(proto_buff_stuff: object) -> None
+                    pass
+
+                # Some other contents of the module.
+
+                # We are not considering this case.
+                var = object()
+                new_string = 'hi'
+
+                change_value = cast(str, change.new_value) #@
+                """
+            )
+        node_with_combined_types.file = filename
+
+        self.checker_test_object.checker.process_tokens(
+           pylint_utils.tokenize_module(node_with_combined_types)
+        )
+        message1 = testutils.Message(
+            msg_id='any-type-used',
+            line=2
+        )
+        message2 = testutils.Message(
+            msg_id='object-class-used',
+            line=6
+        )
+        message3 = testutils.Message(
+            msg_id='cast-func-used',
+            line=14
+        )
+        with self.checker_test_object.assertAddsMessages(
+            message1, message3, message2
+        ):
+            temp_file.close()
+
+    def test_raises_error_if_any_type_used_in_function_signature(self):
+        node_with_any_type_arg = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test'
+        )
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                def foo(*args: Any) -> None:
+                    pass #@
+                """
+            )
+        node_with_any_type_arg.file = filename
+
+        self.checker_test_object.checker.process_tokens(
+           pylint_utils.tokenize_module(node_with_any_type_arg)
+        )
+        message = testutils.Message(
+            msg_id='any-type-used',
+            line=2
+        )
+        with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+
+        node_with_any_type_return = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test'
+        )
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                def foo(*args: str) -> Any:
+                    pass #@
+                """
+            )
+        node_with_any_type_return.file = filename
+
+        self.checker_test_object.checker.process_tokens(
+           pylint_utils.tokenize_module(node_with_any_type_return)
+        )
+        with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+
+        node_with_any_type_return_and_args = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test'
+        )
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                def foo(*args: Any) -> Any:
+                    pass #@
+                """
+            )
+        node_with_any_type_return_and_args.file = filename
+
+        self.checker_test_object.checker.process_tokens(
+           pylint_utils.tokenize_module(node_with_any_type_return_and_args)
+        )
+        with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+
+        node_with_multiple_any_type_functions = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test'
+        )
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                def foo(*args: Any) -> Any:
+                    pass
+
+                def foo1(arg1: str) -> int:
+                    pass
+
+                def foo2(*args: str) -> Any:
+                    pass #@
+                """
+            )
+        node_with_multiple_any_type_functions.file = filename
+
+        self.checker_test_object.checker.process_tokens(
+           pylint_utils.tokenize_module(node_with_multiple_any_type_functions)
+        )
+        message2 = testutils.Message(
+            msg_id='any-type-used',
+            line=8
+        )
+        with self.checker_test_object.assertAddsMessages(
+            message, message2
+        ):
+            temp_file.close()
+
+    def test_any_and_cast_will_not_raise_error_in_import(self):
+        node_with_any_and_cast_imported = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test'
+        )
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                from typing import Any, cast #@
+                """
+            )
+        node_with_any_and_cast_imported.file = filename
+
+        self.checker_test_object.checker.process_tokens(
+           pylint_utils.tokenize_module(node_with_any_and_cast_imported)
+        )
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+        node_with_any_and_cast_in_multi_line_import = (
+            astroid.scoped_nodes.Module(
+                name='test',
+                doc='Custom test'
+            )
+        )
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                from typing import (
+                    Any, Dict, List, Optional, cast
+                ) #@
+                """
+            )
+        node_with_any_and_cast_in_multi_line_import.file = filename
+
+        self.checker_test_object.checker.process_tokens(
+            pylint_utils.tokenize_module(
+                node_with_any_and_cast_in_multi_line_import
+            )
+        )
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+    def test_exceptional_types_with_comments_should_not_raise_error(self):
+        node_with_any_type_and_comment = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test'
+        )
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                from typing import Any
+
+                # Here we used type Any because, this function can take
+                # any argument.
+                def foo(arg1: Any) -> None
+                    pass
+
+                # Some other contents of the Module.
+                new_var: str = 'hi'
+
+                # Here we used type Any because, schema dicts can accept
+                # any value.
+                schema_dict: Dict[str, Any] = {
+                    'key': 'value'
+                }
+
+                def foo1(arg2: str) -> None
+                    # Here we used type Any because, new_value can accept any
+                    # value.
+                    new_value: Any = 'hi' #@
+                """
+            )
+        node_with_any_type_and_comment.file = filename
+
+        self.checker_test_object.checker.process_tokens(
+           pylint_utils.tokenize_module(node_with_any_type_and_comment)
+        )
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+        node_with_cast_method_and_comment = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test'
+        )
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                from typing import Any, cast
+
+                # Here we used type Any because, this function can take
+                # any argument.
+                def foo(arg1: Any) -> None
+                    pass
+
+                # Here we used cast because we are narrowing down the object
+                # to string object.
+                new_var: str = cast(str, object())
+
+                # Here we used type Any because, schema dicts can accept
+                # any value.
+                schema_dict: Dict[str, Any] = {
+                    'key': 'value'
+                }
+
+                # Here we used object because stubs of protobuf are not
+                # available yet. So, instead of Any we used object here.
+                def save_classifier_data(
+                    exp_id: str,
+                    job_id: str,
+                    classifier_data_proto: object
+                ) -> None:
+                    pass #@
+                """
+            )
+        node_with_cast_method_and_comment.file = filename
+
+        self.checker_test_object.checker.process_tokens(
+           pylint_utils.tokenize_module(node_with_cast_method_and_comment)
+        )
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+    def test_no_error_raised_if_objects_are_present_with_comment(self):
+        node_with_multiple_object = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test'
+        )
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                # Here we used object because stubs of protobuf are not
+                # available yet. So, instead of Any we used object here.
+                def foo(exp_id: object) -> object:
+                    return 'hi' #@
+                """
+            )
+        node_with_multiple_object.file = filename
+
+        self.checker_test_object.checker.process_tokens(
+           pylint_utils.tokenize_module(node_with_multiple_object)
+        )
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+
 class SingleLineCommentCheckerTests(unittest.TestCase):
 
     def setUp(self):

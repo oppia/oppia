@@ -1921,6 +1921,65 @@ class SingleLinePragmaChecker(checkers.BaseChecker):
                         'single-line-pragma', line=line_num)
 
 
+class TypeIgnoreCommentChecker(checkers.BaseChecker):
+    """Custom pylint checker which checks if MyPy's type ignores are properly
+    documented or not.
+    """
+
+    __implements__ = interfaces.ITokenChecker
+
+    name = 'type-ignore-comment'
+    priority = -1
+    msgs = {
+        'C0045': (
+            'MyPy type ignore is used. Add a proper comment if \'type: ignore\''
+            ' is needed.',
+            'mypy-ignore-used',
+            'MyPy ignores should be used with proper comments. Except for'
+            ' no-untyped-call MyPy ignore.'
+        ),
+        'C0046': (
+            'Extra comment is present for MyPy type: ignore. Please'
+            ' remove it.',
+            'redundant-type-comment',
+            'No corresponding \'type: ignore\' is found for the type'
+            'ignore comment.'
+        )
+    }
+
+    def process_tokens(self, tokens):
+        """Custom pylint checker which allows only those MyPy type ignores that
+        are properly documented.
+
+        Args:
+            tokens: Token. Object to access all tokens of a module.
+        """
+        type_ignore_comment_regex = r'^# Here we used MyPy ignore because'
+        type_ignore_comment_present = False
+        comment_line_number = 0
+
+        for (token_type, _, (line_num, _), _, line) in tokens:
+            if token_type == tokenize.COMMENT:
+                line = line.lstrip()
+
+                if re.search(type_ignore_comment_regex, line):
+                    type_ignore_comment_present = True
+                    comment_line_number = line_num
+
+                if re.search(r'(#\s*type:)', line):
+                    if '# type: ignore[no-untyped-call]' in line:
+                        continue
+                    if type_ignore_comment_present:
+                        type_ignore_comment_present = False
+                    else:
+                        self.add_message(
+                            'mypy-ignore-used', line=line_num)
+
+        if type_ignore_comment_present:
+            self.add_message(
+                'redundant-type-comment', line=comment_line_number)
+
+
 class SingleSpaceAfterKeyWordChecker(checkers.BaseChecker):
     """Custom pylint checker which checks that there is a single space
     after keywords like `if`, `elif`, `while`, and `yield`.
@@ -1957,6 +2016,244 @@ class SingleSpaceAfterKeyWordChecker(checkers.BaseChecker):
                         'single-space-after-keyword',
                         args=(token),
                         line=line_num)
+
+
+class ExceptionalTypesCommentChecker(checkers.BaseChecker):
+    """Custom pylint checker which checks that there is always a comment
+    for exceptional types in the backend type annotations.
+    """
+
+    __implements__ = interfaces.ITokenChecker
+
+    name = 'comment-for-exceptional-types'
+    priority = -1
+    msgs = {
+        'C0047': (
+            'Any type is used. Please add a proper comment if'
+            ' Any type is needed.',
+            'any-type-used',
+            'Annotations with Any type should be done with'
+            ' a proper comments.'
+        ),
+        'C0048': (
+            'cast function is used. Please add a proper comment if'
+            ' cast is needed.',
+            'cast-func-used',
+            'Casting of any value should be done with a proper comment.'
+        ),
+        'C0049': (
+            'object class is used. Please add a proper comment if'
+            ' object is needed.',
+            'object-class-used',
+            'Annotating any value with object should be done with a proper'
+            ' comment.'
+        )
+    }
+
+    def process_tokens(self, tokens):
+        """Custom pylint checker which makes sure that every exceptional type
+        should be documented properly.
+
+        Args:
+            tokens: Token. Object to access all tokens of a module.
+        """
+        self.check_comment_is_present_with_any_type(tokens)
+        self.check_comment_is_present_with_cast_method(tokens)
+        self.check_comment_is_present_with_object_class(tokens)
+
+    def check_comment_is_present_with_object_class(self, tokens):
+        """Checks whether the object class in a module has been documented
+        or not. If the object class is not documented then adds an error
+        message.
+
+        Args:
+            tokens: Token. Object to access all tokens of a module.
+        """
+        object_type_regex = r'# Here we used object because'
+        object_comment_present = False
+        object_already_encountered_line_num = 0
+
+        for (token_type, token, (line_num, _), _, line) in tokens:
+            line = line.strip()
+
+            if token_type == tokenize.COMMENT:
+                if re.search(object_type_regex, line):
+                    object_comment_present = True
+
+            if token == 'object' and token_type == tokenize.NAME:
+                # Excluding the case where 2 or more objects occurred
+                # in the same line.
+                if object_already_encountered_line_num == line_num:
+                    continue
+                object_already_encountered_line_num = line_num
+                # Excluding the case when object is called:
+                # Eg: var = object()
+                if 'object()' in line:
+                    continue
+                if object_comment_present:
+                    object_comment_present = False
+                else:
+                    self.add_message(
+                        'object-class-used', line=line_num)
+
+    def check_comment_is_present_with_cast_method(self, tokens):
+        """Checks whether the cast method in a module has been documented
+        or not. If the cast method is not documented then adds an error
+        message.
+
+        Args:
+            tokens: Token. Object to access all tokens of a module.
+        """
+        cast_type_regex = r'^# Here we used cast because'
+        cast_comment_present = False
+        multi_line_import = False
+        single_line_import = False
+        import_line_num = 0
+
+        for (token_type, token, (line_num, _), _, line) in tokens:
+            line = line.strip()
+
+            if token_type == tokenize.COMMENT:
+                if re.search(cast_type_regex, line):
+                    cast_comment_present = True
+
+            # Checking if single-line import is present.
+            # Eg: from typing import Any.
+            if token_type == tokenize.NAME:
+                if token == 'import':
+                    single_line_import = True
+                    import_line_num = line_num
+
+            # Checking if multi-line import is present.
+            # Eg: from typing import (
+            #   Any, Callable, Dict, FrozenSet, Iterator, List, Set,
+            #   Tuple, Type, cast
+            # )
+            if token_type == tokenize.OP:
+                if single_line_import and token == '(':
+                    multi_line_import = True
+                    single_line_import = False
+                if multi_line_import and token == ')':
+                    multi_line_import = False
+
+            if token_type == tokenize.NAME and token == 'cast':
+                # Passing those cases where cast is imported.
+                if single_line_import and import_line_num == line_num:
+                    pass
+                elif multi_line_import:
+                    pass
+                # Throwing an error when cast is encountered but there is no
+                # corresponding comment exist.
+                elif cast_comment_present:
+                    cast_comment_present = False
+                else:
+                    self.add_message(
+                        'cast-func-used', line=line_num)
+
+    def check_comment_is_present_with_any_type(self, tokens):
+        """Checks whether the Any type in a module has been documented
+        or not. If the Any type is not documented then adds an error
+        message.
+
+        Args:
+            tokens: Token. Object to access all tokens of a module.
+        """
+        any_type_comment_present = False
+        outside_function_def = True
+        outside_args_section = True
+        any_present_inside_arg_section = False
+        any_present_inside_return_section = False
+        any_present_in_function_def = False
+        multi_line_import = False
+        single_line_import = False
+        import_line_num = 0
+        args_section_end_line_num = 0
+
+        any_type_regex = r'^# Here we used type Any because'
+
+        for (token_type, token, (line_num, _), _, line) in tokens:
+            line = line.strip()
+
+            if token_type == tokenize.COMMENT:
+                if re.search(any_type_regex, line):
+                    any_type_comment_present = True
+
+            # Checking if single-line import is present.
+            # Eg: from typing import Any.
+            if token_type == tokenize.NAME:
+                if token == 'import':
+                    single_line_import = True
+                    import_line_num = line_num
+
+            # Checking if multi-line import is present.
+            # Eg: from typing import (
+            #   Any, Callable, Dict, FrozenSet, Iterator, List, Set,
+            #   Tuple, Type, cast
+            # )
+            if token_type == tokenize.OP:
+                if single_line_import and token == '(':
+                    multi_line_import = True
+                    single_line_import = False
+                if multi_line_import and token == ')':
+                    multi_line_import = False
+
+            # Checking if linters are in argument-section, return-section or
+            # outside of the function definition.
+            # Eg:
+            #       <outside function definition>
+            #   def func(<argument-section>) -> <return-section>:
+            #       <outside function definition>.
+            if token_type == tokenize.NAME:
+                if token == 'def':
+                    outside_function_def = False
+                    func_def_start_line = line_num
+                    outside_args_section = False
+
+            if token_type == tokenize.OP:
+                if token == '->':
+                    outside_args_section = True
+                    args_section_end_line_num = line_num
+                if outside_args_section and token == ':':
+                    outside_function_def = True
+
+            # Checking if Any type is present in function definition or not.
+            if token_type == tokenize.NAME and token == 'Any':
+                if not outside_args_section:
+                    any_present_inside_arg_section = True
+                elif (
+                    outside_args_section and
+                    args_section_end_line_num == line_num
+                ):
+                    any_present_inside_return_section = True
+
+            if (
+                any_present_inside_arg_section or
+                any_present_inside_return_section
+            ):
+                any_present_in_function_def = True
+
+            if outside_function_def:
+                if any_present_in_function_def:
+                    if any_type_comment_present:
+                        any_type_comment_present = False
+                    else:
+                        self.add_message(
+                            'any-type-used', line=func_def_start_line
+                        )
+                    any_present_in_function_def = False
+                    any_present_inside_arg_section = False
+                    any_present_inside_return_section = False
+                if token_type == tokenize.NAME and token == 'Any':
+                    # Passing those cases where Any is imported.
+                    if single_line_import and import_line_num == line_num:
+                        pass
+                    elif multi_line_import:
+                        pass
+                    elif any_type_comment_present:
+                        any_type_comment_present = False
+                    else:
+                        self.add_message(
+                            'any-type-used', line=line_num)
 
 
 class InequalityWithNoneChecker(checkers.BaseChecker):
@@ -2318,7 +2615,9 @@ def register(linter):
     linter.register_checker(SingleLineCommentChecker(linter))
     linter.register_checker(BlankLineBelowFileOverviewChecker(linter))
     linter.register_checker(SingleLinePragmaChecker(linter))
+    linter.register_checker(TypeIgnoreCommentChecker(linter))
     linter.register_checker(SingleSpaceAfterKeyWordChecker(linter))
+    linter.register_checker(ExceptionalTypesCommentChecker(linter))
     linter.register_checker(InequalityWithNoneChecker(linter))
     linter.register_checker(NonTestFilesFunctionNameChecker(linter))
     linter.register_checker(DisallowedFunctionsChecker(linter))
