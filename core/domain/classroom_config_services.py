@@ -140,7 +140,7 @@ def get_new_classroom_id() -> str:
     return classroom_models.ClassroomModel.generate_new_classroom_id()
 
 
-def _save_classroom(
+def _update_classroom(
     classroom: classroom_config_domain.Classroom,
     classroom_model: classroom_models.ClassroomModel
 ) -> None:
@@ -193,7 +193,7 @@ def update_or_create_classroom_model(
     if model is None:
         _create_new_classroom(classroom)
     else:
-        _save_classroom(classroom, model)
+        _update_classroom(classroom, model)
 
 
 def delete_classroom(classroom_id: str) -> None:

@@ -16,13 +16,26 @@
 
 from __future__ import annotations
 
+import logging
+
 from core import feconf
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import classroom_services
+from core.domain import classroom_config_domain
+from core.domain import classroom_config_services
 from core.domain import config_domain
 from core.domain import topic_fetchers
+
+
+SCHEMA_FOR_CLASSROOM_ID = {
+    'type': 'basestring',
+    'validators': [{
+        'id': 'is_regex_matched',
+        'regex_pattern': constants.ENTITY_ID_REGEX
+    }]
+}
 
 
 class ClassroomDataHandler(base.BaseHandler):
@@ -103,34 +116,18 @@ class DefaultClassroomRedirectPage(base.BaseHandler):
         self.redirect('/learn/%s' % constants.DEFAULT_CLASSROOM_URL_FRAGMENT)
 
 
-class ClassroomAdminPageHandler(base.BaseHandler):
-    """Renders the classroom admin page."""
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
-
-    @acl_decorators.can_access_admin_page
-    def get(self):
-        """Handles GET requests."""
-
-        self.render_template('classroom-admin-page.mainpage.html')
-
-
 class ClassroomAdminDataHandler(base.BaseHandler):
     """Fetches relevant data for the classroom admin page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.can_access_admin_page
     def get(self):
         """Handles GET requests."""
         classroom_id_to_classroom_name = (
-            classroom_conifg_services.get_classroom_id_to_classroom_name_dict())
+            classroom_config_services.get_classroom_id_to_classroom_name_dict())
 
         self.values.update({
             'classroom_id_to_classroom_name': classroom_id_to_classroom_name
@@ -143,33 +140,34 @@ class NewClassroomIdHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {}
-    }
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.can_access_admin_page
     def get(self):
         """Handles GET requests."""
         self.values.update({
-            'classroom_id': classroom_conifg_services.get_new_classroom_id()
+            'classroom_id': classroom_config_services.get_new_classroom_id()
         })
         self.render_json(self.values)
 
 
-class EditClassroomDataHandler(base.BaseHandler):
+class ClassroomHandler(base.BaseHandler):
     """Edits classroom data."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
         'classroom_id': {
-            'schema': {}
+            'schema': SCHEMA_FOR_CLASSROOM_ID
         }
     }
     HANDLER_ARGS_SCHEMAS = {
         'GET': {},
         'PUT': {
             'classroom_dict': {
-                'schema': {}
+                'schema': {
+                    'type': 'object_dict',
+                    'object_class': classroom_config_domain.Classroom
+                }
             }
         },
         "DELETE": {}
@@ -178,24 +176,27 @@ class EditClassroomDataHandler(base.BaseHandler):
     @acl_decorators.can_access_admin_page
     def get(self, classroom_id):
         """Handles GET requests."""
-        classroom = classroom_conifg_services.get_classroom_by_id(classroom_id)
+        classroom = classroom_config_services.get_classroom_by_id(classroom_id)
+        if classroom is None:
+            raise self.InvalidInputException(
+                'Sorry, classroom with given classroom ID does not exist.')
+
         self.values.update({
-            'classroom': classroom.to_dict()
+            'classroom_dict': classroom.to_dict()
         })
         self.render_json(self.values)
 
-
     @acl_decorators.can_access_admin_page
-    def put(self, _):
+    def put(self, classroom_id):
         """Updates properties of a given classroom."""
-        classroom = self.normalized_payload('classroom_dict')
-        classroom_conifg_services.update_classroom_properties(classroom)
+        classroom = self.normalized_payload.get('classroom_dict')
+        classroom_config_services.update_or_create_classroom_model(classroom)
         self.render_json(self.values)
 
     @acl_decorators.can_access_admin_page
     def delete(self, classroom_id):
         """Deletes classroom from the classroom admin page."""
-        classroom_conifg_services.delete_classroom(classroom_id)
+        classroom_config_services.delete_classroom(classroom_id)
         log_info_string = '(%s) %s deleted classroom %s' % (
             self.roles, self.user_id, classroom_id)
         logging.info(log_info_string)
