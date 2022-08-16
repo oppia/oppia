@@ -116,6 +116,8 @@ export class CheckpointCelebrationModalComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.add(
       this.playerPositionService.onNewCardOpened.subscribe(
         (nextStateCard: StateCard) => {
+          this.checkpointCelebrationUtilityService.setIsOnCheckpointedState(
+            false);
           if (this.miniMessageTooltipIsShown) {
             this.dismissMiniMessage();
             setTimeout(() => {
@@ -175,6 +177,7 @@ export class CheckpointCelebrationModalComponent implements OnInit, OnDestroy {
     this.currentCheckpointPosition = checkpointPos;
     this.generateCheckpointStatusArray();
 
+    this.checkpointCelebrationUtilityService.setIsOnCheckpointedState(true);
     if (this.shouldDisplayFullScaleMessage) {
       this.triggerStandardMessage();
     } else {

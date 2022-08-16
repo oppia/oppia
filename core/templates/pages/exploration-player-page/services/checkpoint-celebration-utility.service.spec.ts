@@ -257,6 +257,21 @@ describe('Checkpoint celebration utility service', () => {
       'DUMMY_CHECKPOINT_TITLE_I18N_KEY');
   });
 
+  it('should correctly set and retrieve isOnCheckpointedState value', () => {
+    expect(checkpointCelebrationUtilityService.getIsOnCheckpointedState())
+      .toBe(false);
+
+    checkpointCelebrationUtilityService.setIsOnCheckpointedState(true);
+
+    expect(checkpointCelebrationUtilityService.getIsOnCheckpointedState())
+      .toBe(true);
+
+    checkpointCelebrationUtilityService.setIsOnCheckpointedState(false);
+
+    expect(checkpointCelebrationUtilityService.getIsOnCheckpointedState())
+      .toBe(false);
+  });
+
   it('should get emitter meant to open the lesson info modal', () => {
     let mockLessonInfoModalEmitter = new EventEmitter<void>();
 

@@ -16,19 +16,30 @@
  * @fileoverview Unit tests for the checkpoint celebration modal component.
  */
 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
 import { CheckpointCelebrationModalComponent } from './checkpoint-celebration-modal.component';
 import { CheckpointCelebrationUtilityService } from 'pages/exploration-player-page/services/checkpoint-celebration-utility.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 
-describe('Practice session confirmation modal component', function() {
+class MockCheckpointCelebrationUtilityService {
+  isOnCheckpointedState = false;
+}
+
+describe('Placeholder test', function() {
   let component: CheckpointCelebrationModalComponent;
   let fixture: ComponentFixture<CheckpointCelebrationModalComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
       declarations: [CheckpointCelebrationModalComponent, MockTranslatePipe],
-      providers: [CheckpointCelebrationUtilityService]
+      providers: [
+        {
+          provide: CheckpointCelebrationUtilityService,
+          useClass: MockCheckpointCelebrationUtilityService
+        }
+      ]
     }).compileComponents();
   }));
 

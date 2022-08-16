@@ -37,6 +37,7 @@ enum CheckpointMessageTypes {
   providedIn: 'root'
 })
 export class CheckpointCelebrationUtilityService {
+  private isOnCheckpointedState: boolean = false;
   private _openLessonInformationModalEmitter = new EventEmitter<void>();
   constructor(
     private computeGraphService: ComputeGraphService,
@@ -130,6 +131,14 @@ export class CheckpointCelebrationUtilityService {
   getCheckpointTitle(): string {
     const titleI18nKey = this.getCheckpointTitleI18nKey();
     return this.translateService.instant(titleI18nKey);
+  }
+
+  setIsOnCheckpointedState(isOnCheckpointedState: boolean): void {
+    this.isOnCheckpointedState = isOnCheckpointedState;
+  }
+
+  getIsOnCheckpointedState(): boolean {
+    return this.isOnCheckpointedState;
   }
 
   getOpenLessonInformationModalEmitter(): EventEmitter<void> {
