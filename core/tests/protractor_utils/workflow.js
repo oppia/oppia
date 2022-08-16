@@ -264,12 +264,8 @@ var addExplorationPlaytester = async function(username) {
 
 // Here, roleName is the server-side form of the name (e.g. 'owner').
 var _getExplorationRoles = async function(roleName) {
-  var itemName = roleName + 'Name';
-  var listName = roleName + 'Names';
-  return await element.all(by.repeater(
-    itemName + ' in $ctrl.ExplorationRightsService.' + listName +
-    ' track by $index'
-  )).map(async function(elem) {
+  var listName = '.e2e-test-names-of-' + roleName;
+  return await element.all(by.css(listName)).map(async function(elem) {
     return await elem.getText();
   });
 };

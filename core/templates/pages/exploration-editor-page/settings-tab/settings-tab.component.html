@@ -316,7 +316,7 @@
           <strong>Managers</strong>
           <ul>
             <li *ngFor="let ownerName of explorationRightsService.ownerNames; let index = index">
-              <div class="oppia-user-list-item e2e-test-role-owner-name">
+              <div class="oppia-user-list-item e2e-test-names-of-owner">
                 <span>{{ ownerName }}</span>
                 <span [hidden]="!isRolesFormOpen || ownerName === loggedInUser" [ngbTooltip]="'Remove user'" type="button" class="material-icons oppia-delete-user-button" (click)="removeRole(ownerName, 'Managers')">highlight_off
                 </span>
@@ -329,7 +329,7 @@
           <strong>Collaborators</strong>
           <ul>
             <li *ngFor="let editorName of explorationRightsService.editorNames; let index = index">
-              <div  class="oppia-user-list-item">
+              <div  class="oppia-user-list-item e2e-test-names-of-editor">
                 <span>{{ editorName }}</span>
                 <span [hidden]="!isRolesFormOpen" type="button" [ngbTooltip]="'Remove user'" class="material-icons oppia-delete-user-button" (click)="removeRole(editorName, 'Collaborators')">highlight_off
                 </span>
@@ -342,7 +342,7 @@
           <strong>Playtesters</strong>
           <ul>
             <li *ngFor="let viewerName of explorationRightsService.viewerNames; let index = index">
-              <div class="oppia-user-list-item">
+              <div class="oppia-user-list-item e2e-test-names-of-viewer">
                 <span>{{ viewerName }}</span>
                 <span [hidden]="!isRolesFormOpen" type="button" [ngbTooltip]="'Remove user'" class="material-icons oppia-delete-user-button" (click)="removeRole(viewerName, 'Playtesters')">highlight_off
                 </span>
@@ -420,7 +420,7 @@
         <div [hidden]="!(explorationRightsService.voiceArtistNames?.length > 0)">
           <ul>
             <li *ngFor="let voiceArtistName of explorationRightsService.voiceArtistNames; let index = index">
-              <div class="oppia-user-list-item e2e-test-voice-artist-{{voiceArtistName}}">
+              <div class="oppia-user-list-item e2e-test-names-of-voiceArtist e2e-test-voice-artist-{{voiceArtistName}}">
                 <span>{{voiceArtistName}}</span>
                 <span [hidden]="!(isVoiceoverFormOpen)" type="button" [ngbTooltip]="'Remove user'" class="material-icons" (click)="removeVoiceArtist(voiceArtistName)">highlight_off
                 </span>
