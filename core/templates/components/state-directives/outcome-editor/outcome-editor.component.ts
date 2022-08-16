@@ -34,6 +34,7 @@ import { AddOutcomeModalComponent } from 'pages/exploration-editor-page/editor-t
 interface AddOutcomeModalResponse {
   outcome: Outcome;
 }
+
 @Component({
   selector: 'oppia-outcome-editor',
   templateUrl: './outcome-editor.component.html'
