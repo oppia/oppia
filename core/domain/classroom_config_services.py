@@ -12,7 +12,7 @@
 # distributed under the License is distributed on an "AS-IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
-# limitations under the License.]
+# limitations under the License.
 
 # Currently, the classroom data is stored in the config model and we are
 # planning to migrate the storage into a new Classroom model. After the
@@ -34,8 +34,36 @@ if MYPY: # pragma: no cover
 (classroom_models,) = models.Registry.import_models([models.NAMES.classroom])
 
 
+def get_all_classroom_models():
+    """Returns all the classrooms present in the datastore.
+
+    Returns:
+        list(Classroom). The list of classrooms present in the datastore.
+    """
+    backend_classroom_models = classroom_models.ClassroomModel.get_all()
+    classrooms: List[classroom_config_domain.Classroom] = [
+        get_classroom_from_classroom_model(model)
+        for model in backend_classroom_models
+    ]
+    return classrooms
+
+
 def get_classroom_id_to_classroom_name_dict():
-    pass
+    """Returns a dict with classroom id as key and classroom name as value for
+    all the classrooms present in the datastore.
+
+    Returns:
+        dict(str, str). A dict with classroom id as key and classroom name as
+        value for all the classrooms present in the datastore.
+    """
+    classroom_id_to_classroom_name = {}
+    classrooms = get_all_classroom_models()
+
+    for classroom in classrooms:
+        classroom_id_to_classroom_name[classroom.classroom_id] = classroom.name
+
+    return classroom_id_to_classroom_name
+
 
 def get_classroom_from_classroom_model(
     classroom_model: classroom_models.ClassroomModel
@@ -104,6 +132,7 @@ def get_classroom_by_url_fragment(
     else:
         return None
 
+
 def get_new_classroom_id() -> str:
     """Returns a new classroom ID.
 
@@ -112,24 +141,68 @@ def get_new_classroom_id() -> str:
     """
     return classroom_models.ClassroomModel.generate_new_blog_post_id()
 
-def create_new_default_classroom():
-    """Creates a new default classroom.
 
-    Returns:
-        Classroom. A default classroom object.
+def _save_classroom(
+    classroom: classroom_config_domain.Classroom,
+    classroom_model: classroom_models.ClassroomModel
+) -> None:
+    """Saves a Clasroom domain object to the datastore.
+
+    Args:
+        classroom: Classroom. The classroom domain object for the given
+            classroom.
     """
-    classroom_id = get_new_classroom_id()
-    default_classroom_name = ''
-    default
-    classroom_model = classroom_models.ClassroomModel.create(
-        classroom_id,
-        '
+    classroom.validate()
+    classroom_model.name = classroom.name
+    classroom_model.url_fragment = classroom.url_fragment
+    classroom_model.course_details = classroom.course_details
+    classroom_model.topic_list_intro = classroom.topic_list_intro
+    classroom_model.topic_id_to_prerequisite_topic_ids = (
+        classroom.topic_id_to_prerequisite_topic_ids)
+
+    classroom_model.update_timestamps()
+    classroom_model.put()
+
+
+def _create_new_classroom(
+    classroom: classroom_config_domain.Classroom
+) -> None:
+    """Creates a new classroom model from using the classroom domain object.
+
+    Args:
+        classroom: Classroom. The classroom domain object for the given
+            classroom.
+    """
+    classroom.validate()
+    classroom_models.ClassroomModel.create(
+        classroom.classroom_id,
+        classroom.name,
+        classroom.url_fragment,
+        classroom.course_details,
+        classroom.topic_list_intro,
+        classroom_model.topic_id_to_prerequisite_topic_ids
     )
 
 
-def update_classroom_properties():
-    pass
+def update_or_create_classroom_model(
+    classroom: classroom_config_domain.Classroom
+) -> None:
+    """Updates the properties of an existing classroom model or creates a new
+    classroom model.
+    """
+    model = classroom_models.ClassroomModel.get(
+        classroom.classroom_id, strict=True)
+
+    if model is None:
+        _create_new_classroom(classroom)
+    else:
+        _save_classroom(classroom, model)
 
 
-def delete_classroom():
-    pass
+def delete_classroom(classroom_id: str) -> None:
+    """Deletes the classroom model.
+
+    Args:
+        classroom_id: str. ID of the classroom which is to be deleted.
+    """
+    classroom_models.ClassroomModel.get(classroom_id).delete()

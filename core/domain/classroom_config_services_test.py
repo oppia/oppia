@@ -12,7 +12,7 @@
 # distributed under the License is distributed on an "AS-IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
-# limitations under the License.]
+# limitations under the License.
 
 # Currently, the classroom data is stored in the config model and we are
 # planning to migrate the storage into a new Classroom model. After the
@@ -30,6 +30,23 @@ from core.tests import test_utils
 class ClassroomServicesTests(test_utils.GenericTestBase):
     """Tests for classroom services."""
 
-    def setUp(self):
-        super().setUp()
+    def test_get_classroom_by_id(self):
+        pass
 
+    def test_get_classroom_by_url_fragment(self):
+        pass
+
+    def test_get_all_classroom_models(self):
+        pass
+
+    def test_get_classroom_id_to_classroom_name_dict(self):
+        pass
+
+    def test_get_new_classroom_id(self):
+        pass
+
+    def test_create_new_classroom_model(self):
+        pass
+
+    def test_update_existing_classroom_model(self):
+        pass
