@@ -108,7 +108,12 @@ export class TranslationLanguageSelectorComponent implements OnInit {
     if (this.dropdownShown) {
       this.optionsFilter = '';
       this.filteredOptions = this.options;
-      setTimeout(() => this.filterDivRef.nativeElement.focus(), 1);
+      setTimeout(() => {
+        if (this.filterDivRef) {
+          this.filterDivRef.nativeElement.focus();
+        }
+      }
+      , 1);
     }
   }
 
