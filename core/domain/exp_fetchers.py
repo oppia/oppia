@@ -89,8 +89,8 @@ def _migrate_states_schema(
     next_content_id_index = None
     while (states_schema_version <
            feconf.CURRENT_STATE_SCHEMA_VERSION):
-        if states_schema_version == 51:
-            # State conversion function from 51 to 52 removes
+        if states_schema_version == 52:
+            # State conversion function from 52 to 53 removes
             # next_content_id_index from the state level, hence this if case
             # populates the next_content_id_index from the old state, which will
             # be used for introducing next_content_id_index into

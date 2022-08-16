@@ -3359,7 +3359,7 @@ class State(translation_domain.BaseTranslatableObject):
                     )
 
     @classmethod
-    def update_old_content_id_to_new_content_id_in_v51_states(
+    def update_old_content_id_to_new_content_id_in_v52_states(
         cls,
         states_dict
     ):

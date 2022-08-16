@@ -1401,9 +1401,27 @@ class Question(translation_domain.BaseTranslatableObject):
 
         return question_state_dict
 
+    def _convert_state_v51_dict_to_v52_dict(
+        cls, question_state_dict: state_domain.StateDict
+    ) -> state_domain.StateDict:
+        """Converts from version 51 to 52. Version 52 fixes content IDs for
+        translations and voiceovers in exploration but no action is required in
+        question dicts.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+
+        return question_state_dict
+
     @classmethod
-    def _convert_state_v51_dict_to_v52_dict(cls, question_state_dict):
-        """Converts from v51 to v52. Version 52 removes next_content_id_index
+    def _convert_state_v52_dict_to_v53_dict(cls, question_state_dict):
+        """Converts from v52 to v53. Version 53 removes next_content_id_index
         and WrittenTranslation from State. This version also updates the
         content-ids for each translatable field in the state with its new
         content-id.
@@ -1412,7 +1430,7 @@ class Question(translation_domain.BaseTranslatableObject):
         del question_state_dict['written_translations']
         states_dict, next_content_id_index = (
             state_domain.State
-            .update_old_content_id_to_new_content_id_in_v49_states(
+            .update_old_content_id_to_new_content_id_in_v52_states(
                 [states_dict])
         )
 

@@ -239,7 +239,7 @@ class DraftUpgradeUtil:
         return draft_change_list
 
     @classmethod
-    def _convert_states_v51_dict_to_v52_dict(
+    def _convert_states_v52_dict_to_v53_dict(
         cls, draft_change_list: List[exp_domain.ExplorationChange]
     ) -> List[exp_domain.ExplorationChange]:
         """Converts draft change list from state version 50 to 51. Version 51
@@ -256,6 +256,50 @@ class DraftUpgradeUtil:
                 completed.
         """
         raise InvalidDraftConversionException('Conversion cannot be completed.')
+
+    @classmethod
+    def _convert_states_v51_dict_to_v52_dict(
+        cls, draft_change_list: List[exp_domain.ExplorationChange]
+    ) -> List[exp_domain.ExplorationChange]:
+        """Converts from version 51 to 52. Version 52 fixes content IDs
+        in translations and voiceovers (some content IDs are removed).
+        We discard drafts that work with content IDs to make sure that they
+        don't contain content IDs that were removed.
+
+        Args:
+            draft_change_list: list(ExplorationChange). The list of
+                ExplorationChange domain objects to upgrade.
+
+        Returns:
+            list(ExplorationChange). The converted draft_change_list.
+
+        Raises:
+            InvalidDraftConversionException. The conversion cannot be
+                completed.
+        """
+        for exp_change in draft_change_list:
+            if exp_change.cmd in (
+                exp_domain.CMD_MARK_WRITTEN_TRANSLATIONS_AS_NEEDING_UPDATE,
+                exp_domain.CMD_MARK_WRITTEN_TRANSLATION_AS_NEEDING_UPDATE,
+                exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                exp_domain.DEPRECATED_CMD_ADD_TRANSLATION,
+            ):
+                # All cmds above somehow work with content IDs and as in
+                # the 51 to 52 conversion we remove some content IDs we raise
+                # an exception so that these drafts are removed.
+                raise InvalidDraftConversionException(
+                    'Conversion cannot be completed.')
+            if exp_change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
+                if (
+                    exp_change.property_name ==
+                    exp_domain.STATE_PROPERTY_NEXT_CONTENT_ID_INDEX
+                ):
+                    # If we change the next content ID index in the draft
+                    # we rather remove it as in the 51 to 52 conversion
+                    # we remove some content IDs.
+                    raise InvalidDraftConversionException(
+                        'Conversion cannot be completed.')
+        return draft_change_list
 
     @classmethod
     def _convert_states_v50_dict_to_v51_dict(cls, draft_change_list):

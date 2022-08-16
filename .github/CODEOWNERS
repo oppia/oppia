@@ -396,7 +396,7 @@
 /core/controllers/practice_sessions*.py @oppia/lace-backend-reviewers
 /core/controllers/question*.py @oppia/lace-backend-reviewers
 /core/controllers/review_tests*.py @oppia/lace-backend-reviewers
-/core/domain/classroom_domain*.py @oppia/lace-backend-reviewers
+/core/domain/classroom*.py @oppia/lace-backend-reviewers
 /core/domain/classroom_services*.py @oppia/lace-backend-reviewers
 /core/domain/question*.py @oppia/lace-backend-reviewers
 /core/domain/rights_domain*.py @oppia/lace-backend-reviewers

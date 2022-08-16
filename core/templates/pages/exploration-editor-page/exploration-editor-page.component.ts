@@ -610,6 +610,8 @@ angular.module('oppia').component('explorationEditorPage', {
         ctrl.explorationUrl = '/create/' + ctrl.explorationId;
         ctrl.explorationDownloadUrl = (
           '/createhandler/download/' + ctrl.explorationId);
+        ctrl.checkRevertExplorationValidUrl = (
+          '/createhandler/check_revert_valid/' + ctrl.explorationId);
         ctrl.revertExplorationUrl = (
           '/createhandler/revert/' + ctrl.explorationId);
         ctrl.areExplorationWarningsVisible = false;

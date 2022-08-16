@@ -5040,7 +5040,7 @@ next_content_id_index: 7
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 56
+schema_version: 57
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -5136,7 +5136,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 51
+states_schema_version: 52
 tags: []
 title: Title
 """)
@@ -5290,7 +5290,7 @@ next_content_id_index: 7
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 56
+schema_version: 57
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -5393,7 +5393,7 @@ states:
       voiceovers_mapping:
         content: {}
     solicit_answer_details: false
-states_schema_version: 51
+states_schema_version: 53
 tags: []
 title: Title
 """)
@@ -5508,7 +5508,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 56
+schema_version: 57
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -5545,8 +5545,6 @@ states:
         ca_buttonText: {}
         content: {}
         default_outcome: {}
-        feedback_1: {}
-        solution: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
@@ -5557,8 +5555,6 @@ states:
             translation: hello
         content: {}
         default_outcome: {}
-        feedback_1: {}
-        solution: {}
   END:
     card_is_checkpoint: false
     classifier_model_id: null
@@ -5585,7 +5581,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 51
+states_schema_version: 52
 tags: []
 title: Title
 """)
