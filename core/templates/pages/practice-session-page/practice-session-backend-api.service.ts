@@ -21,10 +21,8 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 interface getPracticeSessionsData {
-  data: {
-    skill_ids_to_descriptions_map: object;
-    topic_name: string;
-  };
+  skill_ids_to_descriptions_map: object;
+  topic_name: string;
 }
 
 @Injectable({

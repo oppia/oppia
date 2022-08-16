@@ -99,10 +99,10 @@ export class PracticeSessionPageComponent implements OnInit, OnDestroy {
       practiceSessionsDataUrl).then((result) => {
       var skillList = [];
       var skillDescriptions = [];
-      for (var skillId in result.data.skill_ids_to_descriptions_map) {
+      for (var skillId in result.skill_ids_to_descriptions_map) {
         skillList.push(skillId);
         skillDescriptions.push(
-          result.data.skill_ids_to_descriptions_map[skillId]);
+          result.skill_ids_to_descriptions_map[skillId]);
       }
       this.questionPlayerConfig = {
         resultActionButtons: [
@@ -126,7 +126,7 @@ export class PracticeSessionPageComponent implements OnInit, OnDestroy {
         questionCount: PracticeSessionPageConstants.TOTAL_QUESTIONS,
         questionsSortedByDifficulty: false
       };
-      this.topicName = result.data.topic_name;
+      this.topicName = result.topic_name;
       this.setPageTitle();
       this.subscribeToOnLanguageCodeChange();
       this.loaderService.hideLoadingScreen();

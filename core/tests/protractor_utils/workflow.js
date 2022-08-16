@@ -264,7 +264,7 @@ var addExplorationPlaytester = async function(username) {
 
 // Here, roleName is the server-side form of the name (e.g. 'owner').
 var _getExplorationRoles = async function(roleName) {
-  var listName = '.e2e-test-names-of-' + roleName;
+  var listName = '.e2e-test-' + roleName + '-role-names';
   return await element.all(by.css(listName)).map(async function(elem) {
     return await elem.getText();
   });

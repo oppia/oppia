@@ -3,7 +3,7 @@
   <div class="oppia-review-test">
     Review Test
   </div>
-  <oppia-question-player *ngIf="questionPlayerConfig.skillList && questionPlayerConfig.skillList.length > 0"
+  <oppia-question-player *ngIf="questionPlayerConfig && questionPlayerConfig.skillList.length > 0"
                          [questionPlayerConfig]="questionPlayerConfig">
   </oppia-question-player>
 </div>
