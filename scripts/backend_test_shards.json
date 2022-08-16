@@ -153,7 +153,8 @@
         "extensions.issues.CyclicStateTransitions.CyclicStateTransitions_test",
         "extensions.issues.EarlyQuit.EarlyQuit_test",
         "extensions.visualizations.models_test",
-        "scripts.check_overall_backend_test_coverage_test"
+        "scripts.check_overall_backend_test_coverage_test",
+        "core.jobs.batch_jobs.exp_version_history_computation_job_test"
     ],
     "3": [
         "core.controllers.incoming_app_feedback_report_test",
@@ -206,8 +207,7 @@
         "core.domain.app_feedback_report_constants_test",
         "scripts.linters.warranted_angular_security_bypasses_test",
         "scripts.create_expression_parser_test",
-        "scripts.run_frontend_tests_test",
-        "core.jobs.batch_jobs.exp_version_history_computation_job_test"
+        "scripts.run_frontend_tests_test"
     ],
     "4": [
         "core.storage.learner_group.gae_models_test",
