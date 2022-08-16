@@ -2585,7 +2585,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return states_dict
 
     @classmethod
-    def _convert_states_v52_dict_to_v53_dict(cls, states_dict):
+    def _convert_states_v52_dict_to_v53_dict(
+        cls, states_dict: Dict[str, state_domain.StateDict]
+    ) -> Dict[str, state_domain.StateDict]:
         """Converts from v52 to v53. Version 53 removes next_content_id_index
         and WrittenTranslation from State. This version also updates the
         content-ids for each translatable field in the state with its new
@@ -2633,7 +2635,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         if current_states_schema_version == 43:
             versioned_exploration_states['states'] = conversion_fn(
                 versioned_exploration_states['states'], init_state_name)
-        elif current_states_schema_version == 51:
+        elif current_states_schema_version == 52:
             versioned_exploration_states['states'], next_content_id_index = (
                 conversion_fn(versioned_exploration_states['states']))
             return next_content_id_index
@@ -2938,7 +2940,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         exploration_dict['schema_version'] = 58
 
         exploration_dict['states'], next_content_id_index = (
-            cls._convert_states_v51_dict_to_v52_dict(
+            cls._convert_states_v52_dict_to_v53_dict(
                 exploration_dict['states'])
         )
         exploration_dict['states_schema_version'] = 53
