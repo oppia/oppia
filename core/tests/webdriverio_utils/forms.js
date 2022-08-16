@@ -253,7 +253,7 @@ var RichTextEditor = async function(elem) {
     // passed on to the relevant RTE component editor.
     addRteComponent: async function(componentName) {
       await _clickToolbarButton(
-        'cke_button__oppia' + componentName.toLowerCase());
+        '.cke_button__oppia' + componentName.toLowerCase());
 
       var modalDialogElements = await modalDialogElementsSelector();
       var modalDialogLength = modalDialogElements.length;
