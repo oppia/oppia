@@ -27,8 +27,9 @@ describe('GenerateContentIdService', () => {
 
   beforeEach(() => {
     fakeSnciis = { displayed: 0 };
-    gcis = new GenerateContentIdService(
-      fakeSnciis as StateNextContentIdIndexService);
+    gcis = new GenerateContentIdService();
+    let currentIndex = 0;
+    gcis.init(() => currentIndex++, () => {});
   });
 
   it('should generate content id for new feedbacks using next content' +

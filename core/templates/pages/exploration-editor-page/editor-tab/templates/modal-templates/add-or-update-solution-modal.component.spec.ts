@@ -31,6 +31,7 @@ import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { InteractionAnswer } from 'interactions/answer-defs';
 import { Interaction } from 'domain/exploration/InteractionObjectFactory';
 import { InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
+import { GenerateContentIdService } from 'services/generate-content-id.service';
 
 class MockActiveModal {
   close(): void {
@@ -52,6 +53,7 @@ describe('Add Or Update Solution Modal Component', () => {
   let solutionObjectFactory: SolutionObjectFactory;
   let stateInteractionIdService: StateInteractionIdService;
   let stateSolutionService: StateSolutionService;
+  let generateContentIdService: GenerateContentIdService;
 
   let answerEditorHtml: Solution;
   let mockInteractionRule: InteractionRulesService;
@@ -87,6 +89,8 @@ describe('Add Or Update Solution Modal Component', () => {
     solutionObjectFactory = TestBed.inject(SolutionObjectFactory);
     stateInteractionIdService = TestBed.inject(StateInteractionIdService);
     stateSolutionService = TestBed.inject(StateSolutionService);
+    generateContentIdService = TestBed.inject(GenerateContentIdService);
+    generateContentIdService.init(() => 0, () => {});
   });
 
   describe('when solution is valid', () => {

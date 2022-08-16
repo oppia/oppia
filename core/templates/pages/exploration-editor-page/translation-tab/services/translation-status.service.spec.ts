@@ -43,6 +43,7 @@ describe('Translation status service', () => {
   let swts = null;
   let ttams = null;
   let tls = null;
+  let generateContentIdService = null;
   let ALL_ASSETS_AVAILABLE_COLOR = '#16A765';
   let FEW_ASSETS_AVAILABLE_COLOR = '#E9B330';
   let NO_ASSETS_AVAILABLE_COLOR = '#D14836';
@@ -75,13 +76,14 @@ describe('Translation status service', () => {
       ]
     });
 
-    tss = TestBed.inject(
-      TranslationStatusService);
+    tss = TestBed.inject(TranslationStatusService);
     ess = TestBed.inject(ExplorationStatesService);
     ttams = TestBed.inject(TranslationTabActiveModeService);
     tls = TestBed.inject(TranslationLanguageService);
     srvs = TestBed.inject(StateRecordedVoiceoversService);
     swts = TestBed.inject(StateWrittenTranslationsService);
+    generateContentIdService = TestBed.inject(GenerateContentIdService);
+    generateContentIdService.init(() => 0, () => { });
   });
 
   beforeEach(() => {
@@ -374,7 +376,7 @@ describe('Translation status service', () => {
     expect(explorationTranslationsRequiredCount).toBe(9);
 
     // To test changes after adding a new state.
-    ess.addState('Fourth');
+    ess.addState('Fourth', 'content_4', 'default_outcome_5');
     ess.saveInteractionId('Third', 'MultipleChoiceInput');
     ess.saveInteractionId('Fourth', 'EndExploration');
     tss.refresh();
@@ -399,7 +401,7 @@ describe('Translation status service', () => {
         .getExplorationContentNotAvailableCount();
       expect(explorationAudioNotAvailableCount).toBe(6);
 
-      ess.addState('Fourth');
+      ess.addState('Fourth', 'content_4', 'default_outcome_5');
       ess.saveInteractionId('Third', 'MultipleChoiceInput');
       ess.saveInteractionId('Fourth', 'EndExploration');
       tss.refresh();
@@ -417,7 +419,7 @@ describe('Translation status service', () => {
       tss.getExplorationContentNotAvailableCount());
     expect(explorationTranslationNotAvailableCount).toBe(6);
 
-    ess.addState('Fourth');
+    ess.addState('Fourth', 'content_4', 'default_outcome_5');
     ess.saveInteractionId('Third', 'MultipleChoiceInput');
     ess.saveInteractionId('Fourth', 'EndExploration');
     tss.refresh();

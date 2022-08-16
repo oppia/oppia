@@ -21,12 +21,16 @@ import { RuleBackendDict } from 'domain/exploration/RuleObjectFactory';
 
 import { PopulateRuleContentIdsService } from
   'pages/exploration-editor-page/services/populate-rule-content-ids.service';
+import { GenerateContentIdService } from 'services/generate-content-id.service';
 
 describe('Populate Rule Content Ids Service', () => {
   let populateRuleContentIdsService: PopulateRuleContentIdsService;
+  let generateContentIdService: GenerateContentIdService;
 
   beforeEach(() => {
     populateRuleContentIdsService = TestBed.get(PopulateRuleContentIdsService);
+    generateContentIdService = TestBed.inject(GenerateContentIdService);
+    generateContentIdService.init(() => 0, () => {});
   });
 
   it('should populate null content ids on save', () => {
