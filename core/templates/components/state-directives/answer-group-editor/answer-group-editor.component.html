@@ -1,7 +1,7 @@
 <div class="h-100">
   <!-- For the default answer group, 'rules' is null. Otherwise, 'rules' is a list of rules. -->
   <div *ngIf="rules">
-    <strong>
+    <strong class="oppia-answer-group-heading">
       If the learner's answer...
     </strong>
     <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist">
@@ -142,7 +142,7 @@
   }
 
   @media screen and (max-width: 500px) {
-    strong {
+    .oppia-answer-group-heading {
       font-size: 18px;
     }
   }
