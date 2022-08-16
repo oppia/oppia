@@ -2143,6 +2143,20 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self.assertIn('dest_if_really_stuck', outcome_dict)
         self.assertEqual(outcome_dict['dest_if_really_stuck'], None)
 
+    def test_question_state_dict_conversion_from_v51_to_v52(self) -> None:
+        question_data = (
+            question_domain.Question.create_default_question_state().to_dict())
+
+        test_value: question_domain.VersionedQuestionStateDict = {
+            'state': question_data,
+            'state_schema_version': 51
+        }
+
+        question_domain.Question.update_state_from_model(
+            test_value, test_value['state_schema_version'])
+
+        self.assertEqual(test_value['state_schema_version'], 52)
+
 
 class QuestionSummaryTest(test_utils.GenericTestBase):
     """Test for Question Summary object."""
