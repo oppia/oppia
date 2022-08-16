@@ -262,4 +262,17 @@ describe('Translation language selector', () => {
         selectedLanguage);
     });
   });
+
+  it('should filter language options based on the filter text', () => {
+    component.ngOnInit();
+
+    expect(component.filteredOptions.length).toBeGreaterThan(1);
+
+    component.optionsFilter = 'sp';
+    component.filterOptions();
+    fixture.detectChanges();
+
+    expect(component.filteredOptions.length).toBe(1);
+    expect(component.filteredOptions[0].id).toBe('es');
+  });
 });
