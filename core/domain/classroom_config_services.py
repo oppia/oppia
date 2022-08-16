@@ -34,7 +34,7 @@ if MYPY: # pragma: no cover
 (classroom_models,) = models.Registry.import_models([models.NAMES.classroom])
 
 
-def get_all_classroom_models():
+def get_all_classrooms():
     """Returns all the classrooms present in the datastore.
 
     Returns:
@@ -57,7 +57,7 @@ def get_classroom_id_to_classroom_name_dict():
         value for all the classrooms present in the datastore.
     """
     classroom_id_to_classroom_name = {}
-    classrooms = get_all_classroom_models()
+    classrooms = get_all_classrooms()
 
     for classroom in classrooms:
         classroom_id_to_classroom_name[classroom.classroom_id] = classroom.name
@@ -79,7 +79,7 @@ def get_classroom_from_classroom_model(
         Classroom. A classroom domain object corresponding to the given
         classroom model.
     """
-    return (
+    return classroom_config_domain.Classroom(
         classroom_model.id,
         classroom_model.name,
         classroom_model.url_fragment,
@@ -91,7 +91,6 @@ def get_classroom_from_classroom_model(
 
 def get_classroom_by_id(
     classroom_id: str,
-    strict: bool = True
 ) -> Optional[classroom_config_domain.Classroom]:
     """Returns a domain object representing a classroom.
 
@@ -103,8 +102,8 @@ def get_classroom_by_id(
         Classroom or None. The domain object representing a classroom with the
         given id, or None if it does not exist.
     """
-    classroom_model = classroom_models.ClassroomModel.get(
-        classroom_id, strict=strict)
+    classroom_model = classroom_models.ClassroomModel.get_by_id(
+        classroom_id)
     if classroom_model:
         return get_classroom_from_classroom_model(classroom_model)
     else:
@@ -113,7 +112,6 @@ def get_classroom_by_id(
 
 def get_classroom_by_url_fragment(
     url_fragment: str,
-    strict: bool = True
 ) -> Optional[classroom_config_domain.Classroom]:
     """Returns a domain object representing a classroom.
 
@@ -126,7 +124,7 @@ def get_classroom_by_url_fragment(
         given id, or None if it does not exist.
     """
     classroom_model = classroom_models.ClassroomModel.get_by_url_fragment(
-        classroom_id, strict=strict)
+        url_fragment)
     if classroom_model:
         return get_classroom_from_classroom_model(classroom_model)
     else:
@@ -139,7 +137,7 @@ def get_new_classroom_id() -> str:
     Returns:
         str. A new classroom ID.
     """
-    return classroom_models.ClassroomModel.generate_new_blog_post_id()
+    return classroom_models.ClassroomModel.generate_new_classroom_id()
 
 
 def _save_classroom(
@@ -180,7 +178,7 @@ def _create_new_classroom(
         classroom.url_fragment,
         classroom.course_details,
         classroom.topic_list_intro,
-        classroom_model.topic_id_to_prerequisite_topic_ids
+        classroom.topic_id_to_prerequisite_topic_ids
     )
 
 
@@ -190,8 +188,7 @@ def update_or_create_classroom_model(
     """Updates the properties of an existing classroom model or creates a new
     classroom model.
     """
-    model = classroom_models.ClassroomModel.get(
-        classroom.classroom_id, strict=True)
+    model = classroom_models.ClassroomModel.get_by_id(classroom.classroom_id)
 
     if model is None:
         _create_new_classroom(classroom)
