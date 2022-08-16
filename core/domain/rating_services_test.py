@@ -27,7 +27,8 @@ from core.domain import rating_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing_extensions import Final
+from typing import Optional, overload
+from typing_extensions import Final, Literal
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -199,22 +200,41 @@ class RatingServicesTests(test_utils.GenericTestBase):
     def test_rating_assignation_with_no_exploration_summary_ratings(
         self
     ) -> None:
+        @overload
+        def _mock_get_exploration_summary_by_id(
+            exp_id: str,
+        ) -> exp_domain.ExplorationSummary: ...
+
+        @overload
+        def _mock_get_exploration_summary_by_id(
+                exp_id: str, *, strict: Literal[True]
+        ) -> exp_domain.ExplorationSummary: ...
+
+        @overload
+        def _mock_get_exploration_summary_by_id(
+            exp_id: str, *, strict: Literal[False]
+        ) -> Optional[exp_domain.ExplorationSummary]: ...
 
         def _mock_get_exploration_summary_by_id(
             exp_id: str, strict: bool = True
-        ) -> exp_models.ExpSummaryModel:
+        ) -> Optional[exp_domain.ExplorationSummary]:
             """Assign None to exploration summary ratings."""
             exp_summary_model = exp_models.ExpSummaryModel.get(
                 exp_id, strict=strict
             )
-            # Ruling out the possibility of None for mypy type checking.
-            assert exp_summary_model is not None
-            exp_summary_model.ratings = None
-            return exp_summary_model
+            if exp_summary_model:
+                exp_summary = exp_fetchers.get_exploration_summary_from_model(
+                    exp_summary_model)
+            else:
+                return None
+            exp_summary.ratings = {}
+            return exp_summary
 
         with self.swap(
-            exp_fetchers, 'get_exploration_summary_by_id',
-            _mock_get_exploration_summary_by_id):
+            exp_fetchers,
+            'get_exploration_summary_by_id',
+            _mock_get_exploration_summary_by_id
+        ):
             exp_services.save_new_exploration(  # type: ignore[no-untyped-call]
                 'exp_id_a',
                 exp_domain.Exploration.create_default_exploration('exp_id_a'))  # type: ignore[no-untyped-call]
