@@ -470,7 +470,7 @@ class Question(translation_domain.BaseTranslatableObject):
                 for rule_spec in new_answer_group['rule_specs']:
                     rule_input = ltt.latex_to_text(rule_spec['inputs']['x'])
 
-                    rule_input = exp_domain.clean_math_expression(  # type: ignore[no-untyped-call]
+                    rule_input = exp_domain.clean_math_expression(
                         rule_input)
 
                     type_of_input = exp_domain.TYPE_INVALID_EXPRESSION
@@ -556,10 +556,10 @@ class Question(translation_domain.BaseTranslatableObject):
                 question_state_dict['interaction']['id'] = new_interaction_id
                 question_state_dict['interaction']['answer_groups'] = (
                     new_answer_groups)
-                if question_state_dict['interaction']['solution']:
+                if question_state_dict['interaction']['solution'] is not None:
                     correct_answer = question_state_dict['interaction'][
                         'solution']['correct_answer']['ascii']
-                    correct_answer = exp_domain.clean_math_expression(  # type: ignore[no-untyped-call]
+                    correct_answer = exp_domain.clean_math_expression(
                         correct_answer)
                     question_state_dict['interaction'][
                         'solution']['correct_answer'] = correct_answer
@@ -1390,6 +1390,25 @@ class Question(translation_domain.BaseTranslatableObject):
         return question_state_dict
 
     @classmethod
+    def _convert_state_v51_dict_to_v52_dict(
+        cls, question_state_dict: state_domain.StateDict
+    ) -> state_domain.StateDict:
+        """Converts from version 51 to 52. Version 52 fixes content IDs for
+        translations and voiceovers in exploration but no action is required in
+        question dicts.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initialize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+
+        return question_state_dict
+
+    @classmethod
     def update_state_from_model(
         cls,
         versioned_question_state: VersionedQuestionStateDict,
@@ -1533,6 +1552,10 @@ class Question(translation_domain.BaseTranslatableObject):
             raise utils.ValidationError(
                 'Expected the question to have at least one hint')
 
+        # Here, we are asserting that id is never going to be None, because
+        # None interactions are not allowed to contain questions, so if an
+        # interaction have questions then it definitely have interaction_id.
+        assert interaction.id is not None
         if (
                 (interaction.solution is None) and
                 (interaction_specs[interaction.id]['can_have_solution'])):

@@ -605,13 +605,13 @@ class Solution(translation_domain.BaseTranslatableObject):
 class InteractionInstanceDict(TypedDict):
     """Dictionary representing the InteractionInstance object."""
 
-    id: str
+    id: Optional[str]
     customization_args: Dict[str, Dict[str, Any]]
     answer_groups: List[AnswerGroupDict]
     default_outcome: OutcomeDict
     confirmed_unclassified_answers: List[str]
     hints: List[HintDict]
-    solution: SolutionDict
+    solution: Optional[SolutionDict]
 
 
 class InteractionInstance(translation_domain.BaseTranslatableObject):
@@ -626,13 +626,13 @@ class InteractionInstance(translation_domain.BaseTranslatableObject):
     # of values, we used Any here.
     def __init__(
         self,
-        interaction_id: str,
+        interaction_id: Optional[str],
         customization_args: Dict[str, InteractionCustomizationArg],
         answer_groups: List[AnswerGroup],
         default_outcome: Outcome,
         confirmed_unclassified_answers: List[str],
         hints: List[Hint],
-        solution: Solution
+        solution: Optional[Solution]
     ) -> None:
         """Initializes a InteractionInstance domain object.
 
@@ -3064,7 +3064,7 @@ class State(translation_domain.BaseTranslatableObject):
                     'Expected linked_skill_id to be a str, '
                     'received %s.' % self.linked_skill_id)
 
-    def get_content_html(self, content_id):
+    def get_content_html(self, content_id: str) -> str:
         """Returns the content belongs to a given content id of the object.
 
         Args:

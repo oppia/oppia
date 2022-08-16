@@ -344,7 +344,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         # TODO(#13059): After we fully type the codebase we plan to get
         # rid of the tests that intentionally test wrong inputs that we
         # can normally catch by typing.
-        state.interaction.solution = None  # type: ignore[assignment]
+        state.interaction.solution = None
         self._assert_question_domain_validation_error(
             'Expected the question to have a solution')
         state.interaction.hints = []
@@ -976,6 +976,8 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                 'outcome']['feedback']['content_id'],
             'temp_id_3'
         )
+        # Ruling out the possibility of None for mypy type checking.
+        assert test_value['state']['interaction']['solution'] is not None
         self.assertNotIn(
             'ascii',
             test_value['state']['interaction']['solution']['correct_answer']
@@ -2137,6 +2139,20 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
         self.assertIn('dest_if_really_stuck', outcome_dict)
         self.assertEqual(outcome_dict['dest_if_really_stuck'], None)
+
+    def test_question_state_dict_conversion_from_v51_to_v52(self) -> None:
+        question_data = (
+            question_domain.Question.create_default_question_state().to_dict())
+
+        test_value: question_domain.VersionedQuestionStateDict = {
+            'state': question_data,
+            'state_schema_version': 51
+        }
+
+        question_domain.Question.update_state_from_model(
+            test_value, test_value['state_schema_version'])
+
+        self.assertEqual(test_value['state_schema_version'], 52)
 
 
 class QuestionSummaryTest(test_utils.GenericTestBase):
