@@ -389,6 +389,7 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     UploadActivityModalComponent,
     ThreadTableComponent,
     TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
+    TagMisconceptionModalComponent,
     LearnerDashboardIconsComponent,
     PreviewThumbnailComponent,
     AddOrUpdateSolutionModalComponent,
