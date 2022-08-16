@@ -83,11 +83,15 @@ describe('Outcome Destination If Stuck Editor', () => {
       }, [
         {
           source: 'Introduction',
-          target: 'State1'
+          target: 'State1',
+          linkProperty: '',
+          connectsDestIfStuck: false
         },
         {
           source: 'State1',
-          target: 'End'
+          target: 'End',
+          linkProperty: '',
+          connectsDestIfStuck: false
         }
       ], 'Introduction', ['End']);
     spyOn(stateEditorService, 'getStateNames')
@@ -158,11 +162,15 @@ describe('Outcome Destination If Stuck Editor', () => {
       }, [
         {
           source: 'Introduction',
-          target: 'State1'
+          target: 'State1',
+          linkProperty: '',
+          connectsDestIfStuck: false
         },
         {
           source: 'State1',
-          target: 'End'
+          target: 'End',
+          linkProperty: '',
+          connectsDestIfStuck: false
         }
       ], 'Introduction', ['End']);
     spyOnProperty(stateEditorService, 'onStateNamesChanged')

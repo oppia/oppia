@@ -126,11 +126,13 @@ describe('Graph Data Service', () => {
       links: [{
         source: 'Hola',
         target: 'Me Llamo',
-        linkProperty: null
+        linkProperty: null,
+        connectsDestIfStuck: false
       }, {
         source: 'Hola',
         target: 'Hola',
-        linkProperty: null
+        linkProperty: null,
+        connectsDestIfStuck: false
       }],
       nodes: { Hola: 'Hola' }
     };
