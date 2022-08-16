@@ -206,7 +206,8 @@
         "core.domain.app_feedback_report_constants_test",
         "scripts.linters.warranted_angular_security_bypasses_test",
         "scripts.create_expression_parser_test",
-        "scripts.run_frontend_tests_test"
+        "scripts.run_frontend_tests_test",
+        "core.jobs.batch_jobs.exp_version_history_computation_job_test"
     ],
     "4": [
         "core.storage.learner_group.gae_models_test",
@@ -351,7 +352,6 @@
         "core.domain.question_domain_test",
         "core.platform.bulk_email.mailchimp_bulk_email_services_test",
         "core.platform.bulk_email.dev_mode_bulk_email_services_test",
-        "core.jobs.io.job_io_test",
-        "core.jobs.batch_jobs.exp_version_history_computation_job_test"
+        "core.jobs.io.job_io_test"
     ]
 }
