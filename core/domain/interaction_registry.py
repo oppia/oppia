@@ -23,9 +23,8 @@ import itertools
 import json
 import os
 
+from core import constants
 from core import feconf
-from core import utils
-from core.constants import constants
 
 from typing import Dict, List, Optional
 
@@ -50,7 +49,8 @@ class Registry:
         """Get a list of all interaction ids."""
         return list(set(itertools.chain.from_iterable(
             interaction_category['interaction_ids']
-            for interaction_category in constants.ALLOWED_INTERACTION_CATEGORIES
+            for interaction_category
+            in constants.constants.ALLOWED_INTERACTION_CATEGORIES
         )))
 
     @classmethod
@@ -157,16 +157,23 @@ class Registry:
         """
         if (state_schema_version not in
                 cls._state_schema_version_to_interaction_specs):
-            file_name = (
-                'interaction_specs_state_v%i.json' % state_schema_version)
-            spec_file = os.path.join(
-                feconf.INTERACTIONS_LEGACY_SPECS_FILE_DIR, file_name)
+            spec_file_path = os.path.join(
+                'interactions',
+                'legacy_interaction_specs_by_state_version',
+                'interaction_specs_state_v%i.json' % state_schema_version
+            )
+            spec_file_contents: Optional[str]
+            try:
+                spec_file_contents = constants.get_package_file_contents(
+                    'extensions', spec_file_path
+                )
+            except FileNotFoundError:
+                spec_file_contents = None
 
-            if os.path.isfile(spec_file):
-                with utils.open_file(spec_file, 'r') as f:
-                    specs_from_json: Dict[str, base.BaseInteractionDict] = (
-                        json.loads(f.read())
-                    )
+            if spec_file_contents:
+                specs_from_json: Dict[str, base.BaseInteractionDict] = (
+                    json.loads(spec_file_contents)
+                )
                 cls._state_schema_version_to_interaction_specs[
                     state_schema_version] = specs_from_json
                 return cls._state_schema_version_to_interaction_specs[

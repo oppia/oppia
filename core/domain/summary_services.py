@@ -869,7 +869,7 @@ def get_recently_published_exp_summary_dicts(
     # Arranging recently published exploration summaries with respect to time.
     # sorted() is used to sort the random list of recently published summaries.
     sort_fnc: Callable[
-        [exp_domain.ExplorationSummary], int
+        [exp_domain.ExplorationSummary], float
     ] = lambda exp_summary: exp_summary.first_published_msec
     summaries = sorted(
         recently_published_exploration_summaries,
