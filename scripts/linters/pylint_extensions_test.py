@@ -2637,7 +2637,7 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
         )
         message3 = testutils.Message(
             msg_id='cast-func-used',
-            line=14
+            line=15
         )
         with self.checker_test_object.assertAddsMessages(
             message1, message3, message2
