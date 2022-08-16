@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the translation language selector component.
  */
 
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { TranslationLanguageSelectorComponent } from
   // eslint-disable-next-line max-len
@@ -65,7 +65,7 @@ describe('Translation language selector', () => {
   let clickDropdown: () => void;
   let getDropdownOptionsContainer: () => HTMLElement;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [
         FormsModule,
@@ -112,7 +112,7 @@ describe('Translation language selector', () => {
     expect(component.languageIdToDescription.fr).toBe('français (French)');
   });
 
-  it('should correctly fetch featured languages', async(() => {
+  it('should correctly fetch featured languages', waitForAsync(() => {
     fixture.whenStable().then(() => {
       fixture.detectChanges();
       expect(component.featuredLanguages).toEqual(featuredLanguages);
@@ -163,7 +163,7 @@ describe('Translation language selector', () => {
     expect(component.setActiveLanguageCode.emit).toHaveBeenCalledWith('fr');
   });
 
-  it('should show details of featured language', async(() => {
+  it('should show details of featured language', waitForAsync(() => {
     clickDropdown();
 
     fixture.whenStable().then(() => {
@@ -193,7 +193,7 @@ describe('Translation language selector', () => {
   });
 
   it('should display the preferred language when the preferred' +
-    ' language is defined', async(() => {
+    ' language is defined', waitForAsync(() => {
     component.activeLanguageCode = null;
     component.languageSelection = '';
     preferredLanguageCode = 'en';
@@ -217,7 +217,7 @@ describe('Translation language selector', () => {
   }));
 
   it('should ask user to select a language when the preferred' +
-    ' language is not defined', async(() => {
+    ' language is not defined', waitForAsync(() => {
     preferredLanguageCode = '';
     component.activeLanguageCode = null;
     component.languageSelection = '';
