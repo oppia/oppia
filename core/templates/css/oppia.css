@@ -159,26 +159,26 @@ why they need to be overriden.  */
   transform: translate3d(0,-1px,0);
 }
 
-.oppia-learner-confirm-button.e2e-test-submit-answer-button.md-button[disabled],
-.oppia-learner-confirm-button.e2e-test-submit-answer-button.mat-button[disabled] {
+.oppia-learner-confirm-button.oppia-learner-submit-answer-button.md-button[disabled],
+.oppia-learner-confirm-button.oppia-learner-submit-answer-button.mat-button[disabled] {
   background-color: transparent;
   color: rgba(0,0,0,0.38);
   cursor: default;
 }
 
-.oppia-learner-confirm-button.e2e-test-submit-answer-button.md-button[disabled]:hover,
-.oppia-learner-confirm-button.e2e-test-submit-answer-button.mat-button[disabled]:hover {
+.oppia-learner-confirm-button.oppia-learner-submit-answer-button.md-button[disabled]:hover,
+.oppia-learner-confirm-button.oppia-learner-submit-answer-button.mat-button[disabled]:hover {
   text-decoration: none;
 }
 
-.oppia-learner-confirm-button.e2e-test-submit-answer-button.md-button,
-.oppia-learner-confirm-button.e2e-test-submit-answer-button.mat-button {
+.oppia-learner-confirm-button.oppia-learner-submit-answer-button.md-button,
+.oppia-learner-confirm-button.oppia-learner-submit-answer-button.mat-button {
   font: 16px;
   margin: 0;
   min-width: 55px;
 }
 
-.oppia-learner-confirm-button.e2e-test-submit-answer-button.mat-button {
+.oppia-learner-confirm-button.oppia-learner-submit-answer-button.mat-button {
   border-radius: 2px;
   font-size: 16px;
   line-height: 22px;
@@ -1994,8 +1994,6 @@ pre.oppia-pre-wrapped-text {
   cursor: pointer;
   height: 30px;
   opacity: 0.5;
-  position: absolute;
-  right: 8px;
   top: 8px;
   width: 30px;
 }

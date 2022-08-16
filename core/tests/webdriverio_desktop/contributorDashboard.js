@@ -1,4 +1,4 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,32 +16,32 @@
  * @fileoverview End-to-end tests for the contributor dashboard page.
  */
 
-var action = require('../protractor_utils/action.js');
-var forms = require('../protractor_utils/forms.js');
-var general = require('../protractor_utils/general.js');
-var users = require('../protractor_utils/users.js');
-var workflow = require('../protractor_utils/workflow.js');
-var waitFor = require('../protractor_utils/waitFor.js');
+var action = require('../webdriverio_utils/action.js');
+var forms = require('../webdriverio_utils/forms.js');
+var general = require('../webdriverio_utils/general.js');
+var users = require('../webdriverio_utils/users.js');
+var workflow = require('../webdriverio_utils/workflow.js');
+var waitFor = require('../webdriverio_utils/waitFor.js');
 
-var AdminPage = require('../protractor_utils/AdminPage.js');
+var AdminPage = require('../webdriverio_utils/AdminPage.js');
 var ContributorDashboardPage = require(
-  '../protractor_utils/ContributorDashboardPage.js');
+  '../webdriverio_utils/ContributorDashboardPage.js');
 var ContributorDashboardAdminPage = require(
-  '../protractor_utils/ContributorDashboardAdminPage.js');
+  '../webdriverio_utils/ContributorDashboardAdminPage.js');
 var ExplorationEditorPage = require(
-  '../protractor_utils/ExplorationEditorPage.js');
+  '../webdriverio_utils/ExplorationEditorPage.js');
 var SkillEditorPage = require(
-  '../protractor_utils/SkillEditorPage.js');
+  '../webdriverio_utils/SkillEditorPage.js');
 var TopicsAndSkillsDashboardPage = require(
-  '../protractor_utils/TopicsAndSkillsDashboardPage.js');
-var StoryEditorPage = require('../protractor_utils/StoryEditorPage.js');
-var Constants = require('../protractor_utils/ProtractorConstants.js');
-var TopicEditorPage = require('../protractor_utils/TopicEditorPage.js');
+  '../webdriverio_utils/TopicsAndSkillsDashboardPage.js');
+var StoryEditorPage = require('../webdriverio_utils/StoryEditorPage.js');
+var Constants = require('../webdriverio_utils/WebdriverioConstants.js');
+var TopicEditorPage = require('../webdriverio_utils/TopicEditorPage.js');
 var ExplorationEditorPage = require(
-  '../protractor_utils/ExplorationEditorPage.js'
+  '../webdriverio_utils/ExplorationEditorPage.js'
 );
 var CreatorDashboardPage = require(
-  '../protractor_utils/CreatorDashboardPage.js'
+  '../webdriverio_utils/CreatorDashboardPage.js'
 );
 
 describe('Contributor dashboard page', function() {
@@ -93,7 +93,7 @@ describe('Contributor dashboard page', function() {
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createTopic(
       TOPIC_NAMES[0], 'community-topic-one', 'Topic description 1', false);
-    const URL = await browser.getCurrentUrl();
+    const URL = await browser.getUrl();
     // Example URL: http://localhost:8181/topic_editor/jT9z3iLnFjsQ#/
     const TOPIC_ID_URL_PART = URL.split('/')[4];
     // We have to remove the ending "#".
@@ -173,7 +173,7 @@ describe('Contributor dashboard page', function() {
         'create',
         ['rectangle', 'bezier', 'piechart', 'svgupload'],
         'An svg diagram.');
-    });
+    }, true);
     await explorationEditorMainTab.setInteraction('EndExploration');
     var explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     await explorationEditorPage.navigateToSettingsTab();
@@ -202,14 +202,11 @@ describe('Contributor dashboard page', function() {
     await storyEditorPage.returnToTopic();
 
     // Testing the copy tool.
-    let images = element.all(by.css('.e2e-test-image'));
-    let opportunityActionButtonCss = element(by.css(
-      '.e2e-test-opportunity-list-item-button'));
-    let copyButton = element(by.css('.e2e-test-copy-button'));
-    let doneButton = element(
-      by.css('.e2e-test-close-rich-text-component-editor'));
-    let cancelButton = element(
-      by.css('.e2e-test-cancel-rich-text-editor'));
+    let opportunityActionButtonCss = $(
+      '.e2e-test-opportunity-list-item-button');
+    let copyButton = $('.e2e-test-copy-button');
+    let doneButton = $('.e2e-test-close-rich-text-component-editor');
+    let cancelButton = $('.e2e-test-cancel-rich-text-editor');
 
     await contributorDashboardPage.get();
     await contributorDashboardPage.navigateToTranslateTextTab();
@@ -217,25 +214,28 @@ describe('Contributor dashboard page', function() {
       GERMAN_LANGUAGE);
     await contributorDashboardPage.waitForOpportunitiesToLoad();
     await action.click('Opportunity button', opportunityActionButtonCss);
+    let image = $('.e2e-test-image');
     await waitFor.visibilityOf(
-      images.first(),
+      image,
       'Test image taking too long to appear.');
-    expect(await images.count()).toEqual(1);
+    let images = await $$('.e2e-test-image');
+    expect(images.length).toEqual(1);
 
     // Copy tool should copy image on pressing 'Done'.
     await waitFor.visibilityOf(
       copyButton, 'Copy button taking too long to appear');
     await action.click('Copy button', copyButton);
-    await action.click('Image', images.first());
+    await action.click('Image', images[0]);
     await action.click('Done', doneButton);
-    expect(await images.count()).toEqual(2);
+    images = await $$('.e2e-test-image');
+    expect(images.length).toEqual(2);
 
     // Copy tool should not copy image on pressing 'Cancel'.
     await waitFor.visibilityOf(
       copyButton, 'Copy button taking too long to appear');
-    await action.click('Image', images.first());
+    await action.click('Image', images[0]);
     await action.click('Cancel', cancelButton);
-    expect(await images.count()).toEqual(2);
+    expect(images.length).toEqual(2);
     await users.logout();
   });
 
@@ -254,7 +254,7 @@ describe('Contributor dashboard page', function() {
       SKILL_DESCRIPTIONS[0], TOPIC_NAMES[0]);
     await skillEditorPage.confirmSkillDifficulty();
     await explorationEditorMainTab.setContent(
-      await forms.toRichText('Question 1'));
+      await forms.toRichText('Question 1'), true);
     await explorationEditorMainTab.setInteraction('TextInput');
     await explorationEditorMainTab.addResponse(
       'TextInput', await forms.toRichText('Correct Answer'), null, false,
@@ -316,7 +316,7 @@ describe('Contributor dashboard page', function() {
       SKILL_DESCRIPTIONS[0], TOPIC_NAMES[0]);
     await skillEditorPage.confirmSkillDifficulty();
     await explorationEditorMainTab.setContent(
-      await forms.toRichText('Question 1'));
+      await forms.toRichText('Question 1'), true);
     await explorationEditorMainTab.setInteraction('TextInput');
     await explorationEditorMainTab.addResponse(
       'TextInput', await forms.toRichText('Correct Answer'), null, false,

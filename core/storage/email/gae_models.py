@@ -219,7 +219,7 @@ class SentEmailModel(base_models.BaseModel):
 
     def _pre_put_hook(self) -> None:
         """Operations to perform just before the model is `put` into storage."""
-        super(SentEmailModel, self)._pre_put_hook()
+        super()._pre_put_hook()
         self.email_hash = self._generate_hash(
             self.recipient_id, self.subject, self.html_body)
 

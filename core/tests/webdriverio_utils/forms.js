@@ -189,7 +189,10 @@ var RichTextEditor = async function(elem) {
   var closeRteComponentButtonLocator = (
     '.e2e-test-close-rich-text-component-editor');
   // Set focus in the RTE.
-  await waitFor.elementToBeClickable(rteElements[0]);
+  await waitFor.elementToBeClickable(
+    rteElements[0],
+    'First RTE element taking too long to become clickable.'
+  );
   await rteElements[0].click();
 
   var _appendContentText = async function(text) {
@@ -407,7 +410,7 @@ var MultiSelectEditor = function(elem) {
     var filteredElementsCount = 0;
     for (var i = 0; i < texts.length; i++) {
       var filteredElement = elem.$(
-        `.e2e-test-search-bar-dropdown-menu span=${texts[i]}`);
+        '.e2e-test-search-bar-dropdown-menu').$(`span=${texts[i]}`);
       if (await filteredElement.isExisting()) {
         filteredElementsCount += 1;
         expect(await filteredElement.getAttribute('class')).toMatch(
@@ -439,6 +442,8 @@ var MultiSelectEditor = function(elem) {
     },
     expectCurrentSelectionToBe: async function(expectedCurrentSelection) {
       // Open the dropdown menu.
+      var searchBarDropdownToggleElement = elem.$(
+        '.e2e-test-search-bar-dropdown-toggle');
       await action.click(
         'Searchbar Dropdown Toggle Element',
         searchBarDropdownToggleElement);

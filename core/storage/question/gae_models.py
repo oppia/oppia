@@ -24,10 +24,12 @@ from core import utils
 from core.constants import constants
 from core.platform import models
 
-from typing import Any, Dict, List, Mapping, Sequence
+from typing import Dict, List, Mapping, Sequence
 
 MYPY = False
 if MYPY: # pragma: no cover
+    # Here, we are importing state domain only for type-checking purpose.
+    from core.domain import state_domain  # pylint: disable=invalid-import # isort:skip
     from mypy_imports import base_models
     from mypy_imports import datastore_services
 
@@ -180,14 +182,16 @@ class QuestionModel(base_models.VersionedModel):
             'The id generator for QuestionModel is producing too many '
             'collisions.')
 
-    # TODO(#13523): Change 'commit_cmds' to TypedDict/Domain Object
-    # to remove Any used below.
-    def compute_models_to_commit(
+    # We have ignored [override] here because the signature of this method
+    # doesn't match with VersionedModel.compute_models_to_commit(). Because
+    # argument `commit_message` of super class can accept Optional[str] but
+    # this method can only accept str.
+    def compute_models_to_commit(  # type: ignore[override]
         self,
         committer_id: str,
         commit_type: str,
         commit_message: str,
-        commit_cmds: List[Dict[str, Any]],
+        commit_cmds: base_models.AllowedCommitCmdsListType,
         # We expect Mapping because we want to allow models that inherit
         # from BaseModel as the values, if we used Dict this wouldn't
         # be allowed.
@@ -235,12 +239,10 @@ class QuestionModel(base_models.VersionedModel):
             'versioned_model': models_to_put['versioned_model'],
         }
 
-    # TODO(#13523): Change 'question_state_data' to TypedDict/Domain Object
-    # to remove Any used below.
     @classmethod
     def create(
         cls,
-        question_state_data: Dict[str, Any],
+        question_state_data: state_domain.StateDict,
         language_code: str,
         version: int,
         linked_skill_ids: List[str],

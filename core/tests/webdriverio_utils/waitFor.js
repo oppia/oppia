@@ -143,6 +143,25 @@ var elementAttributeToBe = async function(
   });
 };
 
+var rightTransistionToComplete = async function(
+    element, errorMessage
+) {
+  await browser.waitUntil(async function() {
+    var firstValue = await element.getLocation('x');
+    // We need to pause the browser before getting the next
+    // location of element to make sure the elements provide equal
+    // location points only when they stopped moving.
+    // eslint-disable-next-line oppia/e2e-practices
+    await browser.pause(1000);
+    var secondValue = await element.getLocation('x');
+    return await firstValue === secondValue;
+  },
+  {
+    timeout: DEFAULT_WAIT_TIME_MSECS,
+    timeoutMsg: errorMessage + '\n' + new Error().stack + '\n'
+  });
+};
+
 /**
 * Wait for new tab is opened
 */
@@ -172,6 +191,19 @@ var urlRedirection = async function(url) {
     });
 };
 
+var numberOfElementsToBe = async function(
+    elementSelector, elementName, number) {
+  await browser.waitUntil(async function() {
+    var element = await $$(elementSelector);
+    return element.length === number;
+  },
+  {
+    timeout: DEFAULT_WAIT_TIME_MSECS,
+    timeoutMsg: `Number of ${elementName} is not equal to ${number}\n` +
+    new Error().stack + '\n'
+  });
+};
+
 var visibilityOfInfoToast = async function(errorMessage) {
   var toastInfoElement = $('.toast-info');
   await visibilityOf(toastInfoElement, errorMessage);
@@ -188,19 +220,13 @@ var invisibilityOfLoadingMessage = async function(errorMessage) {
 };
 
 var visibilityOfSuccessToast = async function(errorMessage) {
-  var toastSuccessElement = $('.toast-success');
+  var toastSuccessElement = await $('.toast-success');
   await visibilityOf(toastSuccessElement, errorMessage);
 };
 
-var fadeInToComplete = async function(element, errorMessage) {
-  await visibilityOf(element, 'Editor taking too long to appear');
-  await browser.waitUntil(async function() {
-    return (await element.getCSSProperty('opacity')).value === 1;
-  },
-  {
-    timeout: DEFAULT_WAIT_TIME_MSECS,
-    timeoutMsg: errorMessage
-  });
+var invisibilityOfSuccessToast = async function(errorMessage) {
+  var toastSuccessElement = await $('.toast-success');
+  await invisibilityOf(toastSuccessElement, errorMessage);
 };
 
 var modalPopupToAppear = async function() {
@@ -253,13 +279,15 @@ exports.textToBePresentInElement = textToBePresentInElement;
 exports.visibilityOf = visibilityOf;
 exports.presenceOf = presenceOf;
 exports.elementAttributeToBe = elementAttributeToBe;
+exports.rightTransistionToComplete = rightTransistionToComplete;
 exports.invisibilityOfInfoToast = invisibilityOfInfoToast;
 exports.invisibilityOfLoadingMessage = invisibilityOfLoadingMessage;
 exports.visibilityOfInfoToast = visibilityOfInfoToast;
 exports.visibilityOfSuccessToast = visibilityOfSuccessToast;
-exports.fadeInToComplete = fadeInToComplete;
+exports.invisibilityOfSuccessToast = invisibilityOfSuccessToast;
 exports.modalPopupToAppear = modalPopupToAppear;
 exports.fileToBeDownloaded = fileToBeDownloaded;
 exports.newTabToBeCreated = newTabToBeCreated;
 exports.urlRedirection = urlRedirection;
+exports.numberOfElementsToBe = numberOfElementsToBe;
 exports.clientSideRedirection = clientSideRedirection;

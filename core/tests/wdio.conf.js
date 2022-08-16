@@ -12,8 +12,9 @@ var args = process.argv;
 // eslint-disable-next-line eqeqeq
 var chromeVersion = (args[0] == 'DEBUG=true') ? args[6] : args[5];
 
-var chromedriverPath =
-'./node_modules/webdriver-manager/selenium/chromedriver_' + chromeVersion;
+const drivers = {
+  chrome: { version: chromeVersion },
+};
 
 // If video recorder is not running the ffmpeg process will be null.
 var ffmpegProcess = null;
@@ -28,8 +29,24 @@ var suites = {
     './core/tests/webdriverio_desktop/**/*.js',
   ],
 
+  blogDashboard: [
+    './core/tests/webdriverio_desktop/blogDashboard.js'
+  ],
+
+  classroomPage: [
+    './core/tests/webdriverio_desktop/classroomPage.js'
+  ],
+
+  classroomPageFileUploadFeatures: [
+    './core/tests/webdriverio_desktop/classroomPageFileUploadFeatures.js'
+  ],
+
   collections: [
     './core/tests/webdriverio_desktop/collections.js'
+  ],
+
+  contributorDashboard: [
+    './core/tests/webdriverio_desktop/contributorDashboard.js'
   ],
 
   creatorDashboard: [
@@ -44,6 +61,10 @@ var suites = {
     './core/tests/webdriverio_desktop/learnerDashboard.js'
   ],
 
+  navigation: [
+    './core/tests/webdriverio_desktop/navigation.js'
+  ],
+
   preferences: [
     './core/tests/webdriverio_desktop/preferences.js'
   ],
@@ -56,12 +77,24 @@ var suites = {
     './core/tests/webdriverio/profileMenuFlow.js'
   ],
 
+  skillEditor: [
+    './core/tests/webdriverio_desktop/skillEditor.js'
+  ],
+
   subscriptions: [
     './core/tests/webdriverio/subscriptionsFlow.js'
   ],
 
+  topicsAndSkillsDashboard: [
+    './core/tests/webdriverio_desktop/topicsAndSkillsDashboard.js'
+  ],
+
   topicAndStoryEditor: [
     './core/tests/webdriverio_desktop/topicAndStoryEditor.js'
+  ],
+
+  topicAndStoryEditorFileUploadFeatures: [
+    './core/tests/webdriverio_desktop/topicAndStoryEditorFileUploadFeatures.js'
   ],
 
   topicAndStoryViewer: [
@@ -71,6 +104,10 @@ var suites = {
   users: [
     './core/tests/webdriverio_desktop/userJourneys.js'
   ],
+
+  wipeout: [
+    './core/tests/webdriverio_desktop/wipeout.js'
+  ]
 };
 
 // A reference configuration file.
@@ -151,9 +188,12 @@ exports.config = {
   // they don't add newcommands. Instead, they hook themselves up into
   // the test process.
   services: [
-    ['chromedriver', {
-      chromedriverCustomPath: chromedriverPath
-    }]],
+    ['selenium-standalone', {
+      logPath: 'logs',
+      installArgs: { drivers },
+      args: { drivers }
+    }]
+  ],
 
   // Framework you want to run your specs with.
   // The following are supported: Mocha, Jasmine, and Cucumber

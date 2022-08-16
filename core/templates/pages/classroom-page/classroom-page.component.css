@@ -143,8 +143,7 @@ classroom-page .oppia-classroom-page-subheading-text {
   }
 
   .oppia-classroom-search-container {
-    margin-left: -10vw;
-    padding-bottom: 27px;
+    padding-bottom: 12vw;
   }
 
   .classroom-page-help-text {
@@ -162,7 +161,7 @@ classroom-page .oppia-classroom-page-subheading-text {
   .oppia-classroom-viewer-container .oppia-topic-summary-tiles {
     grid-template-columns: 150px 150px 150px;
     margin-top: 5vh;
-    padding-bottom: 120px;
+    padding-bottom: 140px;
   }
 }
 

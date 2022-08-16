@@ -108,7 +108,7 @@ describe('Topic editor functionality', function() {
     await topicEditorPage.moveToQuestionsTab();
     await topicEditorPage.createQuestionForSkillWithName('Skill 1');
     await explorationEditorMainTab.setContent(
-      await forms.toRichText('Question 1'));
+      await forms.toRichText('Question 1'), true);
     await explorationEditorMainTab.setInteraction(
       'TextInput', 'Placeholder', 5);
     await explorationEditorMainTab.addResponse(
@@ -339,7 +339,7 @@ describe('Chapter editor functionality', function() {
         async function(richTextEditor) {
           await richTextEditor.addRteComponent(
             'Skillreview', 'Description', 'skillFromChapterEditor0');
-        });
+        }, true);
       await explorationEditorPage.navigateToPreviewTab();
       await explorationPlayerPage.expectContentToMatch(
         async function(richTextChecker) {

@@ -25,7 +25,7 @@
           Contributions
         </div>
         <div class="oppia-contributions-dropdown-list-option" *ngFor="let tab of contributionTabs">
-          <div *ngIf="tab?.enabled"
+          <div *ngIf="tab && tab.enabled"
                (click)="switchToTab(TAB_TYPE_CONTRIBUTIONS, tab.suggestionType)"
                [ngClass]="isActiveTab(TAB_TYPE_CONTRIBUTIONS, tab.suggestionType) ? 'oppia-contributions-dropdown-list-option-selected' : ''">
             {{ tab.text }}
@@ -49,7 +49,7 @@
     <div class="oppia-contributions-side-navbar-part" *ngIf="userIsLoggedIn">
       <div class="oppia-contributions-navbar-items-list" navbar-label="Contributions">
         <div class="oppia-contributions-navbar-item" *ngFor="let tab of contributionTabs">
-          <button *ngIf="tab?.enabled"
+          <button *ngIf="tab && tab.enabled"
                   class="oppia-contributions-navbar-button"
                   (click)="switchToTab(TAB_TYPE_CONTRIBUTIONS, tab.suggestionType)"
                   [ngClass]="isActiveTab(TAB_TYPE_CONTRIBUTIONS, tab.suggestionType) ? 'oppia-contributions-active-navbar' : ''">{{tab.text}}
@@ -67,7 +67,7 @@
                                 [loadOpportunities]="loadReviewableTranslationOpportunities.bind(this)"
                                 (clickActionButton)="onClickReviewableTranslations($event)"
                                 [labelRequired]="!activeReviewTab"
-                                [showOpportunityButton]="false">
+                                [showOpportunityButton]="true">
       </oppia-opportunities-list>
       <div *ngIf="activeExplorationId !== null || !isReviewTranslationsTab()">
         <div *ngIf="isReviewTranslationsTab()" class="oppia-contributions-back-to-lessons-container">
