@@ -126,7 +126,7 @@ class BaseSuggestionUnitTests(test_utils.GenericTestBase):
                 conversion_fn)
 
 
-class SuggestionEditStateContentTestDict(TypedDict):
+class SuggestionEditStateContentDict(TypedDict):
     """Dictionary representing the SuggestionEditStateContent object."""
 
     suggestion_id: str
@@ -159,7 +159,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         self.signup(self.REVIEWER_EMAIL, 'reviewer')
         self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
-        self.suggestion_dict: SuggestionEditStateContentTestDict = {
+        self.suggestion_dict: SuggestionEditStateContentDict = {
             'suggestion_id': 'exploration.exp1.thread1',
             'suggestion_type': (
                 feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
