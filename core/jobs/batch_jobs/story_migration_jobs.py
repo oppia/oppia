@@ -168,10 +168,10 @@ class MigrateStoryJob(base_jobs.JobBase):
                 additional_models={}
             )
         models_to_put_values = []
-        for _, value in models_to_put.items():
+        for model in models_to_put.values():
             # Here, we are narrowing down the type from object to BaseModel.
-            assert isinstance(value, base_models.BaseModel)
-            models_to_put_values.append(value)
+            assert isinstance(model, base_models.BaseModel)
+            models_to_put_values.append(model)
         datastore_services.update_timestamps_multi(models_to_put_values)
         return models_to_put_values
 
