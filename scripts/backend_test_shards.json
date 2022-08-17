@@ -81,6 +81,7 @@
         "core.domain.feedback_services_test",
         "core.domain.classroom_services_test",
         "core.domain.visualization_registry_test",
+        "core.jobs.batch_jobs.exp_migration_jobs_test",
         "core.domain.exp_services_test",
         "core.domain.app_feedback_report_services_test",
         "core.controllers.learner_goals_test",
