@@ -50,8 +50,9 @@ export class CheckpointCelebrationModalComponent implements OnInit, OnDestroy {
   checkpointStatusArray!: string[];
   oppiaAvatarImageUrl!: string;
   checkpointNodeFadeInDelays!: number[];
-  orderedCheckpointList!: string[]| undefined;
+  orderedCheckpointList!: string[];
   checkpointStatusArrayPlaceholder!: string[];
+  checkpointTimer!: SVGPolylineElement;
   directiveSubscriptions = new Subscription();
   exploration: ReadOnlyExplorationBackendDict | undefined;
   hasViewedLessonInfoOnce: boolean | undefined;
@@ -68,7 +69,6 @@ export class CheckpointCelebrationModalComponent implements OnInit, OnDestroy {
   miniMessageTooltipIsDismissed: boolean = false;
   shouldDisplayFullScaleMessage: boolean = true;
   autoMessageDismissalTimeout: NodeJS.Timeout | undefined;
-  checkpointTimer: SVGPolylineElement | null = null;
 
   constructor(
     private contextService: ContextService,
