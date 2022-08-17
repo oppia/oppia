@@ -72,8 +72,9 @@ export class InteractiveNumberWithUnitsComponent
         this.errorMessageI18nKey = '';
         this.isValid = true;
       } catch (parsingError) {
-        let error = parsingError as Error;
-        this.errorMessageI18nKey = error.message;
+        if (parsingError instanceof Error) {
+          this.errorMessageI18nKey = parsingError.message;
+        }
         this.isValid = false;
       }
       this.currentInteractionService.updateViewWithNewAnswer();
@@ -115,8 +116,9 @@ export class InteractiveNumberWithUnitsComponent
         numberWithUnits,
         this.numberWithUnitsRulesService as unknown as InteractionRulesService);
     } catch (parsingError) {
-      let error = parsingError as Error;
-      this.errorMessageI18nKey = error.message;
+      if (parsingError instanceof Error) {
+        this.errorMessageI18nKey = parsingError.message;
+      }
       this.isValid = false;
     }
   }

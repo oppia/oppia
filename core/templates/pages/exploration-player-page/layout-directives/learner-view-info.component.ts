@@ -51,7 +51,7 @@ export class LearnerViewInfoComponent {
   topicName!: string;
   topicNameTranslationKey!: string;
   isLinkedToTopic!: boolean;
-  expInfo?: LearnerExplorationSummaryBackendDict;
+  expInfo!: LearnerExplorationSummaryBackendDict;
   directiveSubscriptions: Subscription = new Subscription();
 
   constructor(

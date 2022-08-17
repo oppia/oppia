@@ -33,9 +33,9 @@ import { icon, LatLng, latLng, LeafletMouseEvent, Marker, marker, TileLayer, til
 import { downgradeComponent } from '@angular/upgrade/static';
 
 interface OverlayStyle {
-  'background-color'?: string;
-  opacity?: number;
-  'z-index'?: number;
+  'background-color': string;
+  opacity: number;
+  'z-index': number;
 }
 
 interface MapOptions {
@@ -195,7 +195,9 @@ export class InteractiveInteractiveMapComponent implements OnInit, OnDestroy {
 
   hideOverlay(): void {
     this.overlayStyle = {
-      'background-color': '#fff'
+      'background-color': '#fff',
+      opacity: 0,
+      'z-index': 0
     };
   }
 
