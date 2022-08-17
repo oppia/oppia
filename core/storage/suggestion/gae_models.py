@@ -1378,11 +1378,7 @@ class TranslationReviewStatsModel(base_models.BaseModel):
 
     @staticmethod
     def generate_id(
-<<<<<<< HEAD
-            language_code: str, reviewer_user_id: str, topic_id: str
-=======
         language_code: str, reviewer_user_id: str, topic_id: str
->>>>>>> 4ba04d87b7e8aea3953287ae183c8e7d1c0031b6
     ) -> str:
         """Generates a unique ID for a TranslationReviewStatsModel
         instance.
@@ -1600,11 +1596,7 @@ class QuestionContributionStatsModel(base_models.BaseModel):
 
     @staticmethod
     def generate_id(
-<<<<<<< HEAD
-            contributor_user_id: str, topic_id: str
-=======
         contributor_user_id: str, topic_id: str
->>>>>>> 4ba04d87b7e8aea3953287ae183c8e7d1c0031b6
     ) -> str:
         """Generates a unique ID for a QuestionContributionStatsModel
         instance.
@@ -1810,11 +1802,7 @@ class QuestionReviewStatsModel(base_models.BaseModel):
 
     @staticmethod
     def generate_id(
-<<<<<<< HEAD
-            reviewer_user_id: str, topic_id: str
-=======
         reviewer_user_id: str, topic_id: str
->>>>>>> 4ba04d87b7e8aea3953287ae183c8e7d1c0031b6
     ) -> str:
         """Generates a unique ID for a QuestionReviewStatsModel
         instance.
