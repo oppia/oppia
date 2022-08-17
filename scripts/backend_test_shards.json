@@ -153,7 +153,8 @@
         "extensions.issues.CyclicStateTransitions.CyclicStateTransitions_test",
         "extensions.issues.EarlyQuit.EarlyQuit_test",
         "extensions.visualizations.models_test",
-        "scripts.check_overall_backend_test_coverage_test"
+        "scripts.check_overall_backend_test_coverage_test",
+        "scripts.run_backend_tests_test"
     ],
     "3": [
         "core.controllers.incoming_app_feedback_report_test",
