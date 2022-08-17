@@ -1954,7 +1954,7 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):
         Args:
             tokens: Token. Object to access all tokens of a module.
         """
-        type_ignore_comment_regex = r'^# Here we used MyPy ignore because'
+        type_ignore_comment_regex = r'^# Here we use MyPy ignore because'
         type_ignore_comment_present = False
         comment_line_number = 0
 
@@ -1969,7 +1969,10 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):
                 if re.search(r'(#\s*type:)', line):
                     if '# type: ignore[no-untyped-call]' in line:
                         continue
-                    if type_ignore_comment_present:
+                    if (
+                        type_ignore_comment_present and
+                        comment_line_number + 10 >= line_num
+                    ):
                         type_ignore_comment_present = False
                     else:
                         self.add_message(
@@ -2069,9 +2072,17 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
         Args:
             tokens: Token. Object to access all tokens of a module.
         """
-        object_type_regex = r'# Here we used object because'
         object_comment_present = False
+        outside_function_signature_block = True
+        outside_args_section = True
+        object_present_inside_arg_section = False
+        object_present_inside_return_section = False
+        object_present_in_function_signature = False
         object_already_encountered_line_num = 0
+        args_section_end_line_num = 0
+        object_comment_line_num = 0
+
+        object_type_regex = r'# Here we use object because'
 
         for (token_type, token, (line_num, _), _, line) in tokens:
             line = line.strip()
@@ -2079,22 +2090,75 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
             if token_type == tokenize.COMMENT:
                 if re.search(object_type_regex, line):
                     object_comment_present = True
+                    object_comment_line_num = line_num
 
-            if token == 'object' and token_type == tokenize.NAME:
-                # Excluding the case where 2 or more objects occurred
-                # in the same line.
-                if object_already_encountered_line_num == line_num:
-                    continue
-                object_already_encountered_line_num = line_num
-                # Excluding the case when object is called:
-                # Eg: var = object()
-                if 'object()' in line:
-                    continue
-                if object_comment_present:
-                    object_comment_present = False
-                else:
-                    self.add_message(
-                        'object-class-used', line=line_num)
+            # Checking if linters are in argument-section, return-section or
+            # outside of the function definition.
+            # Eg:
+            #       <outside function signature block>
+            #   def func(<argument-section>) -> <return-section>:
+            #       <outside function signature block>.
+            if token_type == tokenize.NAME:
+                if token == 'def':
+                    outside_function_signature_block = False
+                    func_def_start_line = line_num
+                    outside_args_section = False
+
+            if token_type == tokenize.OP:
+                if token == '->':
+                    outside_args_section = True
+                    args_section_end_line_num = line_num
+                if outside_args_section and token == ':':
+                    outside_function_signature_block = True
+
+            # Checking if object type is present in function signature or not.
+            if token_type == tokenize.NAME and token == 'object':
+                if not outside_args_section:
+                    object_present_inside_arg_section = True
+                elif (
+                    outside_args_section and
+                    args_section_end_line_num == line_num
+                ):
+                    object_present_inside_return_section = True
+
+            if (
+                object_present_inside_arg_section or
+                object_present_inside_return_section
+            ):
+                object_present_in_function_signature = True
+
+            if outside_function_signature_block:
+                if object_present_in_function_signature:
+                    if (
+                        object_comment_present and
+                        object_comment_line_num + 10 >= func_def_start_line
+                    ):
+                        object_comment_present = False
+                    else:
+                        self.add_message(
+                            'object-class-used', line=func_def_start_line
+                        )
+                    object_present_in_function_signature = False
+                    object_present_inside_arg_section = False
+                    object_present_inside_return_section = False
+                if token_type == tokenize.NAME and token == 'object':
+                    # Excluding the case where 2 or more objects occurred
+                    # in the same line.
+                    if object_already_encountered_line_num == line_num:
+                        continue
+                    object_already_encountered_line_num = line_num
+                    # Excluding the case when object is called:
+                    # Eg: var = object()
+                    if 'object()' in line:
+                        continue
+                    if (
+                        object_comment_present and
+                        object_comment_line_num + 10 >= line_num
+                    ):
+                        object_comment_present = False
+                    else:
+                        self.add_message(
+                            'object-class-used', line=line_num)
 
     def check_comment_is_present_with_cast_method(self, tokens):
         """Checks whether the cast method in a module has been documented
@@ -2104,11 +2168,12 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
         Args:
             tokens: Token. Object to access all tokens of a module.
         """
-        cast_type_regex = r'^# Here we used cast because'
+        cast_type_regex = r'^# Here we use cast because'
         cast_comment_present = False
         multi_line_import = False
         single_line_import = False
         import_line_num = 0
+        cast_comment_line_num = 0
 
         for (token_type, token, (line_num, _), _, line) in tokens:
             line = line.strip()
@@ -2116,6 +2181,7 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
             if token_type == tokenize.COMMENT:
                 if re.search(cast_type_regex, line):
                     cast_comment_present = True
+                    cast_comment_line_num = line_num
 
             # Checking if single-line import is present.
             # Eg: from typing import Any.
@@ -2144,7 +2210,10 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
                     pass
                 # Throwing an error when cast is encountered but there is no
                 # corresponding comment exist.
-                elif cast_comment_present:
+                elif (
+                    cast_comment_present and
+                    cast_comment_line_num + 10 >= line_num
+                ):
                     cast_comment_present = False
                 else:
                     self.add_message(
@@ -2159,17 +2228,18 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
             tokens: Token. Object to access all tokens of a module.
         """
         any_type_comment_present = False
-        outside_function_def = True
+        outside_function_signature_block = True
         outside_args_section = True
         any_present_inside_arg_section = False
         any_present_inside_return_section = False
-        any_present_in_function_def = False
+        any_present_in_function_signature = False
         multi_line_import = False
         single_line_import = False
         import_line_num = 0
         args_section_end_line_num = 0
+        any_type_comment_line_num = 0
 
-        any_type_regex = r'^# Here we used type Any because'
+        any_type_regex = r'^# Here we use type Any because'
 
         for (token_type, token, (line_num, _), _, line) in tokens:
             line = line.strip()
@@ -2177,6 +2247,7 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
             if token_type == tokenize.COMMENT:
                 if re.search(any_type_regex, line):
                     any_type_comment_present = True
+                    any_type_comment_line_num = line_num
 
             # Checking if single-line import is present.
             # Eg: from typing import Any.
@@ -2200,12 +2271,12 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
             # Checking if linters are in argument-section, return-section or
             # outside of the function definition.
             # Eg:
-            #       <outside function definition>
+            #       <outside function signature block>
             #   def func(<argument-section>) -> <return-section>:
-            #       <outside function definition>.
+            #       <outside function signature block>.
             if token_type == tokenize.NAME:
                 if token == 'def':
-                    outside_function_def = False
+                    outside_function_signature_block = False
                     func_def_start_line = line_num
                     outside_args_section = False
 
@@ -2214,7 +2285,7 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
                     outside_args_section = True
                     args_section_end_line_num = line_num
                 if outside_args_section and token == ':':
-                    outside_function_def = True
+                    outside_function_signature_block = True
 
             # Checking if Any type is present in function definition or not.
             if token_type == tokenize.NAME and token == 'Any':
@@ -2230,17 +2301,20 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
                 any_present_inside_arg_section or
                 any_present_inside_return_section
             ):
-                any_present_in_function_def = True
+                any_present_in_function_signature = True
 
-            if outside_function_def:
-                if any_present_in_function_def:
-                    if any_type_comment_present:
+            if outside_function_signature_block:
+                if any_present_in_function_signature:
+                    if (
+                        any_type_comment_present and
+                        any_type_comment_line_num + 10 >= func_def_start_line
+                    ):
                         any_type_comment_present = False
                     else:
                         self.add_message(
                             'any-type-used', line=func_def_start_line
                         )
-                    any_present_in_function_def = False
+                    any_present_in_function_signature = False
                     any_present_inside_arg_section = False
                     any_present_inside_return_section = False
                 if token_type == tokenize.NAME and token == 'Any':
@@ -2249,7 +2323,10 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
                         pass
                     elif multi_line_import:
                         pass
-                    elif any_type_comment_present:
+                    elif (
+                        any_type_comment_present and
+                        any_type_comment_line_num + 10 >= line_num
+                    ):
                         any_type_comment_present = False
                     else:
                         self.add_message(

@@ -2418,13 +2418,13 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
         with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""
-                # Here we used MyPy ignore because attributes on BaseChange
+                # Here we use MyPy ignore because attributes on BaseChange
                 # class are defined dynamically.
                 suggestion.change.new_value = (  # type: ignore[attr-defined]
                     new_content
                 )
 
-                # Here we used MyPy ignore because currently this function is
+                # Here we use MyPy ignore because currently this function is
                 # not type annotated and because of this MyPy is not able to
                 # fetch argument's type.
                 func_only_accept_str('hi') #@
@@ -2453,13 +2453,13 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
         with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""
-                # Here we used MyPy ignore because attributes on BaseChange
+                # Here we use MyPy ignore because attributes on BaseChange
                 # class are defined dynamically.
                 suggestion.change.new_value = (  # type: ignore[attr-defined]
                     new_content
                 )
 
-                # Here we used MyPy ignore because this function is can only
+                # Here we use MyPy ignore because this function is can only
                 # str values but here we are providing integer which causes
                 # MyPy to throw an error. Thus to avoid the error, we used
                 # ignore here.
@@ -2485,7 +2485,7 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
         with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""
-                # Here we used MyPy ignore because attributes on BaseChange
+                # Here we use MyPy ignore because attributes on BaseChange
                 # class are defined dynamically.
                 suggestion.change.new_value = (  # type: ignore[attr-defined]
                     new_content
@@ -2500,6 +2500,50 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
            pylint_utils.tokenize_module(node_function)
         )
         with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+    def test_raises_error_if_gap_in_ignore_and_comment_is_more_than_ten(self):
+        node_with_ignore_and_more_than_ten_gap = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test'
+        )
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                # Here we use MyPy ignore because stubs of protobuf are not
+                # available yet.
+
+                variable_one: str = '123'
+                variable_two: str = '1234'
+                # Some other content of module one.
+
+                # Some other content of module two.
+
+                def test_foo(arg: str) -> str:
+
+                def foo(exp_id: str) -> str:  # type: ignore[arg-type]
+                    return 'hi' #@
+                """
+            )
+        node_with_ignore_and_more_than_ten_gap.file = filename
+
+        self.checker_test_object.checker.process_tokens(
+           pylint_utils.tokenize_module(node_with_ignore_and_more_than_ten_gap)
+        )
+        message1 = testutils.Message(
+            msg_id='mypy-ignore-used',
+            line=13
+        )
+        message2 = testutils.Message(
+            msg_id='redundant-type-comment',
+            line=2
+        )
+        with self.checker_test_object.assertAddsMessages(
+            message1, message2
+        ):
             temp_file.close()
 
 
@@ -2610,10 +2654,13 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
                     'key': 'value'
                 }
 
-                def func(proto_buff_stuff: object) -> None
+                def func(proto_buff_stuff: object) -> None:
                     pass
 
                 # Some other contents of the module.
+
+                # Here we use object because to test the linters.
+                new_object: object = 'strong hi'
 
                 # We are not considering this case.
                 var = object()
@@ -2637,7 +2684,7 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
         )
         message3 = testutils.Message(
             msg_id='cast-func-used',
-            line=15
+            line=18
         )
         with self.checker_test_object.assertAddsMessages(
             message1, message3, message2
@@ -2811,7 +2858,7 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
                 u"""
                 from typing import Any
 
-                # Here we used type Any because, this function can take
+                # Here we use type Any because, this function can take
                 # any argument.
                 def foo(arg1: Any) -> None
                     pass
@@ -2819,14 +2866,14 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
                 # Some other contents of the Module.
                 new_var: str = 'hi'
 
-                # Here we used type Any because, schema dicts can accept
+                # Here we use type Any because, schema dicts can accept
                 # any value.
                 schema_dict: Dict[str, Any] = {
                     'key': 'value'
                 }
 
                 def foo1(arg2: str) -> None
-                    # Here we used type Any because, new_value can accept any
+                    # Here we use type Any because, new_value can accept any
                     # value.
                     new_value: Any = 'hi' #@
                 """
@@ -2851,22 +2898,22 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
                 u"""
                 from typing import Any, cast
 
-                # Here we used type Any because, this function can take
+                # Here we use type Any because, this function can take
                 # any argument.
                 def foo(arg1: Any) -> None
                     pass
 
-                # Here we used cast because we are narrowing down the object
+                # Here we use cast because we are narrowing down the object
                 # to string object.
                 new_var: str = cast(str, object())
 
-                # Here we used type Any because, schema dicts can accept
+                # Here we use type Any because, schema dicts can accept
                 # any value.
                 schema_dict: Dict[str, Any] = {
                     'key': 'value'
                 }
 
-                # Here we used object because stubs of protobuf are not
+                # Here we use object because stubs of protobuf are not
                 # available yet. So, instead of Any we used object here.
                 def save_classifier_data(
                     exp_id: str,
@@ -2885,7 +2932,7 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             temp_file.close()
 
     def test_no_error_raised_if_objects_are_present_with_comment(self):
-        node_with_multiple_object = astroid.scoped_nodes.Module(
+        node_with_multiple_objects_in_func = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test'
         )
@@ -2895,16 +2942,112 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
         with utils.open_file(filename, 'w') as tmp:
             tmp.write(
                 u"""
-                # Here we used object because stubs of protobuf are not
+                # Here we use object because stubs of protobuf are not
                 # available yet. So, instead of Any we used object here.
                 def foo(exp_id: object) -> object:
                     return 'hi' #@
                 """
             )
-        node_with_multiple_object.file = filename
+        node_with_multiple_objects_in_func.file = filename
 
         self.checker_test_object.checker.process_tokens(
-           pylint_utils.tokenize_module(node_with_multiple_object)
+           pylint_utils.tokenize_module(node_with_multiple_objects_in_func)
+        )
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+        node_with_multiple_objects_in_type = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test'
+        )
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                # Here we use object because stubs of protobuf are not
+                # available yet. So, instead of Any we used object here.
+                object_dicts: Dict[str, Union[object, object]] = {
+                    'key': 'value'
+                }
+                """
+            )
+        node_with_multiple_objects_in_type.file = filename
+
+        self.checker_test_object.checker.process_tokens(
+           pylint_utils.tokenize_module(node_with_multiple_objects_in_type)
+        )
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+    def test_raises_error_if_gap_between_type_and_comment_is_more_than_ten(
+        self
+    ):
+        node_with_object_and_more_than_ten_gap = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test'
+        )
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                # Here we use object because stubs of protobuf are not
+                # available yet. So, instead of Any we used object here.
+
+                variable_one: str = '123'
+                variable_two: str = '1234'
+                # Some other content of module one.
+
+                # Some other content of module two.
+
+                def test_foo(arg: str) -> str:
+
+                def foo(exp_id: str) -> object:
+                    return 'hi' #@
+                """
+            )
+        node_with_object_and_more_than_ten_gap.file = filename
+
+        self.checker_test_object.checker.process_tokens(
+           pylint_utils.tokenize_module(node_with_object_and_more_than_ten_gap)
+        )
+        message = testutils.Message(
+            msg_id='object-class-used',
+            line=13
+        )
+        with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+
+        node_with_object_and_less_than_ten_gap = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test'
+        )
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                # Here we use object because stubs of protobuf are not
+                # available yet. So, instead of Any we used object here.
+
+                variable_one: str = '123'
+                variable_two: str = '1234'
+                # Some other content of module one.
+
+                def test_foo(arg: str) -> str:
+
+                def foo(exp_id: str) -> object:
+                    return 'hi' #@
+                """
+            )
+        node_with_object_and_less_than_ten_gap.file = filename
+
+        self.checker_test_object.checker.process_tokens(
+           pylint_utils.tokenize_module(node_with_object_and_less_than_ten_gap)
         )
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
