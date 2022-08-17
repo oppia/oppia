@@ -608,8 +608,10 @@ class CollectionRightsModel(base_models.VersionedModel):
 
         return model_dict
 
-    # TODO(#13523): Change 'snapshot_dict' to domain object/TypedDict to
-    # remove Any from type-annotation below.
+    # TODO(#15911): This '_reconstitute' method accepts content NDB JSON
+    # properties and those NDB JSON properties have loose typing. So, once
+    # we explicitly typed those NDB JSON properties we can remove Any type
+    # from the argument of '_reconstitute' method.
     def _reconstitute(
         self, snapshot_dict: Dict[str, Any]
     ) -> CollectionRightsModel:
