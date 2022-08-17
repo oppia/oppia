@@ -63,7 +63,7 @@ export class OutcomeEditorComponent implements OnInit {
   destinationEditorIsOpen: boolean = false;
   feedbackEditorIsOpen: boolean = false;
   onMobile: boolean = false;
-  resizeSubscription: Subscription;
+  resizeSubscription!: Subscription;
 
   constructor(
     private externalSaveService: ExternalSaveService,
@@ -171,7 +171,6 @@ export class OutcomeEditorComponent implements OnInit {
   openFeedbackEditor(): void {
     if (this.isEditable) {
       this.feedbackEditorIsOpen = true;
-      this.changeDetectorRef.detectChanges();
     }
   }
 
