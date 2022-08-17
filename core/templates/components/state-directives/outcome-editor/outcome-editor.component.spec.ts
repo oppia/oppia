@@ -303,7 +303,16 @@ describe('Outcome Editor Component', () => {
     expect(component.invalidStateAfterDestinationSave()).toBeTrue();
   });
 
-  it('should open feedback editor if it is editable', fakeAsync(() => {
+  it('should open feedback editor if it is editable', () => {
+    component.feedbackEditorIsOpen = false;
+    component.isEditable = true;
+
+    component.openFeedbackEditor();
+
+    expect(component.feedbackEditorIsOpen).toBeTrue();
+  });
+
+  it('should open feedback editor modal if it is editable', fakeAsync(() => {
     const outcome = new Outcome(
       'Introduction',
       null,
@@ -328,7 +337,7 @@ describe('Outcome Editor Component', () => {
     });
 
     component.isEditable = true;
-    component.openFeedbackEditor();
+    component.openFeedbackEditorModal();
 
     expect(ngbModal.open).toHaveBeenCalled();
   }));

@@ -29,6 +29,7 @@ import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AddOutcomeModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-outcome-modal.component';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 
 
 interface AddOutcomeModalResponse {
@@ -61,13 +62,16 @@ export class OutcomeEditorComponent implements OnInit {
   correctnessLabelEditorIsOpen: boolean = false;
   destinationEditorIsOpen: boolean = false;
   feedbackEditorIsOpen: boolean = false;
+  onMobile: boolean = false;
+  resizeSubscription: Subscription;
 
   constructor(
     private externalSaveService: ExternalSaveService,
     private stateEditorService: StateEditorService,
     private stateInteractionIdService: StateInteractionIdService,
     private ngbModal: NgbModal,
-    private changeDetectorRef: ChangeDetectorRef
+    private changeDetectorRef: ChangeDetectorRef,
+    private windowDimensionsService: WindowDimensionsService
   ) {}
 
   isInQuestionMode(): boolean {
@@ -139,7 +143,7 @@ export class OutcomeEditorComponent implements OnInit {
     return this.isSelfLoopWithNoFeedback(tmpOutcome);
   }
 
-  openFeedbackEditor(): void {
+  openFeedbackEditorModal(): void {
     if (this.isEditable) {
       let modalRef = this.ngbModal.open(AddOutcomeModalComponent, {
         backdrop: 'static',
@@ -156,6 +160,13 @@ export class OutcomeEditorComponent implements OnInit {
         // This callback is triggered when the Cancel button is clicked.
         // No further action is needed.
       });
+    }
+  }
+
+  openFeedbackEditor(): void {
+    if (this.isEditable) {
+      this.feedbackEditorIsOpen = true;
+      this.changeDetectorRef.detectChanges();
     }
   }
 
@@ -253,6 +264,14 @@ export class OutcomeEditorComponent implements OnInit {
     this.destinationEditorIsOpen = false;
     this.correctnessLabelEditorIsOpen = false;
     this.savedOutcome = cloneDeep(this.outcome);
+
+    this.onMobile = (
+      this.windowDimensionsService.getWidth() <= 500);
+    this.resizeSubscription = this.windowDimensionsService.getResizeEvent()
+      .subscribe(event => {
+        this.onMobile = (
+          this.windowDimensionsService.getWidth() <= 500);
+      });
   }
 
   ngOnDestroy(): void {
