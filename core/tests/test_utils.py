@@ -943,13 +943,17 @@ class TaskqueueServicesStub:
     layer, namely the platform.taskqueue taskqueue services API.
     """
 
-    def __init__(self, test_base: GenericTestBase) -> None:
+    def __init__(self, test_base: TestBase) -> None:
         """Initializes a taskqueue services stub that replaces the API
         functionality of core.platform.taskqueue.
 
         Args:
             test_base: GenericTestBase. The current test base.
         """
+        # Narrowing down the type from TestBase to GenericTestBase,
+        # because methods that was used on '_test_base' are defined
+        # in only GenericTestBase.
+        assert isinstance(test_base, GenericTestBase)
         self._test_base = test_base
         self._client = cloud_tasks_emulator.Emulator(
             task_handler=self._task_handler, automatic_task_handling=False)
@@ -1780,7 +1784,7 @@ class AppEngineTestBase(TestBase):
         # throw `incompatible argument type` error. Thus to avoid the error, we
         # used cast here.
         self._platform_taskqueue_services_stub = TaskqueueServicesStub(
-            cast(GenericTestBase, self)
+            self
         )
 
     def setUp(self) -> None:
