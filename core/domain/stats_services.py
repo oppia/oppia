@@ -476,14 +476,13 @@ def update_exp_issues_for_new_exp_version(
 
     playthrough_ids = list(itertools.chain.from_iterable(
         issue.playthrough_ids for issue in exp_issues.unresolved_issues))
-    playthrough_models_with_none = (
+    playthrough_models = (
         stats_models.PlaythroughModel.get_multi(playthrough_ids))
-    playthrough_models = []
+    updated_playthrough_models = []
 
-    for playthrough_model in playthrough_models_with_none:
+    for playthrough_model in playthrough_models:
         # Ruling out the possibility of None for mypy type checking.
         assert playthrough_model is not None
-        playthrough_models.append(playthrough_model)
         playthrough = get_playthrough_from_model(playthrough_model)
 
         if 'state_names' in playthrough.issue_customization_args:
@@ -539,9 +538,12 @@ def update_exp_issues_for_new_exp_version(
             playthrough.issue_customization_args)
         playthrough_model.actions = [
             action.to_dict() for action in playthrough.actions]
+        updated_playthrough_models.append(playthrough_model)
 
-    stats_models.PlaythroughModel.update_timestamps_multi(playthrough_models)
-    stats_models.PlaythroughModel.put_multi(playthrough_models)
+    stats_models.PlaythroughModel.update_timestamps_multi(
+        updated_playthrough_models
+    )
+    stats_models.PlaythroughModel.put_multi(updated_playthrough_models)
 
     for exp_issue in exp_issues.unresolved_issues:
         if 'state_names' in exp_issue.issue_customization_args:
