@@ -358,6 +358,89 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
         return states_with_errored_values
 
     @staticmethod
+    def multiple_choice_invalid_values(
+        states_dict: Dict[str, state_domain.State]
+    ) -> Tuple[List[Dict[str, object]], List[str]]:
+        """Checks the following in the MultipleChoiceInput interaction
+            - If one choice empty or we have duplicates then we can remove
+            those choices from the rules, checks if removing them results in
+            disconnection of current state to any connected state
+            - If the invalid choices that we have to report is less than 4,
+            then we report the state. We only use this value for the curated
+            explorations
+
+        Args:
+            states_dict: dict[str, state_domain.State]. The state dictionary.
+
+        Returns:
+            Tuple[List[Dict[str, object]]] | Tuple[None]. The errored states
+            or None if the interaction is not MultipleChoiceInput.
+        """
+        invalid_states = []
+        invalid_states_for_choices_less_than_4 = []
+        for state_name, state in states_dict.items():
+            if state.interaction.id != 'MultipleChoiceInput':
+                continue
+            invalid_ans_groups = []
+            choices = (
+                state.interaction.customization_args['choices'].value)
+            empty_choices = []
+            seen_choices = []
+            invalid_choices_index = []
+            for choice in choices:
+                if choice.html.strip() in ('<p></p>', ''):
+                    empty_choices.append(choice)
+
+            # Only one choice is empty.
+            if len(empty_choices) == 1:
+                invalid_choices_index.append(choices.index(empty_choices[0]))
+
+            # Duplicate choices.
+            for choice in choices:
+                if choice.html not in seen_choices:
+                    seen_choices.append(choice.html)
+                else:
+                    invalid_choices_index.append(choices.index(choice))
+
+            # Remove rules whose choice has been deleted.
+            answer_groups = state.interaction.answer_groups
+            valid_dest_ans_group_count = 0
+            invalid_ans_group_count = 0
+            for ans_group_idx, answer_group in enumerate(answer_groups):
+                if answer_group.outcome.dest == state_name:
+                    continue
+                valid_dest_ans_group_count += 1
+                invalid_rules = []
+                for rule_spec in answer_group.rule_specs:
+                    if rule_spec.rule_type == 'Equals':
+                        if rule_spec.inputs['x'] in invalid_choices_index:
+                            invalid_rules.append(rule_spec)
+                if (
+                    len(invalid_rules) > 0 and
+                    len(invalid_rules) == len(answer_group.rule_specs)
+                ):
+                    invalid_ans_group_count += 1
+                    invalid_ans_groups.append(ans_group_idx)
+
+            if (
+                invalid_ans_group_count == valid_dest_ans_group_count and
+                invalid_ans_group_count != 0 and
+                valid_dest_ans_group_count != 0
+            ):
+                invalid_states.append(
+                    {
+                        'state_name': state_name,
+                        'ans_group_idx': invalid_ans_groups
+                    }
+                )
+
+            choices_less_than_4 = len(choices) - len(invalid_choices_index) < 4
+            if choices_less_than_4:
+                invalid_states_for_choices_less_than_4.append(state_name)
+
+        return (invalid_states, invalid_states_for_choices_less_than_4)
+
+    @staticmethod
     def get_exploration_from_models(
         model: Tuple[Any, Any] | Any
     ) -> None | exp_domain.Exploration:
@@ -507,7 +590,42 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                     job_run_result.JobRunResult.as_stderr(
                        f'The id of exp is {exp_id}, '
                        f'created on {exp_created_on}, and the invalid '
-                       f'drag drop rule states are {exp_drag_errors}'
+                       f'drag drop states are {exp_drag_errors}'
+                    )
+                )
+            )
+        )
+
+        # DragAndDrop invalid curated rules.
+        filter_invalid_curated_drag_drop_rules = (
+            curated_explorations
+            | 'Get invalid curated drag drop rules' >> beam.MapTuple(
+                lambda exp_id, exp_states, exp_created_on: (
+                    exp_id,
+                    self.invalid_drag_drop_interactions(exp_states),
+                    exp_created_on.date()
+                )
+            )
+            | 'Remove empty values curated drag drop rule' >> beam.Filter(
+                lambda exp: len(exp[1]) > 0)
+        )
+
+        report_count_invalid_curated_drag_drop_rules = (
+            filter_invalid_curated_drag_drop_rules
+            | 'Report count for invalid curated drag drop rules' >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'NUMBER OF EXPS WITH INVALID CURATED DRAG DROP RULES')
+            )
+        )
+
+        report_invalid_curated_drag_drop_rules = (
+            filter_invalid_curated_drag_drop_rules
+            | 'Show info for curated drag drop' >> beam.MapTuple(
+                lambda exp_id, exp_drag_errors, exp_created_on: (
+                    job_run_result.JobRunResult.as_stderr(
+                       f'The id of exp is {exp_id}, '
+                       f'created on {exp_created_on}, and the invalid '
+                       f'curated drag drop states are {exp_drag_errors}'
                     )
                 )
             )
@@ -521,20 +639,18 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                 lambda exp: self.filter_invalid_continue_interaction_exps(
                     exp.states)
             )
-            | 'Map exp id, language code and created on date' >> beam.Map(
-                lambda exp: (exp.id, exp.language_code, exp.created_on.date())
+            | 'Map language code' >> beam.Map(
+                lambda exp: exp.language_code
             )
+            | 'Combine globally' >> beam.Distinct()
         )
 
         report_continue_text_language_code_values = (
             filter_invalid_continue_text_values
-            | 'Show info for continue invalid values' >> beam.MapTuple(
-                lambda exp_id, cont_lang, exp_created_on: (
+            | 'Show info for continue invalid values' >> beam.Map(
+                lambda exp_language_codes: (
                     job_run_result.JobRunResult.as_stderr(
-                       f'The id of exp is {exp_id}, '
-                       f'created on {exp_created_on}, and the '
-                       f'invalid continue interaction language code '
-                       f'is {cont_lang}'
+                       f'The invalid language codes are {exp_language_codes}'
                     )
                 )
             )
@@ -579,6 +695,46 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
             )
         )
 
+        # ItemSelection curated exps == should have b/w min and
+        # max number of selections.
+        filter_curated_item_selec_equals_value_between_min_max = (
+            curated_explorations
+            | 'Get curated item selection equals value between min and max'
+            >> beam.MapTuple(
+                lambda exp_id, exp_states, exp_created_on: (
+                    exp_id,
+                    self.item_selec_equals_value_between_min_max_value(
+                        exp_states),
+                    exp_created_on.date()
+                )
+            )
+            | 'Remove empty curated values for item selec equals value '
+            'between min and max' >> beam.Filter(
+                lambda exp: len(exp[1]) > 0
+            )
+        )
+
+        report_count_curated_item_selec_equals_value_between_min_max = (
+            filter_curated_item_selec_equals_value_between_min_max
+            | 'Report count for curated item selec values' >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'NUMBER OF EXPS WITH INVALID CURATED ITEM SELECTION')
+            )
+        )
+
+        report_curated_item_selec_equals_value_between_min_max = (
+            filter_curated_item_selec_equals_value_between_min_max
+            | 'Show info for curated item selec equals value' >> beam.MapTuple(
+                lambda exp_id, exp_item_errors, exp_created_on: (
+                    job_run_result.JobRunResult.as_stderr(
+                       f'The id of exp is {exp_id}, '
+                       f'created on {exp_created_on}, and the invalid '
+                       f'curated item selection states are {exp_item_errors}'
+                    )
+                )
+            )
+        )
+
         # NumericInput invalid rules.
         filter_invalid_numeric_input_values = (
             combine_exp_ids_and_states
@@ -609,8 +765,44 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
                     job_run_result.JobRunResult.as_stderr(
                        f'The id of exp is {exp_id}, '
                        f'created on {exp_created_on}, and the invalid '
-                       f'numeric input rules '
-                       f'states are {exp_numeric_errors}'
+                       f'numeric input states are {exp_numeric_errors}'
+                    )
+                )
+            )
+        )
+
+        # NumericInput curated invalid rules.
+        filter_invalid_curated_numeric_input_values = (
+            curated_explorations
+            | 'Get invalid curated numeric input invalid values'
+            >> beam.MapTuple(
+                lambda exp_id, exp_states, exp_created_on: (
+                    exp_id,
+                    self.numeric_input_invalid_values(exp_states),
+                    exp_created_on.date()
+                )
+            )
+            | 'Remove empty curated values numeric input' >> beam.Filter(
+                lambda exp: len(exp[1]) > 0
+            )
+        )
+
+        report_count_invalid_curated_numeric_input_values = (
+            filter_invalid_curated_numeric_input_values
+            | 'Report count for invalid curated numeric input' >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'NUMBER OF EXPS WITH INVALID NUMERIC INPUT CURATED RULES')
+            )
+        )
+
+        report_invalid_curated_numeric_input_values = (
+            filter_invalid_curated_numeric_input_values
+            | 'Show info for curated numeric input' >> beam.MapTuple(
+                lambda exp_id, exp_numeric_errors, exp_created_on: (
+                    job_run_result.JobRunResult.as_stderr(
+                       f'The id of exp is {exp_id}, '
+                       f'created on {exp_created_on}, and the invalid '
+                       f'curated numeric input states are {exp_numeric_errors}'
                     )
                 )
             )
@@ -654,21 +846,159 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
             )
         )
 
+        # MultipleChoiceInput invalid rules.
+        filter_invalid_multiple_choice_input_values = (
+            combine_exp_ids_and_states
+            | 'Get invalid multiple choice input invalid values'
+            >> beam.MapTuple(
+                lambda exp_id, exp_states, exp_created_on: (
+                    exp_id,
+                    self.multiple_choice_invalid_values(exp_states)[0],
+                    exp_created_on.date()
+                )
+            )
+            | 'Remove empty values multiple choice input' >> beam.Filter(
+                lambda exp: len(exp[1]) > 0
+            )
+        )
+
+        report_count_invalid_multiple_choice_input_values = (
+            filter_invalid_multiple_choice_input_values
+            | 'Report count for invalid multiple choice input' >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'NUMBER OF EXPS WITH INVALID MULTIPLE CHOICE INPUT')
+            )
+        )
+
+        report_invalid_multiple_choice_input_values = (
+            filter_invalid_multiple_choice_input_values
+            | 'Show info for multiplr choice input' >> beam.MapTuple(
+                lambda exp_id, exp_multi_errors, exp_created_on: (
+                    job_run_result.JobRunResult.as_stderr(
+                       f'The id of exp is {exp_id}, '
+                       f'created on {exp_created_on}, and the invalid '
+                       f'multiple choice input '
+                       f'states are {exp_multi_errors}'
+                    )
+                )
+            )
+        )
+
+        # Curated MultipleChoiceInput invalid rules.
+        filter_invalid_curated_multiple_choice_input_values = (
+            curated_explorations
+            | 'Get invalid curated multiple choice input invalid values'
+            >> beam.MapTuple(
+                lambda exp_id, exp_states, exp_created_on: (
+                    exp_id,
+                    self.multiple_choice_invalid_values(exp_states)[0],
+                    exp_created_on.date()
+                )
+            )
+            | 'Remove empty values curated multiple choice input'
+            >> beam.Filter(
+                lambda exp: len(exp[1]) > 0
+            )
+        )
+
+        report_count_invalid_curated_multiple_choice_input_values = (
+            filter_invalid_curated_multiple_choice_input_values
+            | 'Report count for invalid curated multiple choice input' >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'NUMBER OF EXPS WITH INVALID CURATED '
+                    'MULTIPLE CHOICE INPUT')
+            )
+        )
+
+        report_invalid_curated_multiple_choice_input_values = (
+            filter_invalid_curated_multiple_choice_input_values
+            | 'Show info for curated multiple choice input' >> beam.MapTuple(
+                lambda exp_id, exp_multi_errors, exp_created_on: (
+                    job_run_result.JobRunResult.as_stderr(
+                       f'The id of exp is {exp_id}, '
+                       f'created on {exp_created_on}, and the invalid '
+                       f'curated multiple choice input '
+                       f'states are {exp_multi_errors}'
+                    )
+                )
+            )
+        )
+
+        # Curated exps with multiple choice input having choices less than 4.
+        filter_invalid_curated_multiple_choice_have_choices_less_than_4 = (
+            curated_explorations
+            | 'Get invalid curated multiple choice interaction have '
+            'choices less than 4' >> beam.MapTuple(
+                lambda exp_id, exp_states, exp_created_on: (
+                    exp_id,
+                    self.multiple_choice_invalid_values(exp_states)[1],
+                    exp_created_on.date()
+                )
+            )
+            | 'Remove curated values which are correct'
+            >> beam.Filter(
+                lambda exp: len(exp[1]) > 0
+            )
+        )
+
+        report_count_invalid_curated_multi_interac_choices_less_than_4 = (
+            filter_invalid_curated_multiple_choice_have_choices_less_than_4
+            | 'Report count for invalid curated multiple choice input '
+            'interaction having choices less than 4' >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'NUMBER OF EXPS WITH INVALID CURATED '
+                    'MULTIPLE CHOICE INPUT INTERACTION CHOICES LESS THAN 4')
+            )
+        )
+
+        report_invalid_curated_multiple_interac_choices_less_than_4 = (
+            filter_invalid_curated_multiple_choice_have_choices_less_than_4
+            | 'Show info for curated multiple choice input interac '
+            'having choices less than 4' >> beam.MapTuple(
+                lambda exp_id, exp_multi_errors, exp_created_on: (
+                    job_run_result.JobRunResult.as_stderr(
+                       f'The id of exp is {exp_id}, '
+                       f'created on {exp_created_on}, and the invalid '
+                       f'curated multiple choice interaction having '
+                       f'choices less than 4 are {exp_multi_errors}'
+                    )
+                )
+            )
+        )
+
         return (
             (
                 report_count_invalid_drag_drop_rules,
                 report_invalid_drag_drop_rules,
+
+                report_count_invalid_curated_drag_drop_rules,
+                report_invalid_curated_drag_drop_rules,
 
                 report_continue_text_language_code_values,
 
                 report_count_invalid_item_selec_equals_value_between_min_max,
                 report_invalid_item_selec_equals_value_between_min_max,
 
+                report_count_curated_item_selec_equals_value_between_min_max,
+                report_curated_item_selec_equals_value_between_min_max,
+
                 report_count_invalid_numeric_input_values,
                 report_invalid_numeric_input_values,
 
+                report_count_invalid_curated_numeric_input_values,
+                report_invalid_curated_numeric_input_values,
+
                 report_count_invalid_rte_image_alt_value,
-                report_invalid_rte_image_alt_value
+                report_invalid_rte_image_alt_value,
+
+                report_count_invalid_multiple_choice_input_values,
+                report_invalid_multiple_choice_input_values,
+
+                report_count_invalid_curated_multiple_choice_input_values,
+                report_invalid_curated_multiple_choice_input_values,
+
+                report_count_invalid_curated_multi_interac_choices_less_than_4,
+                report_invalid_curated_multiple_interac_choices_less_than_4,
             )
             | 'Combine results' >> beam.Flatten()
         )

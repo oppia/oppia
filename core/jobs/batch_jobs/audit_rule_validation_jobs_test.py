@@ -49,6 +49,7 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
     EXPLORATION_ID_3 = '3'
     EXPLORATION_ID_4 = '4'
     EXPLORATION_ID_5 = '5'
+    EXPLORATION_ID_6 = '6'
 
     # DragAndDrop Interaction.
     EXP_1_STATE_1 = state_domain.State.create_default_state(
@@ -807,23 +808,174 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
       '<p>dffddfdffdfd</p>\n\n<p>&nbsp;</p>\n<oppia-noninteractive-image>'
       '</oppia-noninteractive-image>\n\n<p>&nbsp;</p>\n\n<p>&nbsp;</p>\n\n<p>'
       '<oppia-noninteractive-link></oppia-noninteractive-link>'
-      '<oppia-noninteractive-math math_content-with-value=\"{&amp;quot;'
+      '<oppia-noninteractive-math math_content-with-value=\'{&amp;quot;'
       'svg_filename&amp;quot;:&amp;quot;mathImg_20220719_221502_sr5wjlbtbn_'
-      'height_3d205_width_1d784_vertical_1d306.svg&amp;quot;}\"></oppia-'
+      'height_3d205_width_1d784_vertical_1d306.svg&amp;quot;}\'></oppia-'
       'noninteractive-math><oppia-noninteractive-skillreview></oppia-'
       'noninteractive-skillreview></p><oppia-noninteractive-video>'
       '</oppia-noninteractive-video>'
-      '<oppia-noninteractive-math math_content-with-value=\"{&amp;quot;'
-      'raw_latex&amp;quot;:&amp;quot;abcde&amp;quot;}\"></oppia-'
+      '<oppia-noninteractive-math math_content-with-value=\'{&amp;quot;'
+      'raw_latex&amp;quot;:&amp;quot;abcde&amp;quot;}\'></oppia-'
       'noninteractive-math>'
       '<oppia-noninteractive-math></oppia-noninteractive-math>'
-      '<oppia-noninteractive-image alt-with-value=\"&amp;quot;'
-      'aaaaaaaaaaaaaaaaaaaa&amp;quot;\" caption-with-value='
-      '\"&amp;quot;&amp;quot;\" filepath-with-value=\"&amp;quot;'
-      'img_2_0xmbq9hwfz_height_276_width_490.svg&amp;quot;\">'
+      '<oppia-noninteractive-image alt-with-value=\'&amp;quot;'
+      'aaaaaaaaaaaaaaaaaaaa&amp;quot;\' caption-with-value='
+      '\'&amp;quot;&amp;quot;\' filepath-with-value=\'&amp;quot;'
+      'img_2_0xmbq9hwfz_height_276_width_490.svg&amp;quot;\'>'
       '</oppia-noninteractive-image><oppia-noninteractive-image>'
       '</oppia-noninteractive-image>'
     )
+
+    # MultipleChoiceInput interaction.
+    EXP_6_STATE_1 = state_domain.State.create_default_state(
+        'EXP_6_STATE_1', is_initial_state=False).to_dict()
+    EXP_6_STATE_1['interaction'] = {
+      'id': 'MultipleChoiceInput',
+      'customization_args': {
+        'choices': {
+          'value': [
+            {
+              'content_id': 'ca_choices_1',
+              'html': ''
+            },
+            {
+              'content_id': 'ca_choices_2',
+              'html': ''
+            },
+            {
+              'content_id': 'ca_choices_3',
+              'html': '<p>1</p>'
+            },
+            {
+              'content_id': 'ca_choices_4',
+              'html': '<p>1</p>'
+            }
+          ]
+        },
+        'showChoicesInShuffledOrder': {
+          'value': True
+        }
+      },
+      'answer_groups': [
+        {
+          'rule_specs': [
+            {
+              'rule_type': 'Equals',
+              'inputs': {
+                'x': 3
+              }
+            }
+          ],
+          'outcome': {
+            'dest': 'end',
+            'dest_if_really_stuck': None,
+            'feedback': {
+              'content_id': 'feedback_5',
+              'html': ''
+            },
+            'labelled_as_correct': False,
+            'param_changes': [],
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None
+          },
+          'training_data': [],
+          'tagged_skill_misconception_id': None
+        }
+      ],
+      'default_outcome': {
+        'dest': 'end',
+        'dest_if_really_stuck': None,
+        'feedback': {
+          'content_id': 'default_outcome',
+          'html': '<p>fd</p>'
+        },
+        'labelled_as_correct': False,
+        'param_changes': [],
+        'refresher_exploration_id': None,
+        'missing_prerequisite_skill_id': None
+      },
+      'confirmed_unclassified_answers': [],
+      'hints': [],
+      'solution': None
+    }
+
+    EXP_6_STATE_2 = state_domain.State.create_default_state(
+        'EXP_6_STATE_2', is_initial_state=False).to_dict()
+    EXP_6_STATE_2['interaction'] = {
+      'id': 'MultipleChoiceInput',
+      'customization_args': {
+        'choices': {
+          'value': [
+            {
+              'content_id': 'ca_choices_1',
+              'html': ''
+            },
+            {
+              'content_id': 'ca_choices_2',
+              'html': ''
+            },
+            {
+              'content_id': 'ca_choices_3',
+              'html': '<p>1</p>'
+            },
+            {
+              'content_id': 'ca_choices_4',
+              'html': '<p>1</p>'
+            }
+          ]
+        },
+        'showChoicesInShuffledOrder': {
+          'value': True
+        }
+      },
+      'answer_groups': [
+        {
+          'rule_specs': [
+            {
+              'rule_type': 'Equals',
+              'inputs': {
+                'x': 3
+              }
+            },
+            {
+              'rule_type': 'Equals',
+              'inputs': {
+                'x': 2
+              }
+            }
+          ],
+          'outcome': {
+            'dest': 'end',
+            'dest_if_really_stuck': None,
+            'feedback': {
+              'content_id': 'feedback_5',
+              'html': ''
+            },
+            'labelled_as_correct': False,
+            'param_changes': [],
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None
+          },
+          'training_data': [],
+          'tagged_skill_misconception_id': None
+        }
+      ],
+      'default_outcome': {
+        'dest': 'end',
+        'dest_if_really_stuck': None,
+        'feedback': {
+          'content_id': 'default_outcome',
+          'html': '<p>fd</p>'
+        },
+        'labelled_as_correct': False,
+        'param_changes': [],
+        'refresher_exploration_id': None,
+        'missing_prerequisite_skill_id': None
+      },
+      'confirmed_unclassified_answers': [],
+      'hints': [],
+      'solution': None
+    }
 
     TODAY_DATE = datetime.datetime.utcnow()
     YEAR_AGO_DATE = str((TODAY_DATE - datetime.timedelta(weeks=52)).date())
@@ -940,9 +1092,91 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
             }
         )
 
-        self.opportunity_model = self.create_model(
+        self.exp_6 = self.create_model(
+            exp_models.ExplorationModel,
+            id=self.EXPLORATION_ID_6,
+            title='title6',
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            category=feconf.DEFAULT_EXPLORATION_CATEGORY,
+            objective=feconf.DEFAULT_EXPLORATION_OBJECTIVE,
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            tags=['Topic'],
+            blurb='blurb',
+            author_notes='author notes',
+            states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
+            param_specs={},
+            param_changes=[],
+            auto_tts_enabled=feconf.DEFAULT_AUTO_TTS_ENABLED,
+            correctness_feedback_enabled=False,
+            states={
+              'EXP_6_STATE_1': self.EXP_6_STATE_1,
+              'EXP_6_STATE_2': self.EXP_6_STATE_2
+            }
+        )
+
+        self.opportunity_model_1 = self.create_model(
             opportunity_models.ExplorationOpportunitySummaryModel,
             id=self.EXPLORATION_ID_5,
+            topic_id='topic_id',
+            topic_name='a_topic name',
+            story_id='story_id',
+            story_title='A story title',
+            chapter_title='A chapter title',
+            content_count=20,
+            incomplete_translation_language_codes=['hi', 'ar'],
+            translation_counts={},
+            language_codes_needing_voice_artists=['en'],
+            language_codes_with_assigned_voice_artists=[]
+        )
+
+        self.opportunity_model_2 = self.create_model(
+            opportunity_models.ExplorationOpportunitySummaryModel,
+            id=self.EXPLORATION_ID_6,
+            topic_id='topic_id',
+            topic_name='a_topic name',
+            story_id='story_id',
+            story_title='A story title',
+            chapter_title='A chapter title',
+            content_count=20,
+            incomplete_translation_language_codes=['hi', 'ar'],
+            translation_counts={},
+            language_codes_needing_voice_artists=['en'],
+            language_codes_with_assigned_voice_artists=[]
+        )
+
+        self.opportunity_model_3 = self.create_model(
+            opportunity_models.ExplorationOpportunitySummaryModel,
+            id=self.EXPLORATION_ID_1,
+            topic_id='topic_id',
+            topic_name='a_topic name',
+            story_id='story_id',
+            story_title='A story title',
+            chapter_title='A chapter title',
+            content_count=20,
+            incomplete_translation_language_codes=['hi', 'ar'],
+            translation_counts={},
+            language_codes_needing_voice_artists=['en'],
+            language_codes_with_assigned_voice_artists=[]
+        )
+
+        self.opportunity_model_4 = self.create_model(
+            opportunity_models.ExplorationOpportunitySummaryModel,
+            id=self.EXPLORATION_ID_3,
+            topic_id='topic_id',
+            topic_name='a_topic name',
+            story_id='story_id',
+            story_title='A story title',
+            chapter_title='A chapter title',
+            content_count=20,
+            incomplete_translation_language_codes=['hi', 'ar'],
+            translation_counts={},
+            language_codes_needing_voice_artists=['en'],
+            language_codes_with_assigned_voice_artists=[]
+        )
+
+        self.opportunity_model_5 = self.create_model(
+            opportunity_models.ExplorationOpportunitySummaryModel,
+            id=self.EXPLORATION_ID_4,
             topic_id='topic_id',
             topic_name='a_topic name',
             story_id='story_id',
@@ -966,26 +1200,33 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
         self.put_multi([self.exp_2])
         self.assert_job_output_is([
           job_run_result.JobRunResult.as_stderr(
-            f'The id of exp is 2, created on {self.YEAR_AGO_DATE}, '
-            f'and the invalid continue interaction language code is en'
+            'The invalid language codes are en'
           )
         ])
 
     def test_drag_drop_interaction(self) -> None:
-        self.put_multi([self.exp_1])
+        self.put_multi([self.exp_1, self.opportunity_model_3])
         self.assert_job_output_is([
           job_run_result.JobRunResult.as_stderr(
             f'The id of exp is 1, created on {self.YEAR_AGO_DATE}, '
-            f'and the invalid drag drop rule states are '
+            f'and the invalid drag drop states are '
             f'[{{\'state_name\': \'EXP_1_STATE_1\', \'ans_group_idx\': [0]}}]'
           ),
           job_run_result.JobRunResult.as_stdout(
             'NUMBER OF EXPS WITH INVALID DRAG DROP RULES SUCCESS: 1'
+          ),
+          job_run_result.JobRunResult.as_stderr(
+            f'The id of exp is 1, created on 2021-08-18, '
+            f'and the invalid curated drag drop states are '
+            f'[{{\'state_name\': \'EXP_1_STATE_1\', \'ans_group_idx\': [0]}}]'
+          ),
+          job_run_result.JobRunResult.as_stdout(
+            'NUMBER OF EXPS WITH INVALID CURATED DRAG DROP RULES SUCCESS: 1'
           )
         ])
 
     def test_item_interaction(self) -> None:
-        self.put_multi([self.exp_3])
+        self.put_multi([self.exp_3, self.opportunity_model_4])
         self.assert_job_output_is([
           job_run_result.JobRunResult.as_stderr(
             f'The id of exp is 3, created on {self.YEAR_AGO_DATE}, '
@@ -994,24 +1235,41 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
           ),
           job_run_result.JobRunResult.as_stdout(
             'NUMBER OF EXPS WITH INVALID ITEM SELECTION SUCCESS: 1'
+          ),
+          job_run_result.JobRunResult.as_stderr(
+            f'The id of exp is 3, created on 2021-08-18, '
+            f'and the invalid curated item selection states are '
+            f'[{{\'state_name\': \'EXP_3_STATE_1\', \'ans_group\': 0}}]'
+          ),
+          job_run_result.JobRunResult.as_stdout(
+            'NUMBER OF EXPS WITH INVALID CURATED ITEM SELECTION SUCCESS: 1'
           )
         ])
 
     def test_numeric_interaction(self) -> None:
-        self.put_multi([self.exp_4])
+        self.put_multi([self.exp_4, self.opportunity_model_5])
         self.assert_job_output_is([
           job_run_result.JobRunResult.as_stderr(
             f'The id of exp is 4, created on {self.YEAR_AGO_DATE}, '
-            f'and the invalid numeric input rules states are '
+            f'and the invalid numeric input states are '
             f'[{{\'state_name\': \'EXP_4_STATE_1\', \'ans_group_idx\': [0]}}]'
           ),
           job_run_result.JobRunResult.as_stdout(
             'NUMBER OF EXPS WITH INVALID NUMERIC INPUT RULES SUCCESS: 1'
+          ),
+          job_run_result.JobRunResult.as_stderr(
+            f'The id of exp is 4, created on 2021-08-18, '
+            f'and the invalid curated numeric input states are '
+            f'[{{\'state_name\': \'EXP_4_STATE_1\', \'ans_group_idx\': [0]}}]'
+          ),
+          job_run_result.JobRunResult.as_stdout(
+            'NUMBER OF EXPS WITH INVALID NUMERIC INPUT CURATED '
+            'RULES SUCCESS: 1'
           )
         ])
 
     def test_rte_image(self) -> None:
-        self.put_multi([self.exp_5, self.opportunity_model])
+        self.put_multi([self.exp_5, self.opportunity_model_1])
         self.assert_job_output_is([
           job_run_result.JobRunResult.as_stderr(
             f'The id of curated exp is 5, '
@@ -1020,6 +1278,37 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
           ),
           job_run_result.JobRunResult.as_stdout(
             'NUMBER OF EXPS WITH INVALID RTE IMAGE SUCCESS: 1'
+          )
+        ])
+
+    def test_multiple_choice_interaction(self) -> None:
+        self.put_multi([self.exp_6, self.opportunity_model_2])
+        self.assert_job_output_is([
+          job_run_result.JobRunResult.as_stderr(
+            f'The id of exp is 6, created on {self.YEAR_AGO_DATE}, '
+            f'and the invalid multiple choice input states are '
+            f'[{{\'state_name\': \'EXP_6_STATE_1\', \'ans_group_idx\': [0]}}]'
+          ),
+          job_run_result.JobRunResult.as_stderr(
+            f'The id of exp is 6, created on {self.YEAR_AGO_DATE}, '
+            f'and the invalid curated multiple choice input states are '
+            f'[{{\'state_name\': \'EXP_6_STATE_1\', \'ans_group_idx\': [0]}}]'
+          ),
+          job_run_result.JobRunResult.as_stderr(
+            f'The id of exp is 6, created on {self.YEAR_AGO_DATE}, '
+            f'and the invalid curated multiple choice interaction having '
+            f'choices less than 4 are [\'EXP_6_STATE_1\', \'EXP_6_STATE_2\']'
+          ),
+          job_run_result.JobRunResult.as_stdout(
+            'NUMBER OF EXPS WITH INVALID MULTIPLE CHOICE INPUT SUCCESS: 1'
+          ),
+          job_run_result.JobRunResult.as_stdout(
+            'NUMBER OF EXPS WITH INVALID CURATED MULTIPLE CHOICE '
+            'INPUT SUCCESS: 1'
+          ),
+          job_run_result.JobRunResult.as_stdout(
+            'NUMBER OF EXPS WITH INVALID CURATED MULTIPLE CHOICE INPUT '
+            'INTERACTION CHOICES LESS THAN 4 SUCCESS: 1'
           )
         ])
 
@@ -1046,7 +1335,7 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
     def mock_convert_to_model_pair(self) -> None:
         temp_tuple = (
           [self.exp_1, self.exp_2],
-          [self.opportunity_model, self.opportunity_model]
+          [self.opportunity_model_1, self.opportunity_model_2]
         )
         model = (
             audit_rule_validation_jobs.ExpAuditRuleChecksJob.
