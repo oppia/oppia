@@ -1783,9 +1783,7 @@ class AppEngineTestBase(TestBase):
         # we are providing super class (AppEngineTestBase) which causes MyPy to
         # throw `incompatible argument type` error. Thus to avoid the error, we
         # used cast here.
-        self._platform_taskqueue_services_stub = TaskqueueServicesStub(
-            self
-        )
+        self._platform_taskqueue_services_stub = TaskqueueServicesStub(self)
 
     def setUp(self) -> None:
         super().setUp()
