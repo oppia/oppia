@@ -912,7 +912,7 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
             },
             {
               'content_id': 'ca_choices_2',
-              'html': ''
+              'html': '2'
             },
             {
               'content_id': 'ca_choices_3',
@@ -920,7 +920,11 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
             },
             {
               'content_id': 'ca_choices_4',
-              'html': '<p>1</p>'
+              'html': '<p>3</p>'
+            },
+            {
+              'content_id': 'ca_choices_4',
+              'html': '<p>4</p>'
             }
           ]
         },
@@ -938,14 +942,44 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
               }
             },
             {
-              'rule_type': 'Equals',
+              'rule_type': 'Not Equals',
               'inputs': {
                 'x': 2
               }
             }
           ],
           'outcome': {
-            'dest': 'end',
+            'dest': 'A valid state',
+            'dest_if_really_stuck': None,
+            'feedback': {
+              'content_id': 'feedback_5',
+              'html': ''
+            },
+            'labelled_as_correct': False,
+            'param_changes': [],
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None
+          },
+          'training_data': [],
+          'tagged_skill_misconception_id': None
+        },
+        {
+          'rule_specs': [
+            {
+              'rule_type': 'Equals',
+              'inputs': {
+                'x': 3
+              }
+            },
+            {
+              'rule_type': 'Not Equals',
+              'inputs': {
+                'x': 2
+              }
+            }
+          ],
+          'outcome': {
+            'dest': 'EXP_6_STATE_2',
             'dest_if_really_stuck': None,
             'feedback': {
               'content_id': 'feedback_5',
@@ -961,7 +995,7 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
         }
       ],
       'default_outcome': {
-        'dest': 'end',
+        'dest': 'EXP_6_STATE_2',
         'dest_if_really_stuck': None,
         'feedback': {
           'content_id': 'default_outcome',
@@ -1216,7 +1250,7 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
             'NUMBER OF EXPS WITH INVALID DRAG DROP RULES SUCCESS: 1'
           ),
           job_run_result.JobRunResult.as_stderr(
-            f'The id of exp is 1, created on 2021-08-18, '
+            f'The id of exp is 1, created on {self.YEAR_AGO_DATE}, '
             f'and the invalid curated drag drop states are '
             f'[{{\'state_name\': \'EXP_1_STATE_1\', \'ans_group_idx\': [0]}}]'
           ),
@@ -1237,7 +1271,7 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
             'NUMBER OF EXPS WITH INVALID ITEM SELECTION SUCCESS: 1'
           ),
           job_run_result.JobRunResult.as_stderr(
-            f'The id of exp is 3, created on 2021-08-18, '
+            f'The id of exp is 3, created on {self.YEAR_AGO_DATE}, '
             f'and the invalid curated item selection states are '
             f'[{{\'state_name\': \'EXP_3_STATE_1\', \'ans_group\': 0}}]'
           ),
@@ -1258,7 +1292,7 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
             'NUMBER OF EXPS WITH INVALID NUMERIC INPUT RULES SUCCESS: 1'
           ),
           job_run_result.JobRunResult.as_stderr(
-            f'The id of exp is 4, created on 2021-08-18, '
+            f'The id of exp is 4, created on {self.YEAR_AGO_DATE}, '
             f'and the invalid curated numeric input states are '
             f'[{{\'state_name\': \'EXP_4_STATE_1\', \'ans_group_idx\': [0]}}]'
           ),
@@ -1297,7 +1331,7 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
           job_run_result.JobRunResult.as_stderr(
             f'The id of exp is 6, created on {self.YEAR_AGO_DATE}, '
             f'and the invalid curated multiple choice interaction having '
-            f'choices less than 4 are [\'EXP_6_STATE_1\', \'EXP_6_STATE_2\']'
+            f'choices less than 4 are [\'EXP_6_STATE_1\']'
           ),
           job_run_result.JobRunResult.as_stdout(
             'NUMBER OF EXPS WITH INVALID MULTIPLE CHOICE INPUT SUCCESS: 1'
