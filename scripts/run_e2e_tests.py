@@ -110,6 +110,7 @@ SUITES_MIGRATED_TO_WEBDRIVERIO = [
     'classroomPageFileUploadFeatures',
     'collections',
     'contributorDashboard',
+    'coreEditorAndPlayerFeatures',
     'creatorDashboard',
     'learner',
     'learnerDashboard',
@@ -128,7 +129,6 @@ SUITES_MIGRATED_TO_WEBDRIVERIO = [
 ]
 
 SUITES_STILL_IN_PROTRACTOR = [
-    'coreEditorAndPlayerFeatures',
     'embedding',
     'explorationImprovementsTab',
     'explorationFeedbackTab',

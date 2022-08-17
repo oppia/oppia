@@ -148,8 +148,10 @@ var ExplorationEditorSettingsTab = function() {
   this.expectFirstStateToBe = async function(firstState) {
     await waitFor.presenceOf(
       initialStateSelect, 'Initial state select takes too long to be visible.');
-    expect(await initialStateSelect.$('option:checked').getText()).
-      toEqual(firstState);
+    await waitFor.textToBePresentInElement(
+      initialStateSelect.$('option:checked'),
+      firstState,
+      `Initial state is not set as ${firstState}`);
   };
 
   this.expectLanguageToBe = async function(language) {

@@ -83,6 +83,10 @@ var suites = {
     './core/tests/webdriverio_desktop/contributorDashboard.js'
   ],
 
+  coreEditorAndPlayerFeatures: [
+    './core/tests/webdriverio_desktop/coreEditorAndPlayerFeatures.js'
+  ],
+
   creatorDashboard: [
     './core/tests/webdriverio_desktop/creatorDashboard.js'
   ],
