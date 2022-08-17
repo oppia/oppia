@@ -211,14 +211,22 @@ export class PreferencesPageComponent {
 
     this.hasPageLoaded = false;
 
+    let preferencesProfilePictureDataUrlPromise = (
+      this.userBackendApiService.getPreferencesProfilePictureDataUrlAsync());
+
+    preferencesProfilePictureDataUrlPromise.then((data) => {
+      this.profilePictureDataUrl = decodeURIComponent(
+        data.profile_picture_data_url);
+      this.subscriptionList = data.subscription_list;
+    });
+
+
     let preferencesPromise = this.userBackendApiService.getPreferencesAsync();
 
     preferencesPromise.then((data) => {
       this.userBio = data.user_bio;
       this.subjectInterests = data.subject_interests;
       this.preferredLanguageCodes = data.preferred_language_codes;
-      this.profilePictureDataUrl = decodeURIComponent(
-        data.profile_picture_data_url);
       this.defaultDashboard = data.default_dashboard;
       this.canReceiveEmailUpdates = data.can_receive_email_updates;
       this.canReceiveEditorRoleEmail =
@@ -231,7 +239,6 @@ export class PreferencesPageComponent {
         data.preferred_site_language_code;
       this.preferredAudioLanguageCode =
         data.preferred_audio_language_code;
-      this.subscriptionList = data.subscription_list;
       this.subscriptionList.forEach((subscription) => {
         subscription.creator_picture_data_url = (
           decodeURIComponent(subscription.creator_picture_data_url));

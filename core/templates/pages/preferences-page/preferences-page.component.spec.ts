@@ -27,7 +27,7 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 import { LoaderService } from 'services/loader.service';
 import { PreventPageUnloadEventService } from 'services/prevent-page-unload-event.service';
-import { EmailPreferencesBackendDict, PreferencesBackendDict, UpdatePreferencesResponse, UserBackendApiService } from 'services/user-backend-api.service';
+import { EmailPreferencesBackendDict, PreferencesBackendDict, ProfilePictureDataBackendDict, UpdatePreferencesResponse, UserBackendApiService } from 'services/user-backend-api.service';
 import { UserService } from 'services/user.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { PreferencesPageComponent } from './preferences-page.component';
@@ -46,11 +46,19 @@ describe('Preferences Page Component', () => {
   let mockWindowRef: MockWindowRef;
   let mockUserBackendApiService: MockUserBackendApiService;
 
+  let preferencesProfilePictureDataUrl: ProfilePictureDataBackendDict = {
+    profile_picture_data_url: '',
+    subscription_list: [{
+      creator_picture_data_url: 'picture_url',
+      creator_username: 'creator',
+      creator_impact: 0
+    }]
+  };
+
   let preferencesData: PreferencesBackendDict = {
     preferred_language_codes: ['en'],
     preferred_site_language_code: 'en',
     preferred_audio_language_code: 'en',
-    profile_picture_data_url: '',
     default_dashboard: 'creator',
     user_bio: 'test user bio',
     subject_interests: '',
@@ -58,11 +66,6 @@ describe('Preferences Page Component', () => {
     can_receive_editor_role_email: true,
     can_receive_feedback_message_email: false,
     can_receive_subscription_email: true,
-    subscription_list: [{
-      creator_picture_data_url: 'picture_url',
-      creator_username: 'creator',
-      creator_impact: 0
-    }]
   };
 
   class MockWindowRef {
@@ -91,6 +94,24 @@ describe('Preferences Page Component', () => {
     ): Promise<UpdatePreferencesResponse> {
       return Promise.resolve({
         bulk_email_signup_message_should_be_shown: false
+      });
+    }
+
+    async getPreferencesProfilePictureDataUrlAsync(
+    ): Promise<ProfilePictureDataBackendDict> {
+      return Promise.resolve(preferencesProfilePictureDataUrl);
+    }
+
+    async updatePreferencesProfilePictureDataUrlAsync(
+        data: string
+    ): Promise<ProfilePictureDataBackendDict> {
+      return Promise.resolve({
+        profile_picture_data_url: '',
+        subscription_list: [{
+          creator_picture_data_url: 'picture_url',
+          creator_username: 'creator',
+          creator_impact: 0
+        }]
       });
     }
   }
@@ -173,7 +194,7 @@ describe('Preferences Page Component', () => {
     expect(componentInstance.preferredLanguageCodes).toEqual(
       preferencesData.preferred_language_codes);
     expect(componentInstance.profilePictureDataUrl).toEqual(
-      preferencesData.profile_picture_data_url);
+      preferencesProfilePictureDataUrl.profile_picture_data_url);
     expect(componentInstance.defaultDashboard).toEqual(
       preferencesData.default_dashboard);
     expect(componentInstance.canReceiveEmailUpdates).toEqual(
@@ -187,7 +208,7 @@ describe('Preferences Page Component', () => {
     expect(componentInstance.preferredSiteLanguageCode).toEqual(
       preferencesData.preferred_site_language_code);
     expect(componentInstance.subscriptionList).toEqual(
-      preferencesData.subscription_list);
+      preferencesProfilePictureDataUrl.subscription_list);
     expect(loaderService.showLoadingScreen).toHaveBeenCalled();
     expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
   }));
@@ -298,12 +319,19 @@ describe('Preferences Page Component', () => {
   });
 
   it('should show edit profile picture modal', fakeAsync(() => {
-    let profilePictureDataUrl = 'profile_picture_data_url';
     spyOn(ngbModal, 'open').and.returnValue({
-      result: Promise.resolve(profilePictureDataUrl)
+      result: Promise.resolve()
     } as NgbModalRef);
     spyOn(userService, 'setProfileImageDataUrlAsync').and.returnValue(
-      Promise.resolve({ bulk_email_signup_message_should_be_shown: false }));
+      Promise.resolve({
+        profile_picture_data_url: 'a',
+        subscription_list: [{
+          creator_picture_data_url: 'picture_url',
+          creator_username: 'creator',
+          creator_impact: 0
+        }]
+      })
+    );
     spyOn(mockWindowRef.nativeWindow.location, 'reload');
     componentInstance.showEditProfilePictureModal();
     tick();

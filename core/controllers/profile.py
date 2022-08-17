@@ -148,8 +148,8 @@ class BulkEmailWebhookEndpoint(base.BaseHandler):
         self.render_json({})
 
 
-class PreferencesHandler(base.BaseHandler):
-    """Provides data for the preferences page."""
+class ProfilePictureDataUrlHandler(base.BaseHandler):
+    """Handles requests for the profile picture data url."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
@@ -157,15 +157,12 @@ class PreferencesHandler(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         user_settings = user_services.get_user_settings(self.user_id)
-        user_email_preferences = user_services.get_email_preferences(
-            self.user_id)
 
         creators_subscribed_to = subscription_services.get_all_creators_subscribed_to( # pylint: disable=line-too-long
             self.user_id)
         creators_settings = user_services.get_users_settings(
             creators_subscribed_to)
         subscription_list = []
-
         for index, creator_settings in enumerate(creators_settings):
             subscription_summary = {
                 'creator_picture_data_url': (
@@ -179,6 +176,31 @@ class PreferencesHandler(base.BaseHandler):
             subscription_list.append(subscription_summary)
 
         self.values.update({
+            'profile_picture_data_url': user_settings.profile_picture_data_url,
+            'subscription_list': subscription_list
+        })
+        self.render_json(self.values)
+
+    @acl_decorators.can_manage_own_account
+    def put(self):
+        """Handles PUT requests."""
+        data = self.payload.get('data')
+        user_services.update_profile_picture_data_url(self.user_id, data)
+
+
+class PreferencesHandler(base.BaseHandler):
+    """Provides data for the preferences page."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_manage_own_account
+    def get(self):
+        """Handles GET requests."""
+        user_settings = user_services.get_user_settings(self.user_id)
+        user_email_preferences = user_services.get_email_preferences(
+            self.user_id)
+
+        self.values.update({
             'preferred_language_codes': user_settings.preferred_language_codes,
             'preferred_site_language_code': (
                 user_settings.preferred_site_language_code),
@@ -186,7 +208,6 @@ class PreferencesHandler(base.BaseHandler):
                 user_settings.preferred_audio_language_code),
             'preferred_translation_language_code': (
                 user_settings.preferred_translation_language_code),
-            'profile_picture_data_url': user_settings.profile_picture_data_url,
             'default_dashboard': user_settings.default_dashboard,
             'user_bio': user_settings.user_bio,
             'subject_interests': user_settings.subject_interests,
@@ -197,8 +218,7 @@ class PreferencesHandler(base.BaseHandler):
             'can_receive_feedback_message_email': (
                 user_email_preferences.can_receive_feedback_message_email),
             'can_receive_subscription_email': (
-                user_email_preferences.can_receive_subscription_email),
-            'subscription_list': subscription_list
+                user_email_preferences.can_receive_subscription_email)
         })
         self.render_json(self.values)
 
@@ -228,8 +248,6 @@ class PreferencesHandler(base.BaseHandler):
         elif update_type == 'preferred_translation_language_code':
             user_services.update_preferred_translation_language_code(
                 self.user_id, data)
-        elif update_type == 'profile_picture_data_url':
-            user_services.update_profile_picture_data_url(self.user_id, data)
         elif update_type == 'default_dashboard':
             user_services.update_user_default_dashboard(self.user_id, data)
         elif update_type == 'email_preferences':

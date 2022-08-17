@@ -38,10 +38,13 @@ interface NonEmailPreferencesBackendDict {
   'preferred_language_codes': string[];
   'preferred_site_language_code': string;
   'preferred_audio_language_code': string;
-  'profile_picture_data_url': string;
   'default_dashboard': string;
   'user_bio': string;
   'subject_interests': string;
+}
+
+export interface ProfilePictureDataBackendDict {
+  'profile_picture_data_url': string;
   'subscription_list': SubscriptionSummary[];
 }
 
@@ -82,6 +85,9 @@ export class UserBackendApiService {
   private USER_INFO_URL = '/userinfohandler';
   private PROFILE_PICTURE_URL = '/preferenceshandler/profile_picture';
   private PREFERENCES_DATA_URL = '/preferenceshandler/data';
+  private PREFERENCES_PROFILE_PICTURE_DATA_URL = (
+    '/preferenceshandler/profile_picture_data');
+
   private USER_CONTRIBUTION_RIGHTS_DATA_URL = (
     '/usercontributionrightsdatahandler');
 
@@ -97,17 +103,17 @@ export class UserBackendApiService {
   }
 
   async getProfileImageDataUrlAsync(defaultUrl: string): Promise<string> {
-    return this.http.get<PreferencesBackendDict>(
+    return this.http.get<ProfilePictureDataBackendDict>(
       this.PROFILE_PICTURE_URL).toPromise().then(
       (backendDict) => {
         return backendDict.profile_picture_data_url || defaultUrl;
       });
   }
 
-  async setProfileImageDataUrlAsync(
-      newProfileImageDataUrl: string): Promise<UpdatePreferencesResponse> {
-    return this.updatePreferencesDataAsync(
-      'profile_picture_data_url', newProfileImageDataUrl);
+  async setProfileImageDataUrlAsync(newProfileImageDataUrl: string):
+    Promise<ProfilePictureDataBackendDict> {
+    return this.updatePreferencesProfilePictureDataUrlAsync(
+      newProfileImageDataUrl);
   }
 
   async getLoginUrlAsync(currentUrl: string): Promise<string> {
@@ -140,6 +146,12 @@ export class UserBackendApiService {
       .toPromise();
   }
 
+  async getPreferencesProfilePictureDataUrlAsync():
+    Promise<ProfilePictureDataBackendDict> {
+    return this.http.get<ProfilePictureDataBackendDict>(
+      this.PREFERENCES_PROFILE_PICTURE_DATA_URL).toPromise();
+  }
+
   async updatePreferencesDataAsync(
       updateType: string,
       data: boolean | string | string[] | EmailPreferencesBackendDict
@@ -148,6 +160,16 @@ export class UserBackendApiService {
       update_type: updateType,
       data: data
     }).toPromise();
+  }
+
+  async updatePreferencesProfilePictureDataUrlAsync(
+      data: string
+  ): Promise<ProfilePictureDataBackendDict> {
+    return this.http.put<ProfilePictureDataBackendDict>(
+      this.PREFERENCES_PROFILE_PICTURE_DATA_URL, {
+        data: data
+      }
+    ).toPromise();
   }
 }
 angular.module('oppia').factory(

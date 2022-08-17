@@ -24,7 +24,7 @@ import { UserInfo } from 'domain/user/user-info.model';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
-import { PreferencesBackendDict, UserBackendApiService } from 'services/user-backend-api.service';
+import { PreferencesBackendDict, ProfilePictureDataBackendDict, UserBackendApiService } from 'services/user-backend-api.service';
 
 describe('User Backend Api Service', () => {
   let userBackendApiService: UserBackendApiService;
@@ -152,12 +152,26 @@ describe('User Backend Api Service', () => {
     flushMicrotasks();
   }));
 
+  it('should update user bio', fakeAsync(() => {
+    let updateType = 'user_bio';
+    let data = '';
+    userBackendApiService.updatePreferencesDataAsync(updateType, data);
+    const req = httpTestingController.expectOne(
+      '/preferenceshandler/data'
+    );
+    expect(req.request.method).toEqual('PUT');
+    req.flush({});
+    flushMicrotasks();
+  }));
+
   it('should handle when set profile image data url is reject',
     fakeAsync(() => {
       const newProfileImageDataurl = '/avatar/x.png';
       const errorMessage = 'It\'s not possible to set a new profile image data';
       userBackendApiService.setProfileImageDataUrlAsync(newProfileImageDataurl);
-      const req = httpTestingController.expectOne('/preferenceshandler/data');
+      const req = httpTestingController.expectOne(
+        '/preferenceshandler/profile_picture_data'
+      );
       expect(req.request.method).toEqual('PUT');
       req.flush(errorMessage);
 
@@ -184,12 +198,31 @@ describe('User Backend Api Service', () => {
     flushMicrotasks();
   }));
 
+  it('should return user preferences profile picture data', fakeAsync(() => {
+    let samplePreferencesProfilePictureData: ProfilePictureDataBackendDict = {
+      profile_picture_data_url: '',
+      subscription_list: []
+    };
+    userBackendApiService.getPreferencesProfilePictureDataUrlAsync().then(
+      PreferencesProfilePictureDataUrl => {
+        expect(PreferencesProfilePictureDataUrl).toEqual(
+          samplePreferencesProfilePictureData
+        );
+      }
+    );
+    const req = httpTestingController.expectOne(
+      '/preferenceshandler/profile_picture_data');
+    expect(req.request.method).toEqual('GET');
+    req.flush(samplePreferencesProfilePictureData);
+
+    flushMicrotasks();
+  }));
+
   it('should return user preferences data', fakeAsync(() => {
     let samplePreferencesData: PreferencesBackendDict = {
       preferred_language_codes: ['en', 'hi'],
       preferred_site_language_code: 'en',
       preferred_audio_language_code: 'en',
-      profile_picture_data_url: '',
       default_dashboard: 'learner',
       user_bio: '',
       subject_interests: '',
@@ -197,7 +230,6 @@ describe('User Backend Api Service', () => {
       can_receive_editor_role_email: true,
       can_receive_feedback_message_email: true,
       can_receive_subscription_email: true,
-      subscription_list: []
     };
     userBackendApiService.getPreferencesAsync().then((preferencesData) => {
       expect(preferencesData).toEqual(samplePreferencesData);

@@ -318,7 +318,9 @@ describe('User Api Service', () => {
   it('should set a profile image data url', fakeAsync(() => {
     const newProfileImageDataurl = '/avatar/x.png';
     userService.setProfileImageDataUrlAsync(newProfileImageDataurl);
-    const req = httpTestingController.expectOne('/preferenceshandler/data');
+    const req = httpTestingController.expectOne(
+      '/preferenceshandler/profile_picture_data'
+    );
     expect(req.request.method).toEqual('PUT');
     req.flush({profile_picture_data_url: newProfileImageDataurl});
 
@@ -330,7 +332,9 @@ describe('User Api Service', () => {
       const newProfileImageDataurl = '/avatar/x.png';
       const errorMessage = 'It\'s not possible to set a new profile image data';
       userService.setProfileImageDataUrlAsync(newProfileImageDataurl);
-      const req = httpTestingController.expectOne('/preferenceshandler/data');
+      const req = httpTestingController.expectOne(
+        '/preferenceshandler/profile_picture_data'
+      );
       expect(req.request.method).toEqual('PUT');
       req.flush(errorMessage);
 

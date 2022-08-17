@@ -54,6 +54,7 @@ HANDLER_CLASS_NAMES_WHICH_STILL_NEED_SCHEMAS = [
     'PendingAccountDeletionPage',
     'PreferenceHandler',
     'PreferencesHandler',
+    'ProfilePictureDataUrlHandler',
     'ProfilePage',
     'QuebstionsListHandler',
     'QuestionCountDataHandler',
