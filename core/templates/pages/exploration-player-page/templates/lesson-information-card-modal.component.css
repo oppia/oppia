@@ -284,9 +284,9 @@
 }
 
 .oppia-lesson-info-card .checkpoint-message-text {
+  font-weight: 800;
   margin-top: 20px;
   text-align: center;
-  font-weight: 800;
 }
 
 .oppia-lesson-info-card .save-progress-btn-container {
