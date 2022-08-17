@@ -597,6 +597,14 @@ URLS = [
         r'%s/<entity_type>/<entity_id>' % (
             feconf.LEARNER_ANSWER_DETAILS_SUBMIT_URL),
         reader.LearnerAnswerDetailsSubmissionHandler),
+    get_redirect_route(
+        r'%s/<exploration_id>/<state_name>/<version>' % (
+            feconf.STATE_VERSION_HISTORY_URL_PREFIX
+        ), reader.StateVersionHistoryHandler),
+    get_redirect_route(
+        r'%s/<exploration_id>/<version>' % (
+            feconf.METADATA_VERSION_HISTORY_URL_PREFIX
+        ), reader.MetadataVersionHistoryHandler),
 
     get_redirect_route(
         r'%s/<question_id>' % feconf.QUESTION_EDITOR_DATA_URL_PREFIX,
@@ -624,6 +632,9 @@ URLS = [
     get_redirect_route(
         r'/createhandler/state_yaml/<exploration_id>',
         editor.StateYamlHandler),
+    get_redirect_route(
+        r'/createhandler/check_revert_valid/<exploration_id>/<version>',
+        editor.ExplorationCheckRevertValidHandler),
     get_redirect_route(
         r'/createhandler/revert/<exploration_id>',
         editor.ExplorationRevertHandler),
@@ -952,11 +963,20 @@ URLS = [
         r'/facilitator_view_of_learner_group_handler/<learner_group_id>',
         learner_group.FacilitatorLearnerGroupViewHandler),
     get_redirect_route(
-        r'/learner_group_search_syllabus_handler/<learner_group_id>',
+        r'/learner_group_search_syllabus_handler',
         learner_group.LearnerGroupSearchSyllabusHandler),
     get_redirect_route(
         r'/learner_group_user_progress_handler/<learner_group_id>',
-        learner_group.LearnerGroupStudentProgressHandler)
+        learner_group.LearnerGroupStudentProgressHandler),
+    get_redirect_route(
+        r'%s' % feconf.FACILITATOR_DASHBOARD_PAGE_URL,
+        learner_group.FacilitatorDashboardPage),
+    get_redirect_route(
+        r'%s' % feconf.CREATE_LEARNER_GROUP_PAGE_URL,
+        learner_group.CreateLearnerGroupPage),
+    get_redirect_route(
+        r'/learner_group_search_student_handler',
+        learner_group.LearnerGroupSearchStudentHandler)
 ]
 
 # Adding redirects for topic landing pages.

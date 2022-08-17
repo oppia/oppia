@@ -57,7 +57,7 @@ class JobOptions(pipeline_options.PipelineOptions): # type: ignore[misc]
             joined_unsupported_options = ', '.join(sorted(unsupported_options))
             raise ValueError(
                 'Unsupported option(s): %s' % joined_unsupported_options)
-        super(JobOptions, self).__init__(
+        super().__init__(
             # Needed by PipelineOptions.
             flags=flags,
             # Needed by GoogleCloudOptions.

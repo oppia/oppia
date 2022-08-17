@@ -49,7 +49,7 @@ describe('Schema Based Int Editor Component', () => {
     focusManagerService = TestBed.inject(FocusManagerService);
     schemaFormSubmittedService = TestBed.inject(SchemaFormSubmittedService);
 
-    component.labelForFocusTarget = {};
+    component.labelForFocusTarget = 'label';
   });
 
   it('should set component properties on initialization', fakeAsync(() => {
@@ -76,10 +76,7 @@ describe('Schema Based Int Editor Component', () => {
   }));
 
   it('should write value', () => {
-    component.localValue = null;
-    component.writeValue(null);
-
-    expect(component.localValue).toEqual(null);
+    component.localValue = 10;
 
     component.writeValue(1);
     expect(component.localValue).toBe(1);

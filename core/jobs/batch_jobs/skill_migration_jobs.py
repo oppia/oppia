@@ -45,6 +45,7 @@ if MYPY: # pragma: no cover
 (base_models, skill_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.skill
 ])
+
 datastore_services = models.Registry.import_datastore_services()
 
 
@@ -181,9 +182,14 @@ class MigrateSkillJob(base_jobs.JobBase):
                 commit_message,
                 change_dicts,
                 additional_models={}
-            ).values()
-        datastore_services.update_timestamps_multi(list(models_to_put))
-        return models_to_put
+            )
+        models_to_put_values = []
+        for model in models_to_put.values():
+            # Here, we are narrowing down the type from object to BaseModel.
+            assert isinstance(model, base_models.BaseModel)
+            models_to_put_values.append(model)
+        datastore_services.update_timestamps_multi(models_to_put_values)
+        return models_to_put_values
 
     @staticmethod
     def _update_skill_summary(

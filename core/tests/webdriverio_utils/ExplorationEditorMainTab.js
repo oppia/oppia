@@ -43,12 +43,12 @@ var ExplorationEditorMainTab = function() {
   var editOutcomeDestAddExplorationId = $(
     '.e2e-test-add-refresher-exploration-id');
   var editOutcomeDestBubble = $('.e2e-test-dest-bubble');
+  var editOutcomeDestForm = $('.e2e-test-dest-form');
   var editOutcomeDestDropdownOptions = $(
     '.e2e-test-destination-selector-dropdown');
   var editorWelcomeModal = $('.e2e-test-welcome-modal');
   var explanationTextAreaElement = $('.e2e-test-explanation-textarea');
   var explorationGraph = $('.e2e-test-exploration-graph');
-  var fadeIn = $('.e2e-test-editor-cards-container');
   var feedbackBubble = $('.e2e-test-feedback-bubble');
   var feedbackEditor = $('.e2e-test-open-feedback-editor');
   var hintTextElement = $('.e2e-test-hint-text');
@@ -69,7 +69,7 @@ var ExplorationEditorMainTab = function() {
   };
   var multipleChoiceAnswerOptions = function(optionNum) {
     return $$(
-      `.e2e-test-html-select-selector=${optionNum}`)[0];
+      `.e2e-test-html-select-selector=${optionNum}`);
   };
   var nodeLabelLocator = '.e2e-test-node-label';
   var openOutcomeDestEditor = $('.e2e-test-open-outcome-dest-editor');
@@ -78,9 +78,9 @@ var ExplorationEditorMainTab = function() {
   var responseBody = function(responseNum) {
     return $(`.e2e-test-response-body-${responseNum}`);
   };
+  var responseTabElement = $('.e2e-test-response-tab');
   var ruleDetails = $('.e2e-test-rule-details');
   var stateContentDisplay = $('.e2e-test-state-content-display');
-  var stateContentEditorLocator = '.e2e-test-state-content-editor';
   var stateEditButton = $('.e2e-test-edit-content-pencil-button');
   var stateEditorTag = $('.e2e-test-state-content-editor');
   var stateNameContainer = $('.e2e-test-state-name-container');
@@ -272,8 +272,9 @@ var ExplorationEditorMainTab = function() {
       if (responseNum === 'default') {
         headerElem = defaultResponseTab;
       } else {
+        await waitFor.visibilityOf(
+          responseTabElement, 'Response tab is not visible');
         var responseTab = await $$('.e2e-test-response-tab');
-        await waitFor.visibilityOf(responseTab[0]);
         headerElem = responseTab[responseNum];
       }
 
@@ -437,8 +438,16 @@ var ExplorationEditorMainTab = function() {
 
     await editOutcomeDestDropdownOptions.selectByVisibleText(targetOption);
 
+    // 'End' is one of the key names present in Webdriver protocol,
+    // and so if we try to pass 'End' in setValue, webdriverio will
+    // press the 'End' key present in keyboard instead of typing 'End'
+    // as a string. Hence, to type 'End' as a string, we need to pass it
+    // as an array of string.
+    if (destName === 'End') {
+      destName = ['E', 'n', 'd'];
+    }
     if (createNewDest) {
-      var editOutcomeDestStateInput = editOutcomeDestBubble.$(
+      var editOutcomeDestStateInput = editOutcomeDestForm.$(
         '.e2e-test-add-state-input');
       await action.setValue(
         'Edit Outcome State Input', editOutcomeDestStateInput, destName);
@@ -460,17 +469,16 @@ var ExplorationEditorMainTab = function() {
       postTutorialPopover, 'Post-tutorial popover does not disappear.');
     await action.waitForAutosave();
     if (expectFadeIn) {
-      await waitFor.fadeInToComplete(
-        fadeIn, 'Editor taking long to fade in');
+      // We use browser.pause() here because waiting for the fade-in to complete
+      // doesn't work for some reason. Also, since the fade-in is a client-side
+      // animation, it should always happen in the same amount of time.
+      // eslint-disable-next-line oppia/e2e-practices
+      await browser.pause(5000);
     }
     await action.click('stateEditButton', stateEditButton);
     await waitFor.visibilityOf(
       stateEditorTag, 'State editor tag not showing up');
-    var stateContentEditor = stateEditorTag.$(stateContentEditorLocator);
-    await waitFor.visibilityOf(
-      stateContentEditor,
-      'stateContentEditor taking too long to appear to set content');
-    var richTextEditor = await forms.RichTextEditor(stateContentEditor);
+    var richTextEditor = await forms.RichTextEditor(stateEditorTag);
     await richTextEditor.clear();
     await richTextInstructions(richTextEditor);
     await action.click('Save State Content Button', saveStateContentButton);
@@ -734,7 +742,7 @@ var ExplorationEditorMainTab = function() {
           'Parameter Element Button', parameterElementButton);
 
         var multipleChoiceAnswerOption =
-          await multipleChoiceAnswerOptions(parameterValues[i]);
+          await multipleChoiceAnswerOptions(parameterValues[i])[0];
 
         await action.click(
           'Multiple Choice Answer Option: ' + i,
@@ -808,14 +816,15 @@ var ExplorationEditorMainTab = function() {
   this.deleteState = async function(stateName) {
     await action.waitForAutosave();
     await general.scrollToTop();
+    var nodeStateElement = await explorationGraph.$(
+      `.e2e-test-node=${stateName}`);
+    await waitFor.visibilityOf(
+      nodeStateElement,
+      'State ' + stateName + ' takes too long to appear or does not exist');
     var nodeElement = await explorationGraph.$$(
       `.e2e-test-node=${stateName}`)[0];
-    await waitFor.visibilityOf(
-      nodeElement,
-      'State ' + stateName + ' takes too long to appear or does not exist');
     var deleteNode = nodeElement.$(deleteNodeLocator);
     await action.click('Delete Node', deleteNode);
-
     await action.click('Confirm Delete State Button', confirmDeleteStateButton);
     await waitFor.invisibilityOf(
       confirmDeleteStateButton, 'Deleting state takes too long');

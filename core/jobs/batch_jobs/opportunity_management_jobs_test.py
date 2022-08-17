@@ -26,6 +26,9 @@ from core.jobs.batch_jobs import opportunity_management_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
 
+from typing import Type
+from typing_extensions import Final
+
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import datastore_services
@@ -37,11 +40,19 @@ if MYPY: # pragma: no cover
     from mypy_imports import topic_models
 
 (
-    exp_models, opportunity_models, story_models,
-    topic_models, skill_models, question_models
+    exp_models,
+    opportunity_models,
+    story_models,
+    topic_models,
+    skill_models,
+    question_models
 ) = models.Registry.import_models([
-    models.NAMES.exploration, models.NAMES.opportunity, models.NAMES.story,
-    models.NAMES.topic, models.NAMES.skill, models.NAMES.question
+    models.NAMES.exploration,
+    models.NAMES.opportunity,
+    models.NAMES.story,
+    models.NAMES.topic,
+    models.NAMES.skill,
+    models.NAMES.question
 ])
 
 datastore_services = models.Registry.import_datastore_services()
@@ -49,8 +60,9 @@ datastore_services = models.Registry.import_datastore_services()
 
 class DeleteSkillOpportunityModelJobTests(job_test_utils.JobTestBase):
 
-    JOB_CLASS = (
-        opportunity_management_jobs.DeleteSkillOpportunityModelJob)
+    JOB_CLASS: Type[
+        opportunity_management_jobs.DeleteSkillOpportunityModelJob
+    ] = opportunity_management_jobs.DeleteSkillOpportunityModelJob
 
     def test_empty_storage(self) -> None:
         self.assert_job_output_is_empty()
@@ -88,15 +100,16 @@ class DeleteSkillOpportunityModelJobTests(job_test_utils.JobTestBase):
 
 class GenerateSkillOpportunityModelJobTests(job_test_utils.JobTestBase):
 
-    JOB_CLASS = (
-        opportunity_management_jobs.GenerateSkillOpportunityModelJob)
+    JOB_CLASS: Type[
+        opportunity_management_jobs.GenerateSkillOpportunityModelJob
+    ] = opportunity_management_jobs.GenerateSkillOpportunityModelJob
 
-    SKILL_1_ID = 'skill_1'
-    SKILL_1_DESCRIPTION = 'skill 1'
-    SKILL_2_ID = 'skill_2'
-    SKILL_2_DESCRIPTION = 'skill 2'
-    QUESTION_1_ID = 'question_1'
-    QUESTION_2_ID = 'question_2'
+    SKILL_1_ID: Final = 'skill_1'
+    SKILL_1_DESCRIPTION: Final = 'skill 1'
+    SKILL_2_ID: Final = 'skill_2'
+    SKILL_2_DESCRIPTION: Final = 'skill 2'
+    QUESTION_1_ID: Final = 'question_1'
+    QUESTION_2_ID: Final = 'question_2'
 
     def setUp(self) -> None:
         super().setUp()
@@ -329,8 +342,9 @@ class GenerateSkillOpportunityModelJobTests(job_test_utils.JobTestBase):
 
 class DeleteExplorationOpportunitySummariesJobTests(job_test_utils.JobTestBase):
 
-    JOB_CLASS = (
-        opportunity_management_jobs.DeleteExplorationOpportunitySummariesJob)
+    JOB_CLASS: Type[
+        opportunity_management_jobs.DeleteExplorationOpportunitySummariesJob
+    ] = opportunity_management_jobs.DeleteExplorationOpportunitySummariesJob
 
     def test_empty_storage(self) -> None:
         self.assert_job_output_is_empty()
@@ -383,18 +397,23 @@ class DeleteExplorationOpportunitySummariesJobTests(job_test_utils.JobTestBase):
 class GenerateExplorationOpportunitySummariesJobTests(
     job_test_utils.JobTestBase):
 
-    JOB_CLASS = (
-        opportunity_management_jobs.GenerateExplorationOpportunitySummariesJob)
+    JOB_CLASS: Type[
+        opportunity_management_jobs.GenerateExplorationOpportunitySummariesJob
+    ] = opportunity_management_jobs.GenerateExplorationOpportunitySummariesJob
 
-    VALID_USER_ID_1 = 'uid_%s' % ('a' * feconf.USER_ID_RANDOM_PART_LENGTH)
-    VALID_USER_ID_2 = 'uid_%s' % ('b' * feconf.USER_ID_RANDOM_PART_LENGTH)
-    EXP_1_ID = 'exp_1_id'
-    EXP_2_ID = 'exp_2_id'
-    TOPIC_1_ID = 'topic_1_id'
-    TOPIC_2_ID = 'topic_2_id'
-    STORY_1_ID = 'story_1_id'
-    STORY_2_ID = 'story_2_id'
-    LANG_1 = 'lang_1'
+    VALID_USER_ID_1: Final = 'uid_%s' % (
+        'a' * feconf.USER_ID_RANDOM_PART_LENGTH
+    )
+    VALID_USER_ID_2: Final = 'uid_%s' % (
+        'b' * feconf.USER_ID_RANDOM_PART_LENGTH
+    )
+    EXP_1_ID: Final = 'exp_1_id'
+    EXP_2_ID: Final = 'exp_2_id'
+    TOPIC_1_ID: Final = 'topic_1_id'
+    TOPIC_2_ID: Final = 'topic_2_id'
+    STORY_1_ID: Final = 'story_1_id'
+    STORY_2_ID: Final = 'story_2_id'
+    LANG_1: Final = 'lang_1'
 
     def setUp(self) -> None:
         super().setUp()
@@ -455,7 +474,7 @@ class GenerateExplorationOpportunitySummariesJobTests(
             init_state_name='state',
             states_schema_version=48,
             states={
-                'state': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
+                'state': state_domain.State.create_default_state(
                     'state', is_initial_state=True
                 ).to_dict()
             })
@@ -540,10 +559,10 @@ class GenerateExplorationOpportunitySummariesJobTests(
             init_state_name='state1',
             states_schema_version=48,
             states={
-                'state1': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
+                'state1': state_domain.State.create_default_state(
                     'state1', is_initial_state=True
                 ).to_dict(),
-                'state2': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
+                'state2': state_domain.State.create_default_state(
                     'state2'
                 ).to_dict()
             })
@@ -795,10 +814,10 @@ class GenerateExplorationOpportunitySummariesJobTests(
             init_state_name='state1',
             states_schema_version=48,
             states={
-                'state1': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
+                'state1': state_domain.State.create_default_state(
                     'state1', is_initial_state=True
                 ).to_dict(),
-                'state2': state_domain.State.create_default_state( # type: ignore[no-untyped-call]
+                'state2': state_domain.State.create_default_state(
                     'state2'
                 ).to_dict()
             })

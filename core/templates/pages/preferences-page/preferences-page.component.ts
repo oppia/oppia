@@ -32,6 +32,8 @@ import { UserService } from 'services/user.service';
 import { EditProfilePictureModalComponent } from './modal-templates/edit-profile-picture-modal.component';
 require('cropperjs/dist/cropper.min.css');
 
+import './preferences-page.component.css';
+
 interface AudioLangaugeChoice {
   id: string;
   text: string;
