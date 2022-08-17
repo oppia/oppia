@@ -170,16 +170,16 @@ class MigrateExplorationJobTests(
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'dummy-subtopic-url')]
         topic.next_subtopic_id = 2
-        topic_services.save_new_topic(feconf.SYSTEM_COMMITTER_ID, topic) # type: ignore[no-untyped-call]
-        topic_services.publish_topic(topic_id, feconf.SYSTEM_COMMITTER_ID) # type: ignore[no-untyped-call]
+        topic_services.save_new_topic(feconf.SYSTEM_COMMITTER_ID, topic)
+        topic_services.publish_topic(topic_id, feconf.SYSTEM_COMMITTER_ID)
 
         story = story_domain.Story.create_default_story(
             story_id, 'A story title', 'description', topic_id,
             'story-one')
         story_services.save_new_story(feconf.SYSTEM_COMMITTER_ID, story)
-        topic_services.add_canonical_story( # type: ignore[no-untyped-call]
+        topic_services.add_canonical_story(
             feconf.SYSTEM_COMMITTER_ID, topic_id, story_id)
-        topic_services.publish_story( # type: ignore[no-untyped-call]
+        topic_services.publish_story(
             topic_id, story_id, feconf.SYSTEM_COMMITTER_ID)
         change_list = [
             story_domain.StoryChange({
