@@ -143,8 +143,9 @@ class BlogPostSearchServicesUnitTests(test_utils.GenericTestBase):
             'title', [], 2)[0]
         self.assertEqual(result, [self.blog_post_b_id])
 
-        # Trying indexing draft blog post
-        draft_blog_post = blog_services.get_blog_post_summary_by_id(self.blog_post_a_id)
+        # Trying indexing draft blog post.
+        draft_blog_post = blog_services.get_blog_post_summary_by_id(
+            self.blog_post_a_id)
         blog_post_search_services.index_blog_post_summaries([draft_blog_post])
 
         result = blog_post_search_services.search_blog_post_summaries(
