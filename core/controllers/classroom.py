@@ -190,6 +190,8 @@ class ClassroomHandler(base.BaseHandler):
     def put(self, classroom_id):
         """Updates properties of a given classroom."""
         classroom = self.normalized_payload.get('classroom_dict')
+        assert classroom_id, classroom.classroom_id
+
         classroom_config_services.update_or_create_classroom_model(classroom)
         self.render_json(self.values)
 
