@@ -43,21 +43,24 @@ const MINI_MESSAGE_MODAL_APPROX_COMPLETE_ANIMATION_DURATION_MS = 6500;
   templateUrl: './checkpoint-celebration-modal.component.html',
 })
 export class CheckpointCelebrationModalComponent implements OnInit, OnDestroy {
-  directiveSubscriptions = new Subscription();
+  // These properties below are initialized using Angular lifecycle hooks
+  // where we need to do non-null assertion. For more information see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   explorationId!: string;
+  checkpointStatusArray!: string[];
+  oppiaAvatarImageUrl!: string;
+  checkpointNodeFadeInDelays!: number[];
+  orderedCheckpointList!: string[]| undefined;
+  checkpointStatusArrayPlaceholder!: string[];
+  directiveSubscriptions = new Subscription();
   exploration: ReadOnlyExplorationBackendDict | undefined;
   hasViewedLessonInfoOnce: boolean | undefined;
-  orderedCheckpointList: string[]| undefined;
   currentStateName: string | undefined;
-  mostRecentlyReachedCheckpointStateName: string | null;
-
+  mostRecentlyReachedCheckpointStateName: string | null = null;
   translatedCurrentCheckpointMessage: string | null = null;
   translatedCurrentCheckpointMessageTitle: string | null = null;
   currentCheckpointPosition: number = 0;
   totalNumberOfCheckpoints: number = 0;
-  checkpointStatusArrayPlaceholder!: string[];
-  checkpointStatusArray!: string[];
-  checkpointNodeFadeInDelays!: number[];
   checkpointNodesAreVisible: boolean = false;
   messageModalIsShown: boolean = false;
   messageModalIsDismissed: boolean = false;
@@ -65,8 +68,7 @@ export class CheckpointCelebrationModalComponent implements OnInit, OnDestroy {
   miniMessageTooltipIsDismissed: boolean = false;
   shouldDisplayFullScaleMessage: boolean = true;
   autoMessageDismissalTimeout: NodeJS.Timeout | undefined;
-  oppiaAvatarImageUrl: string;
-  checkpointTimer: SVGPolylineElement;
+  checkpointTimer: SVGPolylineElement | null = null;
 
   constructor(
     private contextService: ContextService,
@@ -241,7 +243,9 @@ export class CheckpointCelebrationModalComponent implements OnInit, OnDestroy {
   }
 
   dismissMessage(): void {
-    clearTimeout(this.autoMessageDismissalTimeout);
+    if (this.autoMessageDismissalTimeout) {
+      clearTimeout(this.autoMessageDismissalTimeout);
+    }
     this.messageModalIsShown = false;
     this.messageModalIsDismissed = true;
     this.checkpointNodesAreVisible = false;
