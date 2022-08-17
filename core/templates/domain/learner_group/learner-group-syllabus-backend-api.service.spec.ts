@@ -157,7 +157,7 @@ describe('Learner Group Syllabus Backend API Service', () => {
 
       const LEARNER_GROUP_STUDENTS_PROGRESS_URL = (
         '/learner_group_user_progress_handler/groupId');
-    
+
       const studentProgressDicts = [{
         username: 'user1',
         progress_sharing_is_turned_on: true,

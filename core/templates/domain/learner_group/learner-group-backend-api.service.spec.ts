@@ -297,7 +297,7 @@ describe('Learner Group Backend API Service', () => {
         profile_picture_data_url: 'picture2',
         error: ''
       }]
-    }
+    };
 
     const LEARNER_GROUP_STUDENT_INFO_GET_URL = (
       '/learner_group_students_info_handler/groupId'

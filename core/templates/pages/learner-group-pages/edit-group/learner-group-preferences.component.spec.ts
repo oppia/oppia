@@ -20,8 +20,6 @@ import { NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { LearnerGroupSyllabusBackendApiService } from
-  'domain/learner_group/learner-group-syllabus-backend-api.service';
 import { LearnerGroupData } from 'domain/learner_group/learner-group.model';
 import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-group-backend-api.service';
 import { LearnerGroupPreferencesComponent } from './learner-group-preferences.component';
@@ -39,8 +37,6 @@ class MockTrunctePipe {
 describe('LearnerGroupPreferencesComponent', () => {
   let component: LearnerGroupPreferencesComponent;
   let fixture: ComponentFixture<LearnerGroupPreferencesComponent>;
-  let learnerGroupSyllabusBackendApiService:
-    LearnerGroupSyllabusBackendApiService;
   let learnerGroupBackendApiService: LearnerGroupBackendApiService;
 
   const learnerGroupBackendDict = {
@@ -70,8 +66,6 @@ describe('LearnerGroupPreferencesComponent', () => {
   });
 
   beforeEach(() => {
-    learnerGroupSyllabusBackendApiService = TestBed.inject(
-      LearnerGroupSyllabusBackendApiService);
     learnerGroupBackendApiService = TestBed.inject(
       LearnerGroupBackendApiService);
     fixture = TestBed.createComponent(LearnerGroupPreferencesComponent);
@@ -83,20 +77,20 @@ describe('LearnerGroupPreferencesComponent', () => {
   it('should set active tab and check if tab is active correctly', () => {
     component.setActiveTab(
       LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_PREFERENCES_SECTIONS
-      .GROUP_DETAILS);
+        .GROUP_DETAILS);
 
     expect(component.activeTab).toEqual(
       LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_PREFERENCES_SECTIONS
-      .GROUP_DETAILS);
+        .GROUP_DETAILS);
 
     let tabIsActive = component.isTabActive(
       LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_PREFERENCES_SECTIONS
-      .GROUP_DETAILS);
+        .GROUP_DETAILS);
     expect(tabIsActive).toBeTrue();
 
     tabIsActive = component.isTabActive(
       LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_PREFERENCES_SECTIONS
-      .GROUP_STUDENTS);
+        .GROUP_STUDENTS);
     expect(tabIsActive).toBeFalse();
   });
 
@@ -155,7 +149,7 @@ describe('LearnerGroupPreferencesComponent', () => {
       }]
     });
     spyOn(learnerGroupBackendApiService, 'fetchStudentsInfoAsync')
-    .and.returnValue(Promise.resolve(allStudentsInfo));
+      .and.returnValue(Promise.resolve(allStudentsInfo));
 
     expect(component.learnerGroup).toEqual(learnerGroup);
 

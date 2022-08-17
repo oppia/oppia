@@ -24,7 +24,6 @@ import { NavigationService } from 'services/navigation.service';
 import { LearnerGroupSyllabusBackendApiService } from
   'domain/learner_group/learner-group-syllabus-backend-api.service';
 import { LearnerGroupData } from 'domain/learner_group/learner-group.model';
-import { LearnerGroupUserInfo } from 'domain/learner_group/learner-group-user-info.model';
 import { LearnerGroupStudentsProgressComponent } from './learner-group-students-progress.component';
 import { LearnerGroupUserProgress } from 'domain/learner_group/learner-group-user-progress.model';
 
@@ -85,11 +84,6 @@ describe('LearnerGroupStudentsProgressComponent', () => {
     classroom_url_fragment: 'math'
   };
 
-  const userInfo = LearnerGroupUserInfo.createFromBackendDict({
-    username: 'username2',
-    profile_picture_data_url: 'picture',
-    error: ''
-  });
   const sampleLearnerGroupUserProgDict = {
     username: 'username2',
     progress_sharing_is_turned_on: true,
@@ -184,21 +178,22 @@ describe('LearnerGroupStudentsProgressComponent', () => {
   });
 
   it('should search student progress with username matching keyword correctly',
-  () => {
-    component.studentsProgress = [sampleLearnerGroupUserProg];
-    component.matchingUsersProgress = [sampleLearnerGroupUserProg];
+    () => {
+      component.studentsProgress = [sampleLearnerGroupUserProg];
+      component.matchingUsersProgress = [sampleLearnerGroupUserProg];
 
-    component.searchUsernameQuery = '';
-    expect(component.getSearchUsernameResults()).toEqual(
-      [sampleLearnerGroupUserProg]);
+      component.searchUsernameQuery = '';
+      expect(component.getSearchUsernameResults()).toEqual(
+        [sampleLearnerGroupUserProg]);
 
-    component.searchUsernameQuery = 'some';
-    expect(component.getSearchUsernameResults()).toEqual([]);
+      component.searchUsernameQuery = 'some';
+      expect(component.getSearchUsernameResults()).toEqual([]);
 
-    component.searchUsernameQuery = 'Usern';
-    expect(component.getSearchUsernameResults()).toEqual(
-      [sampleLearnerGroupUserProg]);
-  });
+      component.searchUsernameQuery = 'Usern';
+      expect(component.getSearchUsernameResults()).toEqual(
+        [sampleLearnerGroupUserProg]);
+    }
+  );
 
   it('should get user profile image data url correctly', () => {
     const dataUrl = '%2Fimages%2Furl%2F1';
@@ -216,7 +211,7 @@ describe('LearnerGroupStudentsProgressComponent', () => {
   });
 
   it('should update learner specific progress successfully', fakeAsync(() => {
-    component.updateStudentSpecificProgress(sampleLearnerGroupUserProg)
+    component.updateStudentSpecificProgress(sampleLearnerGroupUserProg);
     tick(100);
 
     expect(component.specificStudentProgress).toEqual(

@@ -118,7 +118,7 @@ describe('EditLearnerGroupPageComponent', () => {
       translateService.onLangChange.emit();
 
       expect(component.setPageTitle).toHaveBeenCalled();
-      })
+    })
   );
 
   it('should set page title', () => {

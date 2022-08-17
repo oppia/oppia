@@ -21,8 +21,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NavigationService } from 'services/navigation.service';
-import { LearnerGroupData } from 'domain/learner_group/learner-group.model';
-import { LearnerGroupUserInfo } from 'domain/learner_group/learner-group-user-info.model';
 import { LearnerGroupUserProgress } from 'domain/learner_group/learner-group-user-progress.model';
 import { LearnerGroupStudentSpecificProgressComponent } from './learner-group-student-specific-progress.component';
 
@@ -37,7 +35,7 @@ class MockNavigationService {
   openSubmenu(evt: KeyboardEvent, menuName: string): void {}
 }
 
-fdescribe('LearnerGroupStudentSpecificProgressComponent', () => {
+describe('LearnerGroupStudentSpecificProgressComponent', () => {
   let component: LearnerGroupStudentSpecificProgressComponent;
   let fixture: ComponentFixture<LearnerGroupStudentSpecificProgressComponent>;
 
@@ -80,11 +78,6 @@ fdescribe('LearnerGroupStudentSpecificProgressComponent', () => {
     classroom_url_fragment: 'math'
   };
 
-  const userInfo = LearnerGroupUserInfo.createFromBackendDict({
-    username: 'username2',
-    profile_picture_data_url: 'picture',
-    error: ''
-  });
   const sampleLearnerGroupUserProgDict = {
     username: 'username2',
     progress_sharing_is_turned_on: true,
@@ -96,19 +89,6 @@ fdescribe('LearnerGroupStudentSpecificProgressComponent', () => {
     LearnerGroupUserProgress.createFromBackendDict(
       sampleLearnerGroupUserProgDict)
   );
-
-  const learnerGroupBackendDict = {
-    id: 'groupId',
-    title: 'title',
-    description: 'description',
-    facilitator_usernames: ['facilitator_username'],
-    student_usernames: ['username1'],
-    invited_student_usernames: ['username2'],
-    subtopic_page_ids: [],
-    story_ids: ['story_id_1']
-  };
-  const learnerGroup = LearnerGroupData.createFromBackendDict(
-    learnerGroupBackendDict);
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -129,8 +109,8 @@ fdescribe('LearnerGroupStudentSpecificProgressComponent', () => {
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent
-      (LearnerGroupStudentSpecificProgressComponent);
+    fixture = TestBed.createComponent(
+      LearnerGroupStudentSpecificProgressComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
 

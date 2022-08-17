@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import { LearnerGroupUserInfo, LearnerGroupUserInfoBackendDict } from
-  "./learner-group-user-info.model";
+  './learner-group-user-info.model';
 
 /**
  * @fileoverview Model for displaying instances of frontend domain objects of

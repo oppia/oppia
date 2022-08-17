@@ -154,7 +154,7 @@ describe('LearnerGroupOverviewComponent', () => {
 
     expect(component.activeTab).toEqual(
       LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_OVERVIEW_SECTIONS
-      .SKILLS_ANALYSIS);
+        .SKILLS_ANALYSIS);
     expect(component.learnerGroup).toEqual(learnerGroup);
     expect(component.studentsProgress).toEqual([sampleLearnerGroupUserProg]);
   }));
@@ -162,16 +162,16 @@ describe('LearnerGroupOverviewComponent', () => {
   it('should check whether the given tab is active successfully', () => {
     component.setActiveTab(
       LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_OVERVIEW_SECTIONS
-      .SKILLS_ANALYSIS);
+        .SKILLS_ANALYSIS);
 
     let tabIsActive = component.isTabActive(
       LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_OVERVIEW_SECTIONS
-      .SKILLS_ANALYSIS);
+        .SKILLS_ANALYSIS);
     expect(tabIsActive).toBeTrue();
 
     tabIsActive = component.isTabActive(
       LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_OVERVIEW_SECTIONS
-      .PROGRESS_IN_STORIES);
+        .PROGRESS_IN_STORIES);
     expect(tabIsActive).toBeFalse();
   });
 
