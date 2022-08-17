@@ -18,9 +18,9 @@ from __future__ import annotations
 
 from core import feconf
 from core.constants import constants
-from core.domain import config_domain
 from core.domain import classroom_config_domain
 from core.domain import classroom_config_services
+from core.domain import config_domain
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
@@ -249,11 +249,7 @@ class ClassroomAdminTests(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         classroom_handler_url = (
             feconf.CLASSROOM_HANDLER_URL + '/' + self.physics_classroom_id)
-        self.delete_json(classroom_handler_url)
 
-        response = self.get_json(classroom_handler_url, expected_status_int=400)
-        self.assertEqual(
-            response['error'],
-            'Sorry, classroom with given classroom ID does not exist.'
-        )
+        self.delete_json(classroom_handler_url)
+        self.get_json(classroom_handler_url, expected_status_int=404)
         self.logout()

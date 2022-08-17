@@ -22,12 +22,11 @@ from core import feconf
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import classroom_services
 from core.domain import classroom_config_domain
 from core.domain import classroom_config_services
+from core.domain import classroom_services
 from core.domain import config_domain
 from core.domain import topic_fetchers
-
 
 SCHEMA_FOR_CLASSROOM_ID = {
     'type': 'basestring',
@@ -170,16 +169,17 @@ class ClassroomHandler(base.BaseHandler):
                 }
             }
         },
-        "DELETE": {}
+        'DELETE': {}
     }
 
     @acl_decorators.can_access_admin_page
     def get(self, classroom_id):
         """Handles GET requests."""
-        classroom = classroom_config_services.get_classroom_by_id(classroom_id)
+        classroom = classroom_config_services.get_classroom_by_id(
+            classroom_id, strict=False)
         if classroom is None:
-            raise self.InvalidInputException(
-                'Sorry, classroom with given classroom ID does not exist.')
+            raise self.PageNotFoundException(
+                'The classroom with the given id or url doesn\'t exist.')
 
         self.values.update({
             'classroom_dict': classroom.to_dict()

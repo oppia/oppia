@@ -24,17 +24,17 @@
 
 from __future__ import annotations
 
-from core.constants import constants
-from core.tests import test_utils
 from core.domain import classroom_config_domain
 from core.domain import classroom_config_services
 from core.platform import models
+from core.tests import test_utils
 
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import classroom_models
 
 (classroom_models,) = models.Registry.import_models([models.NAMES.classroom])
+
 
 class ClassroomServicesTests(test_utils.GenericTestBase):
     """Tests for classroom services."""
@@ -94,11 +94,15 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
         self.assertEqual(classroom.to_dict(), self.math_classroom_dict)
 
         self.assertIsNone(
-            classroom_config_services.get_classroom_by_id('incorrect_id'))
+            classroom_config_services.get_classroom_by_id(
+                'incorrect_id', strict=False)
+        )
 
     def test_get_classroom_by_url_fragment(self) -> None:
         classroom = classroom_config_services.get_classroom_by_url_fragment(
             'math')
+        # Ruling out the possibility of None for mypy type checking.
+        assert classroom is not None
         self.assertEqual(classroom.to_dict(), self.math_classroom_dict)
 
         self.assertIsNone(
@@ -142,7 +146,9 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
             }
         )
         self.assertIsNone(
-            classroom_config_services.get_classroom_by_id(new_classroom_id))
+            classroom_config_services.get_classroom_by_id(
+                new_classroom_id, strict=False)
+        )
 
         classroom_config_services.update_or_create_classroom_model(
             chemistry_classroom)
@@ -176,4 +182,5 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
         classroom_config_services.delete_classroom('math_classroom_id')
 
         self.assertIsNone(
-            classroom_config_services.get_classroom_by_id('math_classroom_id'))
+            classroom_config_services.get_classroom_by_id(
+                'math_classroom_id', strict=False))

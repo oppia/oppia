@@ -27,6 +27,9 @@ from __future__ import annotations
 from core.domain import classroom_config_domain
 from core.platform import models
 
+from typing import Dict, List, Optional, overload
+from typing_extensions import Literal
+
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import classroom_models
@@ -34,7 +37,7 @@ if MYPY: # pragma: no cover
 (classroom_models,) = models.Registry.import_models([models.NAMES.classroom])
 
 
-def get_all_classrooms():
+def get_all_classrooms() -> List[classroom_config_domain.Classroom]:
     """Returns all the classrooms present in the datastore.
 
     Returns:
@@ -48,7 +51,7 @@ def get_all_classrooms():
     return classrooms
 
 
-def get_classroom_id_to_classroom_name_dict():
+def get_classroom_id_to_classroom_name_dict() -> Dict[str, str]:
     """Returns a dict with classroom id as key and classroom name as value for
     all the classrooms present in the datastore.
 
@@ -89,8 +92,27 @@ def get_classroom_from_classroom_model(
     )
 
 
+@overload
+def get_classroom_by_id(
+    classroom_id: str
+) -> classroom_config_domain.Classroom: ...
+
+
+@overload
+def get_classroom_by_id(
+    classroom_id: str, *, strict: Literal[True]
+) -> classroom_config_domain.Classroom: ...
+
+
+@overload
+def get_classroom_by_id(
+    classroom_id: str, *, strict: Literal[False]
+) -> Optional[classroom_config_domain.Classroom]: ...
+
+
 def get_classroom_by_id(
     classroom_id: str,
+    strict: bool = True
 ) -> Optional[classroom_config_domain.Classroom]:
     """Returns a domain object representing a classroom.
 
@@ -102,8 +124,8 @@ def get_classroom_by_id(
         Classroom or None. The domain object representing a classroom with the
         given id, or None if it does not exist.
     """
-    classroom_model = classroom_models.ClassroomModel.get_by_id(
-        classroom_id)
+    classroom_model = classroom_models.ClassroomModel.get(
+        classroom_id, strict=strict)
     if classroom_model:
         return get_classroom_from_classroom_model(classroom_model)
     else:
@@ -111,13 +133,12 @@ def get_classroom_by_id(
 
 
 def get_classroom_by_url_fragment(
-    url_fragment: str,
+    url_fragment: str
 ) -> Optional[classroom_config_domain.Classroom]:
     """Returns a domain object representing a classroom.
 
     Args:
         url_fragment: str. The url fragment of the classroom.
-        strict: bool. Fails noisily if the model doesn't exist.
 
     Returns:
         Classroom or None. The domain object representing a classroom with the
@@ -149,6 +170,7 @@ def _update_classroom(
     Args:
         classroom: Classroom. The classroom domain object for the given
             classroom.
+        classroom_model: ClassroomModel. The classroom model instance.
     """
     classroom.validate()
     classroom_model.name = classroom.name
