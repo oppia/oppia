@@ -78,6 +78,11 @@ export class OutcomeEditorComponent implements OnInit {
     return this.stateEditorService.isInQuestionMode();
   }
 
+  isFeedbackLengthExceeded(): boolean {
+    // TODO(#13764): Edit this check after appropriate limits are found.
+    return (this.outcome.feedback._html.length > 10000);
+  }
+
   isCorrectnessFeedbackEnabled(): boolean {
     return this.stateEditorService.getCorrectnessFeedbackEnabled();
   }

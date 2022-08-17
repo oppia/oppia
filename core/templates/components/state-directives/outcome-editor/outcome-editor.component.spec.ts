@@ -25,8 +25,21 @@ import { StateInteractionIdService } from 'components/state-editor/state-editor-
 import { Outcome, OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import { AddOutcomeModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-outcome-modal.component';
+import { of } from 'rxjs';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { ExternalSaveService } from 'services/external-save.service';
 import { OutcomeEditorComponent } from './outcome-editor.component';
+
+class MockWindowDimensionsService {
+  getResizeEvent() {
+    return of(new Event('resize'));
+  }
+
+  getWidth(): number {
+    // Screen width of iPhone 12 Pro (to simulate a mobile viewport).
+    return 390;
+  }
+}
 
 describe('Outcome Editor Component', () => {
   let component: OutcomeEditorComponent;
@@ -36,6 +49,7 @@ describe('Outcome Editor Component', () => {
   let stateInteractionIdService: StateInteractionIdService;
   let ngbModal: NgbModal;
   let outcomeObjectFactory: OutcomeObjectFactory;
+  let windowDimensionsService: MockWindowDimensionsService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -50,6 +64,10 @@ describe('Outcome Editor Component', () => {
         ExternalSaveService,
         StateEditorService,
         StateInteractionIdService,
+        {
+          provide: WindowDimensionsService,
+          useClass: MockWindowDimensionsService
+        }
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -63,6 +81,7 @@ describe('Outcome Editor Component', () => {
     stateEditorService = TestBed.inject(StateEditorService);
     stateInteractionIdService = TestBed.inject(StateInteractionIdService);
     ngbModal = TestBed.inject(NgbModal);
+    windowDimensionsService = TestBed.inject(WindowDimensionsService);
 
     spyOn(stateEditorService, 'isExplorationWhitelisted').and.returnValue(true);
   });
@@ -83,11 +102,18 @@ describe('Outcome Editor Component', () => {
     );
     component.outcome = outcome;
 
+    const windowResizeSpy = spyOn(
+      windowDimensionsService, 'getResizeEvent').and.callThrough();
+
     expect(component.savedOutcome).toBeUndefined();
 
     component.ngOnInit();
+    fixture.detectChanges();
 
     expect(component.savedOutcome).toEqual(outcome);
+    expect(windowResizeSpy).toHaveBeenCalled();
+    expect(component.resizeSubscription).not.toBe(undefined);
+    expect(component.onMobile).toBeTrue();
   });
 
   it('should save feedback on external save event when editFeedbackForm is' +
