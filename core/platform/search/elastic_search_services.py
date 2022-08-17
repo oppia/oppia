@@ -353,10 +353,10 @@ def blog_post_summaries_search(
             }
         }]
     if tags:
-        query_definition['query']['bool']['filter'].append(
-            {'term': {'tags': tags}}
-        )
-
+        for tag in tags:
+            query_definition['query']['bool']['filter'].append(
+                {'match': {'tags': tag}}
+            )
     # Fetch (size + 1) results in order to decide whether a "next
     # page" offset needs to be returned.
     num_docs_to_fetch = size + 1

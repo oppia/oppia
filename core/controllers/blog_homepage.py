@@ -87,7 +87,7 @@ def _get_matching_blog_card_summary_dicts(
     if len(blog_post_summary_dicts) == feconf.DEFAULT_QUERY_LIMIT:
         logging.exception(
             '%s blog post summaries were fetched to load the search/filter by '
-            'result page. You may be running up against the default query'
+            'result page. You may be running up against the default query '
             'limits.'
             % feconf.DEFAULT_QUERY_LIMIT)
     return blog_post_summary_dicts, new_search_offset
@@ -279,7 +279,7 @@ class BlogPostSearchHandler(base.BaseHandler):
 
         self.values.update({
             'summary_dicts': blog_post_summary_dicts,
-            'search_cursor': new_search_offset,
+            'search_offset': new_search_offset,
         })
 
         self.render_json(self.values)

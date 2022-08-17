@@ -573,7 +573,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
             tags = [doc['tags'] for doc in docs]
             self.assertEqual(set(ids), set(expected_blog_post_ids))
             self.assertEqual(set(titles), set(expected_blog_post_titles))
-            self.assertEqual(set(tags), set(expected_blog_post_tags))
+            self.assertEqual(tags.sort(), expected_blog_post_tags.sort())
             return ids
 
         add_docs_counter = test_utils.CallCounter(mock_add_documents_to_index) # type: ignore[no-untyped-call]
@@ -785,7 +785,7 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
         for blog_id in self.all_blog_post_ids[:6]:
             blog_services.publish_blog_post(blog_id)
 
-        # Add blog post 7 to the search index without publishing.
+        # Try Adding blog post 7 to the search index without publishing.
         blog_services.index_blog_post_summaries_given_ids(
             [self.all_blog_post_ids[6]])
 
@@ -842,6 +842,37 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
             sorted([
                 self.ids_of_blog_posts_by_user_B[1],
                 self.ids_of_blog_posts_by_user_B[2],
+            ])
+        )
+
+        # Search for blog posts containing tag 'Math' and 'Social'.
+        blog_post_ids, _ = blog_services.get_blog_post_ids_matching_query(
+            '', ['Math', 'Social'])
+        self.assertEqual(
+            sorted(blog_post_ids),
+            sorted([
+                self.ids_of_blog_posts_by_user_A[1],
+            ])
+        )
+
+        # Search for blog posts containing 'Lessons'.
+        blog_post_ids, _ = blog_services.get_blog_post_ids_matching_query(
+            'Lessons', [])
+        self.assertEqual(
+            sorted(blog_post_ids),
+            sorted([
+                self.ids_of_blog_posts_by_user_B[0],
+                self.ids_of_blog_posts_by_user_B[1],
+            ])
+        )
+
+        # Search for blog posts containing 'Lessons' and tag 'Social'.
+        blog_post_ids, _ = blog_services.get_blog_post_ids_matching_query(
+            'Lessons', ['Social'])
+        self.assertEqual(
+            sorted(blog_post_ids),
+            sorted([
+                self.ids_of_blog_posts_by_user_B[1],
             ])
         )
 

@@ -25,7 +25,7 @@ from core.domain import blog_domain
 from core.domain import user_services
 from core.platform import models
 
-from typing import List, Optional, Tuple, cast
+from typing import List, Optional, Tuple, Union, cast
 from typing_extensions import Final, TypedDict
 
 MYPY = False
@@ -59,6 +59,11 @@ def index_blog_post_summaries(
         blog_post_summaries: list(BlogPostSummary). List of BlogPostSummary
             domain objects to be indexed.
     """
+
+    docs_to_index = [
+        _blog_post_summary_to_search_dict(blog_post_summary)
+        for blog_post_summary in blog_post_summaries
+    ]
     # The argument `documents` of add_documents_to_index() is annotated
     # with List[Dict[str, Any]] because this method can accept any kind
     # of dictionaries, but here we are providing a strict type
@@ -66,15 +71,13 @@ def index_blog_post_summaries(
     # and due to this MyPy throws an error. So, to silent the error, we used
     # ignore here.
     platform_search_services.add_documents_to_index([
-       _blog_post_summary_to_search_dict(blog_post_summary)  # type: ignore[misc]
-        for blog_post_summary in blog_post_summaries
-        if _should_index_blog_post_summary(blog_post_summary)
+       doc for doc in docs_to_index if doc # type: ignore[misc]
     ], SEARCH_INDEX_BLOG_POSTS)
 
 
 def _blog_post_summary_to_search_dict(
     blog_post_summary: blog_domain.BlogPostSummary
-) -> BlogPostSummaryDomainSearchDict:
+) -> Union[BlogPostSummaryDomainSearchDict, None]:
     """Updates the dict to be returned, whether the given blog post summary is
     to be indexed for further queries or not.
 
@@ -85,41 +88,22 @@ def _blog_post_summary_to_search_dict(
         dict. The representation of the given blog post summary, in a form that
         can be used by the search index.
     """
-    author_settings = (
-        user_services.get_user_settings(blog_post_summary.author_id))
-    if blog_post_summary.published_on:
-        rank = math.floor(
-            utils.get_time_in_millisecs(blog_post_summary.published_on))
-    else:
-        rank = 0
-    doc: BlogPostSummaryDomainSearchDict = {
-        'id': blog_post_summary.id,
-        'title': blog_post_summary.title,
-        'tags': blog_post_summary.tags,
-        'author_username': author_settings.username,
-        'rank': rank
-    }
-
-    return doc
-
-
-def _should_index_blog_post_summary(
-    blog_post_summary: blog_domain.BlogPostSummary
-) -> bool:
-    """Returns whether the given blog post should be indexed for future
-    search queries.
-
-    Args:
-        blog_post_summary: BlogPostSummary. BlogPostSummary domain object.
-
-    Returns:
-        bool. Whether the given blog post should be indexed for future
-        search queries.
-    """
-    return (
+    if (
         not blog_post_summary.deleted and
         blog_post_summary.published_on is not None
-    )
+    ):
+        author_settings = (
+            user_services.get_user_settings(blog_post_summary.author_id))
+        doc: BlogPostSummaryDomainSearchDict = {
+            'id': blog_post_summary.id,
+            'title': blog_post_summary.title,
+            'tags': blog_post_summary.tags,
+            'author_username': author_settings.username,
+            'rank': math.floor(
+                utils.get_time_in_millisecs(blog_post_summary.published_on))
+        }
+        return doc
+    return None
 
 
 def search_blog_post_summaries(

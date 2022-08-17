@@ -454,6 +454,9 @@ URLS = [
     get_redirect_route(
         r'%s' % feconf.BLOG_HOMEPAGE_DATA_URL,
         blog_homepage.BlogHomepageDataHandler),
+    get_redirect_route(
+        r'%s' % feconf.BLOG_SEARCH_DATA_URL,
+        blog_homepage.BlogPostSearchHandler),
 
     get_redirect_route(
         r'/assetsdevhandler/<page_context>/<page_identifier>/'

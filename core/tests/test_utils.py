@@ -481,7 +481,7 @@ class ElasticSearchStub:
 
         for f in filters:
             for k, v in f['match'].items():
-                result_docs = [doc for doc in result_docs if doc[k] in v]
+                result_docs = [doc for doc in result_docs if v in doc[k]]
 
         if terms:
             filtered_docs = []

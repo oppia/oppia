@@ -414,7 +414,11 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
                     'bool': {
                         'filter': [{
                             'match': {
-                                'tags': '"tag1" "tag2"',
+                                'tags': 'tag1',
+                            }
+                        }, {
+                            'match': {
+                                'tags': 'tag2',
                             }
                         }],
                         'must': [],
@@ -469,7 +473,11 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
                         }],
                         'filter': [{
                             'match': {
-                                'tags': '"tag1" "tag2"',
+                                'tags': 'tag1',
+                            }
+                        }, {
+                            'match': {
+                                'tags': 'tag2',
                             }
                         }]
                     }

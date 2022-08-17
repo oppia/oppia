@@ -15,6 +15,7 @@
 """Tests for the blog homepage page."""
 
 from __future__ import annotations
+import logging
 
 from core import feconf
 from core.domain import blog_services
@@ -254,3 +255,139 @@ class AuthorsPageHandlerTest(test_utils.GenericTestBase):
                 feconf.AUTHOR_SPECIFIC_BLOG_POST_PAGE_URL_PREFIX,
                 self.BLOG_ADMIN_USERNAME),
             expected_status_int=404)
+
+
+class BlogPostSearchHandlerTest(test_utils.GenericTestBase):
+    """Checks that the search functionality for blog posts is working as
+    expected."""
+
+    username = 'user'
+    user_email = 'user@example.com'
+
+    def setUp(self):
+        """Complete the setup process for testing."""
+
+        super().setUp()
+        self.signup('a@example.com', 'A')
+        self.signup('b@example.com', 'B')
+        self.user_id_a = self.get_user_id_from_email('a@example.com')  # type: ignore[no-untyped-call]
+        self.user_id_b = self.get_user_id_from_email('b@example.com')  # type: ignore[no-untyped-call]
+
+        self.signup(self.user_email, self.username)
+
+        self.ids_of_blog_posts_by_user_A = []
+        for _ in range(2):
+            blog_post = blog_services.create_new_blog_post(self.user_id_a)
+            self.ids_of_blog_posts_by_user_A.append(blog_post.id)
+
+        self.ids_of_blog_posts_by_user_B = []
+        for _ in range(2):
+            blog_post = blog_services.create_new_blog_post(self.user_id_b)
+            self.ids_of_blog_posts_by_user_B.append(blog_post.id)
+
+        self.all_blog_post_ids = (
+            self.ids_of_blog_posts_by_user_A + self.ids_of_blog_posts_by_user_B
+        )
+
+        self.change_dict_1: blog_services.BlogPostChangeDict = {
+            'title': 'Welcome to Oppia',
+            'thumbnail_filename': 'thumbnail.svg',
+            'content': 'Hello Blog Authors',
+            'tags': ['Math', 'Science']
+        }
+        blog_services.update_blog_post(
+            self.ids_of_blog_posts_by_user_A[0], self.change_dict_1)
+
+        self.change_dict_2: blog_services.BlogPostChangeDict = {
+            'title': 'Welcome',
+            'thumbnail_filename': 'thumbnail.svg',
+            'content': 'Hello Blog Authors',
+            'tags': ['Math', 'Social']
+        }
+        blog_services.update_blog_post(
+            self.ids_of_blog_posts_by_user_A[1], self.change_dict_2)
+
+        self.change_dict_3: blog_services.BlogPostChangeDict = {
+            'title': 'New Lessons in Mathematics',
+            'thumbnail_filename': 'thumbnail.svg',
+            'content': 'Hello Blog',
+            'tags': ['Math', 'Oppia']
+        }
+        blog_services.update_blog_post(
+            self.ids_of_blog_posts_by_user_B[0], self.change_dict_3)
+
+        self.change_dict_4: blog_services.BlogPostChangeDict = {
+            'title': 'Basic English Lessons',
+            'thumbnail_filename': 'thumbnail.svg',
+            'content': 'Authors in Oppia',
+            'tags': ['English', 'Oppia', 'Social']
+        }
+        blog_services.update_blog_post(
+            self.ids_of_blog_posts_by_user_B[1], self.change_dict_4)
+
+        for blog_id in self.all_blog_post_ids:
+            blog_services.publish_blog_post(blog_id)
+
+    def test_get_search_page_data(self):
+        self.login(self.user_email)
+
+        # Load the search results with an empty query.
+        response_dict = self.get_json(feconf.BLOG_SEARCH_DATA_URL)
+        self.assertEqual(len(response_dict['summary_dicts']), 4)
+
+        # Deleting a blog post should remove it from search results.
+        blog_services.delete_blog_post(self.ids_of_blog_posts_by_user_A[0])
+        # Load the search results with an empty query.
+        response_dict = self.get_json(feconf.BLOG_SEARCH_DATA_URL)
+        self.assertEqual(len(response_dict['summary_dicts']), 3)
+
+        # Unpublishing a blog post should remove it from search results.
+        blog_services.unpublish_blog_post(self.ids_of_blog_posts_by_user_A[1])
+        # Load the search results with an empty query.
+        response_dict = self.get_json(feconf.BLOG_SEARCH_DATA_URL)
+        self.assertEqual(len(response_dict['summary_dicts']), 2)
+
+    def test_library_handler_with_exceeding_query_limit_logs_error(self):
+        self.login(self.user_email)
+        response_dict = self.get_json(feconf.BLOG_SEARCH_DATA_URL)
+        self.assertEqual(len(response_dict['summary_dicts']), 4)
+        self.assertEqual(response_dict['search_offset'], None)
+
+        observed_log_messages = []
+
+        def _mock_logging_function(msg, *_):
+            """Mocks logging.error()."""
+            observed_log_messages.append(msg)
+
+        logging_swap = self.swap(logging, 'exception', _mock_logging_function)
+        default_query_limit_swap = self.swap(feconf, 'DEFAULT_QUERY_LIMIT', 2)
+        max_cards_limit_swap = self.swap(
+            feconf, 'MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE', 2)
+        # Load the search results with an empty query.
+        with default_query_limit_swap, logging_swap, max_cards_limit_swap:
+            response_dict = self.get_json(feconf.BLOG_SEARCH_DATA_URL)
+
+            self.assertEqual(len(observed_log_messages), 1)
+            self.assertEqual(
+                observed_log_messages[0],
+                '2 blog post summaries were fetched to load the search/filter '
+                'by result page. You may be running up against the default '
+                'query limits.')
+            self.assertEqual(len(response_dict['summary_dicts']), 2)
+            self.assertEqual(response_dict['search_offset'], 2)
+
+    def test_handler_with_given_query_and_tag(self):
+        self.login(self.user_email)
+        response_dict = self.get_json(
+            feconf.BLOG_SEARCH_DATA_URL, params={
+                'q': 'Welcome',
+                'tags': '("Science")'
+            })
+
+        self.assertEqual(len(response_dict['summary_dicts']), 1)
+        self.assertEqual(
+            response_dict['summary_dicts'][0]['id'],
+            self.ids_of_blog_posts_by_user_A[0]
+        )
+
+        self.logout()
