@@ -334,7 +334,7 @@ def advance_version_of_exp_stats(
     if exp_versions_diff is None:
         raise Exception(
             'ExplorationVersionsDiff cannot be None when the change is'
-            ' a revert.'
+            ' not a revert.'
         )
     # Handle unchanged states.
     unchanged_state_names = set(utils.compute_list_difference(
