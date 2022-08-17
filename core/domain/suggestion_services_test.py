@@ -34,14 +34,17 @@ from core.domain import story_domain
 from core.domain import story_services
 from core.domain import suggestion_registry
 from core.domain import suggestion_services
+from core.domain import topic_domain
+from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-(suggestion_models, feedback_models, user_models) = (
+(suggestion_models, feedback_models, opportunity_models, user_models) = (
     models.Registry.import_models(
-        [models.NAMES.suggestion, models.NAMES.feedback, models.NAMES.user]
+        [models.NAMES.suggestion, models.NAMES.feedback, models.NAMES.opportunity,
+        models.NAMES.user]
     )
 )
 
@@ -1752,11 +1755,15 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.AUTHOR_EMAIL, 'author')
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)  # type: ignore[no-untyped-call]
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         self.reviewer_id = self.editor_id
 
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])  # type: ignore[no-untyped-call]
         self.editor = user_services.get_user_actions_info(self.editor_id)
 
         # Login and create exploration and suggestions.
@@ -1937,6 +1944,229 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             translation_suggestion[0].contributor_user_id,
             'user_id'
+        )
+
+    def test_update_translation_stats(self):
+        topic_id = 'topic_id'
+        story_id = 'story_id'
+        exploration = (
+            self.save_new_linear_exp_with_state_names_and_interactions(
+                'exp_01', self.author_id, ['state 1'], ['TextInput'],
+                category='Algebra'))
+        old_content = state_domain.SubtitledHtml(
+            'content', '<p>old content html</p>').to_dict()
+        exploration.states['state 1'].update_content(
+            state_domain.SubtitledHtml.from_dict(old_content))
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'state 1',
+            'new_value': {
+                'content_id': 'content',
+                'html': '<p>old content html</p>'
+            }
+        })]
+        exp_services.update_exploration(
+            self.author_id, exploration.id, change_list, '')
+        topic = topic_domain.Topic.create_default_topic(
+            topic_id, 'newtopic', 'abbrev', 'description', 'fragm')
+        topic.thumbnail_filename = 'thumbnail.svg'
+        topic.thumbnail_bg_color = '#C6DCDA'
+        topic.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Title', ['skill_id_1'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                'dummy-subtopic-url')]
+        topic.next_subtopic_id = 2
+        topic.skill_ids_for_diagnostic_test = ['skill_id_1']
+        topic_services.save_new_topic(self.owner_id, topic)  # type: ignore[no-untyped-call]
+        topic_services.publish_topic(topic_id, self.admin_id)  # type: ignore[no-untyped-call]
+
+        story = story_domain.Story.create_default_story(
+            story_id, 'A story', 'Description', topic_id,
+            'story-two')
+        story_services.save_new_story(self.owner_id, story)  # type: ignore[no-untyped-call]
+        topic_services.add_canonical_story(  # type: ignore[no-untyped-call]
+            self.owner_id, topic_id, story_id)
+        topic_services.publish_story(  # type: ignore[no-untyped-call]
+            topic_id, story_id, self.admin_id)
+
+        opportunity_models.ExplorationOpportunitySummaryModel(
+            id='exp_01',
+            topic_id='topic_id',
+            topic_name='topic_name',
+            story_id='story_id',
+            story_title='story_title',
+            chapter_title='chapter_title',
+            content_count=1,
+        ).put()
+        add_translation_change_dict = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': 'state 1',
+            'content_id': 'content',
+            'language_code': 'hi',
+            'content_html': '<p>old content html</p>',
+            'translation_html': 'Hello world',
+            'data_format': 'html'
+        }
+        suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            'exp_01', 1, self.author_id, add_translation_change_dict,
+            'test description')
+        suggestion_services.update_translation_contribution_stats(
+            suggestion, self.author_id, 'exp_01', True
+        )
+
+        translation_contribution_stats_model = (
+            suggestion_models.TranslationContributionStatsModel.get(
+                'hi', self.author_id, 'topic_id'
+            )
+        )
+        self.assertEqual(
+            translation_contribution_stats_model.submitted_translations_count,
+            1
+        )
+        self.assertEqual(
+            (
+                translation_contribution_stats_model
+                .submitted_translation_word_count
+            ),
+            2
+        )
+        self.assertEqual(
+            translation_contribution_stats_model.accepted_translations_count,
+            0
+        )
+
+        suggestion.status = suggestion_models.STATUS_ACCEPTED
+        suggestion_services.update_translation_review_stats(
+            suggestion, self.reviewer_id, 'exp_01', True
+        )
+
+        translation_review_stats_model = (
+            suggestion_models.TranslationReviewStatsModel.get(
+                'hi', self.reviewer_id, 'topic_id'
+            )
+        )
+        translation_contribution_stats_model = (
+            suggestion_models.TranslationContributionStatsModel.get(
+                'hi', self.author_id, 'topic_id'
+            )
+        )
+
+        self.assertEqual(
+            translation_contribution_stats_model.submitted_translations_count,
+            1
+        )
+        self.assertEqual(
+            (
+                translation_contribution_stats_model
+                .submitted_translation_word_count
+            ),
+            2
+        )
+        self.assertEqual(
+            translation_contribution_stats_model.accepted_translations_count,
+            1
+        )
+        self.assertEqual(
+            translation_review_stats_model.accepted_translations_count,
+            1
+        )
+        self.assertEqual(
+            (
+                translation_review_stats_model
+                .reviewed_translation_word_count
+            ),
+            2
+        )
+
+    def test_update_question_stats(self):
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            skill_id, self.author_id, description='description')
+        topic_id = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            topic_id, 'topic_admin', name='Topic1',
+            abbreviated_name='topic-three', url_fragment='topic-three',
+            description='Description',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[skill_id],
+            subtopics=[], next_subtopic_id=1)
+        suggestion_change = {
+            'cmd': (
+                question_domain
+                .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
+            'question_dict': {
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'language_code': 'en',
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION),
+                'linked_skill_ids': ['skill_1'],
+                'inapplicable_skill_misconception_ids': ['skillid12345-1']
+            },
+            'skill_id': skill_id,
+            'skill_difficulty': 0.3
+        }
+        suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            feconf.ENTITY_TYPE_SKILL, skill_id, 1,
+            self.author_id, suggestion_change, 'test description')
+        suggestion_services.update_question_contribution_stats(
+            suggestion, self.author_id, skill_id, True
+        )
+
+        question_contribution_stats_model = (
+            suggestion_models.QuestionContributionStatsModel.get(
+                self.author_id, topic_id
+            )
+        )
+        self.assertEqual(
+            question_contribution_stats_model.submitted_questions_count,
+            1
+        )
+        self.assertEqual(
+            question_contribution_stats_model.accepted_questions_count,
+            0
+        )
+
+        suggestion.status = suggestion_models.STATUS_ACCEPTED
+        suggestion_services.update_question_review_stats(
+            suggestion, self.reviewer_id, skill_id, True
+        )
+
+        question_review_stats_model = (
+            suggestion_models.QuestionReviewStatsModel.get(
+                self.reviewer_id, topic_id
+            )
+        )
+        question_contribution_stats_model = (
+            suggestion_models.QuestionContributionStatsModel.get(
+                self.author_id, topic_id
+            )
+        )
+
+        self.assertEqual(
+            question_contribution_stats_model.submitted_questions_count,
+            1
+        )
+        self.assertEqual(
+            question_contribution_stats_model.accepted_questions_count,
+            1
+        )
+        self.assertEqual(
+            question_review_stats_model.accepted_questions_count,
+            1
+        )
+        self.assertEqual(
+            (
+                question_review_stats_model
+                .reviewed_questions_count
+            ),
+            1
         )
 
     def test_create_and_reject_suggestion(self):
