@@ -63,5 +63,5 @@ Registry.create_feature_flag(
 Registry.create_feature_flag(
     PARAM_NAMES.checkpoint_celebration,
     'This flag is for the checkpoint celebration feature.',
-    platform_parameter_domain.FeatureStages.DEV,
+    platform_parameter_domain.FeatureStages.PROD,
 )

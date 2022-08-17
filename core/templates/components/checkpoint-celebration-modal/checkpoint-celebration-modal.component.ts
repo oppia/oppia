@@ -27,6 +27,7 @@ import { CheckpointCelebrationUtilityService } from 'pages/exploration-player-pa
 import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
 import { StateCard } from 'domain/state_card/state-card.model';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { PlatformFeatureService } from 'services/platform-feature.service';
 
 import './checkpoint-celebration-modal.component.css';
 
@@ -79,7 +80,8 @@ export class CheckpointCelebrationModalComponent implements OnInit, OnDestroy {
     private playerPositionService: PlayerPositionService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private urlInterpolationService: UrlInterpolationService,
-    private windowDimensionsService: WindowDimensionsService
+    private windowDimensionsService: WindowDimensionsService,
+    private platformFeatureService: PlatformFeatureService
   ) {}
 
   ngOnInit(): void {
@@ -157,7 +159,8 @@ export class CheckpointCelebrationModalComponent implements OnInit, OnDestroy {
   checkIfCheckpointMessageIsToBeTriggered(newStateName: string): void {
     if (
       newStateName === this.currentStateName ||
-      newStateName === this.mostRecentlyReachedCheckpointStateName
+      newStateName === this.mostRecentlyReachedCheckpointStateName ||
+      !this.platformFeatureService.status.CheckpointCelebration.isEnabled
     ) {
       return;
     }
@@ -290,6 +293,9 @@ export class CheckpointCelebrationModalComponent implements OnInit, OnDestroy {
   }
 
   openLessonInfoModal(): void {
+    if (!this.platformFeatureService.status.CheckpointCelebration.isEnabled) {
+      return;
+    }
     this.checkpointCelebrationUtilityService.openLessonInformationModal();
   }
 

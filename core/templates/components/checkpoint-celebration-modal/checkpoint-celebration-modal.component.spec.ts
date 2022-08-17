@@ -33,6 +33,7 @@ import { InteractionObjectFactory } from 'domain/exploration/InteractionObjectFa
 import { WrittenTranslationsObjectFactory } from 'domain/exploration/WrittenTranslationsObjectFactory';
 import { AudioTranslationLanguageService } from 'pages/exploration-player-page/services/audio-translation-language.service';
 import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
+import { PlatformFeatureService } from 'services/platform-feature.service';
 
 class MockCheckpointCelebrationUtilityService {
   isOnCheckpointedState = false;
@@ -64,6 +65,16 @@ class MockCheckpointCelebrationUtilityService {
 
   openLessonInformationModal() {
     this.openLessonInformationModalEmitter.emit();
+  }
+}
+
+class MockPlatformFeatureService {
+  get status(): object {
+    return {
+      CheckpointCelebration: {
+        isEnabled: true
+      }
+    };
   }
 }
 
@@ -217,6 +228,7 @@ describe('Checkpoint celebration modal component', function() {
   let interactionObjectFactory: InteractionObjectFactory;
   let writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory;
   let audioTranslationLanguageService: AudioTranslationLanguageService;
+  let platformFeatureService: PlatformFeatureService;
   let dummyStateCard: StateCard;
   let mockResizeEmitter: EventEmitter<void>;
 
@@ -235,6 +247,10 @@ describe('Checkpoint celebration modal component', function() {
         InteractionObjectFactory,
         WrittenTranslationsObjectFactory,
         AudioTranslationLanguageService,
+        {
+          provide: PlatformFeatureService,
+          useClass: MockPlatformFeatureService
+        },
         {
           provide: WindowDimensionsService,
           useValue: {
@@ -265,6 +281,7 @@ describe('Checkpoint celebration modal component', function() {
       WrittenTranslationsObjectFactory);
     audioTranslationLanguageService = TestBed.inject(
       AudioTranslationLanguageService);
+    platformFeatureService = TestBed.inject(PlatformFeatureService);
     fixture = TestBed.createComponent(CheckpointCelebrationModalComponent);
     component = fixture.componentInstance;
 
@@ -500,6 +517,32 @@ describe('Checkpoint celebration modal component', function() {
     expect(component.triggerMiniMessage).toHaveBeenCalled();
   });
 
+  it('should not check if checkpoint message is to be triggered if feature ' +
+  'is disabled', () => {
+    component.orderedCheckpointList = [
+      'Introduction',
+      'MostRecentlyReachedCheckpointStateName',
+      'NewStateName',
+      'EndState'
+    ];
+    component.currentStateName = 'Introduction';
+    component.mostRecentlyReachedCheckpointStateName = (
+      'MostRecentlyReachedCheckpointStateName');
+    spyOn(checkpointCelebrationUtilityService, 'getCheckpointMessage');
+    spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue(
+      {
+        CheckpointCelebration: {
+          isEnabled: false
+        }
+      }
+    );
+
+    component.checkIfCheckpointMessageIsToBeTriggered('NewStateName');
+
+    expect(checkpointCelebrationUtilityService.getCheckpointMessage)
+      .not.toHaveBeenCalled();
+  });
+
   it('should generate checkpoint status array', () => {
     component.checkpointNodesAreVisible = false;
     component.checkpointStatusArray = new Array(8);
@@ -635,6 +678,22 @@ describe('Checkpoint celebration modal component', function() {
 
     expect(checkpointCelebrationUtilityService.openLessonInformationModal)
       .toHaveBeenCalled();
+  });
+
+  it('should not open lesson info modal if feature is disabled', () => {
+    spyOn(checkpointCelebrationUtilityService, 'openLessonInformationModal');
+    spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue(
+      {
+        CheckpointCelebration: {
+          isEnabled: false
+        }
+      }
+    );
+
+    component.openLessonInfoModal();
+
+    expect(checkpointCelebrationUtilityService.openLessonInformationModal)
+      .not.toHaveBeenCalled();
   });
 
   it('should determine if current language is RTL', () => {
