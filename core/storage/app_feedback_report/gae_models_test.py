@@ -338,14 +338,14 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
         ):
             with self.swap(
                 model_class, 'query',
-                self._mock_query_filters_returns_empy_list):
+                self._mock_query_filters_returns_empty_list):
                 # Using type ignore[arg-type] because we passes arg of type
                 # InvalidFilter to type class filter_field_names. This is done
                 # to ensure that InvalidInputException is thrown.
                 model_class.get_filter_options_for_field(
                     InvalidFilter.INVALID_FIELD) # type: ignore[arg-type]
 
-    def _mock_query_filters_returns_empy_list(
+    def _mock_query_filters_returns_empty_list(
         self, projection: bool, distinct: bool  # pylint: disable=unused-argument
     ) -> List[str]:
         """Mock the model query to test for an invalid filter field. Named
