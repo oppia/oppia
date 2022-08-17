@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import datetime
+import math
 
 from core import utils
 
@@ -91,8 +92,10 @@ class IndexBlogPostSummariesInSearchJobTests(job_test_utils.JobTestBase):
                         'title': 'title',
                         'tags': ['tag1', 'tag2'],
                         'author_username': self.USERNAME,
-                        'rank': utils.get_time_in_millisecs(
-                            blog_summary.published_on),
+                        'rank': math.floor(
+                            utils.get_time_in_millisecs(
+                                blog_summary.published_on
+                            )),
                     }],
                     blog_post_search_services.SEARCH_INDEX_BLOG_POSTS)
             ]
@@ -138,7 +141,10 @@ class IndexBlogPostSummariesInSearchJobTests(job_test_utils.JobTestBase):
                         'title': 'title',
                         'tags': ['tag1', 'tag2'],
                         'author_username': self.USERNAME,
-                        'rank': utils.get_time_in_millisecs(date_time_now),
+                        'rank': math.floor(
+                            utils.get_time_in_millisecs(
+                                blog_summary.published_on
+                            )),
                     }],
                     blog_post_search_services.SEARCH_INDEX_BLOG_POSTS
                 ) for i in range(5)
@@ -193,8 +199,10 @@ class IndexBlogPostSummariesInSearchJobTests(job_test_utils.JobTestBase):
                         'title': 'title',
                         'tags': ['tag1', 'tag2'],
                         'author_username': self.USERNAME,
-                        'rank': utils.get_time_in_millisecs(
-                            blog_summary.published_on),
+                        'rank': math.floor(
+                            utils.get_time_in_millisecs(
+                                blog_summary.published_on
+                            )),
                     }],
                     blog_post_search_services.SEARCH_INDEX_BLOG_POSTS
                 )

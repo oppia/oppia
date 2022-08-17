@@ -40,6 +40,7 @@ from core import utils
 from core.constants import constants
 from core.controllers import base
 from core.domain import auth_domain
+from core.domain import blog_services
 from core.domain import caching_domain
 from core.domain import collection_domain
 from core.domain import collection_services
@@ -480,8 +481,12 @@ class ElasticSearchStub:
         terms = body['query']['bool']['must']
 
         for f in filters:
-            for k, v in f['match'].items():
-                result_docs = [doc for doc in result_docs if v in doc[k]]
+            if index == blog_services.SEARCH_INDEX_BLOG_POSTS:
+                for k, v in f['match'].items():
+                    result_docs = [doc for doc in result_docs if v in doc[k]]
+            else:
+                for k, v in f['match'].items():
+                    result_docs = [doc for doc in result_docs if doc[k] in v]
 
         if terms:
             filtered_docs = []
