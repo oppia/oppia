@@ -28,9 +28,9 @@ import { UtilsService } from 'services/utils.service';
   providedIn: 'root'
 })
 export class StateLinkedSkillIdService
-    // Until a skill is selected, the state attribute is undefined. Also used to
+    // Until a skill is selected, the state attribute is null. Also used to
     // avoid circular dependencies.
-    extends StatePropertyService<string | undefined> {
+    extends StatePropertyService<string | null> {
   constructor(alertsService: AlertsService, utilsService: UtilsService) {
     super(alertsService, utilsService);
     this.setterMethodKey = 'saveLinkedSkillId';
