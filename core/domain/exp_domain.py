@@ -3252,7 +3252,7 @@ class ExplorationSummary:
         version: int,
         exploration_model_created_on: datetime.datetime,
         exploration_model_last_updated: datetime.datetime,
-        first_published_msec: float,
+        first_published_msec: Optional[float],
         deleted: bool = False
     ) -> None:
         """Initializes a ExplorationSummary domain object.
@@ -3290,8 +3290,9 @@ class ExplorationSummary:
                 the exploration model is created.
             exploration_model_last_updated: datetime.datetime. Date and time
                 when the exploration model was last updated.
-            first_published_msec: float. Time in milliseconds since the Epoch,
-                when the exploration was first published.
+            first_published_msec: float|None. Time in milliseconds since the
+                Epoch, when the exploration was first published, or None if
+                Exploration is not published yet.
             deleted: bool. Whether the exploration is marked as deleted.
         """
         self.id = exploration_id

@@ -1803,11 +1803,11 @@ def regenerate_exploration_summary_with_new_contributor(
     """
     exploration = exp_fetchers.get_exploration_by_id(
         exploration_id, strict=False)
-    exp_rights = rights_manager.get_exploration_rights(
-        exploration_id, strict=True)
     exp_summary = exp_fetchers.get_exploration_summary_by_id(
         exploration_id, strict=False)
     if exploration is not None:
+        exp_rights = rights_manager.get_exploration_rights(
+            exploration_id, strict=True)
         if exp_summary is None:
             updated_exp_summary = generate_new_exploration_summary(
                 exploration, exp_rights)
@@ -1867,6 +1867,9 @@ def update_exploration_summary(
 
     Returns:
         ExplorationSummary. The resulting exploration summary domain object.
+
+    Raises:
+        Exception. No data available for when the exploration was created_on.
     """
     scaled_average_rating = get_scaled_average_rating(exp_summary.ratings)
 
@@ -1885,11 +1888,6 @@ def update_exploration_summary(
     if exploration.created_on is None:
         raise Exception(
             'No data available for when the exploration was created_on.'
-        )
-
-    if exp_rights.first_published_msec is None:
-        raise Exception(
-            'No data available for when the exploration was first published.'
         )
 
     return exp_domain.ExplorationSummary(
@@ -1919,16 +1917,14 @@ def generate_new_exploration_summary(
 
     Returns:
         ExplorationSummary. The resulting exploration summary domain object.
+
+    Raises:
+        Exception. No data available for when the exploration was created_on.
     """
     ratings = feconf.get_empty_ratings()
     scaled_average_rating = get_scaled_average_rating(ratings)
     exploration_model_last_updated = datetime.datetime.fromtimestamp(
         get_last_updated_by_human_ms(exploration.id) / 1000.0)
-
-    if exp_rights.first_published_msec is None:
-        raise Exception(
-            'No data available for when the exploration was first published.'
-        )
 
     if exploration.created_on is None:
         raise Exception(

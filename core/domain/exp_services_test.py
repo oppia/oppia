@@ -6134,6 +6134,36 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
             ['Could not find exploration with ID dummy_id']
         )
 
+    def test_raises_error_while_creating_summary_if_no_created_on_data_present(
+        self
+    ) -> None:
+        self.save_new_valid_exploration('exp_id', 'owner_id')
+        exploration = exp_fetchers.get_exploration_by_id('exp_id')
+        exp_rights = rights_manager.get_exploration_rights(
+            'exp_id', strict=True)
+        exploration.created_on = None
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            Exception, 'No data available for when the exploration was'
+        ):
+            exp_services.generate_new_exploration_summary(
+                exploration, exp_rights
+            )
+
+    def test_raises_error_while_updating_summary_if_no_created_on_data_present(
+        self
+    ) -> None:
+        self.save_new_valid_exploration('exp_id', 'owner_id')
+        exploration = exp_fetchers.get_exploration_by_id('exp_id')
+        exp_rights = rights_manager.get_exploration_rights(
+            'exp_id', strict=True)
+        exploration.created_on = None
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            Exception, 'No data available for when the exploration was'
+        ):
+            exp_services.generate_new_exploration_summary(
+                exploration, exp_rights
+            )
+
 
 class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
     """Test exploration summaries get_* functions."""
