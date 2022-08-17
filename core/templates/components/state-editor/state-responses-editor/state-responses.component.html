@@ -69,7 +69,7 @@
                                                (showMarkAllAudioAsNeedingUpdateModalIfRequired)="sendshowMarkAllAudioAsNeedingUpdateModalIfRequired($event)">
                     </oppia-answer-group-editor>
                   </div>
-                  <div class="btn btn-danger oppia-delete-response"
+                  <div class="btn btn-danger oppia-delete-response e2e-test-delete-response"
                        *ngIf="editabilityService.isEditable()"
                        (click)="deleteAnswerGroup($event, index)">
                     Delete Response
