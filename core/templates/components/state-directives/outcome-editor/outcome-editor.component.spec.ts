@@ -538,4 +538,28 @@ describe('Outcome Editor Component', () => {
     expect(component.savedOutcome.refresherExplorationId).toBe(null);
     expect(component.savedOutcome.missingPrerequisiteSkillId).toBe('SkillId');
   });
+
+  it('should check if outcome feedback exceeds 10000 characters', () => {
+    component.outcome = new Outcome(
+      'Dest',
+      null,
+      new SubtitledHtml('a'.repeat(10000), 'contentId'),
+      true,
+      [],
+      'OutcomeExpId',
+      'SkillId',
+    );
+    expect(component.isFeedbackLengthExceeded()).toBeFalse();
+
+    component.outcome = new Outcome(
+      'Dest',
+      null,
+      new SubtitledHtml('a'.repeat(10001), 'contentId'),
+      true,
+      [],
+      'OutcomeExpId',
+      'SkillId',
+    );
+    expect(component.isFeedbackLengthExceeded()).toBeTrue();
+  });
 });
