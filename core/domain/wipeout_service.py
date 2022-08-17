@@ -351,6 +351,7 @@ def delete_user(pending_deletion_request):
     _pseudonymize_config_models(pending_deletion_request)
     _delete_models(user_id, models.NAMES.feedback)
     _delete_models(user_id, models.NAMES.improvements)
+    _delete_models(user_id, models.NAMES.suggestion)
     if feconf.ROLE_ID_MOBILE_LEARNER not in user_roles:
         remove_user_from_activities_with_associated_rights_models(
             pending_deletion_request.user_id)
@@ -1280,6 +1281,7 @@ def _pseudonymize_suggestion_models(pending_deletion_request):
     """
     user_id = pending_deletion_request.user_id
 
+<<<<<<< HEAD
     suggestion_models.TranslationContributionStatsModel.apply_deletion_policy(
         user_id
     )
@@ -1296,6 +1298,8 @@ def _pseudonymize_suggestion_models(pending_deletion_request):
         user_id
     )
 
+=======
+>>>>>>> 4ba04d87b7e8aea3953287ae183c8e7d1c0031b6
     voiceover_application_class = (
         suggestion_models.GeneralVoiceoverApplicationModel)
 

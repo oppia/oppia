@@ -395,7 +395,7 @@ describe('State Responses Component', () => {
       defaultOutcome);
     spyOn(component, 'openAddAnswerGroupModal');
 
-    expect(component.answerGroups).toEqual(undefined);
+    expect(component.answerGroups).toEqual([]);
     expect(component.defaultOutcome).toEqual(undefined);
     expect(component.activeAnswerGroupIndex).toBe(undefined);
 
@@ -437,7 +437,7 @@ describe('State Responses Component', () => {
     spyOn(stateEditorService, 'getInapplicableSkillMisconceptionIds')
       .and.returnValue(['misconception1']);
 
-    expect(component.answerGroups).toEqual(undefined);
+    expect(component.answerGroups).toEqual([]);
     expect(component.defaultOutcome).toEqual(undefined);
     expect(component.activeAnswerGroupIndex).toBe(undefined);
     expect(component.inapplicableSkillMisconceptionIds).toEqual(undefined);

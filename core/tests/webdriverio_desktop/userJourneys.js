@@ -119,7 +119,7 @@ describe('Site language', function() {
     await workflow.createExploration(true);
     firstExplorationId = await general.getExplorationIdFromEditor();
     await explorationEditorMainTab.setContent(
-      await forms.toRichText('Language Test'));
+      await forms.toRichText('Language Test'), true);
     await explorationEditorMainTab.setInteraction('NumericInput');
     await explorationEditorMainTab.addResponse(
       'NumericInput', await forms.toRichText('Nice!!'),
@@ -128,7 +128,8 @@ describe('Site language', function() {
       'default');
     await responseEditor.setFeedback(await forms.toRichText('Ok!!'));
     await explorationEditorMainTab.moveToState('END');
-    await explorationEditorMainTab.setContent(await forms.toRichText('END'));
+    await explorationEditorMainTab.setContent(
+      await forms.toRichText('END'), true);
     await explorationEditorMainTab.setInteraction('EndExploration');
 
     // Save changes.
