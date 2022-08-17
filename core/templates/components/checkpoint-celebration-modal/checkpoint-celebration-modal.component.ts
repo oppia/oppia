@@ -36,6 +36,7 @@ const CHECKPOINT_STATUS_IN_PROGRESS = 'in-progress';
 
 const MESSAGE_MODAL_APPROX_TRIGGER_AND_DISMISSAL_DURATION_MS = 2200;
 const MESSAGE_MODAL_APPROX_COMPLETE_ANIMATION_DURATION_MS = 15000;
+const MINI_MESSAGE_MODAL_APPROX_COMPLETE_ANIMATION_DURATION_MS = 6500;
 
 @Component({
   selector: 'oppia-checkpoint-celebration-modal',
@@ -65,6 +66,7 @@ export class CheckpointCelebrationModalComponent implements OnInit, OnDestroy {
   shouldDisplayFullScaleMessage: boolean = true;
   autoMessageDismissalTimeout: NodeJS.Timeout | undefined;
   oppiaAvatarImageUrl: string;
+  checkpointTimer: SVGPolylineElement;
 
   constructor(
     private contextService: ContextService,
@@ -235,7 +237,7 @@ export class CheckpointCelebrationModalComponent implements OnInit, OnDestroy {
     this.miniMessageTooltipIsShown = true;
     setTimeout(() => {
       this.miniMessageTooltipIsShown = false;
-    }, MESSAGE_MODAL_APPROX_COMPLETE_ANIMATION_DURATION_MS);
+    }, MINI_MESSAGE_MODAL_APPROX_COMPLETE_ANIMATION_DURATION_MS);
   }
 
   dismissMessage(): void {
@@ -260,7 +262,7 @@ export class CheckpointCelebrationModalComponent implements OnInit, OnDestroy {
     if (!this.shouldDisplayFullScaleMessage) {
       return;
     }
-    const checkpointTimer = document.querySelector(
+    this.checkpointTimer = document.querySelector(
       '.checkpoint-celebration-modal-timer') as SVGPolylineElement;
     // This function is meant to reset the timer SVG to its initial position,
     // i.e. completely filled. This needs to happen instantly, as opposed to the
@@ -275,12 +277,12 @@ export class CheckpointCelebrationModalComponent implements OnInit, OnDestroy {
     // To force the browser to pick up this change, we need to trigger a reflow.
     // The clientHeight property is one of the properties that causes a
     // reflow.
-    checkpointTimer.style.transitionDuration = '0s';
-    checkpointTimer.style.strokeDashoffset = '0';
-    checkpointTimer.clientHeight;
-    checkpointTimer.style.transitionDuration = '12.14s';
-    checkpointTimer.clientHeight;
-    checkpointTimer.style.strokeDashoffset = '10';
+    this.checkpointTimer.style.transitionDuration = '0s';
+    this.checkpointTimer.style.strokeDashoffset = '0';
+    this.checkpointTimer.clientHeight;
+    this.checkpointTimer.style.transitionDuration = '12.14s';
+    this.checkpointTimer.clientHeight;
+    this.checkpointTimer.style.strokeDashoffset = '10';
   }
 
   openLessonInfoModal(): void {

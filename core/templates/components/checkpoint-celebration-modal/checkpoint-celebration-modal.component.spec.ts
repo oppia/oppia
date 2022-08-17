@@ -500,23 +500,142 @@ describe('Checkpoint celebration modal component', function() {
     expect(component.triggerMiniMessage).toHaveBeenCalled();
   });
 
-  it('should generate checkpoint status array', () => {});
+  it('should generate checkpoint status array', () => {
+    component.checkpointNodesAreVisible = false;
+    component.checkpointStatusArray = new Array(8);
+    component.currentCheckpointPosition = 4;
+    component.totalNumberOfCheckpoints = 8;
 
-  it('should get completed progress bar width', () => {});
+    component.generateCheckpointStatusArray();
 
-  it('should set fade-in delays for checkpoint nodes', () => {});
+    expect(component.checkpointStatusArray).toEqual([
+      'completed', 'completed', 'completed', 'completed',
+      'in-progress', 'incomplete', 'incomplete', 'incomplete'
+    ]);
+    expect(component.checkpointNodesAreVisible).toEqual(true);
+  });
 
-  it('should trigger standard message', () => {});
+  it('should get completed progress bar width', () => {
+    component.messageModalIsShown = false;
 
-  it('should trigger mini message', () => {});
+    expect(component.getCompletedProgressBarWidth()).toEqual(0);
 
-  it('should dismiss message', () => {});
+    component.currentCheckpointPosition = 0;
+    component.totalNumberOfCheckpoints = 5;
+    component.messageModalIsShown = true;
 
-  it('should dismiss mini message', () => {});
+    expect(component.getCompletedProgressBarWidth()).toEqual(0);
 
-  it('should reset timer', () => {});
+    component.currentCheckpointPosition = 2;
 
-  it('should open lesson info modal', () => {});
+    expect(component.getCompletedProgressBarWidth()).toEqual(37.5);
+  });
+
+  it('should set fade-in delays for checkpoint nodes', () => {
+    component.totalNumberOfCheckpoints = 5;
+    component.checkpointNodeFadeInDelays = new Array(5);
+
+    component.setFadeInDelaysForCheckpointNodes();
+
+    const expectedDelays = [2.2, 2.5, 2.8, 3.1, 3.4];
+
+    component.checkpointNodeFadeInDelays.forEach((delay, index) => {
+      expect(delay).withContext(`fade-in delay for checkpoint ${index}`)
+        .toBeCloseTo(expectedDelays[index]);
+    });
+  });
+
+  it('should trigger standard message', fakeAsync(() => {
+    component.messageModalIsShown = false;
+    component.checkpointNodesAreVisible = true;
+    spyOn(component, 'resetTimer');
+
+    component.triggerStandardMessage();
+
+    expect(component.messageModalIsShown).toEqual(true);
+    expect(component.resetTimer).toHaveBeenCalled();
+
+    tick(15100);
+
+    expect(component.messageModalIsShown).toEqual(false);
+    expect(component.checkpointNodesAreVisible).toEqual(false);
+  }));
+
+  it('should trigger mini message', fakeAsync(() => {
+    component.miniMessageTooltipIsShown = false;
+
+    component.triggerMiniMessage();
+
+    expect(component.miniMessageTooltipIsShown).toEqual(true);
+
+    tick(6500);
+
+    expect(component.miniMessageTooltipIsShown).toEqual(false);
+  }));
+
+  it('should dismiss message', fakeAsync(() => {
+    let mockSetTimeout = setTimeout(() => {});
+    component.autoMessageDismissalTimeout = mockSetTimeout;
+    component.messageModalIsShown = true;
+    component.messageModalIsDismissed = false;
+    component.checkpointNodesAreVisible = true;
+
+    component.dismissMessage();
+
+    expect(component.messageModalIsShown).toEqual(false);
+    expect(component.messageModalIsDismissed).toEqual(true);
+    expect(component.checkpointNodesAreVisible).toEqual(false);
+
+    tick(2500);
+
+    expect(component.messageModalIsDismissed).toEqual(false);
+  }));
+
+  it('should dismiss mini message', fakeAsync(() => {
+    component.miniMessageTooltipIsShown = true;
+    component.miniMessageTooltipIsDismissed = false;
+
+    component.dismissMiniMessage();
+
+    expect(component.miniMessageTooltipIsShown).toEqual(false);
+    expect(component.miniMessageTooltipIsDismissed).toEqual(true);
+
+    tick(2500);
+
+    expect(component.miniMessageTooltipIsDismissed).toEqual(false);
+  }));
+
+  it('should reset timer', () => {
+    spyOn(document, 'querySelector').and.returnValue({
+      style: {
+        transitionDuration: '0s',
+        strokeDashoffset: '0',
+      }
+    } as SVGPolylineElement);
+    component.shouldDisplayFullScaleMessage = false;
+
+    component.resetTimer();
+
+    expect(document.querySelector).not.toHaveBeenCalled();
+
+    component.shouldDisplayFullScaleMessage = true;
+
+    component.resetTimer();
+
+    expect(document.querySelector).toHaveBeenCalled();
+    expect(component.checkpointTimer.style.transitionDuration).toEqual(
+      '12.14s');
+    expect(component.checkpointTimer.style.strokeDashoffset).toEqual('10');
+  });
+
+  it('should open lesson info modal', () => {
+    spyOn(checkpointCelebrationUtilityService, 'openLessonInformationModal');
+
+    component.openLessonInfoModal();
+
+    expect(checkpointCelebrationUtilityService.openLessonInformationModal)
+      .toHaveBeenCalled();
+  });
 
   it('should determine if current language is RTL', () => {
     const isLanguageRTLSpy = spyOn(
