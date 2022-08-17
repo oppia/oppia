@@ -165,14 +165,14 @@ var ExplorationEditorSettingsTab = function() {
     await waitFor.presenceOf(
       explorationObjectiveInput,
       'Objective input takes too long to be visible.');
-    expect(await explorationObjectiveInput.getAttribute('value')).
+    expect(await explorationObjectiveInput.getValue()).
       toEqual(objective);
   };
 
   this.expectTitleToBe = async function(title) {
     await waitFor.presenceOf(
       explorationTitleInput, 'Title input takes too long to be visible.');
-    expect(await explorationTitleInput.getAttribute('value')).
+    expect(await explorationTitleInput.getValue()).
       toEqual(title);
   };
 
@@ -180,7 +180,7 @@ var ExplorationEditorSettingsTab = function() {
     await waitFor.presenceOf(
       explorationObjectiveWarning,
       'Objective warning takes too long to be visible.');
-    expect(await explorationObjectiveWarning.getCSSProperty('color')).
+    expect((await explorationObjectiveWarning.getCSSProperty('color')).value).
       toEqual(color);
   };
 };
