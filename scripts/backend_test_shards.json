@@ -90,7 +90,7 @@
         "core.domain.beam_job_services_test",
         "core.domain.blog_domain_test",
         "core.domain.blog_services_test",
-        "core.domain.blog_post_services_test",
+        "core.domain.blog_post_search_services_test",
         "core.controllers.blog_admin_test",
         "core.controllers.blog_dashboard_test",
         "core.controllers.blog_homepage_test",
