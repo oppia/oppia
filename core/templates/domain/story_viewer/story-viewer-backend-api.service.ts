@@ -32,7 +32,10 @@ import { StoryViewerDomainConstants } from
   'domain/story_viewer/story-viewer-domain.constants';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
-import { ChapterProgressSummary, ChapterProgressSummaryBackendDict } from 'domain/learner_group/learner-group-user-progress.model';
+import {
+  ChapterProgressSummary,
+  ChapterProgressSummaryBackendDict
+} from 'domain/exploration/chapter-progress-summary.model';
 
 interface StoryChapterCompletionBackendResponse {
   'next_node_id': string;

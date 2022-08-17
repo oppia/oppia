@@ -50,7 +50,7 @@ export class EditLearnerGroupPageComponent implements OnInit, OnDestroy {
     private pageTitleService: PageTitleService,
     private translateService: TranslateService,
     private learnerGroupBackendApiService: LearnerGroupBackendApiService,
-    private contextService: ContextService,
+    private contextService: ContextService
   ) {}
 
   ngOnInit(): void {

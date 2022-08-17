@@ -22,6 +22,8 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { LearnerGroupSyllabusBackendApiService } from
   './learner-group-syllabus-backend-api.service';
+import { LearnerGroupSyllabus } from './learner-group-syllabus.model';
+import { LearnerGroupUserProgress } from './learner-group-user-progress.model';
 
 describe('Learner Group Syllabus Backend API Service', () => {
   var learnerGroupSyllabusBackendApiService:
@@ -29,15 +31,16 @@ describe('Learner Group Syllabus Backend API Service', () => {
   let httpTestingController: HttpTestingController;
 
   const sampleLearnerGroupSubtopicSummaryDict = {
-    subtopic_id: 'subtopicId',
+    subtopic_id: 1,
     subtopic_title: 'subtopicTitle',
     parent_topic_id: 'parentTopicId',
-    parent_topic_name: 'Place Values',
+    parent_topic_name: 'parentTopicName',
     thumbnail_filename: 'thumbnailFilename',
-    thumbnail_bg_color: 'red'
+    thumbnail_bg_color: 'red',
+    subtopic_mastery: 0.5
   };
 
-  let nodeDict = {
+  const nodeDict = {
     id: 'node_1',
     thumbnail_filename: 'image.png',
     title: 'Title 1',
@@ -59,11 +62,11 @@ describe('Learner Group Syllabus Backend API Service', () => {
     thumbnail_bg_color: '#F8BF74',
     description: 'Description',
     story_is_published: true,
-    completed_node_titles: [],
+    completed_node_titles: ['Chapter 1'],
     url_fragment: 'story-url-fragment',
     all_node_dicts: [nodeDict],
-    topic_name: 'Place Values',
-    topic_url_fragment: 'place-values',
+    topic_name: 'Topic one',
+    topic_url_fragment: 'topic-one',
     classroom_url_fragment: 'math'
   };
 
@@ -119,6 +122,67 @@ describe('Learner Group Syllabus Backend API Service', () => {
       flushMicrotasks();
 
       expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
+
+  it('should successfully fetch learner group syllabus to be shown',
+    fakeAsync(() => {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
+
+      const LEARNER_GROUP_SYLLABUS_URL = (
+        '/learner_group_syllabus_handler/groupId');
+
+      learnerGroupSyllabusBackendApiService.fetchLearnerGroupSyllabus(
+        'groupId').then(successHandler, failHandler);
+
+      var req = httpTestingController.expectOne(LEARNER_GROUP_SYLLABUS_URL);
+      expect(req.request.method).toEqual('GET');
+      req.flush(sampleLearnerGroupSyllabusDict);
+
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalledWith(
+        LearnerGroupSyllabus.createFromBackendDict(
+          sampleLearnerGroupSyllabusDict));
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
+
+  it('should successfully fetch students progress in assigned syllabus',
+    fakeAsync(() => {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
+
+      const LEARNER_GROUP_STUDENTS_PROGRESS_URL = (
+        '/learner_group_user_progress_handler/groupId');
+    
+      const studentProgressDicts = [{
+        username: 'user1',
+        progress_sharing_is_turned_on: true,
+        profile_picture_data_url: 'picture',
+        stories_progress: [sampleStorySummaryBackendDict],
+        subtopic_pages_progress: [sampleLearnerGroupSubtopicSummaryDict]
+      }];
+
+      learnerGroupSyllabusBackendApiService
+        .fetchStudentsProgressInAssignedSyllabus('groupId', ['user1'])
+        .then(successHandler, failHandler);
+
+      var req = httpTestingController.expectOne(
+        LEARNER_GROUP_STUDENTS_PROGRESS_URL +
+        '?student_usernames=%5B%22user1%22%5D');
+      expect(req.request.method).toEqual('GET');
+      req.flush(studentProgressDicts);
+
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalledWith(
+        studentProgressDicts.map(
+          progressInfoDict => LearnerGroupUserProgress.createFromBackendDict(
+            progressInfoDict)
+        ));
       expect(failHandler).not.toHaveBeenCalled();
     })
   );

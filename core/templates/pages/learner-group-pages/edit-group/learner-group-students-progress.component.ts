@@ -18,8 +18,9 @@
 
 import { Component, Input, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { ChapterProgressSummary } from 'domain/exploration/chapter-progress-summary.model';
 import { LearnerGroupSyllabusBackendApiService } from 'domain/learner_group/learner-group-syllabus-backend-api.service';
-import { ChapterProgressSummary, LearnerGroupUserProgress } from 'domain/learner_group/learner-group-user-progress.model';
+import { LearnerGroupUserProgress } from 'domain/learner_group/learner-group-user-progress.model';
 import { LearnerGroupData } from 'domain/learner_group/learner-group.model';
 import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
 import { NavigationService } from 'services/navigation.service';
@@ -33,19 +34,18 @@ import './learner-group-students-progress.component.css';
 })
 export class LearnerGroupStudentsProgressComponent implements OnInit {
   @Input() learnerGroup!: LearnerGroupData;
-  studentsProgress!: LearnerGroupUserProgress[];
+  studentsProgress: LearnerGroupUserProgress[] = [];
   studentSpecificProgressViewIsActive = false;
   specificStudentProgress!: LearnerGroupUserProgress;
   searchUsernameQuery: string = '';
-  matchingUsersProgress!: LearnerGroupUserProgress[];
-  storiesChaptersProgress!: ChapterProgressSummary[];
+  matchingUsersProgress: LearnerGroupUserProgress[] = [];
+  storiesChaptersProgress: ChapterProgressSummary[] = [];
 
   constructor(
     private learnerGroupSyllabusBackendApiService:
       LearnerGroupSyllabusBackendApiService,
     private navigationService: NavigationService,
     private storyViewerBackendApiService: StoryViewerBackendApiService
-
   ) {}
 
   ngOnInit(): void {
@@ -58,11 +58,6 @@ export class LearnerGroupStudentsProgressComponent implements OnInit {
           this.matchingUsersProgress = this.studentsProgress;
         });
     }
-  }
-
-  getStudentsProgressToDisplay(): void {
-    this.studentsProgress.forEach(studentProgress => {
-    });
   }
 
   getCompletedStoriesCountByStudent(index: number): number {

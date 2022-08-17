@@ -18,9 +18,11 @@
 
 import { Component, Input } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { ChapterProgressSummary } from
+  'domain/exploration/chapter-progress-summary.model';
 import { LearnerGroupSyllabusBackendApiService }
   from 'domain/learner_group/learner-group-syllabus-backend-api.service';
-import { ChapterProgressSummary, LearnerGroupUserProgress } from
+import { LearnerGroupUserProgress } from
   'domain/learner_group/learner-group-user-progress.model';
 import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
 import { LearnerGroupPagesConstants } from '../learner-group-pages.constants';

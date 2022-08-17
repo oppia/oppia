@@ -17,44 +17,6 @@
  * user info domain objects.
  */
 
-export interface LearnerGroupAllStudentsInfoBackendDict {
-  students_info: LearnerGroupUserInfoBackendDict[];
-  invited_students_info: LearnerGroupUserInfoBackendDict[];
-}
-
-export class LearnerGroupAllStudentsInfo {
-  _studentsInfo: LearnerGroupUserInfo[];
-  _invitedStudentsInfo: LearnerGroupUserInfo[];
-
-  constructor(
-      studentsInfo: LearnerGroupUserInfo[],
-      invitedStudentsInfo: LearnerGroupUserInfo[]
-  ) {
-    this._studentsInfo = studentsInfo;
-    this._invitedStudentsInfo = invitedStudentsInfo;
-  }
-
-  get studentsInfo(): LearnerGroupUserInfo[] {
-    return this._studentsInfo;
-  }
-
-  get invitedStudentsInfo(): LearnerGroupUserInfo[] {
-    return this._invitedStudentsInfo;
-  }
-
-  static createFromBackendDict(
-      infoBackendDict: LearnerGroupAllStudentsInfoBackendDict
-  ): LearnerGroupAllStudentsInfo {
-    return new LearnerGroupAllStudentsInfo(
-      infoBackendDict.students_info.map((info) => {
-        return LearnerGroupUserInfo.createFromBackendDict(info);
-      }),
-      infoBackendDict.invited_students_info.map((info) => {
-        return LearnerGroupUserInfo.createFromBackendDict(info);
-      }));
-  }
-}
-
 export interface LearnerGroupUserInfoBackendDict {
   username: string;
   profile_picture_data_url: string;

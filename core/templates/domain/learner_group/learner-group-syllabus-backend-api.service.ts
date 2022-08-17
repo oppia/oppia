@@ -112,8 +112,6 @@ export class LearnerGroupSyllabusBackendApiService {
               progressInfo)
           )
         );
-      }, errorResponse => {
-        reject(errorResponse.error.error);
       });
     });
   }

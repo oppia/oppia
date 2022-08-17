@@ -58,12 +58,14 @@ export class LearnerGroupSyllabusComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.learnerGroupSyllabusBackendApiService.fetchLearnerGroupSyllabus(
-      this.learnerGroup.id).then(groupSyllabus => {
-      this.subtopicSummaries = groupSyllabus.subtopicPageSummaries;
-      this.storySummaries = groupSyllabus.storySummaries;
-      this.setDisplayOrderOfSyllabusItems();
-    });
+    if (this.learnerGroup) {
+      this.learnerGroupSyllabusBackendApiService.fetchLearnerGroupSyllabus(
+        this.learnerGroup.id).then(groupSyllabus => {
+        this.subtopicSummaries = groupSyllabus.subtopicPageSummaries;
+        this.storySummaries = groupSyllabus.storySummaries;
+        this.setDisplayOrderOfSyllabusItems();
+      });
+    }
   }
 
   setDisplayOrderOfSyllabusItems(): void {
@@ -195,9 +197,6 @@ export class LearnerGroupSyllabusComponent implements OnInit {
       this.toggleAddNewSyllabusItemsMode();
     }, () => {
       this.ngOnInit();
-      // Note to developers:
-      // This callback is triggered when the Cancel button is clicked.
-      // No further action is needed.
     });
   }
 

@@ -23,11 +23,12 @@ import { Injectable } from '@angular/core';
 
 import { LearnerGroupBackendDict, LearnerGroupData } from './learner-group.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { LearnerGroupUserInfo, LearnerGroupUserInfoBackendDict } from
+  './learner-group-user-info.model';
 import {
   LearnerGroupAllStudentsInfo,
-  LearnerGroupAllStudentsInfoBackendDict,
-  LearnerGroupUserInfo, LearnerGroupUserInfoBackendDict
-} from './learner-group-user-info.model';
+  LearnerGroupAllStudentsInfoBackendDict
+} from './learner-group-all-students-info.model';
 
 
 interface DeleteLearnerGroupBackendResponse {
