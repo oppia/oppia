@@ -21,6 +21,7 @@ from __future__ import annotations
 from core.tests import test_utils
 from scripts import run_backend_tests # pylint: disable=unused-import
 
+
 # The script run_backend_tests will be tested fully under the GSoC project:
 # Improve line and branch coverage for the backend and frontend.
 class RunBackendTestsTests(test_utils.GenericTestBase):
