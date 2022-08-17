@@ -276,6 +276,12 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         blog_post_rights = (
             blog_services.get_blog_post_rights(self.blog_post_a_id))
         self.assertFalse(blog_post_rights.blog_post_is_published)
+        blog_post_model = (
+            blog_services.get_blog_post_by_id(self.blog_post_a_id))
+        self.assertIsNone(blog_post_model.published_on)
+        blog_post_summary_model = (
+            blog_services.get_blog_post_summary_by_id(self.blog_post_a_id))
+        self.assertIsNone(blog_post_summary_model.published_on)
 
     def test_cannot_unpublish_invalid_blog_post(self) -> None:
         blog_services.delete_blog_post(self.blog_post_a_id)
