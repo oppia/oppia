@@ -2461,6 +2461,7 @@ div#ng-curtain {
 
 .oppia-navbar-back-button {
   color: white;
+  font-size: 20px;
   padding: 6px;
 }
 

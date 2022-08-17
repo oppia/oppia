@@ -22,10 +22,9 @@
          class="blog-post-thumbnail-uploader d-flex flex-column flex-grow-1 text-center justify-content-center position-relative"
          [ngClass]="{'blog-post-narrow-thumbnail-uploader': isWindowNarrow, 'image-uploader-is-narrow': blogDashboardPageService.imageUploaderIsNarrow, 'uploader-with-error-message': errorMessage}"
          for="image-file-input">
-    <mat-icon class="mx-auto"
-              [ngClass]="{'d-none': blogDashboardPageService.imageUploaderIsNarrow}">
-      insert_photo
-    </mat-icon>
+    <i class="fas fa-image image-uploader-no-thumbnail-icon"
+       [ngClass]="{'d-none': blogDashboardPageService.imageUploaderIsNarrow}">
+    </i>
     <span class="font-weight-light">{{ 'I18N_BLOG_POST_THUMBNAIL_PICTURE_DRAG' | translate }}</span>
   </label>
 </div>
@@ -144,6 +143,10 @@
 
   .uploader-with-error-message {
     height: 135px
+  }
+
+  .image-uploader-no-thumbnail-icon {
+    font-size: 30px;
   }
 
   @media(max-width:768px) {

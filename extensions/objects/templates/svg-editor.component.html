@@ -282,9 +282,8 @@
   </div>
   <div *ngIf="isDiagramSaved()">
     <div class="diagram-editor-saved-image-container e2e-test-saved-diagram-container">
-      <i class="material-icons diagram-editor-edit edit-icon" (click)="continueDiagramEditing()"
-         title="Continue editing the diagram">
-        &#xE254;
+      <i class="fas fa-pen diagram-editor-edit edit-icon" (click)="continueDiagramEditing()"
+         title="Continue editing the diagram">s
       </i>
       <img [src]="data.savedSvgUrl" [ngStyle]="svgContainerStyle">
     </div>
