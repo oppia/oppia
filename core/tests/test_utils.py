@@ -77,7 +77,7 @@ import requests_mock
 from typing import (
     IO, Any, Callable, Collection, Dict, Iterable, Iterator, List, Mapping,
     Optional, OrderedDict, Pattern, Sequence, Set, Tuple, Type,
-    Union, cast, overload
+    Union, overload
 )
 from typing_extensions import Final, Literal, TypedDict
 import webapp2
