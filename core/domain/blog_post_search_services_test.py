@@ -131,3 +131,22 @@ class BlogPostSearchServicesUnitTests(test_utils.GenericTestBase):
             blog_post_search_services.delete_blog_post_summary_from_search_index(self.blog_post_a_id)  # pylint: disable=line-too-long
 
         self.assertEqual(delete_docs_counter.times_called, 1)
+
+    def test_should_not_index_draft_blog_post(self) -> None:
+        result = blog_post_search_services.search_blog_post_summaries(
+            'title', [], 2)[0]
+        self.assertEqual(result, [self.blog_post_a_id, self.blog_post_b_id])
+
+        # Unpublishing a blog post removes it from the search index.
+        blog_services.unpublish_blog_post(self.blog_post_a_id)
+        result = blog_post_search_services.search_blog_post_summaries(
+            'title', [], 2)[0]
+        self.assertEqual(result, [self.blog_post_b_id])
+
+        # Trying indexing draft blog post
+        draft_blog_post = blog_services.get_blog_post_summary_by_id(self.blog_post_a_id)
+        blog_post_search_services.index_blog_post_summaries([draft_blog_post])
+
+        result = blog_post_search_services.search_blog_post_summaries(
+            'title', [], 2)[0]
+        self.assertEqual(result, [self.blog_post_b_id])

@@ -103,8 +103,7 @@ def _blog_post_summary_to_search_dict(
                 utils.get_time_in_millisecs(blog_post_summary.published_on))
         }
         return doc
-    return None
-
+    return
 
 def search_blog_post_summaries(
     query: str,
