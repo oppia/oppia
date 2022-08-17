@@ -165,10 +165,6 @@
   justify-content: space-between;
 }
 
-.checkpoint-celebration-modal .standard-message-container .reverse-checkpoint-order {
-  flex-direction: row-reverse;
-}
-
 .checkpoint-celebration-modal .standard-message-container .progress-bar {
   background-color: #bbb;
   border-radius: 5px;

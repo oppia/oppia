@@ -289,7 +289,11 @@ export class CheckpointCelebrationModalComponent implements OnInit, OnDestroy {
     this.checkpointTimer.clientHeight;
     this.checkpointTimer.style.transitionDuration = '12.14s';
     this.checkpointTimer.clientHeight;
-    this.checkpointTimer.style.strokeDashoffset = '10';
+    if (this.isLanguageRTL()) {
+      this.checkpointTimer.style.strokeDashoffset = '-10';
+    } else {
+      this.checkpointTimer.style.strokeDashoffset = '10';
+    }
   }
 
   openLessonInfoModal(): void {

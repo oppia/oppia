@@ -58,8 +58,8 @@
       {{ translatedCurrentCheckpointMessage }}
     </p>
     <div class="progress-bar-container"
-         [ngClass]="{'single-checkpoint-bar': totalNumberOfCheckpoints === 1, 'multiple-checkpoints-bar': totalNumberOfCheckpoints > 1, 'reverse-checkpoint-order': isLanguageRTL()}">
-      <div class="progress-bar" [ngClass]="{'reverse-checkpoint-order': isLanguageRTL()}">
+         [ngClass]="{'single-checkpoint-bar': totalNumberOfCheckpoints === 1, 'multiple-checkpoints-bar': totalNumberOfCheckpoints > 1}">
+      <div class="progress-bar">
         <div class="completed-progress-bar"
              [style.width.%]="getCompletedProgressBarWidth() ? getCompletedProgressBarWidth() : 0">
         </div>

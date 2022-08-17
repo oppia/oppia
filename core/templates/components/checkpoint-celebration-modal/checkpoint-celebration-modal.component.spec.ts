@@ -655,6 +655,8 @@ describe('Checkpoint celebration modal component', function() {
         strokeDashoffset: '0',
       }
     } as SVGPolylineElement);
+    const rtlSpy = spyOn(i18nLanguageCodeService, 'isLanguageRTL')
+      .and.returnValue(false);
     component.shouldDisplayFullScaleMessage = false;
 
     component.resetTimer();
@@ -666,9 +668,19 @@ describe('Checkpoint celebration modal component', function() {
     component.resetTimer();
 
     expect(document.querySelector).toHaveBeenCalled();
+    expect(rtlSpy).toHaveBeenCalled();
     expect(component.checkpointTimer.style.transitionDuration).toEqual(
       '12.14s');
     expect(component.checkpointTimer.style.strokeDashoffset).toEqual('10');
+
+    rtlSpy.and.returnValue(true);
+
+    component.resetTimer();
+
+    expect(rtlSpy).toHaveBeenCalled();
+    expect(component.checkpointTimer.style.transitionDuration).toEqual(
+      '12.14s');
+    expect(component.checkpointTimer.style.strokeDashoffset).toEqual('-10');
   });
 
   it('should open lesson info modal', () => {
