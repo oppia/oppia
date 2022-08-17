@@ -499,7 +499,7 @@ class TopicIdToDiagnosticTestSkillIdsHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    def normalize_comma_separated_topic_ids(self, comma_separated_topic_ids):
+    def normalize_comma_separated_topic_ids(comma_separated_topic_ids):
         """Normalizes a comma seperated topic IDs into a list of topic IDs.
 
         Args:

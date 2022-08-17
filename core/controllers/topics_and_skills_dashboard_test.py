@@ -1073,7 +1073,7 @@ class TopicIdToDiagnosticTestSkillIdsHandlerTests(
     def setUp(self) -> None:
         super().setUp()
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
-        self.url = '%s/%s' % (
+        self.url = '%s/?comma_separated_topic_ids=%s' % (
             feconf.TOPIC_ID_TO_DIAGNOSTIC_TEST_SKILL_IDS_HANDLER, 'topic_id')
 
         self.topic = topic_domain.Topic.create_default_topic(
@@ -1100,7 +1100,7 @@ class TopicIdToDiagnosticTestSkillIdsHandlerTests(
             {'topic_id': ['skill_id_1']}
         )
 
-        url = '%s/%s' % (
+        url = '%s/?comma_separated_topic_ids=%s' % (
             feconf.TOPIC_ID_TO_DIAGNOSTIC_TEST_SKILL_IDS_HANDLER,
             'incorrect_topic_id')
         json_response = self.get_json(url)
