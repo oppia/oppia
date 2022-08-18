@@ -123,9 +123,11 @@ export class LearnerViewInfoComponent {
     }
   }
 
-  getTopicUrl(): string {
-    let topicUrlFragment!: string;
-    let classroomUrlFragment!: string;
+  // Returns null if the topic is not linked to the learner's current
+  // exploration.
+  getTopicUrl(): string | null {
+    let topicUrlFragment: string | null = null;
+    let classroomUrlFragment: string | null = null;
 
     try {
       topicUrlFragment = (

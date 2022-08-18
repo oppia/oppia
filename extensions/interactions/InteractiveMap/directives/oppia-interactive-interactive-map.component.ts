@@ -58,9 +58,7 @@ export class InteractiveInteractiveMapComponent implements OnInit, OnDestroy {
   @Input() lastAnswer!: number[] | null;
   @Input() longitudeWithValue!: string;
   @Input() zoomWithValue!: string;
-  // Class Marker is of type Marker<P=any> therefore type
-  // cannot be determined.
-  mapMarkers!: Marker<unknown>;
+  mapMarkers!: Marker<string>;
   mapOptions!: MapOptions;
   coords!: [number, number];
   zoomLevel!: number;
