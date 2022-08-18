@@ -169,24 +169,25 @@ var ExplorationEditorSettingsTab = function() {
   };
 
   this.expectCategoryToBe = async function(category) {
+    var containerLocator = by.css('.e2e-test-exploration-category-dropdown');
     await waitFor.presenceOf(
       explorationCategoryInput,
       'Exploration category input takes too long to be visible.');
-    expect(await explorationCategoryInput.$('option:checked').getText()).
+    expect(await element(containerLocator).getText()).
       toEqual(category);
   };
 
   this.expectFirstStateToBe = async function(firstState) {
     await waitFor.presenceOf(
       initialStateSelect, 'Initial state select takes too long to be visible.');
-    expect(await initialStateSelect.$('option:checked').getText()).
+    expect(await initialStateSelect.getText()).
       toEqual(firstState);
   };
 
   this.expectLanguageToBe = async function(language) {
     await waitFor.presenceOf(
       explorationLanguageInput, 'Language input takes too long to be visible.');
-    expect(await explorationLanguageInput.$('option:checked').getText()).
+    expect(await explorationLanguageInput.getText()).
       toEqual(language);
     await action.click('Neutral element', neutralElement);
   };
