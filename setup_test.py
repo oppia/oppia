@@ -53,13 +53,12 @@ class SetupTests(test_utils.GenericTestBase):
                 'include_package_data': True,
             }])
 
-        dummy_path = sys.path
-        dummy_path2 = []
-        for path in dummy_path:
-            if 'google-cloud-sdk' not in path:
-                dummy_path2.append(path)
+        dummy_path = []
+        for path in sys.path:
+            if common.GOOGLE_CLOUD_SDK_HOME not in path:
+                dummy_path.append(path)
 
-        swap_path = self.swap(sys, 'path', dummy_path2)
+        swap_path = self.swap(sys, 'path', dummy_path)
         
         with swap_setup, swap_path:
             import setup
