@@ -68,7 +68,7 @@ _PARSER.add_argument(
     required=True, choices=['1', '2'])
 
 
-def run_lighthouse_puppeteer_script():
+def run_lighthouse_puppeteer_script() -> None:
     """Runs puppeteer script to collect dynamic urls."""
     puppeteer_path = (
         os.path.join('core', 'tests', 'puppeteer', 'lighthouse_setup.js'))
@@ -98,7 +98,7 @@ def run_lighthouse_puppeteer_script():
         sys.exit(1)
 
 
-def run_webpack_compilation():
+def run_webpack_compilation() -> None:
     """Runs webpack compilation."""
     max_tries = 5
     webpack_bundles_dir_name = 'webpack_bundles'
@@ -116,7 +116,7 @@ def run_webpack_compilation():
         sys.exit(1)
 
 
-def export_url(line):
+def export_url(line) -> None:
     """Exports the entity ID in the given line to an environment variable, if
     the line is a URL.
 
@@ -139,7 +139,7 @@ def export_url(line):
         os.environ['skill_id'] = url_parts[4]
 
 
-def run_lighthouse_checks(lighthouse_mode, shard):
+def run_lighthouse_checks(lighthouse_mode, shard) -> None:
     """Runs the Lighthouse checks through the Lighthouse config.
 
     Args:
@@ -175,7 +175,7 @@ def run_lighthouse_checks(lighthouse_mode, shard):
         sys.exit(1)
 
 
-def main(args=None):
+def main(args=None) -> None:
     """Runs lighthouse checks and deletes reports."""
     parsed_args = _PARSER.parse_args(args=args)
 

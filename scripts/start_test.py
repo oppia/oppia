@@ -32,13 +32,13 @@ class MockCompiler:
 
 
 class MockCompilerContextManager():
-    def __init__(self):
+    def __init__(self) -> None:
         pass
 
-    def __enter__(self):
+    def __enter__(self) -> MockCompiler:
         return MockCompiler()
 
-    def __exit__(self, *unused_args):
+    def __exit__(self, *unused_args) -> None:
         pass
 
 
