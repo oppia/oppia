@@ -16,12 +16,11 @@
 
 from __future__ import annotations
 
-from core.tests import test_utils
-import sys
-
 import pkg_resources
 import setuptools
+import sys
 
+from core.tests import test_utils
 from scripts import common # isort:skip pylint: disable=unused-import
 # Since feconf imports typing_extensions, it should be
 # imported after common is imported.
@@ -59,7 +58,7 @@ class SetupTests(test_utils.GenericTestBase):
                 dummy_path.append(path)
 
         swap_path = self.swap(sys, 'path', dummy_path)
-        
+
         with swap_setup, swap_path:
             import setup
             setup.main()
