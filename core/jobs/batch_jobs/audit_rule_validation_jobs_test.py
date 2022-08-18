@@ -1255,7 +1255,7 @@ class ExpAuditRuleChecksJobTest(job_test_utils.JobTestBase):
             f'[{{\'state_name\': \'EXP_1_STATE_1\', \'ans_group_idx\': [0]}}]'
           ),
           job_run_result.JobRunResult.as_stdout(
-            'NUMBER OF EXPS WITH INVALID CURATED DRAG DROP RULES SUCCESS: 1'
+            'NUMBER OF CURATED EXPS WITH INVALID DRAG DROP RULES SUCCESS: 1'
           )
         ])
 

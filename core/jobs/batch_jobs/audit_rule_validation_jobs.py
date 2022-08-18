@@ -46,7 +46,10 @@ datastore_services = models.Registry.import_datastore_services()
 class ExpAuditRuleChecksJob(base_jobs.JobBase):
     """Job that filters out the explorations which contains only one answer
     group and one rule spec which is invalid according to our validation checks
-    , removing them will result in the disconnected state
+    , removing them will result in the disconnected state. Returns the language
+    codes of the exploration that have `Continue` interaction text value more
+    than 20. Also returns the curated explorations that do not have the
+    alt-with-value attribute inside the image RTE component
     """
 
     @staticmethod
@@ -506,10 +509,14 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
         return (model_pair[0] is not None) and (model_pair[1] is not None)
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        all_explorations = (
+        exp_model_pipeline = (
             self.pipeline
             | 'Get all ExplorationModels' >> ndb_io.GetModels(
                 exp_models.ExplorationModel.get_all(include_deleted=False))
+        )
+
+        all_explorations = (
+            exp_model_pipeline
             | 'Get exploration from model' >> beam.Map(
                 self.get_exploration_from_models)
             | 'Filter valid explorations' >> beam.Filter(
@@ -524,9 +531,7 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
         )
 
         exps_with_id_and_models = (
-            self.pipeline
-            | 'Get all ExplorationModels again' >> ndb_io.GetModels(
-                exp_models.ExplorationModel.get_all(include_deleted=False))
+            exp_model_pipeline
             | 'Map id and exp model' >> beam.Map(
                 lambda exp: (exp.id, exp)
             )
@@ -547,8 +552,7 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
         curated_explorations = (
             (exps_with_id_and_models, all_exp_opportunities)
             | 'Combine the PCollections s' >> beam.CoGroupByKey()
-            | 'Drop off the exp ids' >>
-                beam.Values() # pylint: disable=no-value-for-parameter
+            | 'Drop off the exp ids' >> beam.Values() # pylint: disable=no-value-for-parameter
             | 'Get tuple pairs from both models' >> beam.Map(
                 self.convert_into_model_pair)
             | 'Filter curated explorations' >> beam.Filter(
@@ -614,7 +618,7 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
             filter_invalid_curated_drag_drop_rules
             | 'Report count for invalid curated drag drop rules' >> (
                 job_result_transforms.CountObjectsToJobRunResult(
-                    'NUMBER OF EXPS WITH INVALID CURATED DRAG DROP RULES')
+                    'NUMBER OF CURATED EXPS WITH INVALID DRAG DROP RULES')
             )
         )
 
@@ -631,7 +635,8 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
             )
         )
 
-        # Continue Text should be non-empty and have a max-length of 20.
+        # Continue Text should be non-empty and have a max-length of 20,
+        # it returns the language code of invalid explorations.
         filter_invalid_continue_text_values = (
             all_explorations
             | 'Filter invalid continue interaction explorations'
