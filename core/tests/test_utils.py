@@ -28,6 +28,7 @@ import inspect
 import itertools
 import json
 import logging
+import math
 import os
 import random
 import re
@@ -4487,7 +4488,7 @@ class FailingFunction(FunctionWrapper):
     It can be set to succeed after a given number of calls.
     """
 
-    INFINITY: Final = 'infinity'
+    INFINITY: Final = math.inf
 
     # Here we use type Any because argument 'f' can accept any kind of
     # function signature. So, to allow every function signature we used
@@ -4496,14 +4497,14 @@ class FailingFunction(FunctionWrapper):
         self,
         f: Callable[..., Any],
         exception: Union[Type[BaseException], BaseException],
-        num_tries_before_success: Union[str, int]
+        num_tries_before_success: float
     ) -> None:
         """Create a new Failing function.
 
         Args:
             f: func. See FunctionWrapper.
             exception: Exception. The exception to be raised.
-            num_tries_before_success: int. The number of times to raise an
+            num_tries_before_success: float. The number of times to raise an
                 exception, before a call succeeds. If this is 0, all calls will
                 succeed, if it is FailingFunction. INFINITY, all calls will
                 fail.
@@ -4516,14 +4517,10 @@ class FailingFunction(FunctionWrapper):
         self._exception = exception
         self._num_tries_before_success = num_tries_before_success
         self._always_fail = (
-            str(self._num_tries_before_success) == FailingFunction.INFINITY)
+            self._num_tries_before_success == FailingFunction.INFINITY)
         self._times_called = 0
 
-        if (
-            not self._always_fail and
-            isinstance(self._num_tries_before_success, int) and
-            self._num_tries_before_success < 0
-        ):
+        if not self._always_fail and self._num_tries_before_success < 0:
             raise ValueError(
                 'num_tries_before_success should either be an '
                 'integer greater than or equal to 0, '
@@ -4541,7 +4538,7 @@ class FailingFunction(FunctionWrapper):
         """
         self._times_called += 1
         call_should_fail = (
-            self._always_fail or isinstance(self._num_tries_before_success, int)
-            and self._num_tries_before_success >= self._times_called)
+            self._always_fail or
+            self._num_tries_before_success >= self._times_called)
         if call_should_fail:
             raise self._exception
