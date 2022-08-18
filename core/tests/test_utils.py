@@ -386,7 +386,10 @@ class ElasticSearchStub:
         }
 
     def mock_index(
-        self, index_name: str, document: Dict[str, str], id: Optional[str]=None  # pylint: disable=redefined-builtin
+        self,
+        index_name: str,
+        document: Dict[str, str],
+        id: Optional[str] = None  # pylint: disable=redefined-builtin
     ) -> ExistingIndexDict:
         """Adds a document with the given ID to the index.
 
@@ -1329,10 +1332,6 @@ class TestBase(unittest.TestCase):
             def __next__(self) -> str:
                 pass
 
-        # The class StreamHandler can only accept IO[str] type objects, but for
-        # implementation purposes we are providing custom class ('ListStream').
-        # So, because of this MyPy throws an error. Thus to the suppress the
-        # error, we used cast here.
         list_stream_handler = logging.StreamHandler(ListStream())
 
         logger = logging.getLogger()
@@ -2716,6 +2715,8 @@ title: Title
 
         return response
 
+    # Here we use type Any because this method can return any python object
+    # that was parsed from json response.
     def _parse_json_response(
         self, json_response: webtest.TestResponse, expect_errors: bool
     ) -> Any:
@@ -2730,12 +2731,15 @@ title: Title
 
         return json.loads(json_response.body[len(feconf.XSSI_PREFIX):])
 
+    # Here we use type Any because this method can return JSON response Dict
+    # whose values can contain any type of values, like int, bool, str and
+    # other types too.
     def get_json(
-            self,
-            url: str,
-            params: Optional[Dict[str, str]] = None,
-            expected_status_int: int = 200,
-            headers: Optional[Dict[str, str]] = None
+        self,
+        url: str,
+        params: Optional[Dict[str, str]] = None,
+        expected_status_int: int = 200,
+        headers: Optional[Dict[str, str]] = None
     ) -> Dict[str, Any]:
         """Get a JSON response, transformed to a Python object."""
         if params is not None:
@@ -2757,12 +2761,18 @@ title: Title
         # https://github.com/Pylons/webtest/blob/bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119
         self.assertEqual(json_response.status_int, expected_status_int)
 
+        # Here we use type Any because response is JSON response dict
+        # which can contain different types of values. So, to allow every
+        # type of value we used Any here.
         response: Dict[str, Any] = self._parse_json_response(
             json_response,
             expect_errors
         )
         return response
 
+    # Here we use type Any because this method can return JSON response Dict
+    # whose values can contain different types of values, like int, bool,
+    # str and other types too.
     def post_json(
         self,
         url: str,
@@ -2827,6 +2837,9 @@ title: Title
         )
         return response
 
+    # Here we use type Any because this method can return JSON response Dict
+    # whose values can contain different types of values, like int, bool,
+    # str and other types too.
     def delete_json(
         self,
         url: str,
@@ -2926,6 +2939,9 @@ title: Title
             status=expected_status_int, expect_errors=expect_errors,
             content_type='application/json')
 
+    # Here we use type Any because this method can return JSON response Dict
+    # whose values can contain different types of values, like int, bool,
+    # str and other types too.
     def put_json(
         self,
         url: str,
@@ -4353,6 +4369,9 @@ class FunctionWrapper:
     methods for more info.
     """
 
+    # Here we use type Any because argument 'func' can accept any kind of
+    # function signature. So, to allow every function signature we used
+    # Callable[..., Any] type here.
     def __init__(self, func: Callable[..., Any]) -> None:
         """Creates a new FunctionWrapper instance.
 
@@ -4394,6 +4413,8 @@ class FunctionWrapper:
         self._instance = instance
         return self
 
+    # Here we use type Any because argument 'args' can accept arbitrary number
+    # of function's arguments and these arguments can be of any type.
     def pre_call_hook(self, args: OrderedDict[str, Any]) -> None:
         """Override this to do tasks that should be executed before the actual
         function call.
@@ -4403,6 +4424,8 @@ class FunctionWrapper:
         """
         pass
 
+    # Here we use type Any because argument 'args' can accept arbitrary number
+    # of function's arguments and these arguments can be of any type.
     def post_call_hook(self, args: OrderedDict[str, Any], result: str) -> None:
         """Override this to do tasks that should be executed after the actual
         function call.
@@ -4420,6 +4443,9 @@ class CallCounter(FunctionWrapper):
     increased when the function raises an exception.
     """
 
+    # Here we use type Any because argument 'f' can accept any kind of
+    # function signature. So, to allow every function signature we used
+    # Callable[..., Any] type here.
     def __init__(self, f: Callable[..., Any]) -> None:
         """Counts the number of times the given function has been called. See
         FunctionWrapper for arguments.
@@ -4437,6 +4463,8 @@ class CallCounter(FunctionWrapper):
         """
         return self._times_called
 
+    # Here we use type Any because argument 'args' can accept arbitrary number
+    # of function's arguments and these arguments can be of any type.
     def pre_call_hook(self, args: OrderedDict[str, Any]) -> None:
         """Method that is called before each function call to increment the
         counter tracking the number of times a function is called. This will
@@ -4455,6 +4483,9 @@ class FailingFunction(FunctionWrapper):
 
     INFINITY: Final = 'infinity'
 
+    # Here we use type Any because argument 'f' can accept any kind of
+    # function signature. So, to allow every function signature we used
+    # Callable[..., Any] type here.
     def __init__(
         self,
         f: Callable[..., Any],
@@ -4492,6 +4523,8 @@ class FailingFunction(FunctionWrapper):
                 'integer greater than or equal to 0, '
                 'or FailingFunction.INFINITY')
 
+    # Here we use type Any because argument 'args' can accept arbitrary number
+    # of function's arguments and these arguments can be of any type.
     def pre_call_hook(self, args: OrderedDict[str, Any]) -> None:
         """Method that is called each time before the actual function call to
         check if the exception is to be raised based on the number of tries
