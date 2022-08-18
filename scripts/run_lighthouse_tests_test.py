@@ -54,7 +54,7 @@ class MockCompilerContextManager():
     def __enter__(self) -> MockCompiler:
         return MockCompiler()
 
-    def __exit__(self, *unused_args) -> None:
+    def __exit__(self, *unused_args: Any) -> None:
         pass
 
 
@@ -183,7 +183,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                 pass
             def __enter__(self) -> MockFailedCompiler:
                 return MockFailedCompiler()
-            def __exit__(self, *unused_args) -> None:
+            def __exit__(self, *unused_args: Any) -> None:
                 pass
 
         def mock_failed_context_manager() -> MockFailedCompilerContextManager:
