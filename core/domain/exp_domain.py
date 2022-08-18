@@ -21,6 +21,7 @@ objects they represent are stored. All methods and properties in this file
 should therefore be independent of the specific storage models used.
 """
 
+import bs4
 from __future__ import annotations
 
 import collections
@@ -39,7 +40,6 @@ from core.domain import param_domain
 from core.domain import state_domain
 from core.domain import translation_domain
 
-import bs4
 from typing import (
     Any, Callable, Dict, List, Mapping, Optional, Sequence,
     Set, Tuple, cast
@@ -2520,8 +2520,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
         cls, states_dict: Dict[str, state_domain.StateDict],
         language_code: str
     ) -> Dict[str, state_domain.StateDict]:
-        """Converts from version 51 to 52. Version 52 handles all the
-        errored data of the following -
+        """Converts from version 51 to 52. Version 52 fixes all the backend
+        validation checks for explorations errored data which are
+        categorized as -
             - Explorarion states
             - Exploration interaction
             - Exploration RTE
@@ -2537,6 +2538,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
         """
         exploration_rights = exp_models.ExplorationRightsModel.get_all(
             include_deleted=False)
+        # Exp ids are required to verify if all the recommended explorations
+        # inside the end explorations are valid or not.
         exp_ids = [exp.id for exp in exploration_rights]
 
         # Update general state validations.
@@ -2557,7 +2560,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
     ) -> Dict[str, state_domain.StateDict]:
         """Handles errored data for the general exploration state, performs the
         following -
-            - If destination is `try again` and the value of labeled_as_correct
+            - If destination is `try again` and the value of labelled_as_correct
             is True, replaces it with False
             - If refresher_exploration_id is not None for lesson, marks it as
             None
@@ -2573,7 +2576,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         for state_name, state_dict in states_dict.items():
             answer_groups = state_dict['interaction']['answer_groups']
             for answer_group in answer_groups:
-                # lab_as_correct should not be True if dest is try again.
+                # labelled_as_correct should not be True if dest is try again.
                 if (
                     answer_group['outcome']['dest'] == state_name and
                     answer_group['outcome']['labelled_as_correct']
@@ -2581,21 +2584,16 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     answer_group['outcome']['labelled_as_correct'] = False
 
                 # refresher_exploration_id be None for all lessons.
-                if (
-                    answer_group['outcome']['refresher_exploration_id'] is
-                    not None
-                ):
-                    answer_group['outcome']['refresher_exploration_id'] = None
+                answer_group['outcome']['refresher_exploration_id'] = None
+
+            state_dict['interaction']['answer_groups'] = answer_groups
 
             # refresher_exploration_id be None for all lessons(def outcome).
             default_outcome = state_dict['interaction']['default_outcome']
             if default_outcome is not None:
-                def_ref_exp_id = default_outcome['refresher_exploration_id']
-                if def_ref_exp_id is not None:
-                    state_dict['interaction']['default_outcome'][
-                        'refresher_exploration_id'] = None
+                state_dict['interaction']['default_outcome'][
+                    'refresher_exploration_id'] = None
 
-            state_dict['interaction']['answer_groups'] = answer_groups
         return states_dict
 
     @classmethod
@@ -3598,9 +3596,13 @@ class Exploration(translation_domain.BaseTranslatableObject):
         if current_states_schema_version == 43:
             versioned_exploration_states['states'] = conversion_fn(
                 versioned_exploration_states['states'], init_state_name)
-        else:
+        elif current_states_schema_version == 51:
             versioned_exploration_states['states'] = conversion_fn(
                 versioned_exploration_states['states'], language_code
+            )
+        else:
+            versioned_exploration_states['states'] = conversion_fn(
+                versioned_exploration_states['states']
             )
 
     # The current version of the exploration YAML schema. If any backward-
