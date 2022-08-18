@@ -20,6 +20,7 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { RemoveItemModalComponent } from './remove-item-modal.component';
 
 class MockActiveModal {
@@ -39,7 +40,8 @@ describe('Remove Item Modal Component', function() {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
-        RemoveItemModalComponent
+        RemoveItemModalComponent,
+        MockTranslatePipe
       ],
       providers: [{
         provide: NgbActiveModal,

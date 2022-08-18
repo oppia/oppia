@@ -20,6 +20,7 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { InviteSuccessfullModalComponent } from './invite-successfull-modal.component';
 
 class MockActiveModal {
@@ -39,7 +40,8 @@ describe('Invite Successfull Modal Component', function() {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
-        InviteSuccessfullModalComponent
+        InviteSuccessfullModalComponent,
+        MockTranslatePipe
       ],
       providers: [{
         provide: NgbActiveModal,
