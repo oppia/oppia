@@ -190,7 +190,11 @@ class ClassroomHandler(base.BaseHandler):
     def put(self, classroom_id):
         """Updates properties of a given classroom."""
         classroom = self.normalized_payload.get('classroom_dict')
-        assert classroom_id, classroom.classroom_id
+        if classroom_id != classroom.classroom_id:
+            raise self.InvalidInputException(
+                'Classroom ID of the URL path argument must match with the ID '
+                'given in the classroom payload dict.'
+            )
 
         classroom_config_services.update_or_create_classroom_model(classroom)
         self.render_json(self.values)

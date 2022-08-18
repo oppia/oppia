@@ -208,6 +208,14 @@ class ClassroomAdminTests(test_utils.GenericTestBase):
         )
         self.logout()
 
+    def test_not_able_to_get_classroom_data_when_user_is_not_admin(
+        self
+    ) -> None:
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.login(self.VIEWER_EMAIL)
+        self.get_html_response('/blog-dashboard', expected_status_int=401)
+        self.logout()
+
     def test_get_new_classroom_id(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         json_response = self.get_json(feconf.CLASSROOM_ID_HANDLER_URL)
@@ -221,8 +229,8 @@ class ClassroomAdminTests(test_utils.GenericTestBase):
 
     def test_get_classroom_dict(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        classroom_handler_url = (
-            feconf.CLASSROOM_HANDLER_URL + '/' + self.math_classroom_id)
+        classroom_handler_url = '%s/%s' % (
+            feconf.CLASSROOM_HANDLER_URL, self.math_classroom_id)
 
         json_response = self.get_json(classroom_handler_url)
 
@@ -232,8 +240,8 @@ class ClassroomAdminTests(test_utils.GenericTestBase):
 
     def test_update_classroom_data(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        classroom_handler_url = (
-            feconf.CLASSROOM_HANDLER_URL + '/' + self.physics_classroom_id)
+        classroom_handler_url = '%s/%s' % (
+            feconf.CLASSROOM_HANDLER_URL, self.physics_classroom_id)
         csrf_token = self.get_new_csrf_token()
 
         self.physics_classroom_dict['name'] = 'Quantum physics'
@@ -247,9 +255,31 @@ class ClassroomAdminTests(test_utils.GenericTestBase):
 
     def test_delete_classroom_data(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        classroom_handler_url = (
-            feconf.CLASSROOM_HANDLER_URL + '/' + self.physics_classroom_id)
+        classroom_handler_url = '%s/%s' % (
+            feconf.CLASSROOM_HANDLER_URL, self.physics_classroom_id)
 
         self.delete_json(classroom_handler_url)
         self.get_json(classroom_handler_url, expected_status_int=404)
+        self.logout()
+
+    def test_mismatching_id_while_editing_classroom_should_raise_an_exception(
+        self
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        classroom_handler_url = '%s/%s' % (
+            feconf.CLASSROOM_HANDLER_URL, self.math_classroom_id)
+        csrf_token = self.get_new_csrf_token()
+
+        self.physics_classroom_dict['name'] = 'Quantum physics'
+
+        response = self.put_json(
+            classroom_handler_url, {
+                'classroom_dict': self.physics_classroom_dict
+            }, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(
+            response['error'],
+            'Classroom ID of the URL path argument must match with the ID '
+            'given in the classroom payload dict.'
+        )
         self.logout()
