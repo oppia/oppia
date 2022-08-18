@@ -27,7 +27,7 @@ from core.domain import rules_registry
 from core.domain import state_domain
 from core.platform import models
 
-from typing import Any, Callable, Dict, List, Optional
+from typing import Callable, Dict, List, Optional
 
 MYPY = False
 if MYPY:  # pragma: no cover
