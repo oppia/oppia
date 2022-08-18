@@ -24,7 +24,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { AppConstants } from 'app.constants';
 import { FeedbackThread, FeedbackThreadBackendDict, FeedbackThreadObjectFactory } from 'domain/feedback_thread/FeedbackThreadObjectFactory';
 import { ThreadMessage, ThreadMessageBackendDict } from 'domain/feedback_message/ThreadMessage.model';
-import { SuggestionThread, SuggestionThreadObjectFactory } from 'domain/suggestion/SuggestionThreadObjectFactory';
+import { SuggestionThread } from 'domain/suggestion/suggestion-thread-object.model';
 import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { ExplorationEditorPageConstants } from 'pages/exploration-editor-page/exploration-editor-page.constants';
 import { AlertsService } from 'services/alerts.service';
@@ -63,7 +63,6 @@ export class ThreadDataBackendApiService {
     private contextService: ContextService,
     private feedbackThreadObjectFactory: FeedbackThreadObjectFactory,
     private http: HttpClient,
-    private suggestionThreadObjectFactory: SuggestionThreadObjectFactory,
     private urlInterpolationService: UrlInterpolationService
   ) {}
 
