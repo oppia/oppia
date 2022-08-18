@@ -42,7 +42,7 @@ export class DeleteSkillModalComponent extends ConfirmOrCancelModal {
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   skillId!: string;
-  nonEligibleTopicNameToTopicAssignments !: TopicNameToTopicAssignments;
+  nonEligibleTopicNameToTopicAssignments!: TopicNameToTopicAssignments;
   nonEligibleTopicNames: string[] = [];
   topicsAssignments!: AssignedSkill[];
   topicsAssignmentsAreFetched: boolean = false;

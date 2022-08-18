@@ -236,10 +236,6 @@ export class Topic {
         'Topic url fragment should not be longer than ' +
         `${topicUrlFragmentCharLimit} characters.`);
     }
-    if (this._skillSummariesForDiagnosticTest.length === 0) {
-      issues.push(
-        'The diagnostic test for the topic should test at least one skill.');
-    }
     if (this._skillSummariesForDiagnosticTest.length > 3) {
       issues.push(
         'The diagnostic test for the topic should test at most 3 skills.');
@@ -337,6 +333,10 @@ export class Topic {
     }
     if (!this._subtopics.length) {
       issues.push('Topic should have at least 1 subtopic.');
+    }
+    if (this._skillSummariesForDiagnosticTest.length === 0) {
+      issues.push(
+        'The diagnostic test for the topic should test at least one skill.');
     }
     return issues;
   }

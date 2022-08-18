@@ -277,7 +277,7 @@ describe('Skill backend API service', () => {
       flushMicrotasks();
 
       expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalledWith();
+      expect(failHandler).not.toHaveBeenCalled();
     }));
 
   it(

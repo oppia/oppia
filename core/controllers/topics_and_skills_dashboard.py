@@ -494,25 +494,26 @@ class MergeSkillHandler(base.BaseHandler):
         })
 
 
+def normalize_comma_separated_topic_ids(comma_separated_topic_ids):
+    """Normalizes a comma seperated topic IDs into a list of topic IDs.
+
+    Args:
+        comma_separated_topic_ids: str. Comma seperated topic IDs.
+
+    Returns:
+        list(str). A list of topic IDs.
+    """
+    topic_ids = []
+    if not comma_separated_topic_ids:
+        return topic_ids
+    topic_ids = list(comma_separated_topic_ids.split(','))
+    return topic_ids
+
+
 class TopicIdToDiagnosticTestSkillIdsHandler(base.BaseHandler):
     """Handler class to get topic ID to diagnostic test skill IDs dict."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    def normalize_comma_separated_topic_ids(comma_separated_topic_ids):
-        """Normalizes a comma seperated topic IDs into a list of topic IDs.
-
-        Args:
-            comma_separated_topic_ids: str. Comma seperated topic IDs.
-
-        Returns:
-            list(str). A list of topic IDs.
-        """
-        topic_ids = comma_separated_topic_ids.split(',')
-        empty_string = ''
-        if empty_string in topic_ids:
-            topic_ids.remove(empty_string)
-        return topic_ids
 
     URL_PATH_ARGS_SCHEMAS = {}
     HANDLER_ARGS_SCHEMAS = {

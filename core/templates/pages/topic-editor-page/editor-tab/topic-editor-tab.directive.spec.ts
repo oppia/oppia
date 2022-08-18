@@ -655,24 +655,24 @@ describe('Topic editor tab directive', function() {
 
   it('should call the TopicUpdateService if skillId is added in the ' +
      'diagnostic test', fakeAsync(function() {
-    var updateSkillIdForDiagosticTestSpy = spyOn(
+    var updateSkillIdForDiagnosticTestSpy = spyOn(
       TopicUpdateService, 'updateDiagnosticTestSkills');
     $scope.selectedSkillForDiagnosticTest = skillSummary;
     $scope.availableSkillSummariesForDiagnosticTest = [skillSummary];
     $scope.addSkillForDiagnosticTest();
     $rootScope.$apply();
     tick();
-    expect(updateSkillIdForDiagosticTestSpy).toHaveBeenCalled();
+    expect(updateSkillIdForDiagnosticTestSpy).toHaveBeenCalled();
   }));
 
   it('should call the TopicUpdateService if any skillId is removed from the ' +
      'diagnostic test', function() {
-    var updateSkillIdForDiagosticTestSpy = spyOn(
+    var updateSkillIdForDiagnosticTestSpy = spyOn(
       TopicUpdateService, 'updateDiagnosticTestSkills');
     $scope.selectedSkillSummariesForDiagnosticTest = [skillSummary];
 
     $scope.removeSkillFromDiagnosticTest(skillSummary);
-    expect(updateSkillIdForDiagosticTestSpy).toHaveBeenCalled();
+    expect(updateSkillIdForDiagnosticTestSpy).toHaveBeenCalled();
   });
 
   it('should get eligible skill for diagnostic test selection', function() {

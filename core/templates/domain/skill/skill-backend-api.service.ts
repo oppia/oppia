@@ -188,31 +188,22 @@ export class SkillBackendApiService {
     });
   }
 
-  private _getTopicNamesWithGivenSkillAssignedForDiagnosticTest(
-      skillId: string,
-      successCallback: (value: string[] | PromiseLike<string[]>) => void,
-      errorCallback: (reason?: string) => void): void {
-    let skillAssignmentForDiagnosticTestUrl = (
-      this.urlInterpolationService.interpolateUrl(
-        SkillDomainConstants
-          .SKILL_ASSIGNMENT_FOR_DIAGNOSTIC_TEST_URL_TEMPLATE, {
-          skill_id: skillId
-        }));
-    this.http.get<SkillAssignmentForDiagnosticTestBackendResponse>(
-      skillAssignmentForDiagnosticTestUrl).toPromise().then((response) => {
-      if (successCallback) {
-        successCallback(response.topic_names);
-      }
-    }, (errorResponse) => {
-      errorCallback(errorResponse.error.error);
-    });
-  }
-
   async getTopicNamesWithGivenSkillAssignedForDiagnosticTest(skillId: string):
       Promise<string[]> {
     return new Promise((resolve, reject) => {
-      this._getTopicNamesWithGivenSkillAssignedForDiagnosticTest(
-        skillId, resolve, reject);
+      let skillAssignmentForDiagnosticTestUrl = (
+        this.urlInterpolationService.interpolateUrl(
+          SkillDomainConstants
+            .SKILL_ASSIGNMENT_FOR_DIAGNOSTIC_TEST_URL_TEMPLATE, {
+            skill_id: skillId
+          }));
+
+      this.http.get<SkillAssignmentForDiagnosticTestBackendResponse>(
+        skillAssignmentForDiagnosticTestUrl).toPromise().then((response) => {
+        resolve(response.topic_names);
+      }, (errorResponse) => {
+        reject(errorResponse.error.error);
+      });
     });
   }
 }

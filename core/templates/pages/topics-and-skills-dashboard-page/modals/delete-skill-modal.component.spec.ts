@@ -135,25 +135,28 @@ describe('Assign Skill to Topic Modal Component', () => {
     expect(componentInstance.skillCanBeDeleted).toBeTrue();
   }));
 
-  it('should not allow skill deletion', fakeAsync(() => {
-    let topicsAndSkillsDashboardBackendApiService = TestBed.inject(
-      TopicsAndSkillsDashboardBackendApiService);
-    componentInstance.skillId = 'skill_id';
-    componentInstance.topicsAssignmentsAreFetched = false;
-    spyOn(
-      topicsAndSkillsDashboardBackendApiService,
-      'fetchTopicIdToDiagnosticTestSkillIdsAsync'
-    ).and.returnValue(Promise.resolve({
-      topicIdToDiagnosticTestSkillIds: {
-        topicId1: ['skill_id'],
-        topicId2: []
-      }
-    }));
+  it(
+    'should not allow skill deletion when the given skill is assigned to ' +
+    'the diagnostic test in any topic',
+    fakeAsync(() => {
+      let topicsAndSkillsDashboardBackendApiService = TestBed.inject(
+        TopicsAndSkillsDashboardBackendApiService);
+      componentInstance.skillId = 'skill_id';
+      componentInstance.topicsAssignmentsAreFetched = false;
+      spyOn(
+        topicsAndSkillsDashboardBackendApiService,
+        'fetchTopicIdToDiagnosticTestSkillIdsAsync'
+      ).and.returnValue(Promise.resolve({
+        topicIdToDiagnosticTestSkillIds: {
+          topicId1: ['skill_id'],
+          topicId2: []
+        }
+      }));
 
-    componentInstance.fetchTopicAssignmentsForSkill();
-    tick(50);
-    expect(componentInstance.skillCanBeDeleted).toBeFalse();
-  }));
+      componentInstance.fetchTopicAssignmentsForSkill();
+      tick();
+      expect(componentInstance.skillCanBeDeleted).toBeFalse();
+    }));
 
   it('should get topic editor url', () => {
     spyOn(urlInterpolationService, 'interpolateUrl').and

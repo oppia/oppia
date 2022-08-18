@@ -448,14 +448,14 @@ def get_all_topic_assignments_for_skill(skill_id):
 
 def get_topic_names_with_given_skill_in_diagnostic_test(skill_id):
     """Returns a list of topic names for which the given skill is assigned
-    to that topic's diagnostic test test.
+    to that topic's diagnostic test.
 
     Args:
         skill_id: str. ID of the skill.
 
     Returns:
         list(str). A list of topic names for which the given skill is assigned
-        to that topic's diagnostic test test.
+        to that topic's diagnostic test.
     """
     topics = topic_fetchers.get_all_topics()
     topic_names = []

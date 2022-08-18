@@ -1246,11 +1246,12 @@ def get_topic_id_to_diagnostic_test_skill_ids(topic_ids):
         diagnostic test skill IDs as value.
     """
     topic_id_to_diagnostic_test_skill_ids = {}
-    for topic_id in topic_ids:
-        topic = topic_fetchers.get_topic_by_id(topic_id, strict=None)
+    topics = topic_fetchers.get_topics_by_ids(topic_ids)
+
+    for topic in topics:
         if topic is None:
             continue
-        topic_id_to_diagnostic_test_skill_ids[topic_id] = (
+        topic_id_to_diagnostic_test_skill_ids[topic.id] = (
             topic.skill_ids_for_diagnostic_test)
 
     return topic_id_to_diagnostic_test_skill_ids

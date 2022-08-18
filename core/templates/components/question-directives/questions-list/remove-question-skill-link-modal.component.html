@@ -1,0 +1,57 @@
+<div class="modal-header">
+  <h3>
+    Are you sure you want to remove the question from this skill?
+  </h3>
+</div>
+<div class="modal-body" *ngIf="!questionDeletionIsAllowed">
+  <div *ngIf="!canEditQuestion">
+    <p>User does not have enough rights to remove the question.</p>
+  </div>
+  <div *ngIf="canEditQuestion">
+    <p>
+      The question cannot be removed because the given skill is assigned to
+      the diagnostic test(s) of the following topic(s) with less than or
+      equal to 2 questions.
+    </p>
+    <ul>
+      <li *ngFor="let topic of topicNameToTopicId | keyvalue">
+        <a [href]="getTopicEditorUrl(topic.value)" target="_blank" rel="noopener">
+          {{ topic.key }}
+        </a>
+      </li>
+    </ul>
+    <p>
+      Please remove the skills from those topic(s) first, then perform this
+      operation.
+    </p>
+  </div>
+</div>
+<div class="modal-footer">
+  <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
+  <button class="btn btn-danger"
+          (click)="confirm()"
+          *ngIf="questionDeletionIsAllowed">
+      <span>Delete Question</span>
+  </button>
+</div>
+
+<style>
+  @media screen and (max-width: 768px) {
+    .remove-question-skill-link-modal .modal-dialog {
+      border: 0;
+      border-radius: 0;
+      margin: 0 auto;
+      padding: 0;
+      width: 95vw;
+    }
+    .remove-question-skill-link-modal .modal-header {
+      display: inline-block;
+      padding: 10px 15px;
+    }
+    .remove-question-skill-link-modal .modal-content {
+      border: 0;
+      border-radius: 0;
+      top: 20vh;
+    }
+  }
+</style>

@@ -48,6 +48,7 @@ import { SkillEditorRoutingService } from 'pages/skill-editor-page/services/skil
 import { UtilsService } from 'services/utils.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { RemoveQuestionSkillLinkModalComponent } from './remove-question-skill-link-modal.component';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 
 interface GroupedSkillSummaries {
@@ -273,34 +274,6 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     this.windowRef.nativeWindow.location.hash = this.questionId;
   }
 
-  async isQuestionDeletionAllowed(): Promise<boolean> {
-    let questionDeletionIsAllowed = true;
-    if (!this.canEditQuestion) {
-      this.alertsService.addWarning(
-        'User does not have enough rights to delete the question');
-      questionDeletionIsAllowed = false;
-      return questionDeletionIsAllowed;
-    }
-
-    let numberOfQuestions = this.questionSummariesForOneSkill.length;
-    await this.skillBackendApiService
-      .getTopicNamesWithGivenSkillAssignedForDiagnosticTest(
-        this.selectedSkillId).then((topicNames) => {
-        if ((topicNames.length > 0) && (
-          numberOfQuestions <=
-            AppConstants.MINIMUM_QUESTION_COUNT_FOR_A_DIAGNOSTIC_TEST_SKILL)) {
-          let alertMessge = (
-            'This skill is used as the only diagnostic test skill in the ' +
-            'following topics: ' + topicNames.join(', ') + '. Please remove ' +
-            'this skill from the diagnostic tests of those topics first.'
-          );
-          this.alertsService.addInfoMessage(alertMessge, 7000);
-          questionDeletionIsAllowed = false;
-        }
-      });
-    return questionDeletionIsAllowed;
-  }
-
   removeQuestionSkillLinkAsync(questionId: string, skillId: string): void {
     this.editableQuestionBackendApiService.editQuestionSkillLinksAsync(
       questionId, [
@@ -320,11 +293,17 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
 
   deleteQuestionFromSkill(
       questionId: string, skillDescription: string): void {
-    this.isQuestionDeletionAllowed().then((response) => {
-      if (!response) {
-        return;
-      }
+    let modalRef: NgbModalRef = this.ngbModal.
+      open(RemoveQuestionSkillLinkModalComponent, {
+        backdrop: 'static'
+      });
 
+    modalRef.componentInstance.skillId = this.selectedSkillId;
+    modalRef.componentInstance.canEditQuestion = this.canEditQuestion;
+    modalRef.componentInstance.numberOfQuestions = (
+      this.questionSummariesForOneSkill.length);
+
+    modalRef.result.then(() => {
       this.deletedQuestionIds.push(questionId);
       if (this.allSkillSummaries.length === 0) {
         this.removeQuestionSkillLinkAsync(questionId, this.selectedSkillId);
@@ -335,6 +314,10 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
           }
         });
       }
+    }, () => {
+      // Note to developers:
+      // This callback is triggered when the Cancel button is clicked.
+      // No further action is needed.
     });
   }
 

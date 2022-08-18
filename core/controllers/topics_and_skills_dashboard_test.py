@@ -1093,7 +1093,6 @@ class TopicIdToDiagnosticTestSkillIdsHandlerTests(
         self
     ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-
         json_response = self.get_json(self.url)
         self.assertEqual(
             json_response['topic_id_to_diagnostic_test_skill_ids'],

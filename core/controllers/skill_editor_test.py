@@ -525,7 +525,8 @@ class DiagnosticTestSkillAssignmentHandlerTest(BaseSkillEditorControllerTests):
             })]
         topic_services.update_topic_and_subtopic_pages(
             self.admin_id, self.topic.id, changelist,
-            'Updated diagnostic test.')
+            'Adds skill for the diagnostic test.')
 
         json_response = self.get_json(self.url)
         self.assertEqual(json_response['topic_names'], ['topic'])
+        self.logout()

@@ -341,13 +341,13 @@
       </button>
       <div class="oppia-diagnostic-test-card-note">
         <span ng-if="!availableSkillSummariesForDiagnosticTest.length && selectedSkillSummariesForDiagnosticTest.length < 3">
-          <em>(No more skills left for assignment.)</em>
+          <em>No more skills left for assignment.</em>
         </span>
         <span ng-if="selectedSkillSummariesForDiagnosticTest.length === 3">
-          <em>(The maximum limit was reached for adding skills to the diagnostic test.)</em>
+          <em>The maximum limit was reached for adding skills to the diagnostic test.</em>
         </span>
         <span ng-if="selectedSkillSummariesForDiagnosticTest.length === 0 && availableSkillSummariesForDiagnosticTest.length > 0">
-          <em>(Please add at least 1 skill.)</em>
+          <em>Please add at least 1 skill for the diagnostic test.</em>
         </span>
       </div>
     </md-card>

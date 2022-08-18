@@ -78,8 +78,8 @@ angular.module('oppia').directive('topicEditorTab', [
         'MAX_CHARS_IN_META_TAG_CONTENT',
         'MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB',
         'MAX_CHARS_IN_TOPIC_DESCRIPTION', 'MAX_CHARS_IN_TOPIC_NAME',
-        'MINIMUM_QUESTION_COUNT_FOR_A_DIAGNOSTIC_TEST_SKILL',
         'MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB',
+        'MIN_QUESTION_COUNT_FOR_A_DIAGNOSTIC_TEST_SKILL',
         function(
             $rootScope, $scope, $uibModal, ContextService,
             EntityCreationService, FocusManagerService,
@@ -91,8 +91,8 @@ angular.module('oppia').directive('topicEditorTab', [
             MAX_CHARS_IN_META_TAG_CONTENT,
             MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB,
             MAX_CHARS_IN_TOPIC_DESCRIPTION, MAX_CHARS_IN_TOPIC_NAME,
-            MINIMUM_QUESTION_COUNT_FOR_A_DIAGNOSTIC_TEST_SKILL,
-            MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB,) {
+            MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB,
+            MIN_QUESTION_COUNT_FOR_A_DIAGNOSTIC_TEST_SKILL,) {
           var ctrl = this;
           ctrl.directiveSubscriptions = new Subscription();
           $scope.MAX_CHARS_IN_TOPIC_URL_FRAGMENT = (
@@ -141,7 +141,7 @@ angular.module('oppia').directive('topicEditorTab', [
               return availableSkillSummaries.filter(skillSummary => {
                 return (
                   $scope.skillQuestionCountDict[skillSummary.getId()] >=
-                  MINIMUM_QUESTION_COUNT_FOR_A_DIAGNOSTIC_TEST_SKILL
+                  MIN_QUESTION_COUNT_FOR_A_DIAGNOSTIC_TEST_SKILL
                 );
               });
             };

@@ -358,6 +358,7 @@ class DiagnosticTestSkillAssignmentHandler(base.BaseHandler):
     is assigned to that topic's diagnostic test.
     """
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
         'skill_id': {
             'schema': {
@@ -370,7 +371,6 @@ class DiagnosticTestSkillAssignmentHandler(base.BaseHandler):
         }
     }
     HANDLER_ARGS_SCHEMAS = {'GET': {}}
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_edit_skill
     def get(self, skill_id: str) -> None:
