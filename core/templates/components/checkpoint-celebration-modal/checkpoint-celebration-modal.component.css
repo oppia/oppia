@@ -9,6 +9,7 @@
   flex-direction: column;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   left: 30px;
+  opacity: 0;
   padding: 0;
   position: fixed;
   transition-property: bottom;
@@ -130,10 +131,10 @@
 }
 
 @keyframes modal-complete-transition-animation {
-  0% { bottom: -100vh; }
-  15% { bottom: 70px; }
-  85% { bottom: 70px; }
-  100% { bottom: -100vh; }
+  0% { bottom: -100vh; opacity: 0; }
+  15% { bottom: 70px; opacity: 1; }
+  85% { bottom: 70px; opacity: 1; }
+  100% { bottom: -100vh; opacity: 0; }
 }
 
 .checkpoint-celebration-modal .standard-message-container.downward-transition {
@@ -144,8 +145,8 @@
 }
 
 @keyframes modal-downward-transition-animation {
-  0% { bottom: 70px; }
-  100% { bottom: -100vh; }
+  0% { bottom: 70px; opacity: 1; }
+  100% { bottom: -100vh; opacity: 0; }
 }
 
 .checkpoint-celebration-modal .standard-message-container .progress-bar-container {

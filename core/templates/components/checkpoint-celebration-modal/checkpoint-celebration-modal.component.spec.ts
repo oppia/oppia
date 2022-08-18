@@ -34,6 +34,7 @@ import { WrittenTranslationsObjectFactory } from 'domain/exploration/WrittenTran
 import { AudioTranslationLanguageService } from 'pages/exploration-player-page/services/audio-translation-language.service';
 import { StateObjectsBackendDict } from 'domain/exploration/StatesObjectFactory';
 import { PlatformFeatureService } from 'services/platform-feature.service';
+import { ExplorationPlayerStateService } from 'pages/exploration-player-page/services/exploration-player-state.service';
 
 class MockCheckpointCelebrationUtilityService {
   isOnCheckpointedState = false;
@@ -229,6 +230,7 @@ describe('Checkpoint celebration modal component', function() {
   let writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory;
   let audioTranslationLanguageService: AudioTranslationLanguageService;
   let platformFeatureService: PlatformFeatureService;
+  let explorationPlayerStateService: ExplorationPlayerStateService;
   let dummyStateCard: StateCard;
   let mockResizeEmitter: EventEmitter<void>;
 
@@ -247,6 +249,7 @@ describe('Checkpoint celebration modal component', function() {
         InteractionObjectFactory,
         WrittenTranslationsObjectFactory,
         AudioTranslationLanguageService,
+        ExplorationPlayerStateService,
         {
           provide: PlatformFeatureService,
           useClass: MockPlatformFeatureService
@@ -282,6 +285,8 @@ describe('Checkpoint celebration modal component', function() {
     audioTranslationLanguageService = TestBed.inject(
       AudioTranslationLanguageService);
     platformFeatureService = TestBed.inject(PlatformFeatureService);
+    explorationPlayerStateService = TestBed.inject(
+      ExplorationPlayerStateService);
     fixture = TestBed.createComponent(CheckpointCelebrationModalComponent);
     component = fixture.componentInstance;
 
@@ -459,6 +464,8 @@ describe('Checkpoint celebration modal component', function() {
     spyOn(checkpointCelebrationUtilityService, 'setIsOnCheckpointedState');
     spyOn(component, 'triggerStandardMessage');
     spyOn(component, 'triggerMiniMessage');
+    spyOn(explorationPlayerStateService, 'isInStoryChapterMode')
+      .and.returnValue(true);
     component.currentStateName = 'Introduction';
     component.mostRecentlyReachedCheckpointStateName = (
       'MostRecentlyReachedCheckpointStateName');
@@ -517,8 +524,7 @@ describe('Checkpoint celebration modal component', function() {
     expect(component.triggerMiniMessage).toHaveBeenCalled();
   });
 
-  it('should not check if checkpoint message is to be triggered if feature ' +
-  'is disabled', () => {
+  it('should not trigger checkpoint message if feature is disabled', () => {
     component.orderedCheckpointList = [
       'Introduction',
       'MostRecentlyReachedCheckpointStateName',
@@ -528,6 +534,8 @@ describe('Checkpoint celebration modal component', function() {
     component.currentStateName = 'Introduction';
     component.mostRecentlyReachedCheckpointStateName = (
       'MostRecentlyReachedCheckpointStateName');
+    spyOn(explorationPlayerStateService, 'isInStoryChapterMode')
+      .and.returnValue(true);
     spyOn(checkpointCelebrationUtilityService, 'getCheckpointMessage');
     spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue(
       {
@@ -536,6 +544,26 @@ describe('Checkpoint celebration modal component', function() {
         }
       }
     );
+
+    component.checkIfCheckpointMessageIsToBeTriggered('NewStateName');
+
+    expect(checkpointCelebrationUtilityService.getCheckpointMessage)
+      .not.toHaveBeenCalled();
+  });
+
+  it('should not trigger checkpoint message if not in story mode', () => {
+    component.orderedCheckpointList = [
+      'Introduction',
+      'MostRecentlyReachedCheckpointStateName',
+      'NewStateName',
+      'EndState'
+    ];
+    component.currentStateName = 'Introduction';
+    component.mostRecentlyReachedCheckpointStateName = (
+      'MostRecentlyReachedCheckpointStateName');
+    spyOn(explorationPlayerStateService, 'isInStoryChapterMode')
+      .and.returnValue(false);
+    spyOn(checkpointCelebrationUtilityService, 'getCheckpointMessage');
 
     component.checkIfCheckpointMessageIsToBeTriggered('NewStateName');
 
