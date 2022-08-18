@@ -27,6 +27,8 @@ import { StoryPlaythrough } from
   'domain/story_viewer/story-playthrough.model';
 import { StoryDataDict, StoryViewerBackendApiService } from
   'domain/story_viewer/story-viewer-backend-api.service';
+import { ChapterProgressSummary } from
+  'domain/exploration/chapter-progress-summary.model';
 
 describe('Story viewer backend API service', () => {
   let storyViewerBackendApiService: StoryViewerBackendApiService;
@@ -182,4 +184,48 @@ describe('Story viewer backend API service', () => {
     expect(storyViewerBackendApiService.onSendStoryData).toEqual(
       storyDataEventEmitter);
   });
+
+  it('should successfully fetch students progress in stories chapters',
+    fakeAsync(() => {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
+
+      const CHAPTERS_PROGRESS_SUMMARY_URL = (
+        '/user_progress_in_stories_chapters_handler/user1');
+
+      const chapterProgressSummaryDicts = [
+        {
+          total_checkpoints_count: 6,
+          visited_checkpoints_count: 5
+        },
+        {
+          total_checkpoints_count: 3,
+          visited_checkpoints_count: 0
+        },
+        {
+          total_checkpoints_count: 4,
+          visited_checkpoints_count: 4
+        },
+      ];
+
+      storyViewerBackendApiService
+        .fetchProgressInStoriesChapters('user1', ['story_id_1', 'story_id_2'])
+        .then(successHandler, failHandler);
+
+      var req = httpTestingController.expectOne(
+        CHAPTERS_PROGRESS_SUMMARY_URL +
+        '?story_ids=%5B%22story_id_1%22,%22story_id_2%22%5D');
+      expect(req.request.method).toEqual('GET');
+      req.flush(chapterProgressSummaryDicts);
+
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalledWith(
+        chapterProgressSummaryDicts.map(
+          progressInfoDict => ChapterProgressSummary.createFromBackendDict(
+            progressInfoDict)
+        ));
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
 });

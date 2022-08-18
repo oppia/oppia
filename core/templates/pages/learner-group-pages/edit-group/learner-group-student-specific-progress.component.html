@@ -98,7 +98,7 @@
                       <div class="chapter-progress" *ngIf="getVisitedCheckpointsCount(storyIndex, idx) > 0">
                         <div class="chapter-progress-bar"></div>
                         <div class="completed-progress-bar" [style.width.%]="getCompletedProgressBarWidth(storyIndex, idx)"></div>
-                        <div *ngFor="let checkpoint of getAllCheckpointsOfChapter(storyIndex, idx); let checkpointIdx = index;" class="checkpoints-progress-node-container">
+                        <div *ngFor="let checkpoint of getAllCheckpointsProgressOfChapter(storyIndex, idx); let checkpointIdx = index;" class="checkpoints-progress-node-container">
                           <div class="checkpoints-progress-node" *ngIf="checkpoint == 0" title="Checkpoint Not Started">{{checkpointIdx + 1}}</div>
                           <div class="checkpoints-progress-node completed-checkpoint" *ngIf="checkpoint == 1" title="Checkpoint Completed">{{checkpointIdx + 1}}</div>
                           <div class="checkpoints-progress-node in-progress-checkpoint" *ngIf="checkpoint == 2" title="Checkpoint In Progress">{{checkpointIdx + 1}}</div>

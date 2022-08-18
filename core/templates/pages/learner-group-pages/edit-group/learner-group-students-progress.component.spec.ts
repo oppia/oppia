@@ -26,6 +26,8 @@ import { LearnerGroupSyllabusBackendApiService } from
 import { LearnerGroupData } from 'domain/learner_group/learner-group.model';
 import { LearnerGroupStudentsProgressComponent } from './learner-group-students-progress.component';
 import { LearnerGroupUserProgress } from 'domain/learner_group/learner-group-user-progress.model';
+import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
+import { ChapterProgressSummary } from 'domain/exploration/chapter-progress-summary.model';
 
 @Pipe({name: 'truncate'})
 class MockTrunctePipe {
@@ -44,6 +46,7 @@ describe('LearnerGroupStudentsProgressComponent', () => {
   let learnerGroupSyllabusBackendApiService:
     LearnerGroupSyllabusBackendApiService;
   let navigationService: NavigationService;
+  let storyViewerBackendApiService: StoryViewerBackendApiService;
 
   const sampleLearnerGroupSubtopicSummaryDict = {
     subtopic_id: 1,
@@ -131,6 +134,8 @@ describe('LearnerGroupStudentsProgressComponent', () => {
     learnerGroupSyllabusBackendApiService = TestBed.inject(
       LearnerGroupSyllabusBackendApiService);
     navigationService = TestBed.inject(NavigationService);
+    storyViewerBackendApiService = TestBed.inject(
+      StoryViewerBackendApiService);
     fixture = TestBed.createComponent(LearnerGroupStudentsProgressComponent);
     component = fixture.componentInstance;
 
@@ -211,10 +216,21 @@ describe('LearnerGroupStudentsProgressComponent', () => {
   });
 
   it('should update learner specific progress successfully', fakeAsync(() => {
+    const chapterProgressSummaryDict = {
+      total_checkpoints_count: 6,
+      visited_checkpoints_count: 4
+    };
+    const chaptersProgress = ChapterProgressSummary.createFromBackendDict(
+      chapterProgressSummaryDict);
+
+    spyOn(storyViewerBackendApiService, 'fetchProgressInStoriesChapters')
+      .and.returnValue(Promise.resolve([chaptersProgress]));
+
     component.updateStudentSpecificProgress(sampleLearnerGroupUserProg);
     tick(100);
 
     expect(component.specificStudentProgress).toEqual(
       sampleLearnerGroupUserProg);
+    expect(component.storiesChaptersProgress).toEqual([chaptersProgress]);
   }));
 });

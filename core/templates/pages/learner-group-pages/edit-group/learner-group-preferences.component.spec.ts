@@ -26,6 +26,7 @@ import { LearnerGroupPreferencesComponent } from './learner-group-preferences.co
 import { LearnerGroupPagesConstants } from '../learner-group-pages.constants';
 import { LearnerGroupUserInfo } from 'domain/learner_group/learner-group-user-info.model';
 import { LearnerGroupAllStudentsInfo } from 'domain/learner_group/learner-group-all-students-info.model';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 @Pipe({name: 'truncate'})
 class MockTrunctePipe {
@@ -38,6 +39,7 @@ describe('LearnerGroupPreferencesComponent', () => {
   let component: LearnerGroupPreferencesComponent;
   let fixture: ComponentFixture<LearnerGroupPreferencesComponent>;
   let learnerGroupBackendApiService: LearnerGroupBackendApiService;
+  let ngbModal: NgbModal;
 
   const learnerGroupBackendDict = {
     id: 'groupId',
@@ -68,6 +70,7 @@ describe('LearnerGroupPreferencesComponent', () => {
   beforeEach(() => {
     learnerGroupBackendApiService = TestBed.inject(
       LearnerGroupBackendApiService);
+    ngbModal = TestBed.inject(NgbModal);
     fixture = TestBed.createComponent(LearnerGroupPreferencesComponent);
     component = fixture.componentInstance;
 
@@ -106,13 +109,13 @@ describe('LearnerGroupPreferencesComponent', () => {
   });
 
   it('should check status of read only mode correctly', () => {
-    expect(component.readOnlyMode).toBeTrue();
+    expect(component.isReadOnlyModeActive()).toBeTrue();
 
     component.toggleReadOnlyMode();
-    expect(component.readOnlyMode).toBeFalse();
+    expect(component.isReadOnlyModeActive()).toBeFalse();
 
     component.toggleReadOnlyMode();
-    expect(component.readOnlyMode).toBeTrue();
+    expect(component.isReadOnlyModeActive()).toBeTrue();
   });
 
   it('should initialize', fakeAsync(() => {
@@ -160,6 +163,35 @@ describe('LearnerGroupPreferencesComponent', () => {
     expect(component.invitedStudentsInfo).toEqual([studentInfo1, studentInfo2]);
   }));
 
+  it('should save learner group info successfully', fakeAsync(() => {
+    const demoLearnerGroupBackendDict = {
+      id: 'groupId',
+      title: 'some title',
+      description: 'some description',
+      facilitator_usernames: ['facilitator_username'],
+      student_usernames: ['username1'],
+      invited_student_usernames: ['username2'],
+      subtopic_page_ids: [],
+      story_ids: ['story_id_1']
+    };
+    const demoLearnerGroup = LearnerGroupData.createFromBackendDict(
+      demoLearnerGroupBackendDict);
+
+    spyOn(learnerGroupBackendApiService, 'updateLearnerGroupAsync')
+      .and.returnValue(Promise.resolve(learnerGroup));
+
+    component.learnerGroup = demoLearnerGroup;
+    component.newLearnerGroupTitle = 'title';
+    component.newLearnerGroupDescription = 'description';
+
+    component.saveLearnerGroupInfo();
+    tick(100);
+    fixture.detectChanges();
+
+    expect(component.learnerGroup.title).toBe('title');
+    expect(component.learnerGroup.description).toBe('description');
+  }));
+
   it('should update invited students to learner group successfully', () => {
     expect(component.invitedStudents).toEqual([]);
     component.updateInvitedStudents(['username1', 'username2']);
@@ -190,6 +222,7 @@ describe('LearnerGroupPreferencesComponent', () => {
 
     component.learnerGroup = demoLearnerGroup;
     component.currentStudentsInfo = [];
+    component.invitedStudentsInfo = [newStudentInfo];
 
     component.addStudentToLearnerGroup(newStudentInfo);
     tick(100);
@@ -203,4 +236,234 @@ describe('LearnerGroupPreferencesComponent', () => {
     const dataUrl = '%2Fimages%2Furl%2F1';
     expect(component.getProfileImageDataUrl(dataUrl)).toBe('/images/url/1');
   });
+
+  it('should open invite students modal successfully', fakeAsync(() => {
+    const demoLearnerGroupBackendDict = {
+      id: 'groupId',
+      title: 'title',
+      description: 'description',
+      facilitator_usernames: ['facilitator_username'],
+      student_usernames: [],
+      invited_student_usernames: ['username1', 'username2'],
+      subtopic_page_ids: [],
+      story_ids: ['story_id_1']
+    };
+    const demoLearnerGroup = LearnerGroupData.createFromBackendDict(
+      demoLearnerGroupBackendDict);
+    const newStudentInfo = LearnerGroupUserInfo.createFromBackendDict({
+      username: 'username1',
+      profile_picture_data_url: 'picture',
+      error: ''
+    });
+
+    spyOn(ngbModal, 'open').and.returnValues({
+      componentInstance: {
+        learnerGroupId: 'groupId'
+      },
+      result: Promise.resolve({
+        invitedStudents: ['username1'],
+        invitedStudentsInfo: [newStudentInfo]
+      })
+    } as NgbModalRef,
+    {
+      componentInstance: {
+        successMessage: 'message',
+        invitedUsernames: ['user1', 'user2']
+      },
+      result: Promise.resolve()
+    } as NgbModalRef);
+
+    spyOn(learnerGroupBackendApiService, 'updateLearnerGroupAsync')
+      .and.returnValue(Promise.resolve(learnerGroup));
+
+    component.learnerGroup = demoLearnerGroup;
+    component.invitedStudentsInfo = [];
+
+    component.openInviteStudentsModal();
+    tick(100);
+    fixture.detectChanges();
+
+    expect(component.learnerGroup).toEqual(learnerGroup);
+    expect(component.invitedStudentsInfo).toEqual([newStudentInfo]);
+  }));
+
+  it('should close invite students modal successfully',
+    fakeAsync(() => {
+      const demoLearnerGroupBackendDict = {
+        id: 'groupId',
+        title: 'title',
+        description: 'description',
+        facilitator_usernames: ['facilitator_username'],
+        student_usernames: ['username1', 'user3'],
+        invited_student_usernames: ['username2'],
+        subtopic_page_ids: [],
+        story_ids: ['story_id_1']
+      };
+      const demoLearnerGroup = LearnerGroupData.createFromBackendDict(
+        demoLearnerGroupBackendDict);
+      const studentInfo = LearnerGroupUserInfo.createFromBackendDict({
+        username: 'user3',
+        profile_picture_data_url: 'picture',
+        error: ''
+      });
+
+      spyOn(ngbModal, 'open').and.returnValue({
+        componentInstance: {
+          learnerGroupId: 'groupId'
+        },
+        result: Promise.reject()
+      } as NgbModalRef);
+
+      spyOn(learnerGroupBackendApiService, 'updateLearnerGroupAsync')
+        .and.returnValue(Promise.resolve(demoLearnerGroup));
+
+      component.learnerGroup = demoLearnerGroup;
+      component.currentStudentsInfo = [studentInfo];
+
+      component.openInviteStudentsModal();
+      tick(100);
+      fixture.detectChanges();
+
+      expect(component.learnerGroup).toEqual(demoLearnerGroup);
+      expect(component.currentStudentsInfo).toEqual([studentInfo]);
+    })
+  );
+
+  it('should close invitation successfull modal successfully',
+    fakeAsync(() => {
+      const demoLearnerGroupBackendDict = {
+        id: 'groupId',
+        title: 'title',
+        description: 'description',
+        facilitator_usernames: ['facilitator_username'],
+        student_usernames: [],
+        invited_student_usernames: ['username1', 'username2'],
+        subtopic_page_ids: [],
+        story_ids: ['story_id_1']
+      };
+      const demoLearnerGroup = LearnerGroupData.createFromBackendDict(
+        demoLearnerGroupBackendDict);
+      const newStudentInfo = LearnerGroupUserInfo.createFromBackendDict({
+        username: 'username1',
+        profile_picture_data_url: 'picture',
+        error: ''
+      });
+
+      spyOn(ngbModal, 'open').and.returnValues({
+        componentInstance: {
+          learnerGroupId: 'groupId'
+        },
+        result: Promise.resolve({
+          invitedStudents: ['username1'],
+          invitedStudentsInfo: [newStudentInfo]
+        })
+      } as NgbModalRef,
+      {
+        componentInstance: {
+          successMessage: 'message',
+          invitedUsernames: ['user1', 'user2']
+        },
+        result: Promise.reject()
+      } as NgbModalRef);
+
+      spyOn(learnerGroupBackendApiService, 'updateLearnerGroupAsync')
+        .and.returnValue(Promise.resolve(learnerGroup));
+
+      component.learnerGroup = demoLearnerGroup;
+      component.invitedStudentsInfo = [];
+
+      component.openInviteStudentsModal();
+      tick(100);
+      fixture.detectChanges();
+
+      expect(component.learnerGroup).toEqual(learnerGroup);
+      expect(component.invitedStudentsInfo).toEqual([newStudentInfo]);
+    })
+  );
+
+  it('should open remove student from group modal successfully',
+    fakeAsync(() => {
+      const demoLearnerGroupBackendDict = {
+        id: 'groupId',
+        title: 'title',
+        description: 'description',
+        facilitator_usernames: ['facilitator_username'],
+        student_usernames: ['username1', 'user3'],
+        invited_student_usernames: ['username2'],
+        subtopic_page_ids: [],
+        story_ids: ['story_id_1']
+      };
+      const demoLearnerGroup = LearnerGroupData.createFromBackendDict(
+        demoLearnerGroupBackendDict);
+      const studentInfo = LearnerGroupUserInfo.createFromBackendDict({
+        username: 'user3',
+        profile_picture_data_url: 'picture',
+        error: ''
+      });
+
+      spyOn(ngbModal, 'open').and.returnValue({
+        componentInstance: {
+          confirmationTitle: 'Remove Student',
+          confirmationMessage: 'Some confirmation message.'
+        },
+        result: Promise.resolve()
+      } as NgbModalRef);
+
+      spyOn(learnerGroupBackendApiService, 'updateLearnerGroupAsync')
+        .and.returnValue(Promise.resolve(learnerGroup));
+
+      component.learnerGroup = demoLearnerGroup;
+      component.currentStudentsInfo = [studentInfo];
+
+      component.openRemoveStudentFromGroupModal(studentInfo);
+      tick(100);
+      fixture.detectChanges();
+
+      expect(component.learnerGroup).toEqual(learnerGroup);
+      expect(component.currentStudentsInfo).toEqual([]);
+    })
+  );
+
+  it('should open withdraw student invitation modal successfully',
+    fakeAsync(() => {
+      const demoLearnerGroupBackendDict = {
+        id: 'groupId',
+        title: 'title',
+        description: 'description',
+        facilitator_usernames: ['facilitator_username'],
+        student_usernames: ['username1'],
+        invited_student_usernames: ['username2', 'user3'],
+        subtopic_page_ids: [],
+        story_ids: ['story_id_1']
+      };
+      const demoLearnerGroup = LearnerGroupData.createFromBackendDict(
+        demoLearnerGroupBackendDict);
+      const studentInfo = LearnerGroupUserInfo.createFromBackendDict({
+        username: 'user3',
+        profile_picture_data_url: 'picture',
+        error: ''
+      });
+
+      spyOn(ngbModal, 'open').and.returnValue({
+        componentInstance: {
+          confirmationTitle: 'Withdraw Invitation',
+          confirmationMessage: 'Some confirmation message.'
+        },
+        result: Promise.resolve()
+      } as NgbModalRef);
+
+      spyOn(learnerGroupBackendApiService, 'updateLearnerGroupAsync')
+        .and.returnValue(Promise.resolve(learnerGroup));
+
+      component.learnerGroup = demoLearnerGroup;
+      component.invitedStudentsInfo = [studentInfo];
+
+      component.openWithdrawStudentInvitationModal(studentInfo);
+      tick(100);
+      fixture.detectChanges();
+
+      expect(component.learnerGroup).toEqual(learnerGroup);
+      expect(component.invitedStudentsInfo).toEqual([]);
+    })
+  );
 });

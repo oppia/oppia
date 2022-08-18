@@ -61,11 +61,11 @@ export class LearnerGroupStudentSpecificProgressComponent {
       });
       this.studentProgress.storiesProgress.forEach(storyProgress => {
         this.storyIds.push(storyProgress.getId());
-        let previousChapterCount = (
+        let previousChaptersCount = (
           this.cummulativeStoryChaptersCount.slice(-1).pop());
-        if (previousChapterCount) {
+        if (previousChaptersCount) {
           this.cummulativeStoryChaptersCount.push(
-            previousChapterCount + storyProgress.getNodeTitles().length);
+            previousChaptersCount + storyProgress.getNodeTitles().length);
         } else {
           this.cummulativeStoryChaptersCount.push(
             storyProgress.getNodeTitles().length);
@@ -92,7 +92,7 @@ export class LearnerGroupStudentSpecificProgressComponent {
     return decodeURIComponent(dataUrl);
   }
 
-  getAllCheckpointsOfChapter(
+  getAllCheckpointsProgressOfChapter(
       storyIndex: number, chapterIndex: number
   ): number[] {
     let chapterProgressIndex = chapterIndex;
@@ -107,9 +107,9 @@ export class LearnerGroupStudentSpecificProgressComponent {
     }
     let allCheckpointsProgress: number[] = [];
     for (let i = 0; i < chapterProgress.totalCheckpoints; i++) {
-      if (i < chapterProgress.visitedCheckpoints - 1) {
+      if (i < (chapterProgress.visitedCheckpoints - 1)) {
         allCheckpointsProgress.push(1);
-      } else if (i === chapterProgress.visitedCheckpoints - 1) {
+      } else if (i === (chapterProgress.visitedCheckpoints - 1)) {
         allCheckpointsProgress.push(2);
       } else {
         allCheckpointsProgress.push(0);
@@ -130,7 +130,7 @@ export class LearnerGroupStudentSpecificProgressComponent {
   getCompletedProgressBarWidth(
       storyIndex: number, chapterIndex: number
   ): number {
-    const checkpointsProgress = this.getAllCheckpointsOfChapter(
+    const checkpointsProgress = this.getAllCheckpointsProgressOfChapter(
       storyIndex, chapterIndex);
     const completedCheckpoints = checkpointsProgress.filter(
       checkpointProgress => checkpointProgress === 1
@@ -144,7 +144,7 @@ export class LearnerGroupStudentSpecificProgressComponent {
   getVisitedCheckpointsCount(
       storyIndex: number, chapterIndex: number
   ): number {
-    const checkpointsProgress = this.getAllCheckpointsOfChapter(
+    const checkpointsProgress = this.getAllCheckpointsProgressOfChapter(
       storyIndex, chapterIndex);
     return checkpointsProgress.filter(
       checkpointProgress => (

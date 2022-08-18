@@ -165,8 +165,6 @@ export class StoryViewerBackendApiService {
               progressInfo)
           )
         );
-      }, errorResponse => {
-        reject(errorResponse.error.error);
       });
     });
   }
