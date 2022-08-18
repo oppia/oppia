@@ -16,7 +16,7 @@
   </div>
 
   <div *ngIf="dropdownShown" class="oppia-translation-language-selector-dropdown-container e2e-test-language-selector-dropdown">
-    <input #filterDiv type="text" class="oppia-translation-language-selector-filter-input oppia-autofocu"
+    <input #filterDiv type="text" class="oppia-translation-language-selector-filter-input"
            placeholder="Language"
            [(ngModel)]="optionsFilter"
            (input)="filterOptions()"
