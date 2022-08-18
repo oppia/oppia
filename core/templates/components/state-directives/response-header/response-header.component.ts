@@ -26,17 +26,12 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
 import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
 
-interface DeleteValue {
-  index: number;
-  evt: Event;
-}
 
 @Component({
   selector: 'oppia-response-header',
   templateUrl: './response-header.component.html'
 })
 export class ResponseHeaderComponent {
-  @Output() delete = new EventEmitter<DeleteValue>();
   @Output() navigateToState = new EventEmitter<string>();
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
@@ -93,15 +88,6 @@ export class ResponseHeaderComponent {
   isCreatingNewState(): boolean {
     const outcome = this.outcome;
     return outcome && outcome.dest === AppConstants.PLACEHOLDER_OUTCOME_DEST;
-  }
-
-  deleteResponse(evt: Event): void {
-    const value: DeleteValue = {
-      index: this.index,
-      evt: evt
-    };
-
-    this.delete.emit(value);
   }
 }
 
