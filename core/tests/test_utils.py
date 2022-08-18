@@ -552,9 +552,9 @@ class ElasticSearchStub:
         """Searches and returns documents that match the given query.
 
         Args:
-            body: dict. A dictionary search definition that uses Query DSL.
-            index: str. The name of the index to search.
-            params: dict. A dict with two keys: `size` and `from`. The
+            body: dict|None. A dictionary search definition that uses Query DSL.
+            index: str|None. The name of the index to search.
+            params: dict|None. A dict with two keys: `size` and `from`. The
                 corresponding values are ints which represent the number of
                 results to fetch, and the offset from which to fetch them,
                 respectively.
@@ -722,33 +722,31 @@ class AuthServicesStub:
 
     @classmethod
     def establish_auth_session(
-        cls,
-        unused_request: webapp2.Request,
-        unused_response: webapp2.Response
+        cls, _: webapp2.Request, __: webapp2.Response
     ) -> None:
         """Sets login cookies to maintain a user's sign-in session.
 
         Args:
-            unused_request: webapp2.Request. Unused because os.environ handles
+            _: webapp2.Request. Unused because os.environ handles
                 sessions.
-            unused_response: webapp2.Response. Unused because os.environ handles
+            __: webapp2.Response. Unused because os.environ handles
                 sessions.
         """
         pass
 
     @classmethod
-    def destroy_auth_session(cls, unused_response: webapp2.Response) -> None:
+    def destroy_auth_session(cls, _: webapp2.Response) -> None:
         """Clears login cookies from the given response headers.
 
         Args:
-            unused_response: webapp2.Response. Unused because os.environ handles
+            _: webapp2.Response. Unused because os.environ handles
                 sessions.
         """
         pass
 
     @classmethod
     def get_auth_claims_from_request(
-        cls, unused_request: webapp2.Request
+        cls, _: webapp2.Request
     ) -> Optional[auth_domain.AuthClaims]:
         """Authenticates the request and returns claims about its authorizer.
 
@@ -757,7 +755,7 @@ class AuthServicesStub:
         association for the user to simulate a genuine "provided" value.
 
         Args:
-            unused_request: webapp2.Request. The HTTP request to authenticate.
+            _: webapp2.Request. The HTTP request to authenticate.
                 Unused because auth-details are extracted from environment
                 variables.
 
@@ -1396,9 +1394,7 @@ class TestBase(unittest.TestCase):
         self, obj: Any, attr: str, value: Optional[Any] = None
     ) -> Iterator[None]:
         """Swap obj.attr with a function that always returns the given value."""
-        def function_that_always_returns(
-            *unused_args: str, **unused_kwargs: str
-        ) -> Any:
+        def function_that_always_returns(*_: str, **__: str) -> Any:
             """Returns the input value."""
             return value
         with self.swap(obj, attr, function_that_always_returns):
@@ -1414,10 +1410,7 @@ class TestBase(unittest.TestCase):
         error: Union[Exception, Type[Exception]] = Exception
     ) -> Iterator[None]:
         """Swap obj.attr with a function that always raises the given error."""
-        def function_that_always_raises(
-            *unused_args: str,
-            **unused_kwargs: str
-        ) -> None:
+        def function_that_always_raises(*_: str, **__: str) -> None:
             """Raises the input exception."""
             raise error
         with self.swap(obj, attr, function_that_always_raises):

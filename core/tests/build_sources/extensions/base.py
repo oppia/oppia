@@ -169,7 +169,7 @@ class BaseInteraction:
     @property
     def customization_arg_specs(self) -> List[domain.CustomizationArgSpec]:
         return [
-            domain.CustomizationArgSpec(**cas)  # type: ignore[no-untyped-call]
+            domain.CustomizationArgSpec(**cas)
             for cas in self._customization_arg_specs]
 
     @property
@@ -207,7 +207,7 @@ class BaseInteraction:
         if self.answer_type is None:
             return None
         else:
-            return object_registry.Registry.get_object_class_by_type(  # type: ignore[no-untyped-call]
+            return object_registry.Registry.get_object_class_by_type(
                 self.answer_type).normalize(answer)
 
     @property
