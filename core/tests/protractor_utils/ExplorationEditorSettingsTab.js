@@ -135,7 +135,7 @@ var ExplorationEditorSettingsTab = function() {
 
     await action.click(
       'State name option', initialStateSelectOption(stateName), true);
-    await action.click('Neutral element', neutralElement);
+    await action.click('Neutral element', neutralElement, true);
   };
 
   this.setLanguage = async function(language) {
