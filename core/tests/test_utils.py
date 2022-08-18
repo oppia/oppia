@@ -1767,10 +1767,10 @@ class AppEngineTestBase(TestBase):
         # Defined outside of setUp() because we access it from methods, but can
         # only install it during the run() method. Defining it in __init__
         # satisfies pylint's attribute-defined-outside-init warning.
-        # TaskqueueServicesStub can only accept 'GenericTestBase' class but here
-        # we are providing super class (AppEngineTestBase) which causes MyPy to
-        # throw `incompatible argument type` error. Thus to avoid the error, we
-        # used cast here.
+        # TODO(#15922): TaskqueueServicesStub can only accept 'GenericTestBase'
+        # class but here we are providing super class (AppEngineTestBase) which
+        # causes MyPy to throw `incompatible argument type` error. Thus to avoid
+        # the error, we used cast here.
         self._platform_taskqueue_services_stub = TaskqueueServicesStub(
             cast(GenericTestBase, self)
         )
@@ -2761,7 +2761,7 @@ title: Title
         # https://github.com/Pylons/webtest/blob/bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119
         self.assertEqual(json_response.status_int, expected_status_int)
 
-        # Here we use type Any because response is JSON response dict
+        # Here we use type Any because response is a JSON response dict
         # which can contain different types of values. So, to allow every
         # type of value we used Any here.
         response: Dict[str, Any] = self._parse_json_response(
@@ -2831,6 +2831,9 @@ title: Title
         # https://github.com/Pylons/webtest/blob/bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119
         self.assertEqual(json_response.status_int, expected_status_int)
 
+        # Here we use type Any because response is a JSON response dict
+        # which can contain different types of values. So, to allow every
+        # type of value we used Any here.
         response: Dict[str, Any] = self._parse_json_response(
             json_response,
             expect_errors
@@ -2866,6 +2869,9 @@ title: Title
         # https://github.com/Pylons/webtest/blob/bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119
         self.assertEqual(json_response.status_int, expected_status_int)
 
+        # Here we use type Any because response is a JSON response dict
+        # which can contain different types of values. So, to allow every
+        # type of value we used Any here.
         response: Dict[str, Any] = self._parse_json_response(
             json_response,
             expect_errors

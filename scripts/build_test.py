@@ -75,8 +75,8 @@ class BuildTests(test_utils.GenericTestBase):
                 INVALID_OUTPUT_FILEPATH,
                 INVALID_FILENAME)
         # Stubs of 'assertRaisesRegex' does not contain any returncode
-        # attribute, so because this MyPy throws an '"Exception" has no
-        # attribute "returncode"' error. Thus to avoid the error, we
+        # attribute, so because of this MyPy throws an '"Exception" has
+        # no attribute "returncode"' error. Thus to avoid the error, we
         # used ignore here.
         # `returncode` is the exit status of the child process.
         self.assertEqual(called_process.exception.returncode, 1)  # type: ignore[attr-defined]
@@ -89,8 +89,8 @@ class BuildTests(test_utils.GenericTestBase):
             build._minify_and_create_sourcemap(  # pylint: disable=protected-access
                 INVALID_INPUT_FILEPATH, INVALID_OUTPUT_FILEPATH)
         # Stubs of 'assertRaisesRegex' does not contain any returncode
-        # attribute, so because this MyPy throws an '"Exception" has no
-        # attribute "returncode"' error. Thus to avoid the error, we
+        # attribute, so because of this MyPy throws an '"Exception" has
+        # no attribute "returncode"' error. Thus to avoid the error, we
         # used ignore here.
         # `returncode` is the exit status of the child process.
         self.assertEqual(called_process.exception.returncode, 1)  # type: ignore[attr-defined]
