@@ -297,6 +297,7 @@ def run_tests(args):
                 debug_mode=args.debug_mode,
                 chrome_version=args.chrome_driver_version,
                 sharding_instances=args.sharding_instances,
+                mobile=args.mobile,
                 stdout=subprocess.PIPE))
 
             print(

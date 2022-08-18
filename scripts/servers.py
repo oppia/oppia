@@ -672,7 +672,7 @@ def managed_protractor_server(
 @contextlib.contextmanager
 def managed_webdriverio_server(
         suite_name='full', dev_mode=True, debug_mode=False,
-        sharding_instances=1, chrome_version=None, **kwargs):
+        sharding_instances=1, chrome_version=None, mobile=False, **kwargs):
     """Returns context manager to start/stop the WebdriverIO server gracefully.
 
     Args:
@@ -708,6 +708,7 @@ def managed_webdriverio_server(
         common.NODEMODULES_WDIO_BIN_PATH, common.WEBDRIVERIO_CONFIG_FILE_PATH,
         '--suite', suite_name, chrome_version,
         '--params.devMode=%s' % dev_mode,
+        '--params.mobile=%s' % mobile
     ]
 
     # Capabilities in wdio.conf.js are added as an array of object,

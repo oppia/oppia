@@ -31,6 +31,7 @@ var StoryEditorPage = function() {
   var commitMessageField = $('.e2e-test-commit-message-input');
   var closeSaveModalButton = $('.e2e-test-close-save-modal-button');
   var createChapterButton = $('.e2e-test-add-chapter-button');
+  var createChapterButtonMobile = $('.e2e-test-mobile-add-chapter');
   var newChapterTitleField = $('.e2e-test-new-chapter-title-field');
   var newChapterExplorationField = $('.e2e-test-chapter-exploration-input');
   var notesEditor = $('.e2e-test-story-notes-rte');
@@ -156,9 +157,19 @@ var StoryEditorPage = function() {
 
   this.createNewChapter = async function(title, explorationId, imgPath) {
     await general.scrollToTop();
+
+    let width = (await browser.getWindowSize()).width;
+
+    if (width < 831) {
+      await action.click(
+        'Create chapter arrow takes too long to be clickable.',
+        createChapterButtonMobile, true);
+    }
+
     await action.click(
       'Create chapter button takes too long to be clickable.',
       createChapterButton);
+
     await action.setValue(
       'New chapter title field', newChapterTitleField, title);
     await action.setValue(

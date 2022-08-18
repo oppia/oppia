@@ -178,9 +178,9 @@ describe('Contributor dashboard page', function() {
     await explorationEditorMainTab.setInteraction('EndExploration');
     var explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     await explorationEditorPage.navigateToSettingsTab();
-    let width = (await browser.manage().window().getSize()).width;
+    let width = (await browser.getWindowSize()).width;
     if (width < 769) {
-      var basicSettings = element(by.css('.e2e-test-basic-settings'));
+      var basicSettings = $('.e2e-test-basic-settings');
       await action.click('Basic Settings', basicSettings);
     }
     await explorationEditorSettingsTab.setTitle('exp1');
