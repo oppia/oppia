@@ -19,6 +19,9 @@
   position: relative;
   text-align: left;
 }
+.oppia-topic-title {
+  visibility: hidden;
+}
 .oppia-subtopic-title {
   color: #00645c;
   font-family: Capriola, Roboto, Arial, sans-serif;
@@ -90,11 +93,22 @@
     padding-top: 80px;
   }
 
+  .oppia-topic-title {
+    color: #00645c;
+    font-family: Capriola, Roboto, Arial, sans-serif;
+    font-size: 1.5rem;
+    margin-left: 25px;
+    margin-top: 25px;
+    padding-right: 25px;
+    padding-top: 20px;
+    text-align: left;
+    visibility: visible;
+  }
+
   .oppia-subtopic-title {
     font-size: 2rem;
     margin-left: 25px;
     padding-right: 25px;
-    padding-top: 20px;
   }
 
   .oppia-page-contents-viewer {

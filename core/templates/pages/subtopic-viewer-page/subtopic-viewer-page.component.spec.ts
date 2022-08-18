@@ -28,10 +28,12 @@ import { AlertsService } from 'services/alerts.service';
 import { ContextService } from 'services/context.service';
 import { LoaderService } from 'services/loader.service';
 import { SubtopicViewerBackendApiService } from 'domain/subtopic_viewer/subtopic-viewer-backend-api.service';
+import { TopicViewerBackendApiService } from 'domain/topic_viewer/topic-viewer-backend-api.service';
 import { UrlService } from 'services/contextual/url.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { ReadOnlyTopic } from 'domain/topic_viewer/read-only-topic-object.factory';
 
 class MockTranslateService {
   onLangChange: EventEmitter<string> = new EventEmitter();
@@ -48,6 +50,7 @@ describe('Subtopic viewer page', function() {
   let alertsService: AlertsService;
   let windowDimensionsService: WindowDimensionsService;
   let subtopicViewerBackendApiService: SubtopicViewerBackendApiService;
+  let topicViewerBackendApiService: TopicViewerBackendApiService;
   let urlService: UrlService;
   let loaderService: LoaderService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
@@ -55,6 +58,21 @@ describe('Subtopic viewer page', function() {
 
   let topicName = 'Topic Name';
   let topicId = '123abcd';
+  let topicDataObject: ReadOnlyTopic = new ReadOnlyTopic(
+    topicName,
+    topicId,
+    'Topic Description',
+    [],
+    [],
+    [],
+    [],
+    {},
+    {},
+    true,
+    '',
+    ''
+  );
+
   let subtopicTitle = 'Subtopic Title';
   let subtopicUrlFragment = 'subtopic-title';
   let subtopicDataObject: ReadOnlySubtopicPageData = (
@@ -143,6 +161,8 @@ describe('Subtopic viewer page', function() {
     alertsService = TestBed.inject(AlertsService);
     subtopicViewerBackendApiService = TestBed.inject(
       SubtopicViewerBackendApiService);
+    topicViewerBackendApiService = TestBed.inject(
+      TopicViewerBackendApiService);
     urlService = TestBed.inject(UrlService);
     loaderService = TestBed.inject(LoaderService);
     translateService = TestBed.inject(TranslateService);
@@ -151,8 +171,8 @@ describe('Subtopic viewer page', function() {
       true);
   });
 
-  it('should succesfully get subtopic data and set context with next subtopic' +
-  ' card', fakeAsync(() => {
+  it('should successfully get topic/subtopic data and set context with ' +
+  'next subtopic card', fakeAsync(() => {
     spyOn(component, 'subscribeToOnLangChange');
     spyOn(contextService, 'setCustomEntityContext');
     spyOn(contextService, 'removeCustomEntityContext');
@@ -167,7 +187,11 @@ describe('Subtopic viewer page', function() {
     expect(component.subtopicSummaryIsShown).toBe(false);
     spyOn(subtopicViewerBackendApiService, 'fetchSubtopicDataAsync')
       .and.returnValue(Promise.resolve(subtopicDataObject));
+    spyOn(topicViewerBackendApiService, 'fetchTopicDataAsync')
+      .and.returnValue(Promise.resolve(topicDataObject));
     spyOn(i18nLanguageCodeService, 'getSubtopicTranslationKey')
+      .and.returnValue('I18N_SUBTOPIC_123abcd_test_TITLE');
+    spyOn(i18nLanguageCodeService, 'getTopicTranslationKey')
       .and.returnValue('I18N_SUBTOPIC_123abcd_test_TITLE');
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
       .and.returnValue(false);
@@ -183,6 +207,8 @@ describe('Subtopic viewer page', function() {
       subtopicDataObject.getSubtopicTitle());
     expect(component.parentTopicId).toEqual(
       subtopicDataObject.getParentTopicId());
+    expect(component.parentTopicTitle).toEqual(
+      subtopicDataObject.getParentTopicName());
     expect(component.nextSubtopic).toEqual(
       subtopicDataObject.getNextSubtopic());
     expect(component.prevSubtopic).toBeUndefined();
@@ -190,9 +216,14 @@ describe('Subtopic viewer page', function() {
 
     expect(component.subtopicTitleTranslationKey).toEqual(
       'I18N_SUBTOPIC_123abcd_test_TITLE');
+    expect(component.parentTopicTitleTranslationKey).toEqual(
+      'I18N_SUBTOPIC_123abcd_test_TITLE');
     let hackySubtopicTitleTranslationIsDisplayed =
       component.isHackySubtopicTitleTranslationDisplayed();
+    let hackyTopicTitleTranslationIsDisplayed =
+      component.isHackyTopicTitleTranslationDisplayed();
     expect(hackySubtopicTitleTranslationIsDisplayed).toBe(true);
+    expect(hackyTopicTitleTranslationIsDisplayed).toBe(true);
     expect(contextService.setCustomEntityContext).toHaveBeenCalled();
     expect(component.subscribeToOnLangChange).toHaveBeenCalled();
 
@@ -231,7 +262,7 @@ describe('Subtopic viewer page', function() {
     expect(component.directiveSubscriptions.closed).toBe(true);
   });
 
-  it('should succesfully get subtopic data with prev subtopic card',
+  it('should successfully get subtopic data with prev subtopic card',
     fakeAsync(() => {
       spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
         'topic-url');
