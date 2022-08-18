@@ -1044,7 +1044,7 @@ def compute_summary_of_skill(
         SkillSummary. The computed summary for the given skill.
 
     Raises:
-        Exception. No data available for when the skill was last_updated on.
+        Exception. No data available for when the skill was last_updated.
     """
     skill_model_misconception_count = len(skill.misconceptions)
     skill_model_worked_examples_count = len(
@@ -1052,7 +1052,7 @@ def compute_summary_of_skill(
 
     if skill.created_on is None or skill.last_updated is None:
         raise Exception(
-            'No data available for when the skill was last_updated on.'
+            'No data available for when the skill was last_updated.'
         )
     skill_summary = skill_domain.SkillSummary(
         skill.id, skill.description, skill.language_code,
