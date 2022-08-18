@@ -149,6 +149,7 @@ import { StateGraphVisualization } from 'pages/exploration-editor-page/editor-ta
 import { VersionDiffVisualizationComponent } from './version-diff-visualization/version-diff-visualization.component';
 import { QuestionSuggestionEditorModalComponent } from 'pages/contributor-dashboard-page/modal-templates/question-suggestion-editor-modal.component';
 import { QuestionSuggestionReviewModalComponent } from 'pages/contributor-dashboard-page/modal-templates/question-suggestion-review-modal.component';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 // Pipes.
 import { StringUtilityPipesModule } from 'filters/string-utility-filters/string-utility-pipes.module';
@@ -190,6 +191,7 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     StringUtilityPipesModule,
     AngularFireModule.initializeApp(AuthService.firebaseConfig),
     AngularFireAuthModule,
+    MatProgressSpinnerModule,
   ],
 
   providers: [

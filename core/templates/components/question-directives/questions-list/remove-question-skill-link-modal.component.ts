@@ -16,24 +16,24 @@
  * @fileoverview Component for Unassign Skill Modal.
  */
 
- import { Component } from '@angular/core';
- import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
- import { AppConstants } from 'app.constants';
- import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
- import { AssignedSkill } from 'domain/skill/assigned-skill.model';
- import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
- import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
- import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
+import { Component } from '@angular/core';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { AppConstants } from 'app.constants';
+import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import { AssignedSkill } from 'domain/skill/assigned-skill.model';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
 
- export interface TopicNameToTopicId {
-   [key: string]: string;
- }
+export interface TopicNameToTopicId {
+  [key: string]: string;
+}
 
- @Component({
-   selector: 'oppia-remove-question-skill-link-modal',
-   templateUrl: './remove-question-skill-link-modal.component.html'
- })
- export class RemoveQuestionSkillLinkModalComponent
+@Component({
+  selector: 'oppia-remove-question-skill-link-modal',
+  templateUrl: './remove-question-skill-link-modal.component.html'
+})
+export class RemoveQuestionSkillLinkModalComponent
   extends ConfirmOrCancelModal {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
@@ -42,9 +42,8 @@
   canEditQuestion!: boolean;
   numberOfQuestions!: number;
   questionDeletionIsAllowed: boolean = true;
-  // TODO: Add comment.
+  topicsAssignmentsAreFetched = false;
   topicNameToTopicId: TopicNameToTopicId = {};
-
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -57,7 +56,7 @@
   }
 
   getTopicNameToTopicId(
-      topicAssignments: AssignedSkill[], topicNames: string[]) {
+      topicAssignments: AssignedSkill[], topicNames: string[]): void {
     this.topicNameToTopicId = {};
 
     for (let topic of topicAssignments) {
@@ -72,18 +71,16 @@
       this.questionDeletionIsAllowed = false;
       return;
     }
-
     this.skillBackendApiService
       .getTopicNamesWithGivenSkillAssignedForDiagnosticTest(
         this.skillId).then((topicNames) => {
-
         if ((topicNames.length > 0) && (
           this.numberOfQuestions <=
             AppConstants.MIN_QUESTION_COUNT_FOR_A_DIAGNOSTIC_TEST_SKILL)) {
           this.getTopicNameToTopicId(topicAssignments, topicNames);
           this.questionDeletionIsAllowed = false;
         }
-      })
+      });
   }
 
   fetchTopicAssignmentsForSkill(): void {
@@ -92,8 +89,10 @@
         this.skillId
       ).then((response: AssignedSkill[]) => {
         this.isQuestionDeletionAllowed(response);
+        this.topicsAssignmentsAreFetched = true;
       });
   }
+
   getTopicEditorUrl(topicId: string): string {
     const TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topic_id>#/';
     return this.urlInterpolationService.interpolateUrl(
@@ -109,4 +108,4 @@
   close(): void {
     this.ngbActiveModal.close();
   }
- }
+}

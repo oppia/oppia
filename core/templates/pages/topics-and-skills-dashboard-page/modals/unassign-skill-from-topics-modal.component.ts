@@ -108,7 +108,6 @@ export class UnassignSkillFromTopicsModalComponent
             this.eligibleTopicNameToTopicAssignments);
           this.nonEligibleTopicNames = Object.keys(
             this.nonEligibleTopicNameToTopicAssignments);
-          this.topicsAssignmentsAreFetched = true;
         });
   }
 
@@ -118,6 +117,7 @@ export class UnassignSkillFromTopicsModalComponent
         this.skillId
       ).then((response: AssignedSkill[]) => {
         this.fetchTopicIdToDiagnosticTestSkillIds(response);
+        this.topicsAssignmentsAreFetched = true;
       });
   }
 
