@@ -642,7 +642,7 @@ class ExpAuditRuleChecksJob(base_jobs.JobBase):
             | 'Map language code' >> beam.Map(
                 lambda exp: exp.language_code
             )
-            | 'Combine globally' >> beam.Distinct()
+            | 'Combine globally' >> beam.Distinct() # pylint: disable=no-value-for-parameter
         )
 
         report_continue_text_language_code_values = (
