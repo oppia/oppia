@@ -2656,8 +2656,7 @@ def get_checkpoints_in_order(
         order.
 
     Raises:
-        Exception. None destination can never be a checkpoint.
-        Exception. None default destination can never be a checkpoint.
+        Exception. States with a null destination can never be a checkpoint.
     """
     queue = [init_state_name]
     checkpoint_state_names = []
@@ -2675,8 +2674,8 @@ def get_checkpoints_in_order(
             for answer_group in current_state.interaction.answer_groups:
                 if answer_group.outcome.dest is None:
                     raise Exception(
-                        'None destination can never be a checkpoint in'
-                        ' exploration.'
+                        'States with a null destination can never be a'
+                        ' checkpoint.'
                     )
                 queue.append(answer_group.outcome.dest)
 
@@ -2684,8 +2683,8 @@ def get_checkpoints_in_order(
             if current_state.interaction.default_outcome is not None:
                 if current_state.interaction.default_outcome.dest is None:
                     raise Exception(
-                        'None default destination can never be a checkpoint'
-                        ' in exploration.'
+                        'States with a null destination can never be a'
+                        ' checkpoint.'
                     )
                 queue.append(current_state.interaction.default_outcome.dest)
 

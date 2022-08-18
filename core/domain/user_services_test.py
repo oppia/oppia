@@ -2200,7 +2200,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception,
-            'None destination can never be a checkpoint in exploration.'
+            'States with a null destination can never be a checkpoint.'
         ):
             user_services.get_checkpoints_in_order('Introduction', states)
 
@@ -2229,7 +2229,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             Exception,
-            'None default destination can never be a checkpoint'
+            'States with a null destination can never be a checkpoint'
         ):
             user_services.get_checkpoints_in_order('Introduction', states)
 
