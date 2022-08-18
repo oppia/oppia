@@ -247,12 +247,12 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
     EXPLORATION_ID = 'exp_id_0'
 
     def setUp(self) -> None:
-        super(CollectionDomainUnitTests, self).setUp()
+        super().setUp()
         self.save_new_valid_collection(
             self.COLLECTION_ID, 'user@example.com', title='Title',
             category='Category', objective='Objective',
             exploration_id=self.EXPLORATION_ID)
-        self.collection = collection_services.get_collection_by_id( # type: ignore[no-untyped-call]
+        self.collection = collection_services.get_collection_by_id(
             self.COLLECTION_ID)
 
     # We have ignored [override] here because the signature of this method
@@ -269,36 +269,52 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         """Test validating a new, valid collection."""
         self.collection.validate()
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_title_validation(self) -> None:
-        self.collection.title = 0
+        self.collection.title = 0  # type: ignore[assignment]
         self._assert_validation_error('Expected title to be a string')
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_category_validation(self) -> None:
-        self.collection.category = 0
+        self.collection.category = 0  # type: ignore[assignment]
         self._assert_validation_error('Expected category to be a string')
 
     def test_objective_validation(self) -> None:
         self.collection.objective = ''
         self._assert_validation_error('objective must be specified')
 
-        self.collection.objective = 0
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
+        self.collection.objective = 0  # type: ignore[assignment]
         self._assert_validation_error('Expected objective to be a string')
 
     def test_language_code_validation(self) -> None:
         self.collection.language_code = ''
         self._assert_validation_error('language must be specified')
 
-        self.collection.language_code = 0
+        # TODO(#13059): After we fully type the codebase we plan to get
+        # rid of the tests that intentionally test wrong inputs that we
+        # can normally catch by typing.
+        self.collection.language_code = 0  # type: ignore[assignment]
         self._assert_validation_error('Expected language code to be a string')
 
         self.collection.language_code = 'xz'
         self._assert_validation_error('Invalid language code')
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing. In this test only those cases should
+    # be removed where `type: ignore` is added.
     def test_tags_validation(self) -> None:
-        self.collection.tags = 'abc'
+        self.collection.tags = 'abc'  # type: ignore[assignment]
         self._assert_validation_error('Expected tags to be a list')
 
-        self.collection.tags = [2, 3]
+        self.collection.tags = [2, 3]  # type: ignore[list-item]
         self._assert_validation_error('Expected each tag to be a string')
 
         self.collection.tags = ['', 'tag']
@@ -320,8 +336,11 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Expected tags to be unique, but found duplicates')
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_schema_version_validation(self) -> None:
-        self.collection.schema_version = 'some_schema_version'
+        self.collection.schema_version = 'some_schema_version'  # type: ignore[assignment]
         self._assert_validation_error('Expected schema version to be an int')
 
         self.collection.schema_version = 100
@@ -329,8 +348,11 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
             'Expected schema version to be %s' %
             feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_nodes_validation(self) -> None:
-        self.collection.nodes = {}
+        self.collection.nodes = {}  # type: ignore[assignment]
         self._assert_validation_error('Expected nodes to be a list')
 
         self.collection.nodes = [
@@ -393,10 +415,13 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         self.collection.validate(strict=False)
         self.collection.validate(strict=True)
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_collection_node_exploration_id_validation(self) -> None:
         # Validate CollectionNode's exploration_id.
         collection_node0 = self.collection.get_node('exp_id_0')
-        collection_node0.exploration_id = 2
+        collection_node0.exploration_id = 2  # type: ignore[union-attr]
         self._assert_validation_error('Expected exploration ID to be a string')
 
     def test_is_demo_property(self) -> None:
@@ -997,7 +1022,7 @@ title: A title
 class CollectionSummaryTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
-        super(CollectionSummaryTests, self).setUp()
+        super().setUp()
         current_time = datetime.datetime.utcnow()
         self.collection_summary_dict = {
             'category': 'category',
