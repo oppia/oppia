@@ -639,15 +639,6 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
             | 'Group by key' >> beam.CoGroupByKey()
         )
 
-        invalid_model_groups = (
-            model_groups
-            | 'Filter invalid model groups' >> beam.Filter(
-                lambda group: not self.filter_valid_model_group(group[1])
-            )
-            | 'Get the ids for which model group is invalid' >>
-                beam.Map(lambda group: group[0])
-        )
-
         valid_model_groups = (
             model_groups
             | 'Get rid of exploration id' >>
@@ -700,24 +691,6 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                 job_result_transforms.CountObjectsToJobRunResult('ALL EXPS')
         )
 
-        report_number_of_invalid_model_groups = (
-            invalid_model_groups
-            | 'Count number of explorations having incomplete commit logs' >>
-                job_result_transforms.CountObjectsToJobRunResult(
-                    'EXPS FOR WHICH VERSION HISTORY CANNOT BE COMPUTED'
-                )
-        )
-
-        report_details_of_invalid_model_groups = (
-            invalid_model_groups
-            | 'Save info on invalid model groups' >> beam.Map(
-                lambda exp_id: job_run_result.JobRunResult.as_stderr(
-                    'Version history cannot be computed for exploration '
-                    'with ID %s' % (exp_id)
-                )
-            )
-        )
-
         report_exps_count_for_which_version_history_can_be_computed = (
             valid_model_groups
             | 'Count exps for which version history can be computed' >>
@@ -762,8 +735,6 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
         return (
             (
                 report_number_of_exps_queried,
-                report_number_of_invalid_model_groups,
-                report_details_of_invalid_model_groups,
                 report_exps_count_for_which_version_history_can_be_computed,
                 report_number_of_exps_with_invalid_change_list,
                 report_details_of_exps_having_invalid_change_list,

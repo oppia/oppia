@@ -490,14 +490,7 @@ class ComputeExplorationVersionHistoryJobTests(
         snapshot_model.put()
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult.as_stdout('ALL EXPS SUCCESS: 1'),
-            job_run_result.JobRunResult.as_stdout(
-                'EXPS FOR WHICH VERSION HISTORY CANNOT BE COMPUTED SUCCESS: 1'
-            ),
-            job_run_result.JobRunResult.as_stderr(
-                'Version history cannot be computed for exploration '
-                'with ID %s' % (self.EXP_ID_1)
-            )
+            job_run_result.JobRunResult.as_stdout('ALL EXPS SUCCESS: 1')
         ])
 
     # The following tests are to fully cover all branches but most of them
