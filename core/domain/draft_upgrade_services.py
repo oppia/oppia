@@ -129,10 +129,7 @@ class DraftUpgradeUtil:
             list(ExplorationChange). The converted draft_change_list.
         """
         for i, change in enumerate(draft_change_list):
-            # Here, we are using Any type because new_value can contain values
-            # of type Dict, OutcomeDict, str, list, HintDict and other types
-            # too.
-            new_value: Any = None
+            new_value = None
             if not change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
                 continue
             # The change object has the key 'new_value' only if the
@@ -179,6 +176,9 @@ class DraftUpgradeUtil:
             elif (change.property_name ==
                   exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME and
                   new_value is not None):
+                # Ruling out the possibility of any other type for mypy
+                # type checking.
+                assert isinstance(new_value, dict)
                 new_value = (
                     state_domain.Outcome.convert_html_in_outcome(
                         new_value, conversion_fn))
