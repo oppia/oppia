@@ -2554,6 +2554,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         return states_dict
 
+    # The start of the updating general state section.
     @classmethod
     def _update_general_state(
         cls, states_dict: Dict[str, state_domain.StateDict]
@@ -3171,6 +3172,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         return answer_groups
 
+    # The start of the update general state interaction section.
     @classmethod
     def _update_general_state_interaction(
         cls, states_dict: Dict[str, state_domain.StateDict],
@@ -3189,7 +3191,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             dict. The converted state dictionary.
         """
         for state_dict in states_dict.values():
-        # Continue Interaction.
+            # Continue Interaction.
             # Text should have a max-length of 20.
             if state_dict['interaction']['id'] == 'Continue':
                 text_value = state_dict['interaction'][
@@ -3199,7 +3201,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         state_dict['interaction']['customization_args'][
                             'buttonText']['value']['unicode_str'] = 'Continue'
 
-        # End Interaction.
+            # End Interaction.
             if state_dict['interaction']['id'] == 'EndExploration':
                 recc_exp_ids = state_dict['interaction'][
                     'customization_args']['recommendedExplorationIds']['value']
@@ -3219,7 +3221,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     state_dict['interaction']['customization_args'][
                         'recommendedExplorationIds']['value'] = recc_exp_ids
 
-        # NumericInput Interaction.
+            # NumericInput Interaction.
             if state_dict['interaction']['id'] == 'NumericInput':
                 answer_groups = state_dict['interaction']['answer_groups']
                 # Each answer group should not be a subset of any answer
@@ -3246,7 +3248,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
                 state_dict['interaction']['answer_groups'] = answer_groups
 
-        # FractionInput Interaction.
+            # FractionInput Interaction.
             if state_dict['interaction']['id'] == 'FractionInput':
                 # All rules should have solutions that do not match
                 # previous rules' solutions.
@@ -3256,7 +3258,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 )
                 state_dict['interaction']['answer_groups'] = answer_groups
 
-        # MultipleChoiceInput Interaction.
+            # MultipleChoiceInput Interaction.
             if state_dict['interaction']['id'] == 'MultipleChoiceInput':
                 selected_equals_choices = []
                 answer_groups = state_dict['interaction']['answer_groups']
@@ -3294,7 +3296,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
                 state_dict['interaction']['answer_groups'] = answer_groups
 
-        # ItemSelectionInput Interaction.
+            # ItemSelectionInput Interaction.
             if state_dict['interaction']['id'] == 'ItemSelectionInput':
                 min_value = (
                     state_dict['interaction']['customization_args']
@@ -3353,7 +3355,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     'value'] = cls._choices_should_be_unique_and_non_empty(
                         choices)
 
-        # DragAndDropInput Interaction.
+            # DragAndDropInput Interaction.
             if state_dict['interaction']['id'] == 'DragAndDropSortInput':
                 answer_groups = state_dict['interaction']['answer_groups']
                 # `==` should come before idx(a) == b if it satisfies
@@ -3405,7 +3407,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
                 state_dict['interaction']['answer_groups'] = answer_groups
 
-        # TextInput Interaction.
+            # TextInput Interaction.
             if state_dict['interaction']['id'] == 'TextInput':
                 answer_groups = state_dict['interaction']['answer_groups']
                 # Text input height >= 1 and <= 10.
@@ -3454,6 +3456,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         return states_dict
 
+    # The start of the update general state RTE section.
     @classmethod
     def _update_general_state_rte(
         cls, states_dict: Dict[str, state_domain.StateDict]
