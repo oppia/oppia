@@ -921,7 +921,7 @@ class EstablishFirebaseConnectionTests(test_utils.TestBase):
         self.assertEqual(init_app_counter.times_called, 1)
 
 
-class FirebaseAuthServicesTestBase(test_utils.TestBase):
+class FirebaseAuthServicesTestBase(test_utils.AppEngineTestBase):
     """Test base for Firebase-specific tests with helpful default behavior."""
 
     AUTH_ID = 'aid'

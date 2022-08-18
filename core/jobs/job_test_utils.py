@@ -46,7 +46,7 @@ if MYPY:  # pragma: no cover
 datastore_services = models.Registry.import_datastore_services()
 
 
-class PipelinedTestBase(test_utils.GenericTestBase):
+class PipelinedTestBase(test_utils.AppEngineTestBase):
     """Base class that runs tests within the context of a TestPipeline."""
 
     # TODO(#11464): Find a newer version of Apache Beam that fixes
