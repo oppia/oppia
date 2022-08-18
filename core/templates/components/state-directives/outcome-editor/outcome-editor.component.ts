@@ -64,6 +64,9 @@ export class OutcomeEditorComponent implements OnInit {
   feedbackEditorIsOpen: boolean = false;
   onMobile: boolean = false;
   resizeSubscription!: Subscription;
+  // The value of this variable should match the breapoint used in
+  // outcome-editor.component.html.
+  mobileBreakpoint: number = 500;
 
   constructor(
     private externalSaveService: ExternalSaveService,
@@ -270,11 +273,11 @@ export class OutcomeEditorComponent implements OnInit {
     this.savedOutcome = cloneDeep(this.outcome);
 
     this.onMobile = (
-      this.windowDimensionsService.getWidth() <= 500);
+      this.windowDimensionsService.getWidth() <= this.mobileBreakpoint);
     this.resizeSubscription = this.windowDimensionsService.getResizeEvent()
       .subscribe(event => {
         this.onMobile = (
-          this.windowDimensionsService.getWidth() <= 500);
+          this.windowDimensionsService.getWidth() <= this.mobileBreakpoint);
       });
   }
 
