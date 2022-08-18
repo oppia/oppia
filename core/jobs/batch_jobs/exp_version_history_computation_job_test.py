@@ -474,7 +474,8 @@ class ComputeExplorationVersionHistoryJobTests(
             ),
             job_run_result.JobRunResult.as_stderr(
                 'Exploration exp_1 has invalid change list. '
-                'Error: \'Some other state\'. Version: 2'
+                'Error: Deleting a state called Some other state which is not '
+                'present in the exploration.. Version: 2'
             )
         ])
 

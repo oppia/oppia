@@ -302,6 +302,78 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                 return change.version_number
         return None
 
+    def validate_change_list(
+        self,
+        change_list: List[exp_domain.ExplorationChange],
+        old_states_dict: dict
+    ) -> str:
+        """Validates the change list.
+
+        Args:
+            change_list: list(ExplorationChange). The list of changes to check.
+            old_states_dict: dict. The states dict at the previous version of
+                the exploration.
+
+        Returns:
+            str. Error message if the change list is invalid or empty string
+            if it is valid.
+        """
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
+        error_message = ''
+
+        for state_name in exp_versions_diff.deleted_state_names:
+            if state_name not in old_states_dict:
+                error_message = (
+                    'Deleting a state called %s which is not present in the '
+                    'exploration.' % (state_name)
+                )
+                return error_message
+
+        effective_old_to_new_state_names = {}
+        for old_state_name, new_state_name in (
+            exp_versions_diff.old_to_new_state_names.items()
+        ):
+            if old_state_name != new_state_name:
+                effective_old_to_new_state_names[old_state_name] = new_state_name
+        for old_state_name in effective_old_to_new_state_names:
+            if old_state_name not in old_states_dict:
+                error_message = (
+                    'Renaming a state called %s which is not present in the '
+                    'exploration.' % (old_state_name)
+                )
+                return error_message
+
+        states_which_were_not_renamed = []
+        for state_name in old_states_dict:
+            if (
+                state_name not in exp_versions_diff.deleted_state_names and
+                state_name not in effective_old_to_new_state_names
+            ):
+                states_which_were_not_renamed.append(state_name)
+
+        state_property_changed_data = {
+            state_name: False
+            for state_name in states_which_were_not_renamed
+        }
+        for change in change_list:
+            if change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
+                if change.state_name in state_property_changed_data:
+                    state_property_changed_data[state_name] = True
+
+        for state_name, state_property_changed in (
+            state_property_changed_data.items()
+        ):
+            if state_property_changed and state_name not in old_states_dict:
+                error_message = (
+                    'Property of a state called %s is changed but '
+                    'the state was not found in the exploration.' % (
+                        state_name
+                    )
+                )
+                return error_message
+
+        return error_message
+
     def create_version_history_models(
         self, model_group: FormattedModelGroupDict
     ) -> Tuple[str, List[exp_models.ExplorationVersionHistoryModel]]:
@@ -431,6 +503,12 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                         'edits_allowed': new_exploration.edits_allowed
                     }
 
+                    validation_error = self.validate_change_list(
+                        change_list, old_states_dict
+                    )
+                    if validation_error:
+                        return (exp_id, [], validation_error, version)
+
                     old_vh_model = version_history_models[version - 2]
                     old_states_vh = {
                         state_name: (
@@ -446,34 +524,31 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                         old_vh_model.metadata_last_edited_committer_id
                     )
 
-                    try:
-                        new_states_vh = (
-                            exp_services.update_states_version_history( # type: ignore[no-untyped-call]
-                                old_states_vh, change_list, old_states_dict,
-                                new_states_dict, version, committer_id
-                            )
+                    new_states_vh = (
+                        exp_services.update_states_version_history( # type: ignore[no-untyped-call]
+                            old_states_vh, change_list, old_states_dict,
+                            new_states_dict, version, committer_id
                         )
-                        new_metadata_vh = (
-                            exp_services.update_metadata_version_history( # type: ignore[no-untyped-call]
-                                old_metadata_vh, change_list, old_metadata_dict,
-                                new_metadata_dict, version, committer_id
-                            )
+                    )
+                    new_metadata_vh = (
+                        exp_services.update_metadata_version_history( # type: ignore[no-untyped-call]
+                            old_metadata_vh, change_list, old_metadata_dict,
+                            new_metadata_dict, version, committer_id
                         )
-                        new_committer_ids = (
-                            exp_services.get_updated_committer_ids( # type: ignore[no-untyped-call]
-                                new_states_vh,
-                                new_metadata_vh.last_edited_committer_id
-                            )
+                    )
+                    new_committer_ids = (
+                        exp_services.get_updated_committer_ids( # type: ignore[no-untyped-call]
+                            new_states_vh,
+                            new_metadata_vh.last_edited_committer_id
                         )
-                        new_vh_model = self.get_updated_version_history_model( # type: ignore[no-untyped-call]
-                            version_history_models[version - 1],
-                            exp_id, version, committer_id,
-                            new_states_vh, new_metadata_vh, new_committer_ids
-                        )
-                        new_vh_model.update_timestamps()
-                        version_history_models[version - 1] = new_vh_model
-                    except Exception as e:
-                        return (exp_id, [], e, version)
+                    )
+                    new_vh_model = self.get_updated_version_history_model( # type: ignore[no-untyped-call]
+                        version_history_models[version - 1],
+                        exp_id, version, committer_id,
+                        new_states_vh, new_metadata_vh, new_committer_ids
+                    )
+                    new_vh_model.update_timestamps()
+                    version_history_models[version - 1] = new_vh_model
 
             return (exp_id, version_history_models)
 
