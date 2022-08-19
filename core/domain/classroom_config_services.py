@@ -59,13 +59,10 @@ def get_classroom_id_to_classroom_name_dict() -> Dict[str, str]:
         dict(str, str). A dict with classroom id as key and classroom name as
         value for all the classrooms present in the datastore.
     """
-    classroom_id_to_classroom_name = {}
     classrooms = get_all_classrooms()
-
-    for classroom in classrooms:
-        classroom_id_to_classroom_name[classroom.classroom_id] = classroom.name
-
-    return classroom_id_to_classroom_name
+    return {
+        classroom.classroom_id: classroom.name for classroom in classrooms
+    }
 
 
 def get_classroom_from_classroom_model(
@@ -210,7 +207,8 @@ def update_or_create_classroom_model(
     """Updates the properties of an existing classroom model or creates a new
     classroom model.
     """
-    model = classroom_models.ClassroomModel.get_by_id(classroom.classroom_id)
+    model = classroom_models.ClassroomModel.get(
+        classroom.classroom_id, strict=False)
 
     if model is None:
         _create_new_classroom(classroom)

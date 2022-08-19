@@ -213,7 +213,8 @@ class ClassroomAdminTests(test_utils.GenericTestBase):
     ) -> None:
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
-        self.get_html_response('/blog-dashboard', expected_status_int=401)
+        self.get_json(
+            feconf.CLASSROOM_ADMIN_DATA_HANDLER_URL, expected_status_int=401)
         self.logout()
 
     def test_get_new_classroom_id(self) -> None:
