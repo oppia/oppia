@@ -83,15 +83,15 @@ class ContributorDashboardDebugInitializer():
         firebase_admin.initialize_app(
             options={'projectId': feconf.OPPIA_PROJECT_ID})
 
-        self.sign_up_new_user(SUPER_ADMIN_EMAIL, SUPER_ADMIN_USERNAME)
-        self.sign_up_new_user(CONTRIBUTOR_EMAIL, CONTRIBUTOR_USERNAME)
+        self._sign_up_new_user(SUPER_ADMIN_EMAIL, SUPER_ADMIN_USERNAME)
+        self._sign_up_new_user(CONTRIBUTOR_EMAIL, CONTRIBUTOR_USERNAME)
 
-        self.begin_session(SUPER_ADMIN_EMAIL)
-        self.csrf_token = self.get_csrf_token()
-        self.assign_admin_roles(SUPER_ADMIN_ROLES, SUPER_ADMIN_USERNAME)
-        self.add_submit_question_rights(CONTRIBUTOR_USERNAME)
-        self.generate_dummy_new_structures_data()
-        self.add_topics_to_classroom(CLASSROOM_NAME, CLASSROOM_URL_FRAGMENT)
+        self._sign_in(SUPER_ADMIN_EMAIL)
+        self.csrf_token = self._get_csrf_token()
+        self._assign_admin_roles(SUPER_ADMIN_ROLES, SUPER_ADMIN_USERNAME)
+        self._add_submit_question_rights(CONTRIBUTOR_USERNAME)
+        self._generate_dummy_new_structures_data()
+        self._add_topics_to_classroom(CLASSROOM_NAME, CLASSROOM_URL_FRAGMENT)
 
     def _make_request(
         self,
@@ -124,7 +124,7 @@ class ContributorDashboardDebugInitializer():
 
         return token_id
 
-    def sign_up_new_user(self, email: str, username: str) -> None:
+    def _sign_up_new_user(self, email: str, username: str) -> None:
         """Sign up a new user based on email and username. The password is
         generated automatically from email.
         """
@@ -134,9 +134,9 @@ class ContributorDashboardDebugInitializer():
         firebase_auth.create_user(email=email, password=password) # type: ignore
 
         # Sign up the new user in Oppia and set its username.
-        self.begin_session(email)
+        self._sign_in(email)
         self._make_request('GET', '/signup?return_url=/')
-        self.csrf_token = self.get_csrf_token()
+        self.csrf_token = self._get_csrf_token()
 
         params = {'payload': json.dumps({
             'username': username,
@@ -150,7 +150,7 @@ class ContributorDashboardDebugInitializer():
         self._make_request('GET', '/session_end')
         self.csrf_token = ''
 
-    def begin_session(self, email: str) -> None:
+    def _sign_in(self, email: str) -> None:
         """Begins a session with the given email, i.e. log in with the email."""
         password = hashlib.md5(email.encode('utf-8')).hexdigest()
 
@@ -159,7 +159,7 @@ class ContributorDashboardDebugInitializer():
 
         self._make_request('GET', '/session_begin', headers=headers)
 
-    def get_csrf_token(self) -> str:
+    def _get_csrf_token(self) -> str:
         """Gets the CSRF token."""
         response = self._make_request('GET', '/csrfhandler')
         csrf_token = str(
@@ -167,7 +167,7 @@ class ContributorDashboardDebugInitializer():
 
         return csrf_token
 
-    def assign_admin_roles(self, roles: List[str], username: str) -> None:
+    def _assign_admin_roles(self, roles: List[str], username: str) -> None:
         """Assigns the given roles to the user with the given username."""
         for role in roles:
             params = {
@@ -180,7 +180,7 @@ class ContributorDashboardDebugInitializer():
             self._make_request(
                 'PUT', feconf.ADMIN_ROLE_HANDLER_URL, params=params)
 
-    def add_submit_question_rights(self, username: str) -> None:
+    def _add_submit_question_rights(self, username: str) -> None:
         """Adds submit question rights to the user with the given username."""
         params = {
             'payload': json.dumps({'username': username}),
@@ -190,7 +190,7 @@ class ContributorDashboardDebugInitializer():
         self._make_request(
             'POST', '/contributionrightshandler/submit_question', params=params)
 
-    def generate_dummy_new_structures_data(self) -> None:
+    def _generate_dummy_new_structures_data(self) -> None:
         """Generates dummy new structures data."""
         params = {
             'payload': json.dumps({
@@ -200,7 +200,7 @@ class ContributorDashboardDebugInitializer():
 
         self._make_request('POST', '/adminhandler', params=params)
 
-    def add_topics_to_classroom(
+    def _add_topics_to_classroom(
             self, classroom_name: str, classroom_url_fragment: str) -> None:
         """Adds all dummy topics to a classroom."""
         response = self._make_request(
