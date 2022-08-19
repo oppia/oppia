@@ -1956,7 +1956,7 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):
         Args:
             tokens: Token. Object to access all tokens of a module.
         """
-        type_ignore_comment_regex = r'^# Here we use MyPy ignore because'
+        type_ignore_comment_regex = r'Here we use MyPy ignore because'
         type_ignore_comment_present = False
         comment_line_number = 0
 
@@ -2144,7 +2144,7 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
         args_section_end_line_num = 0
         object_comment_line_num = 0
 
-        object_type_regex = r'# Here we use object because'
+        object_type_regex = r'Here we use object because'
 
         for (token_type, token, (line_num, _), _, line) in tokens:
             line = line.strip()
@@ -2236,7 +2236,7 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
         Args:
             tokens: Token. Object to access all tokens of a module.
         """
-        cast_type_regex = r'^# Here we use cast because'
+        cast_type_regex = r'Here we use cast because'
         cast_comment_present = False
         inside_multi_line_import_scope = False
         single_line_import = False
@@ -2308,7 +2308,7 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
         args_section_end_line_num = 0
         any_type_comment_line_num = 0
 
-        any_type_regex = r'^# Here we use type Any because'
+        any_type_regex = r'Here we use type Any because'
 
         for (token_type, token, (line_num, _), _, line) in tokens:
             line = line.strip()
