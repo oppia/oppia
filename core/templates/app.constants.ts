@@ -71,6 +71,8 @@ export const AppConstants = {
     INCORRECT_SOLUTION: 'The current solution does not lead to another card.',
     UNRESOLVED_ANSWER:
       'There is an answer among the top 10 which has no explicit feedback.',
+    INVALID_REDIRECTION: 'Learner should not be directed back by more' +
+      ' than 3 cards in the lesson.'
   },
 
   CHECKPOINT_ERROR_MESSAGES: {

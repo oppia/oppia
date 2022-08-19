@@ -27,6 +27,11 @@ import { Subscription } from 'rxjs';
 import { ExternalSaveService } from 'services/external-save.service';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
+import { States } from 'domain/exploration/StatesObjectFactory';
+import { ComputeGraphService } from 'services/compute-graph.service';
+import { ExplorationWarningsService } from 'pages/exploration-editor-page/services/exploration-warnings.service';
+import { ExplorationInitStateNameService } from 'pages/exploration-editor-page/services/exploration-init-state-name.service';
+import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
 
 @Component({
   selector: 'oppia-outcome-editor',
@@ -57,8 +62,12 @@ export class OutcomeEditorComponent implements OnInit {
 
   constructor(
     private externalSaveService: ExternalSaveService,
+    private computeGraphService: ComputeGraphService,
     private stateEditorService: StateEditorService,
     private stateInteractionIdService: StateInteractionIdService,
+    private explorationWarningsService: ExplorationWarningsService,
+    private explorationInitStateNameService: ExplorationInitStateNameService,
+    private explorationStatesService: ExplorationStatesService
   ) {}
 
   isInQuestionMode(): boolean {
@@ -100,6 +109,44 @@ export class OutcomeEditorComponent implements OnInit {
         this.cancelThisDestinationEdit();
       }
     }
+  }
+
+  getDistanceToDestState(
+    initStateId: string, states: States, sourceStateName: string, destStateName: string): number {
+      let distance = -1;
+      let stateFound = false;
+      let stateGraph = this.computeGraphService.compute(initStateId, states);
+      let stateNamesInBfsOrder: string[] = [];
+      let queue: string[] = [];
+      let seen: Record<string, boolean> = {};
+      seen[sourceStateName] = true;
+      queue.push(sourceStateName);
+      while (queue.length > 0) {
+        // '.shift()' here can return an undefined value, but we're already
+        // checking for queue.length > 0, so this is safe.
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        let queueSize = queue.length;
+        distance++;
+        while(queueSize-- && !stateFound) {
+          let currStateName = queue.shift()!;
+          if (currStateName == destStateName) {
+            stateFound = true;
+          }
+          stateNamesInBfsOrder.push(currStateName);
+          for (let e = 0; e < stateGraph.links.length; e++) {
+            let edge = stateGraph.links[e];
+            let dest = edge.target;
+            if (edge.source === currStateName && !seen.hasOwnProperty(dest)) {
+              seen[dest] = true;
+              queue.push(dest);
+            }
+          }
+        }
+      }
+      if(distance!= -1 && !stateFound) {
+        distance = -1;
+      }
+      return distance;
   }
 
   isFeedbackLengthExceeded(): boolean {
@@ -183,6 +230,14 @@ export class OutcomeEditorComponent implements OnInit {
 
   saveThisDestination(): void {
     this.stateEditorService.onSaveOutcomeDestDetails.emit();
+    let activeStateName = this.stateEditorService.getActiveStateName();
+    let initStateName = this.explorationInitStateNameService.displayed;
+    let states = this.explorationStatesService.getStates();
+    let destStateName = this.outcome.dest;
+    if(!this.redirectionIsValid(
+      (initStateName) as string, states, destStateName, activeStateName)) {
+      this.explorationWarningsService.raiseRedirectionError(activeStateName);
+    }
     this.destinationEditorIsOpen = false;
     this.savedOutcome.dest = cloneDeep(this.outcome.dest);
     if (!this.isSelfLoop(this.outcome)) {
@@ -194,6 +249,17 @@ export class OutcomeEditorComponent implements OnInit {
       this.outcome.missingPrerequisiteSkillId;
 
     this.saveDest.emit(this.savedOutcome);
+  }
+
+  redirectionIsValid(
+    initStateId: string, states: States, sourceStateName: string, destStateName: string) : boolean {
+    let distance = this.getDistanceToDestState(initStateId, states, sourceStateName, destStateName);
+    // Raise validation error if the creator redirects the learner
+    // back by more than 3 cards.
+    if(distance-1 > 2) return false; 
+    else {
+      return true;
+    }
   }
 
   onChangeCorrectnessLabel(): void {

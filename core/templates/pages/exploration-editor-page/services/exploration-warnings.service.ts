@@ -109,6 +109,7 @@ export class ExplorationWarningsService {
   stateWarnings = {};
   checkpointCountWarning: string = '';
   hasCriticalStateWarning: boolean = false;
+  statesWithInvalidRedirection: string[] = [];
 
   _getStatesWithoutInteractionIds(): string[] {
     let statesWithoutInteractionIds = [];
@@ -274,6 +275,10 @@ export class ExplorationWarningsService {
       });
   }
 
+  raiseRedirectionError(stateName: string) {
+    this.statesWithInvalidRedirection.push(stateName);   //Temporary keeping
+  }
+
   _updateWarningsList(): void {
     this._warningsList = [];
     this.stateWarnings = {};
@@ -322,6 +327,11 @@ export class ExplorationWarningsService {
       _extendStateWarnings(
         stateWithoutInteractionIds,
         AppConstants.STATE_ERROR_MESSAGES.ADD_INTERACTION);
+    });
+
+    this.statesWithInvalidRedirection.forEach((stateName) => {
+      _extendStateWarnings(
+        stateName, AppConstants.STATE_ERROR_MESSAGES.INVALID_REDIRECTION);
     });
 
     let statesWithAnswersThatMustBeResolved =
