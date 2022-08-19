@@ -1928,6 +1928,8 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):
 
     __implements__ = interfaces.ITokenChecker
 
+    ALLOWED_LINES_OF_GAP = 10
+
     name = 'type-ignore-comment'
     priority = -1
     msgs = {
@@ -1971,7 +1973,10 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):
                         continue
                     if (
                         type_ignore_comment_present and
-                        comment_line_number + 10 >= line_num
+                        line_num <= (
+                            comment_line_number +
+                            self.ALLOWED_LINES_OF_GAP
+                        )
                     ):
                         type_ignore_comment_present = False
                     else:
