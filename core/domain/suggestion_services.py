@@ -2179,8 +2179,7 @@ def update_translation_contribution_stats(
         opportunity_services.get_exploration_opportunity_summaries_by_ids(
             [target_id]))
     exp_opportunity = exp_opportunity_dict[target_id]
-    if exp_opportunity is not None:
-        topic_id = exp_opportunity.topic_id
+    topic_id = exp_opportunity.topic_id
 
     content_plain_text = html_cleaner.strip_html_tags(suggestion.change.translation_html)
     content_word_count = len(content_plain_text.split())
@@ -2260,8 +2259,7 @@ def update_translation_review_stats(
         opportunity_services.get_exploration_opportunity_summaries_by_ids(
             [target_id]))
     exp_opportunity = exp_opportunity_dict[target_id]
-    if exp_opportunity is not None:
-        topic_id = exp_opportunity.topic_id
+    topic_id = exp_opportunity.topic_id
 
     content_plain_text = html_cleaner.strip_html_tags(suggestion.change.translation_html)
     content_word_count = len(content_plain_text.split())
