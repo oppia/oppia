@@ -14,7 +14,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""This script helps develop for the contributor dashboard."""
+"""This script helps develop for the contributor dashboard. When "contributor 
+dashboard debug" flag is enabled, the start script will call
+"populate_debug_data" function, whcih does the following:
+    1. Create an admin user with username "a" and assign curriculum,
+    translation, and question admin rights to "a".
+    2. Create a non-admin user with username "b" and give the user "submit
+    question" rights.
+    3. Populate sample lessons for translations. This is achieved by reproducing
+    the "Load dummy new structures data" admin action.
+    4. Add the topics linked to the lessons above to a classroom. This is needed
+    for the topics, if published, to show up in the topic selectors and for the
+    linked opportunities to show up in the "Submit Question" tab.
+"""
 
 from __future__ import annotations
 
@@ -50,7 +62,14 @@ CLASSROOM_URL_FRAGMENT = 'math'
 
 
 class ContributorDashboardDebugInitializer():
-    """Client-side requests to help develop for the contributor dashboard."""
+    """Client-side requests to help develop for the contributor dashboard.
+    
+    Attributes:
+        session: object(Session). The requests.Session object to send requests
+            to the Oppia server.
+        base_url: str. The base url of the Oppia server.
+        csrf_token: str. The csrf token of the current session.
+    """
 
     def __init__(self, base_url: str) -> None:
         self.session = requests.session()
@@ -132,7 +151,7 @@ class ContributorDashboardDebugInitializer():
         self.csrf_token = ''
 
     def begin_session(self, email: str) -> None:
-        """Begin a session with the given email, i.e. log in wtih the email."""
+        """Begins a session with the given email, i.e. log in with the email."""
         password = hashlib.md5(email.encode('utf-8')).hexdigest()
 
         token_id = self._sign_in_with_email_and_password(email, password)
