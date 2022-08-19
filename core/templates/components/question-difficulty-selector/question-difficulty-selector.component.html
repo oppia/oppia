@@ -7,15 +7,17 @@
                       class="e2e-test-skill-difficulty-{{rubric.getDifficulty().toLowerCase()}} mat-radio-button">
       <strong>{{ rubric.getDifficulty() }}</strong>
       <mat-list>
-        <mat-list-item class="pl-0" *ngFor="let explanation of rubric.getExplanations()">
-          <div class="oppia-skill-description-label">Skill description:</div>
-          <div class="oppia-skill-description-container">
-            <oppia-rte-output-display class="oppia-skill-description-text"
-                                      [rteString]="explanation">
-            </oppia-rte-output-display>
-          </div>
-          <div *ngIf="explanation === '' || explanation === '<p></p>'">
-            <span class="oppia-placeholder">This rubric has not yet been specified</span>
+        <mat-list-item *ngFor="let explanation of rubric.getExplanations()">
+          <div class="oppia-difficulty-container">
+            <div class="oppia-skill-description-label">Skill description:</div>
+            <div class="oppia-skill-description-container">
+              <oppia-rte-output-display class="oppia-skill-description-text"
+                                        [rteString]="explanation">
+              </oppia-rte-output-display>
+            </div>
+            <div *ngIf="explanation === '' || explanation === '<p></p>'">
+              <span class="oppia-placeholder">This rubric has not yet been specified</span>
+            </div>
           </div>
         </mat-list-item>
       </mat-list>
@@ -24,6 +26,15 @@
 </mat-radio-group>
 
 <style>
+  .mat-radio-button {
+    margin-top: 10px;
+    width: 100%;
+  }
+  .oppia-difficulty-container {
+    display: flex;
+    width: 100%;
+  }
+
   .md-container {
     top: 1.1rem;
   }
@@ -41,5 +52,14 @@
     margin-left: 30px;
     white-space: normal;
     word-break: break-word;
+  }
+
+  @media only screen and (max-width: 700px) {
+    .oppia-difficulty-container {
+      flex-direction: column;
+    }
+    .oppia-skill-description-container {
+      margin: 0;
+    }
   }
 </style>
