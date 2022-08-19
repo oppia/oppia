@@ -118,6 +118,8 @@ export class InteractiveNumberWithUnitsComponent
     } catch (parsingError) {
       if (parsingError instanceof Error) {
         this.errorMessageI18nKey = parsingError.message;
+      } else {
+        throw parsingError;
       }
       this.isValid = false;
     }

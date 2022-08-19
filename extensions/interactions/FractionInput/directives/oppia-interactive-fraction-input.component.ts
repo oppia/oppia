@@ -190,6 +190,8 @@ export class InteractiveFractionInputComponent implements OnInit, OnDestroy {
     } catch (parsingError) {
       if (parsingError instanceof Error) {
         this.errorMessageI18nKey = parsingError.message;
+      } else {
+        throw parsingError;
       }
       this.isValid = false;
     }
