@@ -82,16 +82,16 @@ export class UnassignSkillFromTopicsModalComponent
               diagnosticTestSkillIds.indexOf(this.skillId) !== -1
             ) {
               this.inEligibleTopicNameToTopicAssignments[topic.topicName] = {
-                topicId: topic.topicId ,
+                topicId: topic.topicId,
                 subtopicId: topic.subtopicId,
                 topicVersion: topic.topicVersion
-              }
+              };
             } else {
               this.eligibleTopicNameToTopicAssignments[topic.topicName] = {
-                topicId: topic.topicId ,
+                topicId: topic.topicId,
                 subtopicId: topic.subtopicId,
                 topicVersion: topic.topicVersion
-              }
+              };
             }
           }
 

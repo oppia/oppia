@@ -168,7 +168,7 @@ angular.module('oppia').directive('topicEditorTab', [
               let skillSummary = (
                 $scope.availableSkillSummariesForDiagnosticTest.find(
                   skill => skill.getId() === skillToAdd.getId())
-              )
+              );
               if (skillSummary) {
                 let index = $scope.availableSkillSummariesForDiagnosticTest
                   .indexOf(skillSummary);
@@ -186,7 +186,7 @@ angular.module('oppia').directive('topicEditorTab', [
               let skillSummary = (
                 $scope.selectedSkillSummariesForDiagnosticTest.find(
                   skill => skill.getId() === skillToRemove.getId())
-              )
+              );
               if (skillSummary) {
                 let index = $scope.selectedSkillSummariesForDiagnosticTest
                   .indexOf(skillSummary);

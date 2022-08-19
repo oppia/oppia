@@ -681,7 +681,7 @@ describe('Topic editor tab directive', function() {
     $scope.skillQuestionCountDict = {
       skill_1: 3
     };
-    spyOn($scope.topic,'getAvailableSkillSummariesForDiagnosticTest')
+    spyOn($scope.topic, 'getAvailableSkillSummariesForDiagnosticTest')
       .and.returnValue([skillSummary]);
     expect($scope.getEligibleSkillSummariesForDiagnosticTest()).toEqual(
       [skillSummary]);
