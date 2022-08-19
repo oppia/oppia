@@ -125,35 +125,35 @@ describe('Question deletion modal', () => {
   it(
     'should not be able to delete questions when user have not enough rights',
     fakeAsync(() => {
-      expect(componentInstance.questionDeletionIsAllowed).toBeTrue();
+      expect(componentInstance.questionRemovalIsAllowed).toBeTrue();
       componentInstance.canEditQuestion = false;
       componentInstance.fetchTopicAssignmentsForSkill();
       tick();
-      expect(componentInstance.questionDeletionIsAllowed).toBeFalse();
+      expect(componentInstance.questionRemovalIsAllowed).toBeFalse();
     }));
 
   it(
     'should not be able to delete questions when skill is assigned to ' +
     'the diagnostic test and question count is less than equal to 2',
     fakeAsync(() => {
-      expect(componentInstance.questionDeletionIsAllowed).toBeTrue();
+      expect(componentInstance.questionRemovalIsAllowed).toBeTrue();
       componentInstance.numberOfQuestions = 2;
       componentInstance.canEditQuestion = true;
       componentInstance.fetchTopicAssignmentsForSkill();
       tick();
-      expect(componentInstance.questionDeletionIsAllowed).toBeFalse();
+      expect(componentInstance.questionRemovalIsAllowed).toBeFalse();
     }));
 
   it(
     'should be able to delete questions when skill is assigned to ' +
     'the diagnostic test and question count is greater than 2',
     fakeAsync(() => {
-      expect(componentInstance.questionDeletionIsAllowed).toBeTrue();
+      expect(componentInstance.questionRemovalIsAllowed).toBeTrue();
       componentInstance.numberOfQuestions = 3;
       componentInstance.canEditQuestion = true;
       componentInstance.fetchTopicAssignmentsForSkill();
       tick();
-      expect(componentInstance.questionDeletionIsAllowed).toBeTrue();
+      expect(componentInstance.questionRemovalIsAllowed).toBeTrue();
     }));
 
   it(
@@ -166,9 +166,9 @@ describe('Question deletion modal', () => {
       ).and.returnValue(Promise.resolve([]));
       componentInstance.canEditQuestion = true;
       componentInstance.numberOfQuestions = 3;
-      expect(componentInstance.questionDeletionIsAllowed).toBeTrue();
+      expect(componentInstance.questionRemovalIsAllowed).toBeTrue();
       componentInstance.fetchTopicAssignmentsForSkill();
       tick();
-      expect(componentInstance.questionDeletionIsAllowed).toBeTrue();
+      expect(componentInstance.questionRemovalIsAllowed).toBeTrue();
     }));
 });

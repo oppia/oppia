@@ -41,7 +41,7 @@ export class RemoveQuestionSkillLinkModalComponent
   skillId!: string;
   canEditQuestion!: boolean;
   numberOfQuestions!: number;
-  questionDeletionIsAllowed: boolean = true;
+  questionRemovalIsAllowed: boolean = true;
   topicsAssignmentsAreFetched = false;
   topicNameToTopicId: TopicNameToTopicId = {};
 
@@ -66,9 +66,9 @@ export class RemoveQuestionSkillLinkModalComponent
     }
   }
 
-  isQuestionDeletionAllowed(topicAssignments: AssignedSkill[]): void {
+  isQuestionRemovalAllowed(topicAssignments: AssignedSkill[]): void {
     if (!this.canEditQuestion) {
-      this.questionDeletionIsAllowed = false;
+      this.questionRemovalIsAllowed = false;
       return;
     }
     this.skillBackendApiService
@@ -78,7 +78,7 @@ export class RemoveQuestionSkillLinkModalComponent
           this.numberOfQuestions <=
             AppConstants.MIN_QUESTION_COUNT_FOR_A_DIAGNOSTIC_TEST_SKILL)) {
           this.getTopicNameToTopicId(topicAssignments, topicNames);
-          this.questionDeletionIsAllowed = false;
+          this.questionRemovalIsAllowed = false;
         }
       });
   }
@@ -88,7 +88,7 @@ export class RemoveQuestionSkillLinkModalComponent
       .fetchTopicAssignmentsForSkillAsync(
         this.skillId
       ).then((response: AssignedSkill[]) => {
-        this.isQuestionDeletionAllowed(response);
+        this.isQuestionRemovalAllowed(response);
         this.topicsAssignmentsAreFetched = true;
       });
   }

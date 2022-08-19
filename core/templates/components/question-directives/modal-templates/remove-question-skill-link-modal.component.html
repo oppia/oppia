@@ -6,7 +6,7 @@
 <div class="loading-spinner" *ngIf="!topicsAssignmentsAreFetched">
   <mat-spinner [diameter]="30"></mat-spinner>
 </div>
-<div class="modal-body" *ngIf="!questionDeletionIsAllowed">
+<div class="modal-body" *ngIf="!questionRemovalIsAllowed">
   <div *ngIf="!canEditQuestion">
     <p>User does not have enough rights to remove the question.</p>
   </div>
@@ -33,8 +33,8 @@
   <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
   <button class="btn btn-danger"
           (click)="confirm()"
-          *ngIf="questionDeletionIsAllowed">
-    <span>Delete Question</span>
+          *ngIf="questionRemovalIsAllowed">
+    <span>Remove Question</span>
   </button>
 </div>
 

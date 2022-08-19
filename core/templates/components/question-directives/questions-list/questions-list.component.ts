@@ -48,7 +48,7 @@ import { SkillEditorRoutingService } from 'pages/skill-editor-page/services/skil
 import { UtilsService } from 'services/utils.service';
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { RemoveQuestionSkillLinkModalComponent } from './remove-question-skill-link-modal.component';
+import { RemoveQuestionSkillLinkModalComponent } from '../modal-templates/remove-question-skill-link-modal.component';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 
 interface GroupedSkillSummaries {
@@ -286,12 +286,12 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
       this.questionsListService.resetPageNumber();
       this.questionsListService.getQuestionSummariesAsync(
         this.selectedSkillId, true, true);
-      this.alertsService.addSuccessMessage('Deleted Question');
+      this.alertsService.addSuccessMessage('Question Removed');
       this._removeArrayElement(questionId);
     });
   }
 
-  deleteQuestionFromSkill(
+  removeQuestionFromSkill(
       questionId: string, skillDescription: string): void {
     let modalRef: NgbModalRef = this.ngbModal.
       open(RemoveQuestionSkillLinkModalComponent, {
@@ -308,11 +308,12 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
       if (this.allSkillSummaries.length === 0) {
         this.removeQuestionSkillLinkAsync(questionId, this.selectedSkillId);
       } else {
-        this.allSkillSummaries.find((summary) => {
-          if (summary.getDescription() === skillDescription) {
-            this.removeQuestionSkillLinkAsync(questionId, summary.getId());
-          }
-        });
+        let skillSummary = this.allSkillSummaries.find(
+          summary => summary.getDescription() === skillDescription
+        );
+        if (skillSummary) {
+          this.removeQuestionSkillLinkAsync(questionId, skillSummary.getId());
+        }
       }
     }, () => {
       // Note to developers:

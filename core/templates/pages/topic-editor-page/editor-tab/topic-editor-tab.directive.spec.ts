@@ -662,7 +662,8 @@ describe('Topic editor tab directive', function() {
     $scope.addSkillForDiagnosticTest();
     $rootScope.$apply();
     tick();
-    expect(updateSkillIdForDiagnosticTestSpy).toHaveBeenCalled();
+    expect(updateSkillIdForDiagnosticTestSpy).toHaveBeenCalledWith(
+      $scope.topic, $scope.selectedSkillSummariesForDiagnosticTest);
   }));
 
   it('should call the TopicUpdateService if any skillId is removed from the ' +
@@ -672,18 +673,16 @@ describe('Topic editor tab directive', function() {
     $scope.selectedSkillSummariesForDiagnosticTest = [skillSummary];
 
     $scope.removeSkillFromDiagnosticTest(skillSummary);
-    expect(updateSkillIdForDiagnosticTestSpy).toHaveBeenCalled();
+    expect(updateSkillIdForDiagnosticTestSpy).toHaveBeenCalledWith(
+      $scope.topic, $scope.selectedSkillSummariesForDiagnosticTest);
   });
 
   it('should get eligible skill for diagnostic test selection', function() {
     $scope.skillQuestionCountDict = {
       skill_1: 3
     };
-    spyOn(
-      $scope.topic,
-      'getAvailableSkillSummariesForDiagnosticTest').and.returnValue(
-      [skillSummary]
-    );
+    spyOn($scope.topic,'getAvailableSkillSummariesForDiagnosticTest')
+      .and.returnValue([skillSummary]);
     expect($scope.getEligibleSkillSummariesForDiagnosticTest()).toEqual(
       [skillSummary]);
   });

@@ -143,7 +143,7 @@ import { QuestionEditorComponent } from './question-directives/question-editor/q
 import { QuestionPlayerConceptCardModalComponent } from './question-directives/question-player/question-player-concept-card-modal.component';
 import { QuestionPlayerComponent } from './question-directives/question-player/question-player.component';
 import { QuestionsListComponent } from './question-directives/questions-list/questions-list.component';
-import { RemoveQuestionSkillLinkModalComponent } from './question-directives/questions-list/remove-question-skill-link-modal.component';
+import { RemoveQuestionSkillLinkModalComponent } from './question-directives/modal-templates/remove-question-skill-link-modal.component';
 import { SkillMasteryModalComponent } from './question-directives/question-player/skill-mastery-modal.component';
 import { StateGraphVisualization } from 'pages/exploration-editor-page/editor-tab/graph-directives/state-graph-visualization.component';
 import { VersionDiffVisualizationComponent } from './version-diff-visualization/version-diff-visualization.component';

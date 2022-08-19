@@ -4,17 +4,17 @@
   </h3>
 </div>
 <div class="modal-body">
-  <div *ngIf="nonEligibleTopicNames.length > 0">
+  <div *ngIf="inEligibleTopicsCount > 0">
     <div>
       <p>
         This skill is used as the only diagnostic test skill in the following
-        <span *ngIf="nonEligibleTopicNames.length === 1">topic</span>
-        <span *ngIf="nonEligibleTopicNames.length > 1">topics</span>
+        <span *ngIf="inEligibleTopicsCount === 1">topic</span>
+        <span *ngIf="inEligibleTopicsCount > 1">topics</span>
       </p>
       <ul>
-        <li *ngFor="let nonEligibleTopicNameToTopicAssignment of nonEligibleTopicNameToTopicAssignments | keyvalue">
-          <a [href]="getTopicEditorUrl(nonEligibleTopicNameToTopicAssignment.value)" target="_blank" rel="noopener">
-            {{ nonEligibleTopicNameToTopicAssignment.key }}
+        <li *ngFor="let inEligibleTopicNameToTopicAssignment of inEligibleTopicNameToTopicAssignments | keyvalue">
+          <a [href]="getTopicEditorUrl(inEligibleTopicNameToTopicAssignment.value)" target="_blank" rel="noopener">
+            {{ inEligibleTopicNameToTopicAssignment.key }}
           </a>
         </li>
       </ul>
@@ -26,10 +26,10 @@
     <br>
   </div>
   <div>
-    <div *ngIf="topicsAssignmentsAreFetched && eligibleTopicNamesForUnassignment.length !== 0">
+    <div *ngIf="topicsAssignmentsAreFetched && eligibleTopicsCount !== 0">
       Tick the eligible topics that you want this skill to be unassigned from.
     </div>
-    <div *ngIf="topicsAssignmentsAreFetched && eligibleTopicNamesForUnassignment.length === 0">
+    <div *ngIf="topicsAssignmentsAreFetched && eligibleTopicsCount === 0">
       This skill is not currently assigned to any topic.
     </div>
   </div>
@@ -48,7 +48,7 @@
   <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
   <button class="btn btn-danger e2e-test-confirm-unassign-skill-button"
           (click)="close()" [disabled]="!topicsAssignmentsAreFetched"
-          *ngIf="eligibleTopicNamesForUnassignment.length !== 0">
+          *ngIf="eligibleTopicsCount.length !== 0">
     <span>Unassign Skill</span>
   </button>
 </div>

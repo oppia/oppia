@@ -43,13 +43,15 @@ export class UnassignSkillFromTopicsModalComponent
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   skillId!: string;
-  eligibleTopicNameToTopicAssignments!: TopicNameToTopicAssignments;
-  nonEligibleTopicNameToTopicAssignments !: TopicNameToTopicAssignments;
-  nonEligibleTopicNames: string[] = [];
   topicsAssignmentsAreFetched: boolean = false;
   selectedTopicNames: string[] = [];
   selectedTopics: TopicAssignmentsSummary[] = [];
-  eligibleTopicNamesForUnassignment: string[] = [];
+  // The topics that do not contain the given skill as their only diagnostic
+  // test skill are eligible for the unassignment.
+  eligibleTopicNameToTopicAssignments!: TopicNameToTopicAssignments;
+  inEligibleTopicNameToTopicAssignments!: TopicNameToTopicAssignments;
+  eligibleTopicsCount: number = 0;
+  inEligibleTopicsCount: number = 0;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -66,48 +68,37 @@ export class UnassignSkillFromTopicsModalComponent
     for (let topic of topicAssignments) {
       allTopicIds.push(topic.topicId);
     }
-
     this.eligibleTopicNameToTopicAssignments = {};
-    this.nonEligibleTopicNameToTopicAssignments = {};
-    let eligibleTopicIds: string[] = [];
-    let nonEligibleTopicIds: string[] = [];
+    this.inEligibleTopicNameToTopicAssignments = {};
     this.topicsAndSkillsDashboardBackendApiService
       .fetchTopicIdToDiagnosticTestSkillIdsAsync(allTopicIds).then(
         (responseDict: TopicIdToDiagnosticTestSkillIdsResponse) => {
-          for (let topicId in responseDict.topicIdToDiagnosticTestSkillIds) {
+          for (let topic of topicAssignments) {
             let diagnosticTestSkillIds = (
-              responseDict.topicIdToDiagnosticTestSkillIds[topicId]);
+              responseDict.topicIdToDiagnosticTestSkillIds[topic.topicId]);
 
             if (
               diagnosticTestSkillIds.length === 1 &&
               diagnosticTestSkillIds.indexOf(this.skillId) !== -1
             ) {
-              nonEligibleTopicIds.push(topicId);
-            } else {
-              eligibleTopicIds.push(topicId);
-            }
-          }
-
-          for (let topic of topicAssignments) {
-            if (nonEligibleTopicIds.indexOf(topic.topicId) !== -1) {
-              this.nonEligibleTopicNameToTopicAssignments[topic.topicName] = {
+              this.inEligibleTopicNameToTopicAssignments[topic.topicName] = {
+                topicId: topic.topicId ,
                 subtopicId: topic.subtopicId,
-                topicVersion: topic.topicVersion,
-                topicId: topic.topicId,
-              };
+                topicVersion: topic.topicVersion
+              }
             } else {
               this.eligibleTopicNameToTopicAssignments[topic.topicName] = {
+                topicId: topic.topicId ,
                 subtopicId: topic.subtopicId,
-                topicVersion: topic.topicVersion,
-                topicId: topic.topicId,
-              };
+                topicVersion: topic.topicVersion
+              }
             }
           }
 
-          this.eligibleTopicNamesForUnassignment = Object.keys(
-            this.eligibleTopicNameToTopicAssignments);
-          this.nonEligibleTopicNames = Object.keys(
-            this.nonEligibleTopicNameToTopicAssignments);
+          this.eligibleTopicsCount = Object.keys(
+            this.eligibleTopicNameToTopicAssignments).length;
+          this.inEligibleTopicsCount = Object.keys(
+            this.inEligibleTopicNameToTopicAssignments).length;
         });
   }
 

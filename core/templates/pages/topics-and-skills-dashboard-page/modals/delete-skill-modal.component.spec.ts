@@ -42,7 +42,7 @@ describe('Assign Skill to Topic Modal Component', () => {
   const testTopicIdToDiagnosticTestSkillIds:
     TopicIdToDiagnosticTestSkillIdsResponse = {
       topicIdToDiagnosticTestSkillIds: {
-        topicId: []
+        topicId1: []
       }
     };
 
@@ -112,12 +112,13 @@ describe('Assign Skill to Topic Modal Component', () => {
     expect(componentInstance.showTopicsAssignments()).toBeFalse();
   });
 
-  it('should fetch Topic Assignments for Skill', () => {
+  it('should fetch Topic Assignments for Skill', fakeAsync(() => {
     componentInstance.topicsAssignmentsAreFetched = false;
     componentInstance.fetchTopicAssignmentsForSkill();
+    tick();
     expect(componentInstance.topicsAssignments).toEqual(testSkills);
     expect(componentInstance.topicsAssignmentsAreFetched).toBeTrue();
-  });
+  }));
 
   it('should allow skill deletion', fakeAsync(() => {
     let topicsAndSkillsDashboardBackendApiService = TestBed.inject(

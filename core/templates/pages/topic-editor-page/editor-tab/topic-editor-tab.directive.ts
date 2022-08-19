@@ -163,17 +163,19 @@ angular.module('oppia').directive('topicEditorTab', [
             $scope.addSkillForDiagnosticTest = async function() {
               let skillToAdd = $scope.selectedSkillForDiagnosticTest;
               $scope.selectedSkillForDiagnosticTest = null;
-
               $scope.selectedSkillSummariesForDiagnosticTest.push(skillToAdd);
-              let j = -1;
-              for (
-                let skill of $scope.availableSkillSummariesForDiagnosticTest) {
-                j++;
-                if (skill.getId() === skillToAdd.getId()) {
-                  $scope.availableSkillSummariesForDiagnosticTest.splice(j, 1);
-                  break;
-                }
+
+              let skillSummary = (
+                $scope.availableSkillSummariesForDiagnosticTest.find(
+                  skill => skill.getId() === skillToAdd.getId())
+              )
+              if (skillSummary) {
+                let index = $scope.availableSkillSummariesForDiagnosticTest
+                  .indexOf(skillSummary);
+                $scope.availableSkillSummariesForDiagnosticTest.splice(
+                  index, 1);
               }
+
               TopicUpdateService.updateDiagnosticTestSkills(
                 $scope.topic,
                 cloneDeep($scope.selectedSkillSummariesForDiagnosticTest));
@@ -181,15 +183,17 @@ angular.module('oppia').directive('topicEditorTab', [
             };
 
             $scope.removeSkillFromDiagnosticTest = function(skillToRemove) {
-              let j = -1;
-              for (
-                let skill of $scope.selectedSkillSummariesForDiagnosticTest) {
-                j++;
-                if (skill.getId() === skillToRemove.getId()) {
-                  $scope.selectedSkillSummariesForDiagnosticTest.splice(j, 1);
-                  break;
-                }
+              let skillSummary = (
+                $scope.availableSkillSummariesForDiagnosticTest.find(
+                  skill => skill.getId() === skillToRemove.getId())
+              )
+              if (skillSummary) {
+                let index = $scope.availableSkillSummariesForDiagnosticTest
+                  .indexOf(skillSummary);
+                $scope.availableSkillSummariesForDiagnosticTest.splice(
+                  index, 1);
               }
+
               $scope.availableSkillSummariesForDiagnosticTest.push(
                 skillToRemove);
 

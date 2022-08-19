@@ -42,9 +42,9 @@ export class DeleteSkillModalComponent extends ConfirmOrCancelModal {
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   skillId!: string;
-  nonEligibleTopicNameToTopicAssignments!: TopicNameToTopicAssignments;
-  nonEligibleTopicNames: string[] = [];
-  topicsAssignments!: AssignedSkill[];
+  inEligibleTopicNameToTopicAssignments: TopicNameToTopicAssignments = {};
+  inEligibleTopicsCount: number = 0;
+  topicsAssignments: AssignedSkill[] = [];
   topicsAssignmentsAreFetched: boolean = false;
   skillCanBeDeleted: boolean = true;
 
@@ -63,36 +63,29 @@ export class DeleteSkillModalComponent extends ConfirmOrCancelModal {
     for (let topic of topicAssignments) {
       allTopicIds.push(topic.topicId);
     }
-    this.nonEligibleTopicNameToTopicAssignments = {};
-    let nonEligibleTopicIds: string[] = [];
+    this.inEligibleTopicNameToTopicAssignments = {};
     this.topicsAndSkillsDashboardBackendApiService
       .fetchTopicIdToDiagnosticTestSkillIdsAsync(allTopicIds).then(
         (responseDict: TopicIdToDiagnosticTestSkillIdsResponse) => {
-          for (let topicId in responseDict.topicIdToDiagnosticTestSkillIds) {
+          for (let topic of topicAssignments) {
             let diagnosticTestSkillIds = (
-              responseDict.topicIdToDiagnosticTestSkillIds[topicId]);
+              responseDict.topicIdToDiagnosticTestSkillIds[topic.topicId]);
+
             if (
               diagnosticTestSkillIds.length === 1 &&
               diagnosticTestSkillIds.indexOf(this.skillId) !== -1
             ) {
-              nonEligibleTopicIds.push(topicId);
-            }
-          }
-
-          for (let topic of topicAssignments) {
-            if (nonEligibleTopicIds.indexOf(topic.topicId) !== -1) {
-              this.nonEligibleTopicNameToTopicAssignments[topic.topicName] = {
+              this.inEligibleTopicNameToTopicAssignments[topic.topicName] = {
+                topicId: topic.topicId ,
                 subtopicId: topic.subtopicId,
-                topicVersion: topic.topicVersion,
-                topicId: topic.topicId,
-              };
+                topicVersion: topic.topicVersion
+              }
               this.skillCanBeDeleted = false;
             }
           }
+          this.inEligibleTopicsCount = Object.keys(
+            this.inEligibleTopicNameToTopicAssignments).length;
           this.topicsAssignments = topicAssignments;
-          this.nonEligibleTopicNames = Object.keys(
-            this.nonEligibleTopicNameToTopicAssignments);
-          this.topicsAssignmentsAreFetched = true;
         });
   }
 
@@ -102,6 +95,7 @@ export class DeleteSkillModalComponent extends ConfirmOrCancelModal {
         this.skillId
       ).then((response: AssignedSkill[]) => {
         this.fetchTopicIdToDiagnosticTestSkillIds(response);
+        this.topicsAssignmentsAreFetched = true;
       });
   }
 

@@ -791,12 +791,12 @@ describe('Questions List Component', () => {
         spyOn(editableQuestionBackendApiService, 'editQuestionSkillLinksAsync')
           .and.returnValue(Promise.resolve());
 
-        component.deleteQuestionFromSkill(questionId, skillDescription);
+        component.removeQuestionFromSkill(questionId, skillDescription);
         tick();
 
         expect(ngbModal.open).toHaveBeenCalled();
         expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
-          'Deleted Question'
+          'Question Removed'
         );
       }));
 
@@ -824,12 +824,12 @@ describe('Questions List Component', () => {
         spyOn(editableQuestionBackendApiService, 'editQuestionSkillLinksAsync')
           .and.returnValue(Promise.resolve());
 
-        component.deleteQuestionFromSkill(questionId, skillDescription);
+        component.removeQuestionFromSkill(questionId, skillDescription);
         tick();
 
         expect(ngbModal.open).toHaveBeenCalled();
         expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
-          'Deleted Question'
+          'Question Removed'
         );
       }));
 
@@ -856,7 +856,7 @@ describe('Questions List Component', () => {
         .and.returnValue(Promise.resolve());
       spyOn(component, 'removeQuestionSkillLinkAsync');
 
-      component.deleteQuestionFromSkill(questionId, skillDescription);
+      component.removeQuestionFromSkill(questionId, skillDescription);
       tick();
       expect(ngbModal.open).toHaveBeenCalled();
       expect(component.removeQuestionSkillLinkAsync).not.toHaveBeenCalled();
