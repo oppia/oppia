@@ -384,6 +384,38 @@ describe('Context service', () => {
       });
   });
 
+  describe('behavior in the edit learner group page', () => {
+    beforeEach(() => {
+      ecs = TestBed.get(ContextService);
+      urlService = TestBed.get(UrlService);
+      spyOn(urlService, 'getPathname').and.returnValue(
+        '/edit-learner-group/groupId');
+      ecs.removeCustomEntityContext();
+    });
+
+    it('should correctly retrieve the learner group id', () => {
+      expect(ecs.getLearnerGroupId()).toBe('groupId');
+    });
+
+    it('should correctly retrieve the page context', () => {
+      expect(ecs.getPageContext()).toBe('learner_group_editor');
+    });
+  });
+
+  describe('behavior in the learner group viewer page', () => {
+    beforeEach(() => {
+      ecs = TestBed.get(ContextService);
+      urlService = TestBed.get(UrlService);
+      spyOn(urlService, 'getPathname').and.returnValue(
+        '/learner-groups/groupId');
+      ecs.removeCustomEntityContext();
+    });
+
+    it('should correctly retrieve the learner group id', () => {
+      expect(ecs.getLearnerGroupId()).toBe('groupId');
+    });
+  });
+
   describe('behavior in different pages', () => {
     beforeEach(() => {
       ecs = TestBed.get(ContextService);
@@ -441,6 +473,14 @@ describe('Context service', () => {
         expect(() => ecs.getExplorationId()).toThrowError(
           'ContextService should not be used outside the ' +
           'context of an exploration or a question.');
+      }
+    );
+
+    it('should throw an error when trying to retrieve the learner group id',
+      () => {
+        expect(() => ecs.getLearnerGroupId()).toThrowError(
+          'ContextService should not be used outside the ' +
+          'context of a learner group.');
       }
     );
 
