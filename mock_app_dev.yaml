@@ -1,0 +1,4 @@
+export = {
+  "DEV_MODE": true,
+  "EMULATOR_MODE": true,
+};

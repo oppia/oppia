@@ -143,25 +143,25 @@ def _update_report_stats_model_in_transaction( # type: ignore[no-untyped-def]
         # that we will want to splice aggregate stats by and they will each have
         # a count of 1 since this is the first report added for this entity.
         stats_dict = {
-            stats_parameter_names.report_type.name: {
+            stats_parameter_names.report_type.value: {
                 report_type: 1
             },
-            stats_parameter_names.country_locale_code.name: {
+            stats_parameter_names.country_locale_code.value: {
                 country_locale_code: 1
             },
-            stats_parameter_names.entry_point_name.name: {
+            stats_parameter_names.entry_point_name.value: {
                 entry_point_name: 1
             },
-            stats_parameter_names.text_language_code.name: {
+            stats_parameter_names.text_language_code.value: {
                 text_language_code: 1
             },
-            stats_parameter_names.audio_language_code.name: {
+            stats_parameter_names.audio_language_code.value: {
                 audio_language_code: 1
             },
-            stats_parameter_names.android_sdk_version.name: {
+            stats_parameter_names.android_sdk_version.value: {
                 sdk_version: 1
             },
-            stats_parameter_names.version_name.name: {
+            stats_parameter_names.version_name.value: {
                 version_name: 1
             }
         }

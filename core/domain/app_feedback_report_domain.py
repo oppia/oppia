@@ -345,7 +345,7 @@ class AppFeedbackReport:
             CATEGORY. The enum representing this category.
         """
         for category_type in app_feedback_report_constants.ALLOWED_CATEGORIES:
-            if category_name == category_type.name:
+            if category_name == category_type.value:
                 return category_type
         raise utils.InvalidInputException(
             'The given category %s is invalid.' % category_name)
