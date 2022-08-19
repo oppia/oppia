@@ -38,6 +38,7 @@ from core.domain import change_domain
 from core.domain import param_domain
 from core.domain import state_domain
 from core.domain import translation_domain
+from extensions.objects.models import objects
 
 from typing import (
         Any, Callable, Dict, Final, List, Mapping, Optional, Sequence, Set,
@@ -45,6 +46,7 @@ from typing import (
 
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
+from core.domain import interaction_registry  # pylint: disable=invalid-import-from # isort:skip
 from core.platform import models  # pylint: disable=invalid-import-from # isort:skip
 
 # TODO(#14537): Refactor this file and remove imports marked
@@ -2513,6 +2515,106 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return states_dict
 
     @classmethod
+    def _convert_states_v51_dict_to_v52_dict(
+        cls, states_dict: Dict[str, state_domain.StateDict]
+    ) -> Dict[str, state_domain.StateDict]:
+        """Converts from version 51 to 52. Version 52 correctly updates
+        the content IDs for translations and for voiceovers. In the 49 to 50
+        conversion we removed some interaction rules and thus also some parts of
+        the exploration that had its content IDs, but then the content IDs in
+        translations and voiceovers were not updated.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        for state_dict in states_dict.values():
+            interaction = state_dict['interaction']
+            content_id_list = [state_dict['content']['content_id']]
+
+            for answer_group in interaction['answer_groups']:
+                content_id_list.append(
+                    answer_group['outcome']['feedback']['content_id']
+                )
+
+                for rule_spec in answer_group['rule_specs']:
+                    for param_name, value in rule_spec['inputs'].items():
+                        interaction_id = interaction['id']
+                        # Ruling out the possibility of None for mypy type
+                        # checking.
+                        assert interaction_id is not None
+                        param_type = (
+                            interaction_registry.Registry.get_interaction_by_id( # type: ignore[no-untyped-call]
+                                interaction_id
+                            ).get_rule_param_type(
+                                rule_spec['rule_type'], param_name
+                            )
+                        )
+
+                        if issubclass(
+                            param_type, objects.BaseTranslatableObject
+                        ):
+                            # We can assume that the value will be a dict,
+                            # as the param_type is BaseTranslatableObject.
+                            assert isinstance(value, dict)
+                            content_id = value['contentId']
+                            # We can assume the contentId will be str,
+                            # as the param_type is BaseTranslatableObject.
+                            assert isinstance(content_id, str)
+                            content_id_list.append(content_id)
+
+            default_outcome = interaction['default_outcome']
+            if default_outcome:
+                content_id_list.append(
+                    default_outcome['feedback']['content_id'])
+
+            for hint in interaction['hints']:
+                content_id_list.append(hint['hint_content']['content_id'])
+
+            interaction_solution = interaction['solution']
+            if interaction_solution:
+                content_id_list.append(
+                    interaction_solution['explanation']['content_id'])
+
+            if interaction['id'] is not None:
+                customisation_args = (
+                    state_domain.InteractionInstance # type: ignore[no-untyped-call]
+                    .convert_customization_args_dict_to_customization_args(
+                        interaction['id'],
+                        interaction['customization_args'],
+                        state_schema_version=51
+                    )
+                )
+                for ca_name in customisation_args:
+                    content_id_list.extend(
+                        customisation_args[ca_name].get_content_ids()
+                    )
+
+            translations_mapping = (
+                state_dict['written_translations']['translations_mapping'])
+            new_translations_mapping = {}
+            for content_id, translation_item in translations_mapping.items():
+                if content_id in content_id_list:
+                    new_translations_mapping[content_id] = translation_item
+            state_dict['written_translations']['translations_mapping'] = (
+                new_translations_mapping)
+
+            voiceovers_mapping = (
+                state_dict['recorded_voiceovers']['voiceovers_mapping'])
+            new_voiceovers_mapping = {}
+            for content_id, voiceover_item in voiceovers_mapping.items():
+                if content_id in content_id_list:
+                    new_voiceovers_mapping[content_id] = voiceover_item
+            state_dict['recorded_voiceovers']['voiceovers_mapping'] = (
+                new_voiceovers_mapping)
+
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
         cls,
         versioned_exploration_states: VersionedExplorationStatesDict,
@@ -2552,7 +2654,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 56
+    CURRENT_EXP_SCHEMA_VERSION = 57
     EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION = 46
 
     @classmethod
@@ -2802,6 +2904,30 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return exploration_dict
 
     @classmethod
+    def _convert_v56_dict_to_v57_dict(
+        cls, exploration_dict: VersionedExplorationDict
+    ) -> VersionedExplorationDict:
+        """Converts a v56 exploration dict into a v57 exploration dict.
+        Version 57 correctly updates the content IDs for translations and
+        for voiceovers.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v56.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v57.
+        """
+        exploration_dict['schema_version'] = 57
+
+        exploration_dict['states'] = cls._convert_states_v51_dict_to_v52_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 52
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(
         cls, yaml_content: str
     ) -> VersionedExplorationDict:
@@ -2892,6 +3018,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
             exploration_dict = cls._convert_v55_dict_to_v56_dict(
                 exploration_dict)
             exploration_schema_version = 56
+
+        if exploration_schema_version == 56:
+            exploration_dict = cls._convert_v56_dict_to_v57_dict(
+                exploration_dict)
+            exploration_schema_version = 57
 
         return exploration_dict
 
