@@ -42,16 +42,6 @@
         </picture>
         <div class="oppia-editor-card-section-container">
           <div class="oppia-editor-card-section oppia-mobile-collapsible-card-content">
-<<<<<<< HEAD
-            <button type="button"
-                    class="e2e-test-delete-interaction oppia-delete-interaction-button oppia-transition-200"
-                    (click)="deleteInteraction()"
-                    *ngIf="editabilityService.isEditable()">
-              <i class="fas fa-times"></i>
-            </button>
-
-=======
->>>>>>> upstream/develop
             <div *ngIf="hasLoaded"
                  class="e2e-test-interaction"
                  [ngClass]="{'oppia-editable-section': editabilityService.isEditable() && !interactionIsDisabled}">
