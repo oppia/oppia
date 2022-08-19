@@ -62,5 +62,5 @@ class SetupTests(test_utils.GenericTestBase):
         swap_path = self.swap(sys, 'path', dummy_path)
 
         with swap_setup, swap_path:
-            import setup
+            import setup # pylint: disable=import-error
             setup.main()
