@@ -136,7 +136,7 @@ export class ContributorDashboardPageComponent
 
   ngOnInit(): void {
     this.profilePictureDataUrl = null;
-    this.username = null;
+    this.username = '';
     this.userInfoIsLoading = true;
     this.userIsLoggedIn = false;
     this.userIsReviewer = false;
@@ -194,20 +194,22 @@ export class ContributorDashboardPageComponent
         this.profilePictureDataUrl = decodeURIComponent(dataUrl);
       });
 
-    this.topicName = (
-      ContributorDashboardConstants.DEFAULT_OPPORTUNITY_TOPIC_NAME);
-    this.translationTopicService.setActiveTopicName(this.topicName);
-
     this.contributionOpportunitiesService.getTranslatableTopicNamesAsync()
       .then((topicNames) => {
+        // TODO(#15710): Set default active topic to 'All'.
+        if (topicNames.length <= 0) {
+          return;
+        }
+        this.topicName = topicNames[0];
         if (topicNames.indexOf(prevSelectedTopicName) !== -1) {
           this.topicName = prevSelectedTopicName;
-          this.translationTopicService.setActiveTopicName(this.topicName);
         }
+        this.translationTopicService.setActiveTopicName(this.topicName);
       });
 
     this.activeTabName = 'myContributionTab';
 
+    // TODO(#13015): Remove use of unknown as a type.
     this.tabsDetails = {
       ...ContributorDashboardConstants.CONTRIBUTOR_DASHBOARD_TABS_DETAILS
     } as unknown as ContributorDashboardTabsDetails;

@@ -42,8 +42,8 @@ import certifi
 import yaml
 
 from typing import ( # isort:skip
-    IO, Any, BinaryIO, Callable, Dict, Iterable, Iterator, List, Optional,
-    TextIO, Tuple, TypeVar, Union, overload)
+    IO, Any, BinaryIO, Callable, Dict, Iterable, Iterator, List, Mapping,
+    Optional, TextIO, Tuple, TypeVar, Union, overload)
 from typing_extensions import Literal # isort:skip
 
 
@@ -133,9 +133,31 @@ def open_file(
     return file
 
 
+@overload
+def get_file_contents(filepath: str) -> str: ...
+
+
+@overload
 def get_file_contents(
-        filepath: str, raw_bytes: bool = False, mode: str = 'r'
-) -> bytes:
+    filepath: str, *, mode: str = 'r'
+) -> str: ...
+
+
+@overload
+def get_file_contents(
+    filepath: str, *, raw_bytes: Literal[False], mode: str = 'r'
+) -> str: ...
+
+
+@overload
+def get_file_contents(
+    filepath: str, *, raw_bytes: Literal[True], mode: str = 'r'
+) -> bytes: ...
+
+
+def get_file_contents(
+    filepath: str, raw_bytes: bool = False, mode: str = 'r'
+) -> Union[str, bytes]:
     """Gets the contents of a file, given a relative filepath
     from oppia.
 
@@ -145,8 +167,9 @@ def get_file_contents(
         mode: str. File opening mode, default is in read mode.
 
     Returns:
-        *. Either the raw_bytes stream if the flag is set or the
-        decoded stream in utf-8 format.
+        Union[str, bytes]. Either the raw_bytes stream ( bytes type ) if
+        the raw_bytes is True or the decoded stream ( string type ) in
+        utf-8 format if raw_bytes is False.
     """
     if raw_bytes:
         mode = 'rb'
@@ -156,12 +179,15 @@ def get_file_contents(
 
     with open(
         filepath, mode, encoding=encoding) as f:
-        return f.read() # type: ignore[no-any-return]
+        file_contents = f.read()
+        # Ruling out the possibility of Any other type for mypy type checking.
+        assert isinstance(file_contents, (str, bytes))
+        return file_contents
 
 
 def get_exploration_components_from_dir(
         dir_path: str
-) -> Tuple[bytes, List[Tuple[str, bytes]]]:
+) -> Tuple[str, List[Tuple[str, bytes]]]:
     """Gets the (yaml, assets) from the contents of an exploration data dir.
 
     Args:
@@ -277,7 +303,9 @@ def dict_from_yaml(yaml_str: str) -> Dict[str, Any]:
         raise InvalidInputException(e) from e
 
 
-def yaml_from_dict(dictionary: Dict[str, Any], width: int = 80) -> str:
+# Here, Mapping is used so that both Dict and TypedDict types of values
+# are accepted by yaml_from_dict() method.
+def yaml_from_dict(dictionary: Mapping[str, Any], width: int = 80) -> str:
     """Gets the YAML representation of a dict.
 
     Args:
