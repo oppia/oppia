@@ -192,7 +192,7 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
 
         with mock_ci_scripts:
             with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
-                Exception, 'coreEditorAndPlayerFeatures is expected to be in '
+                Exception, 'publication is expected to be in '
                            'the e2e test suites extracted from the script '
                            'section of CI config files, but it is '
                            'missing.'):
@@ -200,7 +200,7 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
 
         with mock_protractor_test_suites, mock_tests_not_in_ci:
             with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
-                Exception, 'coreEditorAndPlayerFeatures is expected to be in '
+                Exception, 'publication is expected to be in '
                            'the e2e test suites extracted from the '
                            'protractor.conf.js file, but it is missing.'):
                 check_e2e_tests_are_captured_in_ci.main()
