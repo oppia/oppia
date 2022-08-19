@@ -184,13 +184,13 @@ angular.module('oppia').directive('topicEditorTab', [
 
             $scope.removeSkillFromDiagnosticTest = function(skillToRemove) {
               let skillSummary = (
-                $scope.availableSkillSummariesForDiagnosticTest.find(
+                $scope.selectedSkillSummariesForDiagnosticTest.find(
                   skill => skill.getId() === skillToRemove.getId())
               )
               if (skillSummary) {
-                let index = $scope.availableSkillSummariesForDiagnosticTest
+                let index = $scope.selectedSkillSummariesForDiagnosticTest
                   .indexOf(skillSummary);
-                $scope.availableSkillSummariesForDiagnosticTest.splice(
+                $scope.selectedSkillSummariesForDiagnosticTest.splice(
                   index, 1);
               }
 
