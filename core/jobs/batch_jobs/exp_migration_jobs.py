@@ -53,7 +53,7 @@ if MYPY: # pragma: no cover
 datastore_services = models.Registry.import_datastore_services()
 
 
-# TODO(#): This job needs to be kept in sync with
+# TODO(#15927): This job needs to be kept in sync with
 # AuditExplorationMigrationJob and later we will unify these jobs together.
 class MigrateExplorationJob(base_jobs.JobBase):
     """Job that migrates Exploration models."""
@@ -512,7 +512,7 @@ class MigrateExplorationJob(base_jobs.JobBase):
         )
 
 
-# TODO(#): This job needs to be kept in sync with MigrateExplorationJob and
+# TODO(#15927): This job needs to be kept in sync with MigrateExplorationJob and
 # later we will unify these jobs together.
 class AuditExplorationMigrationJob(base_jobs.JobBase):
     """Job that migrates Exploration models."""
