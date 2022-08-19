@@ -42,7 +42,7 @@ from typing import Any, Dict, List
 auth_services = models.Registry.import_auth_services()
 
 
-class ContributorDashboardDebugRequestsTests(test_utils.GenericTestBase):
+class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
@@ -50,7 +50,7 @@ class ContributorDashboardDebugRequestsTests(test_utils.GenericTestBase):
             firebase_auth_services_test.FirebaseAdminSdkStub())
         self.firebase_sdk_stub.install(self)
         self.contributor_dashboard_debug = (
-            contributor_dashboard_debug.ContributorDashboardDebugRequests(
+            contributor_dashboard_debug.ContributorDashboardDebugInitializer(
                 base_url=''))
         self.request_swap = self.swap(
             self.contributor_dashboard_debug.session,
@@ -86,20 +86,18 @@ class ContributorDashboardDebugRequestsTests(test_utils.GenericTestBase):
         """Sets the environment variables to simulate a login of admin."""
         self.login(email, is_super_admin=True)
 
-    def test_populate_data_for_contributor_dashboard_debug(self) -> None:
+    def test_populate_debug_data(self) -> None:
         init_app_swap = self.swap_with_call_counter(
             firebase_admin, 'initialize_app')
         sign_up_swap = self.swap(
-            self.contributor_dashboard_debug, 'sign_up_new_user', self.signup)
+            self.contributor_dashboard_debug, '_sign_up_new_user', self.signup)
         begin_session_swap = self.swap(
-            self.contributor_dashboard_debug, 'begin_session',
+            self.contributor_dashboard_debug, '_sign_in',
             self.mock_login_as_admin)
 
         with self.request_swap, sign_up_swap, begin_session_swap, (
             init_app_swap) as init_app_counter:
-            (
-                self.contributor_dashboard_debug.
-                populate_data_for_contributor_dashboard_debug())
+                self.contributor_dashboard_debug.populate_debug_data()
 
         self.assertEqual(init_app_counter.times_called, 1)
         self._assert_user_roles(
@@ -107,7 +105,7 @@ class ContributorDashboardDebugRequestsTests(test_utils.GenericTestBase):
             contributor_dashboard_debug.SUPER_ADMIN_ROLES)
         self._assert_can_submit_question_suggestions(
             contributor_dashboard_debug.CONTRIBUTOR_USERNAME)
-        self._assert_generate_dummy_new_structures_data()
+        self._assert_generate_sample_new_structures_data()
         self._assert_topics_in_classroom(
             contributor_dashboard_debug.CLASSROOM_NAME)
 
@@ -117,20 +115,20 @@ class ContributorDashboardDebugRequestsTests(test_utils.GenericTestBase):
         create_user_swap = self.swap(
             firebase_auth, 'create_user', self.mock_firebase_auth_create_user)
         begin_session_swap = self.swap(
-            self.contributor_dashboard_debug, 'begin_session', self.login)
+            self.contributor_dashboard_debug, '_sign_in', self.login)
         load_template_swap = self.swap(
             base, 'load_template', test_utils.mock_load_template)
 
         with self.request_swap, create_user_swap, begin_session_swap, (
                 load_template_swap):
-            self.contributor_dashboard_debug.sign_up_new_user(email, username)
+            self.contributor_dashboard_debug._sign_up_new_user(email, username)
 
         self.assertIsNotNone(self.firebase_sdk_stub.get_user_by_email(email))
         self.assertEqual(
             user_services.get_user_settings_from_email(email).username, # type: ignore
             username)
 
-    def test_begin_session(self) -> None:
+    def test_sign_in(self) -> None:
         email = 'user1@example.com'
         auth_id = self.get_auth_id_from_email(email) # type: ignore
         token_id = self.firebase_sdk_stub.create_user(auth_id, email=email)
@@ -143,13 +141,13 @@ class ContributorDashboardDebugRequestsTests(test_utils.GenericTestBase):
 
         with sign_in_swap, self.request_swap, establish_session_swap as (
             establish_session_counter):
-            self.contributor_dashboard_debug.begin_session(email)
+            self.contributor_dashboard_debug._sign_in(email)
 
         self.assertEqual(establish_session_counter.times_called, 1)
 
     def test_get_csrf_token(self) -> None:
         with self.request_swap:
-            csrf_token = self.contributor_dashboard_debug.get_csrf_token()
+            csrf_token = self.contributor_dashboard_debug._get_csrf_token()
         self.assertTrue(
             base.CsrfTokenManager.is_csrf_token_valid(None, csrf_token)) # type: ignore
 
@@ -164,7 +162,7 @@ class ContributorDashboardDebugRequestsTests(test_utils.GenericTestBase):
         self.contributor_dashboard_debug.csrf_token = self.get_new_csrf_token() # type: ignore
 
         with self.request_swap:
-            self.contributor_dashboard_debug.assign_admin_roles(roles, username)
+            self.contributor_dashboard_debug._assign_admin_roles(roles, username)
 
         self.logout()
 
@@ -188,7 +186,7 @@ class ContributorDashboardDebugRequestsTests(test_utils.GenericTestBase):
         self.contributor_dashboard_debug.csrf_token = self.get_new_csrf_token() # type: ignore
 
         with self.request_swap:
-            self.contributor_dashboard_debug.add_submit_question_rights(
+            self.contributor_dashboard_debug._add_submit_question_rights(
                 username)
 
         self.logout()
@@ -200,7 +198,7 @@ class ContributorDashboardDebugRequestsTests(test_utils.GenericTestBase):
         user_id = user_services.get_user_id_from_username(username)
         self.assertTrue(user_services.can_submit_question_suggestions(user_id)) # type: ignore
 
-    def test_generate_dummy_new_structures_data(self) -> None:
+    def test_generate_sample_new_structures_data(self) -> None:
         self.set_curriculum_admins([self.SUPER_ADMIN_USERNAME]) # type: ignore
         self.login(self.SUPER_ADMIN_EMAIL, is_super_admin=True)
         self.contributor_dashboard_debug.csrf_token = self.get_new_csrf_token() # type: ignore
@@ -208,14 +206,14 @@ class ContributorDashboardDebugRequestsTests(test_utils.GenericTestBase):
         with self.request_swap:
             (
                 self.contributor_dashboard_debug.
-                generate_dummy_new_structures_data())
+                _generate_sample_new_structures_data())
 
         self.logout()
 
-        self._assert_generate_dummy_new_structures_data()
+        self._assert_generate_sample_new_structures_data()
 
-    def _assert_generate_dummy_new_structures_data(self) -> None:
-        """Asserts that the dummy new structures data is generated."""
+    def _assert_generate_sample_new_structures_data(self) -> None:
+        """Asserts that the sample new structures data is generated."""
         topic_summaries = topic_fetchers.get_all_topic_summaries()
         self.assertEqual(len(topic_summaries), 2)
         for summary in topic_summaries:
@@ -259,7 +257,7 @@ class ContributorDashboardDebugRequestsTests(test_utils.GenericTestBase):
         self.contributor_dashboard_debug.csrf_token = self.get_new_csrf_token() # type: ignore
 
         with self.request_swap:
-            self.contributor_dashboard_debug.add_topics_to_classroom(
+            self.contributor_dashboard_debug._add_topics_to_classroom(
                 classroom_name, classroom_url_fragment)
 
         self.logout()

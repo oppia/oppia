@@ -90,7 +90,7 @@ class ContributorDashboardDebugInitializer():
         self.csrf_token = self._get_csrf_token()
         self._assign_admin_roles(SUPER_ADMIN_ROLES, SUPER_ADMIN_USERNAME)
         self._add_submit_question_rights(CONTRIBUTOR_USERNAME)
-        self._generate_dummy_new_structures_data()
+        self._generate_sample_new_structures_data()
         self._add_topics_to_classroom(CLASSROOM_NAME, CLASSROOM_URL_FRAGMENT)
 
     def _sign_up_new_user(self, email: str, username: str) -> None:
@@ -172,8 +172,8 @@ class ContributorDashboardDebugInitializer():
         self._make_request(
             'POST', '/contributionrightshandler/submit_question', params=params)
 
-    def _generate_dummy_new_structures_data(self) -> None:
-        """Generates dummy new structures data."""
+    def _generate_sample_new_structures_data(self) -> None:
+        """Generates sample new structures data."""
         params = {
             'payload': json.dumps({
                 'action': 'generate_dummy_new_structures_data'}),
