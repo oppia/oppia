@@ -2546,6 +2546,32 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
         ):
             temp_file.close()
 
+    def test_raises_no_error_if_todo_is_present_initially(self):
+        node_with_ignore_having_todo = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test'
+        )
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                # TODO(#sll): Here we use MyPy ignore because stubs of protobuf
+                # are not available yet.
+
+                def foo(exp_id: str) -> str:  # type: ignore[arg-type]
+                    return 'hi' #@
+                """
+            )
+        node_with_ignore_having_todo.file = filename
+
+        self.checker_test_object.checker.process_tokens(
+           pylint_utils.tokenize_module(node_with_ignore_having_todo)
+        )
+        with self.checker_test_object.assertAddsMessages():
+            temp_file.close()
+
 
 class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
 
@@ -3048,6 +3074,32 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
 
         self.checker_test_object.checker.process_tokens(
            pylint_utils.tokenize_module(node_with_object_and_less_than_ten_gap)
+        )
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+    def test_no_error_raised_if_objects_are_present_with_todo_comment(self):
+        node_with_object_and_todo_comment = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test'
+        )
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                # TODO(#sll): Here we use object because stubs of protobuf
+                # are not available yet. So, instead of Any we used object
+                # here.
+                def foo(exp_id: object) -> object:
+                    return 'hi' #@
+                """
+            )
+        node_with_object_and_todo_comment.file = filename
+
+        self.checker_test_object.checker.process_tokens(
+           pylint_utils.tokenize_module(node_with_object_and_todo_comment)
         )
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
