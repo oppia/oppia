@@ -91,6 +91,10 @@ OTHER_SHARD_NAME = 'other'
 # another shard.  Currently we are not sharding the lint checks, so the
 # only shard is the `other` shard that contains all files.
 SHARDS = {
+    # Remove this once this folder is completed.
+    '1': [
+        'core/storage/',
+    ],
     'other': None,
 }
 

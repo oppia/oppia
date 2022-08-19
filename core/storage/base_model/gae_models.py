@@ -170,7 +170,7 @@ class BaseModel(datastore_services.Model):
     # Whether the current version of the model instance is deleted.
     deleted = datastore_services.BooleanProperty(indexed=True, default=False)
 
-    # We use type Any for *args and **kwargs to denote compatibility with the
+    # Here we use type Any because we need to denote the compatibility with the
     # overridden constructor of the parent class i.e datastore_services.Model
     # here.
     def __init__(self, *args: Any, **kwargs: Any) -> None:
@@ -235,7 +235,7 @@ class BaseModel(datastore_services.Model):
             'The has_reference_to_user_id() method is missing from the '
             'derived class. It should be implemented in the derived class.')
 
-    # Using Dict[str, Any] here so that the return type of all the export_data
+    # Here we use type Any because the return type of all the export_data
     # methods in BaseModel's subclasses is a subclass of Dict[str, Any].
     # Otherwise subclass methods will throw [override] error.
     @staticmethod
@@ -580,7 +580,7 @@ class BaseHumanMaintainedModel(BaseModel):
     last_updated_by_human = (
         datastore_services.DateTimeProperty(indexed=True, required=True))
 
-    # We use type Any for *args and **kwargs to denote compatibility with the
+    # Here we use type Any because we need to denote the compatibility with the
     # overridden put method of the parent class i.e. BaseModel here.
     def put(self, *args: Any, **kwargs: Any) -> None:
         """Unsupported operation on human-maintained models."""
@@ -1040,7 +1040,7 @@ class VersionedModel(BaseModel):
             'versioned_model': self,
         }
 
-    # We have ignored [override] here because the signature of this method
+    # Here we use MyPy ignore because the signature of this method
     # doesn't match with BaseModel.delete().
     # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
     def delete( # type: ignore[override]
@@ -1114,7 +1114,7 @@ class VersionedModel(BaseModel):
             BaseModel.update_timestamps_multi(models_to_put)
             BaseModel.put_multi(models_to_put)
 
-    # We have ignored [override] here because the signature of this method
+    # Here we use MyPy ignore because the signature of this method
     # doesn't match with BaseModel.delete_multi().
     # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
     @classmethod
@@ -1224,18 +1224,17 @@ class VersionedModel(BaseModel):
                 snapshot_content_models.append(
                     model.SNAPSHOT_CONTENT_CLASS.create(snapshot_id, snapshot))
 
-            # We need the cast here in order to convey to MyPy that all these
-            # lists can be merged together for the purpose of putting them into
-            # the datastore.
-            entities = (
-                cast(List[BaseModel], snapshot_metadata_models) +
-                cast(List[BaseModel], snapshot_content_models) +
-                cast(List[BaseModel], versioned_models)
-            )
+            entities: List[BaseModel] = []
+            for snapshot_model in snapshot_metadata_models:
+                entities.append(snapshot_model)
+            for content_model in snapshot_content_models:
+                entities.append(content_model)
+            for versioned_model in versioned_models:
+                entities.append(versioned_model)
             cls.update_timestamps_multi(entities)
             BaseModel.put_multi_transactional(entities)
 
-    # We use type Any for *args and **kwargs to denote compatibility with the
+    # Here we use type Any because to denote the compatibility with the
     # overridden constructor of the parent class i.e BaseModel here.
     def put(self, *args: Any, **kwargs: Any) -> None:
         """For VersionedModels, this method is replaced with commit()."""
@@ -1531,8 +1530,8 @@ class VersionedModel(BaseModel):
         version: Optional[int] = None
     ) -> Optional[SELF_VERSIONED_MODEL]: ...
 
-    # Here, the signature of get method is different from the get method in
-    # superclass. Thus to avoid MyPy error, we used ignore here.
+    # Here we use MyPy ignore because the signature of this method
+    # doesn't match with BaseModel.get().
     @classmethod
     def get(  # type: ignore[override]
         cls: Type[SELF_VERSIONED_MODEL],
@@ -1619,8 +1618,8 @@ class VersionedModel(BaseModel):
                     'Invalid version number %s for model %s with id %s'
                     % (version_numbers[ind], cls.__name__, model_instance_id))
 
-        # We need the cast here to make sure that returned_models only contains
-        # BaseSnapshotMetadataModel and not None.
+        # Here we use cast because we need to make sure that returned_models
+        # only contains BaseSnapshotMetadataModel and not None.
         returned_models_without_none = cast(
             List[BaseSnapshotMetadataModel], returned_models)
         return [{
@@ -1718,8 +1717,6 @@ class BaseSnapshotMetadataModel(BaseModel):
             cls.content_user_ids == user_id,
         )).get(keys_only=True) is not None
 
-    # TODO(#13523): Change 'commit_cmds' to domain object/TypedDict to
-    # remove Any from type-annotation below.
     @classmethod
     def create(
             cls: Type[SELF_BASE_SNAPSHOT_METADATA_MODEL],
@@ -1727,7 +1724,7 @@ class BaseSnapshotMetadataModel(BaseModel):
             committer_id: str,
             commit_type: str,
             commit_message: Optional[str],
-            commit_cmds: Union[Dict[str, Any], List[Dict[str, Any]], None]
+            commit_cmds: AllowedCommitCmdsListType
     ) -> SELF_BASE_SNAPSHOT_METADATA_MODEL:
         """This method returns an instance of the BaseSnapshotMetadataModel for
         a construct with the common fields filled.
