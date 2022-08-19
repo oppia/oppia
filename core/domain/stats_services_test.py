@@ -440,27 +440,27 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         )
         stats_services.create_stats_model(exploration_stats_for_new_exploration)
 
-        updated_exploration_stats = (
+        newly_created_exploration_stats = (
             stats_services.get_exploration_stats_by_id(
                 exploration.id, exploration.version
             )
         )
         # Ruling out the possibility of None for mypy type checking.
-        assert updated_exploration_stats is not None
-        self.assertEqual(updated_exploration_stats.exp_id, exp_id)
-        self.assertEqual(updated_exploration_stats.exp_version, 1)
-        self.assertEqual(updated_exploration_stats.num_starts_v1, 0)
-        self.assertEqual(updated_exploration_stats.num_starts_v2, 0)
+        assert newly_created_exploration_stats is not None
+        self.assertEqual(newly_created_exploration_stats.exp_id, exp_id)
+        self.assertEqual(newly_created_exploration_stats.exp_version, 1)
+        self.assertEqual(newly_created_exploration_stats.num_starts_v1, 0)
+        self.assertEqual(newly_created_exploration_stats.num_starts_v2, 0)
         self.assertEqual(
-            updated_exploration_stats.num_actual_starts_v1, 0
+            newly_created_exploration_stats.num_actual_starts_v1, 0
         )
         self.assertEqual(
-            updated_exploration_stats.num_actual_starts_v2, 0
+            newly_created_exploration_stats.num_actual_starts_v2, 0
         )
-        self.assertEqual(updated_exploration_stats.num_completions_v1, 0)
-        self.assertEqual(updated_exploration_stats.num_completions_v2, 0)
+        self.assertEqual(newly_created_exploration_stats.num_completions_v1, 0)
+        self.assertEqual(newly_created_exploration_stats.num_completions_v2, 0)
         self.assertEqual(
-            list(updated_exploration_stats.state_stats_mapping.keys()),
+            list(newly_created_exploration_stats.state_stats_mapping.keys()),
             ['Home', 'End']
         )
 
@@ -822,22 +822,22 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         )
         stats_services.create_stats_model(exploration_stats_for_new_exp_version)
 
-        updated_exploration_stats = (
+        newly_created_exploration_stats = (
             stats_services.get_exploration_stats_by_id(
                 exploration.id, exploration.version
             )
         )
         # Ruling out the possibility of None for mypy type checking.
-        assert updated_exploration_stats is not None
-        self.assertEqual(updated_exploration_stats.exp_version, 8)
+        assert newly_created_exploration_stats is not None
+        self.assertEqual(newly_created_exploration_stats.exp_version, 8)
         self.assertEqual(
-            set(updated_exploration_stats.state_stats_mapping.keys()),
+            set(newly_created_exploration_stats.state_stats_mapping.keys()),
             set(['Home', 'Renamed state', 'End']))
 
         self.assertEqual(
-            updated_exploration_stats.num_actual_starts_v2, 0
+            newly_created_exploration_stats.num_actual_starts_v2, 0
         )
-        self.assertEqual(updated_exploration_stats.num_completions_v2, 0)
+        self.assertEqual(newly_created_exploration_stats.num_completions_v2, 0)
 
         # Test state name swaps.
         exploration.add_states(['New state 5', 'New state 6'])

@@ -934,15 +934,15 @@ def delete_playthroughs_multi(playthrough_ids: List[str]) -> None:
     @transaction_services.run_in_transaction_wrapper
     def _delete_playthroughs_multi_transactional() -> None:
         """Implementation to be run in a transaction."""
-        playthrough_models_with_none = stats_models.PlaythroughModel.get_multi(
+        playthrough_models = stats_models.PlaythroughModel.get_multi(
             playthrough_ids
         )
-        playthrough_models = []
-        for playthrough_model in playthrough_models_with_none:
+        filtered_playthrough_models = []
+        for playthrough_model in playthrough_models:
             # Ruling out the possibility of None for mypy type checking.
             assert playthrough_model is not None
-            playthrough_models.append(playthrough_model)
-        stats_models.PlaythroughModel.delete_multi(playthrough_models)
+            filtered_playthrough_models.append(playthrough_model)
+        stats_models.PlaythroughModel.delete_multi(filtered_playthrough_models)
 
     # Run in transaction to help prevent data-races between concurrent
     # operations that may update the playthroughs being deleted.
