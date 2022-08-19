@@ -148,6 +148,7 @@ import { StateGraphVisualization } from 'pages/exploration-editor-page/editor-ta
 import { VersionDiffVisualizationComponent } from './version-diff-visualization/version-diff-visualization.component';
 import { QuestionSuggestionEditorModalComponent } from 'pages/contributor-dashboard-page/modal-templates/question-suggestion-editor-modal.component';
 import { QuestionSuggestionReviewModalComponent } from 'pages/contributor-dashboard-page/modal-templates/question-suggestion-review-modal.component';
+import { AddOutcomeModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-outcome-modal.component';
 
 // Pipes.
 import { StringUtilityPipesModule } from 'filters/string-utility-filters/string-utility-pipes.module';
@@ -161,6 +162,7 @@ import { AuthService } from 'services/auth.service';
 import { SmartRouterModule } from 'hybrid-router-module-provider';
 import { StaleTabInfoModalComponent } from './stale-tab-info/stale-tab-info-modal.component';
 import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status-info/unsaved-changes-status-info-modal.component';
+import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
   imports: [
@@ -189,6 +191,7 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     StringUtilityPipesModule,
     AngularFireModule.initializeApp(AuthService.firebaseConfig),
     AngularFireAuthModule,
+    NgbModalModule
   ],
 
   providers: [
@@ -275,7 +278,6 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     LearnerDashboardIconsComponent,
     PreviewThumbnailComponent,
     AddOrUpdateSolutionModalComponent,
-    AddHintModalComponent,
     QuestionMisconceptionSelectorComponent,
     QuestionsOpportunitiesSelectDifficultyModalComponent,
     QuestionsListSelectSkillAndDifficultyModalComponent,
@@ -285,6 +287,7 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     DeleteSolutionModalComponent,
     SavePendingChangesModalComponent,
     AddHintModalComponent,
+    AddOutcomeModalComponent,
     ReviewMaterialEditorComponent,
     TagMisconceptionModalComponent,
     QuestionMisconceptionEditorComponent,
@@ -364,6 +367,7 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     OutcomeDestinationEditorComponent,
     OutcomeEditorComponent,
     OutcomeFeedbackEditorComponent,
+    AddOutcomeModalComponent,
     HintAndSolutionButtonsComponent,
     HintEditorComponent,
     InputResponsePairComponent,
@@ -521,6 +525,7 @@ import { UnsavedChangesStatusInfoModalComponent } from './unsaved-changes-status
     SavePendingChangesModalComponent,
     LearnerDashboardIconsComponent,
     AddOrUpdateSolutionModalComponent,
+    AddOutcomeModalComponent,
     QuestionMisconceptionSelectorComponent,
     QuestionsOpportunitiesSelectDifficultyModalComponent,
     QuestionsListSelectSkillAndDifficultyModalComponent,
