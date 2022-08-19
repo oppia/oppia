@@ -31,7 +31,7 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
 
     def setUp(self):
         """Completes the setup for SkillMasteryDataHandler."""
-        super(SkillMasteryDataHandlerTest, self).setUp()
+        super().setUp()
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
 
@@ -382,7 +382,7 @@ class SubtopicMasteryDataHandlerTest(test_utils.GenericTestBase):
 
     def setUp(self):
         """Completes the setup for SubtopicMasteryDataHandler."""
-        super(SubtopicMasteryDataHandlerTest, self).setUp()
+        super().setUp()
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
         self.set_curriculum_admins([self.NEW_USER_USERNAME])

@@ -66,7 +66,7 @@ class ValidateModelWithUserId(base_validation.ValidateBaseModelId):
     """Overload for models keyed by a user ID, which have a special format."""
 
     def __init__(self) -> None:
-        super(ValidateModelWithUserId, self).__init__()
+        super().__init__()
         # IMPORTANT: Only picklable objects can be stored on DoFns! This is
         # because DoFns are serialized with pickle when run on a pipeline (and
         # might be run on many different machines). Any other types assigned to

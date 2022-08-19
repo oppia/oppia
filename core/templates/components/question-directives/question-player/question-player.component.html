@@ -46,15 +46,15 @@
 
         <div class="skill-score-body">
           <div class="score" *ngFor="let item of scorePerSkillMapping | keyvalue">
-            <div *ngIf="item.value?.total > 0">
-              <div class="list-item" (click)="openSkillMasteryModal(item.key)">{{item.value?.description}}</div>
+            <div *ngIf="item.value && item.value.total > 0">
+              <div class="list-item" (click)="openSkillMasteryModal(item.key)">{{item.value.description}}</div>
               <div class="score-outer d-flex justify-content-between align-items-center">
                 <div class="oppia-skill-score-container">
                   <div class="score-bar" [ngStyle]="{width: getScorePercentage(item.value) + '%', background: getColorForScoreBar(item.value)}"></div>
                 </div>
                 <div class="score-text-outer">
-                  <span class="score-recieved">{{item.value?.score.toFixed(2)}}</span>
-                  <span class="score-total">/ {{item.value?.total}}</span>
+                  <span class="score-recieved">{{item.value.score.toFixed(2)}}</span>
+                  <span class="score-total">/ {{item.value.total}}</span>
                 </div>
               </div>
             </div>
