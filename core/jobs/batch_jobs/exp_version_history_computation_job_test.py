@@ -474,8 +474,7 @@ class ComputeExplorationVersionHistoryJobTests(
             ),
             job_run_result.JobRunResult.as_stderr(
                 'Exploration exp_1 has invalid change list. '
-                'Error: Deleting a state called Some other state which is not '
-                'present in the exploration.. Version: 2'
+                'Error: \'Some other state\'. Version: 2'
             )
         ])
 
@@ -490,7 +489,14 @@ class ComputeExplorationVersionHistoryJobTests(
         snapshot_model.put()
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult.as_stdout('ALL EXPS SUCCESS: 1')
+            job_run_result.JobRunResult.as_stdout('ALL EXPS SUCCESS: 1'),
+            job_run_result.JobRunResult.as_stdout(
+                'EXPS FOR WHICH VERSION HISTORY CANNOT BE COMPUTED SUCCESS: 1'
+            ),
+            job_run_result.JobRunResult.as_stderr(
+                'Version history cannot be computed for exploration '
+                'with ID %s' % (self.EXP_ID_1)
+            )
         ])
 
     # The following tests are to fully cover all branches but most of them
