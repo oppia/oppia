@@ -93,37 +93,6 @@ class ContributorDashboardDebugInitializer():
         self._generate_dummy_new_structures_data()
         self._add_topics_to_classroom(CLASSROOM_NAME, CLASSROOM_URL_FRAGMENT)
 
-    def _make_request(
-        self,
-        method: str,
-        url: str,
-        params: Dict[str, Any] | None = None,
-        headers: Dict[str, Any] | None = None
-        ) -> requests.Response:
-        """Makes a request to the Oppia server."""
-        if params is None:
-            params = {}
-        if headers is None:
-            headers = {}
-
-        response = self.session.request(
-            method, self.base_url + url, headers=headers, params=params)
-
-        return response
-
-    def _sign_in_with_email_and_password(
-            self, email: str, password: str) -> Any:
-        """Signs in with email and password, and returns the token id."""
-        token_id = requests.post(
-            FIREBASE_SIGN_IN_URL,
-            params={'key': 'fake-api-key'},
-            json={
-                'email': email,
-                'password': password
-        }).json()['idToken']
-
-        return token_id
-
     def _sign_up_new_user(self, email: str, username: str) -> None:
         """Sign up a new user based on email and username. The password is
         generated automatically from email.
@@ -158,6 +127,19 @@ class ContributorDashboardDebugInitializer():
         headers = {'Authorization': 'Bearer %s' % token_id}
 
         self._make_request('GET', '/session_begin', headers=headers)
+
+    def _sign_in_with_email_and_password(
+            self, email: str, password: str) -> Any:
+        """Signs in with email and password, and returns the token id."""
+        token_id = requests.post(
+            FIREBASE_SIGN_IN_URL,
+            params={'key': 'fake-api-key'},
+            json={
+                'email': email,
+                'password': password
+        }).json()['idToken']
+
+        return token_id
 
     def _get_csrf_token(self) -> str:
         """Gets the CSRF token."""
@@ -227,3 +209,21 @@ class ContributorDashboardDebugInitializer():
         }
 
         self._make_request('POST', '/adminhandler', params=params)
+
+    def _make_request(
+            self,
+            method: str,
+            url: str,
+            params: Dict[str, Any] | None = None,
+            headers: Dict[str, Any] | None = None
+        ) -> requests.Response:
+        """Makes a request to the Oppia server."""
+        if params is None:
+            params = {}
+        if headers is None:
+            headers = {}
+
+        response = self.session.request(
+            method, self.base_url + url, headers=headers, params=params)
+
+        return response
