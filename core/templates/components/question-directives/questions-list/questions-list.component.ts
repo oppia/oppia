@@ -222,7 +222,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     }
     if (!this.canEditQuestion) {
       this.alertsService.addWarning(
-        'User does not have enough rights to delete the question');
+        'User does not have enough rights to edit the question');
       return;
     }
     this.newQuestionSkillIds = [];

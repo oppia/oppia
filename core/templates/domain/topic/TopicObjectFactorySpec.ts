@@ -25,6 +25,9 @@ import { Subtopic } from './subtopic.model';
 describe('Topic object factory', () => {
   let topicObjectFactory: TopicObjectFactory;
   let _sampleTopic: Topic;
+  let skillSummary1: ShortSkillSummary;
+  let skillSummary2: ShortSkillSummary;
+  let skillSummary3: ShortSkillSummary;
 
   beforeEach(() => {
     topicObjectFactory = TestBed.get(TopicObjectFactory);
@@ -73,6 +76,13 @@ describe('Topic object factory', () => {
       skill_2: 'Description 2',
       skill_3: 'Description 3'
     };
+    skillSummary1 = ShortSkillSummary.create(
+      'skill_1', 'Description 1');
+    skillSummary2 = ShortSkillSummary.create(
+      'skill_2', 'Description 2');
+    skillSummary3 = ShortSkillSummary.create(
+      'skill_3', 'Description 3');
+
     _sampleTopic = topicObjectFactory.create(
       sampleTopicBackendObject, skillIdToDescriptionDict);
   });
@@ -113,7 +123,7 @@ describe('Topic object factory', () => {
   it('should warn user when no skills were added for the diagnostic test',
     () => {
       _sampleTopic._skillSummariesForDiagnosticTest = [];
-      expect(_sampleTopic.validate()).toEqual([
+      expect(_sampleTopic.prepublishValidate()).toEqual([
         'The diagnostic test for the topic should test at least one skill.'
       ]);
     });
@@ -176,10 +186,9 @@ describe('Topic object factory', () => {
 
   it('should be able to correctly update skill Ids for the diagnostic test',
     () => {
-      var skillSummary1 = ShortSkillSummary.create('skill_1', 'Description 1');
-      var skillSummary2 = ShortSkillSummary.create('skill_1', 'Description 1');
       expect(_sampleTopic.getSkillSummariesForDiagnosticTest()).toEqual(
         [skillSummary1]);
+
       _sampleTopic.setSkillSummariesForDiagnosticTest([skillSummary2]);
       expect(_sampleTopic.getSkillSummariesForDiagnosticTest()).toEqual(
         [skillSummary2]);
@@ -187,15 +196,9 @@ describe('Topic object factory', () => {
 
   it('should be able to get all the available skillIds for assignment in the ' +
      'diagnostic test', () => {
-    var shortSkillSummaries1 = ShortSkillSummary.create(
-      'skill_1', 'Description 1');
-    var shortSkillSummaries2 = ShortSkillSummary.create(
-      'skill_2', 'Description 2');
-    var shortSkillSummaries3 = ShortSkillSummary.create(
-      'skill_3', 'Description 3');
-    _sampleTopic._skillSummariesForDiagnosticTest = [shortSkillSummaries1];
+    _sampleTopic._skillSummariesForDiagnosticTest = [skillSummary1];
     expect(_sampleTopic.getAvailableSkillSummariesForDiagnosticTest()).toEqual(
-      [shortSkillSummaries2, shortSkillSummaries3]);
+      [skillSummary2, skillSummary3]);
   });
 
   it('should correctly remove the various array elements', () => {

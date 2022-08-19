@@ -701,7 +701,7 @@ describe('Questions List Component', () => {
       component.editQuestion(null, null, null);
 
       expect(alertsService.addWarning).toHaveBeenCalledWith(
-        'User does not have enough rights to delete the question');
+        'User does not have enough rights to edit the question');
     });
 
     it('should fetch question data from backend and set new ' +
@@ -772,27 +772,21 @@ describe('Questions List Component', () => {
     let questionId = 'qId';
     let skillDescription = 'Skill Description';
 
-    it('should display warning when user does not have rights to delete' +
-      ' a question', () => {
-      component.canEditQuestion = (false);
-      spyOn(alertsService, 'addWarning');
-
-      component.deleteQuestionFromSkill(questionId, skillDescription);
-
-      expect(alertsService.addWarning).toHaveBeenCalledWith(
-        'User does not have enough rights to delete the question');
-    });
-
     it('should delete question when user is in the skill editor',
       fakeAsync(() => {
         component.selectedSkillId = 'skillId1';
         component.deletedQuestionIds = [];
-        component.canEditQuestion = true;
         spyOn(alertsService, 'addSuccessMessage');
-        spyOn(
-          skillBackendApiService,
-          'getTopicNamesWithGivenSkillAssignedForDiagnosticTest'
-        ).and.returnValue(Promise.resolve([]));
+        spyOn(ngbModal, 'open').and.returnValue(
+          {
+            componentInstance: {
+              skillId: 'skillId',
+              canEditQuestion: true,
+              numberOfQuestions: 3
+            },
+            result: Promise.resolve()
+          } as NgbModalRef
+        );
         component.allSkillSummaries = [];
         spyOn(editableQuestionBackendApiService, 'editQuestionSkillLinksAsync')
           .and.returnValue(Promise.resolve());
@@ -800,6 +794,7 @@ describe('Questions List Component', () => {
         component.deleteQuestionFromSkill(questionId, skillDescription);
         tick();
 
+        expect(ngbModal.open).toHaveBeenCalled();
         expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
           'Deleted Question'
         );
@@ -809,12 +804,17 @@ describe('Questions List Component', () => {
       fakeAsync(() => {
         component.selectedSkillId = 'skillId1';
         component.deletedQuestionIds = [];
-        component.canEditQuestion = true;
         spyOn(alertsService, 'addSuccessMessage');
-        spyOn(
-          skillBackendApiService,
-          'getTopicNamesWithGivenSkillAssignedForDiagnosticTest'
-        ).and.returnValue(Promise.resolve([]));
+        spyOn(ngbModal, 'open').and.returnValue(
+          {
+            componentInstance: {
+              skillId: 'skillId',
+              canEditQuestion: true,
+              numberOfQuestions: 3
+            },
+            result: Promise.resolve()
+          } as NgbModalRef
+        );
         component.allSkillSummaries = ([
           ShortSkillSummary.createFromBackendDict({
             skill_id: '1',
@@ -827,69 +827,40 @@ describe('Questions List Component', () => {
         component.deleteQuestionFromSkill(questionId, skillDescription);
         tick();
 
+        expect(ngbModal.open).toHaveBeenCalled();
         expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
           'Deleted Question'
         );
       }));
 
-    it(
-      'should able to delete question when skill is assigned to the ' +
-      'diagnostic test and the question count is greater than 2',
-      fakeAsync(() => {
-        component.selectedSkillId = 'skillId1';
-        component.deletedQuestionIds = [];
-        component.canEditQuestion = true;
-        spyOn(alertsService, 'addInfoMessage');
-        spyOn(
-          skillBackendApiService,
-          'getTopicNamesWithGivenSkillAssignedForDiagnosticTest'
-        ).and.returnValue(Promise.resolve(['topic_name']));
-        component.allSkillSummaries = ([
-          ShortSkillSummary.createFromBackendDict({
-            skill_id: '1',
-            skill_description: 'Skill Description'
-          })
-        ]);
-        spyOn(editableQuestionBackendApiService, 'editQuestionSkillLinksAsync')
-          .and.returnValue(Promise.resolve());
-        component.questionSummariesForOneSkill.length = 3;
+    it('should cancel delete question modal', fakeAsync(() => {
+      component.deletedQuestionIds = [];
+      spyOn(alertsService, 'addInfoMessage');
+      component.allSkillSummaries = ([
+        ShortSkillSummary.createFromBackendDict({
+          skill_id: '1',
+          skill_description: 'Skill Description'
+        })
+      ]);
+      spyOn(ngbModal, 'open').and.returnValue(
+        {
+          componentInstance: {
+            skillId: 'skillId',
+            canEditQuestion: true,
+            numberOfQuestions: 3
+          },
+          result: Promise.reject()
+        } as NgbModalRef
+      );
+      spyOn(editableQuestionBackendApiService, 'editQuestionSkillLinksAsync')
+        .and.returnValue(Promise.resolve());
+      spyOn(component, 'removeQuestionSkillLinkAsync');
 
-        component.deleteQuestionFromSkill(questionId, skillDescription);
-        tick();
-
-        expect(alertsService.addInfoMessage).not.toHaveBeenCalled();
-      }));
-
-    it(
-      'should not be able to delete question when skill is assigned to the ' +
-      'diagnostic test and the question count is less than or equal to 2',
-      fakeAsync(() => {
-        component.selectedSkillId = 'skillId1';
-        component.deletedQuestionIds = [];
-        component.canEditQuestion = true;
-        spyOn(alertsService, 'addInfoMessage');
-        spyOn(
-          skillBackendApiService,
-          'getTopicNamesWithGivenSkillAssignedForDiagnosticTest'
-        ).and.returnValue(Promise.resolve(['topic_name']));
-        component.allSkillSummaries = ([
-          ShortSkillSummary.createFromBackendDict({
-            skill_id: '1',
-            skill_description: 'Skill Description'
-          })
-        ]);
-        spyOn(editableQuestionBackendApiService, 'editQuestionSkillLinksAsync')
-          .and.returnValue(Promise.resolve());
-        component.questionSummariesForOneSkill.length = 2;
-
-        component.deleteQuestionFromSkill(questionId, skillDescription);
-        tick();
-
-        expect(alertsService.addInfoMessage).toHaveBeenCalledWith(
-          'This skill is used as the only diagnostic test skill in the ' +
-          'following topics: topic_name. Please remove this skill from the ' +
-          'diagnostic tests of those topics first.', 7000);
-      }));
+      component.deleteQuestionFromSkill(questionId, skillDescription);
+      tick();
+      expect(ngbModal.open).toHaveBeenCalled();
+      expect(component.removeQuestionSkillLinkAsync).not.toHaveBeenCalled();
+    }));
   });
 
   it('should not remove skill if it is the only one', () => {

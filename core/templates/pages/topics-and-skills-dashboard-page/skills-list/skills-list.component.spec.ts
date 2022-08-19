@@ -363,7 +363,7 @@ describe('Skills List Component', () => {
     tick(500);
   }));
 
-  it('should cancel delete skil modal', () => {
+  it('should cancel delete skill modal', () => {
     mockNgbModal.modal = 'delete_skill';
     mockNgbModal.success = false;
     componentInstance.deleteSkill('test_skill');

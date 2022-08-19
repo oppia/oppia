@@ -134,7 +134,7 @@ describe('Question deletion modal', () => {
 
   it(
     'should not be able to delete questions when skill is assigned to ' +
-    'diagnostic test and questio count is less than 2',
+    'the diagnostic test and question count is less than equal to 2',
     fakeAsync(() => {
       expect(componentInstance.questionDeletionIsAllowed).toBeTrue();
       componentInstance.numberOfQuestions = 2;
@@ -146,7 +146,7 @@ describe('Question deletion modal', () => {
 
   it(
     'should be able to delete questions when skill is assigned to ' +
-    'diagnostic test and questio count greater than 2',
+    'the diagnostic test and question count is greater than 2',
     fakeAsync(() => {
       expect(componentInstance.questionDeletionIsAllowed).toBeTrue();
       componentInstance.numberOfQuestions = 3;
@@ -158,7 +158,7 @@ describe('Question deletion modal', () => {
 
   it(
     'should be able to delete questions when skill is not assigned to ' +
-    'diagnostic test',
+    'the diagnostic test',
     fakeAsync(() => {
       spyOn(
         skillBackendApiService,
