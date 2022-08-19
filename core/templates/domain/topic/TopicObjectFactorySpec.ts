@@ -137,7 +137,7 @@ describe('Topic object factory', () => {
       ShortSkillSummary.create('skill 4', 'description 4'),
     ];
     _sampleTopic._skillSummariesForDiagnosticTest = shortSkillSummaries;
-    expect(_sampleTopic.validate()).toEqual([
+    expect(_sampleTopic.prepublishValidate()).toEqual([
       'The diagnostic test for the topic should test at most 3 skills.'
     ]);
   });

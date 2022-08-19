@@ -503,11 +503,9 @@ def normalize_comma_separated_topic_ids(comma_separated_topic_ids):
     Returns:
         list(str). A list of topic IDs.
     """
-    topic_ids = []
     if not comma_separated_topic_ids:
-        return topic_ids
-    topic_ids = list(comma_separated_topic_ids.split(','))
-    return topic_ids
+        return list([])
+    return list(comma_separated_topic_ids.split(','))
 
 
 class TopicIdToDiagnosticTestSkillIdsHandler(base.BaseHandler):

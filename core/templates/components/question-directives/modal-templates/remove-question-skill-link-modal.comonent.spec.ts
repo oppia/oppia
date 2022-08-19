@@ -1,4 +1,4 @@
-// Copyright 2021 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for Unassign Skill Modal.
+ * @fileoverview Unit tests for Remove Question Modal.
  */
 
 import { ComponentFixture, fakeAsync, TestBed, waitForAsync, tick } from '@angular/core/testing';
@@ -21,7 +21,6 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { AssignedSkillBackendDict, AssignedSkill } from 'domain/skill/assigned-skill.model';
 import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { RemoveQuestionSkillLinkModalComponent } from './remove-question-skill-link-modal.component';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
 
@@ -29,7 +28,6 @@ describe('Question deletion modal', () => {
   let fixture: ComponentFixture<RemoveQuestionSkillLinkModalComponent>;
   let componentInstance: RemoveQuestionSkillLinkModalComponent;
   let ngbActiveModal: NgbActiveModal;
-  let urlInterpolationService: UrlInterpolationService;
   let skillBackendApiService: SkillBackendApiService;
   let skillBackendDictForAddition: AssignedSkillBackendDict = {
     topic_id: 'test_id_1',
@@ -85,8 +83,7 @@ describe('Question deletion modal', () => {
         {
           provide: SkillBackendApiService,
           useClass: MockSkillBackendApiService
-        },
-        UrlInterpolationService
+        }
       ]
     }).compileComponents();
   }));
@@ -96,7 +93,6 @@ describe('Question deletion modal', () => {
     ngbActiveModal = TestBed.inject(NgbActiveModal);
     ngbActiveModal = (ngbActiveModal as unknown) as
       jasmine.SpyObj<NgbActiveModal>;
-    urlInterpolationService = TestBed.inject(UrlInterpolationService);
     skillBackendApiService = TestBed.inject(SkillBackendApiService);
   });
 
@@ -117,13 +113,12 @@ describe('Question deletion modal', () => {
   });
 
   it('should get topic editor url', () => {
-    spyOn(urlInterpolationService, 'interpolateUrl').and
-      .returnValue('test_url');
-    expect(componentInstance.getTopicEditorUrl('topicID')).toEqual('test_url');
+    expect(componentInstance.getTopicEditorUrl('topicID')).toEqual(
+      '/topic_editor/topicID#/');
   });
 
   it(
-    'should not be able to delete questions when user have not enough rights',
+    'should not be able to remove questions when user have not enough rights',
     fakeAsync(() => {
       expect(componentInstance.questionRemovalIsAllowed).toBeTrue();
       componentInstance.canEditQuestion = false;
@@ -133,7 +128,7 @@ describe('Question deletion modal', () => {
     }));
 
   it(
-    'should not be able to delete questions when skill is assigned to ' +
+    'should not be able to remove questions when skill is assigned to ' +
     'the diagnostic test and question count is less than equal to 2',
     fakeAsync(() => {
       expect(componentInstance.questionRemovalIsAllowed).toBeTrue();
@@ -145,7 +140,7 @@ describe('Question deletion modal', () => {
     }));
 
   it(
-    'should be able to delete questions when skill is assigned to ' +
+    'should be able to remove questions when skill is assigned to ' +
     'the diagnostic test and question count is greater than 2',
     fakeAsync(() => {
       expect(componentInstance.questionRemovalIsAllowed).toBeTrue();
@@ -157,7 +152,7 @@ describe('Question deletion modal', () => {
     }));
 
   it(
-    'should be able to delete questions when skill is not assigned to ' +
+    'should be able to remove questions when skill is not assigned to ' +
     'the diagnostic test',
     fakeAsync(() => {
       spyOn(

@@ -768,11 +768,11 @@ describe('Questions List Component', () => {
       .toHaveBeenCalled();
   });
 
-  describe('when deleting question from skill', () => {
+  describe('when removing question from skill', () => {
     let questionId = 'qId';
     let skillDescription = 'Skill Description';
 
-    it('should delete question when user is in the skill editor',
+    it('should remove question when user is in the skill editor',
       fakeAsync(() => {
         component.selectedSkillId = 'skillId1';
         component.deletedQuestionIds = [];
@@ -800,7 +800,7 @@ describe('Questions List Component', () => {
         );
       }));
 
-    it('should delete question when user is not in the skill editor',
+    it('should remove question when user is not in the skill editor',
       fakeAsync(() => {
         component.selectedSkillId = 'skillId1';
         component.deletedQuestionIds = [];
@@ -833,7 +833,7 @@ describe('Questions List Component', () => {
         );
       }));
 
-    it('should cancel delete question modal', fakeAsync(() => {
+    it('should cancel remove question modal', fakeAsync(() => {
       component.deletedQuestionIds = [];
       spyOn(alertsService, 'addInfoMessage');
       component.allSkillSummaries = ([

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for Unassign Skill Modal.
+ * @fileoverview Component for Remove Question Modal.
  */
 
 import { Component } from '@angular/core';
