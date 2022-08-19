@@ -49,7 +49,7 @@ CLASSROOM_NAME = 'math'
 CLASSROOM_URL_FRAGMENT = 'math'
 
 
-class ContributorDashboardDebugRequests():
+class ContributorDashboardDebugInitializer():
     """Client-side requests to help develop for the contributor dashboard."""
 
     def __init__(self, base_url: str) -> None:
@@ -57,7 +57,7 @@ class ContributorDashboardDebugRequests():
         self.base_url = base_url
         self.csrf_token = ''
 
-    def populate_data_for_contributor_dashboard_debug(self) -> None:
+    def populate_debug_data(self) -> None:
         """Populate sample data to help develop for the contributor
         dashboard.
         """

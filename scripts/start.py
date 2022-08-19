@@ -37,6 +37,7 @@ from . import extend_index_yaml # isort:skip  pylint: disable=wrong-import-posit
 from . import servers # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 from core.constants import constants # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from scripts import contributor_dashboard_debug # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 _PARSER = argparse.ArgumentParser(
     description="""
@@ -184,12 +185,11 @@ def main(args: Optional[Sequence[str]] = None) -> None:
             port=PORT_NUMBER_FOR_GAE_SERVER))
 
         if parsed_args.contributor_dashboard_debug:
-            from scripts import contributor_dashboard_debug # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
             debug_requests = (
-                contributor_dashboard_debug.ContributorDashboardDebugRequests(
+                contributor_dashboard_debug.ContributorDashboardDebugInitializer(
                 base_url='http://localhost:%s' % PORT_NUMBER_FOR_GAE_SERVER
             ))
-            debug_requests.populate_data_for_contributor_dashboard_debug()
+            debug_requests.populate_debug_data()
 
         managed_web_browser = (
             None if parsed_args.no_browser else
