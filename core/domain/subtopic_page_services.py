@@ -22,6 +22,7 @@ import copy
 
 from core import feconf
 from core.domain import change_domain
+from core.domain import learner_group_services
 from core.domain import skill_services
 from core.domain import subtopic_page_domain
 from core.domain import topic_fetchers
@@ -324,6 +325,8 @@ def delete_subtopic_page(
     subtopic_models.SubtopicPageModel.get(subtopic_page_id).delete(
         committer_id, feconf.COMMIT_MESSAGE_SUBTOPIC_PAGE_DELETED,
         force_deletion=force_deletion)
+    learner_group_services.remove_subtopic_page_reference_from_learner_groups(
+        topic_id, subtopic_id)
 
 
 def get_topic_ids_from_subtopic_page_ids(

@@ -24,7 +24,6 @@ from core.domain import learner_group_domain
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import subtopic_page_domain
-from core.domain import subtopic_page_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.platform import models
@@ -33,11 +32,14 @@ from typing import List, Optional, Sequence, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
+    from mypy_imports import datastore_services
     from mypy_imports import learner_group_models
     from mypy_imports import user_models
 
 (learner_group_models, user_models) = models.Registry.import_models(
     [models.NAMES.learner_group, models.NAMES.user])
+
+datastore_services = models.Registry.import_datastore_services()
 
 
 def is_learner_group_feature_enabled() -> bool:
@@ -159,7 +161,7 @@ def update_learner_group(
         invite_students_to_learner_group(
             group_id, newly_added_invites)
         remove_invited_students_from_learner_group(
-            group_id, newly_removed_invites)
+            group_id, newly_removed_invites, False)
 
     old_student_ids = set(learner_group_model.student_user_ids)
     new_student_ids = set(student_ids)
@@ -168,7 +170,7 @@ def update_learner_group(
             old_student_ids - new_student_ids
         )
         remove_students_from_learner_group(
-            group_id, newly_removed_students)
+            group_id, newly_removed_students, False)
 
     learner_group_model.title = title
     learner_group_model.description = description
@@ -506,22 +508,29 @@ def add_student_to_learner_group(
 
 def remove_students_from_learner_group(
     group_id: str,
-    user_ids: List[str]
+    user_ids: List[str],
+    update_group: bool
 ) -> None:
     """Removes the given student from the given learner group.
 
     Args:
         group_id: str. The id of the learner group.
         user_ids: List[str]. The id of the students to be removed.
+        update_group: bool. Flag indicating whether to update the
+            learner group or not.
     """
-    learner_group_model = learner_group_models.LearnerGroupModel.get(
-        group_id, strict=True
-    )
+    if update_group:
+        learner_group_model = learner_group_models.LearnerGroupModel.get(
+            group_id, strict=True
+        )
 
-    learner_group_model.student_user_ids = [
-        user_id for user_id in learner_group_model.student_user_ids
-        if user_id not in user_ids
-    ]
+        learner_group_model.student_user_ids = [
+            user_id for user_id in learner_group_model.student_user_ids
+            if user_id not in user_ids
+        ]
+
+        learner_group_model.update_timestamps()
+        learner_group_model.put()
 
     learner_grps_users_models = user_models.LearnerGroupsUserModel.get_multi(
         user_ids)
@@ -539,9 +548,6 @@ def remove_students_from_learner_group(
 
     user_models.LearnerGroupsUserModel.update_timestamps_multi(models_to_put)
     user_models.LearnerGroupsUserModel.put_multi(models_to_put)
-
-    learner_group_model.update_timestamps()
-    learner_group_model.put()
 
 
 def invite_students_to_learner_group(
@@ -578,14 +584,29 @@ def invite_students_to_learner_group(
 
 def remove_invited_students_from_learner_group(
     group_id: str,
-    student_ids: List[str]
+    student_ids: List[str],
+    update_group: bool
 ) -> None:
     """Removes the given invited students from the given learner group.
 
     Args:
         group_id: str. The id of the learner group.
         student_ids: list(str). The ids of the students to remove.
+        update_group: bool. Flag indicating whether to update the
+            learner group or not.
     """
+    if update_group:
+        learner_group_model = learner_group_models.LearnerGroupModel.get(
+            group_id, strict=True
+        )
+        learner_group_model.invited_student_user_ids = [
+            student_id for student_id in
+            learner_group_model.invited_student_user_ids if
+            student_id not in student_ids
+        ]
+        learner_group_model.update_timestamps()
+        learner_group_model.put()
+
     found_models = (
         user_models.LearnerGroupsUserModel.get_multi(student_ids))
 
@@ -599,17 +620,6 @@ def remove_invited_students_from_learner_group(
 
     user_models.LearnerGroupsUserModel.update_timestamps_multi(models_to_put)
     user_models.LearnerGroupsUserModel.put_multi(models_to_put)
-
-    learner_group_model = learner_group_models.LearnerGroupModel.get(
-        group_id, strict=True
-    )
-    learner_group_model.invited_student_user_ids = [
-        student_id for student_id in
-        learner_group_model.invited_student_user_ids if
-        student_id not in student_ids
-    ]
-    learner_group_model.update_timestamps()
-    learner_group_model.put()
 
 
 def get_learner_group_from_model(
@@ -676,53 +686,62 @@ def can_user_be_invited(
     return (True, '')
 
 
-def sync_syllabus_to_stories_and_skills(
-    learner_group: learner_group_domain.LearnerGroup
-) -> learner_group_domain.LearnerGroup:
-    """Synchronizes the assigned syllabus items in the learner group with the
-    stories and skills on oppia server.
+def remove_story_reference_from_learner_groups(story_id: str) -> None:
+    """Removes a given story id from all learner groups that have it's
+    reference.
 
     Args:
-        learner_group: LearnerGroup. Domain object storing the version of
-            learner group prior to sync.
-
-    Returns:
-        learner_group: LearnerGroup. Domain object storing the synced in
-        syllabus.
+        story_id: str. Story id to remove.
     """
-    story_ids = learner_group.story_ids
-    all_valid_stories = [
-        story for story in story_fetchers.get_stories_by_ids(story_ids) if story
-    ]
-    valid_story_ids = [
-        story.id for story in all_valid_stories
-        if story.corresponding_topic_id
-    ]
-
-    learner_group_model = learner_group_models.LearnerGroupModel.get(
-        learner_group.group_id, strict=True
+    found_models: Sequence[learner_group_models.LearnerGroupModel] = (
+        learner_group_models.LearnerGroupModel.get_all().filter(
+            datastore_services.any_of(
+                learner_group_models.LearnerGroupModel.story_ids == story_id
+            )
+        ).fetch()
     )
-    learner_group_model.story_ids = valid_story_ids
 
-    subtopic_page_ids = learner_group.subtopic_page_ids
-    topic_ids = subtopic_page_services.get_topic_ids_from_subtopic_page_ids(
-        subtopic_page_ids)
-    all_topics = topic_fetchers.get_topics_by_ids(topic_ids)
-    valid_subtopic_page_ids: List[str] = []
-    for topic in all_topics:
+    models_to_put = []
+    for model in found_models:
         # Ruling out the possibility of None for mypy type checking.
-        assert topic is not None
-        valid_subtopic_page_ids.extend([
-            '{}:{}'.format(topic.id, subtopic.id) for subtopic in
-            topic.subtopics if '{}:{}'.format(topic.id, subtopic.id) in
-            subtopic_page_ids
-        ])
-    learner_group_model.subtopic_page_ids = valid_subtopic_page_ids
+        assert model is not None
+        model.story_ids.remove(story_id)
+        models_to_put.append(model)
 
-    learner_group_model.update_timestamps()
-    learner_group_model.put()
+    learner_group_models.LearnerGroupModel.update_timestamps_multi(
+        models_to_put)
+    learner_group_models.LearnerGroupModel.put_multi(models_to_put)
 
-    updated_model = learner_group_models.LearnerGroupModel.get(
-        learner_group_model.id, strict=True
+
+def remove_subtopic_page_reference_from_learner_groups(
+    topic_id: str,
+    subtopic_id: int
+) -> None:
+    """Removes a given subtopic page from all learner groups that have it's
+    reference.
+
+    Args:
+        topic_id: str. Id of the topic of the subtopic page.
+        subtopic_id: int. Id of the subtopic of the subtopic page.
+    """
+    subtopic_page_id = '{}:{}'.format(topic_id, subtopic_id)
+
+    learner_group_model_cls = learner_group_models.LearnerGroupModel
+    found_models: Sequence[learner_group_models.LearnerGroupModel] = (
+        learner_group_model_cls.get_all().filter(
+            datastore_services.any_of(
+                learner_group_model_cls.subtopic_page_ids == subtopic_page_id
+            )
+        ).fetch()
     )
-    return get_learner_group_from_model(updated_model)
+
+    models_to_put = []
+    for model in found_models:
+        # Ruling out the possibility of None for mypy type checking.
+        assert model is not None
+        model.subtopic_page_ids.remove(subtopic_page_id)
+        models_to_put.append(model)
+
+    learner_group_models.LearnerGroupModel.update_timestamps_multi(
+        models_to_put)
+    learner_group_models.LearnerGroupModel.put_multi(models_to_put)

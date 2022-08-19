@@ -21,7 +21,7 @@ import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testin
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { AddSyllabusItemsComponent } from './add-syllabus-items.component';
-import { EventToCodes, NavigationService } from 'services/navigation.service';
+import { NavigationService } from 'services/navigation.service';
 import { TranslateService } from '@ngx-translate/core';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
@@ -59,23 +59,6 @@ class MockTranslateService {
 }
 
 class MockNavigationService {
-  KEYBOARD_EVENT_TO_KEY_CODES = {
-    enter: {
-      shiftKeyIsPressed: false,
-      keyCode: 13
-    },
-    tab: {
-      shiftKeyIsPressed: false,
-      keyCode: 9
-    },
-    shiftTab: {
-      shiftKeyIsPressed: true,
-      keyCode: 9
-    }
-  };
-
-  onMenuKeypress(): void {}
-
   openSubmenu(evt: KeyboardEvent, menuName: string): void {}
 
   ACTION_OPEN: string = 'open';
@@ -448,20 +431,5 @@ describe('AddSyllabusItemsComponent', () => {
 
     expect(component.isStoryPartOfAddedSyllabus('story_id_0')).toBe(true);
     expect(component.isStoryPartOfAddedSyllabus('story_id_1')).toBe(false);
-  });
-
-  it('should handle keydown events on menus', () => {
-    let keydownEvent = new KeyboardEvent('click', {
-      shiftKey: true,
-      keyCode: 9
-    });
-
-    expect(component.activeMenuName).toBe('');
-
-    component.onMenuKeypress(keydownEvent, 'category', {
-      shiftTab: 'open',
-    } as EventToCodes);
-
-    expect(component.activeMenuName).toBe('category');
   });
 });

@@ -773,7 +773,7 @@ class LearnerGroupStudentInvitationHandler(base.BaseHandler):
                 learner_group_id, student_user_id, progress_sharing_permission)
         else:
             learner_group_services.remove_invited_students_from_learner_group(
-                learner_group_id, [student_user_id])
+                learner_group_id, [student_user_id], True)
 
         learner_group = learner_group_fetchers.get_learner_group_by_id(
             learner_group_id)

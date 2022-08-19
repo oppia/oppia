@@ -26,7 +26,7 @@ import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
 import { LanguageIdAndText, LanguageUtilService } from
   'domain/utilities/language-util.service';
-import { EventToCodes, NavigationService } from 'services/navigation.service';
+import { NavigationService } from 'services/navigation.service';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import constants from 'assets/constants';
 import { ConstructTranslationIdsService } from
@@ -86,12 +86,10 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
   SEARCH_DROPDOWN_TYPES!: SearchDropDownItems[];
   selectionDetails!: SyllabusSelectionDetails;
   SEARCH_DROPDOWN_CATEGORIES!: SearchDropDownItems[];
-  KEYBOARD_EVENT_TO_KEY_CODES!: {};
   directiveSubscriptions: Subscription = new Subscription();
   searchQuery: string = '';
   searchQueryChanged: Subject<string> = new Subject<string>();
   translationData: Record<string, number> = {};
-  activeMenuName: string = '';
   searchIsInProgress = false;
   syllabusFilter!: LearnerGroupSyllabusFilter;
   debounceTimeout = 1000;
@@ -113,8 +111,6 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.SEARCH_DROPDOWN_CATEGORIES = this.searchDropdownCategories();
-    this.KEYBOARD_EVENT_TO_KEY_CODES = (
-      this.navigationService.KEYBOARD_EVENT_TO_KEY_CODES);
     this.ACTION_OPEN = this.navigationService.ACTION_OPEN;
     this.ACTION_CLOSE = this.navigationService.ACTION_CLOSE;
     this.SUPPORTED_CONTENT_LANGUAGES = (
@@ -383,26 +379,6 @@ export class AddSyllabusItemsComponent implements OnInit, OnDestroy {
       this.learnerGroup &&
       this.learnerGroup.subtopicPageIds.indexOf(subtopicPageId) !== -1
     );
-  }
-
-  /**
-   * Handles keydown events on menus.
-   * @param {KeyboardEvent} evt
-   * @param {String} menuName - name of menu to perform action
-   * on(category/language)
-   * @param {EventToCodes} eventsTobeHandled - Map keyboard events('Enter') to
-   * corresponding actions to be performed(open/close).
-   *
-   * @example
-   *  onMenuKeypress($event, 'category', {enter: 'open'})
-   */
-  onMenuKeypress(
-      evt: KeyboardEvent,
-      menuName: string,
-      eventsTobeHandled: EventToCodes
-  ): void {
-    this.navigationService.onMenuKeypress(evt, menuName, eventsTobeHandled);
-    this.activeMenuName = this.navigationService.activeMenuName;
   }
 
   ngOnDestroy(): void {

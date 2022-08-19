@@ -318,6 +318,34 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
             learner_group_fetchers.get_learner_group_by_id(
                 self.LEARNER_GROUP_ID))
 
+    def test_remove_invited_students_from_learner_group(self) -> None:
+        # Ruling out the possibility of None for mypy type checking.
+        assert self.LEARNER_GROUP_ID is not None
+
+        user_model = user_models.LearnerGroupsUserModel.get(
+            self.STUDENT_ID, strict=True)
+        self.assertEqual(
+            user_model.invited_to_learner_groups_ids,
+            [self.LEARNER_GROUP_ID])
+
+        learner_group_services.invite_students_to_learner_group(
+            'group_id_2', [self.STUDENT_ID])
+
+        user_model = user_models.LearnerGroupsUserModel.get(
+            self.STUDENT_ID, strict=True)
+        self.assertEqual(
+            user_model.invited_to_learner_groups_ids,
+            [self.LEARNER_GROUP_ID, 'group_id_2'])
+
+        learner_group_services.remove_invited_students_from_learner_group(
+            self.LEARNER_GROUP_ID, [self.STUDENT_ID], True)
+
+        user_model = user_models.LearnerGroupsUserModel.get(
+            self.STUDENT_ID, strict=True)
+        self.assertEqual(
+            user_model.invited_to_learner_groups_ids,
+            ['group_id_2'])
+
     def test_invite_students_to_learner_group(self) -> None:
         # Ruling out the possibility of None for mypy type checking.
         assert self.LEARNER_GROUP_ID is not None
@@ -420,7 +448,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
             learner_group.student_user_ids,
             ['student2', 'student3'])
         learner_group_services.remove_students_from_learner_group(
-            self.LEARNER_GROUP_ID, ['student2', 'student3'])
+            self.LEARNER_GROUP_ID, ['student2', 'student3'], True)
 
         learner_group = learner_group_fetchers.get_learner_group_by_id(
             self.LEARNER_GROUP_ID)

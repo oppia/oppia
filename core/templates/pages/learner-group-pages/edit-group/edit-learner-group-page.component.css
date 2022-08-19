@@ -1,9 +1,3 @@
-/*
-  NOTE to developers: We generate RTL CSS from this file in the webpack
-  compilation, here are sme additional rules that can be added to the CSS files:
-  https://rtlcss.com/learn/usage-guide/control-directives .
-*/
-
 .oppia-edit-learner-group {
   text-align: left;
   width: 90%;
