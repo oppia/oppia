@@ -8,9 +8,7 @@
               [removable]="removable"
               (removed)="remove(subjectInterest)">
       {{ subjectInterest }}
-      <mat-icon matChipRemove *ngIf="removable">
-        {{ 'I18N_PREFERENCES_CANCEL_BUTTON' | translate }}
-      </mat-icon>
+      <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
     </mat-chip>
     <input placeholder="{{ 'I18N_PREFERENCES_SUBJECT_INTERESTS_LABEL' | translate }}"
            class="e2e-test-subject-interests-input"
