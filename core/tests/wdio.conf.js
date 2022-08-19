@@ -91,6 +91,22 @@ var suites = {
     './core/tests/webdriverio_desktop/creatorDashboard.js'
   ],
 
+  explorationFeedbackTab: [
+    './core/tests/webdriverio_desktop/explorationFeedbackTab.js'
+  ],
+
+  explorationImprovementsTab: [
+    './core/tests/webdriverio_desktop/explorationImprovementsTab.js'
+  ],
+
+  explorationHistoryTab: [
+    './core/tests/webdriverio_desktop/explorationHistoryTab.js'
+  ],
+
+  explorationStatisticsTab: [
+    './core/tests/webdriverio_desktop/explorationStatisticsTab.js'
+  ],
+
   learner: [
     './core/tests/webdriverio/learnerFlow.js'
   ],

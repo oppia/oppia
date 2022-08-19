@@ -176,8 +176,8 @@ var ExplorationEditorHistoryTab = function() {
        */
       expectNumberOfLinksToMatch: async function(
           totalLinks, addedLinks, deletedLinks) {
-        var COLOR_ADDED = 'rgb(31, 125, 31)';
-        var COLOR_DELETED = 'rgb(178, 34, 34)';
+        var COLOR_ADDED = 'rgb(31,125,31)';
+        var COLOR_DELETED = 'rgb(178,34,34)';
         var totalCount = 0;
         var addedCount = 0;
         var deletedCount = 0;
