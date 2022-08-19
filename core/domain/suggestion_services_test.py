@@ -52,9 +52,10 @@ if MYPY:  # pragma: no cover
     from mypy_imports import suggestion_models
     from mypy_imports import user_models
 
-(suggestion_models, feedback_models, opportunity_models, user_models) = (
+(suggestion_models, feedback_models, opportunity_models,user_models) = (
     models.Registry.import_models(
-        [models.NAMES.suggestion, models.NAMES.feedback, models.NAMES.opportunity,
+        [models.NAMES.suggestion, models.NAMES.feedback,
+        models.NAMES.opportunity,
         models.NAMES.user]
     )
 )
@@ -2212,17 +2213,17 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         for exp in explorations:
             self.publish_exploration(self.owner_id, exp.id)
 
-        self.topic_id = '0'
+        topic_id = '0'
         topic = topic_domain.Topic.create_default_topic(
             self.topic_id, 'topic_name', 'abbrev', 'description', 'fragm')
-        self.skill_id_0 = 'skill_id_0'
-        self.skill_id_1 = 'skill_id_1'
-        self._publish_valid_topic(topic, [self.skill_id_0, self.skill_id_1]) # type: ignore[no-untyped-call]
+        skill_id_0 = 'skill_id_0'
+        skill_id_1 = 'skill_id_1'
+        self._publish_valid_topic(topic, [skill_id_0, skill_id_1]) # type: ignore[no-untyped-call]
 
         self.create_story_for_translation_opportunity( # type: ignore[no-untyped-call]
-            self.owner_id, self.admin_id, 'story_id_0', self.topic_id, '0')
+            self.owner_id, self.admin_id, 'story_id_0', topic_id, '0')
         self.create_story_for_translation_opportunity( # type: ignore[no-untyped-call]
-            self.owner_id, self.admin_id, 'story_id_1', self.topic_id, '1')
+            self.owner_id, self.admin_id, 'story_id_1', topic_id, '1')
 
         change_dict = {
             'cmd': 'add_translation',
@@ -2281,17 +2282,17 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         for exp in explorations:
             self.publish_exploration(self.owner_id, exp.id)
 
-        self.topic_id = '0'
+        topic_id = '0'
         topic = topic_domain.Topic.create_default_topic(
             self.topic_id, 'topic_name', 'abbrev', 'description', 'fragm')
-        self.skill_id_0 = 'skill_id_0'
-        self.skill_id_1 = 'skill_id_1'
-        self._publish_valid_topic(topic, [self.skill_id_0, self.skill_id_1]) # type: ignore[no-untyped-call]
+        skill_id_0 = 'skill_id_0'
+        skill_id_1 = 'skill_id_1'
+        self._publish_valid_topic(topic, [skill_id_0, skill_id_1]) # type: ignore[no-untyped-call]
 
         self.create_story_for_translation_opportunity( # type: ignore[no-untyped-call]
-            self.owner_id, self.admin_id, 'story_id_01', self.topic_id, '0')
+            self.owner_id, self.admin_id, 'story_id_01', topic_id, '0')
         self.create_story_for_translation_opportunity( # type: ignore[no-untyped-call]
-            self.owner_id, self.admin_id, 'story_id_02', self.topic_id, '1')
+            self.owner_id, self.admin_id, 'story_id_02', topic_id, '1')
 
         change_dict = {
             'cmd': 'add_translation',
@@ -2309,7 +2310,6 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
             '1', 1, self.author_id, change_dict, 'description')
-
 
         suggestion_services.update_translation_contribution_stats(
             initial_suggestion, self.author_id, '0', True
