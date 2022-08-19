@@ -96,8 +96,6 @@ ISSUES_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'issues'))
 INTERACTIONS_DIR = (
     os.path.join('extensions', 'interactions'))
-INTERACTIONS_LEGACY_SPECS_FILE_DIR = (
-    os.path.join(INTERACTIONS_DIR, 'legacy_interaction_specs_by_state_version'))
 INTERACTIONS_SPECS_FILE_PATH = (
     os.path.join(INTERACTIONS_DIR, 'interaction_specs.json'))
 RTE_EXTENSIONS_DIR = (
@@ -336,7 +334,7 @@ EARLIEST_SUPPORTED_STATE_SCHEMA_VERSION = 41
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_STATE_SCHEMA_VERSION = 51
+CURRENT_STATE_SCHEMA_VERSION = 52
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
