@@ -36,76 +36,88 @@ from core.domain import suggestion_services
 from core.platform import models
 from core.tests import test_utils
 
+from typing import Any, Dict, Optional, Union
+from typing_extensions import Final
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import suggestion_models
+
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
+
+ChangeType = Dict[
+    str, Union[str, float, Dict[str, Union[str, int, state_domain.StateDict]]]
+]
 
 
 class MockInvalidSuggestion(suggestion_registry.BaseSuggestion):
 
-    def __init__(self):  # pylint: disable=super-init-not-called
+    def __init__(self) -> None:  # pylint: disable=super-init-not-called
         pass
 
 
 class BaseSuggestionUnitTests(test_utils.GenericTestBase):
     """Tests for the BaseSuggestion class."""
 
-    def setUp(self):
-        super(BaseSuggestionUnitTests, self).setUp()
+    def setUp(self) -> None:
+        super().setUp()
         self.base_suggestion = MockInvalidSuggestion()
 
-    def test_base_class_accept_raises_error(self):
-        with self.assertRaisesRegex(
+    def test_base_class_accept_raises_error(self) -> None:
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             NotImplementedError,
             'Subclasses of BaseSuggestion should implement accept.'):
-            self.base_suggestion.accept()
+            self.base_suggestion.accept('test_message')
 
     def test_base_class_get_change_list_for_accepting_suggestion_raises_error(
-            self):
-        with self.assertRaisesRegex(
+        self
+    ) -> None:
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             NotImplementedError,
             'Subclasses of BaseSuggestion should implement '
             'get_change_list_for_accepting_suggestion.'):
             self.base_suggestion.get_change_list_for_accepting_suggestion()
 
-    def test_base_class_pre_accept_validate_raises_error(self):
-        with self.assertRaisesRegex(
+    def test_base_class_pre_accept_validate_raises_error(self) -> None:
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             NotImplementedError,
             'Subclasses of BaseSuggestion should implement'
             ' pre_accept_validate.'):
             self.base_suggestion.pre_accept_validate()
 
-    def test_base_class_populate_old_value_of_change_raises_error(self):
-        with self.assertRaisesRegex(
+    def test_base_class_populate_old_value_of_change_raises_error(self) -> None:
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             NotImplementedError,
             'Subclasses of BaseSuggestion should implement'
             ' populate_old_value_of_change.'):
             self.base_suggestion.populate_old_value_of_change()
 
-    def test_base_class_pre_update_validate_raises_error(self):
-        with self.assertRaisesRegex(
+    def test_base_class_pre_update_validate_raises_error(self) -> None:
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             NotImplementedError,
             'Subclasses of BaseSuggestion should implement'
             ' pre_update_validate.'):
             self.base_suggestion.pre_update_validate({})
 
-    def test_base_class_get_all_html_content_strings(self):
-        with self.assertRaisesRegex(
+    def test_base_class_get_all_html_content_strings(self) -> None:
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             NotImplementedError,
             'Subclasses of BaseSuggestion should implement'
             ' get_all_html_content_strings.'):
             self.base_suggestion.get_all_html_content_strings()
 
-    def test_base_class_get_target_entity_html_strings(self):
-        with self.assertRaisesRegex(
+    def test_base_class_get_target_entity_html_strings(self) -> None:
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             NotImplementedError,
             'Subclasses of BaseSuggestion should implement'
             ' get_target_entity_html_strings.'):
             self.base_suggestion.get_target_entity_html_strings()
 
-    def test_base_class_convert_html_in_suggestion_change(self):
-        def conversion_fn():
+    def test_base_class_convert_html_in_suggestion_change(self) -> None:
+        def conversion_fn(_: str) -> str:
             """Temporary function."""
-            pass
-        with self.assertRaisesRegex(
+            return 'abcd'
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             NotImplementedError,
             'Subclasses of BaseSuggestion should implement'
             ' convert_html_in_suggestion_change.'):
@@ -116,18 +128,18 @@ class BaseSuggestionUnitTests(test_utils.GenericTestBase):
 class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
     """Tests for the SuggestionEditStateContent class."""
 
-    AUTHOR_EMAIL = 'author@example.com'
-    REVIEWER_EMAIL = 'reviewer@example.com'
-    ASSIGNED_REVIEWER_EMAIL = 'assigned_reviewer@example.com'
-    fake_date = datetime.datetime(2016, 4, 10, 0, 0, 0, 0)
+    AUTHOR_EMAIL: Final = 'author@example.com'
+    REVIEWER_EMAIL: Final = 'reviewer@example.com'
+    ASSIGNED_REVIEWER_EMAIL: Final = 'assigned_reviewer@example.com'
+    fake_date: datetime.datetime = datetime.datetime(2016, 4, 10, 0, 0, 0, 0)
 
-    def setUp(self):
-        super(SuggestionEditStateContentUnitTests, self).setUp()
+    def setUp(self) -> None:
+        super().setUp()
 
         self.signup(self.AUTHOR_EMAIL, 'author')
-        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
+        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)  # type: ignore[no-untyped-call]
         self.signup(self.REVIEWER_EMAIL, 'reviewer')
-        self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
+        self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)  # type: ignore[no-untyped-call]
         self.suggestion_dict = {
             'suggestion_id': 'exploration.exp1.thread1',
             'suggestion_type': (
@@ -151,7 +163,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             'edited_by_reviewer': False
         }
 
-    def test_create_suggestion_edit_state_content(self):
+    def test_create_suggestion_edit_state_content(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
 
         observed_suggestion = suggestion_registry.SuggestionEditStateContent(
@@ -166,7 +178,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         self.assertDictEqual(
             observed_suggestion.to_dict(), expected_suggestion_dict)
 
-    def test_validate_suggestion_edit_state_content(self):
+    def test_validate_suggestion_edit_state_content(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
 
         suggestion = suggestion_registry.SuggestionEditStateContent(
@@ -180,7 +192,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.validate()
 
-    def test_get_score_part_helper_methods(self):
+    def test_get_score_part_helper_methods(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
 
         suggestion = suggestion_registry.SuggestionEditStateContent(
@@ -195,7 +207,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         self.assertEqual(suggestion.get_score_type(), 'content')
         self.assertEqual(suggestion.get_score_sub_type(), 'Algebra')
 
-    def test_validate_suggestion_type(self):
+    def test_validate_suggestion_type(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionEditStateContent(
             expected_suggestion_dict['suggestion_id'],
@@ -209,13 +221,13 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.suggestion_type = 'invalid_suggestion_type'
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected suggestion_type to be among allowed choices'
         ):
             suggestion.validate()
 
-    def test_validate_target_type(self):
+    def test_validate_target_type(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionEditStateContent(
             expected_suggestion_dict['suggestion_id'],
@@ -229,13 +241,16 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.target_type = 'invalid_target_type'
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected target_type to be among allowed choices'
         ):
             suggestion.validate()
 
-    def test_validate_target_id(self):
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
+    def test_validate_target_id(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionEditStateContent(
             expected_suggestion_dict['suggestion_id'],
@@ -248,13 +263,16 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.validate()
 
-        suggestion.target_id = 0
-        with self.assertRaisesRegex(
+        suggestion.target_id = 0  # type: ignore[assignment]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'Expected target_id to be a string'
         ):
             suggestion.validate()
 
-    def test_validate_target_version_at_submission(self):
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
+    def test_validate_target_version_at_submission(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionEditStateContent(
             expected_suggestion_dict['suggestion_id'],
@@ -267,14 +285,14 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.validate()
 
-        suggestion.target_version_at_submission = 'invalid_version'
-        with self.assertRaisesRegex(
+        suggestion.target_version_at_submission = 'invalid_version'  # type: ignore[assignment]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected target_version_at_submission to be an int'
         ):
             suggestion.validate()
 
-    def test_validate_status(self):
+    def test_validate_status(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionEditStateContent(
             expected_suggestion_dict['suggestion_id'],
@@ -288,12 +306,15 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.status = 'invalid_status'
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'Expected status to be among allowed choices'
         ):
             suggestion.validate()
 
-    def test_validate_author_id(self):
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
+    def test_validate_author_id(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionEditStateContent(
             expected_suggestion_dict['suggestion_id'],
@@ -306,13 +327,13 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.validate()
 
-        suggestion.author_id = 0
-        with self.assertRaisesRegex(
+        suggestion.author_id = 0  # type: ignore[assignment]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'Expected author_id to be a string'
         ):
             suggestion.validate()
 
-    def test_validate_author_id_format(self):
+    def test_validate_author_id_format(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionEditStateContent(
             expected_suggestion_dict['suggestion_id'],
@@ -329,13 +350,16 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.author_id = ''
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected author_id to be in a valid user ID format'
         ):
             suggestion.validate()
 
-    def test_validate_final_reviewer_id(self):
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
+    def test_validate_final_reviewer_id(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionEditStateContent(
             expected_suggestion_dict['suggestion_id'],
@@ -348,13 +372,13 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.validate()
 
-        suggestion.final_reviewer_id = 1
-        with self.assertRaisesRegex(
+        suggestion.final_reviewer_id = 1  # type: ignore[assignment]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'Expected final_reviewer_id to be a string'
         ):
             suggestion.validate()
 
-    def test_validate_final_reviewer_id_format(self):
+    def test_validate_final_reviewer_id_format(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionEditStateContent(
             expected_suggestion_dict['suggestion_id'],
@@ -371,13 +395,16 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.final_reviewer_id = ''
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected final_reviewer_id to be in a valid user ID format'
         ):
             suggestion.validate()
 
-    def test_validate_score_category(self):
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
+    def test_validate_score_category(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionEditStateContent(
             expected_suggestion_dict['suggestion_id'],
@@ -390,13 +417,13 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.validate()
 
-        suggestion.score_category = 0
-        with self.assertRaisesRegex(
+        suggestion.score_category = 0  # type: ignore[assignment]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'Expected score_category to be a string'
         ):
             suggestion.validate()
 
-    def test_validate_score_category_format(self):
+    def test_validate_score_category_format(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionEditStateContent(
             expected_suggestion_dict['suggestion_id'],
@@ -410,7 +437,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.score_category = 'score.score_type.score_sub_type'
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected score_category to be of the form'
             ' score_type.score_sub_type'
@@ -418,14 +445,14 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             suggestion.validate()
 
         suggestion.score_category = 'invalid_score_category'
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected score_category to be of the form'
             ' score_type.score_sub_type'
         ):
             suggestion.validate()
 
-    def test_validate_score_type(self):
+    def test_validate_score_type(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionEditStateContent(
             expected_suggestion_dict['suggestion_id'],
@@ -439,14 +466,17 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.score_category = 'invalid_score_type.score_sub_type'
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected the first part of score_category to be among allowed'
             ' choices'
         ):
             suggestion.validate()
 
-    def test_validate_change(self):
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
+    def test_validate_change(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionEditStateContent(
             expected_suggestion_dict['suggestion_id'],
@@ -459,13 +489,13 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.validate()
 
-        suggestion.change = {}
-        with self.assertRaisesRegex(
+        suggestion.change = {}  # type: ignore[assignment]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'Expected change to be an ExplorationChange'
         ):
             suggestion.validate()
 
-    def test_validate_score_type_content(self):
+    def test_validate_score_type_content(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionEditStateContent(
             expected_suggestion_dict['suggestion_id'],
@@ -479,13 +509,13 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.score_category = 'question.score_sub_type'
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected the first part of score_category to be content'
         ):
             suggestion.validate()
 
-    def test_validate_change_cmd(self):
+    def test_validate_change_cmd(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionEditStateContent(
             expected_suggestion_dict['suggestion_id'],
@@ -498,12 +528,12 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.change.cmd = 'invalid_cmd'
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'Expected cmd to be edit_state_property'
         ):
             suggestion.validate()
 
-    def test_validate_change_property_name(self):
+    def test_validate_change_property_name(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionEditStateContent(
             expected_suggestion_dict['suggestion_id'],
@@ -516,14 +546,20 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.validate()
 
-        suggestion.change.property_name = 'invalid_property'
-        with self.assertRaisesRegex(
+        # Here, change is of type ExplorationChange and all attributes
+        # on ExplorationChange are created dynamically except cmd, so due
+        # this MyPy is unable to recognize `property_name` as an attribute of
+        # change and throwing `"ExplorationChange" has no attribute
+        # "property_name"` error. Thus to avoid the error, we used ignore here.
+        suggestion.change.property_name = 'invalid_property'  # type: ignore[attr-defined]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'Expected property_name to be content'
         ):
             suggestion.validate()
 
     def test_validate_language_code_fails_when_language_codes_do_not_match(
-            self):
+        self
+    ) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionEditStateContent(
             expected_suggestion_dict['suggestion_id'],
@@ -537,13 +573,13 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.language_code = 'wrong_language_code'
 
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected language_code to be None, received wrong_language_code'
         ):
             suggestion.validate()
 
-    def test_pre_accept_validate_state_name(self):
+    def test_pre_accept_validate_state_name(self) -> None:
         self.save_new_default_exploration('exp1', self.author_id)
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionEditStateContent(
@@ -555,25 +591,30 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['score_category'],
             expected_suggestion_dict['language_code'], False, self.fake_date)
 
-        exp_services.update_exploration(
+        exp_services.update_exploration(  # type: ignore[no-untyped-call]
             self.author_id, 'exp1', [
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_STATE,
                     'state_name': 'State A',
                 })
             ], 'Added state')
-        suggestion.change.state_name = 'State A'
+        # Here, change is of type ExplorationChange and all attributes
+        # on ExplorationChange are created dynamically except cmd, so due
+        # this MyPy is unable to recognize `state_name` as an attribute of
+        # change and throwing `"ExplorationChange" has no attribute
+        # "state_name"` error. Thus to avoid the error, we used ignore here.
+        suggestion.change.state_name = 'State A'  # type: ignore[attr-defined]
 
         suggestion.pre_accept_validate()
 
-        suggestion.change.state_name = 'invalid_state_name'
-        with self.assertRaisesRegex(
+        suggestion.change.state_name = 'invalid_state_name'  # type: ignore[attr-defined]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected invalid_state_name to be a valid state name'
         ):
             suggestion.pre_accept_validate()
 
-    def test_populate_old_value_of_change_with_invalid_state(self):
+    def test_populate_old_value_of_change_with_invalid_state(self) -> None:
         self.save_new_default_exploration('exp1', self.author_id)
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionEditStateContent(
@@ -585,7 +626,12 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['score_category'],
             expected_suggestion_dict['language_code'], False, self.fake_date)
 
-        suggestion.change.state_name = 'invalid_state_name'
+        # Here, change is of type ExplorationChange and all attributes
+        # on ExplorationChange are created dynamically except cmd, so due
+        # this MyPy is unable to recognize `state_name` as an attribute of
+        # change and throwing `"ExplorationChange" has no attribute
+        # "state_name"` error. Thus to avoid the error, we used ignore here.
+        suggestion.change.state_name = 'invalid_state_name'  # type: ignore[attr-defined]
 
         self.assertIsNone(suggestion.change.old_value)
 
@@ -593,7 +639,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
 
         self.assertIsNone(suggestion.change.old_value)
 
-    def test_pre_update_validate_change_cmd(self):
+    def test_pre_update_validate_change_cmd(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionEditStateContent(
             expected_suggestion_dict['suggestion_id'],
@@ -611,14 +657,14 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             'new_value': 'new suggestion content',
             'old_value': None
         }
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'The following extra attributes are present: new_value, '
             'old_value, property_name'
         ):
             suggestion.pre_update_validate(exp_domain.ExplorationChange(change))
 
-    def test_pre_update_validate_change_property_name(self):
+    def test_pre_update_validate_change_property_name(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionEditStateContent(
             expected_suggestion_dict['suggestion_id'],
@@ -636,13 +682,13 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             'new_value': 'new suggestion content',
             'old_value': None
         }
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'The new change property_name must be equal to content'
         ):
             suggestion.pre_update_validate(exp_domain.ExplorationChange(change))
 
-    def test_pre_update_validate_change_state_name(self):
+    def test_pre_update_validate_change_state_name(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionEditStateContent(
             expected_suggestion_dict['suggestion_id'],
@@ -660,13 +706,13 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             'new_value': 'new suggestion content',
             'old_value': None
         }
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'The new change state_name must be equal to state_1'
         ):
             suggestion.pre_update_validate(exp_domain.ExplorationChange(change))
 
-    def test_pre_update_validate_change_new_value(self):
+    def test_pre_update_validate_change_new_value(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionEditStateContent(
             expected_suggestion_dict['suggestion_id'],
@@ -679,21 +725,28 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         new_content = state_domain.SubtitledHtml(
             'content', '<p>new suggestion html</p>').to_dict()
 
-        suggestion.change.new_value = new_content
+        # Here, change is of type ExplorationChange and all attributes
+        # on ExplorationChange are created dynamically except cmd, so due
+        # this MyPy is unable to recognize `new_value` as an attribute of
+        # change and throwing `"ExplorationChange" has no attribute
+        # "new_value"` error. Thus to avoid the error, we used ignore here.
+        suggestion.change.new_value = new_content  # type: ignore[attr-defined]
 
-        change = {
+        change: Dict[
+            str, Union[Optional[str], state_domain.SubtitledHtmlDict]
+        ] = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
             'state_name': suggestion.change.state_name,
             'new_value': new_content,
             'old_value': None
         }
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'The new html must not match the old html'
         ):
             suggestion.pre_update_validate(exp_domain.ExplorationChange(change))
 
-    def test_pre_update_validate_non_equal_change_cmd(self):
+    def test_pre_update_validate_non_equal_change_cmd(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionEditStateContent(
             expected_suggestion_dict['suggestion_id'],
@@ -704,7 +757,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['score_category'],
             expected_suggestion_dict['language_code'], False, self.fake_date)
 
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'The new change cmd must be equal to edit_state_property'
         ):
@@ -714,8 +767,8 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
                 'new_value': 'Exploration 1 Albert title'
             }))
 
-    def test_get_all_html_content_strings(self):
-        change_dict = {
+    def test_get_all_html_content_strings(self) -> None:
+        change_dict: Dict[str, Union[Optional[str], Dict[str, str]]] = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
             'state_name': 'state_1',
@@ -738,7 +791,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         expected_outcome_list = [u'new suggestion content']
         self.assertEqual(expected_outcome_list, actual_outcome_list)
 
-    def test_convert_html_in_suggestion_change(self):
+    def test_convert_html_in_suggestion_change(self) -> None:
         html_content = (
             '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
             'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
@@ -748,7 +801,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             'amp;quot;svg_filename&amp;quot;: &amp;quot;&amp;quot;}"></oppia'
             '-noninteractive-math>')
 
-        change = {
+        change: Dict[str, Union[str, Dict[str, str]]] = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
             'state_name': 'Introduction',
@@ -773,11 +826,15 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         suggestion.convert_html_in_suggestion_change(
             html_validation_service.
             add_math_content_to_math_rte_components)
+        # Ruling out the possibility of any other type for mypy type checking.
+        assert isinstance(suggestion.change.old_value, dict)
         self.assertEqual(
             suggestion.change.old_value['html'], expected_html_content)
 
-    def test_get_target_entity_html_strings_returns_expected_strings(self):
-        change_dict = {
+    def test_get_target_entity_html_strings_returns_expected_strings(
+        self
+    ) -> None:
+        change_dict: Dict[str, Union[str, Dict[str, str]]] = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
             'state_name': 'state_1',
@@ -803,8 +860,8 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         expected_outcome_list = [u'Old content.']
         self.assertEqual(expected_outcome_list, actual_outcome_list)
 
-    def test_get_target_entity_html_with_none_old_value(self):
-        change_dict = {
+    def test_get_target_entity_html_with_none_old_value(self) -> None:
+        change_dict: Dict[str, Union[Optional[str], Dict[str, str]]] = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
             'state_name': 'state_1',
@@ -830,18 +887,18 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
 class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
     """Tests for the SuggestionEditStateContent class."""
 
-    AUTHOR_EMAIL = 'author@example.com'
-    REVIEWER_EMAIL = 'reviewer@example.com'
-    ASSIGNED_REVIEWER_EMAIL = 'assigned_reviewer@example.com'
-    fake_date = datetime.datetime(2016, 4, 10, 0, 0, 0, 0)
+    AUTHOR_EMAIL: Final = 'author@example.com'
+    REVIEWER_EMAIL: Final = 'reviewer@example.com'
+    ASSIGNED_REVIEWER_EMAIL: Final = 'assigned_reviewer@example.com'
+    fake_date: datetime.datetime = datetime.datetime(2016, 4, 10, 0, 0, 0, 0)
 
-    def setUp(self):
-        super(SuggestionTranslateContentUnitTests, self).setUp()
+    def setUp(self) -> None:
+        super().setUp()
 
         self.signup(self.AUTHOR_EMAIL, 'author')
-        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
+        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)  # type: ignore[no-untyped-call]
         self.signup(self.REVIEWER_EMAIL, 'reviewer')
-        self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
+        self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)  # type: ignore[no-untyped-call]
         self.suggestion_dict = {
             'suggestion_id': 'exploration.exp1.thread1',
             'suggestion_type': (
@@ -867,7 +924,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             'edited_by_reviewer': False
         }
 
-    def test_pre_update_validate_fails_for_invalid_change_cmd(self):
+    def test_pre_update_validate_fails_for_invalid_change_cmd(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionTranslateContent(
             expected_suggestion_dict['suggestion_id'],
@@ -876,20 +933,21 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False,
+            self.fake_date)
 
         change = {
             'cmd': exp_domain.CMD_ADD_STATE,
             'state_name': 'Introduction'
         }
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'The new change cmd must be equal to %s' % (
                 exp_domain.CMD_ADD_WRITTEN_TRANSLATION)
         ):
             suggestion.pre_update_validate(exp_domain.ExplorationChange(change))
 
-    def test_pre_update_validate_change_state_name(self):
+    def test_pre_update_validate_change_state_name(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionTranslateContent(
             expected_suggestion_dict['suggestion_id'],
@@ -898,7 +956,8 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False,
+            self.fake_date)
         change = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': 'State 1',
@@ -908,13 +967,13 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             'translation_html': '<p>This is the updated translated html.</p>',
             'data_format': 'html'
         }
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'The new change state_name must be equal to Introduction'
         ):
             suggestion.pre_update_validate(exp_domain.ExplorationChange(change))
 
-    def test_pre_update_validate_change_language_code(self):
+    def test_pre_update_validate_change_language_code(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionTranslateContent(
             expected_suggestion_dict['suggestion_id'],
@@ -923,7 +982,8 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False,
+            self.fake_date)
         change = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': 'Introduction',
@@ -933,13 +993,13 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             'translation_html': '<p>This is the updated translated html.</p>',
             'data_format': 'html'
         }
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'The language code must be equal to hi'
         ):
             suggestion.pre_update_validate(exp_domain.ExplorationChange(change))
 
-    def test_pre_update_validate_change_content_html(self):
+    def test_pre_update_validate_change_content_html(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionTranslateContent(
             expected_suggestion_dict['suggestion_id'],
@@ -948,7 +1008,8 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'],
-            expected_suggestion_dict['language_code'], self.fake_date)
+            expected_suggestion_dict['language_code'], False,
+            self.fake_date)
         change = {
             'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'state_name': 'Introduction',
@@ -958,7 +1019,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             'translation_html': '<p>This is the updated translated html.</p>',
             'data_format': 'html'
         }
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'The new change content_html must be equal to <p>This is a ' +
             'content.</p>'
@@ -966,7 +1027,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             suggestion.pre_update_validate(
                 exp_domain.ExplorationChange(change))
 
-    def test_create_suggestion_add_translation(self):
+    def test_create_suggestion_add_translation(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
 
         observed_suggestion = suggestion_registry.SuggestionTranslateContent(
@@ -981,7 +1042,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         self.assertDictEqual(
             observed_suggestion.to_dict(), expected_suggestion_dict)
 
-    def test_validate_suggestion_add_translation(self):
+    def test_validate_suggestion_add_translation(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
 
         suggestion = suggestion_registry.SuggestionTranslateContent(
@@ -995,7 +1056,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.validate()
 
-    def test_get_score_part_helper_methods(self):
+    def test_get_score_part_helper_methods(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
 
         suggestion = suggestion_registry.SuggestionTranslateContent(
@@ -1010,7 +1071,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         self.assertEqual(suggestion.get_score_type(), 'translation')
         self.assertEqual(suggestion.get_score_sub_type(), 'Algebra')
 
-    def test_validate_suggestion_type(self):
+    def test_validate_suggestion_type(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionTranslateContent(
             expected_suggestion_dict['suggestion_id'],
@@ -1024,13 +1085,13 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.suggestion_type = 'invalid_suggestion_type'
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected suggestion_type to be among allowed choices'
         ):
             suggestion.validate()
 
-    def test_validate_target_type(self):
+    def test_validate_target_type(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionTranslateContent(
             expected_suggestion_dict['suggestion_id'],
@@ -1044,13 +1105,16 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.target_type = 'invalid_target_type'
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected target_type to be among allowed choices'
         ):
             suggestion.validate()
 
-    def test_validate_target_id(self):
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
+    def test_validate_target_id(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionTranslateContent(
             expected_suggestion_dict['suggestion_id'],
@@ -1063,13 +1127,16 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.validate()
 
-        suggestion.target_id = 0
-        with self.assertRaisesRegex(
+        suggestion.target_id = 0  # type: ignore[assignment]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'Expected target_id to be a string'
         ):
             suggestion.validate()
 
-    def test_validate_target_version_at_submission(self):
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
+    def test_validate_target_version_at_submission(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionTranslateContent(
             expected_suggestion_dict['suggestion_id'],
@@ -1082,14 +1149,14 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.validate()
 
-        suggestion.target_version_at_submission = 'invalid_version'
-        with self.assertRaisesRegex(
+        suggestion.target_version_at_submission = 'invalid_version'  # type: ignore[assignment]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected target_version_at_submission to be an int'
         ):
             suggestion.validate()
 
-    def test_validate_status(self):
+    def test_validate_status(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionTranslateContent(
             expected_suggestion_dict['suggestion_id'],
@@ -1103,12 +1170,15 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.status = 'invalid_status'
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'Expected status to be among allowed choices'
         ):
             suggestion.validate()
 
-    def test_validate_author_id(self):
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
+    def test_validate_author_id(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionTranslateContent(
             expected_suggestion_dict['suggestion_id'],
@@ -1121,13 +1191,13 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.validate()
 
-        suggestion.author_id = 0
-        with self.assertRaisesRegex(
+        suggestion.author_id = 0  # type: ignore[assignment]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'Expected author_id to be a string'
         ):
             suggestion.validate()
 
-    def test_validate_author_id_format(self):
+    def test_validate_author_id_format(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionTranslateContent(
             expected_suggestion_dict['suggestion_id'],
@@ -1141,13 +1211,16 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.author_id = ''
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected author_id to be in a valid user ID format.'
         ):
             suggestion.validate()
 
-    def test_validate_final_reviewer_id(self):
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
+    def test_validate_final_reviewer_id(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionTranslateContent(
             expected_suggestion_dict['suggestion_id'],
@@ -1160,13 +1233,13 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.validate()
 
-        suggestion.final_reviewer_id = 1
-        with self.assertRaisesRegex(
+        suggestion.final_reviewer_id = 1  # type: ignore[assignment]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'Expected final_reviewer_id to be a string'
         ):
             suggestion.validate()
 
-    def test_validate_final_reviewer_id_format(self):
+    def test_validate_final_reviewer_id_format(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionTranslateContent(
             expected_suggestion_dict['suggestion_id'],
@@ -1180,13 +1253,16 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.final_reviewer_id = ''
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected final_reviewer_id to be in a valid user ID format'
         ):
             suggestion.validate()
 
-    def test_validate_score_category(self):
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
+    def test_validate_score_category(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionTranslateContent(
             expected_suggestion_dict['suggestion_id'],
@@ -1199,13 +1275,13 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.validate()
 
-        suggestion.score_category = 0
-        with self.assertRaisesRegex(
+        suggestion.score_category = 0  # type: ignore[assignment]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'Expected score_category to be a string'
         ):
             suggestion.validate()
 
-    def test_validate_score_category_format(self):
+    def test_validate_score_category_format(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionTranslateContent(
             expected_suggestion_dict['suggestion_id'],
@@ -1219,7 +1295,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.score_category = 'score.score_type.score_sub_type'
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected score_category to be of the form'
             ' score_type.score_sub_type'
@@ -1227,14 +1303,14 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             suggestion.validate()
 
         suggestion.score_category = 'invalid_score_category'
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected score_category to be of the form'
             ' score_type.score_sub_type'
         ):
             suggestion.validate()
 
-    def test_validate_score_type(self):
+    def test_validate_score_type(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionTranslateContent(
             expected_suggestion_dict['suggestion_id'],
@@ -1248,14 +1324,17 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.score_category = 'invalid_score_type.score_sub_type'
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected the first part of score_category to be among allowed'
             ' choices'
         ):
             suggestion.validate()
 
-    def test_validate_change(self):
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
+    def test_validate_change(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionTranslateContent(
             expected_suggestion_dict['suggestion_id'],
@@ -1268,13 +1347,13 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.validate()
 
-        suggestion.change = {}
-        with self.assertRaisesRegex(
+        suggestion.change = {}  # type: ignore[assignment]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'Expected change to be an ExplorationChange'
         ):
             suggestion.validate()
 
-    def test_validate_score_type_translation(self):
+    def test_validate_score_type_translation(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionTranslateContent(
             expected_suggestion_dict['suggestion_id'],
@@ -1288,13 +1367,13 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.score_category = 'question.score_sub_type'
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected the first part of score_category to be translation'
         ):
             suggestion.validate()
 
-    def test_validate_change_cmd(self):
+    def test_validate_change_cmd(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionTranslateContent(
             expected_suggestion_dict['suggestion_id'],
@@ -1308,13 +1387,14 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.change.cmd = 'invalid_cmd'
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'Expected cmd to be add_written_translation'
         ):
             suggestion.validate()
 
     def test_validate_language_code_fails_when_language_codes_do_not_match(
-            self):
+        self
+    ) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionTranslateContent(
             expected_suggestion_dict['suggestion_id'],
@@ -1331,15 +1411,19 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.language_code = 'wrong_language_code'
 
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected language_code to be %s, '
             'received wrong_language_code' % expected_language_code
         ):
             suggestion.validate()
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_validate_language_code_fails_when_language_code_is_set_to_none(
-            self):
+        self
+    ) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionTranslateContent(
             expected_suggestion_dict['suggestion_id'],
@@ -1351,14 +1435,16 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['language_code'], False, self.fake_date)
         suggestion.validate()
 
-        suggestion.language_code = None
+        suggestion.language_code = None  # type: ignore[assignment]
 
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'language_code cannot be None'
         ):
             suggestion.validate()
 
-    def test_validate_change_with_invalid_language_code_fails_validation(self):
+    def test_validate_change_with_invalid_language_code_fails_validation(
+        self
+    ) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionTranslateContent(
             expected_suggestion_dict['suggestion_id'],
@@ -1371,13 +1457,18 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.validate()
 
-        suggestion.change.language_code = 'invalid_code'
-        with self.assertRaisesRegex(
+        # Here, change is of type ExplorationChange and all attributes
+        # on ExplorationChange are created dynamically except cmd, so due
+        # this MyPy is unable to recognize `language_code` as an attribute
+        # of change and throwing `"ExplorationChange" has no attribute
+        # "language_code"` error. Thus to avoid the error, we used ignore here.
+        suggestion.change.language_code = 'invalid_code'  # type: ignore[attr-defined]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'Invalid language_code: invalid_code'
         ):
             suggestion.validate()
 
-    def test_pre_accept_validate_state_name(self):
+    def test_pre_accept_validate_state_name(self) -> None:
         self.save_new_default_exploration('exp1', self.author_id)
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionTranslateContent(
@@ -1389,7 +1480,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['score_category'],
             expected_suggestion_dict['language_code'], False, self.fake_date)
 
-        exp_services.update_exploration(
+        exp_services.update_exploration(  # type: ignore[no-untyped-call]
             self.author_id, 'exp1', [
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_STATE,
@@ -1405,18 +1496,23 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
                     'state_name': 'State A',
                 })
             ], 'Added state')
-        suggestion.change.state_name = 'State A'
+        # Here, change is of type ExplorationChange and all attributes
+        # on ExplorationChange are created dynamically except cmd, so due
+        # this MyPy is unable to recognize `state_name` as an attribute of
+        # change and throwing `"ExplorationChange" has no attribute
+        # "state_name"` error. Thus to avoid the error, we used ignore here.
+        suggestion.change.state_name = 'State A'  # type: ignore[attr-defined]
 
         suggestion.pre_accept_validate()
 
-        suggestion.change.state_name = 'invalid_state_name'
-        with self.assertRaisesRegex(
+        suggestion.change.state_name = 'invalid_state_name'  # type: ignore[attr-defined]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected invalid_state_name to be a valid state name'
         ):
             suggestion.pre_accept_validate()
 
-    def test_accept_suggestion_adds_translation_in_exploration(self):
+    def test_accept_suggestion_adds_translation_in_exploration(self) -> None:
         self.save_new_default_exploration('exp1', self.author_id)
         exploration = exp_fetchers.get_exploration_by_id('exp1')
         self.assertEqual(exploration.get_translation_counts(), {})
@@ -1437,7 +1533,9 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             'hi': 1
         })
 
-    def test_accept_suggestion_with_set_of_string_adds_translation(self):
+    def test_accept_suggestion_with_set_of_string_adds_translation(
+        self
+    ) -> None:
         self.save_new_default_exploration('exp1', self.author_id)
         exploration = exp_fetchers.get_exploration_by_id('exp1')
         self.assertEqual(exploration.get_translation_counts(), {})
@@ -1467,7 +1565,9 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             'hi': 1
         })
 
-    def test_accept_suggestion_with_psedonymous_author_adds_translation(self):
+    def test_accept_suggestion_with_psedonymous_author_adds_translation(
+        self
+    ) -> None:
         self.save_new_default_exploration('exp1', self.author_id)
 
         exploration = exp_fetchers.get_exploration_by_id('exp1')
@@ -1492,7 +1592,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             'hi': 1
         })
 
-    def test_get_all_html_content_strings(self):
+    def test_get_all_html_content_strings(self) -> None:
         suggestion = suggestion_registry.SuggestionTranslateContent(
             self.suggestion_dict['suggestion_id'],
             self.suggestion_dict['target_id'],
@@ -1508,7 +1608,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             u'<p>This is translated html.</p>', u'<p>This is a content.</p>']
         self.assertEqual(expected_outcome_list, actual_outcome_list)
 
-    def test_get_all_html_content_strings_for_content_lists(self):
+    def test_get_all_html_content_strings_for_content_lists(self) -> None:
         suggestion = suggestion_registry.SuggestionTranslateContent(
             self.suggestion_dict['suggestion_id'],
             self.suggestion_dict['target_id'],
@@ -1533,7 +1633,9 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             'translated text1', 'translated text2', 'text1', 'text2']
         self.assertEqual(expected_outcome_list, actual_outcome_list)
 
-    def test_get_target_entity_html_strings_returns_expected_strings(self):
+    def test_get_target_entity_html_strings_returns_expected_strings(
+        self
+    ) -> None:
         suggestion = suggestion_registry.SuggestionTranslateContent(
             self.suggestion_dict['suggestion_id'],
             self.suggestion_dict['target_id'],
@@ -1547,7 +1649,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         expected_outcome_list = [self.suggestion_dict['change']['content_html']]
         self.assertEqual(expected_outcome_list, actual_outcome_list)
 
-    def test_convert_html_in_suggestion_change(self):
+    def test_convert_html_in_suggestion_change(self) -> None:
         html_content = (
             '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
             'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
@@ -1582,18 +1684,18 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
 class SuggestionAddQuestionTest(test_utils.GenericTestBase):
     """Tests for the SuggestionAddQuestion class."""
 
-    AUTHOR_EMAIL = 'author@example.com'
-    REVIEWER_EMAIL = 'reviewer@example.com'
-    ASSIGNED_REVIEWER_EMAIL = 'assigned_reviewer@example.com'
-    fake_date = datetime.datetime(2016, 4, 10, 0, 0, 0, 0)
+    AUTHOR_EMAIL: Final = 'author@example.com'
+    REVIEWER_EMAIL: Final = 'reviewer@example.com'
+    ASSIGNED_REVIEWER_EMAIL: Final = 'assigned_reviewer@example.com'
+    fake_date: datetime.datetime = datetime.datetime(2016, 4, 10, 0, 0, 0, 0)
 
-    def setUp(self):
-        super(SuggestionAddQuestionTest, self).setUp()
+    def setUp(self) -> None:
+        super().setUp()
 
         self.signup(self.AUTHOR_EMAIL, 'author')
-        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
+        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)  # type: ignore[no-untyped-call]
         self.signup(self.REVIEWER_EMAIL, 'reviewer')
-        self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
+        self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)  # type: ignore[no-untyped-call]
         self.suggestion_dict = {
             'suggestion_id': 'skill1.thread1',
             'suggestion_type': feconf.SUGGESTION_TYPE_ADD_QUESTION,
@@ -1623,7 +1725,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'edited_by_reviewer': False
         }
 
-    def test_create_suggestion_add_question(self):
+    def test_create_suggestion_add_question(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
 
         observed_suggestion = suggestion_registry.SuggestionAddQuestion(
@@ -1638,7 +1740,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         self.assertDictEqual(
             observed_suggestion.to_dict(), expected_suggestion_dict)
 
-    def test_validate_suggestion_edit_state_content(self):
+    def test_validate_suggestion_edit_state_content(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
 
         suggestion = suggestion_registry.SuggestionAddQuestion(
@@ -1652,7 +1754,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         suggestion.validate()
 
-    def test_get_score_part_helper_methods(self):
+    def test_get_score_part_helper_methods(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
 
         suggestion = suggestion_registry.SuggestionAddQuestion(
@@ -1667,7 +1769,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         self.assertEqual(suggestion.get_score_type(), 'question')
         self.assertEqual(suggestion.get_score_sub_type(), 'topic_1')
 
-    def test_validate_score_type(self):
+    def test_validate_score_type(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
 
         suggestion = suggestion_registry.SuggestionAddQuestion(
@@ -1683,13 +1785,16 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         suggestion.score_category = 'content.score_sub_type'
 
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected the first part of score_category to be "question"'
         ):
             suggestion.validate()
 
-    def test_validate_change_type(self):
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
+    def test_validate_change_type(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
 
         suggestion = suggestion_registry.SuggestionAddQuestion(
@@ -1703,15 +1808,15 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         suggestion.validate()
 
-        suggestion.change = 'invalid_change'
+        suggestion.change = 'invalid_change'  # type: ignore[assignment]
 
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected change to be an instance of QuestionSuggestionChange'
         ):
             suggestion.validate()
 
-    def test_validate_change_cmd(self):
+    def test_validate_change_cmd(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
 
         suggestion = suggestion_registry.SuggestionAddQuestion(
@@ -1727,12 +1832,12 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         suggestion.change.cmd = None
 
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'Expected change to contain cmd'
         ):
             suggestion.validate()
 
-    def test_validate_change_cmd_type(self):
+    def test_validate_change_cmd_type(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
 
         suggestion = suggestion_registry.SuggestionAddQuestion(
@@ -1748,13 +1853,13 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         suggestion.change.cmd = 'invalid_cmd'
 
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected cmd to be create_new_fully_specified_question'
         ):
             suggestion.validate()
 
-    def test_validate_change_question_dict(self):
+    def test_validate_change_question_dict(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
 
         suggestion = suggestion_registry.SuggestionAddQuestion(
@@ -1768,14 +1873,19 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         suggestion.validate()
 
-        suggestion.change.question_dict = None
+        # Here, change is of type QuestionSuggestionChange and all attributes
+        # on QuestionSuggestionChange are created dynamically except cmd, so due
+        # this MyPy is unable to recognize `question_dict` as an attribute of
+        # change and throwing `"ExplorationChange" has no attribute "skill_id"`
+        # error. Thus to avoid the error, we used ignore here.
+        suggestion.change.question_dict = None  # type: ignore[attr-defined]
 
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'Expected change to contain question_dict'
         ):
             suggestion.validate()
 
-    def test_validate_change_question_state_data_schema_version(self):
+    def test_validate_change_question_state_data_schema_version(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
 
         suggestion = suggestion_registry.SuggestionAddQuestion(
@@ -1793,7 +1903,10 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         # directly since pylint produces unsupported-assignment-operation
         # error. The detailed analysis for the same can be checked
         # in this issue: https://github.com/oppia/oppia/issues/7008.
-        question_dict = suggestion.change.question_dict
+        assert isinstance(suggestion.change.question_dict, dict)
+        question_dict: question_domain.QuestionDict = (
+            suggestion.change.question_dict
+        )
         question_dict['question_state_data_schema_version'] = 0
         suggestion.change.question_dict = question_dict
 
@@ -1804,7 +1917,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         ):
             suggestion.validate()
 
-    def test_validate_change_skill_difficulty_none(self):
+    def test_validate_change_skill_difficulty_none(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionAddQuestion(
             expected_suggestion_dict['suggestion_id'],
@@ -1816,14 +1929,19 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['language_code'], False, self.fake_date)
         suggestion.validate()
 
-        suggestion.change.skill_difficulty = None
+        # Here, change is of type QuestionSuggestionChange and all attributes
+        # on QuestionSuggestionChange are created dynamically except cmd, so due
+        # this MyPy is unable to recognize `skill_difficulty` as an attribute of
+        # change and throwing `"ExplorationChange" has no attribute "skill_id"`
+        # error. Thus to avoid the error, we used ignore here.
+        suggestion.change.skill_difficulty = None  # type: ignore[attr-defined]
 
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'Expected change to contain skill_difficulty'
         ):
             suggestion.validate()
 
-    def test_validate_change_skill_difficulty_invalid_value(self):
+    def test_validate_change_skill_difficulty_invalid_value(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionAddQuestion(
             expected_suggestion_dict['suggestion_id'],
@@ -1835,15 +1953,20 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['language_code'], False, self.fake_date)
         suggestion.validate()
 
-        suggestion.change.skill_difficulty = 0.4
+        # Here, change is of type QuestionSuggestionChange and all attributes
+        # on QuestionSuggestionChange are created dynamically except cmd, so due
+        # this MyPy is unable to recognize `skill_difficulty` as an attribute of
+        # change and throwing `"QuestionSuggestionChange" has no attribute
+        # "skill_id"` error. Thus to avoid the error, we used ignore here.
+        suggestion.change.skill_difficulty = 0.4  # type: ignore[attr-defined]
 
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected change skill_difficulty to be one of '
         ):
             suggestion.validate()
 
-    def test_pre_accept_validate_change_skill_id(self):
+    def test_pre_accept_validate_change_skill_id(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
 
         suggestion = suggestion_registry.SuggestionAddQuestion(
@@ -1856,19 +1979,24 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['language_code'], False, self.fake_date)
 
         skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(skill_id, self.author_id, description='description')
-        suggestion.change.skill_id = skill_id
+        self.save_new_skill(skill_id, self.author_id, description='description')  # type: ignore[no-untyped-call]
+        # Here, change is of type QuestionSuggestionChange and all attributes
+        # on QuestionSuggestionChange are created dynamically except cmd, so due
+        # this MyPy is unable to recognize `skill_id` as an attribute of change
+        # and throwing `"QuestionSuggestionChange" has no attribute "skill_id"`
+        # error. Thus to avoid the error, we used ignore here.
+        suggestion.change.skill_id = skill_id  # type: ignore[attr-defined]
 
         suggestion.pre_accept_validate()
 
-        suggestion.change.skill_id = None
+        suggestion.change.skill_id = None  # type: ignore[attr-defined]
 
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'Expected change to contain skill_id'
         ):
             suggestion.pre_accept_validate()
 
-    def test_pre_accept_validate_change_invalid_skill_id(self):
+    def test_pre_accept_validate_change_invalid_skill_id(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
 
         suggestion = suggestion_registry.SuggestionAddQuestion(
@@ -1881,19 +2009,24 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['language_code'], False, self.fake_date)
 
         skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(skill_id, self.author_id, description='description')
-        suggestion.change.skill_id = skill_id
+        self.save_new_skill(skill_id, self.author_id, description='description')  # type: ignore[no-untyped-call]
+        # Here, change is of type QuestionSuggestionChange and all attributes
+        # on QuestionSuggestionChange are created dynamically except cmd, so due
+        # this MyPy is unable to recognize `skill_id` as an attribute of change
+        # and throwing `"QuestionSuggestionChange" has no attribute "skill_id"`
+        # error. Thus to avoid the error, we used ignore here.
+        suggestion.change.skill_id = skill_id  # type: ignore[attr-defined]
 
         suggestion.pre_accept_validate()
 
-        suggestion.change.skill_id = skill_services.get_new_skill_id()
+        suggestion.change.skill_id = skill_services.get_new_skill_id()  # type: ignore[attr-defined]
 
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'The skill with the given id doesn\'t exist.'
         ):
             suggestion.pre_accept_validate()
 
-    def test_get_change_list_for_accepting_suggestion(self):
+    def test_get_change_list_for_accepting_suggestion(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
 
         suggestion = suggestion_registry.SuggestionAddQuestion(
@@ -1905,9 +2038,13 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['score_category'],
             expected_suggestion_dict['language_code'], False, self.fake_date)
 
-        self.assertIsNone(suggestion.get_change_list_for_accepting_suggestion())
+        # Method `get_change_list_for_accepting_suggestion` does not return any
+        # value but for testing purposes we are still comparing it's return
+        # value with None which causes MyPy to throw error. Thus to avoid the
+        # error, we used ignore here.
+        self.assertIsNone(suggestion.get_change_list_for_accepting_suggestion())  # type: ignore[func-returns-value]
 
-    def test_populate_old_value_of_change(self):
+    def test_populate_old_value_of_change(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
 
         suggestion = suggestion_registry.SuggestionAddQuestion(
@@ -1919,9 +2056,13 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['score_category'],
             expected_suggestion_dict['language_code'], False, self.fake_date)
 
-        self.assertIsNone(suggestion.populate_old_value_of_change())
+        # Method `populate_old_value_of_change` does not return any value but
+        # for testing purpose we are still comparing it's return value with None
+        # which causes MyPy to throw error. Thus to avoid the error, we used
+        # ignore here.
+        self.assertIsNone(suggestion.populate_old_value_of_change())  # type: ignore[func-returns-value]
 
-    def test_cannot_accept_suggestion_with_invalid_skill_id(self):
+    def test_cannot_accept_suggestion_with_invalid_skill_id(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
 
         suggestion = suggestion_registry.SuggestionAddQuestion(
@@ -1933,15 +2074,20 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['score_category'],
             expected_suggestion_dict['language_code'], False, self.fake_date)
 
-        suggestion.change.skill_id = skill_services.get_new_skill_id()
+        # Here, change is of type QuestionSuggestionChange and all attributes
+        # on QuestionSuggestionChange are created dynamically except cmd, so due
+        # this MyPy is unable to recognize `skill_id` as an attribute of change
+        # and throwing `"QuestionSuggestionChange" has no attribute "skill_id"`
+        # error. Thus to avoid the error, we used ignore here.
+        suggestion.change.skill_id = skill_services.get_new_skill_id()  # type: ignore[attr-defined]
 
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'The skill with the given id doesn\'t exist.'
         ):
             suggestion.accept('commit message')
 
-    def test_pre_update_validate_change_cmd(self):
+    def test_pre_update_validate_change_cmd(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
 
         suggestion = suggestion_registry.SuggestionAddQuestion(
@@ -1959,7 +2105,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'new_value': 'bn',
             'old_value': 'en'
         }
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'The new change cmd must be equal to '
             'create_new_fully_specified_question'
@@ -1967,7 +2113,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             suggestion.pre_update_validate(
                 question_domain.QuestionChange(change))
 
-    def test_pre_update_validate_change_skill_id(self):
+    def test_pre_update_validate_change_skill_id(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
 
         suggestion = suggestion_registry.SuggestionAddQuestion(
@@ -1979,7 +2125,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['score_category'],
             expected_suggestion_dict['language_code'], False, self.fake_date)
 
-        change = {
+        change: ChangeType = {
             'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
                 'question_state_data': self._create_valid_question_data(
@@ -1991,15 +2137,15 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'skill_id': 'skill_2'
         }
 
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'The new change skill_id must be equal to skill_1'
         ):
             suggestion.pre_update_validate(
                 question_domain.QuestionChange(change))
 
-    def test_pre_update_validate_complains_if_nothing_changed(self):
-        change = {
+    def test_pre_update_validate_complains_if_nothing_changed(self) -> None:
+        change: ChangeType = {
             'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
                 'question_state_data': self._create_valid_question_data(
@@ -2016,9 +2162,9 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'exploration.exp1.thread1', 'exp1', 1,
             suggestion_models.STATUS_ACCEPTED, self.author_id,
             self.reviewer_id, change,
-            'question.topic_1', 'en', self.fake_date)
+            'question.topic_1', 'en', False, self.fake_date)
 
-        new_change = {
+        new_change: ChangeType = {
             'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
                 'question_state_data': self._create_valid_question_data(
@@ -2031,7 +2177,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'skill_difficulty': 0.3
         }
 
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'At least one of the new skill_difficulty or question_dict '
             'should be changed.'):
@@ -2039,8 +2185,9 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
                 question_domain.QuestionSuggestionChange(new_change))
 
     def test_pre_update_validate_accepts_a_change_in_skill_difficulty_only(
-            self):
-        change = {
+        self
+    ) -> None:
+        change: ChangeType = {
             'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
                 'question_state_data': self._create_valid_question_data(
@@ -2057,9 +2204,9 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'exploration.exp1.thread1', 'exp1', 1,
             suggestion_models.STATUS_ACCEPTED, self.author_id,
             self.reviewer_id, change,
-            'question.topic_1', 'en', self.fake_date)
+            'question.topic_1', 'en', False, self.fake_date)
 
-        new_change = {
+        new_change: ChangeType = {
             'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
                 'question_state_data': self._create_valid_question_data(
@@ -2072,12 +2219,18 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'skill_difficulty': 0.6
         }
 
+        # Method `pre_update_validate` does not return any value but for testing
+        # purpose we are still comparing it's return value with None which
+        # causes MyPy to throw error. Thus to avoid the error, we used
+        # ignore here.
         self.assertEqual(
-            suggestion.pre_update_validate(
+            suggestion.pre_update_validate(  # type: ignore[func-returns-value]
                 question_domain.QuestionSuggestionChange(new_change)), None)
 
-    def test_pre_update_validate_accepts_a_change_in_state_data_only(self):
-        change = {
+    def test_pre_update_validate_accepts_a_change_in_state_data_only(
+        self
+    ) -> None:
+        change: ChangeType = {
             'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
                 'question_state_data': self._create_valid_question_data(
@@ -2094,9 +2247,9 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'exploration.exp1.thread1', 'exp1', 1,
             suggestion_models.STATUS_ACCEPTED, self.author_id,
             self.reviewer_id, change,
-            'question.topic_1', 'en', self.fake_date)
+            'question.topic_1', 'en', False, self.fake_date)
 
-        new_change = {
+        new_change: ChangeType = {
             'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
                 'question_state_data': self._create_valid_question_data(
@@ -2109,11 +2262,18 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'skill_difficulty': 0.3
         }
 
+        # Method `pre_update_validate` does not return any value but for testing
+        # purpose we are still comparing it's return value with None which
+        # causes MyPy to throw error. Thus to avoid the error, we used
+        # ignore here.
         self.assertEqual(
-            suggestion.pre_update_validate(
+            suggestion.pre_update_validate(  # type: ignore[func-returns-value]
                 question_domain.QuestionSuggestionChange(new_change)), None)
 
-    def test_validate_author_id(self):
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
+    def test_validate_author_id(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionAddQuestion(
             expected_suggestion_dict['suggestion_id'],
@@ -2126,12 +2286,12 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         suggestion.validate()
 
-        suggestion.author_id = 0
-        with self.assertRaisesRegex(
+        suggestion.author_id = 0  # type: ignore[assignment]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'Expected author_id to be a string'):
             suggestion.validate()
 
-    def test_validate_author_id_format(self):
+    def test_validate_author_id_format(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionAddQuestion(
             expected_suggestion_dict['suggestion_id'],
@@ -2145,12 +2305,15 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.author_id = ''
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected author_id to be in a valid user ID format.'):
             suggestion.validate()
 
-    def test_validate_final_reviewer_id(self):
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
+    def test_validate_final_reviewer_id(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionAddQuestion(
             expected_suggestion_dict['suggestion_id'],
@@ -2163,12 +2326,12 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         suggestion.validate()
 
-        suggestion.final_reviewer_id = 1
-        with self.assertRaisesRegex(
+        suggestion.final_reviewer_id = 1  # type: ignore[assignment]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'Expected final_reviewer_id to be a string'):
             suggestion.validate()
 
-    def test_validate_final_reviewer_id_format(self):
+    def test_validate_final_reviewer_id_format(self) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionAddQuestion(
             expected_suggestion_dict['suggestion_id'],
@@ -2182,13 +2345,14 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         suggestion.validate()
 
         suggestion.final_reviewer_id = ''
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected final_reviewer_id to be in a valid user ID format'):
             suggestion.validate()
 
     def test_validate_language_code_fails_when_language_codes_do_not_match(
-            self):
+        self
+    ) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionAddQuestion(
             expected_suggestion_dict['suggestion_id'],
@@ -2204,15 +2368,19 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         suggestion.validate()
 
         expected_question_dict['language_code'] = 'wrong_language_code'
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected question language_code.wrong_language_code. to be same '
             'as suggestion language_code.en.'
         ):
             suggestion.validate()
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_validate_language_code_fails_when_language_code_is_set_to_none(
-            self):
+        self
+    ) -> None:
         expected_suggestion_dict = self.suggestion_dict
         suggestion = suggestion_registry.SuggestionAddQuestion(
             expected_suggestion_dict['suggestion_id'],
@@ -2224,14 +2392,14 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['language_code'], False, self.fake_date)
         suggestion.validate()
 
-        suggestion.language_code = None
+        suggestion.language_code = None  # type: ignore[assignment]
 
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected language_code to be en, received None'):
             suggestion.validate()
 
-    def test_get_all_html_conztent_strings(self):
+    def test_get_all_html_conztent_strings(self) -> None:
         suggestion = suggestion_registry.SuggestionAddQuestion(
             self.suggestion_dict['suggestion_id'],
             self.suggestion_dict['target_id'],
@@ -2239,14 +2407,14 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             self.suggestion_dict['status'], self.author_id,
             self.reviewer_id, self.suggestion_dict['change'],
             self.suggestion_dict['score_category'],
-            self.suggestion_dict['language_code'], self.fake_date)
+            self.suggestion_dict['language_code'], False, self.fake_date)
 
         actual_outcome_list = suggestion.get_all_html_content_strings()
         expected_outcome_list = [
             u'', u'<p>This is a hint.</p>', u'<p>This is a solution.</p>', u'']
         self.assertEqual(expected_outcome_list, actual_outcome_list)
 
-    def test_convert_html_in_suggestion_change(self):
+    def test_convert_html_in_suggestion_change(self) -> None:
         html_content = (
             '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
             'mp;quot;+,-,-,+&amp;quot;"></oppia-noninteractive-math>')
@@ -2382,11 +2550,16 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             suggestion_dict['language_code'], False, self.fake_date)
         suggestion.convert_html_in_suggestion_change(
             html_validation_service.add_math_content_to_math_rte_components)
+        # Ruling out the possibility of any other type for mypy type checking.
+        assert isinstance(suggestion.change.question_dict, dict)
+        question_dict: question_domain.QuestionDict = (
+            suggestion.change.question_dict
+        )
         self.assertEqual(
-            suggestion.change.question_dict['question_state_data']['content'][
+            question_dict['question_state_data']['content'][
                 'html'], expected_html_content)
 
-    def test_accept_suggestion_with_images(self):
+    def test_accept_suggestion_with_images(self) -> None:
         html_content = (
             '<p>Value</p><oppia-noninteractive-math math_content-with-value='
             '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &'
@@ -2403,7 +2576,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         fs_services.save_original_and_compressed_versions_of_image(
             'img.svg', image_context, 'skill1',
             raw_image, 'image', False)
-        self.save_new_skill('skill1', self.author_id, description='description')
+        self.save_new_skill('skill1', self.author_id, description='description')  # type: ignore[no-untyped-call]
 
         suggestion_dict = {
             'suggestion_id': 'skill1.thread1',
@@ -2439,7 +2612,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             suggestion_dict['language_code'], False, self.fake_date)
         suggestion.accept('commit_message')
 
-    def test_accept_suggestion_with_image_region_interactions(self):
+    def test_accept_suggestion_with_image_region_interactions(self) -> None:
         with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
             encoding=None) as f:
@@ -2448,7 +2621,11 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'image.png', 'question_suggestions', 'skill1',
             original_image_content, 'image', True)
 
-        question_state_dict = {
+        # Here, the expected type for `solution` key is SolutionDict but
+        # for testing purposes here we are providing None which causes
+        # MyPy to throw `Incompatible types` error. Thus to avoid the
+        # error, we used ignore here.
+        question_state_dict: state_domain.StateDict = {
             'content': {
                 'html': '<p>Text</p>',
                 'content_id': 'content'
@@ -2578,7 +2755,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'language_code': 'en',
             'last_updated': utils.get_time_in_millisecs(self.fake_date)
         }
-        self.save_new_skill(
+        self.save_new_skill(  # type: ignore[no-untyped-call]
             'skill1', self.author_id, description='description')
         suggestion = suggestion_registry.SuggestionAddQuestion(
             suggestion_dict['suggestion_id'], suggestion_dict['target_id'],
@@ -2598,11 +2775,11 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             suggestion.status,
             suggestion_models.STATUS_ACCEPTED)
 
-    def test_contructor_updates_state_shema_in_change_cmd(self):
+    def test_contructor_updates_state_shema_in_change_cmd(self) -> None:
         score_category = (
             suggestion_models.SCORE_TYPE_QUESTION +
             suggestion_models.SCORE_CATEGORY_DELIMITER + 'skill_id')
-        change = {
+        change: Dict[str, Union[str, float, Dict[str, Any]]] = {
             'cmd': (
                 question_domain
                 .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
@@ -2616,23 +2793,29 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'skill_id': 'skill_id',
             'skill_difficulty': 0.3
         }
+        # Ruling out the possibility of any other type for mypy type checking.
+        assert isinstance(change['question_dict'], dict)
         self.assertEqual(
             change['question_dict']['question_state_data_schema_version'], 27)
 
         suggestion = suggestion_registry.SuggestionAddQuestion(
             'suggestionId', 'target_id', 1, suggestion_models.STATUS_IN_REVIEW,
-            self.author_id, None, change, score_category, 'en', False,
-            self.fake_date)
+            self.author_id, 'test_reviewer', change, score_category, 'en',
+            False, self.fake_date)
+        # Ruling out the possibility of any other type for mypy type checking.
+        assert isinstance(suggestion.change.question_dict, dict)
         self.assertEqual(
             suggestion.change.question_dict[
                 'question_state_data_schema_version'],
             feconf.CURRENT_STATE_SCHEMA_VERSION)
 
-    def test_contructor_raise_exception_for_invalid_state_shema_version(self):
+    def test_contructor_raise_exception_for_invalid_state_shema_version(
+        self
+    ) -> None:
         score_category = (
             suggestion_models.SCORE_TYPE_QUESTION +
             suggestion_models.SCORE_CATEGORY_DELIMITER + 'skill_id')
-        change = {
+        change: Dict[str, Union[str, float, Dict[str, Any]]] = {
             'cmd': (
                 question_domain
                 .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
@@ -2646,63 +2829,66 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'skill_id': 'skill_id',
             'skill_difficulty': 0.3
         }
+        # Ruling out the possibility of any other type for mypy type checking.
+        assert isinstance(change['question_dict'], dict)
         self.assertEqual(
             change['question_dict']['question_state_data_schema_version'], 23)
 
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected state schema version to be in between 25'
         ):
             suggestion_registry.SuggestionAddQuestion(
                 'suggestionId', 'target_id', 1,
-                suggestion_models.STATUS_IN_REVIEW, self.author_id, None,
-                change, score_category, 'en', False, self.fake_date)
+                suggestion_models.STATUS_IN_REVIEW, self.author_id,
+                'test_reviewer', change, score_category, 'en', False,
+                self.fake_date)
 
 
 class MockInvalidVoiceoverApplication(
         suggestion_registry.BaseVoiceoverApplication):
 
-    def __init__(self):  # pylint: disable=super-init-not-called
+    def __init__(self) -> None:  # pylint: disable=super-init-not-called
         pass
 
 
 class BaseVoiceoverApplicationUnitTests(test_utils.GenericTestBase):
     """Tests for the BaseVoiceoverApplication class."""
 
-    def setUp(self):
-        super(BaseVoiceoverApplicationUnitTests, self).setUp()
+    def setUp(self) -> None:
+        super().setUp()
         self.base_voiceover_application = MockInvalidVoiceoverApplication()
 
-    def test_base_class_init_raises_error(self):
-        with self.assertRaisesRegex(
+    def test_base_class_init_raises_error(self) -> None:
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             NotImplementedError,
             'Subclasses of BaseVoiceoverApplication should implement '
             '__init__.'):
             suggestion_registry.BaseVoiceoverApplication()
 
-    def test_base_class_accept_raises_error(self):
-        with self.assertRaisesRegex(
+    def test_base_class_accept_raises_error(self) -> None:
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             NotImplementedError,
             'Subclasses of BaseVoiceoverApplication should implement accept.'):
-            self.base_voiceover_application.accept()
+            self.base_voiceover_application.accept('abcd')
 
-    def test_base_class_reject_raises_error(self):
-        with self.assertRaisesRegex(
+    def test_base_class_reject_raises_error(self) -> None:
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             NotImplementedError,
             'Subclasses of BaseVoiceoverApplication should implement reject.'):
-            self.base_voiceover_application.reject()
+            self.base_voiceover_application.reject('abcd', 'abcd')
 
 
 class ExplorationVoiceoverApplicationUnitTest(test_utils.GenericTestBase):
     """Tests for the ExplorationVoiceoverApplication class."""
 
-    def setUp(self):
-        super(ExplorationVoiceoverApplicationUnitTest, self).setUp()
+    def setUp(self) -> None:
+        super().setUp()
         self.signup('author@example.com', 'author')
-        self.author_id = self.get_user_id_from_email('author@example.com')
+        self.author_id = self.get_user_id_from_email('author@example.com')  # type: ignore[no-untyped-call]
 
         self.signup('reviewer@example.com', 'reviewer')
-        self.reviewer_id = self.get_user_id_from_email('reviewer@example.com')
+        self.reviewer_id = self.get_user_id_from_email('reviewer@example.com')  # type: ignore[no-untyped-call]
 
         self.voiceover_application = (
             suggestion_registry.ExplorationVoiceoverApplication(
@@ -2710,62 +2896,75 @@ class ExplorationVoiceoverApplicationUnitTest(test_utils.GenericTestBase):
                 self.author_id, None, 'en', 'audio_file.mp3', '<p>Content</p>',
                 None))
 
-    def test_validation_with_invalid_target_type_raise_exception(self):
+    def test_validation_with_invalid_target_type_raise_exception(self) -> None:
         self.voiceover_application.validate()
 
         self.voiceover_application.target_type = 'invalid_target'
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected target_type to be among allowed choices, '
             'received invalid_target'
         ):
             self.voiceover_application.validate()
 
-    def test_validation_with_invalid_target_id_raise_exception(self):
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
+    def test_validation_with_invalid_target_id_raise_exception(self) -> None:
         self.voiceover_application.validate()
 
-        self.voiceover_application.target_id = 123
-        with self.assertRaisesRegex(
+        self.voiceover_application.target_id = 123  # type: ignore[assignment]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'Expected target_id to be a string'
         ):
             self.voiceover_application.validate()
 
-    def test_validation_with_invalid_status_raise_exception(self):
+    def test_validation_with_invalid_status_raise_exception(self) -> None:
         self.voiceover_application.validate()
 
         self.voiceover_application.status = 'invalid_status'
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected status to be among allowed choices, '
             'received invalid_status'
         ):
             self.voiceover_application.validate()
 
-    def test_validation_with_invalid_author_id_raise_exception(self):
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
+    def test_validation_with_invalid_author_id_raise_exception(self) -> None:
         self.voiceover_application.validate()
 
-        self.voiceover_application.author_id = 123
-        with self.assertRaisesRegex(
+        self.voiceover_application.author_id = 123  # type: ignore[assignment]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'Expected author_id to be a string'
         ):
             self.voiceover_application.validate()
 
-    def test_validation_with_invalid_final_reviewer_id_raise_exception(self):
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
+    def test_validation_with_invalid_final_reviewer_id_raise_exception(
+        self
+    ) -> None:
         self.assertEqual(
             self.voiceover_application.status,
             suggestion_models.STATUS_IN_REVIEW)
         self.assertEqual(self.voiceover_application.final_reviewer_id, None)
         self.voiceover_application.validate()
 
-        self.voiceover_application.final_reviewer_id = 123
-        with self.assertRaisesRegex(
+        self.voiceover_application.final_reviewer_id = 123  # type: ignore[assignment]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected final_reviewer_id to be None as the '
             'voiceover application is not yet handled.'
         ):
             self.voiceover_application.validate()
 
-    def test_validation_for_handled_application_with_invalid_final_review(self):
+    def test_validation_for_handled_application_with_invalid_final_review(
+        self
+    ) -> None:
         self.assertEqual(
             self.voiceover_application.status,
             suggestion_models.STATUS_IN_REVIEW)
@@ -2773,12 +2972,12 @@ class ExplorationVoiceoverApplicationUnitTest(test_utils.GenericTestBase):
         self.voiceover_application.validate()
 
         self.voiceover_application.status = suggestion_models.STATUS_ACCEPTED
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'Expected final_reviewer_id to be a string'
         ):
             self.voiceover_application.validate()
 
-    def test_validation_for_rejected_application_with_no_message(self):
+    def test_validation_for_rejected_application_with_no_message(self) -> None:
         self.assertEqual(
             self.voiceover_application.status,
             suggestion_models.STATUS_IN_REVIEW)
@@ -2787,14 +2986,14 @@ class ExplorationVoiceoverApplicationUnitTest(test_utils.GenericTestBase):
 
         self.voiceover_application.final_reviewer_id = 'reviewer_id'
         self.voiceover_application.status = suggestion_models.STATUS_REJECTED
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected rejection_message to be a string for a '
             'rejected application'
         ):
             self.voiceover_application.validate()
 
-    def test_validation_for_accepted_application_with_message(self):
+    def test_validation_for_accepted_application_with_message(self) -> None:
         self.assertEqual(
             self.voiceover_application.status,
             suggestion_models.STATUS_IN_REVIEW)
@@ -2804,54 +3003,69 @@ class ExplorationVoiceoverApplicationUnitTest(test_utils.GenericTestBase):
         self.voiceover_application.final_reviewer_id = 'reviewer_id'
         self.voiceover_application.status = suggestion_models.STATUS_ACCEPTED
         self.voiceover_application.rejection_message = 'Invalid message'
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected rejection_message to be None for the accepted '
             'voiceover application, received Invalid message'
         ):
             self.voiceover_application.validate()
 
-    def test_validation_with_invalid_language_code_type_raise_exception(self):
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
+    def test_validation_with_invalid_language_code_type_raise_exception(
+        self
+    ) -> None:
         self.assertEqual(self.voiceover_application.language_code, 'en')
         self.voiceover_application.validate()
 
-        self.voiceover_application.language_code = 1
-        with self.assertRaisesRegex(
+        self.voiceover_application.language_code = 1  # type: ignore[assignment]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'Expected language_code to be a string'
         ):
             self.voiceover_application.validate()
 
-    def test_validation_with_invalid_language_code_raise_exception(self):
+    def test_validation_with_invalid_language_code_raise_exception(
+        self
+    ) -> None:
         self.assertEqual(self.voiceover_application.language_code, 'en')
         self.voiceover_application.validate()
 
         self.voiceover_application.language_code = 'invalid language'
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'Invalid language_code: invalid language'
         ):
             self.voiceover_application.validate()
 
-    def test_validation_with_invalid_filename_type_raise_exception(self):
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
+    def test_validation_with_invalid_filename_type_raise_exception(
+        self
+    ) -> None:
         self.assertEqual(self.voiceover_application.filename, 'audio_file.mp3')
         self.voiceover_application.validate()
 
-        self.voiceover_application.filename = 1
-        with self.assertRaisesRegex(
+        self.voiceover_application.filename = 1  # type: ignore[assignment]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'Expected filename to be a string'
         ):
             self.voiceover_application.validate()
 
-    def test_validation_with_invalid_content_type_raise_exception(self):
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
+    def test_validation_with_invalid_content_type_raise_exception(self) -> None:
         self.assertEqual(self.voiceover_application.content, '<p>Content</p>')
         self.voiceover_application.validate()
 
-        self.voiceover_application.content = 1
-        with self.assertRaisesRegex(
+        self.voiceover_application.content = 1  # type: ignore[assignment]
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError, 'Expected content to be a string'
         ):
             self.voiceover_application.validate()
 
-    def test_to_dict_returns_correct_dict(self):
+    def test_to_dict_returns_correct_dict(self) -> None:
         self.voiceover_application.accept(self.reviewer_id)
         expected_dict = {
             'voiceover_application_id': 'application_id',
@@ -2868,14 +3082,14 @@ class ExplorationVoiceoverApplicationUnitTest(test_utils.GenericTestBase):
         self.assertEqual(
             self.voiceover_application.to_dict(), expected_dict)
 
-    def test_is_handled_property_returns_correct_value(self):
+    def test_is_handled_property_returns_correct_value(self) -> None:
         self.assertFalse(self.voiceover_application.is_handled)
 
         self.voiceover_application.accept(self.reviewer_id)
 
         self.assertTrue(self.voiceover_application.is_handled)
 
-    def test_accept_voiceover_application(self):
+    def test_accept_voiceover_application(self) -> None:
         self.assertEqual(self.voiceover_application.final_reviewer_id, None)
         self.assertEqual(self.voiceover_application.status, 'review')
 
@@ -2885,7 +3099,7 @@ class ExplorationVoiceoverApplicationUnitTest(test_utils.GenericTestBase):
             self.voiceover_application.final_reviewer_id, self.reviewer_id)
         self.assertEqual(self.voiceover_application.status, 'accepted')
 
-    def test_reject_voiceover_application(self):
+    def test_reject_voiceover_application(self) -> None:
         self.assertEqual(self.voiceover_application.final_reviewer_id, None)
         self.assertEqual(self.voiceover_application.status, 'review')
 
@@ -2901,25 +3115,25 @@ class ExplorationVoiceoverApplicationUnitTest(test_utils.GenericTestBase):
 class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
     """Tests for the CommunityContributionStats class."""
 
-    translation_reviewer_counts_by_lang_code = {
+    translation_reviewer_counts_by_lang_code: Dict[str, int] = {
         'hi': 0,
         'en': 1
     }
 
-    translation_suggestion_counts_by_lang_code = {
+    translation_suggestion_counts_by_lang_code: Dict[str, int] = {
         'fr': 6,
         'en': 5
     }
 
-    question_reviewer_count = 1
-    question_suggestion_count = 4
+    question_reviewer_count: int = 1
+    question_suggestion_count: int = 4
 
-    negative_count = -1
-    non_integer_count = 'non_integer_count'
-    sample_language_code = 'en'
-    invalid_language_code = 'invalid'
+    negative_count: int = -1
+    non_integer_count: str = 'non_integer_count'
+    sample_language_code: str = 'en'
+    invalid_language_code: str = 'invalid'
 
-    def _assert_community_contribution_stats_is_in_default_state(self):
+    def _assert_community_contribution_stats_is_in_default_state(self) -> None:
         """Checks if the community contribution stats is in its default
         state.
         """
@@ -2942,7 +3156,9 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             community_contribution_stats.question_suggestion_count, 0)
 
-    def test_initial_object_with_valid_arguments_has_correct_properties(self):
+    def test_initial_object_with_valid_arguments_has_correct_properties(
+        self
+    ) -> None:
         community_contribution_stats = (
             suggestion_registry.CommunityContributionStats(
                 self.translation_reviewer_counts_by_lang_code,
@@ -2976,7 +3192,8 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         )
 
     def test_set_translation_reviewer_count_for_lang_code_updates_empty_dict(
-            self):
+        self
+    ) -> None:
         community_contribution_stats = (
             suggestion_services.get_community_contribution_stats()
         )
@@ -2997,7 +3214,8 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         )
 
     def test_set_translation_reviewer_count_for_lang_code_updates_count_value(
-            self):
+        self
+    ) -> None:
         community_contribution_stats = (
             suggestion_services.get_community_contribution_stats()
         )
@@ -3022,7 +3240,8 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         )
 
     def test_set_translation_reviewer_count_for_lang_code_adds_new_lang_key(
-            self):
+        self
+    ) -> None:
         community_contribution_stats = (
             suggestion_services.get_community_contribution_stats()
         )
@@ -3046,7 +3265,8 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         )
 
     def test_set_translation_suggestion_count_for_lang_code_updates_empty_dict(
-            self):
+        self
+    ) -> None:
         community_contribution_stats = (
             suggestion_services.get_community_contribution_stats()
         )
@@ -3066,7 +3286,8 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         )
 
     def test_set_translation_suggestion_count_for_lang_code_updates_count_value(
-            self):
+        self
+    ) -> None:
         community_contribution_stats = (
             suggestion_services.get_community_contribution_stats()
         )
@@ -3091,7 +3312,8 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         )
 
     def test_set_translation_suggestion_count_for_lang_code_adds_new_lang_key(
-            self):
+        self
+    ) -> None:
         community_contribution_stats = (
             suggestion_services.get_community_contribution_stats()
         )
@@ -3115,7 +3337,8 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         )
 
     def test_get_translation_language_codes_that_need_reviewers_for_one_lang(
-            self):
+        self
+    ) -> None:
         stats = suggestion_services.get_community_contribution_stats()
         stats.set_translation_suggestion_count_for_language_code(
             self.sample_language_code, 1)
@@ -3128,7 +3351,8 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             language_codes_that_need_reviewers, {self.sample_language_code})
 
     def test_get_translation_language_codes_that_need_reviewers_for_multi_lang(
-            self):
+        self
+    ) -> None:
         stats = suggestion_services.get_community_contribution_stats()
         stats.set_translation_suggestion_count_for_language_code('hi', 1)
         stats.set_translation_suggestion_count_for_language_code('fr', 1)
@@ -3141,7 +3365,8 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             language_codes_that_need_reviewers, {'hi', 'fr'})
 
     def test_get_translation_language_codes_that_need_reviewers_for_no_lang(
-            self):
+        self
+    ) -> None:
         stats = suggestion_services.get_community_contribution_stats()
 
         language_codes_that_need_reviewers = (
@@ -3152,7 +3377,8 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             language_codes_that_need_reviewers, set())
 
     def test_translation_reviewers_are_needed_if_suggestions_but_no_reviewers(
-            self):
+        self
+    ) -> None:
         stats = suggestion_services.get_community_contribution_stats()
         stats.set_translation_suggestion_count_for_language_code(
             self.sample_language_code, 1)
@@ -3161,7 +3387,9 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             stats.are_translation_reviewers_needed_for_lang_code(
                 self.sample_language_code))
 
-    def test_translation_reviewers_are_needed_if_num_suggestions_past_max(self):
+    def test_translation_reviewers_are_needed_if_num_suggestions_past_max(
+        self
+    ) -> None:
         stats = suggestion_services.get_community_contribution_stats()
         stats.set_translation_suggestion_count_for_language_code(
             self.sample_language_code, 2)
@@ -3176,7 +3404,9 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
 
         self.assertTrue(reviewers_are_needed)
 
-    def test_translation_reviewers_not_needed_if_num_suggestions_eqs_max(self):
+    def test_translation_reviewers_not_needed_if_num_suggestions_eqs_max(
+        self
+    ) -> None:
         stats = suggestion_services.get_community_contribution_stats()
         stats.set_translation_suggestion_count_for_language_code(
             self.sample_language_code, 2)
@@ -3191,7 +3421,9 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
 
         self.assertFalse(reviewers_are_needed)
 
-    def test_translation_reviewers_not_needed_if_num_suggestions_less_max(self):
+    def test_translation_reviewers_not_needed_if_num_suggestions_less_max(
+        self
+    ) -> None:
         stats = suggestion_services.get_community_contribution_stats()
         stats.set_translation_suggestion_count_for_language_code(
             self.sample_language_code, 1)
@@ -3207,7 +3439,8 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         self.assertFalse(reviewers_are_needed)
 
     def test_translation_reviewers_not_needed_if_reviewers_and_no_sugestions(
-            self):
+        self
+    ) -> None:
         stats = suggestion_services.get_community_contribution_stats()
         stats.set_translation_reviewer_count_for_language_code(
             self.sample_language_code, 1)
@@ -3217,7 +3450,8 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
                 self.sample_language_code))
 
     def test_translation_reviewers_not_needed_if_no_reviewers_no_sugestions(
-            self):
+        self
+    ) -> None:
         stats = suggestion_services.get_community_contribution_stats()
         self._assert_community_contribution_stats_is_in_default_state()
 
@@ -3226,13 +3460,16 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
                 self.sample_language_code))
 
     def test_question_reviewers_are_needed_if_suggestions_zero_reviewers(
-            self):
+        self
+    ) -> None:
         stats = suggestion_services.get_community_contribution_stats()
         stats.question_suggestion_count = 1
 
         self.assertTrue(stats.are_question_reviewers_needed())
 
-    def test_question_reviewers_are_needed_if_num_suggestions_past_max(self):
+    def test_question_reviewers_are_needed_if_num_suggestions_past_max(
+        self
+    ) -> None:
         stats = suggestion_services.get_community_contribution_stats()
         stats.question_suggestion_count = 2
         stats.question_reviewer_count = 1
@@ -3243,7 +3480,9 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
 
         self.assertTrue(reviewers_are_needed)
 
-    def test_question_reviewers_not_needed_if_num_suggestions_eqs_max(self):
+    def test_question_reviewers_not_needed_if_num_suggestions_eqs_max(
+        self
+    ) -> None:
         stats = suggestion_services.get_community_contribution_stats()
         stats.question_suggestion_count = 2
         stats.question_reviewer_count = 2
@@ -3254,7 +3493,9 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
 
         self.assertFalse(reviewers_are_needed)
 
-    def test_question_reviewers_not_needed_if_num_suggestions_less_max(self):
+    def test_question_reviewers_not_needed_if_num_suggestions_less_max(
+        self
+    ) -> None:
         stats = suggestion_services.get_community_contribution_stats()
         stats.question_suggestion_count = 1
         stats.question_reviewer_count = 2
@@ -3266,14 +3507,16 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         self.assertFalse(reviewers_are_needed)
 
     def test_question_reviewers_not_needed_if_no_reviewers_no_sugestions(
-            self):
+        self
+    ) -> None:
         stats = suggestion_services.get_community_contribution_stats()
         self._assert_community_contribution_stats_is_in_default_state()
 
         self.assertFalse(stats.are_question_reviewers_needed())
 
     def test_validate_translation_reviewer_counts_fails_for_negative_counts(
-            self):
+        self
+    ) -> None:
         community_contribution_stats = (
             suggestion_services.get_community_contribution_stats()
         )
@@ -3283,7 +3526,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
                 self.sample_language_code, self.negative_count)
         )
 
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected the translation reviewer count to be non-negative for '
             '%s language code, received: %s.' % (
@@ -3292,7 +3535,8 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             community_contribution_stats.validate()
 
     def test_validate_translation_suggestion_counts_fails_for_negative_counts(
-            self):
+        self
+    ) -> None:
         community_contribution_stats = (
             suggestion_services.get_community_contribution_stats()
         )
@@ -3302,7 +3546,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
                 self.sample_language_code, self.negative_count)
         )
 
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected the translation suggestion count to be non-negative for '
             '%s language code, received: %s.' % (
@@ -3310,7 +3554,9 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         ):
             community_contribution_stats.validate()
 
-    def test_validate_question_reviewer_count_fails_for_negative_count(self):
+    def test_validate_question_reviewer_count_fails_for_negative_count(
+        self
+    ) -> None:
         community_contribution_stats = (
             suggestion_services.get_community_contribution_stats()
         )
@@ -3318,7 +3564,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             self.negative_count
         )
 
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected the question reviewer count to be non-negative, '
             'received: %s.' % (
@@ -3326,7 +3572,9 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         ):
             community_contribution_stats.validate()
 
-    def test_validate_question_suggestion_count_fails_for_negative_count(self):
+    def test_validate_question_suggestion_count_fails_for_negative_count(
+        self
+    ) -> None:
         community_contribution_stats = (
             suggestion_services.get_community_contribution_stats()
         )
@@ -3334,7 +3582,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             self.negative_count
         )
 
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected the question suggestion count to be non-negative, '
             'received: %s.' % (
@@ -3342,18 +3590,22 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         ):
             community_contribution_stats.validate()
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_validate_translation_reviewer_counts_fails_for_non_integer_counts(
-            self):
+        self
+    ) -> None:
         community_contribution_stats = (
             suggestion_services.get_community_contribution_stats()
         )
         (
             community_contribution_stats
             .set_translation_reviewer_count_for_language_code(
-                self.sample_language_code, self.non_integer_count)
+                self.sample_language_code, self.non_integer_count)  # type: ignore[arg-type]
         )
 
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected the translation reviewer count to be an integer for '
             '%s language code, received: %s.' % (
@@ -3361,18 +3613,22 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         ):
             community_contribution_stats.validate()
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_validate_translation_suggestion_counts_fails_for_non_integer_count(
-            self):
+        self
+    ) -> None:
         community_contribution_stats = (
             suggestion_services.get_community_contribution_stats()
         )
         (
             community_contribution_stats
             .set_translation_suggestion_count_for_language_code(
-                self.sample_language_code, self.non_integer_count)
+                self.sample_language_code, self.non_integer_count)  # type: ignore[arg-type]
         )
 
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected the translation suggestion count to be an integer for '
             '%s language code, received: %s.' % (
@@ -3380,16 +3636,20 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         ):
             community_contribution_stats.validate()
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_validate_question_reviewer_count_fails_for_non_integer_count(
-            self):
+        self
+    ) -> None:
         community_contribution_stats = (
             suggestion_services.get_community_contribution_stats()
         )
         community_contribution_stats.question_reviewer_count = (
-            self.non_integer_count
+            self.non_integer_count  # type: ignore[assignment]
         )
 
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected the question reviewer count to be an integer, '
             'received: %s.' % (
@@ -3397,16 +3657,20 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
         ):
             community_contribution_stats.validate()
 
+    # TODO(#13059): After we fully type the codebase we plan to get
+    # rid of the tests that intentionally test wrong inputs that we
+    # can normally catch by typing.
     def test_validate_question_suggestion_count_fails_for_non_integer_count(
-            self):
+        self
+    ) -> None:
         community_contribution_stats = (
             suggestion_services.get_community_contribution_stats()
         )
         community_contribution_stats.question_suggestion_count = (
-            self.non_integer_count
+            self.non_integer_count  # type: ignore[assignment]
         )
 
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Expected the question suggestion count to be an integer, '
             'received: %s.' % (
@@ -3415,7 +3679,8 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             community_contribution_stats.validate()
 
     def test_validate_translation_reviewer_counts_fails_for_invalid_lang_code(
-            self):
+        self
+    ) -> None:
         community_contribution_stats = (
             suggestion_services.get_community_contribution_stats()
         )
@@ -3425,7 +3690,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
                 self.invalid_language_code, 1)
         )
 
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Invalid language code for the translation reviewer counts: '
             '%s.' % self.invalid_language_code
@@ -3433,7 +3698,8 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             community_contribution_stats.validate()
 
     def test_validate_translation_suggestion_counts_fails_for_invalid_lang_code(
-            self):
+        self
+    ) -> None:
         community_contribution_stats = (
             suggestion_services.get_community_contribution_stats()
         )
@@ -3443,7 +3709,7 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
                 self.invalid_language_code, 1)
         )
 
-        with self.assertRaisesRegex(
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
             utils.ValidationError,
             'Invalid language code for the translation suggestion counts: '
             '%s.' % self.invalid_language_code
@@ -3454,12 +3720,14 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
 class ReviewableSuggestionEmailInfoUnitTests(test_utils.GenericTestBase):
     """Tests for the ReviewableSuggestionEmailInfo class."""
 
-    suggestion_type = feconf.SUGGESTION_TYPE_ADD_QUESTION
-    language_code = 'en'
-    suggestion_content = 'sample question'
-    submission_datetime = datetime.datetime.utcnow()
+    suggestion_type: str = feconf.SUGGESTION_TYPE_ADD_QUESTION
+    language_code: str = 'en'
+    suggestion_content: str = 'sample question'
+    submission_datetime: datetime.datetime = datetime.datetime.utcnow()
 
-    def test_initial_object_with_valid_arguments_has_correct_properties(self):
+    def test_initial_object_with_valid_arguments_has_correct_properties(
+        self
+    ) -> None:
         reviewable_suggestion_email_info = (
             suggestion_registry.ReviewableSuggestionEmailInfo(
                 self.suggestion_type, self.language_code,
@@ -3479,3 +3747,301 @@ class ReviewableSuggestionEmailInfoUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             reviewable_suggestion_email_info.submission_datetime,
             self.submission_datetime)
+
+
+class TranslationReviewStatsUnitTests(test_utils.GenericTestBase):
+    """Tests for the TranslationReviewStats class."""
+
+    LANGUAGE_CODE: Final = 'es'
+    CONTRIBUTOR_USER_ID: Final = 'uid_01234567890123456789012345678912'
+    TOPIC_ID: Final = 'topic_id'
+    REVIEWED_TRANSLATIONS_COUNT: Final = 2
+    REVIEWED_TRANSLATION_WORD_COUNT: Final = 100
+    ACCEPTED_TRANSLATIONS_COUNT: Final = 1
+    ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT: Final = 0
+    ACCEPTED_TRANSLATION_WORD_COUNT: Final = 50
+    FIRST_CONTRIBUTION_DATE: Final = datetime.date.fromtimestamp(1616173836)
+    LAST_CONTRIBUTION_DATE: Final = datetime.date.fromtimestamp(1616173836)
+
+    def test_create_translation_review_stats(self) -> None:
+        expected_stats_dict = {
+            'language_code': self.LANGUAGE_CODE,
+            'contributor_user_id': self.CONTRIBUTOR_USER_ID,
+            'topic_id': self.TOPIC_ID,
+            'reviewed_translations_count': self.REVIEWED_TRANSLATIONS_COUNT,
+            'reviewed_translation_word_count': (
+                self.REVIEWED_TRANSLATION_WORD_COUNT),
+            'accepted_translations_count': self.ACCEPTED_TRANSLATIONS_COUNT,
+            'accepted_translations_with_reviewer_edits_count': (
+                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            'first_contribution_date': self.FIRST_CONTRIBUTION_DATE,
+            'last_contribution_date': self.LAST_CONTRIBUTION_DATE,
+        }
+
+        actual_stats = suggestion_registry.TranslationReviewStats(
+            self.LANGUAGE_CODE, self.CONTRIBUTOR_USER_ID,
+            self.TOPIC_ID, self.REVIEWED_TRANSLATIONS_COUNT,
+            self.REVIEWED_TRANSLATION_WORD_COUNT,
+            self.ACCEPTED_TRANSLATIONS_COUNT,
+            self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT,
+            self.FIRST_CONTRIBUTION_DATE, self.LAST_CONTRIBUTION_DATE
+        )
+
+        self.assertDictEqual(
+            actual_stats.to_dict(), expected_stats_dict)
+
+
+class QuestionContributionStatsUnitTests(test_utils.GenericTestBase):
+    """Tests for the QuestionContributionStats class."""
+
+    CONTRIBUTOR_USER_ID: Final = 'uid_01234567890123456789012345678912'
+    TOPIC_ID: Final = 'topic_id'
+    SUBMITTED_QUESTION_COUNT: Final = 2
+    ACCEPTED_QUESTIONS_COUNT: Final = 1
+    ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT: Final = 0
+    FIRST_CONTRIBUTION_DATE: Final = datetime.date.fromtimestamp(1616173836)
+    LAST_CONTRIBUTION_DATE: Final = datetime.date.fromtimestamp(1616173836)
+
+    def test_create_question_contribution_stats(self) -> None:
+        expected_stats_dict = {
+            'contributor_user_id': self.CONTRIBUTOR_USER_ID,
+            'topic_id': self.TOPIC_ID,
+            'submitted_questions_count': (
+                self.SUBMITTED_QUESTION_COUNT),
+            'accepted_questions_count': (
+                self.ACCEPTED_QUESTIONS_COUNT),
+            'accepted_questions_without_reviewer_edits_count': (
+                self
+                .ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            'first_contribution_date': (
+                self.FIRST_CONTRIBUTION_DATE),
+            'last_contribution_date': (
+                self.LAST_CONTRIBUTION_DATE)
+        }
+
+        actual_stats = suggestion_registry.QuestionContributionStats(
+            self.CONTRIBUTOR_USER_ID, self.TOPIC_ID,
+            self.SUBMITTED_QUESTION_COUNT, self.ACCEPTED_QUESTIONS_COUNT,
+            self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT,
+            self.FIRST_CONTRIBUTION_DATE, self.LAST_CONTRIBUTION_DATE
+        )
+
+        self.assertDictEqual(
+            actual_stats.to_dict(), expected_stats_dict)
+
+
+class QuestionReviewStatsUnitTests(test_utils.GenericTestBase):
+    """Tests for the QuestionReviewStats class."""
+
+    CONTRIBUTOR_USER_ID: Final = 'uid_01234567890123456789012345678912'
+    TOPIC_ID: Final = 'topic_id'
+    REVIEWED_QUESTIONS_COUNT: Final = 2
+    ACCEPTED_QUESTIONS_COUNT: Final = 1
+    ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT: Final = 0
+    FIRST_CONTRIBUTION_DATE: Final = datetime.date.fromtimestamp(1616173836)
+    LAST_CONTRIBUTION_DATE: Final = datetime.date.fromtimestamp(1616173836)
+
+    def test_create_question_review_stats(self) -> None:
+        expected_stats_dict = {
+            'contributor_user_id': self.CONTRIBUTOR_USER_ID,
+            'topic_id': self.TOPIC_ID,
+            'reviewed_questions_count': self.REVIEWED_QUESTIONS_COUNT,
+            'accepted_questions_count': (
+                self.ACCEPTED_QUESTIONS_COUNT),
+            'accepted_questions_with_reviewer_edits_count': (
+                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
+            'first_contribution_date': (
+                self.FIRST_CONTRIBUTION_DATE),
+            'last_contribution_date': self.LAST_CONTRIBUTION_DATE
+        }
+
+        actual_stats = suggestion_registry.QuestionReviewStats(
+            self.CONTRIBUTOR_USER_ID, self.TOPIC_ID,
+            self.REVIEWED_QUESTIONS_COUNT,
+            self.ACCEPTED_QUESTIONS_COUNT,
+            self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT,
+            self.FIRST_CONTRIBUTION_DATE, self.LAST_CONTRIBUTION_DATE
+        )
+
+        self.assertDictEqual(
+            actual_stats.to_dict(), expected_stats_dict)
+
+
+class ContributorMilestoneEmailInfoUnitTests(test_utils.GenericTestBase):
+    """Tests for the ContributorMilestoneEmailInfo class."""
+
+    CONTRIBUTOR_USER_ID: Final = 'uid_01234567890123456789012345678912'
+    CONTRIBUTION_TYPE: Final = 'translation'
+    CONTRIBUTION_SUB_TYPE: Final = 'submission'
+    LANGUAGE_CODE: Final = 'es'
+    CONTRIBUTIONS_COUNT: Final = 1
+
+    def test_create_contribution_milestone_email_info(self) -> None:
+        actual_info = suggestion_registry.ContributorMilestoneEmailInfo(
+            self.CONTRIBUTOR_USER_ID, self.CONTRIBUTION_TYPE,
+            self.CONTRIBUTION_SUB_TYPE, self.LANGUAGE_CODE,
+            self.CONTRIBUTIONS_COUNT
+        )
+
+        self.assertEqual(
+            actual_info.contributor_user_id, self.CONTRIBUTOR_USER_ID
+        )
+        self.assertEqual(
+            actual_info.contribution_type, self.CONTRIBUTION_TYPE
+        )
+        self.assertEqual(
+            actual_info.contribution_sub_type, self.CONTRIBUTION_SUB_TYPE
+        )
+        self.assertEqual(
+            actual_info.language_code, self.LANGUAGE_CODE
+        )
+        self.assertEqual(
+            actual_info.contributions_count, self.CONTRIBUTIONS_COUNT
+        )
+
+
+class ContributorStatsSummaryUnitTests(test_utils.GenericTestBase):
+    """Tests for the ContributorStatsSummary class."""
+
+    LANGUAGE_CODE: Final = 'es'
+    CONTRIBUTOR_USER_ID: Final = 'user_01'
+    TOPIC_ID: Final = 'topic_id'
+    SUBMITTED_TRANSLATIONS_COUNT: Final = 2
+    SUBMITTED_TRANSLATION_WORD_COUNT: Final = 100
+    REJECTED_TRANSLATIONS_COUNT: Final = 0
+    REJECTED_TRANSLATION_WORD_COUNT: Final = 0
+    # Timestamp dates in sec since epoch for Mar 19 2021 UTC.
+    CONTRIBUTION_DATES: Final = {
+        datetime.date.fromtimestamp(1616173836),
+        datetime.date.fromtimestamp(1616173837)
+    }
+    REVIEWED_TRANSLATIONS_COUNT: Final = 2
+    REVIEWED_TRANSLATION_WORD_COUNT: Final = 100
+    ACCEPTED_TRANSLATIONS_COUNT: Final = 1
+    ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT: Final = 0
+    ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT: Final = 0
+    ACCEPTED_TRANSLATION_WORD_COUNT: Final = 50
+    SUBMITTED_QUESTION_COUNT: Final = 2
+    ACCEPTED_QUESTIONS_COUNT: Final = 1
+    ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT: Final = 0
+    REVIEWED_QUESTIONS_COUNT: Final = 2
+    ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT: Final = 0
+    FIRST_CONTRIBUTION_DATE: Final = datetime.date.fromtimestamp(1616173836)
+    LAST_CONTRIBUTION_DATE: Final = datetime.date.fromtimestamp(1616173836)
+
+    def test_create_contribution_stats_summary(self) -> None:
+        expected_translation_contribution_stats = {
+            'language_code': self.LANGUAGE_CODE,
+            'contributor_user_id': self.CONTRIBUTOR_USER_ID,
+            'topic_id': self.TOPIC_ID,
+            'submitted_translations_count': self.SUBMITTED_TRANSLATIONS_COUNT,
+            'submitted_translation_word_count': (
+                self.SUBMITTED_TRANSLATION_WORD_COUNT),
+            'accepted_translations_count': self.ACCEPTED_TRANSLATIONS_COUNT,
+            'accepted_translations_without_reviewer_edits_count': (
+                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            'accepted_translation_word_count': (
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            'rejected_translations_count': self.REJECTED_TRANSLATIONS_COUNT,
+            'rejected_translation_word_count': (
+                self.REJECTED_TRANSLATION_WORD_COUNT),
+            'contribution_dates': self.CONTRIBUTION_DATES
+        }
+        expected_translation_review_stats = {
+            'language_code': self.LANGUAGE_CODE,
+            'contributor_user_id': self.CONTRIBUTOR_USER_ID,
+            'topic_id': self.TOPIC_ID,
+            'reviewed_translations_count': self.REVIEWED_TRANSLATIONS_COUNT,
+            'reviewed_translation_word_count': (
+                self.REVIEWED_TRANSLATION_WORD_COUNT),
+            'accepted_translations_count': self.ACCEPTED_TRANSLATIONS_COUNT,
+            'accepted_translations_with_reviewer_edits_count': (
+                self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT),
+            'first_contribution_date': self.FIRST_CONTRIBUTION_DATE,
+            'last_contribution_date': self.LAST_CONTRIBUTION_DATE,
+        }
+        expected_question_contribution_stats = {
+            'contributor_user_id': self.CONTRIBUTOR_USER_ID,
+            'topic_id': self.TOPIC_ID,
+            'submitted_questions_count': (
+                self.SUBMITTED_QUESTION_COUNT),
+            'accepted_questions_count': (
+                self.ACCEPTED_QUESTIONS_COUNT),
+            'accepted_questions_without_reviewer_edits_count': (
+                self
+                .ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            'first_contribution_date': (
+                self.FIRST_CONTRIBUTION_DATE),
+            'last_contribution_date': (
+                self.LAST_CONTRIBUTION_DATE)
+        }
+        expected_question_review_stats = {
+            'contributor_user_id': self.CONTRIBUTOR_USER_ID,
+            'topic_id': self.TOPIC_ID,
+            'reviewed_questions_count': self.REVIEWED_QUESTIONS_COUNT,
+            'accepted_questions_count': (
+                self.ACCEPTED_QUESTIONS_COUNT),
+            'accepted_questions_with_reviewer_edits_count': (
+                self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
+            'first_contribution_date': (
+                self.FIRST_CONTRIBUTION_DATE),
+            'last_contribution_date': self.LAST_CONTRIBUTION_DATE
+        }
+        expected_contribution_summary = {
+            'contributor_user_id': self.CONTRIBUTOR_USER_ID,
+            'translation_contribution_stats': [
+                expected_translation_contribution_stats],
+            'question_contribution_stats': [
+                expected_question_contribution_stats],
+            'translation_review_stats': [expected_translation_review_stats],
+            'question_review_stats': [expected_question_review_stats]
+        }
+        translation_contribution_stats = (
+            suggestion_registry).TranslationContributionStats(
+                self.LANGUAGE_CODE,
+                self.CONTRIBUTOR_USER_ID,
+                self.TOPIC_ID,
+                self.SUBMITTED_TRANSLATIONS_COUNT,
+                self.SUBMITTED_TRANSLATION_WORD_COUNT,
+                self.ACCEPTED_TRANSLATIONS_COUNT,
+                (
+                    self
+                    .ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT
+                ),
+                self.ACCEPTED_TRANSLATION_WORD_COUNT,
+                self.REJECTED_TRANSLATIONS_COUNT,
+                self.REJECTED_TRANSLATION_WORD_COUNT,
+                self.CONTRIBUTION_DATES
+            )
+        translation_review_stats = suggestion_registry.TranslationReviewStats(
+            self.LANGUAGE_CODE, self.CONTRIBUTOR_USER_ID,
+            self.TOPIC_ID, self.REVIEWED_TRANSLATIONS_COUNT,
+            self.REVIEWED_TRANSLATION_WORD_COUNT,
+            self.ACCEPTED_TRANSLATIONS_COUNT,
+            self.ACCEPTED_TRANSLATIONS_WITH_REVIEWER_EDITS_COUNT,
+            self.FIRST_CONTRIBUTION_DATE, self.LAST_CONTRIBUTION_DATE
+        )
+        question_contribution_stats = (
+            suggestion_registry).QuestionContributionStats(
+                self.CONTRIBUTOR_USER_ID, self.TOPIC_ID,
+                self.SUBMITTED_QUESTION_COUNT, self.ACCEPTED_QUESTIONS_COUNT,
+                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT,
+                self.FIRST_CONTRIBUTION_DATE, self.LAST_CONTRIBUTION_DATE
+            )
+        question_review_stats = suggestion_registry.QuestionReviewStats(
+            self.CONTRIBUTOR_USER_ID, self.TOPIC_ID,
+            self.REVIEWED_QUESTIONS_COUNT,
+            self.ACCEPTED_QUESTIONS_COUNT,
+            self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT,
+            self.FIRST_CONTRIBUTION_DATE, self.LAST_CONTRIBUTION_DATE
+        )
+
+        contribution_summary = suggestion_registry.ContributorStatsSummary(
+            self.CONTRIBUTOR_USER_ID,
+            [translation_contribution_stats], [question_contribution_stats],
+            [translation_review_stats], [question_review_stats]
+        )
+
+        self.assertDictEqual(
+            contribution_summary.to_dict(), expected_contribution_summary
+        )

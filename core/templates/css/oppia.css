@@ -159,26 +159,26 @@ why they need to be overriden.  */
   transform: translate3d(0,-1px,0);
 }
 
-.oppia-learner-confirm-button.e2e-test-submit-answer-button.md-button[disabled],
-.oppia-learner-confirm-button.e2e-test-submit-answer-button.mat-button[disabled] {
+.oppia-learner-confirm-button.oppia-learner-submit-answer-button.md-button[disabled],
+.oppia-learner-confirm-button.oppia-learner-submit-answer-button.mat-button[disabled] {
   background-color: transparent;
   color: rgba(0,0,0,0.38);
   cursor: default;
 }
 
-.oppia-learner-confirm-button.e2e-test-submit-answer-button.md-button[disabled]:hover,
-.oppia-learner-confirm-button.e2e-test-submit-answer-button.mat-button[disabled]:hover {
+.oppia-learner-confirm-button.oppia-learner-submit-answer-button.md-button[disabled]:hover,
+.oppia-learner-confirm-button.oppia-learner-submit-answer-button.mat-button[disabled]:hover {
   text-decoration: none;
 }
 
-.oppia-learner-confirm-button.e2e-test-submit-answer-button.md-button,
-.oppia-learner-confirm-button.e2e-test-submit-answer-button.mat-button {
+.oppia-learner-confirm-button.oppia-learner-submit-answer-button.md-button,
+.oppia-learner-confirm-button.oppia-learner-submit-answer-button.mat-button {
   font: 16px;
   margin: 0;
   min-width: 55px;
 }
 
-.oppia-learner-confirm-button.e2e-test-submit-answer-button.mat-button {
+.oppia-learner-confirm-button.oppia-learner-submit-answer-button.mat-button {
   border-radius: 2px;
   font-size: 16px;
   line-height: 22px;
@@ -1471,6 +1471,7 @@ span.sort-explorations-select .sort-order {
 }
 .oppia-editor-card-with-avatar {
   background: rgb(255,255,255);
+  border: 1px solid #ccc;
   margin: 20px auto 0 auto;
   max-width: 700px;
   padding: 0;
@@ -2001,8 +2002,6 @@ pre.oppia-pre-wrapped-text {
   cursor: pointer;
   height: 30px;
   opacity: 0.5;
-  position: absolute;
-  right: 8px;
   top: 8px;
   width: 30px;
 }
@@ -2240,16 +2239,15 @@ oppia-parameter {
   width: 80%;
 }
 
-.oppia-modal-information-card .modal-dialog {
-  margin: 100px auto;
-  max-width: 35%;
-  min-width: 200px;
-  width: 400px;
-}
-
 .oppia-modal-lesson-information-card .modal-dialog {
   margin: 100px auto;
-  max-width: 430px;
+  max-width: 400px;
+  min-width: 320px;
+}
+
+.oppia-progress-reminder-modal .modal-dialog {
+  margin: 100px auto;
+  max-width: 400px;
   min-width: 320px;
 }
 
@@ -2308,7 +2306,7 @@ oppia-parameter {
   .modal-dialog {
     margin-left: auto;
     margin-right: auto;
-    width: 90vw;
+    width: 95vw;
   }
 }
 @media(min-width: 1024px) {
@@ -2819,19 +2817,18 @@ md-card.preview-conversation-skin-supplemental-card {
   min-height: 450px;
 }
 
-.oppia-modal-information-card .modal-dialog .modal-content {
-  border-radius: 0;
-  min-width: 200px;
+.oppia-modal-lesson-information-card .modal-dialog .modal-content {
+  border-radius: 4px;
+  min-width: 270px;
 }
 
-.oppia-modal-information-card .modal-dialog .modal-content .mat-card {
-  border-radius: 0;
+.oppia-modal-lesson-information-card .modal-dialog .modal-content .mat-card {
   margin: 0;
   padding: 0;
 }
 
-.oppia-modal-lesson-information-card .modal-dialog .modal-content {
-  border-radius: 4px;
+.oppia-progress-reminder-modal .modal-dialog .modal-content {
+  border-radius: 0;
   min-width: 270px;
 }
 

@@ -133,4 +133,10 @@ describe('Player position service', () => {
     let mockHelpCardAvailableEvent = new EventEmitter();
     expect(pps.onHelpCardAvailable).toEqual(mockHelpCardAvailableEvent);
   });
+
+  it('should fetch EventEmitter for loading most recent checkpoint', () => {
+    let mockLoadMostRecentCheckpointEvent = new EventEmitter();
+    expect(pps.onLoadedMostRecentCheckpoint).toEqual(
+      mockLoadMostRecentCheckpointEvent);
+  });
 });

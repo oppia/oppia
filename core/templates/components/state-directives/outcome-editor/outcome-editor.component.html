@@ -1,4 +1,8 @@
 <style>
+  .oppia-outcome-container {
+    display: flex;
+  }
+
   .oppia-confusing-outcome-warning-text {
     color: rgb(200, 0, 0);
     font-style: italic;
@@ -23,6 +27,14 @@
   .oppia-incorrect-text {
     color: rgb(243, 13, 13);
   }
+
+  /* The value used for this breakpoint should be equal to */
+  /* 'mobileBreakpoint' defined in outcome-editor.component.ts */
+  @media screen and (max-width: 500px) {
+    .oppia-outcome-heading {
+      font-size: 18px;
+    }
+  }
 </style>
 
 <div *ngIf="!feedbackEditorIsOpen && displayFeedback"
@@ -31,6 +43,16 @@
   <div class="oppia-readonly-rule-tile e2e-test-edit-outcome-feedback-button"
        [ngClass]="{'oppia-editable-section': isEditable}">
     <div class="oppia-rule-preview oppia-transition-200">
+
+    <!-- Mobile -->
+      <div class="oppia-click-to-start-editing e2e-test-open-outcome-feedback-editor"
+           *ngIf="onMobile && isEditable" (click)="openFeedbackEditorModal()">
+        <i *ngIf="isEditable" class="material-icons oppia-editor-edit-icon float-right"
+           title="Edit Feedback">&#xE254;
+        </i>
+      </div>
+
+      <!-- Desktop -->
       <div class="oppia-click-to-start-editing e2e-test-open-outcome-feedback-editor"
            *ngIf="isEditable" (click)="openFeedbackEditor()">
         <i *ngIf="isEditable" class="fas fa-pen oppia-editor-edit-icon float-right"
@@ -38,7 +60,7 @@
         </i>
       </div>
 
-      <strong>Oppia tells the learner...</strong>
+      <strong class="oppia-outcome-heading">Oppia tells the learner...</strong>
       <div class="position-relative">
         <span *ngIf="isSelfLoopWithNoFeedback(outcome) && !areWarningsSuppressed">
           <span class="oppia-confusing-outcome-warning-text">
@@ -61,7 +83,7 @@
   </div>
 </div>
 
-<div *ngIf="isEditable && feedbackEditorIsOpen">
+<div *ngIf="!onMobile && isEditable && feedbackEditorIsOpen">
   <form role="form"
         class="form-inline e2e-test-edit-outcome-feedback"
         name="editOutcomeForm.editFeedbackForm">
@@ -108,9 +130,9 @@
       </div>
 
       <div>
-        <strong *ngIf="displayFeedback">And afterwards, directs the learner
+        <strong class="oppia-outcome-heading" *ngIf="displayFeedback">And afterwards, directs the learner
         to...</strong>
-        <strong *ngIf="!displayFeedback">Oppia directs the learner to...</strong>
+        <strong class="oppia-outcome-heading" *ngIf="!displayFeedback">Oppia directs the learner to...</strong>
         <span *ngIf="outcome && !isSelfLoop(outcome)" class="position-relative">
           {{ outcome.dest }}
         </span>
@@ -121,7 +143,7 @@
           </span>
         </span>
         <div class="oppia-prerequisite-skill-text" *ngIf="outcome && outcome.missingPrerequisiteSkillId && canAddPrerequisiteSkill">
-          <strong> Attached prerequisite skill for the current state: </strong>
+          <strong class="oppia-outcome-heading"> Attached prerequisite skill for the current state: </strong>
           {{ outcome.missingPrerequisiteSkillId }}
         </div>
       </div>
@@ -174,11 +196,11 @@
           </i>
         </div>
 
-        <strong>The answers falling under this group are
-          <span *ngIf="outcome && outcome?.labelledAsCorrect" class="oppia-correct-text">
+        <strong class="oppia-outcome-heading">The answers falling under this group are
+          <span *ngIf="outcome && outcome.labelledAsCorrect" class="oppia-correct-text">
             correct
           </span>
-          <span *ngIf="outcome && !outcome?.labelledAsCorrect" class="oppia-incorrect-text">
+          <span *ngIf="outcome && !outcome.labelledAsCorrect" class="oppia-incorrect-text">
             incorrect
           </span>
         </strong>
@@ -186,10 +208,10 @@
     </div>
   </div>
 
-  <div *ngIf="isEditable">
-    <strong>The answers in this group are correct</strong>
+  <div class="oppia-outcome-container" *ngIf="isEditable">
     <div *ngIf="outcome">
-      <input class="ml-2 e2e-test-editor-correctness-toggle" type="checkbox" [(ngModel)]="outcome.labelledAsCorrect" (change)="onChangeCorrectnessLabel()">
+      <input class="mr-2 e2e-test-editor-correctness-toggle" type="checkbox" [(ngModel)]="outcome.labelledAsCorrect" (change)="onChangeCorrectnessLabel()">
     </div>
+    <strong class="oppia-outcome-heading">The answers in this group are correct</strong>
   </div>
 </div>

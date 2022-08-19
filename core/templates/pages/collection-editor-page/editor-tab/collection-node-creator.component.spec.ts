@@ -20,6 +20,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { ExplorationCreationBackendApiService } from 'components/entity-creation-services/exploration-creation-backend-api.service';
+import { CollectionPlaythrough } from 'domain/collection/collection-playthrough.model';
 import { Collection } from 'domain/collection/collection.model';
 import { SearchExplorationsBackendApiService } from 'domain/collection/search-explorations-backend-api.service';
 import { ExplorationSummaryBackendApiService } from 'domain/summary/exploration-summary-backend-api.service';
@@ -46,7 +47,7 @@ describe('Collection node creator component', () => {
 
   let mockCollection = new Collection(
     'collection_id', 'collection_title', 'collection_objective', 'en', [],
-    null, '', 2, 3, []);
+    new CollectionPlaythrough(null, []), '', 2, 3, []);
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -103,7 +104,7 @@ describe('Collection node creator component', () => {
         summaries: [{
           category: '',
           community_owned: true,
-          human_readable_contributors_summary: null,
+          human_readable_contributors_summary: {},
           id: expId,
           language_code: '',
           num_views: 1,

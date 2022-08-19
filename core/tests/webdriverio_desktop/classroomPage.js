@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,12 +16,12 @@
  * @fileoverview End-to-end tests for the classroom page.
  */
 
-var general = require('../protractor_utils/general.js');
-var users = require('../protractor_utils/users.js');
-var workflow = require('../protractor_utils/workflow.js');
+var general = require('../webdriverio_utils/general.js');
+var users = require('../webdriverio_utils/users.js');
+var workflow = require('../webdriverio_utils/workflow.js');
 
-var ClassroomPage = require('../protractor_utils/ClassroomPage.js');
-var LibraryPage = require('../protractor_utils/LibraryPage.js');
+var ClassroomPage = require('../webdriverio_utils/ClassroomPage.js');
+var LibraryPage = require('../webdriverio_utils/LibraryPage.js');
 
 describe('Classroom page functionality', function() {
   var classroomPage = null;

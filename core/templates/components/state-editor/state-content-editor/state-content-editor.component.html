@@ -17,7 +17,7 @@
     <span [innerHTML]="'I18N_CARD_HEIGHT_LIMIT_WARNING_MESSAGE' | translate"></span>
   </div>
   <div *ngIf="isContentEditable()"
-       class="e2e-test-edit-content oppia-editable-section"
+       class="e2e-test-edit-content oppia-editable-section e2e-test-edit-content-pencil-button"
        (click)="openStateContentEditor()">
     <i class="fas fa-pen oppia-editor-edit-icon oppia-editor-edit-icon-position protractor-test-edit-content-pencil-button"
        title="Edit Card Content">
