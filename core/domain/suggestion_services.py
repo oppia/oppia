@@ -2073,8 +2073,6 @@ def _update_translation_review_stats_models(translation_review_stats):
             stat.accepted_translations_count)
         stats_model.accepted_translations_with_reviewer_edits_count = (
             stat.accepted_translations_with_reviewer_edits_count)
-        stats_model.accepted_translation_word_count = (
-            stat.accepted_translation_word_count)
         stats_model.first_contribution_date = (
             stat.first_contribution_date)
         stats_model.last_contribution_date = (
@@ -2233,9 +2231,16 @@ def update_translation_contribution_stats(
             content_word_count) * int(not is_submission and is_suggestion_accepted)
         translation_contribution_stat.rejected_translations_count += 1 * int(not is_submission and is_suggestion_rejected)
         translation_contribution_stat.rejected_translation_word_count += content_word_count * int(not is_submission and is_suggestion_rejected)
+
+        print('translation_contribution_stat.accepted_translations_count')
+        print(translation_contribution_stat.accepted_translations_count)
+        print('is_submission')
+        print(is_submission)
+        print('is_suggestion_accepted')
+        print(is_suggestion_accepted)
         
         if is_submission:
-            translation_contribution_stat.contribution_dates.push(
+            translation_contribution_stat.contribution_dates.append(
                 datetime.datetime.strptime(str(
                     suggestion.last_updated.date().isoformat()),
                     '%Y-%m-%d'
@@ -2273,6 +2278,8 @@ def update_translation_review_stats(
             suggestion.change.language_code, user_id, topic_id
         ))
 
+    
+
     if translation_review_stat_model is None:
         suggestion_models.TranslationReviewStatsModel.create(
             language_code=suggestion.change.language_code,
@@ -2304,11 +2311,9 @@ def update_translation_review_stats(
         translation_review_stat.reviewed_translations_count += 1
         translation_review_stat.reviewed_translation_word_count += (
             content_word_count)
-        translation_review_stat.accepted_translations_count += 1 * int(not is_accepted)
+        translation_review_stat.accepted_translations_count += 1 * int(is_accepted)
         translation_review_stat.accepted_translations_with_reviewer_edits_count += 1 + int(
             suggestion.edited_by_reviewer)
-        translation_review_stat.accepted_translation_word_count += (
-            content_word_count) * int(is_accepted)
         translation_review_stat.last_contribution_date =(
                 datetime.datetime.strptime(
                     str(
@@ -2367,6 +2372,8 @@ def update_question_contribution_stats(
                         ).date())
             )
         else:
+            print('------Existing Q S Model')
+            print(suggestion.status)
             question_contribution_stat = (
                 _create_question_contribution_stats_from_models(
                     question_contribution_stat_model))
@@ -2408,12 +2415,16 @@ def update_question_review_stats(
     for topic in topics:
         topic_ids.append(topic.topic_id)
 
+    print('------------------------TOPIC IDS IN Q')
+    print(topic_ids)
     for topic_id in topic_ids:
         question_review_stat_model = (
             suggestion_models.QuestionReviewStatsModel.get(
                 user_id, topic_id
             ))
 
+        print('------------------------Q STAT R')
+        print(question_review_stat_model)
         if question_review_stat_model is None:
             suggestion_models.QuestionReviewStatsModel.create(
                 reviewer_user_id=user_id,
@@ -2440,7 +2451,7 @@ def update_question_review_stats(
                     question_review_stat_model))
 
             question_review_stat.reviewed_questions_count += 1
-            question_review_stat.accepted_questions_count += 1 * int(not is_accepted)
+            question_review_stat.accepted_questions_count += 1 * int(is_accepted)
             question_review_stat.accepted_questions_with_reviewer_edits_count += 1 + int(
                 suggestion.edited_by_reviewer)
             question_review_stat.last_contribution_date =(
