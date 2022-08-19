@@ -76,16 +76,6 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
         if method == 'PUT':
             return self.testapp.put(url, params=params, headers=headers)
 
-    def mock_firebase_auth_create_user(self, **kwargs: Any) -> Any:
-        """Mock for firebase_auth.create_user()."""
-        email = kwargs['email']
-        auth_id = self.get_auth_id_from_email(email) # type: ignore
-        self.firebase_sdk_stub.create_user(auth_id, email)
-
-    def mock_login_as_admin(self, email: str) -> None:
-        """Sets the environment variables to simulate a login of admin."""
-        self.login(email, is_super_admin=True)
-
     def test_populate_debug_data(self) -> None:
         init_app_swap = self.swap_with_call_counter(
             firebase_admin, 'initialize_app')
@@ -109,6 +99,10 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
         self._assert_topics_in_classroom(
             contributor_dashboard_debug.CLASSROOM_NAME)
 
+    def mock_login_as_admin(self, email: str) -> None:
+        """Sets the environment variables to simulate a login of admin."""
+        self.login(email, is_super_admin=True)
+
     def test_sign_up_new_user(self) -> None:
         email = 'user1@example.com'
         username = 'user1'
@@ -127,6 +121,12 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
         self.assertEqual(
             user_services.get_user_settings_from_email(email).username, # type: ignore
             username)
+
+    def mock_firebase_auth_create_user(self, **kwargs: Any) -> Any:
+        """Mock for firebase_auth.create_user()."""
+        email = kwargs['email']
+        auth_id = self.get_auth_id_from_email(email) # type: ignore
+        self.firebase_sdk_stub.create_user(auth_id, email)
 
     def test_sign_in(self) -> None:
         email = 'user1@example.com'
@@ -216,16 +216,16 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
         """Asserts that the sample new structures data is generated."""
         topic_summaries = topic_fetchers.get_all_topic_summaries()
         self.assertEqual(len(topic_summaries), 2)
-        for summary in topic_summaries:
-            if summary.name == 'Dummy Topic 1':
-                topic_id = summary.id
+
         story_id = (
-            topic_fetchers.get_topic_by_id(
-                topic_id).canonical_story_references[0].story_id)
+            topic_fetchers.get_topic_by_name(
+                'Dummy Topic 1').canonical_story_references[0].story_id)
         self.assertIsNotNone(
             story_fetchers.get_story_by_id(story_id, strict=False))
+
         skill_summaries = skill_services.get_all_skill_summaries() # type: ignore
         self.assertEqual(len(skill_summaries), 3)
+
         questions, _ = (
             question_fetchers.get_questions_and_skill_descriptions_by_skill_ids(
                 10, [
@@ -233,6 +233,7 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
                     skill_summaries[2].id], 0)
         )
         self.assertEqual(len(questions), 3)
+
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities('hi', '', None)) # type: ignore
         self.assertEqual(len(translation_opportunities), 3)
