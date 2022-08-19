@@ -344,10 +344,6 @@ class LearnerGroupSyllabusHandler(base.BaseHandler):
         if learner_group is None:
             raise self.InvalidInputException('No such learner group exists.')
 
-        learner_group = (
-            learner_group_services.sync_syllabus_to_stories_and_skills(
-                learner_group))
-
         story_summary_dicts = (
             story_fetchers.get_learner_group_syllabus_story_summaries(
                 learner_group.story_ids))
