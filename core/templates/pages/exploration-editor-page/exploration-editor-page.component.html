@@ -44,7 +44,7 @@
       <li ng-class="{'navbar-tab-active': $ctrl.getActiveTabName() === 'preview', 'oppia-disabled-tab': !$ctrl.connectedToInternet}" id="tutorialPreviewTab" class="nav-item icon nav-list-item e2e-test-preview-tab"
           ng-click="!$ctrl.connectedToInternet || $ctrl.selectPreviewTab()" uib-tooltip="Preview does not work when offline." tooltip-placement="bottom"  tooltip-enable="!$ctrl.connectedToInternet">
         <a class="nav-link  navbar-tab" uib-tooltip="Preview" tooltip-placement="bottom" tabindex="0" tooltip-enable="$ctrl.connectedToInternet">
-          <i class="fas fa-caret-right navbar-tab-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTabName() === 'preview'}"></i>
+          <i class="fas fa-play navbar-tab-icon nav-bar-preview-icon" ng-class="{'navbar-tab-active-icon': $ctrl.getActiveTabName() === 'preview'}"></i>
         </a>
       </li>
 
@@ -245,6 +245,11 @@
     position: relative;
     text-shadow: 0 1px rgba(0, 0, 0, 0.25);
   }
+
+  exploration-editor-page .nav-bar-preview-icon {
+    font-size: 20px;
+  }
+
   @media screen and (max-width: 768px) {
     .navbar-helper {
       display: none;
