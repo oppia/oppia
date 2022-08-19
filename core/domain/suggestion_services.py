@@ -2231,13 +2231,6 @@ def update_translation_contribution_stats(
             content_word_count) * int(not is_submission and is_suggestion_accepted)
         translation_contribution_stat.rejected_translations_count += 1 * int(not is_submission and is_suggestion_rejected)
         translation_contribution_stat.rejected_translation_word_count += content_word_count * int(not is_submission and is_suggestion_rejected)
-
-        print('translation_contribution_stat.accepted_translations_count')
-        print(translation_contribution_stat.accepted_translations_count)
-        print('is_submission')
-        print(is_submission)
-        print('is_suggestion_accepted')
-        print(is_suggestion_accepted)
         
         if is_submission:
             translation_contribution_stat.contribution_dates.append(
@@ -2372,8 +2365,6 @@ def update_question_contribution_stats(
                         ).date())
             )
         else:
-            print('------Existing Q S Model')
-            print(suggestion.status)
             question_contribution_stat = (
                 _create_question_contribution_stats_from_models(
                     question_contribution_stat_model))
@@ -2415,16 +2406,12 @@ def update_question_review_stats(
     for topic in topics:
         topic_ids.append(topic.topic_id)
 
-    print('------------------------TOPIC IDS IN Q')
-    print(topic_ids)
     for topic_id in topic_ids:
         question_review_stat_model = (
             suggestion_models.QuestionReviewStatsModel.get(
                 user_id, topic_id
             ))
 
-        print('------------------------Q STAT R')
-        print(question_review_stat_model)
         if question_review_stat_model is None:
             suggestion_models.QuestionReviewStatsModel.create(
                 reviewer_user_id=user_id,
