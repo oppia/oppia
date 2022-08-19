@@ -1900,9 +1900,9 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)  # type: ignore[no-untyped-call]
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL) # type: ignore[no-untyped-call]
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL) # type: ignore[no-untyped-call]
+        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL) # type: ignore[no-untyped-call]
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)  # type: ignore[no-untyped-call]
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)  # type: ignore[no-untyped-call]
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)  # type: ignore[no-untyped-call]
@@ -2159,7 +2159,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             stats.question_review_stats[0].contributor_user_id, 'user_id')
 
-    def _publish_valid_topic(self, topic, uncategorized_skill_ids):
+    def _publish_valid_topic(self, topic, uncategorized_skill_ids): # type: ignore[no-untyped-def]
         """Saves and publishes a valid topic with linked skills and subtopic.
 
         Args:
@@ -2190,16 +2190,16 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 'url_fragment': 'sample-fragment'
             })]
         )
-        topic_services.save_new_topic(self.owner_id, topic)
-        topic_services.publish_topic(topic.id, self.admin_id)
+        topic_services.save_new_topic(self.owner_id, topic) # type: ignore[no-untyped-call]
+        topic_services.publish_topic(topic.id, self.admin_id) # type: ignore[no-untyped-call]
 
         for skill_id in uncategorized_skill_ids:
-            self.save_new_skill(
+            self.save_new_skill( # type: ignore[no-untyped-call]
                 skill_id, self.admin_id, description='skill_description')
-            topic_services.add_uncategorized_skill(
+            topic_services.add_uncategorized_skill( # type: ignore[no-untyped-call]
                 self.admin_id, topic.id, skill_id)
 
-    def test_update_translation_contribution_stats(self):
+    def test_update_translation_contribution_stats(self) -> None:
         explorations = [self.save_new_valid_exploration(
             '%s' % i,
             self.owner_id,
@@ -2217,11 +2217,11 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             self.topic_id, 'topic_name', 'abbrev', 'description', 'fragm')
         self.skill_id_0 = 'skill_id_0'
         self.skill_id_1 = 'skill_id_1'
-        self._publish_valid_topic(topic, [self.skill_id_0, self.skill_id_1])
+        self._publish_valid_topic(topic, [self.skill_id_0, self.skill_id_1]) # type: ignore[no-untyped-call]
 
-        self.create_story_for_translation_opportunity(
+        self.create_story_for_translation_opportunity( # type: ignore[no-untyped-call]
             self.owner_id, self.admin_id, 'story_id_0', self.topic_id, '0')
-        self.create_story_for_translation_opportunity(
+        self.create_story_for_translation_opportunity( # type: ignore[no-untyped-call]
             self.owner_id, self.admin_id, 'story_id_1', self.topic_id, '1')
 
         change_dict = {
@@ -2253,22 +2253,22 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             )
         )
         self.assertEqual(
-            translation_contribution_stats_model.submitted_translations_count,
+            translation_contribution_stats_model.submitted_translations_count, # type: ignore[union-attr]
             2
         )
         self.assertEqual(
             (
-                translation_contribution_stats_model
+                translation_contribution_stats_model # type: ignore[union-attr]
                 .submitted_translation_word_count
             ),
             6
         )
         self.assertEqual(
-            translation_contribution_stats_model.accepted_translations_count,
+            translation_contribution_stats_model.accepted_translations_count, # type: ignore[union-attr]
             0
         )
 
-    def test_update_translation_review_stats(self):
+    def test_update_translation_review_stats(self) -> None:
         explorations = [self.save_new_valid_exploration(
             '%s' % i,
             self.owner_id,
@@ -2286,11 +2286,11 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             self.topic_id, 'topic_name', 'abbrev', 'description', 'fragm')
         self.skill_id_0 = 'skill_id_0'
         self.skill_id_1 = 'skill_id_1'
-        self._publish_valid_topic(topic, [self.skill_id_0, self.skill_id_1])
+        self._publish_valid_topic(topic, [self.skill_id_0, self.skill_id_1]) # type: ignore[no-untyped-call]
 
-        self.create_story_for_translation_opportunity(
+        self.create_story_for_translation_opportunity( # type: ignore[no-untyped-call]
             self.owner_id, self.admin_id, 'story_id_01', self.topic_id, '0')
-        self.create_story_for_translation_opportunity(
+        self.create_story_for_translation_opportunity( # type: ignore[no-untyped-call]
             self.owner_id, self.admin_id, 'story_id_02', self.topic_id, '1')
 
         change_dict = {
@@ -2324,18 +2324,18 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             )
         )
         self.assertEqual(
-            translation_contribution_stats_model.submitted_translations_count,
+            translation_contribution_stats_model.submitted_translations_count, # type: ignore[union-attr]
             2
         )
         self.assertEqual(
             (
-                translation_contribution_stats_model
+                translation_contribution_stats_model # type: ignore[union-attr]
                 .submitted_translation_word_count
             ),
             6
         )
         self.assertEqual(
-            translation_contribution_stats_model.accepted_translations_count,
+            translation_contribution_stats_model.accepted_translations_count, # type: ignore[union-attr]
             0
         )
 
@@ -2355,24 +2355,24 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         )
 
         self.assertEqual(
-            translation_review_stats_model.accepted_translations_count,
+            translation_review_stats_model.accepted_translations_count, # type: ignore[union-attr]
             2
         )
         self.assertEqual(
             (
-                translation_review_stats_model
+                translation_review_stats_model # type: ignore[union-attr]
                 .reviewed_translation_word_count
             ),
             6
         )
 
-    def test_update_question_contribution_stats(self):
+    def test_update_question_contribution_stats(self) -> None:
         skill_id_1 = skill_services.get_new_skill_id()
         skill_id_2 = skill_services.get_new_skill_id()
-        self.save_new_skill(
+        self.save_new_skill( # type: ignore[no-untyped-call]
             skill_id_1, self.author_id, description='description')
         topic_id = topic_fetchers.get_new_topic_id()
-        self.save_new_topic(
+        self.save_new_topic( # type: ignore[no-untyped-call]
             topic_id, 'topic_admin', name='Topic1',
             abbreviated_name='topic-three', url_fragment='topic-three',
             description='Description',
@@ -2412,11 +2412,11 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             'skill_id': skill_id_2,
             'skill_difficulty': 0.3
         }
-        initial_suggestion = suggestion_services.create_suggestion(
+        initial_suggestion = suggestion_services.create_suggestion( # type: ignore[call-overload]
             feconf.SUGGESTION_TYPE_ADD_QUESTION,
             feconf.ENTITY_TYPE_SKILL, skill_id_1, 1,
             self.author_id, suggestion_change_1, 'test description')
-        latest_suggestion = suggestion_services.create_suggestion(
+        latest_suggestion = suggestion_services.create_suggestion(  # type: ignore[call-overload]
             feconf.SUGGESTION_TYPE_ADD_QUESTION,
             feconf.ENTITY_TYPE_SKILL, skill_id_2, 1,
             self.author_id, suggestion_change_2, 'test description')
@@ -2433,11 +2433,11 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             )
         )
         self.assertEqual(
-            question_contribution_stats_model.submitted_questions_count,
+            question_contribution_stats_model.submitted_questions_count,  # type: ignore[union-attr]
             2
         )
         self.assertEqual(
-            question_contribution_stats_model.accepted_questions_count,
+            question_contribution_stats_model.accepted_questions_count,  # type: ignore[union-attr]
             0
         )
 
@@ -2457,24 +2457,24 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         )
 
         self.assertEqual(
-            question_review_stats_model.accepted_questions_count,
+            question_review_stats_model.accepted_questions_count,  # type: ignore[union-attr]
             2
         )
         self.assertEqual(
             (
-                question_review_stats_model
+                question_review_stats_model  # type: ignore[union-attr]
                 .reviewed_questions_count
             ),
             2
         )
 
-    def test_update_question_review_stats(self):
+    def test_update_question_review_stats(self) -> None:
         skill_id_1 = skill_services.get_new_skill_id()
         skill_id_2 = skill_services.get_new_skill_id()
-        self.save_new_skill(
+        self.save_new_skill(  # type: ignore[no-untyped-call]
             skill_id_1, self.author_id, description='description')
         topic_id = topic_fetchers.get_new_topic_id()
-        self.save_new_topic(
+        self.save_new_topic(  # type: ignore[no-untyped-call]
             topic_id, 'topic_admin', name='Topic1',
             abbreviated_name='topic-three', url_fragment='topic-three',
             description='Description',
@@ -2514,11 +2514,11 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             'skill_id': skill_id_2,
             'skill_difficulty': 0.3
         }
-        initial_suggestion = suggestion_services.create_suggestion(
+        initial_suggestion = suggestion_services.create_suggestion(  # type: ignore[call-overload]
             feconf.SUGGESTION_TYPE_ADD_QUESTION,
             feconf.ENTITY_TYPE_SKILL, skill_id_1, 1,
             self.author_id, suggestion_change_1, 'test description')
-        latest_suggestion = suggestion_services.create_suggestion(
+        latest_suggestion = suggestion_services.create_suggestion(  # type: ignore[call-overload]
             feconf.SUGGESTION_TYPE_ADD_QUESTION,
             feconf.ENTITY_TYPE_SKILL, skill_id_2, 1,
             self.author_id, suggestion_change_2, 'test description')
@@ -2545,12 +2545,12 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         )
 
         self.assertEqual(
-            question_review_stats_model.accepted_questions_count,
+            question_review_stats_model.accepted_questions_count,  # type: ignore[union-attr]
             2
         )
         self.assertEqual(
             (
-                question_review_stats_model
+                question_review_stats_model  # type: ignore[union-attr]
                 .reviewed_questions_count
             ),
             2
