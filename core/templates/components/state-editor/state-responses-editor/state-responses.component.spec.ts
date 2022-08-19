@@ -395,7 +395,7 @@ describe('State Responses Component', () => {
       defaultOutcome);
     spyOn(component, 'openAddAnswerGroupModal');
 
-    expect(component.answerGroups).toEqual(undefined);
+    expect(component.answerGroups).toEqual([]);
     expect(component.defaultOutcome).toEqual(undefined);
     expect(component.activeAnswerGroupIndex).toBe(undefined);
 
@@ -437,7 +437,7 @@ describe('State Responses Component', () => {
     spyOn(stateEditorService, 'getInapplicableSkillMisconceptionIds')
       .and.returnValue(['misconception1']);
 
-    expect(component.answerGroups).toEqual(undefined);
+    expect(component.answerGroups).toEqual([]);
     expect(component.defaultOutcome).toEqual(undefined);
     expect(component.activeAnswerGroupIndex).toBe(undefined);
     expect(component.inapplicableSkillMisconceptionIds).toEqual(undefined);
@@ -877,12 +877,9 @@ describe('State Responses Component', () => {
     ' on delete button', () => {
     spyOn(ngbModal, 'open').and.callThrough();
 
-    const value = {
-      index: 0,
-      evt: new Event('')
-    };
+    const event = new Event('');
 
-    component.deleteAnswerGroup(value);
+    component.deleteAnswerGroup(event, 0);
 
     expect(ngbModal.open).toHaveBeenCalled();
   });
@@ -898,12 +895,9 @@ describe('State Responses Component', () => {
       } as NgbModalRef
     );
 
-    const value = {
-      index: 0,
-      evt: new Event('')
-    };
+    const event = new Event('');
 
-    component.deleteAnswerGroup(value);
+    component.deleteAnswerGroup(event, 0);
     tick();
 
     expect(ngbModal.open).toHaveBeenCalled();
@@ -919,12 +913,9 @@ describe('State Responses Component', () => {
       } as NgbModalRef
     );
 
-    const value = {
-      index: 0,
-      evt: new Event('')
-    };
+    const event = new Event('');
 
-    component.deleteAnswerGroup(value);
+    component.deleteAnswerGroup(event, 0);
 
     expect(alertsService.clearWarnings).toHaveBeenCalled();
   });

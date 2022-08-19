@@ -48,13 +48,6 @@ import { ItemSelectionInputCustomizationArgs } from 'interactions/customization-
 import { CdkDragSortEvent, moveItemInArray} from '@angular/cdk/drag-drop';
 import { EditabilityService } from 'services/editability.service';
 
-interface ValueEvent {
-  evt: {
-    stopPropagation: Function;
-  };
-
-  index: number;
-}
 
 @Component({
   selector: 'oppia-state-responses',
@@ -82,7 +75,7 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
   inapplicableSkillMisconceptionIds: string[];
   activeEditOption: boolean;
   misconceptionsBySkill: object;
-  answerGroups: AnswerGroup[];
+  answerGroups: AnswerGroup[] = [];
   defaultOutcome: Outcome;
   activeAnswerGroupIndex: number;
   SHOW_TRAINABLE_UNRESOLVED_ANSWERS: boolean;
@@ -353,17 +346,17 @@ export class StateResponsesComponent implements OnInit, OnDestroy {
     });
   }
 
-  deleteAnswerGroup(value: ValueEvent): void {
+  deleteAnswerGroup(evt: Event, index: number): void {
     // Prevent clicking on the delete button from also toggling the
     // display state of the answer group.
-    value.evt.stopPropagation();
+    evt.stopPropagation();
 
     this.alertsService.clearWarnings();
     this.ngbModal.open(DeleteAnswerGroupModalComponent, {
       backdrop: true,
     }).result.then(() => {
       this.responsesService.deleteAnswerGroup(
-        value.index, (newAnswerGroups) => {
+        index, (newAnswerGroups) => {
           this.onSaveInteractionAnswerGroups.emit(newAnswerGroups);
           this.refreshWarnings.emit();
         });

@@ -168,7 +168,7 @@ export class ContributionsAndReview
       const requiredData = {
         id: suggestion.suggestion_id,
         heading: this.formatRtePreviewPipe.transform(
-          suggestion.change.question_dict?.question_state_data.content.html),
+          suggestion.change.question_dict.question_state_data.content.html),
         subheading: subheading,
         labelText: this.SUGGESTION_LABELS[suggestion.status].text,
         labelColor: this.SUGGESTION_LABELS[suggestion.status].color,
@@ -450,8 +450,6 @@ export class ContributionsAndReview
     const fetchFunction = this.tabNameToOpportunityFetchFunction[
       this.activeSuggestionType][this.activeTabType];
 
-    this.contributions = {};
-
     return fetchFunction(shouldResetOffset).then((response) => {
       Object.keys(response.suggestionIdToDetails).forEach(id => {
         this.contributions[id] = response.suggestionIdToDetails[id];
@@ -494,6 +492,7 @@ export class ContributionsAndReview
     this.TAB_TYPE_CONTRIBUTIONS = 'contributions';
     this.TAB_TYPE_REVIEWS = 'reviews';
     this.activeExplorationId = null;
+    this.contributions = {};
     this.userDetailsLoading = true;
     this.userIsLoggedIn = false;
     this.activeTabType = '';

@@ -121,7 +121,7 @@ describe('Full exploration editor', function() {
     await explorationEditorMainTab.setStateName('card1');
     await explorationEditorMainTab.expectCurrentStateToBe('card1');
     await explorationEditorMainTab.setContent(
-      await forms.toRichText('card1 content'));
+      await forms.toRichText('card1 content'), true);
     await explorationEditorMainTab.setInteraction('TextInput');
     await (
       await explorationEditorMainTab.getResponseEditor('default')
@@ -144,7 +144,7 @@ describe('Full exploration editor', function() {
     await explorationEditorMainTab.setStateName('first');
     await explorationEditorMainTab.expectCurrentStateToBe('first');
     await explorationEditorMainTab.setContent(
-      await forms.toRichText('card1 content'));
+      await forms.toRichText('card1 content'), true);
 
     // Check deletion of states and changing the first state.
     await explorationEditorMainTab.setInteraction('TextInput');
