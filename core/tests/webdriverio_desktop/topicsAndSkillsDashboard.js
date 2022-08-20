@@ -29,7 +29,7 @@ var SkillEditorPage = require('../webdriverio_utils/SkillEditorPage.js');
 var TopicEditorPage = require('../webdriverio_utils/TopicEditorPage.js');
 
 
-fdescribe('Topics and skills dashboard functionality', function() {
+describe('Topics and skills dashboard functionality', function() {
   var topicsAndSkillsDashboardPage = null;
   var skillEditorPage = null;
   var topicEditorPage = null;
@@ -171,7 +171,7 @@ fdescribe('Topics and skills dashboard functionality', function() {
     await topicEditorPage.expectNumberOfUncategorizedSkillsToBe(1);
   });
 
-  fit('should merge an outside skill with one in a topic', async function() {
+  it('should merge an outside skill with one in a topic', async function() {
     let SKILL_NAME = 'skill3 TASD';
     let TOPIC_NAME = 'Topic3 TASD';
     await topicsAndSkillsDashboardPage.createTopic(
