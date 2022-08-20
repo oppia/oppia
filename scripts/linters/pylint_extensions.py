@@ -1950,8 +1950,9 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):
     }
 
     def process_tokens(self, tokens):
-        """Custom pylint checker which allows only those MyPy type ignores that
-        are properly documented.
+        """Custom pylint checker which allows only those MyPy type ignores
+        that are properly documented by a comment in the code. The comment
+        must be close to the actually ignore.
 
         Args:
             tokens: Token. Object to access all tokens of a module.
@@ -2062,7 +2063,8 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
 
     def process_tokens(self, tokens):
         """Custom pylint checker which makes sure that every exceptional type
-        should be documented properly.
+        should be documented properly by a comment in the code. The comment
+        must be close to the actually ignore.
 
         Args:
             tokens: Token. Object to access all tokens of a module.
@@ -2072,7 +2074,7 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
         self.check_comment_is_present_with_object_class(tokens)
 
     def _check_import_status(
-        self, import_status_vars, token_type, token, line_num
+        self, import_status_dict, token_type, token, line_num
     ):
         """Checks whether the single-line import or multi-line import
         present inside the module. If multi-line import is present then
@@ -2080,13 +2082,13 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
         import's scope or not.
 
         Args:
-            import_status_vars: List[bool, int, bool]. This list contains
-                the variables that tracks the module's import status, where:
-                1st element of list: Indicates whether single line import
+            import_status_dict: dict. This dictionary contains the variables
+                that tracks the module's import status, where:
+                1st element of dict: Indicates whether single line import
                     is encountered or not.
-                2nd element of list: Indicates the line number if import
+                2nd element of dict: Indicates the line number if import
                     is encountered, otherwise it is zero.
-                3rd element of list: Indicates whether the multi-line import is
+                3rd element of dict: Indicates whether the multi-line import is
                     encountered and linters are in it's scope or not.
                     import(
                         << multi-line import's scope >>
@@ -2094,21 +2096,13 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
             token_type: int. The kind to token that pylint provided.
             token: str. The token of module the pylint provided.
             line_num: int. The line number of given token.
-
-        Returns:
-            List[bool, int, bool]. The list which contains the information of
-            the current module's import status.
         """
-        single_line_import = import_status_vars[0]
-        import_line_num = import_status_vars[1]
-        inside_multi_line_import_scope = import_status_vars[2]
-
         # Checking if single-line import is present.
         # Eg: from typing import Any.
         if token_type == tokenize.NAME:
             if token == 'import':
-                single_line_import = True
-                import_line_num = line_num
+                import_status_dict['single_line_import'] = True
+                import_status_dict['import_line_num'] = line_num
 
         # Checking if multi-line import is present.
         # Eg: from typing import (
@@ -2116,15 +2110,14 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
         #   Tuple, Type, cast
         # )
         if token_type == tokenize.OP:
-            if single_line_import and token == '(':
-                inside_multi_line_import_scope = True
-                single_line_import = False
-            if inside_multi_line_import_scope and token == ')':
-                inside_multi_line_import_scope = False
-
-        return (
-            single_line_import, import_line_num, inside_multi_line_import_scope
-        )
+            if import_status_dict['single_line_import'] and token == '(':
+                import_status_dict['inside_multi_line_import_scope'] = True
+                import_status_dict['single_line_import'] = False
+            if (
+                import_status_dict['inside_multi_line_import_scope'] and
+                token == ')'
+            ):
+                import_status_dict['inside_multi_line_import_scope'] = False
 
     def check_comment_is_present_with_object_class(self, tokens):
         """Checks whether the object class in a module has been documented
@@ -2238,31 +2231,23 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
         """
         cast_type_regex = r'Here we use cast because'
         cast_comment_present = False
-        inside_multi_line_import_scope = False
-        single_line_import = False
-        import_line_num = 0
+        import_status_dict = {
+            'single_line_import': False,
+            'import_line_num': 0,
+            'inside_multi_line_import_scope': False
+        }
         cast_comment_line_num = 0
 
         for (token_type, token, (line_num, _), _, line) in tokens:
             line = line.strip()
-
-            import_status_vars = [
-                single_line_import,
-                import_line_num,
-                inside_multi_line_import_scope
-            ]
 
             if token_type == tokenize.COMMENT:
                 if re.search(cast_type_regex, line):
                     cast_comment_present = True
                     cast_comment_line_num = line_num
 
-            (
-                single_line_import,
-                import_line_num,
-                inside_multi_line_import_scope
-            ) = self._check_import_status(
-                import_status_vars,
+            self._check_import_status(
+                import_status_dict,
                 token_type,
                 token,
                 line_num
@@ -2270,9 +2255,12 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
 
             if token_type == tokenize.NAME and token == 'cast':
                 # Passing those cases where cast is imported.
-                if single_line_import and import_line_num == line_num:
+                if (
+                    import_status_dict['single_line_import'] and
+                    import_status_dict['import_line_num'] == line_num
+                ):
                     pass
-                elif inside_multi_line_import_scope:
+                elif import_status_dict['inside_multi_line_import_scope']:
                     pass
                 # Throwing an error when cast is encountered but there is no
                 # corresponding comment exist.
@@ -2302,9 +2290,11 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
         any_present_inside_arg_section = False
         any_present_inside_return_section = False
         any_present_in_function_signature = False
-        inside_multi_line_import_scope = False
-        single_line_import = False
-        import_line_num = 0
+        import_status_dict = {
+            'single_line_import': False,
+            'import_line_num': 0,
+            'inside_multi_line_import_scope': False
+        }
         args_section_end_line_num = 0
         any_type_comment_line_num = 0
 
@@ -2313,23 +2303,13 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
         for (token_type, token, (line_num, _), _, line) in tokens:
             line = line.strip()
 
-            import_status_vars = [
-                single_line_import,
-                import_line_num,
-                inside_multi_line_import_scope
-            ]
-
             if token_type == tokenize.COMMENT:
                 if re.search(any_type_regex, line):
                     any_type_comment_present = True
                     any_type_comment_line_num = line_num
 
-            (
-                single_line_import,
-                import_line_num,
-                inside_multi_line_import_scope
-            ) = self._check_import_status(
-                import_status_vars,
+            self._check_import_status(
+                import_status_dict,
                 token_type,
                 token,
                 line_num
@@ -2389,9 +2369,12 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
                     any_present_inside_return_section = False
                 if token_type == tokenize.NAME and token == 'Any':
                     # Passing those cases where Any is imported.
-                    if single_line_import and import_line_num == line_num:
+                    if (
+                        import_status_dict['single_line_import'] and
+                        import_status_dict['import_line_num'] == line_num
+                    ):
                         pass
-                    elif inside_multi_line_import_scope:
+                    elif import_status_dict['inside_multi_line_import_scope']:
                         pass
                     elif (
                         any_type_comment_present and
