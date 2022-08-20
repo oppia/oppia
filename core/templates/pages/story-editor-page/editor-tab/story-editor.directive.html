@@ -170,9 +170,11 @@
     <div class="chapter-list-container">
       <md-card class="oppia-page-card oppia-long-text content-card oppia-mobile-collapsible-card">
         <div class="story-node-editor">
-          <div class="chapter-list-card-header oppia-mobile-collapsible-card-header e2e-test-mobile-add-chapter"
-               ng-click="toggleChapterLists()">
-            <span>Chapters</span>
+          <div class="chapter-list-card-header oppia-mobile-collapsible-card-header">
+            <span class="e2e-test-mobile-add-chapter"
+                  ng-click="toggleChapterLists()">
+              Chapters
+            </span>
             <i class="fa fa-caret-down e2e-test-mobile-add-chapter"
                ng-if="!chaptersListIsShown"
                aria-hidden="true">
