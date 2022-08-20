@@ -52,7 +52,7 @@ if MYPY:  # pragma: no cover
     from mypy_imports import suggestion_models
     from mypy_imports import user_models
 
-(suggestion_models, feedback_models, opportunity_models,user_models) = (
+(suggestion_models, feedback_models, opportunity_models, user_models) = (
     models.Registry.import_models(
         [models.NAMES.suggestion, models.NAMES.feedback,
         models.NAMES.opportunity,
