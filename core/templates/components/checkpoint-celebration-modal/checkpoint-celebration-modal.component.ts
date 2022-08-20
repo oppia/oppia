@@ -16,7 +16,7 @@
  * @fileoverview Component for the checkpoint celebration modal.
  */
 
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { Subscription } from 'rxjs';
 
 import { ContextService } from 'services/context.service';
@@ -46,6 +46,9 @@ const SCREEN_WIDTH_FOR_STANDARD_SIZED_MESSAGE_MODAL_CUTOFF_PX = 1370;
   templateUrl: './checkpoint-celebration-modal.component.html',
 })
 export class CheckpointCelebrationModalComponent implements OnInit, OnDestroy {
+  @ViewChild('checkpointCelebrationModalTimer') checkpointTimerTemplateRef!:
+    ElementRef<SVGPolylineElement>;
+
   // These properties below are initialized using Angular lifecycle hooks
   // where we need to do non-null assertion. For more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -55,7 +58,7 @@ export class CheckpointCelebrationModalComponent implements OnInit, OnDestroy {
   checkpointNodeFadeInDelays!: number[];
   orderedCheckpointList!: string[];
   checkpointStatusArrayPlaceholder!: string[];
-  checkpointTimer!: SVGPolylineElement;
+  checkpointTimer: SVGPolylineElement | null = null;
   directiveSubscriptions = new Subscription();
   exploration: ReadOnlyExplorationBackendDict | undefined;
   hasViewedLessonInfoOnce: boolean | undefined;
@@ -275,8 +278,7 @@ export class CheckpointCelebrationModalComponent implements OnInit, OnDestroy {
     if (!this.shouldDisplayFullScaleMessage) {
       return;
     }
-    this.checkpointTimer = document.querySelector(
-      '.checkpoint-celebration-modal-timer') as SVGPolylineElement;
+    this.checkpointTimer = this.checkpointTimerTemplateRef.nativeElement;
     // This function is meant to reset the timer SVG to its initial position,
     // i.e. completely filled. This needs to happen instantly, as opposed to the
     // depleting of the timer which happens over a 12 second (approx.) period.
@@ -290,15 +292,17 @@ export class CheckpointCelebrationModalComponent implements OnInit, OnDestroy {
     // To force the browser to pick up this change, we need to trigger a reflow.
     // The clientHeight property is one of the properties that causes a
     // reflow.
-    this.checkpointTimer.style.transitionDuration = '0s';
-    this.checkpointTimer.style.strokeDashoffset = '0';
-    this.checkpointTimer.clientHeight;
-    this.checkpointTimer.style.transitionDuration = '12.14s';
-    this.checkpointTimer.clientHeight;
-    if (this.isLanguageRTL()) {
-      this.checkpointTimer.style.strokeDashoffset = '-10';
-    } else {
-      this.checkpointTimer.style.strokeDashoffset = '10';
+    if (this.checkpointTimer) {
+      this.checkpointTimer.style.transitionDuration = '0s';
+      this.checkpointTimer.style.strokeDashoffset = '0';
+      this.checkpointTimer.clientHeight;
+      this.checkpointTimer.style.transitionDuration = '12.14s';
+      this.checkpointTimer.clientHeight;
+      if (this.isLanguageRTL()) {
+        this.checkpointTimer.style.strokeDashoffset = '-10';
+      } else {
+        this.checkpointTimer.style.strokeDashoffset = '10';
+      }
     }
   }
 
