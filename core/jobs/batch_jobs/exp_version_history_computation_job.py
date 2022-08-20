@@ -31,7 +31,7 @@ from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Union
 from typing_extensions import TypedDict
 
 MYPY = False
@@ -299,12 +299,15 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
         """
         for change in change_list:
             if change.cmd == feconf.CMD_REVERT_COMMIT:
-                return change.version_number
+                return int(change.version_number)
         return None
 
     def create_version_history_models(
         self, model_group: FormattedModelGroupDict
-    ) -> Tuple[str, List[exp_models.ExplorationVersionHistoryModel]]:
+    ) -> Union[
+        Tuple[str, List[exp_models.ExplorationVersionHistoryModel]],
+        Tuple[str, List[exp_models.ExplorationVersionHistoryModel], str, int]
+    ]:
         """Creates the version history models for a particular exploration.
 
         Args:
@@ -479,7 +482,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
 
     def generate_exploration_from_snapshot(
         self, snapshot_model: exp_models.ExplorationSnapshotContentModel
-    ) -> exp_models.ExplorationModel:
+    ) -> Optional[exp_models.ExplorationModel]:
         """Returns the exploration model with given id at version 1.
 
         Args:
@@ -872,7 +875,7 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
         """
         for change in change_list:
             if change.cmd == feconf.CMD_REVERT_COMMIT:
-                return change.version_number
+                return int(change.version_number)
         return None
 
     def verify_version_history_models(
@@ -1018,14 +1021,14 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
                         'edits_allowed': curr_exp.edits_allowed
                     }
                     expected_state_vh = (
-                        exp_services.update_states_version_history(
+                        exp_services.update_states_version_history( # type: ignore[no-untyped-call]
                             copy.deepcopy(verified_state_vh[-1]),
                             change_list, old_states_dict,
                             new_states_dict, version, committer_id
                         )
                     )
                     expected_metadata_vh = (
-                        exp_services.update_metadata_version_history(
+                        exp_services.update_metadata_version_history( # type: ignore[no-untyped-call]
                             copy.deepcopy(verified_metadata_vh[-1]),
                             change_list, old_metadata_dict,
                             new_metadata_dict, version, committer_id
