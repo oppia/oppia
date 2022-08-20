@@ -262,6 +262,21 @@ describe('Rule Editor Component', () => {
       varName: 'varName'
     };
 
+    component.ruleDescriptionChoices = [
+      {
+        id: '1',
+        val: 'data 1',
+      },
+      {
+        id: '2',
+        val: 'data 2',
+      },
+      {
+        id: '3',
+        val: 'data 3',
+      }
+    ];
+
     component.rule = new Rule(
       null,
       {varName: 2},

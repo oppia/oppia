@@ -39,7 +39,8 @@ export class HtmlSelectComponent implements OnInit {
   }
 
   updatedSelection(): void {
-    this.selection = Number(this.selectionAsString);
+    this.selection = this.options
+      .findIndex(x => x.id === this.selectionAsString);
     this.onSelectionChange.emit(this.selection);
   }
 }

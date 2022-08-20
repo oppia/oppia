@@ -209,8 +209,9 @@ export class RuleEditorComponent
     return ruleDescription;
   }
 
-  onSelectionChangeHtmlSelect(selection: number, item: SelectItem): void {
-    this.rule.inputs[item.varName] = selection;
+  onSelectionChangeHtmlSelect(selectionIndex: number, item: SelectItem): void {
+    this.rule.inputs[item.varName] = this
+      .ruleDescriptionChoices[selectionIndex].id;
 
     this.changeDetectorRef.detectChanges();
   }
