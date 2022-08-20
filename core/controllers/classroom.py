@@ -16,8 +16,6 @@
 
 from __future__ import annotations
 
-import logging
-
 from core import feconf
 from core.constants import constants
 from core.controllers import acl_decorators
@@ -203,7 +201,4 @@ class ClassroomHandler(base.BaseHandler):
     def delete(self, classroom_id):
         """Deletes classroom from the classroom admin page."""
         classroom_config_services.delete_classroom(classroom_id)
-        log_info_string = '(%s) %s deleted classroom %s' % (
-            self.roles, self.user_id, classroom_id)
-        logging.info(log_info_string)
         self.render_json(self.values)
