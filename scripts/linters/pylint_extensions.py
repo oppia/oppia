@@ -20,6 +20,7 @@ presubmit checks. Next message id would be C0041.
 
 from __future__ import annotations
 
+import copy
 import fnmatch
 import linecache
 import re
@@ -2032,9 +2033,21 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
     for exceptional types in the backend type annotations.
     """
 
-    __implements__ = interfaces.ITokenChecker
-
     ALLOWED_LINES_OF_GAP = 10
+
+    EXCEPTIONAL_TYPE_STATUS_DICT = {
+        'type_comment_present': False,
+        'type_comment_line_num': 0,
+        'outside_function_signature_block': True,
+        'outside_args_section': True,
+        'type_present_inside_arg_section': False,
+        'type_present_inside_return_section': False,
+        'type_present_in_function_signature': False,
+        'args_section_end_line_num': 0,
+        'func_def_start_line': 0,
+    }
+
+    __implements__ = interfaces.ITokenChecker
 
     name = 'comment-for-exceptional-types'
     priority = -1
@@ -2093,7 +2106,7 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
                     import(
                         << multi-line import's scope >>
                     )
-            token_type: int. The kind to token that pylint provided.
+            token_type: int. The kind of token that pylint provided.
             token: str. The token of module the pylint provided.
             line_num: int. The line number of given token.
         """
@@ -2119,6 +2132,161 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
             ):
                 import_status_dict['inside_multi_line_import_scope'] = False
 
+    def _check_exceptional_type_is_documented(
+        self, type_status_dict, import_status_dict, token_type, token,
+        line, line_num, exceptional_type
+    ):
+        """Checks whether the given exceptional type in a module has been
+        documented or not. If the exceptional type is not documented then
+        adds an error message.
+
+        Args:
+            type_status_dict: dict. The dict containing all the information
+                about the exceptional type that was passed to this method.
+            import_status_dict: Optional[Dict]. This dictionary contains the
+                variables that tracks the module's import status, whether a
+                multi-line import or single-line import is present, or None
+                if the given exceptional_type is not imported in the module.
+            token_type: int. The kind of token that pylint provided.
+            token: str. The token of module the pylint provided.
+            line: str. The line of the module where current token is present.
+            line_num: int. The line number of given token.
+            exceptional_type: str. The exceptional type for which this method
+                is called, Possible values can be 'Any' or 'object'.
+        """
+        # Here, we are defining new variables so that we don't have to fetch
+        # the values from 'type_status_dict' dictionary again and again.
+        outside_function_signature_block = type_status_dict[
+            'outside_function_signature_block'
+        ]
+        outside_args_section = type_status_dict['outside_args_section']
+        args_section_end_line_num = type_status_dict[
+            'args_section_end_line_num'
+        ]
+        type_present_inside_arg_section = type_status_dict[
+            'type_present_inside_arg_section'
+        ]
+        type_present_inside_return_section = type_status_dict[
+            'type_present_inside_return_section'
+        ]
+        type_present_in_function_signature = type_status_dict[
+            'type_present_in_function_signature'
+        ]
+        type_comment_present = type_status_dict['type_comment_present']
+        type_comment_line_num = type_status_dict['type_comment_line_num']
+        func_def_start_line = type_status_dict['func_def_start_line']
+
+        # Checking if linters are in argument-section, return-section or
+        # outside of the function signature.
+        # Eg:
+        #       <outside function signature block>
+        #   def func(<argument-section>) -> <return-section>:
+        #       <outside function signature block>.
+        if token_type == tokenize.NAME:
+            if token == 'def':
+                outside_function_signature_block = False
+                func_def_start_line = line_num
+                outside_args_section = False
+
+        if token_type == tokenize.OP:
+            if token == '->':
+                outside_args_section = True
+                args_section_end_line_num = line_num
+            if outside_args_section and token == ':':
+                outside_function_signature_block = True
+
+        # Checking if exceptional_type is present in function definition or not.
+        if token_type == tokenize.NAME and token == exceptional_type:
+            if not outside_args_section:
+                type_present_inside_arg_section = True
+            elif (
+                outside_args_section and
+                args_section_end_line_num == line_num
+            ):
+                type_present_inside_return_section = True
+
+        if (
+            type_present_inside_arg_section or
+            type_present_inside_return_section
+        ):
+            type_present_in_function_signature = True
+
+        if outside_function_signature_block:
+            if type_present_in_function_signature:
+                if (
+                    type_comment_present and
+                    func_def_start_line <= (
+                        type_comment_line_num +
+                        self.ALLOWED_LINES_OF_GAP
+                    )
+                ):
+                    type_comment_present = False
+                else:
+                    if exceptional_type == 'Any':
+                        self.add_message(
+                            'any-type-used', line=func_def_start_line)
+                    if exceptional_type == 'object':
+                        self.add_message(
+                            'object-class-used', line=func_def_start_line)
+
+                type_present_in_function_signature = False
+                type_present_inside_arg_section = False
+                type_present_inside_return_section = False
+            if token_type == tokenize.NAME and token == exceptional_type:
+                if exceptional_type == 'object':
+                    # Excluding the case when object is called:
+                    # Eg: var = object()
+                    if 'object()' in line:
+                        return
+                # Passing those cases where Any is imported.
+                if exceptional_type == 'Any':
+                    if (
+                        import_status_dict['single_line_import'] and
+                        import_status_dict['import_line_num'] == line_num
+                    ):
+                        return
+                    elif import_status_dict['inside_multi_line_import_scope']:
+                        return
+                # Checking if comment for exceptional_type is present and it's
+                # with in the range (minimum 10 line of gaps).
+                if (
+                    type_comment_present and
+                    line_num <= (
+                        type_comment_line_num +
+                        self.ALLOWED_LINES_OF_GAP
+                    )
+                ):
+                    type_comment_present = False
+                else:
+                    if exceptional_type == 'Any':
+                        self.add_message(
+                            'any-type-used', line=line_num)
+                    if exceptional_type == 'object':
+                        self.add_message(
+                            'object-class-used', line=line_num)
+
+        # Updating the 'type_status_dict' dictionary so that previous data of
+        # exceptional types don't get lost.
+        type_status_dict['outside_function_signature_block'] = (
+            outside_function_signature_block
+        )
+        type_status_dict['outside_args_section'] = outside_args_section
+        type_status_dict['args_section_end_line_num'] = (
+            args_section_end_line_num
+        )
+        type_status_dict['type_present_inside_arg_section'] = (
+            type_present_inside_arg_section
+        )
+        type_status_dict['type_present_inside_return_section'] = (
+            type_present_inside_return_section
+        )
+        type_status_dict['type_present_in_function_signature'] = (
+            type_present_in_function_signature
+        )
+        type_status_dict['type_comment_present'] = type_comment_present
+        type_status_dict['type_comment_line_num'] = type_comment_line_num
+        type_status_dict['func_def_start_line'] = func_def_start_line
+
     def check_comment_is_present_with_object_class(self, tokens):
         """Checks whether the object class in a module has been documented
         or not. If the object class is not documented then adds an error
@@ -2127,15 +2295,9 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
         Args:
             tokens: Token. Object to access all tokens of a module.
         """
-        object_comment_present = False
-        outside_function_signature_block = True
-        outside_args_section = True
-        object_present_inside_arg_section = False
-        object_present_inside_return_section = False
-        object_present_in_function_signature = False
-        object_already_encountered_line_num = 0
-        args_section_end_line_num = 0
-        object_comment_line_num = 0
+        object_class_status_dict = copy.deepcopy(
+            self.EXCEPTIONAL_TYPE_STATUS_DICT
+        )
 
         object_type_regex = r'Here we use object because'
 
@@ -2144,82 +2306,13 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
 
             if token_type == tokenize.COMMENT:
                 if re.search(object_type_regex, line):
-                    object_comment_present = True
-                    object_comment_line_num = line_num
+                    object_class_status_dict['type_comment_present'] = True
+                    object_class_status_dict['type_comment_line_num'] = line_num
 
-            # Checking if linters are in argument-section, return-section or
-            # outside of the function definition.
-            # Eg:
-            #       <outside function signature block>
-            #   def func(<argument-section>) -> <return-section>:
-            #       <outside function signature block>.
-            if token_type == tokenize.NAME:
-                if token == 'def':
-                    outside_function_signature_block = False
-                    func_def_start_line = line_num
-                    outside_args_section = False
-
-            if token_type == tokenize.OP:
-                if token == '->':
-                    outside_args_section = True
-                    args_section_end_line_num = line_num
-                if outside_args_section and token == ':':
-                    outside_function_signature_block = True
-
-            # Checking if object type is present in function signature or not.
-            if token_type == tokenize.NAME and token == 'object':
-                if not outside_args_section:
-                    object_present_inside_arg_section = True
-                elif (
-                    outside_args_section and
-                    args_section_end_line_num == line_num
-                ):
-                    object_present_inside_return_section = True
-
-            if (
-                object_present_inside_arg_section or
-                object_present_inside_return_section
-            ):
-                object_present_in_function_signature = True
-
-            if outside_function_signature_block:
-                if object_present_in_function_signature:
-                    if (
-                        object_comment_present and
-                        func_def_start_line <= (
-                            object_comment_line_num +
-                            self.ALLOWED_LINES_OF_GAP
-                        )
-                    ):
-                        object_comment_present = False
-                    else:
-                        self.add_message(
-                            'object-class-used', line=func_def_start_line
-                        )
-                    object_present_in_function_signature = False
-                    object_present_inside_arg_section = False
-                    object_present_inside_return_section = False
-                if token_type == tokenize.NAME and token == 'object':
-                    # Excluding the case where 2 or more objects occurred
-                    # in the same line.
-                    if object_already_encountered_line_num == line_num:
-                        continue
-                    object_already_encountered_line_num = line_num
-                    # Excluding the case when object is called:
-                    # Eg: var = object()
-                    if 'object()' in line:
-                        continue
-                    if (
-                        object_comment_present and
-                        line_num <= (
-                            object_comment_line_num +
-                            self.ALLOWED_LINES_OF_GAP
-                        )
-                    ):
-                        object_comment_present = False
-                    else:
-                        self.add_message(
-                            'object-class-used', line=line_num)
+            self._check_exceptional_type_is_documented(
+                object_class_status_dict, None, token_type, token,
+                line, line_num, 'object'
+            )
 
     def check_comment_is_present_with_cast_method(self, tokens):
         """Checks whether the cast method in a module has been documented
@@ -2231,12 +2324,12 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
         """
         cast_type_regex = r'Here we use cast because'
         cast_comment_present = False
+        cast_comment_line_num = 0
         import_status_dict = {
             'single_line_import': False,
             'import_line_num': 0,
             'inside_multi_line_import_scope': False
         }
-        cast_comment_line_num = 0
 
         for (token_type, token, (line_num, _), _, line) in tokens:
             line = line.strip()
@@ -2247,10 +2340,7 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
                     cast_comment_line_num = line_num
 
             self._check_import_status(
-                import_status_dict,
-                token_type,
-                token,
-                line_num
+                import_status_dict, token_type, token, line_num
             )
 
             if token_type == tokenize.NAME and token == 'cast':
@@ -2284,19 +2374,15 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
         Args:
             tokens: Token. Object to access all tokens of a module.
         """
-        any_type_comment_present = False
-        outside_function_signature_block = True
-        outside_args_section = True
-        any_present_inside_arg_section = False
-        any_present_inside_return_section = False
-        any_present_in_function_signature = False
         import_status_dict = {
             'single_line_import': False,
             'import_line_num': 0,
             'inside_multi_line_import_scope': False
         }
-        args_section_end_line_num = 0
-        any_type_comment_line_num = 0
+
+        any_type_status_dict = copy.deepcopy(
+            self.EXCEPTIONAL_TYPE_STATUS_DICT
+        )
 
         any_type_regex = r'Here we use type Any because'
 
@@ -2305,88 +2391,17 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
 
             if token_type == tokenize.COMMENT:
                 if re.search(any_type_regex, line):
-                    any_type_comment_present = True
-                    any_type_comment_line_num = line_num
+                    any_type_status_dict['type_comment_present'] = True
+                    any_type_status_dict['type_comment_line_num'] = line_num
 
             self._check_import_status(
-                import_status_dict,
-                token_type,
-                token,
-                line_num
+                import_status_dict, token_type, token, line_num
             )
 
-            # Checking if linters are in argument-section, return-section or
-            # outside of the function definition.
-            # Eg:
-            #       <outside function signature block>
-            #   def func(<argument-section>) -> <return-section>:
-            #       <outside function signature block>.
-            if token_type == tokenize.NAME:
-                if token == 'def':
-                    outside_function_signature_block = False
-                    func_def_start_line = line_num
-                    outside_args_section = False
-
-            if token_type == tokenize.OP:
-                if token == '->':
-                    outside_args_section = True
-                    args_section_end_line_num = line_num
-                if outside_args_section and token == ':':
-                    outside_function_signature_block = True
-
-            # Checking if Any type is present in function definition or not.
-            if token_type == tokenize.NAME and token == 'Any':
-                if not outside_args_section:
-                    any_present_inside_arg_section = True
-                elif (
-                    outside_args_section and
-                    args_section_end_line_num == line_num
-                ):
-                    any_present_inside_return_section = True
-
-            if (
-                any_present_inside_arg_section or
-                any_present_inside_return_section
-            ):
-                any_present_in_function_signature = True
-
-            if outside_function_signature_block:
-                if any_present_in_function_signature:
-                    if (
-                        any_type_comment_present and
-                        func_def_start_line <= (
-                            any_type_comment_line_num +
-                            self.ALLOWED_LINES_OF_GAP
-                        )
-                    ):
-                        any_type_comment_present = False
-                    else:
-                        self.add_message(
-                            'any-type-used', line=func_def_start_line
-                        )
-                    any_present_in_function_signature = False
-                    any_present_inside_arg_section = False
-                    any_present_inside_return_section = False
-                if token_type == tokenize.NAME and token == 'Any':
-                    # Passing those cases where Any is imported.
-                    if (
-                        import_status_dict['single_line_import'] and
-                        import_status_dict['import_line_num'] == line_num
-                    ):
-                        pass
-                    elif import_status_dict['inside_multi_line_import_scope']:
-                        pass
-                    elif (
-                        any_type_comment_present and
-                        line_num <= (
-                            any_type_comment_line_num +
-                            self.ALLOWED_LINES_OF_GAP
-                        )
-                    ):
-                        any_type_comment_present = False
-                    else:
-                        self.add_message(
-                            'any-type-used', line=line_num)
+            self._check_exceptional_type_is_documented(
+                any_type_status_dict, import_status_dict, token_type, token,
+                line, line_num, 'Any'
+            )
 
 
 class InequalityWithNoneChecker(checkers.BaseChecker):

@@ -2982,31 +2982,6 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
 
-        node_with_multiple_objects_in_type = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test'
-        )
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                # Here we use object because stubs of protobuf are not
-                # available yet. So, instead of Any we used object here.
-                object_dicts: Dict[str, Union[object, object]] = {
-                    'key': 'value'
-                }
-                """
-            )
-        node_with_multiple_objects_in_type.file = filename
-
-        self.checker_test_object.checker.process_tokens(
-           pylint_utils.tokenize_module(node_with_multiple_objects_in_type)
-        )
-        with self.checker_test_object.assertNoMessages():
-            temp_file.close()
-
     def test_raises_error_if_gap_between_type_and_comment_is_more_than_ten(
         self
     ):
