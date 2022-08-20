@@ -39,6 +39,7 @@ const CHECKPOINT_STATUS_IN_PROGRESS = 'in-progress';
 const MESSAGE_MODAL_APPROX_TRIGGER_AND_DISMISSAL_DURATION_MS = 2200;
 const MESSAGE_MODAL_APPROX_COMPLETE_ANIMATION_DURATION_MS = 15000;
 const MINI_MESSAGE_MODAL_APPROX_COMPLETE_ANIMATION_DURATION_MS = 6500;
+const SCREEN_WIDTH_FOR_STANDARD_SIZED_MESSAGE_MODAL_CUTOFF_PX = 1370;
 
 @Component({
   selector: 'oppia-checkpoint-celebration-modal',
@@ -112,7 +113,8 @@ export class CheckpointCelebrationModalComponent implements OnInit, OnDestroy {
       this.subscribeToCardChangeEmitter();
     });
     this.shouldDisplayFullScaleMessage = (
-      this.windowDimensionsService.getWidth() > 1370);
+      this.windowDimensionsService.getWidth() >
+      SCREEN_WIDTH_FOR_STANDARD_SIZED_MESSAGE_MODAL_CUTOFF_PX);
     this.subscribeToWindowResizeEmitter();
   }
 
@@ -152,7 +154,8 @@ export class CheckpointCelebrationModalComponent implements OnInit, OnDestroy {
       this.windowDimensionsService.getResizeEvent().subscribe(
         () => {
           this.shouldDisplayFullScaleMessage = (
-            this.windowDimensionsService.getWidth() > 1370);
+            this.windowDimensionsService.getWidth() >
+            SCREEN_WIDTH_FOR_STANDARD_SIZED_MESSAGE_MODAL_CUTOFF_PX);
         }
       )
     );
