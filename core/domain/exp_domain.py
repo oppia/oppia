@@ -29,6 +29,8 @@ import datetime
 import json
 import re
 import string
+from urllib.parse import urlparse
+import bs4
 
 from core import feconf
 from core import schema_utils
@@ -2615,6 +2617,42 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 new_voiceovers_mapping)
 
         return states_dict
+
+    @classmethod
+    def _convert_states_v51_dict_to_v52_dict(
+        cls, states_dict: Dict[str, state_domain.StateDict]
+    ) -> Dict[str, state_domain.StateDict]:
+        for state_dict in states_dict.values():
+            content_html_list = [state_dict['content']['html']]
+
+            for html_content in content_html_list:
+                soup = bs4.BeautifulSoup(html_content, 'html.parser')
+                links = soup.find_all('oppia-noninteractive-link')
+
+                acceptable_schemes = ['https', '']
+
+                for link in links:
+                    lnk = link['url-with-value'].replace('&quot;', '')
+                    txt = link['text-with-value'].replace('&quot;', '')
+
+                    # If text is empty and the link is not
+                    if len(lnk) != 0 and len(txt) == 0:
+                        txt = lnk
+
+                    # If link is http
+                    if urlparse(lnk).scheme == 'http':
+                        # Replace http with https
+                        lnk = lnk.replace('http', 'https')
+
+                    # If link is invalid
+                    if urlparse(lnk).scheme not in acceptable_schemes:
+                        # Delete the link
+                        link.extract()
+
+                    link['url-with-value'] = '&quot;' + lnk + '&quot;'
+                    link['text-with-value'] = '&quot;' + txt + '&quot;'
+
+            return states_dict
 
     @classmethod
     def update_states_from_model(
