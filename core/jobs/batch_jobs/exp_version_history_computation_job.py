@@ -306,7 +306,10 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
         self, model_group: FormattedModelGroupDict
     ) -> Union[
         Tuple[str, List[exp_models.ExplorationVersionHistoryModel]],
-        Tuple[str, List[exp_models.ExplorationVersionHistoryModel], str, int]
+        Tuple[
+            str, List[exp_models.ExplorationVersionHistoryModel],
+            Exception, int
+        ]
     ]:
         """Creates the version history models for a particular exploration.
 
