@@ -120,12 +120,6 @@ describe('Admin roles tab component ', function() {
     spyOn(adminDataService, 'getDataAsync').and.returnValue(
       Promise.resolve(adminPageData));
 
-    // Prechecks.
-    expect(component.UPDATABLE_ROLES).toEqual(null);
-    expect(component.roleToActions).toEqual(null);
-    expect(component.VIEWABLE_ROLES).toEqual(null);
-    expect(component.topicSummaries).toEqual(null);
-
     component.ngOnInit();
     tick();
     fixture.detectChanges();
@@ -144,7 +138,7 @@ describe('Admin roles tab component ', function() {
     component.clearEditor();
 
     expect(component.userRoles).toEqual([]);
-    expect(component.roleCurrentlyBeingUpdatedInBackend).toEqual(null);
+    expect(component.roleCurrentlyBeingUpdatedInBackend).toBeNull();
     expect(component.userIsBanned).toEqual(false);
   });
 
@@ -331,25 +325,25 @@ describe('Admin roles tab component ', function() {
   });
 
   describe('on calling openTopicManagerRoleEditor', function() {
-    let modalSpy = null;
     let ngbModal: NgbModal;
 
     class MockNgbModalRef {
-      componentInstance: {};
+      componentInstance!: {};
     }
 
     beforeEach(function() {
       ngbModal = TestBed.inject(NgbModal);
       component.topicSummaries = [sampleTopicSummary];
-      modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
+    });
+
+    it('should open the TopicManagerRoleEditorModal', fakeAsync(() => {
+      let modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
         return ({
           componentInstance: MockNgbModalRef,
           result: Promise.resolve(['topic_id_1'])
         }) as NgbModalRef;
       });
-    });
 
-    it('should open the TopicManagerRoleEditorModal', fakeAsync(() => {
       component.userRoles = ['MODERATOR'];
       component.managedTopicIds = [];
 
@@ -364,6 +358,13 @@ describe('Admin roles tab component ', function() {
 
     it('should not readd topic manager role if user is already a manager',
       fakeAsync(() => {
+        let modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
+          return ({
+            componentInstance: MockNgbModalRef,
+            result: Promise.resolve(['topic_id_1'])
+          }) as NgbModalRef;
+        });
+
         component.userRoles = ['MODERATOR', 'TOPIC_MANAGER'];
         component.managedTopicIds = [];
 

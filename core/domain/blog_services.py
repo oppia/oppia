@@ -470,6 +470,15 @@ def unpublish_blog_post(blog_post_id: str) -> None:
     blog_post_rights = get_blog_post_rights(blog_post_id, strict=False)
     if blog_post_rights is None:
         raise Exception('The given blog post does not exist')
+
+    blog_post = get_blog_post_by_id(blog_post_id, strict=True)
+    blog_post.published_on = None
+    _save_blog_post(blog_post)
+
+    blog_post_summary = get_blog_post_summary_by_id(blog_post_id, strict=True)
+    blog_post_summary.published_on = None
+    _save_blog_post_summary(blog_post_summary)
+
     blog_post_rights.blog_post_is_published = False
     save_blog_post_rights(blog_post_rights)
 
