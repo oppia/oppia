@@ -2215,7 +2215,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
 
         topic_id = '0'
         topic = topic_domain.Topic.create_default_topic(
-            self.topic_id, 'topic_name', 'abbrev', 'description', 'fragm')
+            topic_id, 'topic_name', 'abbrev', 'description', 'fragm')
         skill_id_0 = 'skill_id_0'
         skill_id_1 = 'skill_id_1'
         self._publish_valid_topic(topic, [skill_id_0, skill_id_1]) # type: ignore[no-untyped-call]
@@ -2284,7 +2284,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
 
         topic_id = '0'
         topic = topic_domain.Topic.create_default_topic(
-            self.topic_id, 'topic_name', 'abbrev', 'description', 'fragm')
+            topic_id, 'topic_name', 'abbrev', 'description', 'fragm')
         skill_id_0 = 'skill_id_0'
         skill_id_1 = 'skill_id_1'
         self._publish_valid_topic(topic, [skill_id_0, skill_id_1]) # type: ignore[no-untyped-call]
