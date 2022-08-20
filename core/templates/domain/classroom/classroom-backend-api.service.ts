@@ -44,7 +44,7 @@ interface ClassroomDataBackendDict {
 interface ClassroomIdToClassroomNameBackendDict {
   'classroom_id_to_classroom_name': {
     [classroomId: string]: string;
-  }
+  };
 }
 
 interface ClassroomIdToClassroomNameResponse {
@@ -78,7 +78,7 @@ interface ClassroomDateResponse {
     courseDetails: string;
     topicListIntro: string;
     topicIdToPrerequisiteTopicIds: {
-      [topicId: string]: string[]
+      [topicId: string]: string[];
     };
   };
 }
@@ -166,15 +166,15 @@ export class ClassroomBackendApiService {
     return new Promise((resolve, reject) => {
       this.http.get<NewClassroomIdBackendDict>(
         '/classroom_id_handler').toPromise().then(response => {
-          resolve(response.classroom_id);
-        }, errorResponse => {
-          reject(errorResponse.error.error);
-        });
+        resolve(response.classroom_id);
+      }, errorResponse => {
+        reject(errorResponse.error.error);
+      });
     });
   }
 
   async getClassroomDataAsync(
-    classroomId: string
+      classroomId: string
   ): Promise<ClassroomDateResponse> {
     return new Promise((resolve, reject) => {
       let classroomUrl = this.urlInterpolationService.interpolateUrl(
@@ -184,25 +184,25 @@ export class ClassroomBackendApiService {
 
       this.http.get<FetchClassroomDataBackendDict>(
         classroomUrl).toPromise().then(response => {
-          resolve({
-            classroomDict: {
-              classroomId: response.classroom_dict['classroom_id'],
-              name: response.classroom_dict['name'],
-              urlFragment: response.classroom_dict['url_fragment'],
-              courseDetails: response.classroom_dict['course_details'],
-              topicListIntro: response.classroom_dict['topic_list_intro'],
-              topicIdToPrerequisiteTopicIds: (
-                response.classroom_dict['topic_id_to_prerequisite_topic_ids'])
-            }
-          });
-        }, errorResponse => {
-          reject(errorResponse.error.error);
+        resolve({
+          classroomDict: {
+            classroomId: response.classroom_dict.classroom_id,
+            name: response.classroom_dict.name,
+            urlFragment: response.classroom_dict.url_fragment,
+            courseDetails: response.classroom_dict.course_details,
+            topicListIntro: response.classroom_dict.topic_list_intro,
+            topicIdToPrerequisiteTopicIds: (
+              response.classroom_dict.topic_id_to_prerequisite_topic_ids)
+          }
         });
+      }, errorResponse => {
+        reject(errorResponse.error.error);
+      });
     });
   }
 
   async updateClassroomDataAsync(
-    classroomId: string, classroomDict: ClassroomDict
+      classroomId: string, classroomDict: ClassroomDict
   ): Promise<void> {
     return new Promise((resolve, reject) => {
       let classroomUrl = this.urlInterpolationService.interpolateUrl(
@@ -242,13 +242,12 @@ export class ClassroomBackendApiService {
     return new Promise((resolve, reject) => {
       this.http.get<ClassroomIdToClassroomNameBackendDict>(
         '/classroom_admin_data_handler').toPromise().then(response => {
-          resolve(response.classroom_id_to_classroom_name);
-        }, errorResponse => {
-          reject(errorResponse.error.error);
-        });
+        resolve(response.classroom_id_to_classroom_name);
+      }, errorResponse => {
+        reject(errorResponse.error.error);
+      });
     });
   }
-
 }
 
 angular.module('oppia').factory(

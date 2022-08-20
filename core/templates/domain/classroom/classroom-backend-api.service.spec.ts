@@ -205,7 +205,7 @@ describe('Classroom backend API service', function() {
 
   it('should create new classroom id', fakeAsync(() => {
     let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail')
+    let failHandler = jasmine.createSpy('fail');
     let service = classroomBackendApiService;
 
     service.getNewClassroomIdAsync().then(successHandler, failHandler);
@@ -223,7 +223,7 @@ describe('Classroom backend API service', function() {
     'should handle errorcallback while getting new classroom id',
     fakeAsync(() => {
       let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail')
+      let failHandler = jasmine.createSpy('fail');
       let service = classroomBackendApiService;
 
       service.getNewClassroomIdAsync().then(successHandler, failHandler);
@@ -244,7 +244,7 @@ describe('Classroom backend API service', function() {
 
   it('should get all classroom id to classroom name dict', fakeAsync(() => {
     let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail')
+    let failHandler = jasmine.createSpy('fail');
     let service = classroomBackendApiService;
 
     service.getAllClassroomIdToClassroomNameDictAsync().then(
@@ -253,17 +253,17 @@ describe('Classroom backend API service', function() {
       '/classroom_admin_data_handler');
     expect(req.request.method).toEqual('GET');
 
-    let classroom_id_to_classroom_name_dict = {
-      'math_classroom_id': 'math',
-      'physics_classroom_id': 'physics'
-    }
+    let classroomIdToClassroomNameDict = {
+      math_classroom_id: 'math',
+      physics_classroom_id: 'physics'
+    };
     req.flush({
-      'classroom_id_to_classroom_name': classroom_id_to_classroom_name_dict
+      classroom_id_to_classroom_name: classroomIdToClassroomNameDict
     });
 
     flushMicrotasks();
     expect(successHandler).toHaveBeenCalledWith(
-      classroom_id_to_classroom_name_dict);
+      classroomIdToClassroomNameDict);
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
@@ -271,7 +271,7 @@ describe('Classroom backend API service', function() {
     'should handle errorcallbask while fetching classroom id to ' +
     'classroom name dict', fakeAsync(() => {
       let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail')
+      let failHandler = jasmine.createSpy('fail');
       let service = classroomBackendApiService;
 
       service.getAllClassroomIdToClassroomNameDictAsync().then(
@@ -293,17 +293,17 @@ describe('Classroom backend API service', function() {
 
   it('should be able to get the classroom data', fakeAsync(() => {
     let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail')
+    let failHandler = jasmine.createSpy('fail');
     let service = classroomBackendApiService;
     let classroomId = 'math_classroom_id';
     let classroomBackendDict = {
-      'classroom_id': 'math_classroom_id',
-      'name': 'math',
-      'url_fragment': 'math',
-      'course_details': 'Curated math foundations course.',
-      'topic_list_intro': 'Start from the basics with our first topic.',
-      'topic_id_to_prerequisite_topic_ids': {}
-    }
+      classroom_id: 'math_classroom_id',
+      name: 'math',
+      url_fragment: 'math',
+      course_details: 'Curated math foundations course.',
+      topic_list_intro: 'Start from the basics with our first topic.',
+      topic_id_to_prerequisite_topic_ids: {}
+    };
     let expectedClassroomDict = {
       classroomId: 'math_classroom_id',
       name: 'math',
@@ -311,14 +311,14 @@ describe('Classroom backend API service', function() {
       courseDetails: 'Curated math foundations course.',
       topicListIntro: 'Start from the basics with our first topic.',
       topicIdToPrerequisiteTopicIds: {}
-    }
+    };
 
     service.getClassroomDataAsync(classroomId).then(
       successHandler, failHandler);
     let req = httpTestingController.expectOne('/classroom/math_classroom_id');
     expect(req.request.method).toEqual('GET');
 
-    req.flush({'classroom_dict': classroomBackendDict});
+    req.flush({classroom_dict: classroomBackendDict});
 
     flushMicrotasks();
     expect(successHandler).toHaveBeenCalledWith(
@@ -331,7 +331,7 @@ describe('Classroom backend API service', function() {
     'should handle errorcallback while getting classroom data',
     fakeAsync(() => {
       let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail')
+      let failHandler = jasmine.createSpy('fail');
       let service = classroomBackendApiService;
       let classroomId = 'math_classroom_id';
 
@@ -353,20 +353,20 @@ describe('Classroom backend API service', function() {
 
   it('should be able to update classroom data', fakeAsync(() => {
     let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail')
+    let failHandler = jasmine.createSpy('fail');
     let service = classroomBackendApiService;
     let classroomId = 'math_classroom_id';
     let classroomBackendDict = {
-      'classroom_id': 'math_classroom_id',
-      'name': 'math',
-      'url_fragment': 'math',
-      'course_details': 'Curated math foundations course.',
-      'topic_list_intro': 'Start from the basics with our first topic.',
-      'topic_id_to_prerequisite_topic_ids': {}
-    }
+      classroom_id: 'math_classroom_id',
+      name: 'math',
+      url_fragment: 'math',
+      course_details: 'Curated math foundations course.',
+      topic_list_intro: 'Start from the basics with our first topic.',
+      topic_id_to_prerequisite_topic_ids: {}
+    };
     let payload = {
       classroom_dict: classroomBackendDict
-    }
+    };
 
     service.updateClassroomDataAsync(classroomId, classroomBackendDict).then(
       successHandler, failHandler);
@@ -382,43 +382,45 @@ describe('Classroom backend API service', function() {
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
-  it('should handle errorcallback while updating classroom data', fakeAsync(() => {
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail')
-    let service = classroomBackendApiService;
-    let classroomId = 'math_classroom_id';
-    let classroomBackendDict = {
-      'classroom_id': 'math_classroom_id',
-      'name': 'math',
-      'url_fragment': 'math',
-      'course_details': 'Curated math foundations course.',
-      'topic_list_intro': 'Start from the basics with our first topic.',
-      'topic_id_to_prerequisite_topic_ids': {}
-    }
-    let payload = {
-      classroom_dict: classroomBackendDict
-    }
+  it(
+    'should handle errorcallback while updating classroom data',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+      let service = classroomBackendApiService;
+      let classroomId = 'math_classroom_id';
+      let classroomBackendDict = {
+        classroom_id: 'math_classroom_id',
+        name: 'math',
+        url_fragment: 'math',
+        course_details: 'Curated math foundations course.',
+        topic_list_intro: 'Start from the basics with our first topic.',
+        topic_id_to_prerequisite_topic_ids: {}
+      };
+      let payload = {
+        classroom_dict: classroomBackendDict
+      };
 
-    service.updateClassroomDataAsync(classroomId, classroomBackendDict).then(
-      successHandler, failHandler);
-    let req = httpTestingController.expectOne('/classroom/math_classroom_id');
-    expect(req.request.method).toEqual('PUT');
-    expect(req.request.body).toEqual(payload);
+      service.updateClassroomDataAsync(classroomId, classroomBackendDict).then(
+        successHandler, failHandler);
+      let req = httpTestingController.expectOne('/classroom/math_classroom_id');
+      expect(req.request.method).toEqual('PUT');
+      expect(req.request.body).toEqual(payload);
 
-    req.flush('Invalid request', {
-      status: 400,
-      statusText: 'Invalid request'
-    });
+      req.flush('Invalid request', {
+        status: 400,
+        statusText: 'Invalid request'
+      });
 
-    flushMicrotasks();
+      flushMicrotasks();
 
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalled();
-  }));
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalled();
+    }));
 
   it('should be able to delete classroom', fakeAsync(() => {
     let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail')
+    let failHandler = jasmine.createSpy('fail');
     let service = classroomBackendApiService;
     let classroomId = 'math_classroom_id';
 
@@ -437,7 +439,7 @@ describe('Classroom backend API service', function() {
 
   it('should handle errorcallback while deleting classroom', fakeAsync(() => {
     let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail')
+    let failHandler = jasmine.createSpy('fail');
     let service = classroomBackendApiService;
     let classroomId = 'math_classroom_id';
 
