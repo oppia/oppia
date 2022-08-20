@@ -543,13 +543,11 @@ class CollectionRightsModel(base_models.VersionedModel):
             cls.viewer_ids == user_id
         )).get(keys_only=True) is not None
 
-    # TODO(#13523): Change 'commit_cmds' to domain object/TypedDict to
-    # remove Any from type-annotation below.
     def save(
-            self,
-            committer_id: str,
-            commit_message: str,
-            commit_cmds: List[Dict[str, Any]]
+        self,
+        committer_id: str,
+        commit_message: str,
+        commit_cmds: base_models.AllowedCommitCmdsListType
     ) -> None:
         """Updates the collection rights model by applying the given
         commit_cmds, then saves it.

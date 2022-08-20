@@ -27,7 +27,7 @@ from core import utils
 from core.constants import constants
 from core.platform import models
 
-from typing import Dict, List, Optional, Sequence, Tuple, Union, cast, overload
+from typing import Dict, List, Optional, Sequence, Tuple, Union, overload
 from typing_extensions import Literal, TypedDict
 
 MYPY = False
@@ -700,7 +700,7 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
         return cls(
             id=instance_id, user_id=user_id, exploration_id=exploration_id)
 
-    # We have ignored [override] here because the signature of this method
+    # Here we use MyPy ignore because the signature of this method
     # doesn't match with BaseModel.get().
     @classmethod
     def get( # type: ignore[override]
@@ -1166,11 +1166,16 @@ class UserSubscriptionsModel(base_models.BaseModel):
 
         # Ruling out the possibility of None for mypy type checking.
         assert user_model is not None
-        creator_user_models = cast(
-            List[UserSettingsModel],
-            UserSettingsModel.get_multi(user_model.creator_ids))
+        creator_user_models = (
+            UserSettingsModel.get_multi(user_model.creator_ids)
+        )
+        filtered_creator_user_models = []
+        for creator_user_model in creator_user_models:
+            # Ruling out the possibility of None for mypy type checking.
+            assert creator_user_model is not None
+            filtered_creator_user_models.append(creator_user_model)
         creator_usernames = [
-            creator.username for creator in creator_user_models]
+            creator.username for creator in filtered_creator_user_models]
 
         user_data = {
             'exploration_ids': user_model.exploration_ids,
@@ -1617,7 +1622,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
         return cls(
             id=instance_id, user_id=user_id, exploration_id=exploration_id)
 
-    # We have ignored [override] here because the signature of this method
+    # Here we use MyPy ignore because the signature of this method
     # doesn't match with BaseModel.get().
     @classmethod
     def get( # type: ignore[override]
@@ -1638,7 +1643,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
         return super(ExplorationUserDataModel, cls).get(
             instance_id, strict=False)
 
-    # We have ignored [override] here because the signature of this method
+    # Here we use MyPy ignore because the signature of this method
     # doesn't match with BaseModel.get_multi().
     @classmethod
     def get_multi( # type: ignore[override]
@@ -1817,7 +1822,7 @@ class CollectionProgressModel(base_models.BaseModel):
         return cls(
             id=instance_id, user_id=user_id, collection_id=collection_id)
 
-    # We have ignored [override] here because the signature of this method
+    # Here we use MyPy ignore because the signature of this method
     # doesn't match with BaseModel.get().
     @classmethod
     def get( # type: ignore[override]
@@ -1838,7 +1843,7 @@ class CollectionProgressModel(base_models.BaseModel):
         return super(CollectionProgressModel, cls).get(
             instance_id, strict=False)
 
-    # We have ignored [override] here because the signature of this method
+    # Here we use MyPy ignore because the signature of this method
     # doesn't match with BaseModel.get_multi().
     @classmethod
     def get_multi( # type: ignore[override]
@@ -2004,6 +2009,8 @@ class StoryProgressModel(base_models.BaseModel):
         return cls(
             id=instance_id, user_id=user_id, story_id=story_id)
 
+    # Here we use MyPy ignore because the signature of this method
+    # doesn't match with BaseModel.get_multi().
     @overload  # type: ignore[override]
     @classmethod
     def get(
@@ -2028,7 +2035,7 @@ class StoryProgressModel(base_models.BaseModel):
         cls, user_id: str, story_id: str, strict: bool = False
     ) -> Optional[StoryProgressModel]: ...
 
-    # We have ignored [override] here because the signature of this method
+    # Here we use MyPy ignore because the signature of this method
     # doesn't match with BaseModel.get().
     @classmethod
     def get( # type: ignore[override]
@@ -2051,7 +2058,7 @@ class StoryProgressModel(base_models.BaseModel):
         return super(StoryProgressModel, cls).get(
             instance_id, strict=strict)
 
-    # We have ignored [override] here because the signature of this method
+    # Here we use MyPy ignore because the signature of this method
     # doesn't match with BaseModel.get_multi().
     @classmethod
     def get_multi( # type: ignore[override]
@@ -2597,7 +2604,7 @@ class UserContributionProficiencyModel(base_models.BaseModel):
         """
         return '.'.join([score_category, user_id])
 
-    # We have ignored [override] here because the signature of this method
+    # Here we use MyPy ignore because the signature of this method
     # doesn't match with BaseModel.get().
     @classmethod
     def get( # type: ignore[override]
@@ -3083,7 +3090,7 @@ class LearnerGroupsUserModel(base_models.BaseModel):
         """
         cls.delete_by_id(user_id)
 
-    # We have ignored [override] here because the signature of this method
+    # Here we use MyPy ignore because the signature of this method
     # doesn't match with BaseModel.export_data().
     @classmethod
     def export_data(cls, user_id: str) -> LearnerGroupsUserDataDict: # type: ignore[override]

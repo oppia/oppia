@@ -233,6 +233,8 @@ class TopicModel(base_models.VersionedModel):
             additional_models
         )
 
+        # Here we use cast because we are narrowing down the type from
+        # BaseModel to TopicRightsModel.
         topic_rights = cast(
             TopicRightsModel, additional_models['rights_model']
         )

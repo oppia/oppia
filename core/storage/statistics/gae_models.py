@@ -26,7 +26,7 @@ from core import feconf
 from core import utils
 from core.platform import models
 
-from typing import Any, Dict, List, Optional, Sequence, Tuple, cast
+from typing import Dict, List, Optional, Sequence, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -1281,20 +1281,18 @@ class ExplorationStatsModel(base_models.BaseModel):
         exploration_stats_model = cls.get(instance_id, strict=False)
         return exploration_stats_model
 
-    # TODO(#13523): Change 'state_stats_mapping' to TypedDict/Domain Object
-    # to remove Any used below.
     @classmethod
     def create(
-            cls,
-            exp_id: str,
-            exp_version: int,
-            num_starts_v1: int,
-            num_starts_v2: int,
-            num_actual_starts_v1: int,
-            num_actual_starts_v2: int,
-            num_completions_v1: int,
-            num_completions_v2: int,
-            state_stats_mapping: Dict[str, Any]
+        cls,
+        exp_id: str,
+        exp_version: int,
+        num_starts_v1: int,
+        num_starts_v2: int,
+        num_actual_starts_v1: int,
+        num_actual_starts_v2: int,
+        num_completions_v1: int,
+        num_completions_v2: int,
+        state_stats_mapping: Dict[str, Dict[str, int]]
     ) -> str:
         """Creates an ExplorationStatsModel instance and writes it to the
         datastore.
@@ -1560,16 +1558,16 @@ class PlaythroughModel(base_models.BaseModel):
             'The id generator for PlaythroughModel is producing too many '
             'collisions.')
 
-    # TODO(#13523): Change 'issue_customization_args' to
-    # TypedDict/Domain Object to remove Any used below.
     @classmethod
     def create(
-            cls,
-            exp_id: str,
-            exp_version: int,
-            issue_type: str,
-            issue_customization_args: Dict[str, Any],
-            actions: List[stats_domain.LearnerActionDict]
+        cls,
+        exp_id: str,
+        exp_version: int,
+        issue_type: str,
+        issue_customization_args: (
+            stats_domain.IssuesCustomizationArgsDictType
+        ),
+        actions: List[stats_domain.LearnerActionDict]
     ) -> str:
         """Creates a PlaythroughModel instance and writes it to the
         datastore.
@@ -2057,8 +2055,11 @@ class StateAnswersModel(base_models.BaseModel):
                         shard_id)
                     for shard_id in range(
                         1, main_shard.shard_count + 1)]
-                all_models += cast(
-                    List[StateAnswersModel], cls.get_multi(shard_ids))
+                state_answer_models = cls.get_multi(shard_ids)
+                for state_answer_model in state_answer_models:
+                    # Filtering out the None cases for MyPy type checking.
+                    assert state_answer_model is not None
+                    all_models.append(state_answer_model)
             return all_models
         else:
             return None
@@ -2066,12 +2067,14 @@ class StateAnswersModel(base_models.BaseModel):
     @classmethod
     @transaction_services.run_in_transaction_wrapper
     def _insert_submitted_answers_unsafe_transactional(
-            cls,
-            exploration_id: str,
-            exploration_version: int,
-            state_name: str,
-            interaction_id: str,
-            new_submitted_answer_dict_list: List[Dict[str, str]]
+        cls,
+        exploration_id: str,
+        exploration_version: int,
+        state_name: str,
+        interaction_id: str,
+        new_submitted_answer_dict_list: List[
+            stats_domain.SubmittedAnswerDict
+        ]
     ) -> None:
         """See the insert_submitted_answers for general documentation of what
         this method does. It's only safe to call this method from within a
@@ -2168,16 +2171,16 @@ class StateAnswersModel(base_models.BaseModel):
         cls.update_timestamps_multi(entities_to_put)
         cls.put_multi(entities_to_put)
 
-    # TODO(#13523): Change 'new_submitted_answer' to TypedDict/Domain Object
-    # to remove Any used below.
     @classmethod
     def insert_submitted_answers(
-            cls,
-            exploration_id: str,
-            exploration_version: int,
-            state_name: str,
-            interaction_id: str,
-            new_submitted_answer_dict_list: List[Dict[str, Any]]
+        cls,
+        exploration_id: str,
+        exploration_version: int,
+        state_name: str,
+        interaction_id: str,
+        new_submitted_answer_dict_list: List[
+            stats_domain.SubmittedAnswerDict
+        ]
     ) -> None:
         """Given an exploration ID, version, state name, and interaction ID,
         attempt to insert a list of specified SubmittedAnswers into this model,
@@ -2229,15 +2232,13 @@ class StateAnswersModel(base_models.BaseModel):
             str(shard_id)
         ])
 
-    # TODO(#13523): Change answer lists to TypedDict/Domain Object
-    # to remove Any used below.
     @classmethod
     def _shard_answers(
-            cls,
-            current_answer_list: List[Dict[str, Any]],
-            current_answer_list_size: int,
-            new_answer_list: List[Dict[str, Any]]
-    ) -> Tuple[List[List[Dict[str, Any]]], List[int]]:
+        cls,
+        current_answer_list: List[stats_domain.SubmittedAnswerDict],
+        current_answer_list_size: int,
+        new_answer_list: List[stats_domain.SubmittedAnswerDict]
+    ) -> Tuple[List[List[stats_domain.SubmittedAnswerDict]], List[int]]:
         """Given a current answer list which can fit within one NDB entity and
         a list of new answers which need to try and fit in the current answer
         list, shard the answers such that a list of answer lists are returned.
@@ -2284,10 +2285,10 @@ class StateAnswersModel(base_models.BaseModel):
                 sharded_answer_list_sizes.append(answer_size)
         return sharded_answer_lists, sharded_answer_list_sizes
 
-    # TODO(#13523): Change answer dict to TypedDict/Domain Object
-    # to remove Any used below.
     @classmethod
-    def _get_answer_dict_size(cls, answer_dict: Dict[str, Any]) -> int:
+    def _get_answer_dict_size(
+        cls, answer_dict: stats_domain.SubmittedAnswerDict
+    ) -> int:
         """Returns a size overestimate (in bytes) of the given answer dict.
 
         Args:

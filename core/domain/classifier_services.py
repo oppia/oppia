@@ -27,16 +27,32 @@ from core.domain import classifier_domain
 from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_fetchers
+from core.domain import state_domain
 from core.domain import fs_services
 from core.platform import models
 
 from typing import Dict, List, Optional, Sequence
+from typing_extensions import TypedDict
 
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import classifier_models
 
 (classifier_models,) = models.Registry.import_models([models.NAMES.classifier])
+
+
+class JobInfoDict(TypedDict):
+    """Type for the job info dictionary."""
+
+    algorithm_id: str
+    interaction_id: str
+    exp_id: str
+    exp_version: int
+    next_scheduled_check_time: datetime.datetime
+    state_name: str
+    training_data: List[state_domain.TrainingDataDict]
+    status: str
+    algorithm_version: int
 
 
 # NOTE TO DEVELOPERS: This function should be kept in sync with its counterpart
@@ -113,7 +129,7 @@ def handle_trainable_states(
     Raises:
         Exception. No classifier algorithm found for the given interaction id.
     """
-    job_dicts_list = []
+    job_dicts_list: List[JobInfoDict] = []
     exp_id = exploration.id
     exp_version = exploration.version
     for state_name in state_names:
@@ -618,7 +634,7 @@ def migrate_state_training_jobs(
         set(state_training_jobs_mapping.algorithm_ids_to_job_ids.keys()))
 
     if len(algorithm_ids_to_add) > 0:
-        job_dicts = []
+        job_dicts: List[JobInfoDict] = []
 
         for algorithm_id in algorithm_ids_to_add:
             next_scheduled_check_time = datetime.datetime.utcnow()

@@ -93,7 +93,7 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
             'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
-    # We have ignored [override] here because the signature of this method
+    # Here we use MyPy ignore because the signature of this method
     # doesn't match with BaseModel.get_multi().
     @classmethod
     def get_multi( # type: ignore[override]
@@ -332,7 +332,7 @@ class ExplorationModel(base_models.VersionedModel):
             additional_models
         )
 
-        # The cast is needed because the additional_models is list of BaseModels
+        # Here we use cast because the additional_models is list of BaseModels
         # and we want to hint the mypy that this is ExplorationRightsModel.
         exploration_rights_model = cast(
             ExplorationRightsModel, additional_models['rights_model']
@@ -354,7 +354,7 @@ class ExplorationModel(base_models.VersionedModel):
             'versioned_model': models_to_put['versioned_model'],
         }
 
-    # We have ignored [override] here because the signature of this method
+    # Here we use MyPy ignore because the signature of this method
     # doesn't match with BaseModel.delete_multi().
     @classmethod
     def delete_multi( # type: ignore[override]
@@ -657,13 +657,11 @@ class ExplorationRightsModel(base_models.VersionedModel):
             cls.viewer_ids == user_id
         )).get(keys_only=True) is not None
 
-    # TODO(#13523): Change 'commit_cmds' to TypedDict/Domain Object
-    # to remove Any used below.
     def save(
         self,
         committer_id: str,
         commit_message: str,
-        commit_cmds: List[Dict[str, Any]]
+        commit_cmds: base_models.AllowedCommitCmdsListType
     ) -> None:
         """Saves a new version of the exploration, updating the Exploration
         datastore model.
