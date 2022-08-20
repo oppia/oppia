@@ -112,10 +112,13 @@ SUITES_MIGRATED_TO_WEBDRIVERIO = [
     'contributorDashboard',
     'coreEditorAndPlayerFeatures',
     'creatorDashboard',
+    'embedding',
     'explorationFeedbackTab',
     'explorationImprovementsTab',
     'explorationHistoryTab',
     'explorationStatisticsTab',
+    'explorationTranslationTab',
+    'extensions',
     'learner',
     'learnerDashboard',
     'navigation',
@@ -133,13 +136,9 @@ SUITES_MIGRATED_TO_WEBDRIVERIO = [
 ]
 
 SUITES_STILL_IN_PROTRACTOR = [
-    'embedding',
-    'explorationTranslationTab',
-    'extensions',
     'featureGating',
     'fileUploadFeatures',
     'fileUploadExtensions',
-    'learner',
     'library',
     'playVoiceovers',
     'publication',

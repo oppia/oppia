@@ -26,13 +26,16 @@ var ExplorationEditorPage = (
   require('../webdriverio_utils/ExplorationEditorPage.js'));
 
 describe('Improvements tab', function() {
-  let adminPage = new AdminPage.AdminPage();
-  let explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
-
-  let explorationEditorImprovementsTab = (
-    explorationEditorPage.getImprovementsTab());
+  let adminPage = null;
+  let explorationEditorPage = null;
+  let explorationEditorImprovementsTab = null;
 
   beforeAll(async() => {
+    adminPage = new AdminPage.AdminPage();
+    explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+
+    explorationEditorImprovementsTab = (
+      explorationEditorPage.getImprovementsTab());
     await users.createAndLoginCurriculumAdminUser(
       'superUser@improvementsTab.com', 'superUser');
     await adminPage.editConfigProperty(

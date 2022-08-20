@@ -123,10 +123,9 @@ describe('Exploration translation and voiceover tab', function() {
       await explorationEditorPage.navigateToTranslationTab();
       await explorationEditorTranslationTab.expectSelectedLanguageToBe(
         'English');
-      await explorationEditorTranslationTab.changeLanguage('Hindi');
+      await explorationEditorTranslationTab.changeLanguage('हिन्दी (Hindi)');
       await browser.refresh();
-      await explorationEditorTranslationTab.expectSelectedLanguageToBe(
-        'Hindi');
+      await explorationEditorTranslationTab.expectSelectedLanguageToBe('Hindi');
       await users.logout();
     });
 
@@ -135,7 +134,7 @@ describe('Exploration translation and voiceover tab', function() {
     await creatorDashboardPage.get();
     await creatorDashboardPage.editExploration('Test Exploration');
     await explorationEditorPage.navigateToTranslationTab();
-    await explorationEditorTranslationTab.changeLanguage('Hindi');
+    await explorationEditorTranslationTab.changeLanguage('हिन्दी (Hindi)');
     await explorationEditorTranslationTab.expectToBeInVoiceoverMode();
     await users.logout();
   });
@@ -190,13 +189,13 @@ describe('Exploration translation and voiceover tab', function() {
       await creatorDashboardPage.get();
       await creatorDashboardPage.editExploration('Test Exploration');
       await explorationEditorPage.navigateToTranslationTab();
-      await explorationEditorTranslationTab.changeLanguage('Hindi');
+      await explorationEditorTranslationTab.changeLanguage('हिन्दी (Hindi)');
       await explorationEditorTranslationTab.switchToTranslationMode();
       await explorationEditorTranslationTab.navigateToFeedbackTab();
       await explorationEditorTranslationTab.setTranslation(
         await forms.toRichText('Sample Translation.'));
       await explorationEditorPage.publishChanges('Adds one translation.');
-      explorationEditorTranslationTab.expectFeedbackTabToBeActive();
+      await explorationEditorTranslationTab.expectFeedbackTabToBeActive();
       await users.logout();
     });
 
@@ -206,7 +205,7 @@ describe('Exploration translation and voiceover tab', function() {
     await creatorDashboardPage.get();
     await creatorDashboardPage.editExploration('Test Exploration');
     await explorationEditorPage.navigateToTranslationTab();
-    await explorationEditorTranslationTab.changeLanguage('Hindi');
+    await explorationEditorTranslationTab.changeLanguage('हिन्दी (Hindi)');
     await explorationEditorTranslationTab.expectSelectedLanguageToBe('Hindi');
     await users.logout();
   });
@@ -216,7 +215,7 @@ describe('Exploration translation and voiceover tab', function() {
     await creatorDashboardPage.get();
     await creatorDashboardPage.editExploration('Test Exploration');
     await explorationEditorPage.navigateToTranslationTab();
-    await explorationEditorTranslationTab.changeLanguage('Hindi');
+    await explorationEditorTranslationTab.changeLanguage('हिन्दी (Hindi)');
     await explorationEditorTranslationTab.expectToBeInVoiceoverMode();
 
     await explorationEditorTranslationTab.switchToTranslationMode();
@@ -234,7 +233,7 @@ describe('Exploration translation and voiceover tab', function() {
       await creatorDashboardPage.get();
       await creatorDashboardPage.editExploration('Test Exploration');
       await explorationEditorPage.navigateToTranslationTab();
-      await expEditorTranslationTab.changeLanguage('Hindi');
+      await expEditorTranslationTab.changeLanguage('हिन्दी (Hindi)');
       await expEditorTranslationTab.switchToTranslationMode();
 
       await expEditorTranslationTab.expectCorrectStatusColor(
