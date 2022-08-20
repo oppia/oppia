@@ -817,12 +817,12 @@ var ExplorationEditorMainTab = function() {
   this.deleteState = async function(stateName) {
     await action.waitForAutosave();
     await general.scrollToTop();
-    var nodeStateElement = await explorationGraph.$(
+    var nodeElement = await explorationGraph.$(
       `.e2e-test-node*=${stateName}`);
     await waitFor.visibilityOf(
-      nodeStateElement,
+      nodeElement,
       'State ' + stateName + ' takes too long to appear or does not exist');
-    var deleteNode = await nodeStateElement.$(deleteNodeLocator);
+    var deleteNode = await nodeElement.$(deleteNodeLocator);
     await action.click('Delete Node', deleteNode);
     await action.click('Confirm Delete State Button', confirmDeleteStateButton);
     await waitFor.invisibilityOf(
@@ -886,9 +886,13 @@ var ExplorationEditorMainTab = function() {
 
     // Wait for state name container to completely disappear
     // and re-appear again.
+
+    // We need to use browser.pause() in order to wait for the state name
+    // container to disappear as webdriverio checks for its presence even before
+    // it disappears.
     // eslint-disable-next-line oppia/e2e-practices
     await browser.pause(2000);
-    await waitFor.presenceOf(
+    await waitFor.visibilityOf(
       stateNameContainer, 'State Name Container takes too long to appear');
     await waitFor.textToBePresentInElement(
       stateNameContainer, name,
