@@ -167,19 +167,17 @@
       </md-card>
     </div>
 
-    <div class="chapter-list-container">
+    <div class="chapter-list-container mb-5">
       <md-card class="oppia-page-card oppia-long-text content-card oppia-mobile-collapsible-card">
         <div class="story-node-editor">
-          <div class="chapter-list-card-header oppia-mobile-collapsible-card-header">
-            <span class="e2e-test-mobile-add-chapter"
-                  ng-click="toggleChapterLists()">
-              Chapters
-            </span>
-            <i class="fa fa-caret-down e2e-test-mobile-add-chapter"
+          <div class="chapter-list-card-header oppia-mobile-collapsible-card-header e2e-test-mobile-add-chapter" 
+               ng-click="toggleChapterLists()">
+            <span>Chapters</span>
+            <i class="fa fa-caret-down"
                ng-if="!chaptersListIsShown"
                aria-hidden="true">
             </i>
-            <i class="fa fa-caret-up e2e-test-mobile-add-chapter"
+            <i class="fa fa-caret-up"
                ng-if="chaptersListIsShown"
                aria-hidden="true">
             </i>
