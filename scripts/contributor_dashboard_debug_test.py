@@ -52,8 +52,8 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
         self.contributor_dashboard_debug = (
             contributor_dashboard_debug.ContributorDashboardDebugInitializer(
                 base_url=''))
-        # signup(), add_user_role(), set_curriculum_admins() must be before
-        # login(), because those functions will call logout().
+        # Functions signup(), add_user_role(), set_curriculum_admins() must be
+        # called before login(), because those functions will call logout().
         self.tested_email = 'testuser@example.com'
         self.tested_username = 'testuser'
         self.signup(self.tested_email, self.tested_username)
@@ -98,8 +98,8 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
             self.mock_login_as_admin)
 
         with self.request_swap, sign_up_swap, begin_session_swap, (
-            init_app_swap) as init_app_counter:
-                self.contributor_dashboard_debug.populate_debug_data()
+                init_app_swap) as init_app_counter:
+            self.contributor_dashboard_debug.populate_debug_data()
 
         self.assertEqual(init_app_counter.times_called, 1)
         self._assert_user_roles(
@@ -127,7 +127,7 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
 
         with self.request_swap, create_user_swap, begin_session_swap, (
                 load_template_swap):
-            self.contributor_dashboard_debug._sign_up_new_user(email, username)
+            self.contributor_dashboard_debug._sign_up_new_user(email, username) # pylint: disable=protected-access
 
         self.assertIsNotNone(self.firebase_sdk_stub.get_user_by_email(email))
         self.assertEqual(
@@ -153,15 +153,15 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
 
         with sign_in_swap, self.request_swap, establish_session_swap as (
             establish_session_counter):
-            self.contributor_dashboard_debug._sign_in(self.tested_email)
+            self.contributor_dashboard_debug._sign_in(self.tested_email) # pylint: disable=protected-access
 
         self.assertEqual(establish_session_counter.times_called, 1)
 
     def test_get_csrf_token(self) -> None:
         with self.request_swap:
-            csrf_token = self.contributor_dashboard_debug._get_csrf_token()
+            csrf_token = self.contributor_dashboard_debug._get_csrf_token() # pylint: disable=protected-access
 
-        admin_id = self.get_user_id_from_email(self.SUPER_ADMIN_EMAIL)
+        admin_id = self.get_user_id_from_email(self.SUPER_ADMIN_EMAIL) # type: ignore
         self.assertTrue(
             base.CsrfTokenManager.is_csrf_token_valid(admin_id, csrf_token)) # type: ignore
 
@@ -170,7 +170,7 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
             feconf.ROLE_ID_TRANSLATION_ADMIN, feconf.ROLE_ID_QUESTION_ADMIN]
 
         with self.request_swap:
-            self.contributor_dashboard_debug._assign_admin_roles(
+            self.contributor_dashboard_debug._assign_admin_roles( # pylint: disable=protected-access
                 roles, self.tested_username)
 
         self._assert_user_roles(self.tested_username, roles)
@@ -183,9 +183,9 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
 
     def test_add_submit_question_rights(self) -> None:
         with self.request_swap:
-            self.contributor_dashboard_debug._add_submit_question_rights(
+            self.contributor_dashboard_debug._add_submit_question_rights( # pylint: disable=protected-access
                 self.tested_username)
-        
+
         self._assert_can_submit_question_suggestions(self.tested_username)
 
     def _assert_can_submit_question_suggestions(self, username: str) -> None:
@@ -196,7 +196,7 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
     def test_generate_sample_new_structures_data(self) -> None:
         with self.request_swap:
             (
-                self.contributor_dashboard_debug.
+                self.contributor_dashboard_debug. # pylint: disable=protected-access
                 _generate_sample_new_structures_data())
 
         self._assert_generate_sample_new_structures_data()
@@ -207,7 +207,7 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
         self.assertEqual(len(topic_summaries), 2)
 
         story_id = (
-            topic_fetchers.get_topic_by_name(
+            topic_fetchers.get_topic_by_name( # type: ignore
                 'Dummy Topic 1').canonical_story_references[0].story_id)
         self.assertIsNotNone(
             story_fetchers.get_story_by_id(story_id, strict=False))
@@ -224,7 +224,7 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
         self.assertEqual(len(questions), 3)
 
         translation_opportunities, _, _ = (
-            opportunity_services.get_translation_opportunities('hi', '', None)) # type: ignore
+            opportunity_services.get_translation_opportunities('hi', '', None))
         self.assertEqual(len(translation_opportunities), 3)
 
     def test_add_topics_to_classroom(self) -> None:
@@ -243,7 +243,7 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
         topic_services.save_new_topic(admin_id, topic_2) # type: ignore
 
         with self.request_swap:
-            self.contributor_dashboard_debug._add_topics_to_classroom(
+            self.contributor_dashboard_debug._add_topics_to_classroom( # pylint: disable=protected-access
                 classroom_name, classroom_url_fragment)
 
         self._assert_topics_in_classroom('math')

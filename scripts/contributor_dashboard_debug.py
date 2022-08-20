@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""This script helps develop for the contributor dashboard. When "contributor 
+"""This script helps develop for the contributor dashboard. When "contributor
 dashboard debug" flag is enabled, the start script will call
 "populate_debug_data" function, whcih does the following:
     1. Create an admin user with username "a" and assign curriculum,
@@ -63,7 +63,7 @@ CLASSROOM_URL_FRAGMENT = 'math'
 
 class ContributorDashboardDebugInitializer():
     """Client-side requests to help develop for the contributor dashboard.
-    
+
     Attributes:
         session: object(Session). The requests.Session object to send requests
             to the Oppia server.
