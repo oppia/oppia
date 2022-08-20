@@ -135,7 +135,6 @@ import { StoryUpdateService } from 'domain/story/story-update.service';
 import { StoryValidationService } from 'domain/story/story-validation.service';
 import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
 import { SubtopicViewerBackendApiService } from 'domain/subtopic_viewer/subtopic-viewer-backend-api.service';
-import { SuggestionThreadObjectFactory } from 'domain/suggestion/SuggestionThreadObjectFactory';
 import { ExplorationSummaryBackendApiService } from 'domain/summary/exploration-summary-backend-api.service';
 import { TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
 import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-backend-api.service';
@@ -226,6 +225,7 @@ import { SolutionValidityService } from 'pages/exploration-editor-page/editor-ta
 import { SolutionVerificationService } from 'pages/exploration-editor-page/editor-tab/services/solution-verification.service';
 import { ThreadDataBackendApiService } from 'pages/exploration-editor-page/feedback-tab/services/thread-data-backend-api.service';
 import { ThreadStatusDisplayService } from 'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
+import { CheckRevertService } from 'pages/exploration-editor-page/history-tab/services/check-revert.service';
 import { VersionTreeService } from 'pages/exploration-editor-page/history-tab/services/version-tree.service';
 import { AngularNameService } from 'pages/exploration-editor-page/services/angular-name.service';
 import { EditorFirstTimeEventsService } from 'pages/exploration-editor-page/services/editor-first-time-events.service';
@@ -813,7 +813,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['SubtopicViewerBackendApiService', SubtopicViewerBackendApiService],
   ['SubtopicValidationService', SubtopicValidationService],
   ['SuggestionModalService', SuggestionModalService],
-  ['SuggestionThreadObjectFactory', SuggestionThreadObjectFactory],
   ['SuggestionsService', SuggestionsService],
   ['SvgFileFetcherBackendApiService', SvgFileFetcherBackendApiService],
   ['SvgSanitizerService', SvgSanitizerService],
@@ -864,6 +863,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['ValidatorsService', ValidatorsService],
   ['VersionedExplorationCachingService', VersionedExplorationCachingService],
   ['VersionHistoryBackendApiService', VersionHistoryBackendApiService],
+  ['CheckRevertService', CheckRevertService],
   ['VersionTreeService', VersionTreeService],
   ['WindowDimensionsService', WindowDimensionsService],
   ['WindowRef', WindowRef],

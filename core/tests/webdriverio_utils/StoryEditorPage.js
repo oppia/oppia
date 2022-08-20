@@ -191,6 +191,7 @@ var StoryEditorPage = function() {
   this.discardStoryChanges = async function() {
     await action.click('Show discard option button', discardOption);
     await action.click('Discard changes button', discardChangesButton);
+    await waitFor.pageToFullyLoad();
   };
 
   this.navigateToChapterWithName = async function(chapterName) {
