@@ -70,6 +70,7 @@ export class TranslationOpportunitiesComponent {
     more: boolean;
   } {
     const opportunitiesDicts: TranslationOpportunity[] = [];
+    const untranslatableOpportunitiesDicts: TranslationOpportunity[] = [];
     for (const index in opportunities) {
       const opportunity = opportunities[index];
       const subheading = opportunity.getOpportunitySubheading();
@@ -89,8 +90,14 @@ export class TranslationOpportunitiesComponent {
         translationsCount: opportunity.getTranslationsCount(languageCode)
       };
       this.allOpportunities[opportunityDict.id] = opportunityDict;
-      opportunitiesDicts.push(opportunityDict);
+      if (opportunityDict.translationsCount +
+          opportunityDict.inReviewCount === opportunityDict.totalCount) {
+        untranslatableOpportunitiesDicts.push(opportunityDict);
+      } else {
+        opportunitiesDicts.push(opportunityDict);
+      }
     }
+    opportunitiesDicts.push(...untranslatableOpportunitiesDicts);
     return {opportunitiesDicts, more};
   }
 

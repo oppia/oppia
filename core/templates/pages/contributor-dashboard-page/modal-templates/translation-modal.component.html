@@ -56,7 +56,7 @@
                              [localValue]="activeWrittenTranslation"
                              (localValueChange)="updateHtml($event)">
         </schema-based-editor>
-        <div *ngIf="editorIsShown && isSetOfStringDataFormat() && isActiveLanguageReviewer" class="oppia-rules-to-translate-container">
+        <div *ngIf="editorIsShown && isSetOfStringDataFormat()" class="oppia-rules-to-translate-container">
           <strong>Please add a translation per answer choice.</strong>
           <p class="oppia-rules-translation-tip">
             Because these answer choices will be matched against a learner's input, we want to be extra careful with the translations so as to not block a learner's progress in a lesson.
@@ -66,9 +66,6 @@
                                (localValueChange)="updateHtml($event)">
           </schema-based-editor>
         </div>
-        <strong *ngIf="editorIsShown && isSetOfStringDataFormat() && !isActiveLanguageReviewer">
-          Sorry! Currently, only translation reviewers are allowed to submit translations for rules.
-        </strong>
       </div>
     </div>
     <div class="oppia-translation-error-section">
@@ -106,7 +103,7 @@
           (click)="returnToPreviousTranslation()">Go Back
   </button>
   <button class="btn btn-success oppia-upload-translated-text-button"
-          [disabled]="loadingData || uploadingTranslation || activeWrittenTranslation === '' || isSubmitted() || (isSetOfStringDataFormat() && !isActiveLanguageReviewer)"
+          [disabled]="loadingData || uploadingTranslation || activeWrittenTranslation === '' || isSubmitted()"
           (click)="suggestTranslatedText()">
     <i [hidden]="!uploadingTranslation" class="fa fa-spinner"></i>
     <span [hidden]="uploadingTranslation || moreAvailable">Save and close</span>
