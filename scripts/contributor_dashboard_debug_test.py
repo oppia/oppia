@@ -52,6 +52,17 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
         self.contributor_dashboard_debug = (
             contributor_dashboard_debug.ContributorDashboardDebugInitializer(
                 base_url=''))
+        # signup(), add_user_role(), set_curriculum_admins() must be before
+        # login(), because those functions will call logout().
+        self.tested_email = 'testuser@example.com'
+        self.tested_username = 'testuser'
+        self.signup(self.tested_email, self.tested_username)
+        self.add_user_role(
+            self.SUPER_ADMIN_USERNAME, feconf.ROLE_ID_QUESTION_ADMIN)
+        self.set_curriculum_admins([self.SUPER_ADMIN_USERNAME]) # type: ignore
+        self.login(self.SUPER_ADMIN_EMAIL, is_super_admin=True)
+        self.contributor_dashboard_debug.csrf_token = self.get_new_csrf_token() # type: ignore
+
         self.request_swap = self.swap(
             self.contributor_dashboard_debug.session,
             'request',
@@ -59,6 +70,7 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
 
     def tearDown(self) -> None:
         self.firebase_sdk_stub.uninstall()
+        self.logout()
         super().tearDown()
 
     def mock_request(
@@ -129,9 +141,9 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
         self.firebase_sdk_stub.create_user(auth_id, email)
 
     def test_sign_in(self) -> None:
-        email = 'user1@example.com'
-        auth_id = self.get_auth_id_from_email(email) # type: ignore
-        token_id = self.firebase_sdk_stub.create_user(auth_id, email=email)
+        auth_id = self.get_auth_id_from_email(self.tested_email) # type: ignore
+        token_id = self.firebase_sdk_stub.create_user(
+            auth_id, email=self.tested_email)
         sign_in_swap = self.swap_to_always_return(
                 self.contributor_dashboard_debug,
                 '_sign_in_with_email_and_password',
@@ -141,32 +153,27 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
 
         with sign_in_swap, self.request_swap, establish_session_swap as (
             establish_session_counter):
-            self.contributor_dashboard_debug._sign_in(email)
+            self.contributor_dashboard_debug._sign_in(self.tested_email)
 
         self.assertEqual(establish_session_counter.times_called, 1)
 
     def test_get_csrf_token(self) -> None:
         with self.request_swap:
             csrf_token = self.contributor_dashboard_debug._get_csrf_token()
+
+        admin_id = self.get_user_id_from_email(self.SUPER_ADMIN_EMAIL)
         self.assertTrue(
-            base.CsrfTokenManager.is_csrf_token_valid(None, csrf_token)) # type: ignore
+            base.CsrfTokenManager.is_csrf_token_valid(admin_id, csrf_token)) # type: ignore
 
     def test_assign_admin_roles(self) -> None:
-        email = 'user1@example.com'
-        username = 'user1'
         roles = [feconf.ROLE_ID_CURRICULUM_ADMIN,
             feconf.ROLE_ID_TRANSLATION_ADMIN, feconf.ROLE_ID_QUESTION_ADMIN]
-        self.signup(email, username)
-
-        self.login(self.SUPER_ADMIN_EMAIL, is_super_admin=True)
-        self.contributor_dashboard_debug.csrf_token = self.get_new_csrf_token() # type: ignore
 
         with self.request_swap:
-            self.contributor_dashboard_debug._assign_admin_roles(roles, username)
+            self.contributor_dashboard_debug._assign_admin_roles(
+                roles, self.tested_username)
 
-        self.logout()
-
-        self._assert_user_roles(username, roles)
+        self._assert_user_roles(self.tested_username, roles)
 
     def _assert_user_roles(self, username: str, roles: List[str]) -> None:
         """Asserts that the user has the given roles."""
@@ -175,23 +182,11 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
             [feconf.ROLE_ID_FULL_USER] + roles)
 
     def test_add_submit_question_rights(self) -> None:
-        email = 'user1@example.com'
-        username = 'user1'
-        self.signup(email, username)
-
-        self.add_user_role(
-            self.SUPER_ADMIN_USERNAME, feconf.ROLE_ID_QUESTION_ADMIN)
-
-        self.login(self.SUPER_ADMIN_EMAIL, is_super_admin=True)
-        self.contributor_dashboard_debug.csrf_token = self.get_new_csrf_token() # type: ignore
-
         with self.request_swap:
             self.contributor_dashboard_debug._add_submit_question_rights(
-                username)
-
-        self.logout()
-
-        self._assert_can_submit_question_suggestions(username)
+                self.tested_username)
+        
+        self._assert_can_submit_question_suggestions(self.tested_username)
 
     def _assert_can_submit_question_suggestions(self, username: str) -> None:
         """Asserts that the user can submit question suggestions."""
@@ -199,16 +194,10 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
         self.assertTrue(user_services.can_submit_question_suggestions(user_id)) # type: ignore
 
     def test_generate_sample_new_structures_data(self) -> None:
-        self.set_curriculum_admins([self.SUPER_ADMIN_USERNAME]) # type: ignore
-        self.login(self.SUPER_ADMIN_EMAIL, is_super_admin=True)
-        self.contributor_dashboard_debug.csrf_token = self.get_new_csrf_token() # type: ignore
-
         with self.request_swap:
             (
                 self.contributor_dashboard_debug.
                 _generate_sample_new_structures_data())
-
-        self.logout()
 
         self._assert_generate_sample_new_structures_data()
 
@@ -253,15 +242,9 @@ class ContributorDashboardDebugInitializerTests(test_utils.GenericTestBase):
         topic_services.save_new_topic(admin_id, topic_1) # type: ignore
         topic_services.save_new_topic(admin_id, topic_2) # type: ignore
 
-        self.set_curriculum_admins([self.SUPER_ADMIN_USERNAME]) # type: ignore
-        self.login(self.SUPER_ADMIN_EMAIL, is_super_admin=True)
-        self.contributor_dashboard_debug.csrf_token = self.get_new_csrf_token() # type: ignore
-
         with self.request_swap:
             self.contributor_dashboard_debug._add_topics_to_classroom(
                 classroom_name, classroom_url_fragment)
-
-        self.logout()
 
         self._assert_topics_in_classroom('math')
 
