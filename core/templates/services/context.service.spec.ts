@@ -386,19 +386,35 @@ describe('Context service', () => {
 
   describe('behavior in the edit learner group page', () => {
     beforeEach(() => {
+      windowRef = new MockWindowRef();
+      TestBed.configureTestingModule({
+        providers: [
+          UrlInterpolationService,
+          { provide: WindowRef, useValue: windowRef },
+        ],
+      });
       ecs = TestBed.get(ContextService);
       urlService = TestBed.get(UrlService);
-      spyOn(urlService, 'getPathname').and.returnValue(
-        '/edit-learner-group/groupId');
       ecs.removeCustomEntityContext();
     });
 
     it('should correctly retrieve the learner group id', () => {
+      spyOn(urlService, 'getPathname').and.returnValue(
+        '/edit-learner-group/groupId');
       expect(ecs.getLearnerGroupId()).toBe('groupId');
     });
 
     it('should correctly retrieve the page context', () => {
+      spyOn(urlService, 'getPathname').and.returnValue(
+        '/edit-learner-group/groupId');
       expect(ecs.getPageContext()).toBe('learner_group_editor');
+    });
+
+    it('should retrieve the learner group id cached before', () => {
+      windowRef.nativeWindow.location.pathname = '/edit-learner-group/groupId1';
+      expect(ecs.getLearnerGroupId()).toBe('groupId1');
+      windowRef.nativeWindow.location.pathname = '/edit-learner-group/groupId2';
+      expect(ecs.getLearnerGroupId()).toBe('groupId1');
     });
   });
 

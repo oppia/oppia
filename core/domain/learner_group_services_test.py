@@ -455,3 +455,41 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
         # Ruling out the possibility of None for mypy type checking.
         assert learner_group is not None
         self.assertEqual(learner_group.student_user_ids, [])
+
+    def test_remove_subtopic_page_reference_from_learner_groups(self) -> None:
+        self.learner_group = learner_group_services.update_learner_group(
+            self.LEARNER_GROUP_ID, self.learner_group.title,
+            self.learner_group.description,
+            self.learner_group.facilitator_user_ids, [],
+            [self.STUDENT_ID], ['topic1:2', 'topic1:1'],
+            self.learner_group.story_ids)
+
+        (
+            learner_group_services
+                .remove_subtopic_page_reference_from_learner_groups(
+                    'topic1', 2
+                )
+        )
+
+        learner_group = learner_group_fetchers.get_learner_group_by_id(
+            self.LEARNER_GROUP_ID)
+        # Ruling out the possibility of None for mypy type checking.
+        assert learner_group is not None
+        self.assertEqual(learner_group.subtopic_page_ids, ['topic1:1'])
+
+    def test_remove_story_reference_from_learner_groups(self) -> None:
+        self.learner_group = learner_group_services.update_learner_group(
+            self.LEARNER_GROUP_ID, self.learner_group.title,
+            self.learner_group.description,
+            self.learner_group.facilitator_user_ids, [],
+            [self.STUDENT_ID], ['topic1:2', 'topic1:1'],
+            ['story_id1', 'story_id2'])
+
+        learner_group_services.remove_story_reference_from_learner_groups(
+            'story_id1')
+
+        learner_group = learner_group_fetchers.get_learner_group_by_id(
+            self.LEARNER_GROUP_ID)
+        # Ruling out the possibility of None for mypy type checking.
+        assert learner_group is not None
+        self.assertEqual(learner_group.story_ids, ['story_id2'])
