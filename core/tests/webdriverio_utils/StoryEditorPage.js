@@ -160,8 +160,6 @@ var StoryEditorPage = function() {
 
     let width = (await browser.getWindowSize()).width;
 
-    await browser.debug();
-
     if (width < 831) {
       await action.click(
         'Create chapter arrow takes too long to be clickable.',
