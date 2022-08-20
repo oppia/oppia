@@ -121,25 +121,22 @@ export class OutcomeEditorComponent implements OnInit {
       let seen: Record<string, boolean> = {};
       seen[sourceStateName] = true;
       queue.push(sourceStateName);
-      while (queue.length > 0) {
+      while (queue.length > 0 && !stateFound) {
         // '.shift()' here can return an undefined value, but we're already
         // checking for queue.length > 0, so this is safe.
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        let queueSize = queue.length;
+        let currStateName = queue.shift()!;
+        if (currStateName == destStateName) {
+          stateFound = true;
+        }
         distance++;
-        while(queueSize-- && !stateFound) {
-          let currStateName = queue.shift()!;
-          if (currStateName == destStateName) {
-            stateFound = true;
-          }
-          stateNamesInBfsOrder.push(currStateName);
-          for (let e = 0; e < stateGraph.links.length; e++) {
-            let edge = stateGraph.links[e];
-            let dest = edge.target;
-            if (edge.source === currStateName && !seen.hasOwnProperty(dest)) {
-              seen[dest] = true;
-              queue.push(dest);
-            }
+        stateNamesInBfsOrder.push(currStateName);
+        for (let e = 0; e < stateGraph.links.length; e++) {
+          let edge = stateGraph.links[e];
+          let dest = edge.target;
+          if (edge.source === currStateName && !seen.hasOwnProperty(dest)) {
+            seen[dest] = true;
+            queue.push(dest);
           }
         }
       }
@@ -236,7 +233,11 @@ export class OutcomeEditorComponent implements OnInit {
     let destStateName = this.outcome.dest;
     if(!this.redirectionIsValid(
       (initStateName) as string, states, destStateName, activeStateName)) {
+      console.log("Wrong Redi-erection.")
       this.explorationWarningsService.raiseRedirectionError(activeStateName);
+    }
+    else {
+      //this.explorationWarningsService.removeFromInvalidRedirectionList(activeStateName);
     }
     this.destinationEditorIsOpen = false;
     this.savedOutcome.dest = cloneDeep(this.outcome.dest);
@@ -249,6 +250,7 @@ export class OutcomeEditorComponent implements OnInit {
       this.outcome.missingPrerequisiteSkillId;
 
     this.saveDest.emit(this.savedOutcome);
+    this.explorationWarningsService.updateWarnings();
   }
 
   redirectionIsValid(
@@ -256,7 +258,8 @@ export class OutcomeEditorComponent implements OnInit {
     let distance = this.getDistanceToDestState(initStateId, states, sourceStateName, destStateName);
     // Raise validation error if the creator redirects the learner
     // back by more than 3 cards.
-    if(distance-1 > 2) return false; 
+    console.log(distance);
+    if(distance > 3) return false; 
     else {
       return true;
     }

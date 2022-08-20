@@ -276,10 +276,22 @@ export class ExplorationWarningsService {
   }
 
   raiseRedirectionError(stateName: string) {
-    this.statesWithInvalidRedirection.push(stateName);   //Temporary keeping
+    if(!this.statesWithInvalidRedirection.includes(stateName)) {
+      this.statesWithInvalidRedirection.push(stateName);
+    }
+  }
+
+  removeFromInvalidRedirectionList(stateName: string) {
+    let index = this.statesWithInvalidRedirection.indexOf(stateName);
+    if (index > -1) {
+      this.statesWithInvalidRedirection.splice(index, 1);
+    }
   }
 
   _updateWarningsList(): void {
+
+    console.log("Updated warning list");
+
     this._warningsList = [];
     this.stateWarnings = {};
     this.checkpointCountWarning = '';
@@ -330,8 +342,9 @@ export class ExplorationWarningsService {
     });
 
     this.statesWithInvalidRedirection.forEach((stateName) => {
+      console.log("run");
       _extendStateWarnings(
-        stateName, AppConstants.STATE_ERROR_MESSAGES.INVALID_REDIRECTION);
+        stateName, AppConstants.STATE_ERROR_MESSAGES.INCORRECT_SOLUTION);
     });
 
     let statesWithAnswersThatMustBeResolved =
