@@ -162,8 +162,8 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
 
         return {
             'exp_vlatest': exp_vlatest,
-            'all_explorations': all_explorations,
-            'commit_log_models': commit_log_models,
+            'all_explorations': all_explorations, # type: ignore[typeddict-item]
+            'commit_log_models': commit_log_models, # type: ignore[typeddict-item]
             'version_history_models': version_history_models
         }
 
@@ -307,8 +307,10 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
     ) -> Union[
         Tuple[str, List[exp_models.ExplorationVersionHistoryModel]],
         Tuple[
-            str, List[exp_models.ExplorationVersionHistoryModel],
-            Exception, int
+            str,
+            List[exp_models.ExplorationVersionHistoryModel],
+            Union[Exception, str],
+            int
         ]
     ]:
         """Creates the version history models for a particular exploration.
@@ -387,7 +389,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                         version_history_models[revert_to_version - 1]
                     )
                     new_vh_model = self.get_reverted_version_history_model(
-                        revert_to_vh_model,
+                        revert_to_vh_model, # type: ignore[arg-type]
                         version_history_models[version - 1],
                         exp_id, version
                     )
@@ -445,11 +447,11 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                             )
                         )
                         for state_name, state_vh_dict in
-                        old_vh_model.state_version_history.items()
+                        old_vh_model.state_version_history.items() # type: ignore[union-attr]
                     }
                     old_metadata_vh = exp_domain.MetadataVersionHistory(
-                        old_vh_model.metadata_last_edited_version_number,
-                        old_vh_model.metadata_last_edited_committer_id
+                        old_vh_model.metadata_last_edited_version_number, # type: ignore[union-attr]
+                        old_vh_model.metadata_last_edited_committer_id # type: ignore[union-attr]
                     )
 
                     try:
@@ -471,7 +473,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                                 new_metadata_vh.last_edited_committer_id
                             )
                         )
-                        new_vh_model = self.get_updated_version_history_model( # type: ignore[no-untyped-call]
+                        new_vh_model = self.get_updated_version_history_model(
                             version_history_models[version - 1],
                             exp_id, version, committer_id,
                             new_states_vh, new_metadata_vh, new_committer_ids
@@ -481,7 +483,7 @@ class ComputeExplorationVersionHistoryJob(base_jobs.JobBase):
                     except Exception as e:
                         return (exp_id, [], e, version)
 
-            return (exp_id, version_history_models)
+            return (exp_id, version_history_models) # type: ignore[return-value]
 
     def generate_exploration_from_snapshot(
         self, snapshot_model: exp_models.ExplorationSnapshotContentModel
@@ -709,7 +711,7 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
                 reconstituted_model.last_updated = snapshot_model.last_updated
                 return reconstituted_model
             except Exception:
-                return None
+                return None # type: ignore[return-value]
 
     def filter_valid_model_group(
         self, model_group: UnformattedModelGroupDict
@@ -800,13 +802,15 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
         """
         exp_vlatest = model_group['exp_models_vlatest'][0]
 
-        all_explorations: List[exp_models.ExplorationModel] = (
+        all_explorations: List[Optional[exp_models.ExplorationModel]] = (
             [None] * exp_vlatest.version
         )
         for exp_model in model_group['all_exp_models']:
             all_explorations[exp_model.version - 1] = exp_model
 
-        commit_log_models: List[exp_models.ExplorationCommitLogEntryModel] = (
+        commit_log_models: List[Optional[
+            exp_models.ExplorationCommitLogEntryModel
+        ]] = (
             [None] * exp_vlatest.version
         )
         for commit_log in model_group['commit_log_models']:
@@ -817,14 +821,14 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
             exp_models.ExplorationVersionHistoryModel
         ]] = [None] * exp_vlatest.version
         for version_history in model_group['version_history_models']:
-            version_history_models[version_history.exploration_version - 1] = (
+            version_history_models[version_history.exploration_version - 1] = ( # type: ignore[union-attr]
                 version_history
             )
 
         return {
             'exp_vlatest': exp_vlatest,
-            'all_explorations': all_explorations,
-            'commit_log_models': commit_log_models,
+            'all_explorations': all_explorations, # type: ignore[typeddict-item]
+            'commit_log_models': commit_log_models, # type: ignore[typeddict-item]
             'version_history_models': version_history_models
         }
 
@@ -924,12 +928,12 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
                 state_vh_dict
             )
             for state_name, state_vh_dict in (
-                vh_model.state_version_history.items()
+                vh_model.state_version_history.items() # type: ignore[union-attr]
             )
         }
         actual_metadata_vh = exp_domain.MetadataVersionHistory(
-            vh_model.metadata_last_edited_version_number,
-            vh_model.metadata_last_edited_committer_id
+            vh_model.metadata_last_edited_version_number, # type: ignore[union-attr]
+            vh_model.metadata_last_edited_committer_id # type: ignore[union-attr]
         )
         verified_state_vh.append(expected_state_vh)
         verified_metadata_vh.append(expected_metadata_vh)
@@ -969,12 +973,12 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
                             state_vh_dict
                         )
                         for state_name, state_vh_dict in (
-                            vh_model.state_version_history.items()
+                            vh_model.state_version_history.items() # type: ignore[union-attr]
                         )
                     }
                     actual_metadata_vh = exp_domain.MetadataVersionHistory(
-                        vh_model.metadata_last_edited_version_number,
-                        vh_model.metadata_last_edited_committer_id
+                        vh_model.metadata_last_edited_version_number, # type: ignore[union-attr]
+                        vh_model.metadata_last_edited_committer_id # type: ignore[union-attr]
                     )
                     if not self.compare_version_histories(
                         expected_state_vh, expected_metadata_vh,
@@ -1042,12 +1046,12 @@ class VerifyVersionHistoryModelsJob(base_jobs.JobBase):
                             state_vh_dict
                         )
                         for state_name, state_vh_dict in (
-                            vh_model.state_version_history.items()
+                            vh_model.state_version_history.items() # type: ignore[union-attr]
                         )
                     }
                     actual_metadata_vh = exp_domain.MetadataVersionHistory(
-                        vh_model.metadata_last_edited_version_number,
-                        vh_model.metadata_last_edited_committer_id
+                        vh_model.metadata_last_edited_version_number, # type: ignore[union-attr]
+                        vh_model.metadata_last_edited_committer_id # type: ignore[union-attr]
                     )
                     if not self.compare_version_histories(
                         expected_state_vh, expected_metadata_vh,
