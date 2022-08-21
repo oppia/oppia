@@ -114,6 +114,10 @@ export const AppConstants = {
   // displayed.
   FATAL_ERROR_CODES: [400, 401, 404, 500],
 
+  // Maximum number of states the learner can be directed back from a state
+  // by an editor in an exploration
+  MAX_CARD_COUNT_FOR_VALID_REDIRECTION: 3,
+
   // Do not modify these, for backwards-compatibility reasons. These strings are
   // used to identify components, to generate content ids, and to determine what
   // type of content a given content id is associated with. If you wish to

@@ -233,7 +233,7 @@ export class OutcomeEditorComponent implements OnInit {
     let destStateName = this.outcome.dest;
     if(!this.redirectionIsValid(
       (initStateName) as string, states, destStateName, activeStateName)) {
-      console.log("Wrong Redi-erection.")
+      console.log("Wrong Redirection.")
       this.explorationWarningsService.raiseRedirectionError(activeStateName);
     }
     else {
@@ -257,9 +257,11 @@ export class OutcomeEditorComponent implements OnInit {
     initStateId: string, states: States, sourceStateName: string, destStateName: string) : boolean {
     let distance = this.getDistanceToDestState(initStateId, states, sourceStateName, destStateName);
     // Raise validation error if the creator redirects the learner
-    // back by more than 3 cards.
+    // back by more than MAX_CARD_COUNT_FOR_VALID_REDIRECTION cards.
     console.log(distance);
-    if(distance > 3) return false; 
+    if(distance > AppConstants.MAX_CARD_COUNT_FOR_VALID_REDIRECTION) {
+      return false;
+    } 
     else {
       return true;
     }
