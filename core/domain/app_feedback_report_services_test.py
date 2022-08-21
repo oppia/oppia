@@ -72,7 +72,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         app_feedback_report_constants.ENTRY_POINT.navigation_drawer)
     TEXT_LANGUAGE_CODE_ENGLISH = 'en'
     AUDIO_LANGUAGE_CODE_ENGLISH = 'en'
-    ANDROID_REPORT_INFO = {
+    ANDROID_REPORT_INFO: app_feedback_report_models.ReportInfoDict = {
         'user_feedback_selected_items': [],
         'user_feedback_other_text_input': 'add an admin',
         'event_logs': ['event1', 'event2'],
@@ -87,7 +87,9 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
         'text_size': 'medium_text_size',
         'only_allows_wifi_download_and_update': True,
         'automatically_update_topics': False,
-        'account_is_profile_admin': False
+        'account_is_profile_admin': False,
+        'is_curriculum_admin': False,
+        'language_locale_code': 'en'
     }
     WEB_PLATFORM_VERSION = '3.0.8'
     WEB_REPORT_INFO = {

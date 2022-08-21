@@ -23,7 +23,8 @@ from core import feconf
 from core import utils
 from core.platform import models
 
-from typing import Any, Dict, List, Optional, Sequence, TypeVar
+from typing import Dict, List, Optional, Sequence, TypeVar
+from typing_extensions import TypedDict
 
 SELF_REPORT_MODEL = TypeVar(  # pylint: disable=invalid-name
     'SELF_REPORT_MODEL', bound='AppFeedbackReportModel')
@@ -43,6 +44,26 @@ PLATFORM_CHOICE_ANDROID = 'android'
 PLATFORM_CHOICE_WEB = 'web'
 PLATFORM_CHOICES = [PLATFORM_CHOICE_ANDROID, PLATFORM_CHOICE_WEB]
 GITHUB_REPO_CHOICES = PLATFORM_CHOICES
+
+
+class ReportInfoDict(TypedDict):
+    """Type for the report_info dictionary."""
+
+    user_feedback_selected_items: List[str]
+    user_feedback_other_text_input: str
+    build_fingerprint: str
+    event_logs: List[str]
+    logcat_logs: List[str]
+    package_version_code: int
+    language_locale_code: str
+    entry_point_info: Dict[str, str]
+    text_size: str
+    only_allows_wifi_download_and_update: bool
+    automatically_update_topics: bool
+    is_curriculum_admin: bool
+    android_device_language_locale_code: str
+    account_is_profile_admin: bool
+    network_type: str
 
 
 # TODO(#14419): Change naming style of Enum class from SCREAMING_SNAKE_CASE
@@ -175,26 +196,26 @@ class AppFeedbackReportModel(base_models.BaseModel):
     # objects/TypedDict to remove Any from type-annotation below.
     @classmethod
     def create(
-            cls,
-            entity_id: str,
-            platform: str,
-            submitted_on: datetime.datetime,
-            local_timezone_offset_hrs: int,
-            report_type: str,
-            category: str,
-            platform_version: str,
-            android_device_country_locale_code: Optional[str],
-            android_sdk_version: Optional[int],
-            android_device_model: Optional[str],
-            entry_point: str,
-            entry_point_topic_id: Optional[str],
-            entry_point_story_id: Optional[str],
-            entry_point_exploration_id: Optional[str],
-            entry_point_subtopic_id: Optional[str],
-            text_language_code: str,
-            audio_language_code: str,
-            android_report_info: Optional[Dict[str, Any]],
-            web_report_info: Optional[Dict[str, Any]]
+        cls,
+        entity_id: str,
+        platform: str,
+        submitted_on: datetime.datetime,
+        local_timezone_offset_hrs: int,
+        report_type: str,
+        category: str,
+        platform_version: str,
+        android_device_country_locale_code: Optional[str],
+        android_sdk_version: Optional[int],
+        android_device_model: Optional[str],
+        entry_point: str,
+        entry_point_topic_id: Optional[str],
+        entry_point_story_id: Optional[str],
+        entry_point_exploration_id: Optional[str],
+        entry_point_subtopic_id: Optional[str],
+        text_language_code: str,
+        audio_language_code: str,
+        android_report_info: Optional[ReportInfoDict],
+        web_report_info: Optional[ReportInfoDict]
     ) -> str:
         """Creates a new AppFeedbackReportModel instance and returns its ID.
 

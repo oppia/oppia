@@ -27,7 +27,8 @@ from core.domain import app_feedback_report_constants
 from core.domain import story_domain
 from core.domain import topic_domain
 
-from typing import Any, Dict, List, Match, Optional
+from typing import Any, Dict, List, Match, Optional, Union
+from typing_extensions import TypedDict
 
 from core.domain import exp_services  # pylint: disable=invalid-import-from # isort:skip
 from core.platform import models  # pylint: disable=invalid-import-from # isort:skip
@@ -36,11 +37,34 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import app_feedback_report_models
 
+    AcceptableEntryPointClasses = Union[
+        NavigationDrawerEntryPointDict,
+        LessonPlayerEntryPointDict,
+        RevisionCardEntryPointDict,
+        CrashEntryPointDict
+    ]
+
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
 
-(app_feedback_report_models,) = models.Registry.import_models(
-    [models.NAMES.app_feedback_report])
+(app_feedback_report_models,) = models.Registry.import_models([
+    models.NAMES.app_feedback_report
+])
+
+
+class AppFeedbackReportDict(TypedDict):
+    """Dictionary representing the AppFeedbackReport object."""
+
+    report_id: str
+    schema_version: int
+    platform: str
+    submitted_on_timestamp: str
+    local_timezone_offset_hrs: int
+    ticket_id: Optional[str]
+    scrubbed_by: Optional[str]
+    user_supplied_feedback: UserSuppliedFeedbackDict
+    device_system_context: DeviceSystemContextDict
+    app_context: AppContextDict
 
 
 class AppFeedbackReport:
@@ -94,7 +118,7 @@ class AppFeedbackReport:
         self.device_system_context = device_system_context
         self.app_context = app_context
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> AppFeedbackReportDict:
         """Returns a dict representing this AppFeedbackReport domain object.
 
         Returns:
@@ -427,6 +451,15 @@ class AppFeedbackReport:
             'The given Android network type %s is invalid.' % network_type_name)
 
 
+class UserSuppliedFeedbackDict(TypedDict):
+    """Dictionary representing the UserSuppliedFeedback object."""
+
+    report_type: str
+    category: str
+    user_feedback_selected_items: List[str]
+    user_feedback_other_text_input: str
+
+
 class UserSuppliedFeedback:
     """Domain object for the user-supplied information in feedback reports."""
 
@@ -455,7 +488,7 @@ class UserSuppliedFeedback:
         self.user_feedback_selected_items = user_feedback_selected_items
         self.user_feedback_other_text_input = user_feedback_other_text_input
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> UserSuppliedFeedbackDict:
         """Returns a dict representing this UserSuppliedFeedback domain object.
 
         Returns:
@@ -593,6 +626,13 @@ class UserSuppliedFeedback:
                     'Invalid option %s selected by user.' % item)
 
 
+class DeviceSystemContextDict(TypedDict):
+    """Dictionary representing the DeviceSystemContext object."""
+
+    version_name: str
+    device_country_locale_code: str
+
+
 class DeviceSystemContext:
     """Domain object for the device and system information from the device used
     to submit the report.
@@ -612,7 +652,7 @@ class DeviceSystemContext:
         self.version_name = version_name
         self.device_country_locale_code = device_country_locale_code
 
-    def to_dict(self) -> Dict[str, str]:
+    def to_dict(self) -> DeviceSystemContextDict:
         """Returns a dict representing this DeviceSystemContext domain object.
         Subclasses should override this to propertly format any additional
         properties.
@@ -635,6 +675,19 @@ class DeviceSystemContext:
         raise NotImplementedError(
             'Subclasses of DeviceSystemContext should implement domain '
             'validation.')
+
+
+class AndroidDeviceSystemContextDict(TypedDict):
+    """Dictionary representing the AndroidDeviceSystemContext object."""
+
+    version_name: str
+    package_version_code: int
+    device_country_locale_code: str
+    device_language_locale_code: str
+    device_model: str
+    sdk_version: int
+    build_fingerprint: str
+    network_type: str
 
 
 class AndroidDeviceSystemContext(DeviceSystemContext):
@@ -682,7 +735,7 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
         self.build_fingerprint = build_fingerprint
         self.network_type = network_type
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> AndroidDeviceSystemContextDict:
         """Returns a dict representing this AndroidDeviceSystemContext domain
         object.
 
@@ -863,6 +916,14 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
                 'Invalid network type, received: %s.' % network_type)
 
 
+class AppContextDict(TypedDict):
+    """Dictionary representing the AppContext object."""
+
+    entry_point: AcceptableEntryPointClasses
+    text_language_code: str
+    audio_language_code: str
+
+
 class AppContext:
     """Domain object for the Oppia app information of the user's Oppia instance
     at the time they submitted the report.
@@ -888,7 +949,7 @@ class AppContext:
         self.text_language_code = text_language_code
         self.audio_language_code = audio_language_code
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> AppContextDict:
         """Returns a dict representing this AppContext domain object. Subclasses
         should override this to propertly format any additional properties.
 
@@ -911,6 +972,20 @@ class AppContext:
         raise NotImplementedError(
             'Subclasses of AppContext should implement their own validation '
             'checks.')
+
+
+class AndroidAppContextDict(TypedDict):
+    """Dictionary representing the AndroidAppContext object."""
+
+    entry_point: AcceptableEntryPointClasses
+    text_language_code: str
+    audio_language_code: str
+    text_size: str
+    only_allows_wifi_download_and_update: bool
+    automatically_update_topics: bool
+    account_is_profile_admin: bool
+    event_logs: List[str]
+    logcat_logs: List[str]
 
 
 class AndroidAppContext(AppContext):
@@ -967,7 +1042,7 @@ class AndroidAppContext(AppContext):
         self.event_logs = event_logs
         self.logcat_logs = logcat_logs
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> AndroidAppContextDict:
         """Returns a dict representing this AndroidAppContext domain object.
 
         Returns:
@@ -1121,7 +1196,7 @@ class EntryPoint:
         self.exploration_id = exploration_id
         self.subtopic_id = subtopic_id
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> Any:
         """Returns a dict representing this NavigationDrawerEntryPoint domain
         object.
 
@@ -1200,6 +1275,12 @@ class EntryPoint:
                     exploration_id, story_id, expected_story_id))
 
 
+class NavigationDrawerEntryPointDict(TypedDict):
+    """Dictionary representing the NavigationDrawerEntryPoint object."""
+
+    entry_point_name: str
+
+
 class NavigationDrawerEntryPoint(EntryPoint):
     """Domain object for the Android navigation drawer entry point."""
 
@@ -1209,7 +1290,7 @@ class NavigationDrawerEntryPoint(EntryPoint):
             app_feedback_report_constants.ENTRY_POINT.navigation_drawer, None,
             None, None, None)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> NavigationDrawerEntryPointDict:
         """Returns a dict representing this NavigationDrawerEntryPoint domain
         object.
 
@@ -1233,6 +1314,15 @@ class NavigationDrawerEntryPoint(EntryPoint):
             app_feedback_report_constants.ENTRY_POINT.navigation_drawer)
 
 
+class LessonPlayerEntryPointDict(TypedDict):
+    """Dictionary representing the LessonPlayerEntryPoint object."""
+
+    entry_point_name: str
+    topic_id: Optional[str]
+    story_id: Optional[str]
+    exploration_id: Optional[str]
+
+
 class LessonPlayerEntryPoint(EntryPoint):
     """Domain object for the lesson player entry point."""
 
@@ -1253,7 +1343,7 @@ class LessonPlayerEntryPoint(EntryPoint):
             app_feedback_report_constants.ENTRY_POINT.lesson_player,
             topic_id=topic_id, story_id=story_id, exploration_id=exploration_id)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> LessonPlayerEntryPointDict:
         """Returns a dict representing this LessonPlayerEntryPoint domain
         object.
 
@@ -1286,6 +1376,14 @@ class LessonPlayerEntryPoint(EntryPoint):
             self.exploration_id, self.story_id)
 
 
+class RevisionCardEntryPointDict(TypedDict):
+    """Dictionary representing the RevisionCardEntryPoint object."""
+
+    entry_point_name: str
+    topic_id: Optional[str]
+    subtopic_id: Optional[str]
+
+
 class RevisionCardEntryPoint(EntryPoint):
     """Domain object for the Android revision card entry point."""
 
@@ -1302,7 +1400,7 @@ class RevisionCardEntryPoint(EntryPoint):
             app_feedback_report_constants.ENTRY_POINT.revision_card,
             topic_id, None, None, subtopic_id)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> RevisionCardEntryPointDict:
         """Returns a dict representing this RevisionCardEntryPoint domain
         object.
 
@@ -1333,6 +1431,12 @@ class RevisionCardEntryPoint(EntryPoint):
                     self.subtopic_id))
 
 
+class CrashEntryPointDict(TypedDict):
+    """Dictionary representing the CrashEntryPoint object."""
+
+    entry_point_name: str
+
+
 class CrashEntryPoint(EntryPoint):
     """Domain object for the Android crash dialog entry point."""
 
@@ -1342,7 +1446,7 @@ class CrashEntryPoint(EntryPoint):
                 app_feedback_report_constants.ENTRY_POINT.crash, None, None,
                 None, None)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> CrashEntryPointDict:
         """Returns a dict representing this CrashEntryPoint domain object.
 
         Returns:
@@ -1363,6 +1467,19 @@ class CrashEntryPoint(EntryPoint):
         self.require_valid_entry_point_name(
             self.entry_point_name,
             app_feedback_report_constants.ENTRY_POINT.crash)
+
+
+class AppFeedbackReportTicketDict(TypedDict):
+    """Dictionary representing the AppFeedbackReportTicket object."""
+
+    ticket_id: str
+    ticket_name: str
+    platform: str
+    github_issue_repo_name: Optional[str]
+    github_issue_number: Optional[int]
+    archived: bool
+    newest_report_creation_timestamp: str
+    reports: List[str]
 
 
 class AppFeedbackReportTicket:
@@ -1405,7 +1522,7 @@ class AppFeedbackReportTicket:
         self.newest_report_creation_timestamp = newest_report_creation_timestamp
         self.reports = reports
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> AppFeedbackReportTicketDict:
         """Returns a dict representing this AppFeedbackReportTicket domain
         object.
 
@@ -1541,6 +1658,17 @@ class AppFeedbackReportTicket:
                     app_feedback_report_constants.GITHUB_REPO_CHOICES))
 
 
+class AppFeedbackReportDailyStatsDict(TypedDict):
+    """Dictionary representing the AppFeedbackReportDailyStats object."""
+
+    stats_id: str
+    ticket: AppFeedbackReportTicketDict
+    platform: str
+    stats_tracking_date: str
+    total_reports_submitted: int
+    daily_param_stats: Dict[str, Dict[str, int]]
+
+
 class AppFeedbackReportDailyStats:
     """Domain object for report statistics on a single day for a specific
     ticket.
@@ -1577,7 +1705,7 @@ class AppFeedbackReportDailyStats:
         self.total_reports_submitted = total_reports_submitted
         self.daily_param_stats = daily_param_stats
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> AppFeedbackReportDailyStatsDict:
         """Returns a dict representing this AppFeedbackReportDailyStats domain
         object.
 
@@ -1679,7 +1807,7 @@ class ReportStatsParameterValueCounts:
         """
         self.parameter_value_counts = parameter_value_counts
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> Dict[str, int]:
         """Returns a dict representing this ReportStatsParameterValueCounts
         domain object.
 
@@ -1707,6 +1835,13 @@ class ReportStatsParameterValueCounts:
                     'received: %r' % param_count)
 
 
+class AppFeedbackReportFilterDict(TypedDict):
+    """Dictionary representing the AppFeedbackReportFilter object."""
+
+    filter_field: str
+    filter_options: List[str]
+
+
 class AppFeedbackReportFilter:
     """Domain object for a filter that can be applied to the collection of
     feedback reports.
@@ -1728,7 +1863,7 @@ class AppFeedbackReportFilter:
         self.filter_field = filter_field
         self.filter_options = filter_options
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> AppFeedbackReportFilterDict:
         """Returns a dict representing this AppFeedbackReportFilter domain
         object.
 

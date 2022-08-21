@@ -30,7 +30,7 @@ from core.domain import rights_domain
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Any, Dict, List
+from typing import Dict, List
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -446,10 +446,7 @@ class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
     def test_revert_to_version_with_all_viewer_ids_field_successful(
             self
     ) -> None:
-        # TODO(#13523): Use of Any in the type-annotation below will be
-        # removed when the snapshot of ExplorationRightsModel
-        # is converted to TypedDict/Domain Object.
-        broken_dict: Dict[str, Any] = dict(**self.original_dict)
+        broken_dict = dict(**self.original_dict)
         broken_dict['all_viewer_ids'] = [
             self.USER_ID_1, self.USER_ID_2, self.USER_ID_3]
 
@@ -475,10 +472,7 @@ class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
         )
 
     def test_revert_to_version_with_invalid_status_is_successful(self) -> None:
-        # TODO(#13523): Use of Any in the type-annotation below will be
-        # removed when the snapshot of ExplorationRightsModel
-        # is converted to TypedDict/Domain Object.
-        broken_dict: Dict[str, Any] = dict(**self.original_dict)
+        broken_dict = dict(**self.original_dict)
         broken_dict['status'] = 'publicized'
 
         snapshot_model = (

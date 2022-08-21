@@ -889,17 +889,19 @@ class VersionedModel(BaseModel):
         if self.deleted:
             raise Exception('This model instance has been deleted.')
 
-    # TODO(#13523): Change 'snapshot' to domain object/TypedDict to
-    # remove Any from type-annotation below.
+    # Here we use type Any because the method 'compute_snapshot' defined in
+    # subclasses of VersionedModel can return different Dict/TypedDict types.
+    # So, to allow every Dict/TypedDict type we used any here.
     def compute_snapshot(self) -> Dict[str, Any]:
         """Generates a snapshot (dict) from the model property values."""
         return self.to_dict(exclude=['created_on', 'last_updated'])
 
-    # TODO(#13523): Change 'snapshot_dict' to domain object/Typed Dict to
-    # remove Any from type-annotation below.
+    # Here we use type Any because the method '_reconstitute' defined in
+    # subclasses of VersionedModel can accept different Dict/TypedDict types.
+    # So, to allow every Dict/TypedDict type we used any here.
     def _reconstitute(
-            self: SELF_VERSIONED_MODEL,
-            snapshot_dict: Dict[str, Any]
+        self: SELF_VERSIONED_MODEL,
+        snapshot_dict: Dict[str, Any]
     ) -> SELF_VERSIONED_MODEL:
         """Populates the model instance with the snapshot.
 
@@ -1101,18 +1103,20 @@ class VersionedModel(BaseModel):
             commit_cmds = [{
                 'cmd': self.CMD_DELETE_COMMIT
             }]
-            models_to_put = cast(
-                List[BaseModel],
-                self.compute_models_to_commit(
-                    committer_id,
-                    feconf.COMMIT_TYPE_DELETE,
-                    commit_message,
-                    commit_cmds,
-                    self._prepare_additional_models()
-                ).values()
+            models_to_put = self.compute_models_to_commit(
+                committer_id,
+                feconf.COMMIT_TYPE_DELETE,
+                commit_message,
+                commit_cmds,
+                self._prepare_additional_models()
             )
-            BaseModel.update_timestamps_multi(models_to_put)
-            BaseModel.put_multi(models_to_put)
+            models_to_put_values = []
+            for model_to_put in models_to_put.values():
+                # Here, we are narrowing down the type from object to BaseModel.
+                assert isinstance(model_to_put, BaseModel)
+                models_to_put_values.append(model_to_put)
+            BaseModel.update_timestamps_multi(models_to_put_values)
+            BaseModel.put_multi(models_to_put_values)
 
     # Here we use MyPy ignore because the signature of this method
     # doesn't match with BaseModel.delete_multi().
@@ -1288,18 +1292,20 @@ class VersionedModel(BaseModel):
             else feconf.COMMIT_TYPE_EDIT
         )
 
-        models_to_put = cast(
-            List[BaseModel],
-            self.compute_models_to_commit(
+        models_to_put = self.compute_models_to_commit(
                 committer_id,
                 commit_type,
                 commit_message,
                 commit_cmds,
                 self._prepare_additional_models()
-            ).values()
-        )
-        BaseModel.update_timestamps_multi(models_to_put)
-        BaseModel.put_multi_transactional(models_to_put)
+            )
+        models_to_put_values = []
+        for model_to_put in models_to_put.values():
+            # Here, we are narrowing down the type from object to BaseModel.
+            assert isinstance(model_to_put, BaseModel)
+            models_to_put_values.append(model_to_put)
+        BaseModel.update_timestamps_multi(models_to_put_values)
+        BaseModel.put_multi_transactional(models_to_put_values)
 
     @classmethod
     def revert(
@@ -1349,18 +1355,20 @@ class VersionedModel(BaseModel):
         new_model._reconstitute_from_snapshot_id(snapshot_id)  # pylint: disable=protected-access
         new_model.version = current_version
 
-        models_to_put = cast(
-            List[BaseModel],
-            new_model.compute_models_to_commit(
-                committer_id,
-                feconf.COMMIT_TYPE_REVERT,
-                commit_message,
-                commit_cmds,
-                new_model._prepare_additional_models()
-            ).values()
+        models_to_put = new_model.compute_models_to_commit(
+            committer_id,
+            feconf.COMMIT_TYPE_REVERT,
+            commit_message,
+            commit_cmds,
+            new_model._prepare_additional_models()
         )
-        BaseModel.update_timestamps_multi(list(models_to_put))
-        BaseModel.put_multi_transactional(list(models_to_put))
+        models_to_put_values = []
+        for model_to_put in models_to_put.values():
+            # Here, we are narrowing down the type from object to BaseModel.
+            assert isinstance(model_to_put, BaseModel)
+            models_to_put_values.append(model_to_put)
+        BaseModel.update_timestamps_multi(models_to_put_values)
+        BaseModel.put_multi_transactional(models_to_put_values)
 
     @overload
     @classmethod
@@ -1818,13 +1826,14 @@ class BaseSnapshotContentModel(BaseModel):
             'content': EXPORT_POLICY.NOT_APPLICABLE
         })
 
-    # TODO(#13523): Change 'content' to domain object/TypedDict to
-    # remove Any from type-annotation below.
+    # Here we use type Any because the method 'create' defined in subclasses
+    # of BaseSnapshotContentModel can accept different Dict/TypedDict types.
+    # So, to allow every Dict/TypedDict type we used any here.
     @classmethod
     def create(
-            cls: Type[SELF_BASE_SNAPSHOT_CONTENT_MODEL],
-            snapshot_id: str,
-            content: Dict[str, Any]
+        cls: Type[SELF_BASE_SNAPSHOT_CONTENT_MODEL],
+        snapshot_id: str,
+        content: Dict[str, Any]
     ) -> SELF_BASE_SNAPSHOT_CONTENT_MODEL:
         """This method returns an instance of the BaseSnapshotContentModel for
         a construct with the common fields filled.

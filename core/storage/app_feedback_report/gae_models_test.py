@@ -62,11 +62,15 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
     ENTRY_POINT_NAVIGATION_DRAWER = 'navigation_drawer'
     TEXT_LANGUAGE_CODE_ENGLISH = 'en'
     AUDIO_LANGUAGE_CODE_ENGLISH = 'en'
-    ANDROID_REPORT_INFO = {
+    ANDROID_REPORT_INFO: app_feedback_report_models.ReportInfoDict = {
+        'user_feedback_selected_items': [],
         'user_feedback_other_text_input': 'add an admin',
         'event_logs': ['event1', 'event2'],
         'logcat_logs': ['logcat1', 'logcat2'],
         'package_version_code': 1,
+        'build_fingerprint': 'example_fingerprint_id',
+        'network_type': 'wifi',
+        'android_device_language_locale_code': 'en',
         'language_locale_code': 'en',
         'entry_point_info': {
             'entry_point_name': 'crash',
@@ -74,10 +78,27 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
         'text_size': 'MEDIUM_TEXT_SIZE',
         'only_allows_wifi_download_and_update': True,
         'automatically_update_topics': False,
-        'is_curriculum_admin': False
+        'is_curriculum_admin': False,
+        'account_is_profile_admin': False
     }
-    WEB_REPORT_INFO = {
-        'user_feedback_other_text_input': 'add an admin'
+    WEB_REPORT_INFO: app_feedback_report_models.ReportInfoDict = {
+        'user_feedback_selected_items': [],
+        'user_feedback_other_text_input': 'add an admin',
+        'event_logs': ['event1', 'event2'],
+        'logcat_logs': ['logcat1', 'logcat2'],
+        'package_version_code': 1,
+        'build_fingerprint': 'example_fingerprint_id',
+        'network_type': 'wifi',
+        'android_device_language_locale_code': 'en',
+        'language_locale_code': 'en',
+        'entry_point_info': {
+            'entry_point_name': 'crash',
+        },
+        'text_size': 'MEDIUM_TEXT_SIZE',
+        'only_allows_wifi_download_and_update': True,
+        'automatically_update_topics': False,
+        'is_curriculum_admin': False,
+        'account_is_profile_admin': False
     }
     ANDROID_REPORT_INFO_SCHEMA_VERSION = 1
     WEB_REPORT_INFO_SCHEMA_VERSION = 1

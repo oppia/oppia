@@ -423,8 +423,10 @@ class ExplorationModel(base_models.VersionedModel):
                         ExplorationVersionHistoryModel, version_history_id))
             datastore_services.delete_multi(version_history_keys)
 
-    # TODO(#13523): Change snapshot of this model to TypedDict/Domain Object
-    # to remove Any used below.
+    # TODO(#15911): Here we use type Any because 'convert_to_valid_dict' method
+    # accepts content NDB JSON properties and those NDB JSON properties have
+    # loose typing. So, once we explicitly typed those NDB JSON properties we
+    # can remove Any type from here.
     @staticmethod
     def convert_to_valid_dict(snapshot_dict: Dict[str, Any]) -> Dict[str, Any]:
         """Replace invalid fields and values in the ExplorationModel dict.
@@ -452,11 +454,13 @@ class ExplorationModel(base_models.VersionedModel):
 
         return snapshot_dict
 
-    # TODO(#13523): Change 'snapshot_dict' to TypedDict/Domain Object
-    # to remove Any used below.
+    # TODO(#15911): Here we use type Any because this '_reconstitute' method
+    # accepts content NDB JSON properties and those NDB JSON properties have
+    # loose typing. So, once we explicitly typed those NDB JSON properties we
+    # can remove Any type from the argument of '_reconstitute' method.
     def _reconstitute(
-            self,
-            snapshot_dict: Dict[str, Any]
+        self,
+        snapshot_dict: Dict[str, Any]
     ) -> ExplorationModel:
         """Populates the model instance with the snapshot.
         Some old ExplorationSnapshotContentModels can contain fields
@@ -682,8 +686,10 @@ class ExplorationRightsModel(base_models.VersionedModel):
         """
         super().commit(committer_id, commit_message, commit_cmds)
 
-    # TODO(#13523): Change snapshot of this model to TypedDict/Domain Object
-    # to remove Any used below.
+    # TODO(#15911): Here we use type Any because 'convert_to_valid_dict' method
+    # accepts content NDB JSON properties and those NDB JSON properties have
+    # loose typing. So, once we explicitly typed those NDB JSON properties we
+    # can remove Any type from here.
     @staticmethod
     def convert_to_valid_dict(model_dict: Dict[str, Any]) -> Dict[str, Any]:
         """Replace invalid fields and values in the ExplorationRightsModel dict.
@@ -733,11 +739,13 @@ class ExplorationRightsModel(base_models.VersionedModel):
 
         return model_dict
 
-    # TODO(#13523): Change 'snapshot_dict' to TypedDict/Domain Object
-    # to remove Any used below.
+    # TODO(#15911): Here we use type Any because this '_reconstitute' method
+    # accepts content NDB JSON properties and those NDB JSON properties have
+    # loose typing. So, once we explicitly typed those NDB JSON properties we
+    # can remove Any type from the argument of '_reconstitute' method.
     def _reconstitute(
-            self,
-            snapshot_dict: Dict[str, Any]
+        self,
+        snapshot_dict: Dict[str, Any]
     ) -> ExplorationRightsModel:
         """Populates the model instance with the snapshot.
 
