@@ -323,7 +323,7 @@ class CollectionModel(base_models.VersionedModel):
             additional_models
         )
 
-        # The cast is needed because the additional_models is list of BaseModels
+        # Here we use cast because the additional_models is list of BaseModels
         # and we want to hint the mypy that this is CollectionRightsModel.
         collection_rights_model = cast(
             CollectionRightsModel, additional_models['rights_model']
@@ -346,7 +346,7 @@ class CollectionModel(base_models.VersionedModel):
             'versioned_model': models_to_put['versioned_model'],
         }
 
-    # We have ignored [override] here because the signature of this method
+    # Here we use MyPy ignore because the signature of this method
     # doesn't match with BaseModel.delete_multi().
     # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
     @classmethod

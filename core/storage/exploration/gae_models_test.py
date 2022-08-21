@@ -565,9 +565,10 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
         with self.assertRaisesRegex( # type: ignore[no-untyped-call]
             Exception, 'max_age must be a datetime.timedelta instance or None.'
         ):
-            # TODO(#13528): Remove this test after the backend is fully
-            # type-annotated. Here ignore[arg-type] is used to test method
-            # get_all_non_private_commits() for invalid input type.
+            # TODO(#13528): Here we use MyPy ignore because we remove this test
+            # after the backend is fully type-annotated. Here ignore[arg-type]
+            # is used to test method get_all_non_private_commits() for invalid
+            # input type.
             results, _, _ = (
                 exp_models.ExplorationCommitLogEntryModel
                 .get_all_non_private_commits(2, None, max_age=1)) # type: ignore[arg-type]
