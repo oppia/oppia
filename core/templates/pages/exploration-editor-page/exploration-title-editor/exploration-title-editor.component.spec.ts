@@ -23,31 +23,26 @@ import { ExplorationTitleEditorComponent } from './exploration-title-editor.comp
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { RouterService } from '../services/router.service';
 import { ExplorationTitleService } from '../services/exploration-title.service';
-
-class MockRouterService {
-  private refreshSettingsTabEventEmitter: EventEmitter<void>;
-  get onRefreshSettingsTab() {
-    return this.refreshSettingsTabEventEmitter;
-  }
-
-  getActiveTabName() {
-    return ('main');
-  }
-
-  set refreshSettingsTabEmitter(val) {
-    this.refreshSettingsTabEventEmitter = val;
-  }
-}
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 describe('Exploration Title Editor Component', () => {
   let component: ExplorationTitleEditorComponent;
   let fixture: ComponentFixture<ExplorationTitleEditorComponent>;
   let focusManagerService: FocusManagerService;
-  let routerService: MockRouterService;
+  let mockEventEmitter = new EventEmitter();
+  let explorationTitleService: ExplorationTitleService;
+
+  class MockRouterService {
+    onRefreshSettingsTab = mockEventEmitter;
+  }
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [
+        HttpClientTestingModule,
+        FormsModule,
+        ReactiveFormsModule
+      ],
       declarations: [
         ExplorationTitleEditorComponent
       ],
@@ -58,7 +53,6 @@ describe('Exploration Title Editor Component', () => {
         },
         ExplorationTitleService,
         FocusManagerService,
-        ExplorationTitleService
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -70,9 +64,9 @@ describe('Exploration Title Editor Component', () => {
     component = fixture.componentInstance;
 
     focusManagerService = TestBed.inject(FocusManagerService);
-    routerService = TestBed.inject(MockRouterService);
 
-    routerService.refreshSettingsTabEmitter = new EventEmitter();
+    explorationTitleService = TestBed.inject(ExplorationTitleService);
+    explorationTitleService.displayed = '';
 
     component.ngOnInit();
     fixture.detectChanges();
@@ -88,7 +82,7 @@ describe('Exploration Title Editor Component', () => {
 
     component.focusLabel = 'xyzz';
 
-    routerService.onRefreshSettingsTab.emit();
+    mockEventEmitter.emit();
     component.inputFieldBlur();
     tick();
 

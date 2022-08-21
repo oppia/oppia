@@ -13,93 +13,101 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for ExplorationGraphModalController.
+ * @fileoverview Unit tests for ExplorationGraphModalComponent.
  */
 
-import { TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
-import { StateEditorRefreshService } from
-  'pages/exploration-editor-page/services/state-editor-refresh.service';
-import { ReadOnlyExplorationBackendApiService } from
-  'domain/exploration/read-only-exploration-backend-api.service';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ExplorationGraphModalComponent } from './exploration-graph-modal.component';
+import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import { GraphDataService } from 'pages/exploration-editor-page/services/graph-data.service';
 
-describe('Exploration Graph Modal Controller', function() {
-  var $scope = null;
-  var $uibModalInstance = null;
-  var GraphDataService = null;
-  var StateEditorService = null;
+class MockActiveModal {
+  close(): void {
+    return;
+  }
 
-  var isEditable = true;
-  var graphData = {};
-  var stateName = 'Introduction';
+  dismiss(): void {
+    return;
+  }
+}
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('NgbModal', {
-      open: () => {
-        return {
-          result: Promise.resolve()
-        };
-      }
-    });
+class MockNgbModal {
+  open() {
+    return {
+      result: Promise.resolve()
+    };
+  }
+}
+
+describe('Exploration Graph Modal Component', () => {
+  let component: ExplorationGraphModalComponent;
+  let fixture: ComponentFixture<ExplorationGraphModalComponent>;
+  let ngbActiveModal: NgbActiveModal;
+  let graphDataService: GraphDataService;
+  let stateEditorService: StateEditorService;
+  let isEditable = true;
+  let stateName = 'Introduction';
+
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      declarations: [
+        ExplorationGraphModalComponent
+      ],
+      providers: [
+        GraphDataService,
+        StateEditorService,
+        {
+          provide: NgbActiveModal,
+          useClass: MockActiveModal
+        },
+        {
+          provide: NgbModal,
+          useClass: MockNgbModal
+        }
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   }));
-  importAllAngularServices();
 
   beforeEach(() => {
-    TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
-    });
-  });
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
-    $provide.value(
-      'ReadOnlyExplorationBackendApiService',
-      TestBed.get(ReadOnlyExplorationBackendApiService));
-  }));
-  beforeEach(angular.mock.inject(function($injector, $controller) {
-    var $rootScope = $injector.get('$rootScope');
-    GraphDataService = $injector.get('GraphDataService');
-    StateEditorService = $injector.get('StateEditorService');
+    fixture = TestBed.createComponent(ExplorationGraphModalComponent);
+    component = fixture.componentInstance;
 
-    $uibModalInstance = jasmine.createSpyObj(
-      '$uibModalInstance', ['close', 'dismiss']);
+    ngbActiveModal = TestBed.inject(NgbActiveModal);
+    graphDataService = TestBed.inject(GraphDataService);
+    stateEditorService = TestBed.inject(StateEditorService);
 
-    spyOn(GraphDataService, 'getGraphData').and.returnValue(graphData);
-    spyOn(StateEditorService, 'getActiveStateName').and.returnValue(stateName);
+    spyOn(graphDataService, 'getGraphData').and.returnValue(null);
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValue(stateName);
+    spyOn(ngbActiveModal, 'close').and.stub();
 
-    $scope = $rootScope.$new();
-    $controller('ExplorationGraphModalController', {
-      $scope: $scope,
-      $uibModalInstance: $uibModalInstance,
-      isEditable: isEditable
-    });
-  }));
-
-  it('should initialize $scope properties after controller is initialized',
-    function() {
-      expect($scope.currentStateName).toBe(stateName);
-      expect($scope.graphData).toEqual(graphData);
-      expect($scope.isEditable).toBe(isEditable);
-    });
-
-  it('should delete state when closing the modal', function() {
-    var stateName = 'State Name';
-    $scope.deleteState(stateName);
-
-    expect($uibModalInstance.close).toHaveBeenCalledWith({
-      action: 'delete',
-      stateName: stateName
-    });
+    component.isEditable = isEditable;
+    component.ngOnInit();
   });
 
-  it('should select state when closing the modal', function() {
-    var stateName = 'State Name';
-    $scope.selectState(stateName);
 
-    expect($uibModalInstance.close).toHaveBeenCalledWith({
-      action: 'navigate',
-      stateName: stateName
+  it('should initialize component properties after Component is initialized',
+    () => {
+      expect(component.currentStateName).toBe(stateName);
+      expect(component.graphData).toEqual(null);
+      expect(component.isEditable).toBe(isEditable);
     });
+
+  it('should delete state when closing the modal', () => {
+    let stateName = 'State Name';
+    component.deleteState(stateName);
+
+    expect(ngbActiveModal.close).toHaveBeenCalled();
+  });
+
+  it('should select state when closing the modal', () => {
+    let stateName = 'State Name';
+    component.selectState(stateName);
+
+    expect(ngbActiveModal.close).toHaveBeenCalled();
   });
 });

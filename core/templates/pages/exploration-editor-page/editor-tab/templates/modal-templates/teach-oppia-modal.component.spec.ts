@@ -13,62 +13,52 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for TeachOppiaModalController.
+ * @fileoverview Unit tests for TeachOppiaModalComponent.
  */
 
-import { EventEmitter } from '@angular/core';
-import { fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { EventEmitter, Injector, NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { StateCustomizationArgsService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-customization-args.service';
-import { StateInteractionIdService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import { StateSolutionService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-solution.service';
-import { OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
-import { StateObjectFactory } from 'domain/state/StateObjectFactory';
-import { TextInputRulesService } from
-  'interactions/TextInput/directives/text-input-rules.service';
-import { ReadOnlyExplorationBackendApiService } from
-  'domain/exploration/read-only-exploration-backend-api.service';
-import { AngularNameService } from
-  'pages/exploration-editor-page/services/angular-name.service';
-import { StateEditorRefreshService } from
-  'pages/exploration-editor-page/services/state-editor-refresh.service';
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
+import { StateBackendDict, StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { TrainingDataService } from '../../training-panel/training-data.service';
 import { TrainingModalService } from '../../training-panel/training-modal.service';
-import { ExplorationPlayerConstants } from 'pages/exploration-player-page/exploration-player-page.constants';
+import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
+import { AlertsService } from 'services/alerts.service';
+import { ContextService } from 'services/context.service';
+import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
+import { ResponsesService } from '../../services/responses.service';
+import { TeachOppiaModalComponent } from './teach-oppia-modal.component';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { TruncateInputBasedOnInteractionAnswerTypePipe } from 'filters/truncate-input-based-on-interaction-answer-type.pipe';
+import { AnswerClassificationResult } from 'domain/classifier/answer-classification-result.model';
+import { AnswerClassificationService } from 'pages/exploration-player-page/services/answer-classification.service';
+import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import { TeachOppiaModalBackendApiService } from './teach-oppia-modal-backend-api.service';
+import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
 
-describe('Teach Oppia Modal Controller', function() {
-  importAllAngularServices();
-
-  var $httpBackend = null;
-  var $log = null;
-  var $scope = null;
-  let ctrl = null;
-  var $uibModalInstance = null;
-  var alertsService = null;
-  var angularNameService = null;
-  var contextService = null;
-  var explorationHtmlFormatterService = null;
-  var stateCustomizationArgsService = null;
-  var stateEditorService = null;
-  var stateInteractionIdService = null;
-  var stateObjectFactory = null;
-  var explorationStatesService = null;
-  var responsesService = null;
-  var trainingDataService = null;
-  var trainingModalService = null;
-  var mockExternalSaveEventEmitter = null;
-  var explorationId = 'exp1';
-  var stateName = 'Introduction';
-  let mockEmitter = new EventEmitter();
-  var state = {
+describe('Teach Oppia Modal Component', () => {
+  let component: TeachOppiaModalComponent;
+  let fixture: ComponentFixture<TeachOppiaModalComponent>;
+  let alertsService: AlertsService;
+  let contextService: ContextService;
+  let explorationHtmlFormatterService: ExplorationHtmlFormatterService;
+  let stateEditorService: StateEditorService;
+  let stateInteractionIdService: StateInteractionIdService;
+  let stateObjectFactory: StateObjectFactory;
+  let explorationStatesService: ExplorationStatesService;
+  let responsesService: ResponsesService;
+  let trainingDataService: TrainingDataService;
+  let trainingModalService: TrainingModalService;
+  let answerClassificationService: AnswerClassificationService;
+  let teachOppiaModalBackendApiService: TeachOppiaModalBackendApiService;
+  let explorationId = 'exp1';
+  let stateName = 'Introduction';
+  let injector: Injector;
+  let onchange = new EventEmitter();
+  let state: StateBackendDict = {
     classifier_model_id: null,
     content: {
       html: '',
@@ -87,10 +77,12 @@ describe('Teach Oppia Modal Controller', function() {
       answer_groups: [{
         rule_specs: [{
           rule_type: 'Equals',
-          inputs: { x: {
-            contentId: 'rule_input',
-            normalizedStrSet: ['Correct Answer']
-          }}
+          inputs: {
+            x: {
+              contentId: 'rule_input',
+              normalizedStrSet: ['Correct Answer']
+            }
+          }
         }],
         outcome: {
           dest: 'outcome 1',
@@ -101,7 +93,8 @@ describe('Teach Oppia Modal Controller', function() {
           },
           labelled_as_correct: true,
           param_changes: [],
-          refresher_exploration_id: null
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null
         },
         training_data: [],
         tagged_skill_misconception_id: null
@@ -130,162 +123,139 @@ describe('Teach Oppia Modal Controller', function() {
     solicit_answer_details: false,
     written_translations: {
       translations_mapping: {}
-    }
+    },
+    card_is_checkpoint: false,
+    next_content_id_index: 0
   };
+
+  class MockTrainingDataService {
+    associateWithDefaultResponse(item) {}
+
+    associateWithAnswerGroup(item) {}
+
+    isConfirmedUnclassifiedAnswer(item) {}
+  }
+
+  class MockTrainingModalService {
+    openTrainUnresolvedAnswerModal(item1, item2, item3) {}
+
+    onFinishTrainingCallback = onchange;
+  }
+
+  class MockActiveModal {
+    close(): void {
+      return;
+    }
+
+    dismiss(): void {
+      return;
+    }
+  }
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
-    });
+      imports: [
+        HttpClientTestingModule
+      ],
+      declarations: [
+        TeachOppiaModalComponent,
+      ],
+      providers: [
+        Injector,
+        TruncateInputBasedOnInteractionAnswerTypePipe,
+        TeachOppiaModalBackendApiService,
+        AnswerClassificationService,
+        {
+          provide: NgbActiveModal,
+          useClass: MockActiveModal
+        },
+        {
+          provide: TrainingDataService,
+          useClass: MockTrainingDataService
+        },
+        {
+          provide: TrainingModalService,
+          useClass: MockTrainingModalService
+        },
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   });
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('NgbModal', {
-      isConfirmedUnclassifiedAnswer: () => {
-        return true;
-      },
-      associateWithDefaultResponse: () => {},
-      associateWithAnswerGroup: () => {},
-    });
-
-    $provide.value('TrainingDataService', {
-      open: () => {
-        return {
-          result: Promise.resolve()
-        };
-      }
-    });
-
-    $provide.value('TrainingModalService', {
-      openTrainUnresolvedAnswerModal: () => {
-        return true;
-      },
-      onFinishTrainingCallback: mockEmitter
-    });
-  }));
-
-  beforeEach(function() {
-    angularNameService = TestBed.get(AngularNameService);
-    stateCustomizationArgsService = TestBed.get(StateCustomizationArgsService);
-    stateInteractionIdService = TestBed.get(StateInteractionIdService);
-    stateObjectFactory = TestBed.get(StateObjectFactory);
-    trainingDataService = TestBed.get(TrainingDataService);
-    trainingModalService = TestBed.get(TrainingModalService);
+  beforeEach(() => {
+    fixture = TestBed.createComponent(TeachOppiaModalComponent);
+    component = fixture.componentInstance;
+    injector = TestBed.inject(Injector);
+    stateInteractionIdService = TestBed.inject(StateInteractionIdService);
+    stateObjectFactory = TestBed.inject(StateObjectFactory);
+    trainingDataService = TestBed.inject(TrainingDataService);
+    trainingModalService = TestBed.inject(TrainingModalService);
+    teachOppiaModalBackendApiService = TestBed.inject(
+      TeachOppiaModalBackendApiService);
+    answerClassificationService = TestBed.inject(AnswerClassificationService);
   });
 
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('AngularNameService', angularNameService);
-    $provide.value(
-      'TextInputRulesService',
-      TestBed.get(TextInputRulesService));
-    $provide.value(
-      'OutcomeObjectFactory', TestBed.get(OutcomeObjectFactory));
-    $provide.value(
-      'StateCustomizationArgsService', stateCustomizationArgsService);
-    $provide.value(
-      'DEFAULT_OUTCOME_CLASSIFICATION',
-      ExplorationPlayerConstants.DEFAULT_OUTCOME_CLASSIFICATION);
-    $provide.value(
-      'EXPLICIT_CLASSIFICATION',
-      ExplorationPlayerConstants.EXPLICIT_CLASSIFICATION);
-    $provide.value(
-      'TRAINING_DATA_CLASSIFICATION',
-      ExplorationPlayerConstants.TRAINING_DATA_CLASSIFICATION);
+  describe('when successfully fetching top unresolved answers', () => {
+    beforeEach(() => {
+      component.unresolvedAnswers = [
+        {
+          answer: 'Answer Text',
+          answerTemplate: '',
+          classificationResult: new AnswerClassificationResult(
+            null, null, null, null),
+          feedbackHtml: 'This is a html feedback'
+        },
+        {
+          answer: 'Answer Text',
+          answerTemplate: '',
+          classificationResult: new AnswerClassificationResult(
+            null, null, null, null),
+          feedbackHtml: 'This is a html feedback'
+        }
+      ];
+      alertsService = TestBed.inject(AlertsService);
+      contextService = TestBed.inject(ContextService);
+      explorationHtmlFormatterService = TestBed.inject(
+        ExplorationHtmlFormatterService);
+      explorationStatesService = TestBed.inject(ExplorationStatesService);
+      stateEditorService = TestBed.inject(StateEditorService);
+      responsesService = TestBed.inject(ResponsesService);
+      trainingDataService = TestBed.inject(TrainingDataService);
+      trainingModalService = TestBed.inject(TrainingModalService);
 
-    $provide.value(
-      'StateEditorRefreshService', TestBed.get(StateEditorRefreshService));
-    $provide.value('StateInteractionIdService', stateInteractionIdService);
-    $provide.value('TrainingDataService', trainingDataService);
-    $provide.value('TrainingModalService', trainingModalService);
-    $provide.value('StateSolutionService', TestBed.get(StateSolutionService));
-    mockExternalSaveEventEmitter = new EventEmitter();
-    $provide.value('ExternalSaveService', {
-      onExternalSave: mockExternalSaveEventEmitter
-    });
-    $provide.value(
-      'ReadOnlyExplorationBackendApiService',
-      TestBed.get(ReadOnlyExplorationBackendApiService));
-  }));
-
-  describe('when successfully fetching top unresolved answers', function() {
-    let onchange = new EventEmitter();
-
-    beforeEach(angular.mock.inject(function($injector, $controller) {
-      alertsService = $injector.get('AlertsService');
-      $httpBackend = $injector.get('$httpBackend');
-      var $rootScope = $injector.get('$rootScope');
-      contextService = $injector.get('ContextService');
+      spyOn(injector, 'get').and.stub();
       spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
-
-      explorationHtmlFormatterService = $injector.get(
-        'ExplorationHtmlFormatterService');
-      explorationStatesService = $injector.get('ExplorationStatesService');
-      stateEditorService = $injector.get('StateEditorService');
-      responsesService = $injector.get('ResponsesService');
-      trainingDataService = $injector.get('TrainingDataService');
-      trainingModalService = $injector.get('TrainingModalService');
-
-      $uibModalInstance = jasmine.createSpyObj(
-        '$uibModalInstance', ['close', 'dismiss']);
-
       spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
         stateName);
-
       spyOn(explorationStatesService, 'getState').and.returnValue(
         stateObjectFactory.createFromBackendDict(stateName, state));
-
       stateInteractionIdService.init(stateName, 'TextInput');
-
       spyOn(responsesService, 'getConfirmedUnclassifiedAnswers').and
-        .returnValue([{}]);
+        .returnValue([]);
       spyOn(responsesService, 'getAnswerGroups').and
-        .returnValue([{
-          rules: [],
-          trainingData: [{}]
-        }]);
+        .returnValue([new AnswerGroup([], null, [], '')]);
 
       spyOn(explorationHtmlFormatterService, 'getAnswerHtml').and
         .returnValue('');
 
-      $httpBackend.expect(
-        'GET', '/createhandler/get_top_unresolved_answers/' +
-        'exp1?state_name=Introduction').respond(200, {
-        unresolved_answers: [{
-          answer: 'Answer Text'
-        }, {
-          answer: 'Correct answer'
-        }]
-      });
-
-      $scope = $rootScope.$new();
-      ctrl = $controller('TeachOppiaModalController', {
-        $scope: $scope,
-        $uibModalInstance: $uibModalInstance
-      });
-      $httpBackend.flush();
-
-      spyOnProperty(trainingModalService, 'onFinishTrainingCallback')
-        .and.returnValue(onchange);
-      ctrl.$onInit();
-      $rootScope.$apply();
-    }));
+      component.ngOnInit();
+    });
 
     afterEach(() => {
-      ctrl.$onDestroy();
+      component.ngOnDestroy();
     });
 
     it('should initialize unresolved answer properties after controller is' +
       ' initialized', fakeAsync(() => {
-      let unresolvedAnswers = $scope.unresolvedAnswers[0];
+      let unresolvedAnswers = component.unresolvedAnswers[0];
 
       let finishTrainingResult = {
         answerIndex: 0,
         answer: 'answer Data for truncateInputBasedOnInteractionAnswerType'
       };
-      $scope.interactionId = 'TextInput';
+      component.interactionId = 'TextInput';
 
       onchange.emit(finishTrainingResult);
-      $scope.$apply();
       tick();
 
       expect(unresolvedAnswers.answer).toBe('Answer Text');
@@ -294,18 +264,46 @@ describe('Teach Oppia Modal Controller', function() {
     }));
 
     it('should confirm answer assignment when its type is default_outcome',
-      function() {
+      () => {
         spyOn(alertsService, 'addSuccessMessage');
         spyOn(trainingDataService, 'associateWithDefaultResponse').and
           .callFake(() => {});
-        $scope.confirmAnswerAssignment(0);
+        component.confirmAnswerAssignment(0);
+
+        expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
+          'The answer Answer Text has been successfully trained.', 2000);
+      });
+
+    it('should return when its type is not default_outcome',
+      () => {
+        component.unresolvedAnswers = [
+          {
+            answer: 'Answer Text',
+            answerTemplate: '',
+            classificationResult: new AnswerClassificationResult(
+              null, null, null, 'default_outcome'),
+            feedbackHtml: 'This is a html feedback'
+          },
+          {
+            answer: 'Answer Text',
+            answerTemplate: '',
+            classificationResult: new AnswerClassificationResult(
+              null, null, null, 'default_outcome'),
+            feedbackHtml: 'This is a html feedback'
+          }
+        ];
+
+        spyOn(alertsService, 'addSuccessMessage');
+        spyOn(trainingDataService, 'associateWithDefaultResponse').and
+          .callFake(() => {});
+        component.confirmAnswerAssignment(0);
 
         expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
           'The answer Answer Text has been successfully trained.', 2000);
       });
 
     it('should confirm answer assignment when its type is not default_outcome',
-      function() {
+      () => {
         spyOn(alertsService, 'addSuccessMessage');
         spyOn(trainingDataService, 'associateWithAnswerGroup').and
           .callFake(() => {});
@@ -313,98 +311,66 @@ describe('Teach Oppia Modal Controller', function() {
         // Mocking the answer object to change its type manually because
         // the controller has a lot of dependencies and can make it
         // hard to understand.
-        Object.defineProperty($scope, 'unresolvedAnswers', {
+        Object.defineProperty(component, 'unresolvedAnswers', {
           get: () => undefined
         });
-        spyOnProperty($scope, 'unresolvedAnswers').and.returnValue([{}, {
+        spyOnProperty(component, 'unresolvedAnswers').and.returnValue([{}, {
           answer: 'Correct answer',
           classificationResult: {
             classificationCategorization: 'explicit',
             answerGroupIndex: 0
           }
         }]);
-        $scope.confirmAnswerAssignment(1);
+        component.confirmAnswerAssignment(1);
 
         expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
           'The answer Correct a... has been successfully trained.', 2000);
       });
 
-    it('should open train unresolved answer modal', function() {
+    it('should open train unresolved answer modal', () => {
       spyOn(trainingModalService, 'openTrainUnresolvedAnswerModal').and
         .callFake(function(InteractionAnswer, interactionId, answerIndex) {
         });
 
-      $scope.openTrainUnresolvedAnswerModal(0);
+      component.openTrainUnresolvedAnswerModal(0);
 
       expect(trainingModalService.openTrainUnresolvedAnswerModal)
         .toHaveBeenCalled();
     });
-  });
 
-  describe('when fetching top unresolved answers fails', function() {
-    var $logSpy = null;
+    it('should show Unresolved Answers', () => {
+      let outcome = new Outcome(
+        '', '', new SubtitledHtml('html', 'html'),
+        false, [], '', '');
+      spyOn(answerClassificationService, 'getMatchingClassificationResult')
+        .and.returnValue(
+          new AnswerClassificationResult(outcome, null, null, 'Answers'));
+      spyOn(trainingDataService, 'isConfirmedUnclassifiedAnswer')
+        .and.returnValue(false);
+      let unresolvedAnswers = [{
+        answer: null
+      }];
+      component.showUnresolvedAnswers(unresolvedAnswers);
+    });
 
-    beforeEach(angular.mock.inject(function($injector, $controller) {
-      alertsService = $injector.get('AlertsService');
-      $httpBackend = $injector.get('$httpBackend');
-      $log = $injector.get('$log');
-      var $rootScope = $injector.get('$rootScope');
-      contextService = $injector.get('ContextService');
-      spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
+    it('should call teachOppiaModalBackendApiService to fetch data',
+      fakeAsync(() => {
+        let response = {
+          data: {
+            unresolved_answers: null
+          }
+        };
 
-      explorationHtmlFormatterService = $injector.get(
-        'ExplorationHtmlFormatterService');
-      explorationStatesService = $injector.get('ExplorationStatesService');
-      stateEditorService = $injector.get('StateEditorService');
-      responsesService = $injector.get('ResponsesService');
-      trainingDataService = $injector.get('TrainingDataService');
-      trainingModalService = $injector.get('TrainingModalService');
+        spyOn(component, 'showUnresolvedAnswers').and.stub();
+        spyOn(teachOppiaModalBackendApiService, 'fetchTeachOppiaModalDataAsync')
+          .and.returnValue(
+            Promise.resolve(response)
+          );
 
-      $uibModalInstance = jasmine.createSpyObj(
-        '$uibModalInstance', ['close', 'dismiss']);
+        component.ngOnInit();
+        tick();
 
-      spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
-        stateName);
-
-      spyOn(explorationStatesService, 'getState').and.returnValue(
-        stateObjectFactory.createFromBackendDict(stateName, state));
-
-      stateInteractionIdService.init(stateName, 'TextInput');
-
-      spyOn(responsesService, 'getConfirmedUnclassifiedAnswers').and
-        .returnValue([{}]);
-      spyOn(responsesService, 'getAnswerGroups').and
-        .returnValue([{
-          rules: [],
-          trainingData: [{}]
-        }]);
-
-      spyOn(explorationHtmlFormatterService, 'getAnswerHtml').and
-        .returnValue('');
-
-      $logSpy = spyOn($log, 'error');
-
-      $httpBackend.expect(
-        'GET', '/createhandler/get_top_unresolved_answers/' +
-        'exp1?state_name=Introduction').respond(
-        500, 'Server error.');
-
-      $scope = $rootScope.$new();
-      $controller('TeachOppiaModalController', {
-        $scope: $scope,
-        $uibModalInstance: $uibModalInstance
-      });
-      $httpBackend.flush();
-    }));
-
-    it('should initialize controller properties after its initialization',
-      function() {
-        expect($logSpy.calls.allArgs()).toContain(
-          ['Error occurred while fetching unresolved answers ' +
-          'for exploration exp1 state Introduction: Server error.']);
-
-        expect($scope.loadingDotsAreShown).toBe(false);
-        expect($scope.unresolvedAnswers).toEqual([]);
-      });
+        expect(component.showUnresolvedAnswers).toHaveBeenCalled();
+      }));
   });
 });

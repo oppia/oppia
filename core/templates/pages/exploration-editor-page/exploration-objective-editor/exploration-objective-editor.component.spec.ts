@@ -17,18 +17,23 @@
  */
 
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ExplorationObjectiveEditorComponent } from './exploration-objective-editor.component';
 import { ExplorationObjectiveService } from '../services/exploration-objective.service';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 describe('Exploration Objective Editor Component', () => {
   let component: ExplorationObjectiveEditorComponent;
   let fixture: ComponentFixture<ExplorationObjectiveEditorComponent>;
-
+  let explorationObjectiveService: ExplorationObjectiveService;
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [
+        HttpClientTestingModule,
+        FormsModule,
+        ReactiveFormsModule
+      ],
       declarations: [
         ExplorationObjectiveEditorComponent
       ],
@@ -43,17 +48,20 @@ describe('Exploration Objective Editor Component', () => {
     fixture = TestBed.createComponent(ExplorationObjectiveEditorComponent);
     component = fixture.componentInstance;
 
+    explorationObjectiveService = TestBed.inject(ExplorationObjectiveService);
+    explorationObjectiveService.displayed = '';
     fixture.detectChanges();
   });
 
   it('should initialize controller properties after its initialization',
-    () => {
-      const spyEmitter = spyOnProperty(
+    fakeAsync(() => {
+      spyOn(
         component.onInputFieldBlur, 'emit').and.stub();
 
       component.inputFieldBlur();
+      tick();
 
-      expect(spyEmitter).toHaveBeenCalled();
+      expect(component.onInputFieldBlur.emit).toHaveBeenCalled();
       expect(component).toBeDefined();
-    });
+    }));
 });
