@@ -2687,6 +2687,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 for rule_spec in answer_group['rule_specs']:
                     if rule_spec == rule_to_remove:
                         answer_group['rule_specs'].remove(rule_spec)
+                if len(answer_group['rule_specs']) == 0:
+                    answer_groups.remove(answer_group)
 
         return answer_groups
 
@@ -3311,15 +3313,17 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     state_dict['interaction']['customization_args']
                     ['maxAllowableSelectionCount']['value']
                 )
+                choices = (
+                    state_dict['interaction']['customization_args'][
+                        'choices']['value']
+                )
 
                 # None of the answer groups should be the same.
                 answer_groups = state_dict['interaction']['answer_groups']
 
                 answer_groups = cls._item_selec_no_ans_group_should_be_same(
                     answer_groups)
-                state_dict['interaction']['answer_groups'] = answer_groups
 
-                invalid_ans_groups = []
                 for answer_group in answer_groups:
                     invalid_rules = []
                     for rule_spec in answer_group['rule_specs']:
@@ -3335,30 +3339,27 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     for invalid_rule in invalid_rules:
                         answer_group['rule_specs'].remove(invalid_rule)
                     if len(answer_group['rule_specs']) == 0:
-                        invalid_ans_groups.append(answer_group)
-
-                for invalid_ans_group in invalid_ans_groups:
-                    answer_groups.remove(invalid_ans_group)
+                        answer_groups.remove(answer_group)
 
                 state_dict['interaction']['answer_groups'] = answer_groups
 
-                # Min no of selec should be no greater than max num.
-                if min_value > max_value:
-                    min_value, max_value = max_value, min_value
+                # # Min no of selec should be no greater than max num.
+                # if min_value > max_value:
+                #     min_value, max_value = max_value, min_value
 
-                # There should be enough choice to have min num of selec.
-                if len(choices) < min_value:
-                    min_value = 1
+                # # There should be enough choice to have min num of selec.
+                # if len(choices) < min_value:
+                #     min_value = 1
 
-                state_dict['interaction']['customization_args'][
-                    'minAllowableSelectionCount']['value'] = min_value
-                state_dict['interaction']['customization_args'][
-                    'maxAllowableSelectionCount']['value'] = max_value
+                # state_dict['interaction']['customization_args'][
+                #     'minAllowableSelectionCount']['value'] = min_value
+                # state_dict['interaction']['customization_args'][
+                #     'maxAllowableSelectionCount']['value'] = max_value
 
-                # Answer choices should be non-empty and unique.
-                state_dict['interaction']['customization_args']['choices'][
-                    'value'] = cls._choices_should_be_unique_and_non_empty(
-                        choices)
+                # # Answer choices should be non-empty and unique.
+                # state_dict['interaction']['customization_args']['choices'][
+                #     'value'] = cls._choices_should_be_unique_and_non_empty(
+                #         choices, answer_groups)
 
             # DragAndDropInput Interaction.
             if state_dict['interaction']['id'] == 'DragAndDropSortInput':
