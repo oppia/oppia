@@ -370,6 +370,15 @@ class TranslatableTextHandler(base.BaseHandler):
         exp = exp_fetchers.get_exploration_by_id(exp_id)
         state_names_to_content_id_mapping = exp.get_translatable_text(
             language_code)
+        contribution_rights = user_services.get_user_contribution_rights(
+            self.user_id)
+        reviewable_language_codes = (
+            contribution_rights.can_review_translation_for_language_codes)
+        if language_code not in reviewable_language_codes:
+            state_names_to_content_id_mapping = (
+                self._get_state_names_to_not_set_content_id_mapping(
+                    state_names_to_content_id_mapping
+                ))
         state_names_to_not_in_review_content_id_mapping = (
             self._get_state_names_to_not_in_review_content_id_mapping(
                 state_names_to_content_id_mapping,
@@ -385,6 +394,37 @@ class TranslatableTextHandler(base.BaseHandler):
         }
 
         self.render_json(self.values)
+
+    def _get_state_names_to_not_set_content_id_mapping(
+            self, state_names_to_content_id_mapping):
+        """Returns a copy of the supplied state_names_to_content_id_mapping
+        minus any contents of which the data is set of strings.
+
+        Args:
+            state_names_to_content_id_mapping:
+                dict(str, dict(str, TranslatableItem)). A dict whose keys are
+                state names, and whose corresponding values are each dicts
+                mapping content IDs to the corresponding translatable items.
+
+        Returns:
+            dict(str, dict(str, TranslatableItem)). A dict where state_name
+            is the key and a dict with content_id as the key and
+            TranslatableItem as value.
+        """
+        mapping_without_set_data_format = {}
+        for state_name in state_names_to_content_id_mapping:
+            content_id_to_translatable_item = (
+                state_names_to_content_id_mapping[state_name])
+            content_id_to_not_set_translatable_item = {}
+            for content_id, translatable_item in (
+                    content_id_to_translatable_item.items()):
+                if not translatable_item.is_set_data_format():
+                    content_id_to_not_set_translatable_item[content_id] = (
+                        translatable_item)
+            if content_id_to_not_set_translatable_item:
+                mapping_without_set_data_format[state_name] = (
+                    content_id_to_not_set_translatable_item)
+        return mapping_without_set_data_format
 
     def _get_state_names_to_not_in_review_content_id_mapping(
             self, state_names_to_content_id_mapping, suggestions):

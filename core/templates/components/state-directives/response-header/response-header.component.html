@@ -42,26 +42,7 @@
   </span>
 </div>
 
-<span class="oppia-delete-response-button oppia-transition-200 e2e-test-delete-response"
-      *ngIf="editabilityService.isEditable() && !defaultOutcome"
-      (click)="deleteResponse($event)">
-  <i class="material-icons md-18">&#xE5CD;</i>
-</span>
-
 <style>
-  .oppia-delete-response-button {
-    cursor: pointer;
-    opacity: 0.5;
-    position: absolute;
-    right: 8px;
-    top: 8px;
-    width: 20px;
-  }
-
-  .oppia-delete-response-button:hover {
-    opacity: 1;
-  }
-
   .oppia-response-header-block {
     margin-left: 39px;
   }
