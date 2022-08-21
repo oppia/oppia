@@ -21,9 +21,9 @@ objects they represent are stored. All methods and properties in this file
 should therefore be independent of the specific storage models used.
 """
 
-import bs4
 from __future__ import annotations
 
+import bs4
 import collections
 import copy
 import datetime
@@ -2536,25 +2536,21 @@ class Exploration(translation_domain.BaseTranslatableObject):
         Returns:
             dict. The converted states_dict.
         """
-        exploration_rights = exp_models.ExplorationRightsModel.get_all(
-            include_deleted=False)
-        # Exp ids are required to verify if all the recommended explorations
-        # inside the end explorations are valid or not.
-        exp_ids = [exp.id for exp in exploration_rights]
-
         # Update general state validations.
         states_dict = cls._update_general_state(states_dict)
 
         # Update general state interaction validations.
         states_dict = cls._update_general_state_interaction(
-            states_dict, exp_ids, language_code)
+            states_dict, language_code)
 
         # Update general state RTE validations.
         states_dict = cls._update_general_state_rte(states_dict)
 
         return states_dict
 
-    # The start of the updating general state section.
+    #############################################
+    # Fix validation errors for exploration state.
+    #############################################
     @classmethod
     def _update_general_state(
         cls, states_dict: Dict[str, state_domain.StateDict]
@@ -2578,10 +2574,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             answer_groups = state_dict['interaction']['answer_groups']
             for answer_group in answer_groups:
                 # labelled_as_correct should not be True if dest is try again.
-                if (
-                    answer_group['outcome']['dest'] == state_name and
-                    answer_group['outcome']['labelled_as_correct']
-                ):
+                if answer_group['outcome']['dest'] == state_name:
                     answer_group['outcome']['labelled_as_correct'] = False
 
                 # refresher_exploration_id be None for all lessons.
@@ -2590,6 +2583,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             state_dict['interaction']['answer_groups'] = answer_groups
 
             # refresher_exploration_id be None for all lessons(def outcome).
+            # TODO:Sean - Manual changes needs to be done.
             default_outcome = state_dict['interaction']['default_outcome']
             if default_outcome is not None:
                 state_dict['interaction']['default_outcome'][
@@ -2608,6 +2602,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             - If multiple choices are empty replace them with `Choice 1` ,
             `Choice 2` etc
             - If choices are duplicate, removes the later choice
+            - Remove the rules whose choices has been deleted
 
         Args:
             choices: List[str]. A list of choices.
@@ -2615,7 +2610,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
         Returns:
             choices_to_save: List[str]. The list of valid choices.
         """
-        # Misbehaving when after removing invalid choices and the choices count becomes below 4.
+        # TODO: 8 curated exps reported where after removing the invalid
+        # choices the total will be less than 4, waiting on Sean's suggestion
+        # to decide what to do.
         empty_choices = []
         seen_choices = []
         choices_to_remove = []
@@ -2646,6 +2643,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         for choice_to_remove in choices_to_remove:
             choices.remove(choice_to_remove)
 
+        # TODO: Need to handle for ItemSelection.
         # Remove rules whose choice has been deleted.
         for answer_group in answer_groups:
             invalid_rules = []
@@ -2696,10 +2694,12 @@ class Exploration(translation_domain.BaseTranslatableObject):
     def _equals_should_come_before_idx_rule(
         cls, answer_groups: List[state_domain.AnswerGroup]
     ) -> List[state_domain.AnswerGroup]:
-        """Inside DragAndDrop interaction the `Equals` rule should always come
-        before `HasElementXAtPositionY` otherwise the rule will never going to
-        match, this helper functions simply removes the `Equals` rules as it
-        will never going to match
+        """Performs the following -
+            - Inside DragAndDrop interaction the `Equals` rule should always
+            come before `HasElementXAtPositionY` otherwise the rule will
+            never going to match, this helper functions simply removes the
+            `Equals` rules as it will never going to match
+            - Rule `IsEqualToOrdering` having empty values is removed
 
         Args:
             answer_groups: List[state_domain.AnswerGroup]. The answer group.
@@ -2728,16 +2728,20 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         rule_choice = rule_spec['inputs']['x'][
                             ele_position - 1]
 
-                        if len(rule_choice) > 1:
+                        if len(rule_choice) == 0:
+                            rules_to_remove.append(rule_spec)
+                            continue
+
+                        elif (
+                            len(rule_choice) == 1 and
+                            rule_choice[0] == ele_element
+                        ):
+                            rules_to_remove.append(rule_spec)
+
+                        else:
                             for choice in rule_choice:
                                 if choice == ele_element:
                                     rules_to_remove.append(rule_spec)
-                        else:
-                            if len(rule_choice) <= 0:
-                                rules_to_remove.append(rule_spec)
-                                continue
-                            if rule_choice[0] == ele_element:
-                                rules_to_remove.append(rule_spec)
 
         for rule_to_remove in rules_to_remove:
             for answer_group in answer_groups:
@@ -2762,7 +2766,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         Returns:
             List[state_domain.AnswerGroup]. The modified answer group.
         """
-        equal_ordering_one_at_incorec_posn = []
+        off_by_one_rules = []
         rules_to_remove = []
         for answer_group in answer_groups:
             for rule_spec in answer_group['rule_specs']:
@@ -2770,23 +2774,23 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         rule_spec['rule_type'] ==
                         'IsEqualToOrderingWithOneItemAtIncorrectPosition'
                 ):
-                    equal_ordering_one_at_incorec_posn.append(
+                    off_by_one_rules.append(
                         rule_spec['inputs']['x']
                     )
 
                 if rule_spec['rule_type'] == 'IsEqualToOrdering':
-                    dictionary = {}
+                    item_to_layer_idx = {}
                     for layer_idx, layer in enumerate(
                         rule_spec['inputs']['x']
                     ):
                         for item in layer:
-                            dictionary[item] = layer_idx
+                            item_to_layer_idx[item] = layer_idx
 
-                    for ele in equal_ordering_one_at_incorec_posn:
+                    for ele in off_by_one_rules:
                         wrong_positions = 0
                         for layer_idx, layer in enumerate(ele):
                             for item in layer:
-                                if layer_idx != dictionary[item]:
+                                if layer_idx != item_to_layer_idx[item]:
                                     wrong_positions += 1
                         if wrong_positions <= 1:
                             rules_to_remove.append(rule_spec)
@@ -2803,7 +2807,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
         cls, range_var, lower_bound, upper_bound,
         lb_inclusive, ub_inclusive
     ) -> None:
-        """Sets the lower and upper bounds for the range_var, mainly
+        """Helper function for NumericInput and FractionInput interaction,
+        Sets the lower and upper bounds for the range_var, mainly
         we need to set the range so to keep track if any other rule's
         range lies in between or not to prevent redundancy
 
@@ -2823,7 +2828,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
     @classmethod
     def _is_enclosed_by(cls, range_compare_to, range_compare_with) -> bool:
-        """Checks whether the ranges of rules enclosed or not
+        """Helper function for NumericInput and FractionInput interaction,
+        Checks whether the ranges of rules enclosed or not
 
         Args:
             range_compare_to: dict[str, Any]. To keep track of each rule's
@@ -2874,7 +2880,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
     @classmethod
     def _should_check_range_criteria(cls, earlier_rule, later_rule) -> bool:
-        """Checks the range criteria between two rules by comparing their
+        """Helper function for FractionInput interaction,
+        Checks the range criteria between two rules by comparing their
         rule type
 
         Args:
@@ -2884,7 +2891,21 @@ class Exploration(translation_domain.BaseTranslatableObject):
         Returns:
             bool. Returns True if the rules passes the range criteria check.
         """
-        if earlier_rule['rule_type'] != 'IsExactlyEqualTo':
+        # if (
+        #     (earlier_rule['rule_type'] == 'IsExactlyEqualTo' and
+        #     later_rule['rule_type'] == 'IsExactlyEqualTo') or
+        #     (earlier_rule['rule_type'] == 'IsExactlyEqualTo' and
+        #     later_rule['rule_type'] == 'IsEquivalentTo') or
+        #     (earlier_rule['rule_type'] == 'IsExactlyEqualTo' and
+        #     later_rule['rule_type'] == 'IsEquivalentToAndInSimplestForm')
+        # ):
+        #     return False
+        # return True
+
+        if earlier_rule['rule_type'] in (
+            'HasDenominatorEqualTo', 'IsEquivalentTo', 'IsLessThan'
+            'IsEquivalentToAndInSimplestForm', 'IsGreaterThan'
+        ):
             return True
         return later_rule['rule_type'] in (
             'IsExactlyEqualTo', 'IsEquivalentTo',
@@ -2925,96 +2946,83 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 if rule_spec['rule_type'] == 'IsLessThanOrEqualTo':
                     try:
                         rule_value = float(rule_spec['inputs']['x'])
-                        (
-                            cls._set_lower_and_upper_bounds(
-                                range_var, lower_infinity,
-                                rule_value, False, True
-                            )
+                        cls._set_lower_and_upper_bounds(
+                            range_var, lower_infinity,
+                            rule_value, False, True
                         )
                     except Exception:
                         invalid_rules.append(rule_spec)
 
-                if rule_spec['rule_type'] == 'IsGreaterThanOrEqualTo':
+                elif rule_spec['rule_type'] == 'IsGreaterThanOrEqualTo':
                     try:
                         rule_value = float(rule_spec['inputs']['x'])
-                        (
-                            cls._set_lower_and_upper_bounds(
-                                range_var, rule_value,
-                                upper_infinity, True, False
-                            )
+                        cls._set_lower_and_upper_bounds(
+                            range_var, rule_value,
+                            upper_infinity, True, False
                         )
                     except Exception:
                         invalid_rules.append(rule_spec)
 
-                if rule_spec['rule_type'] == 'Equals':
+                elif rule_spec['rule_type'] == 'Equals':
                     try:
                         rule_value = float(rule_spec['inputs']['x'])
-                        (
-                            cls._set_lower_and_upper_bounds(
-                                range_var, rule_value,
-                                rule_value, True, True
-                            )
+                        cls._set_lower_and_upper_bounds(
+                            range_var, rule_value,
+                            rule_value, True, True
                         )
                     except Exception:
                         invalid_rules.append(rule_spec)
 
-                if rule_spec['rule_type'] == 'IsLessThan':
+                elif rule_spec['rule_type'] == 'IsLessThan':
                     try:
                         rule_value = float(rule_spec['inputs']['x'])
-                        (
-                            cls._set_lower_and_upper_bounds(
-                                range_var, lower_infinity,
-                                rule_value, False, False
-                            )
+                        cls._set_lower_and_upper_bounds(
+                            range_var, lower_infinity,
+                            rule_value, False, False
                         )
                     except Exception:
                         invalid_rules.append(rule_spec)
 
-                if rule_spec['rule_type'] == 'IsWithinTolerance':
+                elif rule_spec['rule_type'] == 'IsWithinTolerance':
                     try:
                         rule_value_x = float(rule_spec['inputs']['x'])
                         rule_value_tol = float(rule_spec['inputs']['tol'])
-                        (
-                            cls._set_lower_and_upper_bounds(
-                                range_var, rule_value_x - rule_value_tol,
-                                rule_value_x + rule_value_tol, True, True
-                            )
+                        cls._set_lower_and_upper_bounds(
+                            range_var, rule_value_x - rule_value_tol,
+                            rule_value_x + rule_value_tol, True, True
                         )
                     except Exception:
                         pass
 
-                if rule_spec['rule_type'] == 'IsGreaterThan':
+                elif rule_spec['rule_type'] == 'IsGreaterThan':
                     try:
                         rule_value = float(rule_spec['inputs']['x'])
-                        (
-                            cls._set_lower_and_upper_bounds(
-                                range_var, rule_value,
-                                upper_infinity, False, False
-                            )
+                        cls._set_lower_and_upper_bounds(
+                            range_var, rule_value,
+                            upper_infinity, False, False
                         )
                     except Exception:
                         invalid_rules.append(rule_spec)
 
-                if rule_spec['rule_type'] == 'IsInclusivelyBetween':
+                elif rule_spec['rule_type'] == 'IsInclusivelyBetween':
                     try:
                         rule_value_a = float(rule_spec['inputs']['a'])
                         rule_value_b = float(rule_spec['inputs']['b'])
-                        (
-                            cls._set_lower_and_upper_bounds(
-                                range_var, rule_value_a,
-                                rule_value_b, True, True
-                            )
+                        cls._set_lower_and_upper_bounds(
+                            range_var, rule_value_a,
+                            rule_value_b, True, True
                         )
                     except Exception:
                         pass
 
                 for range_ele in ranges:
-                    if (
-                        cls._is_enclosed_by(range_var, range_ele)
-                    ):
+                    if cls._is_enclosed_by(range_var, range_ele):
                         invalid_rules.append(rule_spec)
                 ranges.append(range_var)
 
+        # TODO: Waiting on response from Sean, whether to remove the
+        # invalid rules or not because at some places it resulted in
+        # state disconnection.
         for invalid_rule in invalid_rules:
             for answer_group in answer_groups:
                 for rule_spec in answer_group['rule_specs']:
@@ -3026,8 +3034,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return answer_groups
 
     @classmethod
-    def _get_rule_value_f(cls, rule_spec: state_domain.RuleSpec) -> float:
-        """Return rule values from the rule_spec
+    def _get_rule_value_of_fraction_interaction(
+        cls, rule_spec: state_domain.RuleSpec
+    ) -> float:
+        """Return rule value of the rule_spec of FractionInput interaction
 
         Args:
             rule_spec: (state_domain.RuleSpec). Rule spec of an answer group.
@@ -3049,7 +3059,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return rule_value_f
 
     @classmethod
-    def _fraction_rules_should_not_match_prev_rule(
+    def _fraction_interaction_rules_range_should_not_intersect(
         cls, answer_groups: List[state_domain.AnswerGroup]
     ) -> List[state_domain.AnswerGroup]:
         """Helper function for FractionInput interaction where rule should
@@ -3087,43 +3097,35 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     'denominator': 0
                 }
 
-                if (
-                    rule_spec['rule_type'] in (
-                        'IsEquivalentTo', 'IsExactlyEqualTo',
-                        'IsEquivalentToAndInSimplestForm'
-                    )
+                if rule_spec['rule_type'] in (
+                    'IsEquivalentTo', 'IsExactlyEqualTo',
+                    'IsEquivalentToAndInSimplestForm'
                 ):
-                    rule_value_f = cls._get_rule_value_f(rule_spec)
-
-                    (
-                        cls._set_lower_and_upper_bounds(
-                            range_var, rule_value_f,
-                            rule_value_f, True, True
-                        )
+                    rule_value_f = cls._get_rule_value_of_fraction_interaction(
+                        rule_spec)
+                    cls._set_lower_and_upper_bounds(
+                        range_var, rule_value_f,
+                        rule_value_f, True, True
                     )
 
                 if rule_spec['rule_type'] == 'IsGreaterThan':
                     rule_value_f = (
-                        cls._get_rule_value_f(rule_spec)
+                        cls._get_rule_value_of_fraction_interaction(rule_spec)
                     )
 
-                    (
-                        cls._set_lower_and_upper_bounds(
-                            range_var, rule_value_f,
-                            upper_infinity, False, False
-                        )
+                    cls._set_lower_and_upper_bounds(
+                        range_var, rule_value_f,
+                        upper_infinity, False, False
                     )
 
                 if rule_spec['rule_type'] == 'IsLessThan':
                     rule_value_f = (
-                        cls._get_rule_value_f(rule_spec)
+                        cls._get_rule_value_of_fraction_interaction(rule_spec)
                     )
 
-                    (
-                        cls._set_lower_and_upper_bounds(
-                            range_var, lower_infinity,
-                            rule_value_f, False, False
-                        )
+                    cls._set_lower_and_upper_bounds(
+                        range_var, lower_infinity,
+                        rule_value_f, False, False
                     )
 
                 if rule_spec['rule_type'] == 'HasDenominatorEqualTo':
@@ -3131,25 +3133,22 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         rule_value_x = int(rule_spec['inputs']['x'])
                         matched_denominator['denominator'] = rule_value_x
                     except Exception:
-                        rule_value_x = rule_spec['inputs']['x']
                         invalid_rules.append(rule_spec)
 
                 for range_ele in ranges:
                     if cls._is_enclosed_by(range_var, range_ele):
-                        earlier_rule = (
-                            answer_groups[range_ele['ans_group_index']]
-                            ['rule_specs'][range_ele['rule_spec_index']]
-                        )
-                        if (
-                            cls._should_check_range_criteria(
-                                earlier_rule, rule_spec
-                            )
+                        earlier_rule = answer_groups[range_ele[
+                            'ans_group_index']]['rule_specs'][
+                                range_ele['rule_spec_index']]
+
+                        if cls._should_check_range_criteria(
+                            earlier_rule, rule_spec
                         ):
                             invalid_rules.append(rule_spec)
 
                 for den in matched_denominator_list:
                     if (
-                        den is not None and rule_spec['rule_type'] ==
+                        rule_spec['rule_type'] ==
                         'HasFractionalPartExactlyEqualTo'
                     ):
                         if (
@@ -3172,19 +3171,20 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         return answer_groups
 
-    # The start of the update general state interaction section.
+    #########################################################
+    # Fix validation errors for exploration state interaction.
+    #########################################################
     @classmethod
     def _update_general_state_interaction(
         cls, states_dict: Dict[str, state_domain.StateDict],
-        exp_ids: List[str], language_code: str
+        language_code: str
     ) -> Dict[str, state_domain.StateDict]:
-        """Handles all the invalid general state interaction
+        """Handles all the invalid general state interactions
 
         Args:
             states_dict: dict. A dict where each key-value pair represents,
                 respectively, a state name and a dict used to initialize a
                 State domain object.
-            exp_ids: List[str]. The list of the exploration ids.
             language_code: str. The language code of the exploration.
 
         Returns:
@@ -3196,6 +3196,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             if state_dict['interaction']['id'] == 'Continue':
                 text_value = state_dict['interaction'][
                     'customization_args']['buttonText']['value']['unicode_str']
+                # TODO: For other language codes, need to add the translated value.
                 if len(text_value) > 20:
                     if language_code == 'en':
                         state_dict['interaction']['customization_args'][
@@ -3203,23 +3204,25 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
             # End Interaction.
             if state_dict['interaction']['id'] == 'EndExploration':
+                # Exp ids are required to verify if all the recommended
+                # explorations are valid or not.
+                exploration_rights = exp_models.ExplorationRightsModel.get_all(
+                    include_deleted=False)
+                all_exp_ids = [
+                    exp.id for exp in exploration_rights]
+
+                # All recommended explorations should be valid.
                 recc_exp_ids = state_dict['interaction'][
                     'customization_args']['recommendedExplorationIds']['value']
-                # All recommended explorations should be valid.
-                valid_recc_exp_ids = []
-                for recc_exp in recc_exp_ids:
-                    if recc_exp in exp_ids:
-                        valid_recc_exp_ids.append(recc_exp)
-                recc_exp_ids = valid_recc_exp_ids
-                state_dict['interaction'][
-                'customization_args']['recommendedExplorationIds'][
-                    'value'] = valid_recc_exp_ids
+                valid_recc_exp_ids = [
+                    exp_id for exp_id in recc_exp_ids if exp_id in all_exp_ids]
 
                 # Should be at most 3 recommended explorations.
-                if len(recc_exp_ids) > 3:
-                    recc_exp_ids = recc_exp_ids[0:3]
-                    state_dict['interaction']['customization_args'][
-                        'recommendedExplorationIds']['value'] = recc_exp_ids
+                if len(valid_recc_exp_ids) > 3:
+                    valid_recc_exp_ids = valid_recc_exp_ids[0:3]
+
+                state_dict['interaction']['customization_args'][
+                    'recommendedExplorationIds']['value'] = valid_recc_exp_ids
 
             # NumericInput Interaction.
             if state_dict['interaction']['id'] == 'NumericInput':
@@ -3253,8 +3256,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 # All rules should have solutions that do not match
                 # previous rules' solutions.
                 answer_groups = state_dict['interaction']['answer_groups']
-                answer_groups = cls._fraction_rules_should_not_match_prev_rule(
-                    answer_groups
+                answer_groups = (
+                    cls._fraction_interaction_rules_range_should_not_intersect(
+                        answer_groups
+                    )
                 )
                 state_dict['interaction']['answer_groups'] = answer_groups
 
@@ -3416,9 +3421,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         'rows']['value']
                 )
                 if rows_value < 1 or rows_value > 10:
-                    rows_value = 10
-                state_dict['interaction']['customization_args'][
-                    'rows']['value'] = rows_value
+                    state_dict['interaction']['customization_args'][
+                        'rows']['value'] = 10
 
                 seen_strings_contains = []
                 seen_strings_startswith = []
@@ -3456,7 +3460,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         return states_dict
 
-    # The start of the update general state RTE section.
+    #################################################
+    # Fix validation errors for exploration state RTE.
+    #################################################
     @classmethod
     def _update_general_state_rte(
         cls, states_dict: Dict[str, state_domain.StateDict]
@@ -3498,14 +3504,14 @@ class Exploration(translation_domain.BaseTranslatableObject):
             soup = bs4.BeautifulSoup(html, 'html.parser')
 
             for tag in soup:
-                if tag == 'oppia-noninteractive-image':
+                if tag.name == 'oppia-noninteractive-image':
                     if 'alt-with-value' not in tag:
                         tag['alt-with-value'] = '&quot;&quot;'
 
                     if 'filepath-with-value' not in tag:
                         tag.decompose()
 
-                elif tag == 'oppia-noninteractive-math':
+                elif tag.name == 'oppia-noninteractive-math':
                     if 'math_content-with-value' not in tag:
                         tag.decompose()
                     else:
@@ -3518,7 +3524,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                             'raw_latex'].strip() == '':
                             tag.decompose()
 
-                elif tag == 'oppia-noninteractive-skillreview':
+                elif tag.name == 'oppia-noninteractive-skillreview':
                     if 'text-with-value' not in tag:
                         tag.decompose()
                     elif tag['text-with-value'] is None:
@@ -3526,7 +3532,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     elif tag['text-with-value'].strip() == '':
                         tag.decompose()
 
-                elif tag == 'oppia-noninteractive-video':
+                elif tag.name == 'oppia-noninteractive-video':
                     if 'start-with-value' not in tag:
                         tag['start-with-value'] = '0'
 
@@ -3537,19 +3543,20 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         tag['autoplay-with-value'] = 'false'
 
                     if 'autoplay-with-value' in tag:
-                        if tag['autoplay-with-value'] not in ('true', 'false'):
+                        if tag['autoplay-with-value'].strip() not in (
+                            'true', 'false'):
                             tag['autoplay-with-value'] = 'false'
 
                     if 'video_id-with-value' not in tag:
                         tag.decompose()
 
-                    if 'video_id-with-value' in tag:
+                    else:
                         if tag['video_id-with-value'] is None:
                             tag.decompose()
                         elif tag['video_id-with-value'].strip() == '':
                             tag.decompose()
 
-                elif tag == 'oppia-noninteractive-link':
+                elif tag.name == 'oppia-noninteractive-link':
                     if (
                         'text-with-value' not in tag or
                         'url-with-value' not in tag
