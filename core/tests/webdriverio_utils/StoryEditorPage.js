@@ -139,8 +139,6 @@ var StoryEditorPage = function() {
   this.publishStory = async function() {
     let width = (await browser.getWindowSize()).width;
 
-    await browser.debug();
-
     if (width < 1000) {
       await action.click('Story Options', storyOptionsDropdown);
       await action.click('Publish Story', publishStoryMobile);
