@@ -106,8 +106,8 @@ class LearnerGroupModel(base_models.BaseModel):
             'story_ids': base_models.EXPORT_POLICY.EXPORTED
         })
 
-    # We have ignored [override] here because the signature of this method
-    # doesn't match with signature of super class's get_new_id() method.
+    # Here we use MyPy ignore because the signature of this method doesn't
+    # match with signature of super class's get_new_id() method.
     @classmethod
     def get_new_id(cls) -> str:  # type: ignore[override]
         """Generates an ID for a new LearnerGroupModel.

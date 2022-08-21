@@ -73,7 +73,7 @@ EVENT_LOGS = ['event1', 'event2']
 LOGCAT_LOGS = ['logcat1', 'logcat2']
 USER_SELECTED_ITEMS: List[str] = []
 USER_TEXT_INPUT = 'add and admin'
-ANDROID_REPORT_INFO = {
+ANDROID_REPORT_INFO: app_feedback_report_models.ReportInfoDict = {
     'user_feedback_selected_items': USER_SELECTED_ITEMS,
     'user_feedback_other_text_input': USER_TEXT_INPUT,
     'event_logs': ['event1', 'event2'],
@@ -82,12 +82,14 @@ ANDROID_REPORT_INFO = {
     'build_fingerprint': ANDROID_BUILD_FINGERPRINT,
     'network_type': NETWORK_WIFI.value,
     'android_device_language_locale_code': LANGUAGE_LOCALE_CODE_ENGLISH,
+    'language_locale_code': 'en',
     'entry_point_info': {
         'entry_point_name': ENTRY_POINT_NAVIGATION_DRAWER,
     },
     'text_size': ANDROID_TEXT_SIZE.value,
     'only_allows_wifi_download_and_update': True,
     'automatically_update_topics': False,
+    'is_curriculum_admin': False,
     'account_is_profile_admin': False
 }
 WEB_REPORT_INFO = {

@@ -66,6 +66,10 @@ MAX_LEARNER_ANSWER_INFO_LIST_BYTE_SIZE: Final = 900000
 # LearnerAnswerInfo.
 MAX_ANSWER_DETAILS_BYTE_SIZE: Final = 10000
 
+IssuesCustomizationArgsDictType = Dict[
+    str, Dict[str, Union[str, int, List[str]]]
+]
+
 
 class SubmittedAnswerDict(TypedDict):
     """Dictionary representing the SubmittedAnswer object."""

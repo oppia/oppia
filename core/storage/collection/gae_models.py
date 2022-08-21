@@ -215,8 +215,10 @@ class CollectionModel(base_models.VersionedModel):
         """Returns the total number of collections."""
         return cls.get_all().count()
 
-    # TODO(#13523): Change 'model_dict' to domain object/TypedDict to
-    # remove Any from type-annotation below.
+    # TODO(#15911): Here we use type Any because 'convert_to_valid_dict' method
+    # accepts content NDB JSON properties and those NDB JSON properties have
+    # loose typing. So, once we explicitly typed those NDB JSON properties we
+    # can remove Any type from here.
     @staticmethod
     def convert_to_valid_dict(model_dict: Dict[str, Any]) -> Dict[str, Any]:
         """Replace invalid fields and values in the CollectionModel dict.
@@ -246,8 +248,10 @@ class CollectionModel(base_models.VersionedModel):
 
         return model_dict
 
-    # TODO(#13523): Change 'snapshot_dict' to domain object/TypedDict to
-    # remove Any from type-annotation below.
+    # TODO(#15911): Here we use type Any because this '_reconstitute' method
+    # accepts content NDB JSON properties and those NDB JSON properties have
+    # loose typing. So, once we explicitly typed those NDB JSON properties we
+    # can remove Any type from the argument of '_reconstitute' method.
     def _reconstitute(self, snapshot_dict: Dict[str, Any]) -> CollectionModel:
         """Populates the model instance with the snapshot.
 
@@ -323,7 +327,7 @@ class CollectionModel(base_models.VersionedModel):
             additional_models
         )
 
-        # The cast is needed because the additional_models is list of BaseModels
+        # Here we use cast because the additional_models is list of BaseModels
         # and we want to hint the mypy that this is CollectionRightsModel.
         collection_rights_model = cast(
             CollectionRightsModel, additional_models['rights_model']
@@ -346,7 +350,7 @@ class CollectionModel(base_models.VersionedModel):
             'versioned_model': models_to_put['versioned_model'],
         }
 
-    # We have ignored [override] here because the signature of this method
+    # Here we use MyPy ignore because the signature of this method
     # doesn't match with BaseModel.delete_multi().
     # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
     @classmethod
@@ -543,13 +547,11 @@ class CollectionRightsModel(base_models.VersionedModel):
             cls.viewer_ids == user_id
         )).get(keys_only=True) is not None
 
-    # TODO(#13523): Change 'commit_cmds' to domain object/TypedDict to
-    # remove Any from type-annotation below.
     def save(
-            self,
-            committer_id: str,
-            commit_message: str,
-            commit_cmds: List[Dict[str, Any]]
+        self,
+        committer_id: str,
+        commit_message: str,
+        commit_cmds: base_models.AllowedCommitCmdsListType
     ) -> None:
         """Updates the collection rights model by applying the given
         commit_cmds, then saves it.
@@ -567,8 +569,10 @@ class CollectionRightsModel(base_models.VersionedModel):
         super().commit(
             committer_id, commit_message, commit_cmds)
 
-    # TODO(#13523): Change 'model_dict' to domain object/TypedDict to
-    # remove Any from type-annotation below.
+    # TODO(#15911): Here we use type Any because 'convert_to_valid_dict' method
+    # accepts content NDB JSON properties and those NDB JSON properties have
+    # loose typing. So, once we explicitly typed those NDB JSON properties we
+    # can remove Any type from here.
     @staticmethod
     def convert_to_valid_dict(model_dict: Dict[str, Any]) -> Dict[str, Any]:
         """Replace invalid fields and values in the CollectionRightsModel dict.
@@ -610,10 +614,12 @@ class CollectionRightsModel(base_models.VersionedModel):
 
         return model_dict
 
-    # TODO(#13523): Change 'snapshot_dict' to domain object/TypedDict to
-    # remove Any from type-annotation below.
+    # TODO(#15911): Here we use type Any because this '_reconstitute' method
+    # accepts content NDB JSON properties and those NDB JSON properties have
+    # loose typing. So, once we explicitly typed those NDB JSON properties we
+    # can remove Any type from the argument of '_reconstitute' method.
     def _reconstitute(
-            self, snapshot_dict: Dict[str, Any]
+        self, snapshot_dict: Dict[str, Any]
     ) -> CollectionRightsModel:
         """Populates the model instance with the snapshot.
 

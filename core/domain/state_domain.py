@@ -56,6 +56,13 @@ AllowedInputValueTypes = Union[
 ]
 
 
+class TrainingDataDict(TypedDict):
+    """Type for the training data dictionary."""
+
+    answer_group_index: int
+    answers: List[str]
+
+
 class AnswerGroupDict(TypedDict):
     """Dictionary representing the AnswerGroup object."""
 
