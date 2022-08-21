@@ -3343,18 +3343,18 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
                 state_dict['interaction']['answer_groups'] = answer_groups
 
-                # # Min no of selec should be no greater than max num.
-                # if min_value > max_value:
-                #     min_value, max_value = max_value, min_value
+                # Min no of selec should be no greater than max num.
+                if min_value > max_value:
+                    min_value, max_value = max_value, min_value
 
-                # # There should be enough choice to have min num of selec.
-                # if len(choices) < min_value:
-                #     min_value = 1
+                # There should be enough choice to have min num of selec.
+                if len(choices) < min_value:
+                    min_value = 1
 
-                # state_dict['interaction']['customization_args'][
-                #     'minAllowableSelectionCount']['value'] = min_value
-                # state_dict['interaction']['customization_args'][
-                #     'maxAllowableSelectionCount']['value'] = max_value
+                state_dict['interaction']['customization_args'][
+                    'minAllowableSelectionCount']['value'] = min_value
+                state_dict['interaction']['customization_args'][
+                    'maxAllowableSelectionCount']['value'] = max_value
 
                 # # Answer choices should be non-empty and unique.
                 # state_dict['interaction']['customization_args']['choices'][
