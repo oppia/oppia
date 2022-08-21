@@ -3050,7 +3050,7 @@ class TranslatableItem:
             'rule_type': self.rule_type
         }
 
-    def is_set_data_format(self):
+    def is_set_data_format(self) -> bool:
         """Check whether the data format of the translatable content is set of
         strings.
 
