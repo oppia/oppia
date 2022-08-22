@@ -1644,8 +1644,8 @@ class ExplorationUserDataModel(base_models.BaseModel):
     def get_multi( # type: ignore[override]
         cls, user_ids: List[str], exploration_ids: List[str]
     ) -> List[Optional[ExplorationUserDataModel]]:
-        """Gets the ExplorationUserDataModel for the given user and exploration
-         ids.
+        """Gets all ExplorationUserDataModels for the given users for given
+        exploration ids.
 
         Args:
             user_ids: list(str). A list of user_ids.
