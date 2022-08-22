@@ -94,7 +94,8 @@
           </div>
         </div>
         <div class="oppia-collapse-content"
-             (click)="toggleExpansionState(1)">
+             (click)="toggleExpansionState(1)"
+             *ngIf="isTranslationOverflowing">
           {{ isTranslationExpanded ? "View Less" : "View More" }}
         </div>
       </div>

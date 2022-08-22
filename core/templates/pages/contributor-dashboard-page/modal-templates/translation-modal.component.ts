@@ -39,6 +39,7 @@ import {
   TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING
 } from 'domain/exploration/WrittenTranslationObjectFactory';
 import { RteOutputDisplayComponent } from 'rich_text_components/rte-output-display.component';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
@@ -133,6 +134,7 @@ export class TranslationModalComponent {
   isContentExpanded: boolean = false;
   isTranslationExpanded: boolean = true;
   isContentOverflowing: boolean = false;
+  isTranslationOverflowing: boolean = false;
   ALLOWED_CUSTOM_TAGS_IN_TRANSLATION_SUGGESTION = [
     'oppia-noninteractive-image',
     'oppia-noninteractive-link',
@@ -159,7 +161,8 @@ export class TranslationModalComponent {
     private readonly translateTextService: TranslateTextService,
     private readonly translationLanguageService: TranslationLanguageService,
     private readonly userService: UserService,
-    private readonly changeDetectorRef: ChangeDetectorRef
+    private readonly changeDetectorRef: ChangeDetectorRef,
+    private readonly windowRef: WindowRef
   ) {
     this.contextService = OppiaAngularRootComponent.contextService;
   }
@@ -211,14 +214,33 @@ export class TranslationModalComponent {
   ngAfterViewInit(): void {
     setTimeout(() => {
       this.computePanelOverflowState();
-    }, 100);
+    }, 500);
+  }
+
+  ngAfterViewChecked(): void {
+    setTimeout(() => {
+      const windowHeight = (
+        this.windowRef?.nativeWindow.innerHeight ||
+        this.windowRef?.nativeWindow.document.documentElement.clientHeight ||
+        this.windowRef?.nativeWindow.document.body.clientHeight
+      );
+      // The value of cutoff must be equal to 'max-height' - 1 set
+      // in the class '.oppia-contracted' in 'translation-modal.component.html'.
+      const cutoff = 29;
+      const heightLimit = windowHeight * (cutoff) / 100;
+
+      this.isTranslationOverflowing = (
+        this.translationContainer?.nativeElement.offsetHeight >=
+        heightLimit
+      );
+    }, 500);
   }
 
   computePanelOverflowState(): void {
     setTimeout(() => {
       this.isContentOverflowing = (
-        this.contentPanel.elementRef.nativeElement.offsetHeight >
-        this.contentContainer.nativeElement.offsetHeight);
+        this.contentPanel?.elementRef.nativeElement.offsetHeight >
+        this.contentContainer?.nativeElement.offsetHeight);
     }, 0);
   }
 
