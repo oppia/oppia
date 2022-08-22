@@ -3356,10 +3356,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 state_dict['interaction']['customization_args'][
                     'maxAllowableSelectionCount']['value'] = max_value
 
-                # # Answer choices should be non-empty and unique.
-                # state_dict['interaction']['customization_args']['choices'][
-                #     'value'] = cls._choices_should_be_unique_and_non_empty(
-                #         choices, answer_groups)
+                # Answer choices should be non-empty and unique.
+                # TODO: Make changes according to item selection.
+                state_dict['interaction']['customization_args']['choices'][
+                    'value'] = cls._choices_should_be_unique_and_non_empty(
+                        choices, answer_groups)
 
             # DragAndDropInput Interaction.
             if state_dict['interaction']['id'] == 'DragAndDropSortInput':
