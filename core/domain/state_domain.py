@@ -3085,13 +3085,21 @@ class TranslatableItem:
             TranslatableItem.DATA_FORMAT_SET_OF_UNICODE_STRING]
 
 
-AcceptableConversionFnType = Union[
+DomainObjectCustomizationArgsConversionFnTypes = Union[
     Callable[[SubtitledHtml, str], SubtitledHtml],
     Callable[[SubtitledHtml, str], SubtitledHtmlDict],
     Callable[[SubtitledUnicode, str], SubtitledUnicodeDict],
-    Callable[[Dict[str, str], Literal['SubtitledUnicode']], SubtitledUnicode],
-    Callable[[Dict[str, str], Literal['SubtitledHtml']], SubtitledHtml],
     Callable[[SubtitledHtml, str], List[str]]
+]
+
+DictCustomizationArgsConversionFnTypes = Union[
+    Callable[[Dict[str, str], Literal['SubtitledUnicode']], SubtitledUnicode],
+    Callable[[Dict[str, str], Literal['SubtitledHtml']], SubtitledHtml]
+]
+
+AcceptableConversionFnType = Union[
+    DomainObjectCustomizationArgsConversionFnTypes,
+    DictCustomizationArgsConversionFnTypes
 ]
 
 
