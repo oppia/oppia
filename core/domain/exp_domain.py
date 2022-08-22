@@ -2622,6 +2622,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         seen_choices = []
         choices_to_remove = []
         invalid_choices_index = []
+        invalid_choices_content_ids = []
         for choice in choices:
             if choice['html'].strip() in ('<p></p>', ''):
                 empty_choices.append(choice)
@@ -2629,6 +2630,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         # Only one choice is empty.
         if len(empty_choices) == 1:
             invalid_choices_index.append(choices.index(empty_choices[0]))
+            invalid_choices_content_ids.append(empty_choices[0]['content_id'])
             choices.remove(empty_choices[0])
         # Multiple choices are empty.
         else:
@@ -2644,6 +2646,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             else:
                 choices_to_remove.append(choice)
                 invalid_choices_index.append(choices.index(choice))
+                invalid_choices_content_ids.append(choice['content_id'])
 
         for choice_to_remove in choices_to_remove:
             choices.remove(choice_to_remove)
@@ -2656,7 +2659,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 for rule_spec in answer_group['rule_specs']:
                     rule_values = rule_spec['inputs']['x']
                     check = any(
-                        item in rule_values for item in invalid_choices_index)
+                        item in rule_values for item in
+                        invalid_choices_content_ids
+                    )
                     if check:
                         invalid_rules.append(rule_spec)
                 for invalid_rule in invalid_rules:
