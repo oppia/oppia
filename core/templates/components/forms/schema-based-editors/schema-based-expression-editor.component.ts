@@ -19,6 +19,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { AbstractControl, ControlValueAccessor, ValidationErrors, Validator } from '@angular/forms';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { SchemaDefaultValue } from 'services/schema-default-value.service';
 import { FocusManagerService } from 'services/stateful/focus-manager.service';
 import { SchemaBasedDictEditorComponent } from './schema-based-dict-editor.component';
 
@@ -28,11 +29,11 @@ import { SchemaBasedDictEditorComponent } from './schema-based-dict-editor.compo
 })
 export class SchemaBasedExpressionEditorComponent
 implements ControlValueAccessor, Validator, OnInit {
-  localValue!: unknown;
+  localValue!: SchemaDefaultValue;
   @Input() disabled!: boolean;
   @Input() outputType!: 'bool' | 'int' | 'float';
   @Input() labelForFocusTarget!: string;
-  onChange: (val: unknown) => void = (val: unknown) => {};
+  onChange: (val: SchemaDefaultValue) => void = (val: SchemaDefaultValue) => {};
 
   constructor(private focusManagerService: FocusManagerService) {}
 
@@ -43,12 +44,12 @@ implements ControlValueAccessor, Validator, OnInit {
   }
 
   // Implemented as a part of ControlValueAccessor interface.
-  writeValue(value: unknown): void {
+  writeValue(value: SchemaDefaultValue): void {
     this.localValue = value;
   }
 
   // Implemented as a part of ControlValueAccessor interface.
-  registerOnChange(fn: (val: unknown) => void): void {
+  registerOnChange(fn: (val: SchemaDefaultValue) => void): void {
     this.onChange = fn;
   }
 
@@ -66,7 +67,7 @@ implements ControlValueAccessor, Validator, OnInit {
     return {};
   }
 
-  localValueChange(value: unknown[]): void {
+  localValueChange(value: SchemaDefaultValue): void {
     if (value === this.localValue) {
       return;
     }

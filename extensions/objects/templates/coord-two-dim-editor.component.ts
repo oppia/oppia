@@ -34,9 +34,7 @@ export class CoordTwoDimEditorComponent implements OnInit {
   @Output() valueChanged: EventEmitter<[number, number]> =
     new EventEmitter<[number, number]>();
 
-  // Class Marker is of type Marker<P=any> therefore type
-  // cannot be determined.
-  mapMarkers!: Marker<unknown>;
+  mapMarkers!: Marker<string>;
   optionsSpec = {
     layers: [{ url: this._optionsUrl, attribution: this._attribution }],
     zoom: 0
