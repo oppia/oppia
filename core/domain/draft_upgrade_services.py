@@ -129,7 +129,6 @@ class DraftUpgradeUtil:
             list(ExplorationChange). The converted draft_change_list.
         """
         for i, change in enumerate(draft_change_list):
-            new_value = None
             if not change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
                 continue
             # The change object has the key 'new_value' only if the
