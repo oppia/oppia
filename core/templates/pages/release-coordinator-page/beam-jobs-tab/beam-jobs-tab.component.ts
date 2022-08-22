@@ -53,8 +53,8 @@ export class BeamJobsTabComponent implements OnInit, OnDestroy {
   filteredJobNames!: Observable<string[]>;
   filteredBeamJobRuns!: Observable<BeamJobRun[]>;
   beamJobRunsRefreshIntervalSubscription!: Subscription;
-  // Selected job is null if no job is selected.
-  selectedJob: BeamJob | null | undefined = null;
+  // Selected job is undefined if no job is selected.
+  selectedJob: BeamJob | undefined = undefined;
   jobNames = new BehaviorSubject<string[]>([]);
   beamJobRuns = new BehaviorSubject<BeamJobRun[]>([]);
 
@@ -84,7 +84,7 @@ export class BeamJobsTabComponent implements OnInit, OnDestroy {
 
     jobNameInputChanges.subscribe(input => {
       if (this.selectedJob?.name !== input) {
-        this.selectedJob = null;
+        this.selectedJob = undefined;
       }
     });
 
