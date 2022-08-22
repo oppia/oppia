@@ -3200,6 +3200,56 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         return answer_groups
 
+    @classmethod
+    def _text_interaction_contains_rule_should_come_after(answer_groups):
+        """
+        """
+        invalid_rules = []
+        seen_strings_contains = []
+        for answer_group in answer_groups:
+            for rule_spec in answer_group['rule_specs']:
+
+                if rule_spec['rule_type'] == 'Contains':
+                    seen_strings_contains.append(
+                        rule_spec['inputs']['x']['normalizedStrSet'])
+                else:
+                    rule_values = rule_spec['inputs']['x']['normalizedStrSet']
+                    for contain_ele in seen_strings_contains:
+                        for item in contain_ele:
+                            for ele in rule_values:
+                                if item in ele:
+                                    invalid_rules.append(rule_spec)
+            for invalid_rule in invalid_rule:
+                answer_group['rule_specs'].remove(invalid_rule)
+            if len(answer_group) == 0:
+                answer_groups.remove(answer_group)
+        return answer_groups
+
+    @classmethod
+    def _text_interaction_starts_with_rule_should_come_after(answer_groups):
+        """
+        """
+        invalid_rules = []
+        seen_strings_startswith = []
+        for answer_group in answer_groups:
+            for rule_spec in answer_group['rule_specs']:
+
+                if rule_spec['rule_type'] == 'StartsWith':
+                    seen_strings_startswith.append(
+                        rule_spec['inputs']['x']['normalizedStrSet'])
+                else:
+                    rule_values = rule_spec['inputs']['x']['normalizedStrSet']
+                    for start_with_ele in seen_strings_startswith:
+                        for item in start_with_ele:
+                            for ele in rule_values:
+                                if ele.startswith(item):
+                                    invalid_rules.append(rule_spec)
+            for invalid_rule in invalid_rule:
+                answer_group['rule_specs'].remove(invalid_rule)
+            if len(answer_group) == 0:
+                answer_groups.remove(answer_group)
+        return answer_groups
+
     #########################################################
     # Fix validation errors for exploration state interaction.
     #########################################################
@@ -3457,37 +3507,15 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     state_dict['interaction']['customization_args'][
                         'rows']['value'] = 10
 
-                seen_strings_contains = []
-                seen_strings_startswith = []
-                invalid_rules = []
-                for answer_group in answer_groups:
-                    for rule_spec in answer_group['rule_specs']:
-                        if rule_spec['rule_type'] == 'Contains':
-                            seen_strings_contains.append(
-                                rule_spec['inputs']['x']['normalizedStrSet'])
-                        elif rule_spec['rule_type'] == 'StartsWith':
-                            seen_strings_startswith.append(
-                                rule_spec['inputs']['x']['normalizedStrSet']
-                            )
-                        else:
-                            rule_values = rule_spec['inputs']['x'][
-                                'normalizedStrSet']
-                            for contain_ele in seen_strings_contains:
-                                for item in contain_ele:
-                                    for ele in rule_values:
-                                        if item in ele:
-                                            invalid_rules.append(rule_spec)
-                            for start_with_ele in seen_strings_startswith:
-                                for item in start_with_ele:
-                                    for ele in rule_values:
-                                        if ele.startswith(item):
-                                            invalid_rules.append(rule_spec)
+                answer_groups = (
+                    cls._text_interaction_contains_rule_should_come_after(
+                        answer_groups)
+                )
 
-                for invalid_rule in invalid_rules:
-                    for answer_group in answer_groups:
-                        for rule_spec in answer_group['rule_specs']:
-                            if rule_spec == invalid_rule:
-                                answer_group['rule_specs'].remove(rule_spec)
+                answer_groups = (
+                    cls._text_interaction_starts_with_rule_should_come_after(
+                        answer_groups)
+                )
 
                 state_dict['interaction']['answer_groups'] = answer_groups
 
