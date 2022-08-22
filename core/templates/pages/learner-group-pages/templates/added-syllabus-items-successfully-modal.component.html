@@ -6,7 +6,11 @@
 </div>
 
 <div class="modal-body">
-  <p class="add-syllabus-success-message">You have successfully added {{itemsAddedCount}} items into the syllabus!</p>
+  <p class="add-syllabus-success-message">You have successfully added {{itemsAddedCount}}
+    <span *ngIf="itemsAddedCount === 1">item </span>
+    <span *ngIf="itemsAddedCount > 1">items </span>
+    into the syllabus!
+  </p>
 </div>
 
 <div class="modal-footer">

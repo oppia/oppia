@@ -39,8 +39,8 @@
         </span>
       </div>
       <div class="oppia-dashboard-view-tabs-item"
-           (click)="setActiveTab(EDIT_LEARNER_GROUP_TABS_I18N_IDS.LEARNER_PROGRESS)"
-           [ngClass]="{'active': isTabActive(EDIT_LEARNER_GROUP_TABS_I18N_IDS.LEARNER_PROGRESS)}">
+           (click)="setActiveTab(EDIT_LEARNER_GROUP_TABS_I18N_IDS.STUDENTS_PROGRESS)"
+           [ngClass]="{'active': isTabActive(EDIT_LEARNER_GROUP_TABS_I18N_IDS.STUDENTS_PROGRESS)}">
         <span class="progress-tab-icon tab-icon">
           <svg xmlns="http://www.w3.org/2000/svg" width="22" height="21" viewBox="0 0 22 21" fill="none">
             <path d="M11.6567 0V0.020352V2.05555C16.33 2.60506 19.6407 6.66529 19.0658 11.1326C18.5762 14.8366 15.5316 17.7775 11.6567 18.2151V20.2503C17.5116 19.6906 21.7698 14.7247 21.1843 9.12788C20.7052 4.29428 16.6919 0.478273 11.6567
@@ -52,7 +52,7 @@
           </svg>
         </span>
         <span class="oppia-dashboard-view-tabs-item-text">
-          {{'I18N_LEARNER_GROUP_LEARNER_PROGRESS_TAB' | translate}}
+          {{'I18N_LEARNER_GROUP_STUDENTS_PROGRESS_TAB' | translate}}
         </span>
       </div>
       <div class="oppia-dashboard-view-tabs-item"
@@ -116,7 +116,7 @@
     <div *ngIf="activeTab === EDIT_LEARNER_GROUP_TABS_I18N_IDS.SYLLABUS">
       <oppia-learner-group-syllabus [learnerGroup]="learnerGroup"></oppia-learner-group-syllabus>
     </div>
-    <div *ngIf="activeTab === EDIT_LEARNER_GROUP_TABS_I18N_IDS.LEARNER_PROGRESS">
+    <div *ngIf="activeTab === EDIT_LEARNER_GROUP_TABS_I18N_IDS.STUDENTS_PROGRESS">
       <oppia-learner-group-students-progress [learnerGroup]="learnerGroup"></oppia-learner-group-students-progress>
     </div>
     <div *ngIf="activeTab === EDIT_LEARNER_GROUP_TABS_I18N_IDS.PREFERENCES">

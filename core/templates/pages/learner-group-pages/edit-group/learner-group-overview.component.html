@@ -2,15 +2,15 @@
   <div class="learner-group-summary-card">
     <div class="students-info">
       <div class="students-count">{{learnerGroup.studentUsernames.length}}</div>
-      <div>{{'I18N_LEARNER_GROUP_STUDENTS_SECTION' | translate}}</div>
+      <div>{{'I18N_LEARNER_GROUP_STUDENTS_SECTION' | translate:{studentsCount: learnerGroup.studentUsernames.length, messageFormat: true} }}</div>
     </div>
     <div class="assigned-skills-info">
       <div class="assigned-skills-count">{{learnerGroup.subtopicPageIds.length}}</div>
-      <div>{{'I18N_LEARNER_GROUP_ASSIGNED_SKILLS' | translate}}</div>
+      <div>{{'I18N_LEARNER_GROUP_ASSIGNED_SKILLS' | translate:{skillsCount: learnerGroup.subtopicPageIds.length, messageFormat: true} }}</div>
     </div>
     <div class="assigned-stories-info">
       <div class="assigned-stories-count">{{learnerGroup.storyIds.length}}</div>
-      <div>{{'I18N_LEARNER_GROUP_ASSIGNED_STORIES' | translate}}</div>
+      <div>{{'I18N_LEARNER_GROUP_ASSIGNED_STORIES' | translate:{storiesCount: learnerGroup.storyIds.length, messageFormat: true} }}</div>
     </div>
   </div>
 
@@ -40,7 +40,7 @@
                   </div>
                   <div class="progress-summary-info"
                        [ngClass]="{'warning': getStrugglingStudentsInfoInSubtopics(subtopicSummary.subtopicPageId).length > 0}">
-                    {{getStrugglingStudentsInfoInSubtopics(subtopicSummary.subtopicPageId).length}} students are struggling this skill
+                    {{getStrugglingStudentsInfoInSubtopics(subtopicSummary.subtopicPageId).length}} students are struggling with this skill
                   </div>
                 </div>
                 <div *ngIf="getStrugglingStudentsInfoInSubtopics(subtopicSummary.subtopicPageId).length > 0" class="progress-summary-students">

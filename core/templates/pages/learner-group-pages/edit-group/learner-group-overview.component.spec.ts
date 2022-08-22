@@ -177,10 +177,10 @@ describe('LearnerGroupOverviewComponent', () => {
 
   it('should set active tab correctly', () => {
     component.setActiveTab(
-      LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_TABS.LEARNER_PROGRESS);
+      LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_TABS.STUDENTS_PROGRESS);
 
     expect(component.activeTab).toEqual(
-      LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_TABS.LEARNER_PROGRESS);
+      LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_TABS.STUDENTS_PROGRESS);
   });
 
   it('should get story completions info correctly', fakeAsync(() => {

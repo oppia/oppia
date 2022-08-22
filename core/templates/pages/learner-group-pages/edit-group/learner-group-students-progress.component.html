@@ -5,7 +5,7 @@
            type="text"
            [(ngModel)]="searchUsernameQuery"
            (keyup)="getSearchUsernameResults()"
-           placeholder="Search Learner"
+           placeholder="Search Student"
     >
   </div>
   <div *ngFor="let studentProgress of matchingUsersProgress; let idx = index">
