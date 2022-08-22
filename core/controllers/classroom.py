@@ -113,6 +113,19 @@ class DefaultClassroomRedirectPage(base.BaseHandler):
         self.redirect('/learn/%s' % constants.DEFAULT_CLASSROOM_URL_FRAGMENT)
 
 
+class ClassroomAdminPageHandler(base.BaseHandler):
+    """Renders the classroom admin page."""
+
+    URL_PATH_ARGS_SCHEMAS = {}
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+    @acl_decorators.can_access_admin_page
+    def get(self):
+        """Handles GET requests."""
+        print('Help!!')
+        self.render_template('classroom-admin-page.mainpage.html')
+
+
 class ClassroomAdminDataHandler(base.BaseHandler):
     """Fetches relevant data for the classroom admin page."""
 

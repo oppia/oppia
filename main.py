@@ -351,6 +351,9 @@ URLS = [
         r'%s/story' % feconf.TOPIC_VIEWER_URL_PREFIX,
         topic_viewer.TopicViewerPage),
     get_redirect_route(
+        r'%s' % feconf.CLASSROOM_ADMIN_PAGE_URL,
+        classroom.ClassroomAdminPageHandler),
+    get_redirect_route(
         r'%s' % feconf.CLASSROOM_ADMIN_DATA_HANDLER_URL,
         classroom.ClassroomAdminDataHandler),
     get_redirect_route(
