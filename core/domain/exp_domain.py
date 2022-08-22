@@ -3395,16 +3395,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
             # DragAndDropInput Interaction.
             if state_dict['interaction']['id'] == 'DragAndDropSortInput':
                 answer_groups = state_dict['interaction']['answer_groups']
-                # `==` should come before idx(a) == b if it satisfies
-                # that condition.
-                answer_groups = cls._equals_should_come_before_idx_rule(
-                    answer_groups)
-                # `==` should come before == +/- 1 if they are off by
-                # at most 1 value.
-                answer_groups = (
-                    cls._equals_should_come_before_misplace_by_one_rule(
-                        answer_groups)
-                )
                 multi_item_value = (
                     state_dict['interaction']['customization_args']
                     ['allowMultipleItemsInSamePosition']['value']
@@ -3441,12 +3431,24 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         if len(answer_group['rule_specs']) == 0:
                             answer_groups.remove(answer_group)
 
+                # `==` should come before idx(a) == b if it satisfies
+                # that condition.
+                answer_groups = cls._equals_should_come_before_idx_rule(
+                    answer_groups)
+
+                # `==` should come before == +/- 1 if they are off by
+                # at most 1 value.
+                answer_groups = (
+                    cls._equals_should_come_before_misplace_by_one_rule(
+                        answer_groups)
+                )
+
                 state_dict['interaction']['answer_groups'] = answer_groups
 
             # TextInput Interaction.
             if state_dict['interaction']['id'] == 'TextInput':
                 answer_groups = state_dict['interaction']['answer_groups']
-                # Text input height >= 1 and <= 10.
+                # Text input height shoule be >= 1 and <= 10.
                 rows_value = int(
                     state_dict['interaction']['customization_args'][
                         'rows']['value']
@@ -3463,7 +3465,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         if rule_spec['rule_type'] == 'Contains':
                             seen_strings_contains.append(
                                 rule_spec['inputs']['x']['normalizedStrSet'])
-                        elif rule_spec['rule_type'] == 'Contains':
+                        elif rule_spec['rule_type'] == 'StartsWith':
                             seen_strings_startswith.append(
                                 rule_spec['inputs']['x']['normalizedStrSet']
                             )
@@ -3599,8 +3601,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
             html_ele_list = soup.prettify().split('\n')
             html_ele_list = [ele.strip() for ele in html_ele_list]
-            state['content']['html'] = ','.join(
-                html_ele_list).replace(',', '')
+            state['content']['html'] = ','.join(html_ele_list).replace(',', '')
 
         return states_dict
 
