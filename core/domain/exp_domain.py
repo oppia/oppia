@@ -2594,7 +2594,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
     @classmethod
     def _choices_should_be_unique_and_non_empty(
         cls, choices: List[str],
-        answer_groups: List[state_domain.AnswerGroup]
+        answer_groups: List[state_domain.AnswerGroup],
+        is_item_selection_interaction = False
     ) -> Tuple(Any):
         """Handles choices present in the ItemSelectionInput or
         in MultipleChoiceInput interactions, implements the following -
@@ -2606,6 +2607,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         Args:
             choices: List[str]. A list of choices.
+            answer_groups: List[state_domain.AnswerGroup]. The list of answer
+            groups.
+            is_item_selection_interaction: bool. If the answer group belongs
+            to ItemSelectionInput interaction or not.
 
         Returns:
             choices_to_save: List[str]. The list of valid choices.
@@ -2643,8 +2648,24 @@ class Exploration(translation_domain.BaseTranslatableObject):
         for choice_to_remove in choices_to_remove:
             choices.remove(choice_to_remove)
 
-        # TODO: Need to handle for ItemSelection.
-        # Remove rules whose choice has been deleted.
+        # Remove rules of MultipleChoice interaction whose choice
+        # has been deleted.
+        if is_item_selection_interaction:
+            for answer_group in answer_groups:
+                invalid_rules = []
+                for rule_spec in answer_group['rule_specs']:
+                    rule_values = rule_spec['inputs']['x']
+                    check = any(
+                        item in rule_values for item in invalid_choices_index)
+                    if check:
+                        invalid_rules.append(rule_spec)
+                for invalid_rule in invalid_rules:
+                    answer_group['rule_specs'].remove(invalid_rule)
+                # TODO: Removal of answer group can result in state
+                # disconnection, need audit.
+
+        # Remove rules of MultipleChoice interaction whose choice
+        # has been deleted.
         for answer_group in answer_groups:
             invalid_rules = []
             for rule_spec in answer_group['rule_specs']:
@@ -2653,7 +2674,8 @@ class Exploration(translation_domain.BaseTranslatableObject):
                         invalid_rules.append(rule_spec)
             for invalid_rule in invalid_rules:
                 answer_group['rule_specs'].remove(invalid_rule)
-            # Removal of answer group if it is valid check.
+            # TODO: Removal of rules/answer group will report in disconnection
+            # of State, 1 exp reported. Waiting on Sean's suggestion.
 
         return (choices, answer_groups)
 
@@ -3341,8 +3363,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     if len(answer_group['rule_specs']) == 0:
                         answer_groups.remove(answer_group)
 
-                state_dict['interaction']['answer_groups'] = answer_groups
-
                 # Min no of selec should be no greater than max num.
                 if min_value > max_value:
                     min_value, max_value = max_value, min_value
@@ -3358,9 +3378,12 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
                 # Answer choices should be non-empty and unique.
                 # TODO: Make changes according to item selection.
-                state_dict['interaction']['customization_args']['choices'][
-                    'value'] = cls._choices_should_be_unique_and_non_empty(
+                choices, answer_groups = cls._choices_should_be_unique_and_non_empty(
                         choices, answer_groups)
+                state_dict['interaction']['customization_args']['choices'][
+                    'value'] = choices
+
+                state_dict['interaction']['answer_groups'] = answer_groups
 
             # DragAndDropInput Interaction.
             if state_dict['interaction']['id'] == 'DragAndDropSortInput':
