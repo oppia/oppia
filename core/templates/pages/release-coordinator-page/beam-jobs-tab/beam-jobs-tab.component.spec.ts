@@ -206,7 +206,7 @@ describe('Beam Jobs Tab Component', () => {
     const autocomplete = await loader.getHarness(MatAutocompleteHarness);
     const input = await loader.getHarness(MatInputHarness);
 
-    expect(component.selectedJob).toBeNull();
+    expect(component.selectedJob).toBeUndefined();
 
     await input.setValue('FooJob');
     await autocomplete.selectOption({text: 'FooJob'});
@@ -217,7 +217,7 @@ describe('Beam Jobs Tab Component', () => {
     await input.setValue('FooJo');
     fixture.detectChanges();
 
-    expect(component.selectedJob).toBeNull();
+    expect(component.selectedJob).toBeUndefined();
 
     component.ngOnDestroy();
   });

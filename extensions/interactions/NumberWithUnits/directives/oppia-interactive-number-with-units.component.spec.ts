@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the NumberWithUnits interaction.
  */
 
-import { async, ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { async, ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { InteractiveNumberWithUnitsComponent } from './oppia-interactive-number-with-units.component';
 import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
 import { NumberWithUnitsObjectFactory } from 'domain/objects/NumberWithUnitsObjectFactory';
@@ -189,6 +189,22 @@ describe('Number with units interaction component', () => {
 
     expect(component.errorMessageI18nKey).toBe('Unit "k" not found.');
   });
+
+  it('should throw uncaught errors that are not Error type',
+    waitForAsync(() => {
+      spyOn(numberWithUnitsObjectFactory, 'fromRawInputString').and.callFake(
+        () => {
+          throw TypeError;
+        }
+      );
+
+      expect(()=>{
+        component.submitAnswer();
+        // The eslint error is suppressed since we need to test if
+        // just a string was thrown.
+        // eslint-disable-next-line oppia/no-to-throw
+      }).toThrow(TypeError);
+    }));
 
   it('should unsubscribe when component is destroyed', function() {
     spyOn(component.componentSubscriptions, 'unsubscribe').and.callThrough();

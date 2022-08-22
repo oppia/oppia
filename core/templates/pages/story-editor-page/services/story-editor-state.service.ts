@@ -210,7 +210,7 @@ export class StoryEditorStateService {
   saveStory(
       commitMessage: string,
       successCallback: (value?: Object) => void,
-      errorCallback: (value?: Object) => void): boolean {
+      errorCallback: (value: string) => void): boolean {
     if (!this._storyIsInitialized) {
       this.alertsService.fatalWarning(
         'Cannot save a story before one is loaded.');

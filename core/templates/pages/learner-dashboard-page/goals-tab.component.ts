@@ -56,7 +56,9 @@ export class GoalsTabComponent implements OnInit {
   @Input() partiallyLearntTopicsList!: LearnerTopicSummary[];
   @Input() learntToPartiallyLearntTopics!: string[];
 
-  @ViewChild('dropdown', {'static': false}) dropdownRef?: ElementRef;
+  // Child dropdown is undefined because initially it is in closed state using
+  // the following property: {'static' = false}.
+  @ViewChild('dropdown', {'static': false}) dropdownRef: ElementRef | undefined;
   learnerDashboardActivityIds!: LearnerDashboardActivityIds;
   MAX_CURRENT_GOALS_LENGTH!: number;
   currentGoalsStoryIsShown!: boolean[];
