@@ -1240,11 +1240,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         answer_groups = interaction.answer_groups
         answer_group = answer_groups[0]
 
-        default_outcome.dest_if_really_stuck = 'ABD'
-        self._assert_validation_error(  # type: ignore[no-untyped-call]
-            exploration, 'The destination for the stuck learner '
-            'ABD is not a valid state')
-
         default_outcome.dest_if_really_stuck = None
 
         # Testing the default outcome does not direct stuck learner
@@ -5132,7 +5127,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 56
+schema_version: 57
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -5238,7 +5233,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 51
+states_schema_version: 52
 tags: []
 title: Title
 """)
@@ -5391,7 +5386,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 56
+schema_version: 57
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -5507,7 +5502,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 51
+states_schema_version: 52
 tags: []
 title: Title
 """)
@@ -5622,7 +5617,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 56
+schema_version: 57
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -5659,8 +5654,6 @@ states:
         ca_buttonText: {}
         content: {}
         default_outcome: {}
-        feedback_1: {}
-        solution: {}
     solicit_answer_details: false
     written_translations:
       translations_mapping:
@@ -5671,8 +5664,6 @@ states:
             translation: hello
         content: {}
         default_outcome: {}
-        feedback_1: {}
-        solution: {}
   END:
     card_is_checkpoint: false
     classifier_model_id: null
@@ -5699,7 +5690,7 @@ states:
     written_translations:
       translations_mapping:
         content: {}
-states_schema_version: 51
+states_schema_version: 52
 tags: []
 title: Title
 """)
