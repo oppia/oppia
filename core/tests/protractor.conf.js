@@ -23,30 +23,6 @@ var suites = {
     explorationHistoryTab: [
       'protractor_desktop/explorationHistoryTab.js'
     ],
-
-    featureGating: [
-      'protractor/featureGatingFlow.js'
-    ],
-
-    fileUploadFeatures: [
-      'protractor_desktop/voiceoverUploadFeatures.js'
-    ],
-
-    fileUploadExtensions: [
-      'protractor_desktop/fileUploadExtensions.js'
-    ],
-
-    library: [
-      'protractor/libraryFlow.js'
-    ],
-
-    playVoiceovers: [
-      'protractor_desktop/playVoiceovers.js'
-    ],
-
-    publication: [
-      'protractor_desktop/publicationAndLibrary.js'
-    ],
   };
 
 // A reference configuration file.

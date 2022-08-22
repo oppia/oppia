@@ -118,12 +118,17 @@ SUITES_MIGRATED_TO_WEBDRIVERIO = [
     'explorationStatisticsTab',
     'explorationTranslationTab',
     'extensions',
+    'featureGating',
+    'fileUploadExtensions',
     'learner',
     'learnerDashboard',
+    'library',
     'navigation',
+    'playVoiceovers',
     'preferences',
     'profileFeatures',
     'profileMenu',
+    'publication',
     'skillEditor',
     'subscriptions',
     'topicsAndSkillsDashboard',
@@ -136,12 +141,7 @@ SUITES_MIGRATED_TO_WEBDRIVERIO = [
 
 SUITES_STILL_IN_PROTRACTOR = [
     'explorationHistoryTab',
-    'featureGating',
     'fileUploadFeatures',
-    'fileUploadExtensions',
-    'library',
-    'playVoiceovers',
-    'publication',
 ]
 
 

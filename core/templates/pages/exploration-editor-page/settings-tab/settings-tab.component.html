@@ -301,7 +301,7 @@
           <strong>Collaborators</strong>
           <ul>
             <li ng-repeat="editorName in $ctrl.ExplorationRightsService.editorNames track by $index">
-              <div  class="oppia-user-list-item">
+              <div class="oppia-user-list-item e2e-test-role-editor-name">
                 <span><[editorName]></span>
                 <span ng-hide="!$ctrl.isRolesFormOpen" type="button" uib-tooltip="Remove user" class="material-icons oppia-delete-user-button" ng-click="$ctrl.removeRole(editorName, 'Collaborators')">highlight_off
                 </span>
@@ -314,7 +314,7 @@
           <strong>Playtesters</strong>
           <ul>
             <li ng-repeat="viewerName in $ctrl.ExplorationRightsService.viewerNames track by $index">
-              <div class="oppia-user-list-item">
+              <div class="oppia-user-list-item e2e-test-role-viewer-name">
                 <span><[viewerName]></span>
                 <span ng-hide="!$ctrl.isRolesFormOpen" type="button" uib-tooltip="Remove user" class="material-icons oppia-delete-user-button" ng-click="$ctrl.removeRole(viewerName, 'Playtesters')">highlight_off
                 </span>
@@ -382,7 +382,7 @@
         <div ng-show="$ctrl.ExplorationRightsService.voiceArtistNames.length > 0">
           <ul>
             <li ng-repeat="voiceArtistName in $ctrl.ExplorationRightsService.voiceArtistNames track by $index">
-              <div class="oppia-user-list-item e2e-test-voice-artist-{{voiceArtistName}}">
+              <div class="oppia-user-list-item e2e-test-role-voiceArtist-name e2e-test-voice-artist-{{voiceArtistName}}">
                 <span><[voiceArtistName]></span>
                 <span ng-show="$ctrl.isVoiceoverFormOpen" type="button" uib-tooltip="Remove user" class="material-icons" ng-click="$ctrl.removeVoiceArtist(voiceArtistName)">highlight_off
                 </span>

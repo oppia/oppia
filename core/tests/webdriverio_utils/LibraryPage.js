@@ -35,6 +35,7 @@ var LibraryPage = function() {
   var expSummaryTileTitleLocator = '.e2e-test-exp-summary-tile-title';
   var mainHeader = $('.e2e-test-library-main-header');
   var searchButton = $('.e2e-test-search-button');
+  var searchInputElement = $('.e2e-test-search-input');
   var searchInputsSelector = function() {
     return $$('.e2e-test-search-input');
   };
@@ -48,6 +49,8 @@ var LibraryPage = function() {
   };
   var categorySelector = forms.MultiSelectEditor(
     $('.e2e-test-search-bar-category-selector'));
+  var expSummaryTileRatingLocator = '.e2e-test-exp-summary-tile-rating';
+  var expSummaryTileObjectiveLocator = '.e2e-test-exp-summary-tile-objective';
   var languageSelector = forms.MultiSelectEditor(
     $('.e2e-test-search-bar-language-selector'));
 
@@ -69,6 +72,8 @@ var LibraryPage = function() {
     // browser and is invisible in case of a mobile browser.
     // The second search bar input element is visible when the library
     // page is rendered for mobile device.
+    await waitFor.visibilityOf(
+      searchInputElement, 'Search input takes too long to appear');
 
     // Function get is a zero-based index.
     var searchInputs = await searchInputsSelector();

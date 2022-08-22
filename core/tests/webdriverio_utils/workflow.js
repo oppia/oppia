@@ -252,6 +252,9 @@ var addExplorationPlaytester = async function(username) {
 // Here, roleName is the server-side form of the name (e.g. 'owner').
 var _getExplorationRoles = async function(roleName) {
   var explorationRoleNameLocator = '.e2e-test-role-' + roleName + '-name';
+  await waitFor.presenceOf(
+    $(explorationRoleNameLocator),
+    'Exploration role name takes too long to appear');
   return await $$(explorationRoleNameLocator).map(async function(elem) {
     return await elem.getText();
   });
@@ -259,6 +262,18 @@ var _getExplorationRoles = async function(roleName) {
 
 var getExplorationManagers = async function() {
   return await _getExplorationRoles('owner');
+};
+
+var getExplorationCollaborators = async function() {
+  return await _getExplorationRoles('editor');
+};
+
+var getExplorationVoiceArtists = async function() {
+  return await _getExplorationRoles('voiceArtist');
+};
+
+var getExplorationPlaytesters = async function() {
+  return await _getExplorationRoles('viewer');
 };
 
 var createSkillAndAssignTopic = async function(
@@ -368,6 +383,9 @@ exports.addExplorationCollaborator = addExplorationCollaborator;
 exports.addExplorationVoiceArtist = addExplorationVoiceArtist;
 exports.addExplorationPlaytester = addExplorationPlaytester;
 exports.getExplorationManagers = getExplorationManagers;
+exports.getExplorationCollaborators = getExplorationCollaborators;
+exports.getExplorationVoiceArtists = getExplorationVoiceArtists;
+exports.getExplorationPlaytesters = getExplorationPlaytesters;
 exports.createAddExpDetailsAndPublishExp = createAddExpDetailsAndPublishExp;
 exports.createSkillAndAssignTopic = createSkillAndAssignTopic;
 exports.createQuestion = createQuestion;

@@ -716,13 +716,10 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
      * expectTextToBe() function should be used when possible.
      */
     expectTextWithHighlightingToBe: async function(expectedTextDict) {
-      console.log(11);
       for (var lineNumber in expectedTextDict) {
         expectedTextDict[lineNumber].checked = false;
       }
-      console.log(12);
       await _compareText(expectedTextDict, true);
-      console.log(13);
     },
     /**
      * Compares text with codeMirror. The input should be a string (with
