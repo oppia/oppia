@@ -2648,7 +2648,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         for choice_to_remove in choices_to_remove:
             choices.remove(choice_to_remove)
 
-        # Remove rules of MultipleChoice interaction whose choice
+        # Remove rules of ItemSelection interaction whose choice
         # has been deleted.
         if is_item_selection_interaction:
             for answer_group in answer_groups:
@@ -3379,7 +3379,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 # Answer choices should be non-empty and unique.
                 # TODO: Make changes according to item selection.
                 choices, answer_groups = cls._choices_should_be_unique_and_non_empty(
-                        choices, answer_groups)
+                        choices, answer_groups, True)
                 state_dict['interaction']['customization_args']['choices'][
                     'value'] = choices
 
