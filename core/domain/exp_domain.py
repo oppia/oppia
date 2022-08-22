@@ -3201,12 +3201,12 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return answer_groups
 
     @classmethod
-    def _text_interaction_contains_rule_should_come_after(answer_groups):
+    def _text_interaction_contains_rule_should_come_after(cls, answer_groups):
         """
         """
-        invalid_rules = []
         seen_strings_contains = []
         for answer_group in answer_groups:
+            invalid_rules = []
             for rule_spec in answer_group['rule_specs']:
 
                 if rule_spec['rule_type'] == 'Contains':
@@ -3219,21 +3219,20 @@ class Exploration(translation_domain.BaseTranslatableObject):
                             for ele in rule_values:
                                 if item in ele:
                                     invalid_rules.append(rule_spec)
-            for invalid_rule in invalid_rule:
+            for invalid_rule in invalid_rules:
                 answer_group['rule_specs'].remove(invalid_rule)
             if len(answer_group) == 0:
                 answer_groups.remove(answer_group)
         return answer_groups
 
     @classmethod
-    def _text_interaction_starts_with_rule_should_come_after(answer_groups):
+    def _text_interaction_starts_with_rule_should_come_after(cls, answer_groups):
         """
         """
-        invalid_rules = []
         seen_strings_startswith = []
         for answer_group in answer_groups:
+            invalid_rules = []
             for rule_spec in answer_group['rule_specs']:
-
                 if rule_spec['rule_type'] == 'StartsWith':
                     seen_strings_startswith.append(
                         rule_spec['inputs']['x']['normalizedStrSet'])
@@ -3244,7 +3243,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                             for ele in rule_values:
                                 if ele.startswith(item):
                                     invalid_rules.append(rule_spec)
-            for invalid_rule in invalid_rule:
+            for invalid_rule in invalid_rules:
                 answer_group['rule_specs'].remove(invalid_rule)
             if len(answer_group) == 0:
                 answer_groups.remove(answer_group)
