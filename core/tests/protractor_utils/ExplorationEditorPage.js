@@ -48,14 +48,19 @@ var ExplorationEditorPage = function() {
     .first();
   var expTitle = element(by.css(
     '.e2e-test-exploration-title-input'));
+  var expTitleInPostPublishModal = element(by.css(
+    '.e2e-test-exploration-title-input-modal'));
   var expObjective = element(by.css(
     '.e2e-test-exploration-objective-input'));
-  var expTags = element(by.css('.e2e-test-tags'));
-  var expInput = expTags.element(by.tagName('input'));
+  var expObjectiveInPostPublishModal = element(by.css(
+    '.e2e-test-exploration-objective-input-modal'));
+  var expInput = element(by.css('.e2e-test-chip-list-tags'));
   var expCategoryDropdownElement = element(
-    by.css('.e2e-test-exploration-category-dropdown'));
+    by.css('.e2e-test-exploration-category-metadata-modal'));
   var expLanguageSelectorElement = element(
     by.css('.e2e-test-exploration-language-select'));
+  var expLanguageSelectorElementModal = element(
+    by.css('.e2e-test-exploration-language-select-modal'));
   var explorationMetadataModalHeaderElement = element(
     by.css('.e2e-test-metadata-modal-header'));
   var confirmPublish = element(by.css('.e2e-test-confirm-publish'));
@@ -65,7 +70,7 @@ var ExplorationEditorPage = function() {
   var sharePublishModalElement = element(
     by.css('.e2e-test-share-publish-modal'));
   var selectionRenderedElement = element(
-    by.css('.select2-selection__rendered'));
+    by.css('.e2e-test-exploration-category-dropdown'));
   var promptModalElement = element(
     by.css('.e2e-test-save-prompt-modal'));
   var explorationSaveModalElement = element(
@@ -159,13 +164,15 @@ var ExplorationEditorPage = function() {
     await action.waitForAutosave();
     await action.click('Publish button', publishExplorationButton);
 
-    await action.sendKeys('Exploration title', expTitle, title);
+    await action.sendKeys(
+      'Exploration title', expTitleInPostPublishModal, title);
     await action.click(
       'Exploration metadata modal header',
       explorationMetadataModalHeaderElement);
     await action.waitForAutosave();
 
-    await action.sendKeys('Exploration objective', expObjective, objective);
+    await action.sendKeys(
+      'Exploration objective', expObjectiveInPostPublishModal, objective);
     await action.click(
       'Exploration metadata modal header',
       explorationMetadataModalHeaderElement);
@@ -175,16 +182,25 @@ var ExplorationEditorPage = function() {
       expCategoryDropdownElement,
       'Category input takes too long to be visible.');
     await (
-      await forms.AutocompleteDropdownEditor(expCategoryDropdownElement)
+      await forms.AutocompleteDropdownEditor(
+        expCategoryDropdownElement)
     ).setValue(category);
     await action.click(
       'Exploration metadata modal header',
       explorationMetadataModalHeaderElement);
     await action.waitForAutosave();
 
-    await action.select(
-      'Exploration Language', expLanguageSelectorElement,
-      language);
+    await action.click(
+      'Exploration Language', expLanguageSelectorElementModal, true);
+
+    var LanguageChoiceOptionElement = element.all(by.cssContainingText(
+      '.e2e-test-exploration-language-select-lan', language)).first();
+
+    await action.click(
+      'Language input Choice takes too long to be visible. ',
+      LanguageChoiceOptionElement, true);
+
+
     await action.click(
       'Exploration metadata modal header',
       explorationMetadataModalHeaderElement);
@@ -225,7 +241,7 @@ var ExplorationEditorPage = function() {
       'Selection Rendered Element', selectionRenderedElement);
     var explorationLanguage = await action.getText(
       'Exploration Language Selector Element',
-      expLanguageSelectorElement.$('option:checked'));
+      expLanguageSelectorElement);
     await waitFor.visibilityOf(
       expTitle, 'Exploration Goal taking too long to appear');
     expect(await expTitle.getAttribute('value')).toMatch(title);
@@ -366,7 +382,7 @@ var ExplorationEditorPage = function() {
   this.navigateToMainTab = async function() {
     await action.waitForAutosave();
     await action.click('Main tab button', navigateToMainTabButton);
-    await action.click('Neutral element', neutralElement);
+    await action.click('Neutral element', neutralElement, true);
     await waitFor.pageToFullyLoad();
   };
 

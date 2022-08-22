@@ -16,31 +16,52 @@
  * @fileoverview Unit tests for explorationObjectiveEditor component.
  */
 
-require(
-  'pages/exploration-editor-page/exploration-title-editor/' +
-  'exploration-title-editor.component.ts');
-import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { ExplorationObjectiveEditorComponent } from './exploration-objective-editor.component';
+import { ExplorationObjectiveService } from '../services/exploration-objective.service';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-describe('Exploration Objective Editor directive', function() {
-  var $scope = null;
-  var ExplorationObjectiveService = null;
-
-  beforeEach(angular.mock.module('oppia'));
-  importAllAngularServices();
-  beforeEach(angular.mock.inject(function($injector, $componentController) {
-    var $rootScope = $injector.get('$rootScope');
-    ExplorationObjectiveService = $injector.get('ExplorationObjectiveService');
-
-    $scope = $rootScope.$new();
-    $componentController('explorationObjectiveEditor', {
-      $scope: $scope,
-      ExplorationObjectiveService: ExplorationObjectiveService
-    });
+describe('Exploration Objective Editor Component', () => {
+  let component: ExplorationObjectiveEditorComponent;
+  let fixture: ComponentFixture<ExplorationObjectiveEditorComponent>;
+  let explorationObjectiveService: ExplorationObjectiveService;
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [
+        HttpClientTestingModule,
+        FormsModule,
+        ReactiveFormsModule
+      ],
+      declarations: [
+        ExplorationObjectiveEditorComponent
+      ],
+      providers: [
+        ExplorationObjectiveService
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
   }));
 
+  beforeEach(() => {
+    fixture = TestBed.createComponent(ExplorationObjectiveEditorComponent);
+    component = fixture.componentInstance;
+
+    explorationObjectiveService = TestBed.inject(ExplorationObjectiveService);
+    explorationObjectiveService.displayed = '';
+    fixture.detectChanges();
+  });
+
   it('should initialize controller properties after its initialization',
-    function() {
-      expect($scope.explorationObjectiveService).toEqual(
-        ExplorationObjectiveService);
-    });
+    fakeAsync(() => {
+      spyOn(
+        component.onInputFieldBlur, 'emit').and.stub();
+
+      component.inputFieldBlur();
+      tick();
+
+      expect(component.onInputFieldBlur.emit).toHaveBeenCalled();
+      expect(component).toBeDefined();
+    }));
 });

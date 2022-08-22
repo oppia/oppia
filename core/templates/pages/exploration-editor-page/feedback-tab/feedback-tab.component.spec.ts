@@ -24,8 +24,8 @@ import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { SuggestionModalService } from 'services/suggestion-modal.service';
 import { AlertsService } from 'services/alerts.service';
 import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
-import { SuggestionThreadObjectFactory } from
-  'domain/suggestion/SuggestionThreadObjectFactory';
+import { SuggestionThread } from
+  'domain/suggestion/suggestion-thread-object.model';
 import { StateEditorRefreshService } from
   'pages/exploration-editor-page/services/state-editor-refresh.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
@@ -50,7 +50,6 @@ describe('Feedback Tab Component', function() {
   var editabilityService = null;
   var explorationStatesService = null;
   var suggestionModalForExplorationEditorService = null;
-  var suggestionThreadObjectFactory = null;
   var threadDataBackendApiService = null;
   var userService = null;
   let ngbModal: NgbModal = null;
@@ -70,7 +69,6 @@ describe('Feedback Tab Component', function() {
     alertsService = TestBed.get(AlertsService);
     changeListService = TestBed.inject(ChangeListService);
     dateTimeFormatService = TestBed.get(DateTimeFormatService);
-    suggestionThreadObjectFactory = TestBed.get(SuggestionThreadObjectFactory);
   });
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -160,7 +158,7 @@ describe('Feedback Tab Component', function() {
     });
 
   it('should set active thread when it exists', function() {
-    var thread = suggestionThreadObjectFactory.createFromBackendDicts({
+    var thread = SuggestionThread.createFromBackendDicts({
       status: 'review',
       subject: '',
       summary: '',
@@ -168,6 +166,9 @@ describe('Feedback Tab Component', function() {
       last_updated_msecs: 0,
       message_count: 1,
       thread_id: '1',
+      state_name: '',
+      last_nonempty_message_author: '',
+      last_nonempty_message_text: ''
     }, {
       suggestion_type: 'edit_exploration_state_content',
       suggestion_id: '1',
@@ -177,8 +178,9 @@ describe('Feedback Tab Component', function() {
       author_name: '',
       change: {
         state_name: '',
-        new_value: '',
-        old_value: '',
+        new_value: {html: ''},
+        old_value: {html: ''},
+        skill_id: '',
       },
       last_updated_msecs: 0
     });
@@ -221,7 +223,7 @@ describe('Feedback Tab Component', function() {
   it('should add new message to a thread and then go back to feedback' +
     ' threads list', function() {
     spyOn(threadDataBackendApiService, 'getThread').and.returnValue(
-      suggestionThreadObjectFactory.createFromBackendDicts({
+      SuggestionThread.createFromBackendDicts({
         status: 'Open',
         subject: '',
         summary: '',
@@ -229,6 +231,9 @@ describe('Feedback Tab Component', function() {
         last_updated_msecs: 0,
         message_count: 1,
         thread_id: '1',
+        state_name: '',
+        last_nonempty_message_author: '',
+        last_nonempty_message_text: ''
       }, {
         suggestion_type: 'edit_exploration_state_content',
         suggestion_id: '1',
@@ -238,8 +243,9 @@ describe('Feedback Tab Component', function() {
         author_name: '',
         change: {
           state_name: '',
-          new_value: '',
-          old_value: '',
+          new_value: {html: ''},
+          old_value: {html: ''},
+          skill_id: '',
         },
         last_updated_msecs: 0
       }));
@@ -269,7 +275,7 @@ describe('Feedback Tab Component', function() {
   it('should use reject handler when trying to add a message in a thread fails',
     function() {
       spyOn(threadDataBackendApiService, 'getThread').and.returnValue(
-        suggestionThreadObjectFactory.createFromBackendDicts({
+        SuggestionThread.createFromBackendDicts({
           status: 'Open',
           subject: '',
           summary: '',
@@ -277,6 +283,9 @@ describe('Feedback Tab Component', function() {
           last_updated_msecs: 0,
           message_count: 1,
           thread_id: '1',
+          state_name: '',
+          last_nonempty_message_author: '',
+          last_nonempty_message_text: ''
         }, {
           suggestion_type: 'edit_exploration_state_content',
           suggestion_id: '1',
@@ -286,8 +295,9 @@ describe('Feedback Tab Component', function() {
           author_name: '',
           change: {
             state_name: '',
-            new_value: '',
-            old_value: '',
+            new_value: {html: ''},
+            old_value: {html: ''},
+            skill_id: '',
           },
           last_updated_msecs: 0
         }));
@@ -308,7 +318,7 @@ describe('Feedback Tab Component', function() {
 
   it('should evaluate suggestion button type to be default when a feedback' +
     ' thread is selected', function() {
-    var thread = suggestionThreadObjectFactory.createFromBackendDicts({
+    var thread = SuggestionThread.createFromBackendDicts({
       status: 'open',
       subject: '',
       summary: '',
@@ -316,6 +326,9 @@ describe('Feedback Tab Component', function() {
       last_updated_msecs: 0,
       message_count: 1,
       thread_id: '1',
+      state_name: '',
+      last_nonempty_message_author: '',
+      last_nonempty_message_text: ''
     }, {
       suggestion_type: 'edit_exploration_state_content',
       suggestion_id: '1',
@@ -325,8 +338,9 @@ describe('Feedback Tab Component', function() {
       author_name: '',
       change: {
         state_name: '',
-        new_value: '',
-        old_value: '',
+        new_value: {html: ''},
+        old_value: {html: ''},
+        skill_id: '',
       },
       last_updated_msecs: 0
     });
@@ -342,7 +356,7 @@ describe('Feedback Tab Component', function() {
 
   it('should evaluate suggestion button type to be primary when a feedback' +
     ' thread is selected', function() {
-    var thread = suggestionThreadObjectFactory.createFromBackendDicts({
+    var thread = SuggestionThread.createFromBackendDicts({
       status: 'review',
       subject: '',
       summary: '',
@@ -350,6 +364,9 @@ describe('Feedback Tab Component', function() {
       last_updated_msecs: 0,
       message_count: 1,
       thread_id: '1',
+      state_name: '',
+      last_nonempty_message_author: '',
+      last_nonempty_message_text: ''
     }, {
       suggestion_type: 'edit_exploration_state_content',
       suggestion_id: '1',
@@ -359,8 +376,9 @@ describe('Feedback Tab Component', function() {
       author_name: '',
       change: {
         state_name: '',
-        new_value: '',
-        old_value: '',
+        new_value: {html: ''},
+        old_value: {html: ''},
+        skill_id: '',
       },
       last_updated_msecs: 0
     });
@@ -387,7 +405,7 @@ describe('Feedback Tab Component', function() {
   it('should open show suggestion modal when active thread exists', function() {
     var getThreadSpy = spyOn(threadDataBackendApiService, 'getThread');
     getThreadSpy.and.returnValue(
-      suggestionThreadObjectFactory.createFromBackendDicts({
+      SuggestionThread.createFromBackendDicts({
         status: 'Open',
         subject: '',
         summary: '',
@@ -396,7 +414,8 @@ describe('Feedback Tab Component', function() {
         message_count: 1,
         thread_id: '1',
         last_nonempty_message_author: 'Message 1',
-        last_nonempty_message_text: 'Message 2'
+        last_nonempty_message_text: 'Message 2',
+        state_name: ''
       }, {
         suggestion_type: 'edit_exploration_state_content',
         suggestion_id: '1',
@@ -406,8 +425,9 @@ describe('Feedback Tab Component', function() {
         author_name: '',
         change: {
           state_name: '',
-          new_value: '',
-          old_value: '',
+          new_value: {html: ''},
+          old_value: {html: ''},
+          skill_id: '',
         },
         last_updated_msecs: 0
       }));
@@ -422,7 +442,7 @@ describe('Feedback Tab Component', function() {
       });
 
     getThreadSpy.and.returnValue(
-      suggestionThreadObjectFactory.createFromBackendDicts({
+      SuggestionThread.createFromBackendDicts({
         status: 'Review',
         subject: '',
         summary: '',
@@ -431,7 +451,8 @@ describe('Feedback Tab Component', function() {
         message_count: 1,
         thread_id: '2',
         last_nonempty_message_author: 'Message 1',
-        last_nonempty_message_text: 'Message 2'
+        last_nonempty_message_text: 'Message 2',
+        state_name: ''
       }, {
         suggestion_type: 'edit_exploration_state_content',
         suggestion_id: '2',
@@ -441,8 +462,9 @@ describe('Feedback Tab Component', function() {
         author_name: '',
         change: {
           state_name: '',
-          new_value: '',
-          old_value: '',
+          new_value: {html: ''},
+          old_value: {html: ''},
+          skill_id: '',
         },
         last_updated_msecs: 0
       }));

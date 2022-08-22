@@ -54,7 +54,7 @@ interface StateIdsAndData {
   stateData: StateData;
 }
 
-interface ProcessedStateIdsAndData {
+export interface ProcessedStateIdsAndData {
   nodes: StateData;
   links: StateLink[];
   originalStateIds: StateIds;

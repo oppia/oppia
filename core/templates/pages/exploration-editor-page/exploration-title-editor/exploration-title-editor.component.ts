@@ -15,44 +15,59 @@
 /**
  * @fileoverview Component for the exploration title field in forms.
  */
-require('pages/exploration-editor-page/services/router.service.ts');
-require('services/stateful/focus-manager.service.ts');
 
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { downgradeComponent } from '@angular/upgrade/static';
 import { Subscription } from 'rxjs';
+import { RouterService } from 'pages/exploration-editor-page/services/router.service';
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
+import { AppConstants } from 'app.constants';
+import { ExplorationTitleService } from '../services/exploration-title.service';
 
-angular.module('oppia').component('explorationTitleEditor', {
-  bindings: {
-    // The text for the label of the field.
-    labelText: '@',
-    // Value to move focus on the element.
-    focusLabel: '@',
-    // Additional CSS style to define the width and font-weight.
-    formStyle: '@',
-    // The method to call when the input field is blured.
-    onInputFieldBlur: '&'
-  },
-  template: require('./exploration-title-editor.component.html'),
-  controller: [
-    '$scope', 'ExplorationTitleService', 'FocusManagerService',
-    'RouterService', 'MAX_CHARS_IN_EXPLORATION_TITLE',
-    function(
-        $scope, ExplorationTitleService, FocusManagerService,
-        RouterService, MAX_CHARS_IN_EXPLORATION_TITLE) {
-      $scope.explorationTitleService = ExplorationTitleService;
-      var ctrl = this;
-      ctrl.directiveSubscriptions = new Subscription();
-      ctrl.$onInit = function() {
-        ctrl.MAX_CHARS_IN_EXPLORATION_TITLE = MAX_CHARS_IN_EXPLORATION_TITLE;
-        ctrl.directiveSubscriptions.add(
-          RouterService.onRefreshSettingsTab.subscribe(
-            () => {
-              FocusManagerService.setFocus(ctrl.focusLabel);
-            }
-          )
-        );
-      };
-      ctrl.$onDestroy = function() {
-        ctrl.directiveSubscriptions.unsubscribe();
-      };
-    }]
-});
+@Component({
+  selector: 'oppia-exploration-title-editor',
+  templateUrl: './exploration-title-editor.component.html'
+})
+export class ExplorationTitleEditorComponent implements OnInit, OnDestroy {
+  directiveSubscriptions = new Subscription();
+
+  @Input() labelText: string;
+  @Input() titleEditorClass: string;
+  @Input() formStyle: string;
+  @Input() focusLabel: string;
+  @Output() onInputFieldBlur = new EventEmitter<void>();
+
+  MAX_CHARS_IN_EXPLORATION_TITLE: number;
+
+  constructor(
+    private focusManagerService: FocusManagerService,
+    private routerService: RouterService,
+    private explorationTitleService: ExplorationTitleService,
+  ) { }
+
+  inputFieldBlur(): void {
+    this.onInputFieldBlur.emit();
+  }
+
+  ngOnInit(): void {
+    this.MAX_CHARS_IN_EXPLORATION_TITLE = (
+      AppConstants.MAX_CHARS_IN_EXPLORATION_TITLE);
+
+    this.directiveSubscriptions.add(
+      this.routerService.onRefreshSettingsTab.subscribe(
+        () => {
+          this.focusManagerService.setFocus(this.focusLabel);
+        }
+      )
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
+  }
+}
+
+angular.module('oppia').directive(
+  'oppiaExplorationTitleEditor', downgradeComponent({
+    component: ExplorationTitleEditorComponent
+  }));

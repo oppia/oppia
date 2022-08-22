@@ -28,12 +28,13 @@ import { StateEditorRefreshService } from
 import { ReadOnlyExplorationBackendApiService } from
   'domain/exploration/read-only-exploration-backend-api.service';
 import { importAllAngularServices } from 'tests/unit-test-utils.ajs';
+require('services/ngb-modal.service.ts');
 
 describe('Unresolved Answers Overview Component', function() {
   var $q = null;
   var $rootScope = null;
   var $scope = null;
-  var $uibModal = null;
+  var ngbModal = null;
   var editabilityService = null;
   var explorationStatesService = null;
   var improvementsService = null;
@@ -82,7 +83,7 @@ describe('Unresolved Answers Overview Component', function() {
   beforeEach(angular.mock.inject(function($injector, $componentController) {
     $q = $injector.get('$q');
     $rootScope = $injector.get('$rootScope');
-    $uibModal = $injector.get('$uibModal');
+    ngbModal = $injector.get('NgbModal');
     explorationStatesService = $injector.get('ExplorationStatesService');
     improvementsService = $injector.get('ImprovementsService');
     stateEditorService = $injector.get('StateEditorService');
@@ -176,17 +177,17 @@ describe('Unresolved Answers Overview Component', function() {
   });
 
   it('should open teach oppia modal', function() {
-    spyOn($uibModal, 'open').and.callThrough();
+    spyOn(ngbModal, 'open').and.callThrough();
 
     $scope.openTeachOppiaModal();
 
-    expect($uibModal.open).toHaveBeenCalled();
+    expect(ngbModal.open).toHaveBeenCalled();
   });
 
   it('should emit externalSave when closing the modal', function() {
     spyOn(mockExternalSaveEventEmitter, 'emit').and.callThrough();
-    spyOn($uibModal, 'open').and.returnValue({
-      result: $q.resolve()
+    spyOn(ngbModal, 'open').and.returnValue({
+      result: Promise.resolve()
     });
 
     $scope.openTeachOppiaModal();
@@ -198,7 +199,7 @@ describe('Unresolved Answers Overview Component', function() {
   it('should broadcast externalSave flag when dismissing the modal',
     function() {
       spyOn(mockExternalSaveEventEmitter, 'emit').and.callThrough();
-      spyOn($uibModal, 'open').and.returnValue({
+      spyOn(ngbModal, 'open').and.returnValue({
         result: $q.reject()
       });
 

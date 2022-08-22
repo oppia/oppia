@@ -171,7 +171,7 @@ class TestingTaskSpec:
         if self.generate_coverage_report:
             exc_list = [
                 sys.executable, '-m', 'coverage', 'run',
-                TEST_RUNNER_PATH, test_target_flag
+                '--branch', TEST_RUNNER_PATH, test_target_flag
             ]
             rand = ''.join(random.choices(string.ascii_lowercase, k=16))
             data_file = '.coverage.%s.%s.%s' % (
@@ -295,12 +295,16 @@ def _check_shards_match_tests(include_load_tests=True):
     shard_modules_set = set(shard_modules)
     shard_extra = shard_modules_set - test_modules_set
     if shard_extra:
-        return 'Modules {} in shards not found. See {}.'.format(
-            shard_extra, SHARDS_WIKI_LINK)
+        return (
+            'Modules {} are in the backend test shards but missing from the '
+            'filesystem. See {}.'
+        ).format(shard_extra, SHARDS_WIKI_LINK)
     test_extra = test_modules_set - shard_modules_set
     assert test_extra
-    return 'Modules {} not in shards. See {}.'.format(
-        test_extra, SHARDS_WIKI_LINK)
+    return (
+        'Modules {} are present on the filesystem but are not listed in the '
+        'backend test shards. See {}.'
+    ).format(test_extra, SHARDS_WIKI_LINK)
 
 
 def _load_coverage_exclusion_list(path):
@@ -585,7 +589,7 @@ def _check_coverage(
         )
     else:
         coverage_result = re.search(
-            r'TOTAL\s+(\d+)\s+(\d+)\s+(?P<total>\d+)%\s+',
+            r'TOTAL\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(?P<total>\d+)%\s+',
             process.stdout)
         coverage = float(coverage_result.group('total'))
 

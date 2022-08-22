@@ -101,7 +101,7 @@ describe('Translation opportunities component', () => {
         topic_name: 'topic_1',
         story_title: 'Story title 1',
         chapter_title: 'Chapter title 1',
-        content_count: 1,
+        content_count: 4,
         translation_counts: {
           en: 2
         },
@@ -114,7 +114,7 @@ describe('Translation opportunities component', () => {
         topic_name: 'topic_2',
         story_title: 'Story title 2',
         chapter_title: 'Chapter title 2',
-        content_count: 2,
+        content_count: 10,
         translation_counts: {
           en: 4
         },
@@ -171,6 +171,106 @@ describe('Translation opportunities component', () => {
         expect(opportunitiesDicts.length).toBe(2);
         expect(more).toBeFalse();
       });
+  });
+
+  it('should move opportunities with no translatable cards to the bottom ' +
+    'of opportunity list', () => {
+    spyOn(translationLanguageService, 'getActiveLanguageCode').and.returnValue(
+      'en');
+
+    const {opportunitiesDicts, } = (
+      component.getPresentableOpportunitiesData({
+        opportunities: opportunitiesArray,
+        more: false
+      }));
+
+    expect(opportunitiesDicts.length).toBe(2);
+    expect(
+      opportunitiesDicts[opportunitiesDicts.length - 1].translationsCount +
+      opportunitiesDicts[opportunitiesDicts.length - 1].inReviewCount ===
+      opportunitiesDicts[opportunitiesDicts.length - 1].totalCount).toBeTrue();
+    expect(opportunitiesDicts).toEqual([{
+      id: '2',
+      heading: 'Chapter title 2',
+      subheading: 'topic_2 - Story title 2',
+      progressPercentage: '40.00',
+      actionButtonTitle: 'Translate',
+      inReviewCount: 4,
+      totalCount: 10,
+      translationsCount: 4,
+    },
+    {
+      id: '1',
+      heading: 'Chapter title 1',
+      subheading: 'topic_1 - Story title 1',
+      progressPercentage: '50.00',
+      actionButtonTitle: 'Translate',
+      inReviewCount: 2,
+      totalCount: 4,
+      translationsCount: 2,
+    }
+    ]);
+  });
+
+  it('should not chagne contents of each opportunity when get presentable ' +
+    'opportunities', () => {
+    spyOn(translationLanguageService, 'getActiveLanguageCode').and.returnValue(
+      'en');
+
+    expect(component.allOpportunities).toEqual({});
+
+    const {opportunitiesDicts, } = (
+      component.getPresentableOpportunitiesData({
+        opportunities: opportunitiesArray,
+        more: false
+      }));
+
+    expect(Object.keys(component.allOpportunities).length).toEqual(2);
+    expect(component.allOpportunities['1']).toEqual({
+      id: '1',
+      heading: 'Chapter title 1',
+      subheading: 'topic_1 - Story title 1',
+      progressPercentage: '50.00',
+      actionButtonTitle: 'Translate',
+      inReviewCount: 2,
+      totalCount: 4,
+      translationsCount: 2,
+    });
+    expect(component.allOpportunities['2']).toEqual({
+      id: '2',
+      heading: 'Chapter title 2',
+      subheading: 'topic_2 - Story title 2',
+      progressPercentage: '40.00',
+      actionButtonTitle: 'Translate',
+      inReviewCount: 4,
+      totalCount: 10,
+      translationsCount: 4,
+    });
+
+    expect(opportunitiesDicts.length).toBe(2);
+    expect(opportunitiesDicts.sort((a, b) => {
+      return parseInt(a.id) - parseInt(b.id);
+    })).toEqual([{
+      id: '1',
+      heading: 'Chapter title 1',
+      subheading: 'topic_1 - Story title 1',
+      progressPercentage: '50.00',
+      actionButtonTitle: 'Translate',
+      inReviewCount: 2,
+      totalCount: 4,
+      translationsCount: 2,
+    },
+    {
+      id: '2',
+      heading: 'Chapter title 2',
+      subheading: 'topic_2 - Story title 2',
+      progressPercentage: '40.00',
+      actionButtonTitle: 'Translate',
+      inReviewCount: 4,
+      totalCount: 10,
+      translationsCount: 4,
+    }
+    ]);
   });
 
   it('should open translation modal when clicking button', fakeAsync(() => {
