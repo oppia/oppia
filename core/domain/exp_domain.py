@@ -3383,8 +3383,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
                 # Answer choices should be non-empty and unique.
                 # TODO: Make changes according to item selection.
-                choices, answer_groups = cls._choices_should_be_unique_and_non_empty(
+                choices, answer_groups = (
+                    cls._choices_should_be_unique_and_non_empty(
                         choices, answer_groups, True)
+                )
                 state_dict['interaction']['customization_args']['choices'][
                     'value'] = choices
 
@@ -3403,7 +3405,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
                     cls._equals_should_come_before_misplace_by_one_rule(
                         answer_groups)
                 )
-                state_dict['interaction']['answer_groups'] = answer_groups
                 multi_item_value = (
                     state_dict['interaction']['customization_args']
                     ['allowMultipleItemsInSamePosition']['value']
