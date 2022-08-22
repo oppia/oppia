@@ -4,7 +4,7 @@
   </h3>
   <i class="fa fa-times modal-close-button" ng-click="cancel()"></i>
 </div>
-<form ng-submit="save(nodeTitle)">
+<form ng-submit="saveAsync(nodeTitle)">
   <div class="modal-body create-new-chapter">
     <div class="chapter-input">
       <div class="chapter-input-header">
@@ -33,9 +33,11 @@
         <span>Exploration ID*</span>
       </div>
       <input ng-change="resetErrorMsg()" ng-model="explorationId" class="form-control e2e-test-chapter-exploration-input">
-      <span class="new-chapter-error-msg e2e-test-invalid-exp-id" ng-if="invalidExpId || explorationId && !validateExplorationId()">
-        <span><[invalidExpErrorString]></span>
-      </span>
+      <div ng-if="invalidExpId || explorationId && !validateExplorationId()">
+        <div ng-repeat="invalidExpErrorString in invalidExpErrorStrings" class="new-chapter-error-msg e2e-test-invalid-exp-id">
+          <span><[invalidExpErrorString]></span>
+        </div>
+      </div>
       <span class="new-chapter-error-msg" ng-if="correctnessFeedbackDisabled">
         <span><[correctnessFeedbackDisabledString]></span>
       </span>
