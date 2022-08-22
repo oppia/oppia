@@ -44,6 +44,8 @@ EXCLUDED_PHRASES = [
 ALLOWED_PRAGMAS_FOR_INLINE_COMMENTS = [
     'pylint:', 'isort:', 'type: ignore', 'pragma:', 'https:']
 
+ALLOWED_LINES_OF_GAP_IN_COMMENT = 10
+
 import astroid  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
 from pylint import checkers  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
 from pylint import interfaces  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
@@ -1929,8 +1931,6 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):
 
     __implements__ = interfaces.ITokenChecker
 
-    ALLOWED_LINES_OF_GAP = 10
-
     name = 'type-ignore-comment'
     priority = -1
     msgs = {
@@ -1977,7 +1977,7 @@ class TypeIgnoreCommentChecker(checkers.BaseChecker):
                         type_ignore_comment_present and
                         line_num <= (
                             comment_line_number +
-                            self.ALLOWED_LINES_OF_GAP
+                            ALLOWED_LINES_OF_GAP_IN_COMMENT
                         )
                     ):
                         type_ignore_comment_present = False
@@ -2032,8 +2032,6 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
     """Custom pylint checker which checks that there is always a comment
     for exceptional types in the backend type annotations.
     """
-
-    ALLOWED_LINES_OF_GAP = 10
 
     EXCEPTIONAL_TYPE_STATUS_DICT = {
         'type_comment_present': False,
@@ -2217,17 +2215,15 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
                     type_comment_present and
                     func_def_start_line <= (
                         type_comment_line_num +
-                        self.ALLOWED_LINES_OF_GAP
+                        ALLOWED_LINES_OF_GAP_IN_COMMENT
                     )
                 ):
                     type_comment_present = False
                 else:
-                    if exceptional_type == 'Any':
-                        self.add_message(
-                            'any-type-used', line=func_def_start_line)
-                    if exceptional_type == 'object':
-                        self.add_message(
-                            'object-class-used', line=func_def_start_line)
+                    self._add_exceptional_type_error_message(
+                        exceptional_type,
+                        func_def_start_line
+                    )
 
                 type_present_in_function_signature = False
                 type_present_inside_arg_section = False
@@ -2253,17 +2249,14 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
                     type_comment_present and
                     line_num <= (
                         type_comment_line_num +
-                        self.ALLOWED_LINES_OF_GAP
+                        ALLOWED_LINES_OF_GAP_IN_COMMENT
                     )
                 ):
                     type_comment_present = False
                 else:
-                    if exceptional_type == 'Any':
-                        self.add_message(
-                            'any-type-used', line=line_num)
-                    if exceptional_type == 'object':
-                        self.add_message(
-                            'object-class-used', line=line_num)
+                    self._add_exceptional_type_error_message(
+                        exceptional_type, line_num
+                    )
 
         # Updating the 'type_status_dict' dictionary so that previous data of
         # exceptional types don't get lost.
@@ -2286,6 +2279,25 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
         type_status_dict['type_comment_present'] = type_comment_present
         type_status_dict['type_comment_line_num'] = type_comment_line_num
         type_status_dict['func_def_start_line'] = func_def_start_line
+
+    def _add_exceptional_type_error_message(self, exceptional_type, line_num):
+        """This method should be called only when an exceptional type error is
+        encountered. If exceptional type is Any then 'any-type-used' error
+        message is added, and for object 'object-class-used' is added.
+
+        Args:
+            exceptional_type: str. The exceptional type for which this method
+                is called, Possible values can be 'Any' or 'object'.
+            line_num: int. The line number where error is encountered.
+        """
+        if exceptional_type == 'Any':
+            self.add_message(
+                'any-type-used', line=line_num
+            )
+        if exceptional_type == 'object':
+            self.add_message(
+                'object-class-used', line=line_num
+            )
 
     def check_comment_is_present_with_object_class(self, tokens):
         """Checks whether the object class in a module has been documented
@@ -2358,7 +2370,7 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
                     cast_comment_present and
                     line_num <= (
                         cast_comment_line_num +
-                        self.ALLOWED_LINES_OF_GAP
+                        ALLOWED_LINES_OF_GAP_IN_COMMENT
                     )
                 ):
                     cast_comment_present = False
