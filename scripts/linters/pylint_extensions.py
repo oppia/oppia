@@ -2283,11 +2283,12 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
     def _add_exceptional_type_error_message(self, exceptional_type, line_num):
         """This method should be called only when an exceptional type error is
         encountered. If exceptional type is Any then 'any-type-used' error
-        message is added, and for object 'object-class-used' is added.
+        message is added, for object 'object-class-used' is added and for cast
+        'cast-func-used' is added.
 
         Args:
             exceptional_type: str. The exceptional type for which this method
-                is called, Possible values can be 'Any' or 'object'.
+                is called, Possible values can be 'Any', 'object' and 'cast'.
             line_num: int. The line number where error is encountered.
         """
         if exceptional_type == 'Any':
@@ -2297,6 +2298,10 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
         if exceptional_type == 'object':
             self.add_message(
                 'object-class-used', line=line_num
+            )
+        if exceptional_type == 'cast':
+            self.add_message(
+                'cast-func-used', line=line_num
             )
 
     def check_comment_is_present_with_object_class(self, tokens):
@@ -2375,8 +2380,7 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):
                 ):
                     cast_comment_present = False
                 else:
-                    self.add_message(
-                        'cast-func-used', line=line_num)
+                    self._add_exceptional_type_error_message('cast', line_num)
 
     def check_comment_is_present_with_any_type(self, tokens):
         """Checks whether the Any type in a module has been documented
