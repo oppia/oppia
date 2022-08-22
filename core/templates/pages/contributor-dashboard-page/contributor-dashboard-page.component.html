@@ -6,7 +6,8 @@
             class="oppia-opportunities-tab-item"
             *ngFor="let item of tabsDetails | keyvalue"
             [attr.aria-label]="item.value.ariaLabel">
-          <div *ngIf="item.value.enabled">
+          <div *ngIf="item.value.enabled"
+                class="oppia-tabs-container">
             <a role="button"
                (click)="onTabClick(item.key)"
                href="#"
@@ -246,6 +247,9 @@
   </div>
 </div>
 <style>
+  .oppia-tabs-container {
+    text-align: center;
+  }
   .oppia-language-container {
     display: flex;
     flex-direction: row;
@@ -453,6 +457,7 @@
     font-size: 18px;
     font-weight: bold;
     padding: 10px;
+    text-align: center;
     text-decoration: none;
     -webkit-transition: color 200ms ease-out;
     -ms-transition: color 200ms ease-out;
@@ -635,8 +640,8 @@
       width: 100%;
     }
     .oppia-dashboard-language-container-label, .oppia-dashboard-topic-container-label {
-      font-size: 18px;
-      margin-right: 10px;
+      font-size: 16px;
+      margin-right: 0;
       padding: auto 0;
       width: 175px;
     }
@@ -646,6 +651,7 @@
     }
     .oppia-opportunities-tabs-text {
       font-size: 18px;
+      text-align: center;
     }
     .oppia-contributor-username-and-review-rights-container {
       align-items: initial;
@@ -692,6 +698,7 @@
     .oppia-opportunities-tabs-text {
       font-size: 15px;
       padding: 10px 5px;
+      text-align: center;
     }
     .oppia-collapsed-opportunities-tab-header {
       align-items: center;
@@ -737,9 +744,12 @@
       width: 90%;
     }
     .oppia-dashboard-language-container-label, .oppia-dashboard-topic-container-label {
-      font-size: 18px;
+      font-size: 16px;
       margin-right: 2vw;
       width: 90px;
+    }
+    .oppia-dashboard-topic-container-label {
+      margin-right: 0;
     }
     .oppia-mascot-container {
       border-bottom: 1px solid rgba(151, 151, 151, 0.5);

@@ -65,7 +65,7 @@ implements AfterViewInit, ControlValueAccessor, Validator {
   }
 
   @Output() localValueChange = new EventEmitter();
-  constructor(private elementRef: ElementRef) { }
+  constructor(public elementRef: ElementRef) { }
 
   // Implemented as a part of ControlValueAccessor interface.
   writeValue(value: SchemaDefaultValue): void {

@@ -18,7 +18,7 @@
 
 import isEqual from 'lodash/isEqual';
 
-import { ChangeDetectorRef, Component, Input } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, Input, ViewChild } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
@@ -38,6 +38,7 @@ import {
   TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING,
   TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING
 } from 'domain/exploration/WrittenTranslationObjectFactory';
+import { RteOutputDisplayComponent } from 'rich_text_components/rte-output-display.component';
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
@@ -47,6 +48,12 @@ class UiConfig {
   'language'?: string;
   'languageDirection'?: string;
 }
+
+enum ExpansionTabType {
+  CONTENT,
+  TRANSLATION
+}
+
 export interface TranslationOpportunity {
   id: string;
   heading: string;
@@ -123,12 +130,24 @@ export class TranslationModalComponent {
   hasImgTextError = false;
   hasIncompleteTranslationError = false;
   editorIsShown = true;
+  isContentExpanded: boolean = false;
+  isTranslationExpanded: boolean = true;
+  isContentOverflowing: boolean = false;
   ALLOWED_CUSTOM_TAGS_IN_TRANSLATION_SUGGESTION = [
     'oppia-noninteractive-image',
     'oppia-noninteractive-link',
     'oppia-noninteractive-math',
     'oppia-noninteractive-skillreview'
   ];
+
+  @ViewChild('contentPanel')
+    contentPanel!: RteOutputDisplayComponent;
+
+  @ViewChild('contentContainer')
+    contentContainer!: ElementRef;
+
+  @ViewChild('translationContainer')
+    translationContainer!: ElementRef;
 
   constructor(
     private readonly activeModal: NgbActiveModal,
@@ -189,6 +208,20 @@ export class TranslationModalComponent {
     };
   }
 
+  ngAfterViewInit(): void {
+    setTimeout(() => {
+      this.computePanelOverflowState();
+    }, 100);
+  }
+
+  computePanelOverflowState(): void {
+    setTimeout(() => {
+      this.isContentOverflowing = (
+        this.contentPanel.elementRef.nativeElement.offsetHeight >
+        this.contentContainer.nativeElement.offsetHeight);
+    }, 0);
+  }
+
   // TODO(#13221): Remove this method completely after the change detection
   // issues in schema-based-editor have been resolved. The current workaround
   // used is to destroy and re-render the component in the view.
@@ -235,6 +268,14 @@ export class TranslationModalComponent {
     this.activeRuleDescription = this.getRuleDescription(
       ruleType, interactionId
     );
+  }
+
+  toggleExpansionState(tab: ExpansionTabType): void {
+    if (tab === ExpansionTabType.CONTENT) {
+      this.isContentExpanded = !this.isContentExpanded;
+    } else if (tab === ExpansionTabType.TRANSLATION) {
+      this.isTranslationExpanded = !this.isTranslationExpanded;
+    }
   }
 
   onContentClick(event: MouseEvent): boolean | void {
