@@ -142,7 +142,7 @@ export class EditorNavigationComponent
     return this.explorationWarningsService.countWarnings();
   }
 
-  getWarnings(): object[] {
+  getWarnings(): string[] | object[] {
     return this.explorationWarningsService.getWarnings();
   }
 

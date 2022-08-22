@@ -187,7 +187,7 @@ describe('Exploration Metadata Modal Component', () => {
       explorationStatesService = TestBed.inject(ExplorationStatesService);
       explorationTagsService = TestBed.inject(ExplorationTagsService);
       explorationTitleService = TestBed.inject(ExplorationTitleService);
-
+      ngbActiveModal = TestBed.inject(NgbActiveModal);
       explorationObjectiveService.init('');
       explorationTitleService.init('');
       explorationCategoryService.init('Generic category');
@@ -205,7 +205,7 @@ describe('Exploration Metadata Modal Component', () => {
       expect(component.isSavingAllowed()).toBe(false);
 
       component.save();
-      tick();
+      tick(500);
 
       expect(alertsService.addWarning).toHaveBeenCalledWith(
         'Please specify a title');
