@@ -60,7 +60,7 @@ export class EventBusService {
           action.call(callbackContext, event);
         } catch (error: unknown) {
           if (error instanceof Error) {
-            this._errorHandler(error as Error);
+            this._errorHandler(error);
           } else {
             throw error;
           }
