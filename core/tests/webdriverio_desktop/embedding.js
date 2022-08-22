@@ -32,10 +32,6 @@ describe('Embedding', function() {
   var explorationEditorSettingsTab = null;
   var explorationPlayerPage = null;
 
-  explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
-  explorationEditorMainTab = explorationEditorPage.getMainTab();
-  explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
-
   var createCountingExploration = async function() {
     // Intro.
     await explorationEditorMainTab.setStateName('Intro');
@@ -120,6 +116,12 @@ describe('Embedding', function() {
     '\'X-Frame-Options\' to \'deny\'.',
   ];
 
+  beforeAll(async() => {
+    explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+    explorationEditorMainTab = explorationEditorPage.getMainTab();
+    explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
+  });
+
   beforeEach(function() {
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
@@ -178,9 +180,7 @@ describe('Embedding', function() {
     await explorationEditorPage.publishChanges('demonstration edit');
 
     for (var i = 0; i < TEST_PAGES.length; i++) {
-      // This is necessary as the pages are non-angular.
-      var driver = browser.driver;
-      await driver.get(
+      await browser.url(
         general.SERVER_URL_PREFIX + general.SCRIPTS_URL_SLICE +
         TEST_PAGES[i].filename);
 
@@ -260,8 +260,7 @@ describe('Embedding', function() {
       // correct.
       var explorationId = null;
       var checkPlaceholder = async function(expectedPlaceholder) {
-        var driver = browser.driver;
-        await driver.get(
+        await browser.url(
           general.SERVER_URL_PREFIX + general.SCRIPTS_URL_SLICE +
           'embedding_tests_dev_i18n_0.0.1.html');
 
@@ -295,7 +294,7 @@ describe('Embedding', function() {
       explorationId = await general.getExplorationIdFromEditor();
 
       await explorationEditorMainTab.setContent(
-        await forms.toRichText('Language Test'));
+        await forms.toRichText('Language Test'), true);
       await explorationEditorMainTab.setInteraction('NumericInput');
       await explorationEditorMainTab.addResponse(
         'NumericInput', await forms.toRichText('Nice!!'),
@@ -308,7 +307,8 @@ describe('Embedding', function() {
       await responseEditor.setDestination('(try again)', null, false);
 
       await explorationEditorMainTab.moveToState('END');
-      await explorationEditorMainTab.setContent(await forms.toRichText('END'));
+      await explorationEditorMainTab.setContent(
+        await forms.toRichText('END'), true);
       await explorationEditorMainTab.setInteraction('EndExploration');
 
       // Save changes.
@@ -327,7 +327,7 @@ describe('Embedding', function() {
       // Change language to Thai, which is not a supported site language.
       await general.openEditor(explorationId, false);
       await explorationEditorPage.navigateToSettingsTab();
-      await explorationEditorSettingsTab.setLanguage('ภาษาไทย');
+      await explorationEditorSettingsTab.setLanguage('ภาษาไทย (Thai)');
       await explorationEditorPage.publishChanges(
         'Changing the language to a not supported one.');
       // We expect the default language, English.
@@ -336,7 +336,7 @@ describe('Embedding', function() {
       // Change language to Spanish, which is a supported site language.
       await general.openEditor(explorationId, false);
       await explorationEditorPage.navigateToSettingsTab();
-      await explorationEditorSettingsTab.setLanguage('español');
+      await explorationEditorSettingsTab.setLanguage('español (Spanish)');
       await explorationEditorPage.publishChanges(
         'Changing the language to a supported one.');
       await checkPlaceholder('Ingresa un número');

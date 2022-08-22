@@ -49,6 +49,8 @@ var ExplorationEditorHistoryTab = function() {
     return $$('.e2e-test-history-list-options');
   };
   var confirmRevertVersionButton = $('.e2e-test-confirm-revert');
+  var viewMetadataHistoryButton = $('.e2e-test-view-metadata-history');
+  var closeMetadataHistoryButton = $('.e2e-test-close-history-metadata-modal');
 
   /*
    * Display
@@ -90,6 +92,7 @@ var ExplorationEditorHistoryTab = function() {
           return await stateNodeLabel(stateElement).getText();
         });
         var matched = false;
+        var stateNodes = await historyGraph.$$('.e2e-test-node');
         for (var i = 0; i < listOfNames.length; i++) {
           if (listOfNames[i] === stateName) {
             var stateNodeButton = stateNodes[i];
@@ -113,6 +116,21 @@ var ExplorationEditorHistoryTab = function() {
           closeStateHistoryButton,
           'Close State History button takes too long to disappear.');
       },
+      openExplorationMetadataHistory: async function() {
+        await action.click(
+          'View metadata changes button', viewMetadataHistoryButton);
+      },
+      closeExplorationMetadataHistory: async function() {
+        await waitFor.elementToBeClickable(
+          closeMetadataHistoryButton,
+          'Close metadata history button is not clickable');
+        expect(await closeMetadataHistoryButton.isDisplayed()).toBe(true);
+        await action.click(
+          'Close metadata history button', closeMetadataHistoryButton);
+        await waitFor.invisibilityOf(
+          closeMetadataHistoryButton,
+          'Close metadata history button takes too long to disappear.');
+      },
       deselectVersion: async function() {
         await waitFor.invisibilityOf(
           toastSuccessElement,
@@ -127,8 +145,14 @@ var ExplorationEditorHistoryTab = function() {
        */
       selectTwoVersions: async function(versionNumber1, versionNumber2) {
         // Array starts at 0.
+        await waitFor.visibilityOf(
+          firstVersionDropdown,
+          'First version dropdown takes too long to appear');
         await firstVersionDropdown.selectByVisibleText(versionNumber1);
 
+        await waitFor.visibilityOf(
+          secondVersionDropdown,
+          'Second version dropdown takes too long to appear');
         await secondVersionDropdown.selectByVisibleText(versionNumber2);
       },
       /*
@@ -152,7 +176,7 @@ var ExplorationEditorHistoryTab = function() {
             stateElement), 'State Node Label taking too long to appear');
           var label = await stateNodeLabel(stateElement).getText();
           var color = await stateNodeBackground(stateElement).getCSSProperty(
-            'fill');
+            'fill').value;
           return {
             label: label,
             color: color
@@ -183,7 +207,7 @@ var ExplorationEditorHistoryTab = function() {
         var deletedCount = 0;
         var historyGraphLink = historyGraph.$$('.e2e-test-link');
         await historyGraphLink.map(async function(link) {
-          var linkColor = await link.getCSSProperty('stroke');
+          var linkColor = await link.getCSSProperty('stroke').value;
           totalCount++;
           if (linkColor === COLOR_ADDED) {
             addedCount++;
@@ -238,12 +262,16 @@ var ExplorationEditorHistoryTab = function() {
        */
       expectTextWithHighlightingToMatch: async function(
           v1StateContents, v2StateContents) {
+        console.log(1);
         var codeMirrorElement = await codeMirrorElementSelector();
+        console.log(2);
         var lastElement = codeMirrorElement.length - 1;
+        console.log(3);
         await forms.CodeMirrorChecker(
           codeMirrorElement[0],
           'first'
         ).expectTextWithHighlightingToBe(v1StateContents);
+        console.log(4);
         await forms.CodeMirrorChecker(
           codeMirrorElement[lastElement],
           'last'

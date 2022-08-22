@@ -115,7 +115,6 @@ SUITES_MIGRATED_TO_WEBDRIVERIO = [
     'embedding',
     'explorationFeedbackTab',
     'explorationImprovementsTab',
-    'explorationHistoryTab',
     'explorationStatisticsTab',
     'explorationTranslationTab',
     'extensions',
@@ -136,6 +135,7 @@ SUITES_MIGRATED_TO_WEBDRIVERIO = [
 ]
 
 SUITES_STILL_IN_PROTRACTOR = [
+    'explorationHistoryTab',
     'featureGating',
     'fileUploadFeatures',
     'fileUploadExtensions',

@@ -650,11 +650,11 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
     var scrollBarWebElement = null;
     if (codeMirrorPaneToScroll === 'first') {
       var scrollBarElements = await $$('.CodeMirror-vscrollbar');
-      scrollBarWebElement = await scrollBarElements[0];
+      scrollBarWebElement = scrollBarElements[0];
     } else {
       var scrollBarElements = await $$('.CodeMirror-vscrollbar');
       var lastElement = scrollBarElements.length - 1;
-      scrollBarWebElement = await scrollBarElements[lastElement];
+      scrollBarWebElement = scrollBarElements[lastElement];
     }
     while (true) {
       // This is used to match and scroll the text in codemirror to a point
@@ -666,7 +666,7 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
       var lineHeight = await elem.$(
         codeMirrorLineNumberLocator).getAttribute('clientHeight');
       var currentScrollTop = await browser.execute(
-        'return $(arguments[0]).scrollTop;', scrollBarWebElement);
+        'return arguments[0].scrollTop;', scrollBarWebElement);
       if (currentScrollTop === prevScrollTop) {
         break;
       } else {
@@ -716,10 +716,13 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
      * expectTextToBe() function should be used when possible.
      */
     expectTextWithHighlightingToBe: async function(expectedTextDict) {
+      console.log(11);
       for (var lineNumber in expectedTextDict) {
         expectedTextDict[lineNumber].checked = false;
       }
+      console.log(12);
       await _compareText(expectedTextDict, true);
+      console.log(13);
     },
     /**
      * Compares text with codeMirror. The input should be a string (with
