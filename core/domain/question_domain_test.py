@@ -986,6 +986,10 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
         # Ruling out the possibility of None for mypy type checking.
         assert test_value['state']['interaction']['solution'] is not None
+        assert isinstance(
+            test_value['state']['interaction']['solution']['correct_answer'],
+            str
+        )
         self.assertNotIn(
             'ascii',
             test_value['state']['interaction']['solution']['correct_answer']
@@ -1777,9 +1781,16 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             test_solution_dict
         )
 
+        drag_and_drop_test_solution_dict = copy.deepcopy(test_solution_dict)
+        drag_and_drop_test_solution_dict['correct_answer'] = [
+            ['correct_value']
+        ]
+
         # Testing with interaction id 'DragAndDropSortInput'.
         test_value['state']['interaction']['id'] = 'DragAndDropSortInput'
-        test_value['state']['interaction']['solution'] = test_solution_dict
+        test_value['state']['interaction']['solution'] = (
+            drag_and_drop_test_solution_dict
+        )
         test_value['state']['interaction']['customization_args'] = {
             'choices': {
                 'value': [
@@ -1872,7 +1883,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         )
         self.assertEqual(
             test_value['state']['interaction']['solution'],
-            test_solution_dict
+            drag_and_drop_test_solution_dict
         )
 
     def test_question_state_dict_conversion_from_v42_to_v43(self) -> None:

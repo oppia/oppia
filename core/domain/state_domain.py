@@ -92,6 +92,11 @@ class StateVersionHistoryDict(TypedDict):
     committer_id: str
 
 
+AcceptableCorrectAnswerTypes = Union[
+    List[List[str]], List[str], str, Dict[str, str], int, List[int]
+]
+
+
 class AnswerGroup(translation_domain.BaseTranslatableObject):
     """Value object for an answer group. Answer groups represent a set of rules
     dictating whether a shared feedback should be shared with the user. These
@@ -440,15 +445,11 @@ class Hint(translation_domain.BaseTranslatableObject):
         return hint_dict
 
 
-# Here, correct_answer is annotated with Any type. Because correct_answer
-# can accept values of type List[Set[str]], List[str], str, int, Dict and
-# other types too. So, to make it generalized for every types of values.
-# We used Any type here.
 class SolutionDict(TypedDict):
     """Dictionary representing the Solution object."""
 
     answer_is_exclusive: bool
-    correct_answer: Any
+    correct_answer: AcceptableCorrectAnswerTypes
     explanation: SubtitledHtmlDict
 
 
@@ -463,15 +464,11 @@ class Solution(translation_domain.BaseTranslatableObject):
     an explanation for the solution.
     """
 
-    # Here, argument `correct_answer` is annotated with Any type. Because
-    # correct_answer can accept values of type List[Set[str]], List[str], str,
-    # int, Dict and other types too. So, to make it generalized for every types
-    # of values. We used Any type here.
     def __init__(
         self,
         interaction_id: str,
         answer_is_exclusive: bool,
-        correct_answer: Any,
+        correct_answer: AcceptableCorrectAnswerTypes,
         explanation: SubtitledHtml
     ) -> None:
         """Constructs a Solution domain object.
@@ -613,17 +610,42 @@ class Solution(translation_domain.BaseTranslatableObject):
                                 html_type ==
                                 feconf.ANSWER_TYPE_LIST_OF_SETS_OF_HTML):
 
+                            # Here correct_answer can only be of type
+                            # List[List[str]] because here html_type is
+                            # 'ListOfSetsOfHtmlStrings'.
+                            assert isinstance(
+                                solution_dict['correct_answer'], list
+                            )
                             for list_index, html_list in enumerate(
                                     solution_dict['correct_answer']):
+                                assert isinstance(html_list, list)
                                 for answer_html_index, answer_html in enumerate(
                                         html_list):
-                                    solution_dict['correct_answer'][list_index][
+                                    # MyPy does not allow indexing on union type
+                                    # and here correct_answer is a Union type of
+                                    # str, int and List[str]. So because of this
+                                    # MyPy throws an error. Thus to avoid the
+                                    # error, we used ignore here.
+                                    solution_dict['correct_answer'][list_index][  # type: ignore[index]
                                         answer_html_index] = (
                                             conversion_fn(answer_html))
                         elif html_type == feconf.ANSWER_TYPE_SET_OF_HTML:
+                            # Here correct_answer can only be of type
+                            # List[str] because here html_type is
+                            # 'SetOfHtmlString'.
+                            assert isinstance(
+                                solution_dict['correct_answer'], list
+                            )
                             for answer_html_index, answer_html in enumerate(
                                     solution_dict['correct_answer']):
-                                solution_dict['correct_answer'][
+                                assert isinstance(answer_html, str)
+                                # Here correct_answer is a Union type of
+                                # List[str], List[int] and List[List[str]], and
+                                # because of this MyPy is not able to set the
+                                # value properly and throwing an error for the
+                                # same. Thus to avoid the error, we used ignore
+                                # here.
+                                solution_dict['correct_answer'][  # type: ignore[call-overload]
                                     answer_html_index] = (
                                         conversion_fn(answer_html))
                         else:
