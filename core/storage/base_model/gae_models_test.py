@@ -214,7 +214,7 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         # Field last_updated won't get updated because update_last_updated_time
         # is set to False and last_updated already has some value.
         # Here we use cast because we are narrowing down the type from
-        # List[Optional[...]] to List[BaseModel].
+        # List[Optional[BaseModel]] to List[BaseModel].
         models_2_without_none = cast(
             List[base_models.BaseModel],
             base_models.BaseModel.get_multi(model_ids)
@@ -229,7 +229,7 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         # Field last_updated will get updated because update_last_updated_time
         # is set to True (by default).
         # Here we use cast because we are narrowing down the type from
-        # List[Optional[...]] to List[BaseModel].
+        # List[Optional[BaseModel]] to List[BaseModel].
         models_3_without_none = cast(
             List[base_models.BaseModel],
             base_models.BaseModel.get_multi(model_ids)

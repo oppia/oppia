@@ -27,7 +27,7 @@ from core.tests import test_utils
 
 from mypy_imports import app_feedback_report_models, base_models # isort:skip
 
-from typing import List, Any # isort:skip # pylint: disable=unused-import
+from typing import List # isort:skip # pylint: disable=unused-import
 
 (base_models, app_feedback_report_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.app_feedback_report])
@@ -347,7 +347,7 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
             with self.swap(
                 model_class, 'query',
                 self._mock_query_filters_returns_empy_list):
-                # Here we use MyPy ignore because we passes arg of type
+                # Here we use MyPy ignore because we pass an arg of type
                 # InvalidFilter to type class filter_field_names. This is done
                 # to ensure that InvalidInputException is thrown.
                 model_class.get_filter_options_for_field(

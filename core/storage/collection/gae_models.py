@@ -217,7 +217,7 @@ class CollectionModel(base_models.VersionedModel):
 
     # TODO(#15911): Here we use type Any because 'convert_to_valid_dict' method
     # accepts content NDB JSON properties and those NDB JSON properties have
-    # loose typing. So, once we explicitly typed those NDB JSON properties we
+    # loose typing. So, once we explicitly type those NDB JSON properties, we
     # can remove Any type from here.
     @staticmethod
     def convert_to_valid_dict(model_dict: Dict[str, Any]) -> Dict[str, Any]:
@@ -250,7 +250,7 @@ class CollectionModel(base_models.VersionedModel):
 
     # TODO(#15911): Here we use type Any because this '_reconstitute' method
     # accepts content NDB JSON properties and those NDB JSON properties have
-    # loose typing. So, once we explicitly typed those NDB JSON properties we
+    # loose typing. So, once we explicitly type those NDB JSON properties, we
     # can remove Any type from the argument of '_reconstitute' method.
     def _reconstitute(self, snapshot_dict: Dict[str, Any]) -> CollectionModel:
         """Populates the model instance with the snapshot.
@@ -328,7 +328,7 @@ class CollectionModel(base_models.VersionedModel):
         )
 
         # Here we use cast because the additional_models is list of BaseModels
-        # and we want to hint the mypy that this is CollectionRightsModel.
+        # and we want to hint the MyPy that this is CollectionRightsModel.
         collection_rights_model = cast(
             CollectionRightsModel, additional_models['rights_model']
         )
@@ -571,7 +571,7 @@ class CollectionRightsModel(base_models.VersionedModel):
 
     # TODO(#15911): Here we use type Any because 'convert_to_valid_dict' method
     # accepts content NDB JSON properties and those NDB JSON properties have
-    # loose typing. So, once we explicitly typed those NDB JSON properties we
+    # loose typing. So, once we explicitly type those NDB JSON properties, we
     # can remove Any type from here.
     @staticmethod
     def convert_to_valid_dict(model_dict: Dict[str, Any]) -> Dict[str, Any]:
@@ -616,7 +616,7 @@ class CollectionRightsModel(base_models.VersionedModel):
 
     # TODO(#15911): Here we use type Any because this '_reconstitute' method
     # accepts content NDB JSON properties and those NDB JSON properties have
-    # loose typing. So, once we explicitly typed those NDB JSON properties we
+    # loose typing. So, once we explicitly type those NDB JSON properties, we
     # can remove Any type from the argument of '_reconstitute' method.
     def _reconstitute(
         self, snapshot_dict: Dict[str, Any]
