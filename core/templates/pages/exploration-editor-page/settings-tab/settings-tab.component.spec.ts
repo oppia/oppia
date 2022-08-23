@@ -85,6 +85,7 @@ describe('Settings Tab Component', () => {
     canUnpublish: true,
     canManageVoiceArtist: true
   };
+  let mockExplorationTagsServiceonPropertyChanged = new EventEmitter();
   let mockEventEmitterRouterService = new EventEmitter();
   let mockEventEmitteruserExplorationPermissionsService = new EventEmitter();
 
@@ -181,6 +182,8 @@ describe('Settings Tab Component', () => {
       UserEmailPreferencesService);
     userService = TestBed.inject(UserService);
 
+    spyOnProperty(explorationTagsService, 'onExplorationPropertyChanged')
+      .and.returnValue(mockExplorationTagsServiceonPropertyChanged);
     spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
     spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
       .returnValue(Promise.resolve(userPermissions as ExplorationPermissions));
@@ -204,6 +207,7 @@ describe('Settings Tab Component', () => {
   it('should initialize controller properties after its initialization',
     fakeAsync(() => {
       component.ngOnInit();
+      mockExplorationTagsServiceonPropertyChanged.emit();
       tick(600);
       jasmine.createSpy('hasState').and.stub();
 

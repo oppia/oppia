@@ -16,7 +16,7 @@
  * @fileoverview Component for the exploration settings tab.
  */
 
-import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
@@ -120,7 +120,6 @@ export class SettingsTabComponent
   constructor(
     private alertsService: AlertsService,
     private changeListService: ChangeListService,
-    private changeDetectorRef: ChangeDetectorRef,
     private contextService: ContextService,
     private editabilityService: EditabilityService,
     private editableExplorationBackendApiService:
@@ -632,6 +631,16 @@ export class SettingsTabComponent
 
   ngOnInit(): void {
     this.directiveSubscriptions.add(
+      this.explorationTagsService.onExplorationPropertyChanged
+        .subscribe(
+          () => {
+            this.explorationTags = (
+              this.explorationTagsService.displayed as string[]);
+          }
+        )
+    );
+
+    this.directiveSubscriptions.add(
       this.routerService.onRefreshSettingsTab.subscribe(
         () => {
           // TODO(#15473): Remove this delay after this has been
@@ -710,16 +719,6 @@ export class SettingsTabComponent
     });
 
     this.filteredChoices = this.CATEGORY_LIST_FOR_SELECT2;
-    setTimeout(() => {
-      this.explorationTags = (
-        this.explorationTagsService.displayed as string[]);
-
-      if (!this.explorationTags) {
-        this.explorationTags = [];
-      }
-
-      this.changeDetectorRef.detectChanges();
-    }, 500);
   }
 
   ngOnDestroy(): void {
