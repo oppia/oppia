@@ -145,7 +145,6 @@ scripts.pre_commit_hook_test
 scripts.pre_push_hook_test
 scripts.release_scripts.repo_specific_changes_fetcher_test
 scripts.rtl_css_test
-scripts.run_backend_tests_test
 scripts.run_e2e_tests_test
 scripts.run_frontend_tests_test
 scripts.servers_test
