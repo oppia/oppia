@@ -2838,6 +2838,18 @@ class TranslatableItem:
             'rule_type': self.rule_type
         }
 
+    def is_set_data_format(self):
+        """Check whether the data format of the translatable content is set of
+        strings.
+
+        Returns:
+            bool. Whether the data format of the translatable content is set of
+            strings.
+        """
+        return self.data_format in [
+            TranslatableItem.DATA_FORMAT_SET_OF_NORMALIZED_STRING,
+            TranslatableItem.DATA_FORMAT_SET_OF_UNICODE_STRING]
+
 
 class StateDict(TypedDict):
     """Dictionary representing the State object."""
