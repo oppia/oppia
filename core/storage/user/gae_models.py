@@ -1644,12 +1644,12 @@ class ExplorationUserDataModel(base_models.BaseModel):
     def get_multi( # type: ignore[override]
         cls, user_id_exp_id_combinations: List[Tuple[str, str]]
     ) -> List[Optional[ExplorationUserDataModel]]:
-        """Gets all ExplorationUserDataModels for the given users for given
-        exploration ids.
+        """Gets all ExplorationUserDataModels for the given pairs of user ids
+        and exploration ids.
 
         Args:
             user_id_exp_id_combinations: list(tuple(str, str)). A list of
-                combinations of user_ids and exploration ids for which
+                combinations of user_ids and exploration ids pairs for which
                 ExplorationUserDataModels are to be fetched.
 
         Returns:
