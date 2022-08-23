@@ -2548,9 +2548,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         return states_dict
 
-    #############################################
+    # ############################################.
     # Fix validation errors for exploration state.
-    #############################################
+    # ############################################.
     @classmethod
     def _update_general_state(
         cls, states_dict: Dict[str, state_domain.StateDict]
@@ -2931,12 +2931,19 @@ class Exploration(translation_domain.BaseTranslatableObject):
         #     return False
         # return True
 
+        if earlier_rule['rule_type'] != 'IsExactlyEqualTo':
+            return True
+        return later_rule['rule_type'] in (
+            'IsExactlyEqualTo', 'IsEquivalentTo',
+            'IsEquivalentToAndInSimplestForm'
+        )
+
         if earlier_rule['rule_type'] in (
             'HasDenominatorEqualTo', 'IsEquivalentTo', 'IsLessThan'
             'IsEquivalentToAndInSimplestForm', 'IsGreaterThan'
         ):
             return True
-        return later_rule['rule_type'] in (
+        return later_rule['rule_type'] not in (
             'IsExactlyEqualTo', 'IsEquivalentTo',
             'IsEquivalentToAndInSimplestForm'
         )
@@ -3201,8 +3208,22 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return answer_groups
 
     @classmethod
-    def _text_interaction_contains_rule_should_come_after(cls, answer_groups):
-        """
+    def _text_interaction_contains_rule_should_come_after(
+        cls,
+        answer_groups: List[state_domain.AnswerGroup]
+    ) -> List[state_domain.AnswerGroup]:
+        """In TextInput interaction `contains` rule should always come
+        after any other rule where the `contains` string is a substring
+        of the other rule's string. Otherwise the other rule will become
+        redundant and will never be match
+
+        Args:
+            answer_groups: List[state_domain.AnswerGroup]. The list of answer
+                groups of a state.
+
+        Returns:
+            answer_groups: List[state_domain.AnswerGroup]. The updated list of
+            answer groups of a state.
         """
         seen_strings_contains = []
         for answer_group in answer_groups:
@@ -3226,8 +3247,22 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return answer_groups
 
     @classmethod
-    def _text_interaction_starts_with_rule_should_come_after(cls, answer_groups):
-        """
+    def _text_interaction_starts_with_rule_should_come_after(
+        cls,
+        answer_groups: List[state_domain.AnswerGroup]
+    ) -> List[state_domain.AnswerGroup]:
+        """In TextInput interaction `starts-with` rule should always come
+        after any other rule where a `starts-with` string is a prefix of
+        the other rule's string. Otherwise the other rule will become
+        redundant and will never be match
+
+        Args:
+            answer_groups: List[state_domain.AnswerGroup]. The list of answer
+                groups of a state.
+
+        Returns:
+            answer_groups: List[state_domain.AnswerGroup]. The updated list of
+            answer groups of a state.
         """
         seen_strings_startswith = []
         for answer_group in answer_groups:
@@ -3249,9 +3284,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 answer_groups.remove(answer_group)
         return answer_groups
 
-    #########################################################
+    # ########################################################.
     # Fix validation errors for exploration state interaction.
-    #########################################################
+    # ########################################################.
     @classmethod
     def _update_general_state_interaction(
         cls, states_dict: Dict[str, state_domain.StateDict],
@@ -3520,9 +3555,9 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
         return states_dict
 
-    #################################################
+    # ################################################.
     # Fix validation errors for exploration state RTE.
-    #################################################
+    # ################################################.
     @classmethod
     def _update_general_state_rte(
         cls, states_dict: Dict[str, state_domain.StateDict]
