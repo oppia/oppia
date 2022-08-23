@@ -1649,7 +1649,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
 
         Args:
             user_id_exp_id_combinations: list(tuple(str, str)). A list of
-                combinations of user_ids and exploration ids pairs for which
+                combinations of user_id and exploration_id pairs for which
                 ExplorationUserDataModels are to be fetched.
 
         Returns:
