@@ -356,8 +356,8 @@ var ExplorationEditorPage = function() {
   this.navigateToMainTab = async function() {
     await action.waitForAutosave();
     await action.click('Main tab button', navigateToMainTabButton);
-    // Wait for the appearing and disappearing for main tab before proceeding
-    // further.
+    // Wait for the appearing and disappearing action to get completed after
+    // the main tab button is clicked.
     // eslint-disable-next-line oppia/e2e-practices
     await browser.pause(2000);
   };

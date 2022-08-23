@@ -67,11 +67,10 @@ var getValue = async function(elementName, element) {
   return await element.getValue();
 };
 
-
 var select = async function(selectorName, selectorElement, optionToSelect) {
   await waitFor.visibilityOf(
     selectorElement,
-    `${selectorName} is not present to select ${optionToSelect}`
+    `${selectorName} is not visible to select ${optionToSelect}`
   );
   await selectorElement.selectByVisibleText(optionToSelect);
 };

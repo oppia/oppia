@@ -884,9 +884,6 @@ var ExplorationEditorMainTab = function() {
       '.e2e-test-state-name-submit');
     await action.click('State Name Submit button', stateNameSubmitButton);
 
-    // Wait for state name container to completely disappear
-    // and re-appear again.
-
     // We need to use browser.pause() in order to wait for the state name
     // container to disappear as webdriverio checks for its presence even before
     // it disappears.
