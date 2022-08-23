@@ -56,6 +56,10 @@ class SetupTests(test_utils.GenericTestBase):
             return MockCompilerContextManager()
         self.swap_print = self.swap(
             common, 'print_each_string_after_two_new_lines', mock_print)
+
+        # We need to create a swap for install_third_party_libs because
+        # scripts/start.py installs third party libraries whenever it is
+        # imported. 
         self.swap_install_third_party_libs = self.swap(
             install_third_party_libs, 'main', lambda: None)
         self.swap_extend_index_yaml = self.swap(
@@ -94,10 +98,14 @@ class SetupTests(test_utils.GenericTestBase):
                             start.main(args=[])
 
         self.assertIn(
-            ['INFORMATION',
-            'Local development server is ready! Opening a default web '
-            'browser window pointing to it: '
-            'http://localhost:%s/' % PORT_NUMBER_FOR_GAE_SERVER],
+            [
+                'INFORMATION',
+                (
+                    'Local development server is ready! Opening a default web '
+                    'browser window pointing to it: '
+                    'http://localhost:%s/' % PORT_NUMBER_FOR_GAE_SERVER
+                )
+            ],
             self.print_arr)
 
     def test_start_servers_successfully_in_production_mode(self) -> None:
@@ -114,10 +122,14 @@ class SetupTests(test_utils.GenericTestBase):
                             start.main(args=['--prod_env'])
 
         self.assertIn(
-            ['INFORMATION',
-            'Local development server is ready! Opening a default web '
-            'browser window pointing to it: '
-            'http://localhost:%s/' % PORT_NUMBER_FOR_GAE_SERVER],
+            [
+                'INFORMATION',
+                (
+                    'Local development server is ready! Opening a default web '
+                    'browser window pointing to it: '
+                    'http://localhost:%s/' % PORT_NUMBER_FOR_GAE_SERVER
+                )
+            ],
             self.print_arr)
 
     def test_start_servers_successfully_in_maintenance_mode(self) -> None:
@@ -137,10 +149,14 @@ class SetupTests(test_utils.GenericTestBase):
                                 args=['--maintenance_mode', '--source_maps'])
 
         self.assertIn(
-            ['INFORMATION',
-            'Local development server is ready! Opening a default web '
-            'browser window pointing to it: '
-            'http://localhost:%s/' % PORT_NUMBER_FOR_GAE_SERVER],
+            [
+                'INFORMATION',
+                (
+                    'Local development server is ready! Opening a default web '
+                    'browser window pointing to it: '
+                    'http://localhost:%s/' % PORT_NUMBER_FOR_GAE_SERVER
+                )
+            ],
             self.print_arr)
 
     def test_could_not_start_new_server_when_port_is_in_use(self) -> None:

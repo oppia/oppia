@@ -16,6 +16,8 @@
 
 from __future__ import annotations
 
+import builtins
+import os
 import sys
 
 from core.tests import test_utils
@@ -33,7 +35,20 @@ class SetupTests(test_utils.GenericTestBase):
     """Unit tests for setup.py."""
 
     def test_setuptools_is_invoked_with_correct_parameters(self) -> None:
-        with open('requirements.txt', encoding='utf-8') as requirements_txt: # pylint: disable=replace-disallowed-function-calls
+        with open('dummy_requirements.txt', 'w', encoding='utf-8') as f:
+            f.write('module1==2.1.2\n')
+            f.write('module2==3.2.3\n')
+            f.write('module3==4.3.4\n')
+
+        dummy_file_object = open('dummy_requirements.txt', encoding='utf-8')
+        
+        swap_open = self.swap_with_checks(
+            builtins, 'open',
+            lambda *unused_args, **unused_kwargs: dummy_file_object,
+            expected_args=(('requirements.txt',),))
+        
+        with open(
+            'dummy_requirements.txt', encoding='utf-8') as requirements_txt: # pylint: disable=replace-disallowed-function-calls
             # The 'parse_requirements' returns a list of 'Requirement' objects.
             # We need to transform these to strings using the str() function.
             required_packages = [
@@ -54,13 +69,16 @@ class SetupTests(test_utils.GenericTestBase):
                 'include_package_data': True,
             }])
 
-        dummy_path = []
-        for path in sys.path:
-            if common.GOOGLE_CLOUD_SDK_HOME not in path:
-                dummy_path.append(path)
+        dummy_path = [
+            path for path in sys.path 
+            if common.GOOGLE_CLOUD_SDK_HOME not in path
+        ]
 
         swap_path = self.swap(sys, 'path', dummy_path)
 
-        with swap_setup, swap_path:
+        with swap_setup, swap_path, swap_open:
             import setup # pylint: disable=import-error
             setup.main()
+        
+        dummy_file_object.close()
+        os.remove('dummy_requirements.txt')
