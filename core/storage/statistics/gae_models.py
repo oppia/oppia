@@ -2057,7 +2057,10 @@ class StateAnswersModel(base_models.BaseModel):
                         1, main_shard.shard_count + 1)]
                 state_answer_models = cls.get_multi(shard_ids)
                 for state_answer_model in state_answer_models:
-                    # Filtering out the None cases for MyPy type checking.
+                    # Filtering out the None cases for MyPy type checking,
+                    # because shard deletion is not supported and we expect
+                    # main_shard.shard_count to be present, since the master
+                    # model keeps track of the number of shards explicitly.
                     assert state_answer_model is not None
                     all_models.append(state_answer_model)
             return all_models

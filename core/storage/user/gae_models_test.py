@@ -1190,6 +1190,30 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
             deleted=True
         ).put()
 
+    def test_raises_error_if_no_user_setting_model_exist_for_invalid_creator_id(
+        self
+    ) -> None:
+        user_models.UserSettingsModel(
+            id='test_user',
+            email='some@email.com'
+        ).put()
+        test_creator_ids = self.CREATOR_IDS + ['Invalid_id']
+
+        user_models.UserSubscriptionsModel(
+            id='test_user',
+            creator_ids=test_creator_ids,
+            collection_ids=self.COLLECTION_IDS,
+            exploration_ids=self.EXPLORATION_IDS,
+            general_feedback_thread_ids=self.GENERAL_FEEDBACK_THREAD_IDS,
+            last_checked=self.GENERIC_DATETIME
+        ).put()
+
+        with self.assertRaisesRegex(  # type: ignore[no-untyped-call]
+            Exception,
+            'No UserSettingsModel exist for the given creator_id: Invalid_id'
+        ):
+            user_models.UserSubscriptionsModel.export_data('test_user')
+
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             user_models.UserSubscriptionsModel.get_deletion_policy(),
