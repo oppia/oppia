@@ -12,7 +12,7 @@
 # distributed under the License is distributed on an "AS-IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
-# limitations under the License.]
+# limitations under the License.
 
 # Currently, the classroom data is stored in the config model and we are
 # planning to migrate the storage into a new Classroom model. After the

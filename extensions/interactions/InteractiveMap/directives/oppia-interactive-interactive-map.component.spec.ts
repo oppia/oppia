@@ -246,7 +246,9 @@ describe('InteractiveInteractiveMapComponent', () => {
     component.leafletMouseOut();
 
     expect(component.overlayStyle).toEqual({
-      'background-color': '#fff'
+      'background-color': '#fff',
+      opacity: 0,
+      'z-index': 0
     });
   });
 
